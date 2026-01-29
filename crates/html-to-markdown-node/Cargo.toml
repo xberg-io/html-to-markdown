@@ -41,8 +41,6 @@ async-trait = "0.1"
 tokio = { version = "1", features = ["rt", "sync"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
-[target.'cfg(not(target_os = "windows"))'.dependencies]
 pprof = { version = "0.15", features = ["flamegraph"], optional = true }
 
 [target.'cfg(all(any(windows, unix), target_arch = "x86_64", not(target_env = "musl")))'.dependencies]

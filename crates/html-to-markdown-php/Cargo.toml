@@ -24,8 +24,6 @@ crate-type = ["cdylib"]
 html-to-markdown-rs = { workspace = true, features = ["inline-images", "metadata", "visitor"] }
 html-to-markdown-bindings-common = { path = "../html-to-markdown-bindings-common", version = "2.24.1", features = ["metadata", "inline-images"] }
 ext-php-rs = { workspace = true }
-
-[target.'cfg(not(target_os = "windows"))'.dependencies]
 pprof = { version = "0.15", features = ["flamegraph"], optional = true }
 
 [features]

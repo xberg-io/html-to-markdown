@@ -30,8 +30,6 @@ pyo3-async-runtimes = { version = "0.27", features = ["tokio-runtime"] }
 tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 async-trait.workspace = true
 once_cell.workspace = true
-
-[target.'cfg(not(target_os = "windows"))'.dependencies]
 pprof = { version = "0.15", features = ["flamegraph"], optional = true }
 
 [dev-dependencies]
