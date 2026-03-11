@@ -1465,7 +1465,7 @@ jobs:
         uses: kreuzberg-dev/actions/publish-hex@v1
         with:
           package-dir: packages/elixir
-          dry-run: "false"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
           HEX_API_KEY: ${{ secrets.HEX_TOKEN }}
 
@@ -1750,6 +1750,24 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Wait for npm indexing (x64)
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "25"
+
+      - name: Wait for npm indexing (arm64)
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "25"
+
       - name: Publish main Node package
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         uses: kreuzberg-dev/actions/publish-npm@v1
@@ -1758,6 +1776,15 @@ jobs:
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Wait for main Node package indexing
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-node"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "25"
 
       - name: Install TypeScript wrapper dependencies from npm
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
@@ -2007,4 +2034,4 @@ jobs:
           tag: ${{ needs.prepare.outputs.tag }}
           version: ${{ needs.prepare.outputs.version }}
           github-repo: kreuzberg-dev/html-to-markdown
-          dry-run: "false"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
