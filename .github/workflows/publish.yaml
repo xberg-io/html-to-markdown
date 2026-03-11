@@ -1389,9 +1389,10 @@ jobs:
 
       - name: Publish gems
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-rubygems.outputs.exists != 'true' }}
-        working-directory: dist
-        run: ../scripts/publish/ruby/publish-gems.sh
-        shell: bash
+        uses: kreuzberg-dev/actions/publish-rubygems@v1
+        with:
+          gems-dir: dist
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
       - name: Ruby gem already published
         if: ${{ needs.check-rubygems.outputs.exists == 'true' && needs.prepare.outputs.dry_run != 'true' }}
@@ -1450,10 +1451,21 @@ jobs:
         run: scripts/publish/elixir/check-hex-version.sh
         shell: bash
 
+      - name: Stage Rust core and generate lockfile
+        if: ${{ steps.hex_check.outputs.exists != 'true' }}
+        shell: bash
+        run: |
+          scripts/publish/elixir/stage-rust-core.sh
+          pushd packages/elixir/native/html_to_markdown_elixir >/dev/null
+          cargo generate-lockfile
+          popd >/dev/null
+
       - name: Publish to Hex.pm
         if: ${{ steps.hex_check.outputs.exists != 'true' }}
-        run: scripts/publish/elixir/publish-hex.sh
-        shell: bash
+        uses: kreuzberg-dev/actions/publish-hex@v1
+        with:
+          package-dir: packages/elixir
+          dry-run: "false"
         env:
           HEX_API_KEY: ${{ secrets.HEX_TOKEN }}
 
@@ -1508,11 +1520,15 @@ jobs:
           ref: ${{ needs.prepare.outputs.ref }}
 
       - name: Trigger Packagist Update
+        uses: kreuzberg-dev/actions/publish-packagist@v1
+        with:
+          packagist-username: kreuzberg-dev
+          package-name: kreuzberg/html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repository-url: https://github.com/kreuzberg-dev/html-to-markdown
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
-        run: |
-          curl -X POST "https://packagist.org/api/update-package?username=kreuzberg-dev&apiToken=${PACKAGIST_TOKEN}" \
-            -d "repository=https://github.com/kreuzberg-dev/html-to-markdown"
+          PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
 
   java-ffi:
     name: Build Java native FFI libraries
@@ -1649,11 +1665,27 @@ jobs:
         run: scripts/publish/maven/prefer-gpg2.sh
         shell: bash
 
-      - name: Release Maven package
-        env:
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: scripts/publish/maven/release-package.sh
+      - name: Copy native libraries into resources
         shell: bash
+        run: |
+          if [[ -d "java-ffi-artifacts" ]]; then
+            echo "Copying native libraries from java-ffi-artifacts..."
+            scripts/publish/java/copy-native-libs.sh java-ffi-artifacts
+          else
+            echo "Warning: java-ffi-artifacts directory not found"
+          fi
+
+      - name: Release Maven package
+        uses: kreuzberg-dev/actions/publish-maven@v1
+        with:
+          pom-file: packages/java/pom.xml
+          maven-profile: publish
+          extra-args: -DskipTests
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
   publish-node:
     name: Publish Node packages
@@ -1711,22 +1743,21 @@ jobs:
 
       - name: Publish native binary packages
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          packages-dir: crates/html-to-markdown-node/npm
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          # NOTE: Using NPM_TOKEN for initial scoped package publishing
-          # After first successful publish, we can migrate to trusted publishing
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: scripts/publish/node/publish-native-packages.sh
-        shell: bash
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish main Node package
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/html-to-markdown-node
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          # NOTE: Using NPM_TOKEN for initial scoped package publishing
-          # After first successful publish, we can migrate to trusted publishing
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: crates/html-to-markdown-node
-        run: ../../scripts/publish/node/publish-main-package.sh
-        shell: bash
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install TypeScript wrapper dependencies from npm
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
@@ -1741,10 +1772,12 @@ jobs:
 
       - name: Publish TypeScript wrapper package
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: packages/typescript
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: scripts/publish/typescript/publish-package.sh
-        shell: bash
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-wasm:
     name: Publish WASM package
@@ -1787,34 +1820,13 @@ jobs:
         run: npm install -g npm@latest
         shell: bash
 
-      - name: Configure npm authentication
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cat > ~/.npmrc <<'EOF'
-          //registry.npmjs.org/:_authToken=${NPM_TOKEN}
-          @kreuzberg:registry=https://registry.npmjs.org/
-          EOF
-        shell: bash
-
       - name: Publish WASM package
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/html-to-markdown-wasm
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd crates/html-to-markdown-wasm
-          publish_log=$(mktemp)
-          set +e
-          npm publish --access public 2>&1 | tee "${publish_log}"
-          status=${PIPESTATUS[0]}
-          set -e
-          if [[ "${status}" -ne 0 ]]; then
-            if grep -q "previously published versions" "${publish_log}"; then
-              echo "WASM package already published; skipping."
-            else
-              exit "${status}"
-            fi
-          fi
-        shell: bash
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   homebrew-bottles:
     name: Build Homebrew bottles (${{ matrix.bottle_tag }})
@@ -1970,26 +1982,12 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
-      - name: Extract release info
-        id: release
-        env:
-          TAG: ${{ needs.prepare.outputs.tag }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-        run: scripts/publish/homebrew/extract-release-info.sh
-
       - name: Download bottle artifacts
         uses: actions/download-artifact@v8
         with:
           pattern: homebrew-bottle-*
           path: dist/homebrew
           merge-multiple: true
-
-      - name: Extract bottle hashes
-        id: bottles
-        env:
-          TAG: ${{ needs.prepare.outputs.tag }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-        run: scripts/publish/homebrew/extract-bottle-hashes.sh dist/homebrew
 
       - name: Setup Git credentials
         env:
@@ -2001,8 +1999,12 @@ jobs:
           git config --global user.email "bot@kreuzberg.dev"
 
       - name: Update Homebrew formula with bottles
-        env:
-          TAG: ${{ needs.prepare.outputs.tag }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-          DRY_RUN: 'false'
-        run: scripts/publish/homebrew/update-formula-with-bottles.sh dist/homebrew homebrew-tap
+        uses: kreuzberg-dev/actions/publish-homebrew@v1
+        with:
+          bottles-dir: dist/homebrew
+          formula-name: html-to-markdown
+          tap-repo: kreuzberg-dev/homebrew-tap
+          tag: ${{ needs.prepare.outputs.tag }}
+          version: ${{ needs.prepare.outputs.version }}
+          github-repo: kreuzberg-dev/html-to-markdown
+          dry-run: "false"
