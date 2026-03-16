@@ -144,7 +144,7 @@ jobs:
 
       - name: Install PHP deps
         if: env.FRAMEWORKS == 'php'
-        uses: ramsey/composer-install@a35c6ebd3d08125aaf8852dff361e686a1a67947 # 3.2.0
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           working-directory: packages/php
           dependency-versions: locked
@@ -278,7 +278,7 @@ jobs:
 
       - name: Install PHP deps
         if: env.FRAMEWORKS == 'php'
-        uses: ramsey/composer-install@a35c6ebd3d08125aaf8852dff361e686a1a67947 # 3.2.0
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           working-directory: packages/php
           dependency-versions: locked

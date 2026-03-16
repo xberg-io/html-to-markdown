@@ -58,14 +58,14 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@a35c6ebd3d08125aaf8852dff361e686a1a67947 # 3.2.0
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           dependency-versions: locked
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
       - name: Install PHP package Composer dependencies
-        uses: ramsey/composer-install@a35c6ebd3d08125aaf8852dff361e686a1a67947 # 3.2.0
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
           dependency-versions: locked
           working-directory: packages/php
