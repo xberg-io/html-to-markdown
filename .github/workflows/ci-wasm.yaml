@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           target: wasm32-unknown-unknown
           use-sccache: false
@@ -60,10 +60,10 @@ jobs:
         shell: bash
 
       - name: Setup workspace
-        uses: kreuzberg-dev/actions/setup-node-workspace@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-node-workspace@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Build WASM (all targets)
-        uses: kreuzberg-dev/actions/build-wasm-package@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/build-wasm-package@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           crate-dir: crates/html-to-markdown-wasm
 
@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           toolchain: stable
           target: wasm32-unknown-unknown

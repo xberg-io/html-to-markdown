@@ -51,7 +51,7 @@ jobs:
           coverage: none
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Capture php-config path
         run: scripts/ci/php/set-php-config.sh
@@ -74,7 +74,7 @@ jobs:
 
       - name: Build PHP extension
         id: build-php-extension
-        uses: kreuzberg-dev/actions/build-php-extension@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/build-php-extension@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php

@@ -134,7 +134,7 @@ jobs:
     steps:
       - name: Check PyPI version
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: pypi
           package: html-to-markdown
@@ -152,7 +152,7 @@ jobs:
     steps:
       - name: Check npm packages
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/html-to-markdown-node"
@@ -171,7 +171,7 @@ jobs:
     steps:
       - name: Check RubyGems version
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: rubygems
           package: html-to-markdown
@@ -187,7 +187,7 @@ jobs:
     steps:
       - name: Check Hex version
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: hex
           package: html_to_markdown
@@ -203,7 +203,7 @@ jobs:
     steps:
       - name: Check Maven version
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: maven
           package: "dev.kreuzberg:html-to-markdown"
@@ -219,7 +219,7 @@ jobs:
     steps:
       - name: Check NuGet package
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: nuget
           package: KreuzbergDev.HtmlToMarkdown
@@ -235,7 +235,7 @@ jobs:
     steps:
       - name: Check Packagist version
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: packagist
           package: kreuzberg-dev/html-to-markdown
@@ -253,7 +253,7 @@ jobs:
     steps:
       - name: Query crates.io
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: cratesio
           package: html-to-markdown-rs
@@ -281,7 +281,7 @@ jobs:
     steps:
       - name: Check Homebrew tap for formula
         id: check
-        uses: kreuzberg-dev/actions/check-registry@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/check-registry@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: homebrew
           package: html-to-markdown
@@ -311,7 +311,7 @@ jobs:
         shell: bash
 
       - name: Build wheels
-        uses: kreuzberg-dev/actions/build-python-wheels@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/build-python-wheels@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           python-version: "3.13"
           package-dir: packages/python
@@ -356,7 +356,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -405,7 +405,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           toolchain: stable
 
@@ -462,7 +462,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Setup Node
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -652,7 +652,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Add wasm32 target
         run: scripts/common/ensure-wasm-target.sh
@@ -729,7 +729,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Add compilation target
         env:
@@ -917,7 +917,7 @@ jobs:
           otp-version: "28.1"
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Install Hex and Rebar
         run: scripts/publish/elixir/install-hex-rebar.sh
@@ -1026,7 +1026,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Build FFI library
         env:
@@ -1072,7 +1072,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Package Go FFI library
         env:
@@ -1119,7 +1119,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Package C FFI distribution
         env:
@@ -1154,7 +1154,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Add Windows Rust target
         if: runner.os == 'Windows'
@@ -1332,7 +1332,7 @@ jobs:
           path: dist
 
       - name: Publish to PyPI
-        uses: kreuzberg-dev/actions/publish-pypi@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-pypi@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           packages-dir: dist
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1376,7 +1376,7 @@ jobs:
 
       - name: Publish gems
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-rubygems.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-rubygems@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-rubygems@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           gems-dir: dist
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1421,7 +1421,7 @@ jobs:
           otp-version: "28.1"
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Install Hex/Rebar
         run: scripts/publish/elixir/install-hex-rebar.sh
@@ -1440,7 +1440,7 @@ jobs:
           popd >/dev/null
 
       - name: Publish to Hex.pm
-        uses: kreuzberg-dev/actions/publish-hex@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-hex@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           package-dir: packages/elixir
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1468,7 +1468,7 @@ jobs:
           path: dist
 
       - name: Publish to NuGet
-        uses: kreuzberg-dev/actions/publish-nuget@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-nuget@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           packages-dir: dist
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1491,7 +1491,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.ref }}
 
       - name: Trigger Packagist Update
-        uses: kreuzberg-dev/actions/publish-packagist@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-packagist@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           packagist-username: kreuzberg-dev
           package-name: kreuzberg/html-to-markdown
@@ -1536,7 +1536,7 @@ jobs:
         shell: bash
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Build FFI library
         env:
@@ -1630,7 +1630,7 @@ jobs:
           rm -f /tmp/gpg-test.txt /tmp/gpg-test.txt.asc
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Prefer gpg2 binary
         run: scripts/publish/maven/prefer-gpg2.sh
@@ -1647,7 +1647,7 @@ jobs:
           fi
 
       - name: Release Maven package
-        uses: kreuzberg-dev/actions/publish-maven@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-maven@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           pom-file: packages/java/pom.xml
           maven-profile: publish
@@ -1714,7 +1714,7 @@ jobs:
 
       - name: Publish native binary packages
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           packages-dir: crates/html-to-markdown-node/npm
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1723,7 +1723,7 @@ jobs:
 
       - name: Wait for npm indexing (x64)
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/wait-for-package@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
@@ -1732,7 +1732,7 @@ jobs:
 
       - name: Wait for npm indexing (arm64)
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/wait-for-package@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
@@ -1741,7 +1741,7 @@ jobs:
 
       - name: Publish main Node package
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           package-dir: crates/html-to-markdown-node
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1750,7 +1750,7 @@ jobs:
 
       - name: Wait for main Node package indexing
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/wait-for-package@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           registry: npm
           package: "@kreuzberg/html-to-markdown-node"
@@ -1770,7 +1770,7 @@ jobs:
 
       - name: Publish TypeScript wrapper package
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           package-dir: packages/typescript
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1819,7 +1819,7 @@ jobs:
         shell: bash
 
       - name: Publish WASM package
-        uses: kreuzberg-dev/actions/publish-npm@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-npm@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           package-dir: crates/html-to-markdown-wasm
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -1997,7 +1997,7 @@ jobs:
           git config --global user.email "bot@kreuzberg.dev"
 
       - name: Update Homebrew formula with bottles
-        uses: kreuzberg-dev/actions/publish-homebrew@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/publish-homebrew@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           bottles-dir: dist/homebrew
           formula-name: html-to-markdown

@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           components: llvm-tools-preview
 
@@ -101,7 +101,7 @@ jobs:
 
       - name: Setup Node workspace
         if: env.FRAMEWORKS == 'node' || env.FRAMEWORKS == 'wasm'
-        uses: kreuzberg-dev/actions/setup-node-workspace@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-node-workspace@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Install wasm-pack
         if: env.FRAMEWORKS == 'wasm'
@@ -221,7 +221,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Setup Python + uv
         if: env.FRAMEWORKS == 'python'
@@ -261,7 +261,7 @@ jobs:
 
       - name: Setup Node workspace
         if: env.FRAMEWORKS == 'node'
-        uses: kreuzberg-dev/actions/setup-node-workspace@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-node-workspace@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Setup PHP
         if: env.FRAMEWORKS == 'php'
