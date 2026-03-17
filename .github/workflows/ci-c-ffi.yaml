@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           cache-key-prefix: c-ffi
           use-sccache: false
@@ -120,7 +120,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
         with:
           cache-key-prefix: c-ffi-windows
           use-sccache: false

@@ -44,7 +44,7 @@ jobs:
           otp-version: "28.1"
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@f43a03ba22ebb2cab85676d36968ac0f96c34215 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@c964c3c295858254aa86d78cf36bd66bd9364e9a # v1.0.0
 
       - name: Install Hex/Rebar
         run: scripts/ci/elixir/install-hex-rebar.sh
