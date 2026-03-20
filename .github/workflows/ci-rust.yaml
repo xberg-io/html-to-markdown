@@ -57,7 +57,7 @@ jobs:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Install Task
-        uses: go-task/setup-task@v1 # v1
+        uses: go-task/setup-task@v2 # v1
         with:
           version: 3.46.4
 
@@ -90,7 +90,7 @@ jobs:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Install Task
-        uses: go-task/setup-task@v1 # v1
+        uses: go-task/setup-task@v2 # v1
         with:
           version: 3.46.4
 
