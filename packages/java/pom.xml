@@ -45,7 +45,7 @@
         <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
         <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-        <checkstyle.version>13.3.0</checkstyle.version>
+        <checkstyle.version>13.4.0</checkstyle.version>
         <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
         <pmd.version>7.22.0</pmd.version>
         <central-publishing-plugin.version>0.10.0</central-publishing-plugin.version>
