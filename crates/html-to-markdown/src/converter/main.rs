@@ -308,6 +308,10 @@ pub(crate) fn walk_node(
 ) {
     let Some(node) = node_handle.get(parser) else { return };
 
+    if depth > options.max_depth {
+        return;
+    }
+
     match node {
         tl::Node::Raw(bytes) => {
             let raw = bytes.as_utf8_str();

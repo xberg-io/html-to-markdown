@@ -129,6 +129,8 @@ pub struct ConversionOptions {
     pub capture_svg: bool,
     #[pyo3(get, set)]
     pub infer_dimensions: bool,
+    #[pyo3(get, set)]
+    pub max_depth: usize,
 }
 
 #[pymethods]
@@ -173,7 +175,8 @@ impl ConversionOptions {
         extract_images=false,
         max_image_size=5242880u64,
         capture_svg=false,
-        infer_dimensions=true
+        infer_dimensions=true,
+        max_depth=100usize
     ))]
     pub fn new(
         heading_style: String,
@@ -214,6 +217,7 @@ impl ConversionOptions {
         max_image_size: u64,
         capture_svg: bool,
         infer_dimensions: bool,
+        max_depth: usize,
     ) -> Self {
         Self {
             heading_style,
@@ -255,6 +259,7 @@ impl ConversionOptions {
             max_image_size,
             capture_svg,
             infer_dimensions,
+            max_depth,
         }
     }
 }
@@ -301,6 +306,7 @@ impl ConversionOptions {
             max_image_size: self.max_image_size,
             capture_svg: self.capture_svg,
             infer_dimensions: self.infer_dimensions,
+            max_depth: self.max_depth,
         }
     }
 }

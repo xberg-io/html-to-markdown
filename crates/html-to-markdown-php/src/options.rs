@@ -131,6 +131,9 @@ pub fn parse_conversion_options(table: &ZendHashTable) -> PhpResult<ConversionOp
             "infer_dimensions" | "inferDimensions" => {
                 update.infer_dimensions = Some(read_bool(value, &key_str)?);
             }
+            "max_depth" | "maxDepth" => {
+                update.max_depth = Some(read_usize(value, &key_str)?);
+            }
             _ => {}
         }
     }

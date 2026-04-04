@@ -49,6 +49,7 @@ declare(strict_types=1);
  *   max_image_size?: int,
  *   capture_svg?: bool,
  *   infer_dimensions?: bool,
+ *   max_depth?: int,
  * }|null $options
  * @return array{
  *   content: string|null,

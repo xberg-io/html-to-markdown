@@ -615,6 +615,36 @@ fn test_regular_caret_link_not_affected() {
     assert!(result.contains("[^]"), "Non-anchor caret links should keep ^: {result}");
 }
 
+#[test]
+fn test_max_depth_truncates_deep_nesting() {
+    // Build HTML nested 10 levels deep: <div>...<p>deep</p>...</div>
+    let mut html = String::new();
+    for _ in 0..10 {
+        html.push_str("<div>");
+    }
+    html.push_str("<p>deep</p>");
+    for _ in 0..10 {
+        html.push_str("</div>");
+    }
+
+    // With max_depth=5, the inner <p> at depth 10 should be unreachable
+    let opts = html_to_markdown_rs::ConversionOptions::builder()
+        .max_depth(5)
+        .build();
+    let result = convert(&html, Some(opts)).unwrap();
+    assert!(
+        !result.contains("deep"),
+        "Content beyond max_depth should be skipped, got: {result}"
+    );
+
+    // With default max_depth (100), the same HTML should convert fine
+    let result = convert(&html, None).unwrap();
+    assert!(
+        result.contains("deep"),
+        "Default max_depth should allow 10 levels, got: {result}"
+    );
+}
+
 fn convert(
     html: &str,
     opts: Option<html_to_markdown_rs::ConversionOptions>,

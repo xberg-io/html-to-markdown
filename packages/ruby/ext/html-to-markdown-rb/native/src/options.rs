@@ -240,6 +240,9 @@ pub fn build_conversion_options(ruby: &Ruby, options: Option<Value>) -> Result<C
             "output_format" => {
                 update.output_format = Some(parse_output_format(val)?);
             }
+            "max_depth" => {
+                update.max_depth = Some(usize::try_convert(val)?);
+            }
             _ => {}
         }
         Ok(ForEach::Continue)

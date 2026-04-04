@@ -160,6 +160,9 @@ class ConversionOptions:
     infer_dimensions: bool = True
     """Infer image dimensions from data URIs."""
 
+    max_depth: int = 100
+    """Maximum DOM tree depth to recurse into. Nodes beyond this depth are silently skipped."""
+
 
 @dataclass
 class PreprocessingOptions:
