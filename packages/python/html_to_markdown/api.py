@@ -120,7 +120,7 @@ def _rust_options(
         rust_opts.capture_svg = options.capture_svg
     if not options.infer_dimensions:
         rust_opts.infer_dimensions = options.infer_dimensions
-    if options.max_depth != 100:
+    if options.max_depth is not None:
         rust_opts.max_depth = options.max_depth
     return rust_opts
 

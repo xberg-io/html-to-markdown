@@ -58,7 +58,7 @@ module HtmlToMarkdown
     max_image_size?: Integer,
     capture_svg?: bool,
     infer_dimensions?: bool,
-    max_depth?: Integer
+    max_depth?: Integer?
   }
 
   type text_direction = "ltr" | "rtl" | "auto" | nil

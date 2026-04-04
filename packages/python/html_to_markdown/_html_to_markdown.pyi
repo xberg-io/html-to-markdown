@@ -53,7 +53,7 @@ class ConversionOptions:
     max_image_size: int
     capture_svg: bool
     infer_dimensions: bool
-    max_depth: int
+    max_depth: int | None
 
     def __init__(
         self,
@@ -95,7 +95,7 @@ class ConversionOptions:
         max_image_size: int = 5_242_880,
         capture_svg: bool = False,
         infer_dimensions: bool = True,
-        max_depth: int = 100,
+        max_depth: int | None = None,
     ) -> None: ...
 
 class GridCell(TypedDict):

@@ -308,8 +308,10 @@ pub(crate) fn walk_node(
 ) {
     let Some(node) = node_handle.get(parser) else { return };
 
-    if depth > options.max_depth {
-        return;
+    if let Some(max_depth) = options.max_depth {
+        if depth > max_depth {
+            return;
+        }
     }
 
     match node {

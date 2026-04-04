@@ -627,9 +627,9 @@ fn test_max_depth_truncates_deep_nesting() {
         html.push_str("</div>");
     }
 
-    // With max_depth=5, the inner <p> at depth 10 should be unreachable
+    // With max_depth=Some(5), the inner <p> at depth 10 should be unreachable
     let opts = html_to_markdown_rs::ConversionOptions::builder()
-        .max_depth(5)
+        .max_depth(Some(5))
         .build();
     let result = convert(&html, Some(opts)).unwrap();
     assert!(

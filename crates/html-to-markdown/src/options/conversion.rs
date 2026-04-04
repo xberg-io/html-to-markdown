@@ -109,7 +109,8 @@ pub struct ConversionOptions {
     /// Infer image dimensions from data.
     pub infer_dimensions: bool,
     /// Maximum DOM tree depth to recurse into. Nodes beyond this depth are silently skipped.
-    pub max_depth: usize,
+    /// `None` means unlimited (default).
+    pub max_depth: Option<usize>,
 }
 
 impl Default for ConversionOptions {
@@ -153,7 +154,7 @@ impl Default for ConversionOptions {
             max_image_size: 5_242_880,
             capture_svg: false,
             infer_dimensions: true,
-            max_depth: 100,
+            max_depth: None,
         }
     }
 }
@@ -263,7 +264,12 @@ impl ConversionOptionsBuilder {
     builder_setter!(infer_dimensions, bool);
 
     // Safety limits
-    builder_setter!(max_depth, usize);
+    /// Set the maximum DOM tree depth. `None` means unlimited.
+    #[must_use]
+    pub fn max_depth(mut self, value: impl Into<Option<usize>>) -> Self {
+        self.0.max_depth = value.into();
+        self
+    }
 
     // Preprocessing
     /// Set the pre-processing options applied to the HTML before conversion.
