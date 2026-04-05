@@ -84,6 +84,8 @@ mod tests {
             max_image_size: None,
             capture_svg: None,
             infer_dimensions: None,
+            link_style: None,
+            max_depth: None,
         };
 
         let rust_opts: ConversionOptions = opts.into();
