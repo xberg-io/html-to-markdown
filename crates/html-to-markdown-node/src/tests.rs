@@ -40,6 +40,7 @@ mod tests {
             encoding: None,
             debug: None,
             strip_tags: None,
+            max_depth: None,
         };
 
         let rust_opts: RustConversionOptions = opts.into();

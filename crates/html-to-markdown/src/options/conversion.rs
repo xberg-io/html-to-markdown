@@ -437,7 +437,9 @@ impl ConversionOptions {
         apply!(max_image_size);
         apply!(capture_svg);
         apply!(infer_dimensions);
-        apply!(max_depth);
+        if let Some(v) = update.max_depth {
+            self.max_depth = Some(v);
+        }
         if let Some(preprocessing) = update.preprocessing {
             self.preprocessing.apply_update(preprocessing);
         }
