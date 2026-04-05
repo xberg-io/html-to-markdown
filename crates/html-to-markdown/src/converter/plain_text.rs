@@ -66,7 +66,7 @@ pub fn extract_plain_text(dom: &tl::VDom, parser: &tl::Parser, options: &Convers
     let mut list_ctx = ListContext::None;
 
     for child_handle in dom.children() {
-        walk_plain(child_handle, parser, &mut buf, options, false, &mut list_ctx);
+        walk_plain(child_handle, parser, &mut buf, options, false, &mut list_ctx, 0);
     }
 
     post_process(&mut buf);
@@ -81,10 +81,17 @@ fn walk_plain(
     options: &ConversionOptions,
     in_pre: bool,
     list_ctx: &mut ListContext,
+    depth: usize,
 ) {
     let Some(node) = node_handle.get(parser) else {
         return;
     };
+
+    if let Some(max_depth) = options.max_depth {
+        if depth > max_depth {
+            return;
+        }
+    }
 
     match node {
         tl::Node::Raw(bytes) => {
@@ -121,7 +128,7 @@ fn walk_plain(
                 }
                 "pre" => {
                     ensure_blank_line(buf);
-                    walk_children(tag, parser, buf, options, true, list_ctx);
+                    walk_children(tag, parser, buf, options, true, list_ctx, depth + 1);
                     ensure_blank_line(buf);
                 }
                 "img" => {
@@ -136,13 +143,13 @@ fn walk_plain(
                 }
                 "table" => {
                     ensure_blank_line(buf);
-                    walk_table(tag, parser, buf, options);
+                    walk_table(tag, parser, buf, options, depth + 1);
                     ensure_blank_line(buf);
                 }
                 "ul" => {
                     ensure_newline(buf);
                     let mut child_ctx = ListContext::Unordered;
-                    walk_children(tag, parser, buf, options, false, &mut child_ctx);
+                    walk_children(tag, parser, buf, options, false, &mut child_ctx, depth + 1);
                     ensure_newline(buf);
                 }
                 "ol" => {
@@ -154,7 +161,7 @@ fn walk_plain(
                         .unwrap_or(1);
                     ensure_newline(buf);
                     let mut child_ctx = ListContext::Ordered { next_index: start };
-                    walk_children(tag, parser, buf, options, false, &mut child_ctx);
+                    walk_children(tag, parser, buf, options, false, &mut child_ctx, depth + 1);
                     ensure_newline(buf);
                 }
                 "li" => {
@@ -172,17 +179,17 @@ fn walk_plain(
                             buf.push_str("- ");
                         }
                     }
-                    walk_children(tag, parser, buf, options, false, list_ctx);
+                    walk_children(tag, parser, buf, options, false, list_ctx, depth + 1);
                     ensure_newline(buf);
                 }
                 _ if BLOCK_TAGS.contains(&tag_str) => {
                     ensure_blank_line(buf);
-                    walk_children(tag, parser, buf, options, in_pre, list_ctx);
+                    walk_children(tag, parser, buf, options, in_pre, list_ctx, depth + 1);
                     ensure_blank_line(buf);
                 }
                 _ => {
                     // Inline elements and structural containers (html, body, etc.)
-                    walk_children(tag, parser, buf, options, in_pre, list_ctx);
+                    walk_children(tag, parser, buf, options, in_pre, list_ctx, depth + 1);
                 }
             }
         }
@@ -198,19 +205,20 @@ fn walk_children(
     options: &ConversionOptions,
     in_pre: bool,
     list_ctx: &mut ListContext,
+    depth: usize,
 ) {
     let children = tag.children();
     let top = children.top();
     for child in top.iter() {
-        walk_plain(child, parser, buf, options, in_pre, list_ctx);
+        walk_plain(child, parser, buf, options, in_pre, list_ctx, depth);
     }
 }
 
 /// Walk a `<table>` element, extracting cells as tab-separated, rows as newline-separated.
-fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, options: &ConversionOptions) {
+fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, options: &ConversionOptions, depth: usize) {
     // Collect all <tr> node handles by recursing into the table
     let mut row_handles = Vec::new();
-    collect_descendant_handles(table_tag, parser, "tr", &mut row_handles);
+    collect_descendant_handles(table_tag, parser, "tr", &mut row_handles, 0);
 
     for (row_idx, row_handle) in row_handles.iter().enumerate() {
         if row_idx > 0 {
@@ -240,7 +248,7 @@ fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, op
             let mut cell_buf = String::new();
             if let Some(tl::Node::Tag(cell_tag)) = cell_handle.get(parser) {
                 let mut cell_list_ctx = ListContext::None;
-                walk_children(cell_tag, parser, &mut cell_buf, options, false, &mut cell_list_ctx);
+                walk_children(cell_tag, parser, &mut cell_buf, options, false, &mut cell_list_ctx, depth + 1);
             }
             buf.push_str(cell_buf.trim());
         }
@@ -248,12 +256,18 @@ fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, op
 }
 
 /// Recursively collect all descendant `NodeHandle`s matching `target_tag` (by cloning handles).
+///
+/// Uses a hard-coded depth limit of 500 to prevent stack overflow on pathological input.
 fn collect_descendant_handles(
     tag: &tl::HTMLTag,
     parser: &tl::Parser,
     target_tag: &str,
     result: &mut Vec<tl::NodeHandle>,
+    depth: usize,
 ) {
+    if depth > 500 {
+        return;
+    }
     let children = tag.children();
     let top = children.top();
     for child in top.iter() {
@@ -261,7 +275,7 @@ fn collect_descendant_handles(
             if child_tag.name().as_utf8_str().eq_ignore_ascii_case(target_tag) {
                 result.push(*child);
             } else {
-                collect_descendant_handles(child_tag, parser, target_tag, result);
+                collect_descendant_handles(child_tag, parser, target_tag, result, depth + 1);
             }
         }
     }
