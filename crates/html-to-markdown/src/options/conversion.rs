@@ -108,7 +108,8 @@ pub struct ConversionOptions {
     pub capture_svg: bool,
     /// Infer image dimensions from data.
     pub infer_dimensions: bool,
-    /// Maximum DOM tree depth to recurse into. Nodes beyond this depth are silently skipped.
+    /// Maximum DOM tree depth to recurse into. When the depth is exceeded, conversion
+    /// returns a [`ConversionError::InvalidInput`](crate::error::ConversionError::InvalidInput) error.
     /// `None` means unlimited (default).
     pub max_depth: Option<usize>,
 }

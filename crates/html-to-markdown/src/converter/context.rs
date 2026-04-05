@@ -102,6 +102,8 @@ pub struct Context {
     #[cfg(feature = "visitor")]
     /// Stores the first visitor error encountered during traversal.
     pub(crate) visitor_error: Rc<RefCell<Option<String>>>,
+    /// Set when DOM depth exceeds `max_depth` during traversal.
+    pub(crate) depth_exceeded: std::cell::Cell<bool>,
     /// Optional structure collector for building a [`crate::types::DocumentStructure`].
     ///
     /// Populated when `options.include_document_structure == true`.
@@ -189,6 +191,7 @@ impl Context {
             visitor: visitor.clone(),
             #[cfg(feature = "visitor")]
             visitor_error: Rc::new(RefCell::new(None)),
+            depth_exceeded: std::cell::Cell::new(false),
             structure_collector,
             reference_collector,
         }
