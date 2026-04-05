@@ -645,30 +645,6 @@ fn test_max_depth_rejects_deep_nesting() {
     );
 }
 
-#[test]
-fn test_max_depth_rejects_deep_nesting_plain_text() {
-    let mut html = String::new();
-    for _ in 0..10 {
-        html.push_str("<div>");
-    }
-    html.push_str("<p>deep</p>");
-    for _ in 0..10 {
-        html.push_str("</div>");
-    }
-
-    // Plain text path also enforces max_depth
-    let opts = ConversionOptions {
-        output_format: html_to_markdown_rs::OutputFormat::Plain,
-        max_depth: Some(5),
-        ..Default::default()
-    };
-    let err = html_to_markdown_rs::convert(&html, Some(opts)).unwrap_err();
-    assert!(
-        err.to_string().contains("max_depth"),
-        "Error should mention max_depth, got: {err}"
-    );
-}
-
 fn convert(
     html: &str,
     opts: Option<html_to_markdown_rs::ConversionOptions>,

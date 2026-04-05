@@ -277,7 +277,7 @@ pub(crate) fn convert_html_impl(
     // If plain text was requested, discard the markdown output and return plain text.
     // The full pipeline was still run above so that metadata + visitor callbacks fire.
     if is_plain_text {
-        let plain = extract_plain_text(&dom, parser, options)?;
+        let plain = extract_plain_text(&dom, parser, options);
         let document =
             structure_collector.and_then(|sc| std::rc::Rc::try_unwrap(sc).ok().map(|cell| cell.into_inner().finish()));
         return Ok((plain, document));

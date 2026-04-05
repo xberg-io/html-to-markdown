@@ -6,7 +6,6 @@
 
 use std::fmt::Write;
 
-use crate::error::ConversionError;
 use crate::options::ConversionOptions;
 use crate::text;
 
@@ -62,37 +61,16 @@ const BLOCK_TAGS: &[&str] = &[
 /// - `<script>`, `<style>`, `<head>`, `<template>`, `<noscript>` are skipped
 /// - Tables: cells separated by tab, rows by newline
 /// - Inline elements are recursed without markers
-pub fn extract_plain_text(
-    dom: &tl::VDom,
-    parser: &tl::Parser,
-    options: &ConversionOptions,
-) -> Result<String, ConversionError> {
+pub fn extract_plain_text(dom: &tl::VDom, parser: &tl::Parser, options: &ConversionOptions) -> String {
     let mut buf = String::with_capacity(1024);
     let mut list_ctx = ListContext::None;
-    let depth_exceeded = std::cell::Cell::new(false);
 
     for child_handle in dom.children() {
-        walk_plain(
-            child_handle,
-            parser,
-            &mut buf,
-            options,
-            false,
-            &mut list_ctx,
-            0,
-            &depth_exceeded,
-        );
-    }
-
-    if depth_exceeded.get() {
-        return Err(ConversionError::InvalidInput(format!(
-            "DOM tree depth exceeds max_depth ({})",
-            options.max_depth.unwrap_or(0)
-        )));
+        walk_plain(child_handle, parser, &mut buf, options, false, &mut list_ctx);
     }
 
     post_process(&mut buf);
-    Ok(buf)
+    buf
 }
 
 /// Recursive plain-text walker.
@@ -103,19 +81,10 @@ fn walk_plain(
     options: &ConversionOptions,
     in_pre: bool,
     list_ctx: &mut ListContext,
-    depth: usize,
-    depth_exceeded: &std::cell::Cell<bool>,
 ) {
     let Some(node) = node_handle.get(parser) else {
         return;
     };
-
-    if let Some(max) = options.max_depth {
-        if depth > max {
-            depth_exceeded.set(true);
-            return;
-        }
-    }
 
     match node {
         tl::Node::Raw(bytes) => {
@@ -152,7 +121,7 @@ fn walk_plain(
                 }
                 "pre" => {
                     ensure_blank_line(buf);
-                    walk_children(tag, parser, buf, options, true, list_ctx, depth, depth_exceeded);
+                    walk_children(tag, parser, buf, options, true, list_ctx);
                     ensure_blank_line(buf);
                 }
                 "img" => {
@@ -167,13 +136,13 @@ fn walk_plain(
                 }
                 "table" => {
                     ensure_blank_line(buf);
-                    walk_table(tag, parser, buf, options, depth, depth_exceeded);
+                    walk_table(tag, parser, buf, options);
                     ensure_blank_line(buf);
                 }
                 "ul" => {
                     ensure_newline(buf);
                     let mut child_ctx = ListContext::Unordered;
-                    walk_children(tag, parser, buf, options, false, &mut child_ctx, depth, depth_exceeded);
+                    walk_children(tag, parser, buf, options, false, &mut child_ctx);
                     ensure_newline(buf);
                 }
                 "ol" => {
@@ -185,7 +154,7 @@ fn walk_plain(
                         .unwrap_or(1);
                     ensure_newline(buf);
                     let mut child_ctx = ListContext::Ordered { next_index: start };
-                    walk_children(tag, parser, buf, options, false, &mut child_ctx, depth, depth_exceeded);
+                    walk_children(tag, parser, buf, options, false, &mut child_ctx);
                     ensure_newline(buf);
                 }
                 "li" => {
@@ -203,17 +172,17 @@ fn walk_plain(
                             buf.push_str("- ");
                         }
                     }
-                    walk_children(tag, parser, buf, options, false, list_ctx, depth, depth_exceeded);
+                    walk_children(tag, parser, buf, options, false, list_ctx);
                     ensure_newline(buf);
                 }
                 _ if BLOCK_TAGS.contains(&tag_str) => {
                     ensure_blank_line(buf);
-                    walk_children(tag, parser, buf, options, in_pre, list_ctx, depth, depth_exceeded);
+                    walk_children(tag, parser, buf, options, in_pre, list_ctx);
                     ensure_blank_line(buf);
                 }
                 _ => {
                     // Inline elements and structural containers (html, body, etc.)
-                    walk_children(tag, parser, buf, options, in_pre, list_ctx, depth, depth_exceeded);
+                    walk_children(tag, parser, buf, options, in_pre, list_ctx);
                 }
             }
         }
@@ -229,25 +198,16 @@ fn walk_children(
     options: &ConversionOptions,
     in_pre: bool,
     list_ctx: &mut ListContext,
-    depth: usize,
-    depth_exceeded: &std::cell::Cell<bool>,
 ) {
     let children = tag.children();
     let top = children.top();
     for child in top.iter() {
-        walk_plain(child, parser, buf, options, in_pre, list_ctx, depth + 1, depth_exceeded);
+        walk_plain(child, parser, buf, options, in_pre, list_ctx);
     }
 }
 
 /// Walk a `<table>` element, extracting cells as tab-separated, rows as newline-separated.
-fn walk_table(
-    table_tag: &tl::HTMLTag,
-    parser: &tl::Parser,
-    buf: &mut String,
-    options: &ConversionOptions,
-    depth: usize,
-    depth_exceeded: &std::cell::Cell<bool>,
-) {
+fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, options: &ConversionOptions) {
     // Collect all <tr> node handles by recursing into the table
     let mut row_handles = Vec::new();
     collect_descendant_handles(table_tag, parser, "tr", &mut row_handles);
@@ -280,16 +240,7 @@ fn walk_table(
             let mut cell_buf = String::new();
             if let Some(tl::Node::Tag(cell_tag)) = cell_handle.get(parser) {
                 let mut cell_list_ctx = ListContext::None;
-                walk_children(
-                    cell_tag,
-                    parser,
-                    &mut cell_buf,
-                    options,
-                    false,
-                    &mut cell_list_ctx,
-                    depth,
-                    depth_exceeded,
-                );
+                walk_children(cell_tag, parser, &mut cell_buf, options, false, &mut cell_list_ctx);
             }
             buf.push_str(cell_buf.trim());
         }
