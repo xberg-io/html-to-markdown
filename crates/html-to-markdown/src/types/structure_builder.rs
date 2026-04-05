@@ -14,17 +14,12 @@ use super::tables::{GridCell, TableGrid};
 /// Extract plain text from a tag's descendants, decoding HTML entities.
 fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
     let mut buf = String::new();
-    collect_text_from_tag(tag, parser, &mut buf, 0);
+    collect_text_from_tag(tag, parser, &mut buf);
     buf
 }
 
 /// Recursively accumulate text content from a tag's children.
-///
-/// Uses a hard-coded depth limit of 500 to prevent stack overflow on pathological input.
-fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, depth: usize) {
-    if depth > 500 {
-        return;
-    }
+fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String) {
     let children = tag.children();
     for handle in children.top().iter() {
         let Some(node) = handle.get(parser) else {
@@ -42,7 +37,7 @@ fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut Strin
                 if matches!(name.as_str(), "script" | "style" | "head") {
                     continue;
                 }
-                collect_text_from_tag(child_tag, parser, buf, depth + 1);
+                collect_text_from_tag(child_tag, parser, buf);
             }
             tl::Node::Comment(_) => {}
         }
@@ -56,24 +51,18 @@ fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut Strin
 /// `text` is the pre-extracted full text of the enclosing block node; annotation
 /// byte offsets are computed relative to that string.
 fn collect_annotations(tag: &tl::HTMLTag, parser: &tl::Parser, text: &str, annotations: &mut Vec<TextAnnotation>) {
-    collect_annotations_from_tag(tag, parser, text, &mut 0usize, annotations, 0);
+    collect_annotations_from_tag(tag, parser, text, &mut 0usize, annotations);
 }
 
 /// Recursive helper.  `offset` tracks how many bytes of `full_text` have been consumed
 /// so far; it is mutated in place as we walk the tree.
-///
-/// Uses a hard-coded depth limit of 500 to prevent stack overflow on pathological input.
 fn collect_annotations_from_tag(
     tag: &tl::HTMLTag,
     parser: &tl::Parser,
     full_text: &str,
     offset: &mut usize,
     annotations: &mut Vec<TextAnnotation>,
-    depth: usize,
 ) {
-    if depth > 500 {
-        return;
-    }
     let children = tag.children();
     for handle in children.top().iter() {
         let Some(node) = handle.get(parser) else {
@@ -93,7 +82,7 @@ fn collect_annotations_from_tag(
 
                 let start = *offset;
                 // Recurse to advance offset over the child's text span.
-                collect_annotations_from_tag(child_tag, parser, full_text, offset, annotations, depth + 1);
+                collect_annotations_from_tag(child_tag, parser, full_text, offset, annotations);
                 let end = *offset;
 
                 // Emit annotation only for non-empty spans that fit within the text.
@@ -144,7 +133,7 @@ fn collect_annotations_from_tag(
 fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid {
     // Gather all <tr> handles (recursing through thead/tbody/tfoot).
     let mut row_handles: Vec<tl::NodeHandle> = Vec::new();
-    collect_tr_handles(table_tag, parser, &mut row_handles, 0);
+    collect_tr_handles(table_tag, parser, &mut row_handles);
 
     let mut cells: Vec<GridCell> = Vec::new();
     let mut max_col: u32 = 0;
@@ -212,11 +201,7 @@ fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid
 }
 
 /// Recursively collect all `<tr>` `NodeHandle`s from within a table element.
-/// Uses a hard-coded depth limit of 500 to prevent stack overflow on pathological input.
-fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<tl::NodeHandle>, depth: usize) {
-    if depth > 500 {
-        return;
-    }
+fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<tl::NodeHandle>) {
     let children = tag.children();
     for handle in children.top().iter() {
         if let Some(tl::Node::Tag(child_tag)) = handle.get(parser) {
@@ -224,7 +209,7 @@ fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<t
             if name == "tr" {
                 result.push(*handle);
             } else {
-                collect_tr_handles(child_tag, parser, result, depth + 1);
+                collect_tr_handles(child_tag, parser, result);
             }
         }
     }
@@ -388,7 +373,7 @@ pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
     let mut state = BuilderState::new();
 
     for handle in dom.children() {
-        walk(&mut state, handle, parser, None, 0);
+        walk(&mut state, handle, parser, None);
     }
 
     DocumentStructure {
@@ -400,13 +385,7 @@ pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
 /// Recursive DOM walker.
 ///
 /// `parent_idx` is the flat-list index of the nearest structural parent, if any.
-///
-/// Uses a hard-coded depth limit of 500 to prevent stack overflow on pathological input.
-fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, parent_idx: Option<u32>, depth: usize) {
-    if depth > 500 {
-        return;
-    }
-
+fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, parent_idx: Option<u32>) {
     let Some(node) = handle.get(parser) else {
         return;
     };
@@ -415,7 +394,7 @@ fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, 
         tl::Node::Raw(_) | tl::Node::Comment(_) => {}
         tl::Node::Tag(tag) => {
             let tag_name = tag.name().as_utf8_str().to_ascii_lowercase();
-            process_tag(state, tag_name.as_str(), tag, parser, parent_idx, depth);
+            process_tag(state, tag_name.as_str(), tag, parser, parent_idx);
         }
     }
 }
@@ -428,7 +407,6 @@ fn process_tag(
     tag: &tl::HTMLTag,
     parser: &tl::Parser,
     parent_idx: Option<u32>,
-    depth: usize,
 ) {
     match tag_name {
         // ── Headings ──────────────────────────────────────────────────────
@@ -522,7 +500,7 @@ fn process_tag(
             // Recurse with the list node as the parent so <li>s attach to it.
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, Some(list_idx), depth + 1);
+                walk(state, child_handle, parser, Some(list_idx));
             }
         }
 
@@ -657,7 +635,7 @@ fn process_tag(
             // Recurse into blockquote children under the Quote node.
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, Some(quote_idx), depth + 1);
+                walk(state, child_handle, parser, Some(quote_idx));
             }
         }
 
@@ -765,7 +743,7 @@ fn process_tag(
             }
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, Some(group_idx), depth + 1);
+                walk(state, child_handle, parser, Some(group_idx));
             }
         }
 
@@ -774,7 +752,7 @@ fn process_tag(
         | "form" | "fieldset" => {
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, parent_idx, depth + 1);
+                walk(state, child_handle, parser, parent_idx);
             }
         }
 
@@ -782,7 +760,7 @@ fn process_tag(
         _ => {
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, parent_idx, depth + 1);
+                walk(state, child_handle, parser, parent_idx);
             }
         }
     }

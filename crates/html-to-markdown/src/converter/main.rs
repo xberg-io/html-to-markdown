@@ -122,6 +122,16 @@ pub(crate) fn convert_html_impl(
         }
     }
 
+    // Enforce max_depth before walking the DOM tree.
+    if let Some(max_depth) = options.max_depth {
+        let actual_depth = measure_dom_depth(&dom, parser);
+        if actual_depth > max_depth {
+            return Err(crate::error::ConversionError::InvalidInput(format!(
+                "DOM tree depth {actual_depth} exceeds max_depth {max_depth}"
+            )));
+        }
+    }
+
     // Plain text output: run the full pipeline (for metadata + visitor callbacks),
     // then return plain text instead of markdown.
     let is_plain_text = options.output_format == OutputFormat::Plain;
@@ -293,6 +303,29 @@ pub(crate) fn convert_html_impl(
 // has_more_than_one_char moved to main_helpers
 // is_inline_element available from utility::content
 
+/// Measure the maximum nesting depth of a parsed DOM tree iteratively.
+fn measure_dom_depth(dom: &tl::VDom, parser: &tl::Parser) -> usize {
+    let mut max_depth: usize = 0;
+    let mut stack: Vec<(&tl::NodeHandle, usize)> = Vec::new();
+
+    for handle in dom.children() {
+        stack.push((handle, 1));
+    }
+
+    while let Some((handle, depth)) = stack.pop() {
+        if depth > max_depth {
+            max_depth = depth;
+        }
+        if let Some(tl::Node::Tag(tag)) = handle.get(parser) {
+            for child in tag.children().top().iter() {
+                stack.push((child, depth + 1));
+            }
+        }
+    }
+
+    max_depth
+}
+
 /// Recursively walk DOM nodes and convert to Markdown.
 #[allow(clippy::only_used_in_recursion)]
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -307,12 +340,6 @@ pub(crate) fn walk_node(
     dom_ctx: &DomContext,
 ) {
     let Some(node) = node_handle.get(parser) else { return };
-
-    if let Some(max_depth) = options.max_depth {
-        if depth > max_depth {
-            return;
-        }
-    }
 
     match node {
         tl::Node::Raw(bytes) => {
