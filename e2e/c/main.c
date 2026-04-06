@@ -49,6 +49,18 @@ int main(void) {
     test_options_list_indent_tabs();
     passed++;
 
+    printf("Running {}...\n", "test_options_max_depth_default_unlimited");
+    test_options_max_depth_default_unlimited();
+    passed++;
+
+    printf("Running {}...\n", "test_options_max_depth_exceeds_limit");
+    test_options_max_depth_exceeds_limit();
+    passed++;
+
+    printf("Running {}...\n", "test_options_max_depth_within_limit");
+    test_options_max_depth_within_limit();
+    passed++;
+
     printf("Running {}...\n", "test_options_output_format_djot");
     test_options_output_format_djot();
     passed++;

@@ -152,6 +152,41 @@ fn test_options_list_indent_tabs() {
 }
 
 #[test]
+fn test_options_max_depth_default_unlimited() {
+    // Without max_depth, deeply nested HTML converts successfully
+    let html = r#"<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>"#;
+    let result = convert(html, None).expect("conversion should succeed");
+    let content = result.content.unwrap_or_default();
+
+    assert!(!content.trim().is_empty(), "expected non-empty content");
+    assert!(content.contains("Deep content"), "expected content to contain: Deep content");
+}
+
+#[test]
+fn test_options_max_depth_exceeds_limit() {
+    // Conversion returns an error when DOM depth exceeds max_depth
+    let html = r#"<div><div><div><div><p>Too deep</p></div></div></div></div>"#;
+    let options_json = r#"{"maxDepth":2}"#;
+    let options = conversion_options_from_json(options_json).expect("valid options");
+    let result = convert(html, Some(options));
+    assert!(result.is_err(), "expected conversion to fail");
+    assert!(result.unwrap_err().to_string().contains("max_depth"), "error message mismatch");
+}
+
+#[test]
+fn test_options_max_depth_within_limit() {
+    // Conversion succeeds when DOM depth is within max_depth
+    let html = r#"<div><p>Shallow content</p></div>"#;
+    let options_json = r#"{"maxDepth":10}"#;
+    let options = conversion_options_from_json(options_json).expect("valid options");
+    let result = convert(html, Some(options)).expect("conversion should succeed");
+    let content = result.content.unwrap_or_default();
+
+    assert!(!content.trim().is_empty(), "expected non-empty content");
+    assert!(content.contains("Shallow content"), "expected content to contain: Shallow content");
+}
+
+#[test]
 fn test_options_output_format_djot() {
     // Djot output format produces djot-compatible markup
     let html = r#"<p>Simple paragraph.</p>"#;

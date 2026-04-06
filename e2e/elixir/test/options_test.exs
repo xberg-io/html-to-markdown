@@ -110,6 +110,34 @@ defmodule HtmlToMarkdown.OptionsTest do
     assert String.contains?(content, "Child")
   end
 
+  test "options_max_depth_default_unlimited: Without max_depth, deeply nested HTML converts successfully" do
+    html = "<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>"
+    {:ok, result} = HtmlToMarkdown.convert(html)
+    content = result[:content] || ""
+
+    assert String.trim(content) != ""
+    assert String.contains?(content, "Deep content")
+  end
+
+  test "options_max_depth_exceeds_limit: Conversion returns an error when DOM depth exceeds max_depth" do
+    html = "<div><div><div><div><p>Too deep</p></div></div></div></div>"
+    opts = %{"max_depth" => 2}
+    assert_raise(FunctionClauseError, fn ->
+      HtmlToMarkdown.convert(html, opts)
+    end)
+    # Error should contain: max_depth
+  end
+
+  test "options_max_depth_within_limit: Conversion succeeds when DOM depth is within max_depth" do
+    html = "<div><p>Shallow content</p></div>"
+    opts = %{"max_depth" => 10}
+    {:ok, result} = HtmlToMarkdown.convert(html, opts)
+    content = result[:content] || ""
+
+    assert String.trim(content) != ""
+    assert String.contains?(content, "Shallow content")
+  end
+
   test "options_output_format_djot: Djot output format produces djot-compatible markup" do
     html = "<p>Simple paragraph.</p>"
     opts = %{"output_format" => "djot"}

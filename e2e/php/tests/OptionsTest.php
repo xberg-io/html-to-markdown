@@ -158,6 +158,45 @@ class OptionsTest extends TestCase
     }
 
     /**
+     * Without max_depth, deeply nested HTML converts successfully
+     */
+    public function testOptionsMaxDepthDefaultUnlimited(): void
+    {
+        $html = "<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>";
+        $result = html_to_markdown_convert($html);
+        $content = $result['content'] ?? '';
+
+        $this->assertNotEmpty(trim($content), 'expected non-empty content');
+        $this->assertStringContainsString("Deep content", $content);
+    }
+
+    /**
+     * Conversion returns an error when DOM depth exceeds max_depth
+     */
+    public function testOptionsMaxDepthExceedsLimit(): void
+    {
+        $html = "<div><div><div><div><p>Too deep</p></div></div></div></div>";
+        $options = json_decode("{\"maxDepth\":2}", true);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessageMatches('/max_depth/');
+        html_to_markdown_convert($html, $options);
+    }
+
+    /**
+     * Conversion succeeds when DOM depth is within max_depth
+     */
+    public function testOptionsMaxDepthWithinLimit(): void
+    {
+        $html = "<div><p>Shallow content</p></div>";
+        $options = json_decode("{\"maxDepth\":10}", true);
+        $result = html_to_markdown_convert($html, $options);
+        $content = $result['content'] ?? '';
+
+        $this->assertNotEmpty(trim($content), 'expected non-empty content');
+        $this->assertStringContainsString("Shallow content", $content);
+    }
+
+    /**
      * Djot output format produces djot-compatible markup
      */
     public function testOptionsOutputFormatDjot(): void

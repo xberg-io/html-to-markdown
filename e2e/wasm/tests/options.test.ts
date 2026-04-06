@@ -103,6 +103,30 @@ describe('options', () => {
     expect(content).toContain('Child');
   });
 
+  it('options_max_depth_default_unlimited: Without max_depth, deeply nested HTML converts successfully', () => {
+    const html = `<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>`;
+    const result = convert(html);
+    const content = result.content ?? '';
+
+    expect(content.trim().length).toBeGreaterThan(0);
+    expect(content).toContain('Deep content');
+  });
+
+  it('options_max_depth_exceeds_limit: Conversion returns an error when DOM depth exceeds max_depth', () => {
+    const html = `<div><div><div><div><p>Too deep</p></div></div></div></div>`;
+    expect(() => convert(html, { maxDepth: 2 })).toThrow();
+    // Error should contain: max_depth
+  });
+
+  it('options_max_depth_within_limit: Conversion succeeds when DOM depth is within max_depth', () => {
+    const html = `<div><p>Shallow content</p></div>`;
+    const result = convert(html, { maxDepth: 10 });
+    const content = result.content ?? '';
+
+    expect(content.trim().length).toBeGreaterThan(0);
+    expect(content).toContain('Shallow content');
+  });
+
   it('options_output_format_djot: Djot output format produces djot-compatible markup', () => {
     const html = `<p>Simple paragraph.</p>`;
     const result = convert(html, { outputFormat: 'djot' });

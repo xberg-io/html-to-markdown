@@ -112,6 +112,34 @@ RSpec.describe 'options' do
     expect(content).to include('Child')
   end
 
+  it 'options_max_depth_default_unlimited: Without max_depth, deeply nested HTML converts successfully' do
+    html = '<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>'
+    result = HtmlToMarkdown.convert(html)
+    content = result[:content] || ''
+
+    expect(content.strip).not_to be_empty
+    expect(content).to include('Deep content')
+  end
+
+  it 'options_max_depth_exceeds_limit: Conversion returns an error when DOM depth exceeds max_depth' do
+    html = '<div><div><div><div><p>Too deep</p></div></div></div></div>'
+    opts = { 'max_depth' => 2 }
+    expect {
+      HtmlToMarkdown.convert(html, opts)
+    }.to raise_error
+    # Error should contain: max_depth
+  end
+
+  it 'options_max_depth_within_limit: Conversion succeeds when DOM depth is within max_depth' do
+    html = '<div><p>Shallow content</p></div>'
+    opts = { 'max_depth' => 10 }
+    result = HtmlToMarkdown.convert(html, opts)
+    content = result[:content] || ''
+
+    expect(content.strip).not_to be_empty
+    expect(content).to include('Shallow content')
+  end
+
   it 'options_output_format_djot: Djot output format produces djot-compatible markup' do
     html = '<p>Simple paragraph.</p>'
     opts = { 'output_format' => 'djot' }

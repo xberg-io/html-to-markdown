@@ -128,6 +128,37 @@ class OptionsTest {
     }
 
     @Test
+    void testOptionsMaxDepthDefaultUnlimited() {
+        // Without max_depth, deeply nested HTML converts successfully
+        var html = "<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>";
+        var result = HtmlToMarkdown.convert(html);
+        var content = result.content() != null ? result.content() : "";
+
+        assertNotEquals("", content.strip(), "expected non-empty content");
+        assertTrue(content.contains("Deep content"), "expected content to contain: Deep content");
+    }
+
+    @Test
+    void testOptionsMaxDepthExceedsLimit() {
+        // Conversion returns an error when DOM depth exceeds max_depth
+        var html = "<div><div><div><div><p>Too deep</p></div></div></div></div>";
+        assertThrows(Exception.class, () -> HtmlToMarkdown.convert(html, "{\"maxDepth\":2}"));
+        var ex = assertThrows(Exception.class, () -> HtmlToMarkdown.convert(html, "{\"maxDepth\":2}"));
+        assertTrue(ex.getMessage().contains("max_depth"));
+    }
+
+    @Test
+    void testOptionsMaxDepthWithinLimit() {
+        // Conversion succeeds when DOM depth is within max_depth
+        var html = "<div><p>Shallow content</p></div>";
+        var result = HtmlToMarkdown.convert(html, "{\"maxDepth\":10}");
+        var content = result.content() != null ? result.content() : "";
+
+        assertNotEquals("", content.strip(), "expected non-empty content");
+        assertTrue(content.contains("Shallow content"), "expected content to contain: Shallow content");
+    }
+
+    @Test
     void testOptionsOutputFormatDjot() {
         // Djot output format produces djot-compatible markup
         var html = "<p>Simple paragraph.</p>";
