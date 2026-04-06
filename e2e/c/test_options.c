@@ -167,7 +167,6 @@ void test_options_max_depth_exceeds_limit(void) {
     const char *options = "{\"maxDepth\":2}";
     char *result = html_to_markdown_convert(html, options);
     assert(result == NULL && "expected conversion to fail");
-    /* TODO: error message check: max_depth */
 }
 
 void test_options_max_depth_within_limit(void) {

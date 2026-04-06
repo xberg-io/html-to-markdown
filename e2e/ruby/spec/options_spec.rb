@@ -127,7 +127,6 @@ RSpec.describe 'options' do
     expect {
       HtmlToMarkdown.convert(html, opts)
     }.to raise_error
-    # Error should contain: max_depth
   end
 
   it 'options_max_depth_within_limit: Conversion succeeds when DOM depth is within max_depth' do

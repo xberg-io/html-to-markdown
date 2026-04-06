@@ -142,7 +142,6 @@ class OptionsTest {
     void testOptionsMaxDepthExceedsLimit() {
         // Conversion returns an error when DOM depth exceeds max_depth
         var html = "<div><div><div><div><p>Too deep</p></div></div></div></div>";
-        assertThrows(Exception.class, () -> HtmlToMarkdown.convert(html, "{\"maxDepth\":2}"));
         var ex = assertThrows(Exception.class, () -> HtmlToMarkdown.convert(html, "{\"maxDepth\":2}"));
         assertTrue(ex.getMessage().contains("max_depth"));
     }

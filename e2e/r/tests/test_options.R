@@ -134,7 +134,6 @@ test_that("options_max_depth_exceeds_limit: Conversion returns an error when DOM
   html <- "<div><div><div><div><p>Too deep</p></div></div></div></div>"
   opts <- list(max_depth = 2)
   expect_error(convert(html, options = opts))
-  # Error should contain: max_depth
 })
 
 test_that("options_max_depth_within_limit: Conversion succeeds when DOM depth is within max_depth", {

@@ -92,6 +92,7 @@ fn apply_options(map: HashMap<String, Term>) -> NifResult<ConversionOptions> {
             "output_format" => update.output_format = Some(parse_output_format(value)?),
             "skip_images" => update.skip_images = Some(decode_bool(value, "skip_images")?),
             "preprocessing" => update.preprocessing = Some(decode_preprocessing(value)?),
+            "max_depth" => update.max_depth = Some(decode_positive_integer(value, "max_depth")?),
             "debug" => update.debug = Some(decode_bool(value, "debug")?),
             _ => {}
         }

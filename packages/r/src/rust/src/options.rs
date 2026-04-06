@@ -65,6 +65,7 @@ fn apply_options(list: &List) -> std::result::Result<ConversionOptions, String> 
             "newline_style" => update.newline_style = Some(parse_newline_style(&value)?),
             "code_block_style" => update.code_block_style = Some(parse_code_block_style(&value)?),
             "preprocessing" => update.preprocessing = Some(decode_preprocessing(&value)?),
+            "max_depth" => update.max_depth = Some(decode_positive_integer(&value, "max_depth")?),
             "debug" => update.debug = Some(decode_bool(&value, "debug")?),
             _ => {}
         }
