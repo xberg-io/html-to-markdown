@@ -122,10 +122,8 @@ defmodule HtmlToMarkdown.OptionsTest do
   test "options_max_depth_exceeds_limit: Conversion returns an error when DOM depth exceeds max_depth" do
     html = "<div><div><div><div><p>Too deep</p></div></div></div></div>"
     opts = %{"max_depth" => 2}
-    assert_raise(FunctionClauseError, fn ->
-      HtmlToMarkdown.convert(html, opts)
-    end)
-    # Error should contain: max_depth
+    {:error, reason} = HtmlToMarkdown.convert(html, opts)
+    assert to_string(reason) =~ "max_depth"
   end
 
   test "options_max_depth_within_limit: Conversion succeeds when DOM depth is within max_depth" do

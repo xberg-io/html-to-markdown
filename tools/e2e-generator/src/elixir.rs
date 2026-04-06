@@ -134,12 +134,10 @@ fn render_test_function(out: &mut String, fixture: &Fixture) {
 
     // Conversion call + error handling.
     if fixture.assertions.expect_error == Some(true) {
-        let _ = writeln!(out, "    assert_raise(FunctionClauseError, fn ->");
-        let _ = writeln!(out, "      {convert_call}");
-        let _ = writeln!(out, "    end)");
+        let _ = writeln!(out, "    {{:error, reason}} = {convert_call}");
         if let Some(contains) = &fixture.assertions.error_contains {
             let escaped = escape_elixir_string(contains);
-            let _ = writeln!(out, "    # Error should contain: {escaped}");
+            let _ = writeln!(out, "    assert to_string(reason) =~ \"{escaped}\"");
         }
         let _ = writeln!(out, "  end");
         return;
