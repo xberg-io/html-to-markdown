@@ -105,7 +105,7 @@ fn render_test_function(out: &mut String, fixture: &Fixture) {
         let entries: Vec<String> = opts
             .iter()
             .map(|(k, v)| {
-                let js_val = json_value_to_js(v);
+                let js_val = json_value_to_js_option(k, v);
                 format!("{k}: {js_val}")
             })
             .collect();
@@ -459,6 +459,49 @@ fn json_value_to_js(v: &serde_json::Value) -> String {
         serde_json::Value::Null => "null".to_string(),
         other => format!("'{}'", escape_string(&other.to_string())),
     }
+}
+
+/// napi-rs `#[napi(string_enum)]` expects PascalCase variant names.
+/// These option keys correspond to napi string enums and need their
+/// string values converted from the fixture's camelCase to PascalCase.
+const NAPI_ENUM_OPTION_KEYS: &[&str] = &[
+    "headingStyle",
+    "codeBlockStyle",
+    "listIndentType",
+    "whitespaceMode",
+    "newlineStyle",
+    "outputFormat",
+    "highlightStyle",
+    "linkStyle",
+    "preprocessing",
+];
+
+/// Format a `serde_json::Value` as a JavaScript literal, applying PascalCase
+/// conversion for option keys that map to napi string enums.
+fn json_value_to_js_option(key: &str, v: &serde_json::Value) -> String {
+    if NAPI_ENUM_OPTION_KEYS.contains(&key) {
+        if let serde_json::Value::String(s) = v {
+            return format!("'{}'", escape_string(&to_pascal_case(s)));
+        }
+    }
+    json_value_to_js(v)
+}
+
+/// Convert a camelCase or lowercase string to PascalCase.
+fn to_pascal_case(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut capitalize_next = true;
+    for ch in s.chars() {
+        if ch == '_' || ch == '-' {
+            capitalize_next = true;
+        } else if capitalize_next {
+            result.extend(ch.to_uppercase());
+            capitalize_next = false;
+        } else {
+            result.push(ch);
+        }
+    }
+    result
 }
 
 /// Escape a string for use inside a JavaScript string literal.
