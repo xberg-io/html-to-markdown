@@ -479,10 +479,10 @@ const NAPI_ENUM_OPTION_KEYS: &[&str] = &[
 /// Format a `serde_json::Value` as a JavaScript literal, applying PascalCase
 /// conversion for option keys that map to napi string enums.
 fn json_value_to_js_option(key: &str, v: &serde_json::Value) -> String {
-    if NAPI_ENUM_OPTION_KEYS.contains(&key) {
-        if let serde_json::Value::String(s) = v {
-            return format!("'{}'", escape_string(&to_pascal_case(s)));
-        }
+    if NAPI_ENUM_OPTION_KEYS.contains(&key)
+        && let serde_json::Value::String(s) = v
+    {
+        return format!("'{}'", escape_string(&to_pascal_case(s)));
     }
     json_value_to_js(v)
 }
