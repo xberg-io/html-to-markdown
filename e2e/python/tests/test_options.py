@@ -137,7 +137,7 @@ def test_options_max_depth_exceeds_limit() -> None:
     """Conversion returns an error when DOM depth exceeds max_depth."""
     html = "<div><div><div><div><p>Too deep</p></div></div></div></div>"
     opts = ConversionOptions(max_depth=2)
-    with pytest.raises(Exception) as exc_info:
+    with pytest.raises(ValueError, match=r"max_depth") as exc_info:
         convert(html, opts)
     assert "max_depth" in str(exc_info.value)
 

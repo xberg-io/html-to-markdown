@@ -123,7 +123,16 @@ fn render_test_function(out: &mut String, fixture: &Fixture) {
 
     // Conversion call + error handling.
     if fixture.assertions.expect_error == Some(true) {
-        let _ = writeln!(out, "    with pytest.raises(Exception) as exc_info:");
+        let match_param = fixture
+            .assertions
+            .error_contains
+            .as_deref()
+            .map(|s| format!(", match=r\"{}\"", escape_python_string(s)))
+            .unwrap_or_default();
+        let _ = writeln!(
+            out,
+            "    with pytest.raises(ValueError{match_param}) as exc_info:"
+        );
         let _ = writeln!(out, "        {convert_call}");
         if let Some(contains) = &fixture.assertions.error_contains {
             let escaped = escape_python_string(contains);
