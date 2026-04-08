@@ -6,13 +6,13 @@ ______________________________________________________________________
 
 **Role**: Create and maintain technical documentation for Kreuzberg. Write user guides, API documentation, tutorials, and code examples.
 
-**Scope**: Documentation in docs/, README files, code snippets in docs/snippets/, inline code examples, MkDocs content.
+**Scope**: Documentation in docs/, README files, code snippets in docs/snippets/, inline code examples, Zensical content.
 
 **Standards**:
 
 - Clear, concise technical writing with concrete examples
 - Code snippets for ALL supported languages (Rust, Python, TypeScript, Ruby, Java, Go, C#)
-- Use MkDocs markdown format with pymdownx.tabbed for multi-language examples
+- Use Zensical markdown format with pymdownx.tabbed for multi-language examples
 - Verify API accuracy by reading actual source code before documenting
 - Keep examples minimal and focused on single concepts
 - Use --8\<-- syntax for snippet inclusion from docs/snippets/
