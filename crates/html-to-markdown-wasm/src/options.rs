@@ -118,6 +118,8 @@ pub struct WasmConversionOptions {
     pub capture_svg: Option<bool>,
     /// Infer image dimensions from data
     pub infer_dimensions: Option<bool>,
+    /// Maximum DOM tree depth to recurse into
+    pub max_depth: Option<usize>,
 }
 
 impl From<WasmConversionOptions> for ConversionOptionsUpdate {
@@ -161,6 +163,7 @@ impl From<WasmConversionOptions> for ConversionOptionsUpdate {
             max_image_size: val.max_image_size,
             capture_svg: val.capture_svg,
             infer_dimensions: val.infer_dimensions,
+            max_depth: val.max_depth,
         }
     }
 }

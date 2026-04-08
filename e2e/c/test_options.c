@@ -148,6 +148,41 @@ void test_options_list_indent_tabs(void) {
     html_to_markdown_free_string(result);
 }
 
+void test_options_max_depth_default_unlimited(void) {
+    /* Without max_depth, deeply nested HTML converts successfully */
+    const char *html = "<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>";
+    char *result = html_to_markdown_convert(html, NULL);
+    assert(result != NULL && "conversion should succeed");
+
+    /* content_not_empty */
+    assert(strlen(result) > 0);
+    /* content_contains_all */
+    assert(strstr(result, "Deep content") != NULL);
+    html_to_markdown_free_string(result);
+}
+
+void test_options_max_depth_exceeds_limit(void) {
+    /* Conversion returns an error when DOM depth exceeds max_depth */
+    const char *html = "<div><div><div><div><p>Too deep</p></div></div></div></div>";
+    const char *options = "{\"maxDepth\":2}";
+    char *result = html_to_markdown_convert(html, options);
+    assert(result == NULL && "expected conversion to fail");
+}
+
+void test_options_max_depth_within_limit(void) {
+    /* Conversion succeeds when DOM depth is within max_depth */
+    const char *html = "<div><p>Shallow content</p></div>";
+    const char *options = "{\"maxDepth\":10}";
+    char *result = html_to_markdown_convert(html, options);
+    assert(result != NULL && "conversion should succeed");
+
+    /* content_not_empty */
+    assert(strlen(result) > 0);
+    /* content_contains_all */
+    assert(strstr(result, "Shallow content") != NULL);
+    html_to_markdown_free_string(result);
+}
+
 void test_options_output_format_djot(void) {
     /* Djot output format produces djot-compatible markup */
     const char *html = "<p>Simple paragraph.</p>";

@@ -274,6 +274,16 @@ public class ConversionOptions
     public bool SkipImages { get; set; } = false;
 
     /// <summary>
+    /// Maximum allowed DOM tree depth.
+    ///
+    /// When set, the converter returns an error if the HTML DOM tree exceeds
+    /// this depth. Useful for preventing excessive recursion on deeply nested input.
+    /// Default: null (unlimited)
+    /// </summary>
+    [JsonPropertyName("maxDepth")]
+    public int? MaxDepth { get; set; } = null;
+
+    /// <summary>
     /// Output format for conversion.
     ///
     /// Specifies target markup language: "markdown" (CommonMark compatible) or "djot".

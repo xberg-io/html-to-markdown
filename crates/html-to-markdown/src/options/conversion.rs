@@ -108,6 +108,10 @@ pub struct ConversionOptions {
     pub capture_svg: bool,
     /// Infer image dimensions from data.
     pub infer_dimensions: bool,
+    /// Maximum DOM tree depth to recurse into. When the depth is exceeded, conversion
+    /// returns a [`ConversionError::InvalidInput`](crate::error::ConversionError::InvalidInput) error.
+    /// `None` means unlimited (default).
+    pub max_depth: Option<usize>,
 }
 
 impl Default for ConversionOptions {
@@ -151,6 +155,7 @@ impl Default for ConversionOptions {
             max_image_size: 5_242_880,
             capture_svg: false,
             infer_dimensions: true,
+            max_depth: None,
         }
     }
 }
@@ -258,6 +263,14 @@ impl ConversionOptionsBuilder {
     builder_setter!(max_image_size, u64);
     builder_setter!(capture_svg, bool);
     builder_setter!(infer_dimensions, bool);
+
+    // Safety limits
+    /// Set the maximum DOM tree depth. `None` means unlimited.
+    #[must_use]
+    pub fn max_depth(mut self, value: impl Into<Option<usize>>) -> Self {
+        self.0.max_depth = value.into();
+        self
+    }
 
     // Preprocessing
     /// Set the pre-processing options applied to the HTML before conversion.
@@ -374,6 +387,8 @@ pub struct ConversionOptionsUpdate {
     pub capture_svg: Option<bool>,
     /// Optional override for [`ConversionOptions::infer_dimensions`].
     pub infer_dimensions: Option<bool>,
+    /// Optional override for [`ConversionOptions::max_depth`].
+    pub max_depth: Option<usize>,
 }
 
 impl ConversionOptions {
@@ -423,6 +438,9 @@ impl ConversionOptions {
         apply!(max_image_size);
         apply!(capture_svg);
         apply!(infer_dimensions);
+        if let Some(v) = update.max_depth {
+            self.max_depth = Some(v);
+        }
         if let Some(preprocessing) = update.preprocessing {
             self.preprocessing.apply_update(preprocessing);
         }

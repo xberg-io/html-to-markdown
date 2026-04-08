@@ -228,6 +228,58 @@ func Test_OptionsListIndentTabs(t *testing.T) {
 	}
 }
 
+func Test_OptionsMaxDepthDefaultUnlimited(t *testing.T) {
+	// Without max_depth, deeply nested HTML converts successfully
+	html := `<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>`
+	result, err := htmd.Convert(html)
+	if err != nil {
+		t.Fatalf("conversion failed: %v", err)
+	}
+	content := ""
+	if result != nil && result.Content != nil {
+		content = *result.Content
+	}
+
+	if strings.TrimSpace(content) == "" {
+		t.Errorf("expected non-empty content")
+	}
+	if !strings.Contains(content, "Deep content") {
+		t.Errorf("expected content to contain: Deep content")
+	}
+}
+
+func Test_OptionsMaxDepthExceedsLimit(t *testing.T) {
+	// Conversion returns an error when DOM depth exceeds max_depth
+	html := `<div><div><div><div><p>Too deep</p></div></div></div></div>`
+	_, err := htmd.Convert(html, `{"maxDepth":2}`)
+	if err == nil {
+		t.Errorf("expected conversion to fail, but it succeeded")
+	}
+	if !strings.Contains(err.Error(), "max_depth") {
+		t.Errorf("error message mismatch: got %v", err)
+	}
+}
+
+func Test_OptionsMaxDepthWithinLimit(t *testing.T) {
+	// Conversion succeeds when DOM depth is within max_depth
+	html := `<div><p>Shallow content</p></div>`
+	result, err := htmd.Convert(html, `{"maxDepth":10}`)
+	if err != nil {
+		t.Fatalf("conversion failed: %v", err)
+	}
+	content := ""
+	if result != nil && result.Content != nil {
+		content = *result.Content
+	}
+
+	if strings.TrimSpace(content) == "" {
+		t.Errorf("expected non-empty content")
+	}
+	if !strings.Contains(content, "Shallow content") {
+		t.Errorf("expected content to contain: Shallow content")
+	}
+}
+
 func Test_OptionsOutputFormatDjot(t *testing.T) {
 	// Djot output format produces djot-compatible markup
 	html := `<p>Simple paragraph.</p>`

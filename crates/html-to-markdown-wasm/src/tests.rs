@@ -60,6 +60,7 @@ mod wasm_tests {
             max_image_size: None,
             capture_svg: None,
             infer_dimensions: None,
+            max_depth: None,
         };
 
         let js_options = serde_wasm_bindgen::to_value(&options).unwrap();

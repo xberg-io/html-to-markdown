@@ -245,6 +245,13 @@ pub(crate) fn convert_html_impl(
         walk_node(child_handle, parser, &mut output, options, &ctx, 0, &dom_ctx);
     }
 
+    if ctx.depth_exceeded.get() {
+        return Err(crate::error::ConversionError::InvalidInput(format!(
+            "DOM tree depth exceeds max_depth ({})",
+            options.max_depth.unwrap_or(0)
+        )));
+    }
+
     #[cfg(feature = "visitor")]
     if let Some(err) = ctx.visitor_error.borrow().as_ref() {
         return Err(crate::error::ConversionError::Visitor(err.clone()));
@@ -307,6 +314,13 @@ pub(crate) fn walk_node(
     dom_ctx: &DomContext,
 ) {
     let Some(node) = node_handle.get(parser) else { return };
+
+    if let Some(max) = options.max_depth {
+        if depth > max {
+            ctx.depth_exceeded.set(true);
+            return;
+        }
+    }
 
     match node {
         tl::Node::Raw(bytes) => {

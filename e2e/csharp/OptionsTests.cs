@@ -158,6 +158,45 @@ public class OptionsTests
     }
 
     /// <summary>
+    /// Without max_depth, deeply nested HTML converts successfully
+    /// </summary>
+    [Fact]
+    public void TestOptionsMaxDepthDefaultUnlimited()
+    {
+        var html = "<div><div><div><div><div><p>Deep content</p></div></div></div></div></div>";
+        var result = HtmlToMarkdownConverter.Convert(html);
+        var content = result.Content ?? "";
+
+        Assert.False(string.IsNullOrWhiteSpace(content));
+        Assert.Contains("Deep content", content);
+    }
+
+    /// <summary>
+    /// Conversion returns an error when DOM depth exceeds max_depth
+    /// </summary>
+    [Fact]
+    public void TestOptionsMaxDepthExceedsLimit()
+    {
+        var html = "<div><div><div><div><p>Too deep</p></div></div></div></div>";
+        var exception = Assert.Throws<Exception>(() => HtmlToMarkdownConverter.Convert(html, "{\"maxDepth\":2}"));
+        Assert.Contains("max_depth", exception.Message);
+    }
+
+    /// <summary>
+    /// Conversion succeeds when DOM depth is within max_depth
+    /// </summary>
+    [Fact]
+    public void TestOptionsMaxDepthWithinLimit()
+    {
+        var html = "<div><p>Shallow content</p></div>";
+        var result = HtmlToMarkdownConverter.Convert(html, "{\"maxDepth\":10}");
+        var content = result.Content ?? "";
+
+        Assert.False(string.IsNullOrWhiteSpace(content));
+        Assert.Contains("Shallow content", content);
+    }
+
+    /// <summary>
     /// Djot output format produces djot-compatible markup
     /// </summary>
     [Fact]

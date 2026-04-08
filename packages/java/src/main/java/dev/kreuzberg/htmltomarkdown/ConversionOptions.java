@@ -59,6 +59,7 @@ public final class ConversionOptions {
   private String newlineStyle = "spaces";
   private String codeBlockStyle = "backticks";
   private OutputFormat outputFormat = OutputFormat.MARKDOWN;
+  private Integer maxDepth = null;
   private boolean debug = false;
 
   /**
@@ -607,6 +608,29 @@ public final class ConversionOptions {
   /** Get the output format. */
   public OutputFormat getOutputFormat() {
     return outputFormat;
+  }
+
+  // Max Depth
+  /**
+   * Set the maximum allowed DOM tree depth.
+   *
+   * <p>When set, the converter returns an error if the HTML DOM tree exceeds this depth. Useful for
+   * preventing excessive recursion on deeply nested input.
+   *
+   * @param depth the maximum depth, or {@code null} for unlimited (default)
+   * @return this options object for method chaining
+   */
+  public ConversionOptions setMaxDepth(final Integer depth) {
+    if (depth != null && depth <= 0) {
+      throw new IllegalArgumentException("Max depth must be positive");
+    }
+    this.maxDepth = depth;
+    return this;
+  }
+
+  /** Get the maximum DOM tree depth, or {@code null} if unlimited. */
+  public Integer getMaxDepth() {
+    return maxDepth;
   }
 
   // Debug
