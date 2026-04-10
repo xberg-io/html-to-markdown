@@ -30,8 +30,10 @@ dev = [
   "pyyaml>=6.0.3",
   "ruff>=0.14.10",
   "uv-bump",
+  "zensical>=0.0.31",
 ]
 doc = [
+  "mkdocstrings[python]",
   "zensical",
 ]
 

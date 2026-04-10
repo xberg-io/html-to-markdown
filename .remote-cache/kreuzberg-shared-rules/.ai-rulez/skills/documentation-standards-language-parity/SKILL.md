@@ -10,7 +10,7 @@ ______________________________________________________________________
 
 - Location: docs/snippets/{language}/{category}/{filename}.{ext}
 - Categories: getting-started, config, advanced, ocr, metadata, plugins, api, mcp, cli, utils, cache, docker, benchmarking
-- Use MkDocs pymdownx.tabbed extension for multi-language code blocks
+- Use Zensical pymdownx.tabbed extension for multi-language code blocks
 - Include snippets with --8\<-- syntax: `--8<-- "docs/snippets/python/config/basic.py"`
 
 **Snippet requirements**:

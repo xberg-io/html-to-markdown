@@ -8,7 +8,7 @@ The documentation domain provides comprehensive, multi-language technical docume
 
 - Author user guides, API documentation, tutorials, and troubleshooting resources
 - Ensure language parity: every guide and example includes code snippets for ALL supported languages
-- Maintain MkDocs documentation infrastructure with pymdownx.tabbed for multi-language code blocks
+- Maintain Zensical documentation infrastructure with pymdownx.tabbed for multi-language code blocks
 - Create code snippet library in docs/snippets/{language}/{category}/{filename}.{ext}
 - Write inline API documentation (rustdoc, JSDoc, Javadoc, docstrings, YARD, etc.) per language conventions
 - Verify API accuracy by reading actual source code before documenting
@@ -21,13 +21,13 @@ The documentation domain provides comprehensive, multi-language technical docume
 
 ## Referenced Agents
 
-- **docs-writer**: Technical documentation author for guides, README, MkDocs content, code snippets in docs/snippets/
+- **docs-writer**: Technical documentation author for guides, README, Zensical content, code snippets in docs/snippets/
 - **api-doc-writer**: Inline API documentation (rustdoc, JSDoc, Javadoc, docstrings). API reference pages. Verify against source code.
 - **tutorial-writer**: Step-by-step tutorials and learning paths. Progressive complexity. Runnable code examples. Troubleshooting sections.
 
 ## Referenced Skills
 
-- **documentation-standards-language-parity**: Full language parity for ALL supported languages. docs/snippets/ structure with categories. MkDocs pymdownx.tabbed. Language-specific inline doc formats.
+- **documentation-standards-language-parity**: Full language parity for ALL supported languages. docs/snippets/ structure with categories. Zensical pymdownx.tabbed. Language-specific inline doc formats.
 - **quick-start**: Getting started guides with minimal focused examples. Essential concepts first, advanced patterns later.
 - **repository-structure-commands**: Documentation of directory structure, build commands, test commands, development workflows, contribution guidelines
 
@@ -43,7 +43,7 @@ The documentation domain provides comprehensive, multi-language technical docume
 
 ## Critical Files This Domain Manages
 
-- `docs/` (MkDocs documentation root)
+- `docs/` (Zensical documentation root)
 - `docs/snippets/` (Code snippet library organized by language/category)
 - `docs/index.md`, `docs/getting-started.md`, `docs/api-reference.md`, `docs/tutorials/`
 - `README.md` (Project overview and quick start)
