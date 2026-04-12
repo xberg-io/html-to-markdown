@@ -127,7 +127,7 @@ pub unsafe extern "C" fn html_to_markdown_convert(html: *const c_char, options_j
         }
     };
 
-    match guard_panic(|| html_to_markdown_rs::convert(html_str, options.clone())) {
+    match guard_panic(|| html_to_markdown_rs::convert(html_str, options)) {
         Ok(result) => {
             set_last_error(None);
             set_last_error_code(HtmlToMarkdownErrorCode::Ok);

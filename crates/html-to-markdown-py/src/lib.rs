@@ -75,12 +75,9 @@ fn convert<'py>(
                         Rc::new(RefCell::new(bridge)) as Rc<RefCell<dyn HtmlVisitor>>
                     })
                 };
-                let markdown =
-                    html_to_markdown_rs::convert_with_visitor(&html, rust_options.clone(), Some(rc_visitor))?;
-                Ok(html_to_markdown_rs::ConversionResult {
-                    content: Some(markdown),
-                    ..html_to_markdown_rs::ConversionResult::default()
-                })
+                let res =
+                    html_to_markdown_rs::convert_with_visitor_result(&html, rust_options.clone(), Some(rc_visitor))?;
+                Ok(res)
             })
         })
         .map_err(to_py_err)?
@@ -329,6 +326,7 @@ mod tests {
             Vec::new(),
             "utf-8".to_string(),
             false,
+            "inline".to_string(),
             "markdown".to_string(),
             false,
             false,
