@@ -1,3 +1,5 @@
+from typing import Any
+
 from html_to_markdown import ConversionOptions, convert
 
 SAMPLE_HTML = """
@@ -17,7 +19,7 @@ SAMPLE_HTML = """
 
 
 class ImageSkipVisitor:
-    def visit_image(self, ctx, src, alt, title):
+    def visit_image(self, ctx: Any, src: str, alt: str, title: str) -> dict[str, str]:
         del ctx, src, title
         if not alt:
             return {"type": "skip"}
@@ -25,11 +27,11 @@ class ImageSkipVisitor:
 
 
 class ContinueAllVisitor:
-    def visit_image(self, ctx, src, alt, title):
+    def visit_image(self, ctx: Any, src: str, alt: str, title: str) -> dict[str, str]:
         return {"type": "continue"}
 
 
-def test_visitor_retains_metadata():
+def test_visitor_retains_metadata() -> None:
     opts = ConversionOptions(extract_metadata=True, extract_images=True)
 
     # Baseline: no visitor
