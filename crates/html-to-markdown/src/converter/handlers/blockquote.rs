@@ -12,7 +12,6 @@ use crate::converter::main::walk_node;
 use crate::options::ConversionOptions;
 
 #[cfg(feature = "visitor")]
-#[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 #[cfg(feature = "visitor")]
 use std::collections::BTreeMap;

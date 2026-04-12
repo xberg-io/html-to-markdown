@@ -98,7 +98,7 @@ pub use convert_api::inline_image_config_from_json;
 
 #[cfg(feature = "visitor")]
 #[doc(hidden)]
-pub use convert_api::convert_with_visitor;
+pub use convert_api::{convert_with_visitor, convert_with_visitor_result};
 
 // Tests
 // ============================================================================
