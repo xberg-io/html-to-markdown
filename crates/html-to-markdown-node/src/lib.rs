@@ -83,6 +83,7 @@ mod tests {
             extract_images: None,
             max_image_size: None,
             capture_svg: None,
+            link_style: None,
             infer_dimensions: None,
         };
 
