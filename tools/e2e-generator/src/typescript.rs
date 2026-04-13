@@ -48,8 +48,8 @@ fn render_package_json() -> String {
     "test": "vitest run"
   },
   "devDependencies": {
-    "@kreuzberg/html-to-markdown": "file:../../packages/typescript",
-    "vitest": "^1.0.0"
+    "@kreuzberg/html-to-markdown": "workspace:*",
+    "vitest": "^4.1.2"
   }
 }
 "#
