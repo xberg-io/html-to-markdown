@@ -231,6 +231,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 ### Example: Quick Start
 
 
+
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -265,6 +266,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
+
 
 
 ```python
