@@ -8,7 +8,7 @@ import { convert } from '@kreuzberg/html-to-markdown';
 describe('options', () => {
   it('options_code_block_backticks: Backticks code block style uses triple backtick fences', () => {
     const html = `<pre><code class="language-js">console.log('hi');</code></pre>`;
-    const result = convert(html, { codeBlockStyle: 'backticks' });
+    const result = convert(html, { codeBlockStyle: 'Backticks' });
     const content = result.content ?? '';
 
     expect(content).toContain('```');
@@ -17,7 +17,7 @@ describe('options', () => {
 
   it('options_code_block_tildes: Tildes code block style uses triple tilde fences', () => {
     const html = `<pre><code>some code</code></pre>`;
-    const result = convert(html, { codeBlockStyle: 'tildes' });
+    const result = convert(html, { codeBlockStyle: 'Tildes' });
     const content = result.content ?? '';
 
     expect(content).toContain('~~~');
@@ -59,7 +59,7 @@ describe('options', () => {
 
   it('options_heading_style_atx: ATX heading style produces hash-prefixed headings', () => {
     const html = `<h1>Title</h1><h2>Subtitle</h2>`;
-    const result = convert(html, { headingStyle: 'atx' });
+    const result = convert(html, { headingStyle: 'Atx' });
     const content = result.content ?? '';
 
     expect(content).toContain('# Title');
@@ -68,7 +68,7 @@ describe('options', () => {
 
   it('options_heading_style_atx_closed: ATX closed heading style adds closing hashes', () => {
     const html = `<h1>Closed Heading</h1>`;
-    const result = convert(html, { headingStyle: 'atxClosed' });
+    const result = convert(html, { headingStyle: 'AtxClosed' });
     const content = result.content ?? '';
 
     expect(content).toContain('# Closed Heading #');
@@ -76,7 +76,7 @@ describe('options', () => {
 
   it('options_heading_style_underlined: Underlined heading style produces setext-style headings for h1 and h2', () => {
     const html = `<h1>Main Title</h1>`;
-    const result = convert(html, { headingStyle: 'underlined' });
+    const result = convert(html, { headingStyle: 'Underlined' });
     const content = result.content ?? '';
 
     expect(content.trim().length).toBeGreaterThan(0);
@@ -94,7 +94,7 @@ describe('options', () => {
 
   it('options_list_indent_tabs: Tab indentation type for nested list items', () => {
     const html = `<ul><li>Parent<ul><li>Child</li></ul></li></ul>`;
-    const result = convert(html, { listIndentType: 'tabs' });
+    const result = convert(html, { listIndentType: 'Tabs' });
     const content = result.content ?? '';
 
     expect(content.trim().length).toBeGreaterThan(0);
@@ -104,7 +104,7 @@ describe('options', () => {
 
   it('options_output_format_djot: Djot output format produces djot-compatible markup', () => {
     const html = `<p>Simple paragraph.</p>`;
-    const result = convert(html, { outputFormat: 'djot' });
+    const result = convert(html, { outputFormat: 'Djot' });
     const content = result.content ?? '';
 
     expect(content.trim().length).toBeGreaterThan(0);
@@ -113,7 +113,7 @@ describe('options', () => {
 
   it('options_output_format_markdown: Default markdown output format produces standard markdown', () => {
     const html = `<h1>Title</h1><p>Some text.</p>`;
-    const result = convert(html, { outputFormat: 'markdown' });
+    const result = convert(html, { outputFormat: 'Markdown' });
     const content = result.content ?? '';
 
     expect(content).toContain('# Title');
@@ -122,7 +122,7 @@ describe('options', () => {
 
   it('options_output_format_plain: Plain text output format strips markdown syntax', () => {
     const html = `<h1>Title</h1><p>Some <strong>bold</strong> text.</p>`;
-    const result = convert(html, { outputFormat: 'plain' });
+    const result = convert(html, { outputFormat: 'Plain' });
     const content = result.content ?? '';
 
     expect(content).toContain('Title');
@@ -134,7 +134,7 @@ describe('options', () => {
 
   it('options_whitespace_normalized: Normalized whitespace mode collapses multiple spaces', () => {
     const html = `<p>Text   with    extra   spaces.</p>`;
-    const result = convert(html, { whitespaceMode: 'normalized' });
+    const result = convert(html, { whitespaceMode: 'Normalized' });
     const content = result.content ?? '';
 
     expect(content.trim().length).toBeGreaterThan(0);
@@ -146,7 +146,7 @@ describe('options', () => {
 
   it('options_whitespace_strict: Strict whitespace mode preserves whitespace as-is', () => {
     const html = `<p>Preserved   spacing.</p>`;
-    const result = convert(html, { whitespaceMode: 'strict' });
+    const result = convert(html, { whitespaceMode: 'Strict' });
     const content = result.content ?? '';
 
     expect(content.trim().length).toBeGreaterThan(0);

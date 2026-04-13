@@ -48,7 +48,7 @@ fn render_package_json() -> String {
     "test": "vitest run"
   },
   "devDependencies": {
-    "@kreuzberg/html-to-markdown": "file:../../packages/typescript",
+    "@kreuzberg/html-to-markdown": "workspace:*",
     "vitest": "^1.0.0"
   }
 }
@@ -105,7 +105,41 @@ fn render_test_function(out: &mut String, fixture: &Fixture) {
         let entries: Vec<String> = opts
             .iter()
             .map(|(k, v)| {
-                let js_val = json_value_to_js(v);
+                let mut js_val = json_value_to_js(v);
+                if let serde_json::Value::String(s) = v {
+                    if matches!(
+                        k.as_str(),
+                        "headingStyle"
+                            | "listIndentType"
+                            | "whitespaceMode"
+                            | "newlineStyle"
+                            | "codeBlockStyle"
+                            | "highlightStyle"
+                            | "linkStyle"
+                            | "outputFormat"
+                            | "preset"
+                    ) {
+                        let mut pascal_case = s
+                            .split('_')
+                            .map(|part| {
+                                let mut c = part.chars();
+                                match c.next() {
+                                    None => String::new(),
+                                    Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+                                }
+                            })
+                            .collect::<String>();
+
+                        // Handle special cases for NAPI-RS naming
+                        if pascal_case == "Atxclosed" {
+                            pascal_case = "AtxClosed".to_string();
+                        } else if pascal_case == "Doubleequal" {
+                            pascal_case = "DoubleEqual".to_string();
+                        }
+
+                        js_val = format!("'{}'", escape_string(&pascal_case));
+                    }
+                }
                 format!("{k}: {js_val}")
             })
             .collect();

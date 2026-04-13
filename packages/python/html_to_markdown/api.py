@@ -45,7 +45,8 @@ class ConversionResult(TypedDict):
     """Full result of the convert() API."""
 
     content: str | None
-    document: None
+    document: dict[str, Any] | str | None
+    metadata: dict[str, Any] | None
     tables: list[ExtractedTable]
     images: list[Any]
     warnings: list[ProcessingWarning]
