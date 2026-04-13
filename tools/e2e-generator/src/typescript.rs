@@ -106,18 +106,21 @@ fn render_test_function(out: &mut String, fixture: &Fixture) {
             .iter()
             .map(|(k, v)| {
                 let mut js_val = json_value_to_js(v);
-                if let (serde_json::Value::String(s), true) = (v, matches!(
-                    k.as_str(),
-                    "headingStyle"
-                        | "listIndentType"
-                        | "whitespaceMode"
-                        | "newlineStyle"
-                        | "codeBlockStyle"
-                        | "highlightStyle"
-                        | "linkStyle"
-                        | "outputFormat"
-                        | "preset"
-                )) {
+                if let (serde_json::Value::String(s), true) = (
+                    v,
+                    matches!(
+                        k.as_str(),
+                        "headingStyle"
+                            | "listIndentType"
+                            | "whitespaceMode"
+                            | "newlineStyle"
+                            | "codeBlockStyle"
+                            | "highlightStyle"
+                            | "linkStyle"
+                            | "outputFormat"
+                            | "preset"
+                    ),
+                ) {
                     let mut pascal_case = s
                         .split('_')
                         .map(|part| {
