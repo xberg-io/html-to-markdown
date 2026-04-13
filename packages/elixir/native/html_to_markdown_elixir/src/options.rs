@@ -4,9 +4,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 
 use html_to_markdown_rs::{
-    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle,
-    HighlightStyle, ListIndentType, NewlineStyle, OutputFormat,
-    PreprocessingOptionsUpdate, PreprocessingPreset, WhitespaceMode,
+    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle, HighlightStyle, ListIndentType,
+    NewlineStyle, OutputFormat, PreprocessingOptionsUpdate, PreprocessingPreset, WhitespaceMode,
 };
 use rustler::{Error, NifResult, Term};
 

@@ -26,7 +26,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: All elements
     /// Frequency: high
     fn visit_element_start(&self, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.element_start else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.element_start else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -43,7 +45,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <br>, <br/>
     /// Frequency: medium
     fn visit_line_break(&self, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.line_break else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.line_break else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -60,15 +64,16 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <hr>, <hr/>
     /// Frequency: low
     fn visit_horizontal_rule(&self, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.horizontal_rule else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.horizontal_rule else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx)) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx)) };
         // Convert C result back to Rust VisitResult
         convert_c_visit_result(result)
     }
@@ -78,7 +83,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <table>
     /// Frequency: low
     fn visit_table_start(&self, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.table_start else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.table_start else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -95,15 +102,16 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <dl>
     /// Frequency: low
     fn visit_definition_list_start(&self, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.definition_list_start else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.definition_list_start else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx)) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx)) };
         // Convert C result back to Rust VisitResult
         convert_c_visit_result(result)
     }
@@ -113,7 +121,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <figure>
     /// Frequency: low
     fn visit_figure_start(&self, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.figure_start else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.figure_start else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -130,7 +140,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: Text nodes
     /// Frequency: very_high
     fn visit_text(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.text else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.text else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -158,7 +170,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <strong>, <b>
     /// Frequency: medium
     fn visit_strong(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.strong else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.strong else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -171,8 +185,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -187,7 +200,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <em>, <i>
     /// Frequency: medium
     fn visit_emphasis(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.emphasis else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.emphasis else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -200,8 +215,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -216,7 +230,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <s>, <del>, <strike>
     /// Frequency: low
     fn visit_strikethrough(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.strikethrough else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.strikethrough else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -229,8 +245,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -245,7 +260,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <u>, <ins>
     /// Frequency: low
     fn visit_underline(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.underline else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.underline else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -258,8 +275,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -274,7 +290,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <sub>
     /// Frequency: low
     fn visit_subscript(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.subscript else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.subscript else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -287,8 +305,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -303,7 +320,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <sup>
     /// Frequency: low
     fn visit_superscript(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.superscript else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.superscript else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -316,8 +335,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -332,7 +350,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <mark>
     /// Frequency: low
     fn visit_mark(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.mark else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.mark else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -360,7 +380,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <code>
     /// Frequency: medium
     fn visit_code_inline(&self, code: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.code_inline else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.code_inline else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -373,8 +395,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_code) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_code) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -389,7 +410,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: All elements
     /// Frequency: high
     fn visit_element_end(&self, output: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.element_end else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.element_end else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -402,8 +425,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -418,7 +440,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: </table>
     /// Frequency: low
     fn visit_table_end(&self, output: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.table_end else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.table_end else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -431,8 +455,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -447,7 +470,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <dt>
     /// Frequency: low
     fn visit_definition_term(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.definition_term else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.definition_term else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -460,9 +485,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -477,7 +500,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <dd>
     /// Frequency: low
     fn visit_definition_description(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.definition_description else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.definition_description else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -490,9 +515,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -507,7 +530,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: </dl>
     /// Frequency: low
     fn visit_definition_list_end(&self, output: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.definition_list_end else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.definition_list_end else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -520,9 +545,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -537,7 +560,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <summary>
     /// Frequency: low
     fn visit_summary(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.summary else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.summary else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -550,8 +575,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -566,7 +590,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <figcaption>
     /// Frequency: low
     fn visit_figcaption(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.figcaption else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.figcaption else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -579,8 +605,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -595,7 +620,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <a href="...">
     /// Frequency: high
     fn visit_link(&self, href: &str, text: &str, title: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.link else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.link else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -622,9 +649,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_href, c_text, c_title)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_href, c_text, c_title) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -651,7 +676,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <img src="..." alt="...">
     /// Frequency: medium
     fn visit_image(&self, src: &str, alt: &str, title: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.image else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.image else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -678,9 +705,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_src, c_alt, c_title)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_src, c_alt, c_title) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -707,7 +732,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <pre><code>
     /// Frequency: medium
     fn visit_code_block(&self, lang: &Option<String>, code: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.code_block else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.code_block else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -728,9 +755,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_lang, c_code)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_lang, c_code) };
         // Free nullable string if it was allocated
         if !c_lang.is_null() {
             // SAFETY: Pointer was allocated by CString::into_raw above
@@ -752,7 +777,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <li>
     /// Frequency: medium
     fn visit_list_item(&self, ordered: bool, marker: &str, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.list_item else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.list_item else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -799,7 +826,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: </ul>, </ol>
     /// Frequency: medium
     fn visit_list_end(&self, ordered: bool, output: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.list_end else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.list_end else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -812,9 +841,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), ordered, c_output)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), ordered, c_output) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -829,7 +856,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <blockquote>
     /// Frequency: medium
     fn visit_blockquote(&self, content: &str, depth: usize, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.blockquote else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.blockquote else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -842,9 +871,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_content, depth)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_content, depth) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -859,7 +886,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: Unknown elements
     /// Frequency: low
     fn visit_custom_element(&self, tag_name: &str, content: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.custom_element else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.custom_element else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -878,14 +907,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(
-                self.callbacks.user_data,
-                ptr::addr_of!(c_ctx),
-                c_tag_name,
-                c_content,
-            )
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_tag_name, c_content) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -905,7 +927,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <form>
     /// Frequency: low
     fn visit_form(&self, action: &Option<String>, method: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.form else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.form else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -928,9 +952,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_action, c_method)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_action, c_method) };
         // Free nullable string if it was allocated
         if !c_action.is_null() {
             // SAFETY: Pointer was allocated by CString::into_raw above
@@ -960,7 +982,9 @@ impl HtmlVisitor for CVisitorWrapper {
         value: &Option<String>,
         ctx: &NodeContext,
     ) -> VisitResult {
-        let Some(cb) = self.callbacks.input else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.input else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1030,7 +1054,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <button>
     /// Frequency: low
     fn visit_button(&self, text: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.button else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.button else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1043,8 +1069,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_text) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -1059,7 +1084,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <audio>
     /// Frequency: low
     fn visit_audio(&self, src: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.audio else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.audio else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1091,7 +1118,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <video>
     /// Frequency: low
     fn visit_video(&self, src: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.video else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.video else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1123,7 +1152,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <iframe>
     /// Frequency: low
     fn visit_iframe(&self, src: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.iframe else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.iframe else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1155,7 +1186,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <h1> through <h6>
     /// Frequency: medium
     fn visit_heading(&self, level: u32, text: &str, id: &Option<String>, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.heading else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.heading else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1176,9 +1209,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), level, c_text, c_id)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), level, c_text, c_id) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {
@@ -1200,15 +1231,16 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <ul>, <ol>
     /// Frequency: medium
     fn visit_list_start(&self, ordered: bool, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.list_start else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.list_start else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), ordered) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), ordered) };
         // Convert C result back to Rust VisitResult
         convert_c_visit_result(result)
     }
@@ -1218,7 +1250,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <tr>
     /// Frequency: low
     fn visit_table_row(&self, cells: &[String], is_header: bool, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.table_row else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.table_row else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1238,9 +1272,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result = unsafe {
-            cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_cells, is_header)
-        };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_cells, is_header) };
         // Free string array elements (excluding null terminator)
         for ptr in c_cells_vec.iter().take(cells.len()) {
             // SAFETY: Pointers were allocated by CString::into_raw above
@@ -1257,7 +1289,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: <details>
     /// Frequency: low
     fn visit_details(&self, open: bool, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.details else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.details else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1274,7 +1308,9 @@ impl HtmlVisitor for CVisitorWrapper {
     /// HTML elements: </figure>
     /// Frequency: low
     fn visit_figure_end(&self, output: &str, ctx: &NodeContext) -> VisitResult {
-        let Some(cb) = self.callbacks.figure_end else { return VisitResult::Continue; };
+        let Some(cb) = self.callbacks.figure_end else {
+            return VisitResult::Continue;
+        };
 
         // Convert NodeContext to C-compatible format
         let c_ctx = HtmlToMarkdownNodeContext::from_node_context(ctx);
@@ -1287,8 +1323,7 @@ impl HtmlVisitor for CVisitorWrapper {
         // Call the C callback
         // SAFETY: Callback function pointer is validated at registration time.
         // All pointer arguments are properly allocated and valid for the callback duration.
-        let result =
-            unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
+        let result = unsafe { cb(self.callbacks.user_data, ptr::addr_of!(c_ctx), c_output) };
         // Free allocated string
         // SAFETY: Pointer was allocated by CString::into_raw above
         unsafe {

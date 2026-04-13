@@ -7,25 +7,15 @@ use html_to_markdown_rs::metadata::{
 mod options;
 mod types;
 
-use options::{
-    INVALID_OPTION_ERROR, decode_options_term,
-    take_invalid_option_message,
-};
+use options::{INVALID_OPTION_ERROR, decode_options_term, take_invalid_option_message};
 use types::{
     ConversionResultTerm, DocumentMetadataTerm, ExtendedMetadataTerm, ExtractTableTerm, GridCellTerm,
-    HeaderMetadataTerm, ImageMetadataTerm, InlineImageTerm, LinkMetadataTerm,
-    StructuredDataTerm, WarningTerm,
+    HeaderMetadataTerm, ImageMetadataTerm, InlineImageTerm, LinkMetadataTerm, StructuredDataTerm, WarningTerm,
 };
 
 use rustler::{Encoder, Env, Error, NifResult, Term};
 
-rustler::init!(
-    "Elixir.HtmlToMarkdown.Native",
-    [
-        convert
-    ],
-    load = on_load
-);
+rustler::init!("Elixir.HtmlToMarkdown.Native", [convert], load = on_load);
 
 fn on_load(_env: Env, _info: Term) -> bool {
     true
@@ -98,15 +88,11 @@ fn convert<'a>(env: Env<'a>, html: String, options_term: Term<'a>) -> NifResult<
                 .into_iter()
                 .map(|w| {
                     let kind = match w.kind {
-                        html_to_markdown_rs::WarningKind::ImageExtractionFailed => {
-                            "image_extraction_failed"
-                        }
+                        html_to_markdown_rs::WarningKind::ImageExtractionFailed => "image_extraction_failed",
                         html_to_markdown_rs::WarningKind::EncodingFallback => "encoding_fallback",
                         html_to_markdown_rs::WarningKind::TruncatedInput => "truncated_input",
                         html_to_markdown_rs::WarningKind::MalformedHtml => "malformed_html",
-                        html_to_markdown_rs::WarningKind::SanitizationApplied => {
-                            "sanitization_applied"
-                        }
+                        html_to_markdown_rs::WarningKind::SanitizationApplied => "sanitization_applied",
                     };
                     WarningTerm {
                         message: w.message,
@@ -115,9 +101,7 @@ fn convert<'a>(env: Env<'a>, html: String, options_term: Term<'a>) -> NifResult<
                 })
                 .collect();
 
-            let document = result.document.and_then(|doc| {
-                serde_json::to_string(&doc).ok()
-            });
+            let document = result.document.and_then(|doc| serde_json::to_string(&doc).ok());
 
             let images: Vec<InlineImageTerm> = result
                 .images

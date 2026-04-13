@@ -1,9 +1,9 @@
 //! Metadata configuration and conversion functions.
 
 use html_to_markdown_rs::metadata::{
-    DocumentMetadata as RustDocumentMetadata, HeaderMetadata as RustHeaderMetadata,
-    HtmlMetadata as RustHtmlMetadata, ImageMetadata as RustImageMetadata, LinkMetadata as RustLinkMetadata,
-    StructuredData as RustStructuredData, TextDirection as RustTextDirection,
+    DocumentMetadata as RustDocumentMetadata, HeaderMetadata as RustHeaderMetadata, HtmlMetadata as RustHtmlMetadata,
+    ImageMetadata as RustImageMetadata, LinkMetadata as RustLinkMetadata, StructuredData as RustStructuredData,
+    TextDirection as RustTextDirection,
 };
 use magnus::prelude::*;
 use magnus::{Error, Ruby, Value};

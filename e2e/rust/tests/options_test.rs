@@ -241,7 +241,10 @@ fn test_options_wrap_disabled() {
     let result = convert(html, Some(options)).expect("conversion should succeed");
     let content = result.content.unwrap_or_default();
 
-    assert!(content.contains("This is a long paragraph that should not be wrapped at all because wrapping is disabled."), "expected content to contain: This is a long paragraph that should not be wrapped at all because wrapping is disabled.");
+    assert!(
+        content.contains("This is a long paragraph that should not be wrapped at all because wrapping is disabled."),
+        "expected content to contain: This is a long paragraph that should not be wrapped at all because wrapping is disabled."
+    );
 }
 
 #[test]
