@@ -78,6 +78,7 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
 Requires Java 25+ with Panama FFI support.
 
 **Maven:**
+
 ```xml
 <dependency>
     <groupId>dev.kreuzberg</groupId>
@@ -87,6 +88,7 @@ Requires Java 25+ with Panama FFI support.
 ```
 
 **Gradle (Kotlin DSL):**
+
 ```kotlin
 implementation("dev.kreuzberg:html-to-markdown:3.1.0")
 ```
@@ -178,6 +180,7 @@ List<?>  tables   = result.tables();    // empty unless extractTables(true)
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
+
 - `heading_style`: Heading format (`"underlined"` | `"atx"` | `"atx_closed"`) — default: `"underlined"`
 - `list_indent_width`: Spaces per indent level — default: `2`
 - `bullets`: Bullet characters cycle — default: `"*+-"`
