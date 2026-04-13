@@ -145,7 +145,6 @@ result.warnings   # Any conversion warnings
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
-
 - `heading_style`: Heading format (`"underlined"` | `"atx"` | `"atx_closed"`) — default: `"underlined"`
 - `list_indent_width`: Spaces per indent level — default: `2`
 - `bullets`: Bullet characters cycle — default: `"*+-"`
@@ -214,7 +213,6 @@ Plain text mode is useful for search indexing, text extraction, and feeding cont
 The metadata extraction feature enables comprehensive document analysis during conversion. Extract document properties, headers, links, images, and structured data in a single pass — all via the standard `convert()` function.
 
 **Use Cases:**
-
 - **SEO analysis** – Extract title, description, Open Graph tags, Twitter cards
 - **Table of contents generation** – Build structured outlines from heading hierarchy
 - **Content migration** – Document all external links and resources
@@ -249,7 +247,6 @@ IO.inspect(result.metadata["structured_data"])    # JSON-LD, Microdata, RDFa
 The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
 
 **Use Cases:**
-
 - **Custom Markdown dialects** – Convert to Obsidian, Notion, or other flavors
 - **Content filtering** – Remove tracking pixels, ads, or unwanted elements
 - **URL rewriting** – Rewrite CDN URLs, add query parameters, validate links
