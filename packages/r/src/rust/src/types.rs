@@ -157,7 +157,9 @@ pub fn conversion_result_to_robj(result: html_to_markdown_rs::ConversionResult) 
         .into_iter()
         .map(|w| {
             let kind = match w.kind {
-                html_to_markdown_rs::WarningKind::ImageExtractionFailed => "image_extraction_failed",
+                html_to_markdown_rs::WarningKind::ImageExtractionFailed => {
+                    "image_extraction_failed"
+                }
                 html_to_markdown_rs::WarningKind::EncodingFallback => "encoding_fallback",
                 html_to_markdown_rs::WarningKind::TruncatedInput => "truncated_input",
                 html_to_markdown_rs::WarningKind::MalformedHtml => "malformed_html",

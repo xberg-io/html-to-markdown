@@ -30,8 +30,8 @@ fn convert_full_fn(ruby: &Ruby, args: &[Value]) -> Result<Value, Error> {
     let html = parsed.required.0;
     let options = build_conversion_options(ruby, parsed.optional.0)?;
 
-    let result =
-        guard_panic(|| html_to_markdown_rs::convert(&html, Some(options.clone()))).map_err(conversion_error)?;
+    let result = guard_panic(|| html_to_markdown_rs::convert(&html, Some(options.clone())))
+        .map_err(conversion_error)?;
 
     let hash = ruby.hash_new();
 

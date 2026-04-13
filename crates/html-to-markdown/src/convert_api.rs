@@ -223,7 +223,7 @@ fn convert_impl(
         (Vec::new(), Vec::new())
     };
 
-    // Map InlineImageWarnings \u2192 ProcessingWarnings.
+    // Map InlineImageWarnings → ProcessingWarnings.
     #[cfg(feature = "inline-images")]
     let warnings: Vec<crate::types::ProcessingWarning> = image_warnings
         .into_iter()

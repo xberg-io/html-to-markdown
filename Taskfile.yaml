@@ -388,10 +388,10 @@ tasks:
 
   # Documentation
   docs:build:
-    desc: "Build documentation site with zensical"
+    desc: "Build documentation site with mkdocs"
     cmds:
       - task: python:install
-      - uv run zensical build --clean --strict
+      - uv run mkdocs build --clean --strict
 
   # Clean artifacts
   clean:

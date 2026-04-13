@@ -17,7 +17,8 @@ use types::conversion_result_to_robj;
 #[extendr]
 fn convert(html: &str, options: Robj) -> Result<Robj> {
     let opts = decode_options(options).map_err(|e| Error::Other(e))?;
-    let result = html_to_markdown_rs::convert(html, Some(opts.clone())).map_err(|e| Error::Other(e.to_string()))?;
+    let result = html_to_markdown_rs::convert(html, Some(opts.clone()))
+        .map_err(|e| Error::Other(e.to_string()))?;
     Ok(conversion_result_to_robj(result))
 }
 

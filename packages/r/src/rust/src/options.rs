@@ -2,8 +2,9 @@
 
 use extendr_api::prelude::*;
 use html_to_markdown_rs::{
-    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle, HighlightStyle, ListIndentType,
-    NewlineStyle, PreprocessingOptionsUpdate, PreprocessingPreset, WhitespaceMode,
+    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle,
+    HighlightStyle, ListIndentType, NewlineStyle,
+    PreprocessingOptionsUpdate, PreprocessingPreset, WhitespaceMode,
 };
 
 /// Decode an R list into ConversionOptions.
