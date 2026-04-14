@@ -2,62 +2,152 @@
   {
     "id": "unordered_list",
     "description": "Unordered list",
-    "html": "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>",
-    "assertions": { "content_contains_all": ["- Item 1", "- Item 2", "- Item 3"] }
+    "input": {
+      "html": "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "- Item 1",
+          "- Item 2",
+          "- Item 3"
+        ]
+      }
+    ]
   },
   {
     "id": "ordered_list",
     "description": "Ordered list",
-    "html": "<ol><li>First</li><li>Second</li><li>Third</li></ol>",
-    "assertions": { "content_contains_all": ["1. First", "2. Second", "3. Third"] }
+    "input": {
+      "html": "<ol><li>First</li><li>Second</li><li>Third</li></ol>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "1. First",
+          "2. Second",
+          "3. Third"
+        ]
+      }
+    ]
   },
   {
     "id": "list_nested_unordered",
     "description": "Nested unordered list with two levels of depth",
-    "html": "<ul><li>Parent A<ul><li>Child A1</li><li>Child A2</li></ul></li><li>Parent B</li></ul>",
-    "assertions": {
-      "content_contains_all": ["Parent A", "Child A1", "Child A2", "Parent B"]
-    }
+    "input": {
+      "html": "<ul><li>Parent A<ul><li>Child A1</li><li>Child A2</li></ul></li><li>Parent B</li></ul>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Parent A",
+          "Child A1",
+          "Child A2",
+          "Parent B"
+        ]
+      }
+    ]
   },
   {
     "id": "list_nested_ordered",
     "description": "Nested ordered list with two levels of depth",
-    "html": "<ol><li>Step 1<ol><li>Step 1a</li><li>Step 1b</li></ol></li><li>Step 2</li></ol>",
-    "assertions": {
-      "content_contains_all": ["Step 1", "Step 1a", "Step 1b", "Step 2"]
-    }
+    "input": {
+      "html": "<ol><li>Step 1<ol><li>Step 1a</li><li>Step 1b</li></ol></li><li>Step 2</li></ol>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Step 1",
+          "Step 1a",
+          "Step 1b",
+          "Step 2"
+        ]
+      }
+    ]
   },
   {
     "id": "list_mixed_nested",
     "description": "Mixed list: ordered list nested inside unordered list",
-    "html": "<ul><li>Item A<ol><li>Sub 1</li><li>Sub 2</li></ol></li><li>Item B</li></ul>",
-    "assertions": {
-      "content_contains_all": ["Item A", "Sub 1", "Sub 2", "Item B"]
-    }
+    "input": {
+      "html": "<ul><li>Item A<ol><li>Sub 1</li><li>Sub 2</li></ol></li><li>Item B</li></ul>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Item A",
+          "Sub 1",
+          "Sub 2",
+          "Item B"
+        ]
+      }
+    ]
   },
   {
     "id": "list_task_checkboxes",
     "description": "Task list with checked and unchecked checkboxes",
-    "html": "<ul><li><input type=\"checkbox\" checked> Done task</li><li><input type=\"checkbox\"> Pending task</li></ul>",
-    "assertions": {
-      "content_contains_all": ["Done task", "Pending task"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<ul><li><input type=\"checkbox\" checked> Done task</li><li><input type=\"checkbox\"> Pending task</li></ul>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Done task",
+          "Pending task"
+        ]
+      }
+    ]
   },
   {
     "id": "list_item_multiple_paragraphs",
     "description": "List item containing multiple paragraphs",
-    "html": "<ul><li><p>First paragraph in item.</p><p>Second paragraph in item.</p></li><li>Simple item</li></ul>",
-    "assertions": {
-      "content_contains_all": ["First paragraph in item.", "Second paragraph in item.", "Simple item"]
-    }
+    "input": {
+      "html": "<ul><li><p>First paragraph in item.</p><p>Second paragraph in item.</p></li><li>Simple item</li></ul>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "First paragraph in item.",
+          "Second paragraph in item.",
+          "Simple item"
+        ]
+      }
+    ]
   },
   {
     "id": "list_definition_dl",
     "description": "Definition list with dt and dd elements",
-    "html": "<dl><dt>Term One</dt><dd>Definition of term one.</dd><dt>Term Two</dt><dd>Definition of term two.</dd></dl>",
-    "assertions": {
-      "content_contains_all": ["Term One", "Definition of term one.", "Term Two", "Definition of term two."]
-    }
+    "input": {
+      "html": "<dl><dt>Term One</dt><dd>Definition of term one.</dd><dt>Term Two</dt><dd>Definition of term two.</dd></dl>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Term One",
+          "Definition of term one.",
+          "Term Two",
+          "Definition of term two."
+        ]
+      }
+    ]
   }
 ]

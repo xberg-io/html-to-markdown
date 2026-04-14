@@ -44,12 +44,6 @@
     }
   },
   "scripts": {
-    "post-install-cmd": [
-      "@php packages/php/bin/install-extension.php"
-    ],
-    "post-update-cmd": [
-      "@php packages/php/bin/install-extension.php"
-    ],
     "phpstan": "php -d detect_unicode=0 vendor/bin/phpstan --configuration=packages/php/phpstan.neon",
     "csfixer": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config packages/php/php-cs-fixer.php packages/php/src packages/php/tests",
     "format": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config packages/php/php-cs-fixer.php packages/php/src packages/php/tests",

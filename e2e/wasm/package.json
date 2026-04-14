@@ -1,0 +1,15 @@
+{
+  "name": "html_to_markdown-e2e-wasm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "html_to_markdown": "file:../../crates/html-to-markdown-wasm/pkg",
+    "vite-plugin-top-level-await": "^1.4.0",
+    "vite-plugin-wasm": "^3.4.0",
+    "vitest": "^3.0.0"
+  }
+}

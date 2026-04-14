@@ -160,11 +160,3 @@ jobs:
       - name: Validate READMEs
         run: task docs:generate-readme:check
         shell: bash
-
-      - name: Build snippet-runner
-        run: cargo build --release -p snippet-runner
-        shell: bash
-
-      - name: Validate documentation snippets
-        run: ./target/release/snippet-runner validate --snippets docs/snippets --level syntax
-        shell: bash

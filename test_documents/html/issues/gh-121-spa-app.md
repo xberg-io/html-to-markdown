@@ -4,8 +4,8 @@
 
 - [Team Appraisal](/team-appraisal)
 
-  - [Team](/team-appraisal/team)
-  - [Pending](/team-appraisal/pending)
+  * [Team](/team-appraisal/team)
+  * [Pending](/team-appraisal/pending)
 
 - [My Appraisals](/my-appraisal)
 - [My Feedbacks](/my-feedbacks)

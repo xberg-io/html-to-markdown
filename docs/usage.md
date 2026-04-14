@@ -123,60 +123,18 @@ Enable `extract_metadata` to populate the `metadata` field with structured data 
 
 ### Metadata Fields
 
-`result.metadata` is an `HtmlMetadata` with five top-level fields: `document`, `headers`, `links`, `images`, and `structured_data`. Everything is populated in a single pass.
-
-#### `document` (DocumentMetadata)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | `Option<String>` | Page title from the `<title>` element. |
-| `description` | `Option<String>` | `<meta name="description">` content. |
-| `keywords` | `Vec<String>` | Parsed `<meta name="keywords">`, split on commas. |
-| `author` | `Option<String>` | `<meta name="author">` content. |
-| `canonical_url` | `Option<String>` | `<link rel="canonical">` href. |
-| `base_href` | `Option<String>` | `<base href="…">` value. |
-| `language` | `Option<String>` | `lang` attribute on `<html>`. |
-| `text_direction` | `Option<TextDirection>` | `dir` attribute on `<html>`. One of `left_to_right`, `right_to_left`, `auto`. |
-| `open_graph` | `BTreeMap<String, String>` | All `og:*` meta tags keyed by property (without the `og:` prefix). |
-| `twitter_card` | `BTreeMap<String, String>` | All `twitter:*` meta tags keyed by name (without the prefix). |
-| `meta_tags` | `BTreeMap<String, String>` | Every other `<meta name>` tag, keyed by name. |
-
-#### `headers`, `links`, `images`, `structured_data`
-
 | Field | Description |
 |-------|-------------|
-| `headers` | `HeaderMetadata` entries for every `<h1>`–`<h6>` with level, text, and id. |
-| `links` | `LinkMetadata` entries for every `<a>` with href, text, `rel` values, and classified `link_type`. |
-| `images` | `ImageMetadata` entries for every `<img>` with src, alt, dimensions, and classified `image_type`. |
-| `structured_data` | JSON-LD, Microdata, and RDFa blocks with a `data_type` tag and the raw content. |
-
-#### `links[].link_type`
-
-| Value | Matches |
-|-------|---------|
-| `anchor` | href starts with `#` (same-page anchors). |
-| `internal` | relative href or href that resolves inside the document's own host. |
-| `external` | absolute URL on a different host. |
-| `email` | `mailto:` URI. |
-| `phone` | `tel:` URI. |
-| `other` | anything else (`javascript:`, `data:`, custom schemes). |
-
-#### `images[].image_type`
-
-| Value | Matches |
-|-------|---------|
-| `data_uri` | `src` starts with `data:`. |
-| `inline_svg` | inline `<svg>` element (captured when `extract_images` is enabled). |
-| `external` | absolute URL on a remote host. |
-| `relative` | relative path or same-host URL. |
-
-#### `structured_data[].data_type`
-
-| Value | Matches |
-|-------|---------|
-| `json_ld` | `<script type="application/ld+json">` blocks. |
-| `microdata` | `itemscope`/`itemprop` subtrees. |
-| `rdfa` | `typeof`/`property` subtrees. |
+| `document.title` | Page title from `<title>` tag |
+| `document.description` | Content of `<meta name="description">` |
+| `document.language` | `lang` attribute of `<html>` tag |
+| `document.charset` | Character encoding declaration |
+| `document.open_graph` | Open Graph tags (`og:title`, `og:description`, etc.) |
+| `document.twitter_card` | Twitter Card tags |
+| `document.json_ld` | JSON-LD structured data blocks |
+| `headers` | All `<h1>`–`<h6>` elements with level, text, and id |
+| `links` | All `<a>` tags with href, text, rel, and link type |
+| `images` | All `<img>` tags with src, alt, width, height |
 
 ## Document Structure Extraction
 
@@ -220,5 +178,3 @@ Enable `include_document_structure` to get a parsed tree of the document's struc
       console.log(node);
     }
     ```
-
---8<-- "snippets/feedback.md"

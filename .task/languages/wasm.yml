@@ -58,7 +58,7 @@ tasks:
     desc: "Run WASM tests in Node.js environment"
     silent: false
     cmds:
-      - cmd: cd {{.WASM_PKG}} && wasm-pack test --node --headless
+      - cmd: cd {{.WASM_PKG}} && wasm-pack test --node
         ignore_error: false
 
   test:ci:
@@ -133,6 +133,22 @@ tasks:
         ignore_error: false
       - cmd: cd {{.WASM_PKG}} && rm -rf pkg/
         ignore_error: true
+
+  e2e:generate:
+    desc: "Generate E2E tests from fixtures using alef"
+    silent: false
+    cmds:
+      - cmd: alef e2e generate --lang wasm
+        ignore_error: false
+
+  e2e:test:
+    desc: "Run WASM E2E tests in e2e/wasm directory (builds WASM first)"
+    silent: false
+    cmds:
+      - cmd: cd {{.WASM_PKG}} && wasm-pack build --dev --target bundler
+        ignore_error: false
+      - cmd: cd e2e/wasm && pnpm install --ignore-workspace && pnpm test
+        ignore_error: false
 
   pack:
     desc: "Build WASM package with bundler target for distribution"

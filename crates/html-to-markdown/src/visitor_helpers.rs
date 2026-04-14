@@ -58,7 +58,7 @@ use crate::visitor::{HtmlVisitor, NodeContext, NodeType, VisitResult};
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// let ctx = build_node_context(
 ///     NodeType::Heading,
 ///     "h1",
@@ -129,7 +129,7 @@ pub fn build_node_context(
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// let result = dispatch_visitor(
 ///     &visitor,
 ///     |v| v.visit_heading(&ctx, level, text, id),
@@ -252,7 +252,7 @@ impl VisitorDispatch {
 ///
 /// # Syntax
 ///
-/// ```ignore
+/// ```text
 /// try_visitor!(visitor_option, method_name, ctx, arg1, arg2, ...);
 /// ```
 ///
@@ -264,7 +264,7 @@ impl VisitorDispatch {
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// // Before (verbose):
 /// let dispatch = dispatch_visitor(&visitor, |v| v.visit_heading(&ctx, level, text, id))?;
 /// match dispatch {
@@ -311,13 +311,13 @@ macro_rules! try_visitor {
 ///
 /// # Syntax
 ///
-/// ```ignore
+/// ```text
 /// try_visitor_element_start!(visitor_option, ctx);
 /// ```
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// fn process_heading(...) -> Result<String> {
 ///     let ctx = build_node_context(...);
 ///     try_visitor_element_start!(visitor, &ctx)?;
@@ -340,13 +340,13 @@ macro_rules! try_visitor_element_start {
 ///
 /// # Syntax
 ///
-/// ```ignore
+/// ```text
 /// try_visitor_element_end!(visitor_option, ctx, default_output_string);
 /// ```
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// fn process_heading(...) -> Result<String> {
 ///     let ctx = build_node_context(...);
 ///     let mut output = String::from("# Heading");

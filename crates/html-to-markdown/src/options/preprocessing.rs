@@ -42,10 +42,7 @@ impl PreprocessingPreset {
     any(feature = "serde", feature = "metadata"),
     derive(serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(
-    any(feature = "serde", feature = "metadata"),
-    serde(rename_all = "camelCase", deny_unknown_fields)
-)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default, deny_unknown_fields))]
 pub struct PreprocessingOptions {
     /// Enable HTML preprocessing globally
     pub enabled: bool,
@@ -70,10 +67,7 @@ pub struct PreprocessingOptions {
     any(feature = "serde", feature = "metadata"),
     derive(serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(
-    any(feature = "serde", feature = "metadata"),
-    serde(rename_all = "camelCase", deny_unknown_fields)
-)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(deny_unknown_fields))]
 pub struct PreprocessingOptionsUpdate {
     /// Optional global preprocessing enablement override
     pub enabled: Option<bool>,
@@ -91,7 +85,7 @@ pub struct PreprocessingOptionsUpdate {
 impl Default for PreprocessingOptions {
     fn default() -> Self {
         Self {
-            enabled: false,
+            enabled: true,
             preset: PreprocessingPreset::default(),
             remove_navigation: true,
             remove_forms: true,

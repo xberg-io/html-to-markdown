@@ -2,9 +2,9 @@
 
 use extendr_api::prelude::*;
 use html_to_markdown_rs::{
-    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle,
-    HighlightStyle, ListIndentType, NewlineStyle,
-    PreprocessingOptionsUpdate, PreprocessingPreset, WhitespaceMode,
+    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle, HighlightStyle,
+    LinkStyle, ListIndentType, NewlineStyle, OutputFormat, PreprocessingOptionsUpdate,
+    PreprocessingPreset, WhitespaceMode,
 };
 
 /// Decode an R list into ConversionOptions.
@@ -24,14 +24,21 @@ fn apply_options(list: &List) -> std::result::Result<ConversionOptions, String> 
     let mut update = ConversionOptionsUpdate::default();
 
     for (key, value) in list.iter() {
+        // Accept both snake_case and camelCase option keys for compatibility with
+        // auto-generated test suites and user convenience.
         match key {
-            "heading_style" => update.heading_style = Some(parse_heading_style(&value)?),
-            "list_indent_type" => update.list_indent_type = Some(parse_list_indent_type(&value)?),
-            "list_indent_width" => {
-                update.list_indent_width = Some(decode_positive_integer(&value, "list_indent_width")?)
+            "heading_style" | "headingStyle" => {
+                update.heading_style = Some(parse_heading_style(&value)?)
+            }
+            "list_indent_type" | "listIndentType" => {
+                update.list_indent_type = Some(parse_list_indent_type(&value)?)
+            }
+            "list_indent_width" | "listIndentWidth" => {
+                update.list_indent_width =
+                    Some(decode_positive_integer(&value, "list_indent_width")?)
             }
             "bullets" => update.bullets = Some(decode_string(&value, "bullets")?),
-            "strong_em_symbol" => {
+            "strong_em_symbol" | "strongEmSymbol" => {
                 let symbol = decode_string(&value, "strong_em_symbol")?;
                 let ch = symbol
                     .chars()
@@ -39,31 +46,94 @@ fn apply_options(list: &List) -> std::result::Result<ConversionOptions, String> 
                     .ok_or_else(|| "strong_em_symbol: must not be empty".to_string())?;
                 update.strong_em_symbol = Some(ch);
             }
-            "escape_asterisks" => update.escape_asterisks = Some(decode_bool(&value, "escape_asterisks")?),
-            "escape_underscores" => update.escape_underscores = Some(decode_bool(&value, "escape_underscores")?),
-            "escape_misc" => update.escape_misc = Some(decode_bool(&value, "escape_misc")?),
-            "escape_ascii" => update.escape_ascii = Some(decode_bool(&value, "escape_ascii")?),
-            "code_language" => update.code_language = Some(decode_string(&value, "code_language")?),
+            "escape_asterisks" | "escapeAsterisks" => {
+                update.escape_asterisks = Some(decode_bool(&value, "escape_asterisks")?)
+            }
+            "escape_underscores" | "escapeUnderscores" => {
+                update.escape_underscores = Some(decode_bool(&value, "escape_underscores")?)
+            }
+            "escape_misc" | "escapeMisc" => {
+                update.escape_misc = Some(decode_bool(&value, "escape_misc")?)
+            }
+            "escape_ascii" | "escapeAscii" => {
+                update.escape_ascii = Some(decode_bool(&value, "escape_ascii")?)
+            }
+            "code_language" | "codeLanguage" => {
+                update.code_language = Some(decode_string(&value, "code_language")?)
+            }
             "encoding" => update.encoding = Some(decode_string(&value, "encoding")?),
             "autolinks" => update.autolinks = Some(decode_bool(&value, "autolinks")?),
-            "default_title" => update.default_title = Some(decode_bool(&value, "default_title")?),
-            "keep_inline_images_in" => {
-                update.keep_inline_images_in = Some(decode_string_list(&value, "keep_inline_images_in")?)
+            "default_title" | "defaultTitle" => {
+                update.default_title = Some(decode_bool(&value, "default_title")?)
             }
-            "br_in_tables" => update.br_in_tables = Some(decode_bool(&value, "br_in_tables")?),
-            "highlight_style" => update.highlight_style = Some(parse_highlight_style(&value)?),
-            "extract_metadata" => update.extract_metadata = Some(decode_bool(&value, "extract_metadata")?),
-            "whitespace_mode" => update.whitespace_mode = Some(parse_whitespace_mode(&value)?),
-            "strip_newlines" => update.strip_newlines = Some(decode_bool(&value, "strip_newlines")?),
+            "keep_inline_images_in" | "keepInlineImagesIn" => {
+                update.keep_inline_images_in =
+                    Some(decode_string_list(&value, "keep_inline_images_in")?)
+            }
+            "br_in_tables" | "brInTables" => {
+                update.br_in_tables = Some(decode_bool(&value, "br_in_tables")?)
+            }
+            "highlight_style" | "highlightStyle" => {
+                update.highlight_style = Some(parse_highlight_style(&value)?)
+            }
+            "extract_metadata" | "extractMetadata" => {
+                update.extract_metadata = Some(decode_bool(&value, "extract_metadata")?)
+            }
+            "whitespace_mode" | "whitespaceMode" => {
+                update.whitespace_mode = Some(parse_whitespace_mode(&value)?)
+            }
+            "strip_newlines" | "stripNewlines" => {
+                update.strip_newlines = Some(decode_bool(&value, "strip_newlines")?)
+            }
             "wrap" => update.wrap = Some(decode_bool(&value, "wrap")?),
-            "wrap_width" => update.wrap_width = Some(decode_positive_integer(&value, "wrap_width")?),
-            "strip_tags" => update.strip_tags = Some(decode_string_list(&value, "strip_tags")?),
-            "preserve_tags" => update.preserve_tags = Some(decode_string_list(&value, "preserve_tags")?),
-            "convert_as_inline" => update.convert_as_inline = Some(decode_bool(&value, "convert_as_inline")?),
-            "sub_symbol" => update.sub_symbol = Some(decode_string(&value, "sub_symbol")?),
-            "sup_symbol" => update.sup_symbol = Some(decode_string(&value, "sup_symbol")?),
-            "newline_style" => update.newline_style = Some(parse_newline_style(&value)?),
-            "code_block_style" => update.code_block_style = Some(parse_code_block_style(&value)?),
+            "wrap_width" | "wrapWidth" => {
+                update.wrap_width = Some(decode_positive_integer(&value, "wrap_width")?)
+            }
+            "strip_tags" | "stripTags" => {
+                update.strip_tags = Some(decode_string_list(&value, "strip_tags")?)
+            }
+            "preserve_tags" | "preserveTags" => {
+                update.preserve_tags = Some(decode_string_list(&value, "preserve_tags")?)
+            }
+            "convert_as_inline" | "convertAsInline" => {
+                update.convert_as_inline = Some(decode_bool(&value, "convert_as_inline")?)
+            }
+            "sub_symbol" | "subSymbol" => {
+                update.sub_symbol = Some(decode_string(&value, "sub_symbol")?)
+            }
+            "sup_symbol" | "supSymbol" => {
+                update.sup_symbol = Some(decode_string(&value, "sup_symbol")?)
+            }
+            "newline_style" | "newlineStyle" => {
+                update.newline_style = Some(parse_newline_style(&value)?)
+            }
+            "code_block_style" | "codeBlockStyle" => {
+                update.code_block_style = Some(parse_code_block_style(&value)?)
+            }
+            "output_format" | "outputFormat" => {
+                update.output_format = Some(parse_output_format(&value)?)
+            }
+            "link_style" | "linkStyle" => update.link_style = Some(parse_link_style(&value)?),
+            "skip_images" | "skipImages" => {
+                update.skip_images = Some(decode_bool(&value, "skip_images")?)
+            }
+            "include_document_structure" | "includeDocumentStructure" => {
+                update.include_document_structure =
+                    Some(decode_bool(&value, "include_document_structure")?)
+            }
+            "extract_images" | "extractImages" => {
+                update.extract_images = Some(decode_bool(&value, "extract_images")?)
+            }
+            "max_image_size" | "maxImageSize" => {
+                update.max_image_size =
+                    Some(decode_positive_integer(&value, "max_image_size")? as u64)
+            }
+            "capture_svg" | "captureSvg" => {
+                update.capture_svg = Some(decode_bool(&value, "capture_svg")?)
+            }
+            "infer_dimensions" | "inferDimensions" => {
+                update.infer_dimensions = Some(decode_bool(&value, "infer_dimensions")?)
+            }
             "preprocessing" => update.preprocessing = Some(decode_preprocessing(&value)?),
             "debug" => update.debug = Some(decode_bool(&value, "debug")?),
             _ => {}
@@ -85,9 +155,12 @@ fn decode_preprocessing(value: &Robj) -> std::result::Result<PreprocessingOption
             "enabled" => update.enabled = Some(decode_bool(&val, "preprocessing.enabled")?),
             "preset" => update.preset = Some(parse_preset(&val)?),
             "remove_navigation" => {
-                update.remove_navigation = Some(decode_bool(&val, "preprocessing.remove_navigation")?)
+                update.remove_navigation =
+                    Some(decode_bool(&val, "preprocessing.remove_navigation")?)
             }
-            "remove_forms" => update.remove_forms = Some(decode_bool(&val, "preprocessing.remove_forms")?),
+            "remove_forms" => {
+                update.remove_forms = Some(decode_bool(&val, "preprocessing.remove_forms")?)
+            }
             _ => {}
         }
     }
@@ -132,7 +205,8 @@ fn parse_heading_style(value: &Robj) -> std::result::Result<HeadingStyle, String
         .ok_or_else(|| "heading_style: must be a character string".to_string())?;
     match s {
         "atx" => Ok(HeadingStyle::Atx),
-        "atx_closed" => Ok(HeadingStyle::AtxClosed),
+        // Accept both snake_case and camelCase variants for ATX closed style.
+        "atx_closed" | "atxclosed" | "atxClosed" => Ok(HeadingStyle::AtxClosed),
         "underlined" => Ok(HeadingStyle::Underlined),
         _ => Err(format!("heading_style: invalid value: {s}")),
     }
@@ -194,6 +268,29 @@ fn parse_code_block_style(value: &Robj) -> std::result::Result<CodeBlockStyle, S
         "backticks" => Ok(CodeBlockStyle::Backticks),
         "tildes" => Ok(CodeBlockStyle::Tildes),
         _ => Err(format!("code_block_style: invalid value: {s}")),
+    }
+}
+
+fn parse_output_format(value: &Robj) -> std::result::Result<OutputFormat, String> {
+    let s = value
+        .as_str()
+        .ok_or_else(|| "output_format: must be a character string".to_string())?;
+    match s {
+        "markdown" => Ok(OutputFormat::Markdown),
+        "djot" => Ok(OutputFormat::Djot),
+        "plain" | "plaintext" | "text" => Ok(OutputFormat::Plain),
+        _ => Err(format!("output_format: invalid value: {s}")),
+    }
+}
+
+fn parse_link_style(value: &Robj) -> std::result::Result<LinkStyle, String> {
+    let s = value
+        .as_str()
+        .ok_or_else(|| "link_style: must be a character string".to_string())?;
+    match s {
+        "inline" => Ok(LinkStyle::Inline),
+        "reference" => Ok(LinkStyle::Reference),
+        _ => Err(format!("link_style: invalid value: {s}")),
     }
 }
 

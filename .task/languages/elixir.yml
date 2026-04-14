@@ -138,17 +138,23 @@ tasks:
         ignore_error: true
 
   e2e:generate:
-    desc: "Generate Elixir E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language elixir --output e2e/elixir
+      - cmd: alef e2e generate --lang elixir
         ignore_error: false
 
   e2e:test:
     desc: "Run Elixir E2E tests in e2e/elixir directory"
     silent: false
+    env:
+      MIX_ENV: "test"
     cmds:
       - cmd: cd e2e/elixir && mix local.hex --force && mix local.rebar --force && mix deps.get
+        ignore_error: false
+      - cmd: cd e2e/elixir && mix deps.compile rustler jason
+        ignore_error: false
+      - cmd: cd e2e/elixir && mix deps.compile
         ignore_error: false
       - cmd: cd e2e/elixir && mix test test/
         ignore_error: false

@@ -53,7 +53,7 @@ pub use elements::handle as handle_form_elements;
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```text
 /// if dispatch_form_handler(tag_name, &node_handle, &parser, output, options, ctx, depth, dom_ctx) {
 ///     // Tag was handled
 /// } else {

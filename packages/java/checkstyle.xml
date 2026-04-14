@@ -14,12 +14,6 @@
         <property name="optional" value="false"/>
     </module>
 
-    <!-- Size Violations -->
-    <module name="LineLength">
-        <property name="max" value="120"/>
-        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-    </module>
-
     <module name="TreeWalker">
         <!-- Naming Conventions -->
         <module name="ConstantName">
@@ -46,32 +40,9 @@
             <property name="max" value="150"/>
         </module>
 
-        <!-- Whitespace -->
-        <module name="EmptyForIteratorPad"/>
-        <module name="GenericWhitespace"/>
-        <module name="MethodParamPad"/>
-        <module name="NoWhitespaceAfter"/>
-        <module name="NoWhitespaceBefore"/>
-        <module name="OperatorWrap">
-            <property name="option" value="nl"/>
-            <property name="tokens" value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF "/>
-        </module>
-        <module name="ParenPad"/>
-        <module name="TypecastParenPad"/>
-        <module name="WhitespaceAfter"/>
-        <module name="WhitespaceAround">
-            <property name="allowEmptyTypes" value="true"/>
-        </module>
-
         <!-- Modifier Checks -->
         <module name="ModifierOrder"/>
         <module name="RedundantModifier"/>
-
-        <!-- Blocks -->
-        <module name="EmptyBlock"/>
-        <module name="LeftCurly"/>
-        <module name="NeedBraces"/>
-        <module name="RightCurly"/>
 
         <!-- Coding -->
         <module name="EmptyStatement"/>

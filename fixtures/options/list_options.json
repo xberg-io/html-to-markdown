@@ -2,20 +2,45 @@
   {
     "id": "options_list_indent_tabs",
     "description": "Tab indentation type for nested list items",
-    "html": "<ul><li>Parent<ul><li>Child</li></ul></li></ul>",
-    "options": { "listIndentType": "tabs" },
-    "assertions": {
-      "content_contains_all": ["Parent", "Child"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<ul><li>Parent<ul><li>Child</li></ul></li></ul>",
+      "options": {
+        "listIndentType": "Tabs"
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Parent",
+          "Child"
+        ]
+      }
+    ]
   },
   {
     "id": "options_list_custom_bullets",
     "description": "Custom bullet character for unordered lists",
-    "html": "<ul><li>Item A</li><li>Item B</li></ul>",
-    "options": { "bullets": "*" },
-    "assertions": {
-      "content_contains_all": ["* Item A", "* Item B"]
-    }
+    "input": {
+      "html": "<ul><li>Item A</li><li>Item B</li></ul>",
+      "options": {
+        "bullets": "*"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "* Item A",
+          "* Item B"
+        ]
+      }
+    ]
   }
 ]

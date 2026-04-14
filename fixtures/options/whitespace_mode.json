@@ -2,21 +2,51 @@
   {
     "id": "options_whitespace_normalized",
     "description": "Normalized whitespace mode collapses multiple spaces",
-    "html": "<p>Text   with    extra   spaces.</p>",
-    "options": { "whitespaceMode": "normalized" },
-    "assertions": {
-      "content_contains_all": ["Text", "with", "extra", "spaces."],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Text   with    extra   spaces.</p>",
+      "options": {
+        "whitespaceMode": "Normalized"
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Text",
+          "with",
+          "extra",
+          "spaces."
+        ]
+      }
+    ]
   },
   {
     "id": "options_whitespace_strict",
     "description": "Strict whitespace mode preserves whitespace as-is",
-    "html": "<p>Preserved   spacing.</p>",
-    "options": { "whitespaceMode": "strict" },
-    "assertions": {
-      "content_contains_all": ["Preserved", "spacing."],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Preserved   spacing.</p>",
+      "options": {
+        "whitespaceMode": "Strict"
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Preserved",
+          "spacing."
+        ]
+      }
+    ]
   }
 ]

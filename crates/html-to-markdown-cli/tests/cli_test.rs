@@ -212,7 +212,7 @@ fn test_list_indent_width() {
         .write_stdin("<ul><li>Item 1<ul><li>Nested</li></ul></li></ul>")
         .assert()
         .success()
-        .stdout(predicate::str::contains("    - Nested"));
+        .stdout(predicate::str::contains("    * Nested"));
 }
 
 #[test]

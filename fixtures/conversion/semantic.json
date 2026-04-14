@@ -2,63 +2,154 @@
   {
     "id": "semantic_article",
     "description": "Article element wrapping content preserves inner content",
-    "html": "<article><h2>Article Title</h2><p>Article body.</p></article>",
-    "assertions": { "content_contains_all": ["Article Title", "Article body."] }
+    "input": {
+      "html": "<article><h2>Article Title</h2><p>Article body.</p></article>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Article Title",
+          "Article body."
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_section_with_heading",
     "description": "Section element with heading preserves structure",
-    "html": "<section><h3>Section Heading</h3><p>Section content.</p></section>",
-    "assertions": { "content_contains_all": ["Section Heading", "Section content."] }
+    "input": {
+      "html": "<section><h3>Section Heading</h3><p>Section content.</p></section>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Section Heading",
+          "Section content."
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_details_summary",
     "description": "Details and summary elements produce readable output",
-    "html": "<details><summary>Click to expand</summary><p>Hidden content here.</p></details>",
-    "assertions": {
-      "content_contains_all": ["Click to expand"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<details><summary>Click to expand</summary><p>Hidden content here.</p></details>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Click to expand"
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_definition_list",
     "description": "Definition list with term and description",
-    "html": "<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl>",
-    "assertions": {
-      "content_contains_all": ["HTML", "HyperText Markup Language", "CSS", "Cascading Style Sheets"]
-    }
+    "input": {
+      "html": "<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "HTML",
+          "HyperText Markup Language",
+          "CSS",
+          "Cascading Style Sheets"
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_mark_highlight",
     "description": "Mark tag produces highlighted output",
-    "html": "<p>This is <mark>highlighted text</mark> in a sentence.</p>",
-    "assertions": {
-      "content_contains_all": ["highlighted text"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>This is <mark>highlighted text</mark> in a sentence.</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "highlighted text"
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_sub_superscript",
     "description": "Subscript and superscript elements are preserved in output",
-    "html": "<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>",
-    "assertions": {
-      "content_contains_all": ["H", "2", "O", "E=mc"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "H",
+          "2",
+          "O",
+          "E=mc"
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_abbr",
     "description": "Abbreviation element text is preserved",
-    "html": "<p>The <abbr title=\"World Wide Web\">WWW</abbr> is global.</p>",
-    "assertions": { "content_contains_all": ["WWW"] }
+    "input": {
+      "html": "<p>The <abbr title=\"World Wide Web\">WWW</abbr> is global.</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "WWW"
+        ]
+      }
+    ]
   },
   {
     "id": "semantic_hr",
     "description": "Horizontal rule produces a separator in output",
-    "html": "<p>Above</p><hr><p>Below</p>",
-    "assertions": {
-      "content_contains_all": ["Above", "Below"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Above</p><hr><p>Below</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Above",
+          "Below"
+        ]
+      }
+    ]
   }
 ]

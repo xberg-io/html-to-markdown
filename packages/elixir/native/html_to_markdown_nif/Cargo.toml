@@ -1,0 +1,13 @@
+[package]
+name = "html_to_markdown_nif"
+version = "3.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = ["full"] }
+rustler = "0.37"
+serde_json = "1"

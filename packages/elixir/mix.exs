@@ -1,61 +1,28 @@
-defmodule HtmlToMarkdown.MixProject do
+defmodule Html_to_markdown.MixProject do
   use Mix.Project
-
-  @version "3.1.0"
-  @source_url "https://github.com/kreuzberg-dev/html-to-markdown"
 
   def project do
     [
       app: :html_to_markdown,
-      version: @version,
-      elixir: "~> 1.19",
-      start_permanent: Mix.env() == :prod,
-      elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps(),
-      description: "High-performance HTML to Markdown converter with a Rust core",
+      version: "3.1.0",
+      elixir: "~> 1.14",
+      description: "High-performance HTML to Markdown converter",
       package: package(),
-      docs: docs(),
-      source_url: @source_url
-    ]
-  end
-
-  def application do
-    [extra_applications: [:logger]]
-  end
-
-  defp deps do
-    [
-      {:jason, "~> 1.4", runtime: false},
-      {:rustler, "~> 0.37.3", runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.34", only: :dev, runtime: false}
+      deps: deps()
     ]
   end
 
   defp package do
     [
       licenses: ["MIT"],
-      links: %{GitHub: @source_url},
-      files:
-        ~w(lib mix.exs README.md .formatter.exs) ++
-          [
-            "native/html_to_markdown_elixir/src",
-            "native/html_to_markdown_elixir/vendor",
-            "native/html_to_markdown_elixir/.cargo",
-            "native/html_to_markdown_elixir/Cargo.toml",
-            "native/html_to_markdown_elixir/Cargo.lock"
-          ]
+      links: %{"GitHub" => "https://github.com/kreuzberg-dev/html-to-markdown"}
     ]
   end
 
-  defp docs do
+  defp deps do
     [
-      main: "HtmlToMarkdown",
-      source_url: @source_url,
-      extras: ["README.md"]
+      {:rustler, "~> 0.34"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
-
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 end

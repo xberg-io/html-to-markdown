@@ -13,7 +13,7 @@ use crate::options::validation::{
 ///
 /// # Example
 ///
-/// ```rust,ignore
+/// ```text
 /// use html_to_markdown_rs::ConversionOptions;
 ///
 /// let options = ConversionOptions::builder()
@@ -27,10 +27,7 @@ use crate::options::validation::{
     any(feature = "serde", feature = "metadata"),
     derive(serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(
-    any(feature = "serde", feature = "metadata"),
-    serde(rename_all = "camelCase", default, deny_unknown_fields)
-)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default, deny_unknown_fields))]
 pub struct ConversionOptions {
     /// Heading style to use in Markdown output (ATX `#` or Setext underline).
     pub heading_style: HeadingStyle,
@@ -116,7 +113,7 @@ impl Default for ConversionOptions {
             heading_style: HeadingStyle::default(),
             list_indent_type: ListIndentType::default(),
             list_indent_width: 2,
-            bullets: "-".to_string(),
+            bullets: "-*+".to_string(),
             strong_em_symbol: '*',
             escape_asterisks: false,
             escape_underscores: false,
@@ -293,10 +290,7 @@ use crate::options::preprocessing::PreprocessingOptionsUpdate;
     any(feature = "serde", feature = "metadata"),
     derive(serde::Serialize, serde::Deserialize)
 )]
-#[cfg_attr(
-    any(feature = "serde", feature = "metadata"),
-    serde(rename_all = "camelCase", deny_unknown_fields)
-)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(deny_unknown_fields))]
 pub struct ConversionOptionsUpdate {
     /// Optional override for [`ConversionOptions::heading_style`].
     pub heading_style: Option<HeadingStyle>,
@@ -472,8 +466,8 @@ mod tests {
     #[test]
     fn test_conversion_options_partial_deserialization() {
         let partial_json = r#"{
-            "headingStyle": "atxClosed",
-            "listIndentWidth": 4,
+            "heading_style": "atxclosed",
+            "list_indent_width": 4,
             "bullets": "*"
         }"#;
 

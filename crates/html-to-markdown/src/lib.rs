@@ -77,9 +77,8 @@ mod validation;
 pub use exports::*;
 pub use types::{
     AnnotationKind, ConversionResult, DocumentNode, DocumentStructure, GridCell, NodeContent, ProcessingWarning,
-    TableGrid, TextAnnotation, WarningKind,
+    TableData, TableGrid, TextAnnotation, WarningKind,
 };
-// Note: types::TableData will replace convert_api::TableData when convert() is refactored
 
 // ============================================================================
 // Main Public API Functions
@@ -98,7 +97,7 @@ pub use convert_api::inline_image_config_from_json;
 
 #[cfg(feature = "visitor")]
 #[doc(hidden)]
-pub use convert_api::{convert_with_visitor, convert_with_visitor_result};
+pub use convert_api::convert_with_visitor;
 
 // Tests
 // ============================================================================
@@ -148,3 +147,4 @@ mod basic_tests {
         assert!(content.contains(r"\_underscores\_"));
     }
 }
+// trigger

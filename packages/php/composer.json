@@ -20,10 +20,10 @@
 		"ext-html_to_markdown": "*"
 	},
 	"autoload": {
+		"files": ["src/functions.php"],
 		"psr-4": {
-			"HtmlToMarkdown\\": "src/"
-		},
-		"files": ["src/functions.php"]
+			"Html\\To\\Markdown\\Rs\\": "src/"
+		}
 	},
 	"autoload-dev": {
 		"psr-4": {
@@ -31,13 +31,11 @@
 		}
 	},
 	"scripts": {
-		"post-install-cmd": ["@php bin/install-extension.php"],
-		"post-update-cmd": ["@php bin/install-extension.php"],
 		"phpstan": "php -d detect_unicode=0 vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M",
 		"csfixer": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php src tests",
 		"format": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php src tests",
 		"format:check": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php --dry-run src tests",
-		"test": "php bin/run-tests.php",
+		"test": "php vendor/bin/phpunit",
 		"lint": "@phpstan",
 		"lint:fix": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php src tests && php -d detect_unicode=0 vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
 	},

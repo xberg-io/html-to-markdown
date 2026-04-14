@@ -1,0 +1,818 @@
+languages = [
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "ffi",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+]
+
+[crate]
+name = "html-to-markdown-rs"
+core_import = "html_to_markdown_rs"
+sources = [
+  "crates/html-to-markdown/src/lib.rs",
+  "crates/html-to-markdown/src/options/conversion.rs",
+  "crates/html-to-markdown/src/options/preprocessing.rs",
+  "crates/html-to-markdown/src/options/validation.rs",
+  "crates/html-to-markdown/src/types/result.rs",
+  "crates/html-to-markdown/src/types/document.rs",
+  "crates/html-to-markdown/src/types/tables.rs",
+  "crates/html-to-markdown/src/types/warnings.rs",
+  "crates/html-to-markdown/src/error.rs",
+  "crates/html-to-markdown/src/convert_api.rs",
+  "crates/html-to-markdown/src/metadata/types.rs",
+]
+version_from = "Cargo.toml"
+workspace_root = "."
+features = ["full", "metadata", "visitor", "serde", "inline-images"]
+
+[include]
+types = [
+  "ConversionOptions",
+  "PreprocessingOptions",
+  "MetadataConfig",
+  "HtmlMetadata",
+  "DocumentMetadata",
+  "HeaderMetadata",
+  "LinkMetadata",
+  "ImageMetadata",
+  "ConversionResult",
+  "DocumentStructure",
+  "DocumentNode",
+  "TextAnnotation",
+  "TableGrid",
+  "GridCell",
+  "ProcessingWarning",
+  "MetadataResult",
+  "HeadingInfo",
+  "LinkInfo",
+  "ImageInfo",
+]
+functions = ["convert"]
+
+[exclude]
+functions = []
+types = []
+methods = [
+  "MetadataConfig.apply_update",
+  "ConversionOptions.apply_update",
+  "PreprocessingOptions.apply_update",
+  "MetadataConfig.from_update",
+  "MetadataConfig.from",
+  "ConversionOptions.from_update",
+  "ConversionOptions.from",
+  "PreprocessingOptions.from_update",
+  "PreprocessingOptions.from",
+]
+
+[output]
+python = "crates/html-to-markdown-py/src/"
+node = "crates/html-to-markdown-node/src/"
+ruby = "packages/ruby/ext/html_to_markdown_rb/src/"
+php = "crates/html-to-markdown-php/src/"
+ffi = "crates/html-to-markdown-ffi/src/"
+go = "packages/go/"
+elixir = "packages/elixir/native/html_to_markdown_nif/src/"
+wasm = "crates/html-to-markdown-wasm/src/"
+
+[python]
+module_name = "_html_to_markdown"
+
+[python.stubs]
+output = "packages/python/html_to_markdown/"
+
+[node]
+package_name = "@kreuzberg/html-to-markdown-node"
+
+[ffi]
+prefix = "htm"
+header_name = "html_to_markdown.h"
+lib_name = "html_to_markdown_ffi"
+visitor_callbacks = true
+
+[go]
+module = "github.com/kreuzberg-dev/html-to-markdown-go"
+package_name = "htmltomarkdown"
+
+[java]
+package = "dev.kreuzberg.htmltomarkdown"
+
+[csharp]
+namespace = "HtmlToMarkdown"
+
+[elixir]
+app_name = "html_to_markdown"
+
+[readme]
+template_dir = "readme_templates"
+snippets_dir = "docs/snippets"
+discord_url = "https://discord.gg/pXxagNK2zN"
+banner_url = "https://github.com/user-attachments/assets/419fc06c-8313-4324-b159-4b4d3cfce5c0"
+
+[readme.languages.python]
+name = "Python"
+template = "language_package.md"
+package_manager = ["pip"]
+package_name = "html-to-markdown"
+install_command = "pip install html-to-markdown"
+description = """
+High-performance HTML to Markdown converter with a clean Python API (powered by a Rust core).
+The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
+stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
+"""
+migration_version = ""
+
+[readme.languages.python.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[readme.languages.python.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.python.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.62ms"
+throughput = "208 MB/s"
+
+[[readme.languages.python.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.02ms"
+throughput = "178 MB/s"
+
+[[readme.languages.python.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.56ms"
+throughput = "144 MB/s"
+
+[readme.languages.python.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.typescript]
+name = "TypeScript (Node.js)"
+template = "language_package.md"
+output_path = "packages/typescript/README.md"
+package_manager = ["npm", "pnpm", "yarn", "bun"]
+package_name = "@kreuzberg/html-to-markdown"
+install_command = "npm install @kreuzberg/html-to-markdown"
+description = """
+High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
+This package wraps native `@kreuzberg/html-to-markdown-node` bindings and provides a type-safe API.
+"""
+migration_version = "3.1.0"
+
+[readme.languages.typescript.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[readme.languages.typescript.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.typescript.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.58ms"
+throughput = "222 MB/s"
+
+[[readme.languages.typescript.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "1.89ms"
+throughput = "190 MB/s"
+
+[[readme.languages.typescript.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.21ms"
+throughput = "156 MB/s"
+
+[readme.languages.typescript.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.ruby]
+name = "Ruby"
+template = "language_package.md"
+output_path = "packages/ruby/README.md"
+package_manager = ["gem", "bundler"]
+package_name = "html-to-markdown"
+install_command = "gem install html-to-markdown"
+description = """
+Blazing-fast HTML to Markdown conversion for Ruby, powered by the same Rust engine used by our Python, Node.js, WebAssembly, and PHP packages.
+Ship identical Markdown across every runtime while enjoying native extension performance with Magnus bindings.
+"""
+migration_version = ""
+
+[readme.languages.ruby.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = true
+
+[readme.languages.ruby.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.ruby.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.71ms"
+throughput = "182 MB/s"
+
+[[readme.languages.ruby.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.15ms"
+throughput = "167 MB/s"
+
+[[readme.languages.ruby.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.89ms"
+throughput = "134 MB/s"
+
+[readme.languages.ruby.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.php]
+name = "PHP"
+template = "language_package.md"
+package_manager = ["composer", "pie"]
+package_name = "kreuzberg-dev/html-to-markdown"
+install_command = "composer require kreuzberg-dev/html-to-markdown"
+description = """
+High-performance HTML to Markdown converter with typed PHP bindings powered by a Rust core.
+Provides a type-safe API with full PHPStan level 9 support, modern PHP 8.2+ features, and comprehensive metadata extraction.
+
+Note: The package was previously published as `goldziher/html-to-markdown`, which still works for backward compatibility.
+"""
+migration_version = ""
+
+[readme.languages.php.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[readme.languages.php.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.php.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 3346
+
+[[readme.languages.php.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 973
+
+[[readme.languages.php.performance.benchmarks]]
+name = "Medium (Python)"
+size = "657KB"
+ops_sec = 485
+
+[readme.languages.php.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.go]
+name = "Go"
+template = "language_package.md"
+output_path = "packages/go/v3/README.md"
+package_manager = ["go"]
+package_name = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+install_command = "go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+description = """
+High-performance HTML to Markdown converter with Go bindings to the Rust core library.
+Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and Windows with customizable caching.
+"""
+migration_version = ""
+
+[readme.languages.go.features]
+visitor_pattern = false
+metadata_extraction = false
+cli_proxy = false
+
+[readme.languages.go.performance]
+platform = "Apple M4"
+function = "Convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.go.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.46ms"
+throughput = "277.5 MB/s"
+
+[[readme.languages.go.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "1.37ms"
+throughput = "262.1 MB/s"
+
+[[readme.languages.go.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "2.75ms"
+throughput = "237.9 MB/s"
+
+[readme.languages.go.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.java]
+name = "Java"
+template = "language_package.md"
+output_path = "packages/java/README.md"
+package_manager = ["maven", "gradle"]
+package_name = "dev.kreuzberg:html-to-markdown"
+install_command = """
+<dependency>
+    <groupId>dev.kreuzberg</groupId>
+    <artifactId>html-to-markdown</artifactId>
+    <version>3.1.0</version>
+    <classifier>linux</classifier> <!-- or macos, windows -->
+</dependency>"""
+description = """
+High-performance HTML to Markdown converter with Java Panama FFI bindings to the Rust core.
+Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion with full metadata extraction support.
+"""
+migration_version = "3.1.0"
+
+[readme.languages.java.features]
+visitor_pattern = false
+metadata_extraction = false
+cli_proxy = false
+
+[readme.languages.java.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.java.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 2308
+throughput = "291.5 MB/s"
+
+[[readme.languages.java.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 773
+throughput = "272.0 MB/s"
+
+[[readme.languages.java.performance.benchmarks]]
+name = "Mixed (Python)"
+size = "656KB"
+ops_sec = 403
+throughput = "258.5 MB/s"
+
+[readme.languages.java.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.csharp]
+name = "C# / .NET"
+template = "language_package.md"
+output_path = "packages/csharp/README.md"
+package_manager = ["nuget"]
+package_name = "KreuzbergDev.HtmlToMarkdown"
+install_command = "dotnet add package KreuzbergDev.HtmlToMarkdown"
+description = """
+High-performance HTML to Markdown converter with C#/.NET bindings using P/Invoke to the Rust core.
+Provides type-safe record-based APIs for metadata extraction, visitor patterns, and thread-safe concurrent conversion.
+"""
+migration_version = "3.1.0"
+
+[readme.languages.csharp.features]
+visitor_pattern = false
+metadata_extraction = false
+cli_proxy = false
+
+[readme.languages.csharp.performance]
+platform = "Apple M4"
+function = "Convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.csharp.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 3111
+throughput = "392.9 MB/s"
+
+[[readme.languages.csharp.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 853
+throughput = "300.1 MB/s"
+
+[[readme.languages.csharp.performance.benchmarks]]
+name = "Mixed (Python)"
+size = "656KB"
+ops_sec = 456
+throughput = "292.3 MB/s"
+
+[readme.languages.csharp.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.elixir]
+name = "Elixir"
+template = "language_package.md"
+output_path = "packages/elixir/README.md"
+package_manager = ["mix"]
+package_name = "html_to_markdown"
+install_command = 'Add {:html_to_markdown, "~> 3.0"} to mix.exs deps'
+description = """
+Elixir bindings for the Rust html-to-markdown engine. The package exposes a fast HTML to Markdown converter implemented with Rustler.
+Ship identical Markdown across every runtime while enjoying native performance with Rustler NIF bindings.
+"""
+migration_version = ""
+
+[readme.languages.elixir.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[readme.languages.elixir.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.elixir.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+ops_sec = 2547
+throughput = "321.7 MB/s"
+
+[[readme.languages.elixir.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+ops_sec = 835
+throughput = "293.8 MB/s"
+
+[[readme.languages.elixir.performance.benchmarks]]
+name = "Medium (Python)"
+size = "656KB"
+ops_sec = 439
+throughput = "281.5 MB/s"
+
+[[readme.languages.elixir.performance.benchmarks]]
+name = "Large (Rust)"
+size = "567KB"
+ops_sec = 485
+throughput = "268.7 MB/s"
+
+[[readme.languages.elixir.performance.benchmarks]]
+name = "Small (Intro)"
+size = "463KB"
+ops_sec = 581
+throughput = "262.9 MB/s"
+
+[readme.languages.elixir.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[readme.languages.r]
+name = "R"
+template = "language_package.md"
+output_path = "packages/r/README.md"
+package_manager = ["install.packages"]
+package_name = "htmltomarkdown"
+install_command = 'install.packages("htmltomarkdown")'
+description = """
+High-performance HTML to Markdown converter with R bindings powered by a Rust core via extendr.
+Ship identical Markdown across every runtime while enjoying native performance with extendr bindings.
+"""
+migration_version = ""
+
+[readme.languages.r.features]
+visitor_pattern = true
+metadata_extraction = true
+cli_proxy = false
+
+[readme.languages.r.performance]
+platform = "Apple M4"
+function = "convert()"
+note = "Real Wikipedia documents"
+
+[[readme.languages.r.performance.benchmarks]]
+name = "Lists (Timeline)"
+size = "129KB"
+latency = "0.68ms"
+throughput = "190 MB/s"
+
+[[readme.languages.r.performance.benchmarks]]
+name = "Tables (Countries)"
+size = "360KB"
+latency = "2.10ms"
+throughput = "171 MB/s"
+
+[[readme.languages.r.performance.benchmarks]]
+name = "Mixed (Python wiki)"
+size = "656KB"
+latency = "4.75ms"
+throughput = "138 MB/s"
+
+[readme.languages.r.snippets]
+basic_usage = "getting-started/basic_usage.md"
+with_options = "getting-started/with_options.md"
+metadata_extraction = "metadata/basic_extraction.md"
+visitor_basic = "visitor/basic_visitor.md"
+table_extraction = "table-extraction/basic_extraction.md"
+
+[sync]
+extra_paths = [
+  "packages/ruby/lib/html_to_markdown/version.rb",
+  "packages/python/html_to_markdown/__init__.py",
+]
+
+[scaffold]
+description = "High-performance HTML to Markdown converter"
+license = "MIT"
+repository = "https://github.com/kreuzberg-dev/html-to-markdown"
+authors = ["Kreuzberg Team"]
+keywords = ["html", "markdown", "converter"]
+
+[custom_modules]
+node = ["helpers"]
+
+[test.python]
+command = "task python:test"
+e2e = "cd e2e/python && python3 -m pytest tests/ -q"
+
+[test.node]
+command = "npx vitest run --config packages/typescript/vitest.config.ts"
+e2e = "cd e2e/typescript && npx vitest run"
+
+[test.go]
+command = "task go:test"
+e2e = "cd e2e/go && go test ./... -count=1"
+
+[test.ruby]
+command = "task ruby:test"
+
+[test.php]
+command = "task php:test"
+
+[test.java]
+command = "task java:test"
+
+[test.csharp]
+command = "task csharp:test"
+
+[test.elixir]
+command = "task elixir:test"
+e2e = "cd e2e/elixir && mix test"
+
+[test.r]
+command = "task r:test"
+e2e = "cd e2e/r && Rscript -e \"devtools::load_all('../../packages/r'); testthat::set_max_fails(Inf); testthat::test_dir('tests')\""
+
+[test.wasm]
+e2e = "cd e2e/wasm && npm test"
+
+[test.rust]
+e2e = "cd e2e/rust && cargo test"
+
+[test.c]
+e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
+
+# E2E test generation configuration
+[e2e]
+fixtures = "fixtures"
+output = "e2e"
+fields_optional = [
+  "content",
+  "document",
+  "metadata.document.title",
+  "metadata.document.description",
+  "metadata.document.author",
+  "metadata.document.canonical_url",
+  "metadata.document.open_graph[title]",
+  "metadata.document.open_graph[description]",
+  "metadata.document.open_graph[image]",
+  "metadata.document.open_graph[type]",
+  "metadata.document.open_graph[url]",
+  "metadata.document.open_graph[site_name]",
+  "metadata.document.twitter_card[card]",
+  "metadata.document.twitter_card[title]",
+  "metadata.document.twitter_card[description]",
+]
+
+[e2e.call]
+function = "convert"
+module = "html_to_markdown"
+result_var = "result"
+args = [
+  { name = "html", field = "html", type = "string" },
+  { name = "options", field = "options", type = "json_object", optional = true },
+]
+
+[e2e.call.overrides.rust]
+crate_name = "html_to_markdown_rs"
+function = "convert"
+
+[e2e.call.overrides.python]
+module = "html_to_markdown"
+function = "convert"
+options_type = "ConversionOptions"
+enum_module = "html_to_markdown.options"
+
+[e2e.call.overrides.python.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+
+[e2e.call.overrides.node]
+module = "html-to-markdown"
+function = "convert"
+options_type = "ConversionOptions"
+enum_module = "html_to_markdown._html_to_markdown"
+
+[e2e.call.overrides.go]
+module = "github.com/kreuzberg-dev/html-to-markdown-go"
+function = "Convert"
+alias = "htmd"
+options_type = "ConversionOptions"
+
+[e2e.call.overrides.java]
+class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdown"
+function = "convert"
+options_type = "ConversionOptions"
+enum_module = "html_to_markdown._html_to_markdown"
+
+[e2e.call.overrides.csharp]
+class = "HtmlToMarkdownRs"
+function = "Convert"
+options_type = "ConversionOptions"
+
+[e2e.call.overrides.csharp.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+
+[e2e.call.overrides.php]
+module = "HtmlToMarkdown"
+class = "HtmlToMarkdown"
+function = "convert"
+result_is_simple = true
+
+[e2e.call.overrides.php.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+
+[e2e.call.overrides.ruby]
+options_type = "Kreuzberg::ConversionOptions"
+result_is_simple = true
+
+[e2e.call.overrides.ruby.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+
+[e2e.call.overrides.elixir]
+options_type = "ConversionOptions"
+options_via = "conversionoptions_default"
+
+[e2e.call.overrides.elixir.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+
+[e2e.call.overrides.wasm]
+options_type = "JsConversionOptions"
+
+[e2e.call.overrides.wasm.enum_fields]
+headingStyle = "JsHeadingStyle"
+codeBlockStyle = "JsCodeBlockStyle"
+listIndentType = "JsListIndentType"
+newlineStyle = "JsNewlineStyle"
+whitespaceMode = "JsWhitespaceMode"
+highlightStyle = "JsHighlightStyle"
+linkStyle = "JsLinkStyle"
+outputFormat = "JsOutputFormat"
+
+[e2e.call.overrides.c]
+header = "html_to_markdown.h"
+function = "htm_convert"
+prefix = "htm"
+
+[e2e.packages.rust]
+path = "../../crates/html-to-markdown"
+
+[e2e.packages.python]
+name = "html-to-markdown"
+path = "../../packages/python"
+
+[e2e.packages.node]
+name = "html-to-markdown"
+path = "../../crates/html-to-markdown-node"
+
+[e2e.packages.go]
+module = "github.com/kreuzberg-dev/html-to-markdown-go"
+path = "../../packages/go"
+version = "v0.0.0"
+
+[e2e.packages.php]
+name = "kreuzberg-dev/html-to-markdown-rs"
+path = "../../packages/php"
+
+[e2e.packages.csharp]
+name = "HtmlToMarkdown"
+path = "../../packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj"
+
+[e2e.packages.c]
+name = "html_to_markdown_ffi"
+path = "../../crates/html-to-markdown-ffi"
+
+[e2e.fields]
+# Scalar metadata fields: fixture "metadata.X" -> API "metadata.document.X"
+"metadata.title" = "metadata.document.title"
+"metadata.description" = "metadata.document.description"
+"metadata.author" = "metadata.document.author"
+"metadata.canonical_url" = "metadata.document.canonical_url"
+# Collection metadata fields (returned as JSON strings in C FFI)
+"metadata.headings" = "metadata.headers"
+# Open Graph map fields
+"metadata.open_graph.title" = "metadata.document.open_graph[title]"
+"metadata.open_graph.description" = "metadata.document.open_graph[description]"
+"metadata.open_graph.image" = "metadata.document.open_graph[image]"
+"metadata.open_graph.type" = "metadata.document.open_graph[type]"
+"metadata.open_graph.url" = "metadata.document.open_graph[url]"
+"metadata.open_graph.site_name" = "metadata.document.open_graph[site_name]"
+# Twitter Card map fields
+"metadata.twitter.card" = "metadata.document.twitter_card[card]"
+"metadata.twitter.title" = "metadata.document.twitter_card[title]"
+"metadata.twitter.description" = "metadata.document.twitter_card[description]"
+
+[e2e.format]
+python = "ruff check --fix {dir} && ruff format {dir}"
+go = "gofmt -w {dir}"
+rust = "cargo fmt --manifest-path {dir}/Cargo.toml"
+
+[e2e.fields_c_types]
+"conversion_result.metadata" = "HtmlMetadata"
+"conversion_result.document" = "DocumentStructure"
+"html_metadata.document" = "DocumentMetadata"

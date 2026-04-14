@@ -4,360 +4,85 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.kreuzberg</groupId>
-    <artifactId>html-to-markdown</artifactId>
+    <groupId>dev.kreuzberg.htmltomarkdown</groupId>
+    <artifactId>html-to-markdown-rs</artifactId>
     <version>3.1.0</version>
     <packaging>jar</packaging>
 
-    <name>html-to-markdown</name>
-    <description>High-performance HTML to Markdown converter with Rust core and Java Panama FFI bindings</description>
-    <url>https://kreuzberg.dev</url>
+    <name>html-to-markdown-rs</name>
+    <description>High-performance HTML to Markdown converter</description>
+    <url>https://github.com/kreuzberg-dev/html-to-markdown</url>
 
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
+            <name>MIT</name>
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <name>Na'aman Hirschfeld</name>
-            <email>nhirschfeld@gmail.com</email>
-            <url>https://github.com/Goldziher</url>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git://github.com/kreuzberg-dev/html-to-markdown.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kreuzberg-dev/html-to-markdown.git</developerConnection>
-        <url>https://github.com/kreuzberg-dev/html-to-markdown/tree/main</url>
-    </scm>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>25</maven.compiler.release>
-        <junit.version>6.0.3</junit.version>
-        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
-        <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
-        <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
-        <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-        <checkstyle.version>13.3.0</checkstyle.version>
-        <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
-        <pmd.version>7.22.0</pmd.version>
-        <central-publishing-plugin.version>0.10.0</central-publishing-plugin.version>
-        <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
-        <spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
-        <skip.rust.ffi>false</skip.rust.ffi>
-        <!-- Skip GPG signing by default, only enable for publish profile -->
-        <gpg.skip>true</gpg.skip>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencies>
-        <!-- Jackson for JSON parsing -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.21.2</version>
         </dependency>
-
-        <!-- JUnit 5 for testing -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>2.21.2</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
+            <artifactId>junit-jupiter</artifactId>
+            <version>6.0.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <!-- Include native libraries in the JAR -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
-
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>${maven-install-plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>2.21.0</version>
-                <configuration>
-                    <allowSnapshots>false</allowSnapshots>
-                    <ignoredVersions>
-                        <ignoredVersion>.*-alpha.*</ignoredVersion>
-                        <ignoredVersion>.*-beta.*</ignoredVersion>
-                        <ignoredVersion>.*-rc.*</ignoredVersion>
-                        <ignoredVersion>.*-cr.*</ignoredVersion>
-                        <ignoredVersion>.*-milestone.*</ignoredVersion>
-                        <ignoredVersion>.*-M[0-9]+.*</ignoredVersion>
-                    </ignoredVersions>
-                </configuration>
-            </plugin>
-            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <version>3.11.0</version>
                 <configuration>
-                    <release>${maven.compiler.release}</release>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
-
-            <!-- Maven Surefire Plugin for running tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
+                <version>3.2.5</version>
                 <configuration>
-                    <argLine>@{argLine} --enable-preview --enable-native-access=ALL-UNNAMED -Djava.library.path=${project.basedir}/../../target/release</argLine>
+                    <argLine>--enable-native-access=ALL-UNNAMED -Djava.library.path=${project.basedir}/../../target/release</argLine>
                 </configuration>
             </plugin>
-
-            <!-- Exec Maven Plugin for building FFI -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>build-rust-ffi</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>cargo</executable>
-                            <workingDirectory>${project.basedir}/../../</workingDirectory>
-                            <arguments>
-                                <argument>build</argument>
-                                <argument>--release</argument>
-                                <argument>-p</argument>
-                                <argument>html-to-markdown-ffi</argument>
-                            </arguments>
-                            <skip>${skip.rust.ffi}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Maven Source Plugin for source JARs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven-source-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Maven Javadoc Plugin for javadoc JARs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <configuration>
-                    <source>${maven.compiler.release}</source>
-                    <doclint>none</doclint>
-                    <additionalJOptions>
-                        <option>--enable-preview</option>
-                    </additionalJOptions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Maven GPG Plugin for artifact signing -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>${maven-gpg-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Use environment variable for passphrase (recommended best practice) -->
-                            <passphraseEnvName>MAVEN_GPG_PASSPHRASE</passphraseEnvName>
-                            <gpgArguments>
-                                <arg>--batch</arg>
-                                <arg>--yes</arg>
-                                <arg>--pinentry-mode=loopback</arg>
-                            </gpgArguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Explicit resource processing plugin version to avoid Maven warnings -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.5.0</version>
-            </plugin>
-
-            <!-- Explicit JAR packaging plugin version -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.5.0</version>
-            </plugin>
-
-            <!-- Checkstyle Plugin for code linting -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven-checkstyle-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>${checkstyle.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
-                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
-                </configuration>
-            </plugin>
-
-            <!-- PMD Plugin for code quality -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>net.sourceforge.pmd</groupId>
-                        <artifactId>pmd-java</artifactId>
-                        <version>${pmd.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <targetJdk>${maven.compiler.release}</targetJdk>
-                    <failOnViolation>true</failOnViolation>
-                    <printFailingErrors>true</printFailingErrors>
-                </configuration>
-            </plugin>
-
-            <!-- JaCoCo Plugin for code coverage -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Spotless Plugin for code formatting -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>${spotless-maven-plugin.version}</version>
+                <version>3.4.0</version>
                 <configuration>
                     <java>
-                        <includes>
-                            <include>src/main/java/**/*.java</include>
-                        </includes>
                         <googleJavaFormat>
-                            <version>1.28.0</version>
-                            <style>GOOGLE</style>
+                            <version>1.35.0</version>
                         </googleJavaFormat>
-                        <removeUnusedImports/>
-                        <importOrder/>
                     </java>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>publish</id>
-            <properties>
-                <!-- Enable GPG signing for publish profile -->
-                <gpg.skip>false</gpg.skip>
-            </properties>
-            <build>
-                <plugins>
-                    <!-- Skip maven-deploy-plugin when using central-publishing-maven-plugin -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                    <!-- Sonatype Central Publishing plugin -->
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>${central-publishing-plugin.version}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <publishingServerId>ossrh</publishingServerId>
-                            <autoPublish>true</autoPublish>
-                            <waitUntil>published</waitUntil>
-                            <waitMaxTime>7200</waitMaxTime>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

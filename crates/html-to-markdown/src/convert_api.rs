@@ -38,43 +38,6 @@ use crate::{HtmlMetadata, MetadataConfig};
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 pub fn convert(html: &str, options: Option<ConversionOptions>) -> Result<ConversionResult> {
-    convert_impl(
-        html,
-        options,
-        #[cfg(feature = "visitor")]
-        None,
-    )
-}
-
-/// Internal: convert with visitor support. Used by FFI crate.
-#[cfg(feature = "visitor")]
-#[doc(hidden)]
-pub fn convert_with_visitor(
-    html: &str,
-    options: Option<ConversionOptions>,
-    visitor: Option<crate::visitor::VisitorHandle>,
-) -> Result<String> {
-    let res = convert_impl(html, options, visitor)?;
-    Ok(res.content.unwrap_or_default())
-}
-
-/// Internal: convert with visitor support, returning full conversion results.
-/// Used by Python bindings to avoid metadata loss.
-#[cfg(feature = "visitor")]
-#[doc(hidden)]
-pub fn convert_with_visitor_result(
-    html: &str,
-    options: Option<ConversionOptions>,
-    visitor: Option<crate::visitor::VisitorHandle>,
-) -> Result<ConversionResult> {
-    convert_impl(html, options, visitor)
-}
-
-fn convert_impl(
-    html: &str,
-    options: Option<ConversionOptions>,
-    #[cfg(feature = "visitor")] visitor: Option<crate::visitor::VisitorHandle>,
-) -> Result<ConversionResult> {
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -144,9 +107,6 @@ fn convert_impl(
                 &options,
                 image_collector.as_ref().map(Rc::clone),
                 metadata_collector.as_ref().map(Rc::clone),
-                #[cfg(feature = "visitor")]
-                visitor,
-                #[cfg(not(feature = "visitor"))]
                 None,
                 structure_collector,
             )?
@@ -158,9 +118,6 @@ fn convert_impl(
                 &options,
                 None,
                 metadata_collector.as_ref().map(Rc::clone),
-                #[cfg(feature = "visitor")]
-                visitor,
-                #[cfg(not(feature = "visitor"))]
                 None,
                 structure_collector,
             )?
@@ -172,9 +129,6 @@ fn convert_impl(
                 &options,
                 image_collector.as_ref().map(Rc::clone),
                 None,
-                #[cfg(feature = "visitor")]
-                visitor,
-                #[cfg(not(feature = "visitor"))]
                 None,
                 structure_collector,
             )?
@@ -186,9 +140,6 @@ fn convert_impl(
                 &options,
                 None,
                 None,
-                #[cfg(feature = "visitor")]
-                visitor,
-                #[cfg(not(feature = "visitor"))]
                 None,
                 structure_collector,
             )?
@@ -212,13 +163,13 @@ fn convert_impl(
         HtmlMetadata::default()
     };
 
-    // Collect images if extracted.
+    // Collect inline images if extracted.
     #[cfg(feature = "inline-images")]
     let (images, image_warnings) = if let Some(collector) = image_collector {
-        Rc::try_unwrap(collector)
-            .map_err(|_| ConversionError::Other("failed to recover image state".to_string()))?
-            .into_inner()
-            .finish()
+        let c = Rc::try_unwrap(collector)
+            .map_err(|_| ConversionError::Other("failed to recover inline image state".to_string()))?
+            .into_inner();
+        c.finish()
     } else {
         (Vec::new(), Vec::new())
     };
@@ -248,6 +199,25 @@ fn convert_impl(
         images,
         warnings,
     })
+}
+
+/// Internal: convert with visitor support. Used by FFI crate.
+/// Will be removed when convert() accepts visitor parameter directly.
+#[cfg(feature = "visitor")]
+#[doc(hidden)]
+pub fn convert_with_visitor(
+    html: &str,
+    options: Option<ConversionOptions>,
+    visitor: Option<crate::visitor::VisitorHandle>,
+) -> Result<String> {
+    let options = options.unwrap_or_default();
+    let normalized_html = normalize_input(html)?;
+    let markdown = crate::converter::convert_html_with_visitor(normalized_html.as_ref(), &options, visitor)?;
+    if options.wrap {
+        Ok(crate::wrapper::wrap_markdown(&markdown, &options))
+    } else {
+        Ok(markdown)
+    }
 }
 
 /// Validate and normalize HTML input for conversion.

@@ -2,37 +2,83 @@
   {
     "id": "malformed_unclosed_paragraph",
     "description": "Unclosed <p> tag is recovered gracefully and content is preserved",
-    "html": "<p>This paragraph is never closed",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["This paragraph is never closed"]
-    }
+    "input": {
+      "html": "<p>This paragraph is never closed"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "This paragraph is never closed"
+        ]
+      }
+    ]
   },
   {
     "id": "malformed_overlapping_tags",
     "description": "Overlapping bold/italic tags are recovered by the HTML parser without panic",
-    "html": "<p><b><i>bold and italic</b></i></p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["bold and italic"]
-    }
+    "input": {
+      "html": "<p><b><i>bold and italic</b></i></p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "bold and italic"
+        ]
+      }
+    ]
   },
   {
     "id": "malformed_missing_block_closing_tags",
     "description": "Missing closing tags on block elements are auto-closed by parser",
-    "html": "<div><h1>Title<p>First paragraph<p>Second paragraph</div>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["Title", "First paragraph", "Second paragraph"]
-    }
+    "input": {
+      "html": "<div><h1>Title<p>First paragraph<p>Second paragraph</div>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Title",
+          "First paragraph",
+          "Second paragraph"
+        ]
+      }
+    ]
   },
   {
     "id": "malformed_deeply_nested_elements",
     "description": "Deeply nested elements (100 levels) are handled without stack overflow",
-    "html": "<div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><p>Deeply nested content</p></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["Deeply nested content"]
-    }
+    "input": {
+      "html": "<div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><p>Deeply nested content</p></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Deeply nested content"
+        ]
+      }
+    ]
   }
 ]

@@ -1,29 +1,59 @@
 plugins:
+  - rubocop-performance
   - rubocop-rspec
 
 AllCops:
-  NewCops: enable
   TargetRubyVersion: 3.2
+  NewCops: enable
+  SuggestExtensions: false
   Exclude:
-    - "tmp/**/*"
-    - "vendor/**/*"
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'lib/**/*.bundle'
+    - 'ext/**/*'
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: single_quotes
 
 Style/Documentation:
   Enabled: false
 
-Metrics/BlockLength:
+Layout/LineLength:
+  Max: 120
+  AllowedPatterns:
+    - '\A\s*#'
   Exclude:
-    - "spec/**/*"
-    - "*.gemspec"
+    - 'spec/**/*'
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 20
+  Exclude:
+    - 'spec/**/*'
 
-RSpec/MultipleExpectations:
-  Enabled: false
+Metrics/BlockLength:
+  Enabled: true
+  Max: 350
+  CountComments: false
+
+Metrics/AbcSize:
+  Max: 20
+  Exclude:
+    - 'spec/**/*'
 
 RSpec/ExampleLength:
-  Enabled: false
+  Max: 50
 
-RSpec/SpecFilePathFormat:
-  Enabled: false
+RSpec/MultipleExpectations:
+  Max: 25
+
+RSpec/NestedGroups:
+  Max: 6

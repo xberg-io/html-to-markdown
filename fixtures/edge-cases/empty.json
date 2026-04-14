@@ -2,37 +2,85 @@
   {
     "id": "empty_html",
     "description": "Empty HTML document",
-    "html": "<html><head></head><body></body></html>",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "<html><head></head><body></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   },
   {
     "id": "whitespace_only",
     "description": "Whitespace-only content",
-    "html": "<p>   </p>",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "<p>   </p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   },
   {
     "id": "just_whitespace_input",
     "description": "Input that is only whitespace characters (spaces, tabs, newlines) produces empty output",
-    "html": "   ",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "   "
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   },
   {
     "id": "html_comments_only",
     "description": "Document containing only HTML comments produces empty output",
-    "html": "<!-- This is a comment --><!-- Another comment -->",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "<!-- This is a comment --><!-- Another comment -->"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   },
   {
     "id": "script_tags_only",
     "description": "Document with only script tags produces empty output (scripts are stripped)",
-    "html": "<html><head><script>alert('xss')</script></head><body><script>document.write('hello')</script></body></html>",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "<html><head><script>alert('xss')</script></head><body><script>document.write('hello')</script></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   },
   {
     "id": "style_tags_only",
     "description": "Document with only style tags produces empty output (styles are stripped)",
-    "html": "<html><head><style>body { color: red; }</style></head><body><style>.foo { margin: 0; }</style></body></html>",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "<html><head><style>body { color: red; }</style></head><body><style>.foo { margin: 0; }</style></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   }
 ]

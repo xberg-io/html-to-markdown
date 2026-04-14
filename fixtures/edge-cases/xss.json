@@ -2,31 +2,91 @@
   {
     "id": "xss_script_tag_stripped",
     "description": "Script tag content is stripped and does not appear in output",
-    "html": "<p>Safe content.</p><script>alert('xss')</script><p>More safe content.</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["Safe content", "More safe content"],
-      "content_not_contains": ["<script>", "alert(", "xss"]
-    }
+    "input": {
+      "html": "<p>Safe content.</p><script>alert('xss')</script><p>More safe content.</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Safe content",
+          "More safe content"
+        ]
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "values": [
+          "<script>",
+          "alert(",
+          "xss"
+        ]
+      }
+    ]
   },
   {
     "id": "xss_onclick_handler_removed",
     "description": "onclick and other on* event handlers are removed from elements",
-    "html": "<p><a href=\"https://example.com\" onclick=\"alert('xss')\">Click me</a></p><button onmouseover=\"steal_data()\">Hover me</button>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["Click me"],
-      "content_not_contains": ["onclick", "onmouseover", "alert(", "steal_data"]
-    }
+    "input": {
+      "html": "<p><a href=\"https://example.com\" onclick=\"alert('xss')\">Click me</a></p><button onmouseover=\"steal_data()\">Hover me</button>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Click me"
+        ]
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "values": [
+          "onclick",
+          "onmouseover",
+          "alert(",
+          "steal_data"
+        ]
+      }
+    ]
   },
   {
     "id": "xss_svg_nested_script_stripped",
     "description": "Script tags nested inside SVG are stripped",
-    "html": "<p>Before SVG.</p><svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert('svg-xss')</script><text>SVG text</text></svg><p>After SVG.</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["Before SVG", "After SVG"],
-      "content_not_contains": ["<script>", "alert(", "svg-xss"]
-    }
+    "input": {
+      "html": "<p>Before SVG.</p><svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert('svg-xss')</script><text>SVG text</text></svg><p>After SVG.</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Before SVG",
+          "After SVG"
+        ]
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "values": [
+          "<script>",
+          "alert(",
+          "svg-xss"
+        ]
+      }
+    ]
   }
 ]

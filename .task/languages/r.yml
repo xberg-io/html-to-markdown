@@ -119,10 +119,10 @@ tasks:
         ignore_error: false
 
   e2e:generate:
-    desc: "Generate R E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language r --output e2e/r
+      - cmd: alef e2e generate --lang r
         ignore_error: false
 
   e2e:test:
@@ -131,7 +131,7 @@ tasks:
     deps:
       - build
     cmds:
-      - cmd: cd e2e/r && Rscript tests/testthat.R
+      - cmd: cd e2e/r && Rscript run_tests.R
         ignore_error: false
 
   clean:

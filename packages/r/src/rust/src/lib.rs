@@ -16,9 +16,10 @@ use types::conversion_result_to_robj;
 /// @export
 #[extendr]
 fn convert(html: &str, options: Robj) -> Result<Robj> {
-    let opts = decode_options(options).map_err(|e| Error::Other(e))?;
-    let result = html_to_markdown_rs::convert(html, Some(opts.clone()))
+    let opts = decode_options(options).map_err(Error::Other)?;
+    let result = html_to_markdown_rs::convert(html, Some(opts))
         .map_err(|e| Error::Other(e.to_string()))?;
+
     Ok(conversion_result_to_robj(result))
 }
 

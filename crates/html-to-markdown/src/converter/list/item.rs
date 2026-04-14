@@ -198,7 +198,11 @@ pub(crate) fn handle_li(
             } else {
                 let bullets: Vec<char> = options.bullets.chars().collect();
                 let bullet_index = if ctx.ul_depth > 0 { ctx.ul_depth - 1 } else { 0 };
-                let bullet = bullets.get(bullet_index % bullets.len()).copied().unwrap_or('*');
+                let bullet = if bullets.is_empty() {
+                    '*'
+                } else {
+                    bullets[bullet_index % bullets.len()]
+                };
                 output.push(bullet);
                 output.push(' ');
             }
@@ -265,7 +269,11 @@ pub(crate) fn handle_li(
             } else {
                 let bullets: Vec<char> = options.bullets.chars().collect();
                 let bullet_index = if ctx.ul_depth > 0 { ctx.ul_depth - 1 } else { 0 };
-                let bullet = bullets.get(bullet_index % bullets.len()).copied().unwrap_or('*');
+                let bullet = if bullets.is_empty() {
+                    '*'
+                } else {
+                    bullets[bullet_index % bullets.len()]
+                };
                 let bullet_str = bullet.to_string();
                 let text_start = last_line.find(bullet).map_or(0, |pos| pos + 1);
                 (bullet_str, last_line[text_start..].trim().to_string())

@@ -145,10 +145,10 @@ tasks:
       - "{{.MAVEN_CMD}} versions:display-dependency-updates || true"
 
   e2e:generate:
-    desc: "Generate Java E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language java --output e2e/java
+      - cmd: alef e2e generate --lang java
         ignore_error: false
 
   e2e:test:

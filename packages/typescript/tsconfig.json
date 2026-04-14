@@ -9,7 +9,11 @@
 		"emitDeclarationOnly": false,
 		"noUncheckedIndexedAccess": true,
 		"exactOptionalPropertyTypes": true,
-		"types": ["node"]
+		"types": ["node"],
+		"verbatimModuleSyntax": false,
+		"paths": {
+			"@kreuzberg/html-to-markdown-node": ["../../crates/html-to-markdown-node/index.d.ts"]
+		}
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["dist", "tests", "node_modules"]

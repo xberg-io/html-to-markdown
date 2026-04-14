@@ -26,10 +26,7 @@ pub const DEFAULT_INLINE_IMAGE_LIMIT: u64 = 5 * 1024 * 1024;
 /// corresponding fields unchanged when applied via [`InlineImageConfig::apply_update`].
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(any(feature = "serde", feature = "metadata"), derive(serde::Deserialize))]
-#[cfg_attr(
-    any(feature = "serde", feature = "metadata"),
-    serde(rename_all = "camelCase", deny_unknown_fields)
-)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(deny_unknown_fields))]
 pub struct InlineImageConfigUpdate {
     /// Optional maximum decoded size override in bytes.
     pub max_decoded_size_bytes: Option<u64>,

@@ -1,0 +1,13 @@
+{
+  "name": "html-to-markdown-e2e-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "html-to-markdown": "file:../../crates/html-to-markdown-node",
+    "vitest": "^3.0.0"
+  }
+}

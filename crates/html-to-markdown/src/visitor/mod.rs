@@ -13,7 +13,7 @@
 //!
 //! # Example
 //!
-//! ```ignore
+//! ```text
 //! use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult};
 //!
 //! struct CustomVisitor;

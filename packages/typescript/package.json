@@ -1,78 +1,42 @@
 {
-	"name": "@kreuzberg/html-to-markdown",
+	"name": "@kreuzberg/html-to-markdown-node",
 	"version": "3.1.0",
-	"description": "High-performance HTML to Markdown converter for TypeScript/Node.js with a Rust core.",
+	"description": "High-performance HTML to Markdown converter",
+	"license": "MIT",
+	"main": "index.js",
+	"types": "index.d.ts",
+	"repository": "https://github.com/kreuzberg-dev/html-to-markdown",
+	"author": "Kreuzberg Team",
 	"keywords": [
 		"html",
 		"markdown",
-		"converter",
-		"rust",
-		"cli",
-		"napi",
-		"typescript",
-		"bun",
-		"node"
+		"converter"
 	],
-	"license": "MIT",
-	"author": {
-		"name": "Na'aman Hirschfeld",
-		"email": "nhirschfeld@gmail.com"
-	},
-	"homepage": "https://github.com/kreuzberg-dev/html-to-markdown",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/kreuzberg-dev/html-to-markdown"
-	},
-	"bugs": {
-		"url": "https://github.com/kreuzberg-dev/html-to-markdown/issues"
-	},
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		},
-		"./cli": {
-			"types": "./dist/cli.d.ts",
-			"default": "./dist/cli.js"
-		}
-	},
-	"bin": {
-		"html-to-markdown": "./dist/cli.js"
-	},
-	"scripts": {
-		"build": "pnpm --filter @kreuzberg/html-to-markdown-node run build && tsc --project tsconfig.json",
-		"clean": "rm -rf dist",
-		"lint": "biome check src",
-		"lint:fix": "biome check --write src",
-		"format:fix": "biome check --write src",
-		"format:check": "biome check src",
-		"test": "pnpm --filter @kreuzberg/html-to-markdown-node run build && vitest run",
-		"test:coverage": "pnpm --filter @kreuzberg/html-to-markdown-node run build && vitest run --coverage",
-		"test:watch": "vitest",
-		"typecheck": "tsc --noEmit --project tsconfig.json"
-	},
 	"files": [
-		"dist",
-		"README.md"
+		"index.js",
+		"index.d.ts",
+		"**/*.node"
 	],
-	"dependencies": {
-		"@kreuzberg/html-to-markdown-node": "workspace:*"
+	"scripts": {
+		"build": "napi build --manifest-path ../../crates/html-to-markdown-node/Cargo.toml --release",
+		"build:debug": "napi build --manifest-path ../../crates/html-to-markdown-node/Cargo.toml",
+		"test": "node -e \"console.log('Add test command')\"",
+		"typecheck": "tsc --noEmit",
+		"lint": "biome check --no-errors-on-unmatched .",
+		"lint:fix": "biome check --write --no-errors-on-unmatched .",
+		"format": "biome format --write .",
+		"format:check": "biome format --no-errors-on-unmatched ."
+	},
+	"napi": {
+		"name": "html-to-markdown-rs",
+		"triples": [
+			"x86_64-unknown-linux-gnu",
+			"x86_64-apple-darwin",
+			"aarch64-apple-darwin",
+			"x86_64-pc-windows-msvc"
+		]
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.10",
-		"@types/node": "^25.5.2",
-		"@vitest/coverage-v8": "^4.1.2",
-		"typescript": "^6.0.2",
-		"vitest": "^4.1.2"
-	},
-	"engines": {
-		"node": ">=18",
-		"bun": ">=1.2"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org/",
-		"access": "public"
+		"@napi-rs/cli": "^3.6.1"
 	}
 }

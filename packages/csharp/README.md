@@ -56,7 +56,6 @@
   </a>
 </div>
 
-
 High-performance HTML to Markdown converter with C#/.NET bindings using P/Invoke to the Rust core.
 Provides type-safe record-based APIs for metadata extraction, visitor patterns, and thread-safe concurrent conversion.
 
@@ -80,15 +79,9 @@ dotnet add package KreuzbergDev.HtmlToMarkdown
 
 
 
+
 ## Performance Snapshot
 
-Apple M4 • Real Wikipedia documents • `Convert()` (C# / .NET)
-
-| Document | Size | Ops/sec | Throughput |
-| -------- | ---- | ------- | ---------- |
-| Lists (Timeline) | 129KB | 3,111 | 392.9 MB/s |
-| Tables (Countries) | 360KB | 853 | 300.1 MB/s |
-| Mixed (Python) | 656KB | 456 | 292.3 MB/s |
 
 
 
@@ -104,7 +97,6 @@ var html = "<h1>Hello World</h1><p>This is a paragraph.</p>";
 var result = HtmlToMarkdownConverter.Convert(html);
 Console.WriteLine(result.Content);
 ```
-
 
 
 With conversion options:
@@ -124,8 +116,6 @@ var html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>";
 var result = HtmlToMarkdownConverter.Convert(html, options);
 Console.WriteLine(result.Content);
 ```
-
-
 
 
 ## API Reference
@@ -160,7 +150,6 @@ var tables   = result.Tables;     // empty unless ExtractTables = true
 - `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`
 
-
 ## Djot Output Format
 
 The library supports converting HTML to [Djot](https://djot.net/), a lightweight markup language similar to Markdown but with a different syntax for some elements. Set `output_format` to `"djot"` to use this format.
@@ -180,6 +169,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
+
 ```csharp
 using HtmlToMarkdown;
 
@@ -195,12 +185,13 @@ var djot = Converter.Convert(html, new ConversionOptions { OutputFormat = "djot"
 ```
 
 
-Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
+Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 
 ```csharp
@@ -213,8 +204,8 @@ var plain = Converter.Convert(html, new ConversionOptions { OutputFormat = "plai
 ```
 
 
-Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
+Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
 
 

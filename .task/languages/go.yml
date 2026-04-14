@@ -10,7 +10,7 @@ includes:
   _cfg: ../config/vars.yml
 
 vars:
-  GO_PKG: "packages/go/v3/htmltomarkdown"
+  GO_PKG: "packages/go"
   FFI_BUILD_DIR: "{{.TARGET_DIR}}/{{.OS}}-{{.ARCH}}/release"
 
 env:
@@ -170,10 +170,10 @@ tasks:
         ignore_error: false
 
   e2e:generate:
-    desc: "Generate Go E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language go --output e2e/go
+      - cmd: alef e2e generate --lang go
         ignore_error: false
 
   e2e:test:
@@ -186,8 +186,10 @@ tasks:
           FFI_DIR="{{.TARGET_DIR}}/release"
           if [ -f "$FFI_DIR/libhtml_to_markdown_ffi.dylib" ]; then
             export HTML_TO_MARKDOWN_FFI_PATH="$FFI_DIR/libhtml_to_markdown_ffi.dylib"
+            export DYLD_LIBRARY_PATH="$FFI_DIR${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
           elif [ -f "$FFI_DIR/libhtml_to_markdown_ffi.so" ]; then
             export HTML_TO_MARKDOWN_FFI_PATH="$FFI_DIR/libhtml_to_markdown_ffi.so"
+            export LD_LIBRARY_PATH="$FFI_DIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
           elif [ -f "$FFI_DIR/html_to_markdown_ffi.dll" ]; then
             export HTML_TO_MARKDOWN_FFI_PATH="$FFI_DIR/html_to_markdown_ffi.dll"
           fi

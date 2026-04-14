@@ -115,10 +115,10 @@ impl NewlineStyle {
 /// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum CodeBlockStyle {
-    /// Indented code blocks (4 spaces). Default. `CommonMark` standard.
-    #[default]
+    /// Indented code blocks (4 spaces). `CommonMark` standard.
     Indented,
-    /// Fenced code blocks with backticks (```). Supports language hints.
+    /// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
+    #[default]
     Backticks,
     /// Fenced code blocks with tildes (~~~). Supports language hints.
     Tildes,

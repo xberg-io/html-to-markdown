@@ -1,62 +1,21 @@
 [package]
 name = "html-to-markdown-node"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
+version = "3.1.0"
+edition = "2024"
+license = "MIT"
+description.workspace = true
 repository.workspace = true
-homepage.workspace = true
-documentation.workspace = true
 readme.workspace = true
-rust-version.workspace = true
-description = "Node.js/NAPI bindings for html-to-markdown-rs"
-keywords = ["html", "markdown", "nodejs", "napi"]
-categories = ["parsing", "text-processing", "api-bindings"]
-
-[package.metadata.napi]
-package-json-name = "@kreuzberg/html-to-markdown-node"
+keywords.workspace = true
+categories.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
-[features]
-default = ["full"]
-full = ["metadata"]
-metadata = ["html-to-markdown-rs/metadata"]
-
 [dependencies]
-html-to-markdown-bindings-common = { path = "../html-to-markdown-bindings-common", version = "3.1.0", features = [
-    "metadata",
-    "inline-images",
-] }
-html-to-markdown-rs = { workspace = true, features = [
-    "inline-images",
-    "metadata",
-    "serde",
-] }
-napi = { version = "3.4", default-features = false, features = [
-    "napi8",
-    "tokio_rt",
-] }
-napi-derive = "3.3"
-serde_json = "1.0"
-
-[target.'cfg(all(any(windows, unix), target_arch = "x86_64", not(target_env = "musl")))'.dependencies]
-mimalloc-rust = "0.2"
+html-to-markdown-rs = { path = "../html-to-markdown", features = ["full"] }
+napi = { version = "3", features = ["async"] }
+napi-derive = "3"
 
 [build-dependencies]
-napi-build = "2.2"
-
-# Publishing metadata for npm scoped package
-
-[lints.rust]
-unsafe_code = "allow"    # NAPI-RS requires unsafe code
-missing_docs = "warn"
-unused_must_use = "deny"
-
-[lints.clippy]
-all = { level = "deny", priority = -1 }
-cargo = { level = "deny", priority = -1 }
-pedantic = { level = "deny", priority = -1 }
-nursery = { level = "warn", priority = -1 }
-multiple_crate_versions = { level = "allow", priority = 1 }
+napi-build = "2"

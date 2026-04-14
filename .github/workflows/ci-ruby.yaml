@@ -7,7 +7,6 @@ on:
       - packages/ruby/**
       - packages/ruby/ext/**/*
       - scripts/publish/ruby/**
-      - crates/html-to-markdown-rb/**
       - crates/html-to-markdown/**
       - Gemfile
       - Gemfile.lock
@@ -20,7 +19,6 @@ on:
       - packages/ruby/**
       - packages/ruby/ext/**/*
       - scripts/publish/ruby/**
-      - crates/html-to-markdown-rb/**
       - crates/html-to-markdown/**
       - Gemfile
       - Gemfile.lock

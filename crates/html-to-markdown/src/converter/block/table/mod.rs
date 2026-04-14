@@ -29,7 +29,7 @@ pub(crate) use caption::handle_caption;
 /// Dispatches table element handling to the main convert_table function.
 ///
 /// # Usage in converter.rs
-/// ```ignore
+/// ```text
 /// if "table" == tag_name {
 ///     crate::converter::block::table::handle_table(
 ///         node_handle,

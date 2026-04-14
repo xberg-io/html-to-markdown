@@ -2,58 +2,152 @@
   {
     "id": "bold_strong",
     "description": "Strong tag converts to bold",
-    "html": "<p><strong>bold</strong></p>",
-    "assertions": { "content_contains_all": ["**bold**"] }
+    "input": {
+      "html": "<p><strong>bold</strong></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "**bold**"
+        ]
+      }
+    ]
   },
   {
     "id": "italic_em",
     "description": "Em tag converts to italic",
-    "html": "<p><em>italic</em></p>",
-    "assertions": { "content_contains_all": ["*italic*"] }
+    "input": {
+      "html": "<p><em>italic</em></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "*italic*"
+        ]
+      }
+    ]
   },
   {
     "id": "bold_and_italic",
     "description": "Nested bold and italic",
-    "html": "<p><strong><em>both</em></strong></p>",
-    "assertions": { "content_contains_all": ["***both***"] }
+    "input": {
+      "html": "<p><strong><em>both</em></strong></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "***both***"
+        ]
+      }
+    ]
   },
   {
     "id": "emphasis_strikethrough_s",
     "description": "s tag converts to GFM strikethrough",
-    "html": "<p><s>strikethrough</s></p>",
-    "assertions": { "content_contains_all": ["~~strikethrough~~"] }
+    "input": {
+      "html": "<p><s>strikethrough</s></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "~~strikethrough~~"
+        ]
+      }
+    ]
   },
   {
     "id": "emphasis_strikethrough_del",
     "description": "del tag converts to GFM strikethrough",
-    "html": "<p><del>deleted text</del></p>",
-    "assertions": { "content_contains_all": ["~~deleted text~~"] }
+    "input": {
+      "html": "<p><del>deleted text</del></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "~~deleted text~~"
+        ]
+      }
+    ]
   },
   {
     "id": "emphasis_underline_u",
     "description": "u tag content is preserved in output",
-    "html": "<p><u>underlined</u></p>",
-    "assertions": { "content_contains_all": ["underlined"] }
+    "input": {
+      "html": "<p><u>underlined</u></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "underlined"
+        ]
+      }
+    ]
   },
   {
     "id": "emphasis_mark_highlight",
     "description": "mark tag produces highlighted output",
-    "html": "<p><mark>highlighted</mark></p>",
-    "assertions": {
-      "content_contains_all": ["highlighted"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p><mark>highlighted</mark></p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "highlighted"
+        ]
+      }
+    ]
   },
   {
     "id": "emphasis_subscript",
     "description": "sub tag content is preserved",
-    "html": "<p>H<sub>2</sub>O</p>",
-    "assertions": { "content_contains_all": ["H", "2", "O"] }
+    "input": {
+      "html": "<p>H<sub>2</sub>O</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "H",
+          "2",
+          "O"
+        ]
+      }
+    ]
   },
   {
     "id": "emphasis_superscript",
     "description": "sup tag content is preserved",
-    "html": "<p>x<sup>2</sup></p>",
-    "assertions": { "content_contains_all": ["x", "2"] }
+    "input": {
+      "html": "<p>x<sup>2</sup></p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "x",
+          "2"
+        ]
+      }
+    ]
   }
 ]

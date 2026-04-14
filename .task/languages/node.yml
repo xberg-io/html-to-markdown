@@ -11,6 +11,7 @@ includes:
 vars:
   BUILD_PROFILE: "{{.BUILD_PROFILE | default \"release\"}}"
   NODE_PKG: "packages/typescript"
+  NAPI_CRATE: "crates/html-to-markdown-node"
 
 tasks:
   install:
@@ -25,28 +26,28 @@ tasks:
     silent: false
     cmds:
       - cmd: |
-          cd {{.NODE_PKG}} && napi build{{if eq .BUILD_PROFILE "release"}} --release{{end}}
+          cd {{.NAPI_CRATE}} && napi build --output-dir .{{if eq .BUILD_PROFILE "release"}} --release{{end}}
         ignore_error: false
 
   build:dev:
     desc: "Build NAPI-RS bindings in debug mode"
     silent: false
     cmds:
-      - cmd: cd {{.NODE_PKG}} && napi build
+      - cmd: cd {{.NAPI_CRATE}} && napi build --output-dir .
         ignore_error: false
 
   build:release:
     desc: "Build NAPI-RS bindings in release mode"
     silent: false
     cmds:
-      - cmd: cd {{.NODE_PKG}} && napi build --release
+      - cmd: cd {{.NAPI_CRATE}} && napi build --output-dir . --release
         ignore_error: false
 
   build:ci:
     desc: "Build NAPI-RS bindings for CI (release mode)"
     silent: false
     cmds:
-      - cmd: cd {{.NODE_PKG}} && napi build --release
+      - cmd: cd {{.NAPI_CRATE}} && napi build --output-dir . --release
         ignore_error: false
 
   test:
@@ -100,17 +101,17 @@ tasks:
       - pnpm up --latest -w
 
   e2e:generate:
-    desc: "Generate Node/TypeScript E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language typescript --output e2e/typescript
+      - cmd: alef e2e generate --lang typescript
         ignore_error: false
 
   e2e:test:
-    desc: "Run Node/TypeScript E2E tests in e2e/typescript directory"
+    desc: "Run Node/TypeScript E2E tests in e2e/node directory"
     silent: false
     cmds:
-      - cmd: cd e2e/typescript && pnpm install && pnpm test
+      - cmd: cd e2e/node && pnpm install --ignore-workspace && pnpm test
         ignore_error: false
 
   clean:

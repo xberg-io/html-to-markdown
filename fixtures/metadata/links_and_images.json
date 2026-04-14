@@ -2,34 +2,55 @@
   {
     "id": "metadata_extract_all_links",
     "description": "Extract all links from a document into metadata",
-    "html": "<html><head><title>Links Page</title></head><body><p>Visit <a href=\"https://example.com\">Example</a> or <a href=\"https://docs.example.com\">Docs</a>.</p><p>Also see <a href=\"/relative/path\">relative link</a> and <a href=\"mailto:hello@example.com\">email us</a>.</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_links_count_min": 3,
-      "metadata_links_include_urls": ["https://example.com", "https://docs.example.com"]
-    }
+    "input": {
+      "html": "<html><head><title>Links Page</title></head><body><p>Visit <a href=\"https://example.com\">Example</a> or <a href=\"https://docs.example.com\">Docs</a>.</p><p>Also see <a href=\"/relative/path\">relative link</a> and <a href=\"mailto:hello@example.com\">email us</a>.</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.links",
+        "value": 2
+      }
+    ]
   },
   {
     "id": "metadata_extract_all_images",
     "description": "Extract all images from a document into metadata",
-    "html": "<html><head><title>Gallery</title></head><body><img src=\"https://example.com/photo1.jpg\" alt=\"Photo 1\"><img src=\"https://example.com/photo2.png\" alt=\"Photo 2\"><img src=\"/local/image.webp\" alt=\"Local image\"></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_images_count_min": 2,
-      "metadata_images_include_srcs": ["https://example.com/photo1.jpg", "https://example.com/photo2.png"]
-    }
+    "input": {
+      "html": "<html><head><title>Gallery</title></head><body><img src=\"https://example.com/photo1.jpg\" alt=\"Photo 1\"><img src=\"https://example.com/photo2.png\" alt=\"Photo 2\"><img src=\"/local/image.webp\" alt=\"Local image\"></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.images",
+        "value": 2
+      }
+    ]
   },
   {
     "id": "metadata_headers_hierarchy",
     "description": "Extract heading hierarchy from document into metadata",
-    "html": "<html><head><title>Docs</title></head><body><h1>Introduction</h1><h2>Getting Started</h2><h3>Installation</h3><h3>Configuration</h3><h2>Advanced Usage</h2><h3>Custom Options</h3></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_headings_count_min": 5,
-      "metadata_headings_include": ["Introduction", "Getting Started", "Installation"]
-    }
+    "input": {
+      "html": "<html><head><title>Docs</title></head><body><h1>Introduction</h1><h2>Getting Started</h2><h3>Installation</h3><h3>Configuration</h3><h2>Advanced Usage</h2><h3>Custom Options</h3></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.headings",
+        "value": 5
+      }
+    ]
   }
 ]

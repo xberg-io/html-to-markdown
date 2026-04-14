@@ -3,28 +3,38 @@
 require_relative 'html_to_markdown/version'
 require 'html_to_markdown_rb'
 
+# High-performance HTML to Markdown conversion.
+#
+# @example Simple conversion
+#   HtmlToMarkdown.convert('<h1>Hello</h1>') # => "# Hello\n\n"
+#
+# @example With options
+#   HtmlToMarkdown.convert('<h1>Hello</h1>', heading_style: 'atx')
 module HtmlToMarkdown
-  autoload :CLI, 'html_to_markdown/cli'
-  autoload :CLIProxy, 'html_to_markdown/cli_proxy'
-
-  class << self
-    alias native_convert convert
-  end
-
-  module_function
-
-  # Convert HTML to Markdown, returning a Hash with:
-  #   - :content [String, nil] the converted Markdown output
-  #   - :document [nil] document structure (not yet exposed)
-  #   - :metadata [Hash, nil] extracted HTML metadata
-  #   - :tables [Array<Hash>] extracted tables with :grid and :markdown
-  #   - :images [Array<Hash>] extracted inline images
-  #   - :warnings [Array<Hash>] processing warnings
+  # Convert HTML to Markdown.
   #
-  # @param html [String] HTML string to convert
-  # @param options [Hash, nil] optional conversion options
-  # @return [Hash] conversion result
-  def convert(html, options = nil)
-    native_convert(html.to_s, options)
+  # @param html [String] The HTML content to convert.
+  # @param options [Hash] Optional conversion options.
+  #   Supported keys (all optional):
+  #   - :heading_style       - 'atx', 'atx_closed', 'setext', 'underlined'
+  #   - :code_block_style    - 'backticks', 'tildes', 'indented'
+  #   - :escape_asterisks    - Boolean
+  #   - :escape_underscores  - Boolean
+  #   - :escape_misc         - Boolean
+  #   - :escape_ascii        - Boolean
+  #   - :strip_newlines      - Boolean
+  #   - :keep_inline_images_in - Array of tag names
+  #   - :strip_tags          - Array of tag names to strip
+  #   - :preserve_tags       - Array of tag names to preserve verbatim
+  #   (and more, matching ConversionOptions fields)
+  # @return [String] The converted Markdown content.
+  def self.convert(html, options = {})
+    opts = if options.nil? || options.empty?
+             nil
+           else
+             HtmlToMarkdownRs::ConversionOptions.new(options)
+           end
+    result = HtmlToMarkdownRs.convert(html, opts)
+    result.content || ''
   end
 end

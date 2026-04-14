@@ -147,8 +147,10 @@ pub struct TextAnnotation {
 /// Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "annotation_type", rename_all = "snake_case")]
+#[derive(Default)]
 pub enum AnnotationKind {
     /// Bold / strong emphasis.
+    #[default]
     Bold,
     /// Italic / emphasis.
     Italic,
@@ -172,4 +174,13 @@ pub enum AnnotationKind {
         #[serde(skip_serializing_if = "Option::is_none")]
         title: Option<String>,
     },
+}
+
+impl Default for NodeContent {
+    fn default() -> Self {
+        Self::Heading {
+            level: 1,
+            text: String::new(),
+        }
+    }
 }

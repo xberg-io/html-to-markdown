@@ -56,7 +56,6 @@
   </a>
 </div>
 
-
 High-performance HTML to Markdown converter with Go bindings to the Rust core library.
 Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and Windows with customizable caching.
 
@@ -86,13 +85,6 @@ Alternatively, you can manually set `CGO_CFLAGS` and `CGO_LDFLAGS` environment v
 
 ## Performance Snapshot
 
-Apple M4 • Real Wikipedia documents • `Convert()` (Go)
-
-| Document | Size | Latency | Throughput |
-| -------- | ---- | ------- | ---------- |
-| Lists (Timeline) | 129KB | 0.46ms | 277.5 MB/s |
-| Tables (Countries) | 360KB | 1.37ms | 262.1 MB/s |
-| Mixed (Python wiki) | 656KB | 2.75ms | 237.9 MB/s |
 
 
 
@@ -124,7 +116,6 @@ func main() {
     }
 }
 ```
-
 
 
 With conversion options:
@@ -159,8 +150,6 @@ func main() {
 ```
 
 
-
-
 ## API Reference
 
 ### Core Function
@@ -193,7 +182,6 @@ tables    := result.Tables     // []TableData — when ExtractTables: true
 - `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`
 
-
 ## Djot Output Format
 
 The library supports converting HTML to [Djot](https://djot.net/), a lightweight markup language similar to Markdown but with a different syntax for some elements. Set `output_format` to `"djot"` to use this format.
@@ -213,6 +201,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
+
 ```go
 import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
 
@@ -226,12 +215,13 @@ markdown, _ := htmltomarkdown.Convert(html)
 ```
 
 
-Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
+Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 
 ```go
@@ -244,8 +234,8 @@ plain, _ := htmltomarkdown.Convert(html, htmltomarkdown.WithOutputFormat("plain"
 ```
 
 
-Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
+Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
 
 

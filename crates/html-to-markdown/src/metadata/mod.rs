@@ -46,7 +46,7 @@
 //!
 //! ## Basic Usage with `convert()`
 //!
-//! ```ignore
+//! ```text
 //! use html_to_markdown_rs::convert;
 //!
 //! let html = r#"
@@ -87,7 +87,7 @@
 //!
 //! ## Selective Extraction
 //!
-//! ```ignore
+//! ```text
 //! use html_to_markdown_rs::{convert, ConversionOptions};
 //!
 //! let options = ConversionOptions {
@@ -102,7 +102,7 @@
 //!
 //! ## Analyzing Link Types
 //!
-//! ```ignore
+//! ```text
 //! use html_to_markdown_rs::convert;
 //! use html_to_markdown_rs::metadata::LinkType;
 //!
@@ -126,7 +126,7 @@
 //! All types in this module support serialization via `serde` when the `metadata` feature is enabled.
 //! This enables easy export to JSON, YAML, or other formats:
 //!
-//! ```ignore
+//! ```text
 //! use html_to_markdown_rs::convert;
 //!
 //! let result = convert(html, None)?;
@@ -160,7 +160,7 @@ use std::rc::Rc;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// let collector = MetadataCollector::new(MetadataConfig::default());
 /// let handle = Rc::new(RefCell::new(collector));
 ///

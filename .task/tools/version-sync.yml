@@ -5,34 +5,44 @@ includes:
   platforms: ../config/platforms.yml
 
 vars:
-  SYNC_SCRIPT: "{{.ROOT}}/scripts/sync_versions.py"
+  # Use installed alef binary. Install via: cargo binstall alef-cli
+  # For local dev with sibling repo: cargo run --manifest-path ../alef/Cargo.toml --
+  ALEF: "alef"
 
 tasks:
   sync:
-    desc: "Synchronize version across all package manifests and regenerate READMEs"
+    desc: "Synchronize version across all package manifests and regenerate everything"
     cmds:
-      - uv run python3 {{.SYNC_SCRIPT}}
-      - uv run python3 {{.ROOT}}/scripts/generate_readme.py
+      - "{{.ALEF}} sync-versions"
+      - "{{.ALEF}} readme"
+      - "{{.ALEF}} docs"
+      - "{{.ALEF}} generate --clean"
+      - "{{.ALEF}} stubs"
+      - "{{.ALEF}} e2e generate"
 
   check:
     desc: "Check if versions are synchronized (dry-run)"
     cmds:
-      - uv run python3 {{.SYNC_SCRIPT}} --check
+      - cmd: grep -m 1 'version = ' Cargo.toml | sed 's/version = "\(.*\)"/\1/'
+        silent: false
 
   bump:major:
     desc: "Bump major version (X.0.0) and sync"
     cmds:
-      - uv run python3 {{.SYNC_SCRIPT}} --bump major
+      - "{{.ALEF}} sync-versions --bump major"
+      - task: sync
 
   bump:minor:
     desc: "Bump minor version (0.X.0) and sync"
     cmds:
-      - uv run python3 {{.SYNC_SCRIPT}} --bump minor
+      - "{{.ALEF}} sync-versions --bump minor"
+      - task: sync
 
   bump:patch:
     desc: "Bump patch version (0.0.X) and sync"
     cmds:
-      - uv run python3 {{.SYNC_SCRIPT}} --bump patch
+      - "{{.ALEF}} sync-versions --bump patch"
+      - task: sync
 
   show:
     desc: "Show current version from Cargo.toml"

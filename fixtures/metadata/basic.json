@@ -2,51 +2,91 @@
   {
     "id": "metadata_title_tag",
     "description": "Extract title from <title> tag",
-    "html": "<html><head><title>My Page</title></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_title": "My Page"
-    }
+    "input": {
+      "html": "<html><head><title>My Page</title></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.title",
+        "value": "My Page"
+      }
+    ]
   },
   {
     "id": "metadata_description_meta",
     "description": "Extract description from <meta name='description'> tag",
-    "html": "<html><head><title>Page</title><meta name=\"description\" content=\"This is the page description.\"></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_description": "This is the page description."
-    }
+    "input": {
+      "html": "<html><head><title>Page</title><meta name=\"description\" content=\"This is the page description.\"></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.description",
+        "value": "This is the page description."
+      }
+    ]
   },
   {
     "id": "metadata_author_meta",
     "description": "Extract author from <meta name='author'> tag",
-    "html": "<html><head><title>Page</title><meta name=\"author\" content=\"Jane Doe\"></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_author": "Jane Doe"
-    }
+    "input": {
+      "html": "<html><head><title>Page</title><meta name=\"author\" content=\"Jane Doe\"></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.author",
+        "value": "Jane Doe"
+      }
+    ]
   },
   {
     "id": "metadata_keywords_meta",
     "description": "Extract keywords from <meta name='keywords'> tag",
-    "html": "<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, markdown, html, converter\"></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_keywords": "rust, markdown, html, converter"
-    }
+    "input": {
+      "html": "<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, markdown, html, converter\"></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.document.keywords",
+        "value": 1
+      }
+    ]
   },
   {
     "id": "metadata_canonical_url",
     "description": "Extract canonical URL from <link rel='canonical'> tag",
-    "html": "<html><head><title>Page</title><link rel=\"canonical\" href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_canonical_url": "https://example.com/canonical-page"
-    }
+    "input": {
+      "html": "<html><head><title>Page</title><link rel=\"canonical\" href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.canonical_url",
+        "value": "https://example.com/canonical-page"
+      }
+    ]
   }
 ]

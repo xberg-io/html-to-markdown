@@ -1,0 +1,168 @@
+The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
+
+**Use Cases:**
+
+- **Custom Markdown dialects** – Convert to Obsidian, Notion, or other flavors
+- **Content filtering** – Remove tracking pixels, ads, or unwanted elements
+- **URL rewriting** – Rewrite CDN URLs, add query parameters, validate links
+- **Accessibility validation** – Check alt text, heading hierarchy, link text
+- **Analytics** – Track element usage, link destinations, image sources
+
+**Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
+
+### Example: Quick Start
+
+{% if language == 'python' %}
+
+```python
+from html_to_markdown import convert
+
+class MyVisitor:
+    def visit_link(self, ctx, href, text, title):
+        # Rewrite CDN URLs
+        if href.startswith("https://old-cdn.com"):
+            href = href.replace("https://old-cdn.com", "https://new-cdn.com")
+        return {"type": "custom", "output": f"[{text}]({href})"}
+
+    def visit_image(self, ctx, src, alt, title):
+        # Skip tracking pixels
+        if "tracking" in src:
+            return {"type": "skip"}
+        return {"type": "continue"}
+
+html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
+result = convert(html, visitor=MyVisitor())
+markdown = result["content"]
+```
+
+{% elif language == 'typescript' %}
+
+```typescript
+import { convert, type Visitor, type NodeContext, type VisitResult } from '@kreuzberg/html-to-markdown';
+
+const visitor: Visitor = {
+  visitLink(ctx: NodeContext, href: string, text: string, title?: string): VisitResult {
+    // Rewrite CDN URLs
+    if (href.startsWith('https://old-cdn.com')) {
+      href = href.replace('https://old-cdn.com', 'https://new-cdn.com');
+    }
+    return { type: 'custom', output: `[${text}](${href})` };
+  },
+
+  visitImage(ctx: NodeContext, src: string, alt?: string, title?: string): VisitResult {
+    // Skip tracking pixels
+    if (src.includes('tracking')) {
+      return { type: 'skip' };
+    }
+    return { type: 'continue' };
+  },
+};
+
+const html = '<a href="https://old-cdn.com/file.pdf">Download</a>';
+const result = convert(html, {}, visitor);
+const markdown = result.content;
+```
+
+{% elif language == 'ruby' %}
+
+```ruby
+require 'html_to_markdown'
+
+class MyVisitor
+  def visit_link(ctx, href, text, title = nil)
+    # Rewrite CDN URLs
+    if href.start_with?('https://old-cdn.com')
+      href = href.sub('https://old-cdn.com', 'https://new-cdn.com')
+    end
+    { type: :custom, output: "[#{text}](#{href})" }
+  end
+
+  def visit_image(ctx, src, alt = nil, title = nil)
+    # Skip tracking pixels
+    src.include?('tracking') ? { type: :skip } : { type: :continue }
+  end
+end
+
+html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
+result = HtmlToMarkdown.convert(html, visitor: MyVisitor.new)
+markdown = result[:content]
+```
+
+{% elif language == 'php' %}
+
+```php
+<?php
+use HtmlToMarkdown\Config\ConversionOptions;
+use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\Visitor\AbstractVisitor;
+use HtmlToMarkdown\Visitor\NodeContext;
+use HtmlToMarkdown\Visitor\VisitResult;
+
+class MyVisitor extends AbstractVisitor
+{
+    public function visitLink(NodeContext $ctx, string $href, string $text, ?string $title): array
+    {
+        // Rewrite CDN URLs
+        if (str_starts_with($href, 'https://old-cdn.com')) {
+            $href = str_replace('https://old-cdn.com', 'https://new-cdn.com', $href);
+        }
+        return VisitResult::custom("[{$text}]({$href})");
+    }
+
+    public function visitImage(NodeContext $ctx, string $src, ?string $alt, ?string $title): array
+    {
+        // Skip tracking pixels
+        return str_contains($src, 'tracking') ? VisitResult::skip() : VisitResult::continue();
+    }
+}
+
+$html = '<a href="https://old-cdn.com/file.pdf">Download</a>';
+$result = Converter::create()->convert(
+    $html,
+    new ConversionOptions(visitor: new MyVisitor())
+);
+$markdown = $result['content'];
+```
+
+{% elif language == 'elixir' %}
+
+```elixir
+defmodule MyVisitor do
+  use HtmlToMarkdown.Visitor
+
+  @impl true
+  def handle_link(_ctx, href, text, _title) do
+    # Rewrite CDN URLs
+    href = if String.starts_with?(href, "https://old-cdn.com") do
+      String.replace(href, "https://old-cdn.com", "https://new-cdn.com")
+    else
+      href
+    end
+    {:custom, "[#{text}](#{href})"}
+  end
+
+  @impl true
+  def handle_image(_ctx, src, _alt, _title) do
+    # Skip tracking pixels
+    if String.contains?(src, "tracking"), do: :skip, else: :continue
+  end
+end
+
+html = "<a href=\"https://old-cdn.com/file.pdf\">Download</a>"
+opts = %HtmlToMarkdown.Options{visitor: MyVisitor}
+{:ok, result} = HtmlToMarkdown.convert(html, opts)
+result.content
+```
+
+{% elif language == 'r' %}
+
+```r
+library(htmltomarkdown)
+
+html <- '<a href="https://old-cdn.com/file.pdf">Download</a>'
+opts <- conversion_options(extract_metadata = FALSE)
+result <- convert(html, opts)
+cat(result$content)
+```
+
+{% endif %}

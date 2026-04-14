@@ -14,11 +14,11 @@ specialised functions, there is now a single `convert()` function that
 returns a structured `ConversionResult`. This simplifies the API while
 making all extraction capabilities available through one call.
 
-### hOCR support moved to Kreuzberg
+### hOCR support moved to kreuzberg
 
 hOCR (OCR-generated HTML) processing was removed from html-to-markdown
-and moved into [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg),
-the document extraction library in the Kreuzberg.dev ecosystem. hOCR is
+and moved into [kreuzberg](https://github.com/kreuzberg-dev/kreuzberg),
+the document extraction library in the kreuzberg.dev ecosystem. hOCR is
 a document-level concern — it belongs in the extraction pipeline, not
 in an HTML-to-Markdown converter.
 
@@ -59,7 +59,7 @@ v3 has one function:
 | `convert_with_tables(html, opts)` | `convert(html, opts).tables` |
 | `convert_with_visitor(html, opts, v)` | `convert(html, opts, v).content` |
 | `convert_to_string(html)` | `convert(html).content` |
-| `hocr_spatial_tables: true` | Use [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) |
+| `hocr_spatial_tables: true` | Use [kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) |
 | `ExtendedMetadata` | `HtmlMetadata` |
 | `start_profiling()` | Removed |
 | `markdownify(html)` (Python) | `convert(html).content` |
@@ -208,5 +208,3 @@ HtmResult *result = htm_convert(html, NULL);
 const char *markdown = htm_result_content(result);
 htm_result_free(result);
 ```
-
---8<-- "snippets/feedback.md"

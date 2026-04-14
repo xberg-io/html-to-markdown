@@ -56,7 +56,6 @@
   </a>
 </div>
 
-
 High-performance HTML to Markdown converter with Java Panama FFI bindings to the Rust core.
 Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion with full metadata extraction support.
 
@@ -70,7 +69,6 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
     <version>3.1.0</version>
     <classifier>linux</classifier> <!-- or macos, windows -->
 </dependency>
-
 ```
 
 
@@ -98,15 +96,9 @@ implementation("dev.kreuzberg:html-to-markdown:3.1.0")
 
 
 
+
 ## Performance Snapshot
 
-Apple M4 • Real Wikipedia documents • `convert()` (Java)
-
-| Document | Size | Ops/sec | Throughput |
-| -------- | ---- | ------- | ---------- |
-| Lists (Timeline) | 129KB | 2,308 | 291.5 MB/s |
-| Tables (Countries) | 360KB | 773 | 272.0 MB/s |
-| Mixed (Python) | 656KB | 403 | 258.5 MB/s |
 
 
 
@@ -127,7 +119,6 @@ public class Example {
     }
 }
 ```
-
 
 
 With conversion options:
@@ -154,8 +145,6 @@ public class MetadataExample {
     }
 }
 ```
-
-
 
 
 ## API Reference
@@ -191,7 +180,6 @@ List<?>  tables   = result.tables();    // empty unless extractTables(true)
 - `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`
 
-
 ## Djot Output Format
 
 The library supports converting HTML to [Djot](https://djot.net/), a lightweight markup language similar to Markdown but with a different syntax for some elements. Set `output_format` to `"djot"` to use this format.
@@ -209,6 +197,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 | Superscript | N/A | `^text^` |
 
 ### Example Usage
+
 
 
 ```java
@@ -229,12 +218,13 @@ String djot = HtmlToMarkdown.convert(html,
 ```
 
 
-Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
+Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 
 ```java
@@ -250,8 +240,8 @@ String plain = HtmlToMarkdown.convert(html,
 ```
 
 
-Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
+Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
 
 

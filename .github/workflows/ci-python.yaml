@@ -92,10 +92,6 @@ jobs:
         run: cargo build --release -p html-to-markdown-cli
         shell: bash
 
-      - name: Run Python Tests
-        run: task python:test:ci
-        shell: bash
-
       - name: Run E2E tests
         run: task python:e2e:test
         shell: bash

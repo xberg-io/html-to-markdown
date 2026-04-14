@@ -1,3 +1,16 @@
+# Native extension module (Magnus/rb-sys)
+module HtmlToMarkdownRs
+  class ConversionOptions
+    def initialize: (Hash[Symbol, untyped]) -> void
+  end
+
+  class ConversionResult
+    def content: () -> String?
+  end
+
+  def self.convert: (String html, ConversionOptions? options) -> ConversionResult
+end
+
 # Type definitions for HtmlToMarkdown Ruby gem
 module HtmlToMarkdown
   VERSION: String
@@ -128,12 +141,9 @@ module HtmlToMarkdown
 
   public
 
-  # Convert HTML to Markdown, returning a Hash with content, metadata, tables, images, and warnings.
+  # Convert HTML to Markdown, returning the markdown content string.
   #
   # Example:
   #   result = HtmlToMarkdown.convert(html)
-  def self.convert: (String html, ?conversion_options options) -> Hash[String, untyped]
-
-  # Instance method version (created by module_function)
-  def convert: (String html, ?conversion_options options) -> Hash[String, untyped]
+  def self.convert: (String html, ?conversion_options options) -> String
 end

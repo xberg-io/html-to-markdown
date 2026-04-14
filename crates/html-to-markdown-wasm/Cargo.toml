@@ -1,72 +1,21 @@
 [package]
 name = "html-to-markdown-wasm"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
-homepage.workspace = true
-documentation.workspace = true
+version = "3.1.0"
+edition = "2024"
+description = "High-performance HTML to Markdown converter"
+license = "MIT"
 readme.workspace = true
-rust-version.workspace = true
-description = "HTML to Markdown conversion for WebAssembly targets"
-keywords = ["html", "markdown", "wasm", "webassembly"]
-categories = ["parsing", "text-processing", "wasm"]
-
-[package.metadata.wasm-pack.publish]
-registry = "https://registry.npmjs.org/"
+keywords.workspace = true
+categories.workspace = true
+repository = "https://github.com/kreuzberg-dev/html-to-markdown"
 
 [package.metadata.wasm-pack.profile.release]
-wasm-opt = ["-O3", "--enable-bulk-memory", "--enable-nontrapping-float-to-int"]
-
-[package.metadata.wasm-pack.profile.dev]
 wasm-opt = false
 
-[package.metadata.cargo-machete]
-ignored = ["getrandom", "serde_json"]
-
 [lib]
-crate-type = ["cdylib", "rlib"]
-
-[features]
-default = ["full", "js-bindings"]
-full = ["metadata", "visitor"]
-js-bindings = ["wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook", "js-sys"]
-metadata = ["html-to-markdown-rs/metadata"]
-visitor = ["html-to-markdown-rs/visitor"]
-wasmtime-testing = []
+crate-type = ["cdylib"]
 
 [dependencies]
-console_error_panic_hook = { version = "0.1", optional = true }
-getrandom = { version = "0.4", features = ["wasm_js"] }
-html-to-markdown-bindings-common = { path = "../html-to-markdown-bindings-common", version = "3.1.0", features = [
-    "metadata",
-    "inline-images",
-] }
-html-to-markdown-rs = { workspace = true, features = [
-    "inline-images",
-    "metadata",
-    "visitor",
-] }
-js-sys = { version = "0.3", optional = true }
-serde = { version = "1.0", features = ["derive"] }
-serde-wasm-bindgen = { version = "0.6", optional = true }
-serde_json = "1.0"
-wasm-bindgen = { version = "0.2", optional = true }
-
-[dev-dependencies]
-wasm-bindgen-test = "0.3"
-
-# Publishing metadata for npm scoped package
-
-[lints.rust]
-unsafe_code = "allow"    # WASM bindings require unsafe code
-missing_docs = "warn"
-unused_must_use = "deny"
-
-[lints.clippy]
-all = { level = "deny", priority = -1 }
-cargo = { level = "deny", priority = -1 }
-pedantic = { level = "deny", priority = -1 }
-nursery = { level = "warn", priority = -1 }
-multiple_crate_versions = { level = "allow", priority = 1 }
+html-to-markdown-rs = { path = "../html-to-markdown", features = ["full"] }
+serde-wasm-bindgen = "0.6"
+wasm-bindgen = "0.2"

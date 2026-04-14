@@ -18,25 +18,10 @@
     "format": "biome format --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.10",
-    "@textlint-rule/textlint-rule-no-invalid-control-character": "^3.0.0",
-    "@textlint-rule/textlint-rule-no-unmatched-pair": "^2.0.4",
-    "@types/node": "^25.5.2",
-    "textlint": "^15.5.4",
-    "textlint-filter-rule-comments": "^1.3.0",
-    "textlint-filter-rule-node-types": "^1.1.0",
-    "textlint-rule-common-misspellings": "^1.0.1",
-    "textlint-rule-en-capitalization": "^2.0.3",
-    "textlint-rule-no-empty-section": "^1.1.0",
-    "textlint-rule-no-start-duplicated-conjunction": "^2.0.2",
-    "textlint-rule-no-surrogate-pair": "^1.0.1",
-    "textlint-rule-no-todo": "^2.0.1",
-    "textlint-rule-no-zero-width-spaces": "^1.0.1",
-    "textlint-rule-stop-words": "^5.2.0",
-    "textlint-rule-terminology": "^5.2.16",
-    "textlint-rule-write-good": "^2.0.0",
+    "@biomejs/biome": "^2.4.11",
+    "@types/node": "^25.6.0",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
   },
   "engines": {
     "node": ">=18",

@@ -2,34 +2,93 @@
   {
     "id": "inline_code",
     "description": "Inline code",
-    "html": "<p>Use <code>console.log()</code> to debug</p>",
-    "assertions": { "content_contains_all": ["`console.log()`"] }
+    "input": {
+      "html": "<p>Use <code>console.log()</code> to debug</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "`console.log()`"
+        ]
+      }
+    ]
   },
   {
     "id": "code_block",
     "description": "Code block with language preserves content",
-    "html": "<pre><code class=\"language-python\">print('hello')</code></pre>",
-    "assertions": { "content_contains_all": ["print('hello')"], "content_not_empty": true }
+    "input": {
+      "html": "<pre><code class=\"language-python\">print('hello')</code></pre>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "print('hello')"
+        ]
+      }
+    ]
   },
   {
     "id": "code_block_no_language",
     "description": "Code block without a language class preserves content",
-    "html": "<pre><code>plain code here</code></pre>",
-    "assertions": { "content_contains_all": ["plain code here"], "content_not_empty": true }
+    "input": {
+      "html": "<pre><code>plain code here</code></pre>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "plain code here"
+        ]
+      }
+    ]
   },
   {
     "id": "code_with_backticks_in_content",
     "description": "Inline code containing backtick characters is properly escaped",
-    "html": "<p>Use <code>`backtick` here</code> carefully.</p>",
-    "assertions": {
-      "content_contains_all": ["backtick"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Use <code>`backtick` here</code> carefully.</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "backtick"
+        ]
+      }
+    ]
   },
   {
     "id": "code_inline_in_paragraph",
     "description": "Inline code element nested inside a paragraph",
-    "html": "<p>Call the <code>initialize()</code> method first.</p>",
-    "assertions": { "content_contains_all": ["`initialize()`"] }
+    "input": {
+      "html": "<p>Call the <code>initialize()</code> method first.</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "`initialize()`"
+        ]
+      }
+    ]
   }
 ]
