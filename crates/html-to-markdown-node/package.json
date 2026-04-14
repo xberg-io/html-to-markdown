@@ -58,7 +58,7 @@
 		"clean": "rm -rf dist node_modules *.node"
 	},
 	"devDependencies": {
-		"@napi-rs/cli": "^3.6.0",
+		"@napi-rs/cli": "^3.6.1",
 		"@types/node": "^25.5.2",
 		"tsx": "^4.21.0",
 		"vitest": "^4.1.2"
