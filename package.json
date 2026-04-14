@@ -18,7 +18,7 @@
     "format": "biome format --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.10",
+    "@biomejs/biome": "^2.4.11",
     "@textlint-rule/textlint-rule-no-invalid-control-character": "^3.0.0",
     "@textlint-rule/textlint-rule-no-unmatched-pair": "^2.0.4",
     "@types/node": "^25.5.2",
