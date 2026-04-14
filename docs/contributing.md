@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for considering a contribution to html-to-markdown. Every fix, feature, and documentation improvement helps.
+Thanks for considering a contribution to html-to-markdown. Every fix, feature, and documentation improvement helps us to make it better.
 
 ## Ways to contribute
 

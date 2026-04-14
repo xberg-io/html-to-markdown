@@ -30,37 +30,25 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 
 - :material-lightning-bolt:{ .lg .middle } **150–280 MB/s throughput**
 
----
-
     Rust-native parsing and a single-pass DOM walk. 10–80x faster than pure-language alternatives. No JVM, no interpreter overhead.
 
 - :material-translate:{ .lg .middle } **12 language bindings**
-
----
 
     Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, and WebAssembly. All wrap the same core — no separate conversion logic per language.
 
 - :material-format-text:{ .lg .middle } **Three output formats**
 
----
-
     Markdown (CommonMark), Djot, and plain text. Switch with `output_format`. All formatting options apply to every format.
 
 - :material-tag-multiple:{ .lg .middle } **Metadata extraction**
-
----
 
     Title, description, Open Graph, Twitter Card, JSON-LD, links, and images — all in one pass. Enable with `extract_metadata: true`.
 
 - :material-table:{ .lg .middle } **Table extraction**
 
----
-
     Every `<table>` lands in `result.tables` as a structured cell grid with colspan, rowspan, and header data, plus a rendered Markdown string.
 
 - :material-filter:{ .lg .middle } **Visitor pattern**
-
----
 
     40 callbacks to rewrite links, filter elements, or emit custom Markdown for any HTML tag. Zero overhead when not used.
 
@@ -74,15 +62,11 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 
 - :material-download:{ .lg .middle } **Installation**
 
----
-
     Package manager commands for all 12 languages, plus Cargo feature flags for Rust.
 
     [:octicons-arrow-right-24: Installation](installation.md)
 
 - :material-play:{ .lg .middle } **Usage**
-
----
 
     Convert HTML, read result fields, extract metadata, and work with document structure.
 
@@ -90,15 +74,11 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 
 - :material-cog:{ .lg .middle } **Configuration**
 
----
-
     All 34 options with types, defaults, and descriptions. Output formats, preprocessing, link and image handling.
 
     [:octicons-arrow-right-24: Configuration](configuration.md)
 
 - :material-table:{ .lg .middle } **Table Extraction**
-
----
 
     Access cell-level grid data with colspan, rowspan, and header info alongside rendered Markdown.
 
@@ -106,15 +86,11 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 
 - :material-filter:{ .lg .middle } **Visitor Pattern**
 
----
-
     Filter, rewrite, or replace any element during conversion with 40 typed callbacks.
 
     [:octicons-arrow-right-24: Visitor](visitor.md)
 
 - :material-api:{ .lg .middle } **API Reference**
-
----
 
     Every public type: `ConversionResult`, `DocumentNode`, `HtmlMetadata`, `TableData`, `InlineImage`, and more.
 
