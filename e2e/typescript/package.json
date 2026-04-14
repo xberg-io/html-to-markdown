@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "@kreuzberg/html-to-markdown": "workspace:*",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
   }
 }
