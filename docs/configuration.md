@@ -56,6 +56,7 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 |--------|------|---------|-------------|
 | `autolinks` | `bool` | `false` | When link text equals the href, emit `<url>` instead of `[url](url)`. |
 | `default_title` | `bool` | `false` | Use the href as link title when no `title` attribute is present. |
+| `link_style` | `"inline"` \| `"reference"` | `"inline"` | `inline` emits `[text](url)`. `reference` emits `[text][1]` with numbered definitions collected at the end of the document. |
 
 ### Images
 
@@ -63,6 +64,10 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 |--------|------|---------|-------------|
 | `keep_inline_images_in` | `list[str]` | `[]` | Element names where images should be kept as Markdown `![alt](src)` rather than converted to alt text. |
 | `extract_images` | `bool` | `false` | Extract data URIs and embedded SVGs into the `images` field of `ConversionResult`. |
+| `skip_images` | `bool` | `false` | Drop image elements entirely. No `![alt](src)` output, no alt-text fallback. |
+| `max_image_size` | `int` (bytes) | `5242880` | Maximum byte size for an extracted inline image. Larger images are skipped. 5 MB default. |
+| `capture_svg` | `bool` | `false` | Include inline `<svg>` elements in `result.images` when `extract_images` is enabled. |
+| `infer_dimensions` | `bool` | `true` | Infer missing `width` and `height` from decoded image bytes when extracting inline images. |
 
 ### Tables
 
@@ -90,6 +95,19 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 |--------|------|---------|-------------|
 | `convert_as_inline` | `bool` | `false` | Treat block-level elements as inline (no paragraph breaks). |
 | `strip_tags` | `list[str]` | `[]` | Tags to strip entirely (only text content is preserved, no Markdown conversion). |
+| `preserve_tags` | `list[str]` | `[]` | Tags to emit verbatim as HTML instead of converting to Markdown. Counterpart to `strip_tags`. |
+
+### Parsing
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `encoding` | `string` | `"utf-8"` | **CLI only.** Character encoding of the input file or stdin. The value must be a label that the WHATWG Encoding Standard recognises (`"windows-1252"`, `"shift_jis"`, `"iso-8859-1"`, etc.). The core library stores but does not use this field; decoding happens in the CLI before the string reaches `convert()`. |
+
+### Debugging
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `debug` | `bool` | `false` | **CLI only.** When true, the CLI prints diagnostic lines to stderr after each conversion (e.g. `"Generated 1234 bytes of markdown"`). The core library stores but does not act on this field. |
 
 ### Metadata Extraction
 
@@ -99,7 +117,6 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 | `extract_document` | `bool` | `false` | Extract document-level metadata (title, description, charset, language, Open Graph, etc.). Requires `extract_metadata`. |
 | `extract_headers` | `bool` | `false` | Extract heading elements with level, text, and id. Requires `extract_metadata`. |
 | `extract_links` | `bool` | `false` | Extract anchor tags with href, text, rel, and link type. Requires `extract_metadata`. |
-| `extract_images` | `bool` | `false` | Extract image elements. Requires `extract_metadata`. |
 | `extract_structured_data` | `bool` | `false` | Extract JSON-LD, Microdata, and RDFa blocks. Requires `extract_metadata`. |
 | `max_structured_data_size` | `int` | `100000` | Maximum byte size of structured data blocks to extract. |
 
@@ -113,10 +130,49 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `preprocess` | `bool` | `false` | Clean up HTML before conversion (removes navigation, ads, forms, and other boilerplate). |
-| `preset` | `"minimal"` \| `"standard"` \| `"aggressive"` | `"standard"` | Aggressiveness of preprocessing. `aggressive` is suited for web scraping. Requires `preprocess`. |
-| `keep_navigation` | `bool` | `false` | Preserve `<nav>` and menu elements during preprocessing. Requires `preprocess`. |
-| `keep_forms` | `bool` | `false` | Preserve `<form>` and `<input>` elements during preprocessing. Requires `preprocess`. |
+| `preprocess` | `bool` | `false` | Clean up HTML before conversion. Required for any of the options below to have an effect. |
+| `preset` | `"minimal"` \| `"standard"` \| `"aggressive"` | `"standard"` | Preset level carried through for forward compatibility. Current releases honour the boolean flags below and do not branch on preset. |
+| `keep_navigation` | `bool` | `false` | Keep `<nav>`, and keep `<header>`/`<footer>`/`<aside>` that otherwise look like navigation. |
+| `keep_forms` | `bool` | `false` | Accepted and stored. Current releases do not drop form elements during preprocessing regardless of this flag. |
+
+When `preprocess` is `true` and `keep_navigation` is `false`, the preprocessor drops:
+
+- every `<nav>` element
+- `<header>` elements outside a semantic content ancestor (`<article>`, `<main>`, etc.)
+- `<header>`, `<footer>`, and `<aside>` that carry navigation hints in their class or id attributes (`menu`, `sidebar`, `breadcrumb`, and similar)
+
+Script and style tags are always stripped before the DOM walk starts, independent of `preprocess`.
+
+## Output Format Comparison
+
+Given this HTML:
+
+```html
+<h1>Report</h1><p>See <a href="https://example.com"><strong>example</strong></a>.</p>
+```
+
+=== "markdown"
+    ```markdown
+    # Report
+
+    See [**example**](https://example.com).
+    ```
+
+=== "djot"
+    ```djot
+    # Report
+
+    See [*example*](https://example.com).
+    ```
+
+=== "plain"
+    ```text
+    Report
+
+    See example.
+    ```
+
+`markdown` and `djot` both preserve structure and link targets. `djot` uses single-asterisk strong emphasis; `markdown` uses double asterisks. `plain` strips all formatting, link targets, and list markers, returning readable text only.
 
 ## Builder Examples
 
@@ -241,3 +297,5 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
       extract_metadata = TRUE
     )
     result <- convert(html, opts)```
+
+--8<-- "snippets/feedback.md"

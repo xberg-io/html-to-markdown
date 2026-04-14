@@ -83,10 +83,11 @@ html-to-markdown --url https://example.com > output.md
 
 ## Links
 
-| Flag | Description |
-|------|-------------|
-| `-a`, `--autolinks` | When link text equals the href, use `<url>` instead of `[url](url)`. |
-| `--default-title` | Use href as link title when no `title` attribute exists. |
+| Flag | Values | Default | Description |
+|------|--------|---------|-------------|
+| `-a`, `--autolinks` | — | off | When link text equals the href, use `<url>` instead of `[url](url)`. |
+| `--default-title` | — | off | Use href as link title when no `title` attribute exists. |
+| `--link-style STYLE` | `inline`, `reference` | `inline` | `inline` emits `[text](url)`. `reference` emits `[text][1]` with numbered definitions at the end of the document. |
 
 ## Images
 
@@ -126,12 +127,23 @@ html-to-markdown --url https://example.com > output.md
 | Flag | Description |
 |------|-------------|
 | `--extract-metadata` | Prepend a metadata comment block to the Markdown output. |
-| `--json` | Output a full `ConversionResult` as JSON (content, metadata, tables, images, warnings). |
-| `--extract-document` | Extract document-level metadata (requires `--json`). |
-| `--extract-headers` | Extract heading elements (requires `--json`). |
-| `--extract-links` | Extract anchor tags (requires `--json`). |
-| `--extract-images` | Extract image elements (requires `--json`). |
-| `--extract-structured-data` | Extract JSON-LD, Microdata, and RDFa (requires `--json`). |
+| `--extract-document` | Extract document-level metadata (requires `--extract-metadata` or `--json`). |
+| `--extract-headers` | Extract heading elements (requires `--extract-metadata` or `--json`). |
+| `--extract-links` | Extract anchor tags (requires `--extract-metadata` or `--json`). |
+| `--extract-images` | Extract image elements (requires `--extract-metadata` or `--json`). |
+| `--extract-structured-data` | Extract JSON-LD, Microdata, and RDFa (requires `--extract-metadata` or `--json`). |
+
+## JSON Output
+
+`--json` swaps the default Markdown output for a full `ConversionResult` object: `content`, `metadata`, `tables`, `document`, `images`, and `warnings` on a single JSON value. The flags in this section control which fields are populated.
+
+| Flag | Description |
+|------|-------------|
+| `--json` | Output a full `ConversionResult` as JSON instead of Markdown. |
+| `--include-structure` | Populate `document` with the parsed semantic tree. Requires `--json`. |
+| `--extract-inline-images` | Populate `images` with extracted data URIs and SVGs. Requires `--json`. |
+| `--no-content` | Skip Markdown rendering. `content` is empty, metadata and structure still populate. Requires `--json`. |
+| `--show-warnings` | Print each processing warning to stderr as `Warning [<kind>]: <message>`. Works with or without `--json`. |
 
 ## Preprocessing
 
@@ -183,3 +195,5 @@ html-to-markdown input.html \
 # Fetch and convert with Djot output
 html-to-markdown --url https://example.com --output-format djot
 ```
+
+--8<-- "snippets/feedback.md"

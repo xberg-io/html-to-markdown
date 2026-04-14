@@ -208,3 +208,5 @@ HtmResult *result = htm_convert(html, NULL);
 const char *markdown = htm_result_content(result);
 htm_result_free(result);
 ```
+
+--8<-- "snippets/feedback.md"

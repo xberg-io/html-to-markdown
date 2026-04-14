@@ -38,7 +38,6 @@ theme:
     - navigation.instant.progress
     - navigation.path
     - navigation.prune
-    - navigation.indexes
     - navigation.sections
     - navigation.tabs
     - navigation.tabs.sticky
@@ -51,8 +50,6 @@ theme:
     - toc.follow
     - toc.integrate
     - announce.dismiss
-    - content.action.edit
-    - content.action.view
   icon:
     repo: github
     search: search
@@ -136,6 +133,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/kreuzberg-dev/html-to-markdown
       name: View on GitHub
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/pXxagNK2zN
+      name: Community on Discord
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/html-to-markdown/
       name: View on PyPI
@@ -157,9 +157,21 @@ extra_css:
 
 nav:
   - Home: index.md
-  - Installation: installation.md
-  - Usage: usage.md
-  - Configuration: configuration.md
-  - CLI: cli.md
-  - Migration Guide: migration.md
+  - Demo: https://docs.html-to-markdown.kreuzberg.dev/demo
+  - Getting Started:
+    - Installation: installation.md
+    - Usage: usage.md
+    - Configuration: configuration.md
+    - CLI: cli.md
+  - Reference:
+    - API Reference: api-reference.md
+    - Error Handling: errors.md
+    - Table Extraction: tables.md
+    - Visitor Pattern: visitor.md
+  - Guides:
+    - Architecture: architecture.md
+    - Language Bindings: language-guides.md
+    - Migration Guide: migration.md
+  - Contributing:
+    - Contributing: contributing.md
   - Changelog: https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md

@@ -163,6 +163,14 @@ All options are passed to `convert()` as the second argument via a `ConversionOp
 - wrap_width: int 20-500 (default: 80)
 - convert_as_inline: bool (default: false)
 - strip_tags: list of tag names to strip (default: [])
+- preserve_tags: list of tag names to emit verbatim as HTML (default: [])
+- link_style: "inline" | "reference" — inline emits [text](url); reference emits [text][1] with definitions at end (default: "inline")
+- skip_images: bool — drop images entirely (default: false)
+- max_image_size: int bytes — skip inline images larger than this (default: 5242880)
+- capture_svg: bool — include inline SVGs in result.images when extract_images is true (default: false)
+- infer_dimensions: bool — decode image bytes to infer width/height (default: true)
+- encoding: string — CLI only; input file character encoding (default: "utf-8"); ignored by the core library
+- debug: bool — CLI only; prints diagnostic lines to stderr after each conversion (default: false)
 - extract_metadata: bool — populate result.metadata (default: false)
 - extract_document: bool — extract title, description, Open Graph, etc. (default: false)
 - extract_headers: bool — extract h1-h6 elements (default: false)
@@ -202,14 +210,21 @@ Formatting:
   -w, --wrap               Enable line wrapping
   --wrap-width N           Wrap column (default: 80)
 
+Links:
+  --link-style STYLE       inline | reference (default: inline)
+
 Metadata:
   --extract-metadata       Prepend metadata comment block to output
   --json                   Output full ConversionResult as JSON
-  --extract-document       Extract document-level metadata (requires --json)
-  --extract-headers        Extract headings (requires --json)
-  --extract-links          Extract links (requires --json)
-  --extract-images         Extract images (requires --json)
-  --extract-structured-data Extract JSON-LD, Microdata, RDFa (requires --json)
+  --include-structure      Populate document tree (requires --json)
+  --extract-inline-images  Populate images field (requires --json)
+  --no-content             Skip markdown rendering (requires --json)
+  --show-warnings          Print warnings to stderr
+  --extract-document       Extract document-level metadata
+  --extract-headers        Extract headings
+  --extract-links          Extract links
+  --extract-images         Extract images
+  --extract-structured-data Extract JSON-LD, Microdata, RDFa
 
 Preprocessing:
   -p, --preprocess         Clean HTML before conversion
@@ -224,9 +239,9 @@ Preprocessing:
 - Go: `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3`
 - Ruby: `gem install html_to_markdown`
 - PHP: `composer require kreuzberg/html-to-markdown`
-- Java: Maven artifact `dev.kreuzberg:html-to-markdown:3.0.0`
-- C#: `dotnet add package HtmlToMarkdown`
-- Elixir: `{:html_to_markdown, "~> 3.0"}` in mix.exs
+- Java: Maven artifact `dev.kreuzberg:html-to-markdown:3.1.0`
+- C#: `dotnet add package KreuzbergDev.HtmlToMarkdown`
+- Elixir: `{:html_to_markdown, "~> 3.1"}` in mix.exs
 - R: `install.packages("htmltomarkdown")`
 - C: link against `libhtml_to_markdown` (see GitHub releases)
 - WASM: `npm install @kreuzberg/html-to-markdown-wasm`

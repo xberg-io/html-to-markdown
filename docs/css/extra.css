@@ -32,7 +32,10 @@ html {
 	--md-shadow-z1: none;
 }
 
-:root[data-md-color-scheme="slate"] > * {
+/* Slate palette: `data-md-color-scheme` is on `body`, not `html` — `:root[...]` never matched */
+[data-md-color-scheme="slate"] {
+	background-color: #23232c;
+
 	--md-primary-fg-color: #323040;
 	--md-primary-fg-color--light: #4a4858;
 	--md-primary-fg-color--dark: #1a1926;
@@ -50,10 +53,9 @@ html {
 
 	--md-primary-bg-color: #23232c;
 	--md-shadow-z1: none;
-}
 
-[data-md-color-scheme="slate"] {
-	background-color: #23232c;
+	--md-banner-fg-color: #e8f7f3;
+	--md-banner-bg-color: #1f2937;
 }
 
 [data-md-color-scheme="slate"] .md-main {
@@ -332,11 +334,6 @@ html {
 :root > * {
 	--md-banner-fg-color: #0f172a;
 	--md-banner-bg-color: #e8f7f3;
-}
-
-:root[data-md-color-scheme="slate"] > * {
-	--md-banner-fg-color: #e8f7f3;
-	--md-banner-bg-color: #1f2937;
 }
 
 .md-typeset .admonition {
@@ -837,8 +834,21 @@ strong {
 }
 
 .md-header__button.md-logo {
-	margin-right: -0.6rem;
-	padding: 0;
+	margin-right: 0.2rem;
+	padding: 0.2rem;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+	height: 2.4rem;
+	width: 2.4rem;
+	flex-shrink: 0;
+	object-fit: contain;
+}
+
+/* Teal mark reads clearly on both light and dark chrome */
+[data-md-color-scheme="default"] .md-header__button.md-logo {
+	filter: drop-shadow(0 0 1px rgba(46, 45, 54, 0.35));
 }
 
 .md-header__title {
@@ -846,17 +856,43 @@ strong {
 	padding-left: 0;
 }
 
+/* One continuous top bar in light mode (tabs are already this tone) */
+[data-md-color-scheme="default"] .md-header {
+	background-color: #3d3a4d;
+	color: rgba(255, 255, 255, 0.95);
+}
+
+[data-md-color-scheme="default"] .md-header__topic,
+[data-md-color-scheme="default"] .md-header__title,
+[data-md-color-scheme="default"] .md-header .md-ellipsis {
+	color: rgba(255, 255, 255, 0.96);
+}
+
+[data-md-color-scheme="default"] .md-source {
+	color: rgba(255, 255, 255, 0.88);
+}
+
+[data-md-color-scheme="default"] .md-source__repository {
+	color: rgba(255, 255, 255, 0.92);
+}
+
+[data-md-color-scheme="default"] .md-source__facts {
+	color: rgba(255, 255, 255, 0.72);
+}
+
 .md-tabs {
 	background-color: #3d3a4d;
 	width: 100%;
 }
 
+/* Inactive tab labels: must contrast with #3d3a4d (defaults were near #323040) */
 .md-tabs__link {
 	font-family: Inter, sans-serif;
 	font-size: 14px;
 	font-style: normal;
 	font-weight: 400;
 	line-height: 23.8px;
+	color: rgba(255, 255, 255, 0.82) !important;
 }
 
 .md-tabs__item {
@@ -925,6 +961,48 @@ strong {
 
 .md-footer-meta {
 	background-color: #323040;
+	color: rgba(255, 255, 255, 0.82);
+}
+
+/* Light scheme: theme sets dark --md-footer-fg-color — copyright / “Made with …” vanish on #323040 */
+[data-md-color-scheme="default"] .md-footer-meta {
+	--md-footer-fg-color: rgba(255, 255, 255, 0.9);
+	--md-footer-bg-color: #323040;
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-md-color-scheme="default"] .md-footer-meta .md-copyright,
+[data-md-color-scheme="default"] .md-footer-meta .md-copyright__highlight {
+	color: inherit !important;
+}
+
+[data-md-color-scheme="default"] .md-footer-meta a:not(.md-social__link) {
+	color: #7ee9d8 !important;
+}
+
+[data-md-color-scheme="default"] .md-footer-meta a:not(.md-social__link):hover {
+	color: #ffffff !important;
+}
+
+[data-md-color-scheme="default"] .md-footer-meta.md-typeset,
+[data-md-color-scheme="default"] .md-footer-meta .md-typeset,
+[data-md-color-scheme="default"] .md-footer-meta .md-typeset p {
+	color: inherit !important;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta {
+	--md-footer-fg-color: rgba(255, 255, 255, 0.9);
+	color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta a:not(.md-social__link) {
+	color: #58fbda !important;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta.md-typeset,
+[data-md-color-scheme="slate"] .md-footer-meta .md-typeset,
+[data-md-color-scheme="slate"] .md-footer-meta .md-typeset p {
+	color: inherit !important;
 }
 
 .md-social {
@@ -990,9 +1068,14 @@ strong {
 	color: #ffffff;
 }
 
+/* Integrated TOC: avoid large vertical rhythm (20px × every link read as a “hole” above siblings) */
 .md-nav--secondary .md-nav__list .md-nav__link {
-	margin-top: 20px;
+	margin-top: 0;
 	margin-right: 0;
+}
+
+.md-nav--secondary .md-nav__list .md-nav__item:not(:first-child) > .md-nav__link {
+	margin-top: 0.2rem;
 }
 
 nav.md-nav--secondary {
@@ -1246,20 +1329,94 @@ nav.md-nav--secondary > .md-nav__list > .md-nav__item > .md-nav > .md-nav__list 
 	fill: #58fbda;
 }
 
-[data-md-color-scheme="default"] .md-social__link svg {
-	fill: #da2ae0;
+/*
+ * Header (light scheme): dark bar + FA7 paths often use fill="currentColor".
+ * Set fill + color on svg and every descendant so GitHub / search / palette stay solid white.
+ */
+[data-md-color-scheme="default"] .md-header .md-icon svg,
+[data-md-color-scheme="default"] .md-header .md-icon svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
 }
 
-[data-md-color-scheme="slate"] .md-social__link svg {
-	fill: #58fbda;
+[data-md-color-scheme="default"] .md-header .md-source svg,
+[data-md-color-scheme="default"] .md-header .md-source svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
 }
 
-[data-md-color-scheme="default"] .md-header__button svg {
-	fill: #da2ae0;
+/* Social icons can render in the header (e.g. Zensical); not only in .md-footer-meta */
+[data-md-color-scheme="default"] .md-header .md-social__link {
+	color: #ffffff !important;
 }
 
-[data-md-color-scheme="slate"] .md-header__button svg {
-	fill: #58fbda;
+[data-md-color-scheme="default"] .md-header .md-social__link svg,
+[data-md-color-scheme="default"] .md-header .md-social__link svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
+}
+
+[data-md-color-scheme="default"] .md-header .md-social__link:hover,
+[data-md-color-scheme="default"] .md-header .md-social__link:hover svg,
+[data-md-color-scheme="default"] .md-header .md-social__link:hover svg * {
+	color: #58fbda !important;
+	fill: #58fbda !important;
+}
+
+[data-md-color-scheme="slate"] .md-header .md-social__link svg,
+[data-md-color-scheme="slate"] .md-header .md-social__link svg * {
+	fill: #58fbda !important;
+	color: #58fbda !important;
+	opacity: 1 !important;
+}
+
+/*
+ * Footer social (GitHub, Discord, npm, …): same FA path issue on dark #323040 bar.
+ */
+[data-md-color-scheme="default"] .md-footer-meta .md-social__link {
+	color: #ffffff;
+}
+
+[data-md-color-scheme="default"] .md-footer-meta .md-social__link:hover {
+	color: #58fbda;
+}
+
+[data-md-color-scheme="default"] .md-footer-meta .md-social__link svg,
+[data-md-color-scheme="default"] .md-footer-meta .md-social__link svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta .md-social__link {
+	color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta .md-social__link:hover {
+	color: #58fbda;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta .md-social__link svg,
+[data-md-color-scheme="slate"] .md-footer-meta .md-social__link svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
+}
+
+[data-md-color-scheme="default"] .md-header__button:not(.md-logo) svg,
+[data-md-color-scheme="default"] .md-header__button:not(.md-logo) svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
+}
+
+[data-md-color-scheme="slate"] .md-header__button:not(.md-logo) svg,
+[data-md-color-scheme="slate"] .md-header__button:not(.md-logo) svg * {
+	fill: #58fbda !important;
+	color: inherit !important;
 }
 
 [data-md-color-scheme="default"] .md-top {
@@ -1429,4 +1586,263 @@ body:has(.full-width-iframe) article {
 [data-md-color-scheme="slate"] .version-badge.new {
 	background-color: #1e4a2e;
 	color: #50fa7b;
+}
+
+/* Homepage hero: title + description read as one block */
+.md-typeset .home-hero {
+	margin: 0 0 2.25rem;
+	max-width: 44rem;
+}
+
+.md-typeset .home-hero h1 {
+	font-family: "Exo 2", Inter, sans-serif;
+	font-size: clamp(2rem, 4.2vw, 2.625rem);
+	font-weight: 700;
+	line-height: 1.12;
+	letter-spacing: -0.03em;
+	margin: 0 0 0.85rem;
+	padding: 0;
+	color: #1e1d26;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-hero h1 {
+	color: #ffffff;
+}
+
+.md-typeset .home-hero h1::after {
+	content: "";
+	display: block;
+	width: 2.75rem;
+	height: 0.22rem;
+	margin-top: 0.85rem;
+	border-radius: 2px;
+	background: linear-gradient(90deg, #da2ae0 0%, #b825c0 40%, #58fbda 100%);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-hero h1::after {
+	background: linear-gradient(90deg, #58fbda 0%, #7ffce8 50%, #da2ae0 100%);
+	opacity: 0.95;
+}
+
+.md-typeset .home-hero .home-lead {
+	font-family: Inter, sans-serif;
+	font-size: 1.1875rem;
+	font-weight: 400;
+	line-height: 1.62;
+	max-width: 40rem;
+	margin: 0;
+	color: #3f3d4d;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-hero .home-lead {
+	color: rgba(255, 255, 255, 0.88);
+}
+
+/* CTA / instruction card under hero */
+.md-typeset .home-hero .home-instruction {
+	margin-top: 1.35rem;
+	max-width: 42rem;
+	padding: 1rem 1.15rem 1.05rem 1.25rem;
+	border-radius: 8px;
+	border: 1px solid rgba(50, 48, 64, 0.12);
+	border-left: 4px solid #da2ae0;
+	background: linear-gradient(135deg, rgba(218, 42, 224, 0.06) 0%, rgba(50, 48, 64, 0.04) 100%);
+	box-shadow: 0 1px 2px rgba(50, 48, 64, 0.06);
+}
+
+.md-typeset .home-hero .home-instruction h3 {
+	margin: 0 0 0.65rem;
+	padding: 0;
+	font-family: Inter, sans-serif;
+	font-size: 0.8125rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #5b5966;
+	line-height: 1.3;
+	border: none;
+}
+
+.md-typeset .home-hero .home-instruction ol {
+	margin: 0;
+	padding-left: 1.35rem;
+}
+
+.md-typeset .home-hero .home-instruction li {
+	margin: 0.4rem 0;
+	color: #3f3d4d;
+	font-size: 1rem;
+	line-height: 1.55;
+}
+
+.md-typeset .home-hero .home-instruction li:first-child {
+	margin-top: 0;
+}
+
+.md-typeset .home-hero .home-instruction li:last-child {
+	margin-bottom: 0;
+}
+
+.md-typeset .home-hero .home-instruction a {
+	font-weight: 600;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-hero .home-instruction {
+	border-color: rgba(255, 255, 255, 0.12);
+	border-left-color: #58fbda;
+	background: linear-gradient(135deg, rgba(88, 251, 218, 0.08) 0%, rgba(0, 0, 0, 0.2) 100%);
+	box-shadow: none;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-hero .home-instruction h3 {
+	color: rgba(255, 255, 255, 0.65);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-hero .home-instruction li {
+	color: rgba(255, 255, 255, 0.88);
+}
+
+.md-typeset > .home-hero + h2 {
+	margin-top: 0;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid rgba(50, 48, 64, 0.12);
+}
+
+[data-md-color-scheme="slate"] .md-typeset > .home-hero + h2 {
+	border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.md-typeset .home-kreuzberg {
+	margin-top: 2.5rem;
+	padding: 1.15rem 1.35rem;
+	border-radius: 8px;
+	border: 1px solid rgba(50, 48, 64, 0.15);
+	background: rgba(50, 48, 64, 0.03);
+}
+
+.md-typeset .home-kreuzberg > h2:first-child {
+	margin-top: 0;
+	margin-bottom: 0.65rem;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .home-kreuzberg {
+	border-color: rgba(255, 255, 255, 0.12);
+	background: rgba(0, 0, 0, 0.2);
+}
+
+/* Page feedback: compact footer strip (hidden on root index.md via template) */
+.doc-feedback {
+	margin-top: 2rem;
+	padding: 0.65rem 1rem;
+	border-radius: 8px;
+	border: 1px solid rgba(50, 48, 64, 0.14);
+	background: rgba(50, 48, 64, 0.04);
+	font-size: 0.8125rem;
+	line-height: 1.5;
+	color: #5b5966;
+}
+
+.doc-feedback__text {
+	margin: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.35rem 0.5rem;
+}
+
+.doc-feedback__title {
+	color: #323040;
+	font-weight: 600;
+}
+
+.doc-feedback__sep {
+	color: rgba(91, 89, 102, 0.45);
+	user-select: none;
+}
+
+.doc-feedback a {
+	color: #da2ae0;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.doc-feedback a:hover {
+	text-decoration: underline;
+}
+
+[data-md-color-scheme="slate"] .doc-feedback {
+	border-color: rgba(255, 255, 255, 0.12);
+	background: rgba(0, 0, 0, 0.22);
+	color: rgba(255, 255, 255, 0.72);
+}
+
+[data-md-color-scheme="slate"] .doc-feedback__title {
+	color: rgba(255, 255, 255, 0.92);
+}
+
+[data-md-color-scheme="slate"] .doc-feedback__sep {
+	color: rgba(255, 255, 255, 0.35);
+}
+
+[data-md-color-scheme="slate"] .doc-feedback a {
+	color: #58fbda;
+}
+
+/*
+ * Footer meta carries BOTH .md-footer-meta and .md-typeset. In light palette, Material sets dark
+ * prose --md-default-fg-color on .md-typeset, so copyright / “Made with …” match the bar (#323040).
+ * Social SVGs used color:inherit and picked up that dark value. Overrides below ignore palette.
+ */
+footer.md-footer .md-footer-meta.md-typeset {
+	color: rgba(255, 255, 255, 0.94) !important;
+	--md-default-fg-color: rgba(255, 255, 255, 0.94) !important;
+	--md-typeset-color: rgba(255, 255, 255, 0.94) !important;
+}
+
+footer.md-footer .md-footer-meta .md-footer-meta__inner {
+	color: rgba(255, 255, 255, 0.94) !important;
+}
+
+footer.md-footer .md-footer-meta .md-copyright,
+footer.md-footer .md-footer-meta .md-copyright__highlight {
+	color: rgba(255, 255, 255, 0.96) !important;
+}
+
+footer.md-footer .md-footer-meta a:not(.md-social__link) {
+	color: #7ee9d8 !important;
+}
+
+footer.md-footer .md-footer-meta a:not(.md-social__link):hover {
+	color: #ffffff !important;
+}
+
+footer.md-footer .md-footer-meta .md-social__link {
+	color: #ffffff !important;
+}
+
+footer.md-footer .md-footer-meta .md-social__link:hover {
+	color: #58fbda !important;
+}
+
+footer.md-footer .md-footer-meta .md-social__link svg,
+footer.md-footer .md-footer-meta .md-social__link svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
+}
+
+footer.md-footer .md-footer-meta .md-social__link:hover svg,
+footer.md-footer .md-footer-meta .md-social__link:hover svg * {
+	fill: #58fbda !important;
+	color: #58fbda !important;
+}
+
+/* Header repo icon: same .md-icon / FA currentColor fight in light palette */
+.md-header .md-source .md-source__icon svg,
+.md-header .md-source .md-source__icon svg * {
+	fill: #ffffff !important;
+	color: #ffffff !important;
+	opacity: 1 !important;
 }
