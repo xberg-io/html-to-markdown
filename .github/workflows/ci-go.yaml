@@ -65,6 +65,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6 # v6
 
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Build FFI library
+        run: cargo build --release -p html-to-markdown-ffi
+        shell: bash
+
       - name: Setup Go
         uses: actions/setup-go@v6 # v6
         with:

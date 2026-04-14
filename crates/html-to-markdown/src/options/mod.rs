@@ -10,7 +10,7 @@ pub mod preprocessing;
 pub mod validation;
 
 // Re-exports for easy access
-pub use conversion::{ConversionOptions, ConversionOptionsUpdate};
+pub use conversion::{ConversionOptions, ConversionOptionsBuilder, ConversionOptionsUpdate};
 pub use preprocessing::{PreprocessingOptions, PreprocessingOptionsUpdate, PreprocessingPreset};
 pub use validation::{
     CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat, WhitespaceMode,

@@ -14,6 +14,7 @@ use crate::converter::text::dedent_code_block;
 use crate::options::ConversionOptions;
 
 #[cfg(feature = "visitor")]
+#[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 #[cfg(feature = "visitor")]
 use std::collections::BTreeMap;

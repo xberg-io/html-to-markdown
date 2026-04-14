@@ -2,36 +2,88 @@
   {
     "id": "paragraph_simple",
     "description": "Simple paragraph converts to plain text",
-    "html": "<p>Hello World</p>",
-    "assertions": { "content_equals": "Hello World" }
+    "input": {
+      "html": "<p>Hello World</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Hello World"
+      }
+    ]
   },
   {
     "id": "paragraph_multiple",
     "description": "Multiple paragraphs are separated by a blank line",
-    "html": "<p>First paragraph.</p><p>Second paragraph.</p>",
-    "assertions": { "content_contains_all": ["First paragraph.", "Second paragraph."] }
+    "input": {
+      "html": "<p>First paragraph.</p><p>Second paragraph.</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "First paragraph.",
+          "Second paragraph."
+        ]
+      }
+    ]
   },
   {
     "id": "paragraph_with_inline_formatting",
     "description": "Paragraph with bold, italic, and a link",
-    "html": "<p>This has <strong>bold</strong>, <em>italic</em>, and a <a href=\"https://example.com\">link</a>.</p>",
-    "assertions": {
-      "content_contains_all": ["**bold**", "*italic*", "[link](https://example.com)"]
-    }
+    "input": {
+      "html": "<p>This has <strong>bold</strong>, <em>italic</em>, and a <a href=\"https://example.com\">link</a>.</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "**bold**",
+          "*italic*",
+          "[link](https://example.com)"
+        ]
+      }
+    ]
   },
   {
     "id": "paragraph_with_line_breaks",
     "description": "Paragraph with br tags produces line breaks in output",
-    "html": "<p>Line one.<br>Line two.<br>Line three.</p>",
-    "assertions": {
-      "content_contains_all": ["Line one.", "Line two.", "Line three."],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Line one.<br>Line two.<br>Line three.</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Line one.",
+          "Line two.",
+          "Line three."
+        ]
+      }
+    ]
   },
   {
     "id": "paragraph_nested_divs",
     "description": "Text nested inside divs is extracted correctly",
-    "html": "<div><div><p>Nested text</p></div></div>",
-    "assertions": { "content_contains_all": ["Nested text"] }
+    "input": {
+      "html": "<div><div><p>Nested text</p></div></div>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Nested text"
+        ]
+      }
+    ]
   }
 ]

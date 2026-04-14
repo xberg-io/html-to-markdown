@@ -1,35 +1,56 @@
 ---
-title: Home
-description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text. Rust core, 12 native language bindings, 150–280 MB/s."
+title: html-to-markdown
+description: High-performance HTML to Markdown conversion powered by Rust
 ---
-
-<div class="home-hero" markdown="1">
 
 ## html-to-markdown
 
-<p class="home-lead" markdown="1">
-Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language bindings, identical output on every runtime.
-</p>
+High-performance HTML to Markdown conversion powered by Rust. A single Rust core with native bindings for 12 language ecosystems, delivering identical output across every runtime.
 
-<div class="home-instruction" markdown="1">
+### Quick Example
 
-### Start here
+=== "Rust"
+    ```rust
+    use html_to_markdown_rs::convert;
 
-1. **[Install a binding](installation.md)** — add the package to your project (versions, feature flags, and verify steps are on that page).
-2. **[Run a minimal `convert()`](usage.md#basic-conversion)** — open *Usage → Basic conversion*, choose your language tab, and copy the hello-world snippet.
+    let result = convert("<h1>Hello</h1><p>This is <strong>fast</strong>!</p>", None)?;
+    println!("{}", result.content.unwrap_or_default());
+    // # Hello
+    //
+    // This is **fast**!
+    ```
 
-</div>
+=== "Python"
+    ```python
+    from html_to_markdown import convert
 
-</div>
+    result = convert("<h1>Hello</h1><p>This is <strong>fast</strong>!</p>")
+    print(result["content"])
+    # # Hello
+    #
+    # This is **fast**!
+    ```
 
----
+### Features
 
-### What It Does
+- 150–280 MB/s throughput, 10–80x faster than pure-Python alternatives
+- 12 native language bindings: Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, WASM
+- `convert()` returns a `ConversionResult` with `content`, `metadata`, `tables`, `images`, and `warnings`
+- Metadata extraction: title, description, Open Graph, Twitter Card, JSON-LD, links, images
+- Structured document tree extraction (`DocumentStructure`)
+- Visitor pattern for content filtering, URL rewriting, and custom dialects
+- Output formats: Markdown (CommonMark), Djot, plain text
+- Built-in HTML sanitization via [ammonia](https://github.com/rust-ammonia/ammonia)
+- CLI tool with full flag coverage
 
-<div class="grid cards" markdown>
+### Get Started
 
-- :material-lightning-bolt:{ .lg .middle } **150–280 MB/s throughput**
+- [Installation](installation.md) — package manager commands for all 12 languages
+- [Usage](usage.md) — convert HTML, access result fields, extract metadata
+- [Configuration](configuration.md) — all options with types, defaults, and descriptions
+- [CLI](cli.md) — command-line reference
 
+<<<<<<< HEAD
     Rust-native parsing and a single-pass DOM walk. 10–80x faster than pure-language alternatives. No JVM, no interpreter overhead.
 
 - :material-translate:{ .lg .middle } **12 language bindings**
@@ -112,3 +133,8 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core, 12 native language
 html-to-markdown powers the HTML conversion pipeline in [Kreuzberg](https://docs.kreuzberg.dev), a document intelligence library for extracting text and structured data from PDFs, DOCX, images, and other document formats.
 
 </div>
+=======
+### Part of the Kreuzberg Ecosystem
+
+html-to-markdown powers the HTML conversion pipeline in [kreuzberg](https://docs.kreuzberg.dev), a document intelligence library for extracting text and structured data from PDFs, DOCX, images, and other document formats.
+>>>>>>> 76547739 (feat!: alef adoption — full polyglot codegen migration (v3.2.0))

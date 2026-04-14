@@ -104,10 +104,10 @@ tasks:
         ignore_error: false
 
   e2e:generate:
-    desc: "Generate PHP E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language php --output e2e/php
+      - cmd: alef e2e generate --lang php
         ignore_error: false
 
   e2e:test:
@@ -121,8 +121,11 @@ tasks:
             ini_file="$(mktemp)"
             echo "extension=${EXTENSION_PATH}" >"${ini_file}"
             export PHPRC="${ini_file}"
+            php -r "echo 'extension loaded: ' . (function_exists('convert') ? 'yes' : 'no') . PHP_EOL;" || true
+            cd e2e/php && php -d "extension=${EXTENSION_PATH}" vendor/bin/phpunit tests/
+          else
+            cd e2e/php && php vendor/bin/phpunit tests/
           fi
-          cd e2e/php && php vendor/bin/phpunit tests/
         ignore_error: false
 
   clean:

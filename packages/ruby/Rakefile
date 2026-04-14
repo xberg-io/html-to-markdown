@@ -15,7 +15,7 @@ end
 
 Rake::ExtensionTask.new('html_to_markdown_rb', GEMSPEC) do |ext|
   ext.lib_dir = 'lib'
-  ext.ext_dir = 'ext/html-to-markdown-rb'
+  ext.ext_dir = 'ext/html_to_markdown_rb'
   ext.cross_compile = true
   ext.cross_platform = %w[
     x86_64-linux

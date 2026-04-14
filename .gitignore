@@ -88,7 +88,7 @@ vendor/
 .cursorrules
 .windsurfrules
 
-# Zensical
+# MkDocs
 site/
 
 # OS
@@ -148,3 +148,14 @@ GEMINI.md
 .codex/
 test_documents/html/issues/*.md
 test_documents/html/issues/*_metadata.json
+.skif/
+*.pyd
+.gems/
+vendor/bundle/
+*.h.bak
+*.test
+*.class
+*.nupkg
+pkg/
+.alef/
+

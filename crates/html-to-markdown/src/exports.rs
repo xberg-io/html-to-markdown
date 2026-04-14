@@ -18,7 +18,7 @@ pub use crate::metadata::{
 };
 
 pub use crate::options::{
-    CodeBlockStyle, ConversionOptions, ConversionOptionsUpdate, HeadingStyle, HighlightStyle, LinkStyle,
-    ListIndentType, NewlineStyle, OutputFormat, PreprocessingOptions, PreprocessingOptionsUpdate, PreprocessingPreset,
-    WhitespaceMode,
+    CodeBlockStyle, ConversionOptions, ConversionOptionsBuilder, ConversionOptionsUpdate, HeadingStyle, HighlightStyle,
+    LinkStyle, ListIndentType, NewlineStyle, OutputFormat, PreprocessingOptions, PreprocessingOptionsUpdate,
+    PreprocessingPreset, WhitespaceMode,
 };

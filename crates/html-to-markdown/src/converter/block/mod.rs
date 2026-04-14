@@ -40,7 +40,7 @@ pub use super::{Context, DomContext};
 /// element was handled, `false` otherwise.
 ///
 /// # Usage in converter.rs
-/// ```ignore
+/// ```text
 /// if crate::converter::block::dispatch_block_handler(
 ///     &tag_name,
 ///     node_handle,

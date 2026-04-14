@@ -2,43 +2,116 @@
   {
     "id": "link_simple",
     "description": "Simple link",
-    "html": "<a href=\"https://example.com\">Example</a>",
-    "assertions": { "content_contains_all": ["[Example](https://example.com)"] }
+    "input": {
+      "html": "<a href=\"https://example.com\">Example</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "[Example](https://example.com)"
+        ]
+      }
+    ]
   },
   {
     "id": "link_with_title",
     "description": "Link with title attribute",
-    "html": "<a href=\"https://example.com\" title=\"Example Site\">Example</a>",
-    "assertions": { "content_contains_all": ["[Example](https://example.com", "Example Site"] }
+    "input": {
+      "html": "<a href=\"https://example.com\" title=\"Example Site\">Example</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "[Example](https://example.com",
+          "Example Site"
+        ]
+      }
+    ]
   },
   {
     "id": "link_mailto",
     "description": "Mailto link is preserved with mailto: scheme",
-    "html": "<a href=\"mailto:user@example.com\">Email us</a>",
-    "assertions": { "content_contains_all": ["mailto:user@example.com"] }
+    "input": {
+      "html": "<a href=\"mailto:user@example.com\">Email us</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "mailto:user@example.com"
+        ]
+      }
+    ]
   },
   {
     "id": "link_anchor_fragment",
     "description": "Fragment-only anchor link is preserved",
-    "html": "<a href=\"#section\">Jump to section</a>",
-    "assertions": { "content_contains_all": ["[Jump to section](#section)"] }
+    "input": {
+      "html": "<a href=\"#section\">Jump to section</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "[Jump to section](#section)"
+        ]
+      }
+    ]
   },
   {
     "id": "link_with_bold_text",
     "description": "Link containing bold text preserves formatting",
-    "html": "<a href=\"https://example.com\"><strong>Bold link</strong></a>",
-    "assertions": { "content_contains_all": ["**Bold link**", "https://example.com"] }
+    "input": {
+      "html": "<a href=\"https://example.com\"><strong>Bold link</strong></a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "**Bold link**",
+          "https://example.com"
+        ]
+      }
+    ]
   },
   {
     "id": "link_empty_href",
     "description": "Link with empty href produces output with the link text",
-    "html": "<a href=\"\">No destination</a>",
-    "assertions": { "content_contains_all": ["No destination"] }
+    "input": {
+      "html": "<a href=\"\">No destination</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "No destination"
+        ]
+      }
+    ]
   },
   {
     "id": "link_image_inside",
     "description": "Image inside a link produces a linked image",
-    "html": "<a href=\"https://example.com\"><img src=\"logo.png\" alt=\"Logo\"></a>",
-    "assertions": { "content_contains_all": ["![Logo](logo.png)", "https://example.com"] }
+    "input": {
+      "html": "<a href=\"https://example.com\"><img src=\"logo.png\" alt=\"Logo\"></a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![Logo](logo.png)",
+          "https://example.com"
+        ]
+      }
+    ]
   }
 ]

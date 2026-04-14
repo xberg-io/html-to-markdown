@@ -64,7 +64,7 @@ pub use super::{Context, DomContext};
 ///
 /// # Usage in converter.rs
 ///
-/// ```ignore
+/// ```text
 /// if crate::converter::inline::dispatch_inline_handler(
 ///     &tag_name,
 ///     &node_handle,

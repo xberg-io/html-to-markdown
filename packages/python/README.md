@@ -56,7 +56,6 @@
   </a>
 </div>
 
-
 High-performance HTML to Markdown converter with a clean Python API (powered by a Rust core).
 The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
 stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
@@ -78,13 +77,6 @@ Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyP
 
 ## Performance Snapshot
 
-Apple M4 • Real Wikipedia documents • `convert()` (Python)
-
-| Document | Size | Latency | Throughput |
-| -------- | ---- | ------- | ---------- |
-| Lists (Timeline) | 129KB | 0.62ms | 208 MB/s |
-| Tables (Countries) | 360KB | 2.02ms | 178 MB/s |
-| Mixed (Python wiki) | 656KB | 4.56ms | 144 MB/s |
 
 
 
@@ -102,7 +94,6 @@ markdown = result["content"]
 ```
 
 
-
 With conversion options:
 
 ```python
@@ -116,8 +107,6 @@ options = ConversionOptions(
 result = convert(html, options)
 markdown = result["content"]
 ```
-
-
 
 
 ## API Reference
@@ -157,7 +146,6 @@ warnings = result["warnings"]          # Any conversion warnings
 - `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`
 
-
 ## Djot Output Format
 
 The library supports converting HTML to [Djot](https://djot.net/), a lightweight markup language similar to Markdown but with a different syntax for some elements. Set `output_format` to `"djot"` to use this format.
@@ -177,6 +165,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
+
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -192,12 +181,13 @@ djot = convert(html, ConversionOptions(output_format="djot"))
 ```
 
 
-Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
+Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 
 ```python
@@ -208,6 +198,7 @@ html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.
 plain = convert(html, ConversionOptions(output_format="plain"))
 # Result: "Title\n\nThis is bold and italic text."
 ```
+
 
 
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
@@ -229,6 +220,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 **Zero Overhead When Disabled:** Metadata extraction adds negligible overhead and happens during the HTML parsing pass. Pass `extract_metadata: true` in `ConversionOptions` to enable it; the result is available at `result.metadata`.
 
 ### Example: Quick Start
+
 
 
 ```python
@@ -267,6 +259,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ### Example: Quick Start
 
 
+
 ```python
 from html_to_markdown import convert
 
@@ -287,7 +280,6 @@ html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 result = convert(html, visitor=MyVisitor())
 markdown = result["content"]
 ```
-
 
 
 

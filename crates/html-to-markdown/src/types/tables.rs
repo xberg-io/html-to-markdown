@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 /// A structured table grid with cell-level data including spans.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TableGrid {
     /// Number of rows.
     pub rows: u32,

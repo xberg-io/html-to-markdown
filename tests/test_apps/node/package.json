@@ -11,7 +11,7 @@
     "test:all": "vitest run"
   },
   "dependencies": {
-    "@kreuzberg/html-to-markdown": "3.1.0"
+    "@kreuzberg/html-to-markdown": "file:../../../packages/typescript"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

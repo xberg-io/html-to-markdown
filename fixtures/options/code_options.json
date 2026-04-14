@@ -2,19 +2,41 @@
   {
     "id": "options_code_block_backticks",
     "description": "Backticks code block style uses triple backtick fences",
-    "html": "<pre><code class=\"language-js\">console.log('hi');</code></pre>",
-    "options": { "codeBlockStyle": "backticks" },
-    "assertions": {
-      "content_contains_all": ["```", "console.log('hi');"]
-    }
+    "input": {
+      "html": "<pre><code class=\"language-js\">console.log('hi');</code></pre>",
+      "options": {
+        "codeBlockStyle": "Backticks"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "```",
+          "console.log('hi');"
+        ]
+      }
+    ]
   },
   {
     "id": "options_code_block_tildes",
     "description": "Tildes code block style uses triple tilde fences",
-    "html": "<pre><code>some code</code></pre>",
-    "options": { "codeBlockStyle": "tildes" },
-    "assertions": {
-      "content_contains_all": ["~~~", "some code"]
-    }
+    "input": {
+      "html": "<pre><code>some code</code></pre>",
+      "options": {
+        "codeBlockStyle": "Tildes"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "~~~",
+          "some code"
+        ]
+      }
+    ]
   }
 ]

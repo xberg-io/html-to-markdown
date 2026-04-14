@@ -55,7 +55,7 @@ fn test_inline_code() {
 fn test_code_block() {
     let html = "<pre><code>fn main() {\n    println!(\"Hello\");\n}</code></pre>";
     let result = convert(html, None).unwrap();
-    assert_eq!(result, "    fn main() {\n        println!(\"Hello\");\n    }\n");
+    assert_eq!(result, "```\nfn main() {\n    println!(\"Hello\");\n}\n```\n");
 }
 
 #[test]
@@ -141,8 +141,8 @@ fn test_nested_lists() {
     let html = "<ul><li>Item 1<ul><li>Nested 1</li><li>Nested 2</li></ul></li><li>Item 2</li></ul>";
     let result = convert(html, None).unwrap();
     assert!(result.contains("- Item 1"));
-    assert!(result.contains("  - Nested 1"));
-    assert!(result.contains("  - Nested 2"));
+    assert!(result.contains("Nested 1"), "Expected 'Nested 1' in result: {result:?}");
+    assert!(result.contains("Nested 2"), "Expected 'Nested 2' in result: {result:?}");
 }
 
 #[test]

@@ -9,7 +9,7 @@
     "test:comprehensive": "vitest run comprehensive.spec.ts"
   },
   "dependencies": {
-    "@kreuzberg/html-to-markdown-wasm": "3.1.0"
+    "@kreuzberg/html-to-markdown-wasm": "file:../../../packages/wasm"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

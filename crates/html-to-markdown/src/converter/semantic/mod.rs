@@ -64,7 +64,7 @@ pub use summary::handle as handle_summary;
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```text
 /// if dispatch_semantic_handler(tag_name, &node_handle, &parser, output, options, ctx, depth, dom_ctx) {
 ///     // Tag was handled
 /// } else {

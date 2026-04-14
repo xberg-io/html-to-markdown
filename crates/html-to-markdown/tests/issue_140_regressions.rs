@@ -44,10 +44,16 @@ fn converts_should_not_escape_in_pre_or_code_fixture() {
     let pre_html = r"<pre>This pipe | should not be escaped.<pre/>";
 
     let pre_markdown_without_misc = convert(pre_html, Some(default_options())).expect("conversion should succeed");
-    assert_eq!(pre_markdown_without_misc.trim(), "This pipe | should not be escaped.");
+    assert_eq!(
+        pre_markdown_without_misc.trim(),
+        "```\nThis pipe | should not be escaped.\n```"
+    );
 
     let pre_markdown_with_misc = convert(pre_html, Some(escape_misc_options())).expect("conversion should succeed");
-    assert_eq!(pre_markdown_with_misc.trim(), "This pipe | should not be escaped.");
+    assert_eq!(
+        pre_markdown_with_misc.trim(),
+        "```\nThis pipe | should not be escaped.\n```"
+    );
 
     let code_html = r"<code>This pipe | should not be escaped.<code/>";
 

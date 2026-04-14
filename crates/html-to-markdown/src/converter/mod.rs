@@ -40,7 +40,7 @@
 //!
 //! Each submodule (block, inline, list, etc.) follows a consistent pattern:
 //!
-//! ```ignore
+//! ```text
 //! // Module declares handlers for specific element types
 //! pub fn dispatch_<category>_handler(
 //!     tag_name: &str,
@@ -74,7 +74,7 @@
 //! Once `converter.rs` is refactored to use `converter/main.rs`, the walk_node function
 //! will use dispatch functions like:
 //!
-//! ```ignore
+//! ```text
 //! use crate::converter::{block, inline, list, media, semantic, form};
 //!
 //! fn walk_node(...) {

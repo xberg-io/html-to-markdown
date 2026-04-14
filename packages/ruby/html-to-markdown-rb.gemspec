@@ -87,7 +87,7 @@ Gem::Specification.new do |spec|
   spec.files = files
   spec.extra_rdoc_files = ['README.md']
 
-  spec.extensions = ['ext/html-to-markdown-rb/extconf.rb']
+  spec.extensions = ['ext/html_to_markdown_rb/extconf.rb']
 
   spec.add_dependency 'rb_sys', '>= 0.9', '< 1.0'
   spec.metadata['rubygems_mfa_required'] = 'true'

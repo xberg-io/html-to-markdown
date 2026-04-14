@@ -42,8 +42,8 @@
         {Credo.Check.Warning.BoolOperationOnSameValues, []},
         {Credo.Check.Warning.IExPry, []},
         {Credo.Check.Warning.IoInspect, []},
-        # Allow up to 35 fields in structs (Options struct has 32 fields to match Rust API)
-        {Credo.Check.Warning.StructFieldAmount, [max_fields: 35]},
+        # Allow up to 40 fields in structs (ConversionOptions matches Rust API surface)
+        {Credo.Check.Warning.StructFieldAmount, [max_fields: 40]},
         {Credo.Check.Warning.UnusedEnumOperation, []},
         {Credo.Check.Warning.UnusedKeywordOperation, []},
         {Credo.Check.Warning.UnusedListOperation, []},

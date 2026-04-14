@@ -1,6 +1,39 @@
 //! R list type conversions for binding results.
 
 use extendr_api::prelude::*;
+use html_to_markdown_rs::{ConversionResult, WarningKind};
+
+/// Recursively convert a `serde_json::Value` into an `Robj`.
+///
+/// Objects become named lists, arrays become unnamed lists, scalars become
+/// their R equivalents, and `null` becomes R `NULL`.
+fn json_to_robj(value: &serde_json::Value) -> Robj {
+    match value {
+        serde_json::Value::Null => ().into(),
+        serde_json::Value::Bool(b) => (*b).into(),
+        serde_json::Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                (i as i32).into()
+            } else if let Some(f) = n.as_f64() {
+                f.into()
+            } else {
+                ().into()
+            }
+        }
+        serde_json::Value::String(s) => s.as_str().into(),
+        serde_json::Value::Array(arr) => {
+            let items: Vec<Robj> = arr.iter().map(json_to_robj).collect();
+            List::from_values(items).into()
+        }
+        serde_json::Value::Object(map) => {
+            let names: Vec<&str> = map.keys().map(|k| k.as_str()).collect();
+            let values: Vec<Robj> = map.values().map(json_to_robj).collect();
+            let mut list = List::from_values(values);
+            let _ = list.set_names(names);
+            list.into()
+        }
+    }
+}
 
 #[cfg(feature = "metadata")]
 use html_to_markdown_rs::metadata::{
@@ -17,7 +50,8 @@ pub fn metadata_to_robj(metadata: HtmlMetadata) -> Robj {
         headers = List::from_values(metadata.headers.into_iter().map(header_metadata_to_robj)),
         links = List::from_values(metadata.links.into_iter().map(link_metadata_to_robj)),
         images = List::from_values(metadata.images.into_iter().map(image_metadata_to_robj)),
-        structured_data = List::from_values(metadata.structured_data.into_iter().map(structured_data_to_robj))
+        structured_data =
+            List::from_values(metadata.structured_data.into_iter().map(structured_data_to_robj))
     )
     .into()
 }
@@ -109,7 +143,7 @@ fn hashmap_to_robj(map: HashMap<String, String>) -> Robj {
 }
 
 /// Convert a ConversionResult into an R list.
-pub fn conversion_result_to_robj(result: html_to_markdown_rs::ConversionResult) -> Robj {
+pub fn conversion_result_to_robj(result: ConversionResult) -> Robj {
     let content_robj: Robj = match result.content {
         Some(s) => s.into(),
         None => ().into(),
@@ -157,23 +191,25 @@ pub fn conversion_result_to_robj(result: html_to_markdown_rs::ConversionResult) 
         .into_iter()
         .map(|w| {
             let kind = match w.kind {
-                html_to_markdown_rs::WarningKind::ImageExtractionFailed => {
-                    "image_extraction_failed"
-                }
-                html_to_markdown_rs::WarningKind::EncodingFallback => "encoding_fallback",
-                html_to_markdown_rs::WarningKind::TruncatedInput => "truncated_input",
-                html_to_markdown_rs::WarningKind::MalformedHtml => "malformed_html",
-                html_to_markdown_rs::WarningKind::SanitizationApplied => "sanitization_applied",
+                WarningKind::ImageExtractionFailed => "image_extraction_failed",
+                WarningKind::EncodingFallback => "encoding_fallback",
+                WarningKind::TruncatedInput => "truncated_input",
+                WarningKind::MalformedHtml => "malformed_html",
+                WarningKind::SanitizationApplied => "sanitization_applied",
             };
             list!(message = w.message, kind = kind).into()
         })
         .collect();
 
     let document_robj: Robj = match result.document {
-        Some(doc) => match serde_json::to_string(&doc) {
-            Ok(s) => s.into(),
-            Err(_) => ().into(),
-        },
+        Some(doc) => {
+            // Serialize to JSON then parse into an R list so callers can
+            // access fields via `result$document$nodes` etc.
+            match serde_json::to_value(&doc) {
+                Ok(v) => json_to_robj(&v),
+                Err(_) => ().into(),
+            }
+        }
         None => ().into(),
     };
 
@@ -186,8 +222,9 @@ pub fn conversion_result_to_robj(result: html_to_markdown_rs::ConversionResult) 
                     Some((w, h)) => Robj::from(list!(width = w as i32, height = h as i32)),
                     None => ().into(),
                 };
-                let attr_names: Vec<&str> = img.attributes.keys().map(|k| k.as_str()).collect();
-                let attr_values: Vec<Robj> = img.attributes.values().map(|v| v.into_robj()).collect();
+                let attr_names: Vec<&str> = img.attributes.keys().map(|k: &String| k.as_str()).collect();
+                let attr_values: Vec<Robj> =
+                    img.attributes.values().map(|v: &String| v.into_robj()).collect();
                 let mut attr_list = List::from_values(attr_values);
                 let _ = attr_list.set_names(attr_names);
                 list!(

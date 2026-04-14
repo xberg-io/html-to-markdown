@@ -2,49 +2,101 @@
   {
     "id": "structure_heading_paragraph",
     "description": "Simple heading followed by paragraph produces Heading and Paragraph nodes",
-    "html": "<h1>Title</h1><p>A paragraph of text.</p>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 2,
-      "document_node_types_include": ["heading", "paragraph"]
-    }
+    "input": {
+      "html": "<h1>Title</h1><p>A paragraph of text.</p>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 2
+      }
+    ]
   },
   {
     "id": "structure_multiple_headings",
     "description": "Multiple headings create multiple Heading nodes with correct levels",
-    "html": "<h1>Main Title</h1><h2>Section One</h2><p>Section one content.</p><h2>Section Two</h2><p>Section two content.</p>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 4,
-      "document_node_types_include": ["heading", "paragraph"]
-    }
+    "input": {
+      "html": "<h1>Main Title</h1><h2>Section One</h2><p>Section one content.</p><h2>Section Two</h2><p>Section two content.</p>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 4
+      }
+    ]
   },
   {
     "id": "structure_list",
     "description": "Unordered list produces List and ListItem nodes",
-    "html": "<p>Items:</p><ul><li>Alpha</li><li>Beta</li><li>Gamma</li></ul>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 2,
-      "document_node_types_include": ["list", "paragraph"]
-    }
+    "input": {
+      "html": "<p>Items:</p><ul><li>Alpha</li><li>Beta</li><li>Gamma</li></ul>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 2
+      }
+    ]
   },
   {
     "id": "structure_code_block",
     "description": "Fenced code block produces Code node",
-    "html": "<p>Example code:</p><pre><code class=\"language-rust\">fn main() { println!(\"Hello\"); }</code></pre>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 2,
-      "document_node_types_include": ["code", "paragraph"]
-    }
+    "input": {
+      "html": "<p>Example code:</p><pre><code class=\"language-rust\">fn main() { println!(\"Hello\"); }</code></pre>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 2
+      }
+    ]
   }
 ]

@@ -122,10 +122,10 @@ tasks:
         ignore_error: true
 
   e2e:generate:
-    desc: "Generate Ruby E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language ruby --output e2e/ruby
+      - cmd: alef e2e generate --lang ruby
         ignore_error: false
 
   e2e:test:

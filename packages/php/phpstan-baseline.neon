@@ -1,139 +1,73 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method HtmlToMarkdown\\Bridge\\ExtensionBridge\:\:convert\(\) should return array\<string, mixed\> but returns (string|mixed)\.$#'
+			message: '#^Function convert not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/HtmlToMarkdownRs.php
+
+		-
+			message: '#^Method Html\\To\\Markdown\\Rs\\HtmlToMarkdownRs\:\:convert\(\) has invalid return type Html\\To\\Markdown\\Rs\\ConversionResult\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/HtmlToMarkdownRs.php
+
+		-
+			message: '#^Method Html\\To\\Markdown\\Rs\\HtmlToMarkdownRs\:\:convert\(\) should return Html\\To\\Markdown\\Rs\\ConversionResult but returns mixed\.$#'
 			identifier: return.type
 			count: 1
-			path: src/Bridge/ExtensionBridge.php
+			path: src/HtmlToMarkdownRs.php
 
 		-
-			message: '#^Cannot access an offset on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
+			message: '#^PHPDoc tag @throws with type Html\\To\\Markdown\\Rs\\HtmlToMarkdownRsException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
 			count: 1
-			path: tests/VisitorTest.php
+			path: src/HtmlToMarkdownRs.php
 
 		-
-			message: '#^Cannot access offset ''alt'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
+			message: '#^Parameter \$options of method Html\\To\\Markdown\\Rs\\HtmlToMarkdownRs\:\:convert\(\) has invalid type Html\\To\\Markdown\\Rs\\ConversionOptions\.$#'
+			identifier: class.notFound
 			count: 1
-			path: tests/VisitorTest.php
+			path: src/HtmlToMarkdownRs.php
 
 		-
-			message: '#^Cannot access offset ''href'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
+			message: '#^Call to static method default\(\) on an unknown class Html\\To\\Markdown\\Rs\\ConversionOptions\.$#'
+			identifier: class.notFound
 			count: 1
-			path: tests/VisitorTest.php
+			path: src/functions.php
 
 		-
-			message: '#^Cannot access offset ''id'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Cannot access offset ''items'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
+			message: '#^Call to static method from_json\(\) on an unknown class Html\\To\\Markdown\\Rs\\ConversionOptions\.$#'
+			identifier: class.notFound
 			count: 1
-			path: tests/VisitorTest.php
+			path: src/functions.php
 
 		-
-			message: '#^Cannot access offset ''language'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Cannot access offset ''length'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Cannot access offset ''level'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Cannot access offset ''ordered'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
+			message: '#^Cannot call method getContent\(\) on mixed\.$#'
+			identifier: method.nonObject
 			count: 1
-			path: tests/VisitorTest.php
+			path: src/functions.php
 
 		-
-			message: '#^Cannot access offset ''src'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
+			message: '#^Function convert not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: src/functions.php
+
+		-
+			message: '#^Function html_to_markdown_convert\(\) should return string but returns mixed\.$#'
+			identifier: return.type
 			count: 1
-			path: tests/VisitorTest.php
+			path: src/functions.php
 
 		-
-			message: '#^Cannot access offset ''text'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 3
-			path: tests/VisitorTest.php
+			message: '#^PHPDoc tag @throws with type Html\\To\\Markdown\\Rs\\HtmlToMarkdownRsException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
+			count: 1
+			path: src/functions.php
 
 		-
-			message: '#^Cannot access offset ''title'' on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Cannot access offset 0 on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Cannot access offset 1 on mixed\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertCount\(\) expects Countable\|iterable, mixed given\.$#'
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:118\:\:\$calls type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:180\:\:\$links type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:206\:\:\$images type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:281\:\:\$headings type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:313\:\:\$codeBlocks type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:372\:\:\$currentList type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
-
-		-
-			message: '#^Property HtmlToMarkdown\\Visitor\\AbstractVisitor@anonymous/tests/VisitorTest\.php\:372\:\:\$lists type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/VisitorTest.php
+			path: src/functions.php

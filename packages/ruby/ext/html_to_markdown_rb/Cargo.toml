@@ -1,0 +1,17 @@
+[workspace]
+
+[package]
+name = "html-to-markdown-rb"
+version = "3.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = ["full"] }
+magnus = "0.8"
+
+[package.metadata.cargo-machete]
+ignored = ["magnus", "html-to-markdown-rs"]

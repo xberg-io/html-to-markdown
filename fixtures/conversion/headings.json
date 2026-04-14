@@ -2,37 +2,85 @@
   {
     "id": "heading_h1",
     "description": "H1 heading",
-    "html": "<h1>Heading 1</h1>",
-    "assertions": { "content_equals": "# Heading 1" }
+    "input": {
+      "html": "<h1>Heading 1</h1>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "# Heading 1"
+      }
+    ]
   },
   {
     "id": "heading_h2",
     "description": "H2 heading",
-    "html": "<h2>Heading 2</h2>",
-    "assertions": { "content_equals": "## Heading 2" }
+    "input": {
+      "html": "<h2>Heading 2</h2>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "## Heading 2"
+      }
+    ]
   },
   {
     "id": "heading_h3",
     "description": "H3 heading",
-    "html": "<h3>Heading 3</h3>",
-    "assertions": { "content_equals": "### Heading 3" }
+    "input": {
+      "html": "<h3>Heading 3</h3>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "### Heading 3"
+      }
+    ]
   },
   {
     "id": "heading_h4",
     "description": "H4 heading",
-    "html": "<h4>Heading 4</h4>",
-    "assertions": { "content_equals": "#### Heading 4" }
+    "input": {
+      "html": "<h4>Heading 4</h4>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "#### Heading 4"
+      }
+    ]
   },
   {
     "id": "heading_h5",
     "description": "H5 heading",
-    "html": "<h5>Heading 5</h5>",
-    "assertions": { "content_equals": "##### Heading 5" }
+    "input": {
+      "html": "<h5>Heading 5</h5>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "##### Heading 5"
+      }
+    ]
   },
   {
     "id": "heading_h6",
     "description": "H6 heading",
-    "html": "<h6>Heading 6</h6>",
-    "assertions": { "content_equals": "###### Heading 6" }
+    "input": {
+      "html": "<h6>Heading 6</h6>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "###### Heading 6"
+      }
+    ]
   }
 ]

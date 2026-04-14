@@ -5,19 +5,8 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - 'mkdocs.yaml'
+      - 'zensical.toml'
       - 'pyproject.toml'
-      - '.textlintrc.json'
-      - 'package.json'
-      - '.github/workflows/deploy-docs.yaml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - 'mkdocs.yaml'
-      - 'pyproject.toml'
-      - '.textlintrc.json'
-      - 'package.json'
       - '.github/workflows/deploy-docs.yaml'
   workflow_dispatch:
 
@@ -31,8 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  validate:
-    name: Build docs (strict)
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -50,37 +38,18 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Build docs (strict)
-        run: scripts/ci/docs/build.sh --strict
+      - name: Install dependencies and build docs
+        run: |
+          uv sync --group doc --no-editable --no-install-workspace --no-install-project
+          uv run --no-sync zensical build --clean
 
-  lint-prose:
-    name: Lint prose (textlint)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6 # v6
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4 # v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4 # v4
         with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6 # v6
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run textlint
-        run: scripts/ci/docs/textlint.sh
+          path: site
 
   deploy:
-    name: Deploy to GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [validate, lint-prose]
+    needs: build
     permissions:
       pages: write
       id-token: write
@@ -89,29 +58,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6 # v6
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v6 # v6
-        with:
-          python-version: '3.13'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7 # v7
-        with:
-          enable-cache: true
-
-      - name: Build docs
-        run: scripts/ci/docs/build.sh
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4 # v4
-        with:
-          path: site
-
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5 # v4
+        uses: actions/deploy-pages@v4 # v4

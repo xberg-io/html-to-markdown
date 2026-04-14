@@ -2,36 +2,88 @@
   {
     "id": "image_simple",
     "description": "Image with alt text",
-    "html": "<img src=\"photo.jpg\" alt=\"A photo\">",
-    "assertions": { "content_contains_all": ["![A photo](photo.jpg)"] }
+    "input": {
+      "html": "<img src=\"photo.jpg\" alt=\"A photo\">"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![A photo](photo.jpg)"
+        ]
+      }
+    ]
   },
   {
     "id": "image_no_alt",
     "description": "Image without alt text produces image markdown",
-    "html": "<img src=\"banner.jpg\">",
-    "assertions": {
-      "content_contains_all": ["banner.jpg"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<img src=\"banner.jpg\">"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "banner.jpg"
+        ]
+      }
+    ]
   },
   {
     "id": "image_with_title",
     "description": "Image with title attribute includes title in output",
-    "html": "<img src=\"chart.png\" alt=\"Sales chart\" title=\"Q3 Sales\">",
-    "assertions": { "content_contains_all": ["![Sales chart](chart.png", "Q3 Sales"] }
+    "input": {
+      "html": "<img src=\"chart.png\" alt=\"Sales chart\" title=\"Q3 Sales\">"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![Sales chart](chart.png",
+          "Q3 Sales"
+        ]
+      }
+    ]
   },
   {
     "id": "image_figure_figcaption",
     "description": "Figure with figcaption preserves both image and caption",
-    "html": "<figure><img src=\"sunset.jpg\" alt=\"A sunset\"><figcaption>Beautiful sunset over the ocean</figcaption></figure>",
-    "assertions": {
-      "content_contains_all": ["![A sunset](sunset.jpg)", "Beautiful sunset over the ocean"]
-    }
+    "input": {
+      "html": "<figure><img src=\"sunset.jpg\" alt=\"A sunset\"><figcaption>Beautiful sunset over the ocean</figcaption></figure>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![A sunset](sunset.jpg)",
+          "Beautiful sunset over the ocean"
+        ]
+      }
+    ]
   },
   {
     "id": "image_linked",
     "description": "Image inside an anchor produces a linked image",
-    "html": "<a href=\"https://example.com\"><img src=\"icon.png\" alt=\"Icon\"></a>",
-    "assertions": { "content_contains_all": ["![Icon](icon.png)", "https://example.com"] }
+    "input": {
+      "html": "<a href=\"https://example.com\"><img src=\"icon.png\" alt=\"Icon\"></a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![Icon](icon.png)",
+          "https://example.com"
+        ]
+      }
+    ]
   }
 ]

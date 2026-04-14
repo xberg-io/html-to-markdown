@@ -2,38 +2,90 @@
   {
     "id": "og_basic_tags",
     "description": "Extract og:title, og:description, and og:image from Open Graph meta tags",
-    "html": "<html><head><title>Fallback Title</title><meta property=\"og:title\" content=\"OG Title\"><meta property=\"og:description\" content=\"OG description text.\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\"></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_og_title": "OG Title",
-      "metadata_og_description": "OG description text.",
-      "metadata_og_image": "https://example.com/image.jpg"
-    }
+    "input": {
+      "html": "<html><head><title>Fallback Title</title><meta property=\"og:title\" content=\"OG Title\"><meta property=\"og:description\" content=\"OG description text.\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\"></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.title",
+        "value": "OG Title"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.description",
+        "value": "OG description text."
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.image",
+        "value": "https://example.com/image.jpg"
+      }
+    ]
   },
   {
     "id": "og_multiple_tags",
     "description": "Extract multiple Open Graph tags including type, url, and site_name",
-    "html": "<html><head><meta property=\"og:title\" content=\"Article Title\"><meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"https://example.com/article\"><meta property=\"og:site_name\" content=\"Example Site\"><meta property=\"og:description\" content=\"An interesting article.\"><meta property=\"og:image\" content=\"https://example.com/article.jpg\"></head><body><article><p>Article content here.</p></article></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_og_title": "Article Title",
-      "metadata_og_type": "article",
-      "metadata_og_url": "https://example.com/article",
-      "metadata_og_site_name": "Example Site"
-    }
+    "input": {
+      "html": "<html><head><meta property=\"og:title\" content=\"Article Title\"><meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"https://example.com/article\"><meta property=\"og:site_name\" content=\"Example Site\"><meta property=\"og:description\" content=\"An interesting article.\"><meta property=\"og:image\" content=\"https://example.com/article.jpg\"></head><body><article><p>Article content here.</p></article></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.title",
+        "value": "Article Title"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.type",
+        "value": "article"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.url",
+        "value": "https://example.com/article"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.open_graph.site_name",
+        "value": "Example Site"
+      }
+    ]
   },
   {
     "id": "twitter_card_tags",
     "description": "Extract Twitter card meta tags",
-    "html": "<html><head><meta name=\"twitter:card\" content=\"summary_large_image\"><meta name=\"twitter:site\" content=\"@examplesite\"><meta name=\"twitter:title\" content=\"Twitter Card Title\"><meta name=\"twitter:description\" content=\"Twitter card description.\"><meta name=\"twitter:image\" content=\"https://example.com/twitter-image.jpg\"></head><body><p>Content</p></body></html>",
-    "options": { "extractMetadata": true },
-    "assertions": {
-      "content_not_empty": true,
-      "metadata_twitter_card": "summary_large_image",
-      "metadata_twitter_title": "Twitter Card Title",
-      "metadata_twitter_description": "Twitter card description."
-    }
+    "input": {
+      "html": "<html><head><meta name=\"twitter:card\" content=\"summary_large_image\"><meta name=\"twitter:site\" content=\"@examplesite\"><meta name=\"twitter:title\" content=\"Twitter Card Title\"><meta name=\"twitter:description\" content=\"Twitter card description.\"><meta name=\"twitter:image\" content=\"https://example.com/twitter-image.jpg\"></head><body><p>Content</p></body></html>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.twitter.card",
+        "value": "summary_large_image"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.twitter.title",
+        "value": "Twitter Card Title"
+      },
+      {
+        "type": "equals",
+        "field": "metadata.twitter.description",
+        "value": "Twitter card description."
+      }
+    ]
   }
 ]

@@ -2,49 +2,130 @@
   {
     "id": "simple_table",
     "description": "Simple table with header",
-    "html": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>",
-    "assertions": { "content_contains_all": ["Name", "Age", "Alice", "30", "|", "---"] }
+    "input": {
+      "html": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Name",
+          "Age",
+          "Alice",
+          "30",
+          "|",
+          "---"
+        ]
+      }
+    ]
   },
   {
     "id": "table_no_thead",
     "description": "Table without thead uses first row as implied header",
-    "html": "<table><tr><td>Product</td><td>Price</td></tr><tr><td>Apple</td><td>1.00</td></tr></table>",
-    "assertions": {
-      "content_contains_all": ["Product", "Price", "Apple", "1.00", "|"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<table><tr><td>Product</td><td>Price</td></tr><tr><td>Apple</td><td>1.00</td></tr></table>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Product",
+          "Price",
+          "Apple",
+          "1.00",
+          "|"
+        ]
+      }
+    ]
   },
   {
     "id": "table_with_colspan",
     "description": "Table with colspan attribute in a header cell",
-    "html": "<table><thead><tr><th colspan=\"2\">Full Name</th></tr></thead><tbody><tr><td>John</td><td>Doe</td></tr></tbody></table>",
-    "assertions": {
-      "content_contains_all": ["Full Name", "John", "Doe"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<table><thead><tr><th colspan=\"2\">Full Name</th></tr></thead><tbody><tr><td>John</td><td>Doe</td></tr></tbody></table>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Full Name",
+          "John",
+          "Doe"
+        ]
+      }
+    ]
   },
   {
     "id": "table_with_alignment",
     "description": "Table with column alignment attributes",
-    "html": "<table><thead><tr><th align=\"left\">Left</th><th align=\"center\">Center</th><th align=\"right\">Right</th></tr></thead><tbody><tr><td>L</td><td>C</td><td>R</td></tr></tbody></table>",
-    "assertions": {
-      "content_contains_all": ["Left", "Center", "Right", "L", "C", "R", "|"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<table><thead><tr><th align=\"left\">Left</th><th align=\"center\">Center</th><th align=\"right\">Right</th></tr></thead><tbody><tr><td>L</td><td>C</td><td>R</td></tr></tbody></table>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Left",
+          "Center",
+          "Right",
+          "L",
+          "C",
+          "R",
+          "|"
+        ]
+      }
+    ]
   },
   {
     "id": "table_pipe_chars_in_content",
     "description": "Table cells containing pipe characters are escaped in output",
-    "html": "<table><thead><tr><th>Expression</th><th>Result</th></tr></thead><tbody><tr><td>a | b</td><td>true</td></tr></tbody></table>",
-    "assertions": {
-      "content_contains_all": ["Expression", "Result", "true"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<table><thead><tr><th>Expression</th><th>Result</th></tr></thead><tbody><tr><td>a | b</td><td>true</td></tr></tbody></table>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Expression",
+          "Result",
+          "true"
+        ]
+      }
+    ]
   },
   {
     "id": "table_empty",
     "description": "Empty table produces no output or minimal output",
-    "html": "<table></table>",
-    "assertions": { "content_equals": "" }
+    "input": {
+      "html": "<table></table>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": ""
+      }
+    ]
   }
 ]

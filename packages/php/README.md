@@ -56,7 +56,6 @@
   </a>
 </div>
 
-
 High-performance HTML to Markdown converter with typed PHP bindings powered by a Rust core.
 Provides a type-safe API with full PHPStan level 9 support, modern PHP 8.2+ features, and comprehensive metadata extraction.
 
@@ -88,15 +87,9 @@ composer require goldziher/html-to-markdown
 
 
 
+
 ## Performance Snapshot
 
-Apple M4 • Real Wikipedia documents • `convert()` (PHP)
-
-| Document | Size | Ops/sec |
-| -------- | ---- | ------- |
-| Lists (Timeline) | 129KB | 3,346 |
-| Tables (Countries) | 360KB | 973 |
-| Medium (Python) | 657KB | 485 |
 
 
 
@@ -120,7 +113,6 @@ $markdown = $result['content'];
 ```
 
 
-
 With conversion options:
 
 ```php
@@ -137,8 +129,6 @@ $options = new ConversionOptions(
 $result = $converter->convert('<h1>Hello</h1>', $options);
 $markdown = $result['content'];
 ```
-
-
 
 
 ## API Reference
@@ -179,7 +169,6 @@ $warnings = $result['warnings'];   // Any conversion warnings
 - `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`
 
-
 ## Djot Output Format
 
 The library supports converting HTML to [Djot](https://djot.net/), a lightweight markup language similar to Markdown but with a different syntax for some elements. Set `output_format` to `"djot"` to use this format.
@@ -199,6 +188,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
+
 ```php
 use HtmlToMarkdown\Converter;
 use HtmlToMarkdown\ConversionOptions;
@@ -215,12 +205,13 @@ $djot = Converter::convert($html, new ConversionOptions(outputFormat: 'djot'));
 ```
 
 
-Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
+Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 
 ```php
@@ -232,6 +223,7 @@ $html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text
 $plain = Converter::convert($html, new ConversionOptions(outputFormat: 'plain'));
 // Result: "Title\n\nThis is bold and italic text."
 ```
+
 
 
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
@@ -253,6 +245,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 **Zero Overhead When Disabled:** Metadata extraction adds negligible overhead and happens during the HTML parsing pass. Pass `extract_metadata: true` in `ConversionOptions` to enable it; the result is available at `result.metadata`.
 
 ### Example: Quick Start
+
 
 
 ```php
@@ -296,6 +289,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ### Example: Quick Start
 
 
+
 ```php
 <?php
 use HtmlToMarkdown\Config\ConversionOptions;
@@ -329,7 +323,6 @@ $result = Converter::create()->convert(
 );
 $markdown = $result['content'];
 ```
-
 
 
 

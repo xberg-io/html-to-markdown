@@ -2,20 +2,44 @@
   {
     "id": "options_wrap_enabled",
     "description": "Wrap option enabled with custom width wraps long lines",
-    "html": "<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>",
-    "options": { "wrap": true, "wrapWidth": 40 },
-    "assertions": {
-      "content_contains_all": ["This is a long paragraph"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>",
+      "options": {
+        "wrap": true,
+        "wrapWidth": 40
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "This is a long paragraph"
+        ]
+      }
+    ]
   },
   {
     "id": "options_wrap_disabled",
     "description": "Wrap option disabled preserves long lines without breaking",
-    "html": "<p>This is a long paragraph that should not be wrapped at all because wrapping is disabled.</p>",
-    "options": { "wrap": false },
-    "assertions": {
-      "content_contains_all": ["This is a long paragraph that should not be wrapped at all because wrapping is disabled."]
-    }
+    "input": {
+      "html": "<p>This is a long paragraph that should not be wrapped at all because wrapping is disabled.</p>",
+      "options": {
+        "wrap": false
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "This is a long paragraph that should not be wrapped at all because wrapping is disabled."
+        ]
+      }
+    ]
   }
 ]

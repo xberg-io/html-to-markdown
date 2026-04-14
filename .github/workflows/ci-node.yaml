@@ -88,11 +88,6 @@ jobs:
         run: bun run build
         shell: bash
 
-      - name: Test NAPI-RS Bindings (Node.js)
-        if: matrix.runtime == 'node'
-        run: task node:test
-        shell: bash
-
       - name: Run Rust Tests (Node.js only)
         if: matrix.runtime == 'node'
         run: task rust:test
@@ -106,17 +101,6 @@ jobs:
         if: matrix.runtime == 'bun'
         working-directory: packages/typescript
         run: bun x tsc --project tsconfig.json
-        shell: bash
-
-      - name: Test TypeScript Package (Node.js)
-        if: matrix.runtime == 'node'
-        run: task typescript:test:ci
-        shell: bash
-
-      - name: Test TypeScript Package (Bun)
-        if: matrix.runtime == 'bun'
-        working-directory: packages/typescript
-        run: bun test
         shell: bash
 
       - name: Run E2E tests

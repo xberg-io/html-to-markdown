@@ -2,46 +2,110 @@
   {
     "id": "encoding_html_entities",
     "description": "Common HTML entities are decoded in output",
-    "html": "<p>&amp; &lt; &gt; &nbsp; &quot; &apos;</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["&", "<", ">"]
-    }
+    "input": {
+      "html": "<p>&amp; &lt; &gt; &nbsp; &quot; &apos;</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "&",
+          "<",
+          ">"
+        ]
+      }
+    ]
   },
   {
     "id": "encoding_unicode_emoji",
     "description": "Emoji and Unicode characters are preserved",
-    "html": "<p>Hello 🌍 World 🚀</p><p>Stars: ⭐ ✨</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["🌍", "🚀", "⭐"]
-    }
+    "input": {
+      "html": "<p>Hello 🌍 World 🚀</p><p>Stars: ⭐ ✨</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "🌍",
+          "🚀",
+          "⭐"
+        ]
+      }
+    ]
   },
   {
     "id": "encoding_cjk_characters",
     "description": "CJK (Chinese, Japanese, Korean) characters are preserved",
-    "html": "<p>中文内容</p><p>日本語テキスト</p><p>한국어 텍스트</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["中文内容", "日本語テキスト", "한국어 텍스트"]
-    }
+    "input": {
+      "html": "<p>中文内容</p><p>日本語テキスト</p><p>한국어 텍스트</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "中文内容",
+          "日本語テキスト",
+          "한국어 텍스트"
+        ]
+      }
+    ]
   },
   {
     "id": "encoding_numeric_entities",
     "description": "Numeric HTML entities (decimal and hex) are decoded",
-    "html": "<p>Copyright: &#169; Trade: &#174; Euro: &#8364; Hex: &#x00A9;</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["©", "®", "€"]
-    }
+    "input": {
+      "html": "<p>Copyright: &#169; Trade: &#174; Euro: &#8364; Hex: &#x00A9;</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "©",
+          "®",
+          "€"
+        ]
+      }
+    ]
   },
   {
     "id": "encoding_named_entities",
     "description": "Named HTML entities like &mdash; and &hellip; are decoded",
-    "html": "<p>Em dash&mdash;used for parenthetical remarks&mdash;is common. Ellipsis&hellip; indicates omission. Non-breaking&nbsp;space.</p>",
-    "assertions": {
-      "content_not_empty": true,
-      "content_contains_all": ["—", "…"]
-    }
+    "input": {
+      "html": "<p>Em dash&mdash;used for parenthetical remarks&mdash;is common. Ellipsis&hellip; indicates omission. Non-breaking&nbsp;space.</p>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "—",
+          "…"
+        ]
+      }
+    ]
   }
 ]

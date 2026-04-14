@@ -51,7 +51,7 @@ use super::content::VisitorDispatch;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// let result = dispatch_visitor(
 ///     &visitor,
 ///     |v| v.visit_heading(&ctx, level, text, id),

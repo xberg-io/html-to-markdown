@@ -133,10 +133,7 @@ pub struct MetadataConfig {
 /// ```
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(any(feature = "serde", feature = "metadata"), derive(serde::Deserialize))]
-#[cfg_attr(
-    any(feature = "serde", feature = "metadata"),
-    serde(rename_all = "camelCase", deny_unknown_fields)
-)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(deny_unknown_fields))]
 pub struct MetadataConfigUpdate {
     /// Optional override for extracting document-level metadata.
     ///

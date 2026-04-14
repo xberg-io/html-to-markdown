@@ -66,10 +66,6 @@ includes:
   _lint:
     taskfile: ./.task/workflows/lint.yml
     internal: true
-
-  # Snippet runner workflow (exposed as snippets:*)
-  snippets:
-    taskfile: ./.task/workflows/snippets.yml
     optional: true
 
   # Version sync workflow
@@ -388,10 +384,10 @@ tasks:
 
   # Documentation
   docs:build:
-    desc: "Build documentation site with zensical"
+    desc: "Build documentation site with mkdocs"
     cmds:
       - task: python:install
-      - uv run zensical build --clean --strict
+      - uv run mkdocs build --clean --strict
 
   # Clean artifacts
   clean:

@@ -2,31 +2,76 @@
   {
     "id": "options_escape_asterisks",
     "description": "escape_asterisks option escapes asterisks in plain text",
-    "html": "<p>Use 2*3 = 6 in math.</p>",
-    "options": { "escapeAsterisks": true },
-    "assertions": {
-      "content_contains_all": ["2", "3", "6"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Use 2*3 = 6 in math.</p>",
+      "options": {
+        "escapeAsterisks": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "2",
+          "3",
+          "6"
+        ]
+      }
+    ]
   },
   {
     "id": "options_escape_underscores",
     "description": "escape_underscores option escapes underscores in plain text",
-    "html": "<p>The variable_name is defined.</p>",
-    "options": { "escapeUnderscores": true },
-    "assertions": {
-      "content_contains_all": ["variable", "name", "defined."],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>The variable_name is defined.</p>",
+      "options": {
+        "escapeUnderscores": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "variable",
+          "name",
+          "defined."
+        ]
+      }
+    ]
   },
   {
     "id": "options_escape_misc",
     "description": "escape_misc option escapes miscellaneous markdown characters",
-    "html": "<p>Use # and | and ~ in text.</p>",
-    "options": { "escapeMisc": true },
-    "assertions": {
-      "content_contains_all": ["Use", "and", "in text."],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<p>Use # and | and ~ in text.</p>",
+      "options": {
+        "escapeMisc": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Use",
+          "and",
+          "in text."
+        ]
+      }
+    ]
   }
 ]

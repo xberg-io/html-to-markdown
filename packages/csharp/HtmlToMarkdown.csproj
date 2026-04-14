@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>HtmlToMarkdown</RootNamespace>
+    <PackageId>HtmlToMarkdown</PackageId>
+    <Version>3.1.0</Version>
+    <Description>High-performance HTML to Markdown converter</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>
+    <Authors>Kreuzberg Team</Authors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+</Project>

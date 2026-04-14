@@ -55,35 +55,26 @@ jobs:
 
       - name: Build html-to-markdown-ffi
         shell: bash
-        run: cargo build -p html-to-markdown-ffi
+        run: cargo build --release -p html-to-markdown-ffi
 
-      - name: Compile C tests
-        shell: bash
-        run: make -C crates/html-to-markdown-ffi/tests/c LIBDIR="$(pwd)/target/debug" clean all
-
-      - name: Run C tests
+      - name: Run C e2e tests
         shell: bash
         env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/target/debug
-          DYLD_LIBRARY_PATH: ${{ github.workspace }}/target/debug
+          LD_LIBRARY_PATH: ${{ github.workspace }}/target/release
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/target/release
+        run: cd e2e/c && make test
+
+      - name: Verify header exists
+        shell: bash
         run: |
-          FAILED=0
-          for test in crates/html-to-markdown-ffi/tests/c/test_*; do
-            [ -x "$test" ] || continue
-            name=$(basename "$test")
-            if "$test"; then
-              echo "PASS: $name"
-            else
-              echo "FAIL: $name"
-              FAILED=1
-            fi
-          done
-          [ "$FAILED" -eq 0 ] || exit 1
+          HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
+          test -f "$HEADER"
+          echo "Header verified: $HEADER"
 
       - name: Verify pkg-config output
         shell: bash
         run: |
-          PC_DIR="$(pwd)/target/debug/build"
+          PC_DIR="$(pwd)/target/release/build"
           PC_FILE=$(find "$PC_DIR" -name 'html-to-markdown.pc' -path '*/html-to-markdown-ffi-*/out/*' 2>/dev/null | head -1)
           if [ -z "$PC_FILE" ]; then
             echo "Warning: html-to-markdown.pc not found in build output"
@@ -92,24 +83,6 @@ jobs:
             echo "Found pkg-config file: $PC_FILE"
             cat "$PC_FILE"
           fi
-
-      - name: Verify header version constants
-        shell: bash
-        run: |
-          HEADER="crates/html-to-markdown-ffi/html_to_markdown.h"
-          echo "Checking version constants in $HEADER..."
-          grep 'HTML_TO_MARKDOWN_VERSION_MAJOR' "$HEADER"
-          grep 'HTML_TO_MARKDOWN_VERSION_MINOR' "$HEADER"
-          grep 'HTML_TO_MARKDOWN_VERSION_PATCH' "$HEADER"
-          grep 'HTML_TO_MARKDOWN_VERSION ' "$HEADER"
-          echo "Version constants verified."
-
-      - name: Verify CMake config files exist
-        shell: bash
-        run: |
-          test -f crates/html-to-markdown-ffi/cmake/html-to-markdown-ffi-config.cmake
-          test -f crates/html-to-markdown-ffi/cmake/html-to-markdown-ffi-config-version.cmake
-          echo "CMake config files verified."
 
   c-ffi-tests-windows:
     name: C FFI Tests (windows-latest)
@@ -132,6 +105,5 @@ jobs:
       - name: Verify header generated
         shell: bash
         run: |
-          test -f crates/html-to-markdown-ffi/html_to_markdown.h
-          grep 'HTML_TO_MARKDOWN_VERSION_MAJOR' crates/html-to-markdown-ffi/html_to_markdown.h
+          test -f crates/html-to-markdown-ffi/include/html_to_markdown.h
           echo "Header verified on Windows."

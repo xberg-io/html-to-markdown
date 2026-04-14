@@ -2,33 +2,77 @@
   {
     "id": "blockquote_simple",
     "description": "Simple blockquote",
-    "html": "<blockquote><p>Quote text</p></blockquote>",
-    "assertions": { "content_contains_all": ["> Quote text"] }
+    "input": {
+      "html": "<blockquote><p>Quote text</p></blockquote>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "> Quote text"
+        ]
+      }
+    ]
   },
   {
     "id": "blockquote_nested",
     "description": "Nested blockquote produces double-prefixed lines",
-    "html": "<blockquote><p>Outer quote.</p><blockquote><p>Inner quote.</p></blockquote></blockquote>",
-    "assertions": {
-      "content_contains_all": ["Outer quote.", "Inner quote."],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<blockquote><p>Outer quote.</p><blockquote><p>Inner quote.</p></blockquote></blockquote>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Outer quote.",
+          "Inner quote."
+        ]
+      }
+    ]
   },
   {
     "id": "blockquote_multiple_paragraphs",
     "description": "Blockquote with multiple paragraphs has each paragraph prefixed",
-    "html": "<blockquote><p>First paragraph.</p><p>Second paragraph.</p></blockquote>",
-    "assertions": {
-      "content_contains_all": ["> First paragraph.", "> Second paragraph."]
-    }
+    "input": {
+      "html": "<blockquote><p>First paragraph.</p><p>Second paragraph.</p></blockquote>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "> First paragraph.",
+          "> Second paragraph."
+        ]
+      }
+    ]
   },
   {
     "id": "blockquote_with_list",
     "description": "Blockquote containing a list preserves list items inside quote",
-    "html": "<blockquote><p>Quote intro:</p><ul><li>Point one</li><li>Point two</li></ul></blockquote>",
-    "assertions": {
-      "content_contains_all": ["Quote intro:", "Point one", "Point two"],
-      "content_not_empty": true
-    }
+    "input": {
+      "html": "<blockquote><p>Quote intro:</p><ul><li>Point one</li><li>Point two</li></ul></blockquote>"
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Quote intro:",
+          "Point one",
+          "Point two"
+        ]
+      }
+    ]
   }
 ]

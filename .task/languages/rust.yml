@@ -132,13 +132,13 @@ tasks:
         ignore_error: false
       - cmd: cargo update
         ignore_error: false
-      - cmd: cargo upgrade --incompatible --manifest-path packages/ruby/ext/html-to-markdown-rb/native/Cargo.toml
+      - cmd: cargo upgrade --incompatible --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
         ignore_error: false
-      - cmd: cargo update --manifest-path packages/ruby/ext/html-to-markdown-rb/native/Cargo.toml
+      - cmd: cargo update --manifest-path packages/ruby/ext/html_to_markdown_rb/Cargo.toml
         ignore_error: false
-      - cmd: cargo upgrade --incompatible --manifest-path packages/elixir/native/html_to_markdown_elixir/Cargo.toml
+      - cmd: cargo upgrade --incompatible --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
         ignore_error: false
-      - cmd: cargo update --manifest-path packages/elixir/native/html_to_markdown_elixir/Cargo.toml
+      - cmd: cargo update --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
         ignore_error: false
       - cmd: cargo upgrade --incompatible --manifest-path packages/r/src/rust/Cargo.toml
         ignore_error: false
@@ -161,10 +161,10 @@ tasks:
         ignore_error: false
 
   e2e:generate:
-    desc: "Generate Rust E2E tests from fixtures using e2e-generator"
+    desc: "Generate E2E tests from fixtures using alef"
     silent: false
     cmds:
-      - cmd: cargo run --release -p e2e-generator -- --language rust --output e2e/rust
+      - cmd: alef e2e generate --lang rust
         ignore_error: false
 
   e2e:test:

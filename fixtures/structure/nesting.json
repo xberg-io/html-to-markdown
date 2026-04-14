@@ -2,37 +2,76 @@
   {
     "id": "structure_h1_h2_nested_group",
     "description": "H1 followed by H2 creates a nested group under the H1",
-    "html": "<h1>Chapter One</h1><p>Chapter intro.</p><h2>Section One</h2><p>Section content.</p>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 3,
-      "document_node_types_include": ["heading", "paragraph"]
-    }
+    "input": {
+      "html": "<h1>Chapter One</h1><p>Chapter intro.</p><h2>Section One</h2><p>Section content.</p>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 3
+      }
+    ]
   },
   {
     "id": "structure_sibling_h1_groups",
     "description": "H1, H2, then another H1 creates two sibling top-level groups",
-    "html": "<h1>Chapter One</h1><h2>Section A</h2><p>Section A content.</p><h1>Chapter Two</h1><h2>Section B</h2><p>Section B content.</p>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 4,
-      "document_node_types_include": ["heading", "paragraph"]
-    }
+    "input": {
+      "html": "<h1>Chapter One</h1><h2>Section A</h2><p>Section A content.</p><h1>Chapter Two</h1><h2>Section B</h2><p>Section B content.</p>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 4
+      }
+    ]
   },
   {
     "id": "structure_deep_nesting_h1_h2_h3",
     "description": "H1 > H2 > H3 creates three levels of heading nesting",
-    "html": "<h1>Top Level</h1><p>Top intro.</p><h2>Mid Level</h2><p>Mid content.</p><h3>Deep Level</h3><p>Deep content.</p>",
-    "options": { "includeDocumentStructure": true },
-    "assertions": {
-      "content_not_empty": true,
-      "has_document_structure": true,
-      "document_node_count_min": 5,
-      "document_node_types_include": ["heading", "paragraph"]
-    }
+    "input": {
+      "html": "<h1>Top Level</h1><p>Top intro.</p><h2>Mid Level</h2><p>Mid content.</p><h3>Deep Level</h3><p>Deep content.</p>",
+      "options": {
+        "includeDocumentStructure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "not_empty",
+        "field": "document.nodes"
+      },
+      {
+        "type": "count_min",
+        "field": "document.nodes",
+        "value": 5
+      }
+    ]
   }
 ]

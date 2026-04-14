@@ -10,4 +10,4 @@ parameters:
         - tests
     tmpDir: var/cache/phpstan
     stubFiles:
-        - stubs/html_to_markdown_extension.php
+        - stubs/html_to_markdown_rs_extension.php

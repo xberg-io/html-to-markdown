@@ -1,69 +1,29 @@
 {
-	"name": "@kreuzberg/html-to-markdown-node",
+	"name": "html-to-markdown",
 	"version": "3.1.0",
-	"description": "High-performance HTML to Markdown converter - Node.js native bindings",
+	"description": "High-performance HTML to Markdown converter (native Node.js binding)",
+	"license": "MIT",
 	"main": "index.js",
 	"types": "index.d.ts",
-	"repository": "https://github.com/kreuzberg-dev/html-to-markdown",
-	"homepage": "https://kreuzberg.dev",
-	"license": "MIT",
-	"author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",
-	"bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
-	"keywords": [
-		"html",
-		"markdown",
-		"converter",
-		"rust",
-		"napi",
-		"native"
-	],
-	"files": [
-		"index.js",
-		"*.cjs",
-		"*.d.ts",
-		"*.node",
-		"README.md"
-	],
+	"scripts": {
+		"build": "napi build --manifest-path Cargo.toml --release --output-dir .",
+		"build:debug": "napi build --manifest-path Cargo.toml --output-dir ."
+	},
 	"napi": {
-		"binaryName": "html-to-markdown-node",
-		"targets": [
+		"binaryName": "html-to-markdown-rs",
+		"triples": [
+			"x86_64-unknown-linux-gnu",
 			"x86_64-apple-darwin",
 			"aarch64-apple-darwin",
-			"x86_64-pc-windows-msvc",
-			"aarch64-pc-windows-msvc",
-			"x86_64-unknown-linux-gnu",
-			"x86_64-unknown-linux-musl",
-			"aarch64-unknown-linux-gnu",
-			"aarch64-unknown-linux-musl",
-			"armv7-unknown-linux-gnueabihf"
+			"x86_64-pc-windows-msvc"
 		]
 	},
-	"engines": {
-		"node": ">= 10"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org/",
-		"access": "public"
-	},
-	"scripts": {
-		"artifacts": "napi artifacts",
-		"build": "napi build --platform --release",
-		"build:debug": "napi build --platform",
-		"prepublishOnly": "napi prepublish -t npm",
-		"test": "vitest run",
-		"test:watch": "vitest",
-		"test:simple": "node test.js",
-		"universal": "napi universal",
-		"version": "napi version",
-		"clean": "rm -rf dist node_modules *.node"
-	},
 	"devDependencies": {
-		"@napi-rs/cli": "^3.6.0",
-		"@types/node": "^25.5.2",
-		"tsx": "^4.21.0",
-		"vitest": "^4.1.2"
+		"@napi-rs/cli": "^3.6.1"
 	},
-	"dependencies": {
-		"@emnapi/runtime": "1.9.2"
-	}
+	"files": [
+		"index.js",
+		"index.d.ts",
+		"**/*.node"
+	]
 }

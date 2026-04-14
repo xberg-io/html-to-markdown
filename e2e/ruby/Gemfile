@@ -2,5 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'html-to-markdown', path: '../../packages/ruby'
-gem 'rspec'
+gem 'html_to_markdown_rs', path: '../../packages/ruby'
+gem 'rspec', '~> 3.13'
+gem 'rubocop', '~> 1.86'
+gem 'rubocop-rspec', '~> 3.9'

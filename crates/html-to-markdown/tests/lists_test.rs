@@ -51,8 +51,8 @@ fn test_nested_lists() {
 
     let result = convert(html, None).unwrap();
     assert!(result.contains("- Item 1"));
-    assert!(result.contains("- Nested 1"));
-    assert!(result.contains("- Nested 2"));
+    assert!(result.contains("* Nested 1"));
+    assert!(result.contains("* Nested 2"));
     assert!(result.contains("- Item 2"));
 }
 
@@ -129,7 +129,7 @@ fn test_list_indent_spaces() {
 
     let result = convert(html, Some(options)).unwrap();
     assert!(result.contains("- Parent"));
-    assert!(result.contains("  - Child"));
+    assert!(result.contains("  * Child"));
 }
 
 #[test]
@@ -149,7 +149,7 @@ fn test_list_indent_tabs() {
 
     let result = convert(html, Some(options)).unwrap();
     assert!(result.contains("- Parent"));
-    assert!(result.contains("\t- Child"));
+    assert!(result.contains("\t* Child"));
 }
 
 #[test]

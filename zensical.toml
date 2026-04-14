@@ -1,0 +1,188 @@
+[project]
+site_name = "html-to-markdown"
+site_description = "High-performance HTML to Markdown conversion powered by Rust"
+site_url = "https://docs.html-to-markdown.kreuzberg.dev"
+site_author = "kreuzberg.dev"
+repo_name = "kreuzberg-dev/html-to-markdown"
+repo_url = "https://github.com/kreuzberg-dev/html-to-markdown"
+edit_uri = "edit/main/docs/"
+copyright = "Copyright &copy; 2023-2026 Kreuzberg.dev"
+
+extra_css = ["css/extra.css"]
+
+nav = [
+  { "Home" = "index.md" },
+  { "Installation" = "installation.md" },
+  { "Usage" = "usage.md" },
+  { "Configuration" = "reference/configuration.md" },
+  { "CLI" = "cli.md" },
+  { "API Reference" = [
+    { "Python" = "reference/api-python.md" },
+    { "TypeScript" = "reference/api-typescript.md" },
+    { "Go" = "reference/api-go.md" },
+    { "Java" = "reference/api-java.md" },
+    { "C#" = "reference/api-csharp.md" },
+    { "Ruby" = "reference/api-ruby.md" },
+    { "PHP" = "reference/api-php.md" },
+    { "Elixir" = "reference/api-elixir.md" },
+    { "WASM" = "reference/api-wasm.md" },
+    { "C (FFI)" = "reference/api-c.md" },
+    { "Errors" = "reference/errors.md" },
+  ] },
+  { "Migration Guide" = "migration.md" },
+  { "Changelog" = "https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md" },
+]
+
+[project.theme]
+name = "material"
+custom_dir = "docs/overrides"
+logo = "assets/logo.svg"
+favicon = "assets/favicon.ico"
+language = "en"
+features = [
+  "content.code.copy",
+  "content.code.annotate",
+  "content.tabs.link",
+  "navigation.instant",
+  "navigation.instant.progress",
+  "navigation.path",
+  "navigation.prune",
+  "navigation.indexes",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.tracking",
+  "navigation.top",
+  "navigation.footer",
+  "search.highlight",
+  "search.share",
+  "search.suggest",
+  "toc.follow",
+  "toc.integrate",
+  "announce.dismiss",
+  "content.action.edit",
+  "content.action.view",
+]
+
+[project.theme.font]
+text = "Inter"
+code = "JetBrains Mono"
+
+[project.theme.icon]
+repo = "github"
+search = "search"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+
+[project.theme.palette.toggle]
+icon = "sun"
+name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "custom"
+accent = "custom"
+
+[project.theme.palette.toggle]
+icon = "moon"
+name = "Switch to dark mode"
+
+# --- Markdown Extensions ---
+
+[project.markdown_extensions.admonition]
+
+[project.markdown_extensions.attr_list]
+
+[project.markdown_extensions.def_list]
+
+[project.markdown_extensions.footnotes]
+
+[project.markdown_extensions.md_in_html]
+
+[project.markdown_extensions.tables]
+
+[project.markdown_extensions.toc]
+permalink = true
+toc_depth = 3
+
+[project.markdown_extensions.pymdownx.details]
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "zensical.extensions.emoji.twemoji"
+emoji_generator = "zensical.extensions.emoji.to_svg"
+options = { custom_icons = ["docs/overrides/.icons"] }
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+linenums = false
+use_pygments = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+
+[project.markdown_extensions.pymdownx.keys]
+
+[project.markdown_extensions.pymdownx.mark]
+
+[project.markdown_extensions.pymdownx.smartsymbols]
+
+[project.markdown_extensions.pymdownx.snippets]
+base_path = ["docs", "."]
+check_paths = true
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+combine_header_slug = true
+
+[project.markdown_extensions.pymdownx.tabbed.slugify]
+case = "lower"
+
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true
+
+# --- Plugins ---
+
+[project.plugins.search]
+
+# --- Extra ---
+
+[project.extra]
+
+[project.extra.status]
+new = "Recently added"
+deprecated = "Deprecated"
+
+[project.extra.repo]
+stars = true
+forks = true
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/kreuzberg-dev/html-to-markdown"
+name = "View on GitHub"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/html-to-markdown/"
+name = "View on PyPI"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/npm"
+link = "https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node"
+name = "View on npm"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/rust"
+link = "https://crates.io/crates/html-to-markdown-rs"
+name = "View on crates.io"

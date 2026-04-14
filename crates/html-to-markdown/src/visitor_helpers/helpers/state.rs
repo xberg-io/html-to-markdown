@@ -42,7 +42,7 @@ use crate::visitor::NodeType;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```text
 /// let ctx = build_node_context(
 ///     NodeType::Heading,
 ///     "h1",

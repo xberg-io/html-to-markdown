@@ -19,8 +19,11 @@ html-to-markdown-rs = { path = "vendor/html-to-markdown-rs", features = [
   "visitor",
 ] }
 extendr-api = "0.8"
-serde_json = "1"
+serde_json = "1.0"
 
 [features]
 default = ["metadata"]
 metadata = []
+
+[package.metadata.cargo-machete]
+ignored = ["extendr-api", "html-to-markdown-rs"]
