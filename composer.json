@@ -19,7 +19,7 @@
     "php": "^8.4"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "3.94.*",
+    "friendsofphp/php-cs-fixer": "3.95.*",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^11.3",
     "squizlabs/php_codesniffer": "^4.0"
