@@ -24,6 +24,7 @@ allow = [
   "CDLA-Permissive-2.0",
   "Unicode-3.0",
   "bzip2-1.0.6",
+  "OpenSSL",
 ]
 confidence-threshold = 0.8
 exceptions = [
