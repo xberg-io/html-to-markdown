@@ -102,7 +102,7 @@ impl MetadataConfig {
         core_self.any_enabled()
     }
 
-    pub fn apply_update(&self, update: &MetadataConfigUpdate) -> () {
+    pub fn apply_update(&self, _update: &MetadataConfigUpdate) {
         ()
     }
 
@@ -111,12 +111,12 @@ impl MetadataConfig {
         html_to_markdown_rs::metadata::MetadataConfig::default().into()
     }
 
-    pub fn from_update(update: &MetadataConfigUpdate) -> MetadataConfig {
+    pub fn from_update(_update: &MetadataConfigUpdate) -> MetadataConfig {
         panic!("alef: from_update not auto-delegatable")
     }
 
     #[allow(clippy::should_implement_trait)]
-    pub fn from(update: &MetadataConfigUpdate) -> MetadataConfig {
+    pub fn from(_update: &MetadataConfigUpdate) -> MetadataConfig {
         panic!("alef: from not auto-delegatable")
     }
 }
@@ -572,7 +572,7 @@ impl ConversionOptions {
         self.preprocessing.clone()
     }
 
-    pub fn apply_update(&self, update: &ConversionOptionsUpdate) -> () {
+    pub fn apply_update(&self, _update: &ConversionOptionsUpdate) {
         ()
     }
 
@@ -587,12 +587,12 @@ impl ConversionOptions {
         }
     }
 
-    pub fn from_update(update: &ConversionOptionsUpdate) -> ConversionOptions {
+    pub fn from_update(_update: &ConversionOptionsUpdate) -> ConversionOptions {
         panic!("alef: from_update not auto-delegatable")
     }
 
     #[allow(clippy::should_implement_trait)]
-    pub fn from(update: &ConversionOptionsUpdate) -> ConversionOptions {
+    pub fn from(_update: &ConversionOptionsUpdate) -> ConversionOptions {
         panic!("alef: from not auto-delegatable")
     }
 }
@@ -794,7 +794,7 @@ impl PreprocessingOptions {
         serde_json::from_str(&json).map_err(|e| PhpException::default(e.to_string()))
     }
 
-    pub fn apply_update(&self, update: &PreprocessingOptionsUpdate) -> () {
+    pub fn apply_update(&self, _update: &PreprocessingOptionsUpdate) {
         ()
     }
 
@@ -803,12 +803,12 @@ impl PreprocessingOptions {
         html_to_markdown_rs::options::PreprocessingOptions::default().into()
     }
 
-    pub fn from_update(update: &PreprocessingOptionsUpdate) -> PreprocessingOptions {
+    pub fn from_update(_update: &PreprocessingOptionsUpdate) -> PreprocessingOptions {
         panic!("alef: from_update not auto-delegatable")
     }
 
     #[allow(clippy::should_implement_trait)]
-    pub fn from(update: &PreprocessingOptionsUpdate) -> PreprocessingOptions {
+    pub fn from(_update: &PreprocessingOptionsUpdate) -> PreprocessingOptions {
         panic!("alef: from not auto-delegatable")
     }
 }

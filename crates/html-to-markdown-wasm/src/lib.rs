@@ -109,9 +109,7 @@ impl WasmMetadataConfig {
     }
 
     #[wasm_bindgen(js_name = "applyUpdate")]
-    pub fn apply_update(&self, _update: WasmMetadataConfigUpdate) {
-        
-    }
+    pub fn apply_update(&self, _update: WasmMetadataConfigUpdate) {}
 
     #[wasm_bindgen(js_name = "fromUpdate")]
     pub fn from_update(update: WasmMetadataConfigUpdate) -> WasmMetadataConfig {
@@ -1315,9 +1313,7 @@ impl WasmConversionOptions {
     }
 
     #[wasm_bindgen(js_name = "applyUpdate")]
-    pub fn apply_update(&self, _update: WasmConversionOptionsUpdate) {
-        
-    }
+    pub fn apply_update(&self, _update: WasmConversionOptionsUpdate) {}
 
     #[wasm_bindgen(js_name = "fromUpdate")]
     pub fn from_update(update: WasmConversionOptionsUpdate) -> WasmConversionOptions {
@@ -1971,9 +1967,7 @@ impl WasmPreprocessingOptions {
     }
 
     #[wasm_bindgen(js_name = "applyUpdate")]
-    pub fn apply_update(&self, _update: WasmPreprocessingOptionsUpdate) {
-        
-    }
+    pub fn apply_update(&self, _update: WasmPreprocessingOptionsUpdate) {}
 
     #[wasm_bindgen(js_name = "fromUpdate")]
     pub fn from_update(update: WasmPreprocessingOptionsUpdate) -> WasmPreprocessingOptions {
