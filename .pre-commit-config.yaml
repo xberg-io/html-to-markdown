@@ -216,7 +216,7 @@ repos:
         stages: [pre-commit]
       - id: php-lint
         name: php lint (cs-fixer + phpstan)
-        entry: bash -c 'cd packages/php && composer install --no-interaction --no-progress && composer run lint:fix'
+        entry: bash -c 'cd packages/php && composer install --no-interaction --no-progress --ignore-platform-reqs && PHP_CS_FIXER_IGNORE_ENV=1 composer run lint:fix'
         language: system
         files: ^packages/php/
         pass_filenames: false

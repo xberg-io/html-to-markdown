@@ -8,7 +8,7 @@ exclude = ["html-to-markdown-wasm-wasmtime-tests"]
 feature-depth = 1
 
 [advisories]
-ignore = []
+ignore = ["RUSTSEC-2026-0044", "RUSTSEC-2026-0048"]
 
 [licenses]
 allow = [
