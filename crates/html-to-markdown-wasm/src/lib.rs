@@ -109,8 +109,8 @@ impl WasmMetadataConfig {
     }
 
     #[wasm_bindgen(js_name = "applyUpdate")]
-    pub fn apply_update(&self, update: WasmMetadataConfigUpdate) -> () {
-        ()
+    pub fn apply_update(&self, _update: WasmMetadataConfigUpdate) {
+        
     }
 
     #[wasm_bindgen(js_name = "fromUpdate")]
@@ -878,7 +878,7 @@ impl WasmConversionOptions {
             escape_underscores: escape_underscores.unwrap_or(false),
             escape_misc: escape_misc.unwrap_or(false),
             escape_ascii: escape_ascii.unwrap_or(false),
-            code_language: code_language.unwrap_or_else(|| "".to_string()),
+            code_language: code_language.unwrap_or_default(),
             autolinks: autolinks.unwrap_or(true),
             default_title: default_title.unwrap_or(false),
             br_in_tables: br_in_tables.unwrap_or(false),
@@ -889,8 +889,8 @@ impl WasmConversionOptions {
             wrap: wrap.unwrap_or(false),
             wrap_width: wrap_width.unwrap_or(80),
             convert_as_inline: convert_as_inline.unwrap_or(false),
-            sub_symbol: sub_symbol.unwrap_or_else(|| "".to_string()),
-            sup_symbol: sup_symbol.unwrap_or_else(|| "".to_string()),
+            sub_symbol: sub_symbol.unwrap_or_default(),
+            sup_symbol: sup_symbol.unwrap_or_default(),
             newline_style: newline_style.unwrap_or_default(),
             code_block_style: code_block_style.unwrap_or_default(),
             keep_inline_images_in: keep_inline_images_in.unwrap_or_default(),
@@ -1315,8 +1315,8 @@ impl WasmConversionOptions {
     }
 
     #[wasm_bindgen(js_name = "applyUpdate")]
-    pub fn apply_update(&self, update: WasmConversionOptionsUpdate) -> () {
-        ()
+    pub fn apply_update(&self, _update: WasmConversionOptionsUpdate) {
+        
     }
 
     #[wasm_bindgen(js_name = "fromUpdate")]
@@ -1971,8 +1971,8 @@ impl WasmPreprocessingOptions {
     }
 
     #[wasm_bindgen(js_name = "applyUpdate")]
-    pub fn apply_update(&self, update: WasmPreprocessingOptionsUpdate) -> () {
-        ()
+    pub fn apply_update(&self, _update: WasmPreprocessingOptionsUpdate) {
+        
     }
 
     #[wasm_bindgen(js_name = "fromUpdate")]
