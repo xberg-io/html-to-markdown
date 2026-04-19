@@ -50,7 +50,14 @@ public static class HtmlToMarkdownRs
             html,
             optionsHandle
         );
-        if (result == IntPtr.Zero) { var err = GetLastError(); if (err.Code != 0) throw err; }
+        if (result == IntPtr.Zero)
+        {
+            var err = GetLastError();
+            if (err.Code != 0)
+            {
+                throw err;
+            }
+        }
         var jsonPtr = NativeMethods.ConversionResultToJson(result);
         var json = Marshal.PtrToStringUTF8(jsonPtr);
         NativeMethods.FreeString(jsonPtr);

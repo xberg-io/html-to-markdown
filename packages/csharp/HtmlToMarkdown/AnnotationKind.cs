@@ -71,7 +71,10 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
         if (!root.TryGetProperty("annotation_type", out var tagEl))
+        {
             throw new JsonException("AnnotationKind: missing \"annotation_type\" discriminator");
+        }
+
         var tag = tagEl.GetString();
         var json = root.GetRawText();
         return tag switch
@@ -109,7 +112,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "bold");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -119,7 +128,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "italic");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -129,7 +144,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "underline");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -139,7 +160,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "strikethrough");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -149,7 +176,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "code");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -159,7 +192,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "subscript");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -169,7 +208,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "superscript");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -179,7 +224,13 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "highlight");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
@@ -189,11 +240,18 @@ internal sealed class AnnotationKindJsonConverter : JsonConverter<AnnotationKind
                 writer.WriteStartObject();
                 writer.WriteString("annotation_type", "link");
                 foreach (var prop in doc.RootElement.EnumerateObject())
-                    if (prop.Name != "annotation_type") prop.WriteTo(writer);
+                {
+                    if (prop.Name != "annotation_type")
+                    {
+                        prop.WriteTo(writer);
+                    }
+                }
+
                 writer.WriteEndObject();
                 break;
             }
-            default: throw new JsonException($"Unknown AnnotationKind subtype: {value.GetType().Name}");
+            default:
+                throw new JsonException($"Unknown AnnotationKind subtype: {value.GetType().Name}");
         }
     }
 }
