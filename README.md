@@ -103,8 +103,8 @@ See the **[Installation Guide](https://docs.html-to-markdown.kreuzberg.dev/getti
 from html_to_markdown import convert
 
 result = convert("<h1>Hello</h1><p>World</p>")
-print(result["content"])        # # Hello\n\nWorld
-print(result["metadata"])       # title, links, headings, …
+print(result.content)        # # Hello\n\nWorld
+print(result.metadata)       # title, links, headings, …
 ```
 
 ```typescript

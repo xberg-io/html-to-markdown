@@ -27,7 +27,7 @@ println!("{}", result.content.unwrap_or_default());
 from html_to_markdown import convert
 
 result = convert("<h1>Hello</h1><p>This is <strong>fast</strong>!</p>")
-print(result["content"])
+print(result.content)
 # # Hello
 #
 # This is **fast**!

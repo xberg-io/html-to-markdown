@@ -162,8 +162,8 @@ Enable `include_document_structure` to get a parsed tree of the document's struc
 
     options = ConversionOptions(include_document_structure=True)
     result = convert("<h1>Title</h1><p>Paragraph</p>", options)
-    doc = result["document"]
-    for node in doc["nodes"]:
+    doc = result.document
+    for node in doc.nodes:
         print(node)
     ```
 

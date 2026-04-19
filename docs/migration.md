@@ -88,8 +88,8 @@ markdown, metadata = convert_with_metadata(html)
 
 # v3
 result = convert(html)
-markdown = result["content"]
-metadata = result["metadata"]
+markdown = result.content
+metadata = result.metadata
 ```
 
 ### TypeScript

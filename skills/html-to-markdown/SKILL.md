@@ -150,7 +150,7 @@ from html_to_markdown import convert
 
 html = "<h1>Hello World</h1><p>This is a paragraph.</p>"
 result = convert(html)
-print(result["content"])
+print(result.content)
 # Output: # Hello World\n\nThis is a paragraph.\n
 ```
 
@@ -198,10 +198,10 @@ All languages return the same data structure (as a dict, object, or struct).
 |-------|-----------|--------|------------|-------------|
 | `content` | `Option<String>` | `str \| None` | `string \| null` | Converted text (Markdown/Djot/plain). `None` only in extraction-only mode. |
 | `document` | `Option<DocumentStructure>` | `None` (not yet wired) | `null` (not yet wired) | Structured document tree when `include_document_structure=true` |
-| `metadata` | `HtmlMetadata` | `dict \| None` | JSON object or null | Extracted HTML metadata (title, OG, headers, links, images, structured data). Requires `metadata` feature. |
-| `tables` | `Vec<TableData>` | `list[dict]` | `array` | Extracted tables with `grid` (structured cells) and `markdown` fields |
+| `metadata` | `HtmlMetadata` | `HtmlMetadata \| None` | JSON object or null | Extracted HTML metadata (title, OG, headers, links, images, structured data). Requires `metadata` feature. |
+| `tables` | `Vec<TableData>` | `list[TableData]` | `array` | Extracted tables with `grid` (structured cells) and `markdown` fields |
 | `images` | `Vec<InlineImage>` | `list` | `array` | Extracted inline images (data URIs, SVGs). Requires `inline-images` feature. |
-| `warnings` | `Vec<ProcessingWarning>` | `list[dict]` | `array` | Non-fatal processing warnings with `message` and `kind` fields |
+| `warnings` | `Vec<ProcessingWarning>` | `list[ProcessingWarning]` | `array` | Non-fatal processing warnings with `message` and `kind` fields |
 
 ## Configuration
 
@@ -242,7 +242,7 @@ preprocessing = PreprocessingOptions(
 )
 
 result = convert(html, options, preprocessing)
-print(result["content"])
+print(result.content)
 ```
 
 ### TypeScript / Node.js (object)
@@ -309,28 +309,28 @@ html = """
 </html>
 """
 result = convert(html)
-meta = result["metadata"]
+meta = result.metadata
 
 # Document-level metadata
-print(meta["document"]["title"])           # "My Article"
-print(meta["document"]["description"])     # "An article"
-print(meta["document"]["language"])        # "en"
-print(meta["document"]["open_graph"])      # {"title": "OG Title"}
+print(meta.document.title)           # "My Article"
+print(meta.document.description)     # "An article"
+print(meta.document.language)        # "en"
+print(meta.document.open_graph)      # {"title": "OG Title"}
 
 # Headers
-print(meta["headers"][0]["level"])         # 1
-print(meta["headers"][0]["text"])          # "Main Heading"
+print(meta.headers[0].level)         # 1
+print(meta.headers[0].text)          # "Main Heading"
 
 # Links
-print(meta["links"][0]["href"])            # "https://example.com"
-print(meta["links"][0]["link_type"])       # "external"
+print(meta.links[0].href)            # "https://example.com"
+print(meta.links[0].link_type)       # "external"
 
 # Images
-print(meta["images"][0]["alt"])            # "A photo"
-print(meta["images"][0]["image_type"])     # "external"
+print(meta.images[0].alt)            # "A photo"
+print(meta.images[0].image_type)     # "external"
 ```
 
-All metadata is available in `result["metadata"]` (Python), `result.metadata` (Go/Ruby/Elixir), `JSON.parse(convert(html)).metadata` (TypeScript), or `result.metadata` (Rust) from the single `convert()` call.
+All metadata is available in `result.metadata` (Python/Rust/Go/Ruby/Elixir) or `JSON.parse(convert(html)).metadata` (TypeScript) from the single `convert()` call.
 
 ## Document Structure Extraction
 
@@ -340,7 +340,7 @@ Enable `include_document_structure=True` to get a structured semantic tree:
 from html_to_markdown import convert, ConversionOptions
 
 result = convert(html, ConversionOptions(include_document_structure=True))
-doc = result["document"]  # DocumentStructure with nodes array
+doc = result.document  # DocumentStructure with nodes array
 # Each node has: id, content (node_type + fields), parent, children, annotations
 ```
 
@@ -348,9 +348,9 @@ Node types include: `heading`, `paragraph`, `list`, `list_item`, `table`, `image
 
 ## Common Pitfalls
 
-1. **`convert()` returns a result object, not a string.** Access `.content` (Rust/Python dict key) or `JSON.parse()` the return (Node.js) to get the Markdown string.
+1. **`convert()` returns a result object, not a string.** Access `.content` (Rust/Python) or `JSON.parse()` the return (Node.js) to get the Markdown string.
 2. **Node.js `convert()` returns a JSON string.** Always `JSON.parse(convert(html))` — the native NAPI binding returns serialized JSON to avoid type conversion overhead.
-3. **Python `convert()` returns an `ExtractionResult` dict.** Use `result["content"]` for the Markdown text, not `str(result)`.
+3. **Python `convert()` returns a `ConversionResult` object.** Use `result.content` for the Markdown text, not `str(result)` or `result["content"]`.
 4. **Rust builder pattern required.** Use `ConversionOptions::builder().field(value).build()` — direct struct construction omits future fields silently.
 5. **`metadata` requires the `metadata` feature.** In Rust, the `metadata` feature is included in `default`. In bindings (Python, Node, etc.), metadata is always available.
 6. **Python `PreprocessingOptions` is a separate parameter.** Pass it as the second argument to `convert()`, not inside `ConversionOptions`.

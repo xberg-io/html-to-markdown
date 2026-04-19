@@ -3,18 +3,18 @@
 {% if language == 'python' %}
 **`convert(html: str, options?: ConversionOptions, visitor?: object) -> ConversionResult`**
 
-Converts HTML to Markdown. Returns a `ConversionResult` dict with all results in a single call.
+Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```python
 from html_to_markdown import convert, ConversionOptions
 
 result = convert(html)
-markdown = result["content"]           # Converted Markdown string
-metadata = result["metadata"]          # Metadata (when extract_metadata=True)
-tables   = result["tables"]            # Structured table data (when extract_tables=True)
-document = result["document"]          # Document-level info
-images   = result["images"]            # Extracted images
-warnings = result["warnings"]          # Any conversion warnings
+markdown = result.content           # Converted Markdown string
+metadata = result.metadata          # Metadata (when extract_metadata=True)
+tables   = result.tables            # Structured table data
+document = result.document          # Document-level info
+images   = result.images            # Extracted images
+warnings = result.warnings          # Any conversion warnings
 ```
 
 {% elif language == 'typescript' %}

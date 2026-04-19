@@ -97,7 +97,7 @@ from html_to_markdown import convert
 
 html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
 result = convert(html)
-markdown = result["content"]
+markdown = result.content
 ```
 
 
@@ -112,7 +112,7 @@ options = ConversionOptions(
     list_indent_width=2,
 )
 result = convert(html, options)
-markdown = result["content"]
+markdown = result.content
 ```
 
 
@@ -123,18 +123,18 @@ markdown = result["content"]
 
 **`convert(html: str, options?: ConversionOptions, visitor?: object) -> ConversionResult`**
 
-Converts HTML to Markdown. Returns a `ConversionResult` dict with all results in a single call.
+Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```python
 from html_to_markdown import convert, ConversionOptions
 
 result = convert(html)
-markdown = result["content"]           # Converted Markdown string
-metadata = result["metadata"]          # Metadata (when extract_metadata=True)
-tables   = result["tables"]            # Structured table data (when extract_tables=True)
-document = result["document"]          # Document-level info
-images   = result["images"]            # Extracted images
-warnings = result["warnings"]          # Any conversion warnings
+markdown = result.content           # Converted Markdown string
+metadata = result.metadata          # Metadata (when extract_metadata=True)
+tables   = result.tables            # Structured table data
+document = result.document          # Document-level info
+images   = result.images            # Extracted images
+warnings = result.warnings          # Any conversion warnings
 ```
 
 
@@ -236,12 +236,12 @@ from html_to_markdown import convert, ConversionOptions
 html = '<h1>Article</h1><img src="test.jpg" alt="test">'
 result = convert(html, ConversionOptions(extract_metadata=True))
 
-print(result["content"])                          # Converted Markdown
-print(result["metadata"]["document"]["title"])    # Document title
-print(result["metadata"]["headers"])              # All h1-h6 elements
-print(result["metadata"]["links"])                # All hyperlinks
-print(result["metadata"]["images"])               # All images with alt text
-print(result["metadata"]["structured_data"])      # JSON-LD, Microdata, RDFa
+print(result.content)                          # Converted Markdown
+print(result.metadata.document.title)          # Document title
+print(result.metadata.headers)                 # All h1-h6 elements
+print(result.metadata.links)                   # All hyperlinks
+print(result.metadata.images)                  # All images with alt text
+print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 ```
 
 
@@ -285,7 +285,7 @@ class MyVisitor:
 
 html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 result = convert(html, visitor=MyVisitor())
-markdown = result["content"]
+markdown = result.content
 ```
 
 

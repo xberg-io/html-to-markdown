@@ -12,5 +12,5 @@ class CustomVisitor:
 
 options = ConversionOptions(visitor=CustomVisitor())
 result = convert(html, options)
-markdown = result["content"]
+markdown = result.content
 ```

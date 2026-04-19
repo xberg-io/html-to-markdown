@@ -32,7 +32,7 @@ class MyVisitor:
 
 html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 result = convert(html, visitor=MyVisitor())
-markdown = result["content"]
+markdown = result.content
 ```
 
 {% elif language == 'typescript' %}

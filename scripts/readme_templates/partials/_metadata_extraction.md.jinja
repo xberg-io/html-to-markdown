@@ -18,12 +18,12 @@ from html_to_markdown import convert, ConversionOptions
 html = '<h1>Article</h1><img src="test.jpg" alt="test">'
 result = convert(html, ConversionOptions(extract_metadata=True))
 
-print(result["content"])                          # Converted Markdown
-print(result["metadata"]["document"]["title"])    # Document title
-print(result["metadata"]["headers"])              # All h1-h6 elements
-print(result["metadata"]["links"])                # All hyperlinks
-print(result["metadata"]["images"])               # All images with alt text
-print(result["metadata"]["structured_data"])      # JSON-LD, Microdata, RDFa
+print(result.content)                          # Converted Markdown
+print(result.metadata.document.title)          # Document title
+print(result.metadata.headers)                 # All h1-h6 elements
+print(result.metadata.links)                   # All hyperlinks
+print(result.metadata.images)                  # All images with alt text
+print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 ```
 
 {% elif language == 'typescript' %}

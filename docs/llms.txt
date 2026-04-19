@@ -53,7 +53,7 @@ let markdown = result.content.unwrap_or_default();
 from html_to_markdown import convert
 
 result = convert("<h1>Hello</h1><p>World</p>")
-markdown = result["content"]
+markdown = result.content
 # "# Hello\n\nWorld"
 ```
 

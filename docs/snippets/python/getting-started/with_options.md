@@ -7,5 +7,5 @@ options = ConversionOptions(
     list_indent_width=2,
 )
 result = convert(html, options)
-markdown = result["content"]
+markdown = result.content
 ```
