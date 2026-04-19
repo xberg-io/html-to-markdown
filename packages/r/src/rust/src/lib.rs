@@ -15,7 +15,7 @@ use types::conversion_result_to_robj;
 /// @return A named list with content (character or NULL), metadata (list), tables (list), warnings (list).
 /// @export
 #[extendr]
-fn convert(html: &str, options: Robj) -> Result<Robj> {
+fn convert(html: &str, options: Robj) -> std::result::Result<Robj, Error> {
     let opts = decode_options(options).map_err(Error::Other)?;
     let result = html_to_markdown_rs::convert(html, Some(opts))
         .map_err(|e| Error::Other(e.to_string()))?;

@@ -196,6 +196,7 @@ pub fn conversion_result_to_robj(result: ConversionResult) -> Robj {
                 WarningKind::TruncatedInput => "truncated_input",
                 WarningKind::MalformedHtml => "malformed_html",
                 WarningKind::SanitizationApplied => "sanitization_applied",
+                WarningKind::DepthLimitExceeded => "depth_limit_exceeded",
             };
             list!(message = w.message, kind = kind).into()
         })

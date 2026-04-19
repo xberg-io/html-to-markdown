@@ -825,7 +825,7 @@ pub fn metadataconfig_any_enabled(obj: MetadataConfig) -> bool {
 }
 
 #[rustler::nif]
-pub fn metadataconfig_apply_update(obj: MetadataConfig, update: MetadataConfigUpdate) -> () {
+pub fn metadataconfig_apply_update(_obj: MetadataConfig, _update: MetadataConfigUpdate) -> () {
     ()
 }
 
@@ -836,7 +836,8 @@ pub fn metadataconfig_from_update(update: MetadataConfigUpdate) -> MetadataConfi
 
 #[rustler::nif]
 pub fn metadataconfig_from(update: MetadataConfigUpdate) -> MetadataConfig {
-    html_to_markdown_rs::MetadataConfig::from(update.into()).into()
+    let rs_update: html_to_markdown_rs::metadata::MetadataConfigUpdate = update.into();
+    html_to_markdown_rs::MetadataConfig::from(rs_update).into()
 }
 
 #[rustler::nif]
@@ -862,7 +863,7 @@ pub fn conversionoptions_builder() -> ResourceArc<ConversionOptionsBuilder> {
 }
 
 #[rustler::nif]
-pub fn conversionoptions_apply_update(obj: ConversionOptions, update: ConversionOptionsUpdate) -> () {
+pub fn conversionoptions_apply_update(_obj: ConversionOptions, _update: ConversionOptionsUpdate) -> () {
     ()
 }
 
@@ -873,7 +874,8 @@ pub fn conversionoptions_from_update(update: ConversionOptionsUpdate) -> Convers
 
 #[rustler::nif]
 pub fn conversionoptions_from(update: ConversionOptionsUpdate) -> ConversionOptions {
-    html_to_markdown_rs::ConversionOptions::from(update.into()).into()
+    let rs_update: html_to_markdown_rs::options::ConversionOptionsUpdate = update.into();
+    html_to_markdown_rs::ConversionOptions::from(rs_update).into()
 }
 
 #[rustler::nif]
@@ -927,7 +929,7 @@ pub fn preprocessingoptions_default() -> PreprocessingOptions {
 }
 
 #[rustler::nif]
-pub fn preprocessingoptions_apply_update(obj: PreprocessingOptions, update: PreprocessingOptionsUpdate) -> () {
+pub fn preprocessingoptions_apply_update(_obj: PreprocessingOptions, _update: PreprocessingOptionsUpdate) -> () {
     ()
 }
 
@@ -938,7 +940,8 @@ pub fn preprocessingoptions_from_update(update: PreprocessingOptionsUpdate) -> P
 
 #[rustler::nif]
 pub fn preprocessingoptions_from(update: PreprocessingOptionsUpdate) -> PreprocessingOptions {
-    html_to_markdown_rs::PreprocessingOptions::from(update.into()).into()
+    let rs_update: html_to_markdown_rs::options::PreprocessingOptionsUpdate = update.into();
+    html_to_markdown_rs::PreprocessingOptions::from(rs_update).into()
 }
 
 impl From<MetadataConfig> for html_to_markdown_rs::metadata::MetadataConfig {
@@ -1282,7 +1285,7 @@ impl From<ConversionOptionsUpdate> for html_to_markdown_rs::options::ConversionO
             max_image_size: val.max_image_size,
             capture_svg: val.capture_svg,
             infer_dimensions: val.infer_dimensions,
-            max_depth: (val.max_depth).map(Some),
+            max_depth: val.max_depth,
         }
     }
 }
@@ -1328,7 +1331,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             max_image_size: val.max_image_size,
             capture_svg: val.capture_svg,
             infer_dimensions: val.infer_dimensions,
-            max_depth: val.max_depth.flatten(),
+            max_depth: val.max_depth,
         }
     }
 }

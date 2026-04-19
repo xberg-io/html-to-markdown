@@ -7051,7 +7051,7 @@ pub unsafe extern "C" fn htm_convert_with_visitor(
     let options_rs: Option<html_to_markdown_rs::ConversionOptions> = if options.is_null() {
         None
     } else {
-        Some(unsafe { &*(options as *const html_to_markdown_rs::ConversionOptions) }.clone())
+        Some(unsafe { &*options }.clone())
     };
 
     // Build the visitor handle if provided.
