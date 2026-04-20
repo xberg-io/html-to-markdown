@@ -1,5 +1,0 @@
-# Organizational Domain - Rule References
-# Enforcement rules for code quality across all languages
-
-rules:
-  - code-quality

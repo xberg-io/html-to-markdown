@@ -1,4 +1,11 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports, unused_variables)]
+#![allow(
+    clippy::too_many_arguments,
+    clippy::let_unit_value,
+    clippy::needless_borrow,
+    clippy::map_identity,
+    clippy::just_underscores_and_digits
+)]
 
 use ext_php_rs::prelude::*;
 use std::collections::HashMap;

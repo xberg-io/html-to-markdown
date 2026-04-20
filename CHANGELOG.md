@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.6] - 2026-04-20
+
+### Fixed
+
+- **Python type mismatch** — `convert()` return type annotation now uses the public `ConversionResult` instead of `_rust.ConversionResult`, fixing Pylance type errors when annotating with the re-exported type (#310).
+- **Maturin build failure** — removed `readme = "README.md"` from binding crate Cargo.toml files (ffi, node, php, py, wasm) since no README exists for these internal crates (#309).
+
+### Changed
+
+- **PHPUnit** — bumped from `^12.5` to `^13.1` across root, e2e, and test_apps.
+- **Pre-commit shfmt hook** — fixed rev from non-existent `v3.14.2-1` to `v3.9.0-1`.
+- **Pre-commit ai-rulez hook** — updated from `v3.14.0` to `v3.14.2`.
+
+## [3.2.5] - 2026-04-18
+
+### Fixed
+
+- **Silent truncation on large HTML inputs** (#277) — fixed preprocessing pipeline gap where `strip_script_and_style_tags` was not called after `repair_with_html5ever`, causing documents with custom elements and scripts containing literal `<script>` strings to be silently truncated. Also fixed `preprocess_html` fallback to skip only the problematic tag instead of consuming the rest of the document.
+- **WASM plain-object options** (#303) — WASM package now exports a wrapper `convert()` function that accepts plain JavaScript objects for options, eliminating the need to construct `WasmConversionOptions` class instances. The raw WASM classes remain available for advanced use.
+
+### Added
+
+- **`max_depth` option** — new `max_depth` field on `ConversionOptions` to limit DOM traversal depth, preventing stack overflow on deeply nested or malicious HTML. Default is `None` (unlimited). When set, subtrees beyond the limit are silently truncated.
+
+### Removed
+
+- Phantom type references (`MetadataResult`, `HeadingInfo`, `LinkInfo`, `ImageInfo`) from alef configuration that did not correspond to any Rust types.
+
 ## [3.2.4] - 2026-04-17
 
 ### Fixed

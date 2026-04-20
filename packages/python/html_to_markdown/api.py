@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 import html_to_markdown._html_to_markdown as _rust
 
 if TYPE_CHECKING:
+    from ._html_to_markdown import ConversionResult
     from .options import ConversionOptions, PreprocessingOptions
 
 
@@ -132,7 +133,7 @@ def _to_rust_conversion_options(value: ConversionOptions | None) -> _rust.Conver
     )
 
 
-def convert(html: str, options: ConversionOptions | None = None) -> _rust.ConversionResult:
+def convert(html: str, options: ConversionOptions | None = None) -> ConversionResult:
     """Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images."""
     _rust_options = _to_rust_conversion_options(options)
     return _rust.convert(html, _rust_options)

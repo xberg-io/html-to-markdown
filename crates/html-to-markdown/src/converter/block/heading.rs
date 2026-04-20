@@ -397,13 +397,12 @@ pub(crate) fn find_single_heading_child(node_handle: NodeHandle, parser: &Parser
             }
             tl::Node::Tag(child_tag) => {
                 let name = crate::converter::utility::content::normalized_tag_name(child_tag.name().as_utf8_str());
-                if let Some(level) = heading_level_from_name(name.as_ref()) {
+                {
+                    let level = heading_level_from_name(name.as_ref())?;
                     if heading_data.is_some() {
                         return None;
                     }
                     heading_data = Some((level, *child_handle));
-                } else {
-                    return None;
                 }
             }
             tl::Node::Comment(_) => return None,

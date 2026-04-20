@@ -1,6 +1,6 @@
 {
 	"name": "@kreuzberg/html-to-markdown-node",
-	"version": "3.2.5",
+	"version": "3.2.6",
 	"description": "High-performance HTML to Markdown converter - Node.js native bindings",
 	"main": "index.js",
 	"types": "index.d.ts",

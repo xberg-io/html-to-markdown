@@ -310,29 +310,6 @@ class PreprocessingOptions:
 
 
 @dataclass
-class ConversionResult:
-    """The primary result of HTML conversion and extraction."""
-
-    content: str | None = None
-    """Converted text output (markdown, djot, or plain text)."""
-
-    document: Any | None = None
-    """Structured document tree with semantic elements."""
-
-    metadata: Any | None = None
-    """Extracted HTML metadata (title, OG, links, images, structured data)."""
-
-    tables: list[Any] = field(default_factory=list)
-    """Extracted tables with structured cell data and markdown representation."""
-
-    images: list[str] = field(default_factory=list)
-    """Extracted inline images (data URIs and SVGs)."""
-
-    warnings: list[Any] = field(default_factory=list)
-    """Non-fatal processing warnings."""
-
-
-@dataclass
 class TableGrid:
     """A structured table grid with cell-level data including spans."""
 

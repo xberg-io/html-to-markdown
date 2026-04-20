@@ -1602,24 +1602,20 @@ type ProcessingWarning struct {
 // # Errors
 //
 // Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-func Convert(html string, options ...*ConversionOptions) (*ConversionResult, error) {
-    var optionsVal *ConversionOptions
-    if len(options) > 0 {
-        optionsVal = options[0]
-    }
+func Convert(html string, options *ConversionOptions) (*ConversionResult, error) {
     cHtml := C.CString(html)
     defer C.free(unsafe.Pointer(cHtml))
 
-    jsonBytescOptionsVal, err := json.Marshal(optionsVal)
+    jsonBytescOptions, err := json.Marshal(options)
     if err != nil {
         return nil, fmt.Errorf("failed to marshal: %w", err)
     }
-    tmpStrcOptionsVal := C.CString(string(jsonBytescOptionsVal))
-    cOptionsVal := C.htm_conversion_options_from_json(tmpStrcOptionsVal)
-    C.free(unsafe.Pointer(tmpStrcOptionsVal))
-    defer C.htm_conversion_options_free(cOptionsVal)
+    tmpStrcOptions := C.CString(string(jsonBytescOptions))
+    cOptions := C.htm_conversion_options_from_json(tmpStrcOptions)
+    C.free(unsafe.Pointer(tmpStrcOptions))
+    defer C.htm_conversion_options_free(cOptions)
 
-    ptr := C.htm_convert(cHtml, cOptionsVal)
+    ptr := C.htm_convert(cHtml, cOptions)
     if err := lastError(); err != nil {
         if ptr != nil {
             C.htm_conversion_result_free(ptr)
@@ -1678,7 +1674,15 @@ func Convert(html string, options ...*ConversionOptions) (*ConversionResult, err
 // assert!(!config.any_enabled());
 // ```
 func (r *MetadataConfig) AnyEnabled() *bool {
-    ptr := C.htm_metadata_config_any_enabled ((*C.HTMMetadataConfig)(unsafe.Pointer(r)))
+    jsonBytesRecv, err := json.Marshal(r)
+    if err != nil {
+        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+    }
+    tmpStrRecv := C.CString(string(jsonBytesRecv))
+    cRecv := C.htm_metadata_config_from_json(tmpStrRecv)
+    C.free(unsafe.Pointer(tmpStrRecv))
+    defer C.htm_metadata_config_free(cRecv)
+    ptr := C.htm_metadata_config_any_enabled (cRecv)
     return func() *bool { v := ptr != 0; return &v }()
 }
 
@@ -1724,7 +1728,15 @@ func (r *MetadataConfig) ApplyUpdate(update MetadataConfigUpdate) {
     C.free(unsafe.Pointer(tmpStrcUpdate))
     defer C.htm_metadata_config_update_free(cUpdate)
 
-    C.htm_metadata_config_apply_update ((*C.HTMMetadataConfig)(unsafe.Pointer(r)), cUpdate)
+    jsonBytesRecv, err := json.Marshal(r)
+    if err != nil {
+        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+    }
+    tmpStrRecv := C.CString(string(jsonBytesRecv))
+    cRecv := C.htm_metadata_config_from_json(tmpStrRecv)
+    C.free(unsafe.Pointer(tmpStrRecv))
+    defer C.htm_metadata_config_free(cRecv)
+    C.htm_metadata_config_apply_update (cRecv, cUpdate)
 }
 
 
@@ -1757,7 +1769,15 @@ func (r *MetadataConfig) ApplyUpdate(update MetadataConfigUpdate) {
 // assert!(!invalid.is_valid());
 // ```
 func (r *HeaderMetadata) IsValid() *bool {
-    ptr := C.htm_header_metadata_is_valid ((*C.HTMHeaderMetadata)(unsafe.Pointer(r)))
+    jsonBytesRecv, err := json.Marshal(r)
+    if err != nil {
+        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+    }
+    tmpStrRecv := C.CString(string(jsonBytesRecv))
+    cRecv := C.htm_header_metadata_from_json(tmpStrRecv)
+    C.free(unsafe.Pointer(tmpStrRecv))
+    defer C.htm_header_metadata_free(cRecv)
+    ptr := C.htm_header_metadata_is_valid (cRecv)
     return func() *bool { v := ptr != 0; return &v }()
 }
 
@@ -1773,7 +1793,15 @@ func (r *ConversionOptions) ApplyUpdate(update ConversionOptionsUpdate) {
     C.free(unsafe.Pointer(tmpStrcUpdate))
     defer C.htm_conversion_options_update_free(cUpdate)
 
-    C.htm_conversion_options_apply_update ((*C.HTMConversionOptions)(unsafe.Pointer(r)), cUpdate)
+    jsonBytesRecv, err := json.Marshal(r)
+    if err != nil {
+        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+    }
+    tmpStrRecv := C.CString(string(jsonBytesRecv))
+    cRecv := C.htm_conversion_options_from_json(tmpStrRecv)
+    C.free(unsafe.Pointer(tmpStrRecv))
+    defer C.htm_conversion_options_free(cRecv)
+    C.htm_conversion_options_apply_update (cRecv, cUpdate)
 }
 
 
@@ -1786,7 +1814,7 @@ func (r *ConversionOptionsBuilder) StripTags(tags []string) *ConversionOptionsBu
     cTags := C.CString(string(jsonBytescTags))
     defer C.free(unsafe.Pointer(cTags))
 
-    ptr := C.htm_conversion_options_builder_strip_tags ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r)), cTags)
+    ptr := C.htm_conversion_options_builder_strip_tags ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r.ptr)), cTags)
     return &ConversionOptionsBuilder{ptr: unsafe.Pointer(ptr)}
 }
 
@@ -1800,7 +1828,7 @@ func (r *ConversionOptionsBuilder) PreserveTags(tags []string) *ConversionOption
     cTags := C.CString(string(jsonBytescTags))
     defer C.free(unsafe.Pointer(cTags))
 
-    ptr := C.htm_conversion_options_builder_preserve_tags ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r)), cTags)
+    ptr := C.htm_conversion_options_builder_preserve_tags ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r.ptr)), cTags)
     return &ConversionOptionsBuilder{ptr: unsafe.Pointer(ptr)}
 }
 
@@ -1814,7 +1842,7 @@ func (r *ConversionOptionsBuilder) KeepInlineImagesIn(tags []string) *Conversion
     cTags := C.CString(string(jsonBytescTags))
     defer C.free(unsafe.Pointer(cTags))
 
-    ptr := C.htm_conversion_options_builder_keep_inline_images_in ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r)), cTags)
+    ptr := C.htm_conversion_options_builder_keep_inline_images_in ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r.ptr)), cTags)
     return &ConversionOptionsBuilder{ptr: unsafe.Pointer(ptr)}
 }
 
@@ -1830,15 +1858,23 @@ func (r *ConversionOptionsBuilder) Preprocessing(preprocessing PreprocessingOpti
     C.free(unsafe.Pointer(tmpStrcPreprocessing))
     defer C.htm_preprocessing_options_free(cPreprocessing)
 
-    ptr := C.htm_conversion_options_builder_preprocessing ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r)), cPreprocessing)
+    ptr := C.htm_conversion_options_builder_preprocessing ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r.ptr)), cPreprocessing)
     return &ConversionOptionsBuilder{ptr: unsafe.Pointer(ptr)}
 }
 
 
 // Build the final [`ConversionOptions`].
 func (r *ConversionOptionsBuilder) Build() *ConversionOptions {
-    ptr := C.htm_conversion_options_builder_build ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r)))
-    return (*ConversionOptions)(unsafe.Pointer(ptr))
+    ptr := C.htm_conversion_options_builder_build ((*C.HTMConversionOptionsBuilder)(unsafe.Pointer(r.ptr)))
+    defer C.htm_conversion_options_free(ptr)
+    return func() *ConversionOptions {
+	jsonPtr := C.htm_conversion_options_to_json(ptr)
+	if jsonPtr == nil { return nil }
+	defer C.htm_free_string(jsonPtr)
+	var result ConversionOptions
+	if err := json.Unmarshal([]byte(C.GoString(jsonPtr)), &result); err != nil { return nil }
+	return &result
+}()
 }
 
 
@@ -1860,5 +1896,13 @@ func (r *PreprocessingOptions) ApplyUpdate(update PreprocessingOptionsUpdate) {
     C.free(unsafe.Pointer(tmpStrcUpdate))
     defer C.htm_preprocessing_options_update_free(cUpdate)
 
-    C.htm_preprocessing_options_apply_update ((*C.HTMPreprocessingOptions)(unsafe.Pointer(r)), cUpdate)
+    jsonBytesRecv, err := json.Marshal(r)
+    if err != nil {
+        panic(fmt.Sprintf("failed to marshal receiver: %v", err))
+    }
+    tmpStrRecv := C.CString(string(jsonBytesRecv))
+    cRecv := C.htm_preprocessing_options_from_json(tmpStrRecv)
+    C.free(unsafe.Pointer(tmpStrRecv))
+    defer C.htm_preprocessing_options_free(cRecv)
+    C.htm_preprocessing_options_apply_update (cRecv, cUpdate)
 }

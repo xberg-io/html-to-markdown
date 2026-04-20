@@ -1,5 +1,0 @@
-# DevOps & Infrastructure Domain - Agent References
-# CI/CD is infrastructure managed through GitHub Actions
-
-agents:
-  - devops-infrastructure-engineer

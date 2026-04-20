@@ -14,7 +14,7 @@ repos:
 
   # AI-Rulez: auto-generate AI assistant configuration files
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.12.0
+    rev: v3.14.2
     hooks:
       - id: ai-rulez-generate
 
@@ -143,7 +143,7 @@ repos:
 
   # Shell scripts: formatting and linting
   - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
+    rev: v3.9.0-1
     hooks:
       - id: shfmt
         args: ["-w", "-i", "2"]
@@ -176,7 +176,7 @@ repos:
         exclude: ^\.mvn/wrapper/|^e2e/
 
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.73"
+    rev: "v0.1.76"
     hooks:
       - id: rumdl-fmt
         exclude: 'test_documents/|\.ai-rulez/|\.remote-cache/|e2e/|fixtures/'

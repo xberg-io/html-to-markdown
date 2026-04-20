@@ -19,7 +19,7 @@ exclude = [
 ]
 
 [workspace.package]
-version = "3.2.5"
+version = "3.2.6"
 edition = "2024"
 authors = ["Na'aman Hirschfeld <naaman@kreuzberg.dev>"]
 description = "High-performance HTML to Markdown converter"

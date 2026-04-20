@@ -1,6 +1,6 @@
 [package]
 name = "html_to_markdown_nif"
-version = "3.2.0"
+version = "3.2.6"
 edition = "2024"
 license = "MIT"
 

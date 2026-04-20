@@ -1,6 +1,6 @@
 Package: htmltomarkdown
 Title: High-Performance HTML to Markdown Converter
-Version: 3.2.5
+Version: 3.2.6
 Authors@R: c(
     person("Na'aman", "Hirschfeld", email = "nhirschfeld@gmail.com", role = c("aut", "cre")),
     person("The authors of the dependency Rust crates", role = "ctb",

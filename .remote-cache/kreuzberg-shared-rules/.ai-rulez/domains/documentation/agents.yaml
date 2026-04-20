@@ -1,7 +1,0 @@
-# Documentation Domain - Agent References
-# Agents responsible for documentation authoring
-
-agents:
-  - docs-writer
-  - api-doc-writer
-  - tutorial-writer

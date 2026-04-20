@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>HtmlToMarkdown</RootNamespace>
     <PackageId>HtmlToMarkdown</PackageId>
-    <Version>3.2.5</Version>
+    <Version>3.2.6</Version>
     <Description>High-performance HTML to Markdown converter</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>

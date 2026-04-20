@@ -21,7 +21,7 @@
   "require-dev": {
     "friendsofphp/php-cs-fixer": "3.95.*",
     "phpstan/phpstan": "^2.1",
-    "phpunit/phpunit": "^11.3",
+    "phpunit/phpunit": "^13.1",
     "squizlabs/php_codesniffer": "^4.0"
   },
   "suggest": {
@@ -55,7 +55,7 @@
   "config": {
     "sort-packages": true,
     "platform": {
-      "php": "8.4.0"
+      "php": "8.4.1"
     },
     "allow-plugins": {
       "phpstan/extension-installer": true
@@ -81,5 +81,5 @@
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
-  "version": "3.2.5"
+  "version": "3.2.6"
 }

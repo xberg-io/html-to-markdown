@@ -1,11 +1,11 @@
 [package]
 name = "html-to-markdown-wasm"
-version = "3.2.0"
+version = "3.2.6"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
 repository = "https://github.com/kreuzberg-dev/html-to-markdown"
-readme = "README.md"
+readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing", "web-programming"]
 
