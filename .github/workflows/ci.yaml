@@ -1,0 +1,1439 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "crates/**"
+      - "packages/**"
+      - "e2e/**"
+      - "tools/**"
+      - "scripts/**"
+      - "fixtures/**"
+      - ".github/**"
+      - ".cargo/config.toml"
+      - ".pre-commit-config.yaml"
+      - ".golangci.yml"
+      - "biome.json"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "uv.toml"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Taskfile.yaml"
+      - ".task/**"
+      - "rustfmt.toml"
+      - "rust-toolchain.toml"
+      - "Gemfile"
+      - "Gemfile.lock"
+      - "composer.json"
+      - "composer.lock"
+      - "go.mod"
+      - "go.sum"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/**"
+      - "packages/**"
+      - "e2e/**"
+      - "tools/**"
+      - "scripts/**"
+      - "fixtures/**"
+      - ".github/**"
+      - ".cargo/config.toml"
+      - ".pre-commit-config.yaml"
+      - ".golangci.yml"
+      - "biome.json"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "uv.toml"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Taskfile.yaml"
+      - ".task/**"
+      - "rustfmt.toml"
+      - "rust-toolchain.toml"
+      - "Gemfile"
+      - "Gemfile.lock"
+      - "composer.json"
+      - "composer.lock"
+      - "go.mod"
+      - "go.sum"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+  BUILD_PROFILE: "ci"
+  GO_VERSION: "1.26.0"
+  GO_TOOLCHAIN: "go1.26.0"
+  GOLANGCI_LINT_VERSION: "latest"
+
+permissions:
+  contents: read
+
+# --- Stage 1: Validate ---
+
+jobs:
+  validate:
+    name: "Validate"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7 # v7
+        with:
+          enable-cache: true
+
+      - name: Install Prek
+        run: scripts/ci/validate/install-prek.sh
+        shell: bash
+
+      - name: Set up Python
+        uses: actions/setup-python@v6 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+
+      - name: Setup Go
+        uses: actions/setup-go@v6 # v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v5 # v5
+        with:
+          distribution: temurin
+          java-version: "25.0.2+10"
+
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1 # v1
+        with:
+          elixir-version: "1.19"
+          otp-version: "28.1"
+
+      - name: Install Elixir Dependencies
+        run: task elixir:install
+        shell: bash
+
+      - name: Setup R
+        uses: kreuzberg-dev/actions/setup-r@v1 # v1
+        with:
+          install-deps-script: scripts/ci/r/install-deps.sh
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1 # v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Install Ruby Dependencies
+        run: task ruby:install
+        shell: bash
+
+      - name: Setup Node Workspace
+        uses: kreuzberg-dev/actions/setup-node-workspace@v1 # v1
+
+      - name: Install Python Dependencies
+        uses: nick-fields/retry@v4 # v4
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: uv sync --all-extras --no-install-workspace
+          shell: bash
+
+      - name: Install Go Lint Dependencies
+        run: task go:install
+        shell: bash
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.37.0 # 2
+        with:
+          php-version: "8.4"
+          tools: composer:2.9.1
+          coverage: none
+
+      - name: Install PHP Dependencies
+        run: task php:install
+        shell: bash
+
+      - name: Run Lint Checks
+        run: task lint:check
+        shell: bash
+
+      - name: Check Code Formatting
+        run: task format:check
+        shell: bash
+
+      - name: Install C/C++ tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends cppcheck clang-format
+
+      - name: Load Cached Prek Dependencies
+        id: cached-prek-dependencies
+        uses: actions/cache@v5 # v5
+        with:
+          path: ~/.cache/prek/
+          key: prek|${{ env.pythonLocation }}|${{ hashFiles('.prek-config.yaml') }}
+
+      - name: Run Pre-commit Hooks
+        env:
+          SKIP: golangci-lint-packages,golangci-lint-examples
+        run: task pre-commit:run
+        shell: bash
+
+      - name: Install Python README Dependencies
+        run: pip install pyyaml jinja2
+        shell: bash
+
+      - name: Validate READMEs
+        run: task docs:generate-readme:check
+        shell: bash
+
+  validate-rust:
+    name: "Validate: Rust"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Check Rust Formatting
+        run: task rust:lint:check
+        shell: bash
+
+      - name: Run Clippy
+        run: task rust:lint:check
+        shell: bash
+
+  changes:
+    name: "Detect Changes"
+    runs-on: ubuntu-latest
+    outputs:
+      core: ${{ steps.filter.outputs.core }}
+      rust: ${{ steps.filter.outputs.rust }}
+      ffi: ${{ steps.filter.outputs.ffi }}
+      python: ${{ steps.filter.outputs.python }}
+      node: ${{ steps.filter.outputs.node }}
+      ruby: ${{ steps.filter.outputs.ruby }}
+      php: ${{ steps.filter.outputs.php }}
+      go: ${{ steps.filter.outputs.go }}
+      java: ${{ steps.filter.outputs.java }}
+      elixir: ${{ steps.filter.outputs.elixir }}
+      r: ${{ steps.filter.outputs.r }}
+      wasm: ${{ steps.filter.outputs.wasm }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v3 # v3
+        id: filter
+        with:
+          filters: |
+            core:
+              - 'crates/html-to-markdown/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'rust-toolchain.toml'
+              - '.cargo/config.toml'
+              - 'fixtures/**'
+              - 'tools/e2e-generator/**'
+            rust:
+              - 'crates/html-to-markdown/**'
+              - 'crates/html-to-markdown-cli/**'
+              - 'e2e/rust/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'rustfmt.toml'
+            ffi:
+              - 'crates/html-to-markdown-ffi/**'
+              - 'crates/html-to-markdown/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+            python:
+              - 'crates/html-to-markdown-py/**'
+              - 'packages/python/**'
+              - 'e2e/python/**'
+              - 'pyproject.toml'
+              - 'uv.lock'
+              - 'uv.toml'
+              - 'fixtures/**'
+            node:
+              - 'crates/html-to-markdown-node/**'
+              - 'packages/typescript/**'
+              - 'e2e/node/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'fixtures/**'
+            ruby:
+              - 'packages/ruby/**'
+              - 'e2e/ruby/**'
+              - 'Gemfile'
+              - 'Gemfile.lock'
+              - 'fixtures/**'
+            php:
+              - 'crates/html-to-markdown-php/**'
+              - 'packages/php/**'
+              - 'packages/php-ext/**'
+              - 'e2e/php/**'
+              - 'composer.json'
+              - 'composer.lock'
+              - 'fixtures/**'
+            go:
+              - 'packages/go/**'
+              - 'e2e/go/**'
+              - 'crates/html-to-markdown-ffi/**'
+              - 'go.mod'
+              - 'go.sum'
+              - 'fixtures/**'
+            java:
+              - 'packages/java/**'
+              - 'e2e/java/**'
+              - 'crates/html-to-markdown-ffi/**'
+              - 'fixtures/**'
+            elixir:
+              - 'packages/elixir/**'
+              - 'e2e/elixir/**'
+              - 'crates/html-to-markdown-ffi/**'
+              - 'fixtures/**'
+            r:
+              - 'packages/r/**'
+              - 'e2e/r/**'
+              - 'fixtures/**'
+            wasm:
+              - 'crates/html-to-markdown-wasm/**'
+              - 'crates/html-to-markdown-wasm-wasi/**'
+              - 'packages/wasm/**'
+              - 'e2e/wasm/**'
+              - 'fixtures/**'
+
+  # --- Stage 2: Core Builds ---
+
+  build-ffi:
+    needs: [validate, validate-rust, changes]
+    name: "Build: FFI (${{ matrix.runner }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.ffi == 'true'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Free disk space
+        if: startsWith(matrix.runner, 'ubuntu')
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1 # v1
+        with:
+          show-initial: "false"
+          show-final: "true"
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: ffi-${{ matrix.runner }}
+          use-sccache: false
+
+      - name: Build html-to-markdown-ffi (release, Unix)
+        if: matrix.runner != 'windows-latest'
+        run: cargo build --release -p html-to-markdown-ffi
+        shell: bash
+        env:
+          CARGO_TERM_COLOR: always
+          CARGO_INCREMENTAL: "0"
+          RUST_BACKTRACE: short
+
+      - name: Build html-to-markdown-ffi (debug, Windows)
+        if: matrix.runner == 'windows-latest'
+        run: cargo build -p html-to-markdown-ffi
+        shell: bash
+        env:
+          CARGO_TERM_COLOR: always
+
+      - name: Verify header exists
+        shell: bash
+        run: |
+          HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
+          test -f "$HEADER"
+          echo "Header verified: $HEADER"
+
+      - name: Upload FFI artifacts
+        if: matrix.runner != 'windows-latest'
+        uses: actions/upload-artifact@v7 # v7
+        with:
+          name: ffi-${{ matrix.runner }}
+          path: |
+            target/release/libhtml_to_markdown_ffi.*
+            target/release/html_to_markdown_ffi.*
+            crates/html-to-markdown-ffi/include/html_to_markdown.h
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  rust-tests:
+    needs: [validate, validate-rust, changes]
+    name: "Test: Rust (${{ matrix.os }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.rust == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Set up Python
+        uses: actions/setup-python@v6 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+          cache-key-prefix: rust-tests-${{ matrix.os }}
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run Rust Tests
+        env:
+          RUST_BACKTRACE: full
+        run: task rust:test:ci
+        shell: bash
+
+      - name: Run E2E Tests
+        run: task rust:e2e:test
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  rust-coverage:
+    needs: [validate, validate-rust, changes]
+    name: "Coverage: Rust"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.rust == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Generate Rust Coverage
+        run: task rust:coverage
+        shell: bash
+
+      - name: Upload Coverage Artifacts
+        if: always()
+        uses: actions/upload-artifact@v7 # v7
+        with:
+          name: coverage-report-${{ github.sha }}
+          path: rust-coverage.lcov
+          retention-days: 7
+
+  # --- Stage 3: Language Builds ---
+
+  build-python:
+    needs: [rust-tests, changes]
+    name: "Build: Python (${{ matrix.os }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.python == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.12", "3.14"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7 # v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6 # v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+          cache-key-prefix: python-${{ matrix.os }}-${{ matrix.python }}
+
+      - name: Install Python Dependencies
+        uses: nick-fields/retry@v4 # v4
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: |
+            if [[ "${{ runner.os }}" == "Windows" ]] && [[ -d ".venv" ]]; then
+              echo "Removing existing .venv directory on Windows"
+              rm -rf .venv
+            fi
+            uv sync --all-extras --no-install-workspace
+          shell: bash
+
+      - name: Build Python Bindings
+        run: |
+          uv pip install maturin
+          cd packages/python && uv run maturin develop --release
+        shell: bash
+
+      - name: Build CLI binary
+        run: cargo build --release -p html-to-markdown-cli
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  build-node:
+    needs: [rust-tests, changes]
+    name: "Build: Node (${{ matrix.os }}, ${{ matrix.runtime }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.node == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        runtime: [node, bun]
+        exclude:
+          - os: windows-latest
+            runtime: bun
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: node-${{ matrix.os }}-${{ matrix.runtime }}
+
+      - name: Setup Node.js workspace
+        if: matrix.runtime == 'node'
+        uses: kreuzberg-dev/actions/setup-node-workspace@v1 # v1
+
+      - name: Setup Bun
+        if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@v2 # v2
+        with:
+          bun-version: latest
+
+      - name: Build NAPI-RS Bindings (Node.js)
+        if: matrix.runtime == 'node'
+        uses: kreuzberg-dev/actions/build-node-napi@v1 # v1
+        with:
+          crate-dir: crates/html-to-markdown-node
+
+      - name: Install workspace dependencies (Bun)
+        if: matrix.runtime == 'bun'
+        run: bun install
+        shell: bash
+
+      - name: Build NAPI-RS Bindings (Bun)
+        if: matrix.runtime == 'bun'
+        working-directory: crates/html-to-markdown-node
+        run: bun run build
+        shell: bash
+
+      - name: Build TypeScript package (Node.js)
+        if: matrix.runtime == 'node'
+        uses: ./.github/actions/build-typescript
+
+      - name: Build TypeScript package (Bun)
+        if: matrix.runtime == 'bun'
+        working-directory: packages/typescript
+        run: bun x tsc --project tsconfig.json
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  build-ruby:
+    needs: [rust-tests, changes]
+    name: "Build: Ruby (${{ matrix.os }}, ruby-${{ matrix.ruby }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.ruby == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        ruby: ["3.2", "3.3"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: ruby-${{ matrix.os }}-${{ matrix.ruby }}
+
+      - name: Setup Ruby (Unix)
+        if: runner.os != 'Windows'
+        uses: ruby/setup-ruby@v1 # v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: "2.7.2"
+          bundler-cache: false
+          working-directory: packages/ruby
+
+      - name: Setup Ruby (Windows)
+        if: runner.os == 'Windows'
+        uses: ruby/setup-ruby@v1 # v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: "2.7.2"
+          bundler-cache: false
+          working-directory: packages/ruby
+          windows-toolchain: UCRT64
+
+      - name: Set up Python
+        uses: actions/setup-python@v6 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Vendor core crate
+        run: python3 scripts/ci/ruby/vendor-core-crate.py
+        shell: bash
+
+      - name: Build CLI binary
+        uses: kreuzberg-dev/actions/build-rust-cli@v1 # v1
+        with:
+          package-name: html-to-markdown-cli
+          binary-name: html-to-markdown
+
+      - name: Build Ruby extension
+        uses: kreuzberg-dev/actions/build-ruby-gem@v1 # v1
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  build-php:
+    needs: [rust-tests, changes]
+    name: "Build: PHP"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.php == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.37.0 # 2
+        with:
+          php-version: "8.4"
+          tools: composer:2.9.1
+          coverage: none
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: php
+
+      - name: Capture php-config path
+        run: scripts/ci/php/set-php-config.sh
+        shell: bash
+
+      - name: Install root Composer dependencies
+        uses: ramsey/composer-install@4.0.0 # 3
+        with:
+          dependency-versions: locked
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
+
+      - name: Install PHP package Composer dependencies
+        uses: ramsey/composer-install@4.0.0 # 3
+        with:
+          dependency-versions: locked
+          working-directory: packages/php
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
+
+      - name: Build PHP extension
+        id: build-php-extension
+        uses: kreuzberg-dev/actions/build-php-extension@v1 # v1
+        with:
+          crate-name: html-to-markdown-php
+          lib-name: html_to_markdown_php
+
+      - name: Upload PHP extension artifact
+        uses: actions/upload-artifact@v7 # v7
+        with:
+          name: php-extension-ubuntu
+          path: ${{ steps.build-php-extension.outputs.extension-path }}
+          retention-days: 7
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  build-java:
+    needs: [rust-tests, changes]
+    name: "Build: Java (${{ matrix.os }})"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.java == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: ["25"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: java-${{ matrix.os }}
+
+      - name: Test Java Panama FFI bindings
+        uses: kreuzberg-dev/actions/test-java-ffi@v1 # v1
+        with:
+          ffi-crate-name: html-to-markdown-ffi
+          ffi-lib-name: html_to_markdown_ffi
+          java-version: ${{ matrix.java }}
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  build-wasm:
+    needs: [rust-tests, changes]
+    name: "Build: WASM"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.wasm == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          target: wasm32-unknown-unknown
+          use-sccache: false
+          cache-key-prefix: wasm
+
+      - name: Ensure wasm target installed
+        run: scripts/common/ensure-wasm-target.sh
+        shell: bash
+
+      - name: Install wasm-pack
+        run: scripts/common/install-wasm-pack.sh
+        shell: bash
+
+      - name: Setup Node workspace
+        uses: kreuzberg-dev/actions/setup-node-workspace@v1 # v1
+
+      - name: Build WASM (all targets)
+        uses: kreuzberg-dev/actions/build-wasm-package@v1 # v1
+        with:
+          crate-dir: crates/html-to-markdown-wasm
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  # --- Stage 4: Language Tests ---
+
+  test-python:
+    needs: [build-python]
+    name: "Test: Python (${{ matrix.os }}, py-${{ matrix.python }})"
+    if: always() && !cancelled() && needs.build-python.result != 'skipped'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.12", "3.14"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7 # v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6 # v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          components: rustfmt, clippy, llvm-tools-preview
+
+      - name: Install Python Dependencies
+        uses: nick-fields/retry@v4 # v4
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: |
+            if [[ "${{ runner.os }}" == "Windows" ]] && [[ -d ".venv" ]]; then
+              echo "Removing existing .venv directory on Windows"
+              rm -rf .venv
+            fi
+            uv sync --all-extras --no-install-workspace
+          shell: bash
+
+      - name: Build Python Bindings
+        run: |
+          uv pip install maturin
+          cd packages/python && uv run maturin develop --release
+        shell: bash
+
+      - name: Build CLI binary
+        run: cargo build --release -p html-to-markdown-cli
+        shell: bash
+
+      - name: Run E2E tests
+        run: task python:e2e:test
+        shell: bash
+
+  test-node:
+    needs: [build-node]
+    name: "Test: Node (${{ matrix.os }}, ${{ matrix.runtime }})"
+    if: always() && !cancelled() && needs.build-node.result != 'skipped'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        runtime: [node, bun]
+        exclude:
+          - os: windows-latest
+            runtime: bun
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Setup Node.js workspace
+        if: matrix.runtime == 'node'
+        uses: kreuzberg-dev/actions/setup-node-workspace@v1 # v1
+
+      - name: Setup Bun
+        if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@v2 # v2
+        with:
+          bun-version: latest
+
+      - name: Build NAPI-RS Bindings (Node.js)
+        if: matrix.runtime == 'node'
+        uses: kreuzberg-dev/actions/build-node-napi@v1 # v1
+        with:
+          crate-dir: crates/html-to-markdown-node
+
+      - name: Install workspace dependencies (Bun)
+        if: matrix.runtime == 'bun'
+        run: bun install
+        shell: bash
+
+      - name: Build NAPI-RS Bindings (Bun)
+        if: matrix.runtime == 'bun'
+        working-directory: crates/html-to-markdown-node
+        run: bun run build
+        shell: bash
+
+      - name: Run Rust Tests (Node.js only)
+        if: matrix.runtime == 'node'
+        run: task rust:test
+        shell: bash
+
+      - name: Build TypeScript package (Node.js)
+        if: matrix.runtime == 'node'
+        uses: ./.github/actions/build-typescript
+
+      - name: Build TypeScript package (Bun)
+        if: matrix.runtime == 'bun'
+        working-directory: packages/typescript
+        run: bun x tsc --project tsconfig.json
+        shell: bash
+
+      - name: Run E2E tests (Node.js only)
+        if: matrix.runtime == 'node'
+        run: task node:e2e:test
+        shell: bash
+
+  test-ruby:
+    needs: [build-ruby]
+    name: "Test: Ruby (${{ matrix.os }}, ruby-${{ matrix.ruby }})"
+    if: always() && !cancelled() && needs.build-ruby.result != 'skipped'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        ruby: ["3.2", "3.3"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Setup Ruby (Unix)
+        if: runner.os != 'Windows'
+        uses: ruby/setup-ruby@v1 # v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: "2.7.2"
+          bundler-cache: false
+          working-directory: packages/ruby
+
+      - name: Setup Ruby (Windows)
+        if: runner.os == 'Windows'
+        uses: ruby/setup-ruby@v1 # v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: "2.7.2"
+          bundler-cache: false
+          working-directory: packages/ruby
+          windows-toolchain: UCRT64
+
+      - name: Set up Python
+        uses: actions/setup-python@v6 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Vendor core crate
+        run: python3 scripts/ci/ruby/vendor-core-crate.py
+        shell: bash
+
+      - name: Build CLI binary
+        uses: kreuzberg-dev/actions/build-rust-cli@v1 # v1
+        with:
+          package-name: html-to-markdown-cli
+          binary-name: html-to-markdown
+
+      - name: Build Ruby extension
+        uses: kreuzberg-dev/actions/build-ruby-gem@v1 # v1
+
+      - name: Run Rubocop (Ubuntu/ruby-3.3 only)
+        if: runner.os != 'Windows' && matrix.os == 'ubuntu-latest' && matrix.ruby == '3.3'
+        run: ./scripts/ci/ruby/run-rubocop.sh
+        shell: bash
+
+      - name: Validate RBS signatures (Ubuntu/ruby-3.3 only)
+        if: runner.os != 'Windows' && matrix.os == 'ubuntu-latest' && matrix.ruby == '3.3'
+        run: ./scripts/ci/ruby/run-rbs-validate.sh
+        shell: bash
+
+      - name: Run Steep type checking (Ubuntu/ruby-3.3 only)
+        if: runner.os != 'Windows' && matrix.os == 'ubuntu-latest' && matrix.ruby == '3.3'
+        working-directory: packages/ruby
+        run: ../../scripts/ci/ruby/run-steep.sh
+        shell: bash
+
+      - name: Run Ruby specs (Unix)
+        if: runner.os != 'Windows'
+        working-directory: packages/ruby
+        run: ../../scripts/ci/ruby/run-rspec-unix.sh
+        shell: bash
+
+      - name: Run Ruby specs (Windows)
+        if: runner.os == 'Windows'
+        working-directory: packages/ruby
+        shell: pwsh
+        run: ../../scripts/ci/ruby/run-rspec-windows.ps1
+
+      - name: Install Task
+        if: runner.os != 'Windows'
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run E2E tests (Unix only)
+        if: runner.os != 'Windows'
+        run: task ruby:e2e:test
+        shell: bash
+
+  test-php:
+    needs: [build-php]
+    name: "Test: PHP"
+    if: always() && !cancelled() && needs.build-php.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.37.0 # 2
+        with:
+          php-version: "8.4"
+          tools: composer:2.9.1
+          coverage: none
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Capture php-config path
+        run: scripts/ci/php/set-php-config.sh
+        shell: bash
+
+      - name: Install root Composer dependencies
+        uses: ramsey/composer-install@4.0.0 # 3
+        with:
+          dependency-versions: locked
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
+
+      - name: Install PHP package Composer dependencies
+        uses: ramsey/composer-install@4.0.0 # 3
+        with:
+          dependency-versions: locked
+          working-directory: packages/php
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
+
+      - name: Build PHP extension
+        id: build-php-extension
+        uses: kreuzberg-dev/actions/build-php-extension@v1 # v1
+        with:
+          crate-name: html-to-markdown-php
+          lib-name: html_to_markdown_php
+
+      - name: Run PHP static analysis
+        run: scripts/ci/php/run-phpstan.sh
+        shell: bash
+
+      - name: Run PHP tests
+        run: scripts/ci/php/run-php-tests.sh
+        shell: bash
+        env:
+          EXTENSION_PATH: ${{ steps.build-php-extension.outputs.extension-path }}
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run E2E tests
+        run: task php:e2e:test
+        shell: bash
+        env:
+          EXTENSION_PATH: ${{ steps.build-php-extension.outputs.extension-path }}
+
+  test-go:
+    needs: [build-ffi, changes]
+    name: "Test: Go"
+    if: |
+      always() && !cancelled() && needs.build-ffi.result != 'skipped' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.go == 'true' ||
+       needs.changes.outputs.ffi == 'true' ||
+       needs.changes.outputs.core == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Setup Go
+        uses: actions/setup-go@v6 # v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: true
+
+      - name: Build FFI library
+        run: cargo build --release -p html-to-markdown-ffi
+        shell: bash
+
+      - name: Detect Go modules
+        id: set-modules
+        shell: bash
+        run: scripts/ci/go/detect-go-modules.sh
+
+      - name: Install golangci-lint
+        if: steps.set-modules.outputs.modules != '[]'
+        env:
+          GOTOOLCHAIN: ${{ env.GO_TOOLCHAIN }}
+        run: scripts/ci/go/install-golangci-lint.sh
+        shell: bash
+
+      - name: Run golangci-lint (all modules)
+        if: steps.set-modules.outputs.modules != '[]'
+        shell: bash
+        run: |
+          for module in $(echo '${{ steps.set-modules.outputs.modules }}' | jq -r '.[]'); do
+            echo "=== Linting $module ==="
+            (cd "$module" && "${{ github.workspace }}/scripts/ci/go/run-golangci-lint.sh")
+          done
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run E2E tests
+        run: task go:e2e:test
+        shell: bash
+
+  test-java:
+    needs: [build-java]
+    name: "Test: Java (${{ matrix.os }})"
+    if: always() && !cancelled() && needs.build-java.result != 'skipped'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: ["25"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Test Java Panama FFI bindings
+        uses: kreuzberg-dev/actions/test-java-ffi@v1 # v1
+        with:
+          ffi-crate-name: html-to-markdown-ffi
+          ffi-lib-name: html_to_markdown_ffi
+          java-version: ${{ matrix.java }}
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run E2E tests (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: task java:e2e:test
+        shell: bash
+
+  test-elixir:
+    needs: [build-ffi, changes]
+    name: "Test: Elixir"
+    if: |
+      always() && !cancelled() && needs.build-ffi.result != 'skipped' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.elixir == 'true' ||
+       needs.changes.outputs.ffi == 'true' ||
+       needs.changes.outputs.core == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1 # v1
+        with:
+          elixir-version: "1.19"
+          otp-version: "28.1"
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Install Hex/Rebar
+        run: scripts/ci/elixir/install-hex-rebar.sh
+        shell: bash
+
+      - name: Install dependencies
+        working-directory: packages/elixir
+        run: ../../scripts/ci/elixir/install-deps.sh
+        shell: bash
+
+      - name: Run tests
+        working-directory: packages/elixir
+        run: ../../scripts/ci/elixir/run-tests.sh
+        shell: bash
+
+      - name: Credo lint
+        working-directory: packages/elixir
+        run: ../../scripts/ci/elixir/run-credo.sh
+        shell: bash
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run E2E tests
+        run: task elixir:e2e:test
+        shell: bash
+
+  test-r:
+    needs: [rust-tests, changes]
+    name: "Test: R"
+    if: |
+      always() && !cancelled() && needs.rust-tests.result != 'skipped' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.r == 'true' ||
+       needs.changes.outputs.core == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup R
+        uses: kreuzberg-dev/actions/setup-r@v1 # v1
+        with:
+          install-deps-script: scripts/ci/r/install-deps.sh
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+
+      - name: Run tests
+        working-directory: packages/r
+        run: ../../scripts/ci/r/run-tests.sh
+        shell: bash
+
+      - name: Run lintr
+        working-directory: packages/r
+        run: ../../scripts/ci/r/run-lintr.sh
+        shell: bash
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run E2E tests
+        run: task r:e2e:test
+        shell: bash
+
+  test-c-ffi:
+    needs: [build-ffi, changes]
+    name: "Test: C FFI (${{ matrix.runner }})"
+    if: |
+      always() && !cancelled() && needs.build-ffi.result != 'skipped' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.ffi == 'true' ||
+       needs.changes.outputs.core == 'true')
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: c-ffi-${{ matrix.runner }}
+          use-sccache: false
+
+      - name: Build html-to-markdown-ffi
+        shell: bash
+        run: cargo build --release -p html-to-markdown-ffi
+
+      - name: Run C e2e tests
+        shell: bash
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/target/release
+          DYLD_LIBRARY_PATH: ${{ github.workspace }}/target/release
+        run: cd e2e/c && make test
+
+      - name: Verify header exists
+        shell: bash
+        run: |
+          HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
+          test -f "$HEADER"
+          echo "Header verified: $HEADER"
+
+      - name: Verify pkg-config output
+        shell: bash
+        run: |
+          PC_DIR="$(pwd)/target/release/build"
+          PC_FILE=$(find "$PC_DIR" -name 'html-to-markdown.pc' -path '*/html-to-markdown-ffi-*/out/*' 2>/dev/null | head -1)
+          if [ -z "$PC_FILE" ]; then
+            echo "Warning: html-to-markdown.pc not found in build output"
+            find "$PC_DIR" -name '*.pc' 2>/dev/null || echo "No .pc files found"
+          else
+            echo "Found pkg-config file: $PC_FILE"
+            cat "$PC_FILE"
+          fi
+
+  test-c-ffi-windows:
+    needs: [build-ffi, changes]
+    name: "Test: C FFI (windows-latest)"
+    if: |
+      always() && !cancelled() && needs.build-ffi.result != 'skipped' &&
+      (github.event_name == 'workflow_dispatch' ||
+       needs.changes.outputs.ffi == 'true' ||
+       needs.changes.outputs.core == 'true')
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: c-ffi-windows
+          use-sccache: false
+
+      - name: Build html-to-markdown-ffi
+        shell: bash
+        run: cargo build -p html-to-markdown-ffi
+
+      - name: Verify header generated
+        shell: bash
+        run: |
+          test -f crates/html-to-markdown-ffi/include/html_to_markdown.h
+          echo "Header verified on Windows."
+
+  test-wasm:
+    needs: [build-wasm]
+    name: "Test: WASM"
+    if: always() && !cancelled() && needs.build-wasm.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          target: wasm32-unknown-unknown
+          use-sccache: false
+
+      - name: Ensure wasm target installed
+        run: scripts/common/ensure-wasm-target.sh
+        shell: bash
+
+      - name: Install wasm-pack
+        run: scripts/common/install-wasm-pack.sh
+        shell: bash
+
+      - name: Setup Node workspace
+        uses: kreuzberg-dev/actions/setup-node-workspace@v1 # v1
+
+      - name: Build WASM (all targets)
+        uses: kreuzberg-dev/actions/build-wasm-package@v1 # v1
+        with:
+          crate-dir: crates/html-to-markdown-wasm
+
+      - name: Test WASM bundle
+        working-directory: crates/html-to-markdown-wasm
+        run: ../../scripts/ci/wasm/test-wasm-bundle.sh
+        shell: bash
+
+      - name: Run Rust WASM tests
+        working-directory: crates/html-to-markdown-wasm
+        run: ../../scripts/ci/wasm/test-wasm-rust.sh
+        shell: bash
