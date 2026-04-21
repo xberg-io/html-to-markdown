@@ -5,7 +5,7 @@ set -euo pipefail
 # so they can be bundled in the published JAR
 
 artifacts_dir="${1:?ARTIFACTS_DIR is required (e.g. java-ffi-artifacts)}"
-resources_dir="packages/java/src/main/resources/native"
+resources_dir="packages/java/src/main/resources/natives"
 
 echo "Copying native libraries from ${artifacts_dir} to ${resources_dir}"
 
@@ -21,7 +21,8 @@ for platform_dir in "${artifacts_dir}"/*; do
   if [[ -d "${platform_dir}" ]]; then
     platform_name="$(basename "${platform_dir}")"
     echo "  Copying ${platform_name}..."
-    cp -r "${platform_dir}/native" "${resources_dir}/${platform_name}/"
+    mkdir -p "${resources_dir}/${platform_name}"
+    cp -r "${platform_dir}/native/." "${resources_dir}/${platform_name}/"
   fi
 done
 
