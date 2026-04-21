@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Java FFI broken on all platforms** (#315) — native libraries were bundled into the JAR under `natives/{platform}/` by the publish script, but `NativeLib.java` looked for them at `native/{platform}/`. Every release since the FFI was introduced shipped a non-functional JAR. Fixed `copy-native-libs.sh` to write into the correct `natives/` resource directory and added an explicit `mkdir -p` before each copy for portability.
+
 ## [3.2.6] - 2026-04-20
 
 ### Fixed
