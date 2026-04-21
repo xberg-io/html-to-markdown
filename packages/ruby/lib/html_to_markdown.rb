@@ -28,13 +28,15 @@ module HtmlToMarkdown
   #   - :preserve_tags       - Array of tag names to preserve verbatim
   #   (and more, matching ConversionOptions fields)
   # @return [String] The converted Markdown content.
-  def self.convert(html, options = {})
-    opts = if options.nil? || options.empty?
+  def self.convert(html, options = {}, visitor = nil)
+    opts = if options.is_a?(HtmlToMarkdownRs::ConversionOptions)
+             options
+           elsif options.nil? || options.empty?
              nil
            else
              HtmlToMarkdownRs::ConversionOptions.new(options)
            end
-    result = HtmlToMarkdownRs.convert(html, opts)
+    result = HtmlToMarkdownRs.convert(html, opts, visitor)
     result.content || ''
   end
 end

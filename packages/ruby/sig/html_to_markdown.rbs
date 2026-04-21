@@ -8,7 +8,7 @@ module HtmlToMarkdownRs
     def content: () -> String?
   end
 
-  def self.convert: (String html, ConversionOptions? options) -> ConversionResult
+  def self.convert: (String html, ConversionOptions? options, untyped? visitor) -> ConversionResult
 end
 
 # Type definitions for HtmlToMarkdown Ruby gem
@@ -145,5 +145,5 @@ module HtmlToMarkdown
   #
   # Example:
   #   result = HtmlToMarkdown.convert(html)
-  def self.convert: (String html, ?conversion_options options) -> String
+  def self.convert: (String html, ?conversion_options options, ?untyped visitor) -> String
 end
