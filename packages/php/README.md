@@ -69,7 +69,6 @@ composer require kreuzberg-dev/html-to-markdown
 ```
 
 
-
 Requires PHP 8.2+. Install the native extension via PIE:
 
 ```bash
@@ -83,11 +82,6 @@ composer require goldziher/html-to-markdown
 ```
 
 
-
-
-
-
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
@@ -97,8 +91,6 @@ composer require goldziher/html-to-markdown
 | Lists (Timeline) | 129KB | 3346 |
 | Tables (Countries) | 360KB | 973 |
 | Medium (Python) | 657KB | 485 |
-
-
 
 
 ## Quick Start
@@ -161,7 +153,6 @@ $warnings = $result['warnings'];   // Any conversion warnings
 ```
 
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -195,7 +186,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
-
 ```php
 use HtmlToMarkdown\Converter;
 use HtmlToMarkdown\ConversionOptions;
@@ -212,13 +202,11 @@ $djot = Converter::convert($html, new ConversionOptions(outputFormat: 'djot'));
 ```
 
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 
 ```php
@@ -232,9 +220,7 @@ $plain = Converter::convert($html, new ConversionOptions(outputFormat: 'plain'))
 ```
 
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 
 ## Metadata Extraction
@@ -252,7 +238,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 **Zero Overhead When Disabled:** Metadata extraction adds negligible overhead and happens during the HTML parsing pass. Pass `extract_metadata: true` in `ConversionOptions` to enable it; the result is available at `result.metadata`.
 
 ### Example: Quick Start
-
 
 
 ```php
@@ -275,10 +260,6 @@ print_r($result['metadata']->structured_data);    // JSON-LD, Microdata, RDFa
 ```
 
 
-
-
-
-
 ## Visitor Pattern
 
 The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
@@ -294,7 +275,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 
 ```php
@@ -330,8 +310,6 @@ $result = Converter::create()->convert(
 );
 $markdown = $result['content'];
 ```
-
-
 
 
 ## Examples

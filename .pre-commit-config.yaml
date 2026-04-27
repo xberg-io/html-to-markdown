@@ -6,7 +6,7 @@ exclude: ^docs/snippets/|vendor/|node_modules/|target/|dist/|artifacts/|scripts/
 repos:
   # AI-Rulez: auto-generate AI assistant configuration files
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.0.7
+    rev: v4.0.8
     hooks:
       - id: ai-rulez-generate
 
@@ -156,7 +156,7 @@ repos:
 
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.10.1
+    rev: v0.10.3
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -185,7 +185,7 @@ repos:
 
   # Spelling (last — runs after all formatters and generators)
   - repo: https://github.com/crate-ci/typos
-    rev: v1.45.1
+    rev: v1.45.2
     hooks:
       - id: typos
         args: [--force-exclude]

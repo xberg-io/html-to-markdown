@@ -67,7 +67,6 @@ install.packages("htmltomarkdown")
 ```
 
 
-
 Requires R 4.3+ and a Rust toolchain (cargo, rustc).
 
 ```r
@@ -81,11 +80,6 @@ devtools::install_github("kreuzberg-dev/html-to-markdown", subdir = "packages/r"
 ```
 
 
-
-
-
-
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
@@ -95,8 +89,6 @@ devtools::install_github("kreuzberg-dev/html-to-markdown", subdir = "packages/r"
 | Lists (Timeline) | 129KB | 0.68ms | 190 MB/s |
 | Tables (Countries) | 360KB | 2.10ms | 171 MB/s |
 | Mixed (Python wiki) | 656KB | 4.75ms | 138 MB/s |
-
-
 
 
 ## Quick Start
@@ -146,7 +138,6 @@ tables   <- result$tables     # Table data (when extract_tables = TRUE)
 ```
 
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -180,13 +171,11 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 
 ```r
@@ -198,9 +187,7 @@ plain <- result$content
 ```
 
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 
 ## Metadata Extraction
@@ -220,7 +207,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 ### Example: Quick Start
 
 
-
 ```r
 library(htmltomarkdown)
 
@@ -234,10 +220,6 @@ result$metadata$headers                # All h1-h6 elements
 result$metadata$links                  # All hyperlinks
 result$metadata$images                 # All images with alt text
 ```
-
-
-
-
 
 
 ## Visitor Pattern
@@ -257,7 +239,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ### Example: Quick Start
 
 
-
 ```r
 library(htmltomarkdown)
 
@@ -266,8 +247,6 @@ opts <- conversion_options(extract_metadata = FALSE)
 result <- convert(html, opts)
 cat(result$content)
 ```
-
-
 
 
 ## Examples

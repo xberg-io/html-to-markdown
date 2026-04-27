@@ -67,7 +67,6 @@ npm install @kreuzberg/html-to-markdown
 ```
 
 
-
 Requires Node.js 18+ or Bun. Native bindings provide superior performance.
 
 **npm:**
@@ -101,11 +100,6 @@ npm install @kreuzberg/html-to-markdown-wasm
 ```
 
 
-
-
-
-
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
@@ -115,8 +109,6 @@ npm install @kreuzberg/html-to-markdown-wasm
 | Lists (Timeline) | 129KB | 0.58ms | 222 MB/s |
 | Tables (Countries) | 360KB | 1.89ms | 190 MB/s |
 | Mixed (Python wiki) | 656KB | 4.21ms | 156 MB/s |
-
-
 
 
 ## Quick Start
@@ -170,7 +162,6 @@ const warnings  = result.warnings;   // Any conversion warnings
 ```
 
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -204,7 +195,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
-
 ```typescript
 import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
 
@@ -220,13 +210,11 @@ const djot = convert(html, { outputFormat: 'djot' });
 ```
 
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 
 ```typescript
@@ -239,9 +227,7 @@ const plain = convert(html, { outputFormat: 'plain' });
 ```
 
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 
 ## Metadata Extraction
@@ -261,7 +247,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 ### Example: Quick Start
 
 
-
 ```typescript
 import { convert } from '@kreuzberg/html-to-markdown';
 
@@ -275,10 +260,6 @@ console.log(result.metadata?.links);              // All hyperlinks
 console.log(result.metadata?.images);             // All images with alt text
 console.log(result.metadata?.structuredData);     // JSON-LD, Microdata, RDFa
 ```
-
-
-
-
 
 
 ## Visitor Pattern
@@ -296,7 +277,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 
 ```typescript
@@ -324,8 +304,6 @@ const html = '<a href="https://old-cdn.com/file.pdf">Download</a>';
 const result = convert(html, {}, visitor);
 const markdown = result.content;
 ```
-
-
 
 
 ## Examples

@@ -981,7 +981,7 @@ path = "../../crates/html-to-markdown-ffi"
 [e2e.format]
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
-rust = "cargo fmt --manifest-path {dir}/Cargo.toml"
+rust = "(cd {dir} && cargo fmt --all)"
 
 [e2e.fields_c_types]
 "conversion_result.metadata" = "HtmlMetadata"

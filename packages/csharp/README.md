@@ -67,17 +67,11 @@ dotnet add package KreuzbergDev.HtmlToMarkdown
 ```
 
 
-
 Requires .NET 8.0+ SDK.
 
 ```bash
 dotnet add package KreuzbergDev.HtmlToMarkdown
 ```
-
-
-
-
-
 
 
 ## Performance Snapshot
@@ -89,8 +83,6 @@ dotnet add package KreuzbergDev.HtmlToMarkdown
 | Lists (Timeline) | 129KB |  | 392.9 MB/s |
 | Tables (Countries) | 360KB |  | 300.1 MB/s |
 | Mixed (Python) | 656KB |  | 292.3 MB/s |
-
-
 
 
 ## Quick Start
@@ -142,7 +134,6 @@ var tables   = result.Tables;     // empty unless ExtractTables = true
 ```
 
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -176,7 +167,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 
-
 ```csharp
 using HtmlToMarkdown;
 
@@ -192,13 +182,11 @@ var djot = Converter.Convert(html, new ConversionOptions { OutputFormat = "djot"
 ```
 
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 
 ```csharp
@@ -211,11 +199,7 @@ var plain = Converter.Convert(html, new ConversionOptions { OutputFormat = "plai
 ```
 
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
-
-
 
 
 ## Visitor Pattern
@@ -233,8 +217,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
-
 
 
 ## Examples
