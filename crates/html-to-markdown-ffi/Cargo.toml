@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-ffi"
-version = "3.4.0-rc.11"
+version = "3.4.0-rc.12"
 edition = "2021"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
