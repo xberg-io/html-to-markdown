@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-py"
-version = "3.4.0-rc.8"
+version = "3.4.0-rc.9"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter - Python bindings"
