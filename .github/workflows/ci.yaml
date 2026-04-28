@@ -164,6 +164,9 @@ jobs:
         run: task format:check
         shell: bash
 
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1
+
       - name: Run Pre-commit Hooks
         uses: j178/prek-action@v2 # v2
         with:
