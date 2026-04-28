@@ -166,6 +166,13 @@ jobs:
 
       - name: Run Pre-commit Hooks
         uses: j178/prek-action@v2 # v2
+        env:
+          # ai-rulez 4.0.8 is non-deterministic across environments — its
+          # Source-Hash recomputes differently in CI than locally even when
+          # sources are byte-identical, causing the hook to always rewrite
+          # the embedded header. Skip in CI; generation runs locally via
+          # `prek install`.
+          SKIP: ai-rulez-generate
         with:
           extra-args: --all-files
 
