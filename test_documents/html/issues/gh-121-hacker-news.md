@@ -63,5 +63,3 @@
 - 190 points by [plunderer](user?id=plunderer) [21 hours ago](item?id=45995816) | [hide](hide?id=45995816&goto=news) | [57 comments](item?id=45995816)
 - [More](?p=2)
 - [Guidelines](newsguidelines.html) | [FAQ](newsfaq.html) | [Lists](lists) | [API](https://github.com/HackerNews/API) | [Security](security.html) | [Legal](https://www.ycombinator.com/legal/) | [Apply to YC](https://www.ycombinator.com/apply/) | [Contact](mailto:hn@ycombinator.com)
-
-Search:
