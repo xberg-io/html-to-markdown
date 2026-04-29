@@ -6,8 +6,8 @@
   <a href="https://pypi.org/project/html-to-markdown/">
     <img src="https://img.shields.io/pypi/v/html-to-markdown?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-node?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown?label=Node.js&color=007ec6" alt="Node.js">
   </a>
   <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm">
     <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">

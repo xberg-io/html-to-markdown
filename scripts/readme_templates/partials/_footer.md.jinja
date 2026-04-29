@@ -4,7 +4,7 @@
 {% if language == 'python' %}
 - **PyPI:** [pypi.org/project/html-to-markdown](https://pypi.org/project/html-to-markdown/)
 {% elif language == 'typescript' or language == 'node' %}
-- **npm:** [npmjs.com/@kreuzberg/html-to-markdown-node](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
+- **npm:** [npmjs.com/@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown)
 - **WASM:** [npmjs.com/@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)
 {% elif language == 'ruby' %}
 - **RubyGems:** [rubygems.org/gems/html-to-markdown](https://rubygems.org/gems/html-to-markdown)

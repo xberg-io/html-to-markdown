@@ -1,4 +1,4 @@
-version = "0.11.19"
+version = "0.11.20"
 languages = [
   "python",
   "node",
@@ -63,7 +63,7 @@ pip_name = "html-to-markdown"
 output = "packages/python/html_to_markdown/"
 
 [node]
-package_name = "@kreuzberg/html-to-markdown-node"
+package_name = "@kreuzberg/html-to-markdown"
 
 [ffi]
 prefix = "htm"
@@ -156,7 +156,7 @@ package_name = "@kreuzberg/html-to-markdown"
 install_command = "npm install @kreuzberg/html-to-markdown"
 description = """
 High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
-This package wraps native `@kreuzberg/html-to-markdown-node` bindings and provides a type-safe API.
+This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
 """
 migration_version = "3.1.0"
 
@@ -552,8 +552,8 @@ extra_paths = [
 # test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
 [[sync.text_replacements]]
 path = "test_apps/node/package.json"
-search = '"@kreuzberg/html-to-markdown-node": "[^"]*"'
-replace = '"@kreuzberg/html-to-markdown-node": "{version}"'
+search = '"@kreuzberg/html-to-markdown": "[^"]*"'
+replace = '"@kreuzberg/html-to-markdown": "{version}"'
 
 [[sync.text_replacements]]
 path = "test_apps/bun/package.json"
@@ -887,7 +887,7 @@ name = "html-to-markdown"
 version = ">=3.2.0"
 
 [e2e.registry.packages.node]
-name = "@kreuzberg/html-to-markdown-node"
+name = "@kreuzberg/html-to-markdown"
 version = "^3.2.0"
 
 [e2e.registry.packages.rust]

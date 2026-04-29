@@ -1,13 +1,13 @@
 {
-  "name": "@kreuzberg/html-to-markdown-node-e2e-typescript",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "vitest run"
-  },
-  "devDependencies": {
-    "@kreuzberg/html-to-markdown-node": "3.4.0-rc.17",
-    "vitest": "^3.0.0"
-  }
+	"name": "@kreuzberg/html-to-markdown-node-e2e-typescript",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"vitest": "^3.0.0",
+		"@kreuzberg/html-to-markdown": "3.4.0-rc.18"
+	}
 }

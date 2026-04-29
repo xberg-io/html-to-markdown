@@ -1,5 +1,5 @@
 {
-  "name": "kreuzberg/e2e-php",
+  "name": "kreuzberg-dev/e2e-php",
   "description": "E2e tests for PHP bindings",
   "type": "project",
   "require-dev": {
@@ -8,7 +8,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Kreuzberg\\E2e\\": "tests/"
+      "Html\\To\\Markdown\\Rs\\E2e\\": "tests/"
     }
   }
 }

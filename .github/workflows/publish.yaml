@@ -155,7 +155,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1 # v1
         with:
           registry: npm
-          package: "@kreuzberg/html-to-markdown-node"
+          package: "@kreuzberg/html-to-markdown"
           version: ${{ needs.prepare.outputs.version }}
           extra-packages: |
             wasm_exists=@kreuzberg/html-to-markdown-wasm
@@ -1918,7 +1918,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1 # v1
         with:
           registry: npm
-          package: "@kreuzberg/html-to-markdown-node"
+          package: "@kreuzberg/html-to-markdown"
           version: ${{ needs.prepare.outputs.version }}
           extra-packages: |
             ts_exists=@kreuzberg/html-to-markdown
@@ -1937,7 +1937,7 @@ jobs:
         uses: kreuzberg-dev/actions/wait-for-package@v1 # v1
         with:
           registry: npm
-          package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
+          package: "@kreuzberg/html-to-markdown-linux-x64-gnu"
           version: ${{ needs.prepare.outputs.version }}
           max-attempts: "25"
 
@@ -1946,7 +1946,7 @@ jobs:
         uses: kreuzberg-dev/actions/wait-for-package@v1 # v1
         with:
           registry: npm
-          package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
+          package: "@kreuzberg/html-to-markdown-linux-arm64-gnu"
           version: ${{ needs.prepare.outputs.version }}
           max-attempts: "25"
 
@@ -1969,7 +1969,7 @@ jobs:
         uses: kreuzberg-dev/actions/wait-for-package@v1 # v1
         with:
           registry: npm
-          package: "@kreuzberg/html-to-markdown-node"
+          package: "@kreuzberg/html-to-markdown"
           version: ${{ needs.prepare.outputs.version }}
           max-attempts: "25"
 

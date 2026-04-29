@@ -196,7 +196,7 @@ name = "View on PyPI"
 
 [[project.extra.social]]
 icon = "fontawesome/brands/npm"
-link = "https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node"
+link = "https://www.npmjs.com/package/@kreuzberg/html-to-markdown"
 name = "View on npm"
 
 [[project.extra.social]]

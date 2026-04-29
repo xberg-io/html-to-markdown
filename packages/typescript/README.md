@@ -8,8 +8,8 @@
   <a href="https://pypi.org/project/html-to-markdown/">
     <img src="https://img.shields.io/pypi/v/html-to-markdown?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-node?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown?label=Node.js&color=007ec6" alt="Node.js">
   </a>
   <a href="https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm">
     <img src="https://img.shields.io/npm/v/@kreuzberg/html-to-markdown-wasm?label=WASM&color=007ec6" alt="WASM">
@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.4.0-rc.17" alt="Go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.4.0-rc.18" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
@@ -57,7 +57,7 @@
 </div>
 
 High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
-This package wraps native `@kreuzberg/html-to-markdown-node` bindings and provides a type-safe API.
+This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
 
 
 ## Installation
@@ -313,7 +313,7 @@ const markdown = result.content;
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
 
-- **npm:** [npmjs.com/@kreuzberg/html-to-markdown-node](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
+- **npm:** [npmjs.com/@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown)
 - **WASM:** [npmjs.com/@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)
 
 - **Kreuzberg Ecosystem:** [kreuzberg.dev](https://kreuzberg.dev)

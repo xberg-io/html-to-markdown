@@ -1,5 +1,5 @@
 {
-	"name": "@kreuzberg/html-to-markdown-node",
+	"name": "@kreuzberg/html-to-markdown",
 	"version": "3.3.2",
 	"description": "High-performance HTML to Markdown converter",
 	"keywords": [
