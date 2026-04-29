@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Ruby `TypeError` on `convert()` with options** (#334) — `HtmlToMarkdown.convert(html, options)`
+  raised `TypeError` on every call that supplied options (including `3.4.0.pre.rc.15`). The Ruby
+  wrapper was passing a `ConversionOptions` object to the FFI, but the generated Rust function
+  expects `Option<String>` (JSON). The wrapper now serialises the options hash to JSON before
+  crossing the FFI boundary, matching what `serde_json::from_str` expects on the Rust side.
+
 ## [3.3.3] - 2026-04-23
 
 ### Fixed
