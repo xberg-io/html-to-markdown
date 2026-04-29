@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = 'html-to-markdown'
-  spec.version = '3.4.0.pre.rc.15'
+  spec.version = '3.4.0.pre.rc.16'
   spec.authors       = ['Kreuzberg Team']
   spec.summary       = 'High-performance HTML to Markdown converter'
   spec.description   = 'High-performance HTML to Markdown converter'
