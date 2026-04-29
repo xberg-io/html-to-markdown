@@ -122,7 +122,7 @@ tasks:
   ruby:format:
     desc: "Format Ruby bindings with rubocop"
     cmds:
-      - alef fmt --lang ruby
+      - alef lint --lang ruby
 
   ruby:lint:
     desc: "Lint Ruby bindings with rubocop and steep"
@@ -132,7 +132,7 @@ tasks:
   php:format:
     desc: "Format PHP bindings with php-cs-fixer"
     cmds:
-      - alef fmt --lang php
+      - alef lint --lang php
 
   php:lint:
     desc: "Lint PHP bindings with phpstan and php-cs-fixer"
@@ -142,7 +142,7 @@ tasks:
   csharp:format:
     desc: "Format C# bindings with dotnet format"
     cmds:
-      - alef fmt --lang csharp
+      - alef lint --lang csharp
 
   csharp:lint:
     desc: "Lint C# bindings with dotnet format"
@@ -153,7 +153,7 @@ tasks:
     desc: "Format all code"
     cmds:
       - cargo fmt --all
-      - alef fmt
+      - alef lint
 
   format:
     desc: "Format all code (alias for fmt)"

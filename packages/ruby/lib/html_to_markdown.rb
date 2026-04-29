@@ -2,6 +2,7 @@
 
 require_relative 'html_to_markdown/version'
 require 'html_to_markdown_rb'
+require 'json'
 
 # High-performance HTML to Markdown conversion.
 #
@@ -29,14 +30,11 @@ module HtmlToMarkdown
   #   (and more, matching ConversionOptions fields)
   # @return [String] The converted Markdown content.
   def self.convert(html, options = {}, visitor = nil)
-    opts = if options.is_a?(HtmlToMarkdownRs::ConversionOptions)
-             options
-           elsif options.nil? || options.empty?
-             nil
-           else
-             HtmlToMarkdownRs::ConversionOptions.new(options)
-           end
-    result = HtmlToMarkdownRs.convert(html, opts, visitor)
+    # The Rust FFI expects options as a JSON string; serialise the hash here
+    # rather than constructing a ConversionOptions object, which the generated
+    # FFI layer cannot coerce back to String (see issue #334).
+    opts_json = options.nil? || options.empty? ? nil : options.to_json
+    result = HtmlToMarkdownRs.convert(html, opts_json, visitor)
     result.content || ''
   end
 end
