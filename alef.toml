@@ -63,7 +63,7 @@ pip_name = "html-to-markdown"
 output = "packages/python/html_to_markdown/"
 
 [node]
-package_name = "@kreuzberg/html-to-markdown"
+package_name = "@kreuzberg/html-to-markdown-node"
 
 [ffi]
 prefix = "htm"

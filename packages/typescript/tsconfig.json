@@ -13,7 +13,7 @@
 		"verbatimModuleSyntax": false,
 		"isolatedModules": false,
 		"paths": {
-			"@kreuzberg/html-to-markdown": [
+			"@kreuzberg/html-to-markdown-node": [
 				"../../crates/html-to-markdown-node/index.d.ts"
 			]
 		}

@@ -1,5 +1,5 @@
 {
-	"name": "@kreuzberg/html-to-markdown-darwin-x64",
+	"name": "@kreuzberg/html-to-markdown-node-darwin-x64",
 	"version": "3.4.0-rc.18",
 	"cpu": [
 		"x64"

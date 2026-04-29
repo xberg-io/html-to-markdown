@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
-import type { JsConversionOptions, JsConversionResult } from "@kreuzberg/html-to-markdown";
-import { convert } from "@kreuzberg/html-to-markdown";
+import type { JsConversionOptions, JsConversionResult } from "@kreuzberg/html-to-markdown-node";
+import { convert } from "@kreuzberg/html-to-markdown-node";
 
 /**
  * Convert an HTML file to Markdown.

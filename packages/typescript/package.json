@@ -10,29 +10,30 @@
 	"license": "MIT",
 	"author": "Kreuzberg Team",
 	"repository": "https://github.com/kreuzberg-dev/html-to-markdown",
+	"homepage": "https://kreuzberg.dev",
+	"bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
 	"files": [
-		"index.js",
-		"index.d.ts",
-		"**/*.node"
+		"dist",
+		"README.md"
 	],
-	"main": "index.js",
-	"types": "index.d.ts",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
 	"scripts": {
-		"build": "napi build --release",
-		"build:debug": "napi build",
+		"build": "tsc --project tsconfig.json",
 		"lint": "echo 'TypeScript type-checking requires native build; use task node:lint:check instead'",
 		"test": "node -e \"console.log('Add test command')\""
 	},
-	"devDependencies": {
-		"@napi-rs/cli": "^3.6.2"
+	"dependencies": {
+		"@kreuzberg/html-to-markdown-node": "3.4.0-rc.18"
 	},
-	"napi": {
-		"name": "html-to-markdown-rs",
-		"triples": [
-			"x86_64-unknown-linux-gnu",
-			"x86_64-apple-darwin",
-			"aarch64-apple-darwin",
-			"x86_64-pc-windows-msvc"
-		]
+	"devDependencies": {
+		"typescript": "^5.6.0"
+	},
+	"engines": {
+		"node": ">= 18"
 	}
 }
