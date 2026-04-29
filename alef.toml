@@ -634,7 +634,7 @@ format = "cd packages/ruby && bundle exec rubocop -a ."
 
 [lint.php]
 precondition = "command -v php >/dev/null 2>&1"
-before = "cd packages/php && composer install"
+before = "cd packages/php && composer install --ignore-platform-reqs"
 format = "cd packages/php && vendor/bin/php-cs-fixer fix ."
 check = "cd packages/php && vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
 
