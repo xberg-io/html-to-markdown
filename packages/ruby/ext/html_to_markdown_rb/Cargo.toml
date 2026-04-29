@@ -2,7 +2,7 @@
 
 [package]
 name = "html-to-markdown-rb"
-version = "3.4.0-rc.13"
+version = "3.4.0-rc.14"
 edition = "2024"
 license = "MIT"
 
