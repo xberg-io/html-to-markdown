@@ -12,16 +12,16 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.11.4</junit.version>
+        <junit.version>6.0.3</junit.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>dev.kreuzberg.htmltomarkdown</groupId>
             <artifactId>html-to-markdown-rs</artifactId>
-            <version>3.4.0-rc.3</version>
+            <version>3.4.0-rc.15</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-rs-3.4.0-rc.3.jar</systemPath>
+            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-rs-3.4.0-rc.15.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>add-test-source</id>

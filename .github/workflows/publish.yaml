@@ -872,6 +872,24 @@ jobs:
         shell: pwsh
         run: scripts/publish/ruby/build-gem-windows.ps1
 
+      # Only the canonical `linux` builder ships the source gem; other matrix
+      # entries would emit byte-different source gems (line endings, ext-rb
+      # contents, vendor layout) that overwrite each other under merge-multiple
+      # and produce an invalid .gem at publish time. Their native platform
+      # gems (.gem with platform suffix) are still uploaded.
+      - name: Drop source gem on non-canonical builders
+        if: ${{ matrix.label != 'linux' }}
+        shell: bash
+        run: |
+          shopt -s nullglob
+          for f in packages/ruby/pkg/*.gem; do
+            base="$(basename "$f")"
+            case "$base" in
+              *-x86_64-linux.gem|*-aarch64-linux.gem|*-arm64-darwin.gem|*-x86_64-darwin.gem|*-x64-mingw32.gem|*-x64-mingw-ucrt.gem) ;;
+              *) echo "Removing non-canonical source gem $base"; rm -f "$f" ;;
+            esac
+          done
+
       - name: Upload gem artifacts
         uses: actions/upload-artifact@v7 # v7
         with:
