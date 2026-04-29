@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.kreuzberg</groupId>
+    <groupId>dev.kreuzberg.htmltomarkdown</groupId>
     <artifactId>html-to-markdown-rs-e2e-java</artifactId>
     <version>0.1.0</version>
 
@@ -19,9 +19,9 @@
         <dependency>
             <groupId>dev.kreuzberg.htmltomarkdown</groupId>
             <artifactId>html-to-markdown-rs</artifactId>
-            <version>3.4.0-rc.16</version>
+            <version>3.4.0-rc.17</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-rs-3.4.0-rc.16.jar</systemPath>
+            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-rs-3.4.0-rc.17.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

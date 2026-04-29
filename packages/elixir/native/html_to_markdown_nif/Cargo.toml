@@ -1,6 +1,6 @@
 [package]
 name = "html_to_markdown_nif"
-version = "3.4.0-rc.16"
+version = "3.4.0-rc.17"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
