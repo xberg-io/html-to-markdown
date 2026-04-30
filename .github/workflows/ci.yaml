@@ -1158,6 +1158,9 @@ jobs:
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
       - name: Run E2E tests
         run: alef test --e2e --lang go
         shell: bash
@@ -1240,6 +1243,9 @@ jobs:
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang elixir
