@@ -166,6 +166,7 @@ repos:
         files: ^packages/php/.*\.php$
       - id: phpstan
         files: ^packages/php/.*\.php$
+        args: ["analyse", "--no-progress", "--configuration", "packages/php/phpstan.neon"]
       - id: mix-format
         files: ^packages/elixir/
       - id: mix-credo
@@ -175,7 +176,7 @@ repos:
 
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.11.1
+    rev: v0.12.7
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
