@@ -1,4 +1,4 @@
-version = "0.13.0"
+version = "0.13.2"
 languages = [
   "python",
   "node",
@@ -80,6 +80,9 @@ package = "dev.kreuzberg.htmltomarkdown"
 
 [csharp]
 namespace = "HtmlToMarkdown"
+
+[php]
+extension_name = "html_to_markdown"
 
 [ruby]
 gem_name = "html-to-markdown"

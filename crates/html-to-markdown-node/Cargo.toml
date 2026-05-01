@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-node"
-version = "3.4.0-rc.23"
+version = "3.4.0-rc.24"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter - Node.js bindings"
