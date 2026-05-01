@@ -6,7 +6,7 @@ exclude: ^docs/snippets/|vendor/|node_modules/|target/|dist/|artifacts/|scripts/
 repos:
   # AI-Rulez: auto-generate AI assistant configuration files
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.0.8
+    rev: v4.1.4
     hooks:
       - id: ai-rulez-generate
 
@@ -118,7 +118,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.83"
+    rev: "v0.1.85"
     hooks:
       - id: rumdl-fmt
         exclude: 'test_documents/|\.ai-rulez/|\.remote-cache/|e2e/|fixtures/|test_apps/|\.github/copilot-instructions\.md|CLAUDE\.md|\.claude/|\.agents/|\.codex/'
@@ -156,10 +156,13 @@ repos:
         exclude: ^(e2e/|test_apps/)
       - id: rubocop
         files: ^packages/ruby/.*\.rb$
+        exclude: ^packages/ruby/ext/
       - id: rubocop-lint
         files: ^packages/ruby/.*\.(rb|rbs)$
+        exclude: ^packages/ruby/ext/
       - id: steep
         files: ^packages/ruby/.*\.(rb|rbs)$
+        exclude: ^packages/ruby/ext/
       - id: dotnet-format
         files: ^packages/csharp/.*\.cs$
       - id: dotnet-format-check
@@ -178,7 +181,7 @@ repos:
 
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.12.7
+    rev: v0.12.10
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -198,7 +201,7 @@ repos:
 
   # Spelling (last — runs after all formatters and generators)
   - repo: https://github.com/crate-ci/typos
-    rev: v1.45.2
+    rev: v1.46.0
     hooks:
       - id: typos
         args: [--force-exclude]

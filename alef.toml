@@ -1,4 +1,4 @@
-version = "0.12.7"
+version = "0.12.10"
 languages = [
   "python",
   "node",
@@ -756,7 +756,7 @@ fields_optional = [
 
 [e2e.call]
 function = "convert"
-module = "html_to_markdown"
+module = "html_to_markdown_rs"
 result_var = "result"
 args = [
   { name = "html", field = "html", type = "string" },
@@ -765,6 +765,7 @@ args = [
 
 [e2e.call.overrides.rust]
 crate_name = "html_to_markdown_rs"
+module = "html_to_markdown_rs"
 function = "convert"
 
 [e2e.call.overrides.python]
