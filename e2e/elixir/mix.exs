@@ -12,7 +12,7 @@ defmodule E2eElixir.MixProject do
 
   defp deps do
     [
-      {:html_to_markdown, path: "../../packages/elixir"}
+      {:html_to_markdown_rs, path: "../../packages/elixir"}
     ]
   end
 end

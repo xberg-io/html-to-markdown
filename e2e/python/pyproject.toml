@@ -21,7 +21,7 @@ dependencies = [ "html-to-markdown", "pytest>=7.4", "pytest-asyncio>=0.23", "pyt
 packages = []
 
 [tool.uv]
-sources.html-to-markdown = { workspace = true }
+sources.html-to-markdown = { path = "../../packages/python" }
 
 [tool.ruff]
 lint.ignore = [ "PLR2004" ]

@@ -7,7 +7,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "html-to-markdown": "file:../../crates/html-to-markdown-node",
+    "html-to-markdown": "workspace:*",
     "vitest": "^4.1.5"
   }
 }
