@@ -6,7 +6,7 @@ exclude: ^docs/snippets/|vendor/|node_modules/|target/|dist/|artifacts/|scripts/
 repos:
   # AI-Rulez: auto-generate AI assistant configuration files
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.1.4
+    rev: v4.1.5
     hooks:
       - id: ai-rulez-generate
 
@@ -119,7 +119,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.85"
+    rev: "v0.1.86"
     hooks:
       - id: rumdl-fmt
         exclude: 'test_documents/|\.ai-rulez/|\.remote-cache/|e2e/|fixtures/|test_apps/|\.github/copilot-instructions\.md|CLAUDE\.md|\.claude/|\.agents/|\.codex/'
@@ -137,13 +137,7 @@ repos:
       - id: clang-tidy
         files: ^crates/html-to-markdown-ffi/tests/c/
       - id: checkstyle
-        args:
-          [
-            "-c",
-            "packages/java/checkstyle.xml",
-            "-p",
-            "packages/java/checkstyle.properties",
-          ]
+        args: ["-c", "packages/java/checkstyle.xml", "-p", "packages/java/checkstyle.properties"]
         exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
       - id: mypy
         exclude: "e2e/|tests/|scripts/"
