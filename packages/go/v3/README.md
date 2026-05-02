@@ -59,13 +59,11 @@
 High-performance HTML to Markdown converter with Go bindings to the Rust core library.
 Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and Windows with customizable caching.
 
-
 ## Installation
 
 ```bash
 go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown
 ```
-
 
 Requires Go 1.25+. After installing the package, run `go generate` to automatically download the platform-specific FFI library:
 
@@ -77,17 +75,15 @@ This downloads the native library from GitHub releases and generates the necessa
 
 Alternatively, you can manually set `CGO_CFLAGS` and `CGO_LDFLAGS` environment variables if you prefer to manage the FFI library yourself.
 
-
 ## Performance Snapshot
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB | 0.46ms | 277.5 MB/s |
-| Tables (Countries) | 360KB | 1.37ms | 262.1 MB/s |
-| Mixed (Python wiki) | 656KB | 2.75ms | 237.9 MB/s |
-
+| Document            | Size  | Latency | Throughput |
+| ------------------- | ----- | ------- | ---------- |
+| Lists (Timeline)    | 129KB | 0.46ms  | 277.5 MB/s |
+| Tables (Countries)  | 360KB | 1.37ms  | 262.1 MB/s |
+| Mixed (Python wiki) | 656KB | 2.75ms  | 237.9 MB/s |
 
 ## Quick Start
 
@@ -116,7 +112,6 @@ func main() {
     }
 }
 ```
-
 
 With conversion options:
 
@@ -149,11 +144,9 @@ func main() {
 }
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`Convert(html string, options ...ConversionOptions) (ConversionResult, error)`**
 
@@ -165,7 +158,6 @@ markdown  := result.Content    // *string — converted Markdown
 metadata  := result.Metadata   // *Metadata — when ExtractMetadata: true
 tables    := result.Tables     // []TableData — when ExtractTables: true
 ```
-
 
 ### Options
 
@@ -199,7 +191,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```go
 import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
 
@@ -212,13 +203,11 @@ markdown, _ := htmltomarkdown.Convert(html)
 // Note: Djot output format configuration is not yet supported in Go bindings
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```go
 import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
@@ -229,9 +218,7 @@ plain, _ := htmltomarkdown.Convert(html, htmltomarkdown.WithOutputFormat("plain"
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -248,7 +235,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

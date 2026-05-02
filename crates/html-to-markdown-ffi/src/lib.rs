@@ -8216,7 +8216,7 @@ pub unsafe extern "C" fn htm_htm_html_visitor_bridge_new(
         return std::ptr::null_mut();
     }
     // SAFETY: vtable is non-null (checked above); caller guarantees it is valid for this call.
-    let bridge = unsafe { HtmHtmlVisitorBridge::new(String::new(), *vtable, user_data) };
+    let bridge = unsafe { HtmHtmlVisitorBridge::new(String::new(), (*vtable).clone(), user_data) };
     Box::into_raw(Box::new(bridge))
 }
 
