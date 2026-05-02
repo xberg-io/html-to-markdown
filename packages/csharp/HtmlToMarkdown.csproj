@@ -10,7 +10,19 @@
     <Authors>Kreuzberg Team</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+    <!-- Bug 10: outer project is a NuGet packaging wrapper only; inner project owns compilation -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
+
+  <!-- Bug 10: exclude the inner project sources to prevent duplicate definitions -->
+  <ItemGroup>
+    <Compile Remove="HtmlToMarkdown/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="HtmlToMarkdown/HtmlToMarkdown.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="../../LICENSE" Pack="true" PackagePath="/" />
