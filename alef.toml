@@ -1,4 +1,4 @@
-version = "0.13.3"
+version = "0.13.6"
 languages = [
   "python",
   "node",
@@ -672,14 +672,12 @@ check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missin
 [test.python]
 precondition = "command -v ruff >/dev/null 2>&1"
 before = "cd packages/python && maturin develop --release"
-command = "cd packages/python && uv run pytest tests/ -v"
 e2e = "cd e2e/python && python3 -m pytest tests/ -q"
 
 [test.node]
 precondition = "command -v npx >/dev/null 2>&1"
 before = "cd crates/html-to-markdown-node && napi build --output-dir . --release"
-command = "npx vitest run --config packages/typescript/vitest.config.ts"
-e2e = "cd e2e/typescript && npx vitest run"
+e2e = "cd e2e/node && npx vitest run"
 
 [test.go]
 precondition = "command -v go >/dev/null 2>&1"
@@ -689,36 +687,30 @@ e2e = "cd e2e/go && go test ./... -count=1"
 [test.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd e2e/ruby && bundle install"
-command = "cd e2e/ruby && bundle exec rspec"
 e2e = "cd e2e/ruby && bundle exec rspec"
 
 [test.php]
 precondition = "command -v php >/dev/null 2>&1"
 before = "cd e2e/php && composer install"
-command = "cd e2e/php && composer test"
 e2e = "cd e2e/php && composer test"
 
 [test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
-command = "cd e2e/java && mvn test -q"
 e2e = "cd e2e/java && mvn test -q"
 
 [test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
-command = "dotnet test e2e/csharp"
 e2e = "dotnet test e2e/csharp"
 
 [test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get && mix compile"
-command = "cd e2e/elixir && mix test"
 e2e = "cd e2e/elixir && mix test"
 
 [test.r]
 precondition = "which Rscript 2>/dev/null"
-command = "cd e2e/r && Rscript -e \"devtools::load_all('../../packages/r'); testthat::set_max_fails(Inf); testthat::test_dir('tests')\""
 e2e = "cd e2e/r && Rscript -e \"devtools::load_all('../../packages/r'); testthat::set_max_fails(Inf); testthat::test_dir('tests')\""
 
 [test.wasm]
@@ -739,6 +731,20 @@ e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release 
 [e2e]
 fixtures = "fixtures"
 output = "e2e"
+languages = [
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "c",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+  "r",
+  "rust",
+]
 fields_optional = [
   "content",
   "document",
@@ -951,12 +957,32 @@ path = "../../packages/go"
 version = "v0.0.0"
 
 [e2e.packages.php]
-name = "kreuzberg-dev/html-to-markdown-rs"
+name = "kreuzberg-dev/html-to-markdown"
 path = "../../packages/php"
+
+[e2e.packages.java]
+name = "dev.kreuzberg:html-to-markdown"
+path = "../../packages/java"
 
 [e2e.packages.csharp]
 name = "HtmlToMarkdown"
 path = "../../packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj"
+
+[e2e.packages.ruby]
+name = "html-to-markdown"
+path = "../../packages/ruby"
+
+[e2e.packages.elixir]
+name = "html_to_markdown"
+path = "../../packages/elixir"
+
+[e2e.packages.wasm]
+name = "@kreuzberg/html-to-markdown-wasm"
+path = "../../crates/html-to-markdown-wasm"
+
+[e2e.packages.r]
+name = "htmltomarkdown"
+path = "../../packages/r"
 
 [e2e.packages.c]
 name = "html_to_markdown_ffi"

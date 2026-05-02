@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.kreuzberg.htmltomarkdown</groupId>
-    <artifactId>html-to-markdown-rs-e2e-java</artifactId>
+    <artifactId>html-to-markdown-e2e-java</artifactId>
     <version>0.1.0</version>
 
     <properties>
@@ -17,11 +17,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.kreuzberg.htmltomarkdown</groupId>
-            <artifactId>html-to-markdown-rs</artifactId>
-            <version>3.4.0-rc.22</version>
+            <groupId>dev.kreuzberg</groupId>
+            <artifactId>html-to-markdown</artifactId>
+            <version>3.4.0-rc.25</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-rs-3.4.0-rc.22.jar</systemPath>
+            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.4.0-rc.25.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -67,7 +67,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
-                    <argLine>--enable-preview --enable-native-access=ALL-UNNAMED -Djava.library.path=../../target/release</argLine>
+                    <argLine>--enable-preview --enable-native-access=ALL-UNNAMED -Djava.library.path=${project.basedir}/../../target/release</argLine>
+                    <workingDirectory>${project.basedir}/../../test_documents</workingDirectory>
                 </configuration>
             </plugin>
         </plugins>
