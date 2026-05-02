@@ -535,7 +535,7 @@ func (BaseVisitor) VisitFigureEnd(ctx NodeContext, output string) VisitResult {
 // CGo does not allow passing Go function values as C function pointers;
 // we use a numeric ID (stored in user_data) to look up the Visitor at callback time.
 var (
-	visitorRegistry sync.Map
+	visitorRegistry  sync.Map
 	visitorIDCounter atomic.Uint64
 )
 
