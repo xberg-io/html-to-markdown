@@ -3,607 +3,712 @@
 // To regenerate: alef generate
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/kreuzberg-dev/alef
-import { describe, expect, it } from 'vitest';
-import { convert } from '@kreuzberg/html-to-markdown-wasm';
+import { describe, expect, it } from "vitest";
+import { convert } from "@kreuzberg/html-to-markdown-wasm";
 
-describe('visitor', () => {
-  it('visitor_audio_custom: Visitor replaces audio element with custom output', () => {
+describe("visitor", () => {
+  it("visitor_audio_custom: Visitor replaces audio element with custom output", () => {
     const _testVisitor = {
-    visitAudio(ctx: any, src: any): string | { custom: string } {
+      visitAudio(ctx: any, src: any): string | { custom: string } {
         return { custom: "[AUDIO: podcast.mp3]" };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Listen to this: <audio src=\"podcast.mp3\" controls></audio></p>", { visitor: _testVisitor });
+    const result = convert('<p>Listen to this: <audio src="podcast.mp3" controls></audio></p>', {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("[AUDIO: podcast.mp3]");
     expect(result.content ?? "").toContain("Listen to this:");
   });
 
-  it('visitor_audio_skip: Visitor removes audio elements from output', () => {
+  it("visitor_audio_skip: Visitor removes audio elements from output", () => {
     const _testVisitor = {
-    visitAudio(ctx: any, src: any): string | { custom: string } {
+      visitAudio(ctx: any, src: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Background music:</p><audio src=\"music.ogg\" autoplay></audio><p>Enjoy!</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Background music:</p><audio src="music.ogg" autoplay></audio><p>Enjoy!</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Background music:");
     expect(result.content ?? "").toContain("Enjoy!");
     expect(result.content).not.toContain("music.ogg");
   });
 
-  it('visitor_button_custom: Visitor replaces button with bracketed text', () => {
+  it("visitor_button_custom: Visitor replaces button with bracketed text", () => {
     const _testVisitor = {
-    visitButton(ctx: any, text: any): string | { custom: string } {
+      visitButton(ctx: any, text: any): string | { custom: string } {
         return { custom: `[BTN:{text}]` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Confirm action: <button type=\"submit\">Click me</button> or <button type=\"reset\">Cancel</button></p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Confirm action: <button type="submit">Click me</button> or <button type="reset">Cancel</button></p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[BTN:Click me]");
     expect(result.content ?? "").toContain("[BTN:Cancel]");
     expect(result.content ?? "").toContain("Confirm action:");
   });
 
-  it('visitor_button_skip: Visitor removes all buttons from output', () => {
+  it("visitor_button_skip: Visitor removes all buttons from output", () => {
     const _testVisitor = {
-    visitButton(ctx: any, text: any): string | { custom: string } {
+      visitButton(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Actions available: <button>Save</button> <button>Delete</button> <button>Export</button></p>", { visitor: _testVisitor });
+    const result = convert(
+      "<p>Actions available: <button>Save</button> <button>Delete</button> <button>Export</button></p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Actions available:");
     expect(result.content).not.toContain("Save");
     expect(result.content).not.toContain("Delete");
     expect(result.content).not.toContain("Export");
   });
 
-  it('visitor_continue_default: Visitor continue action preserves default conversion', () => {
+  it("visitor_continue_default: Visitor continue action preserves default conversion", () => {
     const _testVisitor = {
-    visitStrong(ctx: any, text: any): string | { custom: string } {
+      visitStrong(ctx: any, text: any): string | { custom: string } {
         return "continue";
-    },
-    }
+      },
+    };
 
     const result = convert("<p>Hello <strong>World</strong></p>", { visitor: _testVisitor });
     expect(result.content ?? "").toContain("**World**");
   });
 
-  it('visitor_custom_blockquote: Visitor replaces blockquote with custom format', () => {
+  it("visitor_custom_blockquote: Visitor replaces blockquote with custom format", () => {
     const _testVisitor = {
-    visitBlockquote(ctx: any, content: any, depth: any): string | { custom: string } {
+      visitBlockquote(ctx: any, content: any, depth: any): string | { custom: string } {
         return { custom: `QUOTE: "{content}"` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<blockquote><p>A wise quote.</p></blockquote>", { visitor: _testVisitor });
+    const result = convert("<blockquote><p>A wise quote.</p></blockquote>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("QUOTE:");
     expect(result.content ?? "").toContain("A wise quote.");
   });
 
-  it('visitor_custom_emphasis: Visitor replaces emphasis with custom output', () => {
+  it("visitor_custom_emphasis: Visitor replaces emphasis with custom output", () => {
     const _testVisitor = {
-    visitEmphasis(ctx: any, text: any): string | { custom: string } {
+      visitEmphasis(ctx: any, text: any): string | { custom: string } {
         return { custom: `>>>{text}<<<` };
-    },
-    }
+      },
+    };
 
     const result = convert("<p>This is <em>important</em> text.</p>", { visitor: _testVisitor });
     expect(result.content ?? "").toContain(">>>important<<<");
     expect(result.content).not.toContain("*important*");
   });
 
-  it('visitor_custom_heading: Visitor replaces heading with custom format', () => {
+  it("visitor_custom_heading: Visitor replaces heading with custom format", () => {
     const _testVisitor = {
-    visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
+      visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
         return { custom: `--- {text} ---` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<h2>Section Title</h2><p>Content below heading.</p>", { visitor: _testVisitor });
+    const result = convert("<h2>Section Title</h2><p>Content below heading.</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("--- Section Title ---");
     expect(result.content).not.toContain("## Section Title");
     expect(result.content ?? "").toContain("Content below heading.");
   });
 
-  it('visitor_custom_image: Visitor replaces image with custom output using template', () => {
+  it("visitor_custom_image: Visitor replaces image with custom output using template", () => {
     const _testVisitor = {
-    visitImage(ctx: any, src: any, alt: any, title: any): string | { custom: string } {
+      visitImage(ctx: any, src: any, alt: any, title: any): string | { custom: string } {
         return { custom: `[Image: {alt}]` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<img src=\"banner.png\" alt=\"Banner\">", { visitor: _testVisitor });
+    const result = convert('<img src="banner.png" alt="Banner">', { visitor: _testVisitor });
     expect(result.content ?? "").toContain("[Image: Banner]");
     expect(result.content).not.toContain("banner.png");
   });
 
-  it('visitor_custom_link_format: Visitor reformats links using template interpolation', () => {
+  it("visitor_custom_link_format: Visitor reformats links using template interpolation", () => {
     const _testVisitor = {
-    visitLink(ctx: any, href: any, text: any, title: any): string | { custom: string } {
+      visitLink(ctx: any, href: any, text: any, title: any): string | { custom: string } {
         return { custom: `{text} ({href})` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Visit <a href=\"https://example.com\">Example</a> for more info.</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Visit <a href="https://example.com">Example</a> for more info.</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Example (https://example.com)");
     expect(result.content).not.toContain("[Example]");
   });
 
-  it('visitor_custom_link_static: Visitor replaces link with static custom output', () => {
+  it("visitor_custom_link_static: Visitor replaces link with static custom output", () => {
     const _testVisitor = {
-    visitLink(ctx: any, href: any, text: any, title: any): string | { custom: string } {
+      visitLink(ctx: any, href: any, text: any, title: any): string | { custom: string } {
         return { custom: "[REDACTED LINK]" };
-    },
-    }
+      },
+    };
 
-    const result = convert("<a href=\"https://example.com\">Click here</a>", { visitor: _testVisitor });
+    const result = convert('<a href="https://example.com">Click here</a>', {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("[REDACTED LINK]");
     expect(result.content).not.toContain("example.com");
   });
 
-  it('visitor_custom_output: Visitor custom action replaces element output', () => {
+  it("visitor_custom_output: Visitor custom action replaces element output", () => {
     const _testVisitor = {
-    visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
+      visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
         return { custom: "## REPLACED HEADING" };
-    },
-    }
+      },
+    };
 
     const result = convert("<h1>Original Heading</h1>", { visitor: _testVisitor });
     expect(result.content ?? "").toContain("## REPLACED HEADING");
     expect(result.content).not.toContain("# Original Heading");
   });
 
-  it('visitor_definition_list_custom: Visitor customizes definition list items', () => {
+  it("visitor_definition_list_custom: Visitor customizes definition list items", () => {
     const _testVisitor = {
-    visitDefinitionTerm(ctx: any, text: any): string | { custom: string } {
+      visitDefinitionTerm(ctx: any, text: any): string | { custom: string } {
         return { custom: `**{text}**` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl>", { visitor: _testVisitor });
+    const result = convert(
+      "<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("**HTML**");
     expect(result.content ?? "").toContain("**CSS**");
     expect(result.content ?? "").toContain("HyperText Markup Language");
   });
 
-  it('visitor_definition_list_custom_format: Visitor formats definition lists with custom templates', () => {
+  it("visitor_definition_list_custom_format: Visitor formats definition lists with custom templates", () => {
     const _testVisitor = {
-    visitDefinitionDescription(ctx: any, text: any): string | { custom: string } {
+      visitDefinitionDescription(ctx: any, text: any): string | { custom: string } {
         return { custom: `> {text}` };
-    },
-    visitDefinitionTerm(ctx: any, text: any): string | { custom: string } {
+      },
+      visitDefinitionTerm(ctx: any, text: any): string | { custom: string } {
         return { custom: `### {text}` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<dl><dt>Python</dt><dd>A high-level programming language</dd><dt>JavaScript</dt><dd>A scripting language for web browsers</dd></dl>", { visitor: _testVisitor });
+    const result = convert(
+      "<dl><dt>Python</dt><dd>A high-level programming language</dd><dt>JavaScript</dt><dd>A scripting language for web browsers</dd></dl>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("### Python");
     expect(result.content ?? "").toContain("### JavaScript");
     expect(result.content ?? "").toContain("> A high-level programming language");
     expect(result.content ?? "").toContain("> A scripting language for web browsers");
   });
 
-  it('visitor_definition_list_skip: Visitor skips definition list items from output', () => {
+  it("visitor_definition_list_skip: Visitor skips definition list items from output", () => {
     const _testVisitor = {
-    visitDefinitionDescription(ctx: any, text: any): string | { custom: string } {
+      visitDefinitionDescription(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    visitDefinitionTerm(ctx: any, text: any): string | { custom: string } {
+      },
+      visitDefinitionTerm(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Glossary:</p><dl><dt>Term A</dt><dd>Definition of term A</dd><dt>Term B</dt><dd>Definition of term B</dd></dl><p>End of glossary</p>", { visitor: _testVisitor });
+    const result = convert(
+      "<p>Glossary:</p><dl><dt>Term A</dt><dd>Definition of term A</dd><dt>Term B</dt><dd>Definition of term B</dd></dl><p>End of glossary</p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Glossary:");
     expect(result.content ?? "").toContain("End of glossary");
     expect(result.content).not.toContain("Term A");
     expect(result.content).not.toContain("Definition");
   });
 
-  it('visitor_details_summary_custom: Visitor customizes details/summary disclosure elements', () => {
+  it("visitor_details_summary_custom: Visitor customizes details/summary disclosure elements", () => {
     const _testVisitor = {
-    visitSummary(ctx: any, text: any): string | { custom: string } {
+      visitSummary(ctx: any, text: any): string | { custom: string } {
         return { custom: `[EXPANDABLE] {text}` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<details><summary>Click to expand</summary><p>This content is initially hidden.</p><p>But can be revealed by the user.</p></details>", { visitor: _testVisitor });
+    const result = convert(
+      "<details><summary>Click to expand</summary><p>This content is initially hidden.</p><p>But can be revealed by the user.</p></details>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[EXPANDABLE] Click to expand");
     expect(result.content ?? "").toContain("This content is initially hidden.");
   });
 
-  it('visitor_details_summary_skip: Visitor removes details/summary elements entirely', () => {
+  it("visitor_details_summary_skip: Visitor removes details/summary elements entirely", () => {
     const _testVisitor = {
-    visitDetails(ctx: any, isOpen: any): string | { custom: string } {
+      visitDetails(ctx: any, isOpen: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Main content here.</p><details><summary>Hidden section</summary><p>Secret details</p></details><p>More main content.</p>", { visitor: _testVisitor });
+    const result = convert(
+      "<p>Main content here.</p><details><summary>Hidden section</summary><p>Secret details</p></details><p>More main content.</p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Main content here.");
     expect(result.content ?? "").toContain("More main content.");
     expect(result.content).not.toContain("Hidden section");
     expect(result.content).not.toContain("Secret details");
   });
 
-  it('visitor_figure_custom: Visitor customizes figure and figcaption elements', () => {
+  it("visitor_figure_custom: Visitor customizes figure and figcaption elements", () => {
     const _testVisitor = {
-    visitFigcaption(ctx: any, text: any): string | { custom: string } {
+      visitFigcaption(ctx: any, text: any): string | { custom: string } {
         return { custom: `*{text}*` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<article><h1>Article Title</h1><p>Introduction paragraph.</p><figure><img src=\"diagram.png\" alt=\"System architecture diagram\"><figcaption>Figure 1: System Architecture</figcaption></figure><p>Explanation of the figure.</p></article>", { visitor: _testVisitor });
+    const result = convert(
+      '<article><h1>Article Title</h1><p>Introduction paragraph.</p><figure><img src="diagram.png" alt="System architecture diagram"><figcaption>Figure 1: System Architecture</figcaption></figure><p>Explanation of the figure.</p></article>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Article Title");
     expect(result.content ?? "").toContain("*Figure 1: System Architecture*");
     expect(result.content ?? "").toContain("Explanation of the figure.");
   });
 
-  it('visitor_figure_custom_wrap: Visitor wraps figure content with custom formatting', () => {
+  it("visitor_figure_custom_wrap: Visitor wraps figure content with custom formatting", () => {
     const _testVisitor = {
-    visitFigureStart(ctx: any): string | { custom: string } {
+      visitFigureStart(ctx: any): string | { custom: string } {
         return { custom: "\n[FIGURE]\n" };
-    },
-    visitFigureEnd(ctx: any, output: any): string | { custom: string } {
-        return { custom: `{output}
+      },
+      visitFigureEnd(ctx: any, output: any): string | { custom: string } {
+        return {
+          custom: `{output}
 [/FIGURE]
-` };
-    },
-    }
+`,
+        };
+      },
+    };
 
-    const result = convert("<section><h2>Gallery</h2><figure><img src=\"photo1.jpg\" alt=\"Photo\"><figcaption>Beautiful sunset</figcaption></figure></section>", { visitor: _testVisitor });
+    const result = convert(
+      '<section><h2>Gallery</h2><figure><img src="photo1.jpg" alt="Photo"><figcaption>Beautiful sunset</figcaption></figure></section>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[FIGURE]");
     expect(result.content ?? "").toContain("[/FIGURE]");
     expect(result.content ?? "").toContain("Gallery");
   });
 
-  it('visitor_figure_skip: Visitor removes figure elements with their captions', () => {
+  it("visitor_figure_skip: Visitor removes figure elements with their captions", () => {
     const _testVisitor = {
-    visitFigureStart(ctx: any): string | { custom: string } {
+      visitFigureStart(ctx: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>See the chart below:</p><figure><img src=\"chart.svg\"><figcaption>Revenue Trends 2020-2024</figcaption></figure><p>As shown in the chart above.</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>See the chart below:</p><figure><img src="chart.svg"><figcaption>Revenue Trends 2020-2024</figcaption></figure><p>As shown in the chart above.</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("See the chart below:");
     expect(result.content ?? "").toContain("As shown in the chart above.");
     expect(result.content).not.toContain("Revenue Trends");
     expect(result.content).not.toContain("chart.svg");
   });
 
-  it('visitor_form_custom: Visitor replaces form with custom output', () => {
+  it("visitor_form_custom: Visitor replaces form with custom output", () => {
     const _testVisitor = {
-    visitForm(ctx: any, actionUrl: any, method: any): string | { custom: string } {
+      visitForm(ctx: any, actionUrl: any, method: any): string | { custom: string } {
         return { custom: "[FORM PLACEHOLDER]" };
-    },
-    }
+      },
+    };
 
-    const result = convert("<div><form action=\"/submit\" method=\"POST\"><label>Name: <input type=\"text\" name=\"name\"></label><button type=\"submit\">Submit</button></form></div>", { visitor: _testVisitor });
+    const result = convert(
+      '<div><form action="/submit" method="POST"><label>Name: <input type="text" name="name"></label><button type="submit">Submit</button></form></div>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[FORM PLACEHOLDER]");
     expect(result.content).not.toContain("submit");
     expect(result.content).not.toContain("input");
   });
 
-  it('visitor_form_skip: Visitor skips form elements entirely', () => {
+  it("visitor_form_skip: Visitor skips form elements entirely", () => {
     const _testVisitor = {
-    visitForm(ctx: any, actionUrl: any, method: any): string | { custom: string } {
+      visitForm(ctx: any, actionUrl: any, method: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Before form</p><form><input type=\"email\" name=\"email\"></form><p>After form</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Before form</p><form><input type="email" name="email"></form><p>After form</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Before form");
     expect(result.content ?? "").toContain("After form");
     expect(result.content).not.toContain("email");
   });
 
-  it('visitor_horizontal_rule_custom: Visitor replaces horizontal rule with custom output', () => {
+  it("visitor_horizontal_rule_custom: Visitor replaces horizontal rule with custom output", () => {
     const _testVisitor = {
-    visitHorizontalRule(ctx: any): string | { custom: string } {
+      visitHorizontalRule(ctx: any): string | { custom: string } {
         return { custom: "\n[DIVIDER]\n" };
-    },
-    }
+      },
+    };
 
-    const result = convert("<h1>Section A</h1><p>Content A</p><hr><h1>Section B</h1><p>Content B</p>", { visitor: _testVisitor });
+    const result = convert(
+      "<h1>Section A</h1><p>Content A</p><hr><h1>Section B</h1><p>Content B</p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[DIVIDER]");
     expect(result.content ?? "").toContain("Section A");
     expect(result.content ?? "").toContain("Section B");
     expect(result.content).not.toContain("---");
   });
 
-  it('visitor_horizontal_rule_skip: Visitor removes all horizontal rules', () => {
+  it("visitor_horizontal_rule_skip: Visitor removes all horizontal rules", () => {
     const _testVisitor = {
-    visitHorizontalRule(ctx: any): string | { custom: string } {
+      visitHorizontalRule(ctx: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Part 1</p><hr><p>Part 2</p><hr><p>Part 3</p>", { visitor: _testVisitor });
+    const result = convert("<p>Part 1</p><hr><p>Part 2</p><hr><p>Part 3</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("Part 1");
     expect(result.content ?? "").toContain("Part 2");
     expect(result.content ?? "").toContain("Part 3");
     expect(result.content).not.toContain("---");
   });
 
-  it('visitor_iframe_custom: Visitor replaces embedded iframe with custom text', () => {
+  it("visitor_iframe_custom: Visitor replaces embedded iframe with custom text", () => {
     const _testVisitor = {
-    visitIframe(ctx: any, src: any): string | { custom: string } {
+      visitIframe(ctx: any, src: any): string | { custom: string } {
         return { custom: "[EMBEDDED: https://maps.example.com/embed]" };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Embedded map:</p><iframe src=\"https://maps.example.com/embed\" width=\"400\" height=\"300\"></iframe><p>End of map</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Embedded map:</p><iframe src="https://maps.example.com/embed" width="400" height="300"></iframe><p>End of map</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[EMBEDDED: https://maps.example.com/embed]");
     expect(result.content ?? "").toContain("Embedded map:");
     expect(result.content ?? "").toContain("End of map");
   });
 
-  it('visitor_iframe_skip: Visitor removes embedded iframes', () => {
+  it("visitor_iframe_skip: Visitor removes embedded iframes", () => {
     const _testVisitor = {
-    visitIframe(ctx: any, src: any): string | { custom: string } {
+      visitIframe(ctx: any, src: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<h3>Reviews</h3><iframe src=\"https://widget.example.com/reviews\"></iframe><p>See reviews from our partners.</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<h3>Reviews</h3><iframe src="https://widget.example.com/reviews"></iframe><p>See reviews from our partners.</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Reviews");
     expect(result.content ?? "").toContain("See reviews from our partners.");
     expect(result.content).not.toContain("widget.example.com");
   });
 
-  it('visitor_input_custom: Visitor replaces input with labeled output', () => {
+  it("visitor_input_custom: Visitor replaces input with labeled output", () => {
     const _testVisitor = {
-    visitInput(ctx: any, inputType: any, name: any, value: any): string | { custom: string } {
+      visitInput(ctx: any, inputType: any, name: any, value: any): string | { custom: string } {
         return { custom: `[INPUT:{input_type}]` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<form><label>Username: <input type=\"text\" name=\"username\" value=\"\"></label><label>Password: <input type=\"password\" name=\"password\"></label></form>", { visitor: _testVisitor });
+    const result = convert(
+      '<form><label>Username: <input type="text" name="username" value=""></label><label>Password: <input type="password" name="password"></label></form>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[INPUT:text]");
     expect(result.content ?? "").toContain("[INPUT:password]");
   });
 
-  it('visitor_input_skip: Visitor skips all input elements', () => {
+  it("visitor_input_skip: Visitor skips all input elements", () => {
     const _testVisitor = {
-    visitInput(ctx: any, inputType: any, name: any, value: any): string | { custom: string } {
+      visitInput(ctx: any, inputType: any, name: any, value: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Sign up:</p><input type=\"text\" name=\"email\" placeholder=\"your@email.com\"><input type=\"checkbox\" name=\"agree\"><p>Continue</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Sign up:</p><input type="text" name="email" placeholder="your@email.com"><input type="checkbox" name="agree"><p>Continue</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Sign up:");
     expect(result.content ?? "").toContain("Continue");
     expect(result.content).not.toContain("email");
   });
 
-  it('visitor_line_break_custom: Visitor replaces line break with custom output', () => {
+  it("visitor_line_break_custom: Visitor replaces line break with custom output", () => {
     const _testVisitor = {
-    visitLineBreak(ctx: any): string | { custom: string } {
+      visitLineBreak(ctx: any): string | { custom: string } {
         return { custom: " | " };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>First line<br>Second line<br>Third line</p>", { visitor: _testVisitor });
+    const result = convert("<p>First line<br>Second line<br>Third line</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("First line | Second line | Third line");
     expect(result.content).not.toContain("\n\n");
   });
 
-  it('visitor_line_break_skip: Visitor removes all line breaks', () => {
+  it("visitor_line_break_skip: Visitor removes all line breaks", () => {
     const _testVisitor = {
-    visitLineBreak(ctx: any): string | { custom: string } {
+      visitLineBreak(ctx: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Address Line 1<br>Address Line 2<br>Address Line 3</p>", { visitor: _testVisitor });
+    const result = convert("<p>Address Line 1<br>Address Line 2<br>Address Line 3</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("Address Line 1Address Line 2Address Line 3");
   });
 
-  it('visitor_mark_custom: Visitor replaces highlight/mark with custom template', () => {
+  it("visitor_mark_custom: Visitor replaces highlight/mark with custom template", () => {
     const _testVisitor = {
-    visitMark(ctx: any, text: any): string | { custom: string } {
+      visitMark(ctx: any, text: any): string | { custom: string } {
         return { custom: `=={text}==` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>This is a <mark>highlighted passage</mark> in the text.</p>", { visitor: _testVisitor });
+    const result = convert("<p>This is a <mark>highlighted passage</mark> in the text.</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("==highlighted passage==");
     expect(result.content ?? "").toContain("This is a");
   });
 
-  it('visitor_mark_skip: Visitor skips mark elements entirely', () => {
+  it("visitor_mark_skip: Visitor skips mark elements entirely", () => {
     const _testVisitor = {
-    visitMark(ctx: any, text: any): string | { custom: string } {
+      visitMark(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Key insight: <mark>always validate input</mark> for security.</p>", { visitor: _testVisitor });
+    const result = convert("<p>Key insight: <mark>always validate input</mark> for security.</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content).not.toContain("always validate input");
     expect(result.content ?? "").toContain("Key insight:");
     expect(result.content ?? "").toContain("for security.");
   });
 
-  it('visitor_preserve_html: Visitor preserve_html action includes raw HTML in output', () => {
+  it("visitor_preserve_html: Visitor preserve_html action includes raw HTML in output", () => {
     const _testVisitor = {
-    visitCustomElement(ctx: any, tagName: any, html: any): string | { custom: string } {
+      visitCustomElement(ctx: any, tagName: any, html: any): string | { custom: string } {
         return "preserve_html";
-    },
-    }
+      },
+    };
 
-    const result = convert("<div><custom-tag>Custom content</custom-tag></div>", { visitor: _testVisitor });
+    const result = convert("<div><custom-tag>Custom content</custom-tag></div>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("<custom-tag>");
   });
 
-  it('visitor_skip_all_headings: Visitor skips all headings from document', () => {
+  it("visitor_skip_all_headings: Visitor skips all headings from document", () => {
     const _testVisitor = {
-    visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
+      visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
     const result = convert("<h1>Title</h1><p>Body text remains.</p>", { visitor: _testVisitor });
     expect(result.content).not.toContain("Title");
     expect(result.content ?? "").toContain("Body text remains.");
   });
 
-  it('visitor_skip_code_blocks: Visitor skips code blocks from output', () => {
+  it("visitor_skip_code_blocks: Visitor skips code blocks from output", () => {
     const _testVisitor = {
-    visitCodeBlock(ctx: any, lang: any, code: any): string | { custom: string } {
+      visitCodeBlock(ctx: any, lang: any, code: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Intro text</p><pre><code>let x = 42;</code></pre><p>Outro text</p>", { visitor: _testVisitor });
+    const result = convert(
+      "<p>Intro text</p><pre><code>let x = 42;</code></pre><p>Outro text</p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Intro text");
     expect(result.content ?? "").toContain("Outro text");
     expect(result.content).not.toContain("let x = 42");
   });
 
-  it('visitor_skip_heading: Visitor skip action omits all headings from output', () => {
+  it("visitor_skip_heading: Visitor skip action omits all headings from output", () => {
     const _testVisitor = {
-    visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
+      visitHeading(ctx: any, level: any, text: any, id: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
     const result = convert("<h1>Title</h1><p>Body text remains.</p>", { visitor: _testVisitor });
     expect(result.content).not.toContain("Title");
     expect(result.content ?? "").toContain("Body text remains.");
   });
 
-  it('visitor_skip_images: Visitor skips all images from output', () => {
+  it("visitor_skip_images: Visitor skips all images from output", () => {
     const _testVisitor = {
-    visitImage(ctx: any, src: any, alt: any, title: any): string | { custom: string } {
+      visitImage(ctx: any, src: any, alt: any, title: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Before image</p><img src=\"photo.jpg\" alt=\"A photo\"><p>After image</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Before image</p><img src="photo.jpg" alt="A photo"><p>After image</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Before image");
     expect(result.content ?? "").toContain("After image");
     expect(result.content).not.toContain("photo.jpg");
     expect(result.content).not.toContain("A photo");
   });
 
-  it('visitor_skip_links: Visitor skips all links entirely', () => {
+  it("visitor_skip_links: Visitor skips all links entirely", () => {
     const _testVisitor = {
-    visitLink(ctx: any, href: any, text: any, title: any): string | { custom: string } {
+      visitLink(ctx: any, href: any, text: any, title: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Before <a href=\"https://example.com\">link text</a> after</p>", { visitor: _testVisitor });
+    const result = convert('<p>Before <a href="https://example.com">link text</a> after</p>', {
+      visitor: _testVisitor,
+    });
     expect(result.content).not.toContain("link text");
     expect(result.content).not.toContain("example.com");
   });
 
-  it('visitor_skip_strong: Visitor skips bold/strong elements', () => {
+  it("visitor_skip_strong: Visitor skips bold/strong elements", () => {
     const _testVisitor = {
-    visitStrong(ctx: any, text: any): string | { custom: string } {
+      visitStrong(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Normal <strong>bold text</strong> normal</p>", { visitor: _testVisitor });
+    const result = convert("<p>Normal <strong>bold text</strong> normal</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content).not.toContain("bold text");
     expect(result.content ?? "").toContain("Normal");
   });
 
-  it('visitor_subscript_custom: Visitor replaces subscript with custom template', () => {
+  it("visitor_subscript_custom: Visitor replaces subscript with custom template", () => {
     const _testVisitor = {
-    visitSubscript(ctx: any, text: any): string | { custom: string } {
+      visitSubscript(ctx: any, text: any): string | { custom: string } {
         return { custom: `~{text}~` };
-    },
-    }
+      },
+    };
 
     const result = convert("<p>H<sub>2</sub>O is water.</p>", { visitor: _testVisitor });
     expect(result.content ?? "").toContain("H~2~O");
     expect(result.content ?? "").toContain("is water");
   });
 
-  it('visitor_subscript_skip: Visitor skips subscript elements entirely', () => {
+  it("visitor_subscript_skip: Visitor skips subscript elements entirely", () => {
     const _testVisitor = {
-    visitSubscript(ctx: any, text: any): string | { custom: string } {
+      visitSubscript(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>The formula C<sub>12</sub>H<sub>22</sub>O<sub>11</sub> is sugar.</p>", { visitor: _testVisitor });
+    const result = convert(
+      "<p>The formula C<sub>12</sub>H<sub>22</sub>O<sub>11</sub> is sugar.</p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("The formula CHO is sugar.");
   });
 
-  it('visitor_superscript_custom: Visitor replaces superscript with custom template', () => {
+  it("visitor_superscript_custom: Visitor replaces superscript with custom template", () => {
     const _testVisitor = {
-    visitSuperscript(ctx: any, text: any): string | { custom: string } {
+      visitSuperscript(ctx: any, text: any): string | { custom: string } {
         return { custom: `^{text}^` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Einstein's E=mc<sup>2</sup> revolutionized physics.</p>", { visitor: _testVisitor });
+    const result = convert("<p>Einstein's E=mc<sup>2</sup> revolutionized physics.</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("E=mc^2^");
     expect(result.content ?? "").toContain("revolutionized physics");
   });
 
-  it('visitor_superscript_skip: Visitor skips superscript from output', () => {
+  it("visitor_superscript_skip: Visitor skips superscript from output", () => {
     const _testVisitor = {
-    visitSuperscript(ctx: any, text: any): string | { custom: string } {
+      visitSuperscript(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>The equation x<sup>3</sup> + y<sup>3</sup> = z<sup>3</sup> has no solutions.</p>", { visitor: _testVisitor });
+    const result = convert(
+      "<p>The equation x<sup>3</sup> + y<sup>3</sup> = z<sup>3</sup> has no solutions.</p>",
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("The equation x + y = z has no solutions.");
   });
 
-  it('visitor_underline_custom: Visitor replaces underline with custom markup', () => {
+  it("visitor_underline_custom: Visitor replaces underline with custom markup", () => {
     const _testVisitor = {
-    visitUnderline(ctx: any, text: any): string | { custom: string } {
+      visitUnderline(ctx: any, text: any): string | { custom: string } {
         return { custom: `_{text}_` };
-    },
-    }
+      },
+    };
 
     const result = convert("<p>This is <u>very important</u> text.</p>", { visitor: _testVisitor });
     expect(result.content ?? "").toContain("_very important_");
     expect(result.content).not.toContain("**");
   });
 
-  it('visitor_underline_skip: Visitor skips underline elements from output', () => {
+  it("visitor_underline_skip: Visitor skips underline elements from output", () => {
     const _testVisitor = {
-    visitUnderline(ctx: any, text: any): string | { custom: string } {
+      visitUnderline(ctx: any, text: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Normal text with <u>underlined part</u> and more text.</p>", { visitor: _testVisitor });
+    const result = convert("<p>Normal text with <u>underlined part</u> and more text.</p>", {
+      visitor: _testVisitor,
+    });
     expect(result.content ?? "").toContain("Normal text with");
     expect(result.content ?? "").toContain("and more text.");
     expect(result.content).not.toContain("underlined part");
   });
 
-  it('visitor_video_custom: Visitor replaces video with custom link', () => {
+  it("visitor_video_custom: Visitor replaces video with custom link", () => {
     const _testVisitor = {
-    visitVideo(ctx: any, src: any): string | { custom: string } {
+      visitVideo(ctx: any, src: any): string | { custom: string } {
         return { custom: `[VIDEO: {src}]` };
-    },
-    }
+      },
+    };
 
-    const result = convert("<p>Watch our tutorial:</p><video src=\"tutorial.mp4\" width=\"320\" height=\"240\" controls></video><p>Great content!</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<p>Watch our tutorial:</p><video src="tutorial.mp4" width="320" height="240" controls></video><p>Great content!</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("[VIDEO: tutorial.mp4]");
     expect(result.content ?? "").toContain("Watch our tutorial:");
     expect(result.content ?? "").toContain("Great content!");
   });
 
-  it('visitor_video_skip: Visitor removes video elements entirely', () => {
+  it("visitor_video_skip: Visitor removes video elements entirely", () => {
     const _testVisitor = {
-    visitVideo(ctx: any, src: any): string | { custom: string } {
+      visitVideo(ctx: any, src: any): string | { custom: string } {
         return "skip";
-    },
-    }
+      },
+    };
 
-    const result = convert("<h2>Demo</h2><video src=\"demo.webm\"></video><p>See the demo above.</p>", { visitor: _testVisitor });
+    const result = convert(
+      '<h2>Demo</h2><video src="demo.webm"></video><p>See the demo above.</p>',
+      { visitor: _testVisitor },
+    );
     expect(result.content ?? "").toContain("Demo");
     expect(result.content ?? "").toContain("See the demo above.");
     expect(result.content).not.toContain("demo.webm");

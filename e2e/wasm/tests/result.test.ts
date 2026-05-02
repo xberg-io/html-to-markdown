@@ -3,46 +3,58 @@
 // To regenerate: alef generate
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/kreuzberg-dev/alef
-import { describe, expect, it } from 'vitest';
-import { convert, type WasmConversionOptions } from '@kreuzberg/html-to-markdown-wasm';
+import { describe, expect, it } from "vitest";
+import { convert, type WasmConversionOptions } from "@kreuzberg/html-to-markdown-wasm";
 
-describe('result', () => {
-  it('result_tables_empty_when_no_tables: Result tables array is empty when input has no tables', () => {
-    const result = convert("<p>No tables here</p>", { includeDocumentStructure: true } as WasmConversionOptions);
+describe("result", () => {
+  it("result_tables_empty_when_no_tables: Result tables array is empty when input has no tables", () => {
+    const result = convert("<p>No tables here</p>", {
+      includeDocumentStructure: true,
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.tables.length).toBe(0);
   });
 
-  it('result_tables_multiple: Multiple tables each appear in the tables array', () => {
-    const result = convert("<table><tr><th>A</th></tr><tr><td>1</td></tr></table><p>Between</p><table><tr><th>B</th></tr><tr><td>2</td></tr></table>", { includeDocumentStructure: true } as WasmConversionOptions);
+  it("result_tables_multiple: Multiple tables each appear in the tables array", () => {
+    const result = convert(
+      "<table><tr><th>A</th></tr><tr><td>1</td></tr></table><p>Between</p><table><tr><th>B</th></tr><tr><td>2</td></tr></table>",
+      { includeDocumentStructure: true } as WasmConversionOptions,
+    );
     expect(result.tables.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('result_tables_simple: Simple table populates the tables array in result', () => {
-    const result = convert("<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>", { includeDocumentStructure: true } as WasmConversionOptions);
+  it("result_tables_simple: Simple table populates the tables array in result", () => {
+    const result = convert(
+      "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>",
+      { includeDocumentStructure: true } as WasmConversionOptions,
+    );
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.tables.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('result_tables_without_structure_flag: Tables array is empty when includeDocumentStructure is false', () => {
+  it("result_tables_without_structure_flag: Tables array is empty when includeDocumentStructure is false", () => {
     const result = convert("<table><tr><th>X</th></tr><tr><td>Y</td></tr></table>");
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.tables.length).toBe(0);
   });
 
-  it('result_warnings_empty_for_clean_input: Warnings array is empty for well-formed HTML without problematic content', () => {
-    const result = convert("<h1>Title</h1><p>Clean content with <a href='https://example.com'>a link</a>.</p>");
+  it("result_warnings_empty_for_clean_input: Warnings array is empty for well-formed HTML without problematic content", () => {
+    const result = convert(
+      "<h1>Title</h1><p>Clean content with <a href='https://example.com'>a link</a>.</p>",
+    );
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.warnings.length).toBe(0);
   });
 
-  it('result_warnings_empty_for_complex_input: Warnings array is empty for complex but valid HTML', () => {
-    const result = convert("<article><h1>Article</h1><p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p><table><tr><th>Col</th></tr><tr><td>Val</td></tr></table><ul><li>Item 1</li><li>Item 2</li></ul></article>");
+  it("result_warnings_empty_for_complex_input: Warnings array is empty for complex but valid HTML", () => {
+    const result = convert(
+      "<article><h1>Article</h1><p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p><table><tr><th>Col</th></tr><tr><td>Val</td></tr></table><ul><li>Item 1</li><li>Item 2</li></ul></article>",
+    );
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.warnings.length).toBe(0);
   });
 
-  it('result_warnings_empty_for_malformed_html: Warnings array is empty even for malformed HTML (parser is lenient)', () => {
+  it("result_warnings_empty_for_malformed_html: Warnings array is empty even for malformed HTML (parser is lenient)", () => {
     const result = convert("<p>Unclosed paragraph<div>Mixed nesting</p></div>");
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.warnings.length).toBe(0);

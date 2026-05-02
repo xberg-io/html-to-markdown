@@ -1,15 +1,15 @@
 [build-system]
 build-backend = "maturin"
-requires = [ "maturin>=1,<2" ]
+requires = ["maturin>=1,<2"]
 
 [project]
 name = "html-to-markdown"
 version = "3.4.0rc25"
 description = "High-performance HTML to Markdown converter"
-keywords = [ "converter", "html", "markdown" ]
+keywords = ["converter", "html", "markdown"]
 license = "MIT"
-license-files = [ "LICENSE" ]
-authors = [ { name = "Kreuzberg Team" } ]
+license-files = ["LICENSE"]
+authors = [{ name = "Kreuzberg Team" }]
 requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
@@ -22,20 +22,20 @@ classifiers = [
 urls.repository = "https://github.com/kreuzberg-dev/html-to-markdown"
 
 [dependency-groups]
-dev = [ "mypy>=1.19", "pytest>=9.0.2", "ruff>=0.14.8" ]
+dev = ["mypy>=1.19", "pytest>=9.0.2", "ruff>=0.14.8"]
 
 [tool.maturin]
 module-name = "html_to_markdown._html_to_markdown"
 manifest-path = "../../crates/html-to-markdown-py/Cargo.toml"
-features = [ "pyo3/extension-module" ]
-python-packages = [ "html_to_markdown" ]
+features = ["pyo3/extension-module"]
+python-packages = ["html_to_markdown"]
 
 [tool.ruff]
 target-version = "py310"
 line-length = 120
 format.docstring-code-line-length = 120
 format.docstring-code-format = true
-lint.select = [ "ALL" ]
+lint.select = ["ALL"]
 lint.ignore = [
   "ANN401",
   "ASYNC109",
@@ -63,7 +63,7 @@ lint.ignore = [
   "TD",
   "TRY",
 ]
-lint.per-file-ignores."tests/**" = [ "ANN", "D103", "PLR2004", "S101" ]
+lint.per-file-ignores."tests/**" = ["ANN", "D103", "PLR2004", "S101"]
 lint.mccabe.max-complexity = 15
 lint.pydocstyle.convention = "google"
 lint.pylint.max-args = 10

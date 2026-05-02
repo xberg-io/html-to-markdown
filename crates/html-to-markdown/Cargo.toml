@@ -33,11 +33,11 @@ base64.workspace = true
 html-escape = "0.2.13"
 html5ever.workspace = true
 image = { version = "0.25", default-features = false, features = [
-    "gif",
-    "jpeg",
-    "png",
-    "bmp",
-    "webp",
+  "gif",
+  "jpeg",
+  "png",
+  "bmp",
+  "webp",
 ], optional = true }
 lru = "0.18"
 memchr = "2"

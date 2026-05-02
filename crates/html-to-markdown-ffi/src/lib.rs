@@ -19,7 +19,7 @@
 
 use std::cell::RefCell;
 use std::ffi::c_void;
-use std::ffi::{c_char, CStr, CString};
+use std::ffi::{CStr, CString, c_char};
 use std::sync::Arc;
 
 thread_local! {
@@ -575,11 +575,7 @@ pub unsafe extern "C" fn htm_header_metadata_is_valid(
     // SAFETY: null check above guarantees this is a valid pointer.
     let obj = unsafe { &*this };
     let result = obj.is_valid();
-    if result {
-        1
-    } else {
-        0
-    }
+    if result { 1 } else { 0 }
 }
 
 /// Create a `LinkMetadata` from a JSON string. Returns null on failure.
@@ -8216,7 +8212,7 @@ pub unsafe extern "C" fn htm_htm_html_visitor_bridge_new(
         return std::ptr::null_mut();
     }
     // SAFETY: vtable is non-null (checked above); caller guarantees it is valid for this call.
-    let bridge = unsafe { HtmHtmlVisitorBridge::new(String::new(), *vtable, user_data) };
+    let bridge = unsafe { HtmHtmlVisitorBridge::new(String::new(), (*vtable).clone(), user_data) };
     Box::into_raw(Box::new(bridge))
 }
 

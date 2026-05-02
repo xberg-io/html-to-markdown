@@ -3,21 +3,21 @@
 // To regenerate: alef generate
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/kreuzberg-dev/alef
-import { describe, expect, it } from 'vitest';
-import { convert } from 'html-to-markdown';
+import { describe, expect, it } from "vitest";
+import { convert } from "html-to-markdown";
 
-describe('smoke', () => {
-  it('smoke_empty_string: Empty string produces empty output', () => {
+describe("smoke", () => {
+  it("smoke_empty_string: Empty string produces empty output", () => {
     const result = convert("");
     expect((result.content ?? "").trim()).toBe("");
   });
 
-  it('smoke_simple_heading: H1 heading converts to ATX markdown', () => {
+  it("smoke_simple_heading: H1 heading converts to ATX markdown", () => {
     const result = convert("<h1>Title</h1>");
     expect(result.content).toContain("# Title");
   });
 
-  it('smoke_simple_paragraph: Simple paragraph converts correctly', () => {
+  it("smoke_simple_paragraph: Simple paragraph converts correctly", () => {
     const result = convert("<p>Hello World</p>");
     expect((result.content ?? "").trim()).toBe("Hello World");
     expect((result.content ?? "").length).toBeGreaterThan(0);

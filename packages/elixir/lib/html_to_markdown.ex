@@ -16,15 +16,8 @@ defmodule HtmlToMarkdown do
   @spec convert(String.t(), String.t() | nil) :: {:ok, String.t() | nil} | {:error, String.t()}
   def convert(html, options) when is_map(options) do
     {visitor, clean_opts} = Map.pop(options, :visitor)
-
     if is_map(visitor) do
-      :ok =
-        HtmlToMarkdown.Native.convert_with_visitor(
-          html,
-          if(map_size(clean_opts) == 0, do: nil, else: Jason.encode!(clean_opts)),
-          visitor
-        )
-
+      :ok = HtmlToMarkdown.Native.convert_with_visitor(html, if(map_size(clean_opts) == 0, do: nil, else: Jason.encode!(clean_opts)), visitor)
       do_visitor_receive_loop(visitor)
     else
       HtmlToMarkdown.Native.convert(html, if(map_size(options) == 0, do: nil, else: Jason.encode!(options)))

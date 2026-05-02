@@ -3,344 +3,458 @@
 // To regenerate: alef generate
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/kreuzberg-dev/alef
-import { describe, expect, it } from 'vitest';
-import { convert, type WasmConversionOptions } from '@kreuzberg/html-to-markdown-wasm';
+import { describe, expect, it } from "vitest";
+import { convert, type WasmConversionOptions } from "@kreuzberg/html-to-markdown-wasm";
 
-describe('options', () => {
-  it('options_autolinks_false: Bare URL links rendered as regular markdown links when autolinks disabled', () => {
-    const result = convert("<p><a href='https://example.com'>https://example.com</a></p>", { autolinks: false } as WasmConversionOptions);
+describe("options", () => {
+  it("options_autolinks_false: Bare URL links rendered as regular markdown links when autolinks disabled", () => {
+    const result = convert("<p><a href='https://example.com'>https://example.com</a></p>", {
+      autolinks: false,
+    } as WasmConversionOptions);
     expect(result.content).toContain("example.com");
   });
 
-  it('options_br_in_tables_false: BR elements in table cells are stripped when disabled', () => {
-    const result = convert("<table><tr><th>Col</th></tr><tr><td>A<br>B</td></tr></table>", { brInTables: false } as WasmConversionOptions);
+  it("options_br_in_tables_false: BR elements in table cells are stripped when disabled", () => {
+    const result = convert("<table><tr><th>Col</th></tr><tr><td>A<br>B</td></tr></table>", {
+      brInTables: false,
+    } as WasmConversionOptions);
     expect(result.content).toContain("Col");
   });
 
-  it('options_br_in_tables_true: BR elements in table cells render as line breaks', () => {
-    const result = convert("<table><tr><th>Header</th></tr><tr><td>Line 1<br>Line 2</td></tr></table>", { brInTables: true } as WasmConversionOptions);
+  it("options_br_in_tables_true: BR elements in table cells render as line breaks", () => {
+    const result = convert(
+      "<table><tr><th>Header</th></tr><tr><td>Line 1<br>Line 2</td></tr></table>",
+      { brInTables: true } as WasmConversionOptions,
+    );
     expect(result.content).toContain("Header");
     expect(result.content).toContain("Line 1");
     expect(result.content).toContain("Line 2");
   });
 
-  it('options_code_block_backticks: Backticks code block style uses triple backtick fences', () => {
-    const result = convert("<pre><code class=\"language-js\">console.log('hi');</code></pre>", { codeBlockStyle: "Backticks" } as WasmConversionOptions);
+  it("options_code_block_backticks: Backticks code block style uses triple backtick fences", () => {
+    const result = convert("<pre><code class=\"language-js\">console.log('hi');</code></pre>", {
+      codeBlockStyle: "Backticks",
+    } as WasmConversionOptions);
     expect(result.content).toContain("```");
     expect(result.content).toContain("console.log('hi');");
   });
 
-  it('options_code_block_indented: Code blocks use 4-space indentation', () => {
-    const result = convert("<pre><code>print('hello')</code></pre>", { codeBlockStyle: "Indented" } as WasmConversionOptions);
+  it("options_code_block_indented: Code blocks use 4-space indentation", () => {
+    const result = convert("<pre><code>print('hello')</code></pre>", {
+      codeBlockStyle: "Indented",
+    } as WasmConversionOptions);
     expect(result.content).toContain("print('hello')");
     expect(result.content).not.toContain("```");
   });
 
-  it('options_code_block_tildes: Code blocks use tilde fences', () => {
-    const result = convert("<pre><code>let x = 1;</code></pre>", { codeBlockStyle: "Tildes" } as WasmConversionOptions);
+  it("options_code_block_tildes: Code blocks use tilde fences", () => {
+    const result = convert("<pre><code>let x = 1;</code></pre>", {
+      codeBlockStyle: "Tildes",
+    } as WasmConversionOptions);
     expect(result.content).toContain("~~~");
     expect(result.content).toContain("let x = 1;");
   });
 
-  it('options_code_block_tildes_style: Tildes code block style uses triple tilde fences', () => {
-    const result = convert("<pre><code>some code</code></pre>", { codeBlockStyle: "Tildes" } as WasmConversionOptions);
+  it("options_code_block_tildes_style: Tildes code block style uses triple tilde fences", () => {
+    const result = convert("<pre><code>some code</code></pre>", {
+      codeBlockStyle: "Tildes",
+    } as WasmConversionOptions);
     expect(result.content).toContain("~~~");
     expect(result.content).toContain("some code");
   });
 
-  it('options_code_language_python: Default code language annotation on blocks without lang attribute', () => {
-    const result = convert("<pre><code>def hello(): pass</code></pre>", { codeLanguage: "python" } as WasmConversionOptions);
+  it("options_code_language_python: Default code language annotation on blocks without lang attribute", () => {
+    const result = convert("<pre><code>def hello(): pass</code></pre>", {
+      codeLanguage: "python",
+    } as WasmConversionOptions);
     expect(result.content).toContain("```python");
     expect(result.content).toContain("def hello");
   });
 
-  it('options_convert_as_inline: Block elements treated as inline', () => {
-    const result = convert("<p>One</p><p>Two</p>", { convertAsInline: true } as WasmConversionOptions);
+  it("options_convert_as_inline: Block elements treated as inline", () => {
+    const result = convert("<p>One</p><p>Two</p>", {
+      convertAsInline: true,
+    } as WasmConversionOptions);
     expect(result.content).toContain("One");
     expect(result.content).toContain("Two");
   });
 
-  it('options_debug_true: Debug mode enabled does not crash and produces output', () => {
+  it("options_debug_true: Debug mode enabled does not crash and produces output", () => {
     const result = convert("<p>Debug test</p>", { debug: true } as WasmConversionOptions);
     expect(result.content).toContain("Debug test");
   });
 
-  it('options_default_title_true: Links without title get empty title attribute when defaultTitle is true', () => {
-    const result = convert("<p><a href='https://example.com'>Link</a></p>", { defaultTitle: true } as WasmConversionOptions);
+  it("options_default_title_true: Links without title get empty title attribute when defaultTitle is true", () => {
+    const result = convert("<p><a href='https://example.com'>Link</a></p>", {
+      defaultTitle: true,
+    } as WasmConversionOptions);
     expect(result.content).toContain("Link");
     expect(result.content).toContain("https://example.com");
   });
 
-  it('options_encoding_utf8: UTF-8 encoding hint for special characters', () => {
-    const result = convert("<p>Café naïve résumé</p>", { encoding: "utf-8" } as WasmConversionOptions);
+  it("options_encoding_utf8: UTF-8 encoding hint for special characters", () => {
+    const result = convert("<p>Café naïve résumé</p>", {
+      encoding: "utf-8",
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
   });
 
-  it('options_escape_ascii_enabled: ASCII Markdown characters are escaped when escapeAscii is true', () => {
-    const result = convert("<p>Text with # hash and [brackets] and * star</p>", { escapeAscii: true } as WasmConversionOptions);
+  it("options_escape_ascii_enabled: ASCII Markdown characters are escaped when escapeAscii is true", () => {
+    const result = convert("<p>Text with # hash and [brackets] and * star</p>", {
+      escapeAscii: true,
+    } as WasmConversionOptions);
     expect(result.content).toContain("Text");
     expect(result.content).toContain("hash");
     expect(result.content).toContain("brackets");
     expect(result.content).toContain("star");
   });
 
-  it('options_escape_asterisks: escape_asterisks option escapes asterisks in plain text', () => {
-    const result = convert("<p>Use 2*3 = 6 in math.</p>", { escapeAsterisks: true } as WasmConversionOptions);
+  it("options_escape_asterisks: escape_asterisks option escapes asterisks in plain text", () => {
+    const result = convert("<p>Use 2*3 = 6 in math.</p>", {
+      escapeAsterisks: true,
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("2");
     expect(result.content).toContain("3");
     expect(result.content).toContain("6");
   });
 
-  it('options_escape_misc: escape_misc option escapes miscellaneous markdown characters', () => {
-    const result = convert("<p>Use # and | and ~ in text.</p>", { escapeMisc: true } as WasmConversionOptions);
+  it("options_escape_misc: escape_misc option escapes miscellaneous markdown characters", () => {
+    const result = convert("<p>Use # and | and ~ in text.</p>", {
+      escapeMisc: true,
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("Use");
     expect(result.content).toContain("and");
     expect(result.content).toContain("in text.");
   });
 
-  it('options_escape_underscores: escape_underscores option escapes underscores in plain text', () => {
-    const result = convert("<p>The variable_name is defined.</p>", { escapeUnderscores: true } as WasmConversionOptions);
+  it("options_escape_underscores: escape_underscores option escapes underscores in plain text", () => {
+    const result = convert("<p>The variable_name is defined.</p>", {
+      escapeUnderscores: true,
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("variable");
     expect(result.content).toContain("name");
     expect(result.content).toContain("defined.");
   });
 
-  it('options_exclude_selectors_attribute: Elements matching CSS attribute selector are excluded entirely', () => {
-    const result = convert("<body><div role=\"complementary\">Sidebar</div><p>Primary text</p></body>", { excludeSelectors: ["[role='complementary']"] } as WasmConversionOptions);
+  it("options_exclude_selectors_attribute: Elements matching CSS attribute selector are excluded entirely", () => {
+    const result = convert(
+      '<body><div role="complementary">Sidebar</div><p>Primary text</p></body>',
+      { excludeSelectors: ["[role='complementary']"] } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Primary text");
     expect(result.content).not.toContain("Sidebar");
   });
 
-  it('options_exclude_selectors_class: Elements matching CSS class selector are excluded entirely', () => {
-    const result = convert("<body><div class=\"cookie-banner\">Accept cookies</div><p>Main content</p></body>", { excludeSelectors: [".cookie-banner"] } as WasmConversionOptions);
+  it("options_exclude_selectors_class: Elements matching CSS class selector are excluded entirely", () => {
+    const result = convert(
+      '<body><div class="cookie-banner">Accept cookies</div><p>Main content</p></body>',
+      { excludeSelectors: [".cookie-banner"] } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Main content");
     expect(result.content).not.toContain("cookies");
   });
 
-  it('options_exclude_selectors_empty_noop: Empty exclude_selectors list does not affect output', () => {
+  it("options_exclude_selectors_empty_noop: Empty exclude_selectors list does not affect output", () => {
     const result = convert("<p>Hello world</p>", { excludeSelectors: [] } as WasmConversionOptions);
     expect(result.content ?? "").toContain("Hello world");
   });
 
-  it('options_exclude_selectors_id: Elements matching CSS id selector are excluded entirely', () => {
-    const result = convert("<body><div id=\"ad-container\">Buy stuff</div><p>Article text</p></body>", { excludeSelectors: ["#ad-container"] } as WasmConversionOptions);
+  it("options_exclude_selectors_id: Elements matching CSS id selector are excluded entirely", () => {
+    const result = convert(
+      '<body><div id="ad-container">Buy stuff</div><p>Article text</p></body>',
+      { excludeSelectors: ["#ad-container"] } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Article text");
     expect(result.content).not.toContain("Buy stuff");
   });
 
-  it('options_exclude_selectors_multiple: Multiple CSS selectors each exclude their matched elements', () => {
-    const result = convert("<body><nav class=\"nav\">Menu</nav><p>Content</p><footer>Footer</footer></body>", { excludeSelectors: [".nav", "footer"] } as WasmConversionOptions);
+  it("options_exclude_selectors_multiple: Multiple CSS selectors each exclude their matched elements", () => {
+    const result = convert(
+      '<body><nav class="nav">Menu</nav><p>Content</p><footer>Footer</footer></body>',
+      { excludeSelectors: [".nav", "footer"] } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Content");
     expect(result.content).not.toContain("Menu");
     expect(result.content).not.toContain("Footer");
   });
 
-  it('options_exclude_selectors_nested_content_dropped: All descendants of excluded elements are dropped', () => {
-    const result = convert("<body><aside class=\"sidebar\"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>", { excludeSelectors: [".sidebar"] } as WasmConversionOptions);
+  it("options_exclude_selectors_nested_content_dropped: All descendants of excluded elements are dropped", () => {
+    const result = convert(
+      '<body><aside class="sidebar"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>',
+      { excludeSelectors: [".sidebar"] } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Main text");
     expect(result.content).not.toContain("Related");
     expect(result.content).not.toContain("Sidebar text");
   });
 
-  it('options_exclude_selectors_plain_text_mode: Exclude selectors work in plain text output mode', () => {
-    const result = convert("<body><div class=\"nav\">Navigation</div><p>Article body</p></body>", { excludeSelectors: [".nav"], outputFormat: "Plain" } as WasmConversionOptions);
+  it("options_exclude_selectors_plain_text_mode: Exclude selectors work in plain text output mode", () => {
+    const result = convert('<body><div class="nav">Navigation</div><p>Article body</p></body>', {
+      excludeSelectors: [".nav"],
+      outputFormat: "Plain",
+    } as WasmConversionOptions);
     expect(result.content ?? "").toContain("Article body");
     expect(result.content).not.toContain("Navigation");
   });
 
-  it('options_exclude_selectors_vs_strip_tags: exclude_selectors drops entire subtree unlike strip_tags which keeps children', () => {
-    const result = convert("<body><div class=\"wrapper\"><p>Inner paragraph</p></div><p>Outer text</p></body>", { excludeSelectors: [".wrapper"] } as WasmConversionOptions);
+  it("options_exclude_selectors_vs_strip_tags: exclude_selectors drops entire subtree unlike strip_tags which keeps children", () => {
+    const result = convert(
+      '<body><div class="wrapper"><p>Inner paragraph</p></div><p>Outer text</p></body>',
+      { excludeSelectors: [".wrapper"] } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Outer text");
     expect(result.content).not.toContain("Inner paragraph");
   });
 
-  it('options_extract_metadata_true: Extract metadata returns document metadata when enabled', () => {
-    const result = convert("<html><head><title>Test Page</title><meta name='description' content='A test page'></head><body><p>Content</p></body></html>", { extractMetadata: true } as WasmConversionOptions);
+  it("options_extract_metadata_true: Extract metadata returns document metadata when enabled", () => {
+    const result = convert(
+      "<html><head><title>Test Page</title><meta name='description' content='A test page'></head><body><p>Content</p></body></html>",
+      { extractMetadata: true } as WasmConversionOptions,
+    );
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect((result.metadata.document.title ?? "").trim()).toBe("Test Page");
     expect((result.metadata.document.description ?? "").trim()).toBe("A test page");
   });
 
-  it('options_heading_style_atx: ATX heading style produces hash-prefixed headings', () => {
-    const result = convert("<h1>Title</h1><h2>Subtitle</h2>", { headingStyle: "Atx" } as WasmConversionOptions);
+  it("options_heading_style_atx: ATX heading style produces hash-prefixed headings", () => {
+    const result = convert("<h1>Title</h1><h2>Subtitle</h2>", {
+      headingStyle: "Atx",
+    } as WasmConversionOptions);
     expect(result.content).toContain("# Title");
     expect(result.content).toContain("## Subtitle");
   });
 
-  it('options_heading_style_atx_closed: ATX closed heading style adds closing hashes', () => {
-    const result = convert("<h1>Closed Heading</h1>", { headingStyle: "AtxClosed" } as WasmConversionOptions);
+  it("options_heading_style_atx_closed: ATX closed heading style adds closing hashes", () => {
+    const result = convert("<h1>Closed Heading</h1>", {
+      headingStyle: "AtxClosed",
+    } as WasmConversionOptions);
     expect(result.content).toContain("# Closed Heading #");
   });
 
-  it('options_heading_style_underlined: Underlined heading style produces setext-style headings for h1 and h2', () => {
-    const result = convert("<h1>Main Title</h1>", { headingStyle: "Underlined" } as WasmConversionOptions);
+  it("options_heading_style_underlined: Underlined heading style produces setext-style headings for h1 and h2", () => {
+    const result = convert("<h1>Main Title</h1>", {
+      headingStyle: "Underlined",
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("Main Title");
   });
 
-  it('options_highlight_bold: Mark tag rendered as bold', () => {
-    const result = convert("<p>Text with <mark>highlighted</mark> text.</p>", { highlightStyle: "Bold" } as WasmConversionOptions);
+  it("options_highlight_bold: Mark tag rendered as bold", () => {
+    const result = convert("<p>Text with <mark>highlighted</mark> text.</p>", {
+      highlightStyle: "Bold",
+    } as WasmConversionOptions);
     expect(result.content).toContain("**highlighted**");
   });
 
-  it('options_highlight_double_equal: Mark tag with double equal highlight style', () => {
-    const result = convert("<p>Text with <mark>highlighted</mark> here.</p>", { highlightStyle: "DoubleEqual" } as WasmConversionOptions);
+  it("options_highlight_double_equal: Mark tag with double equal highlight style", () => {
+    const result = convert("<p>Text with <mark>highlighted</mark> here.</p>", {
+      highlightStyle: "DoubleEqual",
+    } as WasmConversionOptions);
     expect(result.content).toContain("==highlighted==");
   });
 
-  it('options_highlight_none: Mark tag with no highlight style strips the mark', () => {
-    const result = convert("<p>Text with <mark>plain</mark> content.</p>", { highlightStyle: "None" } as WasmConversionOptions);
+  it("options_highlight_none: Mark tag with no highlight style strips the mark", () => {
+    const result = convert("<p>Text with <mark>plain</mark> content.</p>", {
+      highlightStyle: "None",
+    } as WasmConversionOptions);
     expect(result.content).toContain("plain");
     expect(result.content).not.toContain("==");
   });
 
-  it('options_keep_inline_images_in_paragraph: Images inside specified tags stay inline', () => {
-    const result = convert("<p>Text <img src='icon.png' alt='icon'> more text</p>", { keepInlineImagesIn: ["p"] } as WasmConversionOptions);
+  it("options_keep_inline_images_in_paragraph: Images inside specified tags stay inline", () => {
+    const result = convert("<p>Text <img src='icon.png' alt='icon'> more text</p>", {
+      keepInlineImagesIn: ["p"],
+    } as WasmConversionOptions);
     expect(result.content).toContain("Text");
     expect(result.content).toContain("more text");
   });
 
-  it('options_link_style_reference: Links use reference-style formatting', () => {
-    const result = convert("<p><a href='https://example.com'>Example</a> and <a href='https://other.com'>Other</a></p>", { linkStyle: "Reference" } as WasmConversionOptions);
+  it("options_link_style_reference: Links use reference-style formatting", () => {
+    const result = convert(
+      "<p><a href='https://example.com'>Example</a> and <a href='https://other.com'>Other</a></p>",
+      { linkStyle: "Reference" } as WasmConversionOptions,
+    );
     expect(result.content).toContain("Example");
     expect(result.content).toContain("Other");
     expect(result.content).toContain("example.com");
   });
 
-  it('options_list_custom_bullets: Custom bullet character for unordered lists', () => {
-    const result = convert("<ul><li>Item A</li><li>Item B</li></ul>", { bullets: "*" } as WasmConversionOptions);
+  it("options_list_custom_bullets: Custom bullet character for unordered lists", () => {
+    const result = convert("<ul><li>Item A</li><li>Item B</li></ul>", {
+      bullets: "*",
+    } as WasmConversionOptions);
     expect(result.content).toContain("* Item A");
     expect(result.content).toContain("* Item B");
   });
 
-  it('options_list_indent_tabs: Tab indentation type for nested list items', () => {
-    const result = convert("<ul><li>Parent<ul><li>Child</li></ul></li></ul>", { listIndentType: "Tabs" } as WasmConversionOptions);
+  it("options_list_indent_tabs: Tab indentation type for nested list items", () => {
+    const result = convert("<ul><li>Parent<ul><li>Child</li></ul></li></ul>", {
+      listIndentType: "Tabs",
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("Parent");
     expect(result.content).toContain("Child");
   });
 
-  it('options_list_indent_width_four: Nested lists indented with 4 spaces per level', () => {
-    const result = convert("<ul><li>Outer<ul><li>Inner</li></ul></li></ul>", { listIndentWidth: 4 } as WasmConversionOptions);
+  it("options_list_indent_width_four: Nested lists indented with 4 spaces per level", () => {
+    const result = convert("<ul><li>Outer<ul><li>Inner</li></ul></li></ul>", {
+      listIndentWidth: 4,
+    } as WasmConversionOptions);
     expect(result.content).toContain("Outer");
     expect(result.content).toContain("Inner");
   });
 
-  it('options_max_depth_default_unlimited: Default max_depth (null) converts deeply nested content fully', () => {
+  it("options_max_depth_default_unlimited: Default max_depth (null) converts deeply nested content fully", () => {
     const result = convert("<div><div><div><div><p>Deep content</p></div></div></div></div>");
     expect(result.content ?? "").toContain("Deep content");
   });
 
-  it('options_max_depth_truncates: max_depth truncates content beyond the specified depth', () => {
-    const result = convert("<div><p>Shallow</p><div><div><div><p>Too deep</p></div></div></div></div>", { maxDepth: 3 } as WasmConversionOptions);
+  it("options_max_depth_truncates: max_depth truncates content beyond the specified depth", () => {
+    const result = convert(
+      "<div><p>Shallow</p><div><div><div><p>Too deep</p></div></div></div></div>",
+      { maxDepth: 3 } as WasmConversionOptions,
+    );
     expect(result.content ?? "").toContain("Shallow");
     expect(result.content).not.toContain("Too deep");
   });
 
-  it('options_max_depth_zero_empty: max_depth of 0 produces empty output', () => {
+  it("options_max_depth_zero_empty: max_depth of 0 produces empty output", () => {
     const result = convert("<p>Hello</p>", { maxDepth: 0 } as WasmConversionOptions);
     expect((result.content ?? "").trim()).toBe("");
   });
 
-  it('options_newline_backslash: Hard line breaks rendered with backslash', () => {
-    const result = convert("<p>Line one<br>Line two</p>", { newlineStyle: "Backslash" } as WasmConversionOptions);
+  it("options_newline_backslash: Hard line breaks rendered with backslash", () => {
+    const result = convert("<p>Line one<br>Line two</p>", {
+      newlineStyle: "Backslash",
+    } as WasmConversionOptions);
     expect(result.content).toContain("Line one");
     expect(result.content).toContain("Line two");
   });
 
-  it('options_newline_spaces: Hard line breaks rendered with trailing spaces', () => {
-    const result = convert("<p>First<br>Second</p>", { newlineStyle: "Spaces" } as WasmConversionOptions);
+  it("options_newline_spaces: Hard line breaks rendered with trailing spaces", () => {
+    const result = convert("<p>First<br>Second</p>", {
+      newlineStyle: "Spaces",
+    } as WasmConversionOptions);
     expect(result.content).toContain("First");
     expect(result.content).toContain("Second");
   });
 
-  it('options_output_format_djot: Djot output format produces djot-compatible markup', () => {
-    const result = convert("<p>Simple paragraph.</p>", { outputFormat: "Djot" } as WasmConversionOptions);
+  it("options_output_format_djot: Djot output format produces djot-compatible markup", () => {
+    const result = convert("<p>Simple paragraph.</p>", {
+      outputFormat: "Djot",
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("Simple paragraph.");
   });
 
-  it('options_output_format_markdown: Default markdown output format produces standard markdown', () => {
-    const result = convert("<h1>Title</h1><p>Some text.</p>", { headingStyle: "Atx", outputFormat: "Markdown" } as WasmConversionOptions);
+  it("options_output_format_markdown: Default markdown output format produces standard markdown", () => {
+    const result = convert("<h1>Title</h1><p>Some text.</p>", {
+      headingStyle: "Atx",
+      outputFormat: "Markdown",
+    } as WasmConversionOptions);
     expect(result.content).toContain("# Title");
     expect(result.content).toContain("Some text.");
   });
 
-  it('options_output_format_plain: Plain text output format strips markdown syntax', () => {
-    const result = convert("<h1>Title</h1><p>Some <strong>bold</strong> text.</p>", { outputFormat: "Plain" } as WasmConversionOptions);
+  it("options_output_format_plain: Plain text output format strips markdown syntax", () => {
+    const result = convert("<h1>Title</h1><p>Some <strong>bold</strong> text.</p>", {
+      outputFormat: "Plain",
+    } as WasmConversionOptions);
     expect(result.content).toContain("Title");
     expect(result.content).toContain("bold");
     expect(result.content).toContain("text.");
   });
 
-  it('options_preprocessing_aggressive: Aggressive preset removes nav, footer, aside unconditionally', () => {
-    const result = convert("<nav>Menu</nav><article><h1>Title</h1><p>Content</p></article><aside>Sidebar</aside><footer>Footer</footer>", { preprocessing: { preset: "Aggressive" } } as WasmConversionOptions);
+  it("options_preprocessing_aggressive: Aggressive preset removes nav, footer, aside unconditionally", () => {
+    const result = convert(
+      "<nav>Menu</nav><article><h1>Title</h1><p>Content</p></article><aside>Sidebar</aside><footer>Footer</footer>",
+      { preprocessing: { preset: "Aggressive" } } as WasmConversionOptions,
+    );
     expect(result.content).toContain("Title");
     expect(result.content).toContain("Content");
     expect(result.content).not.toContain("Menu");
   });
 
-  it('options_preprocessing_minimal: Minimal preset preserves nav, footer, aside', () => {
-    const result = convert("<nav>Navigation</nav><p>Content</p><footer>Footer</footer>", { preprocessing: { preset: "Minimal" } } as WasmConversionOptions);
+  it("options_preprocessing_minimal: Minimal preset preserves nav, footer, aside", () => {
+    const result = convert("<nav>Navigation</nav><p>Content</p><footer>Footer</footer>", {
+      preprocessing: { preset: "Minimal" },
+    } as WasmConversionOptions);
     expect(result.content).toContain("Navigation");
     expect(result.content).toContain("Content");
     expect(result.content).toContain("Footer");
   });
 
-  it('options_preprocessing_remove_forms: Forms are removed when remove_forms is true', () => {
-    const result = convert("<p>Before</p><form><input type='text'/><button>Submit</button></form><p>After</p>", { preprocessing: { removeForms: true } } as WasmConversionOptions);
+  it("options_preprocessing_remove_forms: Forms are removed when remove_forms is true", () => {
+    const result = convert(
+      "<p>Before</p><form><input type='text'/><button>Submit</button></form><p>After</p>",
+      { preprocessing: { removeForms: true } } as WasmConversionOptions,
+    );
     expect(result.content).toContain("Before");
     expect(result.content).toContain("After");
     expect(result.content).not.toContain("Submit");
   });
 
-  it('options_preserve_tags_iframe: Iframe tags preserved as raw HTML in output', () => {
-    const result = convert("<p>Before</p><iframe src='video.html' width='560'></iframe><p>After</p>", { preserveTags: ["iframe"] } as WasmConversionOptions);
+  it("options_preserve_tags_iframe: Iframe tags preserved as raw HTML in output", () => {
+    const result = convert(
+      "<p>Before</p><iframe src='video.html' width='560'></iframe><p>After</p>",
+      { preserveTags: ["iframe"] } as WasmConversionOptions,
+    );
     expect(result.content).toContain("Before");
     expect(result.content).toContain("After");
     expect(result.content).toContain("<iframe");
   });
 
-  it('options_skip_images_true: Images are omitted from output when skipImages is true', () => {
-    const result = convert("<p>Before <img src='test.jpg' alt='photo'> After</p>", { skipImages: true } as WasmConversionOptions);
+  it("options_skip_images_true: Images are omitted from output when skipImages is true", () => {
+    const result = convert("<p>Before <img src='test.jpg' alt='photo'> After</p>", {
+      skipImages: true,
+    } as WasmConversionOptions);
     expect(result.content).toContain("Before");
     expect(result.content).toContain("After");
     expect(result.content).not.toContain("photo");
   });
 
-  it('options_strip_newlines: Strip newlines produces single-line paragraphs', () => {
-    const result = convert("<p>First paragraph.</p><p>Second paragraph.</p>", { stripNewlines: true } as WasmConversionOptions);
+  it("options_strip_newlines: Strip newlines produces single-line paragraphs", () => {
+    const result = convert("<p>First paragraph.</p><p>Second paragraph.</p>", {
+      stripNewlines: true,
+    } as WasmConversionOptions);
     expect(result.content).toContain("First paragraph.");
     expect(result.content).toContain("Second paragraph.");
   });
 
-  it('options_strip_tags_div_span: Div and span tags stripped but content preserved', () => {
-    const result = convert("<div class='wrapper'><p>Inside div</p></div><p>Outside <span class='hl'>span text</span></p>", { stripTags: ["div", "span"] } as WasmConversionOptions);
+  it("options_strip_tags_div_span: Div and span tags stripped but content preserved", () => {
+    const result = convert(
+      "<div class='wrapper'><p>Inside div</p></div><p>Outside <span class='hl'>span text</span></p>",
+      { stripTags: ["div", "span"] } as WasmConversionOptions,
+    );
     expect(result.content).toContain("Inside div");
     expect(result.content).toContain("span text");
   });
 
-  it('options_strong_em_underscore: Strong and em tags use underscore symbol instead of asterisk', () => {
-    const result = convert("<p><strong>bold</strong> and <em>italic</em></p>", { strongEmSymbol: "_" } as WasmConversionOptions);
+  it("options_strong_em_underscore: Strong and em tags use underscore symbol instead of asterisk", () => {
+    const result = convert("<p><strong>bold</strong> and <em>italic</em></p>", {
+      strongEmSymbol: "_",
+    } as WasmConversionOptions);
     expect(result.content).toContain("__bold__");
     expect(result.content).toContain("_italic_");
   });
 
-  it('options_sub_symbol_tilde: Subscript rendered with tilde symbol', () => {
+  it("options_sub_symbol_tilde: Subscript rendered with tilde symbol", () => {
     const result = convert("<p>H<sub>2</sub>O</p>", { subSymbol: "~" } as WasmConversionOptions);
     expect(result.content).toContain("~2~");
   });
 
-  it('options_sup_symbol_caret: Superscript rendered with caret symbol', () => {
+  it("options_sup_symbol_caret: Superscript rendered with caret symbol", () => {
     const result = convert("<p>x<sup>2</sup></p>", { supSymbol: "^" } as WasmConversionOptions);
     expect(result.content).toContain("^2^");
   });
 
-  it('options_whitespace_normalized: Normalized whitespace mode collapses multiple spaces', () => {
-    const result = convert("<p>Text   with    extra   spaces.</p>", { whitespaceMode: "Normalized" } as WasmConversionOptions);
+  it("options_whitespace_normalized: Normalized whitespace mode collapses multiple spaces", () => {
+    const result = convert("<p>Text   with    extra   spaces.</p>", {
+      whitespaceMode: "Normalized",
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("Text");
     expect(result.content).toContain("with");
@@ -348,20 +462,30 @@ describe('options', () => {
     expect(result.content).toContain("spaces.");
   });
 
-  it('options_whitespace_strict: Strict whitespace mode preserves whitespace as-is', () => {
-    const result = convert("<p>Preserved   spacing.</p>", { whitespaceMode: "Strict" } as WasmConversionOptions);
+  it("options_whitespace_strict: Strict whitespace mode preserves whitespace as-is", () => {
+    const result = convert("<p>Preserved   spacing.</p>", {
+      whitespaceMode: "Strict",
+    } as WasmConversionOptions);
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("Preserved");
     expect(result.content).toContain("spacing.");
   });
 
-  it('options_wrap_disabled: Wrap option disabled preserves long lines without breaking', () => {
-    const result = convert("<p>This is a long paragraph that should not be wrapped at all because wrapping is disabled.</p>", { wrap: false } as WasmConversionOptions);
-    expect(result.content).toContain("This is a long paragraph that should not be wrapped at all because wrapping is disabled.");
+  it("options_wrap_disabled: Wrap option disabled preserves long lines without breaking", () => {
+    const result = convert(
+      "<p>This is a long paragraph that should not be wrapped at all because wrapping is disabled.</p>",
+      { wrap: false } as WasmConversionOptions,
+    );
+    expect(result.content).toContain(
+      "This is a long paragraph that should not be wrapped at all because wrapping is disabled.",
+    );
   });
 
-  it('options_wrap_enabled: Wrap option enabled with custom width wraps long lines', () => {
-    const result = convert("<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>", { wrap: true, wrapWidth: 40 } as WasmConversionOptions);
+  it("options_wrap_enabled: Wrap option enabled with custom width wraps long lines", () => {
+    const result = convert(
+      "<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>",
+      { wrap: true, wrapWidth: 40 } as WasmConversionOptions,
+    );
     expect((result.content ?? "").length).toBeGreaterThan(0);
     expect(result.content).toContain("This is a long paragraph");
   });
