@@ -4,7 +4,7 @@
 # To verify freshness: alef verify --exit-code
 # Issues & docs: https://github.com/kreuzberg-dev/alef
 
-from typing import Literal, TypeAlias, TypedDict
+from typing import Any, Literal, TypeAlias, TypedDict
 
 class DocumentMetadata:
     title: str | None
@@ -437,7 +437,6 @@ class ConversionOptionsBuilder:
     def visitor(self, visitor: VisitorHandle | None = None) -> ConversionOptionsBuilder: ...
     def preprocessing(self, preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder: ...
     def build(self) -> ConversionOptions: ...
-
 class VisitorHandle: ...
 
 class TextDirection:
@@ -617,20 +616,20 @@ class NodeContentGroupVariant(TypedDict):
     heading_level: int | None
     heading_text: str | None
 
-NodeContent: TypeAlias = (
-    NodeContentHeadingVariant
-    | NodeContentParagraphVariant
-    | NodeContentListVariant
-    | NodeContentListItemVariant
-    | NodeContentTableVariant
-    | NodeContentImageVariant
-    | NodeContentCodeVariant
-    | NodeContentQuoteVariant
-    | NodeContentDefinitionListVariant
-    | NodeContentDefinitionItemVariant
-    | NodeContentRawBlockVariant
-    | NodeContentMetadataBlockVariant
-    | NodeContentGroupVariant
+NodeContent = (
+    NodeContentHeadingVariant |
+    NodeContentParagraphVariant |
+    NodeContentListVariant |
+    NodeContentListItemVariant |
+    NodeContentTableVariant |
+    NodeContentImageVariant |
+    NodeContentCodeVariant |
+    NodeContentQuoteVariant |
+    NodeContentDefinitionListVariant |
+    NodeContentDefinitionItemVariant |
+    NodeContentRawBlockVariant |
+    NodeContentMetadataBlockVariant |
+    NodeContentGroupVariant
 )
 
 class AnnotationKindBoldVariant(TypedDict):
@@ -662,16 +661,16 @@ class AnnotationKindLinkVariant(TypedDict):
     url: str
     title: str | None
 
-AnnotationKind: TypeAlias = (
-    AnnotationKindBoldVariant
-    | AnnotationKindItalicVariant
-    | AnnotationKindUnderlineVariant
-    | AnnotationKindStrikethroughVariant
-    | AnnotationKindCodeVariant
-    | AnnotationKindSubscriptVariant
-    | AnnotationKindSuperscriptVariant
-    | AnnotationKindHighlightVariant
-    | AnnotationKindLinkVariant
+AnnotationKind = (
+    AnnotationKindBoldVariant |
+    AnnotationKindItalicVariant |
+    AnnotationKindUnderlineVariant |
+    AnnotationKindStrikethroughVariant |
+    AnnotationKindCodeVariant |
+    AnnotationKindSubscriptVariant |
+    AnnotationKindSuperscriptVariant |
+    AnnotationKindHighlightVariant |
+    AnnotationKindLinkVariant
 )
 
 class WarningKind:
@@ -884,12 +883,12 @@ class VisitResultErrorVariant(TypedDict):
     type: Literal["Error"]
     _0: str
 
-VisitResult: TypeAlias = (
-    VisitResultContinueVariant
-    | VisitResultCustomVariant
-    | VisitResultSkipVariant
-    | VisitResultPreserveHtmlVariant
-    | VisitResultErrorVariant
+VisitResult = (
+    VisitResultContinueVariant |
+    VisitResultCustomVariant |
+    VisitResultSkipVariant |
+    VisitResultPreserveHtmlVariant |
+    VisitResultErrorVariant
 )
 
 def convert(html: str, options: ConversionOptions | None = None) -> ConversionResult: ...
