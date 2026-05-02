@@ -3,7 +3,7 @@
 use html_to_markdown_rs::ConversionOptions;
 
 fn convert(html: &str, opts: Option<ConversionOptions>) -> html_to_markdown_rs::error::Result<String> {
-    html_to_markdown_rs::convert(html, opts, None).map(|r| r.content.unwrap_or_default())
+    html_to_markdown_rs::convert(html, opts).map(|r| r.content.unwrap_or_default())
 }
 
 #[test]

@@ -6,27 +6,12 @@ use std::borrow::Cow;
 
 use crate::error::Result;
 use crate::options::{ConversionOptions, WhitespaceMode};
-
-/// The visitor parameter type accepted by [`convert`].
-///
-/// When the `visitor` feature is enabled, this is the full `VisitorHandle`
-/// (a shared reference-counted dyn `HtmlVisitor`). When the feature is off
-/// it degrades to a unit type so that callers can keep a stable 3-arity
-/// `convert(html, options, None)` call signature regardless of feature flags.
-#[cfg(feature = "visitor")]
-pub type VisitorParam = crate::visitor::VisitorHandle;
-#[cfg(not(feature = "visitor"))]
-pub type VisitorParam = ();
-#[cfg(any(feature = "serde", feature = "metadata", feature = "inline-images"))]
+#[cfg(any(feature = "metadata", feature = "inline-images"))]
 use crate::ConversionError;
-#[cfg(any(feature = "serde", feature = "metadata"))]
-use crate::ConversionOptionsUpdate;
 use crate::text;
 use crate::types::ConversionResult;
 use crate::validation::{Utf16Encoding, detect_utf16_encoding, validate_input};
 
-#[cfg(all(feature = "inline-images", any(feature = "serde", feature = "metadata")))]
-use crate::InlineImageConfig;
 #[cfg(feature = "metadata")]
 use crate::{HtmlMetadata, MetadataConfig};
 
@@ -35,33 +20,34 @@ use crate::{HtmlMetadata, MetadataConfig};
 ///
 /// # Arguments
 ///
-/// * `html` - The HTML string to convert
-/// * `options` - Optional conversion options (defaults to `ConversionOptions::default()`)
+/// * `html` — the HTML string to convert.
+/// * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
+///   When the `visitor` feature is enabled, a custom [`crate::visitor::HtmlVisitor`] can be
+///   attached via the `visitor` field on `ConversionOptions`.
 ///
 /// # Example
 ///
 /// ```
-/// use html_to_markdown_rs::{convert, ConversionOptions};
+/// use html_to_markdown_rs::convert;
 ///
 /// let html = "<h1>Hello World</h1>";
-/// let result = convert(html, None, None).unwrap();
+/// let result = convert(html, None).unwrap();
 /// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
 /// ```
 ///
 /// # Errors
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-pub fn convert(
-    html: &str,
-    options: Option<ConversionOptions>,
-    visitor: Option<VisitorParam>,
-) -> Result<ConversionResult> {
+pub fn convert(html: &str, options: Option<ConversionOptions>) -> Result<ConversionResult> {
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::cell::RefCell;
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::rc::Rc;
 
     let options = options.unwrap_or_default();
+
+    #[cfg(feature = "visitor")]
+    let visitor = options.visitor.clone();
 
     let normalized_html = normalize_input(html)?;
 
@@ -116,12 +102,8 @@ pub fn convert(
             None
         };
 
-    // `convert_html_impl` expects the visitor slot to be `Option<()>` when the visitor
-    // feature is off. We accept `Option<VisitorParam>` (a feature-gated alias) at the
-    // public API — when the feature is off it's `Option<()>`, so `visitor` already has
-    // the right type and we don't need to override it.
     #[cfg(not(feature = "visitor"))]
-    let _ = visitor.is_some();
+    let visitor: Option<()> = None;
 
     // Run the conversion pipeline.
     // Pass structure_collector by value — convert_html_impl will consume it via Rc::try_unwrap
@@ -366,100 +348,4 @@ fn fast_text_only(html: &str, options: &ConversionOptions) -> Option<String> {
     }
     output.push('\n');
     Some(output)
-}
-
-// ============================================================================
-// JSON Configuration Parsing (requires serde feature)
-// ============================================================================
-
-#[cfg(any(feature = "serde", feature = "metadata"))]
-fn parse_json<T: serde::de::DeserializeOwned>(json: &str) -> Result<T> {
-    serde_json::from_str(json).map_err(|err| ConversionError::ConfigError(err.to_string()))
-}
-
-#[cfg(any(feature = "serde", feature = "metadata"))]
-/// Parse JSON string into `ConversionOptions`.
-///
-/// Deserializes a JSON string into a full set of conversion options.
-/// The JSON can be either a complete or partial options object.
-///
-/// # Arguments
-///
-/// * `json` - JSON string representing conversion options
-///
-/// # Returns
-///
-/// Fully populated `ConversionOptions` with defaults applied to any unspecified values
-///
-/// # Errors
-///
-/// Returns `ConversionError::ConfigError` if JSON parsing fails or contains invalid option values
-pub fn conversion_options_from_json(json: &str) -> Result<ConversionOptions> {
-    let update: ConversionOptionsUpdate = parse_json(json)?;
-    Ok(ConversionOptions::from(update))
-}
-
-#[cfg(any(feature = "serde", feature = "metadata"))]
-/// Parse JSON string into partial `ConversionOptions` update.
-///
-/// Deserializes a JSON string into a partial set of conversion options.
-/// Only specified options are included; unspecified options are None.
-///
-/// # Arguments
-///
-/// * `json` - JSON string representing partial conversion options
-///
-/// # Returns
-///
-/// `ConversionOptionsUpdate` with only specified fields populated
-///
-/// # Errors
-///
-/// Returns `ConversionError::ConfigError` if JSON parsing fails or contains invalid option values
-pub fn conversion_options_update_from_json(json: &str) -> Result<ConversionOptionsUpdate> {
-    parse_json(json)
-}
-
-#[cfg(all(feature = "inline-images", any(feature = "serde", feature = "metadata")))]
-/// Parse JSON string into `InlineImageConfig` (requires `inline-images` feature).
-///
-/// Deserializes a JSON string into inline image extraction configuration.
-/// The JSON can be either a complete or partial configuration object.
-///
-/// # Arguments
-///
-/// * `json` - JSON string representing inline image configuration
-///
-/// # Returns
-///
-/// Fully populated `InlineImageConfig` with defaults applied to any unspecified values
-///
-/// # Errors
-///
-/// Returns `ConversionError::ConfigError` if JSON parsing fails or contains invalid configuration values
-pub fn inline_image_config_from_json(json: &str) -> Result<InlineImageConfig> {
-    let update: crate::InlineImageConfigUpdate = parse_json(json)?;
-    Ok(InlineImageConfig::from_update(update))
-}
-
-#[cfg(all(feature = "metadata", any(feature = "serde", feature = "metadata")))]
-/// Parse JSON string into `MetadataConfig` (requires `metadata` feature).
-///
-/// Deserializes a JSON string into metadata extraction configuration.
-/// The JSON can be either a complete or partial configuration object.
-///
-/// # Arguments
-///
-/// * `json` - JSON string representing metadata extraction configuration
-///
-/// # Returns
-///
-/// Fully populated `MetadataConfig` with defaults applied to any unspecified values
-///
-/// # Errors
-///
-/// Returns `ConversionError::ConfigError` if JSON parsing fails or contains invalid configuration values
-pub fn metadata_config_from_json(json: &str) -> Result<MetadataConfig> {
-    let update: crate::MetadataConfigUpdate = parse_json(json)?;
-    Ok(MetadataConfig::from(update))
 }

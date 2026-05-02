@@ -7,7 +7,7 @@
 //! tag when script content contained unbalanced literal `<script>` strings.
 
 fn convert(html: &str) -> String {
-    html_to_markdown_rs::convert(html, None, None)
+    html_to_markdown_rs::convert(html, None)
         .expect("conversion should not fail")
         .content
         .unwrap_or_default()

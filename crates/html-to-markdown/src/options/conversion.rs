@@ -120,6 +120,15 @@ pub struct ConversionOptions {
     /// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default))]
     pub exclude_selectors: Vec<String>,
+
+    /// Optional visitor for custom traversal logic.
+    ///
+    /// When set, the visitor's callbacks are invoked for matching HTML elements
+    /// during conversion, allowing custom output, skipping, or HTML preservation.
+    /// See [`crate::visitor::HtmlVisitor`].
+    #[cfg(feature = "visitor")]
+    #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(skip))]
+    pub visitor: Option<crate::visitor::VisitorHandle>,
 }
 
 impl Default for ConversionOptions {
@@ -165,6 +174,8 @@ impl Default for ConversionOptions {
             infer_dimensions: true,
             max_depth: None,
             exclude_selectors: Vec::new(),
+            #[cfg(feature = "visitor")]
+            visitor: None,
         }
     }
 }
@@ -278,6 +289,14 @@ impl ConversionOptionsBuilder {
     #[must_use]
     pub fn exclude_selectors(mut self, selectors: Vec<String>) -> Self {
         self.0.exclude_selectors = selectors;
+        self
+    }
+
+    /// Set the visitor used during conversion.
+    #[cfg(feature = "visitor")]
+    #[must_use]
+    pub fn visitor(mut self, visitor: Option<crate::visitor::VisitorHandle>) -> Self {
+        self.0.visitor = visitor;
         self
     }
 
@@ -397,6 +416,10 @@ pub struct ConversionOptionsUpdate {
     pub max_depth: Option<Option<usize>>,
     /// Optional override for [`ConversionOptions::exclude_selectors`].
     pub exclude_selectors: Option<Vec<String>>,
+    /// Optional override for [`ConversionOptions::visitor`].
+    #[cfg(feature = "visitor")]
+    #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(skip))]
+    pub visitor: Option<crate::visitor::VisitorHandle>,
 }
 
 impl ConversionOptions {
@@ -448,6 +471,10 @@ impl ConversionOptions {
         apply!(infer_dimensions);
         apply!(max_depth);
         apply!(exclude_selectors);
+        #[cfg(feature = "visitor")]
+        if let Some(visitor) = update.visitor {
+            self.visitor = Some(visitor);
+        }
         if let Some(preprocessing) = update.preprocessing {
             self.preprocessing.apply_update(preprocessing);
         }

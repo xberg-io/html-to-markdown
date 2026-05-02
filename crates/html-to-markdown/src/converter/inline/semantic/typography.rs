@@ -7,7 +7,11 @@
 //! - Abbreviation (abbr) with optional title
 //! - Span element with special OCR handling
 
+#[cfg(feature = "visitor")]
+use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
+#[cfg(feature = "visitor")]
+use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
@@ -52,7 +56,8 @@ pub fn handle_subscript(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
+    #[allow(unused_imports)]
+    use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
     let Some(node) = node_handle.get(parser) else { return };
 
@@ -69,6 +74,53 @@ pub fn handle_subscript(
 
     if ctx.in_code {
         output.push_str(&content);
+        return;
+    }
+
+    #[cfg(feature = "visitor")]
+    let sub_output = if let Some(ref visitor_handle) = ctx.visitor {
+        use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+        let text_content = get_text_content(node_handle, parser, dom_ctx);
+        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
+
+        let node_id = node_handle.get_inner();
+        let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+        let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+
+        let node_ctx = NodeContext {
+            node_type: NodeType::Subscript,
+            tag_name: tag.name().as_utf8_str().to_string(),
+            attributes,
+            depth,
+            index_in_parent,
+            parent_tag,
+            is_inline: true,
+        };
+
+        let visit_result = {
+            let mut visitor = visitor_handle.borrow_mut();
+            visitor.visit_subscript(&node_ctx, &text_content)
+        };
+        match visit_result {
+            VisitResult::Continue => None,
+            VisitResult::Custom(custom) => Some(custom),
+            VisitResult::Skip => Some(String::new()),
+            VisitResult::PreserveHtml => Some(serialize_node(node_handle, parser)),
+            VisitResult::Error(err) => {
+                if ctx.visitor_error.borrow().is_none() {
+                    *ctx.visitor_error.borrow_mut() = Some(err);
+                }
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    #[cfg(feature = "visitor")]
+    if let Some(custom_output) = sub_output {
+        output.push_str(&custom_output);
         return;
     }
 
@@ -106,7 +158,8 @@ pub fn handle_superscript(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
+    #[allow(unused_imports)]
+    use crate::converter::{append_inline_suffix, chomp_inline, get_text_content, serialize_node, walk_node};
 
     let Some(node) = node_handle.get(parser) else { return };
 
@@ -123,6 +176,53 @@ pub fn handle_superscript(
 
     if ctx.in_code {
         output.push_str(&content);
+        return;
+    }
+
+    #[cfg(feature = "visitor")]
+    let sup_output = if let Some(ref visitor_handle) = ctx.visitor {
+        use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+        let text_content = get_text_content(node_handle, parser, dom_ctx);
+        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
+
+        let node_id = node_handle.get_inner();
+        let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+        let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+
+        let node_ctx = NodeContext {
+            node_type: NodeType::Superscript,
+            tag_name: tag.name().as_utf8_str().to_string(),
+            attributes,
+            depth,
+            index_in_parent,
+            parent_tag,
+            is_inline: true,
+        };
+
+        let visit_result = {
+            let mut visitor = visitor_handle.borrow_mut();
+            visitor.visit_superscript(&node_ctx, &text_content)
+        };
+        match visit_result {
+            VisitResult::Continue => None,
+            VisitResult::Custom(custom) => Some(custom),
+            VisitResult::Skip => Some(String::new()),
+            VisitResult::PreserveHtml => Some(serialize_node(node_handle, parser)),
+            VisitResult::Error(err) => {
+                if ctx.visitor_error.borrow().is_none() {
+                    *ctx.visitor_error.borrow_mut() = Some(err);
+                }
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    #[cfg(feature = "visitor")]
+    if let Some(custom_output) = sup_output {
+        output.push_str(&custom_output);
         return;
     }
 
@@ -319,5 +419,140 @@ pub fn handle_span(
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth, dom_ctx);
         }
+    }
+}
+
+#[cfg(all(test, feature = "visitor"))]
+mod tests {
+    use crate::convert;
+    use crate::options::ConversionOptions;
+    use crate::visitor::{HtmlVisitor, NodeContext, VisitResult};
+    use std::cell::RefCell;
+    use std::rc::Rc;
+
+    #[derive(Debug)]
+    struct SubSkipVisitor;
+
+    impl HtmlVisitor for SubSkipVisitor {
+        fn visit_subscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::Skip
+        }
+    }
+
+    #[derive(Debug)]
+    struct SubCustomVisitor;
+
+    impl HtmlVisitor for SubCustomVisitor {
+        fn visit_subscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::Custom("REPLACED".to_string())
+        }
+    }
+
+    #[derive(Debug)]
+    struct SubPreserveVisitor;
+
+    impl HtmlVisitor for SubPreserveVisitor {
+        fn visit_subscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::PreserveHtml
+        }
+    }
+
+    #[derive(Debug)]
+    struct SupSkipVisitor;
+
+    impl HtmlVisitor for SupSkipVisitor {
+        fn visit_superscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::Skip
+        }
+    }
+
+    #[derive(Debug)]
+    struct SupCustomVisitor;
+
+    impl HtmlVisitor for SupCustomVisitor {
+        fn visit_superscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::Custom("REPLACED".to_string())
+        }
+    }
+
+    #[derive(Debug)]
+    struct SupPreserveVisitor;
+
+    impl HtmlVisitor for SupPreserveVisitor {
+        fn visit_superscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::PreserveHtml
+        }
+    }
+
+    fn make_visitor<V: HtmlVisitor + 'static>(v: V) -> ConversionOptions {
+        ConversionOptions {
+            visitor: Some(Rc::new(RefCell::new(v))),
+            ..ConversionOptions::default()
+        }
+    }
+
+    #[test]
+    fn test_visitor_subscript_skip() {
+        let html = "<p>H<sub>2</sub>O</p>";
+        let result = convert(html, Some(make_visitor(SubSkipVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(!content.contains('2'), "sub content should be absent: {}", content);
+        assert!(content.contains('H'), "surrounding text should be present: {}", content);
+    }
+
+    #[test]
+    fn test_visitor_subscript_custom() {
+        let html = "<p>H<sub>2</sub>O</p>";
+        let result = convert(html, Some(make_visitor(SubCustomVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            content.contains("REPLACED"),
+            "custom output should be present: {}",
+            content
+        );
+    }
+
+    #[test]
+    fn test_visitor_subscript_preserve_html() {
+        let html = "<p>H<sub>2</sub>O</p>";
+        let result = convert(html, Some(make_visitor(SubPreserveVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            content.contains("<sub>2</sub>"),
+            "original html should be preserved: {}",
+            content
+        );
+    }
+
+    #[test]
+    fn test_visitor_superscript_skip() {
+        let html = "<p>E=mc<sup>2</sup></p>";
+        let result = convert(html, Some(make_visitor(SupSkipVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(!content.contains('2'), "sup content should be absent: {}", content);
+    }
+
+    #[test]
+    fn test_visitor_superscript_custom() {
+        let html = "<p>E=mc<sup>2</sup></p>";
+        let result = convert(html, Some(make_visitor(SupCustomVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            content.contains("REPLACED"),
+            "custom output should be present: {}",
+            content
+        );
+    }
+
+    #[test]
+    fn test_visitor_superscript_preserve_html() {
+        let html = "<p>E=mc<sup>2</sup></p>";
+        let result = convert(html, Some(make_visitor(SupPreserveVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            content.contains("<sup>2</sup>"),
+            "original html should be preserved: {}",
+            content
+        );
     }
 }

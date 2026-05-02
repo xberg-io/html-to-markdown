@@ -31,7 +31,8 @@ pub fn handle_mark(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    use crate::converter::walk_node;
+    #[allow(unused_imports)]
+    use crate::converter::{get_text_content, serialize_node, walk_node};
 
     let Some(node) = node_handle.get(parser) else { return };
 
@@ -39,6 +40,53 @@ pub fn handle_mark(
         tl::Node::Tag(tag) => tag,
         _ => return,
     };
+
+    #[cfg(feature = "visitor")]
+    let mark_output = if let Some(ref visitor_handle) = ctx.visitor {
+        use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+        let text_content = get_text_content(node_handle, parser, dom_ctx);
+        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
+
+        let node_id = node_handle.get_inner();
+        let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+        let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+
+        let node_ctx = NodeContext {
+            node_type: NodeType::Mark,
+            tag_name: tag.name().as_utf8_str().to_string(),
+            attributes,
+            depth,
+            index_in_parent,
+            parent_tag,
+            is_inline: true,
+        };
+
+        let visit_result = {
+            let mut visitor = visitor_handle.borrow_mut();
+            visitor.visit_mark(&node_ctx, &text_content)
+        };
+        match visit_result {
+            VisitResult::Continue => None,
+            VisitResult::Custom(custom) => Some(custom),
+            VisitResult::Skip => Some(String::new()),
+            VisitResult::PreserveHtml => Some(serialize_node(node_handle, parser)),
+            VisitResult::Error(err) => {
+                if ctx.visitor_error.borrow().is_none() {
+                    *ctx.visitor_error.borrow_mut() = Some(err);
+                }
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    #[cfg(feature = "visitor")]
+    if let Some(custom_output) = mark_output {
+        output.push_str(&custom_output);
+        return;
+    }
 
     if ctx.convert_as_inline {
         // In inline conversion context, just pass through children
@@ -430,5 +478,89 @@ pub fn handle_underline(
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
         }
+    }
+}
+
+#[cfg(all(test, feature = "visitor"))]
+mod tests {
+    use crate::convert;
+    use crate::options::ConversionOptions;
+    use crate::visitor::{HtmlVisitor, NodeContext, VisitResult};
+    use std::cell::RefCell;
+    use std::rc::Rc;
+
+    #[derive(Debug)]
+    struct MarkSkipVisitor;
+
+    impl HtmlVisitor for MarkSkipVisitor {
+        fn visit_mark(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::Skip
+        }
+    }
+
+    #[derive(Debug)]
+    struct MarkCustomVisitor;
+
+    impl HtmlVisitor for MarkCustomVisitor {
+        fn visit_mark(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::Custom("REPLACED".to_string())
+        }
+    }
+
+    #[derive(Debug)]
+    struct MarkPreserveVisitor;
+
+    impl HtmlVisitor for MarkPreserveVisitor {
+        fn visit_mark(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+            VisitResult::PreserveHtml
+        }
+    }
+
+    fn make_visitor<V: HtmlVisitor + 'static>(v: V) -> ConversionOptions {
+        ConversionOptions {
+            visitor: Some(Rc::new(RefCell::new(v))),
+            ..ConversionOptions::default()
+        }
+    }
+
+    #[test]
+    fn test_visitor_mark_skip() {
+        let html = "<p>before <mark>highlighted</mark> after</p>";
+        let result = convert(html, Some(make_visitor(MarkSkipVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            !content.contains("highlighted"),
+            "mark content should be absent: {}",
+            content
+        );
+        assert!(
+            content.contains("before"),
+            "surrounding text should be present: {}",
+            content
+        );
+    }
+
+    #[test]
+    fn test_visitor_mark_custom() {
+        let html = "<p>before <mark>highlighted</mark> after</p>";
+        let result = convert(html, Some(make_visitor(MarkCustomVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            content.contains("REPLACED"),
+            "custom output should be present: {}",
+            content
+        );
+    }
+
+    #[test]
+    fn test_visitor_mark_preserve_html() {
+        let html = "<p>before <mark>highlighted</mark> after</p>";
+        let result = convert(html, Some(make_visitor(MarkPreserveVisitor))).unwrap();
+        let content = result.content.unwrap_or_default();
+        assert!(
+            content.contains("<mark>highlighted</mark>"),
+            "original html should be preserved: {}",
+            content
+        );
     }
 }

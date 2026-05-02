@@ -4,7 +4,7 @@ fn convert(
     html: &str,
     opts: Option<html_to_markdown_rs::ConversionOptions>,
 ) -> html_to_markdown_rs::error::Result<String> {
-    html_to_markdown_rs::convert(html, opts, None).map(|r| r.content.unwrap_or_default())
+    html_to_markdown_rs::convert(html, opts).map(|r| r.content.unwrap_or_default())
 }
 
 use html_to_markdown_rs::ConversionOptions;
@@ -718,7 +718,7 @@ fn test_table_colspan_no_header_issue_233() {
         <td>Cell 2</td>
       </tr>
     </table>"#;
-    let result = html_to_markdown_rs::convert(html, None, None)
+    let result = html_to_markdown_rs::convert(html, None)
         .unwrap()
         .content
         .unwrap_or_default();

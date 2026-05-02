@@ -9,8 +9,20 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use html_to_markdown_rs::convert;
-use html_to_markdown_rs::visitor::HtmlVisitor;
+use html_to_markdown_rs::visitor::{HtmlVisitor, VisitorHandle};
+use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
+
+fn convert(
+    html: &str,
+    options: Option<ConversionOptions>,
+    visitor: Option<VisitorHandle>,
+) -> Result<ConversionResult, ConversionError> {
+    let mut opts = options.unwrap_or_default();
+    if visitor.is_some() {
+        opts.visitor = visitor;
+    }
+    html_to_markdown_rs::convert(html, Some(opts))
+}
 
 /// Empty visitor — does nothing, just uses default implementations.
 #[derive(Debug, Default)]

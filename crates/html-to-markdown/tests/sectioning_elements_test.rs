@@ -1,7 +1,7 @@
 #![allow(missing_docs)]
 
 fn convert(html: &str) -> String {
-    html_to_markdown_rs::convert(html, None, None)
+    html_to_markdown_rs::convert(html, None)
         .map(|r| r.content.unwrap_or_default())
         .expect("conversion should succeed")
 }
@@ -89,7 +89,7 @@ fn test_nav_preserved_when_remove_navigation_disabled() {
         ..Default::default()
     };
     let html = r#"<nav><a href="/home">Home</a></nav>"#;
-    let result = html_to_markdown_rs::convert(html, Some(opts), None)
+    let result = html_to_markdown_rs::convert(html, Some(opts))
         .map(|r| r.content.unwrap_or_default())
         .expect("conversion should succeed");
     assert!(

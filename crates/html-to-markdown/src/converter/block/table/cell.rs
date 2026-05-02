@@ -185,7 +185,7 @@ mod tests {
     #[test]
     fn rich_formatting_preserved_in_cells() {
         let html = "<table><tr><th>H</th></tr><tr><td><strong>Bold</strong> and <em>italic</em></td></tr></table>";
-        let result = crate::convert(html, None, None).unwrap();
+        let result = crate::convert(html, None).unwrap();
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("**Bold**") || content.contains("__Bold__"),

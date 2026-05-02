@@ -111,7 +111,7 @@ fn test_preserve_json_ld_script() {
 </body>
 </html>"#;
 
-    let result = html_to_markdown_rs::convert(html, None, None).expect("Failed to convert");
+    let result = html_to_markdown_rs::convert(html, None).expect("Failed to convert");
     let metadata = result.metadata;
     let markdown = result.content.unwrap_or_default();
 
@@ -164,7 +164,7 @@ fn test_multiple_script_tags() {
 </body>
 </html>"#;
 
-    let result = html_to_markdown_rs::convert(html, None, None).expect("Failed to convert");
+    let result = html_to_markdown_rs::convert(html, None).expect("Failed to convert");
     let metadata = result.metadata;
     let markdown = result.content.unwrap_or_default();
 
@@ -221,7 +221,7 @@ fn test_reuters_like_structure() {
 </body>
 </html>"#;
 
-    let result = html_to_markdown_rs::convert(html, None, None).expect("Failed to convert");
+    let result = html_to_markdown_rs::convert(html, None).expect("Failed to convert");
     let metadata = result.metadata;
     let markdown = result.content.unwrap_or_default();
 
@@ -392,5 +392,5 @@ fn convert(
     html: &str,
     opts: Option<html_to_markdown_rs::ConversionOptions>,
 ) -> html_to_markdown_rs::error::Result<String> {
-    html_to_markdown_rs::convert(html, opts, None).map(|r| r.content.unwrap_or_default())
+    html_to_markdown_rs::convert(html, opts).map(|r| r.content.unwrap_or_default())
 }

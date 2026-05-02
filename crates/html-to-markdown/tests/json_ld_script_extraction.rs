@@ -14,7 +14,7 @@ fn extracts_json_ld_from_head_script() {
         </html>
     "#;
 
-    let result = html_to_markdown_rs::convert(html, None, None).expect("convert failed");
+    let result = html_to_markdown_rs::convert(html, None).expect("convert failed");
     let metadata = result.metadata;
 
     assert_eq!(metadata.structured_data.len(), 1);
@@ -35,7 +35,7 @@ fn extracts_json_ld_from_body_script_and_keeps_content() {
         </html>
     "#;
 
-    let result = html_to_markdown_rs::convert(html, None, None).expect("convert failed");
+    let result = html_to_markdown_rs::convert(html, None).expect("convert failed");
     let metadata = result.metadata;
 
     assert_eq!(metadata.structured_data.len(), 1);

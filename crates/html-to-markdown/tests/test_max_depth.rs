@@ -5,7 +5,7 @@
 use html_to_markdown_rs::ConversionOptions;
 
 fn convert_with_options(html: &str, options: ConversionOptions) -> String {
-    html_to_markdown_rs::convert(html, Some(options), None)
+    html_to_markdown_rs::convert(html, Some(options))
         .expect("conversion should not fail")
         .content
         .unwrap_or_default()

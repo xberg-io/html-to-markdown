@@ -1,10 +1,22 @@
 #![allow(missing_docs)]
 #![cfg(feature = "visitor")]
 
-use html_to_markdown_rs::convert;
-use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult};
+use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
+use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
 use std::cell::RefCell;
 use std::rc::Rc;
+
+fn convert(
+    html: &str,
+    options: Option<ConversionOptions>,
+    visitor: Option<VisitorHandle>,
+) -> Result<ConversionResult, ConversionError> {
+    let mut opts = options.unwrap_or_default();
+    if visitor.is_some() {
+        opts.visitor = visitor;
+    }
+    html_to_markdown_rs::convert(html, Some(opts))
+}
 
 #[derive(Debug)]
 struct CodeVisitor {

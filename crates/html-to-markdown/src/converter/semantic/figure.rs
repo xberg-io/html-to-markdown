@@ -170,7 +170,7 @@ mod tests {
     #[test]
     fn figure_caption_separated_from_image() {
         let html = r#"<figure><img src="photo.jpg" alt="Photo"><figcaption>A nice photo</figcaption></figure>"#;
-        let result = crate::convert(html, None, None).unwrap();
+        let result = crate::convert(html, None).unwrap();
         let content = result.content.unwrap_or_default();
         assert!(
             content.contains("![Photo](photo.jpg)"),

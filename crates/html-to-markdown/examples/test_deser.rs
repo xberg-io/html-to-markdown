@@ -7,6 +7,6 @@ fn main() {
     let opts: ConversionOptions = serde_json::from_str(json).unwrap();
     println!("code_block_style: {:?}", opts.code_block_style);
 
-    let result = html_to_markdown_rs::convert("<pre><code>some code</code></pre>", Some(opts), None).unwrap();
+    let result = html_to_markdown_rs::convert("<pre><code>some code</code></pre>", Some(opts)).unwrap();
     println!("result: {:?}", result.content);
 }

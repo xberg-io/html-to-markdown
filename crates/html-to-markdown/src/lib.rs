@@ -89,15 +89,6 @@ pub use visitor::{NodeContext, NodeType, VisitResult};
 
 pub use convert_api::convert;
 
-#[cfg(any(feature = "serde", feature = "metadata"))]
-pub use convert_api::{conversion_options_from_json, conversion_options_update_from_json};
-
-#[cfg(feature = "metadata")]
-pub use convert_api::metadata_config_from_json;
-
-#[cfg(all(feature = "inline-images", any(feature = "serde", feature = "metadata")))]
-pub use convert_api::inline_image_config_from_json;
-
 // Tests
 // ============================================================================
 
@@ -108,27 +99,27 @@ mod basic_tests {
     #[test]
     fn test_binary_input_rejected() {
         let html = format!("abc{}def", "\0".repeat(20));
-        let result = convert(&html, None, None);
+        let result = convert(&html, None);
         assert!(matches!(result, Err(ConversionError::InvalidInput(_))));
     }
 
     #[test]
     fn test_binary_magic_rejected() {
         let html = "%PDF-1.7";
-        let result = convert(html, None, None);
+        let result = convert(html, None);
         assert!(matches!(result, Err(ConversionError::InvalidInput(_))));
     }
 
     #[test]
     fn test_utf16_hint_recovered() {
         let html = String::from_utf8_lossy(b"\xFF\xFE<\0h\0t\0m\0l\0>\0").to_string();
-        let result = convert(&html, None, None);
+        let result = convert(&html, None);
         assert!(result.is_ok(), "UTF-16 input should be recovered instead of rejected");
     }
 
     #[test]
     fn test_plain_text_allowed() {
-        let result = convert("Just text", None, None).unwrap();
+        let result = convert("Just text", None).unwrap();
         let content = result.content.unwrap_or_default();
         assert!(content.contains("Just text"));
     }
@@ -140,7 +131,7 @@ mod basic_tests {
             escape_underscores: true,
             ..ConversionOptions::default()
         };
-        let result = convert("Text *asterisks* _underscores_", Some(options), None).unwrap();
+        let result = convert("Text *asterisks* _underscores_", Some(options)).unwrap();
         let content = result.content.unwrap_or_default();
         assert!(content.contains(r"\*asterisks\*"));
         assert!(content.contains(r"\_underscores\_"));

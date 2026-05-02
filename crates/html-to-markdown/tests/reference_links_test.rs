@@ -3,7 +3,7 @@
 use html_to_markdown_rs::{ConversionOptions, LinkStyle};
 
 fn convert(html: &str, options: Option<ConversionOptions>) -> String {
-    html_to_markdown_rs::convert(html, options, None)
+    html_to_markdown_rs::convert(html, options)
         .unwrap()
         .content
         .unwrap_or_default()

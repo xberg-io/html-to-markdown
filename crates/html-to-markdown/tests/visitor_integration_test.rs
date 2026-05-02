@@ -7,10 +7,25 @@
 
 #![cfg(feature = "visitor")]
 
-use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, NodeType, VisitResult};
-use html_to_markdown_rs::{ConversionOptions, convert};
+use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, NodeType, VisitResult, VisitorHandle};
+use html_to_markdown_rs::{ConversionError, ConversionOptions, ConversionResult};
 use std::cell::RefCell;
 use std::rc::Rc;
+
+/// Test shim that bridges the legacy 3-arg call shape used throughout this file
+/// onto the public 2-arg `convert(html, options)` API. The visitor (if any) is
+/// folded into `options.visitor`.
+fn convert(
+    html: &str,
+    options: Option<ConversionOptions>,
+    visitor: Option<VisitorHandle>,
+) -> Result<ConversionResult, ConversionError> {
+    let mut opts = options.unwrap_or_default();
+    if visitor.is_some() {
+        opts.visitor = visitor;
+    }
+    html_to_markdown_rs::convert(html, Some(opts))
+}
 
 /// Test visitor that customizes all output
 #[derive(Debug, Default)]
@@ -709,8 +724,6 @@ fn test_visitor_with_skip_images() {
 /// Test that the main `convert()` function accepts optional visitor parameter
 #[test]
 fn test_convert_accepts_visitor_parameter() {
-    use html_to_markdown_rs::convert;
-
     #[derive(Debug, Default)]
     struct CountingVisitor {
         text_count: usize,
@@ -853,7 +866,7 @@ fn test_visitor_and_metadata_both_work() {
     drop(borrowed);
 
     // Verify metadata extraction via convert()
-    let result = html_to_markdown_rs::convert(html, None, None).expect("convert should work");
+    let result = html_to_markdown_rs::convert(html, None).expect("convert should work");
     let metadata = result.metadata;
 
     assert_eq!(
