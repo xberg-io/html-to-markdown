@@ -13,1209 +13,1696 @@ declare(strict_types=1);
 
 namespace HtmlToMarkdown {
 
-class HtmlToMarkdownException extends \RuntimeException
-{
-    public function getErrorCode(): int { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Builder for [`ConversionOptions`].
- *
- * All fields start with default values. Call `.build()` to produce the final options.
- */
-class ConversionOptionsBuilder
-{
-}
-
-/**
- * Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
- *
- * This allows visitors to be passed around and shared while still being mutable.
- */
-class VisitorHandle
-{
-}
-
-/**
- * Document-level metadata extracted from `<head>` and top-level elements.
- *
- * Contains all metadata typically used by search engines, social media platforms,
- * and browsers for document indexing and presentation.
- *
- * # Examples
- *
- * ```
- * # use html_to_markdown_rs::metadata::DocumentMetadata;
- * let doc = DocumentMetadata {
- *     title: Some("My Article".to_string()),
- *     description: Some("A great article about Rust".to_string()),
- *     keywords: vec!["rust".to_string(), "programming".to_string()],
- *     ..Default::default()
- * };
- *
- * assert_eq!(doc.title, Some("My Article".to_string()));
- * ```
- */
-class DocumentMetadata
-{
-    public ?string $title;
-    public ?string $description;
-    /** @var array<string> */
-    public array $keywords;
-    public ?string $author;
-    public ?string $canonical_url;
-    public ?string $base_href;
-    public ?string $language;
-    public ?TextDirection $text_direction;
-    /** @var array<string, string> */
-    public array $open_graph;
-    /** @var array<string, string> */
-    public array $twitter_card;
-    /** @var array<string, string> */
-    public array $meta_tags;
+    class HtmlToMarkdownException extends \RuntimeException
+    {
+        public function getErrorCode(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<string> $keywords
-     * @param array<string, string> $open_graph
-     * @param array<string, string> $twitter_card
-     * @param array<string, string> $meta_tags
+     * Builder for [`ConversionOptions`].
+     *
+     * All fields start with default values. Call `.build()` to produce the final options.
      */
-    public function __construct(
-        array $keywords,
-        array $open_graph,
-        array $twitter_card,
-        array $meta_tags,
-        ?string $title = null,
-        ?string $description = null,
-        ?string $author = null,
-        ?string $canonical_url = null,
-        ?string $base_href = null,
-        ?string $language = null,
-        ?TextDirection $text_direction = null
-    ) { }
-
-    public function getTitle(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getDescription(): ?string { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getKeywords(): array { throw new \RuntimeException('Not implemented.'); }
-    public function getAuthor(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getCanonicalUrl(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getBaseHref(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getLanguage(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getTextDirection(): ?TextDirection { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string, string> */
-    public function getOpenGraph(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string, string> */
-    public function getTwitterCard(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string, string> */
-    public function getMetaTags(): array { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Header element metadata with hierarchy tracking.
- *
- * Captures heading elements (h1-h6) with their text content, identifiers,
- * and position in the document structure.
- *
- * # Examples
- *
- * ```
- * # use html_to_markdown_rs::metadata::HeaderMetadata;
- * let header = HeaderMetadata {
- *     level: 1,
- *     text: "Main Title".to_string(),
- *     id: Some("main-title".to_string()),
- *     depth: 0,
- *     html_offset: 145,
- * };
- *
- * assert_eq!(header.level, 1);
- * assert!(header.is_valid());
- * ```
- */
-class HeaderMetadata
-{
-    public int $level;
-    public string $text;
-    public ?string $id;
-    public int $depth;
-    public int $html_offset;
-
-    public function __construct(
-        int $level,
-        string $text,
-        int $depth,
-        int $html_offset,
-        ?string $id = null
-    ) { }
-
-    public function getLevel(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getText(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getId(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getDepth(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getHtmlOffset(): int { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Hyperlink metadata with categorization and attributes.
- *
- * Represents `<a>` elements with parsed href values, text content, and link type classification.
- *
- * # Examples
- *
- * ```
- * # use html_to_markdown_rs::metadata::{LinkMetadata, LinkType};
- * let link = LinkMetadata {
- *     href: "https://example.com".to_string(),
- *     text: "Example".to_string(),
- *     title: Some("Visit Example".to_string()),
- *     link_type: LinkType::External,
- *     rel: vec!["nofollow".to_string()],
- *     attributes: Default::default(),
- * };
- *
- * assert_eq!(link.link_type, LinkType::External);
- * assert_eq!(link.text, "Example");
- * ```
- */
-class LinkMetadata
-{
-    public string $href;
-    public string $text;
-    public ?string $title;
-    public LinkType $link_type;
-    /** @var array<string> */
-    public array $rel;
-    /** @var array<string, string> */
-    public array $attributes;
+    class ConversionOptionsBuilder {}
 
     /**
-     * @param array<string> $rel
-     * @param array<string, string> $attributes
+     * Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
+     *
+     * This allows visitors to be passed around and shared while still being mutable.
      */
-    public function __construct(
-        string $href,
-        string $text,
-        LinkType $link_type,
-        array $rel,
-        array $attributes,
-        ?string $title = null
-    ) { }
-
-    public function getHref(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getText(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getTitle(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getLinkType(): LinkType { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getRel(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string, string> */
-    public function getAttributes(): array { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Image metadata with source and dimensions.
- *
- * Captures `<img>` elements and inline `<svg>` elements with metadata
- * for image analysis and optimization.
- *
- * # Examples
- *
- * ```
- * # use html_to_markdown_rs::metadata::{ImageMetadata, ImageType};
- * let img = ImageMetadata {
- *     src: "https://example.com/image.jpg".to_string(),
- *     alt: Some("An example image".to_string()),
- *     title: Some("Example".to_string()),
- *     dimensions: Some((800, 600)),
- *     image_type: ImageType::External,
- *     attributes: Default::default(),
- * };
- *
- * assert_eq!(img.image_type, ImageType::External);
- * ```
- */
-class ImageMetadata
-{
-    public string $src;
-    public ?string $alt;
-    public ?string $title;
-    /** @var ?array<int> */
-    public ?array $dimensions;
-    public ImageType $image_type;
-    /** @var array<string, string> */
-    public array $attributes;
+    class VisitorHandle {}
 
     /**
-     * @param array<string, string> $attributes
-     * @param ?array<int> $dimensions
+     * Document-level metadata extracted from `<head>` and top-level elements.
+     *
+     * Contains all metadata typically used by search engines, social media platforms,
+     * and browsers for document indexing and presentation.
+     *
+     * # Examples
+     *
+     * ```
+     * # use html_to_markdown_rs::metadata::DocumentMetadata;
+     * let doc = DocumentMetadata {
+     *     title: Some("My Article".to_string()),
+     *     description: Some("A great article about Rust".to_string()),
+     *     keywords: vec!["rust".to_string(), "programming".to_string()],
+     *     ..Default::default()
+     * };
+     *
+     * assert_eq!(doc.title, Some("My Article".to_string()));
+     * ```
      */
-    public function __construct(
-        string $src,
-        ImageType $image_type,
-        array $attributes,
-        ?string $alt = null,
-        ?string $title = null,
-        ?array $dimensions = null
-    ) { }
+    class DocumentMetadata
+    {
+        public ?string $title;
+        public ?string $description;
+        /** @var array<string> */
+        public array $keywords;
+        public ?string $author;
+        public ?string $canonical_url;
+        public ?string $base_href;
+        public ?string $language;
+        public ?TextDirection $text_direction;
+        /** @var array<string, string> */
+        public array $open_graph;
+        /** @var array<string, string> */
+        public array $twitter_card;
+        /** @var array<string, string> */
+        public array $meta_tags;
 
-    public function getSrc(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getAlt(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getTitle(): ?string { throw new \RuntimeException('Not implemented.'); }
-    /** @return ?array<int> */
-    public function getDimensions(): ?array { throw new \RuntimeException('Not implemented.'); }
-    public function getImageType(): ImageType { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string, string> */
-    public function getAttributes(): array { throw new \RuntimeException('Not implemented.'); }
-}
+        /**
+         * @param array<string> $keywords
+         * @param array<string, string> $open_graph
+         * @param array<string, string> $twitter_card
+         * @param array<string, string> $meta_tags
+         */
+        public function __construct(
+            array $keywords,
+            array $open_graph,
+            array $twitter_card,
+            array $meta_tags,
+            ?string $title = null,
+            ?string $description = null,
+            ?string $author = null,
+            ?string $canonical_url = null,
+            ?string $base_href = null,
+            ?string $language = null,
+            ?TextDirection $text_direction = null
+        ) {}
 
-/**
- * Structured data block (JSON-LD, Microdata, or RDFa).
- *
- * Represents machine-readable structured data found in the document.
- * JSON-LD blocks are collected as raw JSON strings for flexibility.
- *
- * # Examples
- *
- * ```
- * # use html_to_markdown_rs::metadata::{StructuredData, StructuredDataType};
- * let schema = StructuredData {
- *     data_type: StructuredDataType::JsonLd,
- *     raw_json: r#"{"@context":"https://schema.org","@type":"Article"}"#.to_string(),
- *     schema_type: Some("Article".to_string()),
- * };
- *
- * assert_eq!(schema.data_type, StructuredDataType::JsonLd);
- * ```
- */
-class StructuredData
-{
-    public StructuredDataType $data_type;
-    public string $raw_json;
-    public ?string $schema_type;
-
-    public function __construct(
-        StructuredDataType $data_type,
-        string $raw_json,
-        ?string $schema_type = null
-    ) { }
-
-    public function getDataType(): StructuredDataType { throw new \RuntimeException('Not implemented.'); }
-    public function getRawJson(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getSchemaType(): ?string { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Comprehensive metadata extraction result from HTML document.
- *
- * Contains all extracted metadata types in a single structure,
- * suitable for serialization and transmission across language boundaries.
- *
- * # Examples
- *
- * ```
- * # use html_to_markdown_rs::metadata::HtmlMetadata;
- * let metadata = HtmlMetadata {
- *     document: Default::default(),
- *     headers: Vec::new(),
- *     links: Vec::new(),
- *     images: Vec::new(),
- *     structured_data: Vec::new(),
- * };
- *
- * assert!(metadata.headers.is_empty());
- * ```
- */
-class HtmlMetadata
-{
-    public DocumentMetadata $document;
-    /** @var array<HeaderMetadata> */
-    public array $headers;
-    /** @var array<LinkMetadata> */
-    public array $links;
-    /** @var array<ImageMetadata> */
-    public array $images;
-    /** @var array<StructuredData> */
-    public array $structured_data;
+        public function getTitle(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDescription(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getKeywords(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getAuthor(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCanonicalUrl(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getBaseHref(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getLanguage(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getTextDirection(): ?TextDirection
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string, string> */
+        public function getOpenGraph(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string, string> */
+        public function getTwitterCard(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string, string> */
+        public function getMetaTags(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<HeaderMetadata> $headers
-     * @param array<LinkMetadata> $links
-     * @param array<ImageMetadata> $images
-     * @param array<StructuredData> $structured_data
+     * Header element metadata with hierarchy tracking.
+     *
+     * Captures heading elements (h1-h6) with their text content, identifiers,
+     * and position in the document structure.
+     *
+     * # Examples
+     *
+     * ```
+     * # use html_to_markdown_rs::metadata::HeaderMetadata;
+     * let header = HeaderMetadata {
+     *     level: 1,
+     *     text: "Main Title".to_string(),
+     *     id: Some("main-title".to_string()),
+     *     depth: 0,
+     *     html_offset: 145,
+     * };
+     *
+     * assert_eq!(header.level, 1);
+     * assert!(header.is_valid());
+     * ```
      */
-    public function __construct(
-        DocumentMetadata $document,
-        array $headers,
-        array $links,
-        array $images,
-        array $structured_data
-    ) { }
+    class HeaderMetadata
+    {
+        public int $level;
+        public string $text;
+        public ?string $id;
+        public int $depth;
+        public int $html_offset;
 
-    public function getDocument(): DocumentMetadata { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<HeaderMetadata> */
-    public function getHeaders(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<LinkMetadata> */
-    public function getLinks(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<ImageMetadata> */
-    public function getImages(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<StructuredData> */
-    public function getStructuredData(): array { throw new \RuntimeException('Not implemented.'); }
-}
+        public function __construct(
+            int $level,
+            string $text,
+            int $depth,
+            int $html_offset,
+            ?string $id = null
+        ) {}
 
-/**
- * Main conversion options for HTML to Markdown conversion.
- *
- * Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
- *
- * # Example
- *
- * ```text
- * use html_to_markdown_rs::ConversionOptions;
- *
- * let options = ConversionOptions::builder()
- *     .heading_style(HeadingStyle::Atx)
- *     .wrap(true)
- *     .wrap_width(100)
- *     .build();
- * ```
- */
-class ConversionOptions
-{
-    public HeadingStyle $heading_style;
-    public ListIndentType $list_indent_type;
-    public int $list_indent_width;
-    public string $bullets;
-    public string $strong_em_symbol;
-    public bool $escape_asterisks;
-    public bool $escape_underscores;
-    public bool $escape_misc;
-    public bool $escape_ascii;
-    public string $code_language;
-    public bool $autolinks;
-    public bool $default_title;
-    public bool $br_in_tables;
-    public HighlightStyle $highlight_style;
-    public bool $extract_metadata;
-    public WhitespaceMode $whitespace_mode;
-    public bool $strip_newlines;
-    public bool $wrap;
-    public int $wrap_width;
-    public bool $convert_as_inline;
-    public string $sub_symbol;
-    public string $sup_symbol;
-    public NewlineStyle $newline_style;
-    public CodeBlockStyle $code_block_style;
-    /** @var array<string> */
-    public array $keep_inline_images_in;
-    public PreprocessingOptions $preprocessing;
-    public string $encoding;
-    public bool $debug;
-    /** @var array<string> */
-    public array $strip_tags;
-    /** @var array<string> */
-    public array $preserve_tags;
-    public bool $skip_images;
-    public LinkStyle $link_style;
-    public OutputFormat $output_format;
-    public bool $include_document_structure;
-    public bool $extract_images;
-    public int $max_image_size;
-    public bool $capture_svg;
-    public bool $infer_dimensions;
-    public ?int $max_depth;
-    /** @var array<string> */
-    public array $exclude_selectors;
-    public ?VisitorHandle $visitor;
+        public function getLevel(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getText(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getId(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDepth(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getHtmlOffset(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<string> $keep_inline_images_in
-     * @param array<string> $strip_tags
-     * @param array<string> $preserve_tags
-     * @param array<string> $exclude_selectors
+     * Hyperlink metadata with categorization and attributes.
+     *
+     * Represents `<a>` elements with parsed href values, text content, and link type classification.
+     *
+     * # Examples
+     *
+     * ```
+     * # use html_to_markdown_rs::metadata::{LinkMetadata, LinkType};
+     * let link = LinkMetadata {
+     *     href: "https://example.com".to_string(),
+     *     text: "Example".to_string(),
+     *     title: Some("Visit Example".to_string()),
+     *     link_type: LinkType::External,
+     *     rel: vec!["nofollow".to_string()],
+     *     attributes: Default::default(),
+     * };
+     *
+     * assert_eq!(link.link_type, LinkType::External);
+     * assert_eq!(link.text, "Example");
+     * ```
      */
-    public function __construct(
-        HeadingStyle $heading_style,
-        ListIndentType $list_indent_type,
-        int $list_indent_width,
-        string $bullets,
-        string $strong_em_symbol,
-        bool $escape_asterisks,
-        bool $escape_underscores,
-        bool $escape_misc,
-        bool $escape_ascii,
-        string $code_language,
-        bool $autolinks,
-        bool $default_title,
-        bool $br_in_tables,
-        HighlightStyle $highlight_style,
-        bool $extract_metadata,
-        WhitespaceMode $whitespace_mode,
-        bool $strip_newlines,
-        bool $wrap,
-        int $wrap_width,
-        bool $convert_as_inline,
-        string $sub_symbol,
-        string $sup_symbol,
-        NewlineStyle $newline_style,
-        CodeBlockStyle $code_block_style,
-        array $keep_inline_images_in,
-        PreprocessingOptions $preprocessing,
-        string $encoding,
-        bool $debug,
-        array $strip_tags,
-        array $preserve_tags,
-        bool $skip_images,
-        LinkStyle $link_style,
-        OutputFormat $output_format,
-        bool $include_document_structure,
-        bool $extract_images,
-        int $max_image_size,
-        bool $capture_svg,
-        bool $infer_dimensions,
-        array $exclude_selectors,
-        ?int $max_depth = null,
-        ?VisitorHandle $visitor = null
-    ) { }
+    class LinkMetadata
+    {
+        public string $href;
+        public string $text;
+        public ?string $title;
+        public LinkType $link_type;
+        /** @var array<string> */
+        public array $rel;
+        /** @var array<string, string> */
+        public array $attributes;
 
-    public function getHeadingStyle(): HeadingStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getListIndentType(): ListIndentType { throw new \RuntimeException('Not implemented.'); }
-    public function getListIndentWidth(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getBullets(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getStrongEmSymbol(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeAsterisks(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeUnderscores(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeMisc(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeAscii(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getCodeLanguage(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getAutolinks(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getDefaultTitle(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getBrInTables(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getHighlightStyle(): HighlightStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getExtractMetadata(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getWhitespaceMode(): WhitespaceMode { throw new \RuntimeException('Not implemented.'); }
-    public function getStripNewlines(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getWrap(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getWrapWidth(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getConvertAsInline(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getSubSymbol(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getSupSymbol(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getNewlineStyle(): NewlineStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getCodeBlockStyle(): CodeBlockStyle { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getKeepInlineImagesIn(): array { throw new \RuntimeException('Not implemented.'); }
-    public function getPreprocessing(): PreprocessingOptions { throw new \RuntimeException('Not implemented.'); }
-    public function getEncoding(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getDebug(): bool { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getStripTags(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getPreserveTags(): array { throw new \RuntimeException('Not implemented.'); }
-    public function getSkipImages(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getLinkStyle(): LinkStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getOutputFormat(): OutputFormat { throw new \RuntimeException('Not implemented.'); }
-    public function getIncludeDocumentStructure(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getExtractImages(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getMaxImageSize(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getCaptureSvg(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getInferDimensions(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getMaxDepth(): ?int { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getExcludeSelectors(): array { throw new \RuntimeException('Not implemented.'); }
-    public function getVisitor(): ?VisitorHandle { throw new \RuntimeException('Not implemented.'); }
-}
+        /**
+         * @param array<string> $rel
+         * @param array<string, string> $attributes
+         */
+        public function __construct(
+            string $href,
+            string $text,
+            LinkType $link_type,
+            array $rel,
+            array $attributes,
+            ?string $title = null
+        ) {}
 
-/**
- * Partial update for `ConversionOptions`.
- *
- * Uses `Option<T>` fields for selective updates. Bindings use this to construct
- * options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
- */
-class ConversionOptionsUpdate
-{
-    public ?HeadingStyle $heading_style;
-    public ?ListIndentType $list_indent_type;
-    public ?int $list_indent_width;
-    public ?string $bullets;
-    public ?string $strong_em_symbol;
-    public ?bool $escape_asterisks;
-    public ?bool $escape_underscores;
-    public ?bool $escape_misc;
-    public ?bool $escape_ascii;
-    public ?string $code_language;
-    public ?bool $autolinks;
-    public ?bool $default_title;
-    public ?bool $br_in_tables;
-    public ?HighlightStyle $highlight_style;
-    public ?bool $extract_metadata;
-    public ?WhitespaceMode $whitespace_mode;
-    public ?bool $strip_newlines;
-    public ?bool $wrap;
-    public ?int $wrap_width;
-    public ?bool $convert_as_inline;
-    public ?string $sub_symbol;
-    public ?string $sup_symbol;
-    public ?NewlineStyle $newline_style;
-    public ?CodeBlockStyle $code_block_style;
-    /** @var ?array<string> */
-    public ?array $keep_inline_images_in;
-    public ?PreprocessingOptionsUpdate $preprocessing;
-    public ?string $encoding;
-    public ?bool $debug;
-    /** @var ?array<string> */
-    public ?array $strip_tags;
-    /** @var ?array<string> */
-    public ?array $preserve_tags;
-    public ?bool $skip_images;
-    public ?LinkStyle $link_style;
-    public ?OutputFormat $output_format;
-    public ?bool $include_document_structure;
-    public ?bool $extract_images;
-    public ?int $max_image_size;
-    public ?bool $capture_svg;
-    public ?bool $infer_dimensions;
-    public ?int $max_depth;
-    /** @var ?array<string> */
-    public ?array $exclude_selectors;
-    public ?VisitorHandle $visitor;
+        public function getHref(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getText(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getTitle(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getLinkType(): LinkType
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getRel(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string, string> */
+        public function getAttributes(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param ?array<string> $keep_inline_images_in
-     * @param ?array<string> $strip_tags
-     * @param ?array<string> $preserve_tags
-     * @param ?array<string> $exclude_selectors
+     * Image metadata with source and dimensions.
+     *
+     * Captures `<img>` elements and inline `<svg>` elements with metadata
+     * for image analysis and optimization.
+     *
+     * # Examples
+     *
+     * ```
+     * # use html_to_markdown_rs::metadata::{ImageMetadata, ImageType};
+     * let img = ImageMetadata {
+     *     src: "https://example.com/image.jpg".to_string(),
+     *     alt: Some("An example image".to_string()),
+     *     title: Some("Example".to_string()),
+     *     dimensions: Some((800, 600)),
+     *     image_type: ImageType::External,
+     *     attributes: Default::default(),
+     * };
+     *
+     * assert_eq!(img.image_type, ImageType::External);
+     * ```
      */
-    public function __construct(
-        ?HeadingStyle $heading_style = null,
-        ?ListIndentType $list_indent_type = null,
-        ?int $list_indent_width = null,
-        ?string $bullets = null,
-        ?string $strong_em_symbol = null,
-        ?bool $escape_asterisks = null,
-        ?bool $escape_underscores = null,
-        ?bool $escape_misc = null,
-        ?bool $escape_ascii = null,
-        ?string $code_language = null,
-        ?bool $autolinks = null,
-        ?bool $default_title = null,
-        ?bool $br_in_tables = null,
-        ?HighlightStyle $highlight_style = null,
-        ?bool $extract_metadata = null,
-        ?WhitespaceMode $whitespace_mode = null,
-        ?bool $strip_newlines = null,
-        ?bool $wrap = null,
-        ?int $wrap_width = null,
-        ?bool $convert_as_inline = null,
-        ?string $sub_symbol = null,
-        ?string $sup_symbol = null,
-        ?NewlineStyle $newline_style = null,
-        ?CodeBlockStyle $code_block_style = null,
-        ?array $keep_inline_images_in = null,
-        ?PreprocessingOptionsUpdate $preprocessing = null,
-        ?string $encoding = null,
-        ?bool $debug = null,
-        ?array $strip_tags = null,
-        ?array $preserve_tags = null,
-        ?bool $skip_images = null,
-        ?LinkStyle $link_style = null,
-        ?OutputFormat $output_format = null,
-        ?bool $include_document_structure = null,
-        ?bool $extract_images = null,
-        ?int $max_image_size = null,
-        ?bool $capture_svg = null,
-        ?bool $infer_dimensions = null,
-        ?int $max_depth = null,
-        ?array $exclude_selectors = null,
-        ?VisitorHandle $visitor = null
-    ) { }
+    class ImageMetadata
+    {
+        public string $src;
+        public ?string $alt;
+        public ?string $title;
+        /** @var ?array<int> */
+        public ?array $dimensions;
+        public ImageType $image_type;
+        /** @var array<string, string> */
+        public array $attributes;
 
-    public function getHeadingStyle(): ?HeadingStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getListIndentType(): ?ListIndentType { throw new \RuntimeException('Not implemented.'); }
-    public function getListIndentWidth(): ?int { throw new \RuntimeException('Not implemented.'); }
-    public function getBullets(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getStrongEmSymbol(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeAsterisks(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeUnderscores(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeMisc(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getEscapeAscii(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getCodeLanguage(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getAutolinks(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getDefaultTitle(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getBrInTables(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getHighlightStyle(): ?HighlightStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getExtractMetadata(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getWhitespaceMode(): ?WhitespaceMode { throw new \RuntimeException('Not implemented.'); }
-    public function getStripNewlines(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getWrap(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getWrapWidth(): ?int { throw new \RuntimeException('Not implemented.'); }
-    public function getConvertAsInline(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getSubSymbol(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getSupSymbol(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getNewlineStyle(): ?NewlineStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getCodeBlockStyle(): ?CodeBlockStyle { throw new \RuntimeException('Not implemented.'); }
-    /** @return ?array<string> */
-    public function getKeepInlineImagesIn(): ?array { throw new \RuntimeException('Not implemented.'); }
-    public function getPreprocessing(): ?PreprocessingOptionsUpdate { throw new \RuntimeException('Not implemented.'); }
-    public function getEncoding(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getDebug(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    /** @return ?array<string> */
-    public function getStripTags(): ?array { throw new \RuntimeException('Not implemented.'); }
-    /** @return ?array<string> */
-    public function getPreserveTags(): ?array { throw new \RuntimeException('Not implemented.'); }
-    public function getSkipImages(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getLinkStyle(): ?LinkStyle { throw new \RuntimeException('Not implemented.'); }
-    public function getOutputFormat(): ?OutputFormat { throw new \RuntimeException('Not implemented.'); }
-    public function getIncludeDocumentStructure(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getExtractImages(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getMaxImageSize(): ?int { throw new \RuntimeException('Not implemented.'); }
-    public function getCaptureSvg(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getInferDimensions(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getMaxDepth(): ?int { throw new \RuntimeException('Not implemented.'); }
-    /** @return ?array<string> */
-    public function getExcludeSelectors(): ?array { throw new \RuntimeException('Not implemented.'); }
-    public function getVisitor(): ?VisitorHandle { throw new \RuntimeException('Not implemented.'); }
-}
+        /**
+         * @param array<string, string> $attributes
+         * @param ?array<int> $dimensions
+         */
+        public function __construct(
+            string $src,
+            ImageType $image_type,
+            array $attributes,
+            ?string $alt = null,
+            ?string $title = null,
+            ?array $dimensions = null
+        ) {}
 
-/**
- * HTML preprocessing options for document cleanup before conversion.
- */
-class PreprocessingOptions
-{
-    public bool $enabled;
-    public PreprocessingPreset $preset;
-    public bool $remove_navigation;
-    public bool $remove_forms;
-
-    public function __construct(
-        bool $enabled,
-        PreprocessingPreset $preset,
-        bool $remove_navigation,
-        bool $remove_forms
-    ) { }
-
-    public function getEnabled(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getPreset(): PreprocessingPreset { throw new \RuntimeException('Not implemented.'); }
-    public function getRemoveNavigation(): bool { throw new \RuntimeException('Not implemented.'); }
-    public function getRemoveForms(): bool { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Partial update for `PreprocessingOptions`.
- *
- * This struct uses `Option<T>` to represent optional fields that can be selectively updated.
- * Only specified fields (Some values) will override existing options; None values leave the
- * corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
- */
-class PreprocessingOptionsUpdate
-{
-    public ?bool $enabled;
-    public ?PreprocessingPreset $preset;
-    public ?bool $remove_navigation;
-    public ?bool $remove_forms;
-
-    public function __construct(
-        ?bool $enabled = null,
-        ?PreprocessingPreset $preset = null,
-        ?bool $remove_navigation = null,
-        ?bool $remove_forms = null
-    ) { }
-
-    public function getEnabled(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getPreset(): ?PreprocessingPreset { throw new \RuntimeException('Not implemented.'); }
-    public function getRemoveNavigation(): ?bool { throw new \RuntimeException('Not implemented.'); }
-    public function getRemoveForms(): ?bool { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * A structured document tree representing the semantic content of an HTML document.
- *
- * Uses a flat node array with index-based parent/child references for efficient traversal.
- */
-class DocumentStructure
-{
-    /** @var array<DocumentNode> */
-    public array $nodes;
-    public ?string $source_format;
+        public function getSrc(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getAlt(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getTitle(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return ?array<int> */
+        public function getDimensions(): ?array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getImageType(): ImageType
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string, string> */
+        public function getAttributes(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<DocumentNode> $nodes
+     * Structured data block (JSON-LD, Microdata, or RDFa).
+     *
+     * Represents machine-readable structured data found in the document.
+     * JSON-LD blocks are collected as raw JSON strings for flexibility.
+     *
+     * # Examples
+     *
+     * ```
+     * # use html_to_markdown_rs::metadata::{StructuredData, StructuredDataType};
+     * let schema = StructuredData {
+     *     data_type: StructuredDataType::JsonLd,
+     *     raw_json: r#"{"@context":"https://schema.org","@type":"Article"}"#.to_string(),
+     *     schema_type: Some("Article".to_string()),
+     * };
+     *
+     * assert_eq!(schema.data_type, StructuredDataType::JsonLd);
+     * ```
      */
-    public function __construct(
-        array $nodes,
-        ?string $source_format = null
-    ) { }
+    class StructuredData
+    {
+        public StructuredDataType $data_type;
+        public string $raw_json;
+        public ?string $schema_type;
 
-    /** @return array<DocumentNode> */
-    public function getNodes(): array { throw new \RuntimeException('Not implemented.'); }
-    public function getSourceFormat(): ?string { throw new \RuntimeException('Not implemented.'); }
-}
+        public function __construct(
+            StructuredDataType $data_type,
+            string $raw_json,
+            ?string $schema_type = null
+        ) {}
 
-/**
- * A single node in the document tree.
- */
-class DocumentNode
-{
-    public string $id;
-    public NodeContent $content;
-    public ?int $parent;
-    /** @var array<int> */
-    public array $children;
-    /** @var array<TextAnnotation> */
-    public array $annotations;
-    /** @var ?array<string, string> */
-    public ?array $attributes;
+        public function getDataType(): StructuredDataType
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRawJson(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSchemaType(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<int> $children
-     * @param array<TextAnnotation> $annotations
-     * @param ?array<string, string> $attributes
+     * Comprehensive metadata extraction result from HTML document.
+     *
+     * Contains all extracted metadata types in a single structure,
+     * suitable for serialization and transmission across language boundaries.
+     *
+     * # Examples
+     *
+     * ```
+     * # use html_to_markdown_rs::metadata::HtmlMetadata;
+     * let metadata = HtmlMetadata {
+     *     document: Default::default(),
+     *     headers: Vec::new(),
+     *     links: Vec::new(),
+     *     images: Vec::new(),
+     *     structured_data: Vec::new(),
+     * };
+     *
+     * assert!(metadata.headers.is_empty());
+     * ```
      */
-    public function __construct(
-        string $id,
-        NodeContent $content,
-        array $children,
-        array $annotations,
-        ?int $parent = null,
-        ?array $attributes = null
-    ) { }
+    class HtmlMetadata
+    {
+        public DocumentMetadata $document;
+        /** @var array<HeaderMetadata> */
+        public array $headers;
+        /** @var array<LinkMetadata> */
+        public array $links;
+        /** @var array<ImageMetadata> */
+        public array $images;
+        /** @var array<StructuredData> */
+        public array $structured_data;
 
-    public function getId(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getContent(): NodeContent { throw new \RuntimeException('Not implemented.'); }
-    public function getParent(): ?int { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<int> */
-    public function getChildren(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<TextAnnotation> */
-    public function getAnnotations(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return ?array<string, string> */
-    public function getAttributes(): ?array { throw new \RuntimeException('Not implemented.'); }
-}
+        /**
+         * @param array<HeaderMetadata> $headers
+         * @param array<LinkMetadata> $links
+         * @param array<ImageMetadata> $images
+         * @param array<StructuredData> $structured_data
+         */
+        public function __construct(
+            DocumentMetadata $document,
+            array $headers,
+            array $links,
+            array $images,
+            array $structured_data
+        ) {}
 
-/**
- * An inline text annotation with byte-range offsets.
- *
- * Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
- */
-class TextAnnotation
-{
-    public int $start;
-    public int $end;
-    public AnnotationKind $kind;
-
-    public function __construct(
-        int $start,
-        int $end,
-        AnnotationKind $kind
-    ) { }
-
-    public function getStart(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getEnd(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getKind(): AnnotationKind { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * The primary result of HTML conversion and extraction.
- *
- * Contains the converted text output, optional structured document tree,
- * metadata, extracted tables, images, and processing warnings.
- *
- * # Example
- *
- * ```text
- * use html_to_markdown_rs::{convert, ConversionOptions};
- *
- * let result = convert("<h1>Hello</h1><p>World</p>", None)?;
- * assert!(result.content.is_some());
- * assert!(result.warnings.is_empty());
- * ```
- */
-class ConversionResult
-{
-    public ?string $content;
-    public ?DocumentStructure $document;
-    public HtmlMetadata $metadata;
-    /** @var array<TableData> */
-    public array $tables;
-    /** @var array<string> */
-    public array $images;
-    /** @var array<ProcessingWarning> */
-    public array $warnings;
+        public function getDocument(): DocumentMetadata
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<HeaderMetadata> */
+        public function getHeaders(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<LinkMetadata> */
+        public function getLinks(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<ImageMetadata> */
+        public function getImages(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<StructuredData> */
+        public function getStructuredData(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<TableData> $tables
-     * @param array<string> $images
-     * @param array<ProcessingWarning> $warnings
+     * Main conversion options for HTML to Markdown conversion.
+     *
+     * Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
+     *
+     * # Example
+     *
+     * ```text
+     * use html_to_markdown_rs::ConversionOptions;
+     *
+     * let options = ConversionOptions::builder()
+     *     .heading_style(HeadingStyle::Atx)
+     *     .wrap(true)
+     *     .wrap_width(100)
+     *     .build();
+     * ```
      */
-    public function __construct(
-        HtmlMetadata $metadata,
-        array $tables,
-        array $images,
-        array $warnings,
-        ?string $content = null,
-        ?DocumentStructure $document = null
-    ) { }
+    class ConversionOptions
+    {
+        public HeadingStyle $heading_style;
+        public ListIndentType $list_indent_type;
+        public int $list_indent_width;
+        public string $bullets;
+        public string $strong_em_symbol;
+        public bool $escape_asterisks;
+        public bool $escape_underscores;
+        public bool $escape_misc;
+        public bool $escape_ascii;
+        public string $code_language;
+        public bool $autolinks;
+        public bool $default_title;
+        public bool $br_in_tables;
+        public HighlightStyle $highlight_style;
+        public bool $extract_metadata;
+        public WhitespaceMode $whitespace_mode;
+        public bool $strip_newlines;
+        public bool $wrap;
+        public int $wrap_width;
+        public bool $convert_as_inline;
+        public string $sub_symbol;
+        public string $sup_symbol;
+        public NewlineStyle $newline_style;
+        public CodeBlockStyle $code_block_style;
+        /** @var array<string> */
+        public array $keep_inline_images_in;
+        public PreprocessingOptions $preprocessing;
+        public string $encoding;
+        public bool $debug;
+        /** @var array<string> */
+        public array $strip_tags;
+        /** @var array<string> */
+        public array $preserve_tags;
+        public bool $skip_images;
+        public LinkStyle $link_style;
+        public OutputFormat $output_format;
+        public bool $include_document_structure;
+        public bool $extract_images;
+        public int $max_image_size;
+        public bool $capture_svg;
+        public bool $infer_dimensions;
+        public ?int $max_depth;
+        /** @var array<string> */
+        public array $exclude_selectors;
+        public ?VisitorHandle $visitor;
 
-    public function getContent(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getDocument(): ?DocumentStructure { throw new \RuntimeException('Not implemented.'); }
-    public function getMetadata(): HtmlMetadata { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<TableData> */
-    public function getTables(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string> */
-    public function getImages(): array { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<ProcessingWarning> */
-    public function getWarnings(): array { throw new \RuntimeException('Not implemented.'); }
-}
+        /**
+         * @param array<string> $keep_inline_images_in
+         * @param array<string> $strip_tags
+         * @param array<string> $preserve_tags
+         * @param array<string> $exclude_selectors
+         */
+        public function __construct(
+            HeadingStyle $heading_style,
+            ListIndentType $list_indent_type,
+            int $list_indent_width,
+            string $bullets,
+            string $strong_em_symbol,
+            bool $escape_asterisks,
+            bool $escape_underscores,
+            bool $escape_misc,
+            bool $escape_ascii,
+            string $code_language,
+            bool $autolinks,
+            bool $default_title,
+            bool $br_in_tables,
+            HighlightStyle $highlight_style,
+            bool $extract_metadata,
+            WhitespaceMode $whitespace_mode,
+            bool $strip_newlines,
+            bool $wrap,
+            int $wrap_width,
+            bool $convert_as_inline,
+            string $sub_symbol,
+            string $sup_symbol,
+            NewlineStyle $newline_style,
+            CodeBlockStyle $code_block_style,
+            array $keep_inline_images_in,
+            PreprocessingOptions $preprocessing,
+            string $encoding,
+            bool $debug,
+            array $strip_tags,
+            array $preserve_tags,
+            bool $skip_images,
+            LinkStyle $link_style,
+            OutputFormat $output_format,
+            bool $include_document_structure,
+            bool $extract_images,
+            int $max_image_size,
+            bool $capture_svg,
+            bool $infer_dimensions,
+            array $exclude_selectors,
+            ?int $max_depth = null,
+            ?VisitorHandle $visitor = null
+        ) {}
 
-/**
- * A structured table grid with cell-level data including spans.
- */
-class TableGrid
-{
-    public int $rows;
-    public int $cols;
-    /** @var array<GridCell> */
-    public array $cells;
+        public function getHeadingStyle(): HeadingStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getListIndentType(): ListIndentType
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getListIndentWidth(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getBullets(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getStrongEmSymbol(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeAsterisks(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeUnderscores(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeMisc(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeAscii(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCodeLanguage(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getAutolinks(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDefaultTitle(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getBrInTables(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getHighlightStyle(): HighlightStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getExtractMetadata(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getWhitespaceMode(): WhitespaceMode
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getStripNewlines(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getWrap(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getWrapWidth(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getConvertAsInline(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSubSymbol(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSupSymbol(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getNewlineStyle(): NewlineStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCodeBlockStyle(): CodeBlockStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getKeepInlineImagesIn(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getPreprocessing(): PreprocessingOptions
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEncoding(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDebug(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getStripTags(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getPreserveTags(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSkipImages(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getLinkStyle(): LinkStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getOutputFormat(): OutputFormat
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getIncludeDocumentStructure(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getExtractImages(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getMaxImageSize(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCaptureSvg(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getInferDimensions(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getMaxDepth(): ?int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getExcludeSelectors(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getVisitor(): ?VisitorHandle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<GridCell> $cells
+     * Partial update for `ConversionOptions`.
+     *
+     * Uses `Option<T>` fields for selective updates. Bindings use this to construct
+     * options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
      */
-    public function __construct(
-        int $rows,
-        int $cols,
-        array $cells
-    ) { }
+    class ConversionOptionsUpdate
+    {
+        public ?HeadingStyle $heading_style;
+        public ?ListIndentType $list_indent_type;
+        public ?int $list_indent_width;
+        public ?string $bullets;
+        public ?string $strong_em_symbol;
+        public ?bool $escape_asterisks;
+        public ?bool $escape_underscores;
+        public ?bool $escape_misc;
+        public ?bool $escape_ascii;
+        public ?string $code_language;
+        public ?bool $autolinks;
+        public ?bool $default_title;
+        public ?bool $br_in_tables;
+        public ?HighlightStyle $highlight_style;
+        public ?bool $extract_metadata;
+        public ?WhitespaceMode $whitespace_mode;
+        public ?bool $strip_newlines;
+        public ?bool $wrap;
+        public ?int $wrap_width;
+        public ?bool $convert_as_inline;
+        public ?string $sub_symbol;
+        public ?string $sup_symbol;
+        public ?NewlineStyle $newline_style;
+        public ?CodeBlockStyle $code_block_style;
+        /** @var ?array<string> */
+        public ?array $keep_inline_images_in;
+        public ?PreprocessingOptionsUpdate $preprocessing;
+        public ?string $encoding;
+        public ?bool $debug;
+        /** @var ?array<string> */
+        public ?array $strip_tags;
+        /** @var ?array<string> */
+        public ?array $preserve_tags;
+        public ?bool $skip_images;
+        public ?LinkStyle $link_style;
+        public ?OutputFormat $output_format;
+        public ?bool $include_document_structure;
+        public ?bool $extract_images;
+        public ?int $max_image_size;
+        public ?bool $capture_svg;
+        public ?bool $infer_dimensions;
+        public ?int $max_depth;
+        /** @var ?array<string> */
+        public ?array $exclude_selectors;
+        public ?VisitorHandle $visitor;
 
-    public function getRows(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getCols(): int { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<GridCell> */
-    public function getCells(): array { throw new \RuntimeException('Not implemented.'); }
-}
+        /**
+         * @param ?array<string> $keep_inline_images_in
+         * @param ?array<string> $strip_tags
+         * @param ?array<string> $preserve_tags
+         * @param ?array<string> $exclude_selectors
+         */
+        public function __construct(
+            ?HeadingStyle $heading_style = null,
+            ?ListIndentType $list_indent_type = null,
+            ?int $list_indent_width = null,
+            ?string $bullets = null,
+            ?string $strong_em_symbol = null,
+            ?bool $escape_asterisks = null,
+            ?bool $escape_underscores = null,
+            ?bool $escape_misc = null,
+            ?bool $escape_ascii = null,
+            ?string $code_language = null,
+            ?bool $autolinks = null,
+            ?bool $default_title = null,
+            ?bool $br_in_tables = null,
+            ?HighlightStyle $highlight_style = null,
+            ?bool $extract_metadata = null,
+            ?WhitespaceMode $whitespace_mode = null,
+            ?bool $strip_newlines = null,
+            ?bool $wrap = null,
+            ?int $wrap_width = null,
+            ?bool $convert_as_inline = null,
+            ?string $sub_symbol = null,
+            ?string $sup_symbol = null,
+            ?NewlineStyle $newline_style = null,
+            ?CodeBlockStyle $code_block_style = null,
+            ?array $keep_inline_images_in = null,
+            ?PreprocessingOptionsUpdate $preprocessing = null,
+            ?string $encoding = null,
+            ?bool $debug = null,
+            ?array $strip_tags = null,
+            ?array $preserve_tags = null,
+            ?bool $skip_images = null,
+            ?LinkStyle $link_style = null,
+            ?OutputFormat $output_format = null,
+            ?bool $include_document_structure = null,
+            ?bool $extract_images = null,
+            ?int $max_image_size = null,
+            ?bool $capture_svg = null,
+            ?bool $infer_dimensions = null,
+            ?int $max_depth = null,
+            ?array $exclude_selectors = null,
+            ?VisitorHandle $visitor = null
+        ) {}
 
-/**
- * A single cell in a table grid.
- */
-class GridCell
-{
-    public string $content;
-    public int $row;
-    public int $col;
-    public int $row_span;
-    public int $col_span;
-    public bool $is_header;
-
-    public function __construct(
-        string $content,
-        int $row,
-        int $col,
-        int $row_span,
-        int $col_span,
-        bool $is_header
-    ) { }
-
-    public function getContent(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getRow(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getCol(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getRowSpan(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getColSpan(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getIsHeader(): bool { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * A top-level extracted table with both structured data and markdown representation.
- */
-class TableData
-{
-    public TableGrid $grid;
-    public string $markdown;
-
-    public function __construct(
-        TableGrid $grid,
-        string $markdown
-    ) { }
-
-    public function getGrid(): TableGrid { throw new \RuntimeException('Not implemented.'); }
-    public function getMarkdown(): string { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * A non-fatal warning generated during HTML processing.
- */
-class ProcessingWarning
-{
-    public string $message;
-    public WarningKind $kind;
-
-    public function __construct(
-        string $message,
-        WarningKind $kind
-    ) { }
-
-    public function getMessage(): string { throw new \RuntimeException('Not implemented.'); }
-    public function getKind(): WarningKind { throw new \RuntimeException('Not implemented.'); }
-}
-
-/**
- * Context information passed to all visitor methods.
- *
- * Provides comprehensive metadata about the current node being visited,
- * including its type, attributes, position in the DOM tree, and parent context.
- */
-class NodeContext
-{
-    public NodeType $node_type;
-    public string $tag_name;
-    /** @var array<string, string> */
-    public array $attributes;
-    public int $depth;
-    public int $index_in_parent;
-    public ?string $parent_tag;
-    public bool $is_inline;
+        public function getHeadingStyle(): ?HeadingStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getListIndentType(): ?ListIndentType
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getListIndentWidth(): ?int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getBullets(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getStrongEmSymbol(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeAsterisks(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeUnderscores(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeMisc(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEscapeAscii(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCodeLanguage(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getAutolinks(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDefaultTitle(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getBrInTables(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getHighlightStyle(): ?HighlightStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getExtractMetadata(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getWhitespaceMode(): ?WhitespaceMode
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getStripNewlines(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getWrap(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getWrapWidth(): ?int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getConvertAsInline(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSubSymbol(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSupSymbol(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getNewlineStyle(): ?NewlineStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCodeBlockStyle(): ?CodeBlockStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return ?array<string> */
+        public function getKeepInlineImagesIn(): ?array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getPreprocessing(): ?PreprocessingOptionsUpdate
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEncoding(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDebug(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return ?array<string> */
+        public function getStripTags(): ?array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return ?array<string> */
+        public function getPreserveTags(): ?array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSkipImages(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getLinkStyle(): ?LinkStyle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getOutputFormat(): ?OutputFormat
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getIncludeDocumentStructure(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getExtractImages(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getMaxImageSize(): ?int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCaptureSvg(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getInferDimensions(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getMaxDepth(): ?int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return ?array<string> */
+        public function getExcludeSelectors(): ?array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getVisitor(): ?VisitorHandle
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
     /**
-     * @param array<string, string> $attributes
+     * HTML preprocessing options for document cleanup before conversion.
      */
-    public function __construct(
-        NodeType $node_type,
-        string $tag_name,
-        array $attributes,
-        int $depth,
-        int $index_in_parent,
-        bool $is_inline,
-        ?string $parent_tag = null
-    ) { }
+    class PreprocessingOptions
+    {
+        public bool $enabled;
+        public PreprocessingPreset $preset;
+        public bool $remove_navigation;
+        public bool $remove_forms;
 
-    public function getNodeType(): NodeType { throw new \RuntimeException('Not implemented.'); }
-    public function getTagName(): string { throw new \RuntimeException('Not implemented.'); }
-    /** @return array<string, string> */
-    public function getAttributes(): array { throw new \RuntimeException('Not implemented.'); }
-    public function getDepth(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getIndexInParent(): int { throw new \RuntimeException('Not implemented.'); }
-    public function getParentTag(): ?string { throw new \RuntimeException('Not implemented.'); }
-    public function getIsInline(): bool { throw new \RuntimeException('Not implemented.'); }
-}
+        public function __construct(
+            bool $enabled,
+            PreprocessingPreset $preset,
+            bool $remove_navigation,
+            bool $remove_forms
+        ) {}
 
-enum TextDirection: string
-{
-    case LeftToRight = 'LeftToRight';
-    case RightToLeft = 'RightToLeft';
-    case Auto = 'Auto';
-}
+        public function getEnabled(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getPreset(): PreprocessingPreset
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRemoveNavigation(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRemoveForms(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
-enum LinkType: string
-{
-    case Anchor = 'Anchor';
-    case Internal = 'Internal';
-    case External = 'External';
-    case Email = 'Email';
-    case Phone = 'Phone';
-    case Other = 'Other';
-}
+    /**
+     * Partial update for `PreprocessingOptions`.
+     *
+     * This struct uses `Option<T>` to represent optional fields that can be selectively updated.
+     * Only specified fields (Some values) will override existing options; None values leave the
+     * corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
+     */
+    class PreprocessingOptionsUpdate
+    {
+        public ?bool $enabled;
+        public ?PreprocessingPreset $preset;
+        public ?bool $remove_navigation;
+        public ?bool $remove_forms;
 
-enum ImageType: string
-{
-    case DataUri = 'DataUri';
-    case InlineSvg = 'InlineSvg';
-    case External = 'External';
-    case Relative = 'Relative';
-}
+        public function __construct(
+            ?bool $enabled = null,
+            ?PreprocessingPreset $preset = null,
+            ?bool $remove_navigation = null,
+            ?bool $remove_forms = null
+        ) {}
 
-enum StructuredDataType: string
-{
-    case JsonLd = 'JsonLd';
-    case Microdata = 'Microdata';
-    case RDFa = 'RDFa';
-}
+        public function getEnabled(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getPreset(): ?PreprocessingPreset
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRemoveNavigation(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRemoveForms(): ?bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
-enum PreprocessingPreset: string
-{
-    case Minimal = 'Minimal';
-    case Standard = 'Standard';
-    case Aggressive = 'Aggressive';
-}
+    /**
+     * A structured document tree representing the semantic content of an HTML document.
+     *
+     * Uses a flat node array with index-based parent/child references for efficient traversal.
+     */
+    class DocumentStructure
+    {
+        /** @var array<DocumentNode> */
+        public array $nodes;
+        public ?string $source_format;
 
-enum HeadingStyle: string
-{
-    case Underlined = 'Underlined';
-    case Atx = 'Atx';
-    case AtxClosed = 'AtxClosed';
-}
+        /**
+         * @param array<DocumentNode> $nodes
+         */
+        public function __construct(
+            array $nodes,
+            ?string $source_format = null
+        ) {}
 
-enum ListIndentType: string
-{
-    case Spaces = 'Spaces';
-    case Tabs = 'Tabs';
-}
+        /** @return array<DocumentNode> */
+        public function getNodes(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getSourceFormat(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
-enum WhitespaceMode: string
-{
-    case Normalized = 'Normalized';
-    case Strict = 'Strict';
-}
+    /**
+     * A single node in the document tree.
+     */
+    class DocumentNode
+    {
+        public string $id;
+        public NodeContent $content;
+        public ?int $parent;
+        /** @var array<int> */
+        public array $children;
+        /** @var array<TextAnnotation> */
+        public array $annotations;
+        /** @var ?array<string, string> */
+        public ?array $attributes;
 
-enum NewlineStyle: string
-{
-    case Spaces = 'Spaces';
-    case Backslash = 'Backslash';
-}
+        /**
+         * @param array<int> $children
+         * @param array<TextAnnotation> $annotations
+         * @param ?array<string, string> $attributes
+         */
+        public function __construct(
+            string $id,
+            NodeContent $content,
+            array $children,
+            array $annotations,
+            ?int $parent = null,
+            ?array $attributes = null
+        ) {}
 
-enum CodeBlockStyle: string
-{
-    case Indented = 'Indented';
-    case Backticks = 'Backticks';
-    case Tildes = 'Tildes';
-}
+        public function getId(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getContent(): NodeContent
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getParent(): ?int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<int> */
+        public function getChildren(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<TextAnnotation> */
+        public function getAnnotations(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return ?array<string, string> */
+        public function getAttributes(): ?array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
-enum HighlightStyle: string
-{
-    case DoubleEqual = 'DoubleEqual';
-    case Html = 'Html';
-    case Bold = 'Bold';
-    case None = 'None';
-}
+    /**
+     * An inline text annotation with byte-range offsets.
+     *
+     * Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+     */
+    class TextAnnotation
+    {
+        public int $start;
+        public int $end;
+        public AnnotationKind $kind;
 
-enum LinkStyle: string
-{
-    case Inline = 'Inline';
-    case Reference = 'Reference';
-}
+        public function __construct(
+            int $start,
+            int $end,
+            AnnotationKind $kind
+        ) {}
 
-enum OutputFormat: string
-{
-    case Markdown = 'Markdown';
-    case Djot = 'Djot';
-    case Plain = 'Plain';
-}
+        public function getStart(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getEnd(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getKind(): AnnotationKind
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
-/**
- * The semantic content type of a document node.
- *
- * Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
- */
-class NodeContent
-{
-}
+    /**
+     * The primary result of HTML conversion and extraction.
+     *
+     * Contains the converted text output, optional structured document tree,
+     * metadata, extracted tables, images, and processing warnings.
+     *
+     * # Example
+     *
+     * ```text
+     * use html_to_markdown_rs::{convert, ConversionOptions};
+     *
+     * let result = convert("<h1>Hello</h1><p>World</p>", None)?;
+     * assert!(result.content.is_some());
+     * assert!(result.warnings.is_empty());
+     * ```
+     */
+    class ConversionResult
+    {
+        public ?string $content;
+        public ?DocumentStructure $document;
+        public HtmlMetadata $metadata;
+        /** @var array<TableData> */
+        public array $tables;
+        /** @var array<string> */
+        public array $images;
+        /** @var array<ProcessingWarning> */
+        public array $warnings;
 
-/**
- * The type of an inline text annotation.
- *
- * Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
- */
-class AnnotationKind
-{
-}
+        /**
+         * @param array<TableData> $tables
+         * @param array<string> $images
+         * @param array<ProcessingWarning> $warnings
+         */
+        public function __construct(
+            HtmlMetadata $metadata,
+            array $tables,
+            array $images,
+            array $warnings,
+            ?string $content = null,
+            ?DocumentStructure $document = null
+        ) {}
 
-enum WarningKind: string
-{
-    case ImageExtractionFailed = 'ImageExtractionFailed';
-    case EncodingFallback = 'EncodingFallback';
-    case TruncatedInput = 'TruncatedInput';
-    case MalformedHtml = 'MalformedHtml';
-    case SanitizationApplied = 'SanitizationApplied';
-    case DepthLimitExceeded = 'DepthLimitExceeded';
-}
+        public function getContent(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDocument(): ?DocumentStructure
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getMetadata(): HtmlMetadata
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<TableData> */
+        public function getTables(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string> */
+        public function getImages(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<ProcessingWarning> */
+        public function getWarnings(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
-enum NodeType: string
-{
-    case Text = 'Text';
-    case Element = 'Element';
-    case Heading = 'Heading';
-    case Paragraph = 'Paragraph';
-    case Div = 'Div';
-    case Blockquote = 'Blockquote';
-    case Pre = 'Pre';
-    case Hr = 'Hr';
-    case List = 'List';
-    case ListItem = 'ListItem';
-    case DefinitionList = 'DefinitionList';
-    case DefinitionTerm = 'DefinitionTerm';
-    case DefinitionDescription = 'DefinitionDescription';
-    case Table = 'Table';
-    case TableRow = 'TableRow';
-    case TableCell = 'TableCell';
-    case TableHeader = 'TableHeader';
-    case TableBody = 'TableBody';
-    case TableHead = 'TableHead';
-    case TableFoot = 'TableFoot';
-    case Link = 'Link';
-    case Image = 'Image';
-    case Strong = 'Strong';
-    case Em = 'Em';
-    case Code = 'Code';
-    case Strikethrough = 'Strikethrough';
-    case Underline = 'Underline';
-    case Subscript = 'Subscript';
-    case Superscript = 'Superscript';
-    case Mark = 'Mark';
-    case Small = 'Small';
-    case Br = 'Br';
-    case Span = 'Span';
-    case Article = 'Article';
-    case Section = 'Section';
-    case Nav = 'Nav';
-    case Aside = 'Aside';
-    case Header = 'Header';
-    case Footer = 'Footer';
-    case Main = 'Main';
-    case Figure = 'Figure';
-    case Figcaption = 'Figcaption';
-    case Time = 'Time';
-    case Details = 'Details';
-    case Summary = 'Summary';
-    case Form = 'Form';
-    case Input = 'Input';
-    case Select = 'Select';
-    case Option = 'Option';
-    case Button = 'Button';
-    case Textarea = 'Textarea';
-    case Label = 'Label';
-    case Fieldset = 'Fieldset';
-    case Legend = 'Legend';
-    case Audio = 'Audio';
-    case Video = 'Video';
-    case Picture = 'Picture';
-    case Source = 'Source';
-    case Iframe = 'Iframe';
-    case Svg = 'Svg';
-    case Canvas = 'Canvas';
-    case Ruby = 'Ruby';
-    case Rt = 'Rt';
-    case Rp = 'Rp';
-    case Abbr = 'Abbr';
-    case Kbd = 'Kbd';
-    case Samp = 'Samp';
-    case Var = 'Var';
-    case Cite = 'Cite';
-    case Q = 'Q';
-    case Del = 'Del';
-    case Ins = 'Ins';
-    case Data = 'Data';
-    case Meter = 'Meter';
-    case Progress = 'Progress';
-    case Output = 'Output';
-    case Template = 'Template';
-    case Slot = 'Slot';
-    case Html = 'Html';
-    case Head = 'Head';
-    case Body = 'Body';
-    case Title = 'Title';
-    case Meta = 'Meta';
-    case LinkTag = 'LinkTag';
-    case Style = 'Style';
-    case Script = 'Script';
-    case Base = 'Base';
-    case Custom = 'Custom';
-}
+    /**
+     * A structured table grid with cell-level data including spans.
+     */
+    class TableGrid
+    {
+        public int $rows;
+        public int $cols;
+        /** @var array<GridCell> */
+        public array $cells;
 
-enum VisitResult: string
-{
-    case Continue = 'Continue';
-    case Custom = 'Custom';
-    case Skip = 'Skip';
-    case PreserveHtml = 'PreserveHtml';
-    case Error = 'Error';
-}
+        /**
+         * @param array<GridCell> $cells
+         */
+        public function __construct(
+            int $rows,
+            int $cols,
+            array $cells
+        ) {}
 
-class HtmlToMarkdownApi
-{
-    public static function convert(string $html, ?\HtmlToMarkdown\ConversionOptions $options = null): \HtmlToMarkdown\ConversionResult { throw new \RuntimeException('Not implemented.'); }
-}
+        public function getRows(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCols(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<GridCell> */
+        public function getCells(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
+
+    /**
+     * A single cell in a table grid.
+     */
+    class GridCell
+    {
+        public string $content;
+        public int $row;
+        public int $col;
+        public int $row_span;
+        public int $col_span;
+        public bool $is_header;
+
+        public function __construct(
+            string $content,
+            int $row,
+            int $col,
+            int $row_span,
+            int $col_span,
+            bool $is_header
+        ) {}
+
+        public function getContent(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRow(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getCol(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getRowSpan(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getColSpan(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getIsHeader(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
+
+    /**
+     * A top-level extracted table with both structured data and markdown representation.
+     */
+    class TableData
+    {
+        public TableGrid $grid;
+        public string $markdown;
+
+        public function __construct(
+            TableGrid $grid,
+            string $markdown
+        ) {}
+
+        public function getGrid(): TableGrid
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getMarkdown(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
+
+    /**
+     * A non-fatal warning generated during HTML processing.
+     */
+    class ProcessingWarning
+    {
+        public string $message;
+        public WarningKind $kind;
+
+        public function __construct(
+            string $message,
+            WarningKind $kind
+        ) {}
+
+        public function getMessage(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getKind(): WarningKind
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
+
+    /**
+     * Context information passed to all visitor methods.
+     *
+     * Provides comprehensive metadata about the current node being visited,
+     * including its type, attributes, position in the DOM tree, and parent context.
+     */
+    class NodeContext
+    {
+        public NodeType $node_type;
+        public string $tag_name;
+        /** @var array<string, string> */
+        public array $attributes;
+        public int $depth;
+        public int $index_in_parent;
+        public ?string $parent_tag;
+        public bool $is_inline;
+
+        /**
+         * @param array<string, string> $attributes
+         */
+        public function __construct(
+            NodeType $node_type,
+            string $tag_name,
+            array $attributes,
+            int $depth,
+            int $index_in_parent,
+            bool $is_inline,
+            ?string $parent_tag = null
+        ) {}
+
+        public function getNodeType(): NodeType
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getTagName(): string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        /** @return array<string, string> */
+        public function getAttributes(): array
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getDepth(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getIndexInParent(): int
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getParentTag(): ?string
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+        public function getIsInline(): bool
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
+
+    enum TextDirection: string
+    {
+        case LeftToRight = 'LeftToRight';
+        case RightToLeft = 'RightToLeft';
+        case Auto = 'Auto';
+    }
+
+    enum LinkType: string
+    {
+        case Anchor = 'Anchor';
+        case Internal = 'Internal';
+        case External = 'External';
+        case Email = 'Email';
+        case Phone = 'Phone';
+        case Other = 'Other';
+    }
+
+    enum ImageType: string
+    {
+        case DataUri = 'DataUri';
+        case InlineSvg = 'InlineSvg';
+        case External = 'External';
+        case Relative = 'Relative';
+    }
+
+    enum StructuredDataType: string
+    {
+        case JsonLd = 'JsonLd';
+        case Microdata = 'Microdata';
+        case RDFa = 'RDFa';
+    }
+
+    enum PreprocessingPreset: string
+    {
+        case Minimal = 'Minimal';
+        case Standard = 'Standard';
+        case Aggressive = 'Aggressive';
+    }
+
+    enum HeadingStyle: string
+    {
+        case Underlined = 'Underlined';
+        case Atx = 'Atx';
+        case AtxClosed = 'AtxClosed';
+    }
+
+    enum ListIndentType: string
+    {
+        case Spaces = 'Spaces';
+        case Tabs = 'Tabs';
+    }
+
+    enum WhitespaceMode: string
+    {
+        case Normalized = 'Normalized';
+        case Strict = 'Strict';
+    }
+
+    enum NewlineStyle: string
+    {
+        case Spaces = 'Spaces';
+        case Backslash = 'Backslash';
+    }
+
+    enum CodeBlockStyle: string
+    {
+        case Indented = 'Indented';
+        case Backticks = 'Backticks';
+        case Tildes = 'Tildes';
+    }
+
+    enum HighlightStyle: string
+    {
+        case DoubleEqual = 'DoubleEqual';
+        case Html = 'Html';
+        case Bold = 'Bold';
+        case None = 'None';
+    }
+
+    enum LinkStyle: string
+    {
+        case Inline = 'Inline';
+        case Reference = 'Reference';
+    }
+
+    enum OutputFormat: string
+    {
+        case Markdown = 'Markdown';
+        case Djot = 'Djot';
+        case Plain = 'Plain';
+    }
+
+    /**
+     * The semantic content type of a document node.
+     *
+     * Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
+     */
+    class NodeContent {}
+
+    /**
+     * The type of an inline text annotation.
+     *
+     * Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
+     */
+    class AnnotationKind {}
+
+    enum WarningKind: string
+    {
+        case ImageExtractionFailed = 'ImageExtractionFailed';
+        case EncodingFallback = 'EncodingFallback';
+        case TruncatedInput = 'TruncatedInput';
+        case MalformedHtml = 'MalformedHtml';
+        case SanitizationApplied = 'SanitizationApplied';
+        case DepthLimitExceeded = 'DepthLimitExceeded';
+    }
+
+    enum NodeType: string
+    {
+        case Text = 'Text';
+        case Element = 'Element';
+        case Heading = 'Heading';
+        case Paragraph = 'Paragraph';
+        case Div = 'Div';
+        case Blockquote = 'Blockquote';
+        case Pre = 'Pre';
+        case Hr = 'Hr';
+        case List = 'List';
+        case ListItem = 'ListItem';
+        case DefinitionList = 'DefinitionList';
+        case DefinitionTerm = 'DefinitionTerm';
+        case DefinitionDescription = 'DefinitionDescription';
+        case Table = 'Table';
+        case TableRow = 'TableRow';
+        case TableCell = 'TableCell';
+        case TableHeader = 'TableHeader';
+        case TableBody = 'TableBody';
+        case TableHead = 'TableHead';
+        case TableFoot = 'TableFoot';
+        case Link = 'Link';
+        case Image = 'Image';
+        case Strong = 'Strong';
+        case Em = 'Em';
+        case Code = 'Code';
+        case Strikethrough = 'Strikethrough';
+        case Underline = 'Underline';
+        case Subscript = 'Subscript';
+        case Superscript = 'Superscript';
+        case Mark = 'Mark';
+        case Small = 'Small';
+        case Br = 'Br';
+        case Span = 'Span';
+        case Article = 'Article';
+        case Section = 'Section';
+        case Nav = 'Nav';
+        case Aside = 'Aside';
+        case Header = 'Header';
+        case Footer = 'Footer';
+        case Main = 'Main';
+        case Figure = 'Figure';
+        case Figcaption = 'Figcaption';
+        case Time = 'Time';
+        case Details = 'Details';
+        case Summary = 'Summary';
+        case Form = 'Form';
+        case Input = 'Input';
+        case Select = 'Select';
+        case Option = 'Option';
+        case Button = 'Button';
+        case Textarea = 'Textarea';
+        case Label = 'Label';
+        case Fieldset = 'Fieldset';
+        case Legend = 'Legend';
+        case Audio = 'Audio';
+        case Video = 'Video';
+        case Picture = 'Picture';
+        case Source = 'Source';
+        case Iframe = 'Iframe';
+        case Svg = 'Svg';
+        case Canvas = 'Canvas';
+        case Ruby = 'Ruby';
+        case Rt = 'Rt';
+        case Rp = 'Rp';
+        case Abbr = 'Abbr';
+        case Kbd = 'Kbd';
+        case Samp = 'Samp';
+        case Var = 'Var';
+        case Cite = 'Cite';
+        case Q = 'Q';
+        case Del = 'Del';
+        case Ins = 'Ins';
+        case Data = 'Data';
+        case Meter = 'Meter';
+        case Progress = 'Progress';
+        case Output = 'Output';
+        case Template = 'Template';
+        case Slot = 'Slot';
+        case Html = 'Html';
+        case Head = 'Head';
+        case Body = 'Body';
+        case Title = 'Title';
+        case Meta = 'Meta';
+        case LinkTag = 'LinkTag';
+        case Style = 'Style';
+        case Script = 'Script';
+        case Base = 'Base';
+        case Custom = 'Custom';
+    }
+
+    enum VisitResult: string
+    {
+        case Continue = 'Continue';
+        case Custom = 'Custom';
+        case Skip = 'Skip';
+        case PreserveHtml = 'PreserveHtml';
+        case Error = 'Error';
+    }
+
+    class HtmlToMarkdownApi
+    {
+        public static function convert(string $html, ?\HtmlToMarkdown\ConversionOptions $options = null): \HtmlToMarkdown\ConversionResult
+        {
+            throw new \RuntimeException('Not implemented.');
+        }
+    }
 
 } // end namespace
