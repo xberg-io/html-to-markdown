@@ -5890,8 +5890,7 @@ impl From<WasmDocumentNode> for html_to_markdown_rs::DocumentNode {
     fn from(val: WasmDocumentNode) -> Self {
         Self {
             id: val.id,
-            content: serde_wasm_bindgen::from_value(val.content)
-                .unwrap_or(html_to_markdown_rs::NodeContent::Quote),
+            content: serde_wasm_bindgen::from_value(val.content).unwrap_or(html_to_markdown_rs::NodeContent::Quote),
             parent: val.parent,
             children: val.children,
             annotations: val.annotations.into_iter().map(Into::into).collect(),
@@ -5908,8 +5907,7 @@ impl From<html_to_markdown_rs::DocumentNode> for WasmDocumentNode {
     fn from(val: html_to_markdown_rs::DocumentNode) -> Self {
         Self {
             id: val.id,
-            content: serde_wasm_bindgen::to_value(&val.content)
-                .unwrap_or(wasm_bindgen::JsValue::NULL),
+            content: serde_wasm_bindgen::to_value(&val.content).unwrap_or(wasm_bindgen::JsValue::NULL),
             parent: val.parent,
             children: val.children,
             annotations: val.annotations.into_iter().map(Into::into).collect(),

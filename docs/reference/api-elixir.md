@@ -28,7 +28,7 @@ def convert(html, options)
 **Parameters:**
 
 | Name      | Type               | Required | Description |
-| --------- | ------------------ | -------- | ----------- | ------------------ |
+| --------- | ------------------ | -------- | ----------- |
 | `html`    | `String.t()`       | Yes      | The html    |
 | `options` | `ConversionOptions | nil`     | No          | The options to use |
 
@@ -47,7 +47,7 @@ Main conversion options for HTML to Markdown conversion.
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
 
 | Field                        | Type                   | Default         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ---------------------------- | ---------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| ---------------------------- | ---------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `heading_style`              | `HeadingStyle`         | `:atx`          | Heading style to use in Markdown output (ATX `#` or Setext underline).                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `list_indent_type`           | `ListIndentType`       | `:spaces`       | How to indent nested list items (spaces or tab).                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `list_indent_width`          | `integer()`            | `2`             | Number of spaces (or tabs) to use for each level of list indentation.                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -148,7 +148,7 @@ Contains the converted text output, optional structured document tree,
 metadata, extracted tables, images, and processing warnings.
 
 | Field      | Type                      | Default | Description                                                                                         |
-| ---------- | ------------------------- | ------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ---------- | ------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
 | `content`  | `String.t()               | nil`    | `nil`                                                                                               | Converted text output (markdown, djot, or plain text). `nil` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
 | `document` | `DocumentStructure        | nil`    | `nil`                                                                                               | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options.                                |
 | `metadata` | `HtmlMetadata`            | —       | Extracted HTML metadata (title, OG, links, images, structured data).                                |
@@ -246,7 +246,7 @@ Contains all metadata typically used by search engines, social media platforms,
 and browsers for document indexing and presentation.
 
 | Field            | Type               | Default | Description                                                                                                              |
-| ---------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| ---------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `title`          | `String.t()        | nil`    | `nil`                                                                                                                    | Document title from `<title>` tag                              |
 | `description`    | `String.t()        | nil`    | `nil`                                                                                                                    | Document description from `<meta name="description">` tag      |
 | `keywords`       | `list(String.t())` | `[]`    | Document keywords from `<meta name="keywords">` tag, split on commas                                                     |
@@ -266,7 +266,7 @@ and browsers for document indexing and presentation.
 A single node in the document tree.
 
 | Field         | Type                   | Default | Description                                                                                |
-| ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `id`          | `String.t()`           | —       | Deterministic node identifier.                                                             |
 | `content`     | `NodeContent`          | —       | The semantic content of this node.                                                         |
 | `parent`      | `integer()             | nil`    | `nil`                                                                                      | Index of the parent node (None for root nodes).                  |
@@ -283,7 +283,7 @@ A structured document tree representing the semantic content of an HTML document
 Uses a flat node array with index-based parent/child references for efficient traversal.
 
 | Field           | Type                 | Default | Description                          |
-| --------------- | -------------------- | ------- | ------------------------------------ | --------------------------------------------------- |
+| --------------- | -------------------- | ------- | ------------------------------------ |
 | `nodes`         | `list(DocumentNode)` | —       | All nodes in document reading order. |
 | `source_format` | `String.t()          | nil`    | `nil`                                | The source format (always "html" for this library). |
 
@@ -312,7 +312,7 @@ Captures heading elements (h1-h6) with their text content, identifiers,
 and position in the document structure.
 
 | Field         | Type         | Default | Description                               |
-| ------------- | ------------ | ------- | ----------------------------------------- | ---------------------------- |
+| ------------- | ------------ | ------- | ----------------------------------------- |
 | `level`       | `integer()`  | —       | Header level: 1 (h1) through 6 (h6)       |
 | `text`        | `String.t()` | —       | Normalized text content of the header     |
 | `id`          | `String.t()  | nil`    | `nil`                                     | HTML id attribute if present |
@@ -802,7 +802,7 @@ Captures `<img>` elements and inline `<svg>` elements with metadata
 for image analysis and optimization.
 
 | Field        | Type             | Default | Description                                             |
-| ------------ | ---------------- | ------- | ------------------------------------------------------- | ------------------------------------------------------- |
+| ------------ | ---------------- | ------- | ------------------------------------------------------- |
 | `src`        | `String.t()`     | —       | Image source (URL, data URI, or SVG content identifier) |
 | `alt`        | `String.t()      | nil`    | `nil`                                                   | Alternative text from alt attribute (for accessibility) |
 | `title`      | `String.t()      | nil`    | `nil`                                                   | Title attribute (often shown as tooltip)                |
@@ -819,7 +819,7 @@ Hyperlink metadata with categorization and attributes.
 Represents `<a>` elements with parsed href values, text content, and link type classification.
 
 | Field        | Type               | Default | Description                                                         |
-| ------------ | ------------------ | ------- | ------------------------------------------------------------------- | ------------------------------------------------- |
+| ------------ | ------------------ | ------- | ------------------------------------------------------------------- |
 | `href`       | `String.t()`       | —       | The href URL value                                                  |
 | `text`       | `String.t()`       | —       | Link text content (normalized, concatenated if mixed with elements) |
 | `title`      | `String.t()        | nil`    | `nil`                                                               | Optional title attribute (often shown as tooltip) |
@@ -853,7 +853,7 @@ Provides comprehensive metadata about the current node being visited,
 including its type, attributes, position in the DOM tree, and parent context.
 
 | Field             | Type         | Default | Description                                             |
-| ----------------- | ------------ | ------- | ------------------------------------------------------- | ---------------------------------------- |
+| ----------------- | ------------ | ------- | ------------------------------------------------------- |
 | `node_type`       | `NodeType`   | —       | Coarse-grained node type classification                 |
 | `tag_name`        | `String.t()` | —       | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
 | `attributes`      | `map()`      | —       | All HTML attributes as key-value pairs                  |
@@ -944,7 +944,7 @@ Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 | Field         | Type                 | Default | Description                                                |
-| ------------- | -------------------- | ------- | ---------------------------------------------------------- | --------------------------------------------------------------- |
+| ------------- | -------------------- | ------- | ---------------------------------------------------------- |
 | `data_type`   | `StructuredDataType` | —       | Type of structured data (JSON-LD, Microdata, RDFa)         |
 | `raw_json`    | `String.t()`         | —       | Raw JSON string (for JSON-LD) or serialized representation |
 | `schema_type` | `String.t()          | nil`    | `nil`                                                      | Schema type if detectable (e.g., "Article", "Event", "Product") |
