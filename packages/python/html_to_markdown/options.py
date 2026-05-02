@@ -8,8 +8,56 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import TYPE_CHECKING
+
+# Unit enums are defined as #[pyclass] in the native extension module.
+# Import them at runtime so they are accessible as html_to_markdown.options.NewlineStyle etc.
+# and refer to the same Python object as the native class, avoiding TypeError when
+# passing them to native-typed constructor parameters.
+from ._html_to_markdown import (
+    CodeBlockStyle,
+    HeadingStyle,
+    HighlightStyle,
+    LinkStyle,
+    ListIndentType,
+    NewlineStyle,
+    OutputFormat,
+    PreprocessingPreset,
+    TextDirection,
+    WhitespaceMode,
+)
+
+# Add SCREAMING_SNAKE_CASE aliases to the native pyclasses so callers can use
+# e.g. NewlineStyle.BACKSLASH in addition to NewlineStyle.Backslash.
+# The values are the native enum instances, so they pass isinstance checks.
+CodeBlockStyle.BACKTICKS = CodeBlockStyle.Backticks
+CodeBlockStyle.INDENTED = CodeBlockStyle.Indented
+CodeBlockStyle.TILDES = CodeBlockStyle.Tildes
+HeadingStyle.ATX = HeadingStyle.Atx
+HeadingStyle.ATX_CLOSED = HeadingStyle.AtxClosed
+HeadingStyle.UNDERLINED = HeadingStyle.Underlined
+HighlightStyle.BOLD = HighlightStyle.Bold
+HighlightStyle.DOUBLE_EQUAL = HighlightStyle.DoubleEqual
+HighlightStyle.HTML = HighlightStyle.Html
+HighlightStyle.NONE = HighlightStyle.None_
+HighlightStyle.NONE_ = HighlightStyle.None_
+LinkStyle.INLINE = LinkStyle.Inline
+LinkStyle.REFERENCE = LinkStyle.Reference
+ListIndentType.SPACES = ListIndentType.Spaces
+ListIndentType.TABS = ListIndentType.Tabs
+NewlineStyle.BACKSLASH = NewlineStyle.Backslash
+NewlineStyle.SPACES = NewlineStyle.Spaces
+OutputFormat.DJOT = OutputFormat.Djot
+OutputFormat.MARKDOWN = OutputFormat.Markdown
+OutputFormat.PLAIN = OutputFormat.Plain
+PreprocessingPreset.AGGRESSIVE = PreprocessingPreset.Aggressive
+PreprocessingPreset.MINIMAL = PreprocessingPreset.Minimal
+PreprocessingPreset.STANDARD = PreprocessingPreset.Standard
+TextDirection.AUTO = TextDirection.Auto
+TextDirection.LEFT_TO_RIGHT = TextDirection.LeftToRight
+TextDirection.RIGHT_TO_LEFT = TextDirection.RightToLeft
+WhitespaceMode.NORMALIZED = WhitespaceMode.Normalized
+WhitespaceMode.STRICT = WhitespaceMode.Strict
 
 if TYPE_CHECKING:
     from ._html_to_markdown import (
@@ -19,83 +67,6 @@ if TYPE_CHECKING:
         LinkMetadata,
         StructuredData,
     )
-
-
-class TextDirection(str, Enum):
-    """Text directionality of document content."""
-
-    LEFT_TO_RIGHT = "left_to_right"
-    RIGHT_TO_LEFT = "right_to_left"
-    AUTO = "auto"
-
-
-class PreprocessingPreset(str, Enum):
-    """HTML preprocessing aggressiveness level."""
-
-    MINIMAL = "minimal"
-    STANDARD = "standard"
-    AGGRESSIVE = "aggressive"
-
-
-class HeadingStyle(str, Enum):
-    """Heading style options for Markdown output."""
-
-    UNDERLINED = "underlined"
-    ATX = "atx"
-    ATX_CLOSED = "atx_closed"
-
-
-class ListIndentType(str, Enum):
-    """List indentation character type."""
-
-    SPACES = "spaces"
-    TABS = "tabs"
-
-
-class WhitespaceMode(str, Enum):
-    """Whitespace handling strategy during conversion."""
-
-    NORMALIZED = "normalized"
-    STRICT = "strict"
-
-
-class NewlineStyle(str, Enum):
-    """Line break syntax in Markdown output."""
-
-    SPACES = "spaces"
-    BACKSLASH = "backslash"
-
-
-class CodeBlockStyle(str, Enum):
-    """Code block fence style in Markdown output."""
-
-    INDENTED = "indented"
-    BACKTICKS = "backticks"
-    TILDES = "tildes"
-
-
-class HighlightStyle(str, Enum):
-    """Highlight rendering style for `<mark>` elements."""
-
-    DOUBLE_EQUAL = "double_equal"
-    HTML = "html"
-    BOLD = "bold"
-    NONE = "none"
-
-
-class LinkStyle(str, Enum):
-    """Link rendering style in Markdown output."""
-
-    INLINE = "inline"
-    REFERENCE = "reference"
-
-
-class OutputFormat(str, Enum):
-    """Output format for conversion."""
-
-    MARKDOWN = "markdown"
-    DJOT = "djot"
-    PLAIN = "plain"
 
 
 @dataclass
