@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING  # noqa: F401
+from typing import TYPE_CHECKING
+
 from ._html_to_markdown import (
     CodeBlockStyle,
     HeadingStyle,
@@ -25,15 +26,11 @@ from ._html_to_markdown import (
 
 if TYPE_CHECKING:
     from ._html_to_markdown import (
-        DocumentStructure,
         GridCell,
         HeaderMetadata,
         ImageMetadata,
         LinkMetadata,
-        PreprocessingOptionsUpdate,
-        ProcessingWarning,
         StructuredData,
-        TableData,
         VisitorHandle,
     )
 
@@ -49,7 +46,7 @@ HeadingStyle.ATX_CLOSED = HeadingStyle.AtxClosed
 HighlightStyle.DOUBLE_EQUAL = HighlightStyle.DoubleEqual
 HighlightStyle.HTML = HighlightStyle.Html
 HighlightStyle.BOLD = HighlightStyle.Bold
-setattr(HighlightStyle, "NONE", getattr(HighlightStyle, "None_"))
+HighlightStyle.NONE = HighlightStyle.None_
 
 LinkStyle.INLINE = LinkStyle.Inline
 LinkStyle.REFERENCE = LinkStyle.Reference
@@ -74,6 +71,7 @@ TextDirection.AUTO = TextDirection.Auto
 
 WhitespaceMode.NORMALIZED = WhitespaceMode.Normalized
 WhitespaceMode.STRICT = WhitespaceMode.Strict
+
 
 class LinkType(str, Enum):
     """Link classification based on href value and document context."""
