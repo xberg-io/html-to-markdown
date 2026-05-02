@@ -15,11 +15,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 html-to-markdown-rs = { path = "../html-to-markdown", features = [
-  "full",
-  "metadata",
-  "visitor",
-  "serde",
-  "inline-images",
+    "full",
+    "metadata",
+    "visitor",
+    "serde",
+    "inline-images",
 ] }
 pyo3 = { workspace = true, features = ["extension-module"] }
 serde = { version = "1", features = ["derive"] }
