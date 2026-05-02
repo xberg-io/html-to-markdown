@@ -59,11 +59,13 @@
 High-performance HTML to Markdown converter with R bindings powered by a Rust core via extendr.
 Ship identical Markdown across every runtime while enjoying native performance with extendr bindings.
 
+
 ## Installation
 
 ```bash
 install.packages("htmltomarkdown")
 ```
+
 
 Requires R 4.3+ and a Rust toolchain (cargo, rustc).
 
@@ -77,15 +79,17 @@ Or install the development version from GitHub:
 devtools::install_github("kreuzberg-dev/html-to-markdown", subdir = "packages/r")
 ```
 
+
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document            | Size  | Latency | Throughput |
-| ------------------- | ----- | ------- | ---------- |
-| Lists (Timeline)    | 129KB | 0.68ms  | 190 MB/s   |
-| Tables (Countries)  | 360KB | 2.10ms  | 171 MB/s   |
-| Mixed (Python wiki) | 656KB | 4.75ms  | 138 MB/s   |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB | 0.68ms | 190 MB/s |
+| Tables (Countries) | 360KB | 2.10ms | 171 MB/s |
+| Mixed (Python wiki) | 656KB | 4.75ms | 138 MB/s |
+
 
 ## Quick Start
 
@@ -99,6 +103,7 @@ result <- convert(html)
 markdown <- result$content
 cat(markdown)
 ```
+
 
 With conversion options:
 
@@ -115,9 +120,11 @@ result <- convert("<h1>Hello</h1><p>World</p>", opts)
 cat(result$content)
 ```
 
+
 ## API Reference
 
 ### Core Function
+
 
 **`convert(html, options = NULL)`**
 
@@ -129,6 +136,7 @@ markdown <- result$content    # Converted Markdown string
 metadata <- result$metadata   # Metadata (when extract_metadata = TRUE)
 tables   <- result$tables     # Table data (when extract_tables = TRUE)
 ```
+
 
 ### Options
 
@@ -150,23 +158,25 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Syntax Differences
 
-| Element        | Markdown   | Djot       |
-| -------------- | ---------- | ---------- |
-| Strong         | `**text**` | `*text*`   |
-| Emphasis       | `*text*`   | `_text_`   |
-| Strikethrough  | `~~text~~` | `{-text-}` |
-| Inserted/Added | N/A        | `{+text+}` |
-| Highlighted    | N/A        | `{=text=}` |
-| Subscript      | N/A        | `~text~`   |
-| Superscript    | N/A        | `^text^`   |
+| Element | Markdown | Djot |
+|---------|----------|------|
+| Strong | `**text**` | `*text*` |
+| Emphasis | `*text*` | `_text_` |
+| Strikethrough | `~~text~~` | `{-text-}` |
+| Inserted/Added | N/A | `{+text+}` |
+| Highlighted | N/A | `{=text=}` |
+| Subscript | N/A | `~text~` |
+| Superscript | N/A | `^text^` |
 
 ### Example Usage
+
 
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 ```r
 html <- "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
@@ -176,7 +186,9 @@ plain <- result$content
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -194,6 +206,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
+
 ```r
 library(htmltomarkdown)
 
@@ -207,6 +220,7 @@ result$metadata$headers                # All h1-h6 elements
 result$metadata$links                  # All hyperlinks
 result$metadata$images                 # All images with alt text
 ```
+
 
 ## Visitor Pattern
 
@@ -224,6 +238,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 
 ### Example: Quick Start
 
+
 ```r
 library(htmltomarkdown)
 
@@ -233,7 +248,9 @@ result <- convert(html, opts)
 cat(result$content)
 ```
 
+
 ## Examples
+
 
 ## Links
 

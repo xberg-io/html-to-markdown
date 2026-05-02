@@ -11,7 +11,7 @@ npm install html-to-markdown-rs-wasm
 ## Quick Start
 
 ```javascript
-import init from "html-to-markdown-rs-wasm";
+import init from 'html-to-markdown-rs-wasm';
 
 await init();
 // See https://github.com/kreuzberg-dev/html-to-markdown for usage examples.
