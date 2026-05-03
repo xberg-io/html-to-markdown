@@ -307,7 +307,6 @@ module = "html_to_markdown_rs"
 function = "convert"
 options_type = "ConversionOptions"
 wrap_options_in_some = true
-extra_args = ["None"]
 returns_result = true
 
 [crates.e2e.call.overrides.python]
