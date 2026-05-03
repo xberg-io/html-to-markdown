@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.4"
+alef_version = "0.14.6"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -1013,6 +1013,7 @@ table_extraction = "table-extraction/basic_extraction.md"
 
 [crates.custom_modules]
 node = ["helpers"]
+r = ["options", "types"]
 
 [[crates.trait_bridges]]
 trait_name = "HtmlVisitor"

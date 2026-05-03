@@ -30,12 +30,13 @@ module HtmlToMarkdown
   #   (and more, matching ConversionOptions fields)
   # @return [String] The converted Markdown content.
   def self.convert(html, options = {}, _visitor = nil)
-    # The Rust FFI expects options as a JSON string; serialise the hash here
-    # rather than constructing a ConversionOptions object, which the generated
-    # FFI layer cannot coerce back to String (see issue #334).
-    opts_json = options.nil? || options.empty? ? nil : options.to_json
+    # Pass the options hash directly; the Magnus FFI layer will serialize it
+    opts = options.nil? || options.empty? ? nil : options
     # NOTE: visitor support is not yet fully integrated in the Ruby binding
-    result = HtmlToMarkdownRs.convert(html, opts_json)
+    result = HtmlToMarkdownRs.convert(html, opts)
     result.content || ''
   end
+
+  # NOTE: The wrapper explicitly passes a hash, not a pre-serialized JSON string.
+  # The FFI layer calls .to_json() on the hash to serialize nested options.
 end

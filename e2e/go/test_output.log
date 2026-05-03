@@ -1,0 +1,545 @@
+=== RUN   Test_BlockquoteMultipleParagraphs
+--- PASS: Test_BlockquoteMultipleParagraphs (0.00s)
+=== RUN   Test_BlockquoteNested
+--- PASS: Test_BlockquoteNested (0.00s)
+=== RUN   Test_BlockquoteSimple
+--- PASS: Test_BlockquoteSimple (0.00s)
+=== RUN   Test_BlockquoteWithList
+--- PASS: Test_BlockquoteWithList (0.00s)
+=== RUN   Test_BoldAndItalic
+--- PASS: Test_BoldAndItalic (0.00s)
+=== RUN   Test_BoldStrong
+--- PASS: Test_BoldStrong (0.00s)
+=== RUN   Test_CodeBlock
+--- PASS: Test_CodeBlock (0.00s)
+=== RUN   Test_CodeBlockNoLanguage
+--- PASS: Test_CodeBlockNoLanguage (0.00s)
+=== RUN   Test_CodeInlineInParagraph
+--- PASS: Test_CodeInlineInParagraph (0.00s)
+=== RUN   Test_CodeWithBackticksInContent
+--- PASS: Test_CodeWithBackticksInContent (0.00s)
+=== RUN   Test_EmphasisMarkHighlight
+--- PASS: Test_EmphasisMarkHighlight (0.00s)
+=== RUN   Test_EmphasisStrikethroughDel
+--- PASS: Test_EmphasisStrikethroughDel (0.00s)
+=== RUN   Test_EmphasisStrikethroughS
+--- PASS: Test_EmphasisStrikethroughS (0.00s)
+=== RUN   Test_EmphasisSubscript
+--- PASS: Test_EmphasisSubscript (0.00s)
+=== RUN   Test_EmphasisSuperscript
+--- PASS: Test_EmphasisSuperscript (0.00s)
+=== RUN   Test_EmphasisUnderlineU
+--- PASS: Test_EmphasisUnderlineU (0.00s)
+=== RUN   Test_FormInputElements
+    conversion_test.go:290: expected to contain Name
+--- FAIL: Test_FormInputElements (0.00s)
+=== RUN   Test_FormSelectOptions
+    conversion_test.go:306: expected to contain Color
+--- FAIL: Test_FormSelectOptions (0.00s)
+=== RUN   Test_FormTextarea
+    conversion_test.go:322: expected to contain Message
+--- FAIL: Test_FormTextarea (0.00s)
+=== RUN   Test_HeadingH1
+--- PASS: Test_HeadingH1 (0.00s)
+=== RUN   Test_HeadingH2
+--- PASS: Test_HeadingH2 (0.00s)
+=== RUN   Test_HeadingH3
+--- PASS: Test_HeadingH3 (0.00s)
+=== RUN   Test_HeadingH4
+--- PASS: Test_HeadingH4 (0.00s)
+=== RUN   Test_HeadingH5
+--- PASS: Test_HeadingH5 (0.00s)
+=== RUN   Test_HeadingH6
+--- PASS: Test_HeadingH6 (0.00s)
+=== RUN   Test_ImageFigureFigcaption
+--- PASS: Test_ImageFigureFigcaption (0.00s)
+=== RUN   Test_ImageLinked
+--- PASS: Test_ImageLinked (0.00s)
+=== RUN   Test_ImageNoAlt
+--- PASS: Test_ImageNoAlt (0.00s)
+=== RUN   Test_ImageSimple
+--- PASS: Test_ImageSimple (0.00s)
+=== RUN   Test_ImageWithTitle
+--- PASS: Test_ImageWithTitle (0.00s)
+=== RUN   Test_InlineCode
+--- PASS: Test_InlineCode (0.00s)
+=== RUN   Test_ItalicEm
+--- PASS: Test_ItalicEm (0.00s)
+=== RUN   Test_LineBreakBrTag
+--- PASS: Test_LineBreakBrTag (0.00s)
+=== RUN   Test_LineBreakHrTag
+--- PASS: Test_LineBreakHrTag (0.00s)
+=== RUN   Test_LineBreakMultipleBr
+--- PASS: Test_LineBreakMultipleBr (0.00s)
+=== RUN   Test_LinkAnchorFragment
+--- PASS: Test_LinkAnchorFragment (0.00s)
+=== RUN   Test_LinkEmptyHref
+--- PASS: Test_LinkEmptyHref (0.00s)
+=== RUN   Test_LinkImageInside
+--- PASS: Test_LinkImageInside (0.00s)
+=== RUN   Test_LinkMailto
+--- PASS: Test_LinkMailto (0.00s)
+=== RUN   Test_LinkSimple
+--- PASS: Test_LinkSimple (0.00s)
+=== RUN   Test_LinkWithBoldText
+--- PASS: Test_LinkWithBoldText (0.00s)
+=== RUN   Test_LinkWithTitle
+--- PASS: Test_LinkWithTitle (0.00s)
+=== RUN   Test_ListDefinitionDl
+--- PASS: Test_ListDefinitionDl (0.00s)
+=== RUN   Test_ListItemMultipleParagraphs
+--- PASS: Test_ListItemMultipleParagraphs (0.00s)
+=== RUN   Test_ListMixedNested
+--- PASS: Test_ListMixedNested (0.00s)
+=== RUN   Test_ListNestedOrdered
+--- PASS: Test_ListNestedOrdered (0.00s)
+=== RUN   Test_ListNestedUnordered
+--- PASS: Test_ListNestedUnordered (0.00s)
+=== RUN   Test_ListTaskCheckboxes
+--- PASS: Test_ListTaskCheckboxes (0.00s)
+=== RUN   Test_OrderedList
+--- PASS: Test_OrderedList (0.00s)
+=== RUN   Test_ParagraphMultiple
+--- PASS: Test_ParagraphMultiple (0.00s)
+=== RUN   Test_ParagraphNestedDivs
+--- PASS: Test_ParagraphNestedDivs (0.00s)
+=== RUN   Test_ParagraphSimple
+--- PASS: Test_ParagraphSimple (0.00s)
+=== RUN   Test_ParagraphWithInlineFormatting
+--- PASS: Test_ParagraphWithInlineFormatting (0.00s)
+=== RUN   Test_ParagraphWithLineBreaks
+--- PASS: Test_ParagraphWithLineBreaks (0.00s)
+=== RUN   Test_SemanticAbbr
+--- PASS: Test_SemanticAbbr (0.00s)
+=== RUN   Test_SemanticArticle
+--- PASS: Test_SemanticArticle (0.00s)
+=== RUN   Test_SemanticDefinitionList
+--- PASS: Test_SemanticDefinitionList (0.00s)
+=== RUN   Test_SemanticDetailsSummary
+--- PASS: Test_SemanticDetailsSummary (0.00s)
+=== RUN   Test_SemanticHr
+--- PASS: Test_SemanticHr (0.00s)
+=== RUN   Test_SemanticMarkHighlight
+--- PASS: Test_SemanticMarkHighlight (0.00s)
+=== RUN   Test_SemanticSectionWithHeading
+--- PASS: Test_SemanticSectionWithHeading (0.00s)
+=== RUN   Test_SemanticSubSuperscript
+--- PASS: Test_SemanticSubSuperscript (0.00s)
+=== RUN   Test_SimpleTable
+--- PASS: Test_SimpleTable (0.00s)
+=== RUN   Test_TableEmpty
+--- PASS: Test_TableEmpty (0.00s)
+=== RUN   Test_TableNoThead
+--- PASS: Test_TableNoThead (0.00s)
+=== RUN   Test_TablePipeCharsInContent
+--- PASS: Test_TablePipeCharsInContent (0.00s)
+=== RUN   Test_TableWithAlignment
+--- PASS: Test_TableWithAlignment (0.00s)
+=== RUN   Test_TableWithColspan
+--- PASS: Test_TableWithColspan (0.00s)
+=== RUN   Test_UnorderedList
+--- PASS: Test_UnorderedList (0.00s)
+=== RUN   Test_EmptyHtml
+--- PASS: Test_EmptyHtml (0.00s)
+=== RUN   Test_EncodingCjkCharacters
+--- PASS: Test_EncodingCjkCharacters (0.00s)
+=== RUN   Test_EncodingHtmlEntities
+--- PASS: Test_EncodingHtmlEntities (0.00s)
+=== RUN   Test_EncodingNamedEntities
+--- PASS: Test_EncodingNamedEntities (0.00s)
+=== RUN   Test_EncodingNumericEntities
+--- PASS: Test_EncodingNumericEntities (0.00s)
+=== RUN   Test_EncodingUnicodeEmoji
+--- PASS: Test_EncodingUnicodeEmoji (0.00s)
+=== RUN   Test_HtmlCommentsOnly
+--- PASS: Test_HtmlCommentsOnly (0.00s)
+=== RUN   Test_JustWhitespaceInput
+--- PASS: Test_JustWhitespaceInput (0.00s)
+=== RUN   Test_MalformedDeeplyNestedElements
+--- PASS: Test_MalformedDeeplyNestedElements (0.00s)
+=== RUN   Test_MalformedMissingBlockClosingTags
+--- PASS: Test_MalformedMissingBlockClosingTags (0.00s)
+=== RUN   Test_MalformedOverlappingTags
+--- PASS: Test_MalformedOverlappingTags (0.00s)
+=== RUN   Test_MalformedUnclosedParagraph
+--- PASS: Test_MalformedUnclosedParagraph (0.00s)
+=== RUN   Test_ScriptTagsOnly
+--- PASS: Test_ScriptTagsOnly (0.00s)
+=== RUN   Test_StyleTagsOnly
+--- PASS: Test_StyleTagsOnly (0.00s)
+=== RUN   Test_VisitorCustomElementWithNesting
+    edge_cases_test.go:337: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomElementWithNesting (0.00s)
+=== RUN   Test_VisitorDeeplyNestedSkip
+    edge_cases_test.go:356: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorDeeplyNestedSkip (0.00s)
+=== RUN   Test_VisitorElementEndModification
+    edge_cases_test.go:378: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorElementEndModification (0.00s)
+=== RUN   Test_VisitorElementStartSkipEntireSubtree
+    edge_cases_test.go:390: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorElementStartSkipEntireSubtree (0.00s)
+=== RUN   Test_VisitorUnknownTagPreservation
+    edge_cases_test.go:402: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorUnknownTagPreservation (0.00s)
+=== RUN   Test_WhitespaceOnly
+--- PASS: Test_WhitespaceOnly (0.00s)
+=== RUN   Test_XssOnclickHandlerRemoved
+--- PASS: Test_XssOnclickHandlerRemoved (0.00s)
+=== RUN   Test_XssScriptTagStripped
+--- PASS: Test_XssScriptTagStripped (0.00s)
+=== RUN   Test_XssSvgNestedScriptStripped
+--- PASS: Test_XssSvgNestedScriptStripped (0.00s)
+=== RUN   Test_MetadataAuthorMeta
+--- PASS: Test_MetadataAuthorMeta (0.00s)
+=== RUN   Test_MetadataCanonicalUrl
+--- PASS: Test_MetadataCanonicalUrl (0.00s)
+=== RUN   Test_MetadataDescriptionMeta
+--- PASS: Test_MetadataDescriptionMeta (0.00s)
+=== RUN   Test_MetadataDublinCore
+--- PASS: Test_MetadataDublinCore (0.00s)
+=== RUN   Test_MetadataExtractAllImages
+--- PASS: Test_MetadataExtractAllImages (0.00s)
+=== RUN   Test_MetadataExtractAllLinks
+--- PASS: Test_MetadataExtractAllLinks (0.00s)
+=== RUN   Test_MetadataHeadersHierarchy
+--- PASS: Test_MetadataHeadersHierarchy (0.00s)
+=== RUN   Test_MetadataKeywordsMeta
+--- PASS: Test_MetadataKeywordsMeta (0.00s)
+=== RUN   Test_MetadataLangAttribute
+--- PASS: Test_MetadataLangAttribute (0.00s)
+=== RUN   Test_MetadataMicrodataSchemaArticle
+--- PASS: Test_MetadataMicrodataSchemaArticle (0.00s)
+=== RUN   Test_MetadataMicrodataSchemaBreadcrumb
+    metadata_test.go:196: expected to contain Home, got ---
+        title: Navigation
+        ---
+    metadata_test.go:199: expected to contain Products, got ---
+        title: Navigation
+        ---
+    metadata_test.go:202: expected to contain Current Page, got ---
+        title: Navigation
+        ---
+--- FAIL: Test_MetadataMicrodataSchemaBreadcrumb (0.00s)
+=== RUN   Test_MetadataMicrodataSchemaOrganization
+--- PASS: Test_MetadataMicrodataSchemaOrganization (0.00s)
+=== RUN   Test_MetadataMicrodataSchemaPerson
+--- PASS: Test_MetadataMicrodataSchemaPerson (0.00s)
+=== RUN   Test_MetadataMicrodataSchemaProduct
+--- PASS: Test_MetadataMicrodataSchemaProduct (0.00s)
+=== RUN   Test_MetadataTextDirectionLtr
+--- PASS: Test_MetadataTextDirectionLtr (0.00s)
+=== RUN   Test_MetadataTextDirectionRtl
+--- PASS: Test_MetadataTextDirectionRtl (0.00s)
+=== RUN   Test_MetadataTitleTag
+--- PASS: Test_MetadataTitleTag (0.00s)
+=== RUN   Test_OgBasicTags
+--- PASS: Test_OgBasicTags (0.00s)
+=== RUN   Test_OgMultipleTags
+--- PASS: Test_OgMultipleTags (0.00s)
+=== RUN   Test_StructuredDataJsonLd
+--- PASS: Test_StructuredDataJsonLd (0.00s)
+=== RUN   Test_StructuredDataMultipleJsonLd
+--- PASS: Test_StructuredDataMultipleJsonLd (0.00s)
+=== RUN   Test_TwitterCardTags
+--- PASS: Test_TwitterCardTags (0.00s)
+=== RUN   Test_OptionsAutolinksFalse
+--- PASS: Test_OptionsAutolinksFalse (0.00s)
+=== RUN   Test_OptionsBrInTablesFalse
+--- PASS: Test_OptionsBrInTablesFalse (0.00s)
+=== RUN   Test_OptionsBrInTablesTrue
+--- PASS: Test_OptionsBrInTablesTrue (0.00s)
+=== RUN   Test_OptionsCodeBlockBackticks
+--- PASS: Test_OptionsCodeBlockBackticks (0.00s)
+=== RUN   Test_OptionsCodeBlockIndented
+--- PASS: Test_OptionsCodeBlockIndented (0.00s)
+=== RUN   Test_OptionsCodeBlockTildes
+--- PASS: Test_OptionsCodeBlockTildes (0.00s)
+=== RUN   Test_OptionsCodeBlockTildesStyle
+--- PASS: Test_OptionsCodeBlockTildesStyle (0.00s)
+=== RUN   Test_OptionsCodeLanguagePython
+--- PASS: Test_OptionsCodeLanguagePython (0.00s)
+=== RUN   Test_OptionsConvertAsInline
+--- PASS: Test_OptionsConvertAsInline (0.00s)
+=== RUN   Test_OptionsDebugTrue
+--- PASS: Test_OptionsDebugTrue (0.00s)
+=== RUN   Test_OptionsDefaultTitleTrue
+--- PASS: Test_OptionsDefaultTitleTrue (0.00s)
+=== RUN   Test_OptionsEncodingUtf8
+--- PASS: Test_OptionsEncodingUtf8 (0.00s)
+=== RUN   Test_OptionsEscapeAsciiEnabled
+--- PASS: Test_OptionsEscapeAsciiEnabled (0.00s)
+=== RUN   Test_OptionsEscapeAsterisks
+--- PASS: Test_OptionsEscapeAsterisks (0.00s)
+=== RUN   Test_OptionsEscapeMisc
+--- PASS: Test_OptionsEscapeMisc (0.00s)
+=== RUN   Test_OptionsEscapeUnderscores
+--- PASS: Test_OptionsEscapeUnderscores (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsAttribute
+--- PASS: Test_OptionsExcludeSelectorsAttribute (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsClass
+--- PASS: Test_OptionsExcludeSelectorsClass (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsEmptyNoop
+--- PASS: Test_OptionsExcludeSelectorsEmptyNoop (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsId
+--- PASS: Test_OptionsExcludeSelectorsId (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsMultiple
+--- PASS: Test_OptionsExcludeSelectorsMultiple (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsNestedContentDropped
+--- PASS: Test_OptionsExcludeSelectorsNestedContentDropped (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsPlainTextMode
+--- PASS: Test_OptionsExcludeSelectorsPlainTextMode (0.00s)
+=== RUN   Test_OptionsExcludeSelectorsVsStripTags
+--- PASS: Test_OptionsExcludeSelectorsVsStripTags (0.00s)
+=== RUN   Test_OptionsExtractMetadataTrue
+--- PASS: Test_OptionsExtractMetadataTrue (0.00s)
+=== RUN   Test_OptionsHeadingStyleAtx
+--- PASS: Test_OptionsHeadingStyleAtx (0.00s)
+=== RUN   Test_OptionsHeadingStyleAtxClosed
+--- PASS: Test_OptionsHeadingStyleAtxClosed (0.00s)
+=== RUN   Test_OptionsHeadingStyleUnderlined
+--- PASS: Test_OptionsHeadingStyleUnderlined (0.00s)
+=== RUN   Test_OptionsHighlightBold
+--- PASS: Test_OptionsHighlightBold (0.00s)
+=== RUN   Test_OptionsHighlightDoubleEqual
+--- PASS: Test_OptionsHighlightDoubleEqual (0.00s)
+=== RUN   Test_OptionsHighlightNone
+--- PASS: Test_OptionsHighlightNone (0.00s)
+=== RUN   Test_OptionsKeepInlineImagesInParagraph
+--- PASS: Test_OptionsKeepInlineImagesInParagraph (0.00s)
+=== RUN   Test_OptionsLinkStyleReference
+--- PASS: Test_OptionsLinkStyleReference (0.00s)
+=== RUN   Test_OptionsListCustomBullets
+--- PASS: Test_OptionsListCustomBullets (0.00s)
+=== RUN   Test_OptionsListIndentTabs
+--- PASS: Test_OptionsListIndentTabs (0.00s)
+=== RUN   Test_OptionsListIndentWidthFour
+--- PASS: Test_OptionsListIndentWidthFour (0.00s)
+=== RUN   Test_OptionsMaxDepthDefaultUnlimited
+--- PASS: Test_OptionsMaxDepthDefaultUnlimited (0.00s)
+=== RUN   Test_OptionsMaxDepthTruncates
+--- PASS: Test_OptionsMaxDepthTruncates (0.00s)
+=== RUN   Test_OptionsMaxDepthZeroEmpty
+--- PASS: Test_OptionsMaxDepthZeroEmpty (0.00s)
+=== RUN   Test_OptionsNewlineBackslash
+--- PASS: Test_OptionsNewlineBackslash (0.00s)
+=== RUN   Test_OptionsNewlineSpaces
+--- PASS: Test_OptionsNewlineSpaces (0.00s)
+=== RUN   Test_OptionsOutputFormatDjot
+--- PASS: Test_OptionsOutputFormatDjot (0.00s)
+=== RUN   Test_OptionsOutputFormatMarkdown
+--- PASS: Test_OptionsOutputFormatMarkdown (0.00s)
+=== RUN   Test_OptionsOutputFormatPlain
+--- PASS: Test_OptionsOutputFormatPlain (0.00s)
+=== RUN   Test_OptionsPreprocessingAggressive
+--- PASS: Test_OptionsPreprocessingAggressive (0.00s)
+=== RUN   Test_OptionsPreprocessingMinimal
+--- PASS: Test_OptionsPreprocessingMinimal (0.00s)
+=== RUN   Test_OptionsPreprocessingRemoveForms
+--- PASS: Test_OptionsPreprocessingRemoveForms (0.00s)
+=== RUN   Test_OptionsPreserveTagsIframe
+--- PASS: Test_OptionsPreserveTagsIframe (0.00s)
+=== RUN   Test_OptionsSkipImagesTrue
+--- PASS: Test_OptionsSkipImagesTrue (0.00s)
+=== RUN   Test_OptionsStripNewlines
+--- PASS: Test_OptionsStripNewlines (0.00s)
+=== RUN   Test_OptionsStripTagsDivSpan
+--- PASS: Test_OptionsStripTagsDivSpan (0.00s)
+=== RUN   Test_OptionsStrongEmUnderscore
+--- PASS: Test_OptionsStrongEmUnderscore (0.00s)
+=== RUN   Test_OptionsSubSymbolTilde
+--- PASS: Test_OptionsSubSymbolTilde (0.00s)
+=== RUN   Test_OptionsSupSymbolCaret
+--- PASS: Test_OptionsSupSymbolCaret (0.00s)
+=== RUN   Test_OptionsWhitespaceNormalized
+--- PASS: Test_OptionsWhitespaceNormalized (0.00s)
+=== RUN   Test_OptionsWhitespaceStrict
+--- PASS: Test_OptionsWhitespaceStrict (0.00s)
+=== RUN   Test_OptionsWrapDisabled
+--- PASS: Test_OptionsWrapDisabled (0.00s)
+=== RUN   Test_OptionsWrapEnabled
+--- PASS: Test_OptionsWrapEnabled (0.00s)
+=== RUN   Test_RealWorldBlogPost
+--- PASS: Test_RealWorldBlogPost (0.00s)
+=== RUN   Test_RealWorldDocumentationPage
+--- PASS: Test_RealWorldDocumentationPage (0.00s)
+=== RUN   Test_RealWorldProductPage
+--- PASS: Test_RealWorldProductPage (0.00s)
+=== RUN   Test_ResultTablesEmptyWhenNoTables
+--- PASS: Test_ResultTablesEmptyWhenNoTables (0.00s)
+=== RUN   Test_ResultTablesMultiple
+--- PASS: Test_ResultTablesMultiple (0.00s)
+=== RUN   Test_ResultTablesSimple
+--- PASS: Test_ResultTablesSimple (0.00s)
+=== RUN   Test_ResultTablesWithoutStructureFlag
+--- PASS: Test_ResultTablesWithoutStructureFlag (0.00s)
+=== RUN   Test_ResultWarningsEmptyForCleanInput
+--- PASS: Test_ResultWarningsEmptyForCleanInput (0.00s)
+=== RUN   Test_ResultWarningsEmptyForComplexInput
+--- PASS: Test_ResultWarningsEmptyForComplexInput (0.00s)
+=== RUN   Test_ResultWarningsEmptyForMalformedHtml
+--- PASS: Test_ResultWarningsEmptyForMalformedHtml (0.00s)
+=== RUN   Test_SmokeEmptyString
+--- PASS: Test_SmokeEmptyString (0.00s)
+=== RUN   Test_SmokeSimpleHeading
+--- PASS: Test_SmokeSimpleHeading (0.00s)
+=== RUN   Test_SmokeSimpleParagraph
+--- PASS: Test_SmokeSimpleParagraph (0.00s)
+=== RUN   Test_StructureCodeBlock
+--- PASS: Test_StructureCodeBlock (0.00s)
+=== RUN   Test_StructureDeepNestingH1H2H3
+--- PASS: Test_StructureDeepNestingH1H2H3 (0.00s)
+=== RUN   Test_StructureH1H2NestedGroup
+--- PASS: Test_StructureH1H2NestedGroup (0.00s)
+=== RUN   Test_StructureHeadingParagraph
+--- PASS: Test_StructureHeadingParagraph (0.00s)
+=== RUN   Test_StructureList
+--- PASS: Test_StructureList (0.00s)
+=== RUN   Test_StructureMultipleHeadings
+--- PASS: Test_StructureMultipleHeadings (0.00s)
+=== RUN   Test_StructureSiblingH1Groups
+--- PASS: Test_StructureSiblingH1Groups (0.00s)
+=== RUN   Test_VisitorAudioCustom
+    visitor_test.go:414: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorAudioCustom (0.00s)
+=== RUN   Test_VisitorAudioSkip
+    visitor_test.go:433: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorAudioSkip (0.00s)
+=== RUN   Test_VisitorButtonCustom
+    visitor_test.go:455: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorButtonCustom (0.00s)
+=== RUN   Test_VisitorButtonSkip
+    visitor_test.go:477: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorButtonSkip (0.00s)
+=== RUN   Test_VisitorContinueDefault
+    visitor_test.go:502: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorContinueDefault (0.00s)
+=== RUN   Test_VisitorCustomBlockquote
+    visitor_test.go:518: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomBlockquote (0.00s)
+=== RUN   Test_VisitorCustomEmphasis
+    visitor_test.go:537: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomEmphasis (0.00s)
+=== RUN   Test_VisitorCustomHeading
+    visitor_test.go:556: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomHeading (0.00s)
+=== RUN   Test_VisitorCustomImage
+    visitor_test.go:578: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomImage (0.00s)
+=== RUN   Test_VisitorCustomLinkFormat
+    visitor_test.go:597: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomLinkFormat (0.00s)
+=== RUN   Test_VisitorCustomLinkStatic
+    visitor_test.go:616: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomLinkStatic (0.00s)
+=== RUN   Test_VisitorCustomOutput
+    visitor_test.go:635: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorCustomOutput (0.00s)
+=== RUN   Test_VisitorDefinitionListCustom
+    visitor_test.go:654: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorDefinitionListCustom (0.00s)
+=== RUN   Test_VisitorDefinitionListCustomFormat
+    visitor_test.go:676: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorDefinitionListCustomFormat (0.00s)
+=== RUN   Test_VisitorDefinitionListSkip
+    visitor_test.go:701: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorDefinitionListSkip (0.00s)
+=== RUN   Test_VisitorDetailsSummaryCustom
+    visitor_test.go:726: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorDetailsSummaryCustom (0.00s)
+=== RUN   Test_VisitorDetailsSummarySkip
+    visitor_test.go:745: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorDetailsSummarySkip (0.00s)
+=== RUN   Test_VisitorFigureCustom
+    visitor_test.go:770: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorFigureCustom (0.00s)
+=== RUN   Test_VisitorFigureCustomWrap
+    visitor_test.go:792: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorFigureCustomWrap (0.00s)
+=== RUN   Test_VisitorFigureSkip
+    visitor_test.go:814: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorFigureSkip (0.00s)
+=== RUN   Test_VisitorFormCustom
+    visitor_test.go:839: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorFormCustom (0.00s)
+=== RUN   Test_VisitorFormSkip
+    visitor_test.go:861: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorFormSkip (0.00s)
+=== RUN   Test_VisitorHorizontalRuleCustom
+    visitor_test.go:883: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorHorizontalRuleCustom (0.00s)
+=== RUN   Test_VisitorHorizontalRuleSkip
+    visitor_test.go:908: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorHorizontalRuleSkip (0.00s)
+=== RUN   Test_VisitorIframeCustom
+    visitor_test.go:933: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorIframeCustom (0.00s)
+=== RUN   Test_VisitorIframeSkip
+    visitor_test.go:955: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorIframeSkip (0.00s)
+=== RUN   Test_VisitorInputCustom
+    visitor_test.go:977: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorInputCustom (0.00s)
+=== RUN   Test_VisitorInputSkip
+    visitor_test.go:996: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorInputSkip (0.00s)
+=== RUN   Test_VisitorLineBreakCustom
+    visitor_test.go:1018: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorLineBreakCustom (0.00s)
+=== RUN   Test_VisitorLineBreakSkip
+    visitor_test.go:1041: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorLineBreakSkip (0.00s)
+=== RUN   Test_VisitorMarkCustom
+    visitor_test.go:1057: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorMarkCustom (0.00s)
+=== RUN   Test_VisitorMarkSkip
+    visitor_test.go:1076: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorMarkSkip (0.00s)
+=== RUN   Test_VisitorPreserveHtml
+    visitor_test.go:1098: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorPreserveHtml (0.00s)
+=== RUN   Test_VisitorSkipAllHeadings
+    visitor_test.go:1114: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSkipAllHeadings (0.00s)
+=== RUN   Test_VisitorSkipCodeBlocks
+    visitor_test.go:1133: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSkipCodeBlocks (0.00s)
+=== RUN   Test_VisitorSkipHeading
+    visitor_test.go:1155: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSkipHeading (0.00s)
+=== RUN   Test_VisitorSkipImages
+    visitor_test.go:1174: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSkipImages (0.00s)
+=== RUN   Test_VisitorSkipLinks
+    visitor_test.go:1199: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSkipLinks (0.00s)
+=== RUN   Test_VisitorSkipStrong
+    visitor_test.go:1218: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSkipStrong (0.00s)
+=== RUN   Test_VisitorSubscriptCustom
+    visitor_test.go:1237: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSubscriptCustom (0.00s)
+=== RUN   Test_VisitorSubscriptSkip
+    visitor_test.go:1256: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSubscriptSkip (0.00s)
+=== RUN   Test_VisitorSuperscriptCustom
+    visitor_test.go:1272: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSuperscriptCustom (0.00s)
+=== RUN   Test_VisitorSuperscriptSkip
+    visitor_test.go:1291: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorSuperscriptSkip (0.00s)
+=== RUN   Test_VisitorUnderlineCustom
+    visitor_test.go:1307: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorUnderlineCustom (0.00s)
+=== RUN   Test_VisitorUnderlineSkip
+    visitor_test.go:1326: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorUnderlineSkip (0.00s)
+=== RUN   Test_VisitorVideoCustom
+    visitor_test.go:1348: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorVideoCustom (0.00s)
+=== RUN   Test_VisitorVideoSkip
+    visitor_test.go:1370: call failed: failed to decode conversion result: unexpected end of JSON input
+--- FAIL: Test_VisitorVideoSkip (0.00s)
+FAIL
+FAIL	e2e_go	1.122s
+FAIL

@@ -48,10 +48,11 @@ packages/html-to-markdown-ts/bin/
 !packages/ruby/lib/
 !packages/ruby/lib/**/*.rb
 packages/ruby/lib/bin/
-packages/ruby/lib/*.bundle
+packages/ruby/lib/**/*.bundle
 packages/ruby/tmp/
 packages/ruby/vendor/html-to-markdown-rs/
 packages/ruby/vendor/Cargo.toml
+*.gem
 packages/php-ext/workspace/
 !packages/elixir/lib/
 !packages/elixir/lib/**/*.ex
@@ -66,9 +67,16 @@ packages/r/src/*.dll
 packages/r/src/*.dylib
 packages/r/*.tar.gz
 
-# Elixir test application dependencies and builds
+# Elixir test/e2e dependencies and builds
 tests/test_apps/elixir/deps/
 tests/test_apps/elixir/_build/
+test_apps/elixir/deps/
+test_apps/elixir/_build/
+e2e/elixir/deps/
+e2e/elixir/_build/
+e2e/elixir/.elixir_ls/
+e2e/elixir/.fetch
+e2e/elixir/erl_crash.dump
 
 # Example dependency directories
 vendor/
@@ -135,6 +143,18 @@ crates/html-to-markdown-ffi/tests/c/test_*
 crates/html-to-markdown-ffi/tests/c/*.o
 crates/html-to-markdown-ffi/tests/c/*.dSYM/
 
+# C e2e test binaries
+e2e/c/run_tests
+e2e/c/test_*
+!e2e/c/test_*.c
+!e2e/c/test_runner.h
+e2e/c/*.o
+e2e/c/*.dSYM/
+test_apps/c/run_tests
+test_apps/c/test_*
+!test_apps/c/test_*.c
+test_apps/c/*.o
+test_apps/c/*.dSYM/
 
 # Additional generated artifacts
 .remote-cache/

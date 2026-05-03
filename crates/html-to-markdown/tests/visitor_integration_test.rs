@@ -55,7 +55,13 @@ fn test_visitor_input_custom_inside_preprocessed_form() {
     #[derive(Debug, Default)]
     struct InputVisitor;
     impl HtmlVisitor for InputVisitor {
-        fn visit_input(&mut self, _ctx: &NodeContext, input_type: &str, _name: Option<&str>, _value: Option<&str>) -> VisitResult {
+        fn visit_input(
+            &mut self,
+            _ctx: &NodeContext,
+            input_type: &str,
+            _name: Option<&str>,
+            _value: Option<&str>,
+        ) -> VisitResult {
             VisitResult::Custom(format!("[INPUT:{input_type}]"))
         }
     }
