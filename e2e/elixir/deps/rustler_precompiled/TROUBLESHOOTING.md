@@ -57,14 +57,14 @@ rustler = { version = "0.37", default-features = false, features = ["nif_version
 
 The available NIF versions are the following:
 
-- `2.14` - for OTP 21 and above.
-- `2.15` - for OTP 22 and above.
-- `2.16` - for OTP 24 and above.
-- `2.17` - for OTP 26 and above.
+* `2.14` - for OTP 21 and above.
+* `2.15` - for OTP 22 and above.
+* `2.16` - for OTP 24 and above.
+* `2.17` - for OTP 26 and above.
 
 And the default NIF version activated by Rustler versions is the following:
 
-- Rustler `~> v0.29` - NIF `2.15`
+* Rustler `~> v0.29` - NIF `2.15`
 
 The [`rustler-precompiled-action`](https://github.com/philss/rustler-precompiled-action) would
 only require that you specify the NIF version, so it would active the respective feature.

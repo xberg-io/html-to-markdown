@@ -188,6 +188,7 @@ if (!typesOnly) {
   const wrapper = `import * as wasmModule from "./html_to_markdown_wasm_bg.wasm";
 export * from "./html_to_markdown_wasm_bg.js";
 import * as imports_mod from "./html_to_markdown_wasm_bg.js";
+import { convert as wasmConvert, WasmConversionOptions, WasmVisitorHandle } from "./html_to_markdown_wasm_bg.js";
 
 const notReadyError = () =>
   new Error("html-to-markdown-wasm: WebAssembly bundle is still initializing. Await initWasm() before calling convert() in runtimes that load WASM asynchronously (e.g., Cloudflare Workers).");
@@ -300,6 +301,74 @@ export const wasmReady = ensureInitPromise();
 
 export async function initWasm() {
   return ensureInitPromise();
+}
+
+/**
+ * Wrapped convert function that handles plain JavaScript visitor objects.
+ * @param {string} html The HTML to convert
+ * @param {any} options The conversion options
+ * @returns {any} The conversion result
+ */
+export function convert(html, options) {
+  if (!options) {
+    return wasmConvert(html);
+  }
+
+  // Wrap visitor if provided
+  let wrappedVisitor;
+  if (options.visitor) {
+    wrappedVisitor = new WasmVisitorHandle(options.visitor);
+  }
+
+  const wasmOpts = new WasmConversionOptions(
+    options.headingStyle,
+    options.listIndentType,
+    options.listIndentWidth,
+    options.bullets,
+    options.strongEmSymbol,
+    options.escapeAsterisks,
+    options.escapeUnderscores,
+    options.escapeMisc,
+    options.escapeAscii,
+    options.codeLanguage,
+    options.autolinks,
+    options.defaultTitle,
+    options.brInTables,
+    options.highlightStyle,
+    options.extractMetadata,
+    options.whitespaceMode,
+    options.stripNewlines,
+    options.wrap,
+    options.wrapWidth,
+    options.convertAsInline,
+    options.subSymbol,
+    options.supSymbol,
+    options.newlineStyle,
+    options.codeBlockStyle,
+    options.keepInlineImagesIn,
+    options.preprocessing,
+    options.encoding,
+    options.debug,
+    options.stripTags,
+    options.preserveTags,
+    options.skipImages,
+    options.linkStyle,
+    options.outputFormat,
+    options.includeDocumentStructure,
+    options.extractImages,
+    options.maxImageSize,
+    options.captureSvg,
+    options.inferDimensions,
+    options.excludeSelectors,
+    options.maxDepth,
+    wrappedVisitor,
+  );
+
+  try {
+    return wasmConvert(html, wasmOpts);
+  } finally {
+    wasmOpts.free();
+  }
 }
 `;
 

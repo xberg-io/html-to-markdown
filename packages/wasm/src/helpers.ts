@@ -73,6 +73,23 @@ export interface ConversionOptions {
 }
 
 /**
+ * Create a visitor handle from a plain JavaScript visitor object.
+ *
+ * @example
+ * ```ts
+ * import { convert, createVisitor } from "@kreuzberg/html-to-markdown-wasm";
+ *
+ * const visitor = createVisitor({
+ *   visitHeading: (ctx, level, text) => ({ custom: `H${level}: ${text}` })
+ * });
+ * const result = convert("<h1>Title</h1>");
+ * ```
+ */
+export function createVisitor(obj: HtmlVisitor): WasmVisitorHandle {
+  return new WasmVisitorHandle(obj);
+}
+
+/**
  * Convert HTML to Markdown.
  *
  * Accepts an optional plain-object options parameter — no need to construct
@@ -89,6 +106,12 @@ export interface ConversionOptions {
 export function convert(html: string, options?: ConversionOptions | null): WasmConversionResult {
   if (!options) {
     return wasmConvert(html);
+  }
+
+  // Wrap visitor if provided
+  let wrappedVisitor: WasmVisitorHandle | undefined;
+  if (options.visitor) {
+    wrappedVisitor = createVisitor(options.visitor);
   }
 
   const wasmOpts = new WasmConversionOptions(
@@ -132,6 +155,7 @@ export function convert(html: string, options?: ConversionOptions | null): WasmC
     options.inferDimensions,
     options.excludeSelectors,
     options.maxDepth,
+    wrappedVisitor,
   );
 
   try {

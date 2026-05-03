@@ -1,22 +1,22 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/html-to-markdown",
-    "crates/html-to-markdown-cli",
-    "crates/html-to-markdown-ffi",
-    "crates/html-to-markdown-node",
-    "crates/html-to-markdown-php",
-    "crates/html-to-markdown-py",
-    "crates/html-to-markdown-wasm",
+  "crates/html-to-markdown",
+  "crates/html-to-markdown-cli",
+  "crates/html-to-markdown-ffi",
+  "crates/html-to-markdown-node",
+  "crates/html-to-markdown-php",
+  "crates/html-to-markdown-py",
+  "crates/html-to-markdown-wasm",
 ]
 exclude = [
-    "e2e/rust",
-    "packages/elixir/native/html_to_markdown_nif",
-    "packages/r/src/rust",
-    "packages/ruby/ext/html_to_markdown_rb",
-    "packages/ruby/vendor",
-    "test_apps/rust",
-    "tests/test_apps/elixir/deps",
+  "e2e/rust",
+  "packages/elixir/native/html_to_markdown_nif",
+  "packages/r/src/rust",
+  "packages/ruby/ext/html_to_markdown_rb",
+  "packages/ruby/vendor",
+  "test_apps/rust",
+  "tests/test_apps/elixir/deps",
 ]
 
 [workspace.package]

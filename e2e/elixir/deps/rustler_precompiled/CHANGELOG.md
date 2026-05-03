@@ -18,9 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for choosing the IP version to use, therefore supporting IPv6.
   The environment variable `RUSTLER_PRECOMPILED_IPFAMILY` can be set to:
-  - "inet" - for IPv4 only. This is the default option.
-  - "inet6" - for IPv6 only.
-  - "inet6fb4" - for trying IPv6 first, and then fallback to IPv4.
+  * "inet" - for IPv4 only. This is the default option.
+  * "inet6" - for IPv6 only.
+  * "inet6fb4" - for trying IPv6 first, and then fallback to IPv4.
 
 ### Changed
 
@@ -53,10 +53,10 @@ Unauthorized when connecting through authenticated proxies.
 
 This fix:
 
-- Extracts and parses proxy credentials from the userinfo field
-- Passes credentials to :httpc via the proxy_auth HTTP option
-- Redacts credentials in debug logs to avoid leaking sensitive info
-- Handles edge cases like passwords containing colons and JWT tokens
+* Extracts and parses proxy credentials from the userinfo field
+* Passes credentials to :httpc via the proxy_auth HTTP option
+* Redacts credentials in debug logs to avoid leaking sensitive info
+* Handles edge cases like passwords containing colons and JWT tokens
 
 ## [0.8.3] - 2025-07-23
 
@@ -132,10 +132,10 @@ This fix:
   enabling users to use that directory as a repository for the artifacts.
   This env var will affect all packages using this library.
 
-- Add the `RUSTLER_PRECOMPILED_FORCE_BUILD_ALL` env var to force the build of all packages
-  using RustlerPrecompiled. Be aware that `Rustler` will be required if this is set
-  to `1` or `true`. There is a new application env that has precedence over the env var,
-  which is the `:force_build_all`.
+ - Add the `RUSTLER_PRECOMPILED_FORCE_BUILD_ALL` env var to force the build of all packages
+   using RustlerPrecompiled. Be aware that `Rustler` will be required if this is set
+   to `1` or `true`. There is a new application env that has precedence over the env var,
+   which is the `:force_build_all`.
 
 ### Changed
 

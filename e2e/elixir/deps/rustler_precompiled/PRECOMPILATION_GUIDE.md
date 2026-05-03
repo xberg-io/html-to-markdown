@@ -70,13 +70,13 @@ In summary the build matrix looks like this:
 matrix:
   nif: ["2.15"]
   job:
-    - { target: aarch64-unknown-linux-gnu, os: ubuntu-22.04, use-cross: true }
-    - { target: aarch64-apple-darwin, os: macos-15 }
-    - { target: x86_64-apple-darwin, os: macos-15-intel }
-    - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04 }
-    - { target: x86_64-unknown-linux-musl, os: ubuntu-22.04, use-cross: true }
-    - { target: x86_64-pc-windows-gnu, os: windows-2022 }
-    - { target: x86_64-pc-windows-msvc, os: windows-2022 }
+    - { target: aarch64-unknown-linux-gnu   , os: ubuntu-22.04 , use-cross: true }
+    - { target: aarch64-apple-darwin        , os: macos-15      }
+    - { target: x86_64-apple-darwin         , os: macos-15-intel }
+    - { target: x86_64-unknown-linux-gnu    , os: ubuntu-22.04  }
+    - { target: x86_64-unknown-linux-musl   , os: ubuntu-22.04 , use-cross: true }
+    - { target: x86_64-pc-windows-gnu       , os: windows-2022  }
+    - { target: x86_64-pc-windows-msvc      , os: windows-2022  }
 ```
 
 A complete workflow example can be found in the [`rustler_precompilation_example`](https://github.com/philss/rustler_precompilation_example/blob/main/.github/workflows/release.yml) project.

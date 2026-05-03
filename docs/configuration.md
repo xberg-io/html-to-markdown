@@ -152,7 +152,7 @@ Given this HTML:
 
 === "markdown"
 
-````markdown
+`````markdown
     # Report
 
     See [**example**](https://example.com).
@@ -302,4 +302,8 @@ import { convert, ConversionOptions } from '@kreuzberg/html-to-markdown';
 
 --8<-- "snippets/feedback.md"
 ````
-````
+`````
+
+```
+
+```
