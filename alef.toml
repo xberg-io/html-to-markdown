@@ -75,7 +75,7 @@ package_name = "@kreuzberg/html-to-markdown-node"
 
 [crates.ruby]
 gem_name = "html-to-markdown"
-exclude_types = ["ConversionOptionsBuilder"]
+exclude_types = ["ConversionOptionsBuilder", "VisitorHandle"]
 
 [crates.ruby.stubs]
 output = "packages/ruby/sig/"
@@ -341,8 +341,9 @@ returns_result = true
 options_ptr = true
 
 [crates.e2e.call.overrides.java]
-class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdown"
+class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdownRs"
 function = "convert"
+visitor_function = "convertWithVisitor"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
 
@@ -393,6 +394,8 @@ linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
 [crates.e2e.call.overrides.elixir]
+module = "HtmlToMarkdown"
+function = "convert"
 options_type = "ConversionOptions"
 options_via = "conversionoptions_default"
 

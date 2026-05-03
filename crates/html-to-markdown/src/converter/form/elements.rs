@@ -27,6 +27,7 @@ use std::borrow::Cow;
 /// - **Inline mode**: Children are processed inline without block spacing
 /// - **Block mode**: Content is collected, trimmed, and wrapped with blank lines
 /// - **Empty content**: Skipped entirely
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_form(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -38,6 +39,63 @@ pub fn handle_form(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        #[cfg(feature = "visitor")]
+        if let Some(ref visitor_handle) = ctx.visitor {
+            use crate::converter::utility::content::collect_tag_attributes;
+            use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+            let attributes = collect_tag_attributes(tag);
+            let node_id = node_handle.get_inner();
+            let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+            let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+            let action = tag
+                .attributes()
+                .get("action")
+                .flatten()
+                .map(|v| v.as_utf8_str().into_owned());
+            let method = tag
+                .attributes()
+                .get("method")
+                .flatten()
+                .map(|v| v.as_utf8_str().into_owned());
+            let node_ctx = NodeContext {
+                node_type: NodeType::Form,
+                tag_name: "form".to_string(),
+                attributes,
+                depth,
+                index_in_parent,
+                parent_tag,
+                is_inline: false,
+            };
+            let visit_result = {
+                let mut visitor = visitor_handle.borrow_mut();
+                visitor.visit_form(&node_ctx, action.as_deref(), method.as_deref())
+            };
+            match visit_result {
+                VisitResult::Continue => {}
+                VisitResult::Skip => return,
+                VisitResult::Custom(custom) => {
+                    if !output.is_empty() && !output.ends_with("\n\n") {
+                        output.push_str("\n\n");
+                    }
+                    output.push_str(&custom);
+                    output.push_str("\n\n");
+                    return;
+                }
+                VisitResult::PreserveHtml => {
+                    use crate::converter::utility::serialization::serialize_node;
+                    output.push_str(&serialize_node(node_handle, parser));
+                    return;
+                }
+                VisitResult::Error(err) => {
+                    if ctx.visitor_error.borrow().is_none() {
+                        *ctx.visitor_error.borrow_mut() = Some(err);
+                    }
+                    return;
+                }
+            }
+        }
+
         // In inline context, just process children inline
         if ctx.convert_as_inline {
             let children = tag.children();
@@ -231,16 +289,77 @@ pub fn handle_label(
 ///
 /// An input element represents a form control for user input. Since input
 /// elements typically have no text content, this handler produces no output.
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_input(
     _tag_name: &str,
-    _node_handle: &tl::NodeHandle,
-    _parser: &tl::Parser,
-    _output: &mut String,
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &mut String,
     _options: &crate::options::ConversionOptions,
-    _ctx: &super::Context,
-    _depth: usize,
-    _dom_ctx: &super::DomContext,
+    ctx: &super::Context,
+    depth: usize,
+    dom_ctx: &super::DomContext,
 ) {
+    #[cfg(feature = "visitor")]
+    if let Some(ref visitor_handle) = ctx.visitor {
+        use crate::converter::utility::content::collect_tag_attributes;
+        use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+        if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+            let attributes = collect_tag_attributes(tag);
+            let node_id = node_handle.get_inner();
+            let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+            let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+            let input_type = tag
+                .attributes()
+                .get("type")
+                .flatten()
+                .map_or_else(|| std::borrow::Cow::Borrowed("text"), |v| v.as_utf8_str())
+                .into_owned();
+            let name = tag
+                .attributes()
+                .get("name")
+                .flatten()
+                .map(|v| v.as_utf8_str().into_owned());
+            let value = tag
+                .attributes()
+                .get("value")
+                .flatten()
+                .map(|v| v.as_utf8_str().into_owned());
+            let node_ctx = NodeContext {
+                node_type: NodeType::Input,
+                tag_name: "input".to_string(),
+                attributes,
+                depth,
+                index_in_parent,
+                parent_tag,
+                is_inline: true,
+            };
+            let visit_result = {
+                let mut visitor = visitor_handle.borrow_mut();
+                visitor.visit_input(&node_ctx, &input_type, name.as_deref(), value.as_deref())
+            };
+            match visit_result {
+                VisitResult::Continue => {}
+                VisitResult::Skip => return,
+                VisitResult::Custom(custom) => {
+                    output.push_str(&custom);
+                    return;
+                }
+                VisitResult::PreserveHtml => {
+                    use crate::converter::utility::serialization::serialize_node;
+                    output.push_str(&serialize_node(node_handle, parser));
+                    return;
+                }
+                VisitResult::Error(err) => {
+                    if ctx.visitor_error.borrow().is_none() {
+                        *ctx.visitor_error.borrow_mut() = Some(err);
+                    }
+                    return;
+                }
+            }
+        }
+    }
     // Input elements have no text content; render nothing
 }
 
@@ -410,6 +529,7 @@ pub fn handle_optgroup(
 ///
 /// - Content is collected from children
 /// - Blank lines are added after content in block mode only
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_button(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -421,6 +541,54 @@ pub fn handle_button(
     dom_ctx: &super::DomContext,
 ) {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        #[cfg(feature = "visitor")]
+        if let Some(ref visitor_handle) = ctx.visitor {
+            use crate::converter::get_text_content;
+            use crate::converter::utility::content::collect_tag_attributes;
+            use crate::visitor::{NodeContext, NodeType, VisitResult};
+
+            let text = get_text_content(node_handle, parser, dom_ctx);
+            let attributes = collect_tag_attributes(tag);
+            let node_id = node_handle.get_inner();
+            let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
+            let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
+            let node_ctx = NodeContext {
+                node_type: NodeType::Button,
+                tag_name: "button".to_string(),
+                attributes,
+                depth,
+                index_in_parent,
+                parent_tag,
+                is_inline: true,
+            };
+            let visit_result = {
+                let mut visitor = visitor_handle.borrow_mut();
+                visitor.visit_button(&node_ctx, &text)
+            };
+            match visit_result {
+                VisitResult::Continue => {}
+                VisitResult::Skip => return,
+                VisitResult::Custom(custom) => {
+                    output.push_str(&custom);
+                    if !ctx.convert_as_inline && !custom.ends_with('\n') {
+                        output.push_str("\n\n");
+                    }
+                    return;
+                }
+                VisitResult::PreserveHtml => {
+                    use crate::converter::utility::serialization::serialize_node;
+                    output.push_str(&serialize_node(node_handle, parser));
+                    return;
+                }
+                VisitResult::Error(err) => {
+                    if ctx.visitor_error.borrow().is_none() {
+                        *ctx.visitor_error.borrow_mut() = Some(err);
+                    }
+                    return;
+                }
+            }
+        }
+
         let start_len = output.len();
         let children = tag.children();
         {
