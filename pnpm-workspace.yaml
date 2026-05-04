@@ -3,6 +3,7 @@ packages:
   - crates/html-to-markdown-wasm
   - packages/typescript
   - e2e/node
+  - e2e/wasm
 
 ignoredBuiltDependencies:
   - esbuild

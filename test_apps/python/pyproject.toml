@@ -15,7 +15,12 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "html-to-markdown>=3.2", "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1" ]
+dependencies = [
+  "html-to-markdown>=3.2",
+  "pytest>=7.4",
+  "pytest-asyncio>=0.23",
+  "pytest-timeout>=2.1",
+]
 
 [tool.setuptools]
 packages = []

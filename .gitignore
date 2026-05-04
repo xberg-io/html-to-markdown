@@ -170,6 +170,11 @@ GEMINI.md
 !packages/go/v2/bin/
 !packages/go/v2/bin/benchmark.go
 
+.venv/
+node_modules/
+vendor/bundle/
+vendor/
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
 .claude/

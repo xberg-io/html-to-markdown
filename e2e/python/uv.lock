@@ -47,7 +47,7 @@ dev = [
 ]
 
 [[package]]
-name = "html-to-markdown-e2e-tests"
+name = "html-to-markdown-e2e"
 version = "0.0.0"
 source = { editable = "." }
 dependencies = [

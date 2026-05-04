@@ -146,6 +146,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
     private readonly GCHandle _implHandle;
     internal IntPtr _vtable;
     private bool _disposed;
+    private readonly object[] _delegates;
 
     // Vtable slot delegates (41)
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -276,6 +277,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         _implHandle = GCHandle.Alloc(impl, GCHandleType.Normal);
         _vtable = IntPtr.Zero;
         _disposed = false;
+        _delegates = new object[41];
         BuildVtable();
     }
 
@@ -285,166 +287,207 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
         // Slot 0: visit_element_start_fn
         var visitElementStartFn = new VisitElementStartFn(VisitElementStartFnCallback);
+        _delegates[0] = visitElementStartFn;
         Marshal.WriteIntPtr(_vtable, 0, Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
 
         // Slot 1: visit_element_end_fn
         var visitElementEndFn = new VisitElementEndFn(VisitElementEndFnCallback);
+        _delegates[1] = visitElementEndFn;
         Marshal.WriteIntPtr(_vtable, 8, Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
 
         // Slot 2: visit_text_fn
         var visitTextFn = new VisitTextFn(VisitTextFnCallback);
+        _delegates[2] = visitTextFn;
         Marshal.WriteIntPtr(_vtable, 16, Marshal.GetFunctionPointerForDelegate(visitTextFn));
 
         // Slot 3: visit_link_fn
         var visitLinkFn = new VisitLinkFn(VisitLinkFnCallback);
+        _delegates[3] = visitLinkFn;
         Marshal.WriteIntPtr(_vtable, 24, Marshal.GetFunctionPointerForDelegate(visitLinkFn));
 
         // Slot 4: visit_image_fn
         var visitImageFn = new VisitImageFn(VisitImageFnCallback);
+        _delegates[4] = visitImageFn;
         Marshal.WriteIntPtr(_vtable, 32, Marshal.GetFunctionPointerForDelegate(visitImageFn));
 
         // Slot 5: visit_heading_fn
         var visitHeadingFn = new VisitHeadingFn(VisitHeadingFnCallback);
+        _delegates[5] = visitHeadingFn;
         Marshal.WriteIntPtr(_vtable, 40, Marshal.GetFunctionPointerForDelegate(visitHeadingFn));
 
         // Slot 6: visit_code_block_fn
         var visitCodeBlockFn = new VisitCodeBlockFn(VisitCodeBlockFnCallback);
+        _delegates[6] = visitCodeBlockFn;
         Marshal.WriteIntPtr(_vtable, 48, Marshal.GetFunctionPointerForDelegate(visitCodeBlockFn));
 
         // Slot 7: visit_code_inline_fn
         var visitCodeInlineFn = new VisitCodeInlineFn(VisitCodeInlineFnCallback);
+        _delegates[7] = visitCodeInlineFn;
         Marshal.WriteIntPtr(_vtable, 56, Marshal.GetFunctionPointerForDelegate(visitCodeInlineFn));
 
         // Slot 8: visit_list_item_fn
         var visitListItemFn = new VisitListItemFn(VisitListItemFnCallback);
+        _delegates[8] = visitListItemFn;
         Marshal.WriteIntPtr(_vtable, 64, Marshal.GetFunctionPointerForDelegate(visitListItemFn));
 
         // Slot 9: visit_list_start_fn
         var visitListStartFn = new VisitListStartFn(VisitListStartFnCallback);
+        _delegates[9] = visitListStartFn;
         Marshal.WriteIntPtr(_vtable, 72, Marshal.GetFunctionPointerForDelegate(visitListStartFn));
 
         // Slot 10: visit_list_end_fn
         var visitListEndFn = new VisitListEndFn(VisitListEndFnCallback);
+        _delegates[10] = visitListEndFn;
         Marshal.WriteIntPtr(_vtable, 80, Marshal.GetFunctionPointerForDelegate(visitListEndFn));
 
         // Slot 11: visit_table_start_fn
         var visitTableStartFn = new VisitTableStartFn(VisitTableStartFnCallback);
+        _delegates[11] = visitTableStartFn;
         Marshal.WriteIntPtr(_vtable, 88, Marshal.GetFunctionPointerForDelegate(visitTableStartFn));
 
         // Slot 12: visit_table_row_fn
         var visitTableRowFn = new VisitTableRowFn(VisitTableRowFnCallback);
+        _delegates[12] = visitTableRowFn;
         Marshal.WriteIntPtr(_vtable, 96, Marshal.GetFunctionPointerForDelegate(visitTableRowFn));
 
         // Slot 13: visit_table_end_fn
         var visitTableEndFn = new VisitTableEndFn(VisitTableEndFnCallback);
+        _delegates[13] = visitTableEndFn;
         Marshal.WriteIntPtr(_vtable, 104, Marshal.GetFunctionPointerForDelegate(visitTableEndFn));
 
         // Slot 14: visit_blockquote_fn
         var visitBlockquoteFn = new VisitBlockquoteFn(VisitBlockquoteFnCallback);
+        _delegates[14] = visitBlockquoteFn;
         Marshal.WriteIntPtr(_vtable, 112, Marshal.GetFunctionPointerForDelegate(visitBlockquoteFn));
 
         // Slot 15: visit_strong_fn
         var visitStrongFn = new VisitStrongFn(VisitStrongFnCallback);
+        _delegates[15] = visitStrongFn;
         Marshal.WriteIntPtr(_vtable, 120, Marshal.GetFunctionPointerForDelegate(visitStrongFn));
 
         // Slot 16: visit_emphasis_fn
         var visitEmphasisFn = new VisitEmphasisFn(VisitEmphasisFnCallback);
+        _delegates[16] = visitEmphasisFn;
         Marshal.WriteIntPtr(_vtable, 128, Marshal.GetFunctionPointerForDelegate(visitEmphasisFn));
 
         // Slot 17: visit_strikethrough_fn
         var visitStrikethroughFn = new VisitStrikethroughFn(VisitStrikethroughFnCallback);
+        _delegates[17] = visitStrikethroughFn;
         Marshal.WriteIntPtr(_vtable, 136, Marshal.GetFunctionPointerForDelegate(visitStrikethroughFn));
 
         // Slot 18: visit_underline_fn
         var visitUnderlineFn = new VisitUnderlineFn(VisitUnderlineFnCallback);
+        _delegates[18] = visitUnderlineFn;
         Marshal.WriteIntPtr(_vtable, 144, Marshal.GetFunctionPointerForDelegate(visitUnderlineFn));
 
         // Slot 19: visit_subscript_fn
         var visitSubscriptFn = new VisitSubscriptFn(VisitSubscriptFnCallback);
+        _delegates[19] = visitSubscriptFn;
         Marshal.WriteIntPtr(_vtable, 152, Marshal.GetFunctionPointerForDelegate(visitSubscriptFn));
 
         // Slot 20: visit_superscript_fn
         var visitSuperscriptFn = new VisitSuperscriptFn(VisitSuperscriptFnCallback);
+        _delegates[20] = visitSuperscriptFn;
         Marshal.WriteIntPtr(_vtable, 160, Marshal.GetFunctionPointerForDelegate(visitSuperscriptFn));
 
         // Slot 21: visit_mark_fn
         var visitMarkFn = new VisitMarkFn(VisitMarkFnCallback);
+        _delegates[21] = visitMarkFn;
         Marshal.WriteIntPtr(_vtable, 168, Marshal.GetFunctionPointerForDelegate(visitMarkFn));
 
         // Slot 22: visit_line_break_fn
         var visitLineBreakFn = new VisitLineBreakFn(VisitLineBreakFnCallback);
+        _delegates[22] = visitLineBreakFn;
         Marshal.WriteIntPtr(_vtable, 176, Marshal.GetFunctionPointerForDelegate(visitLineBreakFn));
 
         // Slot 23: visit_horizontal_rule_fn
         var visitHorizontalRuleFn = new VisitHorizontalRuleFn(VisitHorizontalRuleFnCallback);
+        _delegates[23] = visitHorizontalRuleFn;
         Marshal.WriteIntPtr(_vtable, 184, Marshal.GetFunctionPointerForDelegate(visitHorizontalRuleFn));
 
         // Slot 24: visit_custom_element_fn
         var visitCustomElementFn = new VisitCustomElementFn(VisitCustomElementFnCallback);
+        _delegates[24] = visitCustomElementFn;
         Marshal.WriteIntPtr(_vtable, 192, Marshal.GetFunctionPointerForDelegate(visitCustomElementFn));
 
         // Slot 25: visit_definition_list_start_fn
         var visitDefinitionListStartFn = new VisitDefinitionListStartFn(VisitDefinitionListStartFnCallback);
+        _delegates[25] = visitDefinitionListStartFn;
         Marshal.WriteIntPtr(_vtable, 200, Marshal.GetFunctionPointerForDelegate(visitDefinitionListStartFn));
 
         // Slot 26: visit_definition_term_fn
         var visitDefinitionTermFn = new VisitDefinitionTermFn(VisitDefinitionTermFnCallback);
+        _delegates[26] = visitDefinitionTermFn;
         Marshal.WriteIntPtr(_vtable, 208, Marshal.GetFunctionPointerForDelegate(visitDefinitionTermFn));
 
         // Slot 27: visit_definition_description_fn
         var visitDefinitionDescriptionFn = new VisitDefinitionDescriptionFn(VisitDefinitionDescriptionFnCallback);
+        _delegates[27] = visitDefinitionDescriptionFn;
         Marshal.WriteIntPtr(_vtable, 216, Marshal.GetFunctionPointerForDelegate(visitDefinitionDescriptionFn));
 
         // Slot 28: visit_definition_list_end_fn
         var visitDefinitionListEndFn = new VisitDefinitionListEndFn(VisitDefinitionListEndFnCallback);
+        _delegates[28] = visitDefinitionListEndFn;
         Marshal.WriteIntPtr(_vtable, 224, Marshal.GetFunctionPointerForDelegate(visitDefinitionListEndFn));
 
         // Slot 29: visit_form_fn
         var visitFormFn = new VisitFormFn(VisitFormFnCallback);
+        _delegates[29] = visitFormFn;
         Marshal.WriteIntPtr(_vtable, 232, Marshal.GetFunctionPointerForDelegate(visitFormFn));
 
         // Slot 30: visit_input_fn
         var visitInputFn = new VisitInputFn(VisitInputFnCallback);
+        _delegates[30] = visitInputFn;
         Marshal.WriteIntPtr(_vtable, 240, Marshal.GetFunctionPointerForDelegate(visitInputFn));
 
         // Slot 31: visit_button_fn
         var visitButtonFn = new VisitButtonFn(VisitButtonFnCallback);
+        _delegates[31] = visitButtonFn;
         Marshal.WriteIntPtr(_vtable, 248, Marshal.GetFunctionPointerForDelegate(visitButtonFn));
 
         // Slot 32: visit_audio_fn
         var visitAudioFn = new VisitAudioFn(VisitAudioFnCallback);
+        _delegates[32] = visitAudioFn;
         Marshal.WriteIntPtr(_vtable, 256, Marshal.GetFunctionPointerForDelegate(visitAudioFn));
 
         // Slot 33: visit_video_fn
         var visitVideoFn = new VisitVideoFn(VisitVideoFnCallback);
+        _delegates[33] = visitVideoFn;
         Marshal.WriteIntPtr(_vtable, 264, Marshal.GetFunctionPointerForDelegate(visitVideoFn));
 
         // Slot 34: visit_iframe_fn
         var visitIframeFn = new VisitIframeFn(VisitIframeFnCallback);
+        _delegates[34] = visitIframeFn;
         Marshal.WriteIntPtr(_vtable, 272, Marshal.GetFunctionPointerForDelegate(visitIframeFn));
 
         // Slot 35: visit_details_fn
         var visitDetailsFn = new VisitDetailsFn(VisitDetailsFnCallback);
+        _delegates[35] = visitDetailsFn;
         Marshal.WriteIntPtr(_vtable, 280, Marshal.GetFunctionPointerForDelegate(visitDetailsFn));
 
         // Slot 36: visit_summary_fn
         var visitSummaryFn = new VisitSummaryFn(VisitSummaryFnCallback);
+        _delegates[36] = visitSummaryFn;
         Marshal.WriteIntPtr(_vtable, 288, Marshal.GetFunctionPointerForDelegate(visitSummaryFn));
 
         // Slot 37: visit_figure_start_fn
         var visitFigureStartFn = new VisitFigureStartFn(VisitFigureStartFnCallback);
+        _delegates[37] = visitFigureStartFn;
         Marshal.WriteIntPtr(_vtable, 296, Marshal.GetFunctionPointerForDelegate(visitFigureStartFn));
 
         // Slot 38: visit_figcaption_fn
         var visitFigcaptionFn = new VisitFigcaptionFn(VisitFigcaptionFnCallback);
+        _delegates[38] = visitFigcaptionFn;
         Marshal.WriteIntPtr(_vtable, 304, Marshal.GetFunctionPointerForDelegate(visitFigcaptionFn));
 
         // Slot 39: visit_figure_end_fn
         var visitFigureEndFn = new VisitFigureEndFn(VisitFigureEndFnCallback);
+        _delegates[39] = visitFigureEndFn;
         Marshal.WriteIntPtr(_vtable, 312, Marshal.GetFunctionPointerForDelegate(visitFigureEndFn));
 
         // Slot 40: free_user_data
         var freeFn = new FreeUserDataFn(FreeUserDataCallback);
+        _delegates[40] = freeFn;
         Marshal.WriteIntPtr(_vtable, 320, Marshal.GetFunctionPointerForDelegate(freeFn));
     }
 

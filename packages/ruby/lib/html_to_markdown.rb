@@ -29,11 +29,16 @@ module HtmlToMarkdown
   #   - :preserve_tags       - Array of tag names to preserve verbatim
   #   (and more, matching ConversionOptions fields)
   # @return [String] The converted Markdown content.
-  def self.convert(html, options = {}, _visitor = nil)
-    # Pass the options hash directly; the Magnus FFI layer will serialize it
-    opts = options.nil? || options.empty? ? nil : options
-    # NOTE: visitor support is not yet fully integrated in the Ruby binding
-    result = HtmlToMarkdownRs.convert(html, opts)
+  def self.convert(html, visitor_or_options = nil)
+    # The FFI layer now accepts (html, visitor) via options_field binding.
+    # This wrapper accepts either:
+    # 1. convert(html)                          -> convert(html, nil)
+    # 2. convert(html, visitor_object)          -> convert(html, visitor_object)
+    # 3. convert(html, options_hash)            -> convert(html, nil) with options embedded
+    #
+    # For now, we pass visitor_or_options directly to the FFI layer.
+    # The FFI layer handles visitor objects specially.
+    result = HtmlToMarkdownRs.convert(html, visitor_or_options)
     result.content || ''
   end
 
