@@ -10,6 +10,7 @@ keywords = ["html", "markdown", "converter"]
 categories = ["text-processing", "web-programming"]
 
 [lib]
+path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
