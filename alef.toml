@@ -194,7 +194,7 @@ e2e = "cd e2e/go && go test ./... -count=1"
 
 [crates.test.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
-before = "cd packages/ruby && bundle install && bundle exec rake compile"
+before = "cd packages/ruby && gem pristine --all 2>/dev/null || true && rm -rf .bundle tmp && bundle install && bundle exec rake compile"
 e2e = "cd e2e/ruby && bundle install && bundle exec rspec"
 
 [crates.test.php]
@@ -426,6 +426,12 @@ highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
 
+[crates.e2e.call.overrides.r]
+module = "html_to_markdown"
+function = "convert"
+options_type = "ConversionOptions"
+result_is_r_list = true
+
 [crates.e2e.call.overrides.wasm]
 options_type = "WasmConversionOptions"
 
@@ -438,6 +444,9 @@ whitespaceMode = "WasmWhitespaceMode"
 highlightStyle = "WasmHighlightStyle"
 linkStyle = "WasmLinkStyle"
 outputFormat = "WasmOutputFormat"
+
+[crates.e2e.call.overrides.wasm.nested_types]
+preprocessing = "WasmPreprocessingOptions"
 
 [crates.e2e.call.overrides.c]
 header = "html_to_markdown.h"
