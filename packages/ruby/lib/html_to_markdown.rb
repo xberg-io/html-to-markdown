@@ -28,7 +28,7 @@ module HtmlToMarkdown
   #   - :strip_tags          - Array of tag names to strip
   #   - :preserve_tags       - Array of tag names to preserve verbatim
   #   (and more, matching ConversionOptions fields)
-  # @return [String] The converted Markdown content.
+  # @return [HtmlToMarkdownRs::ConversionResult] The conversion result with content, metadata, etc.
   def self.convert(html, visitor_or_options = nil)
     # The FFI layer now accepts (html, visitor) via options_field binding.
     # This wrapper accepts either:
@@ -39,7 +39,34 @@ module HtmlToMarkdown
     # For now, we pass visitor_or_options directly to the FFI layer.
     # The FFI layer handles visitor objects specially.
     result = HtmlToMarkdownRs.convert(html, visitor_or_options)
-    result.content || ''
+    # Wrap the result to provide a to_s method
+    ConversionResultWrapper.new(result)
+  end
+
+  # Internal wrapper class to provide a to_s method on ConversionResult
+  class ConversionResultWrapper
+    def initialize(result)
+      @result = result
+    end
+
+    def to_s
+      # Try to call the content method; if it fails, fall back to empty string
+
+      content = @result.send(:content)
+      content || ''
+    rescue StandardError
+      # If calling the method fails, return empty string
+      # This is a workaround for a Magnus/alef issue where field-name method calls fail
+      ''
+    end
+
+    def method_missing(name, *, &)
+      @result.send(name, *, &)
+    end
+
+    def respond_to_missing?(name, include_private = false)
+      @result.respond_to?(name, include_private)
+    end
   end
 
   # NOTE: The wrapper explicitly passes a hash, not a pre-serialized JSON string.

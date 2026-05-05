@@ -15,10 +15,10 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "html-to-markdown", "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1" ]
+dependencies = [ "pytest>=7.4", "pytest-asyncio>=0.23", "pytest-timeout>=2.1", "html-to-markdown" ]
 
 [tool.setuptools]
-packages = []
+packages = [  ]
 
 [tool.uv]
 sources.html-to-markdown = { path = "../../packages/python" }

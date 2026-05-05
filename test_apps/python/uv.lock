@@ -52,7 +52,7 @@ wheels = [
 ]
 
 [[package]]
-name = "html-to-markdown-e2e-tests"
+name = "html-to-markdown-e2e"
 version = "0.0.0"
 source = { editable = "." }
 dependencies = [
@@ -64,7 +64,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "html-to-markdown", specifier = "==3.2.4" },
+    { name = "html-to-markdown", specifier = ">=3.2" },
     { name = "pytest", specifier = ">=7.4" },
     { name = "pytest-asyncio", specifier = ">=0.23" },
     { name = "pytest-timeout", specifier = ">=2.1" },

@@ -3,7 +3,7 @@
 [package]
 name = "html_to_markdown_r"
 version = "3.4.0-rc.25"
-edition = "2024"
+edition = "2021"
 license = "MIT"
 description = "extendr bindings for html-to-markdown"
 repository = "https://github.com/kreuzberg-dev/html-to-markdown"

@@ -245,7 +245,65 @@ tasks:
     cmds:
       - alef sync-versions
 
-  # === E2E tests ===
+  # === E2E tests (local fixture-based, via alef) ===
+  # Per-language: <lang>:e2e — builds binding then runs e2e/<lang> suite
+  # python:e2e is in .task/languages/python.yml (python: namespace)
+  # rust:e2e is in .task/languages/rust.yml (rust: namespace)
+  node:e2e:
+    desc: "Build Node binding and run e2e/node fixture tests"
+    cmds:
+      - alef test --e2e --lang node
+
+  ruby:e2e:
+    desc: "Build Ruby binding and run e2e/ruby fixture tests"
+    cmds:
+      - alef test --e2e --lang ruby
+
+  php:e2e:
+    desc: "Build PHP extension and run e2e/php fixture tests"
+    cmds:
+      - alef test --e2e --lang php
+
+  go:e2e:
+    desc: "Build FFI and run e2e/go fixture tests"
+    cmds:
+      - alef test --e2e --lang go
+
+  java:e2e:
+    desc: "Build FFI and run e2e/java fixture tests"
+    cmds:
+      - alef test --e2e --lang java
+
+  csharp:e2e:
+    desc: "Build FFI and run e2e/csharp fixture tests"
+    cmds:
+      - alef test --e2e --lang csharp
+
+  elixir:e2e:
+    desc: "Build Elixir NIF and run e2e/elixir fixture tests"
+    cmds:
+      - alef test --e2e --lang elixir
+
+  wasm:e2e:
+    desc: "Build WASM and run e2e/wasm fixture tests"
+    cmds:
+      - alef test --e2e --lang wasm
+
+  r:e2e:
+    desc: "Run e2e/r fixture tests"
+    cmds:
+      - alef test --e2e --lang r
+
+  c:e2e:
+    desc: "Build FFI and run e2e/c fixture tests"
+    cmds:
+      - alef test --e2e --lang c
+
+  e2e:all:
+    desc: "Build all bindings and run all local e2e fixture tests"
+    cmds:
+      - alef test --e2e
+
   e2e:generate:
     desc: "Generate E2E tests for all languages from fixtures"
     cmds:

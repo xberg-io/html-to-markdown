@@ -54,8 +54,8 @@ importers:
   e2e/wasm:
     devDependencies:
       '@kreuzberg/html-to-markdown-wasm':
-        specifier: file:../../crates/html-to-markdown-wasm
-        version: link:../../crates/html-to-markdown-wasm
+        specifier: file:../../crates/html-to-markdown-wasm/pkg
+        version: html-to-markdown-wasm@file:crates/html-to-markdown-wasm/pkg
       rollup:
         specifier: ^4.53.3
         version: 4.60.2
@@ -1376,6 +1376,9 @@ packages:
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
     deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+  html-to-markdown-wasm@file:crates/html-to-markdown-wasm/pkg:
+    resolution: {directory: crates/html-to-markdown-wasm/pkg, type: directory}
 
   iconv-lite@0.7.2:
     resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
@@ -2699,6 +2702,8 @@ snapshots:
       minimatch: 3.1.5
       once: 1.4.0
       path-is-absolute: 1.0.1
+
+  html-to-markdown-wasm@file:crates/html-to-markdown-wasm/pkg: {}
 
   iconv-lite@0.7.2:
     dependencies:

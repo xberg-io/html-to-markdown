@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.15"
+alef_version = "0.14.23"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -184,7 +184,7 @@ e2e = "cd e2e/python && uv run pytest tests/ -q"
 
 [crates.test.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-before = "cd crates/html-to-markdown-node && napi build --output-dir . --release"
+before = "cd crates/html-to-markdown-node && napi build --platform --release"
 e2e = "cd e2e/node && pnpm exec vitest run"
 
 [crates.test.go]
@@ -194,12 +194,12 @@ e2e = "cd e2e/go && go test ./... -count=1"
 
 [crates.test.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
-before = "cd e2e/ruby && bundle install"
-e2e = "cd e2e/ruby && bundle exec rspec"
+before = "cd packages/ruby && bundle install && bundle exec rake compile"
+e2e = "cd e2e/ruby && bundle install && bundle exec rspec"
 
 [crates.test.php]
 precondition = "command -v php >/dev/null 2>&1"
-before = "cd e2e/php && composer install"
+before = "cargo build --release -p html-to-markdown-php && cd e2e/php && composer install"
 e2e = "cd e2e/php && composer test"
 
 [crates.test.java]
@@ -209,12 +209,12 @@ e2e = "cd e2e/java && mvn test -q"
 
 [crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi"
+before = "cargo build --release -p html-to-markdown-ffi && cp target/release/libhtml_to_markdown_ffi.dylib packages/csharp/HtmlToMarkdown/runtimes/osx-arm64/native/html_to_markdown_ffi.dylib"
 e2e = "dotnet test e2e/csharp"
 
 [crates.test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
-before = "cd packages/elixir && mix deps.get && mix compile"
+before = "cd packages/elixir && mix deps.get && HTML_TO_MARKDOWN_BUILD=1 mix compile"
 e2e = "cd e2e/elixir && mix deps.get && HTML_TO_MARKDOWN_BUILD=1 mix compile && HTML_TO_MARKDOWN_BUILD=1 mix test"
 
 [crates.test.r]
@@ -334,7 +334,6 @@ enum_module = "html_to_markdown._html_to_markdown"
 [crates.e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 function = "Convert"
-visitor_function = "ConvertWithVisitor"
 alias = "htmd"
 options_type = "ConversionOptions"
 returns_result = true
@@ -343,7 +342,6 @@ options_ptr = true
 [crates.e2e.call.overrides.java]
 class = "dev.kreuzberg.htmltomarkdown.HtmlToMarkdownRs"
 function = "convert"
-visitor_function = "convertWithVisitor"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
 

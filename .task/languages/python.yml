@@ -42,6 +42,11 @@ tasks:
     cmds:
       - cd {{.PYTHON_PKG}} && uv run pytest -v --cov=. --cov-report=lcov:coverage.lcov tests/
 
+  e2e:
+    desc: "Build Python binding and run e2e/python fixture tests"
+    cmds:
+      - alef test --e2e --lang python
+
   clean:
     desc: "Clean Python build artifacts"
     cmds:

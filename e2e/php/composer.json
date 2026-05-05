@@ -6,6 +6,11 @@
     "phpunit/phpunit": "^13.1",
     "guzzlehttp/guzzle": "^7.0"
   },
+  "autoload": {
+    "psr-4": {
+      "Html\\To\\Markdown\\": "../../packages/php/src/"
+    }
+  },
   "autoload-dev": {
     "psr-4": {
       "HtmlToMarkdown\\E2e\\": "tests/"

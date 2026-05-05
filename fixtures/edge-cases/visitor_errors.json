@@ -103,8 +103,14 @@
     },
     "assertions": [
       {
-        "type": "not_empty",
-        "field": "content"
+        "type": "not_contains",
+        "field": "content",
+        "value": "Title"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "Content"
       }
     ]
   },

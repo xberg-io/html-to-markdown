@@ -49,7 +49,7 @@
       "html": "<p>Before</p><form><input type='text'/><button>Submit</button></form><p>After</p>",
       "options": {
         "preprocessing": {
-          "removeForms": true
+          "remove_forms": true
         }
       }
     },
