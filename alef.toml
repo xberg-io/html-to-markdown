@@ -521,7 +521,7 @@ path = "../../packages/elixir"
 
 [crates.e2e.packages.wasm]
 name = "@kreuzberg/html-to-markdown-wasm"
-path = "../../crates/html-to-markdown-wasm/pkg"
+path = "../../crates/html-to-markdown-wasm/dist"
 
 [crates.e2e.packages.r]
 name = "htmltomarkdown"

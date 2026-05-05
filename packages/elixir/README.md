@@ -59,13 +59,11 @@
 Elixir bindings for the Rust html-to-markdown engine. The package exposes a fast HTML to Markdown converter implemented with Rustler.
 Ship identical Markdown across every runtime while enjoying native performance with Rustler NIF bindings.
 
-
 ## Installation
 
 ```bash
 Add {:html_to_markdown, "~> 3.0"} to mix.exs deps
 ```
-
 
 Requires Elixir 1.19+ and OTP 28. Add to your `mix.exs`:
 
@@ -77,19 +75,17 @@ def deps do
 end
 ```
 
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 321.7 MB/s |
-| Tables (Countries) | 360KB |  | 293.8 MB/s |
-| Medium (Python) | 656KB |  | 281.5 MB/s |
-| Large (Rust) | 567KB |  | 268.7 MB/s |
-| Small (Intro) | 463KB |  | 262.9 MB/s |
-
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 321.7 MB/s |
+| Tables (Countries) | 360KB |         | 293.8 MB/s |
+| Medium (Python)    | 656KB |         | 281.5 MB/s |
+| Large (Rust)       | 567KB |         | 268.7 MB/s |
+| Small (Intro)      | 463KB |         | 262.9 MB/s |
 
 ## Quick Start
 
@@ -100,7 +96,6 @@ Basic conversion:
 IO.puts(result.content)
 ```
 
-
 With conversion options:
 
 ```elixir
@@ -109,11 +104,9 @@ opts = %HtmlToMarkdown.Options{wrap: true, wrap_width: 40}
 IO.puts(result.content)
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`HtmlToMarkdown.convert(html, options \\ nil) :: {:ok, ConversionResult.t()} | {:error, term()}`**
 
@@ -128,7 +121,6 @@ result.document   # Document-level info
 result.images     # Extracted images
 result.warnings   # Any conversion warnings
 ```
-
 
 ### Options
 
@@ -162,7 +154,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```elixir
 html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
@@ -175,13 +166,11 @@ html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 # Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```elixir
 html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
@@ -190,9 +179,7 @@ html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -210,7 +197,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ```elixir
 html = "<h1>Article</h1><img src=\"test.jpg\" alt=\"test\">"
 opts = %HtmlToMarkdown.Options{extract_metadata: true}
@@ -223,7 +209,6 @@ IO.inspect(result.metadata["links"])              # All hyperlinks
 IO.inspect(result.metadata["images"])             # All images with alt text
 IO.inspect(result.metadata["structured_data"])    # JSON-LD, Microdata, RDFa
 ```
-
 
 ## Visitor Pattern
 
@@ -240,7 +225,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ```elixir
 defmodule MyVisitor do
@@ -269,7 +253,6 @@ opts = %HtmlToMarkdown.Options{visitor: MyVisitor}
 {:ok, result} = HtmlToMarkdown.convert(html, opts)
 result.content
 ```
-
 
 ## Examples
 

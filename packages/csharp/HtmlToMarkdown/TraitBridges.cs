@@ -1136,3 +1136,13 @@ public static class HtmlVisitorRegistry {
         }
     }
 }
+
+/// <summary>FFI JSON serialization extension methods</summary>
+internal static class FfiJsonExtensions {
+
+    /// <summary>Serialize any object to JSON for FFI marshalling</summary>
+    internal static string ToFfiJson<T>(this T value) {
+        return JsonSerializer.Serialize(value);
+    }
+
+}
