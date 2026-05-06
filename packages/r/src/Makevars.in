@@ -1,40 +1,14 @@
-VENDORING = @VENDORING@
+CARGO_BUILD_ARGS = --release
+STATLIB = ./rust/target/release/libhtml_to_markdown_r.a
+PKG_LIBS = -L./rust/target/release -lhtml_to_markdown_r $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
-TARGET_DIR = ./rust/target
-LIBDIR = $(TARGET_DIR)/@LIBDIR@
-STATLIB = $(LIBDIR)/libhtml_to_markdown_r.a
-PKG_LIBS = -L$(LIBDIR) -lhtml_to_markdown_r
+all: $(SHLIB)
 
-all: $(SHLIB) rust_clean
-
-.PHONY: $(STATLIB)
+$(STATLIB):
+	cargo build --manifest-path ./rust/Cargo.toml $(CARGO_BUILD_ARGS)
 
 $(SHLIB): $(STATLIB)
 
-CARGOTMP = $(CURDIR)/rust/.cargo
-
-$(STATLIB):
-	rm -Rf $(CARGOTMP)
-	if [ "$(VENDORING)" = "yes" ]; then \
-		tar xf ./rust/vendor.tar.xz -C ./rust && \
-		mkdir -p $(CARGOTMP) && \
-		cp ./rust/vendor-config.toml $(CARGOTMP)/config.toml; \
-	fi
-
-	if [ "$(VENDORING)" = "yes" ]; then \
-		export CARGO_HOME=$(CARGOTMP) && \
-		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
-		cargo build @CRAN_FLAGS@ --lib @PROFILE@ --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR) @TARGET@; \
-	else \
-		export PATH="$(PATH):$(HOME)/.cargo/bin" && \
-		cargo build @CRAN_FLAGS@ --lib @PROFILE@ --manifest-path=./rust/Cargo.toml --target-dir $(TARGET_DIR) @TARGET@; \
-	fi
-
-	rm -Rf $(CARGOTMP);
-
-rust_clean: $(SHLIB)
-	rm -Rf $(CARGOTMP) @CLEAN_TARGET@
-	if [ "$(VENDORING)" = "yes" ]; then rm -Rf ./rust/vendor; fi
-
 clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) $(TARGET_DIR)
+	rm -f $(SHLIB) $(STATLIB)
+	cargo clean --manifest-path ./rust/Cargo.toml

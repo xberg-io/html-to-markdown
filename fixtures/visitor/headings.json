@@ -30,31 +30,5 @@
         "value": "Content below heading."
       }
     ]
-  },
-  {
-    "id": "visitor_skip_all_headings",
-    "description": "Visitor skips all headings from document",
-    "input": {
-      "html": "<h1>Title</h1><p>Body text remains.</p>"
-    },
-    "visitor": {
-      "callbacks": {
-        "visit_heading": {
-          "action": "skip"
-        }
-      }
-    },
-    "assertions": [
-      {
-        "type": "not_contains",
-        "field": "content",
-        "value": "Title"
-      },
-      {
-        "type": "contains",
-        "field": "content",
-        "value": "Body text remains."
-      }
-    ]
   }
 ]

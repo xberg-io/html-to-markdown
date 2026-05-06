@@ -2,38 +2,24 @@
 
 declare(strict_types=1);
 
-use PhpCsFixer\Config;
-use PhpCsFixer\Finder;
+$finder = new PhpCsFixer\Finder()
+    ->in(array_filter([
+        __DIR__ . '/src',
+        is_dir(__DIR__ . '/tests') ? __DIR__ . '/tests' : null,
+    ]));
 
-$finder = Finder::create()
-    ->in(__DIR__)
-    ->exclude('vendor')
-    ->exclude('var')
-    ->exclude('pecl')
-    ->exclude('bin')
-    ->files()
-    ->name('*.php')
-    ->path('#^src/#')
-    ->path('#^tests/#')
-    ->notName('*.blade.php');
-
-return new Config()
-    ->setRiskyAllowed(true)
+return new PhpCsFixer\Config()
     ->setRules([
         '@PSR12' => true,
-        '@PSR12:risky' => true,
+        '@PHP82Migration' => true,
         'array_syntax' => ['syntax' => 'short'],
-        'declare_strict_types' => true,
-        'final_class' => false,
-        'final_public_method_for_abstract_class' => false,
         'single_quote' => true,
-        'phpdoc_to_comment' => false,
-        'php_unit_method_casing' => false,
-        'ordered_imports' => [
-            'imports_order' => ['class', 'function', 'const'],
-            'sort_algorithm' => 'alpha',
+        'trailing_comma_in_multiline' => [
+            'elements' => ['arrays', 'arguments', 'parameters'],
         ],
-        'no_superfluous_phpdoc_tags' => true,
-        'native_function_invocation' => ['include' => ['@internal'], 'exclude' => ['html_to_markdown_convert']],
+        'declare_strict_types' => true,
+        'ordered_imports' => ['sort_algorithm' => 'alpha'],
+        'no_unused_imports' => true,
     ])
-    ->setFinder($finder);
+    ->setFinder($finder)
+    ->setRiskyAllowed(true);

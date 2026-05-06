@@ -444,6 +444,7 @@ whitespaceMode = "WasmWhitespaceMode"
 highlightStyle = "WasmHighlightStyle"
 linkStyle = "WasmLinkStyle"
 outputFormat = "WasmOutputFormat"
+preset = "WasmPreprocessingPreset"
 
 [crates.e2e.call.overrides.wasm.nested_types]
 preprocessing = "WasmPreprocessingOptions"

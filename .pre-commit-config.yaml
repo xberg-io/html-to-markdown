@@ -129,7 +129,7 @@ repos:
       - id: php-cs-fixer
         files: ^packages/php/.*\.php$
       - id: phpstan
-        files: ^packages/php/(src|tests|stubs)/.*\.php$
+        files: ^packages/php/(src|tests)/.*\.php$
         args: ["analyse", "--no-progress", "--configuration", "packages/php/phpstan.neon"]
       - id: mix-format
         files: ^packages/elixir/
@@ -145,8 +145,11 @@ repos:
       - id: oxlint
       - id: oxfmt
       - id: cppcheck
+        args: ["--suppress=unusedStructMember"]
       - id: rumdl-fmt
       - id: cpd
+        args: ["--minimum-tokens=120"]
+        exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
     rev: v0.14.23

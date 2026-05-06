@@ -20,7 +20,7 @@ hOCR (OCR-generated HTML) processing was removed from html-to-markdown
 and moved into [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg),
 the document extraction library in the Kreuzberg.dev ecosystem. hOCR is
 a document-level concern — it belongs in the extraction pipeline, not
-in an HTML-to-Markdown converter.
+in an html-to-markdown converter.
 
 ## API changes
 

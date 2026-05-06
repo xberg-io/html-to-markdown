@@ -1,21 +1,21 @@
-[workspace]
 
 [package]
 name = "html-to-markdown-rb"
 version = "3.4.0-rc.25"
 edition = "2024"
 license = "MIT"
+[workspace]
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
 html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = [
-  "full",
-  "metadata",
-  "visitor",
-  "serde",
-  "inline-images",
+    "full",
+    "metadata",
+    "visitor",
+    "serde",
+    "inline-images",
 ] }
 magnus = "0.8"
 serde = { version = "1", features = ["derive"] }

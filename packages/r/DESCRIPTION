@@ -1,25 +1,23 @@
 Package: htmltomarkdown
-Title: High-Performance HTML to Markdown Converter
+Title: High-performance HTML to Markdown converter
 Version: 3.4.0.9025
-Authors@R: c(
-    person("Na'aman", "Hirschfeld", email = "nhirschfeld@gmail.com", role = c("aut", "cre")),
-    person("The authors of the dependency Rust crates", role = "ctb",
-           comment = "see inst/AUTHORS file for details"))
-Description: High-performance HTML to Markdown converter powered by a Rust core
-    engine via 'extendr'. Supports full conversion options, metadata extraction,
-    inline image extraction, and visitor-based conversion. Provides bindings to
-    the 'html-to-markdown' Rust library for native performance.
-License: MIT + file LICENSE
+Authors@R: person("Kreuzberg Team", email = "author@example.com", role = c("aut", "cre"))
+Description: High-performance HTML to Markdown converter
+    Rust bindings generated with extendr.
 URL: https://github.com/kreuzberg-dev/html-to-markdown
 BugReports: https://github.com/kreuzberg-dev/html-to-markdown/issues
+License: MIT
 Depends: R (>= 4.2)
-SystemRequirements: Cargo (Rust's package manager), rustc (>= 1.85)
+Imports: jsonlite
+Suggests:
+    testthat (>= 3.0.0),
+    withr,
+    roxygen2,
+    lintr,
+    styler
+SystemRequirements: Cargo (Rust's package manager), rustc (>= 1.91)
+Config/rextendr/version: 0.4.2
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Suggests:
-    testthat (>= 3.0.0),
-    devtools,
-    lintr
 Config/testthat/edition: 3
-Config/htmltomarkdown/MSRV: 1.85.0

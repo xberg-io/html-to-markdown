@@ -1,65 +1,35 @@
 {
-  "name": "@kreuzberg/html-to-markdown-wasm",
+  "name": "@kreuzberg/html-to-markdown-node-wasm",
   "version": "3.4.0-rc.25",
-  "description": "High-performance HTML to Markdown converter - WebAssembly bindings",
-  "keywords": [
-    "converter",
-    "html",
-    "markdown",
-    "rust",
-    "wasm",
-    "webassembly"
-  ],
-  "homepage": "https://github.com/kreuzberg-dev/html-to-markdown",
-  "bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
+  "private": false,
+  "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
-  "author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",
-  "repository": "https://github.com/kreuzberg-dev/html-to-markdown",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kreuzberg-dev/html-to-markdown",
+    "directory": "crates/html-to-markdown-wasm"
+  },
   "files": [
-    "dist",
-    "dist-node",
-    "dist-web",
+    "pkg",
+    "*.wasm",
+    "*.d.ts",
     "README.md"
   ],
-  "main": "dist/html_to_markdown_wasm.js",
-  "types": "dist/html_to_markdown_wasm.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/html_to_markdown_wasm.js",
-      "types": "./dist/html_to_markdown_wasm.d.ts",
-      "default": "./dist/html_to_markdown_wasm.js"
-    },
-    "./dist-node": {
-      "import": "./dist-node/html_to_markdown_wasm.js",
-      "require": "./dist-node/html_to_markdown_wasm.js",
-      "types": "./dist-node/html_to_markdown_wasm.d.ts"
-    },
-    "./dist-node/*": "./dist-node/*",
-    "./dist-web": {
-      "import": "./dist-web/html_to_markdown_wasm.js",
-      "types": "./dist-web/html_to_markdown_wasm.d.ts"
-    },
-    "./dist-web/*": "./dist-web/*"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
+  "type": "module",
+  "main": "pkg/nodejs/html-to-markdown_wasm.js",
+  "module": "pkg/web/html-to-markdown_wasm.js",
+  "types": "pkg/nodejs/html-to-markdown_wasm.d.ts",
   "scripts": {
-    "build": "wasm-pack build --target bundler --out-dir dist && node ./scripts/patch-bundler-entry.js",
-    "build:nodejs": "wasm-pack build --target nodejs --out-dir dist-node && node ./scripts/patch-bundler-entry.js dist-node --types-only",
-    "build:web": "wasm-pack build --target web --out-dir dist-web && node ./scripts/patch-bundler-entry.js dist-web --types-only",
-    "build:all": "pnpm run build && pnpm run build:nodejs && pnpm run build:web && pnpm run cleanup:gitignore",
-    "cleanup:gitignore": "node ./scripts/cleanup-gitignore.js",
+    "build": "wasm-pack build --target nodejs --out-dir pkg/nodejs",
+    "build:ci": "wasm-pack build --release --target nodejs --out-dir pkg/nodejs",
+    "build:wasm:web": "wasm-pack build --release --target web --out-dir pkg/web",
+    "build:wasm:bundler": "wasm-pack build --release --target bundler --out-dir pkg/bundler",
+    "build:wasm:nodejs": "wasm-pack build --release --target nodejs --out-dir pkg/nodejs",
+    "build:wasm:deno": "wasm-pack build --release --target deno --out-dir pkg/deno",
+    "build:all": "npm run build:wasm:web && npm run build:wasm:bundler && npm run build:wasm:nodejs && npm run build:wasm:deno && find pkg -name .gitignore -delete",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:wasm-pack": "wasm-pack test --headless --chrome",
-    "clean": "rm -rf dist dist-node dist-web node_modules pkg"
-  },
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "tsx": "^4.21.0",
-    "vitest": "^4.1.5",
-    "wasm-pack": "^0.14.0"
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf pkg dist"
   }
 }

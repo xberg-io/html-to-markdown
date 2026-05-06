@@ -1,39 +1,19 @@
 {
   "name": "@kreuzberg/html-to-markdown-node",
   "version": "3.4.0-rc.25",
-  "description": "High-performance HTML to Markdown converter - Node.js native bindings",
-  "keywords": [
-    "converter",
-    "html",
-    "markdown",
-    "napi",
-    "rust"
-  ],
-  "homepage": "https://kreuzberg.dev",
-  "bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
+  "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
-  "author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",
-  "repository": "https://github.com/kreuzberg-dev/html-to-markdown",
   "files": [
     "index.js",
     "index.d.ts",
-    "*.node",
-    "README.md"
+    "*.node"
   ],
   "main": "index.js",
   "types": "index.d.ts",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
   "scripts": {
-    "artifacts": "napi artifacts",
     "build": "napi build --platform --release",
-    "build:debug": "napi build --platform",
-    "prepublishOnly": "napi prepublish -t npm",
-    "test": "node -e \"console.log('ok')\"",
-    "version": "napi version",
-    "clean": "rm -rf *.node"
+    "artifacts": "napi artifacts",
+    "prepublishOnly": "napi prepublish -t npm --skip-optional-publish"
   },
   "devDependencies": {
     "@napi-rs/cli": "^3.6.2"
@@ -41,18 +21,14 @@
   "napi": {
     "binaryName": "html-to-markdown-node",
     "targets": [
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu",
       "x86_64-apple-darwin",
       "aarch64-apple-darwin",
-      "x86_64-pc-windows-msvc",
-      "aarch64-pc-windows-msvc",
-      "x86_64-unknown-linux-gnu",
-      "x86_64-unknown-linux-musl",
-      "aarch64-unknown-linux-gnu",
-      "aarch64-unknown-linux-musl",
-      "armv7-unknown-linux-gnueabihf"
+      "x86_64-pc-windows-msvc"
     ]
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">= 18"
   }
 }

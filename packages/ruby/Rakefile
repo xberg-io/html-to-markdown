@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'bundler'
-Bundler::GemHelper.install_tasks name: 'html_to_markdown'
+Bundler::GemHelper.install_tasks name: 'html-to-markdown'
 require 'rake/extensiontask'
 require 'rspec/core/rake_task'
 

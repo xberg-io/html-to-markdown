@@ -135,6 +135,21 @@ fn apply_options(list: &List) -> std::result::Result<ConversionOptions, String> 
                 update.infer_dimensions = Some(decode_bool(&value, "infer_dimensions")?)
             }
             "preprocessing" => update.preprocessing = Some(decode_preprocessing(&value)?),
+            "exclude_selectors" | "excludeSelectors" => {
+                update.exclude_selectors =
+                    Some(decode_string_list(&value, "exclude_selectors")?)
+            }
+            "max_depth" | "maxDepth" => {
+                let v = value
+                    .as_integer()
+                    .map(|i| i64::from(i))
+                    .or_else(|| value.as_real().map(|r| r as i64))
+                    .ok_or_else(|| "max_depth: must be a non-negative integer".to_string())?;
+                if v < 0 {
+                    return Err(format!("max_depth: must be a non-negative integer, got {v}"));
+                }
+                update.max_depth = Some(Some(v as usize));
+            }
             "debug" => update.debug = Some(decode_bool(&value, "debug")?),
             _ => {}
         }
@@ -182,6 +197,9 @@ fn decode_string(value: &Robj, field: &str) -> std::result::Result<String, Strin
 }
 
 fn decode_string_list(value: &Robj, field: &str) -> std::result::Result<Vec<String>, String> {
+    if value.is_null() {
+        return Ok(vec![]);
+    }
     let strs = value
         .as_str_vector()
         .ok_or_else(|| format!("{field}: must be a character vector"))?;

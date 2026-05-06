@@ -1,8 +1,6 @@
 linters: linters_with_defaults(
     line_length_linter(120),
-    object_name_linter(styles = "snake_case"),
-    object_usage_linter = NULL
-  )
-exclusions: list(
-    "R/extendr-wrappers.R"
+    object_name_linter = NULL,
+    object_usage_linter = NULL,
+    commented_code_linter = NULL
   )

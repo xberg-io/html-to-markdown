@@ -1,41 +1,30 @@
 <?xml version="1.0"?>
-<ruleset name="html-to-markdown Java Rules"
+<ruleset name="Custom PMD Ruleset"
          xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+                             https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+    <description>PMD ruleset for Java bindings</description>
 
-    <description>
-        PMD rules for html-to-markdown Java Panama FFI bindings.
-        Relaxed rules for FFI code that requires defensive programming patterns.
-    </description>
-
-    <!-- Use standard Java rulesets as base -->
     <rule ref="category/java/bestpractices.xml">
-        <!-- Allow throwing NullPointerException for explicit null checks -->
-        <exclude name="AvoidThrowingNullPointerException"/>
-        <!-- Allow catching Throwable in FFI boundary code -->
-        <exclude name="AvoidCatchingGenericException"/>
+        <exclude name="LooseCoupling"/>
     </rule>
-
     <rule ref="category/java/codestyle.xml">
-        <!-- Allow non-final local variables -->
-        <exclude name="LocalVariableCouldBeFinal"/>
-        <exclude name="MethodArgumentCouldBeFinal"/>
-        <!-- Allow multiple return statements for guard clauses -->
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="OnlyOneReturn"/>
-        <!-- Allow detailed comments -->
+    </rule>
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter"/>
+        <exclude name="DataClass"/>
+    </rule>
+    <rule ref="category/java/documentation.xml">
         <exclude name="CommentSize"/>
     </rule>
-
-    <rule ref="category/java/design.xml">
-        <!-- FFI error handling may require higher cyclomatic complexity -->
-        <exclude name="CyclomaticComplexity"/>
-        <!-- Exception classes don't need serialVersionUID -->
-        <exclude name="MissingSerialVersionUID"/>
-        <!-- Allow throwing RuntimeException for FFI errors -->
-        <exclude name="AvoidThrowingRawExceptionTypes"/>
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="EmptyCatchBlock"/>
     </rule>
-
-    <rule ref="category/java/errorprone.xml"/>
+    <rule ref="category/java/multithreading.xml"/>
     <rule ref="category/java/performance.xml"/>
+    <rule ref="category/java/security.xml"/>
 </ruleset>

@@ -1,32 +1,6 @@
 # frozen_string_literal: true
 
-# Steepfile for type checking html-to-markdown Ruby gem
-
 target :lib do
   signature 'sig'
-
   check 'lib'
-
-  configure_code_diagnostics do |hash|
-    hash[Steep::Diagnostic::Ruby::UnannotatedEmptyCollection] = :hint
-    hash[Steep::Diagnostic::Ruby::UnknownConstant] = :hint
-    hash[Steep::Diagnostic::Ruby::NoMethod] = :hint
-  end
-
-  # Configure libraries
-  library 'pathname'
-  library 'open3'
-
-  # Ignore vendor directory
-  ignore 'vendor'
-
-  # Ignore spec directory
-  ignore 'spec'
-
-  # Ignore bin directory
-  ignore 'bin'
-
-  # Ignore internal implementation modules (not public API)
-  ignore 'lib/html_to_markdown/cli.rb'
-  ignore 'lib/html_to_markdown/cli_proxy.rb'
 end

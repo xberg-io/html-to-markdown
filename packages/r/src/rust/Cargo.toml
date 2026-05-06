@@ -1,31 +1,24 @@
-[workspace]
-
 [package]
-name = "html_to_markdown_r"
+name = "html-to-markdown-r"
 version = "3.4.0-rc.25"
-edition = "2021"
+edition = "2024"
 license = "MIT"
-description = "extendr bindings for html-to-markdown"
-repository = "https://github.com/kreuzberg-dev/html-to-markdown"
+description = "High-performance HTML to Markdown converter"
+readme = false
+keywords = ["html", "markdown", "converter"]
+categories = ["text-processing"]
 
 [lib]
-name = "html_to_markdown_r"
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "lib"]
 
 [dependencies]
-html-to-markdown-rs = { path = "vendor/html-to-markdown-rs", features = [
-  "inline-images",
-  "metadata",
-  "serde",
-  "visitor",
-] }
 extendr-api = "0.9"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-
-[features]
-default = ["metadata"]
-metadata = []
-
-[package.metadata.cargo-machete]
-ignored = ["extendr-api", "html-to-markdown-rs"]
+html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = [
+    "full",
+    "metadata",
+    "visitor",
+    "serde",
+    "inline-images",
+] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

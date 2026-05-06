@@ -1,6 +1,6 @@
 {
-	"name": "@kreuzberg/html-to-markdown",
-	"version": "3.3.2",
+	"name": "@kreuzberg/html-to-markdown-node",
+	"version": "3.4.0-rc.25",
 	"description": "High-performance HTML to Markdown converter",
 	"keywords": [
 		"converter",
@@ -22,12 +22,15 @@
 		"build:debug": "napi build",
 		"build:ts": "echo 'No TypeScript wrapper to build'",
 		"test": "node -e \"console.log('Add test command')\"",
-		"lint": "cd ../.. && prek run oxlint --all-files",
-		"lint:fix": "cd ../.. && prek run oxlint --all-files",
-		"format": "cd ../.. && prek run oxfmt --all-files"
+		"format": "oxfmt",
+		"format:check": "oxfmt --check",
+		"lint": "oxlint",
+		"lint:fix": "oxlint --fix"
 	},
 	"devDependencies": {
 		"@napi-rs/cli": "^3.0.0",
+		"oxfmt": "latest",
+		"oxlint": "latest",
 		"typescript": "^6.0.3"
 	},
 	"napi": {

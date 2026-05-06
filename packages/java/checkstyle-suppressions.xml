@@ -4,12 +4,12 @@
     "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- Allow star imports in test files -->
+    <!-- FFI constants -->
+    <suppress checks="ConstantName" files=".*FFI\.java"/>
+    <suppress checks="MagicNumber" files=".*FFI\.java"/>
+
+    <!-- Allow star imports and magic numbers in test files -->
     <suppress checks="AvoidStarImport" files=".*Test\.java"/>
-
-    <!-- Suppress package-info requirement for test packages -->
-    <suppress checks="JavadocPackage" files=".*[\\/]test[\\/].*"/>
-
-    <!-- Allow magic numbers in test files -->
     <suppress checks="MagicNumber" files=".*Test\.java"/>
+    <suppress checks="MethodLength" files=".*Test\.java"/>
 </suppressions>
