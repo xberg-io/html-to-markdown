@@ -295,7 +295,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-latest, macos-15-intel]
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -410,9 +410,15 @@ jobs:
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
+          - os: windows-11-arm
+            label: windows-arm64
+            target: aarch64-pc-windows-msvc
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -847,6 +853,8 @@ jobs:
             label: linux-aarch64
           - os: macos-latest
             label: macos-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
           - os: windows-latest
             label: windows-x64
     runs-on: ${{ matrix.os }}
@@ -956,6 +964,9 @@ jobs:
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -1177,9 +1188,15 @@ jobs:
           - os: windows-latest
             rid: win-x64
             target: x86_64-pc-windows-msvc
+          - os: windows-11-arm
+            rid: win-arm64
+            target: aarch64-pc-windows-msvc
           - os: macos-latest
             rid: osx-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            rid: osx-x64
+            target: x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     permissions:
@@ -1234,9 +1251,15 @@ jobs:
           - os: windows-latest
             platform: windows-x64
             target: x86_64-pc-windows-msvc
+          - os: windows-11-arm
+            platform: windows-arm64
+            target: aarch64-pc-windows-msvc
           - os: macos-latest
             platform: darwin-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            platform: darwin-x64
+            target: x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -1774,9 +1797,15 @@ jobs:
           - os: windows-latest
             platform: windows-x86_64
             target: x86_64-pc-windows-msvc
+          - os: windows-11-arm
+            platform: windows-aarch64
+            target: aarch64-pc-windows-msvc
           - os: macos-latest
             platform: osx-aarch64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            platform: osx-x86_64
+            target: x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     permissions:
@@ -1979,7 +2008,7 @@ jobs:
           registry: npm
           package: "@kreuzberg/html-to-markdown-linux-x64-gnu"
           version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "25"
+          max-attempts: "60"
 
       - name: Wait for npm indexing (arm64)
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
@@ -1988,7 +2017,7 @@ jobs:
           registry: npm
           package: "@kreuzberg/html-to-markdown-linux-arm64-gnu"
           version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "25"
+          max-attempts: "60"
 
       - name: Prepare main Node package metadata
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
@@ -2011,7 +2040,7 @@ jobs:
           registry: npm
           package: "@kreuzberg/html-to-markdown"
           version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "25"
+          max-attempts: "60"
 
       - name: Install TypeScript wrapper dependencies from npm
         if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.ts_exists != 'true' }}
