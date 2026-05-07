@@ -2,23 +2,21 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>HtmlToMarkdown</RootNamespace>
-    <!-- Inner project compiles the assembly; the outer KreuzbergDev.HtmlToMarkdown wrapper
-         packs everything. Without IsPackable=false, dotnet pack adds an external dependency
-         on a non-existent "HtmlToMarkdown" NuGet package id, breaking installs. -->
-    <IsPackable>false</IsPackable>
-    <Version>3.4.0-rc.34</Version>
+    <!-- Pack with the public nuget id directly. There's no wrapper; the outer
+         `packages/csharp/HtmlToMarkdown.csproj` is no longer used for packing. -->
+    <PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>
+    <Version>3.4.0-rc.35</Version>
     <Description>High-performance HTML to Markdown converter</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <Authors>Kreuzberg Team</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../../LICENSE" Pack="true" PackagePath="/" />
     <None Include="runtimes/**" Pack="true" PackagePath="runtimes/" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="../src/**/*.cs" />
   </ItemGroup>
 </Project>

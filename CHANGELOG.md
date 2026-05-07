@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.35] - 2026-05-08
+
+### Fixed
+
+- **NuGet rc.34 still broken** — IsPackable=false on inner project + ProjectReference on outer wrapper made dotnet pack ship a 4 KB stub DLL instead of the full assembly (the inner's 100 KB DLL never made it into the nupkg). The outer wrapper was simply load-bearing in the wrong direction. Inverted the packaging: the **inner** csproj now owns `<PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>` directly and is the target of `dotnet pack`. `scripts/publish/csharp/pack.sh` updated to point at it. Verified locally: published nupkg now contains 101 KB DLL + `runtimes/<rid>/native/*.{so,dylib,dll}` + LICENSE + empty `<dependencies>`.
+
 ## [3.4.0-rc.34] - 2026-05-08
 
 ### Fixed
