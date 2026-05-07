@@ -5,6 +5,8 @@ packages:
   - e2e/node
   - e2e/wasm
 
-ignoredBuiltDependencies:
+onlyBuiltDependencies:
   - esbuild
+
+ignoredBuiltDependencies:
   - wasm-pack
