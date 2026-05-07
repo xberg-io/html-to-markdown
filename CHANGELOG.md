@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.27] - 2026-05-07
+
+### Fixed
+
+- Rust 1.95.0 clippy lints (`arc_with_non_send_sync`, `collapsible_if`, `clone_on_copy`) blocking CI on alef-generated bindings — alef 0.14.28 added these to the crate-root allow lists for napi, pyo3, wasm-bindgen, and ext-php-rs backends.
+- Root `package.json` version sync — was stuck at `3.1.0` (now matches workspace version).
+
 ## [3.4.0-rc.26] - 2026-05-07
 
 ### Fixed

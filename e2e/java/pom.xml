@@ -19,9 +19,9 @@
         <dependency>
             <groupId>dev.kreuzberg</groupId>
             <artifactId>html-to-markdown</artifactId>
-            <version>3.4.0-rc.26</version>
+            <version>3.4.0-rc.27</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.4.0-rc.26.jar</systemPath>
+            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.4.0-rc.27.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

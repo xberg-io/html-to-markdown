@@ -3,7 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>HtmlToMarkdown</RootNamespace>
     <PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>
-    <Version>3.4.0-rc.26</Version>
+    <Version>3.4.0-rc.27</Version>
     <Description>High-performance HTML to Markdown converter</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>

@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-node-linux-arm64-musl",
-  "version": "3.4.0-rc.26",
+  "version": "3.4.0-rc.27",
   "description": "High-performance HTML to Markdown converter - Node.js native bindings",
   "keywords": [
     "converter",
