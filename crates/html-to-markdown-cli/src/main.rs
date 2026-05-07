@@ -12,6 +12,7 @@ use convert::{build_conversion_options, perform_conversion};
 use output::{output_debug_info, write_output};
 use std::fs;
 use std::io::{self, Read, Write as IoWrite};
+use std::panic;
 use std::path::PathBuf;
 use utils::{DEFAULT_USER_AGENT, decode_bytes, fetch_url};
 
@@ -97,8 +98,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let html = read_input(&cli)?;
     let options = build_conversion_options(&cli);
-    let output_content = perform_conversion(&html, options, &cli)?;
-    write_output(cli.output.clone(), &output_content)?;
+    let output_path = cli.output.clone();
+
+    // Wrap conversion in catch_unwind so an unexpected panic produces a clean error
+    // message rather than a Rust backtrace, and no partial output is written.
+    let conversion_result = panic::catch_unwind(panic::AssertUnwindSafe(|| perform_conversion(&html, options, &cli)));
+
+    let output_content = match conversion_result {
+        Ok(result) => result?,
+        Err(panic_payload) => {
+            let msg = panic_payload
+                .downcast_ref::<String>()
+                .map(|s| s.as_str())
+                .or_else(|| panic_payload.downcast_ref::<&str>().copied())
+                .unwrap_or("unknown panic");
+            return Err(format!("internal error during conversion (panic): {msg}").into());
+        }
+    };
+
+    write_output(output_path, &output_content)?;
 
     Ok(())
 }
