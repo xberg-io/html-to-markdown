@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.31] - 2026-05-07
+
+### Fixed
+
+- **Node provenance still failing on rc.30** — even after fixing each platform package's `repository` field, the publish step is fed by `prepare-artifact-directory.sh` which **wipes** `crates/html-to-markdown-node/npm/` and re-extracts from artifact tarballs. NAPI-RS prepublish at build time copies fields from the **main** `crates/html-to-markdown-node/package.json`, which had no `repository` at all — so platform packages always shipped with `repository: ""`. Added the proper `{type, url, directory}` block plus `homepage`/`bugs` to the main package.json so prepublish propagates them.
+- **PyPI sdist rejected** — "License-File LICENSE does not exist in distribution file" — `packages/python/pyproject.toml` had `license = "MIT"` but no `license-files` directive, so the sdist metadata referenced LICENSE without including it. Added `license-files = ["LICENSE"]` so maturin bundles the file.
+
+### Verified published in rc.30
+
+- ✅ npm `@kreuzberg/html-to-markdown-wasm` 3.4.0-rc.30
+- ✅ NuGet `KreuzbergDev.HtmlToMarkdown` 3.4.0-rc.30
+- ✅ RubyGems `html-to-markdown` 3.4.0.pre.rc.30 (4 platforms: ruby, x86_64-linux, aarch64-linux, arm64-darwin)
+- ✅ crates.io `html-to-markdown-rs` 3.4.0-rc.30
+- ✅ Packagist `kreuzberg-dev/html-to-markdown-rs` 3.4.0-rc.30
+- ✅ PyPI 25 wheels (5 platforms × 5 Python versions including macos_10_12_x86_64) — only sdist rejected
+- ✅ Maven Central publish job succeeded (indexing lag pending)
+
 ## [3.4.0-rc.30] - 2026-05-07
 
 ### Fixed

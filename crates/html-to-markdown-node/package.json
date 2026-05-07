@@ -1,8 +1,15 @@
 {
   "name": "@kreuzberg/html-to-markdown-node",
-  "version": "3.4.0-rc.30",
+  "version": "3.4.0-rc.31",
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git",
+    "directory": "crates/html-to-markdown-node"
+  },
+  "homepage": "https://github.com/kreuzberg-dev/html-to-markdown",
+  "bugs": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
   "files": [
     "index.js",
     "index.d.ts",

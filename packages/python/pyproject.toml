@@ -4,10 +4,11 @@ requires = [ "maturin>=1,<2" ]
 
 [project]
 name = "html-to-markdown"
-version = "3.4.0rc30"
+version = "3.4.0rc31"
 description = "High-performance HTML to Markdown converter"
 keywords = [ "converter", "html", "markdown" ]
 license = "MIT"
+license-files = [ "LICENSE" ]
 authors = [ { name = "Kreuzberg Team" } ]
 requires-python = ">=3.10"
 classifiers = [

@@ -4,7 +4,7 @@ defmodule HtmlToMarkdown.MixProject do
   def project do
     [
       app: :html_to_markdown,
-      version: "3.4.0-rc.30",
+      version: "3.4.0-rc.31",
       elixir: "~> 1.14",
       elixirc_paths: ["lib", "../..//packages/elixir/native/html_to_markdown_nif/src"],
       rustler_crates: [html_to_markdown_nif: [mode: :release]],
