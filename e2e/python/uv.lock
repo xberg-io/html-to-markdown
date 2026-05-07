@@ -42,7 +42,6 @@ source = { directory = "../../packages/python" }
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.19" },
-    { name = "pytest", specifier = ">=9.0.2" },
     { name = "ruff", specifier = ">=0.14.8" },
 ]
 

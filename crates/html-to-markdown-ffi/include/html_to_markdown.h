@@ -3037,6 +3037,24 @@ void htm_options_set_visitor_handle(HTMConversionOptions *options,
                                     struct HTMHtmVisitor *visitor);
 
 /**
+ * Convert HTML to Markdown using a callback-based visitor.
+ *
+ * Returns a heap-allocated `ConversionResult` on success, or null on failure.
+ * Check `htm_last_error_code` / `htm_last_error_context` for error details.
+ * The returned pointer must be freed with `htm_conversion_result_free`.
+ *
+ * # Safety
+ *
+ * `html` must be a valid, non-null, null-terminated UTF-8 string.
+ * `options` must be a valid pointer or null.
+ * `visitor` must have been created with `htm_visitor_create`, or be null.
+ * Returned pointer must be freed with `htm_conversion_result_free`.
+ */
+HTMConversionResult *htm_convert_with_visitor(const char *html,
+                                              const HTMConversionOptions *options,
+                                              struct HTMHtmVisitor *visitor);
+
+/**
  * Create a new `HtmHtmlVisitorBridge` from a vtable and opaque user_data pointer.
  *
  * Returns a heap-allocated `HtmHtmlVisitorBridge` on success, or null if `vtable` is null.

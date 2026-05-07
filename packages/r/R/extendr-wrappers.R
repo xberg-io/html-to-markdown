@@ -13,6 +13,8 @@ convert <- function(html, options) .Call("wrap__convert", html, options, PACKAGE
 
 DocumentMetadata <- new.env(parent = emptyenv())
 
+DocumentMetadata$from_json <- function(json) .Call("wrap__DocumentMetadata__from_json", json, PACKAGE = "htmltomarkdown")
+
 #' @export
 `$.DocumentMetadata` <- function(self, name) {
   func <- DocumentMetadata[[name]]
@@ -79,6 +81,8 @@ ConversionOptions$default <- function() .Call("wrap__ConversionOptions__default"
 
 ConversionOptions$builder <- function() .Call("wrap__ConversionOptions__builder", PACKAGE = "htmltomarkdown")
 
+ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__from_json", json, PACKAGE = "htmltomarkdown")
+
 #' @export
 `$.ConversionOptions` <- function(self, name) {
   func <- ConversionOptions[[name]]
@@ -113,6 +117,8 @@ ConversionOptionsBuilder$build <- function() .Call("wrap__ConversionOptionsBuild
 
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
 
+ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
+
 #' @export
 `$.ConversionOptionsUpdate` <- function(self, name) {
   func <- ConversionOptionsUpdate[[name]]
@@ -127,6 +133,8 @@ PreprocessingOptions <- new.env(parent = emptyenv())
 
 PreprocessingOptions$default <- function() .Call("wrap__PreprocessingOptions__default", PACKAGE = "htmltomarkdown")
 
+PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptions__from_json", json, PACKAGE = "htmltomarkdown")
+
 #' @export
 `$.PreprocessingOptions` <- function(self, name) {
   func <- PreprocessingOptions[[name]]
@@ -138,6 +146,8 @@ PreprocessingOptions$default <- function() .Call("wrap__PreprocessingOptions__de
 `[[.PreprocessingOptions` <- `$.PreprocessingOptions`
 
 PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
+
+PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__PreprocessingOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 
 #' @export
 `$.PreprocessingOptionsUpdate` <- function(self, name) {
@@ -208,3 +218,15 @@ NodeContext <- new.env(parent = emptyenv())
 
 #' @export
 `[[.NodeContext` <- `$.NodeContext`
+
+VisitResult <- new.env(parent = emptyenv())
+
+#' @export
+`$.VisitResult` <- function(self, name) {
+  func <- VisitResult[[name]]
+  environment(func) <- environment()
+  func
+}
+
+#' @export
+`[[.VisitResult` <- `$.VisitResult`
