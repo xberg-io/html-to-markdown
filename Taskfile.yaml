@@ -326,6 +326,8 @@ tasks:
     cmds:
       - task: e2e:smoke:python
       - task: e2e:smoke:node
+      - task: e2e:smoke:bun
+      - task: e2e:smoke:wasm
       - task: e2e:smoke:ruby
       - task: e2e:smoke:php
       - task: e2e:smoke:go
@@ -333,6 +335,8 @@ tasks:
       - task: e2e:smoke:csharp
       - task: e2e:smoke:elixir
       - task: e2e:smoke:r
+      - task: e2e:smoke:rust
+      - task: e2e:smoke:c
 
   e2e:smoke:python:
     desc: "Smoke test Python package from PyPI"
@@ -395,6 +399,32 @@ tasks:
     dir: test_apps/r
     cmds:
       - Rscript smoke_test.R
+
+  e2e:smoke:bun:
+    desc: "Smoke test Node package from npm under Bun"
+    dir: test_apps/bun
+    cmds:
+      - bun install
+      - bun test smoke_test.ts
+
+  e2e:smoke:wasm:
+    desc: "Smoke test WASM package from npm"
+    dir: test_apps/wasm
+    cmds:
+      - pnpm install
+      - pnpm test:smoke
+
+  e2e:smoke:rust:
+    desc: "Smoke test Rust crate from crates.io"
+    dir: test_apps/rust
+    cmds:
+      - cargo test --test smoke_test
+
+  e2e:smoke:c:
+    desc: "Smoke test C FFI from GitHub release tarballs"
+    dir: test_apps/c
+    cmds:
+      - make smoke
 
   e2e:test:all:
     desc: "Run comprehensive tests for all published packages"

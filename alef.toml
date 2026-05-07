@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.28"
+alef_version = "0.14.33"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r"]
 
 [workspace.sync]
@@ -8,6 +8,7 @@ extra_paths = [
   "packages/python/html_to_markdown/__init__.py",
   "crates/html-to-markdown-node/package.json",
   "crates/html-to-markdown-node/npm/*/package.json",
+  "package.json",
 ]
 
 # test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
@@ -26,20 +27,52 @@ path = "test_apps/wasm/package.json"
 search = '"@kreuzberg/html-to-markdown-wasm": "[^"]*"'
 replace = '"@kreuzberg/html-to-markdown-wasm": "{version}"'
 
+# Anchor on artifactId so we don't accidentally rewrite junit/jackson <version> tags.
+# Use double-quoted (basic) strings so the \n in the replacement is a real newline.
 [[workspace.sync.text_replacements]]
 path = "test_apps/java/pom.xml"
-search = "<version>{version}</version>"
-replace = "<version>{version}</version>"
+search = "<artifactId>html-to-markdown</artifactId>\\s*<version>[^<]*</version>"
+replace = "<artifactId>html-to-markdown</artifactId>\n            <version>{version}</version>"
 
 [[workspace.sync.text_replacements]]
-path = "test_apps/csharp/TestApp.csproj"
+path = "test_apps/csharp/E2eTests.csproj"
+search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
+replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/csharp/KreuzbergDev.HtmlToMarkdown.E2eTests.csproj"
 search = 'Include="KreuzbergDev.HtmlToMarkdown" Version="[^"]*"'
 replace = 'Include="KreuzbergDev.HtmlToMarkdown" Version="{version}"'
 
 [[workspace.sync.text_replacements]]
 path = "test_apps/php/composer.json"
-search = '"kreuzberg-dev/html-to-markdown": "[^"]*"'
-replace = '"kreuzberg-dev/html-to-markdown": ">={version}"'
+search = '"kreuzberg-dev/html-to-markdown-rs": "[^"]*"'
+replace = '"kreuzberg-dev/html-to-markdown-rs": ">={version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/python/pyproject.toml"
+search = '"html-to-markdown>=[^"]*"'
+replace = '"html-to-markdown>={version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/ruby/Gemfile"
+search = "gem 'html-to-markdown', '[^']*'"
+replace = "gem 'html-to-markdown', '~> {version}'"
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/go/go.mod"
+search = 'github\.com/kreuzberg-dev/html-to-markdown/packages/go/v3 v[0-9][^\s]*'
+replace = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3 v{version}"
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/r/DESCRIPTION"
+search = 'htmltomarkdown \([^)]*\)'
+replace = 'htmltomarkdown ({version})'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/rust/Cargo.toml"
+search = 'package = "html-to-markdown-rs", version = "[^"]*"'
+replace = 'package = "html-to-markdown-rs", version = "{version}"'
 
 [[crates]]
 name = "html-to-markdown-rs"

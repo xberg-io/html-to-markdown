@@ -3,7 +3,7 @@
   "description": "E2e tests for PHP bindings",
   "type": "project",
   "require": {
-    "kreuzberg-dev/html-to-markdown-rs": ">=3.2.0"
+    "kreuzberg-dev/html-to-markdown-rs": ">=3.4.0-rc.28"
   },
   "require-dev": {
     "phpunit/phpunit": "^13.1",

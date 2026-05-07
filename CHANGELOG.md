@@ -7,29 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.28] - 2026-05-07
+
 ### Fixed
 
-- **Python `HeadingStyle` import mismatch (#337)** — `from html_to_markdown import HeadingStyle` returned a Python `Enum` that did not satisfy PyO3's type check on `ConversionOptions(heading_style=...)`, raising `TypeError: 'HeadingStyle' object is not an instance of 'HeadingStyle'`. The package now re-exports the native PyO3 enums directly from `_html_to_markdown` and adds uppercase aliases (`HeadingStyle.ATX`, `CodeBlockStyle.BACKTICKS`, etc.) on the same object so both naming conventions work.
-
-- **PHP 8.5 build failure on `pie install` (#333)** — `ext-php-rs` is now pinned to 0.15.12 (via alef ≥ 0.14.27), which includes upstream's PHP 8.5 build fixes for `zend_dval_to_lval_cap`. The publish workflow also produces pre-built PIE archives for **PHP 8.2/8.3/8.4/8.5 × 6 platforms** (linux x86_64/arm64, macOS arm64/x86_64, windows x86_64/arm64), so `pie install kreuzberg-dev/html-to-markdown` no longer needs to build from source via `phpize`.
-
-- **Doc/duplicate updates** — `ms-fscc.html` truncation (#336) was a duplicate of #330's UTF-8 char-boundary panic, fixed in commit 37d6064a.
-
 - **Bogus HTML comment endings drop following content (#339)** — the `astral-tl` parser mishandles HTML comments whose closing sequence contains more than two consecutive dashes (e.g. `<!-- /// --->`); the tokenizer creates an empty comment node and silently discards every byte that follows. A new `normalize_bogus_comment_endings` preprocessing pass rewrites any `--[-]+>` closing sequence to a well-formed `-->` before `tl::parse` runs, restoring all DOM nodes after the bogus comment. Also wired into the html5ever-repair and inline-block-misnest-repair fallback paths.
-
+- **Python `HeadingStyle` import mismatch (#337)** — `from html_to_markdown import HeadingStyle` returned a Python `Enum` that did not satisfy PyO3's type check on `ConversionOptions(heading_style=...)`, raising `TypeError: 'HeadingStyle' object is not an instance of 'HeadingStyle'`. The package now re-exports the native PyO3 enums directly from `_html_to_markdown` and adds uppercase aliases (`HeadingStyle.ATX`, `CodeBlockStyle.BACKTICKS`, etc.) on the same object so both naming conventions work.
+- **`ms-fscc.html` truncation (#336)** — duplicate of #330's UTF-8 char-boundary panic, fixed in commit 37d6064a.
+- **PHP 8.5 build failure on `pie install` (#333)** — `ext-php-rs` is now pinned to 0.15.12 (via alef ≥ 0.14.27), which includes upstream's PHP 8.5 build fixes for `zend_dval_to_lval_cap`. The publish workflow also produces pre-built PIE archives for **PHP 8.2/8.3/8.4/8.5 × 6 platforms** (linux x86_64/arm64, macOS arm64/x86_64, windows x86_64/arm64), so `pie install kreuzberg-dev/html-to-markdown-rs` no longer needs to build from source via `phpize`.
 - **CLI silent failure on conversion panic** — the CLI now wraps the conversion call in `panic::catch_unwind` and surfaces panic payloads as a `Box<dyn Error>` prefixed with `"internal error during conversion (panic): ..."` rather than exiting with a Rust backtrace. Defensive hardening following #330's UTF-8 char-boundary fix; ensures future regressions in the same family produce actionable error messages instead of partial outputs.
-
 - **Pre-existing clippy errors in `form/elements.rs`** — `handle_input`'s uniform handler signature (`output: &mut String`) tripped `clippy::ptr_arg` and `clippy::needless_pass_by_ref_mut` on Rust 1.95.0; allowed at the function level since the signature is shared with sibling form handlers.
-
 - **npm release-candidate dist-tag (#340)** — pre-release versions (anything matching `-(rc|beta|alpha|pre|dev)`) now publish under the npm `next` dist-tag instead of `latest`, so `npm install @kreuzberg/html-to-markdown-node` no longer pulls a 3.4.0-rc over a stable 3.3.x. Detection lives in `scripts/publish/validate-and-compute-metadata.sh` and is wired through to `publish-npm` for both `@kreuzberg/html-to-markdown-node` and `@kreuzberg/html-to-markdown-wasm`.
+- **npm `check-npm` gate-condition bug** — `check-npm.node_exists` was bound to the existence of `@kreuzberg/html-to-markdown` (the TS meta package), but the gate guards `publish-node`. Result: once the TS meta got ahead, every subsequent attempt skipped publishing the `-node` binding entirely. Primary check now points at `@kreuzberg/html-to-markdown-node`; per-step `wait-for-package` polls were also corrected to the right `-node-<triple>` names (legacy `-<triple>` names were leftovers from a pre-rename era).
+- **Packagist publish-gate package-name mismatch** — the `check-packagist` job was probing `kreuzberg-dev/html-to-markdown` (no `-rs` suffix) while the package is actually published as `kreuzberg-dev/html-to-markdown-rs` (per `packages/php/composer.json`). The `publish-packagist` action even dropped `-dev` to `kreuzberg/html-to-markdown`. All three references aligned to the real Composer slug.
+- **Ruby gem matrix missing Windows arm64** — `ruby-gem` job now also builds on `windows-11-arm` (`aarch64-pc-windows-msvc`); the source-gem drop filter accepts `*-arm64-mingw-ucrt.gem`.
+- **alef `[workspace.sync]` coverage** — root `package.json` is now synced via `extra_paths`; `text_replacements` now match the actual filenames (`E2eTests.csproj` + `KreuzbergDev.HtmlToMarkdown.E2eTests.csproj` instead of a non-existent `TestApp.csproj`) and the actual Composer key (`kreuzberg-dev/html-to-markdown-rs`); new entries cover `test_apps/{python,ruby,go,r,rust}` so `alef sync-versions` advances every test_app on each rc; `test_apps/java/pom.xml` is now anchored on `<artifactId>html-to-markdown</artifactId>` to avoid clobbering Jackson/JUnit `<version>` tags.
 
 ### Changed
 
+- **Smoke-test coverage** — `task e2e:smoke:all` now also runs `bun`, `wasm`, `rust`, and `c` test_apps (4 new entries; `php-ext` deferred — no manifest, raw `.so` test).
+- **alef bumped to 0.14.33** — bindings regenerated; `.pre-commit-config.yaml` and `alef.toml` `[workspace] alef_version` aligned.
 - **Node binding `index.js`/`index.d.ts` regenerated** — refreshed to match `@napi-rs/cli` 3.6.2 template style; runtime version-mismatch check is now env-gated behind `NAPI_RS_ENFORCE_VERSION_CHECK` (no behaviour change for typical consumers).
 
 ### Documentation
 
 - **Cross-platform npm install in Docker (#273)** — clarified that "Cannot find module `@kreuzberg/html-to-markdown-node-linux-x64-gnu`" inside Docker stems from npm/pnpm's handling of `optionalDependencies` when a lockfile is generated on one platform and consumed on another (npm/cli#4828). The published package's `optionalDependencies` already declares all supported platform variants; pnpm consumers building cross-platform images should set `supportedArchitectures` in `pnpm-workspace.yaml` (or pass `--config.supported-architectures.os/cpu/libc`) so the lockfile resolves natives for every target architecture.
+
+### Known gaps
+
+- **Elixir Windows NIFs** — `elixir-natives` matrix only covers Linux + macOS (4 platforms). Windows x86_64/arm64 NIFs require RustlerPrecompiled cross-build support + bash/pwsh branches in the package step; deferred to a follow-up rc.
 
 ## [3.4.0-rc.27] - 2026-05-07
 

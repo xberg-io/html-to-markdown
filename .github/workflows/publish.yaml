@@ -240,7 +240,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1 # v1
         with:
           registry: packagist
-          package: kreuzberg-dev/html-to-markdown
+          package: kreuzberg-dev/html-to-markdown-rs
           version: ${{ needs.prepare.outputs.version }}
 
   check-cratesio:
@@ -870,6 +870,8 @@ jobs:
             label: macos-x86_64
           - os: windows-latest
             label: windows-x64
+          - os: windows-11-arm
+            label: windows-arm64
     runs-on: ${{ matrix.os }}
     env:
       RB_SYS_CARGO_PROFILE: release
@@ -946,7 +948,7 @@ jobs:
           for f in packages/ruby/pkg/*.gem; do
             base="$(basename "$f")"
             case "$base" in
-              *-x86_64-linux.gem|*-aarch64-linux.gem|*-arm64-darwin.gem|*-x86_64-darwin.gem|*-x64-mingw32.gem|*-x64-mingw-ucrt.gem) ;;
+              *-x86_64-linux.gem|*-aarch64-linux.gem|*-arm64-darwin.gem|*-x86_64-darwin.gem|*-x64-mingw32.gem|*-x64-mingw-ucrt.gem|*-arm64-mingw-ucrt.gem) ;;
               *) echo "Removing non-canonical source gem $base"; rm -f "$f" ;;
             esac
           done
@@ -1784,7 +1786,7 @@ jobs:
         uses: kreuzberg-dev/actions/check-registry@v1 # v1
         with:
           registry: packagist
-          package: kreuzberg-dev/html-to-markdown
+          package: kreuzberg-dev/html-to-markdown-rs
           version: ${{ needs.prepare.outputs.version }}
 
       - name: Trigger Packagist Update
@@ -1792,7 +1794,7 @@ jobs:
         uses: kreuzberg-dev/actions/publish-packagist@v1 # v1
         with:
           packagist-username: kreuzberg-dev
-          package-name: kreuzberg/html-to-markdown
+          package-name: kreuzberg-dev/html-to-markdown-rs
           version: ${{ needs.prepare.outputs.version }}
           repository-url: https://github.com/kreuzberg-dev/html-to-markdown
           dry-run: ${{ needs.prepare.outputs.dry_run }}
