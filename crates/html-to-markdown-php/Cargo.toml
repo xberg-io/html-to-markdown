@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-php"
-version = "3.4.0-rc.31"
+version = "3.4.0-rc.32"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"

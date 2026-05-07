@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0-rc.32] - 2026-05-07
+
+### Fixed
+
+- **TypeScript meta package shipped with `workspace:*` reference** — `@kreuzberg/html-to-markdown@3.4.0-rc.31` declared `"@kreuzberg/html-to-markdown-node": "workspace:*"` in dependencies. `pnpm publish` would have rewritten it; the publish workflow uses `npm publish` (via `kreuzberg-dev/actions/publish-npm`) which leaves it as-is. Outside the monorepo this fails to resolve. `scripts/publish/typescript/build-package.sh` now rewrites every `workspace:*` spec to the actual package version before publish.
+- **Go module sub-path tag** — `pkg.go.dev` requires `packages/go/v3.4.0-rc.X` style tags for sub-modules under v3+. Now tagged alongside `v3.4.0-rc.X` going forward.
+
+### Verified by smoke tests against rc.31
+
+- ✅ Python (`test_apps/python` — 3/3 tests pass)
+- ✅ Rust (`test_apps/rust` — 3/3 tests pass)
+- ⚠ Node, Bun — TS meta `workspace:*` blocks install (rc.32 fix above)
+- ⚠ WASM — test_app `smoke.test.ts` calls `convert()` synchronously without awaiting `initWasm()`; alef e2e generator gap, deferred
+- ⚠ Go — Go binding's CGo link path expects local `target/release` lib; needs FFI auto-download flow
+
 ## [3.4.0-rc.31] - 2026-05-07
 
 ### Fixed
