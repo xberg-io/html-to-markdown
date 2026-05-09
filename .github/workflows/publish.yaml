@@ -2309,18 +2309,20 @@ jobs:
 
       - name: Install Homebrew (Linux)
         if: ${{ matrix.install_brew }}
-        run: scripts/publish/install-homebrew-linux.sh
-        shell: bash
+        uses: kreuzberg-dev/actions/install-homebrew-linux@v1
 
       - name: Build bottles
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-          TAP: kreuzberg-dev/tap
-          OUT_DIR: ${{ github.workspace }}/bottle-json
-        run: scripts/publish/build-homebrew-bottles.sh
-        shell: bash
+        uses: kreuzberg-dev/actions/homebrew-build-bottles@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          version: ${{ needs.prepare.outputs.version }}
+          tap: kreuzberg-dev/tap
+          formulas: |
+            html-to-markdown
+            libhtml-to-markdown
+          out-dir: ${{ github.workspace }}/bottle-json
+          github-repo: kreuzberg-dev/html-to-markdown
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload bottle JSON manifests
         uses: actions/upload-artifact@v5 # v5
@@ -2362,13 +2364,16 @@ jobs:
           merge-multiple: true
 
       - name: Merge bottle DSL into formulas
-        env:
-          TAG: ${{ needs.prepare.outputs.tag }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-          TAP_DIR: ${{ github.workspace }}/homebrew-tap
-          JSON_DIR: ${{ github.workspace }}/bottle-json
-        run: scripts/publish/merge-homebrew-bottles.sh
-        shell: bash
+        uses: kreuzberg-dev/actions/homebrew-merge-bottles@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          version: ${{ needs.prepare.outputs.version }}
+          tap-dir: ${{ github.workspace }}/homebrew-tap
+          json-dir: ${{ github.workspace }}/bottle-json
+          formulas: |
+            html-to-markdown
+            libhtml-to-markdown
+          github-repo: kreuzberg-dev/html-to-markdown
 
       - name: Commit and push bottle DSL
         working-directory: homebrew-tap
