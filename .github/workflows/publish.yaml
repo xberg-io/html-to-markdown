@@ -1,33 +1,45 @@
 name: Publish Release
 
+# Action-first html-to-markdown release pipeline.
+#
+# Orchestrates 11 alef language targets:
+#   crates · cli · python · node · typescript · wasm · ruby · php · go · c-ffi
+#   java · csharp · elixir · homebrew
+#
+# Mirrors kreuzberg's publish.yaml composition: every registry interaction,
+# every multi-platform build, and every release-asset upload routes through
+# a shared kreuzberg-dev/actions composite. Inline bash is reserved for
+# repo-quirky orchestration only (homebrew bottle assembly, Node platform
+# package staging, NIF artifact packaging, multi-formula brew flow).
+
 on:
   workflow_dispatch:
     inputs:
       tag:
         description: "Release tag to build (e.g., v2.6.0)"
-        required: true
+        required: false
         type: string
+      ref:
+        description: "Git ref (branch, tag, or commit) to build; defaults to the tag"
+        required: false
+        type: string
+      targets:
+        description: "Comma-separated list of release targets, or 'all'"
+        required: false
+        type: string
+        default: "all"
       dry_run:
         description: "Prepare artifacts without publishing"
         required: false
         type: boolean
         default: false
-      ref:
-        description: "Git ref (branch, tag, or commit) to build; defaults to the tag"
-        required: false
-        type: string
-      force_republish_java:
-        description: "Force republish Java artifacts even if the version exists"
-        required: false
-        type: boolean
-        default: false
-      force_republish_wasm:
-        description: "Force republish WASM package even if the version exists"
-        required: false
-        type: boolean
-        default: false
       republish:
-        description: "Delete and re-create the tag on current HEAD before publishing (retag + full republish)"
+        description: "Delete and re-create the tag on current HEAD before publishing"
+        required: false
+        type: boolean
+        default: false
+      force_republish:
+        description: "Force republish targets whose registry version already exists"
         required: false
         type: boolean
         default: false
@@ -38,6 +50,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.ref || github.event.inputs.tag)) || github.ref || github.run_id }}
@@ -51,80 +64,47 @@ jobs:
       tag: ${{ steps.meta.outputs.tag }}
       version: ${{ steps.meta.outputs.version }}
       ref: ${{ steps.meta.outputs.ref }}
-      dry_run: ${{ steps.meta.outputs.dry_run }}
       checkout_ref: ${{ steps.meta.outputs.checkout_ref }}
       target_sha: ${{ steps.meta.outputs.target_sha }}
       matrix_ref: ${{ steps.meta.outputs.matrix_ref }}
       is_tag: ${{ steps.meta.outputs.is_tag }}
-      npm_tag: ${{ steps.meta.outputs.npm_tag }}
       is_prerelease: ${{ steps.meta.outputs.is_prerelease }}
-      force_republish_java: ${{ steps.republish.outputs.force_republish_java }}
-      force_republish_wasm: ${{ steps.republish.outputs.force_republish_wasm }}
+      npm_tag: ${{ steps.meta.outputs.npm_tag }}
+      dry_run: ${{ steps.meta.outputs.dry_run }}
+      force_republish: ${{ steps.meta.outputs.force_republish }}
+      release_targets: ${{ steps.meta.outputs.release_targets }}
+      release_any: ${{ steps.meta.outputs.release_any }}
+      release_python: ${{ steps.meta.outputs.release_python }}
+      release_node: ${{ steps.meta.outputs.release_node }}
+      release_ruby: ${{ steps.meta.outputs.release_ruby }}
+      release_cli: ${{ steps.meta.outputs.release_cli }}
+      release_crates: ${{ steps.meta.outputs.release_crates }}
+      release_homebrew: ${{ steps.meta.outputs.release_homebrew }}
+      release_java: ${{ steps.meta.outputs.release_java }}
+      release_csharp: ${{ steps.meta.outputs.release_csharp }}
+      release_go: ${{ steps.meta.outputs.release_go }}
+      release_wasm: ${{ steps.meta.outputs.release_wasm }}
+      release_php: ${{ steps.meta.outputs.release_php }}
+      release_elixir: ${{ steps.meta.outputs.release_elixir }}
+      release_c_ffi: ${{ steps.meta.outputs.release_c_ffi }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # v6
+        uses: actions/checkout@v6
         with:
           ref: ${{ (inputs.republish == true && (inputs.ref || github.event.repository.default_branch)) || inputs.ref || inputs.tag || github.ref }}
           fetch-depth: 0
+          submodules: recursive
 
       - name: Retag for republish
         if: ${{ inputs.republish == true || github.event.client_payload.republish == true }}
-        env:
-          TAG: ${{ inputs.tag || github.event.client_payload.tag }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [[ -z "${TAG}" ]]; then
-            echo "::error::republish requires a tag input"
-            exit 1
-          fi
-          sha="$(git rev-parse HEAD)"
-          echo "::notice::Republish requested — deleting and re-creating tag ${TAG} on ${sha:0:8}"
-          # Delete via API (avoids workflows permission issue with git push)
-          gh api "repos/${GITHUB_REPOSITORY}/git/refs/tags/${TAG}" -X DELETE 2>/dev/null || true
-          # Create via API
-          gh api "repos/${GITHUB_REPOSITORY}/git/refs" \
-            -f "ref=refs/tags/${TAG}" \
-            -f "sha=${sha}" --silent
-          # Update local state
-          git tag -d "${TAG}" 2>/dev/null || true
-          git tag "${TAG}" "${sha}"
+        uses: kreuzberg-dev/actions/retag-for-republish@v1
+        with:
+          tag: ${{ inputs.tag || github.event.client_payload.tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate tag and compute version
+      - name: Resolve release metadata
         id: meta
-        env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          INPUT_TAG: ${{ inputs.tag }}
-          INPUT_DRY_RUN: ${{ inputs.dry_run }}
-          INPUT_REF: ${{ inputs.republish == true && format('refs/tags/{0}', inputs.tag) || inputs.ref }}
-          EVENT_RELEASE_TAG: ${{ github.event.release.tag_name }}
-          EVENT_DISPATCH_TAG: ${{ github.event.client_payload.tag }}
-          EVENT_DISPATCH_DRY_RUN: ${{ github.event.client_payload.dry_run }}
-          EVENT_DISPATCH_REF: ${{ github.event.client_payload.ref }}
-        run: scripts/publish/validate-and-compute-metadata.sh
-      - name: Resolve republish flags
-        id: republish
-        env:
-          INPUT_FORCE_REPUBLISH_JAVA: ${{ inputs.force_republish_java }}
-          INPUT_FORCE_REPUBLISH_WASM: ${{ inputs.force_republish_wasm }}
-          EVENT_DISPATCH_FORCE_REPUBLISH_JAVA: ${{ github.event.client_payload.force_republish_java }}
-          EVENT_DISPATCH_FORCE_REPUBLISH_WASM: ${{ github.event.client_payload.force_republish_wasm }}
-        run: |
-          force_java="${INPUT_FORCE_REPUBLISH_JAVA:-${EVENT_DISPATCH_FORCE_REPUBLISH_JAVA:-false}}"
-          force_wasm="${INPUT_FORCE_REPUBLISH_WASM:-${EVENT_DISPATCH_FORCE_REPUBLISH_WASM:-false}}"
-          echo "force_republish_java=${force_java}" >>"$GITHUB_OUTPUT"
-          echo "force_republish_wasm=${force_wasm}" >>"$GITHUB_OUTPUT"
-      - name: Install Task
-        uses: go-task/setup-task@v2 # v2
-        with:
-          version: 3.46.4
-
-      - name: Upload release metadata
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: release-metadata
-          path: release-metadata.json
-          retention-days: 14
+        uses: kreuzberg-dev/actions/prepare-release-metadata@v1
 
       - name: Ensure GitHub Release exists for tag
         if: ${{ steps.meta.outputs.is_tag == 'true' && steps.meta.outputs.dry_run != 'true' }}
@@ -132,6 +112,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.meta.outputs.tag }}
           IS_PRERELEASE: ${{ steps.meta.outputs.is_prerelease }}
+        # Inline: simple idempotent gh-release create that needs the metadata
+        # outputs we just produced. No shared action equivalent.
         run: |
           if gh release view "${TAG}" >/dev/null 2>&1; then
             echo "Release ${TAG} already exists"
@@ -141,20 +123,38 @@ jobs:
               args+=(--prerelease)
             fi
             gh release create "${TAG}" "${args[@]}"
-            echo "Created release ${TAG}"
           fi
+
+  validate-versions:
+    name: Validate language manifest versions
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Validate versions
+        uses: kreuzberg-dev/actions/validate-versions@v1
+        with:
+          version: ${{ needs.prepare.outputs.version }}
+
+  # ─── Registry existence checks ────────────────────────────────────────
 
   check-pypi:
     name: Check PyPI for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_python == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - name: Check PyPI version
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: pypi
           package: html-to-markdown
@@ -163,67 +163,61 @@ jobs:
   check-npm:
     name: Check npm for existing versions
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_node == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       node_exists: ${{ steps.check.outputs.exists }}
-      wasm_exists: ${{ steps.check.outputs.wasm_exists }}
       ts_exists: ${{ steps.check.outputs.ts_exists }}
     steps:
-      - name: Check npm packages
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: npm
           package: "@kreuzberg/html-to-markdown-node"
           version: ${{ needs.prepare.outputs.version }}
           extra-packages: |
-            wasm_exists=@kreuzberg/html-to-markdown-wasm
             ts_exists=@kreuzberg/html-to-markdown
 
-  check-rubygems:
-    name: Check RubyGems for existing version
+  check-wasm:
+    name: Check npm for existing WASM package
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_wasm == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - name: Check RubyGems version
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-wasm"
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-rubygems:
+    name: Check RubyGems for existing version
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_ruby == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: rubygems
           package: html-to-markdown
           version: ${{ needs.prepare.outputs.version }}
 
-  check-hex:
-    name: Check Hex.pm for existing version
-    needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
-    runs-on: ubuntu-latest
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check Hex version
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
-        with:
-          registry: hex
-          package: html_to_markdown
-          version: ${{ needs.prepare.outputs.version }}
-
   check-maven:
     name: Check Maven Central for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_java == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - name: Check Maven version
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: maven
           package: "dev.kreuzberg:html-to-markdown"
@@ -232,14 +226,13 @@ jobs:
   check-nuget:
     name: Check NuGet for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_csharp == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - name: Check NuGet package
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: nuget
           package: KreuzbergDev.HtmlToMarkdown
@@ -248,14 +241,13 @@ jobs:
   check-packagist:
     name: Check Packagist for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_php == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - name: Check Packagist version
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: packagist
           package: kreuzberg-dev/html-to-markdown
@@ -264,16 +256,15 @@ jobs:
   check-cratesio:
     name: Check crates.io for existing versions
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_crates == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       rs_exists: ${{ steps.check.outputs.exists }}
       cli_exists: ${{ steps.check.outputs.cli_exists }}
       all_exist: ${{ steps.derive.outputs.all_exist }}
     steps:
-      - name: Query crates.io
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: cratesio
           package: html-to-markdown-rs
@@ -281,8 +272,9 @@ jobs:
           extra-packages: |
             cli_exists=html-to-markdown-cli
 
-      - name: Derive all_exist
-        id: derive
+      - id: derive
+        # Inline: aggregate two check-registry outputs into a single boolean
+        # the publish-crates job can guard on. No shared action equivalent.
         run: |
           if [[ "${{ steps.check.outputs.exists }}" == "true" && "${{ steps.check.outputs.cli_exists }}" == "true" ]]; then
             echo "all_exist=true" >> "$GITHUB_OUTPUT"
@@ -290,28 +282,118 @@ jobs:
             echo "all_exist=false" >> "$GITHUB_OUTPUT"
           fi
 
-  check-homebrew:
-    name: Check if Homebrew formula already published
+  check-hex:
+    name: Check Hex.pm for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_elixir == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: hex
+          package: html_to_markdown
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-homebrew:
+    name: Check Homebrew tap for formula
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_homebrew == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - name: Check Homebrew tap for formula
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
         with:
           registry: homebrew
           package: html-to-markdown
           version: ${{ needs.prepare.outputs.version }}
           tap-repo: kreuzberg-dev/homebrew-tap
 
+  check-cli:
+    name: Check GitHub Release for CLI assets
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_cli == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: github-release
+          package: html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repo: ${{ github.repository }}
+          tag: ${{ needs.prepare.outputs.tag }}
+          asset-prefix: cli-
+
+  check-go:
+    name: Check GitHub Release for Go FFI assets
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_go == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: github-release
+          package: html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repo: ${{ github.repository }}
+          tag: ${{ needs.prepare.outputs.tag }}
+          asset-prefix: html-to-markdown-rs-go-
+
+  check-c-ffi:
+    name: Check GitHub Release for C FFI assets
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_c_ffi == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: github-release
+          package: html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repo: ${{ github.repository }}
+          tag: ${{ needs.prepare.outputs.tag }}
+          asset-prefix: html-to-markdown-rs-ffi-
+
+  check-elixir-release:
+    name: Check GitHub Release for Elixir NIF assets
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_elixir == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: github-release
+          package: html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repo: ${{ github.repository }}
+          tag: ${{ needs.prepare.outputs.tag }}
+          asset-prefix: libhtml_to_markdown_nif-
+
+  # ─── Build matrix jobs ────────────────────────────────────────────────
+
   python-wheels:
     name: Build Python wheels (${{ matrix.os }})
-    needs: prepare
+    needs: [prepare, check-pypi]
+    if: ${{ needs.prepare.outputs.release_python == 'true' && (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
     env:
       # Required by cibuildwheel/delocate: the Rust-compiled .so/.dylib targets
       # macOS 10.12+ (default in modern toolchains). 10.9 was the legacy default
@@ -323,21 +405,18 @@ jobs:
         # windows-11-arm: cibuildwheel does not yet support aarch64-pc-windows-msvc target
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
 
       - name: Build wheels
-        uses: kreuzberg-dev/actions/build-python-wheels@v1 # v1
+        uses: kreuzberg-dev/actions/build-python-wheels@v1
         with:
           python-version: "3.13"
           package-dir: packages/python
@@ -361,8 +440,7 @@ jobs:
             python scripts\prepare_wheel.py
           upload-artifact: "false"
 
-      - name: Upload wheels
-        uses: actions/upload-artifact@v7 # v7
+      - uses: actions/upload-artifact@v7
         with:
           name: python-wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
@@ -370,122 +448,360 @@ jobs:
 
   python-sdist:
     name: Build Python sdist
-    needs: prepare
+    needs: [prepare, check-pypi]
+    if: ${{ needs.prepare.outputs.release_python == 'true' && (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Set up Python
-        uses: actions/setup-python@v6 # v6
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
-      - name: Install build dependencies
-        run: scripts/publish/python/install-build-deps.sh
+      - name: Build sdist via maturin
+        # Inline: maturin sdist is a one-liner; no shared action wraps it.
+        # The CLI binary is bundled into the sdist so it can be installed via pipx.
         shell: bash
+        run: |
+          python -m pip install --upgrade pip maturin
+          cargo build --release --package html-to-markdown-cli
+          mkdir -p packages/python/html_to_markdown/_cli
+          cp target/release/html-to-markdown packages/python/html_to_markdown/_cli/ 2>/dev/null \
+            || cp target/release/html-to-markdown.exe packages/python/html_to_markdown/_cli/
+          cd packages/python && maturin sdist --out dist/
 
-      - name: Build CLI binary for sdist
-        run: scripts/publish/python/build-cli-for-sdist.sh
-        shell: bash
-
-      - name: Prepare sdist with CLI
-        run: scripts/publish/python/prepare-sdist-with-cli.sh
-        shell: bash
-
-      - name: Build sdist
-        run: scripts/publish/python/build-sdist.sh
-        shell: bash
-
-      - name: Upload sdist
-        uses: actions/upload-artifact@v7 # v7
+      - uses: actions/upload-artifact@v7
         with:
           name: python-sdist
           path: packages/python/dist/*.tar.gz
           retention-days: 14
 
-  php-package:
-    name: Build PHP PIE binary (php${{ matrix.php }} ${{ matrix.platform.label }})
-    needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+  node-typescript-defs:
+    name: Generate Node TypeScript definitions
+    needs: [prepare, check-npm]
+    if: ${{ needs.prepare.outputs.release_node == 'true' && (needs.check-npm.outputs.node_exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+      - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+        with:
+          node-version: "24"
+
+      - name: Generate TypeScript definitions
+        # Inline: napi build produces index.js + index.d.ts as a side effect;
+        # we only need to copy them out and discard the binary. Tightly coupled
+        # to napi-rs convention.
+        shell: bash
+        run: |
+          pnpm --filter ./crates/html-to-markdown-node exec napi build --release
+          mkdir -p typescript-defs
+          cp crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts typescript-defs/
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-typescript-defs
+          path: typescript-defs/
+          retention-days: 14
+
+  node-bindings:
+    name: Build Node bindings (${{ matrix.target }})
+    needs: [prepare, check-npm]
+    if: ${{ needs.prepare.outputs.release_node == 'true' && (needs.check-npm.outputs.node_exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest, target: aarch64-apple-darwin, rust_target: "", use_napi_cross: false }
+          - { os: macos-15-intel, target: x86_64-apple-darwin, rust_target: "", use_napi_cross: false }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, rust_target: "", use_napi_cross: false }
+          - { os: ubuntu-latest, target: aarch64-unknown-linux-gnu, rust_target: aarch64-unknown-linux-gnu, use_napi_cross: true }
+          # musl + armv7 deferred — napi-cross artifact path mismatch ("No dist dir found") blocks every cross-compiled binding.
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, rust_target: "", use_napi_cross: false }
+          - { os: windows-latest, target: aarch64-pc-windows-msvc, rust_target: aarch64-pc-windows-msvc, use_napi_cross: false }
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: ${{ matrix.rust_target || matrix.target }}
+          cache-key-prefix: publish-node-${{ matrix.target }}
+
+      - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+        with:
+          node-version: "24"
+
+      - name: Build native module
+        # Inline: html-to-markdown's per-platform staging is too quirky for the
+        # generic build-node-napi action — we stage into npm/<platform>/, gate
+        # napi-cross for arm64 Linux, and tarball the result so the publish
+        # job can reassemble the optionalDependencies tree downstream.
+        if: runner.os != 'Windows'
+        env:
+          TARGET: ${{ matrix.target }}
+          USE_NAPI_CROSS: ${{ matrix.use_napi_cross }}
+        shell: bash
+        run: |
+          pnpm install --filter ./crates/html-to-markdown-node...
+          rm -rf crates/html-to-markdown-node/npm
+          cd crates/html-to-markdown-node
+          pnpm exec napi create-npm-dirs
+          if [[ "${USE_NAPI_CROSS}" == "true" ]]; then
+            pnpm exec napi build --release --target "${TARGET}" --platform --use-napi-cross --js index.js --dts index.d.ts
+          else
+            pnpm exec napi build --release --target "${TARGET}" --platform --js index.js --dts index.d.ts
+          fi
+          pnpm exec napi artifacts --dir . --npm-dir npm
+          cd ../..
+          tar -czf "node-bindings-${TARGET}.tar.gz" -C crates/html-to-markdown-node npm
+
+      - name: Build native module (Windows)
+        if: runner.os == 'Windows'
+        env:
+          TARGET: ${{ matrix.target }}
+          USE_NAPI_CROSS: ${{ matrix.use_napi_cross }}
+        shell: pwsh
+        run: |
+          pnpm install --filter ./crates/html-to-markdown-node...
+          if (Test-Path "crates/html-to-markdown-node/npm") { Remove-Item -Recurse -Force "crates/html-to-markdown-node/npm" }
+          Push-Location "crates/html-to-markdown-node"
+          pnpm exec napi create-npm-dirs
+          if ($env:USE_NAPI_CROSS -eq "true") {
+            pnpm exec napi build --release --target $env:TARGET --platform --use-napi-cross --js index.js --dts index.d.ts
+          } else {
+            pnpm exec napi build --release --target $env:TARGET --platform --js index.js --dts index.d.ts
+          }
+          pnpm exec napi artifacts --dir . --npm-dir npm
+          Pop-Location
+          tar -czf "node-bindings-$env:TARGET.tar.gz" -C "crates/html-to-markdown-node" npm
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: node-bindings-${{ matrix.target }}
+          path: node-bindings-${{ matrix.target }}.tar.gz
+          retention-days: 14
+
+  wasm-bindings:
+    name: Build WASM package
+    needs: [prepare, check-wasm]
+    if: ${{ needs.prepare.outputs.release_wasm == 'true' && (needs.check-wasm.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: wasm32-unknown-unknown
+          cache-key-prefix: publish-wasm
+
+      - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+        with:
+          node-version: "24"
+
+      - uses: kreuzberg-dev/actions/build-wasm-package@v1
+        with:
+          crate-dir: crates/html-to-markdown-wasm
+          pack-tarball: "false"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wasm-bundle
+          path: |
+            crates/html-to-markdown-wasm/dist/**
+            crates/html-to-markdown-wasm/dist-node/**
+            crates/html-to-markdown-wasm/dist-web/**
+            crates/html-to-markdown-wasm/pkg/**
+            crates/html-to-markdown-wasm/package.json
+          retention-days: 14
+
+  ruby-gem:
+    name: Build Ruby gem (${{ matrix.label }})
+    needs: [prepare, check-rubygems]
+    if: ${{ needs.prepare.outputs.release_ruby == 'true' && (needs.check-rubygems.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    env:
+      RB_SYS_CARGO_PROFILE: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, label: linux }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64 }
+          - { os: macos-latest, label: macos-arm64 }
+          - { os: macos-15-intel, label: macos-x86_64 }
+          - { os: windows-latest, label: windows-x64 }
+          # windows-11-arm: deferred until rb-sys + Magnus toolchain validated on aarch64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - name: Drop cached CLI binaries
+        # Inline: stale CLI artifacts under packages/ruby/exe/ confuse rake
+        # build's filtering. One-shot cleanup, no shared action equivalent.
+        shell: bash
+        run: rm -rf packages/ruby/exe/* packages/ruby/pkg
+
+      - name: Install MSYS2 toolchain (Windows)
+        if: runner.os == 'Windows'
+        # Inline: rb-sys requires the MSYS2 toolchain on Windows for clang +
+        # libffi headers. Magnus also needs ucrt64-prefixed binaries on PATH.
+        shell: pwsh
+        run: |
+          ridk install 1 2 3
+          $msys2Path = (ridk version).Split("`n") | Where-Object { $_ -match "msys2:" } | ForEach-Object { ($_ -split ":\s*")[1].Trim() }
+          if (-not $msys2Path) { $msys2Path = "C:\msys64" }
+          ridk exec pacman -S --noconfirm --needed mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-libffi
+          "$msys2Path\ucrt64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Install Rust (GNU on Windows)
+        if: runner.os == 'Windows'
+        # Inline: rb-sys/Magnus only build against the GNU ABI on Windows; the
+        # default MSVC toolchain produces incompatible artifacts.
+        shell: pwsh
+        run: |
+          rustup install stable-x86_64-pc-windows-gnu
+          rustup default stable-x86_64-pc-windows-gnu
+          rustup target add x86_64-pc-windows-gnu
+          rustc --version
+
+      - name: Configure bindgen sysroot (Windows)
+        if: runner.os == 'Windows'
+        # Inline: bindgen needs an explicit libclang sysroot pointing at the
+        # MSYS2 ucrt64 install — discovery fails on the GitHub runner image.
+        shell: bash
+        run: |
+          UCRT="/c/msys64/ucrt64"
+          echo "BINDGEN_EXTRA_CLANG_ARGS=--sysroot=${UCRT} -I${UCRT}/include" >>"$GITHUB_ENV"
+          echo "LIBCLANG_PATH=${UCRT}/bin" >>"$GITHUB_ENV"
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        if: runner.os != 'Windows'
+        with:
+          cache-key-prefix: publish-ruby-${{ matrix.label }}
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler: "4.0.3"
+          bundler-cache: false
+
+      - name: Install Ruby dependencies
+        # Inline: bundle config + install in the package dir; trivially small
+        # and identical across kreuzcrawl/kreuzberg/html-to-markdown.
+        shell: bash
+        working-directory: packages/ruby
+        run: |
+          gem install bundler -v 4.0.3
+          bundle config set --local path 'vendor/bundle'
+          bundle install --jobs 4 --retry 3
+
+      - uses: kreuzberg-dev/actions/build-ruby-gem@v1
+        with:
+          package-dir: packages/ruby
+
+      - name: Build platform gem
+        # Inline: rb-sys's rake tasks are platform-dependent. cross-gem on Linux
+        # produces native gems for the target triple; native build on macOS/Windows
+        # builds in-place. No shared action wraps both code paths.
+        working-directory: packages/ruby
+        shell: bash
+        run: |
+          if [[ "${RUNNER_OS}" == "Linux" ]]; then
+            bundle exec rake "native[${{ matrix.label == 'linux-aarch64' && 'aarch64-linux' || 'x86_64-linux' }}]" gem
+          else
+            bundle exec rake build
+          fi
+
+      - name: Drop source gem on non-canonical builders
+        if: ${{ matrix.label != 'linux' }}
+        # Inline: only the canonical `linux` builder ships the source gem; others
+        # would emit byte-different source gems that overwrite each other under
+        # merge-multiple and produce an invalid .gem at publish time.
+        shell: bash
+        run: |
+          shopt -s nullglob
+          for f in packages/ruby/pkg/*.gem; do
+            base="$(basename "$f")"
+            case "$base" in
+              *-x86_64-linux.gem|*-aarch64-linux.gem|*-arm64-darwin.gem|*-x86_64-darwin.gem|*-x64-mingw32.gem|*-x64-mingw-ucrt.gem|*-arm64-mingw-ucrt.gem) ;;
+              *) echo "Removing non-canonical source gem $base"; rm -f "$f" ;;
+            esac
+          done
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: rubygems-${{ matrix.label }}
+          path: packages/ruby/pkg/*.gem
+          retention-days: 14
+
+  php-extension:
+    name: Build PHP extension (php${{ matrix.php }} ${{ matrix.platform.label }})
+    needs: [prepare, check-packagist]
+    if: ${{ needs.prepare.outputs.release_php == 'true' && (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
-    permissions:
-      contents: read
     strategy:
       fail-fast: false
       matrix:
         php: ["8.2", "8.3", "8.4", "8.5"]
         platform:
-          - os: ubuntu-latest
-            label: linux-x86_64
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-24.04-arm
-            label: linux-arm64
-            target: aarch64-unknown-linux-gnu
-          - os: macos-latest
-            label: macos-arm64
-            target: aarch64-apple-darwin
-          - os: macos-15-intel
-            label: macos-x86_64
-            target: x86_64-apple-darwin
-          - os: windows-latest
-            label: windows-x86_64
-            target: x86_64-pc-windows-msvc
+          - { os: ubuntu-latest, label: linux-x86_64, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, label: linux-arm64, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, label: macos-x86_64, target: x86_64-apple-darwin }
+          - { os: windows-latest, label: windows-x86_64, target: x86_64-pc-windows-msvc }
           # windows-arm64: deferred until ext-php-rs cross-compile to aarch64-pc-windows-msvc is validated
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup PHP
-        uses: kreuzberg-dev/actions/setup-php@v1 # v1
+      - uses: kreuzberg-dev/actions/setup-php@v1
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+      - uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           cache-key-prefix: publish-php-${{ matrix.platform.label }}-php${{ matrix.php }}
-          toolchain: stable
 
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+      - uses: kreuzberg-dev/actions/install-alef@v1
 
-      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
-        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
-        shell: bash
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
-            | tar xz --strip-components=1 -C "$HOME/.local/bin"
-          chmod +x "$HOME/.local/bin/alef"
-          "$HOME/.local/bin/alef" --version
-
-      - name: Build PHP extension
-        uses: kreuzberg-dev/actions/build-php-extension@v1 # v1
+      - uses: kreuzberg-dev/actions/build-php-extension@v1
         with:
           crate-name: html-to-markdown-php
           lib-name: html_to_markdown_php
@@ -506,8 +822,7 @@ jobs:
           }
           "compiler=$compiler" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-      - name: Package PIE archive
-        uses: kreuzberg-dev/actions/package-php-pie@v1 # v1
+      - uses: kreuzberg-dev/actions/package-php-pie@v1
         with:
           php-version: ${{ matrix.php }}
           php-ts: nts
@@ -516,8 +831,7 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
           output-dir: dist/php-package
 
-      - name: Upload PHP PIE package artifact
-        uses: actions/upload-artifact@v7 # v7
+      - uses: actions/upload-artifact@v7
         with:
           name: php-package-${{ matrix.platform.label }}-php${{ matrix.php }}
           path: |
@@ -527,1336 +841,827 @@ jobs:
             dist/php-package/php_*.zip.sha256
           retention-days: 14
 
-  node-typescript-defs:
-    name: Generate Node TypeScript definitions
-    needs: prepare
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Setup Node
-        uses: actions/setup-node@v6 # v6
-        with:
-          node-version: 24
-          check-latest: true
-
-      - name: Enable corepack
-        run: scripts/common/enable-corepack.sh
-        shell: bash
-
-      - name: Install Node dependencies
-        run: scripts/publish/node/install-node-deps.sh
-        shell: bash
-
-      - name: Generate TypeScript definitions
-        run: scripts/publish/node/generate-typescript-defs.sh
-        shell: bash
-
-      - name: Upload TypeScript definitions
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: node-typescript-defs
-          path: typescript-defs/
-          retention-days: 14
-
-  node-bindings:
-    name: Build Node bindings (${{ matrix.target }})
-    needs: prepare
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            rust_target: ""
-            use_cross: false
-            use_napi_cross: false
-          - os: macos-15-intel
-            target: x86_64-apple-darwin
-            rust_target: ""
-            use_cross: false
-            use_napi_cross: false
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            rust_target: ""
-            use_cross: false
-            use_napi_cross: false
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            rust_target: aarch64-unknown-linux-gnu
-            use_cross: false
-            use_napi_cross: true
-          # musl + armv7 targets deferred — napi-cross artifact path mismatch ("No dist dir found")
-          # blocks every cross-compiled binding.  Track in a follow-up rc once the napi build
-          # output convention is stabilised.
-          # - os: ubuntu-latest
-          #   target: x86_64-unknown-linux-musl
-          # - os: ubuntu-latest
-          #   target: aarch64-unknown-linux-musl
-          # - os: ubuntu-latest
-          #   target: armv7-unknown-linux-gnueabihf
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            rust_target: ""
-            use_cross: false
-            use_napi_cross: false
-          - os: windows-latest
-            target: aarch64-pc-windows-msvc
-            rust_target: aarch64-pc-windows-msvc
-            use_cross: false
-            use_napi_cross: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Add Rust target
-        if: ${{ matrix.rust_target != '' }}
-        env:
-          RUST_TARGET: ${{ matrix.rust_target }}
-        run: scripts/publish/common/add-rust-target.sh
-        shell: bash
-
-      - name: Install cross
-        if: ${{ matrix.use_cross }}
-        run: scripts/publish/cli/install-cross.sh
-        shell: bash
-
-      - name: Setup Node
-        uses: actions/setup-node@v6 # v6
-        with:
-          node-version: 24
-          check-latest: true
-
-      - name: Enable corepack
-        run: scripts/common/enable-corepack.sh
-        shell: bash
-
-      - name: Install Node dependencies
-        run: scripts/publish/node/install-node-deps.sh
-        shell: bash
-
-      - name: Clean npm directory
-        if: runner.os != 'Windows'
-        run: scripts/publish/node/clean-npm-dir.sh
-        shell: bash
-
-      - name: Clean npm directory (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: scripts/publish/node/clean-npm-dir.ps1
-
-      - name: Create npm package structure
-        run: scripts/publish/node/create-npm-package-structure.sh
-        shell: bash
-
-      - name: Build native module
-        if: runner.os != 'Windows'
-        env:
-          TARGET: ${{ matrix.target }}
-          USE_CROSS: ${{ matrix.use_cross }}
-          USE_NAPI_CROSS: ${{ matrix.use_napi_cross }}
-        shell: bash
-        run: scripts/publish/node/build-native-module.sh
-
-      - name: Build native module (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        env:
-          TARGET: ${{ matrix.target }}
-          USE_CROSS: ${{ matrix.use_cross }}
-          USE_NAPI_CROSS: ${{ matrix.use_napi_cross }}
-        run: scripts/publish/node/build-native-module.ps1
-
-      - name: Package artifacts
-        if: runner.os != 'Windows'
-        env:
-          TARGET: ${{ matrix.target }}
-        run: scripts/publish/node/package-artifacts.sh
-        shell: bash
-
-      - name: Package artifacts (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        env:
-          TARGET: ${{ matrix.target }}
-        run: scripts/publish/node/package-artifacts.ps1
-
-      - name: Upload Node artifact
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: node-bindings-${{ matrix.target }}
-          path: node-bindings-${{ matrix.target }}.tar.gz
-          retention-days: 14
-
-  wasm-bindings:
-    name: Build WASM bindings
-    needs: prepare
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Add wasm32 target
-        run: scripts/common/ensure-wasm-target.sh
-        shell: bash
-
-      - name: Install wasm-pack
-        run: scripts/common/install-wasm-pack.sh
-        shell: bash
-
-      - name: Setup Node
-        uses: actions/setup-node@v6 # v6
-        with:
-          node-version: 24
-          check-latest: true
-
-      - name: Enable corepack
-        run: scripts/common/enable-corepack.sh
-        shell: bash
-
-      - name: Install dependencies
-        run: scripts/publish/wasm/install-deps.sh
-        shell: bash
-
-      - name: Build WASM bundles
-        run: scripts/publish/wasm/build-bundles.sh
-        shell: bash
-
-      - name: Package WASM artifacts
-        run: scripts/publish/wasm/package-artifacts.sh
-        shell: bash
-
-      - name: Upload WASM artifacts
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: wasm-bundles
-          path: wasm-artifacts/*
-          retention-days: 14
-
   cli-binaries:
-    name: Build CLI binaries (${{ matrix.target }})
-    needs: prepare
+    name: Build CLI binary (${{ matrix.target }})
+    needs: [prepare, check-cli]
+    if: ${{ needs.prepare.outputs.release_cli == 'true' && (needs.check-cli.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            use_cross: false
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            use_cross: false
-          - os: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-gnu
-            use_cross: false
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            use_cross: false
-          - os: macos-15-intel
-            target: x86_64-apple-darwin
-            use_cross: false
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            use_cross: false
-          - os: windows-11-arm
-            target: aarch64-pc-windows-msvc
-            use_cross: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Add compilation target
-        env:
-          RUST_TARGET: ${{ matrix.target }}
-        run: scripts/publish/common/add-rust-target.sh
-        shell: bash
-
-      - name: Install build dependencies
-        if: runner.os == 'Linux'
-        env:
-          TARGET: ${{ matrix.target }}
-        run: scripts/publish/cli/install-build-deps-linux.sh
-        shell: bash
-
-      - name: Configure cross linker
-        if: ${{ matrix.target == 'aarch64-unknown-linux-gnu' }}
-        env:
-          TARGET: ${{ matrix.target }}
-        run: scripts/publish/cli/configure-cross-linker.sh
-        shell: bash
-
-      - name: Install cross
-        if: ${{ matrix.use_cross }}
-        run: scripts/publish/cli/install-cross.sh
-        shell: bash
-
-      - name: Build CLI
-        shell: bash
-        env:
-          TARGET: ${{ matrix.target }}
-          USE_CROSS: ${{ matrix.use_cross }}
-        run: scripts/publish/cli/build-cli.sh
-
-      - name: Package CLI artifact
-        if: runner.os != 'Windows'
-        shell: bash
-        env:
-          TARGET: ${{ matrix.target }}
-        run: scripts/publish/cli/package-cli-artifact.sh
-
-      - name: Package CLI artifact (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        env:
-          TARGET: ${{ matrix.target }}
-        run: scripts/publish/cli/package-cli-artifact.ps1
-
-      - name: Upload CLI artifact
-        if: runner.os != 'Windows'
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: cli-${{ matrix.target }}
-          path: cli-${{ matrix.target }}.tar.gz
-          retention-days: 14
-
-      - name: Upload CLI artifact (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: cli-${{ matrix.target }}
-          path: cli-${{ matrix.target }}.zip
-          retention-days: 14
-
-  ruby-gem:
-    name: Build Ruby gem (${{ matrix.label }})
-    needs: prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            label: linux
-          - os: ubuntu-24.04-arm
-            label: linux-aarch64
-          - os: macos-latest
-            label: macos-arm64
-          - os: macos-15-intel
-            label: macos-x86_64
-          - os: windows-latest
-            label: windows-x64
-          # windows-11-arm: deferred until rb-sys + Magnus toolchain validated on aarch64-pc-windows-msvc
-    runs-on: ${{ matrix.os }}
-    env:
-      RB_SYS_CARGO_PROFILE: release
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Remove cached CLI binaries
-        shell: bash
-        run: scripts/publish/ruby/remove-cached-cli.sh
-
-      - name: Install MSYS2 toolchain
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: scripts/publish/ruby/install-msys2-toolchain.ps1
-
-      - name: Install Rust (GNU on Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: scripts/publish/ruby/install-rust-gnu.ps1
-
-      - name: Configure bindgen sysroot (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: scripts/publish/ruby/configure-bindgen-windows.sh
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1 # v1
-        with:
-          ruby-version: "3.3"
-          bundler: "4.0.3"
-          bundler-cache: false
-
-      - name: Install Ruby dependencies (Unix)
-        if: runner.os != 'Windows'
-        run: scripts/publish/ruby/install-deps-unix.sh
-        shell: bash
-
-      - name: Install Ruby dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: scripts/publish/ruby/install-deps-windows.ps1
-
-      - name: Build gem artifacts (Unix)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: scripts/publish/ruby/build-gem-unix.sh
-
-      - name: Build gem artifacts (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: scripts/publish/ruby/build-gem-windows.ps1
-
-      # Only the canonical `linux` builder ships the source gem; other matrix
-      # entries would emit byte-different source gems (line endings, ext-rb
-      # contents, vendor layout) that overwrite each other under merge-multiple
-      # and produce an invalid .gem at publish time. Their native platform
-      # gems (.gem with platform suffix) are still uploaded.
-      - name: Drop source gem on non-canonical builders
-        if: ${{ matrix.label != 'linux' }}
-        shell: bash
-        run: |
-          shopt -s nullglob
-          for f in packages/ruby/pkg/*.gem; do
-            base="$(basename "$f")"
-            case "$base" in
-              *-x86_64-linux.gem|*-aarch64-linux.gem|*-arm64-darwin.gem|*-x86_64-darwin.gem|*-x64-mingw32.gem|*-x64-mingw-ucrt.gem|*-arm64-mingw-ucrt.gem) ;;
-              *) echo "Removing non-canonical source gem $base"; rm -f "$f" ;;
-            esac
-          done
-
-      - name: Upload gem artifacts
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: rubygems-${{ matrix.label }}
-          path: packages/ruby/pkg/*.gem
-          retention-days: 14
-
-  elixir-natives:
-    name: Build Elixir native libs (${{ matrix.settings.label }})
-    needs: [prepare]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
-    runs-on: ${{ matrix.settings.os }}
     timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
-        settings:
-          - os: ubuntu-24.04-arm
-            label: linux-aarch64
-            target: aarch64-unknown-linux-gnu
-          - os: ubuntu-latest
-            label: linux-x86_64
-            target: x86_64-unknown-linux-gnu
-          - os: macos-latest
-            label: macos-arm64
-            target: aarch64-apple-darwin
-          - os: macos-15-intel
-            label: macos-x86_64
-            target: x86_64-apple-darwin
+        include:
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-musl }
+          - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, target: x86_64-apple-darwin }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: windows-11-arm, target: aarch64-pc-windows-msvc }
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.ref }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - name: Install musl tools
+        if: ${{ matrix.target == 'x86_64-unknown-linux-musl' }}
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          target: ${{ matrix.settings.target }}
+          target: ${{ matrix.target }}
+          cache-key-prefix: publish-cli-${{ matrix.target }}
 
-      - name: Build Elixir NIF
+      - uses: kreuzberg-dev/actions/build-rust-cli@v1
+        id: build
+        with:
+          package-name: html-to-markdown-cli
+          binary-name: html-to-markdown
+          target: ${{ matrix.target }}
+
+      - name: Package CLI artifact
+        # Inline: archive layout (.tar.gz on Unix, .zip on Windows) varies per
+        # OS in a way no shared action covers; tiny and self-contained.
         env:
-          CARGO_BUILD_TARGET: ${{ matrix.settings.target }}
-        run: cargo build --release --target ${{ matrix.settings.target }} --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
-
-      - name: Package NIF (NIF 2.16)
+          BINARY_PATH: ${{ steps.build.outputs.binary-path }}
+          TARGET: ${{ matrix.target }}
         shell: bash
         run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          TARGET="${{ matrix.settings.target }}"
-          NIF_VERSION="2.16"
-          NIF_DIR="packages/elixir/native/html_to_markdown_nif"
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            LIB_NAME="libhtml_to_markdown_nif.dylib"; EXT="so"
+          STAGE="cli-${TARGET}"
+          mkdir -p "$STAGE"
+          cp LICENSE "$STAGE/" 2>/dev/null || true
+          cp README.md "$STAGE/" 2>/dev/null || true
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            cp "$BINARY_PATH" "$STAGE/html-to-markdown.exe"
+            7z a "${STAGE}.zip" "$STAGE" >/dev/null
           else
-            LIB_NAME="libhtml_to_markdown_nif.so"; EXT="so"
+            cp "$BINARY_PATH" "$STAGE/html-to-markdown"
+            tar -czf "${STAGE}.tar.gz" "$STAGE"
           fi
-          mkdir -p dist/elixir
-          ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${EXT}"
-          LIB_PATH="${NIF_DIR}/target/${TARGET}/release/${LIB_NAME}"
-          [[ ! -f "$LIB_PATH" ]] && LIB_PATH="${NIF_DIR}/target/release/${LIB_NAME}"
-          cp "$LIB_PATH" "${ARTIFACT}"
-          tar -czf "dist/elixir/${ARTIFACT}.tar.gz" "${ARTIFACT}"
 
-      - name: Package NIF (NIF 2.17)
-        shell: bash
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          TARGET="${{ matrix.settings.target }}"
-          NIF_VERSION="2.17"
-          NIF_DIR="packages/elixir/native/html_to_markdown_nif"
-          if [[ "${{ runner.os }}" == "macOS" ]]; then
-            LIB_NAME="libhtml_to_markdown_nif.dylib"; EXT="so"
-          else
-            LIB_NAME="libhtml_to_markdown_nif.so"; EXT="so"
-          fi
-          ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${EXT}"
-          LIB_PATH="${NIF_DIR}/target/${TARGET}/release/${LIB_NAME}"
-          [[ ! -f "$LIB_PATH" ]] && LIB_PATH="${NIF_DIR}/target/release/${LIB_NAME}"
-          cp "$LIB_PATH" "${ARTIFACT}"
-          tar -czf "dist/elixir/${ARTIFACT}.tar.gz" "${ARTIFACT}"
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
-          name: elixir-${{ matrix.settings.label }}
-          path: dist/elixir/*.tar.gz
-          if-no-files-found: error
-          retention-days: 1
+          name: cli-${{ matrix.target }}
+          path: |
+            cli-${{ matrix.target }}.tar.gz
+            cli-${{ matrix.target }}.zip
+          if-no-files-found: ignore
+          retention-days: 14
 
-  upload-elixir-release:
-    name: Upload Elixir NIF binaries to GitHub Release
-    needs: [prepare, elixir-natives]
-    if: ${{ always() && needs.prepare.outputs.is_tag == 'true' && needs.elixir-natives.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-
-      - name: Download Elixir NIF artifacts
-        uses: actions/download-artifact@v8
-        with:
-          pattern: elixir-*
-          path: dist/elixir
-          merge-multiple: true
-
-      - name: Upload to GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG="${{ needs.prepare.outputs.tag }}"
-          for file in dist/elixir/*.tar.gz; do
-            echo "Uploading $(basename "$file")..."
-            gh release upload "$TAG" "$file" --clobber
-          done
-
-  elixir-package:
-    name: Build Elixir Hex package (${{ matrix.label }})
-    needs: prepare
+  go-ffi-libraries:
+    name: Build Go FFI library (${{ matrix.platform }})
+    needs: [prepare, check-go]
+    if: ${{ needs.prepare.outputs.release_go == 'true' && (needs.check-go.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            label: linux
-            build_hex: true
-          - os: macos-latest
-            label: macos
-            build_hex: false
-    runs-on: ${{ matrix.os }}
-    env:
-      MIX_ENV: dev
+          - { os: ubuntu-latest, platform: linux-x64, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, platform: linux-arm64, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, platform: darwin-arm64, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, platform: darwin-x64, target: x86_64-apple-darwin }
+          - { os: windows-latest, platform: windows-x64, target: x86_64-pc-windows-msvc }
+          - { os: windows-11-arm, platform: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
 
-      - name: Setup Elixir
-        uses: erlef/setup-beam@v1 # v1
+      - uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          elixir-version: "1.19"
-          otp-version: "28.1"
+          target: ${{ matrix.target }}
+          cache-key-prefix: publish-go-${{ matrix.platform }}
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Install Hex and Rebar
-        run: scripts/publish/elixir/install-hex-rebar.sh
-        shell: bash
-
-      - name: Install dependencies
-        run: scripts/publish/elixir/install-deps.sh
-        shell: bash
-
-      - name: Run Elixir tests
-        run: scripts/publish/elixir/run-tests.sh
-        shell: bash
-
-      - name: Build Hex package
-        if: ${{ matrix.build_hex }}
-        run: scripts/publish/elixir/build-hex-package.sh
-        shell: bash
-
-      - name: Upload Hex artifact
-        if: ${{ matrix.build_hex }}
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: elixir-hex-package
-          path: packages/elixir/html_to_markdown-*.tar
-          retention-days: 14
-
-  csharp-package:
-    name: Build C# NuGet package
-    needs: [prepare, check-nuget, csharp-ffi]
-    if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-nuget.outputs.exists != 'true' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5 # v5
-        with:
-          dotnet-version: "8.0.x"
-
-      - name: Download C# native FFI libraries
-        uses: actions/download-artifact@v8 # v8
-        with:
-          pattern: csharp-ffi-*
-          path: dist/csharp-ffi
-          merge-multiple: true
-
-      - name: Install dependencies
-        run: scripts/publish/csharp/restore.sh packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj
-        shell: bash
-
-      - name: Pack NuGet package
-        run: scripts/publish/csharp/pack.sh
-        shell: bash
-
-      - name: Upload NuGet artifact
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: csharp-nuget
-          path: artifacts/csharp/*.nupkg
-          retention-days: 14
-
-  csharp-ffi:
-    name: Build C# native FFI libraries
-    needs: [prepare, check-nuget]
-    if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-nuget.outputs.exists != 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            rid: linux-x64
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-24.04-arm
-            rid: linux-arm64
-            target: aarch64-unknown-linux-gnu
-          - os: windows-latest
-            rid: win-x64
-            target: x86_64-pc-windows-msvc
-          - os: windows-11-arm
-            rid: win-arm64
-            target: aarch64-pc-windows-msvc
-          - os: macos-latest
-            rid: osx-arm64
-            target: aarch64-apple-darwin
-          - os: macos-15-intel
-            rid: osx-x64
-            target: x86_64-apple-darwin
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
-      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
-        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
-        shell: bash
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
-            | tar xz --strip-components=1 -C "$HOME/.local/bin"
-          chmod +x "$HOME/.local/bin/alef"
-          "$HOME/.local/bin/alef" --version
-
-      - name: Build and stage FFI library
-        shell: bash
-        run: |
-          alef publish build --lang ffi --target ${{ matrix.target }}
-          mkdir -p dist/csharp-ffi/${{ matrix.rid }}/native
-          # `alef publish build --target X` puts artifacts in target/<X>/release/.
-          # Also fall back to target/release/ in case alef built natively.
-          for src in "target/${{ matrix.target }}/release" "target/release"; do
-            [[ -d "$src" ]] || continue
-            find "$src" -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) -name '*html_to_markdown_ffi*' -exec cp {} dist/csharp-ffi/${{ matrix.rid }}/native/ \;
-          done
-          ls -la dist/csharp-ffi/${{ matrix.rid }}/native/
-
-      - name: Upload FFI artifact
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: csharp-ffi-${{ matrix.rid }}
-          path: dist/csharp-ffi
-          retention-days: 14
-          if-no-files-found: error
-
-  go-ffi:
-    name: Build Go native FFI libraries (${{ matrix.platform }})
-    needs: prepare
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux-x64
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-24.04-arm
-            platform: linux-arm64
-            target: aarch64-unknown-linux-gnu
-          - os: windows-latest
-            platform: windows-x64
-            target: x86_64-pc-windows-msvc
-          - os: windows-11-arm
-            platform: windows-arm64
-            target: aarch64-pc-windows-msvc
-          - os: macos-latest
-            platform: darwin-arm64
-            target: aarch64-apple-darwin
-          - os: macos-15-intel
-            platform: darwin-x64
-            target: x86_64-apple-darwin
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
-      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
-        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
-        shell: bash
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
-            | tar xz --strip-components=1 -C "$HOME/.local/bin"
-          chmod +x "$HOME/.local/bin/alef"
-          "$HOME/.local/bin/alef" --version
+      - uses: kreuzberg-dev/actions/install-alef@v1
 
       - name: Build and package Go FFI library
+        # Inline: html-to-markdown's FFI build is driven by `alef publish` rather
+        # than the generic build-go-ffi action — the alef driver knows about
+        # workspace features, header generation, and the platform-specific
+        # cgo include paths the package layout expects.
         shell: bash
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang go --target ${{ matrix.target }} -o dist/go-ffi
 
-      - name: Upload Go FFI artifact
-        uses: actions/upload-artifact@v7 # v7
+      - uses: actions/upload-artifact@v7
         with:
           name: go-ffi-${{ matrix.platform }}
           path: dist/go-ffi
           retention-days: 14
 
   c-ffi-libraries:
-    name: Build C FFI distribution packages (${{ matrix.platform }})
-    needs: prepare
+    name: Build C FFI distribution (${{ matrix.platform }})
+    needs: [prepare, check-c-ffi]
+    if: ${{ needs.prepare.outputs.release_c_ffi == 'true' && (needs.check-c-ffi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            platform: linux-x64
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-24.04-arm
-            platform: linux-arm64
-            target: aarch64-unknown-linux-gnu
-          - os: windows-latest
-            platform: windows-x64
-            target: x86_64-pc-windows-msvc
-          - os: windows-11-arm
-            platform: windows-arm64
-            target: aarch64-pc-windows-msvc
-          - os: macos-latest
-            platform: darwin-arm64
-            target: aarch64-apple-darwin
-          - os: macos-15-intel
-            platform: darwin-x64
-            target: x86_64-apple-darwin
-    runs-on: ${{ matrix.os }}
+          - { os: ubuntu-latest, platform: linux-x64, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, platform: linux-arm64, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, platform: darwin-arm64, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, platform: darwin-x64, target: x86_64-apple-darwin }
+          - { os: windows-latest, platform: windows-x64, target: x86_64-pc-windows-msvc }
+          - { os: windows-11-arm, platform: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: ${{ matrix.target }}
+          cache-key-prefix: publish-c-ffi-${{ matrix.platform }}
 
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
-      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
-        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
-        shell: bash
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
-            | tar xz --strip-components=1 -C "$HOME/.local/bin"
-          chmod +x "$HOME/.local/bin/alef"
-          "$HOME/.local/bin/alef" --version
+      - uses: kreuzberg-dev/actions/install-alef@v1
 
       - name: Build and package C FFI distribution
+        # Inline: alef-driven FFI packaging emits the pkgconfig + cmake metadata
+        # the homebrew formula expects. The generic build-rust-ffi action
+        # produces only the .so/.dylib/.dll without that scaffolding.
         shell: bash
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang ffi --target ${{ matrix.target }} -o dist/c-ffi
 
-      - name: Upload C FFI artifact
-        uses: actions/upload-artifact@v7 # v7
+      - uses: actions/upload-artifact@v7
         with:
           name: c-ffi-${{ matrix.platform }}
           path: dist/c-ffi
           retention-days: 14
 
-  cargo-packages:
-    name: Package Rust crates
-    needs: prepare
-    runs-on: ubuntu-latest
+  java-natives:
+    name: Build Java FFI library (${{ matrix.platform }})
+    needs: [prepare, check-maven]
+    if: ${{ needs.prepare.outputs.release_java == 'true' && (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: linux-x86_64, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, platform: linux-aarch64, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, platform: osx-aarch64, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, platform: osx-x86_64, target: x86_64-apple-darwin }
+          - { os: windows-latest, platform: windows-x86_64, target: x86_64-pc-windows-msvc }
+          - { os: windows-11-arm, platform: windows-aarch64, target: aarch64-pc-windows-msvc }
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          submodules: recursive
 
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: ${{ matrix.target }}
+          cache-key-prefix: publish-java-${{ matrix.platform }}
+
+      - uses: kreuzberg-dev/actions/install-alef@v1
+
+      - name: Build and stage FFI library
+        # Inline: html-to-markdown reuses the C FFI library for Java (Panama),
+        # so it builds via `alef publish build --lang ffi` and stages the .so/
+        # .dylib/.dll into a per-platform directory the publish-maven job
+        # collects into Maven resources. The build-java-natives shared action
+        # targets repos with a dedicated jni crate, which we don't have.
+        shell: bash
+        run: |
+          alef publish build --lang ffi --target ${{ matrix.target }}
+          mkdir -p "dist/java-ffi/${{ matrix.platform }}/native"
+          for src in "target/${{ matrix.target }}/release" "target/release"; do
+            [[ -d "$src" ]] || continue
+            find "$src" -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) -name '*html_to_markdown_ffi*' -exec cp {} "dist/java-ffi/${{ matrix.platform }}/native/" \;
+          done
+          ls -la "dist/java-ffi/${{ matrix.platform }}/native/"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: java-ffi-${{ matrix.platform }}
+          path: dist/java-ffi
+          if-no-files-found: error
+          retention-days: 14
+
+  csharp-natives:
+    name: Build C# FFI library (${{ matrix.rid }})
+    needs: [prepare, check-nuget]
+    if: ${{ needs.prepare.outputs.release_csharp == 'true' && (needs.check-nuget.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, rid: linux-x64, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, rid: linux-arm64, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, rid: osx-arm64, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, rid: osx-x64, target: x86_64-apple-darwin }
+          - { os: windows-latest, rid: win-x64, target: x86_64-pc-windows-msvc }
+          - { os: windows-11-arm, rid: win-arm64, target: aarch64-pc-windows-msvc }
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: ${{ matrix.target }}
+          cache-key-prefix: publish-csharp-${{ matrix.rid }}
+
+      - uses: kreuzberg-dev/actions/install-alef@v1
+
+      - name: Build and stage FFI library
+        # Inline: html-to-markdown reuses the C FFI library for C# (P/Invoke),
+        # so it builds via `alef publish build --lang ffi` and stages the .so/
+        # .dylib/.dll into runtimes/<rid>/native/ for NuGet packaging. The
+        # build-csharp-natives shared action targets repos with a dedicated
+        # csharp interop crate, which we don't have.
+        shell: bash
+        run: |
+          alef publish build --lang ffi --target ${{ matrix.target }}
+          mkdir -p "dist/csharp-ffi/${{ matrix.rid }}/native"
+          for src in "target/${{ matrix.target }}/release" "target/release"; do
+            [[ -d "$src" ]] || continue
+            find "$src" -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) -name '*html_to_markdown_ffi*' -exec cp {} "dist/csharp-ffi/${{ matrix.rid }}/native/" \;
+          done
+          ls -la "dist/csharp-ffi/${{ matrix.rid }}/native/"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: csharp-ffi-${{ matrix.rid }}
+          path: dist/csharp-ffi
+          if-no-files-found: error
+          retention-days: 14
+
+  elixir-natives:
+    name: Build Elixir NIF (${{ matrix.label }})
+    needs: [prepare, check-elixir-release]
+    if: ${{ needs.prepare.outputs.release_elixir == 'true' && (needs.check-elixir-release.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, label: linux-x86_64, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
+          - { os: macos-15-intel, label: macos-x86_64, target: x86_64-apple-darwin }
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          target: ${{ matrix.target }}
+          cache-key-prefix: publish-elixir-${{ matrix.label }}
+
+      - name: Build NIF
+        # Inline: rustler_precompiled expects flat .so/.dylib artifacts named
+        # libhtml_to_markdown_nif-vVERSION-nif-NIF-TARGET. We build once and
+        # tarball under both supported NIF API versions (2.16 and 2.17).
         env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
+          TARGET: ${{ matrix.target }}
+          VERSION: ${{ needs.prepare.outputs.version }}
         shell: bash
+        run: |
+          cargo build --release --target "${TARGET}" \
+            --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
+          NIF_DIR="packages/elixir/native/html_to_markdown_nif"
+          if [[ "${RUNNER_OS}" == "macOS" ]]; then
+            LIB_NAME="libhtml_to_markdown_nif.dylib"
+          else
+            LIB_NAME="libhtml_to_markdown_nif.so"
+          fi
+          LIB_PATH="${NIF_DIR}/target/${TARGET}/release/${LIB_NAME}"
+          [[ -f "$LIB_PATH" ]] || LIB_PATH="${NIF_DIR}/target/release/${LIB_NAME}"
+          mkdir -p dist/elixir
+          for NIF_VERSION in 2.16 2.17; do
+            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so"
+            cp "$LIB_PATH" "${ARTIFACT}"
+            tar -czf "dist/elixir/${ARTIFACT}.tar.gz" "${ARTIFACT}"
+            rm -f "${ARTIFACT}"
+          done
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: elixir-${{ matrix.label }}
+          path: dist/elixir/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
 
-      - name: Add Windows Rust target
-        if: runner.os == 'Windows'
-        run: rustup target add x86_64-pc-windows-msvc
+  elixir-package:
+    name: Build Elixir Hex package
+    needs: [prepare, check-hex]
+    if: ${{ needs.prepare.outputs.release_elixir == 'true' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.19"
+          otp-version: "28.1"
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+
+      - name: Install Hex/Rebar and dependencies
+        # Inline: trio of one-liners; not worth a shared action.
         shell: bash
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
+          (cd packages/elixir && mix deps.get)
+
+      - name: Build Hex tarball
+        # Inline: hex.build needs the per-package working dir and target/
+        # cleanup to fit under the 128 MiB Hex upload limit. Tightly coupled
+        # to Hex packaging conventions.
+        shell: bash
+        run: |
+          find packages/elixir/native -type d -name target -prune -exec rm -rf {} + 2>/dev/null || true
+          (cd packages/elixir && mix hex.build)
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: elixir-hex-package
+          path: packages/elixir/html_to_markdown-*.tar
+          retention-days: 14
+
+  cargo-packages:
+    name: Package Rust crates
+    needs: [prepare, check-cratesio]
+    if: ${{ needs.prepare.outputs.release_crates == 'true' && (needs.check-cratesio.outputs.all_exist != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
 
       - name: Package crates
+        # Inline: cargo package both crates into crate-artifacts/. The CLI
+        # crate's package step requires html-to-markdown-rs to already be
+        # registered, so we tolerate failure with --no-verify and fall back
+        # to publish-time packaging if needed.
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
-        run: scripts/publish/crates/package-crates.sh
         shell: bash
+        run: |
+          cargo package -p html-to-markdown-rs --allow-dirty
+          cli_status=0
+          cargo package -p html-to-markdown-cli --allow-dirty --no-verify || cli_status=$?
+          mkdir -p crate-artifacts
+          cp target/package/html-to-markdown-rs-*.crate crate-artifacts/
+          if [[ "${cli_status}" -eq 0 ]]; then
+            cp target/package/html-to-markdown-cli-*.crate crate-artifacts/
+          else
+            echo "::warning::Skipping html-to-markdown-cli crate packaging; html-to-markdown-rs ${RELEASE_VERSION} is not yet on crates.io."
+          fi
 
-      - name: Upload crate packages
-        uses: actions/upload-artifact@v7 # v7
+      - uses: actions/upload-artifact@v7
         with:
           name: cargo-crates
           path: crate-artifacts/*.crate
           retention-days: 14
 
-  upload-release-artifacts:
-    name: Upload Release Artifacts
-    needs:
-      [
-        prepare,
-        python-wheels,
-        python-sdist,
-        php-package,
-        node-typescript-defs,
-        node-bindings,
-        wasm-bindings,
-        cli-binaries,
-        ruby-gem,
-        go-ffi,
-        c-ffi-libraries,
-        cargo-packages,
-      ]
-    if: ${{ always() && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.tag }}
-          fetch-depth: 0
+  # ─── GitHub Release asset uploads ─────────────────────────────────────
 
-      - name: Download PHP package artifacts
-        uses: actions/download-artifact@v8 # v8
+  upload-cli-release:
+    name: Upload CLI binaries to GitHub Release
+    needs: [prepare, cli-binaries]
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.cli-binaries.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: cli-*
+          path: dist/cli
+          merge-multiple: true
+
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/cli
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            cli-*.tar.gz
+            cli-*.zip
+
+  upload-go-release:
+    name: Upload Go FFI archives to GitHub Release
+    needs: [prepare, go-ffi-libraries]
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.go-ffi-libraries.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: go-ffi-*
+          path: dist/go-ffi
+          merge-multiple: true
+
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/go-ffi
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            **/*.tar.gz
+            **/*.zip
+
+  upload-c-ffi-release:
+    name: Upload C FFI archives to GitHub Release
+    needs: [prepare, c-ffi-libraries]
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.c-ffi-libraries.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: c-ffi-*
+          path: dist/c-ffi
+          merge-multiple: true
+
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/c-ffi
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            **/*.tar.gz
+            **/*.zip
+
+  upload-elixir-release:
+    name: Upload Elixir NIF archives to GitHub Release
+    needs: [prepare, elixir-natives]
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.elixir-natives.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: elixir-*
+          path: dist/elixir
+          merge-multiple: true
+
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/elixir
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: libhtml_to_markdown_nif-*.tar.gz
+
+  upload-php-pie-release:
+    name: Upload PHP PIE archives to GitHub Release
+    needs: [prepare, php-extension]
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.php-extension.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
         with:
           pattern: php-package-*
           path: dist/php-package
           merge-multiple: true
 
-      - name: Download CLI artifacts
-        uses: actions/download-artifact@v8 # v8
+      - uses: kreuzberg-dev/actions/upload-release-assets@v1
         with:
-          pattern: cli-*
-          path: dist/cli
-          merge-multiple: false
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/php-package
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            php_*.tgz
+            php_*.tgz.sha256
+            php_*.zip
+            php_*.zip.sha256
 
-      - name: Download Go FFI artifacts
-        uses: actions/download-artifact@v8 # v8
-        with:
-          pattern: go-ffi-*
-          path: dist/go-ffi
-          merge-multiple: false
-
-      - name: Download C FFI artifacts
-        uses: actions/download-artifact@v8 # v8
-        with:
-          pattern: c-ffi-*
-          path: dist/c-ffi
-          merge-multiple: false
-
-      - name: Upload PHP PIE packages
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: scripts/publish/upload-php-pie.sh
-        shell: bash
-
-      - name: Upload CLI binaries
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: scripts/publish/upload-cli-artifacts.sh
-        shell: bash
-
-      - name: Upload Go FFI artifacts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: scripts/publish/upload-go-ffi-artifacts.sh
-        shell: bash
-
-      - name: Upload C FFI artifacts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: scripts/publish/upload-c-ffi-artifacts.sh
-        shell: bash
-
-      - name: Create Go module tag
-        env:
-          VERSION: ${{ needs.prepare.outputs.version }}
-        run: scripts/publish/go/create-module-tag.sh "v${VERSION}"
-        shell: bash
+  # ─── Publish jobs ─────────────────────────────────────────────────────
 
   publish-crates:
     name: Publish crates.io packages
-    needs: [prepare, cargo-packages, check-cratesio]
-    if: ${{ always() && needs.cargo-packages.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-cratesio.outputs.all_exist != 'true' }}
+    needs: [prepare, validate-versions, cargo-packages, check-cratesio]
+    if: ${{ needs.prepare.outputs.release_crates == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.cargo-packages.result == 'success' && (needs.check-cratesio.outputs.all_exist != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Verify Cargo.toml version matches tag
-        env:
-          TAG_VERSION: ${{ needs.prepare.outputs.version }}
-        run: scripts/publish/crates/verify-cargo-version.sh
-        shell: bash
-
-      - name: Re-check crates.io before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          registry: cratesio
-          package: html-to-markdown-rs
+          cache-key-prefix: publish-crates
+
+      - uses: kreuzberg-dev/actions/publish-crates@v1
+        with:
+          # Order matters: html-to-markdown-rs is depended on by html-to-markdown-cli.
+          crates: html-to-markdown-rs html-to-markdown-cli
           version: ${{ needs.prepare.outputs.version }}
-          extra-packages: |
-            cli_exists=html-to-markdown-cli
-
-      - name: Publish html-to-markdown-rs
-        if: ${{ steps.recheck.outputs.exists != 'true' }}
-        env:
-          CARGO_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: scripts/publish/crates/publish-rs.sh
-        shell: bash
-
-      - name: Wait for indexing
-        if: ${{ steps.recheck.outputs.exists != 'true' }}
-        run: scripts/publish/crates/wait-for-indexing.sh
-        shell: bash
-
-      - name: Publish html-to-markdown-cli
-        if: ${{ steps.recheck.outputs.cli_exists != 'true' }}
-        env:
-          CARGO_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: scripts/publish/crates/publish-cli.sh
-        shell: bash
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
   publish-pypi:
-    name: Publish Python packages to PyPI
+    name: Publish to PyPI
     needs: [prepare, python-wheels, python-sdist, check-pypi]
-    if: ${{ always() && needs.python-wheels.result == 'success' && needs.python-sdist.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-pypi.outputs.exists != 'true' }}
+    if: ${{ needs.prepare.outputs.release_python == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.python-wheels.result == 'success' && needs.python-sdist.result == 'success' && (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
       contents: read
       id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-
-      - name: Download wheel artifacts
-        uses: actions/download-artifact@v8 # v8
+      - uses: actions/download-artifact@v8
         with:
           pattern: python-wheels-*
           path: dist
           merge-multiple: true
-
-      - name: Download sdist artifact
-        uses: actions/download-artifact@v8 # v8
+      - uses: actions/download-artifact@v8
         with:
           name: python-sdist
           path: dist
 
-      - name: List packages to publish
-        run: |
-          echo "Packages in dist:"
-          ls -lh dist/ 2>/dev/null || echo "No packages found"
-        shell: bash
-
-      - name: Re-check PyPI before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
-        with:
-          registry: pypi
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-
-      - name: Publish to PyPI
-        if: ${{ steps.recheck.outputs.exists != 'true' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: kreuzberg-dev/actions/publish-pypi@v1
         with:
           packages-dir: dist
-          skip-existing: true
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
   publish-rubygems:
     name: Publish Ruby gems
     needs: [prepare, ruby-gem, check-rubygems]
-    if: ${{ always() && needs.ruby-gem.result == 'success' && needs.prepare.outputs.is_tag == 'true' && (needs.prepare.outputs.dry_run == 'true' || needs.check-rubygems.outputs.exists != 'true') }}
+    if: ${{ needs.prepare.outputs.release_ruby == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.ruby-gem.result == 'success' && (needs.check-rubygems.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-
-      - name: Download Ruby gem artifacts
-        uses: actions/download-artifact@v8 # v8
+      - uses: actions/download-artifact@v8
         with:
           pattern: rubygems-*
           path: dist
           merge-multiple: true
 
-      - name: Re-check RubyGems before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
-        with:
-          registry: rubygems
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-
-      - name: Setup Ruby
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: ruby/setup-ruby@v1 # v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
 
       - name: Update RubyGems
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
         run: gem update --system
         shell: bash
 
-      - name: Configure trusted publishing credentials
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: rubygems/configure-rubygems-credentials@v2.0.0 # v1.0.0
+      - uses: rubygems/configure-rubygems-credentials@v2.0.0
 
-      - name: Publish gems
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-rubygems@v1 # v1
+      - uses: kreuzberg-dev/actions/publish-rubygems@v1
         with:
           gems-dir: dist
           dry-run: ${{ needs.prepare.outputs.dry_run }}
 
-      - name: RubyGems already published summary
-        if: ${{ steps.recheck.outputs.exists == 'true' }}
-        run: echo "Gem html-to-markdown@${{ needs.prepare.outputs.version }} already published on RubyGems — skipped." >> "$GITHUB_STEP_SUMMARY"
-        shell: bash
-
-  publish-hex:
-    name: Publish Hex package
-    needs: [prepare, elixir-package, check-hex, upload-elixir-release]
-    if: ${{ always() && needs.elixir-package.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-hex.outputs.exists != 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-
-      - name: Download Hex artifact
-        uses: actions/download-artifact@v8 # v8
-        with:
-          name: elixir-hex-package
-          path: dist/elixir
-
-      - name: Upload Elixir package to GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-        run: scripts/publish/upload-elixir-package.sh
-        shell: bash
-
-      - name: Setup Elixir
-        uses: erlef/setup-beam@v1 # v1
-        with:
-          elixir-version: "1.19"
-          otp-version: "28.1"
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Install Hex/Rebar
-        run: scripts/publish/elixir/install-hex-rebar.sh
-        shell: bash
-
-      - name: Generate NIF checksums from GitHub release
-        run: scripts/publish/generate_elixir_checksums.sh "${{ needs.prepare.outputs.version }}"
-
-      - name: Install dependencies
-        run: scripts/publish/elixir/install-deps.sh
-        shell: bash
-
-      - name: Stage Rust core and generate lockfile
-        shell: bash
-        run: |
-          scripts/publish/elixir/stage-rust-core.sh
-          pushd packages/elixir/native/html_to_markdown_elixir >/dev/null
-          cargo generate-lockfile
-          popd >/dev/null
-
-      - name: Re-check Hex.pm before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
-        with:
-          registry: hex
-          package: html_to_markdown
-          version: ${{ needs.prepare.outputs.version }}
-
-      - name: Publish to Hex.pm
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-hex@v1 # v1
-        with:
-          package-dir: packages/elixir
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-
-      - name: Hex.pm already published summary
-        if: ${{ steps.recheck.outputs.exists == 'true' }}
-        run: echo "Package html_to_markdown@${{ needs.prepare.outputs.version }} already published on Hex.pm — skipped." >> "$GITHUB_STEP_SUMMARY"
-        shell: bash
-
-  publish-nuget:
-    name: Publish NuGet package
-    needs: [prepare, csharp-package, check-nuget]
-    if: ${{ always() && needs.csharp-package.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-nuget.outputs.exists != 'true' }}
+  publish-node:
+    name: Publish Node packages
+    needs: [prepare, node-bindings, node-typescript-defs, check-npm]
+    if: ${{ needs.prepare.outputs.release_node == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.node-bindings.result == 'success' && needs.node-typescript-defs.result == 'success' && (needs.check-npm.outputs.node_exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
 
-      - name: Download NuGet artifact
-        uses: actions/download-artifact@v8 # v8
+      - uses: actions/download-artifact@v8
         with:
-          name: csharp-nuget
-          path: dist
+          pattern: node-bindings-*
+          path: node-artifacts
+          merge-multiple: true
 
-      - name: Re-check NuGet before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - uses: actions/download-artifact@v8
         with:
-          registry: nuget
-          package: KreuzbergDev.HtmlToMarkdown
-          version: ${{ needs.prepare.outputs.version }}
+          name: node-typescript-defs
+          path: typescript-defs
 
-      - name: Publish to NuGet
-        if: ${{ steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-nuget@v1 # v1
+      - uses: kreuzberg-dev/actions/setup-node-workspace@v1
         with:
-          packages-dir: dist
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Stage platform packages and main package
+        # Inline: html-to-markdown's per-platform Node artifact layout is bespoke
+        # (one tarball per target containing pre-staged npm/<platform>/) and the
+        # main package needs an injected optionalDependencies map listing every
+        # platform sub-package. Tightly coupled to napi-rs + repo conventions;
+        # the generic publish-npm action operates on a single package dir.
+        shell: bash
+        run: |
+          rm -rf crates/html-to-markdown-node/npm
+          mkdir -p crates/html-to-markdown-node/npm
+          for pkg in node-artifacts/*.tar.gz; do
+            tar -xzf "${pkg}" -C crates/html-to-markdown-node
+          done
+          cp typescript-defs/index.js typescript-defs/index.d.ts crates/html-to-markdown-node/
+
+          # Pack each platform sub-package as a tarball
+          cd crates/html-to-markdown-node/npm
+          for dir in */; do
+            if [ -f "$dir/package.json" ]; then
+              (cd "$dir" && npm pack && mv ./*.tgz ..)
+            fi
+          done
+          cd ../../..
+
+          # Stamp main package's optionalDependencies with all platform packages
+          tmp_pkg_json="$(mktemp)"
+          optional_deps_json='{}'
+          for platform_pkg_json in crates/html-to-markdown-node/npm/*/package.json; do
+            name="$(jq -r '.name // empty' "$platform_pkg_json")"
+            version="$(jq -r '.version // empty' "$platform_pkg_json")"
+            [[ -z "$name" || -z "$version" ]] && { echo "Invalid: $platform_pkg_json" >&2; exit 1; }
+            optional_deps_json="$(jq -c --arg n "$name" --arg v "$version" '. + {($n): $v}' <<<"$optional_deps_json")"
+          done
+          jq --argjson deps "$optional_deps_json" '.optionalDependencies = $deps' \
+            crates/html-to-markdown-node/package.json > "$tmp_pkg_json"
+          mv "$tmp_pkg_json" crates/html-to-markdown-node/package.json
+
+      - name: Publish platform sub-packages
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          packages-dir: crates/html-to-markdown-node/npm
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  publish-packagist:
-    name: Publish to Packagist
+      - name: Wait for npm indexing (linux-x64-gnu)
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "60"
+
+      - name: Wait for npm indexing (linux-arm64-gnu)
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "60"
+
+      - name: Publish main @kreuzberg/html-to-markdown-node package
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/html-to-markdown-node
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Wait for main Node package indexing
+        if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
+        uses: kreuzberg-dev/actions/wait-for-package@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/html-to-markdown-node"
+          version: ${{ needs.prepare.outputs.version }}
+          max-attempts: "60"
+
+      - name: Build TypeScript wrapper package
+        if: ${{ needs.check-npm.outputs.ts_exists != 'true' }}
+        # Inline: pnpm tsc + workspace:* rewrite so npm publish (used by the
+        # publish-npm shared action) ships an installable package. Tightly
+        # coupled to packages/typescript layout and pnpm workspace conventions.
+        shell: bash
+        run: |
+          (cd packages/typescript && pnpm install --no-frozen-lockfile && pnpm exec tsc --project tsconfig.json)
+          version="$(node -p "require('./packages/typescript/package.json').version")"
+          PKG_VERSION="$version" node -e '
+            const fs = require("node:fs");
+            const path = "packages/typescript/package.json";
+            const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
+            const ver = process.env.PKG_VERSION;
+            for (const field of ["dependencies", "peerDependencies", "optionalDependencies"]) {
+              if (pkg[field]) {
+                for (const [name, spec] of Object.entries(pkg[field])) {
+                  if (typeof spec === "string" && spec.startsWith("workspace:")) {
+                    pkg[field][name] = ver;
+                  }
+                }
+              }
+            }
+            fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
+          '
+
+      - name: Publish TypeScript wrapper package
+        if: ${{ needs.check-npm.outputs.ts_exists != 'true' }}
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: packages/typescript
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-wasm:
+    name: Publish WASM package
+    needs: [prepare, wasm-bindings, check-wasm]
+    if: ${{ needs.prepare.outputs.release_wasm == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.wasm-bindings.result == 'success' && (needs.check-wasm.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
-    needs: [prepare, check-packagist]
-    if: |
-      always() &&
-      needs.prepare.result == 'success' &&
-      needs.prepare.outputs.is_tag == 'true' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.check-packagist.outputs.exists != 'true'
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
 
-      - name: Re-check Packagist before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
+      - uses: actions/download-artifact@v8
         with:
-          registry: packagist
-          package: kreuzberg-dev/html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
+          name: wasm-bundle
+          path: crates/html-to-markdown-wasm
 
-      - name: Trigger Packagist Update
-        if: ${{ steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-packagist@v1 # v1
+      - name: Drop dist .gitignore files
+        # Inline: wasm-pack writes .gitignore into each dist dir which trips up
+        # `npm publish`. One-shot cleanup.
+        shell: bash
+        run: |
+          rm -f crates/html-to-markdown-wasm/dist/.gitignore
+          rm -f crates/html-to-markdown-wasm/dist-node/.gitignore
+          rm -f crates/html-to-markdown-wasm/dist-web/.gitignore
+
+      - uses: kreuzberg-dev/actions/setup-node-workspace@v1
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org/"
+
+      - uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/html-to-markdown-wasm
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          provenance: "true"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-packagist:
+    name: Trigger Packagist update
+    needs: [prepare, upload-php-pie-release, check-packagist]
+    if: ${{ needs.prepare.outputs.release_php == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kreuzberg-dev/actions/publish-packagist@v1
         with:
           packagist-username: kreuzberg-dev
           package-name: kreuzberg-dev/html-to-markdown
@@ -1866,129 +1671,38 @@ jobs:
         env:
           PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
 
-  java-ffi:
-    name: Build Java native FFI libraries
-    needs: [prepare, check-maven]
-    if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish_java == 'true') }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux-x86_64
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-24.04-arm
-            platform: linux-aarch64
-            target: aarch64-unknown-linux-gnu
-          - os: windows-latest
-            platform: windows-x86_64
-            target: x86_64-pc-windows-msvc
-          - os: windows-11-arm
-            platform: windows-aarch64
-            target: aarch64-pc-windows-msvc
-          - os: macos-latest
-            platform: osx-aarch64
-            target: aarch64-apple-darwin
-          - os: macos-15-intel
-            platform: osx-x86_64
-            target: x86_64-apple-darwin
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Ensure target commit
-        if: ${{ needs.prepare.outputs.target_sha != '' }}
-        env:
-          TARGET_SHA: ${{ needs.prepare.outputs.target_sha }}
-        run: scripts/publish/common/ensure-target-commit.sh
-        shell: bash
-
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
-
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
-      - name: Override alef on Intel macOS (workaround pending kreuzberg-dev/actions install-alef fix)
-        if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
-        shell: bash
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fL "https://github.com/kreuzberg-dev/alef/releases/download/v0.14.33/alef-x86_64-apple-darwin.tar.gz" \
-            | tar xz --strip-components=1 -C "$HOME/.local/bin"
-          chmod +x "$HOME/.local/bin/alef"
-          "$HOME/.local/bin/alef" --version
-
-      - name: Build and stage FFI library
-        shell: bash
-        run: |
-          alef publish build --lang ffi --target ${{ matrix.target }}
-          mkdir -p dist/java-ffi/${{ matrix.platform }}/native
-          # alef publish build --target X puts artifacts in target/<X>/release/
-          for src in "target/${{ matrix.target }}/release" "target/release"; do
-            [[ -d "$src" ]] || continue
-            find "$src" -maxdepth 1 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) -name '*html_to_markdown_ffi*' -exec cp {} dist/java-ffi/${{ matrix.platform }}/native/ \;
-          done
-          ls -la dist/java-ffi/${{ matrix.platform }}/native/
-
-      - name: Upload FFI artifact
-        uses: actions/upload-artifact@v7 # v7
-        with:
-          name: java-ffi-${{ matrix.platform }}
-          path: dist/java-ffi
-          retention-days: 14
-          if-no-files-found: error
-
   publish-maven:
-    name: Publish Maven package
-    needs: [prepare, check-maven, java-ffi]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.is_tag == 'true' &&
-      (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish_java == 'true') &&
-      needs.java-ffi.result == 'success'
+    name: Publish Maven (Java) package
+    needs: [prepare, java-natives, check-maven]
+    if: ${{ needs.prepare.outputs.release_java == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.java-natives.result == 'success' && (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
 
-      - name: Check Maven Central for existing release
-        id: maven_check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: maven
-          package: "dev.kreuzberg:html-to-markdown"
-          version: ${{ needs.prepare.outputs.version }}
-
-      - name: Download Java FFI artifacts
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@v8
         with:
           pattern: java-ffi-*
           path: java-ffi-artifacts
           merge-multiple: true
 
-      - name: Setup Rust
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/setup-rust@v1
+      - name: Stage natives into resources
+        # Inline: copy classifier-bucketed libs from artifact tree into
+        # packages/java/src/main/resources/natives/<classifier>/. Tightly
+        # coupled to the Maven resource layout — no shared action covers it.
+        shell: bash
+        run: |
+          mkdir -p packages/java/src/main/resources/natives
+          rm -rf packages/java/src/main/resources/natives/*
+          for dir in java-ffi-artifacts/*/; do
+            classifier="$(basename "$dir")"
+            mkdir -p "packages/java/src/main/resources/natives/${classifier}"
+            cp -r "${dir}native/." "packages/java/src/main/resources/natives/${classifier}/"
+          done
 
-      - name: Setup Java
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        env:
-          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        uses: actions/setup-java@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "25"
@@ -1999,23 +1713,13 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
-      - name: Setup Maven
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/setup-maven@v1
+      - uses: kreuzberg-dev/actions/setup-maven@v1
 
-      - name: Prefer gpg2 binary
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        run: scripts/publish/maven/prefer-gpg2.sh
-        shell: bash
+      - uses: kreuzberg-dev/actions/configure-maven-gpg@v1
+        with:
+          pom-file: packages/java/pom.xml
 
-      - name: Copy native libraries into resources
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        shell: bash
-        run: scripts/publish/java/copy-native-libs.sh java-ffi-artifacts
-
-      - name: Release Maven package
-        if: ${{ steps.maven_check.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-maven@v1
+      - uses: kreuzberg-dev/actions/publish-maven@v1
         with:
           pom-file: packages/java/pom.xml
           maven-profile: publish
@@ -2026,232 +1730,123 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Maven already published summary
-        if: ${{ steps.maven_check.outputs.exists == 'true' }}
-        run: echo "Maven package version ${{ needs.prepare.outputs.version }} already published; skipping." >> "$GITHUB_STEP_SUMMARY"
-
-  publish-node:
-    name: Publish Node packages
-    needs: [prepare, node-bindings, node-typescript-defs, check-npm]
-    if: ${{ always() && needs.node-bindings.result == 'success' && needs.node-typescript-defs.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && needs.check-npm.outputs.node_exists != 'true' }}
+  publish-nuget:
+    name: Publish NuGet package
+    needs: [prepare, csharp-natives, check-nuget]
+    if: ${{ needs.prepare.outputs.release_csharp == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.csharp-natives.result == 'success' && (needs.check-nuget.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
 
-      - name: Download Node artifacts
-        uses: actions/download-artifact@v8 # v8
+      - uses: actions/download-artifact@v8
         with:
-          pattern: node-bindings-*
-          path: node-artifacts
+          pattern: csharp-ffi-*
+          path: dist/csharp-ffi
           merge-multiple: true
 
-      - name: Download TypeScript definitions
-        uses: actions/download-artifact@v8 # v8
+      - name: Stage runtimes/<rid>/native into NuGet project
+        # Inline: NuGet expects native libs in runtimes/<rid>/native/ adjacent
+        # to the project. Copy from artifact tree into the C# project.
+        shell: bash
+        run: |
+          mkdir -p packages/csharp/HtmlToMarkdown/runtimes
+          for dir in dist/csharp-ffi/*/; do
+            rid="$(basename "$dir")"
+            mkdir -p "packages/csharp/HtmlToMarkdown/runtimes/${rid}/native"
+            cp -v "${dir}native/"* "packages/csharp/HtmlToMarkdown/runtimes/${rid}/native/" || true
+          done
+
+      - uses: actions/setup-dotnet@v5
         with:
-          name: node-typescript-defs
-          path: typescript-defs
+          dotnet-version: "8.0.x"
 
-      - name: Setup Node
-        uses: actions/setup-node@v6 # v6
+      - name: Pack NuGet package
+        # Inline: dotnet pack with the version override against the inner csproj.
+        shell: bash
+        run: |
+          dotnet restore packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj
+          dotnet pack packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj \
+            -c Release \
+            -p:Version=${{ needs.prepare.outputs.version }} \
+            -o dist/nuget
+
+      - uses: kreuzberg-dev/actions/publish-nuget@v1
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org/
-
-      - name: Update NPM
-        run: npm install -g npm@latest
-        shell: bash
-
-      - name: Enable corepack
-        run: scripts/common/enable-corepack.sh
-        shell: bash
-
-      - name: Prepare artifact directory
-        run: scripts/publish/node/prepare-artifact-directory.sh
-        shell: bash
-
-      - name: Install workspace dependencies
-        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
-        run: scripts/publish/node/install-node-deps.sh
-        shell: bash
-
-      - name: Pack platform packages
-        run: scripts/publish/node/pack-platform-packages.sh
-        shell: bash
-
-      - name: Re-check npm before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
-        with:
-          registry: npm
-          package: "@kreuzberg/html-to-markdown-node"
-          version: ${{ needs.prepare.outputs.version }}
-          extra-packages: |
-            ts_exists=@kreuzberg/html-to-markdown
-
-      - name: Publish native binary packages
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1 # v1
-        with:
-          packages-dir: crates/html-to-markdown-node/npm
-          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          packages-dir: dist/nuget
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
-      - name: Wait for npm indexing (x64)
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@v1 # v1
-        with:
-          registry: npm
-          package: "@kreuzberg/html-to-markdown-node-linux-x64-gnu"
-          version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "60"
-
-      - name: Wait for npm indexing (arm64)
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@v1 # v1
-        with:
-          registry: npm
-          package: "@kreuzberg/html-to-markdown-node-linux-arm64-gnu"
-          version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "60"
-
-      - name: Prepare main Node package metadata
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        run: scripts/publish/node/prepublish-main-package.sh crates/html-to-markdown-node
-        shell: bash
-
-      - name: Publish main Node package
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1 # v1
-        with:
-          package-dir: crates/html-to-markdown-node
-          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Wait for main Node package indexing
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.exists != 'true' && steps.recheck.outputs.ts_exists != 'true' }}
-        uses: kreuzberg-dev/actions/wait-for-package@v1 # v1
-        with:
-          registry: npm
-          package: "@kreuzberg/html-to-markdown-node"
-          version: ${{ needs.prepare.outputs.version }}
-          max-attempts: "60"
-
-      - name: Install TypeScript wrapper dependencies from npm
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.ts_exists != 'true' }}
-        working-directory: packages/typescript
-        run: pnpm install --no-frozen-lockfile
-        shell: bash
-
-      - name: Build TypeScript wrapper package
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.ts_exists != 'true' }}
-        run: scripts/publish/typescript/build-package.sh
-        shell: bash
-
-      - name: Publish TypeScript wrapper package
-        if: ${{ needs.prepare.outputs.dry_run != 'true' && steps.recheck.outputs.ts_exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1 # v1
-        with:
-          package-dir: packages/typescript
-          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-wasm:
-    name: Publish WASM package
-    needs: [prepare, wasm-bindings, check-npm]
-    if: ${{ always() && needs.wasm-bindings.result == 'success' && needs.prepare.outputs.dry_run != 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-npm.outputs.wasm_exists != 'true' || needs.prepare.outputs.force_republish_wasm == 'true') }}
+  publish-hex:
+    name: Publish Hex package
+    needs: [prepare, elixir-package, upload-elixir-release, check-hex]
+    if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
 
-      - name: Download WASM artifacts
-        uses: actions/download-artifact@v8 # v8
+      - uses: erlef/setup-beam@v1
         with:
-          name: wasm-bundles
-          path: wasm-artifacts
+          elixir-version: "1.19"
+          otp-version: "28.1"
 
-      - name: Extract WASM artifacts
-        run: scripts/publish/wasm/extract-artifacts.sh
-        shell: bash
-
-      - name: Remove .gitignore files from dist directories
-        run: |
-          rm -f crates/html-to-markdown-wasm/dist/.gitignore
-          rm -f crates/html-to-markdown-wasm/dist-node/.gitignore
-          rm -f crates/html-to-markdown-wasm/dist-web/.gitignore
-        shell: bash
-
-      - name: Setup Node
-        uses: actions/setup-node@v6 # v6
+      - name: Generate NIF checksum file
+        uses: kreuzberg-dev/actions/generate-elixir-checksums@v1
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org/
-
-      - name: Update NPM
-        run: npm install -g npm@latest
-        shell: bash
-
-      - name: Re-check npm before publish
-        id: recheck
-        uses: kreuzberg-dev/actions/check-registry@v1 # v1
-        with:
-          registry: npm
-          package: "@kreuzberg/html-to-markdown-wasm"
+          github-repo: ${{ github.repository }}
+          tag: ${{ needs.prepare.outputs.tag }}
           version: ${{ needs.prepare.outputs.version }}
+          lib-name: html_to_markdown_nif
+          nif-versions: "2.16,2.17"
+          targets: x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu,aarch64-apple-darwin,x86_64-apple-darwin
+          output-path: packages/elixir/checksum-Elixir.HtmlToMarkdown.Native.exs
 
-      - name: Publish WASM package
-        if: ${{ steps.recheck.outputs.exists != 'true' }}
-        uses: kreuzberg-dev/actions/publish-npm@v1 # v1
+      - uses: kreuzberg-dev/actions/publish-hex@v1
         with:
-          package-dir: crates/html-to-markdown-wasm
-          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          package-dir: packages/elixir
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+
+  # ─── Homebrew (formula update + bottles) ──────────────────────────────
+  #
+  # Topology (mirrors kreuzberg's; html-to-markdown ships TWO formulas):
+  #   1. publish-homebrew-formula — update Formula/{html-to-markdown,libhtml-to-markdown}.rb
+  #      (no bottles). Backed by the repo-quirky update-homebrew-formula.sh.
+  #   2. homebrew-bottles         — build per-platform bottle JSON manifests
+  #   3. publish-homebrew-bottles — merge bottle DSL into formulas and push
 
   publish-homebrew-formula:
-    name: Update Homebrew formula
-    needs: [prepare, check-homebrew, upload-release-artifacts, c-ffi-libraries, cli-binaries]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.is_tag == 'true' &&
-      (needs.check-homebrew.outputs.exists != 'true') &&
-      needs.upload-release-artifacts.result == 'success'
+    name: Update Homebrew formulas
+    needs: [prepare, check-homebrew, upload-cli-release, upload-c-ffi-release]
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout source repo
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
-      - name: Checkout homebrew-tap
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           repository: kreuzberg-dev/homebrew-tap
           token: ${{ secrets.HOMEBREW_TOKEN }}
           path: homebrew-tap
 
       - name: Update formula files
+        # Inline: html-to-markdown ships two formulas (CLI + libffi) updated
+        # together by a repo-specific generator. The shared publish-homebrew
+        # action targets single-formula repos.
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.prepare.outputs.tag }}
@@ -2260,9 +1855,12 @@ jobs:
         run: scripts/publish/update-homebrew-formula.sh
 
       - name: Commit and push to tap
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         working-directory: homebrew-tap
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+        # Inline: tap-side commit/push of the regenerated formulas. No shared
+        # action covers tap commits — each repo's bot identity is unique.
         run: |
           git config user.name "html-to-markdown-bot"
           git config user.email "bot@kreuzberg.dev"
@@ -2277,11 +1875,7 @@ jobs:
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.is_tag == 'true' &&
-      needs.publish-homebrew-formula.result == 'success'
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.publish-homebrew-formula.result == 'success' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -2289,21 +1883,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
-            bottle_tag: arm64_sonoma
-            install_brew: false
-          - os: macos-15-intel
-            bottle_tag: sonoma
-            install_brew: false
-          - os: ubuntu-latest
-            bottle_tag: x86_64_linux
-            install_brew: true
-          - os: ubuntu-24.04-arm
-            bottle_tag: arm64_linux
-            install_brew: true
+          - { os: macos-latest, bottle_tag: arm64_sonoma, install_brew: false }
+          - { os: macos-15-intel, bottle_tag: sonoma, install_brew: false }
+          - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
+          - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
     steps:
-      - name: Checkout source repo
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
@@ -2324,47 +1909,38 @@ jobs:
           github-repo: kreuzberg-dev/html-to-markdown
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload bottle JSON manifests
-        uses: actions/upload-artifact@v5 # v5
+      - uses: actions/upload-artifact@v7
         with:
           name: homebrew-bottle-json-${{ matrix.bottle_tag }}
           path: ${{ github.workspace }}/bottle-json/*.json
           if-no-files-found: error
+          retention-days: 14
 
   publish-homebrew-bottles:
     name: Merge Homebrew bottle DSL
     needs: [prepare, publish-homebrew-formula, homebrew-bottles]
-    if: |
-      always() &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.prepare.outputs.is_tag == 'true' &&
-      needs.publish-homebrew-formula.result == 'success' &&
-      needs.homebrew-bottles.result == 'success'
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.publish-homebrew-formula.result == 'success' && needs.homebrew-bottles.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout source repo
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
-      - name: Checkout homebrew-tap
-        uses: actions/checkout@v6 # v6
+      - uses: actions/checkout@v6
         with:
           repository: kreuzberg-dev/homebrew-tap
           token: ${{ secrets.HOMEBREW_TOKEN }}
           path: homebrew-tap
 
-      - name: Download all bottle JSON manifests
-        uses: actions/download-artifact@v6 # v6
+      - uses: actions/download-artifact@v8
         with:
           path: ${{ github.workspace }}/bottle-json
           pattern: homebrew-bottle-json-*
           merge-multiple: true
 
-      - name: Merge bottle DSL into formulas
-        uses: kreuzberg-dev/actions/homebrew-merge-bottles@v1
+      - uses: kreuzberg-dev/actions/homebrew-merge-bottles@v1
         with:
           tag: ${{ needs.prepare.outputs.tag }}
           version: ${{ needs.prepare.outputs.version }}
@@ -2376,9 +1952,12 @@ jobs:
           github-repo: kreuzberg-dev/html-to-markdown
 
       - name: Commit and push bottle DSL
+        if: ${{ needs.prepare.outputs.dry_run != 'true' }}
         working-directory: homebrew-tap
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+        # Inline: tap-side commit/push of the regenerated formula. No shared
+        # action covers tap commits — each repo's bot identity is unique.
         run: |
           git config user.name "html-to-markdown-bot"
           git config user.email "bot@kreuzberg.dev"
@@ -2390,6 +1969,68 @@ jobs:
           git commit -m "html-to-markdown ${{ needs.prepare.outputs.version }}: add bottle DSL"
           git push origin HEAD
 
+  # ─── Verification & finalization ──────────────────────────────────────
+
+  verify-assets:
+    name: Verify release assets
+    needs:
+      - prepare
+      - upload-cli-release
+      - upload-go-release
+      - upload-c-ffi-release
+      - upload-elixir-release
+      - upload-php-pie-release
+    if: ${{ always() && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && !contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kreuzberg-dev/actions/verify-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          expected-assets: |
+            # CLI
+            cli-*.tar.gz
+            cli-*.zip
+            # Go FFI
+            html-to-markdown-rs-go-*.tar.gz
+            # C FFI
+            html-to-markdown-rs-ffi-*.tar.gz
+            # Elixir NIF
+            libhtml_to_markdown_nif-*.tar.gz
+
+  release-finalize:
+    name: Finalize GitHub Release
+    needs:
+      - prepare
+      - verify-assets
+      - publish-crates
+      - publish-pypi
+      - publish-rubygems
+      - publish-node
+      - publish-wasm
+      - publish-packagist
+      - publish-maven
+      - publish-nuget
+      - publish-hex
+      - publish-homebrew-bottles
+      - upload-cli-release
+      - upload-go-release
+      - upload-c-ffi-release
+    if: |
+      always() &&
+      !cancelled() &&
+      needs.prepare.outputs.is_tag == 'true' &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      !contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: kreuzberg-dev/actions/finalize-release@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          is-prerelease: ${{ needs.prepare.outputs.is_prerelease == 'true' && 'true' || 'false' }}
+          go-module-path: packages/go/v3
+
   announce-discord:
     name: Announce release on Discord
     needs:
@@ -2397,14 +2038,19 @@ jobs:
       - publish-crates
       - publish-pypi
       - publish-rubygems
-      - publish-hex
-      - publish-nuget
-      - publish-packagist
-      - publish-maven
       - publish-node
       - publish-wasm
-      - publish-homebrew-formula
+      - publish-packagist
+      - publish-maven
+      - publish-nuget
+      - publish-hex
       - publish-homebrew-bottles
+      - upload-cli-release
+      - upload-go-release
+      - upload-c-ffi-release
+      - upload-elixir-release
+      - upload-php-pie-release
+      - release-finalize
     if: |
       always() &&
       !cancelled() &&
