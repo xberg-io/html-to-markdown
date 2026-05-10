@@ -1,3 +1,6 @@
 [submodule "homebrew-tap"]
 	path = homebrew-tap
 	url = https://github.com/Goldziher/homebrew-tap.git
+[submodule "packages/dart"]
+	path = packages/dart
+	url = git@github.com:arrrrny/html_to_markdown_ffi.git
