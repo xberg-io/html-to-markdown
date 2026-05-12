@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.4.0-rc.45" alt="Go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.4.0" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
@@ -81,7 +81,6 @@ Alternatively, you can manually set `CGO_CFLAGS` and `CGO_LDFLAGS` environment v
 ## Performance Snapshot
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
-
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.46ms | 277.5 MB/s |
