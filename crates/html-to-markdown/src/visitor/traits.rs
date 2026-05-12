@@ -31,6 +31,15 @@ use super::types::{NodeContext, VisitResult};
 /// - Return `VisitResult::Continue` quickly for elements you don't need to customize
 /// - Avoid heavy computation in visitor methods; consider caching if needed
 pub trait HtmlVisitor: std::fmt::Debug {
+    /// Visit text nodes (most frequent callback - ~100+ per document).
+    ///
+    /// # Arguments
+    /// - `ctx`: Node context (will have `node_type: NodeType::Text`)
+    /// - `text`: The raw text content (HTML entities already decoded)
+    fn visit_text(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+        VisitResult::Continue
+    }
+
     /// Called before entering any element.
     ///
     /// This is the first callback invoked for every HTML element, allowing
@@ -44,15 +53,6 @@ pub trait HtmlVisitor: std::fmt::Debug {
     /// Receives the default markdown output that would be generated.
     /// Visitors can inspect or replace this output.
     fn visit_element_end(&mut self, _ctx: &NodeContext, _output: &str) -> VisitResult {
-        VisitResult::Continue
-    }
-
-    /// Visit text nodes (most frequent callback - ~100+ per document).
-    ///
-    /// # Arguments
-    /// - `ctx`: Node context (will have `node_type: NodeType::Text`)
-    /// - `text`: The raw text content (HTML entities already decoded)
-    fn visit_text(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 

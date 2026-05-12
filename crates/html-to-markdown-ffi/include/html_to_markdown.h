@@ -504,6 +504,17 @@ typedef struct HTMHtmVisitorCallbacks {
  */
 typedef struct HTMHtmHtmlVisitorVTable {
   /**
+   * Visit text nodes (most frequent callback - ~100+ per document).
+   *
+   * # Arguments
+   * - `ctx`: Node context (will have `node_type: NodeType::Text`)
+   * - `text`: The raw text content (HTML entities already decoded)
+   */
+  int32_t (*visit_text)(const void *user_data,
+                        const char *_ctx,
+                        const char *_text,
+                        char **out_result);
+  /**
    * Called before entering any element.
    *
    * This is the first callback invoked for every HTML element, allowing
@@ -522,17 +533,6 @@ typedef struct HTMHtmHtmlVisitorVTable {
                                const char *_ctx,
                                const char *_output,
                                char **out_result);
-  /**
-   * Visit text nodes (most frequent callback - ~100+ per document).
-   *
-   * # Arguments
-   * - `ctx`: Node context (will have `node_type: NodeType::Text`)
-   * - `text`: The raw text content (HTML entities already decoded)
-   */
-  int32_t (*visit_text)(const void *user_data,
-                        const char *_ctx,
-                        const char *_text,
-                        char **out_result);
   /**
    * Visit anchor links `<a href="...">`.
    *

@@ -14,14 +14,14 @@ namespace HtmlToMarkdown;
 /// </summary>
 public interface IHtmlVisitor {
 
+    /// <summary>visit_text</summary>
+    VisitResult VisitText(NodeContext Ctx, string Text);
+
     /// <summary>visit_element_start</summary>
     VisitResult VisitElementStart(NodeContext Ctx);
 
     /// <summary>visit_element_end</summary>
     VisitResult VisitElementEnd(NodeContext Ctx, string Output);
-
-    /// <summary>visit_text</summary>
-    VisitResult VisitText(NodeContext Ctx, string Text);
 
     /// <summary>visit_link</summary>
     VisitResult VisitLink(NodeContext Ctx, string Href, string Text, string Title);
@@ -149,13 +149,13 @@ public sealed class HtmlVisitorBridge : IDisposable {
     // Vtable slot delegates (41)
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int VisitTextFn(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int VisitElementStartFn(IntPtr userData, IntPtr Ctx, out IntPtr outResult);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int VisitElementEndFn(IntPtr userData, IntPtr Ctx, IntPtr Output, out IntPtr outResult);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitTextFn(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int VisitLinkFn(IntPtr userData, IntPtr Ctx, IntPtr Href, IntPtr Text, IntPtr Title, out IntPtr outResult);
@@ -284,20 +284,20 @@ public sealed class HtmlVisitorBridge : IDisposable {
         // Allocate unmanaged vtable struct (array of function pointers)
         _vtable = Marshal.AllocHGlobal(IntPtr.Size * 41);
 
-        // Slot 0: visit_element_start_fn
-        var visitElementStartFn = new VisitElementStartFn(VisitElementStartFnCallback);
-        _delegates[0] = visitElementStartFn;
-        Marshal.WriteIntPtr(_vtable, 0, Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
-
-        // Slot 1: visit_element_end_fn
-        var visitElementEndFn = new VisitElementEndFn(VisitElementEndFnCallback);
-        _delegates[1] = visitElementEndFn;
-        Marshal.WriteIntPtr(_vtable, 8, Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
-
-        // Slot 2: visit_text_fn
+        // Slot 0: visit_text_fn
         var visitTextFn = new VisitTextFn(VisitTextFnCallback);
-        _delegates[2] = visitTextFn;
-        Marshal.WriteIntPtr(_vtable, 16, Marshal.GetFunctionPointerForDelegate(visitTextFn));
+        _delegates[0] = visitTextFn;
+        Marshal.WriteIntPtr(_vtable, 0, Marshal.GetFunctionPointerForDelegate(visitTextFn));
+
+        // Slot 1: visit_element_start_fn
+        var visitElementStartFn = new VisitElementStartFn(VisitElementStartFnCallback);
+        _delegates[1] = visitElementStartFn;
+        Marshal.WriteIntPtr(_vtable, 8, Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
+
+        // Slot 2: visit_element_end_fn
+        var visitElementEndFn = new VisitElementEndFn(VisitElementEndFnCallback);
+        _delegates[2] = visitElementEndFn;
+        Marshal.WriteIntPtr(_vtable, 16, Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
 
         // Slot 3: visit_link_fn
         var visitLinkFn = new VisitLinkFn(VisitLinkFnCallback);
@@ -495,6 +495,20 @@ public sealed class HtmlVisitorBridge : IDisposable {
         return JsonSerializer.Serialize(value);
     }
 
+    private int VisitTextFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
+        try {
+            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
+            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var result = _impl.VisitText(managed_Ctx, managed_Text);
+            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            return 0;
+        } catch (Exception) {
+            outResult = IntPtr.Zero;
+            return 1;
+        }
+    }
+
     private int VisitElementStartFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
@@ -514,20 +528,6 @@ public sealed class HtmlVisitorBridge : IDisposable {
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitElementEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-    }
-
-    private int VisitTextFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
-        try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
-            var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
-            var result = _impl.VisitText(managed_Ctx, managed_Text);
             outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
