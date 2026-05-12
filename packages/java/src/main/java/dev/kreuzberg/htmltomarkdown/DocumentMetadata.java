@@ -15,24 +15,19 @@ import org.jspecify.annotations.Nullable;
 /**
  * Document-level metadata extracted from {@code &lt;head&gt;} and top-level elements.
  *
- * Contains all metadata typically used by search engines, social media platforms,
- * and browsers for document indexing and presentation.
+ * Contains all metadata typically used by search engines, social media platforms, and browsers for document indexing
+ * and presentation.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = DocumentMetadataBuilder.class)
-public record DocumentMetadata(
-    @Nullable String title,
-    @Nullable String description,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<String> keywords,
-    @Nullable String author,
-    @Nullable @JsonProperty("canonical_url") String canonicalUrl,
-    @Nullable @JsonProperty("base_href") String baseHref,
-    @Nullable String language,
-    @Nullable @JsonProperty("text_direction") TextDirection textDirection,
-    @JsonProperty("open_graph") Map<String, String> openGraph,
-    @JsonProperty("twitter_card") Map<String, String> twitterCard,
-    @JsonProperty("meta_tags") Map<String, String> metaTags
-) {
+public record DocumentMetadata(@Nullable String title, @Nullable String description,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<String> keywords, @Nullable String author,
+        @Nullable @JsonProperty("canonical_url") String canonicalUrl,
+        @Nullable @JsonProperty("base_href") String baseHref, @Nullable String language,
+        @Nullable @JsonProperty("text_direction") TextDirection textDirection,
+        @JsonProperty("open_graph") Map<String, String> openGraph,
+        @JsonProperty("twitter_card") Map<String, String> twitterCard,
+        @JsonProperty("meta_tags") Map<String, String> metaTags) {
     public static DocumentMetadataBuilder builder() {
         return new DocumentMetadataBuilder();
     }
@@ -40,18 +35,19 @@ public record DocumentMetadata(
     /**
      * Parse a {@code DocumentMetadata} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static DocumentMetadata fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, DocumentMetadata.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, DocumentMetadata.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse DocumentMetadata from JSON: " + e.getMessage(), e);
         }

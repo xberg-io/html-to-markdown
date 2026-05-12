@@ -12,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Comprehensive metadata extraction result from HTML document.
  *
- * Contains all extracted metadata types in a single structure,
- * suitable for serialization and transmission across language boundaries.
+ * Contains all extracted metadata types in a single structure, suitable for serialization and transmission across
+ * language boundaries.
  */
 @JsonPOJOBuilder(withPrefix = "with")
 public class HtmlMetadataBuilder {
@@ -57,12 +57,6 @@ public class HtmlMetadataBuilder {
 
     /** Builds the HtmlMetadata instance. */
     public HtmlMetadata build() {
-        return new HtmlMetadata(
-            document,
-            headers,
-            links,
-            images,
-            structuredData
-        );
+        return new HtmlMetadata(document, headers, links, images, structuredData);
     }
 }

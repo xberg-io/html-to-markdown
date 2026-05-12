@@ -47,11 +47,6 @@ public class PreprocessingOptionsBuilder {
 
     /** Builds the PreprocessingOptions instance. */
     public PreprocessingOptions build() {
-        return new PreprocessingOptions(
-            enabled,
-            preset,
-            removeNavigation,
-            removeForms
-        );
+        return new PreprocessingOptions(enabled, preset, removeNavigation, removeForms);
     }
 }

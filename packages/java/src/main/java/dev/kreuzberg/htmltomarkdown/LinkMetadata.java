@@ -17,30 +17,26 @@ import org.jspecify.annotations.Nullable;
  * Represents {@code &lt;a&gt;} elements with parsed href values, text content, and link type classification.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-public record LinkMetadata(
-    String href,
-    String text,
-    @Nullable String title,
-    @JsonProperty("link_type") LinkType linkType,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<String> rel,
-    Map<String, String> attributes
-) {
+public record LinkMetadata(String href, String text, @Nullable String title,
+        @JsonProperty("link_type") LinkType linkType, @JsonInclude(JsonInclude.Include.NON_NULL) List<String> rel,
+        Map<String, String> attributes) {
 
     /**
      * Parse a {@code LinkMetadata} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static LinkMetadata fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, LinkMetadata.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, LinkMetadata.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse LinkMetadata from JSON: " + e.getMessage(), e);
         }

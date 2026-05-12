@@ -14,30 +14,27 @@ import org.jspecify.annotations.Nullable;
  * A single node in the document tree.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-public record DocumentNode(
-    String id,
-    NodeContent content,
-    @Nullable Integer parent,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<Integer> children,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<TextAnnotation> annotations,
-    @Nullable Map<String, String> attributes
-) {
+public record DocumentNode(String id, NodeContent content, @Nullable Integer parent,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<Integer> children,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<TextAnnotation> annotations,
+        @Nullable Map<String, String> attributes) {
 
     /**
      * Parse a {@code DocumentNode} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static DocumentNode fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, DocumentNode.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, DocumentNode.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse DocumentNode from JSON: " + e.getMessage(), e);
         }

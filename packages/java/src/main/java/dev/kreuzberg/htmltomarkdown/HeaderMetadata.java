@@ -12,33 +12,28 @@ import org.jspecify.annotations.Nullable;
 /**
  * Header element metadata with hierarchy tracking.
  *
- * Captures heading elements (h1-h6) with their text content, identifiers,
- * and position in the document structure.
+ * Captures heading elements (h1-h6) with their text content, identifiers, and position in the document structure.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-public record HeaderMetadata(
-    byte level,
-    String text,
-    @Nullable String id,
-    long depth,
-    @JsonProperty("html_offset") long htmlOffset
-) {
+public record HeaderMetadata(byte level, String text, @Nullable String id, long depth,
+        @JsonProperty("html_offset") long htmlOffset) {
 
     /**
      * Parse a {@code HeaderMetadata} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static HeaderMetadata fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, HeaderMetadata.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, HeaderMetadata.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse HeaderMetadata from JSON: " + e.getMessage(), e);
         }

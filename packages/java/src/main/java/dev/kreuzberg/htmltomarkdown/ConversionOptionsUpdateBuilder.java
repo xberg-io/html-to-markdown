@@ -13,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Partial update for {@code ConversionOptions}.
  *
- * Uses {@code Option&lt;T&gt;} fields for selective updates. Bindings use this to construct
- * options from language-native types. Prefer ConversionOptionsBuilder for Rust code.
+ * Uses {@code Option&lt;T&gt;} fields for selective updates. Bindings use this to construct options from
+ * language-native types. Prefer ConversionOptionsBuilder for Rust code.
  */
 @JsonPOJOBuilder(withPrefix = "with")
 public class ConversionOptionsUpdateBuilder {
@@ -343,48 +343,18 @@ public class ConversionOptionsUpdateBuilder {
 
     /** Builds the ConversionOptionsUpdate instance. */
     public ConversionOptionsUpdate build() {
-        return new ConversionOptionsUpdate(
-            headingStyle.orElse(null),
-            listIndentType.orElse(null),
-            listIndentWidth.orElse(null),
-            bullets.orElse(null),
-            strongEmSymbol.orElse(null),
-            escapeAsterisks.orElse(null),
-            escapeUnderscores.orElse(null),
-            escapeMisc.orElse(null),
-            escapeAscii.orElse(null),
-            codeLanguage.orElse(null),
-            autolinks.orElse(null),
-            defaultTitle.orElse(null),
-            brInTables.orElse(null),
-            highlightStyle.orElse(null),
-            extractMetadata.orElse(null),
-            whitespaceMode.orElse(null),
-            stripNewlines.orElse(null),
-            wrap.orElse(null),
-            wrapWidth.orElse(null),
-            convertAsInline.orElse(null),
-            subSymbol.orElse(null),
-            supSymbol.orElse(null),
-            newlineStyle.orElse(null),
-            codeBlockStyle.orElse(null),
-            keepInlineImagesIn.orElse(null),
-            preprocessing.orElse(null),
-            encoding.orElse(null),
-            debug.orElse(null),
-            stripTags.orElse(null),
-            preserveTags.orElse(null),
-            skipImages.orElse(null),
-            linkStyle.orElse(null),
-            outputFormat.orElse(null),
-            includeDocumentStructure.orElse(null),
-            extractImages.orElse(null),
-            maxImageSize.orElse(null),
-            captureSvg.orElse(null),
-            inferDimensions.orElse(null),
-            maxDepth.orElse(null),
-            excludeSelectors.orElse(null),
-            visitor.orElse(null)
-        );
+        return new ConversionOptionsUpdate(headingStyle.orElse(null), listIndentType.orElse(null),
+                listIndentWidth.orElse(null), bullets.orElse(null), strongEmSymbol.orElse(null),
+                escapeAsterisks.orElse(null), escapeUnderscores.orElse(null), escapeMisc.orElse(null),
+                escapeAscii.orElse(null), codeLanguage.orElse(null), autolinks.orElse(null), defaultTitle.orElse(null),
+                brInTables.orElse(null), highlightStyle.orElse(null), extractMetadata.orElse(null),
+                whitespaceMode.orElse(null), stripNewlines.orElse(null), wrap.orElse(null), wrapWidth.orElse(null),
+                convertAsInline.orElse(null), subSymbol.orElse(null), supSymbol.orElse(null), newlineStyle.orElse(null),
+                codeBlockStyle.orElse(null), keepInlineImagesIn.orElse(null), preprocessing.orElse(null),
+                encoding.orElse(null), debug.orElse(null), stripTags.orElse(null), preserveTags.orElse(null),
+                skipImages.orElse(null), linkStyle.orElse(null), outputFormat.orElse(null),
+                includeDocumentStructure.orElse(null), extractImages.orElse(null), maxImageSize.orElse(null),
+                captureSvg.orElse(null), inferDimensions.orElse(null), maxDepth.orElse(null),
+                excludeSelectors.orElse(null), visitor.orElse(null));
     }
 }

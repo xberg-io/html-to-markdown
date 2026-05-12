@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Partial update for {@code PreprocessingOptions}.
  *
- * This struct uses {@code Option&lt;T&gt;} to represent optional fields that can be selectively updated.
- * Only specified fields (Some values) will override existing options; None values leave the
- * corresponding fields unchanged when applied via PreprocessingOptions::apply_update.
+ * This struct uses {@code Option&lt;T&gt;} to represent optional fields that can be selectively updated. Only specified
+ * fields (Some values) will override existing options; None values leave the corresponding fields unchanged when
+ * applied via PreprocessingOptions::apply_update.
  */
 @JsonPOJOBuilder(withPrefix = "with")
 public class PreprocessingOptionsUpdateBuilder {
@@ -52,11 +52,7 @@ public class PreprocessingOptionsUpdateBuilder {
 
     /** Builds the PreprocessingOptionsUpdate instance. */
     public PreprocessingOptionsUpdate build() {
-        return new PreprocessingOptionsUpdate(
-            enabled.orElse(null),
-            preset.orElse(null),
-            removeNavigation.orElse(null),
-            removeForms.orElse(null)
-        );
+        return new PreprocessingOptionsUpdate(enabled.orElse(null), preset.orElse(null), removeNavigation.orElse(null),
+                removeForms.orElse(null));
     }
 }

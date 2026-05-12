@@ -14,11 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = TableGridBuilder.class)
-public record TableGrid(
-    int rows,
-    int cols,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<GridCell> cells
-) {
+public record TableGrid(int rows, int cols, @JsonInclude(JsonInclude.Include.NON_NULL) List<GridCell> cells) {
     public static TableGridBuilder builder() {
         return new TableGridBuilder();
     }
@@ -26,18 +22,19 @@ public record TableGrid(
     /**
      * Parse a {@code TableGrid} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static TableGrid fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, TableGrid.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, TableGrid.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse TableGrid from JSON: " + e.getMessage(), e);
         }

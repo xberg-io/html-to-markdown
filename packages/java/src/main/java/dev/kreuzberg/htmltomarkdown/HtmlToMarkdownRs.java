@@ -9,9 +9,11 @@ package dev.kreuzberg.htmltomarkdown;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 public final class HtmlToMarkdownRs {
-    private HtmlToMarkdownRs() { }
+    private HtmlToMarkdownRs() {
+    }
 
-    public static ConversionResult convert(final String html, final ConversionOptions options) throws HtmlToMarkdownRsException {
+    public static ConversionResult convert(final String html, final ConversionOptions options)
+            throws HtmlToMarkdownRsException {
         if (options != null && options.visitor() != null) {
             return convertWithVisitorInternal(html, options);
         }
@@ -21,14 +23,16 @@ public final class HtmlToMarkdownRs {
             var coptionsJson = options != null ? MAPPER.writeValueAsString(options) : null;
             var coptionsJsonSeg = coptionsJson != null ? arena.allocateFrom(coptionsJson) : MemorySegment.NULL;
             var coptions = coptionsJson != null
-                ? (MemorySegment) NativeLib.HTM_CONVERSION_OPTIONS_FROM_JSON.invoke(coptionsJsonSeg)
-                : MemorySegment.NULL;
+                    ? (MemorySegment) NativeLib.HTM_CONVERSION_OPTIONS_FROM_JSON.invoke(coptionsJsonSeg)
+                    : MemorySegment.NULL;
             var resultPtr = (MemorySegment) NativeLib.HTM_CONVERT.invoke(chtml, coptions);
             if (!coptions.equals(MemorySegment.NULL)) {
                 NativeLib.HTM_CONVERSION_OPTIONS_FREE.invoke(coptions);
             }
             if (resultPtr.equals(MemorySegment.NULL)) {
-                checkLastError();                return null;            }
+                checkLastError();
+                return null;
+            }
             var jsonPtr = (MemorySegment) NativeLib.HTM_CONVERSION_RESULT_TO_JSON.invoke(resultPtr);
             NativeLib.HTM_CONVERSION_RESULT_FREE.invoke(resultPtr);
             if (jsonPtr.equals(MemorySegment.NULL)) {
@@ -43,9 +47,9 @@ public final class HtmlToMarkdownRs {
         }
     }
 
-    private static ConversionResult convertWithVisitorInternal(String html, ConversionOptions options) throws HtmlToMarkdownRsException {
-        try (var arena = Arena.ofConfined();
-             var bridge = new VisitorBridge(options.visitor())) {
+    private static ConversionResult convertWithVisitorInternal(String html, ConversionOptions options)
+            throws HtmlToMarkdownRsException {
+        try (var arena = Arena.ofConfined(); var bridge = new VisitorBridge(options.visitor())) {
             var cHtml = arena.allocateFrom(html);
 
             MemorySegment optionsPtr = MemorySegment.NULL;
@@ -84,7 +88,7 @@ public final class HtmlToMarkdownRs {
                     return null;
                 }
                 String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
-            NativeLib.HTM_FREE_STRING.invoke(jsonPtr);
+                NativeLib.HTM_FREE_STRING.invoke(jsonPtr);
                 return MAPPER.readValue(json, ConversionResult.class);
             } catch (Throwable e) {
                 throw new HtmlToMarkdownRsException("FFI call failed", e);
@@ -115,11 +119,10 @@ public final class HtmlToMarkdownRs {
     }
     private static com.fasterxml.jackson.databind.ObjectMapper createObjectMapper() {
         return new com.fasterxml.jackson.databind.ObjectMapper()
-            .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-            .findAndRegisterModules()
-            .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-            .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-            .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
+                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
     }
 
     private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER = createObjectMapper();

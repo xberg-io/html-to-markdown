@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Node type enumeration covering all HTML element types.
  *
- * This enum categorizes all HTML elements that the converter recognizes,
- * providing a coarse-grained classification for visitor dispatch.
+ * This enum categorizes all HTML elements that the converter recognizes, providing a coarse-grained classification for
+ * visitor dispatch.
  */
 public enum NodeType {
     /** Text node (most frequent - 100+ per document) */

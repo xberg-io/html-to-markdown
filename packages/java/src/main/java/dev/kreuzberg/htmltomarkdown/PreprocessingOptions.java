@@ -14,12 +14,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PreprocessingOptionsBuilder.class)
-public record PreprocessingOptions(
-    boolean enabled,
-    PreprocessingPreset preset,
-    @JsonProperty("remove_navigation") boolean removeNavigation,
-    @JsonProperty("remove_forms") boolean removeForms
-) {
+public record PreprocessingOptions(boolean enabled, PreprocessingPreset preset,
+        @JsonProperty("remove_navigation") boolean removeNavigation,
+        @JsonProperty("remove_forms") boolean removeForms) {
     public static PreprocessingOptionsBuilder builder() {
         return new PreprocessingOptionsBuilder();
     }
@@ -27,18 +24,19 @@ public record PreprocessingOptions(
     /**
      * Parse a {@code PreprocessingOptions} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static PreprocessingOptions fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, PreprocessingOptions.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, PreprocessingOptions.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse PreprocessingOptions from JSON: " + e.getMessage(), e);
         }

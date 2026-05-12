@@ -40,7 +40,8 @@ public interface Visitor {
         return VisitResult.continueDefault();
     }
     /** Called for list items. */
-    default VisitResult visitListItem(final NodeContext context, final boolean ordered, final String marker, final String text) {
+    default VisitResult visitListItem(final NodeContext context, final boolean ordered, final String marker,
+            final String text) {
         return VisitResult.continueDefault();
     }
     /** Called before processing a list. */
@@ -56,7 +57,8 @@ public interface Visitor {
         return VisitResult.continueDefault();
     }
     /** Called for table rows. cells contains the cell text values. */
-    default VisitResult visitTableRow(final NodeContext context, final java.util.List<String> cells, final boolean isHeader) {
+    default VisitResult visitTableRow(final NodeContext context, final java.util.List<String> cells,
+            final boolean isHeader) {
         return VisitResult.continueDefault();
     }
     /** Called after processing a table. */
@@ -128,7 +130,8 @@ public interface Visitor {
         return VisitResult.continueDefault();
     }
     /** Called for input elements. name and value may be null. */
-    default VisitResult visitInput(final NodeContext context, final String inputType, final String name, final String value) {
+    default VisitResult visitInput(final NodeContext context, final String inputType, final String name,
+            final String value) {
         return VisitResult.continueDefault();
     }
     /** Called for button elements. */

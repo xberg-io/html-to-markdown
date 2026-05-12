@@ -13,19 +13,15 @@ import org.jspecify.annotations.Nullable;
 /**
  * The primary result of HTML conversion and extraction.
  *
- * Contains the converted text output, optional structured document tree,
- * metadata, extracted tables, images, and processing warnings.
+ * Contains the converted text output, optional structured document tree, metadata, extracted tables, images, and
+ * processing warnings.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ConversionResultBuilder.class)
-public record ConversionResult(
-    @Nullable String content,
-    @Nullable DocumentStructure document,
-    HtmlMetadata metadata,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<TableData> tables,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<String> images,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<ProcessingWarning> warnings
-) {
+public record ConversionResult(@Nullable String content, @Nullable DocumentStructure document, HtmlMetadata metadata,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<TableData> tables,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<String> images,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<ProcessingWarning> warnings) {
     public static ConversionResultBuilder builder() {
         return new ConversionResultBuilder();
     }
@@ -33,18 +29,19 @@ public record ConversionResult(
     /**
      * Parse a {@code ConversionResult} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static ConversionResult fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, ConversionResult.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, ConversionResult.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse ConversionResult from JSON: " + e.getMessage(), e);
         }

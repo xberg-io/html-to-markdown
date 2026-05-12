@@ -12,30 +12,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * A single cell in a table grid.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-public record GridCell(
-    String content,
-    int row,
-    int col,
-    @JsonProperty("row_span") int rowSpan,
-    @JsonProperty("col_span") int colSpan,
-    @JsonProperty("is_header") boolean isHeader
-) {
+public record GridCell(String content, int row, int col, @JsonProperty("row_span") int rowSpan,
+        @JsonProperty("col_span") int colSpan, @JsonProperty("is_header") boolean isHeader) {
 
     /**
      * Parse a {@code GridCell} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static GridCell fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, GridCell.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, GridCell.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse GridCell from JSON: " + e.getMessage(), e);
         }

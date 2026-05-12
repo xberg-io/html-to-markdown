@@ -5,18 +5,20 @@
 // Issues & docs: https://github.com/kreuzberg-dev/alef
 package dev.kreuzberg.htmltomarkdown;
 public final class HtmlToMarkdown {
-    private HtmlToMarkdown() { }
+    private HtmlToMarkdown() {
+    }
 
     /**
-     * Convert HTML to Markdown, returning a ConversionResult with content, metadata, images,
-     * and warnings.
+     * Convert HTML to Markdown, returning a ConversionResult with content, metadata, images, and warnings.
      * {@literal @}param html — the HTML string to convert.
      *
      * {@literal @}param options — optional conversion options. Defaults to ConversionOptions::default.
      *
-     * {@literal @}throws KreuzbergRsException Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
+     * {@literal @}throws KreuzbergRsException Returns an error if HTML parsing fails or if the input contains invalid
+     * UTF-8.
      */
-    public static ConversionResult convert(final String html, final ConversionOptions options) throws HtmlToMarkdownRsException {
+    public static ConversionResult convert(final String html, final ConversionOptions options)
+            throws HtmlToMarkdownRsException {
         java.util.Objects.requireNonNull(html, "html must not be null");
         return HtmlToMarkdownRs.convert(html, options);
     }

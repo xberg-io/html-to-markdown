@@ -13,18 +13,16 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 /**
  * Comprehensive metadata extraction result from HTML document.
  *
- * Contains all extracted metadata types in a single structure,
- * suitable for serialization and transmission across language boundaries.
+ * Contains all extracted metadata types in a single structure, suitable for serialization and transmission across
+ * language boundaries.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = HtmlMetadataBuilder.class)
-public record HtmlMetadata(
-    DocumentMetadata document,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<HeaderMetadata> headers,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<LinkMetadata> links,
-    @JsonInclude(JsonInclude.Include.NON_NULL) List<ImageMetadata> images,
-    @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("structured_data") List<StructuredData> structuredData
-) {
+public record HtmlMetadata(DocumentMetadata document,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<HeaderMetadata> headers,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<LinkMetadata> links,
+        @JsonInclude(JsonInclude.Include.NON_NULL) List<ImageMetadata> images,
+        @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("structured_data") List<StructuredData> structuredData) {
     public static HtmlMetadataBuilder builder() {
         return new HtmlMetadataBuilder();
     }
@@ -32,18 +30,19 @@ public record HtmlMetadata(
     /**
      * Parse a {@code HtmlMetadata} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static HtmlMetadata fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, HtmlMetadata.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, HtmlMetadata.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse HtmlMetadata from JSON: " + e.getMessage(), e);
         }

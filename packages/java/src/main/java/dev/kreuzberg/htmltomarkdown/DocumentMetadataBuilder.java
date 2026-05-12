@@ -14,8 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Document-level metadata extracted from {@code &lt;head&gt;} and top-level elements.
  *
- * Contains all metadata typically used by search engines, social media platforms,
- * and browsers for document indexing and presentation.
+ * Contains all metadata typically used by search engines, social media platforms, and browsers for document indexing
+ * and presentation.
  */
 @JsonPOJOBuilder(withPrefix = "with")
 public class DocumentMetadataBuilder {
@@ -106,18 +106,8 @@ public class DocumentMetadataBuilder {
 
     /** Builds the DocumentMetadata instance. */
     public DocumentMetadata build() {
-        return new DocumentMetadata(
-            title.orElse(null),
-            description.orElse(null),
-            keywords,
-            author.orElse(null),
-            canonicalUrl.orElse(null),
-            baseHref.orElse(null),
-            language.orElse(null),
-            textDirection.orElse(null),
-            openGraph,
-            twitterCard,
-            metaTags
-        );
+        return new DocumentMetadata(title.orElse(null), description.orElse(null), keywords, author.orElse(null),
+                canonicalUrl.orElse(null), baseHref.orElse(null), language.orElse(null), textDirection.orElse(null),
+                openGraph, twitterCard, metaTags);
     }
 }

@@ -18,5 +18,5 @@ public record NodeContext(
         /** Parent element tag name, or null at the root. */
         String parentTag,
         /** True when this element is treated as inline. */
-        boolean isInline
-) {}
+        boolean isInline) {
+}

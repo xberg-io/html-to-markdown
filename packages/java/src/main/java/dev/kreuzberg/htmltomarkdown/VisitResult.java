@@ -6,40 +6,56 @@
 package dev.kreuzberg.htmltomarkdown;
 
 /** Controls how the visitor affects the conversion pipeline. */
-public sealed interface VisitResult
-        permits VisitResult.Continue, VisitResult.Skip, VisitResult.PreserveHtml,
-                VisitResult.Custom, VisitResult.Error {
+public sealed interface VisitResult permits VisitResult.Continue, VisitResult.Skip, VisitResult.PreserveHtml,
+        VisitResult.Custom, VisitResult.Error {
 
     /** Proceed with default conversion. */
-    record Continue() implements VisitResult {}
+    record Continue() implements VisitResult {
+    }
 
     /** Omit this element from output entirely. */
-    record Skip() implements VisitResult {}
+    record Skip() implements VisitResult {
+    }
 
     /** Keep original HTML verbatim. */
-    record PreserveHtml() implements VisitResult {}
+    record PreserveHtml() implements VisitResult {
+    }
 
     /** Replace with custom Markdown. */
-    record Custom(String markdown) implements VisitResult {}
+    record Custom(String markdown) implements VisitResult {
+    }
 
     /** Abort conversion with an error message. */
-    record Error(String message) implements VisitResult {}
+    record Error(String message) implements VisitResult {
+    }
 
     /** Convenience: continue with default conversion. */
-    static VisitResult continueDefault() { return new Continue(); }
+    static VisitResult continueDefault() {
+        return new Continue();
+    }
 
     /** Convenience: skip this element. */
-    static VisitResult skip() { return new Skip(); }
+    static VisitResult skip() {
+        return new Skip();
+    }
 
     /** Convenience: preserve original HTML. */
-    static VisitResult preserveHtml() { return new PreserveHtml(); }
+    static VisitResult preserveHtml() {
+        return new PreserveHtml();
+    }
 
     /** Convenience: emit custom Markdown. */
-    static VisitResult custom(String markdown) { return new Custom(markdown); }
+    static VisitResult custom(String markdown) {
+        return new Custom(markdown);
+    }
 
     /** Convenience: abort with error. */
-    static VisitResult error(String message) { return new Error(message); }
+    static VisitResult error(String message) {
+        return new Error(message);
+    }
 
     /** Alias for {@link #continueDefault()}. */
-    static VisitResult continue_() { return new Continue(); }
+    static VisitResult continue_() {
+        return new Continue();
+    }
 }

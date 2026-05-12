@@ -19,49 +19,34 @@ import org.jspecify.annotations.Nullable;
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ConversionOptionsBuilder.class)
-public record ConversionOptions(
-    @JsonProperty("heading_style") HeadingStyle headingStyle,
-    @JsonProperty("list_indent_type") ListIndentType listIndentType,
-    @JsonProperty("list_indent_width") long listIndentWidth,
-    String bullets,
-    @JsonProperty("strong_em_symbol") String strongEmSymbol,
-    @JsonProperty("escape_asterisks") boolean escapeAsterisks,
-    @JsonProperty("escape_underscores") boolean escapeUnderscores,
-    @JsonProperty("escape_misc") boolean escapeMisc,
-    @JsonProperty("escape_ascii") boolean escapeAscii,
-    @JsonProperty("code_language") String codeLanguage,
-    boolean autolinks,
-    @JsonProperty("default_title") boolean defaultTitle,
-    @JsonProperty("br_in_tables") boolean brInTables,
-    @JsonProperty("highlight_style") HighlightStyle highlightStyle,
-    @JsonProperty("extract_metadata") boolean extractMetadata,
-    @JsonProperty("whitespace_mode") WhitespaceMode whitespaceMode,
-    @JsonProperty("strip_newlines") boolean stripNewlines,
-    boolean wrap,
-    @JsonProperty("wrap_width") long wrapWidth,
-    @JsonProperty("convert_as_inline") boolean convertAsInline,
-    @JsonProperty("sub_symbol") String subSymbol,
-    @JsonProperty("sup_symbol") String supSymbol,
-    @JsonProperty("newline_style") NewlineStyle newlineStyle,
-    @JsonProperty("code_block_style") CodeBlockStyle codeBlockStyle,
-    @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("keep_inline_images_in") List<String> keepInlineImagesIn,
-    PreprocessingOptions preprocessing,
-    String encoding,
-    boolean debug,
-    @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("strip_tags") List<String> stripTags,
-    @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("preserve_tags") List<String> preserveTags,
-    @JsonProperty("skip_images") boolean skipImages,
-    @JsonProperty("link_style") LinkStyle linkStyle,
-    @JsonProperty("output_format") OutputFormat outputFormat,
-    @JsonProperty("include_document_structure") boolean includeDocumentStructure,
-    @JsonProperty("extract_images") boolean extractImages,
-    @JsonProperty("max_image_size") long maxImageSize,
-    @JsonProperty("capture_svg") boolean captureSvg,
-    @JsonProperty("infer_dimensions") boolean inferDimensions,
-    @Nullable @JsonProperty("max_depth") Long maxDepth,
-    @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("exclude_selectors") List<String> excludeSelectors,
-    @JsonIgnore @Nullable Visitor visitor
-) {
+public record ConversionOptions(@JsonProperty("heading_style") HeadingStyle headingStyle,
+        @JsonProperty("list_indent_type") ListIndentType listIndentType,
+        @JsonProperty("list_indent_width") long listIndentWidth, String bullets,
+        @JsonProperty("strong_em_symbol") String strongEmSymbol,
+        @JsonProperty("escape_asterisks") boolean escapeAsterisks,
+        @JsonProperty("escape_underscores") boolean escapeUnderscores, @JsonProperty("escape_misc") boolean escapeMisc,
+        @JsonProperty("escape_ascii") boolean escapeAscii, @JsonProperty("code_language") String codeLanguage,
+        boolean autolinks, @JsonProperty("default_title") boolean defaultTitle,
+        @JsonProperty("br_in_tables") boolean brInTables,
+        @JsonProperty("highlight_style") HighlightStyle highlightStyle,
+        @JsonProperty("extract_metadata") boolean extractMetadata,
+        @JsonProperty("whitespace_mode") WhitespaceMode whitespaceMode,
+        @JsonProperty("strip_newlines") boolean stripNewlines, boolean wrap, @JsonProperty("wrap_width") long wrapWidth,
+        @JsonProperty("convert_as_inline") boolean convertAsInline, @JsonProperty("sub_symbol") String subSymbol,
+        @JsonProperty("sup_symbol") String supSymbol, @JsonProperty("newline_style") NewlineStyle newlineStyle,
+        @JsonProperty("code_block_style") CodeBlockStyle codeBlockStyle,
+        @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("keep_inline_images_in") List<String> keepInlineImagesIn,
+        PreprocessingOptions preprocessing, String encoding, boolean debug,
+        @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("strip_tags") List<String> stripTags,
+        @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("preserve_tags") List<String> preserveTags,
+        @JsonProperty("skip_images") boolean skipImages, @JsonProperty("link_style") LinkStyle linkStyle,
+        @JsonProperty("output_format") OutputFormat outputFormat,
+        @JsonProperty("include_document_structure") boolean includeDocumentStructure,
+        @JsonProperty("extract_images") boolean extractImages, @JsonProperty("max_image_size") long maxImageSize,
+        @JsonProperty("capture_svg") boolean captureSvg, @JsonProperty("infer_dimensions") boolean inferDimensions,
+        @Nullable @JsonProperty("max_depth") Long maxDepth,
+        @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("exclude_selectors") List<String> excludeSelectors,
+        @JsonIgnore @Nullable Visitor visitor) {
     public static ConversionOptionsBuilder builder() {
         return new ConversionOptionsBuilder();
     }
@@ -69,25 +54,29 @@ public record ConversionOptions(
     /**
      * Parse a {@code ConversionOptions} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static ConversionOptions fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, ConversionOptions.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, ConversionOptions.class);
         } catch (Exception e) {
             throw new HtmlToMarkdownRsException("Failed to parse ConversionOptions from JSON: " + e.getMessage(), e);
         }
     }
-    public ConversionOptions{
-        if (listIndentWidth == 0) listIndentWidth = 2;
-        if (wrapWidth == 0) wrapWidth = 80;
-        if (maxImageSize == 0) maxImageSize = 5242880;
+    public ConversionOptions {
+        if (listIndentWidth == 0)
+            listIndentWidth = 2;
+        if (wrapWidth == 0)
+            wrapWidth = 80;
+        if (maxImageSize == 0)
+            maxImageSize = 5242880;
     }
 }

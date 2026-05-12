@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 /**
  * The primary result of HTML conversion and extraction.
  *
- * Contains the converted text output, optional structured document tree,
- * metadata, extracted tables, images, and processing warnings.
+ * Contains the converted text output, optional structured document tree, metadata, extracted tables, images, and
+ * processing warnings.
  */
 @JsonPOJOBuilder(withPrefix = "with")
 public class ConversionResultBuilder {
@@ -63,13 +63,6 @@ public class ConversionResultBuilder {
 
     /** Builds the ConversionResult instance. */
     public ConversionResult build() {
-        return new ConversionResult(
-            content.orElse(null),
-            document.orElse(null),
-            metadata,
-            tables,
-            images,
-            warnings
-        );
+        return new ConversionResult(content.orElse(null), document.orElse(null), metadata, tables, images, warnings);
     }
 }

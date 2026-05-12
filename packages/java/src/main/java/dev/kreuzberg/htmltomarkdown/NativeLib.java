@@ -41,7 +41,9 @@ final class NativeLib {
                 LIB = SymbolLookup.libraryLookup(loadedLibraryName, arena);
             } catch (Throwable inner1) {
                 // Try with 'lib' prefix if not already present (for System.loadLibrary() case)
-                String nameWithLib = loadedLibraryName.startsWith("lib") ? loadedLibraryName : "lib" + loadedLibraryName;
+                String nameWithLib = loadedLibraryName.startsWith("lib")
+                        ? loadedLibraryName
+                        : "lib" + loadedLibraryName;
                 try {
                     LIB = SymbolLookup.libraryLookup(nameWithLib, arena);
                 } catch (Throwable inner2) {
@@ -84,8 +86,8 @@ final class NativeLib {
             // Find the full path by searching java.library.path
             loadedLibraryName = findLoadedLibraryPath("html_to_markdown_ffi", libName, libExt);
         } catch (UnsatisfiedLinkError e) {
-            String msg = "Failed to load html_to_markdown_ffi native library. Expected resource: " + nativesDir + "/" + libName
-                    + libExt + " (RID: " + nativesRid + "). "
+            String msg = "Failed to load html_to_markdown_ffi native library. Expected resource: " + nativesDir + "/"
+                    + libName + libExt + " (RID: " + nativesRid + "). "
                     + "Ensure the library is bundled in the JAR under natives/{os-arch}/, "
                     + "or place it on the system library path (java.library.path).";
             UnsatisfiedLinkError out = new UnsatisfiedLinkError(msg + " Original error: " + e.getMessage());
@@ -111,7 +113,8 @@ final class NativeLib {
             loadedLibraryName = libPath.toAbsolutePath().toString();
             return libPath;
         } catch (Exception e) {
-            System.err.println("[NativeLib] Failed to extract and load native library from resources: " + e.getMessage());
+            System.err
+                    .println("[NativeLib] Failed to extract and load native library from resources: " + e.getMessage());
             return null;
         }
     }
@@ -249,156 +252,103 @@ final class NativeLib {
         return libName;
     }
 
+    static final MethodHandle HTM_CONVERT = LINKER.downcallHandle(LIB.find("htm_convert").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
-    static final MethodHandle HTM_CONVERT = LINKER.downcallHandle(
-        LIB.find("htm_convert").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
+    static final MethodHandle HTM_FREE_STRING = LINKER.downcallHandle(LIB.find("htm_free_string").orElseThrow(),
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
-
-    static final MethodHandle HTM_FREE_STRING = LINKER.downcallHandle(
-        LIB.find("htm_free_string").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
-
-    static final MethodHandle HTM_FREE_BYTES = LINKER.downcallHandle(
-        LIB.find("htm_free_bytes").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG)
-    );
-
+    static final MethodHandle HTM_FREE_BYTES = LINKER.downcallHandle(LIB.find("htm_free_bytes").orElseThrow(),
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_STRIP_TAGS = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_strip_tags").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_strip_tags").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_PRESERVE_TAGS = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_preserve_tags").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_preserve_tags").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_KEEP_INLINE_IMAGES_IN = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_keep_inline_images_in").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_keep_inline_images_in").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_EXCLUDE_SELECTORS = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_exclude_selectors").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_exclude_selectors").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_VISITOR = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_visitor").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_visitor").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_PREPROCESSING = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_preprocessing").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_preprocessing").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_BUILD = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_build").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
+            LIB.find("htm_conversion_options_builder_build").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
-
-    static final MethodHandle HTM_LAST_ERROR_CODE = LINKER.downcallHandle(
-        LIB.find("htm_last_error_code").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.JAVA_INT)
-    );
+    static final MethodHandle HTM_LAST_ERROR_CODE = LINKER.downcallHandle(LIB.find("htm_last_error_code").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.JAVA_INT));
 
     static final MethodHandle HTM_LAST_ERROR_CONTEXT = LINKER.downcallHandle(
-        LIB.find("htm_last_error_context").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_last_error_context").orElseThrow(), FunctionDescriptor.of(ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_RESULT_TO_JSON = LIB.find("htm_conversion_result_to_json")
-        .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
-        .orElse(null);
-
+            .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
+            .orElse(null);
 
     static final MethodHandle HTM_CONVERSION_RESULT_FREE = LINKER.downcallHandle(
-        LIB.find("htm_conversion_result_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_result_free").orElseThrow(), FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_FROM_JSON = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_from_json").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_from_json").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_FREE = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
+            LIB.find("htm_conversion_options_free").orElseThrow(), FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
-
-    static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_TO_JSON = LIB.find("htm_conversion_options_builder_to_json")
-        .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
-        .orElse(null);
-
+    static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_TO_JSON = LIB
+            .find("htm_conversion_options_builder_to_json")
+            .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
+            .orElse(null);
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_BUILDER_FREE = LINKER.downcallHandle(
-        LIB.find("htm_conversion_options_builder_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_conversion_options_builder_free").orElseThrow(),
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_PREPROCESSING_OPTIONS_FROM_JSON = LINKER.downcallHandle(
-        LIB.find("htm_preprocessing_options_from_json").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_preprocessing_options_from_json").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_PREPROCESSING_OPTIONS_FREE = LINKER.downcallHandle(
-        LIB.find("htm_preprocessing_options_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_preprocessing_options_free").orElseThrow(), FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_CONVERSION_OPTIONS_TO_JSON = LIB.find("htm_conversion_options_to_json")
-        .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
-        .orElse(null);
-
+            .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
+            .orElse(null);
 
     static final MethodHandle HTM_VISITOR_HANDLE_FREE = LINKER.downcallHandle(
-        LIB.find("htm_visitor_handle_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
-
+            LIB.find("htm_visitor_handle_free").orElseThrow(), FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_REGISTER_HTML_VISITOR = LIB
-        .find("htm_register_html_visitor")
-        .map(s -> LINKER.downcallHandle(s, FunctionDescriptor.of(ValueLayout.JAVA_INT,
-            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
-        .orElse(null);
-
+            .find("htm_register_html_visitor").map(
+                    s -> LINKER
+                            .downcallHandle(s,
+                                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)))
+            .orElse(null);
 
     // Visitor FFI handles
-    static final MethodHandle HTM_VISITOR_CREATE = LINKER.downcallHandle(
-        LIB.find("htm_visitor_create").orElseThrow(),
-        FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
+    static final MethodHandle HTM_VISITOR_CREATE = LINKER.downcallHandle(LIB.find("htm_visitor_create").orElseThrow(),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
-    static final MethodHandle HTM_VISITOR_FREE = LINKER.downcallHandle(
-        LIB.find("htm_visitor_free").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
-    );
+    static final MethodHandle HTM_VISITOR_FREE = LINKER.downcallHandle(LIB.find("htm_visitor_free").orElseThrow(),
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     static final MethodHandle HTM_OPTIONS_SET_VISITOR_HANDLE = LINKER.downcallHandle(
-        LIB.find("htm_options_set_visitor_handle").orElseThrow(),
-        FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS)
-    );
+            LIB.find("htm_options_set_visitor_handle").orElseThrow(),
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
 }

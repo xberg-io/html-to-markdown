@@ -13,18 +13,15 @@ import org.jspecify.annotations.Nullable;
 /**
  * Partial update for {@code PreprocessingOptions}.
  *
- * This struct uses {@code Option&lt;T&gt;} to represent optional fields that can be selectively updated.
- * Only specified fields (Some values) will override existing options; None values leave the
- * corresponding fields unchanged when applied via PreprocessingOptions::apply_update.
+ * This struct uses {@code Option&lt;T&gt;} to represent optional fields that can be selectively updated. Only specified
+ * fields (Some values) will override existing options; None values leave the corresponding fields unchanged when
+ * applied via PreprocessingOptions::apply_update.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PreprocessingOptionsUpdateBuilder.class)
-public record PreprocessingOptionsUpdate(
-    @Nullable Boolean enabled,
-    @Nullable PreprocessingPreset preset,
-    @Nullable @JsonProperty("remove_navigation") Boolean removeNavigation,
-    @Nullable @JsonProperty("remove_forms") Boolean removeForms
-) {
+public record PreprocessingOptionsUpdate(@Nullable Boolean enabled, @Nullable PreprocessingPreset preset,
+        @Nullable @JsonProperty("remove_navigation") Boolean removeNavigation,
+        @Nullable @JsonProperty("remove_forms") Boolean removeForms) {
     public static PreprocessingOptionsUpdateBuilder builder() {
         return new PreprocessingOptionsUpdateBuilder();
     }
@@ -32,20 +29,22 @@ public record PreprocessingOptionsUpdate(
     /**
      * Parse a {@code PreprocessingOptionsUpdate} from a JSON string.
      *
-     * @param json JSON serialisation matching the Rust-side field names (snake_case).
-     * @throws HtmlToMarkdownRsException if the JSON cannot be deserialised.
+     * @param json
+     *            JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws HtmlToMarkdownRsException
+     *             if the JSON cannot be deserialised.
      */
     public static PreprocessingOptionsUpdate fromJson(String json) throws HtmlToMarkdownRsException {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper()
-                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-                .findAndRegisterModules()
-                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-                .readValue(json, PreprocessingOptionsUpdate.class);
+                    .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module()).findAndRegisterModules()
+                    .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                    .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                    .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                    .readValue(json, PreprocessingOptionsUpdate.class);
         } catch (Exception e) {
-            throw new HtmlToMarkdownRsException("Failed to parse PreprocessingOptionsUpdate from JSON: " + e.getMessage(), e);
+            throw new HtmlToMarkdownRsException(
+                    "Failed to parse PreprocessingOptionsUpdate from JSON: " + e.getMessage(), e);
         }
     }
 }
