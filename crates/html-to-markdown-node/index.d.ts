@@ -13,7 +13,7 @@ export declare class JsVisitorHandle {
 
 }
 
-export declare function convert(html: string, options?: JsConversionOptions | undefined | null): JsConversionResult
+export declare function convert(html: string, options?: JsConversionOptions | undefined | null, visitor?: object | undefined | null): JsConversionResult
 
 export interface JsAnnotationKind {
   annotation_type: string
