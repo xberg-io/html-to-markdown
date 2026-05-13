@@ -13,10 +13,20 @@
     <Authors>Kreuzberg Team</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="../../../LICENSE" Pack="true" PackagePath="/" />
     <None Include="runtimes/**" Pack="true" PackagePath="runtimes/" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Also copy the host-RID native library flat to the consumer's output dir.
+         For ProjectReference flow (and `dotnet test` without an explicit RID),
+         P/Invoke only searches the assembly directory and standard DYLD/LD_LIBRARY paths,
+         not `runtimes/<RID>/native/`. The flat copy makes `[DllImport("html_to_markdown_ffi")]`
+         resolve consistently across NuGet and ProjectReference consumers. -->
+    <Content Include="runtimes/$(NETCoreSdkRuntimeIdentifier)/native/*"
+             Link="%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest"
+             Pack="false" />
   </ItemGroup>
 </Project>
