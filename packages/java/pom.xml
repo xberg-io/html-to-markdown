@@ -274,6 +274,7 @@
                     <rulesets>
                         <ruleset>/rulesets/java/quickstart.xml</ruleset>
                     </rulesets>
+                    <minimumTokens>200</minimumTokens>
                 </configuration>
                 <executions>
                     <execution>

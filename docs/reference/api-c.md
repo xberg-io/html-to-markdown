@@ -1,10 +1,13 @@
 ---
 title: "C API Reference"
 ---
+
 ## C API Reference <span class="version-badge">v3.4.0</span>
+
 ### Functions
 
 #### htm_convert()
+
 Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 and warnings.
 
@@ -17,6 +20,7 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```c
 HtmConversionResult* htm_convert(const char* html, HtmConversionOptions options);
 ```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -32,6 +36,7 @@ HtmConversionResult* htm_convert(const char* html, HtmConversionOptions options)
 ### Types
 
 #### HtmConversionOptions
+
 Main conversion options for HTML to Markdown conversion.
 
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
@@ -52,7 +57,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `default_title` | `bool` | `false` | Emit a default title when no `<title>` tag is present. |
 | `br_in_tables` | `bool` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HtmHighlightStyle` | `HTM_HTM_DOUBLE_EQUAL` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extract_metadata` | `bool` | `true` | Extract `<meta>` and `<head>` information into the result metadata. |
+| `extract_metadata` | `bool` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
 | `whitespace_mode` | `HtmWhitespaceMode` | `HTM_HTM_NORMALIZED` | Controls how whitespace is normalised during conversion. |
 | `strip_newlines` | `bool` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `false` | Wrap long lines at `wrap_width` characters. |
@@ -81,13 +86,17 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `visitor` | `HtmVisitorHandle*` | `NULL` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ##### Methods
+
 ###### htm_default()
+
 **Signature:**
 
 ```c
 HtmConversionOptions htm_default();
 ```
+
 ###### htm_builder()
+
 Create a new builder with default values.
 
 **Signature:**
@@ -95,7 +104,9 @@ Create a new builder with default values.
 ```c
 HtmConversionOptionsBuilder htm_builder();
 ```
+
 ###### htm_apply_update()
+
 Apply a partial update to these conversion options.
 
 **Signature:**
@@ -103,7 +114,9 @@ Apply a partial update to these conversion options.
 ```c
 void htm_apply_update(HtmConversionOptionsUpdate update);
 ```
+
 ###### htm_from_update()
+
 Create from a partial update, applying to defaults.
 
 **Signature:**
@@ -111,7 +124,9 @@ Create from a partial update, applying to defaults.
 ```c
 HtmConversionOptions htm_from_update(HtmConversionOptionsUpdate update);
 ```
+
 ###### htm_from()
+
 **Signature:**
 
 ```c
@@ -121,6 +136,7 @@ HtmConversionOptions htm_from(HtmConversionOptionsUpdate update);
 ---
 
 #### HtmConversionResult
+
 The primary result of HTML conversion and extraction.
 
 Contains the converted text output, optional structured document tree,
@@ -139,12 +155,15 @@ metadata, extracted tables, images, and processing warnings.
 ---
 
 #### HtmConversionOptionsBuilder
+
 Builder for `ConversionOptions`.
 
 All fields start with default values. Call `.build()` to produce the final options.
 
 ##### Methods
+
 ###### htm_strip_tags()
+
 Set the list of HTML tag names whose content is stripped from output.
 
 **Signature:**
@@ -152,7 +171,9 @@ Set the list of HTML tag names whose content is stripped from output.
 ```c
 HtmConversionOptionsBuilder htm_strip_tags(const char** tags);
 ```
+
 ###### htm_preserve_tags()
+
 Set the list of HTML tag names that are preserved verbatim in output.
 
 **Signature:**
@@ -160,7 +181,9 @@ Set the list of HTML tag names that are preserved verbatim in output.
 ```c
 HtmConversionOptionsBuilder htm_preserve_tags(const char** tags);
 ```
+
 ###### htm_keep_inline_images_in()
+
 Set the list of HTML tag names whose `<img>` children are kept inline.
 
 **Signature:**
@@ -168,7 +191,9 @@ Set the list of HTML tag names whose `<img>` children are kept inline.
 ```c
 HtmConversionOptionsBuilder htm_keep_inline_images_in(const char** tags);
 ```
+
 ###### htm_exclude_selectors()
+
 Set the list of CSS selectors for elements to exclude entirely from output.
 
 **Signature:**
@@ -176,7 +201,9 @@ Set the list of CSS selectors for elements to exclude entirely from output.
 ```c
 HtmConversionOptionsBuilder htm_exclude_selectors(const char** selectors);
 ```
+
 ###### htm_visitor()
+
 Set the visitor used during conversion.
 
 **Signature:**
@@ -184,7 +211,9 @@ Set the visitor used during conversion.
 ```c
 HtmConversionOptionsBuilder htm_visitor(HtmVisitorHandle visitor);
 ```
+
 ###### htm_preprocessing()
+
 Set the pre-processing options applied to the HTML before conversion.
 
 **Signature:**
@@ -192,7 +221,9 @@ Set the pre-processing options applied to the HTML before conversion.
 ```c
 HtmConversionOptionsBuilder htm_preprocessing(HtmPreprocessingOptions preprocessing);
 ```
+
 ###### htm_build()
+
 Build the final `ConversionOptions`.
 
 **Signature:**
@@ -204,6 +235,7 @@ HtmConversionOptions htm_build();
 ---
 
 #### HtmDocumentMetadata
+
 Document-level metadata extracted from `<head>` and top-level elements.
 
 Contains all metadata typically used by search engines, social media platforms,
@@ -227,6 +259,7 @@ and browsers for document indexing and presentation.
 ---
 
 #### HtmDocumentNode
+
 A single node in the document tree.
 
 | Field | Type | Default | Description |
@@ -242,6 +275,7 @@ A single node in the document tree.
 ---
 
 #### HtmDocumentStructure
+
 A structured document tree representing the semantic content of an HTML document.
 
 Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -255,6 +289,7 @@ Uses a flat node array with index-based parent/child references for efficient tr
 ---
 
 #### HtmGridCell
+
 A single cell in a table grid.
 
 | Field | Type | Default | Description |
@@ -270,6 +305,7 @@ A single cell in a table grid.
 ---
 
 #### HtmHeaderMetadata
+
 Header element metadata with hierarchy tracking.
 
 Captures heading elements (h1-h6) with their text content, identifiers,
@@ -284,7 +320,9 @@ and position in the document structure.
 | `html_offset` | `uintptr_t` | — | Byte offset in original HTML document |
 
 ##### Methods
+
 ###### htm_is_valid()
+
 Validate that the header level is within valid range (1-6).
 
 **Returns:**
@@ -300,6 +338,7 @@ bool htm_is_valid();
 ---
 
 #### HtmHtmlMetadata
+
 Comprehensive metadata extraction result from HTML document.
 
 Contains all extracted metadata types in a single structure,
@@ -317,35 +356,39 @@ suitable for serialization and transmission across language boundaries.
 ---
 
 #### HtmHtmlVisitor
+
 Visitor trait for HTML→Markdown conversion.
 
 Implement this trait to customize the conversion behavior for any HTML element type.
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
+
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-##### Methods
-###### htm_visit_text()
+### Methods
+
+#### htm_visit_text()
+
 Visit text nodes (most frequent callback - ~100+ per document).
 
 **Signature:**
@@ -353,7 +396,9 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```c
 HtmVisitResult htm_visit_text(HtmNodeContext ctx, const char* text);
 ```
-###### htm_visit_element_start()
+
+##### htm_visit_element_start()
+
 Called before entering any element.
 
 This is the first callback invoked for every HTML element, allowing
@@ -364,7 +409,9 @@ visitors to implement generic element handling before tag-specific logic.
 ```c
 HtmVisitResult htm_visit_element_start(HtmNodeContext ctx);
 ```
+
 ###### htm_visit_element_end()
+
 Called after exiting any element.
 
 Receives the default markdown output that would be generated.
@@ -375,7 +422,9 @@ Visitors can inspect or replace this output.
 ```c
 HtmVisitResult htm_visit_element_end(HtmNodeContext ctx, const char* output);
 ```
+
 ###### htm_visit_link()
+
 Visit anchor links `<a href="...">`.
 
 **Signature:**
@@ -383,7 +432,9 @@ Visit anchor links `<a href="...">`.
 ```c
 HtmVisitResult htm_visit_link(HtmNodeContext ctx, const char* href, const char* text, const char* title);
 ```
+
 ###### htm_visit_image()
+
 Visit images `<img src="...">`.
 
 **Signature:**
@@ -391,7 +442,9 @@ Visit images `<img src="...">`.
 ```c
 HtmVisitResult htm_visit_image(HtmNodeContext ctx, const char* src, const char* alt, const char* title);
 ```
+
 ###### htm_visit_heading()
+
 Visit heading elements `<h1>` through `<h6>`.
 
 **Signature:**
@@ -399,7 +452,9 @@ Visit heading elements `<h1>` through `<h6>`.
 ```c
 HtmVisitResult htm_visit_heading(HtmNodeContext ctx, uint32_t level, const char* text, const char* id);
 ```
+
 ###### htm_visit_code_block()
+
 Visit code blocks `<pre><code>`.
 
 **Signature:**
@@ -407,7 +462,9 @@ Visit code blocks `<pre><code>`.
 ```c
 HtmVisitResult htm_visit_code_block(HtmNodeContext ctx, const char* lang, const char* code);
 ```
+
 ###### htm_visit_code_inline()
+
 Visit inline code `<code>`.
 
 **Signature:**
@@ -415,7 +472,9 @@ Visit inline code `<code>`.
 ```c
 HtmVisitResult htm_visit_code_inline(HtmNodeContext ctx, const char* code);
 ```
+
 ###### htm_visit_list_item()
+
 Visit list items `<li>`.
 
 **Signature:**
@@ -423,7 +482,9 @@ Visit list items `<li>`.
 ```c
 HtmVisitResult htm_visit_list_item(HtmNodeContext ctx, bool ordered, const char* marker, const char* text);
 ```
+
 ###### htm_visit_list_start()
+
 Called before processing a list `<ul>` or `<ol>`.
 
 **Signature:**
@@ -431,7 +492,9 @@ Called before processing a list `<ul>` or `<ol>`.
 ```c
 HtmVisitResult htm_visit_list_start(HtmNodeContext ctx, bool ordered);
 ```
+
 ###### htm_visit_list_end()
+
 Called after processing a list `</ul>` or `</ol>`.
 
 **Signature:**
@@ -439,7 +502,9 @@ Called after processing a list `</ul>` or `</ol>`.
 ```c
 HtmVisitResult htm_visit_list_end(HtmNodeContext ctx, bool ordered, const char* output);
 ```
+
 ###### htm_visit_table_start()
+
 Called before processing a table `<table>`.
 
 **Signature:**
@@ -447,7 +512,9 @@ Called before processing a table `<table>`.
 ```c
 HtmVisitResult htm_visit_table_start(HtmNodeContext ctx);
 ```
+
 ###### htm_visit_table_row()
+
 Visit table rows `<tr>`.
 
 **Signature:**
@@ -455,7 +522,9 @@ Visit table rows `<tr>`.
 ```c
 HtmVisitResult htm_visit_table_row(HtmNodeContext ctx, const char** cells, bool is_header);
 ```
+
 ###### htm_visit_table_end()
+
 Called after processing a table `</table>`.
 
 **Signature:**
@@ -463,7 +532,9 @@ Called after processing a table `</table>`.
 ```c
 HtmVisitResult htm_visit_table_end(HtmNodeContext ctx, const char* output);
 ```
+
 ###### htm_visit_blockquote()
+
 Visit blockquote elements `<blockquote>`.
 
 **Signature:**
@@ -471,7 +542,9 @@ Visit blockquote elements `<blockquote>`.
 ```c
 HtmVisitResult htm_visit_blockquote(HtmNodeContext ctx, const char* content, uintptr_t depth);
 ```
+
 ###### htm_visit_strong()
+
 Visit strong/bold elements `<strong>`, `<b>`.
 
 **Signature:**
@@ -479,7 +552,9 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```c
 HtmVisitResult htm_visit_strong(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_emphasis()
+
 Visit emphasis/italic elements `<em>`, `<i>`.
 
 **Signature:**
@@ -487,7 +562,9 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```c
 HtmVisitResult htm_visit_emphasis(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_strikethrough()
+
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
 **Signature:**
@@ -495,7 +572,9 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```c
 HtmVisitResult htm_visit_strikethrough(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_underline()
+
 Visit underline elements `<u>`, `<ins>`.
 
 **Signature:**
@@ -503,7 +582,9 @@ Visit underline elements `<u>`, `<ins>`.
 ```c
 HtmVisitResult htm_visit_underline(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_subscript()
+
 Visit subscript elements `<sub>`.
 
 **Signature:**
@@ -511,7 +592,9 @@ Visit subscript elements `<sub>`.
 ```c
 HtmVisitResult htm_visit_subscript(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_superscript()
+
 Visit superscript elements `<sup>`.
 
 **Signature:**
@@ -519,7 +602,9 @@ Visit superscript elements `<sup>`.
 ```c
 HtmVisitResult htm_visit_superscript(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_mark()
+
 Visit mark/highlight elements `<mark>`.
 
 **Signature:**
@@ -527,7 +612,9 @@ Visit mark/highlight elements `<mark>`.
 ```c
 HtmVisitResult htm_visit_mark(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_line_break()
+
 Visit line break elements `<br>`.
 
 **Signature:**
@@ -535,7 +622,9 @@ Visit line break elements `<br>`.
 ```c
 HtmVisitResult htm_visit_line_break(HtmNodeContext ctx);
 ```
+
 ###### htm_visit_horizontal_rule()
+
 Visit horizontal rule elements `<hr>`.
 
 **Signature:**
@@ -543,7 +632,9 @@ Visit horizontal rule elements `<hr>`.
 ```c
 HtmVisitResult htm_visit_horizontal_rule(HtmNodeContext ctx);
 ```
+
 ###### htm_visit_custom_element()
+
 Visit custom elements (web components) or unknown tags.
 
 **Signature:**
@@ -551,7 +642,9 @@ Visit custom elements (web components) or unknown tags.
 ```c
 HtmVisitResult htm_visit_custom_element(HtmNodeContext ctx, const char* tag_name, const char* html);
 ```
+
 ###### htm_visit_definition_list_start()
+
 Visit definition list `<dl>`.
 
 **Signature:**
@@ -559,7 +652,9 @@ Visit definition list `<dl>`.
 ```c
 HtmVisitResult htm_visit_definition_list_start(HtmNodeContext ctx);
 ```
+
 ###### htm_visit_definition_term()
+
 Visit definition term `<dt>`.
 
 **Signature:**
@@ -567,7 +662,9 @@ Visit definition term `<dt>`.
 ```c
 HtmVisitResult htm_visit_definition_term(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_definition_description()
+
 Visit definition description `<dd>`.
 
 **Signature:**
@@ -575,7 +672,9 @@ Visit definition description `<dd>`.
 ```c
 HtmVisitResult htm_visit_definition_description(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_definition_list_end()
+
 Called after processing a definition list `</dl>`.
 
 **Signature:**
@@ -583,7 +682,9 @@ Called after processing a definition list `</dl>`.
 ```c
 HtmVisitResult htm_visit_definition_list_end(HtmNodeContext ctx, const char* output);
 ```
+
 ###### htm_visit_form()
+
 Visit form elements `<form>`.
 
 **Signature:**
@@ -591,7 +692,9 @@ Visit form elements `<form>`.
 ```c
 HtmVisitResult htm_visit_form(HtmNodeContext ctx, const char* action, const char* method);
 ```
+
 ###### htm_visit_input()
+
 Visit input elements `<input>`.
 
 **Signature:**
@@ -599,7 +702,9 @@ Visit input elements `<input>`.
 ```c
 HtmVisitResult htm_visit_input(HtmNodeContext ctx, const char* input_type, const char* name, const char* value);
 ```
+
 ###### htm_visit_button()
+
 Visit button elements `<button>`.
 
 **Signature:**
@@ -607,7 +712,9 @@ Visit button elements `<button>`.
 ```c
 HtmVisitResult htm_visit_button(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_audio()
+
 Visit audio elements `<audio>`.
 
 **Signature:**
@@ -615,7 +722,9 @@ Visit audio elements `<audio>`.
 ```c
 HtmVisitResult htm_visit_audio(HtmNodeContext ctx, const char* src);
 ```
+
 ###### htm_visit_video()
+
 Visit video elements `<video>`.
 
 **Signature:**
@@ -623,7 +732,9 @@ Visit video elements `<video>`.
 ```c
 HtmVisitResult htm_visit_video(HtmNodeContext ctx, const char* src);
 ```
+
 ###### htm_visit_iframe()
+
 Visit iframe elements `<iframe>`.
 
 **Signature:**
@@ -631,7 +742,9 @@ Visit iframe elements `<iframe>`.
 ```c
 HtmVisitResult htm_visit_iframe(HtmNodeContext ctx, const char* src);
 ```
+
 ###### htm_visit_details()
+
 Visit details elements `<details>`.
 
 **Signature:**
@@ -639,7 +752,9 @@ Visit details elements `<details>`.
 ```c
 HtmVisitResult htm_visit_details(HtmNodeContext ctx, bool open);
 ```
+
 ###### htm_visit_summary()
+
 Visit summary elements `<summary>`.
 
 **Signature:**
@@ -647,7 +762,9 @@ Visit summary elements `<summary>`.
 ```c
 HtmVisitResult htm_visit_summary(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_figure_start()
+
 Visit figure elements `<figure>`.
 
 **Signature:**
@@ -655,7 +772,9 @@ Visit figure elements `<figure>`.
 ```c
 HtmVisitResult htm_visit_figure_start(HtmNodeContext ctx);
 ```
+
 ###### htm_visit_figcaption()
+
 Visit figcaption elements `<figcaption>`.
 
 **Signature:**
@@ -663,7 +782,9 @@ Visit figcaption elements `<figcaption>`.
 ```c
 HtmVisitResult htm_visit_figcaption(HtmNodeContext ctx, const char* text);
 ```
+
 ###### htm_visit_figure_end()
+
 Called after processing a figure `</figure>`.
 
 **Signature:**
@@ -674,7 +795,8 @@ HtmVisitResult htm_visit_figure_end(HtmNodeContext ctx, const char* output);
 
 ---
 
-#### HtmImageMetadata
+##### HtmImageMetadata
+
 Image metadata with source and dimensions.
 
 Captures `<img>` elements and inline `<svg>` elements with metadata
@@ -692,7 +814,8 @@ for image analysis and optimization.
 
 ---
 
-#### HtmLinkMetadata
+##### HtmLinkMetadata
+
 Hyperlink metadata with categorization and attributes.
 
 Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -706,8 +829,10 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `rel` | `const char**` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `void*` | — | Additional HTML attributes |
 
-##### Methods
+###### Methods
+
 ###### htm_classify_link()
+
 Classify a link based on href value.
 
 **Returns:**
@@ -722,7 +847,8 @@ HtmLinkType htm_classify_link(const char* href);
 
 ---
 
-#### HtmNodeContext
+##### HtmNodeContext
+
 Context information passed to all visitor methods.
 
 Provides comprehensive metadata about the current node being visited,
@@ -741,7 +867,8 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-#### HtmPreprocessingOptions
+##### HtmPreprocessingOptions
+
 HTML preprocessing options for document cleanup before conversion.
 
 | Field | Type | Default | Description |
@@ -751,14 +878,18 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-##### Methods
+###### Methods
+
 ###### htm_default()
+
 **Signature:**
 
 ```c
 HtmPreprocessingOptions htm_default();
 ```
+
 ###### htm_apply_update()
+
 Apply a partial update to these preprocessing options.
 
 Any specified fields in the update will override the current values.
@@ -769,7 +900,9 @@ Unspecified fields (None) are left unchanged.
 ```c
 void htm_apply_update(HtmPreprocessingOptionsUpdate update);
 ```
+
 ###### htm_from_update()
+
 Create new preprocessing options from a partial update.
 
 Creates a new `PreprocessingOptions` struct with defaults, then applies the update.
@@ -784,7 +917,9 @@ New `PreprocessingOptions` with specified updates applied to defaults
 ```c
 HtmPreprocessingOptions htm_from_update(HtmPreprocessingOptionsUpdate update);
 ```
+
 ###### htm_from()
+
 **Signature:**
 
 ```c
@@ -793,7 +928,8 @@ HtmPreprocessingOptions htm_from(HtmPreprocessingOptionsUpdate update);
 
 ---
 
-#### HtmProcessingWarning
+##### HtmProcessingWarning
+
 A non-fatal warning generated during HTML processing.
 
 | Field | Type | Default | Description |
@@ -804,7 +940,8 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-#### HtmStructuredData
+##### HtmStructuredData
+
 Structured data block (JSON-LD, Microdata, or RDFa).
 
 Represents machine-readable structured data found in the document.
@@ -819,7 +956,8 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-#### HtmTableData
+##### HtmTableData
+
 A top-level extracted table with both structured data and markdown representation.
 
 | Field | Type | Default | Description |
@@ -830,7 +968,8 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-#### HtmTableGrid
+##### HtmTableGrid
+
 A structured table grid with cell-level data including spans.
 
 | Field | Type | Default | Description |
@@ -842,7 +981,8 @@ A structured table grid with cell-level data including spans.
 
 ---
 
-#### HtmTextAnnotation
+##### HtmTextAnnotation
+
 An inline text annotation with byte-range offsets.
 
 Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
@@ -856,7 +996,8 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-#### HtmVisitorHandle
+##### HtmVisitorHandle
+
 Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
 
 This allows visitors to be passed around and shared while still being mutable.
@@ -864,9 +1005,10 @@ This allows visitors to be passed around and shared while still being mutable.
 
 ---
 
-### Enums
+#### Enums
 
-#### HtmTextDirection
+##### HtmTextDirection
+
 Text directionality of document content.
 
 Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -880,7 +1022,8 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### HtmLinkType
+##### HtmLinkType
+
 Link classification based on href value and document context.
 
 Used to categorize links during extraction for filtering and analysis.
@@ -897,7 +1040,8 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### HtmImageType
+##### HtmImageType
+
 Image source classification for proper handling and processing.
 
 Determines whether an image is embedded (data URI), inline SVG, external, or relative.
@@ -912,7 +1056,8 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### HtmStructuredDataType
+##### HtmStructuredDataType
+
 Structured data format type.
 
 Identifies the schema/format used for structured data markup.
@@ -926,7 +1071,8 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### HtmPreprocessingPreset
+##### HtmPreprocessingPreset
+
 HTML preprocessing aggressiveness level.
 
 Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
@@ -940,7 +1086,8 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### HtmHeadingStyle
+##### HtmHeadingStyle
+
 Heading style options for Markdown output.
 
 Controls how headings (h1-h6) are rendered in the output Markdown.
@@ -954,7 +1101,8 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### HtmListIndentType
+##### HtmListIndentType
+
 List indentation character type.
 
 Controls whether list items are indented with spaces or tabs.
@@ -967,7 +1115,8 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### HtmWhitespaceMode
+##### HtmWhitespaceMode
+
 Whitespace handling strategy during conversion.
 
 Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
@@ -980,7 +1129,8 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-#### HtmNewlineStyle
+##### HtmNewlineStyle
+
 Line break syntax in Markdown output.
 
 Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
@@ -993,7 +1143,8 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### HtmCodeBlockStyle
+##### HtmCodeBlockStyle
+
 Code block fence style in Markdown output.
 
 Determines how code blocks (`<pre><code>`) are rendered in Markdown.
@@ -1007,7 +1158,8 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HtmHighlightStyle
+##### HtmHighlightStyle
+
 Highlight rendering style for `<mark>` elements.
 
 Controls how highlighted text is rendered in Markdown output.
@@ -1022,7 +1174,8 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### HtmLinkStyle
+##### HtmLinkStyle
+
 Link rendering style in Markdown output.
 
 Controls whether links and images use inline `[text](url)` syntax or
@@ -1036,7 +1189,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### HtmOutputFormat
+##### HtmOutputFormat
+
 Output format for conversion.
 
 Specifies the target markup language format for the conversion output.
@@ -1050,7 +1204,8 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### HtmNodeContent
+##### HtmNodeContent
+
 The semantic content type of a document node.
 
 Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
@@ -1074,7 +1229,8 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### HtmAnnotationKind
+##### HtmAnnotationKind
+
 The type of an inline text annotation.
 
 Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
@@ -1094,7 +1250,8 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### HtmWarningKind
+##### HtmWarningKind
+
 Categories of processing warnings.
 
 | Value | Description |
@@ -1109,7 +1266,8 @@ Categories of processing warnings.
 
 ---
 
-#### HtmNodeType
+##### HtmNodeType
+
 Node type enumeration covering all HTML element types.
 
 This enum categorizes all HTML elements that the converter recognizes,
@@ -1209,7 +1367,8 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### HtmVisitResult
+##### HtmVisitResult
+
 Result of a visitor callback.
 
 Allows visitors to control the conversion flow by either proceeding
@@ -1227,9 +1386,10 @@ preserving HTML, or signaling errors.
 
 ---
 
-### Errors
+#### Errors
 
-#### HtmConversionError
+##### HtmConversionError
+
 Errors that can occur during HTML to Markdown conversion.
 
 | Variant | Description |

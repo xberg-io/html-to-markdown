@@ -1,10 +1,13 @@
 ---
 title: "Elixir API Reference"
 ---
+
 ## Elixir API Reference <span class="version-badge">v3.4.0</span>
+
 ### Functions
 
 #### convert()
+
 Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 and warnings.
 
@@ -18,6 +21,7 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 @spec convert(html, options) :: {:ok, term()} | {:error, term()}
 def convert(html, options)
 ```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -33,6 +37,7 @@ def convert(html, options)
 ### Types
 
 #### ConversionOptions
+
 Main conversion options for HTML to Markdown conversion.
 
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
@@ -53,7 +58,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `default_title` | `boolean()` | `false` | Emit a default title when no `<title>` tag is present. |
 | `br_in_tables` | `boolean()` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `:double_equal` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extract_metadata` | `boolean()` | `true` | Extract `<meta>` and `<head>` information into the result metadata. |
+| `extract_metadata` | `boolean()` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
 | `whitespace_mode` | `WhitespaceMode` | `:normalized` | Controls how whitespace is normalised during conversion. |
 | `strip_newlines` | `boolean()` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `boolean()` | `false` | Wrap long lines at `wrap_width` characters. |
@@ -82,13 +87,17 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `visitor` | `VisitorHandle | nil` | `nil` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ##### Functions
+
 ###### default()
+
 **Signature:**
 
 ```elixir
 def default()
 ```
+
 ###### builder()
+
 Create a new builder with default values.
 
 **Signature:**
@@ -96,7 +105,9 @@ Create a new builder with default values.
 ```elixir
 def builder()
 ```
+
 ###### apply_update()
+
 Apply a partial update to these conversion options.
 
 **Signature:**
@@ -104,7 +115,9 @@ Apply a partial update to these conversion options.
 ```elixir
 def apply_update(update)
 ```
+
 ###### from_update()
+
 Create from a partial update, applying to defaults.
 
 **Signature:**
@@ -112,7 +125,9 @@ Create from a partial update, applying to defaults.
 ```elixir
 def from_update(update)
 ```
+
 ###### from()
+
 **Signature:**
 
 ```elixir
@@ -122,6 +137,7 @@ def from(update)
 ---
 
 #### ConversionResult
+
 The primary result of HTML conversion and extraction.
 
 Contains the converted text output, optional structured document tree,
@@ -140,12 +156,15 @@ metadata, extracted tables, images, and processing warnings.
 ---
 
 #### ConversionOptionsBuilder
+
 Builder for `ConversionOptions`.
 
 All fields start with default values. Call `.build()` to produce the final options.
 
 ##### Functions
+
 ###### strip_tags()
+
 Set the list of HTML tag names whose content is stripped from output.
 
 **Signature:**
@@ -153,7 +172,9 @@ Set the list of HTML tag names whose content is stripped from output.
 ```elixir
 def strip_tags(tags)
 ```
+
 ###### preserve_tags()
+
 Set the list of HTML tag names that are preserved verbatim in output.
 
 **Signature:**
@@ -161,7 +182,9 @@ Set the list of HTML tag names that are preserved verbatim in output.
 ```elixir
 def preserve_tags(tags)
 ```
+
 ###### keep_inline_images_in()
+
 Set the list of HTML tag names whose `<img>` children are kept inline.
 
 **Signature:**
@@ -169,7 +192,9 @@ Set the list of HTML tag names whose `<img>` children are kept inline.
 ```elixir
 def keep_inline_images_in(tags)
 ```
+
 ###### exclude_selectors()
+
 Set the list of CSS selectors for elements to exclude entirely from output.
 
 **Signature:**
@@ -177,7 +202,9 @@ Set the list of CSS selectors for elements to exclude entirely from output.
 ```elixir
 def exclude_selectors(selectors)
 ```
+
 ###### visitor()
+
 Set the visitor used during conversion.
 
 **Signature:**
@@ -185,7 +212,9 @@ Set the visitor used during conversion.
 ```elixir
 def visitor(visitor)
 ```
+
 ###### preprocessing()
+
 Set the pre-processing options applied to the HTML before conversion.
 
 **Signature:**
@@ -193,7 +222,9 @@ Set the pre-processing options applied to the HTML before conversion.
 ```elixir
 def preprocessing(preprocessing)
 ```
+
 ###### build()
+
 Build the final `ConversionOptions`.
 
 **Signature:**
@@ -205,6 +236,7 @@ def build()
 ---
 
 #### DocumentMetadata
+
 Document-level metadata extracted from `<head>` and top-level elements.
 
 Contains all metadata typically used by search engines, social media platforms,
@@ -228,6 +260,7 @@ and browsers for document indexing and presentation.
 ---
 
 #### DocumentNode
+
 A single node in the document tree.
 
 | Field | Type | Default | Description |
@@ -243,6 +276,7 @@ A single node in the document tree.
 ---
 
 #### DocumentStructure
+
 A structured document tree representing the semantic content of an HTML document.
 
 Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -256,6 +290,7 @@ Uses a flat node array with index-based parent/child references for efficient tr
 ---
 
 #### GridCell
+
 A single cell in a table grid.
 
 | Field | Type | Default | Description |
@@ -271,6 +306,7 @@ A single cell in a table grid.
 ---
 
 #### HeaderMetadata
+
 Header element metadata with hierarchy tracking.
 
 Captures heading elements (h1-h6) with their text content, identifiers,
@@ -285,7 +321,9 @@ and position in the document structure.
 | `html_offset` | `integer()` | — | Byte offset in original HTML document |
 
 ##### Functions
+
 ###### is_valid()
+
 Validate that the header level is within valid range (1-6).
 
 **Returns:**
@@ -301,6 +339,7 @@ def is_valid()
 ---
 
 #### HtmlMetadata
+
 Comprehensive metadata extraction result from HTML document.
 
 Contains all extracted metadata types in a single structure,
@@ -318,35 +357,39 @@ suitable for serialization and transmission across language boundaries.
 ---
 
 #### HtmlVisitor
+
 Visitor trait for HTML→Markdown conversion.
 
 Implement this trait to customize the conversion behavior for any HTML element type.
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
+
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-##### Functions
-###### visit_text()
+### Functions
+
+#### visit_text()
+
 Visit text nodes (most frequent callback - ~100+ per document).
 
 **Signature:**
@@ -354,7 +397,9 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```elixir
 def visit_text(ctx, text)
 ```
-###### visit_element_start()
+
+##### visit_element_start()
+
 Called before entering any element.
 
 This is the first callback invoked for every HTML element, allowing
@@ -365,7 +410,9 @@ visitors to implement generic element handling before tag-specific logic.
 ```elixir
 def visit_element_start(ctx)
 ```
+
 ###### visit_element_end()
+
 Called after exiting any element.
 
 Receives the default markdown output that would be generated.
@@ -376,7 +423,9 @@ Visitors can inspect or replace this output.
 ```elixir
 def visit_element_end(ctx, output)
 ```
+
 ###### visit_link()
+
 Visit anchor links `<a href="...">`.
 
 **Signature:**
@@ -384,7 +433,9 @@ Visit anchor links `<a href="...">`.
 ```elixir
 def visit_link(ctx, href, text, title)
 ```
+
 ###### visit_image()
+
 Visit images `<img src="...">`.
 
 **Signature:**
@@ -392,7 +443,9 @@ Visit images `<img src="...">`.
 ```elixir
 def visit_image(ctx, src, alt, title)
 ```
+
 ###### visit_heading()
+
 Visit heading elements `<h1>` through `<h6>`.
 
 **Signature:**
@@ -400,7 +453,9 @@ Visit heading elements `<h1>` through `<h6>`.
 ```elixir
 def visit_heading(ctx, level, text, id)
 ```
+
 ###### visit_code_block()
+
 Visit code blocks `<pre><code>`.
 
 **Signature:**
@@ -408,7 +463,9 @@ Visit code blocks `<pre><code>`.
 ```elixir
 def visit_code_block(ctx, lang, code)
 ```
+
 ###### visit_code_inline()
+
 Visit inline code `<code>`.
 
 **Signature:**
@@ -416,7 +473,9 @@ Visit inline code `<code>`.
 ```elixir
 def visit_code_inline(ctx, code)
 ```
+
 ###### visit_list_item()
+
 Visit list items `<li>`.
 
 **Signature:**
@@ -424,7 +483,9 @@ Visit list items `<li>`.
 ```elixir
 def visit_list_item(ctx, ordered, marker, text)
 ```
+
 ###### visit_list_start()
+
 Called before processing a list `<ul>` or `<ol>`.
 
 **Signature:**
@@ -432,7 +493,9 @@ Called before processing a list `<ul>` or `<ol>`.
 ```elixir
 def visit_list_start(ctx, ordered)
 ```
+
 ###### visit_list_end()
+
 Called after processing a list `</ul>` or `</ol>`.
 
 **Signature:**
@@ -440,7 +503,9 @@ Called after processing a list `</ul>` or `</ol>`.
 ```elixir
 def visit_list_end(ctx, ordered, output)
 ```
+
 ###### visit_table_start()
+
 Called before processing a table `<table>`.
 
 **Signature:**
@@ -448,7 +513,9 @@ Called before processing a table `<table>`.
 ```elixir
 def visit_table_start(ctx)
 ```
+
 ###### visit_table_row()
+
 Visit table rows `<tr>`.
 
 **Signature:**
@@ -456,7 +523,9 @@ Visit table rows `<tr>`.
 ```elixir
 def visit_table_row(ctx, cells, is_header)
 ```
+
 ###### visit_table_end()
+
 Called after processing a table `</table>`.
 
 **Signature:**
@@ -464,7 +533,9 @@ Called after processing a table `</table>`.
 ```elixir
 def visit_table_end(ctx, output)
 ```
+
 ###### visit_blockquote()
+
 Visit blockquote elements `<blockquote>`.
 
 **Signature:**
@@ -472,7 +543,9 @@ Visit blockquote elements `<blockquote>`.
 ```elixir
 def visit_blockquote(ctx, content, depth)
 ```
+
 ###### visit_strong()
+
 Visit strong/bold elements `<strong>`, `<b>`.
 
 **Signature:**
@@ -480,7 +553,9 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```elixir
 def visit_strong(ctx, text)
 ```
+
 ###### visit_emphasis()
+
 Visit emphasis/italic elements `<em>`, `<i>`.
 
 **Signature:**
@@ -488,7 +563,9 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```elixir
 def visit_emphasis(ctx, text)
 ```
+
 ###### visit_strikethrough()
+
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
 **Signature:**
@@ -496,7 +573,9 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```elixir
 def visit_strikethrough(ctx, text)
 ```
+
 ###### visit_underline()
+
 Visit underline elements `<u>`, `<ins>`.
 
 **Signature:**
@@ -504,7 +583,9 @@ Visit underline elements `<u>`, `<ins>`.
 ```elixir
 def visit_underline(ctx, text)
 ```
+
 ###### visit_subscript()
+
 Visit subscript elements `<sub>`.
 
 **Signature:**
@@ -512,7 +593,9 @@ Visit subscript elements `<sub>`.
 ```elixir
 def visit_subscript(ctx, text)
 ```
+
 ###### visit_superscript()
+
 Visit superscript elements `<sup>`.
 
 **Signature:**
@@ -520,7 +603,9 @@ Visit superscript elements `<sup>`.
 ```elixir
 def visit_superscript(ctx, text)
 ```
+
 ###### visit_mark()
+
 Visit mark/highlight elements `<mark>`.
 
 **Signature:**
@@ -528,7 +613,9 @@ Visit mark/highlight elements `<mark>`.
 ```elixir
 def visit_mark(ctx, text)
 ```
+
 ###### visit_line_break()
+
 Visit line break elements `<br>`.
 
 **Signature:**
@@ -536,7 +623,9 @@ Visit line break elements `<br>`.
 ```elixir
 def visit_line_break(ctx)
 ```
+
 ###### visit_horizontal_rule()
+
 Visit horizontal rule elements `<hr>`.
 
 **Signature:**
@@ -544,7 +633,9 @@ Visit horizontal rule elements `<hr>`.
 ```elixir
 def visit_horizontal_rule(ctx)
 ```
+
 ###### visit_custom_element()
+
 Visit custom elements (web components) or unknown tags.
 
 **Signature:**
@@ -552,7 +643,9 @@ Visit custom elements (web components) or unknown tags.
 ```elixir
 def visit_custom_element(ctx, tag_name, html)
 ```
+
 ###### visit_definition_list_start()
+
 Visit definition list `<dl>`.
 
 **Signature:**
@@ -560,7 +653,9 @@ Visit definition list `<dl>`.
 ```elixir
 def visit_definition_list_start(ctx)
 ```
+
 ###### visit_definition_term()
+
 Visit definition term `<dt>`.
 
 **Signature:**
@@ -568,7 +663,9 @@ Visit definition term `<dt>`.
 ```elixir
 def visit_definition_term(ctx, text)
 ```
+
 ###### visit_definition_description()
+
 Visit definition description `<dd>`.
 
 **Signature:**
@@ -576,7 +673,9 @@ Visit definition description `<dd>`.
 ```elixir
 def visit_definition_description(ctx, text)
 ```
+
 ###### visit_definition_list_end()
+
 Called after processing a definition list `</dl>`.
 
 **Signature:**
@@ -584,7 +683,9 @@ Called after processing a definition list `</dl>`.
 ```elixir
 def visit_definition_list_end(ctx, output)
 ```
+
 ###### visit_form()
+
 Visit form elements `<form>`.
 
 **Signature:**
@@ -592,7 +693,9 @@ Visit form elements `<form>`.
 ```elixir
 def visit_form(ctx, action, method)
 ```
+
 ###### visit_input()
+
 Visit input elements `<input>`.
 
 **Signature:**
@@ -600,7 +703,9 @@ Visit input elements `<input>`.
 ```elixir
 def visit_input(ctx, input_type, name, value)
 ```
+
 ###### visit_button()
+
 Visit button elements `<button>`.
 
 **Signature:**
@@ -608,7 +713,9 @@ Visit button elements `<button>`.
 ```elixir
 def visit_button(ctx, text)
 ```
+
 ###### visit_audio()
+
 Visit audio elements `<audio>`.
 
 **Signature:**
@@ -616,7 +723,9 @@ Visit audio elements `<audio>`.
 ```elixir
 def visit_audio(ctx, src)
 ```
+
 ###### visit_video()
+
 Visit video elements `<video>`.
 
 **Signature:**
@@ -624,7 +733,9 @@ Visit video elements `<video>`.
 ```elixir
 def visit_video(ctx, src)
 ```
+
 ###### visit_iframe()
+
 Visit iframe elements `<iframe>`.
 
 **Signature:**
@@ -632,7 +743,9 @@ Visit iframe elements `<iframe>`.
 ```elixir
 def visit_iframe(ctx, src)
 ```
+
 ###### visit_details()
+
 Visit details elements `<details>`.
 
 **Signature:**
@@ -640,7 +753,9 @@ Visit details elements `<details>`.
 ```elixir
 def visit_details(ctx, open)
 ```
+
 ###### visit_summary()
+
 Visit summary elements `<summary>`.
 
 **Signature:**
@@ -648,7 +763,9 @@ Visit summary elements `<summary>`.
 ```elixir
 def visit_summary(ctx, text)
 ```
+
 ###### visit_figure_start()
+
 Visit figure elements `<figure>`.
 
 **Signature:**
@@ -656,7 +773,9 @@ Visit figure elements `<figure>`.
 ```elixir
 def visit_figure_start(ctx)
 ```
+
 ###### visit_figcaption()
+
 Visit figcaption elements `<figcaption>`.
 
 **Signature:**
@@ -664,7 +783,9 @@ Visit figcaption elements `<figcaption>`.
 ```elixir
 def visit_figcaption(ctx, text)
 ```
+
 ###### visit_figure_end()
+
 Called after processing a figure `</figure>`.
 
 **Signature:**
@@ -675,7 +796,8 @@ def visit_figure_end(ctx, output)
 
 ---
 
-#### ImageMetadata
+##### ImageMetadata
+
 Image metadata with source and dimensions.
 
 Captures `<img>` elements and inline `<svg>` elements with metadata
@@ -693,7 +815,8 @@ for image analysis and optimization.
 
 ---
 
-#### LinkMetadata
+##### LinkMetadata
+
 Hyperlink metadata with categorization and attributes.
 
 Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -707,8 +830,10 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `rel` | `list(String.t())` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `map()` | — | Additional HTML attributes |
 
-##### Functions
+###### Functions
+
 ###### classify_link()
+
 Classify a link based on href value.
 
 **Returns:**
@@ -723,7 +848,8 @@ def classify_link(href)
 
 ---
 
-#### NodeContext
+##### NodeContext
+
 Context information passed to all visitor methods.
 
 Provides comprehensive metadata about the current node being visited,
@@ -742,7 +868,8 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-#### PreprocessingOptions
+##### PreprocessingOptions
+
 HTML preprocessing options for document cleanup before conversion.
 
 | Field | Type | Default | Description |
@@ -752,14 +879,18 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `boolean()` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `boolean()` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-##### Functions
+###### Functions
+
 ###### default()
+
 **Signature:**
 
 ```elixir
 def default()
 ```
+
 ###### apply_update()
+
 Apply a partial update to these preprocessing options.
 
 Any specified fields in the update will override the current values.
@@ -770,7 +901,9 @@ Unspecified fields (None) are left unchanged.
 ```elixir
 def apply_update(update)
 ```
+
 ###### from_update()
+
 Create new preprocessing options from a partial update.
 
 Creates a new `PreprocessingOptions` struct with defaults, then applies the update.
@@ -785,7 +918,9 @@ New `PreprocessingOptions` with specified updates applied to defaults
 ```elixir
 def from_update(update)
 ```
+
 ###### from()
+
 **Signature:**
 
 ```elixir
@@ -794,7 +929,8 @@ def from(update)
 
 ---
 
-#### ProcessingWarning
+##### ProcessingWarning
+
 A non-fatal warning generated during HTML processing.
 
 | Field | Type | Default | Description |
@@ -805,7 +941,8 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-#### StructuredData
+##### StructuredData
+
 Structured data block (JSON-LD, Microdata, or RDFa).
 
 Represents machine-readable structured data found in the document.
@@ -820,7 +957,8 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-#### TableData
+##### TableData
+
 A top-level extracted table with both structured data and markdown representation.
 
 | Field | Type | Default | Description |
@@ -831,7 +969,8 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-#### TableGrid
+##### TableGrid
+
 A structured table grid with cell-level data including spans.
 
 | Field | Type | Default | Description |
@@ -843,7 +982,8 @@ A structured table grid with cell-level data including spans.
 
 ---
 
-#### TextAnnotation
+##### TextAnnotation
+
 An inline text annotation with byte-range offsets.
 
 Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
@@ -857,7 +997,8 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-#### VisitorHandle
+##### VisitorHandle
+
 Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
 
 This allows visitors to be passed around and shared while still being mutable.
@@ -865,9 +1006,10 @@ This allows visitors to be passed around and shared while still being mutable.
 
 ---
 
-### Enums
+#### Enums
 
-#### TextDirection
+##### TextDirection
+
 Text directionality of document content.
 
 Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -881,7 +1023,8 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### LinkType
+##### LinkType
+
 Link classification based on href value and document context.
 
 Used to categorize links during extraction for filtering and analysis.
@@ -898,7 +1041,8 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### ImageType
+##### ImageType
+
 Image source classification for proper handling and processing.
 
 Determines whether an image is embedded (data URI), inline SVG, external, or relative.
@@ -913,7 +1057,8 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### StructuredDataType
+##### StructuredDataType
+
 Structured data format type.
 
 Identifies the schema/format used for structured data markup.
@@ -927,7 +1072,8 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### PreprocessingPreset
+##### PreprocessingPreset
+
 HTML preprocessing aggressiveness level.
 
 Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
@@ -941,7 +1087,8 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### HeadingStyle
+##### HeadingStyle
+
 Heading style options for Markdown output.
 
 Controls how headings (h1-h6) are rendered in the output Markdown.
@@ -955,7 +1102,8 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### ListIndentType
+##### ListIndentType
+
 List indentation character type.
 
 Controls whether list items are indented with spaces or tabs.
@@ -968,7 +1116,8 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### WhitespaceMode
+##### WhitespaceMode
+
 Whitespace handling strategy during conversion.
 
 Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
@@ -981,7 +1130,8 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-#### NewlineStyle
+##### NewlineStyle
+
 Line break syntax in Markdown output.
 
 Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
@@ -994,7 +1144,8 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### CodeBlockStyle
+##### CodeBlockStyle
+
 Code block fence style in Markdown output.
 
 Determines how code blocks (`<pre><code>`) are rendered in Markdown.
@@ -1008,7 +1159,8 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HighlightStyle
+##### HighlightStyle
+
 Highlight rendering style for `<mark>` elements.
 
 Controls how highlighted text is rendered in Markdown output.
@@ -1023,7 +1175,8 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### LinkStyle
+##### LinkStyle
+
 Link rendering style in Markdown output.
 
 Controls whether links and images use inline `[text](url)` syntax or
@@ -1037,7 +1190,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### OutputFormat
+##### OutputFormat
+
 Output format for conversion.
 
 Specifies the target markup language format for the conversion output.
@@ -1051,7 +1205,8 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### NodeContent
+##### NodeContent
+
 The semantic content type of a document node.
 
 Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
@@ -1075,7 +1230,8 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### AnnotationKind
+##### AnnotationKind
+
 The type of an inline text annotation.
 
 Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
@@ -1095,7 +1251,8 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### WarningKind
+##### WarningKind
+
 Categories of processing warnings.
 
 | Value | Description |
@@ -1110,7 +1267,8 @@ Categories of processing warnings.
 
 ---
 
-#### NodeType
+##### NodeType
+
 Node type enumeration covering all HTML element types.
 
 This enum categorizes all HTML elements that the converter recognizes,
@@ -1210,7 +1368,8 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### VisitResult
+##### VisitResult
+
 Result of a visitor callback.
 
 Allows visitors to control the conversion flow by either proceeding
@@ -1228,9 +1387,10 @@ preserving HTML, or signaling errors.
 
 ---
 
-### Errors
+#### Errors
 
-#### ConversionError
+##### ConversionError
+
 Errors that can occur during HTML to Markdown conversion.
 
 | Variant | Description |

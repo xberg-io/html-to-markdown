@@ -1,10 +1,13 @@
 ---
 title: "Python API Reference"
 ---
+
 ## Python API Reference <span class="version-badge">v3.4.0</span>
+
 ### Functions
 
 #### convert()
+
 Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 and warnings.
 
@@ -17,6 +20,7 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```python
 def convert(html: str, options: ConversionOptions = None) -> ConversionResult
 ```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -32,6 +36,7 @@ def convert(html: str, options: ConversionOptions = None) -> ConversionResult
 ### Types
 
 #### ConversionOptions
+
 Main conversion options for HTML to Markdown conversion.
 
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
@@ -52,7 +57,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `default_title` | `bool` | `False` | Emit a default title when no `<title>` tag is present. |
 | `br_in_tables` | `bool` | `False` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `HighlightStyle.DOUBLE_EQUAL` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extract_metadata` | `bool` | `True` | Extract `<meta>` and `<head>` information into the result metadata. |
+| `extract_metadata` | `bool` | `True` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `True`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
 | `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode.NORMALIZED` | Controls how whitespace is normalised during conversion. |
 | `strip_newlines` | `bool` | `False` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `False` | Wrap long lines at `wrap_width` characters. |
@@ -81,14 +86,18 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `visitor` | `VisitorHandle | None` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ##### Methods
+
 ###### default()
+
 **Signature:**
 
 ```python
 @staticmethod
 def default() -> ConversionOptions
 ```
+
 ###### builder()
+
 Create a new builder with default values.
 
 **Signature:**
@@ -97,7 +106,9 @@ Create a new builder with default values.
 @staticmethod
 def builder() -> ConversionOptionsBuilder
 ```
+
 ###### apply_update()
+
 Apply a partial update to these conversion options.
 
 **Signature:**
@@ -105,7 +116,9 @@ Apply a partial update to these conversion options.
 ```python
 def apply_update(self, update: ConversionOptionsUpdate) -> None
 ```
+
 ###### from_update()
+
 Create from a partial update, applying to defaults.
 
 **Signature:**
@@ -114,7 +127,9 @@ Create from a partial update, applying to defaults.
 @staticmethod
 def from_update(update: ConversionOptionsUpdate) -> ConversionOptions
 ```
+
 ###### from()
+
 **Signature:**
 
 ```python
@@ -125,6 +140,7 @@ def from(update: ConversionOptionsUpdate) -> ConversionOptions
 ---
 
 #### ConversionResult
+
 The primary result of HTML conversion and extraction.
 
 Contains the converted text output, optional structured document tree,
@@ -143,12 +159,15 @@ metadata, extracted tables, images, and processing warnings.
 ---
 
 #### ConversionOptionsBuilder
+
 Builder for `ConversionOptions`.
 
 All fields start with default values. Call `.build()` to produce the final options.
 
 ##### Methods
+
 ###### strip_tags()
+
 Set the list of HTML tag names whose content is stripped from output.
 
 **Signature:**
@@ -156,7 +175,9 @@ Set the list of HTML tag names whose content is stripped from output.
 ```python
 def strip_tags(self, tags: list[str]) -> ConversionOptionsBuilder
 ```
+
 ###### preserve_tags()
+
 Set the list of HTML tag names that are preserved verbatim in output.
 
 **Signature:**
@@ -164,7 +185,9 @@ Set the list of HTML tag names that are preserved verbatim in output.
 ```python
 def preserve_tags(self, tags: list[str]) -> ConversionOptionsBuilder
 ```
+
 ###### keep_inline_images_in()
+
 Set the list of HTML tag names whose `<img>` children are kept inline.
 
 **Signature:**
@@ -172,7 +195,9 @@ Set the list of HTML tag names whose `<img>` children are kept inline.
 ```python
 def keep_inline_images_in(self, tags: list[str]) -> ConversionOptionsBuilder
 ```
+
 ###### exclude_selectors()
+
 Set the list of CSS selectors for elements to exclude entirely from output.
 
 **Signature:**
@@ -180,7 +205,9 @@ Set the list of CSS selectors for elements to exclude entirely from output.
 ```python
 def exclude_selectors(self, selectors: list[str]) -> ConversionOptionsBuilder
 ```
+
 ###### visitor()
+
 Set the visitor used during conversion.
 
 **Signature:**
@@ -188,7 +215,9 @@ Set the visitor used during conversion.
 ```python
 def visitor(self, visitor: VisitorHandle) -> ConversionOptionsBuilder
 ```
+
 ###### preprocessing()
+
 Set the pre-processing options applied to the HTML before conversion.
 
 **Signature:**
@@ -196,7 +225,9 @@ Set the pre-processing options applied to the HTML before conversion.
 ```python
 def preprocessing(self, preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder
 ```
+
 ###### build()
+
 Build the final `ConversionOptions`.
 
 **Signature:**
@@ -208,6 +239,7 @@ def build(self) -> ConversionOptions
 ---
 
 #### DocumentMetadata
+
 Document-level metadata extracted from `<head>` and top-level elements.
 
 Contains all metadata typically used by search engines, social media platforms,
@@ -231,6 +263,7 @@ and browsers for document indexing and presentation.
 ---
 
 #### DocumentNode
+
 A single node in the document tree.
 
 | Field | Type | Default | Description |
@@ -246,6 +279,7 @@ A single node in the document tree.
 ---
 
 #### DocumentStructure
+
 A structured document tree representing the semantic content of an HTML document.
 
 Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -259,6 +293,7 @@ Uses a flat node array with index-based parent/child references for efficient tr
 ---
 
 #### GridCell
+
 A single cell in a table grid.
 
 | Field | Type | Default | Description |
@@ -274,6 +309,7 @@ A single cell in a table grid.
 ---
 
 #### HeaderMetadata
+
 Header element metadata with hierarchy tracking.
 
 Captures heading elements (h1-h6) with their text content, identifiers,
@@ -288,7 +324,9 @@ and position in the document structure.
 | `html_offset` | `int` | — | Byte offset in original HTML document |
 
 ##### Methods
+
 ###### is_valid()
+
 Validate that the header level is within valid range (1-6).
 
 **Returns:**
@@ -304,6 +342,7 @@ def is_valid(self) -> bool
 ---
 
 #### HtmlMetadata
+
 Comprehensive metadata extraction result from HTML document.
 
 Contains all extracted metadata types in a single structure,
@@ -321,35 +360,39 @@ suitable for serialization and transmission across language boundaries.
 ---
 
 #### HtmlVisitor
+
 Visitor trait for HTML→Markdown conversion.
 
 Implement this trait to customize the conversion behavior for any HTML element type.
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
+
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-##### Methods
-###### visit_text()
+### Methods
+
+#### visit_text()
+
 Visit text nodes (most frequent callback - ~100+ per document).
 
 **Signature:**
@@ -357,7 +400,9 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```python
 def visit_text(self, ctx: NodeContext, text: str) -> VisitResult
 ```
-###### visit_element_start()
+
+##### visit_element_start()
+
 Called before entering any element.
 
 This is the first callback invoked for every HTML element, allowing
@@ -368,7 +413,9 @@ visitors to implement generic element handling before tag-specific logic.
 ```python
 def visit_element_start(self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_element_end()
+
 Called after exiting any element.
 
 Receives the default markdown output that would be generated.
@@ -379,7 +426,9 @@ Visitors can inspect or replace this output.
 ```python
 def visit_element_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
+
 ###### visit_link()
+
 Visit anchor links `<a href="...">`.
 
 **Signature:**
@@ -387,7 +436,9 @@ Visit anchor links `<a href="...">`.
 ```python
 def visit_link(self, ctx: NodeContext, href: str, text: str, title: str) -> VisitResult
 ```
+
 ###### visit_image()
+
 Visit images `<img src="...">`.
 
 **Signature:**
@@ -395,7 +446,9 @@ Visit images `<img src="...">`.
 ```python
 def visit_image(self, ctx: NodeContext, src: str, alt: str, title: str) -> VisitResult
 ```
+
 ###### visit_heading()
+
 Visit heading elements `<h1>` through `<h6>`.
 
 **Signature:**
@@ -403,7 +456,9 @@ Visit heading elements `<h1>` through `<h6>`.
 ```python
 def visit_heading(self, ctx: NodeContext, level: int, text: str, id: str) -> VisitResult
 ```
+
 ###### visit_code_block()
+
 Visit code blocks `<pre><code>`.
 
 **Signature:**
@@ -411,7 +466,9 @@ Visit code blocks `<pre><code>`.
 ```python
 def visit_code_block(self, ctx: NodeContext, lang: str, code: str) -> VisitResult
 ```
+
 ###### visit_code_inline()
+
 Visit inline code `<code>`.
 
 **Signature:**
@@ -419,7 +476,9 @@ Visit inline code `<code>`.
 ```python
 def visit_code_inline(self, ctx: NodeContext, code: str) -> VisitResult
 ```
+
 ###### visit_list_item()
+
 Visit list items `<li>`.
 
 **Signature:**
@@ -427,7 +486,9 @@ Visit list items `<li>`.
 ```python
 def visit_list_item(self, ctx: NodeContext, ordered: bool, marker: str, text: str) -> VisitResult
 ```
+
 ###### visit_list_start()
+
 Called before processing a list `<ul>` or `<ol>`.
 
 **Signature:**
@@ -435,7 +496,9 @@ Called before processing a list `<ul>` or `<ol>`.
 ```python
 def visit_list_start(self, ctx: NodeContext, ordered: bool) -> VisitResult
 ```
+
 ###### visit_list_end()
+
 Called after processing a list `</ul>` or `</ol>`.
 
 **Signature:**
@@ -443,7 +506,9 @@ Called after processing a list `</ul>` or `</ol>`.
 ```python
 def visit_list_end(self, ctx: NodeContext, ordered: bool, output: str) -> VisitResult
 ```
+
 ###### visit_table_start()
+
 Called before processing a table `<table>`.
 
 **Signature:**
@@ -451,7 +516,9 @@ Called before processing a table `<table>`.
 ```python
 def visit_table_start(self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_table_row()
+
 Visit table rows `<tr>`.
 
 **Signature:**
@@ -459,7 +526,9 @@ Visit table rows `<tr>`.
 ```python
 def visit_table_row(self, ctx: NodeContext, cells: list[str], is_header: bool) -> VisitResult
 ```
+
 ###### visit_table_end()
+
 Called after processing a table `</table>`.
 
 **Signature:**
@@ -467,7 +536,9 @@ Called after processing a table `</table>`.
 ```python
 def visit_table_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
+
 ###### visit_blockquote()
+
 Visit blockquote elements `<blockquote>`.
 
 **Signature:**
@@ -475,7 +546,9 @@ Visit blockquote elements `<blockquote>`.
 ```python
 def visit_blockquote(self, ctx: NodeContext, content: str, depth: int) -> VisitResult
 ```
+
 ###### visit_strong()
+
 Visit strong/bold elements `<strong>`, `<b>`.
 
 **Signature:**
@@ -483,7 +556,9 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```python
 def visit_strong(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_emphasis()
+
 Visit emphasis/italic elements `<em>`, `<i>`.
 
 **Signature:**
@@ -491,7 +566,9 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```python
 def visit_emphasis(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_strikethrough()
+
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
 **Signature:**
@@ -499,7 +576,9 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```python
 def visit_strikethrough(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_underline()
+
 Visit underline elements `<u>`, `<ins>`.
 
 **Signature:**
@@ -507,7 +586,9 @@ Visit underline elements `<u>`, `<ins>`.
 ```python
 def visit_underline(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_subscript()
+
 Visit subscript elements `<sub>`.
 
 **Signature:**
@@ -515,7 +596,9 @@ Visit subscript elements `<sub>`.
 ```python
 def visit_subscript(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_superscript()
+
 Visit superscript elements `<sup>`.
 
 **Signature:**
@@ -523,7 +606,9 @@ Visit superscript elements `<sup>`.
 ```python
 def visit_superscript(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_mark()
+
 Visit mark/highlight elements `<mark>`.
 
 **Signature:**
@@ -531,7 +616,9 @@ Visit mark/highlight elements `<mark>`.
 ```python
 def visit_mark(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_line_break()
+
 Visit line break elements `<br>`.
 
 **Signature:**
@@ -539,7 +626,9 @@ Visit line break elements `<br>`.
 ```python
 def visit_line_break(self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_horizontal_rule()
+
 Visit horizontal rule elements `<hr>`.
 
 **Signature:**
@@ -547,7 +636,9 @@ Visit horizontal rule elements `<hr>`.
 ```python
 def visit_horizontal_rule(self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_custom_element()
+
 Visit custom elements (web components) or unknown tags.
 
 **Signature:**
@@ -555,7 +646,9 @@ Visit custom elements (web components) or unknown tags.
 ```python
 def visit_custom_element(self, ctx: NodeContext, tag_name: str, html: str) -> VisitResult
 ```
+
 ###### visit_definition_list_start()
+
 Visit definition list `<dl>`.
 
 **Signature:**
@@ -563,7 +656,9 @@ Visit definition list `<dl>`.
 ```python
 def visit_definition_list_start(self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_definition_term()
+
 Visit definition term `<dt>`.
 
 **Signature:**
@@ -571,7 +666,9 @@ Visit definition term `<dt>`.
 ```python
 def visit_definition_term(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_definition_description()
+
 Visit definition description `<dd>`.
 
 **Signature:**
@@ -579,7 +676,9 @@ Visit definition description `<dd>`.
 ```python
 def visit_definition_description(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_definition_list_end()
+
 Called after processing a definition list `</dl>`.
 
 **Signature:**
@@ -587,7 +686,9 @@ Called after processing a definition list `</dl>`.
 ```python
 def visit_definition_list_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
+
 ###### visit_form()
+
 Visit form elements `<form>`.
 
 **Signature:**
@@ -595,7 +696,9 @@ Visit form elements `<form>`.
 ```python
 def visit_form(self, ctx: NodeContext, action: str, method: str) -> VisitResult
 ```
+
 ###### visit_input()
+
 Visit input elements `<input>`.
 
 **Signature:**
@@ -603,7 +706,9 @@ Visit input elements `<input>`.
 ```python
 def visit_input(self, ctx: NodeContext, input_type: str, name: str, value: str) -> VisitResult
 ```
+
 ###### visit_button()
+
 Visit button elements `<button>`.
 
 **Signature:**
@@ -611,7 +716,9 @@ Visit button elements `<button>`.
 ```python
 def visit_button(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_audio()
+
 Visit audio elements `<audio>`.
 
 **Signature:**
@@ -619,7 +726,9 @@ Visit audio elements `<audio>`.
 ```python
 def visit_audio(self, ctx: NodeContext, src: str) -> VisitResult
 ```
+
 ###### visit_video()
+
 Visit video elements `<video>`.
 
 **Signature:**
@@ -627,7 +736,9 @@ Visit video elements `<video>`.
 ```python
 def visit_video(self, ctx: NodeContext, src: str) -> VisitResult
 ```
+
 ###### visit_iframe()
+
 Visit iframe elements `<iframe>`.
 
 **Signature:**
@@ -635,7 +746,9 @@ Visit iframe elements `<iframe>`.
 ```python
 def visit_iframe(self, ctx: NodeContext, src: str) -> VisitResult
 ```
+
 ###### visit_details()
+
 Visit details elements `<details>`.
 
 **Signature:**
@@ -643,7 +756,9 @@ Visit details elements `<details>`.
 ```python
 def visit_details(self, ctx: NodeContext, open: bool) -> VisitResult
 ```
+
 ###### visit_summary()
+
 Visit summary elements `<summary>`.
 
 **Signature:**
@@ -651,7 +766,9 @@ Visit summary elements `<summary>`.
 ```python
 def visit_summary(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_figure_start()
+
 Visit figure elements `<figure>`.
 
 **Signature:**
@@ -659,7 +776,9 @@ Visit figure elements `<figure>`.
 ```python
 def visit_figure_start(self, ctx: NodeContext) -> VisitResult
 ```
+
 ###### visit_figcaption()
+
 Visit figcaption elements `<figcaption>`.
 
 **Signature:**
@@ -667,7 +786,9 @@ Visit figcaption elements `<figcaption>`.
 ```python
 def visit_figcaption(self, ctx: NodeContext, text: str) -> VisitResult
 ```
+
 ###### visit_figure_end()
+
 Called after processing a figure `</figure>`.
 
 **Signature:**
@@ -678,7 +799,8 @@ def visit_figure_end(self, ctx: NodeContext, output: str) -> VisitResult
 
 ---
 
-#### ImageMetadata
+##### ImageMetadata
+
 Image metadata with source and dimensions.
 
 Captures `<img>` elements and inline `<svg>` elements with metadata
@@ -696,7 +818,8 @@ for image analysis and optimization.
 
 ---
 
-#### LinkMetadata
+##### LinkMetadata
+
 Hyperlink metadata with categorization and attributes.
 
 Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -710,8 +833,10 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `rel` | `list[str]` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `dict[str, str]` | — | Additional HTML attributes |
 
-##### Methods
+###### Methods
+
 ###### classify_link()
+
 Classify a link based on href value.
 
 **Returns:**
@@ -727,7 +852,8 @@ def classify_link(href: str) -> LinkType
 
 ---
 
-#### NodeContext
+##### NodeContext
+
 Context information passed to all visitor methods.
 
 Provides comprehensive metadata about the current node being visited,
@@ -746,7 +872,8 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-#### PreprocessingOptions
+##### PreprocessingOptions
+
 HTML preprocessing options for document cleanup before conversion.
 
 | Field | Type | Default | Description |
@@ -756,15 +883,19 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool` | `True` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `bool` | `True` | Remove form elements (forms, inputs, buttons, etc.) |
 
-##### Methods
+###### Methods
+
 ###### default()
+
 **Signature:**
 
 ```python
 @staticmethod
 def default() -> PreprocessingOptions
 ```
+
 ###### apply_update()
+
 Apply a partial update to these preprocessing options.
 
 Any specified fields in the update will override the current values.
@@ -775,7 +906,9 @@ Unspecified fields (None) are left unchanged.
 ```python
 def apply_update(self, update: PreprocessingOptionsUpdate) -> None
 ```
+
 ###### from_update()
+
 Create new preprocessing options from a partial update.
 
 Creates a new `PreprocessingOptions` struct with defaults, then applies the update.
@@ -791,7 +924,9 @@ New `PreprocessingOptions` with specified updates applied to defaults
 @staticmethod
 def from_update(update: PreprocessingOptionsUpdate) -> PreprocessingOptions
 ```
+
 ###### from()
+
 **Signature:**
 
 ```python
@@ -801,7 +936,8 @@ def from(update: PreprocessingOptionsUpdate) -> PreprocessingOptions
 
 ---
 
-#### ProcessingWarning
+##### ProcessingWarning
+
 A non-fatal warning generated during HTML processing.
 
 | Field | Type | Default | Description |
@@ -812,7 +948,8 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-#### StructuredData
+##### StructuredData
+
 Structured data block (JSON-LD, Microdata, or RDFa).
 
 Represents machine-readable structured data found in the document.
@@ -827,7 +964,8 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-#### TableData
+##### TableData
+
 A top-level extracted table with both structured data and markdown representation.
 
 | Field | Type | Default | Description |
@@ -838,7 +976,8 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-#### TableGrid
+##### TableGrid
+
 A structured table grid with cell-level data including spans.
 
 | Field | Type | Default | Description |
@@ -850,7 +989,8 @@ A structured table grid with cell-level data including spans.
 
 ---
 
-#### TextAnnotation
+##### TextAnnotation
+
 An inline text annotation with byte-range offsets.
 
 Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
@@ -864,7 +1004,8 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-#### VisitorHandle
+##### VisitorHandle
+
 Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
 
 This allows visitors to be passed around and shared while still being mutable.
@@ -872,9 +1013,10 @@ This allows visitors to be passed around and shared while still being mutable.
 
 ---
 
-### Enums
+#### Enums
 
-#### TextDirection
+##### TextDirection
+
 Text directionality of document content.
 
 Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -888,7 +1030,8 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### LinkType
+##### LinkType
+
 Link classification based on href value and document context.
 
 Used to categorize links during extraction for filtering and analysis.
@@ -905,7 +1048,8 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### ImageType
+##### ImageType
+
 Image source classification for proper handling and processing.
 
 Determines whether an image is embedded (data URI), inline SVG, external, or relative.
@@ -920,7 +1064,8 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### StructuredDataType
+##### StructuredDataType
+
 Structured data format type.
 
 Identifies the schema/format used for structured data markup.
@@ -934,7 +1079,8 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### PreprocessingPreset
+##### PreprocessingPreset
+
 HTML preprocessing aggressiveness level.
 
 Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
@@ -948,7 +1094,8 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### HeadingStyle
+##### HeadingStyle
+
 Heading style options for Markdown output.
 
 Controls how headings (h1-h6) are rendered in the output Markdown.
@@ -962,7 +1109,8 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### ListIndentType
+##### ListIndentType
+
 List indentation character type.
 
 Controls whether list items are indented with spaces or tabs.
@@ -975,7 +1123,8 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### WhitespaceMode
+##### WhitespaceMode
+
 Whitespace handling strategy during conversion.
 
 Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
@@ -988,7 +1137,8 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-#### NewlineStyle
+##### NewlineStyle
+
 Line break syntax in Markdown output.
 
 Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
@@ -1001,7 +1151,8 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### CodeBlockStyle
+##### CodeBlockStyle
+
 Code block fence style in Markdown output.
 
 Determines how code blocks (`<pre><code>`) are rendered in Markdown.
@@ -1015,7 +1166,8 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HighlightStyle
+##### HighlightStyle
+
 Highlight rendering style for `<mark>` elements.
 
 Controls how highlighted text is rendered in Markdown output.
@@ -1030,7 +1182,8 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### LinkStyle
+##### LinkStyle
+
 Link rendering style in Markdown output.
 
 Controls whether links and images use inline `[text](url)` syntax or
@@ -1044,7 +1197,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### OutputFormat
+##### OutputFormat
+
 Output format for conversion.
 
 Specifies the target markup language format for the conversion output.
@@ -1058,7 +1212,8 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### NodeContent
+##### NodeContent
+
 The semantic content type of a document node.
 
 Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
@@ -1082,7 +1237,8 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### AnnotationKind
+##### AnnotationKind
+
 The type of an inline text annotation.
 
 Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
@@ -1102,7 +1258,8 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### WarningKind
+##### WarningKind
+
 Categories of processing warnings.
 
 | Value | Description |
@@ -1117,7 +1274,8 @@ Categories of processing warnings.
 
 ---
 
-#### NodeType
+##### NodeType
+
 Node type enumeration covering all HTML element types.
 
 This enum categorizes all HTML elements that the converter recognizes,
@@ -1217,7 +1375,8 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### VisitResult
+##### VisitResult
+
 Result of a visitor callback.
 
 Allows visitors to control the conversion flow by either proceeding
@@ -1235,12 +1394,14 @@ preserving HTML, or signaling errors.
 
 ---
 
-### Errors
+#### Errors
 
-#### ConversionError
+##### ConversionError
+
 Errors that can occur during HTML to Markdown conversion.
 
 **Base class:** `ConversionError(Exception)`
+
 | Exception | Description |
 |-----------|-------------|
 | `ParseError(ConversionError)` | HTML parsing error |

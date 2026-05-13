@@ -7,7 +7,9 @@ title: "Types Reference"
 All types defined by the library, grouped by category. Types are shown using Rust as the canonical representation.
 
 ### Result Types
+
 #### ConversionResult
+
 The primary result of HTML conversion and extraction.
 
 Contains the converted text output, optional structured document tree,
@@ -25,9 +27,11 @@ metadata, extracted tables, images, and processing warnings.
 ---
 
 ### Configuration Types
+
 See [Configuration Reference](configuration.md) for detailed defaults and language-specific representations.
 
 #### ConversionOptions
+
 Main conversion options for HTML to Markdown conversion.
 
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
@@ -48,7 +52,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `default_title` | `bool` | `false` | Emit a default title when no `<title>` tag is present. |
 | `br_in_tables` | `bool` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `HighlightStyle::DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extract_metadata` | `bool` | `true` | Extract `<meta>` and `<head>` information into the result metadata. |
+| `extract_metadata` | `bool` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
 | `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode::Normalized` | Controls how whitespace is normalised during conversion. |
 | `strip_newlines` | `bool` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `false` | Wrap long lines at `wrap_width` characters. |
@@ -79,6 +83,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ---
 
 #### PreprocessingOptions
+
 HTML preprocessing options for document cleanup before conversion.
 
 | Field | Type | Default | Description |
@@ -91,6 +96,7 @@ HTML preprocessing options for document cleanup before conversion.
 ---
 
 #### TableGrid
+
 A structured table grid with cell-level data including spans.
 
 | Field | Type | Default | Description |
@@ -102,7 +108,9 @@ A structured table grid with cell-level data including spans.
 ---
 
 ### Metadata Types
+
 #### DocumentMetadata
+
 Document-level metadata extracted from `<head>` and top-level elements.
 
 Contains all metadata typically used by search engines, social media platforms,
@@ -125,6 +133,7 @@ and browsers for document indexing and presentation.
 ---
 
 #### HeaderMetadata
+
 Header element metadata with hierarchy tracking.
 
 Captures heading elements (h1-h6) with their text content, identifiers,
@@ -141,6 +150,7 @@ and position in the document structure.
 ---
 
 #### LinkMetadata
+
 Hyperlink metadata with categorization and attributes.
 
 Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -157,6 +167,7 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 ---
 
 #### ImageMetadata
+
 Image metadata with source and dimensions.
 
 Captures `<img>` elements and inline `<svg>` elements with metadata
@@ -174,6 +185,7 @@ for image analysis and optimization.
 ---
 
 #### HtmlMetadata
+
 Comprehensive metadata extraction result from HTML document.
 
 Contains all extracted metadata types in a single structure,
@@ -190,7 +202,9 @@ suitable for serialization and transmission across language boundaries.
 ---
 
 ### Document Structure
+
 #### DocumentStructure
+
 A structured document tree representing the semantic content of an HTML document.
 
 Uses a flat node array with index-based parent/child references for efficient traversal.
@@ -203,6 +217,7 @@ Uses a flat node array with index-based parent/child references for efficient tr
 ---
 
 #### DocumentNode
+
 A single node in the document tree.
 
 | Field | Type | Default | Description |
@@ -217,6 +232,7 @@ A single node in the document tree.
 ---
 
 #### GridCell
+
 A single cell in a table grid.
 
 | Field | Type | Default | Description |
@@ -231,6 +247,7 @@ A single cell in a table grid.
 ---
 
 #### TableData
+
 A top-level extracted table with both structured data and markdown representation.
 
 | Field | Type | Default | Description |
@@ -241,6 +258,7 @@ A top-level extracted table with both structured data and markdown representatio
 ---
 
 #### NodeContext
+
 Context information passed to all visitor methods.
 
 Provides comprehensive metadata about the current node being visited,
@@ -259,7 +277,9 @@ including its type, attributes, position in the DOM tree, and parent context.
 ---
 
 ### Other Types
+
 #### StructuredData
+
 Structured data block (JSON-LD, Microdata, or RDFa).
 
 Represents machine-readable structured data found in the document.
@@ -274,6 +294,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 ---
 
 #### ConversionOptionsBuilder
+
 Builder for `ConversionOptions`.
 
 All fields start with default values. Call `.build()` to produce the final options.
@@ -283,6 +304,7 @@ All fields start with default values. Call `.build()` to produce the final optio
 ---
 
 #### TextAnnotation
+
 An inline text annotation with byte-range offsets.
 
 Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
@@ -296,6 +318,7 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 ---
 
 #### ProcessingWarning
+
 A non-fatal warning generated during HTML processing.
 
 | Field | Type | Default | Description |
@@ -306,6 +329,7 @@ A non-fatal warning generated during HTML processing.
 ---
 
 #### VisitorHandle
+
 Type alias for a visitor handle (Rc-wrapped `RefCell` for interior mutability).
 
 This allows visitors to be passed around and shared while still being mutable.
@@ -315,28 +339,30 @@ This allows visitors to be passed around and shared while still being mutable.
 ---
 
 #### HtmlVisitor
+
 Visitor trait for HTML→Markdown conversion.
 
 Implement this trait to customize the conversion behavior for any HTML element type.
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
+
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
@@ -349,6 +375,7 @@ For a typical element like `<div><p>text</p></div>`:
 ### Enums
 
 #### AnnotationKind
+
 The type of an inline text annotation.
 
 Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
@@ -367,7 +394,8 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### CodeBlockStyle
+##### CodeBlockStyle
+
 Code block fence style in Markdown output.
 
 Determines how code blocks (`<pre><code>`) are rendered in Markdown.
@@ -380,7 +408,8 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HeadingStyle
+##### HeadingStyle
+
 Heading style options for Markdown output.
 
 Controls how headings (h1-h6) are rendered in the output Markdown.
@@ -393,7 +422,8 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### HighlightStyle
+##### HighlightStyle
+
 Highlight rendering style for `<mark>` elements.
 
 Controls how highlighted text is rendered in Markdown output.
@@ -407,7 +437,8 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### ImageType
+##### ImageType
+
 Image source classification for proper handling and processing.
 
 Determines whether an image is embedded (data URI), inline SVG, external, or relative.
@@ -421,7 +452,8 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### LinkStyle
+##### LinkStyle
+
 Link rendering style in Markdown output.
 
 Controls whether links and images use inline `[text](url)` syntax or
@@ -434,7 +466,8 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### LinkType
+##### LinkType
+
 Link classification based on href value and document context.
 
 Used to categorize links during extraction for filtering and analysis.
@@ -450,7 +483,8 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### ListIndentType
+##### ListIndentType
+
 List indentation character type.
 
 Controls whether list items are indented with spaces or tabs.
@@ -462,7 +496,8 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### NewlineStyle
+##### NewlineStyle
+
 Line break syntax in Markdown output.
 
 Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
@@ -474,7 +509,8 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### NodeContent
+##### NodeContent
+
 The semantic content type of a document node.
 
 Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
@@ -497,7 +533,8 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### NodeType
+##### NodeType
+
 Node type enumeration covering all HTML element types.
 
 This enum categorizes all HTML elements that the converter recognizes,
@@ -596,7 +633,8 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### OutputFormat
+##### OutputFormat
+
 Output format for conversion.
 
 Specifies the target markup language format for the conversion output.
@@ -609,7 +647,8 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### PreprocessingPreset
+##### PreprocessingPreset
+
 HTML preprocessing aggressiveness level.
 
 Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
@@ -622,7 +661,8 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### StructuredDataType
+##### StructuredDataType
+
 Structured data format type.
 
 Identifies the schema/format used for structured data markup.
@@ -635,7 +675,8 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### TextDirection
+##### TextDirection
+
 Text directionality of document content.
 
 Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -648,7 +689,8 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### VisitResult
+##### VisitResult
+
 Result of a visitor callback.
 
 Allows visitors to control the conversion flow by either proceeding
@@ -665,7 +707,8 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### WarningKind
+##### WarningKind
+
 Categories of processing warnings.
 
 | Variant | Wire value | Description |
@@ -679,7 +722,8 @@ Categories of processing warnings.
 
 ---
 
-#### WhitespaceMode
+##### WhitespaceMode
+
 Whitespace handling strategy during conversion.
 
 Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.

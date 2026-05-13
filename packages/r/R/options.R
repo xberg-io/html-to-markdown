@@ -17,7 +17,7 @@
 #' @param default_title Emit a default title when no `<title>` tag is present
 #' @param br_in_tables Render `<br>` elements inside table cells as literal line breaks
 #' @param highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`)
-#' @param extract_metadata Extract `<meta>` and `<head>` information into the result metadata
+#' @param extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction
 #' @param whitespace_mode Controls how whitespace is normalised during conversion
 #' @param strip_newlines Strip all newlines from the output, producing a single-line result
 #' @param wrap Wrap long lines at [`wrap_width`](Self::wrap_width) characters

@@ -97,35 +97,26 @@ composer require kreuzberg-dev/html-to-markdown
 Basic conversion:
 
 ```php
-use HtmlToMarkdown\Service\Converter;
-use function HtmlToMarkdown\convert;
+use HtmlToMarkdown\HtmlToMarkdown;
 
-// Object-oriented usage
-$converter = Converter::create();
-$result = $converter->convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
-$markdown = $result['content'];
-
-// Procedural helper
-$result = convert('<h1>Hello</h1>');
-$markdown = $result['content'];
+$result = HtmlToMarkdown::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
+echo $result->content;
 ```
 
 
 With conversion options:
 
 ```php
-use HtmlToMarkdown\Config\ConversionOptions;
-use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\ConversionOptions;
 
-$converter = Converter::create();
+$options = ConversionOptions::builder()
+    ->headingStyle('atx')
+    ->listIndentWidth(2)
+    ->build();
 
-$options = new ConversionOptions(
-    headingStyle: 'Atx',
-    listIndentWidth: 2,
-);
-
-$result = $converter->convert('<h1>Hello</h1>', $options);
-$markdown = $result['content'];
+$result = HtmlToMarkdown::convert('<h1>Hello</h1>', $options);
+echo $result->content;
 ```
 
 

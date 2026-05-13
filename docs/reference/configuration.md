@@ -7,6 +7,7 @@ title: "Configuration Reference"
 This page documents all configuration types and their defaults across all languages.
 
 ### DocumentMetadata
+
 Document-level metadata extracted from `<head>` and top-level elements.
 
 Contains all metadata typically used by search engines, social media platforms,
@@ -29,6 +30,7 @@ and browsers for document indexing and presentation.
 ---
 
 ### HtmlMetadata
+
 Comprehensive metadata extraction result from HTML document.
 
 Contains all extracted metadata types in a single structure,
@@ -45,6 +47,7 @@ suitable for serialization and transmission across language boundaries.
 ---
 
 ### ConversionOptions
+
 Main conversion options for HTML to Markdown conversion.
 
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
@@ -65,7 +68,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `default_title` | `bool` | `False` | Emit a default title when no `<title>` tag is present. |
 | `br_in_tables` | `bool` | `False` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `HighlightStyle.DOUBLE_EQUAL` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extract_metadata` | `bool` | `True` | Extract `<meta>` and `<head>` information into the result metadata. |
+| `extract_metadata` | `bool` | `True` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `True`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
 | `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode.NORMALIZED` | Controls how whitespace is normalised during conversion. |
 | `strip_newlines` | `bool` | `False` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `False` | Wrap long lines at `wrap_width` characters. |
@@ -96,6 +99,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ---
 
 ### PreprocessingOptions
+
 HTML preprocessing options for document cleanup before conversion.
 
 | Field | Type | Default | Description |
@@ -108,6 +112,7 @@ HTML preprocessing options for document cleanup before conversion.
 ---
 
 ### ConversionResult
+
 The primary result of HTML conversion and extraction.
 
 Contains the converted text output, optional structured document tree,
@@ -125,6 +130,7 @@ metadata, extracted tables, images, and processing warnings.
 ---
 
 ### TableGrid
+
 A structured table grid with cell-level data including spans.
 
 | Field | Type | Default | Description |
@@ -138,6 +144,7 @@ A structured table grid with cell-level data including spans.
 ### Enums
 
 #### CodeBlockStyle
+
 Code block fence style in Markdown output.
 
 Determines how code blocks (`<pre><code>`) are rendered in Markdown.
@@ -151,6 +158,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 ---
 
 #### HeadingStyle
+
 Heading style options for Markdown output.
 
 Controls how headings (h1-h6) are rendered in the output Markdown.
@@ -164,6 +172,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 ---
 
 #### HighlightStyle
+
 Highlight rendering style for `<mark>` elements.
 
 Controls how highlighted text is rendered in Markdown output.
@@ -178,6 +187,7 @@ Controls how highlighted text is rendered in Markdown output.
 ---
 
 #### LinkStyle
+
 Link rendering style in Markdown output.
 
 Controls whether links and images use inline `[text](url)` syntax or
@@ -191,6 +201,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 ---
 
 #### ListIndentType
+
 List indentation character type.
 
 Controls whether list items are indented with spaces or tabs.
@@ -203,6 +214,7 @@ Controls whether list items are indented with spaces or tabs.
 ---
 
 #### NewlineStyle
+
 Line break syntax in Markdown output.
 
 Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
@@ -215,6 +227,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 ---
 
 #### OutputFormat
+
 Output format for conversion.
 
 Specifies the target markup language format for the conversion output.
@@ -228,6 +241,7 @@ Specifies the target markup language format for the conversion output.
 ---
 
 #### PreprocessingPreset
+
 HTML preprocessing aggressiveness level.
 
 Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
@@ -241,6 +255,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 ---
 
 #### TextDirection
+
 Text directionality of document content.
 
 Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -254,6 +269,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 ---
 
 #### WhitespaceMode
+
 Whitespace handling strategy during conversion.
 
 Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
