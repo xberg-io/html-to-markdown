@@ -13,6 +13,12 @@ pub fn decode_options(options: Robj) -> std::result::Result<ConversionOptions, S
         return Ok(ConversionOptions::default());
     }
 
+    // Accept the wrapper struct returned by `ConversionOptions$default()` / `$builder()$build()`,
+    // which extendr exposes as an `ExternalPtr` rather than a list.
+    if let Ok(ext) = ExternalPtr::<crate::ConversionOptions>::try_from(&options) {
+        return Ok((*ext).clone().into());
+    }
+
     let list = options
         .as_list()
         .ok_or_else(|| "options must be a named list".to_string())?;
