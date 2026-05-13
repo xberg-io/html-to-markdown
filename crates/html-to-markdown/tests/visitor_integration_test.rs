@@ -1,4 +1,5 @@
 #![allow(missing_docs)]
+#![allow(clippy::significant_drop_tightening)]
 
 //! Integration tests for the visitor pattern
 //!

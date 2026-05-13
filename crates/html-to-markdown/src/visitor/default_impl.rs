@@ -58,7 +58,7 @@ mod tests {
             v.visit_text(&ctx, "test");
         }
 
-        let v = handle.lock().expect("visitor mutex poisoned");
-        assert_eq!(v.text_count, 1);
+        let text_count = handle.lock().expect("visitor mutex poisoned").text_count;
+        assert_eq!(text_count, 1);
     }
 }

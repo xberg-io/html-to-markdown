@@ -1,4 +1,5 @@
 #![allow(missing_docs)]
+#![allow(clippy::significant_drop_tightening)]
 #![cfg(feature = "visitor")]
 
 use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};

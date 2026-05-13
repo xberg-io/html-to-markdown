@@ -152,8 +152,10 @@ where
         return Ok(VisitorDispatch::Continue);
     };
 
-    let mut visitor_ref = visitor_rc.lock().expect("visitor mutex poisoned");
-    let result = callback(&mut *visitor_ref);
+    let result = {
+        let mut visitor_ref = visitor_rc.lock().expect("visitor mutex poisoned");
+        callback(&mut *visitor_ref)
+    };
 
     match result {
         VisitResult::Continue => Ok(VisitorDispatch::Continue),
