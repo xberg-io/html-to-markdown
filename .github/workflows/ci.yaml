@@ -211,7 +211,7 @@ jobs:
         shell: bash
 
       - name: Validate READMEs
-        run: task docs:generate-readme:check
+        run: task generate:generate-readme:check
         shell: bash
 
   validate-rust:
