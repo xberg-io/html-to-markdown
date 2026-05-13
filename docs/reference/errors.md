@@ -7,6 +7,7 @@ title: "Error Reference"
 All error types thrown by the library across all languages.
 
 ### ConversionError
+
 Errors that can occur during HTML to Markdown conversion.
 
 | Variant | Message | Description |
