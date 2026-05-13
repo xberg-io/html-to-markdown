@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **R: `convert(html, options)` no longer rejects `ConversionOptions$default()` and `ConversionOptions$builder()$build()`.** The extendr wrappers return an `ExternalPtr<ConversionOptions>`, not an R named list, so `decode_options` raised `"options must be a named list"` for every call that used the convenience constructors. `decode_options` now extracts the wrapper directly before falling back to list decoding.
+- **C#: `[DllImport("html_to_markdown_ffi")]` resolves under `ProjectReference` consumption.** P/Invoke only searches the assembly directory and standard `DYLD`/`LD_LIBRARY` paths, not NuGet's `runtimes/<RID>/native/` layout, so e2e and any other ProjectReference-based test project failed with `DllNotFoundException`. `packages/csharp/HtmlToMarkdown/HtmlToMarkdown.csproj` now copies the host-RID native library flat alongside the assembly via `<Content Include="runtimes/$(NETCoreSdkRuntimeIdentifier)/native/*" Link=… />`. NuGet consumers continue to pick it up from the existing `<None Include="runtimes/**" />` pack.
+- **C#: CS0579 "Duplicate `AssemblyTitleAttribute`" eliminated.** The SDK auto-synthesises `AssemblyInfo` from `<PropertyGroup>`, which collided with checked-in `Properties/AssemblyInfo.cs` files. All three csproj files now set `<GenerateAssemblyInfo>false</GenerateAssemblyInfo>` and ship explicit `Properties/AssemblyInfo.cs`.
+- **PHP: visitor `Custom` outputs preserve case for custom element callbacks** ([#2b54751a](https://github.com/kreuzberg-dev/html-to-markdown/commit/2b54751a)).
+- **PHP: PIE binary discovery on macOS/Linux** ([#2b54751a](https://github.com/kreuzberg-dev/html-to-markdown/commit/2b54751a)).
+- **Docs: `extract_metadata` description clarified to note it only gates the metadata pass** — table extraction into `result.tables` still runs unconditionally ([#4ba2187a](https://github.com/kreuzberg-dev/html-to-markdown/commit/4ba2187a)).
+
 ## [3.4.0] - 2026-05-09
 
 ### Added
