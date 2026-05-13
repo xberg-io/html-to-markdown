@@ -57,7 +57,11 @@ pub struct ConversionOptions {
     pub br_in_tables: bool,
     /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
     pub highlight_style: HighlightStyle,
-    /// Extract `<meta>` and `<head>` information into the result metadata.
+    /// Populate `result.metadata` with `<head>` / `<meta>` extraction
+    /// (title, description, Open Graph, Twitter Card, JSON-LD, …).
+    ///
+    /// Default `true`. Disabling skips the metadata pass only — table
+    /// extraction into `result.tables` runs unconditionally.
     pub extract_metadata: bool,
     /// Controls how whitespace is normalised during conversion.
     pub whitespace_mode: WhitespaceMode,
