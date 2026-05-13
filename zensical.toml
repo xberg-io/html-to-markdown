@@ -12,18 +12,25 @@ extra_css = ["css/extra.css"]
 
 nav = [
   { "Home" = "index.md" },
-  { "Get started" = [
+  { "Get Started" = [
     { "Installation" = "installation.md" },
     { "Usage" = "usage.md" },
     { "CLI" = "cli.md" },
   ] },
-  { "Configuration" = [
-    { "Options" = "configuration.md" },
+  { "Guides" = [
     { "Visitor pattern" = "visitor.md" },
     { "Table extraction" = "tables.md" },
+    { "Error handling" = "errors.md" },
+  ] },
+  { "Concepts" = [
+    { "Architecture" = "concepts/architecture.md" },
+    { "Conversion pipeline" = "concepts/pipeline.md" },
+    { "Plugin system" = "concepts/plugin-system.md" },
   ] },
   { "Reference" = [
+    { "Configuration" = "configuration.md" },
     { "API reference" = "api-reference.md" },
+    { "Language guides" = "language-guides.md" },
     { "Language APIs" = [
       { "Rust" = "reference/api-rust.md" },
       { "Python" = "reference/api-python.md" },
@@ -41,13 +48,12 @@ nav = [
     { "Types" = "reference/types.md" },
     { "Configuration (generated)" = "reference/configuration.md" },
     { "Error types (generated)" = "reference/errors.md" },
-    { "Language guides" = "language-guides.md" },
-    { "Error handling" = "errors.md" },
-    { "Architecture" = "architecture.md" },
   ] },
-  { "Migration" = "migration.md" },
-  { "Contributing" = "contributing.md" },
-  { "Changelog" = "https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md" },
+  { "More" = [
+    { "Migration" = "migration.md" },
+    { "Contributing" = "contributing.md" },
+    { "Changelog" = "https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md" },
+  ] },
 ]
 
 [project.theme]
@@ -70,15 +76,12 @@ features = [
   "navigation.tabs.sticky",
   "navigation.tracking",
   "navigation.top",
-  "navigation.footer",
   "search.highlight",
   "search.share",
   "search.suggest",
   "toc.follow",
   "toc.integrate",
   "announce.dismiss",
-  "content.action.edit",
-  "content.action.view",
 ]
 
 [project.theme.font]
@@ -89,8 +92,8 @@ code = "JetBrains Mono"
 repo = "github"
 search = "search"
 
+# First palette is the default (dark). Second is light; users can toggle via header.
 [[project.theme.palette]]
-media = "(prefers-color-scheme: dark)"
 scheme = "slate"
 primary = "custom"
 accent = "custom"
@@ -100,7 +103,6 @@ icon = "sun"
 name = "Switch to light mode"
 
 [[project.theme.palette]]
-media = "(prefers-color-scheme: light)"
 scheme = "default"
 primary = "custom"
 accent = "custom"
@@ -150,7 +152,7 @@ use_pygments = true
 [project.markdown_extensions.pymdownx.smartsymbols]
 
 [project.markdown_extensions.pymdownx.snippets]
-base_path = ["docs", "."]
+base_path = [".", "docs"]
 check_paths = true
 
 [project.markdown_extensions.pymdownx.superfences]
