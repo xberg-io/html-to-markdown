@@ -85,6 +85,7 @@ Alternatively, you can manually set `CGO_CFLAGS` and `CGO_LDFLAGS` environment v
 ## Performance Snapshot
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.46ms | 277.5 MB/s |

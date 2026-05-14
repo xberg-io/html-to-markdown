@@ -87,6 +87,7 @@ devtools::install_github("kreuzberg-dev/html-to-markdown", subdir = "packages/r"
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.68ms | 190 MB/s |
