@@ -476,7 +476,7 @@ jobs:
         uses: shivammathur/setup-php@2.37.0 # 2
         with:
           php-version: "8.4"
-          tools: composer:2.9.1
+          tools: composer:2.9.8
           coverage: none
 
       - name: Setup Rust
@@ -654,6 +654,9 @@ jobs:
         run: cargo build --release -p html-to-markdown-cli
         shell: bash
 
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
       - name: Run E2E tests
         run: alef test --e2e --lang python
         shell: bash
@@ -723,6 +726,10 @@ jobs:
         working-directory: packages/typescript
         run: bun x tsc --project tsconfig.json
         shell: bash
+
+      - name: Install alef
+        if: matrix.runtime == 'node'
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
 
       - name: Run E2E tests (Node.js only)
         if: matrix.runtime == 'node'
@@ -816,6 +823,10 @@ jobs:
         if: runner.os != 'Windows'
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
+      - name: Install alef
+        if: runner.os != 'Windows'
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
       - name: Run E2E tests (Unix only)
         if: runner.os != 'Windows'
         run: alef test --e2e --lang ruby
@@ -835,7 +846,7 @@ jobs:
         uses: shivammathur/setup-php@2.37.0 # 2
         with:
           php-version: "8.4"
-          tools: composer:2.9.1
+          tools: composer:2.9.8
           coverage: none
 
       - name: Setup Rust
@@ -879,6 +890,9 @@ jobs:
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang php
@@ -973,6 +987,10 @@ jobs:
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
+      - name: Install alef
+        if: matrix.os == 'ubuntu-latest'
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
       - name: Run E2E tests (Ubuntu only)
         if: matrix.os == 'ubuntu-latest'
         run: alef test --e2e --lang java
@@ -1065,6 +1083,9 @@ jobs:
 
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
 
       - name: Run E2E tests
         run: alef test --e2e --lang r
