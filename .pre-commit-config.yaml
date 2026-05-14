@@ -54,7 +54,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.0.3
+    rev: v1.0.5
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -154,7 +154,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.15.57
+    rev: v0.15.59
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
