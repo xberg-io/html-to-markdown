@@ -54,7 +54,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.0.6
+    rev: v1.0.7
     hooks:
       - id: cargo-sort
         args: [-w]
