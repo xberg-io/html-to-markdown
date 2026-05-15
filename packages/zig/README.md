@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.4.1" alt="Go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.5.0" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
@@ -63,16 +63,13 @@
 High-performance HTML to Markdown converter for Zig, consuming the existing C FFI surface (`libhtml_to_markdown_ffi`) via `linkSystemLibrary`. Idiomatic error sets, slice-based memory management, requires Zig 0.16+.
 Distributed via GitHub Releases — pin a tag in `build.zig.zon` and `zig fetch` handles the rest.
 
-
 ## Installation
 
 ```bash
 zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.5.0/zig.tar.gz
 ```
 
-
 ## Performance Snapshot
-
 
 ## Quick Start
 
@@ -80,16 +77,13 @@ Basic conversion:
 
 <!-- snippet not found: getting-started/basic_usage.md -->
 
-
 With conversion options:
 
 <!-- snippet not found: getting-started/with_options.md -->
 
-
 ## API Reference
 
 ### Core Function
-
 
 ### Options
 
@@ -123,16 +117,13 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -149,7 +140,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

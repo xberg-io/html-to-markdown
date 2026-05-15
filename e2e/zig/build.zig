@@ -25,8 +25,11 @@ pub fn build(b: *std.Build) void {
     });
     conversion_module.addImport("html_to_markdown", html_to_markdown_module);
     const conversion_tests = b.addTest(.{
+        .name = "conversion_test",
         .root_module = conversion_module,
+        .use_llvm = true,
     });
+    b.installArtifact(conversion_tests);
     const conversion_run = b.addRunArtifact(conversion_tests);
     conversion_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&conversion_run.step);
@@ -39,8 +42,11 @@ pub fn build(b: *std.Build) void {
     });
     edge_cases_module.addImport("html_to_markdown", html_to_markdown_module);
     const edge_cases_tests = b.addTest(.{
+        .name = "edge_cases_test",
         .root_module = edge_cases_module,
+        .use_llvm = true,
     });
+    b.installArtifact(edge_cases_tests);
     const edge_cases_run = b.addRunArtifact(edge_cases_tests);
     edge_cases_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&edge_cases_run.step);
@@ -53,8 +59,11 @@ pub fn build(b: *std.Build) void {
     });
     metadata_module.addImport("html_to_markdown", html_to_markdown_module);
     const metadata_tests = b.addTest(.{
+        .name = "metadata_test",
         .root_module = metadata_module,
+        .use_llvm = true,
     });
+    b.installArtifact(metadata_tests);
     const metadata_run = b.addRunArtifact(metadata_tests);
     metadata_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&metadata_run.step);
@@ -67,8 +76,11 @@ pub fn build(b: *std.Build) void {
     });
     options_module.addImport("html_to_markdown", html_to_markdown_module);
     const options_tests = b.addTest(.{
+        .name = "options_test",
         .root_module = options_module,
+        .use_llvm = true,
     });
+    b.installArtifact(options_tests);
     const options_run = b.addRunArtifact(options_tests);
     options_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&options_run.step);
@@ -81,8 +93,11 @@ pub fn build(b: *std.Build) void {
     });
     real_world_module.addImport("html_to_markdown", html_to_markdown_module);
     const real_world_tests = b.addTest(.{
+        .name = "real_world_test",
         .root_module = real_world_module,
+        .use_llvm = true,
     });
+    b.installArtifact(real_world_tests);
     const real_world_run = b.addRunArtifact(real_world_tests);
     real_world_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&real_world_run.step);
@@ -95,8 +110,11 @@ pub fn build(b: *std.Build) void {
     });
     result_module.addImport("html_to_markdown", html_to_markdown_module);
     const result_tests = b.addTest(.{
+        .name = "result_test",
         .root_module = result_module,
+        .use_llvm = true,
     });
+    b.installArtifact(result_tests);
     const result_run = b.addRunArtifact(result_tests);
     result_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&result_run.step);
@@ -109,8 +127,11 @@ pub fn build(b: *std.Build) void {
     });
     smoke_module.addImport("html_to_markdown", html_to_markdown_module);
     const smoke_tests = b.addTest(.{
+        .name = "smoke_test",
         .root_module = smoke_module,
+        .use_llvm = true,
     });
+    b.installArtifact(smoke_tests);
     const smoke_run = b.addRunArtifact(smoke_tests);
     smoke_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&smoke_run.step);
@@ -123,8 +144,11 @@ pub fn build(b: *std.Build) void {
     });
     structure_module.addImport("html_to_markdown", html_to_markdown_module);
     const structure_tests = b.addTest(.{
+        .name = "structure_test",
         .root_module = structure_module,
+        .use_llvm = true,
     });
+    b.installArtifact(structure_tests);
     const structure_run = b.addRunArtifact(structure_tests);
     structure_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&structure_run.step);
@@ -137,8 +161,11 @@ pub fn build(b: *std.Build) void {
     });
     visitor_module.addImport("html_to_markdown", html_to_markdown_module);
     const visitor_tests = b.addTest(.{
+        .name = "visitor_test",
         .root_module = visitor_module,
+        .use_llvm = true,
     });
+    b.installArtifact(visitor_tests);
     const visitor_run = b.addRunArtifact(visitor_tests);
     visitor_run.setCwd(b.path("../../test_documents"));
     test_step.dependOn(&visitor_run.step);

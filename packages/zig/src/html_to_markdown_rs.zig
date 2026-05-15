@@ -30,6 +30,9 @@ inline fn _first_error(comptime E: type) E {
     return @field(E, fields[0].name);
 }
 
+/// Opaque handle for a `VisitorHandle` trait-bridge instance.
+pub const VisitorHandle = *anyopaque;
+
 /// Errors that can occur during HTML to Markdown conversion.
 pub const ConversionError = error {
     ParseError,
@@ -787,22 +790,14 @@ pub const IHtmlVisitor = extern struct {
     free_user_data: ?*const fn (user_data: ?*anyopaque) callconv(.C) void = null,
 };
 
-/// Register a `HtmlVisitor` implementation with the Rust runtime.
-///
-/// `name`     — null-terminated plugin name.
-/// `vtable`   — filled `IHtmlVisitor` struct with all required function pointers.
-/// `user_data`— opaque pointer passed back as the first argument of every vtable call.
-///
-/// Returns 0 on success; non-zero on failure (error text written to `out_error`).
-pub fn register_html_visitor(name: [*c]const u8, vtable: IHtmlVisitor, user_data: ?*anyopaque, out_error: ?*?[*c]u8) i32 {
-    return c.htm_register_html_visitor(name, vtable, user_data, out_error);
-}
-
-/// Unregister a previously registered `HtmlVisitor` implementation by name.
-///
-/// Returns 0 on success; non-zero on failure.
-pub fn unregister_html_visitor(name: [*c]const u8, out_error: ?*?[*c]u8) i32 {
-    return c.htm_unregister_html_visitor(name, out_error);
+/// Wrap a `IHtmlVisitor` vtable into a `VisitorHandle` suitable for the
+/// generated options-field setter (e.g. `ConversionOptionsBuilder.visitor`).
+/// The returned handle owns the vtable's function pointers and must be
+/// released with the matching `htm_visitor_handle_free` once the
+/// containing options object is no longer needed.
+pub fn html_visitor_handle_from_vtable(callbacks: c.HTMHtmVisitorCallbacks) ?VisitorHandle {
+    var _cb = callbacks;
+    return @ptrCast(c.htm_html_visitor_handle_from_callbacks(&_cb));
 }
 
 /// Build an `IHtmlVisitor` vtable for a concrete Zig type `T`.
@@ -1154,7 +1149,7 @@ pub const ConversionOptionsBuilder = struct {
     _handle: *anyopaque,
 
     /// Set the list of HTML tag names whose content is stripped from output.
-    pub fn strip_tags(self: *ConversionOptionsBuilder, tags: []const u8) ConversionOptionsBuilder {
+    pub fn strip_tags(self: *ConversionOptionsBuilder, tags: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
         const tags_z = try std.heap.c_allocator.dupeZ(u8, tags);
         std.heap.c_allocator.free(tags_z);
         const _result = c.htm_conversion_options_builder_strip_tags(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), tags_z);
@@ -1162,7 +1157,7 @@ pub const ConversionOptionsBuilder = struct {
     }
 
     /// Set the list of HTML tag names that are preserved verbatim in output.
-    pub fn preserve_tags(self: *ConversionOptionsBuilder, tags: []const u8) ConversionOptionsBuilder {
+    pub fn preserve_tags(self: *ConversionOptionsBuilder, tags: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
         const tags_z = try std.heap.c_allocator.dupeZ(u8, tags);
         std.heap.c_allocator.free(tags_z);
         const _result = c.htm_conversion_options_builder_preserve_tags(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), tags_z);
@@ -1170,7 +1165,7 @@ pub const ConversionOptionsBuilder = struct {
     }
 
     /// Set the list of HTML tag names whose `<img>` children are kept inline.
-    pub fn keep_inline_images_in(self: *ConversionOptionsBuilder, tags: []const u8) ConversionOptionsBuilder {
+    pub fn keep_inline_images_in(self: *ConversionOptionsBuilder, tags: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
         const tags_z = try std.heap.c_allocator.dupeZ(u8, tags);
         std.heap.c_allocator.free(tags_z);
         const _result = c.htm_conversion_options_builder_keep_inline_images_in(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), tags_z);
@@ -1178,7 +1173,7 @@ pub const ConversionOptionsBuilder = struct {
     }
 
     /// Set the list of CSS selectors for elements to exclude entirely from output.
-    pub fn exclude_selectors(self: *ConversionOptionsBuilder, selectors: []const u8) ConversionOptionsBuilder {
+    pub fn exclude_selectors(self: *ConversionOptionsBuilder, selectors: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
         const selectors_z = try std.heap.c_allocator.dupeZ(u8, selectors);
         std.heap.c_allocator.free(selectors_z);
         const _result = c.htm_conversion_options_builder_exclude_selectors(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), selectors_z);
@@ -1186,23 +1181,23 @@ pub const ConversionOptionsBuilder = struct {
     }
 
     /// Set the visitor used during conversion.
-    pub fn visitor(self: *ConversionOptionsBuilder, visitor: ?VisitorHandle) ConversionOptionsBuilder {
-        const _result = c.htm_conversion_options_builder_visitor(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), visitor);
+    pub fn visitor(self: *ConversionOptionsBuilder, value: ?VisitorHandle) error{OutOfMemory}!ConversionOptionsBuilder {
+        const _result = c.htm_conversion_options_builder_visitor(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), value);
         return ConversionOptionsBuilder{ ._handle = _result.? };
     }
 
     /// Set the pre-processing options applied to the HTML before conversion.
-    pub fn preprocessing(self: *ConversionOptionsBuilder, preprocessing: []const u8) ConversionOptionsBuilder {
-        const preprocessing_z = try std.heap.c_allocator.dupeZ(u8, preprocessing);
-        const preprocessing_handle = c.htm_preprocessing_options_from_json(preprocessing_z.ptr);
-        std.heap.c_allocator.free(preprocessing_z);
-        c.htm_preprocessing_options_free(preprocessing_handle);
-        const _result = c.htm_conversion_options_builder_preprocessing(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), preprocessing_handle);
+    pub fn preprocessing(self: *ConversionOptionsBuilder, value: []const u8) error{OutOfMemory}!ConversionOptionsBuilder {
+        const value_z = try std.heap.c_allocator.dupeZ(u8, value);
+        const value_handle = c.htm_preprocessing_options_from_json(value_z.ptr);
+        std.heap.c_allocator.free(value_z);
+        c.htm_preprocessing_options_free(value_handle);
+        const _result = c.htm_conversion_options_builder_preprocessing(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)), value_handle);
         return ConversionOptionsBuilder{ ._handle = _result.? };
     }
 
     /// Build the final `ConversionOptions`.
-    pub fn build(self: *ConversionOptionsBuilder) []u8 {
+    pub fn build(self: *ConversionOptionsBuilder) error{OutOfMemory}![]u8 {
         const _result = c.htm_conversion_options_builder_build(@as(*c.HTMConversionOptionsBuilder, @ptrCast(self._handle)));
         return blk: {
             const _json_ptr = c.htm_conversion_options_to_json(_result);
