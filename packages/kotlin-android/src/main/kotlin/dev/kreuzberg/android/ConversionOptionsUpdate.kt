@@ -5,8 +5,8 @@ package dev.kreuzberg.android
 /**
  * Partial update for `ConversionOptions`.
  *
- * Uses `Option<T>` fields for selective updates. Bindings use this to construct
- * options from language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
+ * Uses `Option<T>` fields for selective updates. Bindings use this to construct options from
+ * language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
  */
 data class ConversionOptionsUpdate(
     val headingStyle: HeadingStyle?,
@@ -49,5 +49,5 @@ data class ConversionOptionsUpdate(
     val inferDimensions: Boolean?,
     val maxDepth: Long??,
     val excludeSelectors: List<String>?,
-    val visitor: VisitorHandle?
+    val visitor: VisitorHandle?,
 )

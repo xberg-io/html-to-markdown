@@ -8,17 +8,31 @@
 
 class ConversionError(Exception):
     """Errors that can occur during HTML to Markdown conversion."""
+
+
 class ParseError(ConversionError):
     """HTML parsing error."""
+
+
 class SanitizationError(ConversionError):
     """HTML sanitization error."""
+
+
 class ConfigError(ConversionError):
     """Invalid configuration."""
+
+
 class IoError(ConversionError):
     """I/O error."""
+
+
 class PanicError(ConversionError):
     """Panic caught during conversion to prevent unwinding across FFI boundaries."""
+
+
 class InvalidInputError(ConversionError):
     """Invalid input data."""
+
+
 class OtherError(ConversionError):
     """Generic conversion error."""

@@ -1,0 +1,17 @@
+.{
+    .name = .e2e_zig,
+    .version = "0.1.0",
+    .fingerprint = 0xf16334c0592376fc,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .html_to_markdown = .{
+            .url = "https://registry.example.com/html_to_markdown/v0.1.0.tar.gz",
+            .hash = "0000000000000000000000000000000000000000000000000000000000000000",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

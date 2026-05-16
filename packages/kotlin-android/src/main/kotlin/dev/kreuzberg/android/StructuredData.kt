@@ -5,11 +5,11 @@ package dev.kreuzberg.android
 /**
  * Structured data block (JSON-LD, Microdata, or RDFa).
  *
- * Represents machine-readable structured data found in the document.
- * JSON-LD blocks are collected as raw JSON strings for flexibility.
+ * Represents machine-readable structured data found in the document. JSON-LD blocks are collected
+ * as raw JSON strings for flexibility.
  */
 data class StructuredData(
     val dataType: StructuredDataType,
     val rawJson: String,
-    val schemaType: String?
+    val schemaType: String?,
 )

@@ -2,14 +2,12 @@
 
 package dev.kreuzberg.android
 
-/**
- * Categories of processing warnings.
- */
+/** Categories of processing warnings. */
 enum class WarningKind {
     IMAGE_EXTRACTION_FAILED,
     ENCODING_FALLBACK,
     TRUNCATED_INPUT,
     MALFORMED_HTML,
     SANITIZATION_APPLIED,
-    DEPTH_LIMIT_EXCEEDED;
+    DEPTH_LIMIT_EXCEEDED,
 }

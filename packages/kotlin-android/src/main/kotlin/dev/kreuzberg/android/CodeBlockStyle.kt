@@ -10,5 +10,5 @@ package dev.kreuzberg.android
 enum class CodeBlockStyle {
     INDENTED,
     BACKTICKS,
-    TILDES;
+    TILDES,
 }

@@ -5,13 +5,13 @@ package dev.kreuzberg.android
 /**
  * Header element metadata with hierarchy tracking.
  *
- * Captures heading elements (h1-h6) with their text content, identifiers,
- * and position in the document structure.
+ * Captures heading elements (h1-h6) with their text content, identifiers, and position in the
+ * document structure.
  */
 data class HeaderMetadata(
     val level: Byte,
     val text: String,
     val id: String?,
     val depth: Long,
-    val htmlOffset: Long
+    val htmlOffset: Long,
 )

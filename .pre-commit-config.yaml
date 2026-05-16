@@ -93,6 +93,9 @@ repos:
         exclude: ^(e2e/|test_apps/)
       - id: cargo-deny
         args: ["check"]
+      # rustdoc-lint, pydocstyle, jsdoc-lint, alef-docs-fresh land in
+      # kreuzberg-dev/pre-commit-hooks v1.0.9 — re-enable after that
+      # release tag is cut and the rev bump lands here.
       - id: shfmt
         args: ["-w", "-i", "2"]
       - id: shellcheck
@@ -174,7 +177,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.15.71
+    rev: v0.16.16
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

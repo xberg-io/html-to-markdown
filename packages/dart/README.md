@@ -75,11 +75,39 @@ dart pub add h2m
 
 Basic conversion:
 
-<!-- snippet not found: getting-started/basic_usage.md -->
+```dart
+import 'package:h2m/h2m.dart';
+import 'package:h2m/src/html_to_markdown_rs_bridge_generated/frb_generated.dart'
+    show RustLib;
+
+Future<void> main() async {
+  await RustLib.init();
+
+  const html = '<h1>Hello</h1><p>This is <strong>fast</strong>!</p>';
+  final result = await H2mBridge.convert(html);
+  print(result.content);
+}
+```
 
 With conversion options:
 
-<!-- snippet not found: getting-started/with_options.md -->
+```dart
+import 'package:h2m/h2m.dart';
+import 'package:h2m/src/html_to_markdown_rs_bridge_generated/frb_generated.dart'
+    show RustLib;
+
+Future<void> main() async {
+  await RustLib.init();
+
+  final options = await createConversionOptionsFromJson(
+    json: '{"heading_style":"atx","list_indent_width":2,"wrap":true}',
+  );
+
+  const html = '<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>';
+  final result = await H2mBridge.convert(html, options: options);
+  print(result.content);
+}
+```
 
 ## API Reference
 
@@ -172,7 +200,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
 - [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
-- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces this README and all per-language bindings.
+- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
 - [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
 
 ## Contributing
@@ -192,7 +220,7 @@ All contributions must follow our code quality standards (enforced via pre-commi
 
 ## License
 
-MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE).
+MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE). Copyright © Kreuzberg, Inc.
 
 ## Support
 

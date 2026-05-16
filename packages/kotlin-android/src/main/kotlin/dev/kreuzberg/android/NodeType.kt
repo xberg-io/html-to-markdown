@@ -5,8 +5,8 @@ package dev.kreuzberg.android
 /**
  * Node type enumeration covering all HTML element types.
  *
- * This enum categorizes all HTML elements that the converter recognizes,
- * providing a coarse-grained classification for visitor dispatch.
+ * This enum categorizes all HTML elements that the converter recognizes, providing a coarse-grained
+ * classification for visitor dispatch.
  */
 enum class NodeType {
     TEXT,
@@ -96,5 +96,5 @@ enum class NodeType {
     STYLE,
     SCRIPT,
     BASE,
-    CUSTOM;
+    CUSTOM,
 }

@@ -13,46 +13,52 @@ import RustBridgeC
 /// user-facing API. Must remain `public` because Swift requires public visibility
 /// for cross-module protocol conformance (implementer lives in the main target).
 public protocol _SwiftHtmlVisitorBoxDelegate: AnyObject {
-    func visit_text(_ ctx: RustString, _ text: RustString) -> String
-    func visit_element_start(_ ctx: RustString) -> String
-    func visit_element_end(_ ctx: RustString, _ output: RustString) -> String
-    func visit_link(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?) -> String
-    func visit_image(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?) -> String
-    func visit_heading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?) -> String
-    func visit_code_block(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String
-    func visit_code_inline(_ ctx: RustString, _ code: RustString) -> String
-    func visit_list_item(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString) -> String
-    func visit_list_start(_ ctx: RustString, _ ordered: Bool) -> String
-    func visit_list_end(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String
-    func visit_table_start(_ ctx: RustString) -> String
-    func visit_table_row(_ ctx: RustString, _ cells: RustVec<RustString>, _ is_header: Bool) -> String
-    func visit_table_end(_ ctx: RustString, _ output: RustString) -> String
-    func visit_blockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String
-    func visit_strong(_ ctx: RustString, _ text: RustString) -> String
-    func visit_emphasis(_ ctx: RustString, _ text: RustString) -> String
-    func visit_strikethrough(_ ctx: RustString, _ text: RustString) -> String
-    func visit_underline(_ ctx: RustString, _ text: RustString) -> String
-    func visit_subscript(_ ctx: RustString, _ text: RustString) -> String
-    func visit_superscript(_ ctx: RustString, _ text: RustString) -> String
-    func visit_mark(_ ctx: RustString, _ text: RustString) -> String
-    func visit_line_break(_ ctx: RustString) -> String
-    func visit_horizontal_rule(_ ctx: RustString) -> String
-    func visit_custom_element(_ ctx: RustString, _ tag_name: RustString, _ html: RustString) -> String
-    func visit_definition_list_start(_ ctx: RustString) -> String
-    func visit_definition_term(_ ctx: RustString, _ text: RustString) -> String
-    func visit_definition_description(_ ctx: RustString, _ text: RustString) -> String
-    func visit_definition_list_end(_ ctx: RustString, _ output: RustString) -> String
-    func visit_form(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String
-    func visit_input(_ ctx: RustString, _ input_type: RustString, _ name: RustString?, _ value: RustString?) -> String
-    func visit_button(_ ctx: RustString, _ text: RustString) -> String
-    func visit_audio(_ ctx: RustString, _ src: RustString?) -> String
-    func visit_video(_ ctx: RustString, _ src: RustString?) -> String
-    func visit_iframe(_ ctx: RustString, _ src: RustString?) -> String
-    func visit_details(_ ctx: RustString, _ open: Bool) -> String
-    func visit_summary(_ ctx: RustString, _ text: RustString) -> String
-    func visit_figure_start(_ ctx: RustString) -> String
-    func visit_figcaption(_ ctx: RustString, _ text: RustString) -> String
-    func visit_figure_end(_ ctx: RustString, _ output: RustString) -> String
+  func visit_text(_ ctx: RustString, _ text: RustString) -> String
+  func visit_element_start(_ ctx: RustString) -> String
+  func visit_element_end(_ ctx: RustString, _ output: RustString) -> String
+  func visit_link(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?)
+    -> String
+  func visit_image(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?)
+    -> String
+  func visit_heading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?)
+    -> String
+  func visit_code_block(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String
+  func visit_code_inline(_ ctx: RustString, _ code: RustString) -> String
+  func visit_list_item(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString)
+    -> String
+  func visit_list_start(_ ctx: RustString, _ ordered: Bool) -> String
+  func visit_list_end(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String
+  func visit_table_start(_ ctx: RustString) -> String
+  func visit_table_row(_ ctx: RustString, _ cells: RustVec<RustString>, _ is_header: Bool) -> String
+  func visit_table_end(_ ctx: RustString, _ output: RustString) -> String
+  func visit_blockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String
+  func visit_strong(_ ctx: RustString, _ text: RustString) -> String
+  func visit_emphasis(_ ctx: RustString, _ text: RustString) -> String
+  func visit_strikethrough(_ ctx: RustString, _ text: RustString) -> String
+  func visit_underline(_ ctx: RustString, _ text: RustString) -> String
+  func visit_subscript(_ ctx: RustString, _ text: RustString) -> String
+  func visit_superscript(_ ctx: RustString, _ text: RustString) -> String
+  func visit_mark(_ ctx: RustString, _ text: RustString) -> String
+  func visit_line_break(_ ctx: RustString) -> String
+  func visit_horizontal_rule(_ ctx: RustString) -> String
+  func visit_custom_element(_ ctx: RustString, _ tag_name: RustString, _ html: RustString) -> String
+  func visit_definition_list_start(_ ctx: RustString) -> String
+  func visit_definition_term(_ ctx: RustString, _ text: RustString) -> String
+  func visit_definition_description(_ ctx: RustString, _ text: RustString) -> String
+  func visit_definition_list_end(_ ctx: RustString, _ output: RustString) -> String
+  func visit_form(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String
+  func visit_input(
+    _ ctx: RustString, _ input_type: RustString, _ name: RustString?, _ value: RustString?
+  ) -> String
+  func visit_button(_ ctx: RustString, _ text: RustString) -> String
+  func visit_audio(_ ctx: RustString, _ src: RustString?) -> String
+  func visit_video(_ ctx: RustString, _ src: RustString?) -> String
+  func visit_iframe(_ ctx: RustString, _ src: RustString?) -> String
+  func visit_details(_ ctx: RustString, _ open: Bool) -> String
+  func visit_summary(_ ctx: RustString, _ text: RustString) -> String
+  func visit_figure_start(_ ctx: RustString) -> String
+  func visit_figcaption(_ ctx: RustString, _ text: RustString) -> String
+  func visit_figure_end(_ ctx: RustString, _ output: RustString) -> String
 }
 
 /// Opaque box class retained by Rust via `Unmanaged<SwiftHtmlVisitorBox>.passRetained`.
@@ -60,126 +66,141 @@ public protocol _SwiftHtmlVisitorBoxDelegate: AnyObject {
 /// Rust bridge crate; swift-bridge generates @_cdecl shims that call these.
 /// Delegates to a `_SwiftHtmlVisitorBoxDelegate` (implemented in the main module).
 public final class SwiftHtmlVisitorBox {
-    private let delegate: any _SwiftHtmlVisitorBoxDelegate
-    public init(_ delegate: any _SwiftHtmlVisitorBoxDelegate) { self.delegate = delegate }
-    public func alef_visit_text(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_text(ctx, text)
-    }
-    public func alef_visit_element_start(ctx: RustString) -> String {
-        return delegate.visit_element_start(ctx)
-    }
-    public func alef_visit_element_end(ctx: RustString, output: RustString) -> String {
-        return delegate.visit_element_end(ctx, output)
-    }
-    public func alef_visit_link(ctx: RustString, href: RustString, text: RustString, title: RustString?) -> String {
-        return delegate.visit_link(ctx, href, text, title)
-    }
-    public func alef_visit_image(ctx: RustString, src: RustString, alt: RustString, title: RustString?) -> String {
-        return delegate.visit_image(ctx, src, alt, title)
-    }
-    public func alef_visit_heading(ctx: RustString, level: UInt32, text: RustString, id: RustString?) -> String {
-        return delegate.visit_heading(ctx, level, text, id)
-    }
-    public func alef_visit_code_block(ctx: RustString, lang: RustString?, code: RustString) -> String {
-        return delegate.visit_code_block(ctx, lang, code)
-    }
-    public func alef_visit_code_inline(ctx: RustString, code: RustString) -> String {
-        return delegate.visit_code_inline(ctx, code)
-    }
-    public func alef_visit_list_item(ctx: RustString, ordered: Bool, marker: RustString, text: RustString) -> String {
-        return delegate.visit_list_item(ctx, ordered, marker, text)
-    }
-    public func alef_visit_list_start(ctx: RustString, ordered: Bool) -> String {
-        return delegate.visit_list_start(ctx, ordered)
-    }
-    public func alef_visit_list_end(ctx: RustString, ordered: Bool, output: RustString) -> String {
-        return delegate.visit_list_end(ctx, ordered, output)
-    }
-    public func alef_visit_table_start(ctx: RustString) -> String {
-        return delegate.visit_table_start(ctx)
-    }
-    public func alef_visit_table_row(ctx: RustString, cells: RustVec<RustString>, is_header: Bool) -> String {
-        return delegate.visit_table_row(ctx, cells, is_header)
-    }
-    public func alef_visit_table_end(ctx: RustString, output: RustString) -> String {
-        return delegate.visit_table_end(ctx, output)
-    }
-    public func alef_visit_blockquote(ctx: RustString, content: RustString, depth: UInt) -> String {
-        return delegate.visit_blockquote(ctx, content, depth)
-    }
-    public func alef_visit_strong(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_strong(ctx, text)
-    }
-    public func alef_visit_emphasis(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_emphasis(ctx, text)
-    }
-    public func alef_visit_strikethrough(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_strikethrough(ctx, text)
-    }
-    public func alef_visit_underline(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_underline(ctx, text)
-    }
-    public func alef_visit_subscript(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_subscript(ctx, text)
-    }
-    public func alef_visit_superscript(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_superscript(ctx, text)
-    }
-    public func alef_visit_mark(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_mark(ctx, text)
-    }
-    public func alef_visit_line_break(ctx: RustString) -> String {
-        return delegate.visit_line_break(ctx)
-    }
-    public func alef_visit_horizontal_rule(ctx: RustString) -> String {
-        return delegate.visit_horizontal_rule(ctx)
-    }
-    public func alef_visit_custom_element(ctx: RustString, tag_name: RustString, html: RustString) -> String {
-        return delegate.visit_custom_element(ctx, tag_name, html)
-    }
-    public func alef_visit_definition_list_start(ctx: RustString) -> String {
-        return delegate.visit_definition_list_start(ctx)
-    }
-    public func alef_visit_definition_term(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_definition_term(ctx, text)
-    }
-    public func alef_visit_definition_description(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_definition_description(ctx, text)
-    }
-    public func alef_visit_definition_list_end(ctx: RustString, output: RustString) -> String {
-        return delegate.visit_definition_list_end(ctx, output)
-    }
-    public func alef_visit_form(ctx: RustString, action: RustString?, method: RustString?) -> String {
-        return delegate.visit_form(ctx, action, method)
-    }
-    public func alef_visit_input(ctx: RustString, input_type: RustString, name: RustString?, value: RustString?) -> String {
-        return delegate.visit_input(ctx, input_type, name, value)
-    }
-    public func alef_visit_button(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_button(ctx, text)
-    }
-    public func alef_visit_audio(ctx: RustString, src: RustString?) -> String {
-        return delegate.visit_audio(ctx, src)
-    }
-    public func alef_visit_video(ctx: RustString, src: RustString?) -> String {
-        return delegate.visit_video(ctx, src)
-    }
-    public func alef_visit_iframe(ctx: RustString, src: RustString?) -> String {
-        return delegate.visit_iframe(ctx, src)
-    }
-    public func alef_visit_details(ctx: RustString, open: Bool) -> String {
-        return delegate.visit_details(ctx, open)
-    }
-    public func alef_visit_summary(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_summary(ctx, text)
-    }
-    public func alef_visit_figure_start(ctx: RustString) -> String {
-        return delegate.visit_figure_start(ctx)
-    }
-    public func alef_visit_figcaption(ctx: RustString, text: RustString) -> String {
-        return delegate.visit_figcaption(ctx, text)
-    }
-    public func alef_visit_figure_end(ctx: RustString, output: RustString) -> String {
-        return delegate.visit_figure_end(ctx, output)
-    }
+  private let delegate: any _SwiftHtmlVisitorBoxDelegate
+  public init(_ delegate: any _SwiftHtmlVisitorBoxDelegate) { self.delegate = delegate }
+  public func alef_visit_text(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_text(ctx, text)
+  }
+  public func alef_visit_element_start(ctx: RustString) -> String {
+    return delegate.visit_element_start(ctx)
+  }
+  public func alef_visit_element_end(ctx: RustString, output: RustString) -> String {
+    return delegate.visit_element_end(ctx, output)
+  }
+  public func alef_visit_link(
+    ctx: RustString, href: RustString, text: RustString, title: RustString?
+  ) -> String {
+    return delegate.visit_link(ctx, href, text, title)
+  }
+  public func alef_visit_image(
+    ctx: RustString, src: RustString, alt: RustString, title: RustString?
+  ) -> String {
+    return delegate.visit_image(ctx, src, alt, title)
+  }
+  public func alef_visit_heading(ctx: RustString, level: UInt32, text: RustString, id: RustString?)
+    -> String
+  {
+    return delegate.visit_heading(ctx, level, text, id)
+  }
+  public func alef_visit_code_block(ctx: RustString, lang: RustString?, code: RustString) -> String
+  {
+    return delegate.visit_code_block(ctx, lang, code)
+  }
+  public func alef_visit_code_inline(ctx: RustString, code: RustString) -> String {
+    return delegate.visit_code_inline(ctx, code)
+  }
+  public func alef_visit_list_item(
+    ctx: RustString, ordered: Bool, marker: RustString, text: RustString
+  ) -> String {
+    return delegate.visit_list_item(ctx, ordered, marker, text)
+  }
+  public func alef_visit_list_start(ctx: RustString, ordered: Bool) -> String {
+    return delegate.visit_list_start(ctx, ordered)
+  }
+  public func alef_visit_list_end(ctx: RustString, ordered: Bool, output: RustString) -> String {
+    return delegate.visit_list_end(ctx, ordered, output)
+  }
+  public func alef_visit_table_start(ctx: RustString) -> String {
+    return delegate.visit_table_start(ctx)
+  }
+  public func alef_visit_table_row(ctx: RustString, cells: RustVec<RustString>, is_header: Bool)
+    -> String
+  {
+    return delegate.visit_table_row(ctx, cells, is_header)
+  }
+  public func alef_visit_table_end(ctx: RustString, output: RustString) -> String {
+    return delegate.visit_table_end(ctx, output)
+  }
+  public func alef_visit_blockquote(ctx: RustString, content: RustString, depth: UInt) -> String {
+    return delegate.visit_blockquote(ctx, content, depth)
+  }
+  public func alef_visit_strong(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_strong(ctx, text)
+  }
+  public func alef_visit_emphasis(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_emphasis(ctx, text)
+  }
+  public func alef_visit_strikethrough(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_strikethrough(ctx, text)
+  }
+  public func alef_visit_underline(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_underline(ctx, text)
+  }
+  public func alef_visit_subscript(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_subscript(ctx, text)
+  }
+  public func alef_visit_superscript(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_superscript(ctx, text)
+  }
+  public func alef_visit_mark(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_mark(ctx, text)
+  }
+  public func alef_visit_line_break(ctx: RustString) -> String {
+    return delegate.visit_line_break(ctx)
+  }
+  public func alef_visit_horizontal_rule(ctx: RustString) -> String {
+    return delegate.visit_horizontal_rule(ctx)
+  }
+  public func alef_visit_custom_element(ctx: RustString, tag_name: RustString, html: RustString)
+    -> String
+  {
+    return delegate.visit_custom_element(ctx, tag_name, html)
+  }
+  public func alef_visit_definition_list_start(ctx: RustString) -> String {
+    return delegate.visit_definition_list_start(ctx)
+  }
+  public func alef_visit_definition_term(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_definition_term(ctx, text)
+  }
+  public func alef_visit_definition_description(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_definition_description(ctx, text)
+  }
+  public func alef_visit_definition_list_end(ctx: RustString, output: RustString) -> String {
+    return delegate.visit_definition_list_end(ctx, output)
+  }
+  public func alef_visit_form(ctx: RustString, action: RustString?, method: RustString?) -> String {
+    return delegate.visit_form(ctx, action, method)
+  }
+  public func alef_visit_input(
+    ctx: RustString, input_type: RustString, name: RustString?, value: RustString?
+  ) -> String {
+    return delegate.visit_input(ctx, input_type, name, value)
+  }
+  public func alef_visit_button(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_button(ctx, text)
+  }
+  public func alef_visit_audio(ctx: RustString, src: RustString?) -> String {
+    return delegate.visit_audio(ctx, src)
+  }
+  public func alef_visit_video(ctx: RustString, src: RustString?) -> String {
+    return delegate.visit_video(ctx, src)
+  }
+  public func alef_visit_iframe(ctx: RustString, src: RustString?) -> String {
+    return delegate.visit_iframe(ctx, src)
+  }
+  public func alef_visit_details(ctx: RustString, open: Bool) -> String {
+    return delegate.visit_details(ctx, open)
+  }
+  public func alef_visit_summary(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_summary(ctx, text)
+  }
+  public func alef_visit_figure_start(ctx: RustString) -> String {
+    return delegate.visit_figure_start(ctx)
+  }
+  public func alef_visit_figcaption(ctx: RustString, text: RustString) -> String {
+    return delegate.visit_figcaption(ctx, text)
+  }
+  public func alef_visit_figure_end(ctx: RustString, output: RustString) -> String {
+    return delegate.visit_figure_end(ctx, output)
+  }
 }

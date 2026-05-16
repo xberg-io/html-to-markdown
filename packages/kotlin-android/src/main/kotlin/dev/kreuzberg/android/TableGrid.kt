@@ -2,11 +2,5 @@
 
 package dev.kreuzberg.android
 
-/**
- * A structured table grid with cell-level data including spans.
- */
-data class TableGrid(
-    val rows: Int,
-    val cols: Int,
-    val cells: List<GridCell>
-)
+/** A structured table grid with cell-level data including spans. */
+data class TableGrid(val rows: Int, val cols: Int, val cells: List<GridCell>)

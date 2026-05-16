@@ -10,5 +10,5 @@ package dev.kreuzberg.android
 enum class HeadingStyle {
     UNDERLINED,
     ATX,
-    ATX_CLOSED;
+    ATX_CLOSED,
 }

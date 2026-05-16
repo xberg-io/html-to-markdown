@@ -75,11 +75,32 @@ implementation("dev.kreuzberg:html-to-markdown-android:3.5.0")
 
 Basic conversion:
 
-<!-- snippet not found: getting-started/basic_usage.md -->
+```kotlin
+import dev.kreuzberg.android.HtmlToMarkdownRs
+
+val html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
+val result = HtmlToMarkdownRs.convert(html)
+val markdown: String? = result.content
+```
 
 With conversion options:
 
-<!-- snippet not found: getting-started/with_options.md -->
+```kotlin
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import dev.kreuzberg.android.ConversionOptions
+import dev.kreuzberg.android.HtmlToMarkdownRs
+
+val mapper = ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+val options = mapper.readValue(
+    "{\"heading_style\":\"atx\",\"list_indent_width\":2,\"wrap\":true}",
+    ConversionOptions::class.java,
+)
+
+val html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>"
+val result = HtmlToMarkdownRs.convert(html, options)
+val markdown: String? = result.content
+```
 
 ## API Reference
 
@@ -156,7 +177,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
 - [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
-- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces this README and all per-language bindings.
+- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
 - [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
 
 ## Contributing
@@ -176,7 +197,7 @@ All contributions must follow our code quality standards (enforced via pre-commi
 
 ## License
 
-MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE).
+MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE). Copyright © Kreuzberg, Inc.
 
 ## Support
 

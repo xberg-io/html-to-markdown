@@ -9,12 +9,31 @@ import kotlinx.coroutines.withContext
 object HtmlToMarkdownRs {
     private val mapper = jacksonObjectMapper()
 
+    /**
+     * Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images, and
+     * warnings.
+     *
+     * **Errors:**
+     *
+     * Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
+     */
     fun convert(html: String, options: ConversionOptions? = null): ConversionResult {
-        val resultJson = HtmlToMarkdownRsBridge.nativeConvert(html, options?.let { mapper.writeValueAsString(it) } ?: "")
+        val resultJson =
+            HtmlToMarkdownRsBridge.nativeConvert(
+                html,
+                options?.let { mapper.writeValueAsString(it) } ?: "",
+            )
         return mapper.readValue(resultJson, ConversionResult::class.java)
     }
 
+    /**
+     * Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images, and
+     * warnings.
+     *
+     * **Errors:**
+     *
+     * Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
+     */
     suspend fun convertAsync(html: String, options: ConversionOptions? = null): ConversionResult =
         withContext(Dispatchers.IO) { convert(html, options) }
-
 }

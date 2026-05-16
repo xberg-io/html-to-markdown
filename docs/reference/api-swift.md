@@ -23,10 +23,10 @@ public static func convert(html: String, options: ConversionOptions? = nil) thro
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `html` | `String` | Yes | The html |
-| `options` | `ConversionOptions?` | No | The options to use |
+| Name      | Type                 | Required | Description        |
+| --------- | -------------------- | -------- | ------------------ |
+| `html`    | `String`             | Yes      | The html           |
+| `options` | `ConversionOptions?` | No       | The options to use |
 
 **Returns:** `ConversionResult`
 **Errors:** Throws `Error`.
@@ -41,49 +41,49 @@ Main conversion options for HTML to Markdown conversion.
 
 Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `headingStyle` | `HeadingStyle` | `HeadingStyle.Atx` | Heading style to use in Markdown output (ATX `#` or Setext underline). |
-| `listIndentType` | `ListIndentType` | `ListIndentType.Spaces` | How to indent nested list items (spaces or tab). |
-| `listIndentWidth` | `UInt64` | `2` | Number of spaces (or tabs) to use for each level of list indentation. |
-| `bullets` | `String` | `"-*+"` | Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). |
-| `strongEmSymbol` | `String` | `"*"` | Character used for bold/italic emphasis markers (`*` or `_`). |
-| `escapeAsterisks` | `Bool` | `false` | Escape `*` characters in plain text to avoid unintended bold/italic. |
-| `escapeUnderscores` | `Bool` | `false` | Escape `_` characters in plain text to avoid unintended bold/italic. |
-| `escapeMisc` | `Bool` | `false` | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. |
-| `escapeAscii` | `Bool` | `false` | Escape ASCII characters that have special meaning in certain Markdown dialects. |
-| `codeLanguage` | `String` | `""` | Default language annotation for fenced code blocks that have no language hint. |
-| `autolinks` | `Bool` | `true` | Automatically convert bare URLs into Markdown autolinks. |
-| `defaultTitle` | `Bool` | `false` | Emit a default title when no `<title>` tag is present. |
-| `brInTables` | `Bool` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
-| `highlightStyle` | `HighlightStyle` | `HighlightStyle.DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
-| `extractMetadata` | `Bool` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
-| `whitespaceMode` | `WhitespaceMode` | `WhitespaceMode.Normalized` | Controls how whitespace is normalised during conversion. |
-| `stripNewlines` | `Bool` | `false` | Strip all newlines from the output, producing a single-line result. |
-| `wrap` | `Bool` | `false` | Wrap long lines at `wrap_width` characters. |
-| `wrapWidth` | `UInt64` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
-| `convertAsInline` | `Bool` | `false` | Treat the entire document as inline content (no block-level wrappers). |
-| `subSymbol` | `String` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
-| `supSymbol` | `String` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
-| `newlineStyle` | `NewlineStyle` | `NewlineStyle.Spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
-| `codeBlockStyle` | `CodeBlockStyle` | `CodeBlockStyle.Backticks` | Style used for fenced code blocks (backticks or tilde). |
-| `keepInlineImagesIn` | `[String]` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Pre-processing options applied to the HTML before conversion. |
-| `encoding` | `String` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
-| `debug` | `Bool` | `false` | Emit debug information during conversion. |
-| `stripTags` | `[String]` | `[]` | HTML tag names whose content is stripped from the output entirely. |
-| `preserveTags` | `[String]` | `[]` | HTML tag names that are preserved verbatim in the output. |
-| `skipImages` | `Bool` | `false` | Skip conversion of `<img>` elements (omit images from output). |
-| `linkStyle` | `LinkStyle` | `LinkStyle.Inline` | Link rendering style (inline or reference). |
-| `outputFormat` | `OutputFormat` | `OutputFormat.Markdown` | Target output format (Markdown, plain text, etc.). |
-| `includeDocumentStructure` | `Bool` | `false` | Include structured document tree in result. |
-| `extractImages` | `Bool` | `false` | Extract inline images from data URIs and SVGs. |
-| `maxImageSize` | `UInt64` | `5242880` | Maximum decoded image size in bytes (default 5MB). |
-| `captureSvg` | `Bool` | `false` | Capture SVG elements as images. |
-| `inferDimensions` | `Bool` | `true` | Infer image dimensions from data. |
-| `maxDepth` | `UInt64?` | `null` | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated. |
-| `excludeSelectors` | `[String]` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
-| `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
+| Field                      | Type                   | Default                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ---------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `headingStyle`             | `HeadingStyle`         | `HeadingStyle.Atx`           | Heading style to use in Markdown output (ATX `#` or Setext underline).                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `listIndentType`           | `ListIndentType`       | `ListIndentType.Spaces`      | How to indent nested list items (spaces or tab).                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `listIndentWidth`          | `UInt64`               | `2`                          | Number of spaces (or tabs) to use for each level of list indentation.                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `bullets`                  | `String`               | `"-*+"`                      | Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `strongEmSymbol`           | `String`               | `"*"`                        | Character used for bold/italic emphasis markers (`*` or `_`).                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `escapeAsterisks`          | `Bool`                 | `false`                      | Escape `*` characters in plain text to avoid unintended bold/italic.                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `escapeUnderscores`        | `Bool`                 | `false`                      | Escape `_` characters in plain text to avoid unintended bold/italic.                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `escapeMisc`               | `Bool`                 | `false`                      | Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `escapeAscii`              | `Bool`                 | `false`                      | Escape ASCII characters that have special meaning in certain Markdown dialects.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `codeLanguage`             | `String`               | `""`                         | Default language annotation for fenced code blocks that have no language hint.                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `autolinks`                | `Bool`                 | `true`                       | Automatically convert bare URLs into Markdown autolinks.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `defaultTitle`             | `Bool`                 | `false`                      | Emit a default title when no `<title>` tag is present.                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `brInTables`               | `Bool`                 | `false`                      | Render `<br>` elements inside table cells as literal line breaks.                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `highlightStyle`           | `HighlightStyle`       | `HighlightStyle.DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`).                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `extractMetadata`          | `Bool`                 | `true`                       | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally.                                                                                                                                                                                                                                     |
+| `whitespaceMode`           | `WhitespaceMode`       | `WhitespaceMode.Normalized`  | Controls how whitespace is normalised during conversion.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `stripNewlines`            | `Bool`                 | `false`                      | Strip all newlines from the output, producing a single-line result.                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `wrap`                     | `Bool`                 | `false`                      | Wrap long lines at `wrap_width` characters.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `wrapWidth`                | `UInt64`               | `80`                         | Maximum line width when `wrap` is enabled (default `80`).                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `convertAsInline`          | `Bool`                 | `false`                      | Treat the entire document as inline content (no block-level wrappers).                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `subSymbol`                | `String`               | `""`                         | Markdown notation for subscript text (e.g. `"~"`).                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `supSymbol`                | `String`               | `""`                         | Markdown notation for superscript text (e.g. `"^"`).                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `newlineStyle`             | `NewlineStyle`         | `NewlineStyle.Spaces`        | How to encode hard line breaks (`<br>`) in Markdown.                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `codeBlockStyle`           | `CodeBlockStyle`       | `CodeBlockStyle.Backticks`   | Style used for fenced code blocks (backticks or tilde).                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `keepInlineImagesIn`       | `[String]`             | `[]`                         | HTML tag names whose `<img>` children are kept inline instead of block.                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `preprocessing`            | `PreprocessingOptions` | —                            | Pre-processing options applied to the HTML before conversion.                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `encoding`                 | `String`               | `"utf-8"`                    | Expected character encoding of the input HTML (default `"utf-8"`).                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `debug`                    | `Bool`                 | `false`                      | Emit debug information during conversion.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `stripTags`                | `[String]`             | `[]`                         | HTML tag names whose content is stripped from the output entirely.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `preserveTags`             | `[String]`             | `[]`                         | HTML tag names that are preserved verbatim in the output.                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `skipImages`               | `Bool`                 | `false`                      | Skip conversion of `<img>` elements (omit images from output).                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `linkStyle`                | `LinkStyle`            | `LinkStyle.Inline`           | Link rendering style (inline or reference).                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `outputFormat`             | `OutputFormat`         | `OutputFormat.Markdown`      | Target output format (Markdown, plain text, etc.).                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `includeDocumentStructure` | `Bool`                 | `false`                      | Include structured document tree in result.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `extractImages`            | `Bool`                 | `false`                      | Extract inline images from data URIs and SVGs.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `maxImageSize`             | `UInt64`               | `5242880`                    | Maximum decoded image size in bytes (default 5MB).                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `captureSvg`               | `Bool`                 | `false`                      | Capture SVG elements as images.                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `inferDimensions`          | `Bool`                 | `true`                       | Infer image dimensions from data.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `maxDepth`                 | `UInt64?`              | `null`                       | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated.                                                                                                                                                                                                                                                                                                                                                                   |
+| `excludeSelectors`         | `[String]`             | `[]`                         | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
+| `visitor`                  | `VisitorHandle?`       | `null`                       | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`.                                                                                                                                                                                                                                                                 |
 
 ##### Methods
 
@@ -112,15 +112,14 @@ The primary result of HTML conversion and extraction.
 Contains the converted text output, optional structured document tree,
 metadata, extracted tables, images, and processing warnings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `content` | `String?` | `null` | Converted text output (markdown, djot, or plain text). `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
-| `document` | `DocumentStructure?` | `null` | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options. |
-| `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
-| `tables` | `[TableData]` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `[String]` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
-| `warnings` | `[ProcessingWarning]` | `[]` | Non-fatal processing warnings. |
-
+| Field      | Type                  | Default | Description                                                                                                                                        |
+| ---------- | --------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content`  | `String?`             | `null`  | Converted text output (markdown, djot, or plain text). `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
+| `document` | `DocumentStructure?`  | `null`  | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options.                                 |
+| `metadata` | `HtmlMetadata`        | —       | Extracted HTML metadata (title, OG, links, images, structured data).                                                                               |
+| `tables`   | `[TableData]`         | `[]`    | Extracted tables with structured cell data and markdown representation.                                                                            |
+| `images`   | `[String]`            | `[]`    | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options.                                                |
+| `warnings` | `[ProcessingWarning]` | `[]`    | Non-fatal processing warnings.                                                                                                                     |
 
 ---
 
@@ -131,20 +130,19 @@ Document-level metadata extracted from `<head>` and top-level elements.
 Contains all metadata typically used by search engines, social media platforms,
 and browsers for document indexing and presentation.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `title` | `String?` | `null` | Document title from `<title>` tag |
-| `description` | `String?` | `null` | Document description from `<meta name="description">` tag |
-| `keywords` | `[String]` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
-| `author` | `String?` | `null` | Document author from `<meta name="author">` tag |
-| `canonicalUrl` | `String?` | `null` | Canonical URL from `<link rel="canonical">` tag |
-| `baseHref` | `String?` | `null` | Base URL from `<base href="">` tag for resolving relative URLs |
-| `language` | `String?` | `null` | Document language from `lang` attribute |
-| `textDirection` | `TextDirection?` | `null` | Document text direction from `dir` attribute |
-| `openGraph` | `[String: String]` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
-| `twitterCard` | `[String: String]` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
-| `metaTags` | `[String: String]` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
-
+| Field           | Type               | Default | Description                                                                                                              |
+| --------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `title`         | `String?`          | `null`  | Document title from `<title>` tag                                                                                        |
+| `description`   | `String?`          | `null`  | Document description from `<meta name="description">` tag                                                                |
+| `keywords`      | `[String]`         | `[]`    | Document keywords from `<meta name="keywords">` tag, split on commas                                                     |
+| `author`        | `String?`          | `null`  | Document author from `<meta name="author">` tag                                                                          |
+| `canonicalUrl`  | `String?`          | `null`  | Canonical URL from `<link rel="canonical">` tag                                                                          |
+| `baseHref`      | `String?`          | `null`  | Base URL from `<base href="">` tag for resolving relative URLs                                                           |
+| `language`      | `String?`          | `null`  | Document language from `lang` attribute                                                                                  |
+| `textDirection` | `TextDirection?`   | `null`  | Document text direction from `dir` attribute                                                                             |
+| `openGraph`     | `[String: String]` | `{}`    | Open Graph metadata (og:\* properties) for social media Keys like "title", "description", "image", "url", etc.           |
+| `twitterCard`   | `[String: String]` | `{}`    | Twitter Card metadata (twitter:\* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
+| `metaTags`      | `[String: String]` | `{}`    | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content           |
 
 ---
 
@@ -152,15 +150,14 @@ and browsers for document indexing and presentation.
 
 A single node in the document tree.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `id` | `String` | — | Deterministic node identifier. |
-| `content` | `NodeContent` | — | The semantic content of this node. |
-| `parent` | `UInt32?` | `null` | Index of the parent node (None for root nodes). |
-| `children` | `[UInt32]` | — | Indices of child nodes in reading order. |
-| `annotations` | `[TextAnnotation]` | — | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
-| `attributes` | `[String: String]?` | `null` | Format-specific attributes (e.g. class, id, data-* attributes). |
-
+| Field         | Type                | Default | Description                                                                                |
+| ------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `id`          | `String`            | —       | Deterministic node identifier.                                                             |
+| `content`     | `NodeContent`       | —       | The semantic content of this node.                                                         |
+| `parent`      | `UInt32?`           | `null`  | Index of the parent node (None for root nodes).                                            |
+| `children`    | `[UInt32]`          | —       | Indices of child nodes in reading order.                                                   |
+| `annotations` | `[TextAnnotation]`  | —       | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
+| `attributes`  | `[String: String]?` | `null`  | Format-specific attributes (e.g. class, id, data-\* attributes).                           |
 
 ---
 
@@ -170,11 +167,10 @@ A structured document tree representing the semantic content of an HTML document
 
 Uses a flat node array with index-based parent/child references for efficient traversal.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `nodes` | `[DocumentNode]` | — | All nodes in document reading order. |
-| `sourceFormat` | `String?` | `null` | The source format (always "html" for this library). |
-
+| Field          | Type             | Default | Description                                         |
+| -------------- | ---------------- | ------- | --------------------------------------------------- |
+| `nodes`        | `[DocumentNode]` | —       | All nodes in document reading order.                |
+| `sourceFormat` | `String?`        | `null`  | The source format (always "html" for this library). |
 
 ---
 
@@ -182,15 +178,14 @@ Uses a flat node array with index-based parent/child references for efficient tr
 
 A single cell in a table grid.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `content` | `String` | — | The text content of the cell. |
-| `row` | `UInt32` | — | 0-indexed row position. |
-| `col` | `UInt32` | — | 0-indexed column position. |
-| `rowSpan` | `UInt32` | — | Number of rows this cell spans (default 1). |
-| `colSpan` | `UInt32` | — | Number of columns this cell spans (default 1). |
-| `isHeader` | `Bool` | — | Whether this is a header cell (`<th>`). |
-
+| Field      | Type     | Default | Description                                    |
+| ---------- | -------- | ------- | ---------------------------------------------- |
+| `content`  | `String` | —       | The text content of the cell.                  |
+| `row`      | `UInt32` | —       | 0-indexed row position.                        |
+| `col`      | `UInt32` | —       | 0-indexed column position.                     |
+| `rowSpan`  | `UInt32` | —       | Number of rows this cell spans (default 1).    |
+| `colSpan`  | `UInt32` | —       | Number of columns this cell spans (default 1). |
+| `isHeader` | `Bool`   | —       | Whether this is a header cell (`<th>`).        |
 
 ---
 
@@ -201,13 +196,13 @@ Header element metadata with hierarchy tracking.
 Captures heading elements (h1-h6) with their text content, identifiers,
 and position in the document structure.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `level` | `UInt8` | — | Header level: 1 (h1) through 6 (h6) |
-| `text` | `String` | — | Normalized text content of the header |
-| `id` | `String?` | `null` | HTML id attribute if present |
-| `depth` | `UInt64` | — | Document tree depth at the header element |
-| `htmlOffset` | `UInt64` | — | Byte offset in original HTML document |
+| Field        | Type      | Default | Description                               |
+| ------------ | --------- | ------- | ----------------------------------------- |
+| `level`      | `UInt8`   | —       | Header level: 1 (h1) through 6 (h6)       |
+| `text`       | `String`  | —       | Normalized text content of the header     |
+| `id`         | `String?` | `null`  | HTML id attribute if present              |
+| `depth`      | `UInt64`  | —       | Document tree depth at the header element |
+| `htmlOffset` | `UInt64`  | —       | Byte offset in original HTML document     |
 
 ##### Methods
 
@@ -234,14 +229,13 @@ Comprehensive metadata extraction result from HTML document.
 Contains all extracted metadata types in a single structure,
 suitable for serialization and transmission across language boundaries.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `document` | `DocumentMetadata` | — | Document-level metadata (title, description, canonical, etc.) |
-| `headers` | `[HeaderMetadata]` | `[]` | Extracted header elements with hierarchy |
-| `links` | `[LinkMetadata]` | `[]` | Extracted hyperlinks with type classification |
-| `images` | `[ImageMetadata]` | `[]` | Extracted images with source and dimensions |
-| `structuredData` | `[StructuredData]` | `[]` | Extracted structured data blocks |
-
+| Field            | Type               | Default | Description                                                   |
+| ---------------- | ------------------ | ------- | ------------------------------------------------------------- |
+| `document`       | `DocumentMetadata` | —       | Document-level metadata (title, description, canonical, etc.) |
+| `headers`        | `[HeaderMetadata]` | `[]`    | Extracted header elements with hierarchy                      |
+| `links`          | `[LinkMetadata]`   | `[]`    | Extracted hyperlinks with type classification                 |
+| `images`         | `[ImageMetadata]`  | `[]`    | Extracted images with source and dimensions                   |
+| `structuredData` | `[StructuredData]` | `[]`    | Extracted structured data blocks                              |
 
 ---
 
@@ -692,15 +686,14 @@ Image metadata with source and dimensions.
 Captures `<img>` elements and inline `<svg>` elements with metadata
 for image analysis and optimization.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `src` | `String` | — | Image source (URL, data URI, or SVG content identifier) |
-| `alt` | `String?` | `null` | Alternative text from alt attribute (for accessibility) |
-| `title` | `String?` | `null` | Title attribute (often shown as tooltip) |
-| `dimensions` | `[UInt32]?` | `null` | Image dimensions as (width, height) if available |
-| `imageType` | `ImageType` | — | Image type classification |
-| `attributes` | `[String: String]` | — | Additional HTML attributes |
-
+| Field        | Type               | Default | Description                                             |
+| ------------ | ------------------ | ------- | ------------------------------------------------------- |
+| `src`        | `String`           | —       | Image source (URL, data URI, or SVG content identifier) |
+| `alt`        | `String?`          | `null`  | Alternative text from alt attribute (for accessibility) |
+| `title`      | `String?`          | `null`  | Title attribute (often shown as tooltip)                |
+| `dimensions` | `[UInt32]?`        | `null`  | Image dimensions as (width, height) if available        |
+| `imageType`  | `ImageType`        | —       | Image type classification                               |
+| `attributes` | `[String: String]` | —       | Additional HTML attributes                              |
 
 ---
 
@@ -710,15 +703,14 @@ Hyperlink metadata with categorization and attributes.
 
 Represents `<a>` elements with parsed href values, text content, and link type classification.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `href` | `String` | — | The href URL value |
-| `text` | `String` | — | Link text content (normalized, concatenated if mixed with elements) |
-| `title` | `String?` | `null` | Optional title attribute (often shown as tooltip) |
-| `linkType` | `LinkType` | — | Link type classification |
-| `rel` | `[String]` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
-| `attributes` | `[String: String]` | — | Additional HTML attributes |
-
+| Field        | Type               | Default | Description                                                         |
+| ------------ | ------------------ | ------- | ------------------------------------------------------------------- |
+| `href`       | `String`           | —       | The href URL value                                                  |
+| `text`       | `String`           | —       | Link text content (normalized, concatenated if mixed with elements) |
+| `title`      | `String?`          | `null`  | Optional title attribute (often shown as tooltip)                   |
+| `linkType`   | `LinkType`         | —       | Link type classification                                            |
+| `rel`        | `[String]`         | —       | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical")  |
+| `attributes` | `[String: String]` | —       | Additional HTML attributes                                          |
 
 ---
 
@@ -729,16 +721,15 @@ Context information passed to all visitor methods.
 Provides comprehensive metadata about the current node being visited,
 including its type, attributes, position in the DOM tree, and parent context.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `nodeType` | `NodeType` | — | Coarse-grained node type classification |
-| `tagName` | `String` | — | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
-| `attributes` | `[String: String]` | — | All HTML attributes as key-value pairs |
-| `depth` | `UInt64` | — | Depth in the DOM tree (0 = root) |
-| `indexInParent` | `UInt64` | — | Index among siblings (0-based) |
-| `parentTag` | `String?` | `null` | Parent element's tag name (None if root) |
-| `isInline` | `Bool` | — | Whether this element is treated as inline vs block |
-
+| Field           | Type               | Default | Description                                             |
+| --------------- | ------------------ | ------- | ------------------------------------------------------- |
+| `nodeType`      | `NodeType`         | —       | Coarse-grained node type classification                 |
+| `tagName`       | `String`           | —       | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
+| `attributes`    | `[String: String]` | —       | All HTML attributes as key-value pairs                  |
+| `depth`         | `UInt64`           | —       | Depth in the DOM tree (0 = root)                        |
+| `indexInParent` | `UInt64`           | —       | Index among siblings (0-based)                          |
+| `parentTag`     | `String?`          | `null`  | Parent element's tag name (None if root)                |
+| `isInline`      | `Bool`             | —       | Whether this element is treated as inline vs block      |
 
 ---
 
@@ -746,12 +737,12 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 HTML preprocessing options for document cleanup before conversion.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | `Bool` | `true` | Enable HTML preprocessing globally |
-| `preset` | `PreprocessingPreset` | `PreprocessingPreset.Standard` | Preprocessing preset level (Minimal, Standard, Aggressive) |
-| `removeNavigation` | `Bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
-| `removeForms` | `Bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
+| Field              | Type                  | Default                        | Description                                                    |
+| ------------------ | --------------------- | ------------------------------ | -------------------------------------------------------------- |
+| `enabled`          | `Bool`                | `true`                         | Enable HTML preprocessing globally                             |
+| `preset`           | `PreprocessingPreset` | `PreprocessingPreset.Standard` | Preprocessing preset level (Minimal, Standard, Aggressive)     |
+| `removeNavigation` | `Bool`                | `true`                         | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
+| `removeForms`      | `Bool`                | `true`                         | Remove form elements (forms, inputs, buttons, etc.)            |
 
 ###### Methods
 
@@ -777,11 +768,10 @@ public static func from(update: PreprocessingOptionsUpdate) -> PreprocessingOpti
 
 A non-fatal warning generated during HTML processing.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `message` | `String` | — | Human-readable warning message. |
-| `kind` | `WarningKind` | — | The category of warning. |
-
+| Field     | Type          | Default | Description                     |
+| --------- | ------------- | ------- | ------------------------------- |
+| `message` | `String`      | —       | Human-readable warning message. |
+| `kind`    | `WarningKind` | —       | The category of warning.        |
 
 ---
 
@@ -792,12 +782,11 @@ Structured data block (JSON-LD, Microdata, or RDFa).
 Represents machine-readable structured data found in the document.
 JSON-LD blocks are collected as raw JSON strings for flexibility.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `dataType` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
-| `rawJson` | `String` | — | Raw JSON string (for JSON-LD) or serialized representation |
-| `schemaType` | `String?` | `null` | Schema type if detectable (e.g., "Article", "Event", "Product") |
-
+| Field        | Type                 | Default | Description                                                     |
+| ------------ | -------------------- | ------- | --------------------------------------------------------------- |
+| `dataType`   | `StructuredDataType` | —       | Type of structured data (JSON-LD, Microdata, RDFa)              |
+| `rawJson`    | `String`             | —       | Raw JSON string (for JSON-LD) or serialized representation      |
+| `schemaType` | `String?`            | `null`  | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
 ---
 
@@ -805,11 +794,10 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 A top-level extracted table with both structured data and markdown representation.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `grid` | `TableGrid` | — | The structured table grid. |
-| `markdown` | `String` | — | The markdown rendering of this table. |
-
+| Field      | Type        | Default | Description                           |
+| ---------- | ----------- | ------- | ------------------------------------- |
+| `grid`     | `TableGrid` | —       | The structured table grid.            |
+| `markdown` | `String`    | —       | The markdown rendering of this table. |
 
 ---
 
@@ -817,12 +805,11 @@ A top-level extracted table with both structured data and markdown representatio
 
 A structured table grid with cell-level data including spans.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `rows` | `UInt32` | — | Number of rows. |
-| `cols` | `UInt32` | — | Number of columns. |
-| `cells` | `[GridCell]` | `[]` | All cells in the table (may be fewer than rows*cols due to spans). |
-
+| Field   | Type         | Default | Description                                                         |
+| ------- | ------------ | ------- | ------------------------------------------------------------------- |
+| `rows`  | `UInt32`     | —       | Number of rows.                                                     |
+| `cols`  | `UInt32`     | —       | Number of columns.                                                  |
+| `cells` | `[GridCell]` | `[]`    | All cells in the table (may be fewer than rows\*cols due to spans). |
 
 ---
 
@@ -832,12 +819,11 @@ An inline text annotation with byte-range offsets.
 
 Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `start` | `UInt32` | — | Start byte offset (inclusive) into the parent node's text. |
-| `end` | `UInt32` | — | End byte offset (exclusive) into the parent node's text. |
-| `kind` | `AnnotationKind` | — | The type of annotation. |
-
+| Field   | Type             | Default | Description                                                |
+| ------- | ---------------- | ------- | ---------------------------------------------------------- |
+| `start` | `UInt32`         | —       | Start byte offset (inclusive) into the parent node's text. |
+| `end`   | `UInt32`         | —       | End byte offset (exclusive) into the parent node's text.   |
+| `kind`  | `AnnotationKind` | —       | The type of annotation.                                    |
 
 ---
 
@@ -849,7 +835,6 @@ Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mu
 can be shared across threads — required by callers that stash configs inside
 axum/rmcp/tokio Send-bound contexts.
 
-
 ---
 
 #### Enums
@@ -860,12 +845,11 @@ Text directionality of document content.
 
 Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
-| Value | Description |
-|-------|-------------|
-| `LeftToRight` | Left-to-right text flow (default for Latin scripts) |
+| Value         | Description                                          |
+| ------------- | ---------------------------------------------------- |
+| `LeftToRight` | Left-to-right text flow (default for Latin scripts)  |
 | `RightToLeft` | Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) |
-| `Auto` | Automatic directionality detection |
-
+| `Auto`        | Automatic directionality detection                   |
 
 ---
 
@@ -875,15 +859,14 @@ Link classification based on href value and document context.
 
 Used to categorize links during extraction for filtering and analysis.
 
-| Value | Description |
-|-------|-------------|
-| `Anchor` | Anchor link within same document (href starts with #) |
-| `Internal` | Internal link within same domain |
-| `External` | External link to different domain |
-| `Email` | Email link (mailto:) |
-| `Phone` | Phone link (tel:) |
-| `Other` | Other protocol or unclassifiable |
-
+| Value      | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| `Anchor`   | Anchor link within same document (href starts with #) |
+| `Internal` | Internal link within same domain                      |
+| `External` | External link to different domain                     |
+| `Email`    | Email link (mailto:)                                  |
+| `Phone`    | Phone link (tel:)                                     |
+| `Other`    | Other protocol or unclassifiable                      |
 
 ---
 
@@ -893,13 +876,12 @@ Image source classification for proper handling and processing.
 
 Determines whether an image is embedded (data URI), inline SVG, external, or relative.
 
-| Value | Description |
-|-------|-------------|
-| `DataUri` | Data URI embedded image (base64 or other encoding) |
-| `InlineSvg` | Inline SVG element |
-| `External` | External image URL (http/https) |
-| `Relative` | Relative image path |
-
+| Value       | Description                                        |
+| ----------- | -------------------------------------------------- |
+| `DataUri`   | Data URI embedded image (base64 or other encoding) |
+| `InlineSvg` | Inline SVG element                                 |
+| `External`  | External image URL (http/https)                    |
+| `Relative`  | Relative image path                                |
 
 ---
 
@@ -909,12 +891,11 @@ Structured data format type.
 
 Identifies the schema/format used for structured data markup.
 
-| Value | Description |
-|-------|-------------|
-| `JsonLd` | JSON-LD (JSON for Linking Data) script blocks |
+| Value       | Description                                                |
+| ----------- | ---------------------------------------------------------- |
+| `JsonLd`    | JSON-LD (JSON for Linking Data) script blocks              |
 | `Microdata` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
-| `RDFa` | RDF in Attributes (RDFa) markup |
-
+| `RDFa`      | RDF in Attributes (RDFa) markup                            |
 
 ---
 
@@ -924,12 +905,11 @@ HTML preprocessing aggressiveness level.
 
 Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
 
-| Value | Description |
-|-------|-------------|
-| `Minimal` | Minimal cleanup. Remove only essential noise (scripts, styles). |
-| `Standard` | Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. |
-| `Aggressive` | Aggressive cleanup. Remove extensive non-content elements and structure. |
-
+| Value        | Description                                                                        |
+| ------------ | ---------------------------------------------------------------------------------- |
+| `Minimal`    | Minimal cleanup. Remove only essential noise (scripts, styles).                    |
+| `Standard`   | Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. |
+| `Aggressive` | Aggressive cleanup. Remove extensive non-content elements and structure.           |
 
 ---
 
@@ -939,12 +919,11 @@ Heading style options for Markdown output.
 
 Controls how headings (h1-h6) are rendered in the output Markdown.
 
-| Value | Description |
-|-------|-------------|
-| `Underlined` | Underlined style (=== for h1, --- for h2). |
-| `Atx` | ATX style (# for h1, ## for h2, etc.). Default. |
-| `AtxClosed` | ATX closed style (# title #, with closing hashes). |
-
+| Value        | Description                                        |
+| ------------ | -------------------------------------------------- |
+| `Underlined` | Underlined style (=== for h1, --- for h2).         |
+| `Atx`        | ATX style (# for h1, ## for h2, etc.). Default.    |
+| `AtxClosed`  | ATX closed style (# title #, with closing hashes). |
 
 ---
 
@@ -954,11 +933,10 @@ List indentation character type.
 
 Controls whether list items are indented with spaces or tabs.
 
-| Value | Description |
-|-------|-------------|
+| Value    | Description                                                                   |
+| -------- | ----------------------------------------------------------------------------- |
 | `Spaces` | Use spaces for indentation. Default. Width controlled by `list_indent_width`. |
-| `Tabs` | Use tabs for indentation. |
-
+| `Tabs`   | Use tabs for indentation.                                                     |
 
 ---
 
@@ -968,11 +946,10 @@ Whitespace handling strategy during conversion.
 
 Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
 
-| Value | Description |
-|-------|-------------|
+| Value        | Description                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------- |
 | `Normalized` | Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior. |
-| `Strict` | Preserve all whitespace exactly as it appears in the HTML. |
-
+| `Strict`     | Preserve all whitespace exactly as it appears in the HTML.                                   |
 
 ---
 
@@ -982,11 +959,10 @@ Line break syntax in Markdown output.
 
 Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
 
-| Value | Description |
-|-------|-------------|
-| `Spaces` | Two trailing spaces at end of line. Default. Standard Markdown syntax. |
-| `Backslash` | Backslash at end of line. Alternative Markdown syntax. |
-
+| Value       | Description                                                            |
+| ----------- | ---------------------------------------------------------------------- |
+| `Spaces`    | Two trailing spaces at end of line. Default. Standard Markdown syntax. |
+| `Backslash` | Backslash at end of line. Alternative Markdown syntax.                 |
 
 ---
 
@@ -996,12 +972,11 @@ Code block fence style in Markdown output.
 
 Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
-| Value | Description |
-|-------|-------------|
-| `Indented` | Indented code blocks (4 spaces). `CommonMark` standard. |
+| Value       | Description                                                                      |
+| ----------- | -------------------------------------------------------------------------------- |
+| `Indented`  | Indented code blocks (4 spaces). `CommonMark` standard.                          |
 | `Backticks` | Fenced code blocks with backticks (```). Default (GFM). Supports language hints. |
-| `Tildes` | Fenced code blocks with tildes (~~~). Supports language hints. |
-
+| `Tildes`    | Fenced code blocks with tildes (~~~). Supports language hints.                   |
 
 ---
 
@@ -1011,13 +986,12 @@ Highlight rendering style for `<mark>` elements.
 
 Controls how highlighted text is rendered in Markdown output.
 
-| Value | Description |
-|-------|-------------|
+| Value         | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
 | `DoubleEqual` | Double equals syntax (==text==). Default. Pandoc-compatible. |
-| `Html` | Preserve as HTML (==text==). Original HTML tag. |
-| `Bold` | Render as bold (**text**). Uses strong emphasis. |
-| `None` | Strip formatting, render as plain text. No markup. |
-
+| `Html`        | Preserve as HTML (==text==). Original HTML tag.              |
+| `Bold`        | Render as bold (**text**). Uses strong emphasis.             |
+| `None`        | Strip formatting, render as plain text. No markup.           |
 
 ---
 
@@ -1028,11 +1002,10 @@ Link rendering style in Markdown output.
 Controls whether links and images use inline `[text](url)` syntax or
 reference-style `[text][1]` syntax with definitions collected at the end.
 
-| Value | Description |
-|-------|-------------|
-| `Inline` | Inline links: `[text](url)`. Default. |
+| Value       | Description                                                            |
+| ----------- | ---------------------------------------------------------------------- |
+| `Inline`    | Inline links: `[text](url)`. Default.                                  |
 | `Reference` | Reference-style links: `[text][1]` with `[1]: url` at end of document. |
-
 
 ---
 
@@ -1042,12 +1015,11 @@ Output format for conversion.
 
 Specifies the target markup language format for the conversion output.
 
-| Value | Description |
-|-------|-------------|
+| Value      | Description                                         |
+| ---------- | --------------------------------------------------- |
 | `Markdown` | Standard Markdown (CommonMark compatible). Default. |
-| `Djot` | Djot lightweight markup language. |
-| `Plain` | Plain text output (no markup, visible text only). |
-
+| `Djot`     | Djot lightweight markup language.                   |
+| `Plain`    | Plain text output (no markup, visible text only).   |
 
 ---
 
@@ -1057,22 +1029,21 @@ The semantic content type of a document node.
 
 Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
 
-| Value | Description |
-|-------|-------------|
-| `Heading` | A heading element (h1-h6). — Fields: `level`: `UInt8`, `text`: `String` |
-| `Paragraph` | A paragraph of text. — Fields: `text`: `String` |
-| `List` | A list container (ordered or unordered). Children are `ListItem` nodes. — Fields: `ordered`: `Bool` |
-| `ListItem` | A single list item. — Fields: `text`: `String` |
-| `Table` | A table with structured cell data. — Fields: `grid`: `TableGrid` |
-| `Image` | An image element. — Fields: `description`: `String`, `src`: `String`, `imageIndex`: `UInt32` |
-| `Code` | A code block or inline code. — Fields: `text`: `String`, `language`: `String` |
-| `Quote` | A block quote container. |
-| `DefinitionList` | A definition list container. |
-| `DefinitionItem` | A definition list entry with term and description. — Fields: `term`: `String`, `definition`: `String` |
-| `RawBlock` | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `String`, `content`: `String` |
-| `MetadataBlock` | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `[String]` |
-| `Group` | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `String`, `headingLevel`: `UInt8`, `headingText`: `String` |
-
+| Value            | Description                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Heading`        | A heading element (h1-h6). — Fields: `level`: `UInt8`, `text`: `String`                                                                             |
+| `Paragraph`      | A paragraph of text. — Fields: `text`: `String`                                                                                                     |
+| `List`           | A list container (ordered or unordered). Children are `ListItem` nodes. — Fields: `ordered`: `Bool`                                                 |
+| `ListItem`       | A single list item. — Fields: `text`: `String`                                                                                                      |
+| `Table`          | A table with structured cell data. — Fields: `grid`: `TableGrid`                                                                                    |
+| `Image`          | An image element. — Fields: `description`: `String`, `src`: `String`, `imageIndex`: `UInt32`                                                        |
+| `Code`           | A code block or inline code. — Fields: `text`: `String`, `language`: `String`                                                                       |
+| `Quote`          | A block quote container.                                                                                                                            |
+| `DefinitionList` | A definition list container.                                                                                                                        |
+| `DefinitionItem` | A definition list entry with term and description. — Fields: `term`: `String`, `definition`: `String`                                               |
+| `RawBlock`       | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `String`, `content`: `String`                                 |
+| `MetadataBlock`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `[String]`                                                      |
+| `Group`          | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `String`, `headingLevel`: `UInt8`, `headingText`: `String` |
 
 ---
 
@@ -1082,18 +1053,17 @@ The type of an inline text annotation.
 
 Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
 
-| Value | Description |
-|-------|-------------|
-| `Bold` | Bold / strong emphasis. |
-| `Italic` | Italic / emphasis. |
-| `Underline` | Underline. |
-| `Strikethrough` | Strikethrough / deleted text. |
-| `Code` | Inline code. |
-| `Subscript` | Subscript text. |
-| `Superscript` | Superscript text. |
-| `Highlight` | Highlighted / marked text. |
-| `Link` | A hyperlink. — Fields: `url`: `String`, `title`: `String` |
-
+| Value           | Description                                               |
+| --------------- | --------------------------------------------------------- |
+| `Bold`          | Bold / strong emphasis.                                   |
+| `Italic`        | Italic / emphasis.                                        |
+| `Underline`     | Underline.                                                |
+| `Strikethrough` | Strikethrough / deleted text.                             |
+| `Code`          | Inline code.                                              |
+| `Subscript`     | Subscript text.                                           |
+| `Superscript`   | Superscript text.                                         |
+| `Highlight`     | Highlighted / marked text.                                |
+| `Link`          | A hyperlink. — Fields: `url`: `String`, `title`: `String` |
 
 ---
 
@@ -1101,15 +1071,14 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 Categories of processing warnings.
 
-| Value | Description |
-|-------|-------------|
+| Value                   | Description                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------- |
 | `ImageExtractionFailed` | An image could not be extracted (e.g. invalid data URI, unsupported format). |
-| `EncodingFallback` | The input encoding was not recognized; fell back to UTF-8. |
-| `TruncatedInput` | The input was truncated due to size limits. |
-| `MalformedHtml` | The HTML was malformed but processing continued with best effort. |
-| `SanitizationApplied` | Sanitization was applied to remove potentially unsafe content. |
-| `DepthLimitExceeded` | DOM traversal was truncated because max_depth was exceeded. |
-
+| `EncodingFallback`      | The input encoding was not recognized; fell back to UTF-8.                   |
+| `TruncatedInput`        | The input was truncated due to size limits.                                  |
+| `MalformedHtml`         | The HTML was malformed but processing continued with best effort.            |
+| `SanitizationApplied`   | Sanitization was applied to remove potentially unsafe content.               |
+| `DepthLimitExceeded`    | DOM traversal was truncated because max_depth was exceeded.                  |
 
 ---
 
@@ -1120,97 +1089,96 @@ Node type enumeration covering all HTML element types.
 This enum categorizes all HTML elements that the converter recognizes,
 providing a coarse-grained classification for visitor dispatch.
 
-| Value | Description |
-|-------|-------------|
-| `Text` | Text node (most frequent - 100+ per document) |
-| `Element` | Generic element node |
-| `Heading` | Heading elements (h1-h6) |
-| `Paragraph` | Paragraph element |
-| `Div` | Generic div container |
-| `Blockquote` | Blockquote element |
-| `Pre` | Preformatted text block |
-| `Hr` | Horizontal rule |
-| `List` | Ordered or unordered list (ul, ol) |
-| `ListItem` | List item (li) |
-| `DefinitionList` | Definition list (dl) |
-| `DefinitionTerm` | Definition term (dt) |
-| `DefinitionDescription` | Definition description (dd) |
-| `Table` | Table element |
-| `TableRow` | Table row (tr) |
-| `TableCell` | Table cell (td, th) |
-| `TableHeader` | Table header cell (th) |
-| `TableBody` | Table body (tbody) |
-| `TableHead` | Table head (thead) |
-| `TableFoot` | Table foot (tfoot) |
-| `Link` | Anchor link (a) |
-| `Image` | Image (img) |
-| `Strong` | Strong/bold (strong, b) |
-| `Em` | Emphasis/italic (em, i) |
-| `Code` | Inline code (code) |
-| `Strikethrough` | Strikethrough (s, del, strike) |
-| `Underline` | Underline (u, ins) |
-| `Subscript` | Subscript (sub) |
-| `Superscript` | Superscript (sup) |
-| `Mark` | Mark/highlight (mark) |
-| `Small` | Small text (small) |
-| `Br` | Line break (br) |
-| `Span` | Span element |
-| `Article` | Article element |
-| `Section` | Section element |
-| `Nav` | Navigation element |
-| `Aside` | Aside element |
-| `Header` | Header element |
-| `Footer` | Footer element |
-| `Main` | Main element |
-| `Figure` | Figure element |
-| `Figcaption` | Figure caption |
-| `Time` | Time element |
-| `Details` | Details element |
-| `Summary` | Summary element |
-| `Form` | Form element |
-| `Input` | Input element |
-| `Select` | Select element |
-| `Option` | Option element |
-| `Button` | Button element |
-| `Textarea` | Textarea element |
-| `Label` | Label element |
-| `Fieldset` | Fieldset element |
-| `Legend` | Legend element |
-| `Audio` | Audio element |
-| `Video` | Video element |
-| `Picture` | Picture element |
-| `Source` | Source element |
-| `Iframe` | Iframe element |
-| `Svg` | SVG element |
-| `Canvas` | Canvas element |
-| `Ruby` | Ruby annotation |
-| `Rt` | Ruby text |
-| `Rp` | Ruby parenthesis |
-| `Abbr` | Abbreviation |
-| `Kbd` | Keyboard input |
-| `Samp` | Sample output |
-| `Var` | Variable |
-| `Cite` | Citation |
-| `Q` | Quote |
-| `Del` | Deleted text |
-| `Ins` | Inserted text |
-| `Data` | Data element |
-| `Meter` | Meter element |
-| `Progress` | Progress element |
-| `Output` | Output element |
-| `Template` | Template element |
-| `Slot` | Slot element |
-| `Html` | HTML root element |
-| `Head` | Head element |
-| `Body` | Body element |
-| `Title` | Title element |
-| `Meta` | Meta element |
-| `LinkTag` | Link element (not anchor) |
-| `Style` | Style element |
-| `Script` | Script element |
-| `Base` | Base element |
-| `Custom` | Custom element (web components) or unknown tag |
-
+| Value                   | Description                                    |
+| ----------------------- | ---------------------------------------------- |
+| `Text`                  | Text node (most frequent - 100+ per document)  |
+| `Element`               | Generic element node                           |
+| `Heading`               | Heading elements (h1-h6)                       |
+| `Paragraph`             | Paragraph element                              |
+| `Div`                   | Generic div container                          |
+| `Blockquote`            | Blockquote element                             |
+| `Pre`                   | Preformatted text block                        |
+| `Hr`                    | Horizontal rule                                |
+| `List`                  | Ordered or unordered list (ul, ol)             |
+| `ListItem`              | List item (li)                                 |
+| `DefinitionList`        | Definition list (dl)                           |
+| `DefinitionTerm`        | Definition term (dt)                           |
+| `DefinitionDescription` | Definition description (dd)                    |
+| `Table`                 | Table element                                  |
+| `TableRow`              | Table row (tr)                                 |
+| `TableCell`             | Table cell (td, th)                            |
+| `TableHeader`           | Table header cell (th)                         |
+| `TableBody`             | Table body (tbody)                             |
+| `TableHead`             | Table head (thead)                             |
+| `TableFoot`             | Table foot (tfoot)                             |
+| `Link`                  | Anchor link (a)                                |
+| `Image`                 | Image (img)                                    |
+| `Strong`                | Strong/bold (strong, b)                        |
+| `Em`                    | Emphasis/italic (em, i)                        |
+| `Code`                  | Inline code (code)                             |
+| `Strikethrough`         | Strikethrough (s, del, strike)                 |
+| `Underline`             | Underline (u, ins)                             |
+| `Subscript`             | Subscript (sub)                                |
+| `Superscript`           | Superscript (sup)                              |
+| `Mark`                  | Mark/highlight (mark)                          |
+| `Small`                 | Small text (small)                             |
+| `Br`                    | Line break (br)                                |
+| `Span`                  | Span element                                   |
+| `Article`               | Article element                                |
+| `Section`               | Section element                                |
+| `Nav`                   | Navigation element                             |
+| `Aside`                 | Aside element                                  |
+| `Header`                | Header element                                 |
+| `Footer`                | Footer element                                 |
+| `Main`                  | Main element                                   |
+| `Figure`                | Figure element                                 |
+| `Figcaption`            | Figure caption                                 |
+| `Time`                  | Time element                                   |
+| `Details`               | Details element                                |
+| `Summary`               | Summary element                                |
+| `Form`                  | Form element                                   |
+| `Input`                 | Input element                                  |
+| `Select`                | Select element                                 |
+| `Option`                | Option element                                 |
+| `Button`                | Button element                                 |
+| `Textarea`              | Textarea element                               |
+| `Label`                 | Label element                                  |
+| `Fieldset`              | Fieldset element                               |
+| `Legend`                | Legend element                                 |
+| `Audio`                 | Audio element                                  |
+| `Video`                 | Video element                                  |
+| `Picture`               | Picture element                                |
+| `Source`                | Source element                                 |
+| `Iframe`                | Iframe element                                 |
+| `Svg`                   | SVG element                                    |
+| `Canvas`                | Canvas element                                 |
+| `Ruby`                  | Ruby annotation                                |
+| `Rt`                    | Ruby text                                      |
+| `Rp`                    | Ruby parenthesis                               |
+| `Abbr`                  | Abbreviation                                   |
+| `Kbd`                   | Keyboard input                                 |
+| `Samp`                  | Sample output                                  |
+| `Var`                   | Variable                                       |
+| `Cite`                  | Citation                                       |
+| `Q`                     | Quote                                          |
+| `Del`                   | Deleted text                                   |
+| `Ins`                   | Inserted text                                  |
+| `Data`                  | Data element                                   |
+| `Meter`                 | Meter element                                  |
+| `Progress`              | Progress element                               |
+| `Output`                | Output element                                 |
+| `Template`              | Template element                               |
+| `Slot`                  | Slot element                                   |
+| `Html`                  | HTML root element                              |
+| `Head`                  | Head element                                   |
+| `Body`                  | Body element                                   |
+| `Title`                 | Title element                                  |
+| `Meta`                  | Meta element                                   |
+| `LinkTag`               | Link element (not anchor)                      |
+| `Style`                 | Style element                                  |
+| `Script`                | Script element                                 |
+| `Base`                  | Base element                                   |
+| `Custom`                | Custom element (web components) or unknown tag |
 
 ---
 
@@ -1222,14 +1190,13 @@ Allows visitors to control the conversion flow by either proceeding
 with default behavior, providing custom output, skipping elements,
 preserving HTML, or signaling errors.
 
-| Value | Description |
-|-------|-------------|
-| `Continue` | Continue with default conversion behavior |
-| `Custom` | Replace default output with custom markdown The visitor takes full responsibility for the markdown output of this node and its children. — Fields: `0`: `String` |
-| `Skip` | Skip this element entirely (don't output anything) The element and all its children are ignored in the output. |
-| `PreserveHtml` | Preserve original HTML (don't convert to markdown) The element's raw HTML is included verbatim in the output. |
-| `Error` | Stop conversion with an error The conversion process halts and returns this error message. — Fields: `0`: `String` |
-
+| Value          | Description                                                                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Continue`     | Continue with default conversion behavior                                                                                                                        |
+| `Custom`       | Replace default output with custom markdown The visitor takes full responsibility for the markdown output of this node and its children. — Fields: `0`: `String` |
+| `Skip`         | Skip this element entirely (don't output anything) The element and all its children are ignored in the output.                                                   |
+| `PreserveHtml` | Preserve original HTML (don't convert to markdown) The element's raw HTML is included verbatim in the output.                                                    |
+| `Error`        | Stop conversion with an error The conversion process halts and returns this error message. — Fields: `0`: `String`                                               |
 
 ---
 
@@ -1239,15 +1206,14 @@ preserving HTML, or signaling errors.
 
 Errors that can occur during HTML to Markdown conversion.
 
-| Variant | Description |
-|---------|-------------|
-| `ParseError` | HTML parsing error |
-| `SanitizationError` | HTML sanitization error |
-| `ConfigError` | Invalid configuration |
-| `IoError` | I/O error |
-| `Panic` | Internal error caught during conversion |
-| `InvalidInput` | Invalid input data |
-| `Other` | Generic conversion error |
-
+| Variant             | Description                             |
+| ------------------- | --------------------------------------- |
+| `ParseError`        | HTML parsing error                      |
+| `SanitizationError` | HTML sanitization error                 |
+| `ConfigError`       | Invalid configuration                   |
+| `IoError`           | I/O error                               |
+| `Panic`             | Internal error caught during conversion |
+| `InvalidInput`      | Invalid input data                      |
+| `Other`             | Generic conversion error                |
 
 ---

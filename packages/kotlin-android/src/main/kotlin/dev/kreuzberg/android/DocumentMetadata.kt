@@ -5,8 +5,8 @@ package dev.kreuzberg.android
 /**
  * Document-level metadata extracted from `<head>` and top-level elements.
  *
- * Contains all metadata typically used by search engines, social media platforms,
- * and browsers for document indexing and presentation.
+ * Contains all metadata typically used by search engines, social media platforms, and browsers for
+ * document indexing and presentation.
  */
 data class DocumentMetadata(
     val title: String?,
@@ -19,5 +19,5 @@ data class DocumentMetadata(
     val textDirection: TextDirection?,
     val openGraph: Map<String, String>,
     val twitterCard: Map<String, String>,
-    val metaTags: Map<String, String>
+    val metaTags: Map<String, String>,
 )

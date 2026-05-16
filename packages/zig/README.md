@@ -75,11 +75,39 @@ zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown/releases/down
 
 Basic conversion:
 
-<!-- snippet not found: getting-started/basic_usage.md -->
+```zig
+const std = @import("std");
+const html_to_markdown = @import("html_to_markdown");
+
+pub fn main() !void {
+    const html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>";
+    const result_json = try html_to_markdown.convert(html, null);
+    defer std.heap.c_allocator.free(result_json);
+
+    // result_json is the ConversionResult serialised as JSON; parse with
+    // std.json or read the `content` field directly.
+    std.debug.print("{s}\n", .{result_json});
+}
+```
 
 With conversion options:
 
-<!-- snippet not found: getting-started/with_options.md -->
+```zig
+const std = @import("std");
+const html_to_markdown = @import("html_to_markdown");
+
+pub fn main() !void {
+    const html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>";
+    const options_json =
+        \\{"heading_style":"atx","list_indent_width":2,"wrap":true}
+    ;
+
+    const result_json = try html_to_markdown.convert(html, options_json);
+    defer std.heap.c_allocator.free(result_json);
+
+    std.debug.print("{s}\n", .{result_json});
+}
+```
 
 ## API Reference
 
@@ -156,7 +184,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
 - [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
-- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces this README and all per-language bindings.
+- [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
 - [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
 
 ## Contributing
@@ -176,7 +204,7 @@ All contributions must follow our code quality standards (enforced via pre-commi
 
 ## License
 
-MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE).
+MIT License – see [LICENSE](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE). Copyright © Kreuzberg, Inc.
 
 ## Support
 

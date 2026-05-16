@@ -2,10 +2,5 @@
 
 package dev.kreuzberg.android
 
-/**
- * A non-fatal warning generated during HTML processing.
- */
-data class ProcessingWarning(
-    val message: String,
-    val kind: WarningKind
-)
+/** A non-fatal warning generated during HTML processing. */
+data class ProcessingWarning(val message: String, val kind: WarningKind)

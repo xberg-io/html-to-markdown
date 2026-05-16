@@ -10,5 +10,5 @@ package dev.kreuzberg.android
 enum class PreprocessingPreset {
     MINIMAL,
     STANDARD,
-    AGGRESSIVE;
+    AGGRESSIVE,
 }

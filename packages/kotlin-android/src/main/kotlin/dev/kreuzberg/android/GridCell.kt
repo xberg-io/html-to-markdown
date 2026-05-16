@@ -2,14 +2,12 @@
 
 package dev.kreuzberg.android
 
-/**
- * A single cell in a table grid.
- */
+/** A single cell in a table grid. */
 data class GridCell(
     val content: String,
     val row: Int,
     val col: Int,
     val rowSpan: Int,
     val colSpan: Int,
-    val isHeader: Boolean
+    val isHeader: Boolean,
 )

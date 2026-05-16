@@ -2,10 +2,5 @@
 
 package dev.kreuzberg.android
 
-/**
- * A top-level extracted table with both structured data and markdown representation.
- */
-data class TableData(
-    val grid: TableGrid,
-    val markdown: String
-)
+/** A top-level extracted table with both structured data and markdown representation. */
+data class TableData(val grid: TableGrid, val markdown: String)

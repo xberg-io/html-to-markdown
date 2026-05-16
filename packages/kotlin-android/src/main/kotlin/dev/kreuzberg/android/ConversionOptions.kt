@@ -48,5 +48,5 @@ data class ConversionOptions(
     val inferDimensions: Boolean,
     val maxDepth: Long?,
     val excludeSelectors: List<String>,
-    val visitor: VisitorHandle?
+    val visitor: VisitorHandle?,
 )

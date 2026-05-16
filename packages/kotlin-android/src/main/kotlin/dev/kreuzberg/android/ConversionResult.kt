@@ -5,8 +5,8 @@ package dev.kreuzberg.android
 /**
  * The primary result of HTML conversion and extraction.
  *
- * Contains the converted text output, optional structured document tree,
- * metadata, extracted tables, images, and processing warnings.
+ * Contains the converted text output, optional structured document tree, metadata, extracted
+ * tables, images, and processing warnings.
  */
 data class ConversionResult(
     val content: String?,
@@ -14,5 +14,5 @@ data class ConversionResult(
     val metadata: HtmlMetadata,
     val tables: List<TableData>,
     val images: List<String>,
-    val warnings: List<ProcessingWarning>
+    val warnings: List<ProcessingWarning>,
 )

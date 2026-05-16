@@ -11,5 +11,5 @@ enum class HighlightStyle {
     DOUBLE_EQUAL,
     HTML,
     BOLD,
-    NONE;
+    NONE,
 }

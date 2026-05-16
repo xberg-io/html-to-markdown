@@ -189,3 +189,12 @@ vendor/
 AGENTS.md
 CLAUDE.md
 # END ai-rulez
+
+# Build caches (added by docs-quality sweep)
+**/.zig-cache/
+**/.dart_tool/
+**/.build/
+e2e/kotlin_android/build/
+packages/kotlin-android/build/
+
+**/logs/

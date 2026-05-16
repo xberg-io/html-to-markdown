@@ -11,30 +11,30 @@ NULL
 #' Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images,
 #'
 #' and warnings.
-#'
-#' # Arguments
-#'
-#' * `html` — the HTML string to convert.
-#' * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
-#'
-#' # Example
-#'
-#' ```
-#' use html_to_markdown_rs::convert;
-#'
-#' let html = "<h1>Hello World</h1>";
-#' let result = convert(html, None).unwrap();
-#' assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
-#' ```
-#'
-#' # Errors
-#'
-#' Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-#' @param html Character string.
-#' @param options ConversionOptions object (list with class attribute).
+#' @param html — the HTML string to convert.
+#' @param options — optional conversion options. Defaults to [`ConversionOptions::default`].
 #' @return ConversionResult object (list with class attribute).
+#'
+#' @section Errors:
+#' Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 #' @export
 convert <- function(html, options) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
+#' Document-level metadata extracted from `<head>` and top-level elements
+#'
+#' Contains all metadata typically used by search engines, social media platforms,
+#' and browsers for document indexing and presentation.
+#' @field title Document title from `<title>` tag
+#' @field description Document description from `<meta name="description">` tag
+#' @field keywords Document keywords from `<meta name="keywords">` tag, split on commas
+#' @field author Document author from `<meta name="author">` tag
+#' @field canonical_url Canonical URL from `<link rel="canonical">` tag
+#' @field base_href Base URL from `<base href="">` tag for resolving relative URLs
+#' @field language Document language from `lang` attribute
+#' @field text_direction Document text direction from `dir` attribute
+#' @field open_graph Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc.
+#' @field twitter_card Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc.
+#' @field meta_tags Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content
+#' @export
 DocumentMetadata <- new.env(parent = emptyenv())
 DocumentMetadata$from_json <- function(json) .Call("wrap__DocumentMetadata__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
@@ -45,6 +45,16 @@ DocumentMetadata$from_json <- function(json) .Call("wrap__DocumentMetadata__from
 }
 #' @export
 `[[.DocumentMetadata` <- `$.DocumentMetadata`
+#' Header element metadata with hierarchy tracking
+#'
+#' Captures heading elements (h1-h6) with their text content, identifiers,
+#' and position in the document structure.
+#' @field level Header level: 1 (h1) through 6 (h6)
+#' @field text Normalized text content of the header
+#' @field id HTML id attribute if present
+#' @field depth Document tree depth at the header element
+#' @field html_offset Byte offset in original HTML document
+#' @export
 HeaderMetadata <- new.env(parent = emptyenv())
 HeaderMetadata$is_valid <- function() .Call("wrap__HeaderMetadata__is_valid", self, PACKAGE = "htmltomarkdown")
 #' @export
@@ -55,6 +65,16 @@ HeaderMetadata$is_valid <- function() .Call("wrap__HeaderMetadata__is_valid", se
 }
 #' @export
 `[[.HeaderMetadata` <- `$.HeaderMetadata`
+#' Hyperlink metadata with categorization and attributes
+#'
+#' Represents `<a>` elements with parsed href values, text content, and link type classification.
+#' @field href The href URL value
+#' @field text Link text content (normalized, concatenated if mixed with elements)
+#' @field title Optional title attribute (often shown as tooltip)
+#' @field link_type Link type classification
+#' @field rel Rel attribute values (e.g., "nofollow", "stylesheet", "canonical")
+#' @field attributes Additional HTML attributes
+#' @export
 LinkMetadata <- new.env(parent = emptyenv())
 #' @export
 `$.LinkMetadata` <- function(self, name) {
@@ -64,6 +84,17 @@ LinkMetadata <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.LinkMetadata` <- `$.LinkMetadata`
+#' Image metadata with source and dimensions
+#'
+#' Captures `<img>` elements and inline `<svg>` elements with metadata
+#' for image analysis and optimization.
+#' @field src Image source (URL, data URI, or SVG content identifier)
+#' @field alt Alternative text from alt attribute (for accessibility)
+#' @field title Title attribute (often shown as tooltip)
+#' @field dimensions Image dimensions as (width, height) if available
+#' @field image_type Image type classification
+#' @field attributes Additional HTML attributes
+#' @export
 ImageMetadata <- new.env(parent = emptyenv())
 #' @export
 `$.ImageMetadata` <- function(self, name) {
@@ -73,6 +104,14 @@ ImageMetadata <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.ImageMetadata` <- `$.ImageMetadata`
+#' Structured data block (JSON-LD, Microdata, or RDFa)
+#'
+#' Represents machine-readable structured data found in the document.
+#' JSON-LD blocks are collected as raw JSON strings for flexibility.
+#' @field data_type Type of structured data (JSON-LD, Microdata, RDFa)
+#' @field raw_json Raw JSON string (for JSON-LD) or serialized representation
+#' @field schema_type Schema type if detectable (e.g., "Article", "Event", "Product")
+#' @export
 StructuredData <- new.env(parent = emptyenv())
 #' @export
 `$.StructuredData` <- function(self, name) {
@@ -82,6 +121,51 @@ StructuredData <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.StructuredData` <- `$.StructuredData`
+#' Main conversion options for HTML to Markdown conversion
+#'
+#' Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
+#' @field heading_style Heading style to use in Markdown output (ATX `#` or Setext underline).
+#' @field list_indent_type How to indent nested list items (spaces or tab).
+#' @field list_indent_width Number of spaces (or tabs) to use for each level of list indentation.
+#' @field bullets Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).
+#' @field strong_em_symbol Character used for bold/italic emphasis markers (`*` or `_`).
+#' @field escape_asterisks Escape `*` characters in plain text to avoid unintended bold/italic.
+#' @field escape_underscores Escape `_` characters in plain text to avoid unintended bold/italic.
+#' @field escape_misc Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text.
+#' @field escape_ascii Escape ASCII characters that have special meaning in certain Markdown dialects.
+#' @field code_language Default language annotation for fenced code blocks that have no language hint.
+#' @field autolinks Automatically convert bare URLs into Markdown autolinks.
+#' @field default_title Emit a default title when no `<title>` tag is present.
+#' @field br_in_tables Render `<br>` elements inside table cells as literal line breaks.
+#' @field highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`).
+#' @field extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …).
+#' @field whitespace_mode Controls how whitespace is normalised during conversion.
+#' @field strip_newlines Strip all newlines from the output, producing a single-line result.
+#' @field wrap Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
+#' @field wrap_width Maximum line width when [`wrap`](Self::wrap) is enabled (default `80`).
+#' @field convert_as_inline Treat the entire document as inline content (no block-level wrappers).
+#' @field sub_symbol Markdown notation for subscript text (e.g. `"~"`).
+#' @field sup_symbol Markdown notation for superscript text (e.g. `"^"`).
+#' @field newline_style How to encode hard line breaks (`<br>`) in Markdown.
+#' @field code_block_style Style used for fenced code blocks (backticks or tilde).
+#' @field keep_inline_images_in HTML tag names whose `<img>` children are kept inline instead of block.
+#' @field preprocessing Pre-processing options applied to the HTML before conversion.
+#' @field encoding Expected character encoding of the input HTML (default `"utf-8"`).
+#' @field debug Emit debug information during conversion.
+#' @field strip_tags HTML tag names whose content is stripped from the output entirely.
+#' @field preserve_tags HTML tag names that are preserved verbatim in the output.
+#' @field skip_images Skip conversion of `<img>` elements (omit images from output).
+#' @field link_style Link rendering style (inline or reference).
+#' @field output_format Target output format (Markdown, plain text, etc.).
+#' @field include_document_structure Include structured document tree in result.
+#' @field extract_images Extract inline images from data URIs and SVGs.
+#' @field max_image_size Maximum decoded image size in bytes (default 5MB).
+#' @field capture_svg Capture SVG elements as images.
+#' @field infer_dimensions Infer image dimensions from data.
+#' @field max_depth Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are silently truncated.
+#' @field exclude_selectors CSS selectors for elements to exclude entirely (element + all content).
+#' @field visitor Optional visitor for custom traversal logic.
+#' @export
 ConversionOptions <- new.env(parent = emptyenv())
 ConversionOptions$default <- function() .Call("wrap__ConversionOptions__default", PACKAGE = "htmltomarkdown")
 ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__from_json", json, PACKAGE = "htmltomarkdown")
@@ -93,6 +177,52 @@ ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__fr
 }
 #' @export
 `[[.ConversionOptions` <- `$.ConversionOptions`
+#' Partial update for `ConversionOptions`
+#'
+#' Uses `Option<T>` fields for selective updates. Bindings use this to construct
+#' options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
+#' @field heading_style Optional override for [`ConversionOptions::heading_style`].
+#' @field list_indent_type Optional override for [`ConversionOptions::list_indent_type`].
+#' @field list_indent_width Optional override for [`ConversionOptions::list_indent_width`].
+#' @field bullets Optional override for [`ConversionOptions::bullets`].
+#' @field strong_em_symbol Optional override for [`ConversionOptions::strong_em_symbol`].
+#' @field escape_asterisks Optional override for [`ConversionOptions::escape_asterisks`].
+#' @field escape_underscores Optional override for [`ConversionOptions::escape_underscores`].
+#' @field escape_misc Optional override for [`ConversionOptions::escape_misc`].
+#' @field escape_ascii Optional override for [`ConversionOptions::escape_ascii`].
+#' @field code_language Optional override for [`ConversionOptions::code_language`].
+#' @field autolinks Optional override for [`ConversionOptions::autolinks`].
+#' @field default_title Optional override for [`ConversionOptions::default_title`].
+#' @field br_in_tables Optional override for [`ConversionOptions::br_in_tables`].
+#' @field highlight_style Optional override for [`ConversionOptions::highlight_style`].
+#' @field extract_metadata Optional override for [`ConversionOptions::extract_metadata`].
+#' @field whitespace_mode Optional override for [`ConversionOptions::whitespace_mode`].
+#' @field strip_newlines Optional override for [`ConversionOptions::strip_newlines`].
+#' @field wrap Optional override for [`ConversionOptions::wrap`].
+#' @field wrap_width Optional override for [`ConversionOptions::wrap_width`].
+#' @field convert_as_inline Optional override for [`ConversionOptions::convert_as_inline`].
+#' @field sub_symbol Optional override for [`ConversionOptions::sub_symbol`].
+#' @field sup_symbol Optional override for [`ConversionOptions::sup_symbol`].
+#' @field newline_style Optional override for [`ConversionOptions::newline_style`].
+#' @field code_block_style Optional override for [`ConversionOptions::code_block_style`].
+#' @field keep_inline_images_in Optional override for [`ConversionOptions::keep_inline_images_in`].
+#' @field preprocessing Optional override for [`ConversionOptions::preprocessing`].
+#' @field encoding Optional override for [`ConversionOptions::encoding`].
+#' @field debug Optional override for [`ConversionOptions::debug`].
+#' @field strip_tags Optional override for [`ConversionOptions::strip_tags`].
+#' @field preserve_tags Optional override for [`ConversionOptions::preserve_tags`].
+#' @field skip_images Optional override for [`ConversionOptions::skip_images`].
+#' @field link_style Optional override for [`ConversionOptions::link_style`].
+#' @field output_format Optional override for [`ConversionOptions::output_format`].
+#' @field include_document_structure Optional override for [`ConversionOptions::include_document_structure`].
+#' @field extract_images Optional override for [`ConversionOptions::extract_images`].
+#' @field max_image_size Optional override for [`ConversionOptions::max_image_size`].
+#' @field capture_svg Optional override for [`ConversionOptions::capture_svg`].
+#' @field infer_dimensions Optional override for [`ConversionOptions::infer_dimensions`].
+#' @field max_depth Optional override for [`ConversionOptions::max_depth`].
+#' @field exclude_selectors Optional override for [`ConversionOptions::exclude_selectors`].
+#' @field visitor Optional override for [`ConversionOptions::visitor`].
+#' @export
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
 ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
@@ -103,6 +233,12 @@ ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptio
 }
 #' @export
 `[[.ConversionOptionsUpdate` <- `$.ConversionOptionsUpdate`
+#' HTML preprocessing options for document cleanup before conversion
+#' @field enabled Enable HTML preprocessing globally
+#' @field preset Preprocessing preset level (Minimal, Standard, Aggressive)
+#' @field remove_navigation Remove navigation elements (nav, breadcrumbs, menus, sidebars)
+#' @field remove_forms Remove form elements (forms, inputs, buttons, etc.)
+#' @export
 PreprocessingOptions <- new.env(parent = emptyenv())
 PreprocessingOptions$default <- function() .Call("wrap__PreprocessingOptions__default", PACKAGE = "htmltomarkdown")
 PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptions__from_json", json, PACKAGE = "htmltomarkdown")
@@ -114,6 +250,16 @@ PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptio
 }
 #' @export
 `[[.PreprocessingOptions` <- `$.PreprocessingOptions`
+#' Partial update for `PreprocessingOptions`
+#'
+#' This struct uses `Option<T>` to represent optional fields that can be selectively updated.
+#' Only specified fields (Some values) will override existing options; None values leave the
+#' corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
+#' @field enabled Optional global preprocessing enablement override
+#' @field preset Optional preprocessing preset level override (Minimal, Standard, Aggressive)
+#' @field remove_navigation Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
+#' @field remove_forms Optional form element removal override (forms, inputs, buttons, etc.)
+#' @export
 PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
 PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__PreprocessingOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
@@ -124,6 +270,13 @@ PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__Preprocessin
 }
 #' @export
 `[[.PreprocessingOptionsUpdate` <- `$.PreprocessingOptionsUpdate`
+#' An inline text annotation with byte-range offsets
+#'
+#' Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+#' @field start Start byte offset (inclusive) into the parent node's text.
+#' @field end End byte offset (exclusive) into the parent node's text.
+#' @field kind The type of annotation.
+#' @export
 TextAnnotation <- new.env(parent = emptyenv())
 #' @export
 `$.TextAnnotation` <- function(self, name) {
@@ -133,6 +286,14 @@ TextAnnotation <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.TextAnnotation` <- `$.TextAnnotation`
+#' A single cell in a table grid
+#' @field content The text content of the cell.
+#' @field row 0-indexed row position.
+#' @field col 0-indexed column position.
+#' @field row_span Number of rows this cell spans (default 1).
+#' @field col_span Number of columns this cell spans (default 1).
+#' @field is_header Whether this is a header cell (`<th>`).
+#' @export
 GridCell <- new.env(parent = emptyenv())
 #' @export
 `$.GridCell` <- function(self, name) {
@@ -142,6 +303,10 @@ GridCell <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.GridCell` <- `$.GridCell`
+#' A top-level extracted table with both structured data and markdown representation
+#' @field grid The structured table grid.
+#' @field markdown The markdown rendering of this table.
+#' @export
 TableData <- new.env(parent = emptyenv())
 #' @export
 `$.TableData` <- function(self, name) {
@@ -151,6 +316,10 @@ TableData <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.TableData` <- `$.TableData`
+#' A non-fatal warning generated during HTML processing
+#' @field message Human-readable warning message.
+#' @field kind The category of warning.
+#' @export
 ProcessingWarning <- new.env(parent = emptyenv())
 #' @export
 `$.ProcessingWarning` <- function(self, name) {
@@ -160,6 +329,18 @@ ProcessingWarning <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.ProcessingWarning` <- `$.ProcessingWarning`
+#' Context information passed to all visitor methods
+#'
+#' Provides comprehensive metadata about the current node being visited,
+#' including its type, attributes, position in the DOM tree, and parent context.
+#' @field node_type Coarse-grained node type classification
+#' @field tag_name Raw HTML tag name (e.g., "div", "h1", "custom-element")
+#' @field attributes All HTML attributes as key-value pairs
+#' @field depth Depth in the DOM tree (0 = root)
+#' @field index_in_parent Index among siblings (0-based)
+#' @field parent_tag Parent element's tag name (None if root)
+#' @field is_inline Whether this element is treated as inline vs block
+#' @export
 NodeContext <- new.env(parent = emptyenv())
 #' @export
 `$.NodeContext` <- function(self, name) {
@@ -169,6 +350,17 @@ NodeContext <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.NodeContext` <- `$.NodeContext`
+#' Result of a visitor callback
+#'
+#' Allows visitors to control the conversion flow by either proceeding
+#' with default behavior, providing custom output, skipping elements,
+#' preserving HTML, or signaling errors.
+#' @field Continue Continue with default conversion behavior
+#' @field Custom Replace default output with custom markdown
+#' @field Skip Skip this element entirely (don't output anything)
+#' @field PreserveHtml Preserve original HTML (don't convert to markdown)
+#' @field Error Stop conversion with an error
+#' @export
 VisitResult <- new.env(parent = emptyenv())
 #' @export
 `$.VisitResult` <- function(self, name) {
@@ -178,6 +370,10 @@ VisitResult <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.VisitResult` <- `$.VisitResult`
+#' The semantic content type of a document node
+#'
+#' Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
+#' @export
 NodeContent <- new.env(parent = emptyenv())
 NodeContent$default <- function() .Call("wrap__NodeContent__default", PACKAGE = "htmltomarkdown")
 NodeContent$from_json <- function(json) .Call("wrap__NodeContent__from_json", json, PACKAGE = "htmltomarkdown")
@@ -189,6 +385,10 @@ NodeContent$from_json <- function(json) .Call("wrap__NodeContent__from_json", js
 }
 #' @export
 `[[.NodeContent` <- `$.NodeContent`
+#' The type of an inline text annotation
+#'
+#' Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
+#' @export
 AnnotationKind <- new.env(parent = emptyenv())
 AnnotationKind$default <- function() .Call("wrap__AnnotationKind__default", PACKAGE = "htmltomarkdown")
 AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_json", json, PACKAGE = "htmltomarkdown")

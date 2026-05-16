@@ -9,5 +9,5 @@ package dev.kreuzberg.android
  */
 enum class WhitespaceMode {
     NORMALIZED,
-    STRICT;
+    STRICT,
 }

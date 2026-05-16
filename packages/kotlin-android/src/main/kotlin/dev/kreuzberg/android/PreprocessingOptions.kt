@@ -2,12 +2,10 @@
 
 package dev.kreuzberg.android
 
-/**
- * HTML preprocessing options for document cleanup before conversion.
- */
+/** HTML preprocessing options for document cleanup before conversion. */
 data class PreprocessingOptions(
     val enabled: Boolean,
     val preset: PreprocessingPreset,
     val removeNavigation: Boolean,
-    val removeForms: Boolean
+    val removeForms: Boolean,
 )

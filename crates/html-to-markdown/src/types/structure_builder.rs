@@ -2,7 +2,7 @@
 //!
 //! Walk the DOM once, mapping each HTML element to the appropriate [`NodeContent`] variant,
 //! collecting inline [`TextAnnotation`]s, tracking parent/child relationships, and generating
-//! heading-based [`Group`] hierarchy.
+//! heading-based [`NodeContent::Group`] hierarchy.
 
 use std::collections::HashMap;
 
@@ -367,7 +367,7 @@ impl BuilderState {
 ///
 /// Walks the DOM once, mapping HTML elements to semantic [`NodeContent`] variants,
 /// tracking parent/child relationships, extracting inline [`TextAnnotation`]s, and
-/// constructing heading-based [`Group`] nodes.
+/// constructing heading-based [`NodeContent::Group`] nodes.
 pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
     let parser = dom.parser();
     let mut state = BuilderState::new();

@@ -13,5 +13,5 @@ enum class LinkType {
     EXTERNAL,
     EMAIL,
     PHONE,
-    OTHER;
+    OTHER,
 }

@@ -7,8 +7,4 @@ package dev.kreuzberg.android
  *
  * Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
  */
-data class TextAnnotation(
-    val start: Int,
-    val end: Int,
-    val kind: AnnotationKind
-)
+data class TextAnnotation(val start: Int, val end: Int, val kind: AnnotationKind)

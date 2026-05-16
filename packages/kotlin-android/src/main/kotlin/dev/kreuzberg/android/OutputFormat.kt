@@ -10,5 +10,5 @@ package dev.kreuzberg.android
 enum class OutputFormat {
     MARKDOWN,
     DJOT,
-    PLAIN;
+    PLAIN,
 }

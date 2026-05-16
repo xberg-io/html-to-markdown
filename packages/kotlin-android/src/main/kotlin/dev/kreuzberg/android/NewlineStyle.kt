@@ -9,5 +9,5 @@ package dev.kreuzberg.android
  */
 enum class NewlineStyle {
     SPACES,
-    BACKSLASH;
+    BACKSLASH,
 }

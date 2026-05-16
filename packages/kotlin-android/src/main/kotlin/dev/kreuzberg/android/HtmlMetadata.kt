@@ -5,13 +5,13 @@ package dev.kreuzberg.android
 /**
  * Comprehensive metadata extraction result from HTML document.
  *
- * Contains all extracted metadata types in a single structure,
- * suitable for serialization and transmission across language boundaries.
+ * Contains all extracted metadata types in a single structure, suitable for serialization and
+ * transmission across language boundaries.
  */
 data class HtmlMetadata(
     val document: DocumentMetadata,
     val headers: List<HeaderMetadata>,
     val links: List<LinkMetadata>,
     val images: List<ImageMetadata>,
-    val structuredData: List<StructuredData>
+    val structuredData: List<StructuredData>,
 )

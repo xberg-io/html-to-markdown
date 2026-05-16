@@ -2,14 +2,12 @@
 
 package dev.kreuzberg.android
 
-/**
- * A single node in the document tree.
- */
+/** A single node in the document tree. */
 data class DocumentNode(
     val id: String,
     val content: NodeContent,
     val parent: Int?,
     val children: List<Int>,
     val annotations: List<TextAnnotation>,
-    val attributes: Map<String, String>?
+    val attributes: Map<String, String>?,
 )

@@ -5,18 +5,17 @@ package dev.kreuzberg.android
 /**
  * Result of a visitor callback.
  *
- * Allows visitors to control the conversion flow by either proceeding
- * with default behavior, providing custom output, skipping elements,
- * preserving HTML, or signaling errors.
+ * Allows visitors to control the conversion flow by either proceeding with default behavior,
+ * providing custom output, skipping elements, preserving HTML, or signaling errors.
  */
 sealed class VisitResult {
     object Continue : VisitResult()
-    data class Custom(
-        val value: String
-    ) : VisitResult()
+
+    data class Custom(val value: String) : VisitResult()
+
     object Skip : VisitResult()
+
     object PreserveHtml : VisitResult()
-    data class Error(
-        val value: String
-    ) : VisitResult()
+
+    data class Error(val value: String) : VisitResult()
 }
