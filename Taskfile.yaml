@@ -488,6 +488,10 @@ tasks:
       - task: e2e:test:csharp
       - task: e2e:test:elixir
       - task: e2e:test:r
+      - task: e2e:test:swift
+      - task: e2e:test:dart
+      - task: e2e:test:zig
+      - task: e2e:test:kotlin_android
 
   e2e:test:python:
     desc: "Comprehensive tests for Python package"
@@ -547,6 +551,31 @@ tasks:
     dir: packages/r
     cmds:
       - Rscript -e 'devtools::test()'
+
+  e2e:test:swift:
+    desc: "Comprehensive tests for Swift package"
+    dir: test_apps/swift_e2e
+    cmds:
+      - swift test
+
+  e2e:test:dart:
+    desc: "Comprehensive tests for Dart package"
+    dir: test_apps/dart
+    cmds:
+      - dart pub get
+      - dart test
+
+  e2e:test:zig:
+    desc: "Comprehensive tests for Zig package"
+    dir: test_apps/zig
+    cmds:
+      - zig build test
+
+  e2e:test:kotlin_android:
+    desc: "Comprehensive tests for Kotlin/Android AAR (host JVM tests)"
+    dir: test_apps/kotlin_android
+    cmds:
+      - ./gradlew test
 
   # === test_apps aggregators (mirrors lllm naming convention) ===
   test-apps:smoke:
