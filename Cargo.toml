@@ -1,24 +1,25 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/html-to-markdown",
-    "crates/html-to-markdown-cli",
-    "crates/html-to-markdown-ffi",
-    "crates/html-to-markdown-node",
-    "crates/html-to-markdown-php",
-    "crates/html-to-markdown-py",
-    "crates/html-to-markdown-wasm",
-    "packages/dart/rust",
-    "packages/swift/rust",
+  "crates/html-to-markdown",
+  "crates/html-to-markdown-cli",
+  "crates/html-to-markdown-ffi",
+  "crates/html-to-markdown-rs-jni",
+  "crates/html-to-markdown-node",
+  "crates/html-to-markdown-php",
+  "crates/html-to-markdown-py",
+  "crates/html-to-markdown-wasm",
+  "packages/dart/rust",
+  "packages/swift/rust",
 ]
 exclude = [
-    "e2e/rust",
-    "packages/elixir/native/html_to_markdown_nif",
-    "packages/r/src/rust",
-    "packages/ruby/ext/html_to_markdown_rb",
-    "packages/ruby/vendor",
-    "test_apps/rust",
-    "tests/test_apps/elixir/deps",
+  "e2e/rust",
+  "packages/elixir/native/html_to_markdown_nif",
+  "packages/r/src/rust",
+  "packages/ruby/ext/html_to_markdown_rb",
+  "packages/ruby/vendor",
+  "test_apps/rust",
+  "tests/test_apps/elixir/deps",
 ]
 
 [workspace.package]
@@ -36,7 +37,10 @@ categories = ["text-processing", "web-programming"]
 rust-version = "1.85"
 
 [workspace.dependencies]
-ahash = { version = "0.8", default-features = false, features = ["std", "compile-time-rng"] }
+ahash = { version = "0.8", default-features = false, features = [
+  "std",
+  "compile-time-rng",
+] }
 base64 = "0.22"
 clap = { version = "4.6", features = ["derive"] }
 clap_complete = "4.6"
@@ -68,7 +72,7 @@ cargo = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }
 multiple_crate_versions = { level = "allow", priority = 1 } # Allow multiple dependency versions (common in large workspaces)
-cargo_common_metadata = { level = "allow", priority = 1 } # Binding crates are internal, don't need full crates.io metadata
+cargo_common_metadata = { level = "allow", priority = 1 }   # Binding crates are internal, don't need full crates.io metadata
 # Allow common patterns in alef-generated binding code
 unnecessary_cast = { level = "allow", priority = 1 }
 unused_unit = { level = "allow", priority = 1 }
@@ -78,7 +82,7 @@ unnecessary_wraps = { level = "allow", priority = 1 }
 needless_borrows_for_generic_args = { level = "allow", priority = 1 }
 useless_conversion = { level = "allow", priority = 1 }
 unnecessary_fallible_conversions = { level = "allow", priority = 1 }
-arc_with_non_send_sync = { level = "allow", priority = 1 } # ConversionOptionsBuilder holds Box<dyn HtmlVisitor> — not Send/Sync
+arc_with_non_send_sync = { level = "allow", priority = 1 }            # ConversionOptionsBuilder holds Box<dyn HtmlVisitor> — not Send/Sync
 
 [profile.release]
 lto = "thin"

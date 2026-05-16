@@ -2,42 +2,51 @@
 
 package dev.kreuzberg.android
 
-/** Coroutine-friendly wrapper around the Java `dev.kreuzberg.htmltomarkdown.ConversionOptionsBuilder` facade. */
-class ConversionOptionsBuilder internal constructor(internal val inner: dev.kreuzberg.htmltomarkdown.ConversionOptionsBuilder) : AutoCloseable {
+/** JNI-backed wrapper holding a native `ConversionOptionsBuilder` handle. */
+@Suppress("TooManyFunctions")
+class ConversionOptionsBuilder internal constructor(internal val handle: Long) : AutoCloseable {
+    companion object {
+        private val MAPPER = com.fasterxml.jackson.databind.ObjectMapper()
+            .registerModule(com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
+            .findAndRegisterModules()
+            .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+    }
+
     // Set the list of HTML tag names whose content is stripped from output.
     fun stripTags(tags: List<String>): ConversionOptionsBuilder {
-        return inner.stripTags(tags)
+        val responseJson = HtmlToMarkdownRsBridge.nativeConversionOptionsBuilderStripTags(handle, MAPPER.writeValueAsString(tags))
+        return MAPPER.readValue(responseJson, ConversionOptionsBuilder::class.java)
     }
 
     // Set the list of HTML tag names that are preserved verbatim in output.
     fun preserveTags(tags: List<String>): ConversionOptionsBuilder {
-        return inner.preserveTags(tags)
+        val responseJson = HtmlToMarkdownRsBridge.nativeConversionOptionsBuilderPreserveTags(handle, MAPPER.writeValueAsString(tags))
+        return MAPPER.readValue(responseJson, ConversionOptionsBuilder::class.java)
     }
 
     // Set the list of HTML tag names whose `<img>` children are kept inline.
     fun keepInlineImagesIn(tags: List<String>): ConversionOptionsBuilder {
-        return inner.keepInlineImagesIn(tags)
+        val responseJson = HtmlToMarkdownRsBridge.nativeConversionOptionsBuilderKeepInlineImagesIn(handle, MAPPER.writeValueAsString(tags))
+        return MAPPER.readValue(responseJson, ConversionOptionsBuilder::class.java)
     }
 
     // Set the list of CSS selectors for elements to exclude entirely from output.
     fun excludeSelectors(selectors: List<String>): ConversionOptionsBuilder {
-        return inner.excludeSelectors(selectors)
-    }
-
-    // Set the visitor used during conversion.
-    fun visitor(visitor: VisitorHandle? = null): ConversionOptionsBuilder {
-        return inner.visitor(visitor)
+        val responseJson = HtmlToMarkdownRsBridge.nativeConversionOptionsBuilderExcludeSelectors(handle, MAPPER.writeValueAsString(selectors))
+        return MAPPER.readValue(responseJson, ConversionOptionsBuilder::class.java)
     }
 
     // Set the pre-processing options applied to the HTML before conversion.
     fun preprocessing(preprocessing: PreprocessingOptions): ConversionOptionsBuilder {
-        return inner.preprocessing(preprocessing)
+        val responseJson = HtmlToMarkdownRsBridge.nativeConversionOptionsBuilderPreprocessing(handle, MAPPER.writeValueAsString(preprocessing))
+        return MAPPER.readValue(responseJson, ConversionOptionsBuilder::class.java)
     }
 
     // Build the final [`ConversionOptions`].
     fun build(): ConversionOptions {
-        return inner.build()
+        val responseJson = HtmlToMarkdownRsBridge.nativeConversionOptionsBuilderBuild(handle)
+        return MAPPER.readValue(responseJson, ConversionOptions::class.java)
     }
 
-    override fun close() { inner.close() }
+    override fun close() { HtmlToMarkdownRsBridge.nativeFreeConversionOptionsBuilder(handle) }
 }

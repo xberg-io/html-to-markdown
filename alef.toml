@@ -1,6 +1,23 @@
 [workspace]
-alef_version = "0.15.71"
-languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "r", "kotlin", "swift", "dart", "zig"]
+alef_version = "0.16.13"
+languages = [
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "ffi",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+  "r",
+  "kotlin_android",
+  "jni",
+  "swift",
+  "dart",
+  "zig",
+]
 
 [workspace.sync]
 extra_paths = [
@@ -72,6 +89,8 @@ replace = 'package = "html-to-markdown-rs", version = "{version}"'
 [[crates]]
 name = "html-to-markdown-rs"
 core_import = "html_to_markdown_rs"
+error_type = "ConversionError"
+error_constructor = "html_to_markdown_rs::ConversionError::Other({msg})"
 sources = [
   "crates/html-to-markdown/src/lib.rs",
   "crates/html-to-markdown/src/options/conversion.rs",
@@ -138,12 +157,19 @@ namespace = "HtmlToMarkdown"
 [crates.r]
 package_name = "htmltomarkdown"
 
-[crates.kotlin]
+[crates.kotlin_android]
 # Android library (AAR) only — Kotlin/JVM users consume the existing Java
 # package directly. Panama FFM is unavailable on Android (max JDK 17), which
 # is why Android needs its own JNI-based package with bundled .so files.
+# Emitted by alef-backend-kotlin-android (alef >= 0.16.6).
 package = "dev.kreuzberg.android"
-mode = "android"
+namespace = "dev.kreuzberg.android"
+artifact_id = "html-to-markdown-android"
+group_id = "dev.kreuzberg"
+abis = ["arm64-v8a", "x86_64"]
+# JNI trait-handle bridge (mirror dart trait_bridge) is not yet implemented in
+# alef-backend-jni; Option<VisitorHandle> cannot be serde-deserialised from JSON.
+exclude_functions = ["visitor"]
 
 [crates.swift]
 module_name = "HtmlToMarkdown"
@@ -172,7 +198,7 @@ java = "packages/java/src/main/java/"
 elixir = "packages/elixir/native/html_to_markdown_nif/src/"
 wasm = "crates/html-to-markdown-wasm/src/"
 r = "packages/r/src/rust/src/"
-kotlin = "packages/kotlin-android/src/main/kotlin/dev/kreuzberg/android/"
+kotlin_android = "packages/kotlin-android/src/main/kotlin/dev/kreuzberg/android/"
 swift = "packages/swift/Sources/HtmlToMarkdown/"
 dart = "packages/dart/lib/src/"
 zig = "packages/zig/src/"
@@ -183,7 +209,13 @@ functions = []
 methods = []
 
 [crates.include]
-types = ["ConversionOptions", "ConversionResult", "HtmlVisitor", "NodeContext", "VisitResult"]
+types = [
+  "ConversionOptions",
+  "ConversionResult",
+  "HtmlVisitor",
+  "NodeContext",
+  "VisitResult",
+]
 functions = ["convert"]
 
 [crates.lint.python]
@@ -234,7 +266,7 @@ precondition = "test -d e2e/c"
 format = "find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
 check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missingIncludeSystem --suppress=unusedStructMember e2e/c/"
 
-[crates.lint.kotlin]
+[crates.lint.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
 format = "cd packages/kotlin-android && gradle ktlintFormat --no-daemon"
 check = "cd packages/kotlin-android && gradle ktlintCheck --no-daemon"
@@ -312,15 +344,15 @@ precondition = "command -v make >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release LD_LIBRARY_PATH=../../target/release ./run_tests"
 
-[crates.test.kotlin]
+[crates.test.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-ffi"
-e2e = "cd e2e/kotlin && gradle test --no-daemon"
+e2e = "cd e2e/kotlin_android && gradle test --no-daemon"
 
 [crates.test.swift]
 precondition = "command -v swift >/dev/null 2>&1"
 before = "cargo build --release -p html-to-markdown-rs-swift"
-e2e = "cd e2e/swift && swift test"
+e2e = "cd e2e/swift_e2e && swift test"
 
 [crates.test.dart]
 precondition = "command -v dart >/dev/null 2>&1"
@@ -370,8 +402,7 @@ languages = [
   "wasm",
   "r",
   "rust",
-  # kotlin excluded: Android-only AAR — no JVM JAR to run `gradle test` against.
-  # Android e2e requires a device/emulator farm; see gap K3 in /tmp/alef-gaps-v3.5.0.md.
+  "kotlin_android",
   "swift",
   "dart",
   "zig",
@@ -556,12 +587,12 @@ function = "htm_convert"
 prefix = "htm"
 result_type = "ConversionResult"
 
-[crates.e2e.call.overrides.kotlin]
+[crates.e2e.call.overrides.kotlin_android]
 class = "dev.kreuzberg.android.HtmlToMarkdownRs"
 function = "convert"
 options_type = "ConversionOptions"
 
-[crates.e2e.call.overrides.kotlin.enum_fields]
+[crates.e2e.call.overrides.kotlin_android.enum_fields]
 headingStyle = "HeadingStyle"
 codeBlockStyle = "CodeBlockStyle"
 listIndentType = "ListIndentType"
@@ -575,6 +606,7 @@ outputFormat = "OutputFormat"
 module = "HtmlToMarkdown"
 function = "convert"
 options_type = "ConversionOptions"
+options_via = "from_json"
 
 [crates.e2e.call.overrides.dart]
 module = "h2m"
@@ -638,7 +670,7 @@ version = "3.4.0"
 name = "html-to-markdown-ffi"
 version = "3.4.0"
 
-[crates.e2e.registry.packages.kotlin]
+[crates.e2e.registry.packages.kotlin_android]
 name = "dev.kreuzberg:html-to-markdown-android"
 version = "3.5.0"
 
@@ -702,11 +734,12 @@ path = "../../packages/r"
 name = "html_to_markdown_ffi"
 path = "../../crates/html-to-markdown-ffi"
 
-[crates.e2e.packages.kotlin]
+[crates.e2e.packages.kotlin_android]
 module = "dev.kreuzberg.android"
 path = "../../packages/kotlin-android"
 
 [crates.e2e.packages.swift]
+name = "HtmlToMarkdown"
 path = "../../packages/swift"
 
 [crates.e2e.packages.dart]
@@ -1198,7 +1231,7 @@ metadata_extraction = "metadata/basic_extraction.md"
 visitor_basic = "visitor/basic_visitor.md"
 table_extraction = "table-extraction/basic_extraction.md"
 
-[crates.readme.languages.kotlin]
+[crates.readme.languages.kotlin_android]
 name = "Kotlin (Android)"
 template = "language_package.md"
 output_path = "packages/kotlin-android/README.md"
@@ -1212,17 +1245,17 @@ Server-side Kotlin/JVM consumers should use the `dev.kreuzberg:html-to-markdown`
 """
 migration_version = ""
 
-[crates.readme.languages.kotlin.features]
+[crates.readme.languages.kotlin_android.features]
 visitor_pattern = true
 metadata_extraction = false
 cli_proxy = false
 
-[crates.readme.languages.kotlin.performance]
+[crates.readme.languages.kotlin_android.performance]
 platform = "Apple M4"
 function = "convert()"
 note = "Real Wikipedia documents"
 
-[crates.readme.languages.kotlin.snippets]
+[crates.readme.languages.kotlin_android.snippets]
 basic_usage = "getting-started/basic_usage.md"
 with_options = "getting-started/with_options.md"
 

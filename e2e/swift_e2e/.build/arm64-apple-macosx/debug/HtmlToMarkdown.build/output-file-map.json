@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/HtmlToMarkdown.build/primary.swiftdeps"
+  },
+  "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/packages/swift/Sources/HtmlToMarkdown/HtmlToMarkdown.swift": {
+    "dependencies": "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/HtmlToMarkdown.build/HtmlToMarkdown.d",
+    "object": "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/HtmlToMarkdown.build/HtmlToMarkdown.swift.o",
+    "swiftmodule": "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/HtmlToMarkdown.build/HtmlToMarkdown~partial.swiftmodule",
+    "swift-dependencies": "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/HtmlToMarkdown.build/HtmlToMarkdown.swiftdeps",
+    "diagnostics": "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/HtmlToMarkdown.build/HtmlToMarkdown.dia"
+  }
+}

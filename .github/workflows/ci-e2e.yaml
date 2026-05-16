@@ -191,7 +191,7 @@ jobs:
               - 'fixtures/**'
             swift:
               - 'packages/swift/**'
-              - 'e2e/swift/**'
+              - 'e2e/swift_e2e/**'
               - 'fixtures/**'
             dart:
               - 'packages/dart/**'

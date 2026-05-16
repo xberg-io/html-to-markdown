@@ -28,7 +28,9 @@ allow = [
 confidence-threshold = 0.8
 exceptions = [
   # cbindgen is a build-only tool for generating C headers, not linked into output
-  { allow = ["MPL-2.0"], crate = "cbindgen" },
+  { allow = [
+    "MPL-2.0",
+  ], crate = "cbindgen" },
 ]
 
 [licenses.private]

@@ -5,7 +5,7 @@ import 'html_to_markdown_rs_bridge_generated/lib.dart' as rust_bridge;
 // ignore: duplicate_import
 import 'html_to_markdown_rs_bridge_generated/lib.dart';
 
-class HtmlToMarkdownRsBridge {
+class H2mBridge {
   /// Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images,
   /// and warnings.
   ///

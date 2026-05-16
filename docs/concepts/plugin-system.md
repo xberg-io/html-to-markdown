@@ -28,13 +28,13 @@ pub trait HtmlVisitor: std::fmt::Debug {
 
 Every callback returns a `VisitResult`. There are five variants:
 
-| Variant          | Effect                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------- |
-| `Continue`       | Use the default rendering. Default for every method.                                  |
-| `Custom(String)` | Replace the default output with the supplied string. The visitor owns this subtree.   |
-| `Skip`           | Drop the element and all of its children.                                             |
-| `PreserveHtml`   | Emit the raw HTML for this element verbatim, without conversion.                      |
-| `Error(String)`  | Halt conversion. Surfaces as `ConversionError::Visitor` in Rust.                      |
+| Variant          | Effect                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| `Continue`       | Use the default rendering. Default for every method.                                |
+| `Custom(String)` | Replace the default output with the supplied string. The visitor owns this subtree. |
+| `Skip`           | Drop the element and all of its children.                                           |
+| `PreserveHtml`   | Emit the raw HTML for this element verbatim, without conversion.                    |
+| `Error(String)`  | Halt conversion. Surfaces as `ConversionError::Visitor` in Rust.                    |
 
 `visit_text` is hot — it fires for every text node, often 100+ times per page. Return `Continue` fast when you don't care, and avoid allocations in the hot path.
 

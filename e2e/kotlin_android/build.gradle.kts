@@ -1,0 +1,69 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    kotlin("jvm") version "2.3.21"
+    java
+}
+
+group = "dev.kreuzberg.android"
+version = "0.1.0"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    test {
+        // Include the AAR-bundled Java facade as test sources
+        java.srcDir("../../packages/kotlin-android/src/main/java")
+        // Include the AAR-bundled Kotlin wrapper as test sources
+        kotlin.srcDir("../../packages/kotlin-android/src/main/kotlin")
+    }
+}
+
+dependencies {
+    // JNA for loading libkreuzberg_ffi from java.library.path
+    testImplementation("net.java.dev.jna:jna:5.18.1")
+
+    // Jackson for JSON assertion helpers
+    testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.2")
+
+    // jspecify for null-safety annotations on wrapped types
+    testImplementation("org.jspecify:jspecify:1.0.0")
+
+    // Kotlin coroutines for async test helpers
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+
+    // JUnit 5 API and engine
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:6.0.3")
+
+
+    // Kotlin stdlib test helpers
+    testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    useJUnitPlatform()
+
+    // Resolve libkreuzberg_ffi location (e.g., ../../target/release)
+    val libPath = System.getProperty("kb.lib.path") ?: "${rootDir}/../../target/release"
+    systemProperty("java.library.path", libPath)
+    systemProperty("jna.library.path", libPath)
+
+    // Resolve fixture paths (e.g. "docx/fake.docx") against test_documents/
+    workingDir = file("${rootDir}/../../test_documents")
+}

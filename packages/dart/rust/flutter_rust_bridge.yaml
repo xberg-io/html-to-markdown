@@ -1,3 +1,4 @@
 rust_root: .
 rust_input: crate
 dart_output: ../lib/src/html_to_markdown_rs_bridge_generated
+add_mod_to_lib: false

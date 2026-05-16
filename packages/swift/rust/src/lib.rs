@@ -108,7 +108,7 @@ mod ffi {
             list_indent_type: ListIndentType,
             list_indent_width: usize,
             bullets: String,
-            strong_em_symbol: char,
+            strong_em_symbol: String,
             escape_asterisks: bool,
             escape_underscores: bool,
             escape_misc: bool,
@@ -150,7 +150,7 @@ mod ffi {
         fn list_indent_type(&self) -> String;
         fn list_indent_width(&self) -> usize;
         fn bullets(&self) -> String;
-        fn strong_em_symbol(&self) -> char;
+        fn strong_em_symbol(&self) -> String;
         fn escape_asterisks(&self) -> bool;
         fn escape_underscores(&self) -> bool;
         fn escape_misc(&self) -> bool;
@@ -236,7 +236,7 @@ mod ffi {
             list_indent_type: Option<ListIndentType>,
             list_indent_width: Option<usize>,
             bullets: Option<String>,
-            strong_em_symbol: Option<char>,
+            strong_em_symbol: Option<String>,
             escape_asterisks: Option<bool>,
             escape_underscores: Option<bool>,
             escape_misc: Option<bool>,
@@ -278,7 +278,7 @@ mod ffi {
         fn list_indent_type(&self) -> Option<String>;
         fn list_indent_width(&self) -> Option<usize>;
         fn bullets(&self) -> Option<String>;
-        fn strong_em_symbol(&self) -> Option<char>;
+        fn strong_em_symbol(&self) -> Option<String>;
         fn escape_asterisks(&self) -> Option<bool>;
         fn escape_underscores(&self) -> Option<bool>;
         fn escape_misc(&self) -> Option<bool>;
@@ -385,7 +385,6 @@ mod ffi {
         fn document(&self) -> Option<DocumentStructure>;
         fn metadata(&self) -> HtmlMetadata;
         fn tables(&self) -> Vec<TableData>;
-        fn images(&self) -> Vec<String>;
         fn warnings(&self) -> Vec<ProcessingWarning>;
     }
 
@@ -536,17 +535,13 @@ mod ffi {
 
     extern "Swift" {
         type SwiftHtmlVisitorBox;
-        fn alef_name(&self) -> String;
-        fn alef_version(&self) -> String;
-        fn alef_initialize(&self) -> String;
-        fn alef_shutdown(&self) -> String;
         fn alef_visit_text(&self, ctx: String, text: String) -> String;
         fn alef_visit_element_start(&self, ctx: String) -> String;
         fn alef_visit_element_end(&self, ctx: String, output: String) -> String;
-        fn alef_visit_link(&self, ctx: String, href: String, text: String, title: String) -> String;
-        fn alef_visit_image(&self, ctx: String, src: String, alt: String, title: String) -> String;
-        fn alef_visit_heading(&self, ctx: String, level: u32, text: String, id: String) -> String;
-        fn alef_visit_code_block(&self, ctx: String, lang: String, code: String) -> String;
+        fn alef_visit_link(&self, ctx: String, href: String, text: String, title: Option<String>) -> String;
+        fn alef_visit_image(&self, ctx: String, src: String, alt: String, title: Option<String>) -> String;
+        fn alef_visit_heading(&self, ctx: String, level: u32, text: String, id: Option<String>) -> String;
+        fn alef_visit_code_block(&self, ctx: String, lang: Option<String>, code: String) -> String;
         fn alef_visit_code_inline(&self, ctx: String, code: String) -> String;
         fn alef_visit_list_item(&self, ctx: String, ordered: bool, marker: String, text: String) -> String;
         fn alef_visit_list_start(&self, ctx: String, ordered: bool) -> String;
@@ -569,17 +564,40 @@ mod ffi {
         fn alef_visit_definition_term(&self, ctx: String, text: String) -> String;
         fn alef_visit_definition_description(&self, ctx: String, text: String) -> String;
         fn alef_visit_definition_list_end(&self, ctx: String, output: String) -> String;
-        fn alef_visit_form(&self, ctx: String, action: String, method: String) -> String;
-        fn alef_visit_input(&self, ctx: String, input_type: String, name: String, value: String) -> String;
+        fn alef_visit_form(&self, ctx: String, action: Option<String>, method: Option<String>) -> String;
+        fn alef_visit_input(
+            &self,
+            ctx: String,
+            input_type: String,
+            name: Option<String>,
+            value: Option<String>,
+        ) -> String;
         fn alef_visit_button(&self, ctx: String, text: String) -> String;
-        fn alef_visit_audio(&self, ctx: String, src: String) -> String;
-        fn alef_visit_video(&self, ctx: String, src: String) -> String;
-        fn alef_visit_iframe(&self, ctx: String, src: String) -> String;
+        fn alef_visit_audio(&self, ctx: String, src: Option<String>) -> String;
+        fn alef_visit_video(&self, ctx: String, src: Option<String>) -> String;
+        fn alef_visit_iframe(&self, ctx: String, src: Option<String>) -> String;
         fn alef_visit_details(&self, ctx: String, open: bool) -> String;
         fn alef_visit_summary(&self, ctx: String, text: String) -> String;
         fn alef_visit_figure_start(&self, ctx: String) -> String;
         fn alef_visit_figcaption(&self, ctx: String, text: String) -> String;
         fn alef_visit_figure_end(&self, ctx: String, output: String) -> String;
+    }
+
+    extern "Rust" {
+
+        #[swift_bridge(swift_name = "makeHtmlVisitorHandle")]
+        fn make_html_visitor_handle(swift_box: SwiftHtmlVisitorBox) -> VisitorHandle;
+
+    }
+
+    extern "Rust" {
+
+        #[swift_bridge(swift_name = "conversionOptionsFromJsonWithVisitor")]
+        fn conversion_options_from_json_with_visitor(
+            json: String,
+            visitor: Option<VisitorHandle>,
+        ) -> Result<ConversionOptions, String>;
+
     }
 
     extern "Rust" {
@@ -856,7 +874,7 @@ impl ConversionOptions {
         list_indent_type: ListIndentType,
         list_indent_width: usize,
         bullets: String,
-        strong_em_symbol: char,
+        strong_em_symbol: String,
         escape_asterisks: bool,
         escape_underscores: bool,
         escape_misc: bool,
@@ -903,11 +921,7 @@ impl ConversionOptions {
                 __target.bullets = t;
             }
         }
-        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&strong_em_symbol) {
-            if let Ok(t) = ::serde_json::from_value(v) {
-                __target.strong_em_symbol = t;
-            }
-        }
+        __target.strong_em_symbol = strong_em_symbol.chars().next().unwrap_or('\0');
         __target.escape_asterisks = escape_asterisks;
         __target.escape_underscores = escape_underscores;
         __target.escape_misc = escape_misc;
@@ -995,8 +1009,8 @@ impl ConversionOptions {
     pub fn bullets(&self) -> String {
         self.0.bullets.clone()
     }
-    pub fn strong_em_symbol(&self) -> char {
-        serde_json::to_string(&self.0.strong_em_symbol).unwrap_or_default()
+    pub fn strong_em_symbol(&self) -> String {
+        self.0.strong_em_symbol.to_string()
     }
     pub fn escape_asterisks(&self) -> bool {
         ::serde_json::to_value(&self.0.escape_asterisks)
@@ -1187,40 +1201,40 @@ pub fn conversion_options_builder_strip_tags(
     client: &ConversionOptionsBuilder,
     tags: Vec<String>,
 ) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.strip_tags(tags))
+    ConversionOptionsBuilder(client.0.clone().strip_tags(tags))
 }
 pub fn conversion_options_builder_preserve_tags(
     client: &ConversionOptionsBuilder,
     tags: Vec<String>,
 ) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.preserve_tags(tags))
+    ConversionOptionsBuilder(client.0.clone().preserve_tags(tags))
 }
 pub fn conversion_options_builder_keep_inline_images_in(
     client: &ConversionOptionsBuilder,
     tags: Vec<String>,
 ) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.keep_inline_images_in(tags))
+    ConversionOptionsBuilder(client.0.clone().keep_inline_images_in(tags))
 }
 pub fn conversion_options_builder_exclude_selectors(
     client: &ConversionOptionsBuilder,
     selectors: Vec<String>,
 ) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.exclude_selectors(selectors))
+    ConversionOptionsBuilder(client.0.clone().exclude_selectors(selectors))
 }
 pub fn conversion_options_builder_visitor(
     client: &ConversionOptionsBuilder,
     visitor: Option<VisitorHandle>,
 ) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.visitor(visitor.map(|v| v.0)))
+    ConversionOptionsBuilder(client.0.clone().visitor(visitor.map(|v| v.0)))
 }
 pub fn conversion_options_builder_preprocessing(
     client: &ConversionOptionsBuilder,
     preprocessing: PreprocessingOptions,
 ) -> ConversionOptionsBuilder {
-    ConversionOptionsBuilder(client.0.preprocessing(preprocessing.0))
+    ConversionOptionsBuilder(client.0.clone().preprocessing(preprocessing.0))
 }
 pub fn conversion_options_builder_build(client: &ConversionOptionsBuilder) -> ConversionOptions {
-    ConversionOptions(client.0.build())
+    ConversionOptions(client.0.clone().build())
 }
 
 pub struct ConversionOptionsUpdate(pub html_to_markdown_rs::options::ConversionOptionsUpdate);
@@ -1230,7 +1244,7 @@ impl ConversionOptionsUpdate {
         list_indent_type: Option<ListIndentType>,
         list_indent_width: Option<usize>,
         bullets: Option<String>,
-        strong_em_symbol: Option<char>,
+        strong_em_symbol: Option<String>,
         escape_asterisks: Option<bool>,
         escape_underscores: Option<bool>,
         escape_misc: Option<bool>,
@@ -1279,13 +1293,7 @@ impl ConversionOptionsUpdate {
                 }
             }
         }
-        if let Some(s) = strong_em_symbol {
-            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
-                if let Ok(t) = ::serde_json::from_value(v) {
-                    __target.strong_em_symbol = Some(t);
-                }
-            }
-        }
+        __target.strong_em_symbol = strong_em_symbol.as_ref().and_then(|s| s.chars().next());
         __target.escape_asterisks = escape_asterisks;
         __target.escape_underscores = escape_underscores;
         __target.escape_misc = escape_misc;
@@ -1391,11 +1399,8 @@ impl ConversionOptionsUpdate {
     pub fn bullets(&self) -> Option<String> {
         self.0.bullets.clone()
     }
-    pub fn strong_em_symbol(&self) -> Option<char> {
-        self.0
-            .strong_em_symbol
-            .as_ref()
-            .and_then(|v| serde_json::to_string(v).ok())
+    pub fn strong_em_symbol(&self) -> Option<String> {
+        self.0.strong_em_symbol.map(|c| c.to_string())
     }
     pub fn escape_asterisks(&self) -> Option<bool> {
         self.0.escape_asterisks.as_ref().and_then(|v| {
@@ -1772,11 +1777,7 @@ impl ConversionResult {
         }
         __target.metadata = metadata.0;
         __target.tables = tables.into_iter().map(|w| w.0).collect();
-        if let Ok(__v) = ::serde_json::to_value(images) {
-            if let Ok(t) = ::serde_json::from_value(__v) {
-                __target.images = t;
-            }
-        }
+        // alef: images — Vec field type may differ from IR in non-serde struct, left at default
         __target.warnings = warnings.into_iter().map(|w| w.0).collect();
         ConversionResult(__target)
     }
@@ -1792,12 +1793,7 @@ impl ConversionResult {
     pub fn tables(&self) -> Vec<TableData> {
         self.0.tables.iter().map(|elem| TableData(elem.clone())).collect()
     }
-    pub fn images(&self) -> Vec<String> {
-        ::serde_json::to_value(&self.0.images)
-            .ok()
-            .and_then(|j| ::serde_json::from_value(j).ok())
-            .unwrap_or_default()
-    }
+    // alef: skipped getter `images` — type cannot be bridged through swift-bridge
     pub fn warnings(&self) -> Vec<ProcessingWarning> {
         self.0
             .warnings
@@ -2697,13 +2693,10 @@ pub fn alef_phantom_vec_html_visitor() -> Vec<HtmlVisitorBox> {
     Vec::new()
 }
 
-/// Convert a stringified Swift error into the source crate's `KreuzbergError::Plugin`.
+/// Convert a stringified Swift error into the configured source-crate error type.
 #[allow(dead_code)]
-fn plugin_error_from_string(message: String) -> html_to_markdown_rs::KreuzbergError {
-    html_to_markdown_rs::KreuzbergError::Plugin {
-        message,
-        plugin_name: "swift".to_string(),
-    }
+fn plugin_error_from_string(message: String) -> html_to_markdown_rs::ConversionError {
+    html_to_markdown_rs::ConversionError::Other(message)
 }
 
 /// JSON envelope returned by every fallible Swift trait method. Carries `Ok(T)`
@@ -2719,7 +2712,7 @@ enum InboundEnvelope<T> {
 
 /// Deserialise a JSON envelope returned from a Swift FFI shim into a typed Result.
 #[allow(dead_code)]
-fn decode_inbound_envelope<T>(json: &str) -> html_to_markdown_rs::Result<T>
+fn decode_inbound_envelope<T>(json: &str) -> std::result::Result<T, html_to_markdown_rs::ConversionError>
 where
     T: ::serde::de::DeserializeOwned,
 {
@@ -2731,17 +2724,13 @@ where
         ))),
     }
 }
-/// Rust-side wrapper around a Swift class implementing the `HtmlVisitor` plugin protocol.
+/// Rust-side wrapper around a Swift class implementing the `HtmlVisitor` protocol.
 ///
 /// The Swift instance is held via a `swift-bridge` opaque handle that retains
 /// the underlying ARC reference for the lifetime of this struct. Send + Sync are
-/// asserted unsafely: Swift classes used as kreuzberg plugins must be thread-safe
-/// (the `Plugin` super-trait requires it), and ARC handles themselves are safe to share.
+/// asserted unsafely: Swift classes used as trait bridges must be thread-safe.
 pub struct SwiftHtmlVisitorWrapper {
     inner: ffi::SwiftHtmlVisitorBox,
-    /// Cached `Plugin::name()` — required because the trait returns `&str` but
-    /// the Swift FFI shim returns an owned `String`. Populated lazily on first access.
-    name_cache: ::std::sync::OnceLock<String>,
 }
 unsafe impl Send for SwiftHtmlVisitorWrapper {}
 unsafe impl Sync for SwiftHtmlVisitorWrapper {}
@@ -2749,30 +2738,500 @@ unsafe impl Sync for SwiftHtmlVisitorWrapper {}
 impl SwiftHtmlVisitorWrapper {
     /// Construct a new wrapper from a Swift `SwiftHtmlVisitorBox` handle.
     pub fn new(inner: ffi::SwiftHtmlVisitorBox) -> Self {
-        Self {
-            inner,
-            name_cache: ::std::sync::OnceLock::new(),
-        }
+        Self { inner }
     }
 }
-impl html_to_markdown_rs::plugins::Plugin for SwiftHtmlVisitorWrapper {
-    fn name(&self) -> &str {
-        self.name_cache.get_or_init(|| self.inner.alef_name()).as_str()
-    }
-
-    fn version(&self) -> String {
-        self.inner.alef_version()
-    }
-
-    fn initialize(&self) -> html_to_markdown_rs::Result<()> {
-        decode_inbound_envelope::<()>(&self.inner.alef_initialize()).map(|_| ())
-    }
-
-    fn shutdown(&self) -> html_to_markdown_rs::Result<()> {
-        decode_inbound_envelope::<()>(&self.inner.alef_shutdown()).map(|_| ())
+impl ::std::fmt::Debug for SwiftHtmlVisitorWrapper {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("SwiftHtmlVisitorWrapper").finish_non_exhaustive()
     }
 }
-impl html_to_markdown_rs::visitor::HtmlVisitor for SwiftHtmlVisitorWrapper {}
+impl html_to_markdown_rs::visitor::HtmlVisitor for SwiftHtmlVisitorWrapper {
+    fn visit_text(&mut self, ctx: &html_to_markdown_rs::NodeContext, text: &str) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_text(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_text returned invalid JSON")
+    }
+
+    fn visit_element_start(&mut self, ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_element_start(ctx);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_element_start returned invalid JSON")
+    }
+
+    fn visit_element_end(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let output = output.to_string();
+        let json = self.inner.alef_visit_element_end(ctx, output);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_element_end returned invalid JSON")
+    }
+
+    fn visit_link(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        href: &str,
+        text: &str,
+        title: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let href = href.to_string();
+        let text = text.to_string();
+        let title = title.map(|v| v.to_string());
+        let json = self.inner.alef_visit_link(ctx, href, text, title);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_link returned invalid JSON")
+    }
+
+    fn visit_image(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        src: &str,
+        alt: &str,
+        title: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let src = src.to_string();
+        let alt = alt.to_string();
+        let title = title.map(|v| v.to_string());
+        let json = self.inner.alef_visit_image(ctx, src, alt, title);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_image returned invalid JSON")
+    }
+
+    fn visit_heading(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        level: u32,
+        text: &str,
+        id: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let id = id.map(|v| v.to_string());
+        let json = self.inner.alef_visit_heading(ctx, level, text, id);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_heading returned invalid JSON")
+    }
+
+    fn visit_code_block(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        lang: Option<&str>,
+        code: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let lang = lang.map(|v| v.to_string());
+        let code = code.to_string();
+        let json = self.inner.alef_visit_code_block(ctx, lang, code);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_code_block returned invalid JSON")
+    }
+
+    fn visit_code_inline(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        code: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let code = code.to_string();
+        let json = self.inner.alef_visit_code_inline(ctx, code);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_code_inline returned invalid JSON")
+    }
+
+    fn visit_list_item(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        ordered: bool,
+        marker: &str,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let marker = marker.to_string();
+        let text = text.to_string();
+        let json = self.inner.alef_visit_list_item(ctx, ordered, marker, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_list_item returned invalid JSON")
+    }
+
+    fn visit_list_start(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        ordered: bool,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_list_start(ctx, ordered);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_list_start returned invalid JSON")
+    }
+
+    fn visit_list_end(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        ordered: bool,
+        output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let output = output.to_string();
+        let json = self.inner.alef_visit_list_end(ctx, ordered, output);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_list_end returned invalid JSON")
+    }
+
+    fn visit_table_start(&mut self, ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_table_start(ctx);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_table_start returned invalid JSON")
+    }
+
+    fn visit_table_row(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        cells: &[String],
+        is_header: bool,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let cells = cells.to_vec();
+        let json = self.inner.alef_visit_table_row(ctx, cells, is_header);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_table_row returned invalid JSON")
+    }
+
+    fn visit_table_end(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let output = output.to_string();
+        let json = self.inner.alef_visit_table_end(ctx, output);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_table_end returned invalid JSON")
+    }
+
+    fn visit_blockquote(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        content: &str,
+        depth: usize,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let content = content.to_string();
+        let json = self.inner.alef_visit_blockquote(ctx, content, depth);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_blockquote returned invalid JSON")
+    }
+
+    fn visit_strong(&mut self, ctx: &html_to_markdown_rs::NodeContext, text: &str) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_strong(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_strong returned invalid JSON")
+    }
+
+    fn visit_emphasis(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_emphasis(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_emphasis returned invalid JSON")
+    }
+
+    fn visit_strikethrough(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_strikethrough(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_strikethrough returned invalid JSON")
+    }
+
+    fn visit_underline(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_underline(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_underline returned invalid JSON")
+    }
+
+    fn visit_subscript(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_subscript(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_subscript returned invalid JSON")
+    }
+
+    fn visit_superscript(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_superscript(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_superscript returned invalid JSON")
+    }
+
+    fn visit_mark(&mut self, ctx: &html_to_markdown_rs::NodeContext, text: &str) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_mark(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_mark returned invalid JSON")
+    }
+
+    fn visit_line_break(&mut self, ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_line_break(ctx);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_line_break returned invalid JSON")
+    }
+
+    fn visit_horizontal_rule(&mut self, ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_horizontal_rule(ctx);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_horizontal_rule returned invalid JSON")
+    }
+
+    fn visit_custom_element(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        tag_name: &str,
+        html: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let tag_name = tag_name.to_string();
+        let html = html.to_string();
+        let json = self.inner.alef_visit_custom_element(ctx, tag_name, html);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_custom_element returned invalid JSON")
+    }
+
+    fn visit_definition_list_start(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_definition_list_start(ctx);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_definition_list_start returned invalid JSON")
+    }
+
+    fn visit_definition_term(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_definition_term(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_definition_term returned invalid JSON")
+    }
+
+    fn visit_definition_description(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_definition_description(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_definition_description returned invalid JSON")
+    }
+
+    fn visit_definition_list_end(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let output = output.to_string();
+        let json = self.inner.alef_visit_definition_list_end(ctx, output);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_definition_list_end returned invalid JSON")
+    }
+
+    fn visit_form(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        action: Option<&str>,
+        method: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let action = action.map(|v| v.to_string());
+        let method = method.map(|v| v.to_string());
+        let json = self.inner.alef_visit_form(ctx, action, method);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_form returned invalid JSON")
+    }
+
+    fn visit_input(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        input_type: &str,
+        name: Option<&str>,
+        value: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let input_type = input_type.to_string();
+        let name = name.map(|v| v.to_string());
+        let value = value.map(|v| v.to_string());
+        let json = self.inner.alef_visit_input(ctx, input_type, name, value);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_input returned invalid JSON")
+    }
+
+    fn visit_button(&mut self, ctx: &html_to_markdown_rs::NodeContext, text: &str) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_button(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_button returned invalid JSON")
+    }
+
+    fn visit_audio(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        src: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let src = src.map(|v| v.to_string());
+        let json = self.inner.alef_visit_audio(ctx, src);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_audio returned invalid JSON")
+    }
+
+    fn visit_video(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        src: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let src = src.map(|v| v.to_string());
+        let json = self.inner.alef_visit_video(ctx, src);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_video returned invalid JSON")
+    }
+
+    fn visit_iframe(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        src: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let src = src.map(|v| v.to_string());
+        let json = self.inner.alef_visit_iframe(ctx, src);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_iframe returned invalid JSON")
+    }
+
+    fn visit_details(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        open: bool,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_details(ctx, open);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_details returned invalid JSON")
+    }
+
+    fn visit_summary(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_summary(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_summary returned invalid JSON")
+    }
+
+    fn visit_figure_start(&mut self, ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let json = self.inner.alef_visit_figure_start(ctx);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_figure_start returned invalid JSON")
+    }
+
+    fn visit_figcaption(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let text = text.to_string();
+        let json = self.inner.alef_visit_figcaption(ctx, text);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_figcaption returned invalid JSON")
+    }
+
+    fn visit_figure_end(
+        &mut self,
+        ctx: &html_to_markdown_rs::NodeContext,
+        output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let ctx = ::serde_json::to_string(&ctx).expect("serializable param ctx");
+        let output = output.to_string();
+        let json = self.inner.alef_visit_figure_end(ctx, output);
+        ::serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+            .expect("swift html_visitor.visit_figure_end returned invalid JSON")
+    }
+}
+
+/// Construct a `VisitorHandle` from a Swift `SwiftHtmlVisitorBox` handle.
+/// Called by Swift e2e tests via `makeHtmlVisitorHandle(...)` to build a
+/// `VisitorHandle` that can be passed to the options-with-visitor helper.
+pub fn make_html_visitor_handle(swift_box: ffi::SwiftHtmlVisitorBox) -> VisitorHandle {
+    let __wrapper = SwiftHtmlVisitorWrapper::new(swift_box);
+    let __inner: html_to_markdown_rs::visitor::VisitorHandle =
+        ::std::sync::Arc::new(::std::sync::Mutex::new(__wrapper));
+    VisitorHandle::from(__inner)
+}
+
+/// Deserialise a `ConversionOptions` from JSON and attach a visitor handle to its
+/// `visitor` field. Used by Swift e2e tests to thread a `VisitorHandle` into the
+/// conversion call without needing a mutable post-construction setter.
+pub fn conversion_options_from_json_with_visitor(
+    json: String,
+    visitor: Option<VisitorHandle>,
+) -> Result<ConversionOptions, String> {
+    let mut __core: html_to_markdown_rs::options::ConversionOptions =
+        ::serde_json::from_str(&json).map_err(|e| e.to_string())?;
+    __core.visitor = visitor.map(|h| <html_to_markdown_rs::visitor::VisitorHandle>::from(h));
+    Ok(ConversionOptions::from(__core))
+}
 
 pub fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String> {
     serde_json::from_str::<html_to_markdown_rs::options::ConversionOptions>(&json)

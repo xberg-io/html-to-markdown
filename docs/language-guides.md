@@ -193,7 +193,7 @@ Options are named function arguments. The returned list matches the `ConversionR
 ## C
 
 **Link against:** `libhtml_to_markdown`
-**Header:** `html_to_markdown.h` (HTM_H, all symbols prefixed `htm_*` / `HTM*`)
+**Header:** `html_to_markdown.h` (HTM*H, all symbols prefixed `htm*_`/`HTM_`)
 
 Download a pre-built release archive for your platform from the [GitHub releases page](https://github.com/kreuzberg-dev/html-to-markdown/releases), or build from source with `cargo build --release -p html-to-markdown-ffi`.
 

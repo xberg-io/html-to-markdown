@@ -595,7 +595,7 @@ public enum VisitResult {
 }
 
 /// Errors that can occur during HTML to Markdown conversion.
-public enum ConversionError: Error {
+public enum ConversionError: Swift.Error {
     /// HTML parsing error
     case parseError(message: String, field0: String)
     /// HTML sanitization error
@@ -613,25 +613,255 @@ public enum ConversionError: Error {
 }
 
 // MARK: - From-JSON Helpers
-// Public wrappers forwarding RustBridge's swift_bridge-generated
-// `{TypeName}FromJson` helpers into this module's namespace.
+// Public helpers that decode JSON into first-class Swift types.
+// First-class struct types (Codable) use JSONDecoder directly.
+// Opaque RustBridge types forward to RustBridge.
 
 public func conversionOptionsFromJson(_ json: String) throws -> ConversionOptions {
-    return try RustBridge.conversionOptionsFromJson(json)
+                     let data = json.data(using: .utf8) ?? Data()
+                     return try JSONDecoder().decode(ConversionOptions.self, from: data)
 }
 
 public func conversionOptionsUpdateFromJson(_ json: String) throws -> ConversionOptionsUpdate {
-    return try RustBridge.conversionOptionsUpdateFromJson(json)
+                     let data = json.data(using: .utf8) ?? Data()
+                     return try JSONDecoder().decode(ConversionOptionsUpdate.self, from: data)
 }
 
 public func preprocessingOptionsFromJson(_ json: String) throws -> PreprocessingOptions {
-    return try RustBridge.preprocessingOptionsFromJson(json)
+                     let data = json.data(using: .utf8) ?? Data()
+                     return try JSONDecoder().decode(PreprocessingOptions.self, from: data)
 }
 
 public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> PreprocessingOptionsUpdate {
-    return try RustBridge.preprocessingOptionsUpdateFromJson(json)
+                     let data = json.data(using: .utf8) ?? Data()
+                     return try JSONDecoder().decode(PreprocessingOptionsUpdate.self, from: data)
 }
 
 public func nodeContextFromJson(_ json: String) throws -> NodeContext {
-    return try RustBridge.nodeContextFromJson(json)
+                     let data = json.data(using: .utf8) ?? Data()
+                     return try JSONDecoder().decode(NodeContext.self, from: data)
+}
+
+/// Swift protocol that Swift classes implement to provide visitor callbacks.
+/// Conform to this protocol to intercept HTML→Markdown conversion events.
+public protocol HtmlVisitorProtocol: AnyObject {
+    func visitText(_ ctx: String, _ text: String) -> VisitResult
+    func visitElementStart(_ ctx: String) -> VisitResult
+    func visitElementEnd(_ ctx: String, _ output: String) -> VisitResult
+    func visitLink(_ ctx: String, _ href: String, _ text: String, _ title: String?) -> VisitResult
+    func visitImage(_ ctx: String, _ src: String, _ alt: String, _ title: String?) -> VisitResult
+    func visitHeading(_ ctx: String, _ level: UInt32, _ text: String, _ id: String?) -> VisitResult
+    func visitCodeBlock(_ ctx: String, _ lang: String?, _ code: String) -> VisitResult
+    func visitCodeInline(_ ctx: String, _ code: String) -> VisitResult
+    func visitListItem(_ ctx: String, _ ordered: Bool, _ marker: String, _ text: String) -> VisitResult
+    func visitListStart(_ ctx: String, _ ordered: Bool) -> VisitResult
+    func visitListEnd(_ ctx: String, _ ordered: Bool, _ output: String) -> VisitResult
+    func visitTableStart(_ ctx: String) -> VisitResult
+    func visitTableRow(_ ctx: String, _ cells: RustVec<String>, _ isHeader: Bool) -> VisitResult
+    func visitTableEnd(_ ctx: String, _ output: String) -> VisitResult
+    func visitBlockquote(_ ctx: String, _ content: String, _ depth: Int) -> VisitResult
+    func visitStrong(_ ctx: String, _ text: String) -> VisitResult
+    func visitEmphasis(_ ctx: String, _ text: String) -> VisitResult
+    func visitStrikethrough(_ ctx: String, _ text: String) -> VisitResult
+    func visitUnderline(_ ctx: String, _ text: String) -> VisitResult
+    func visitSubscript(_ ctx: String, _ text: String) -> VisitResult
+    func visitSuperscript(_ ctx: String, _ text: String) -> VisitResult
+    func visitMark(_ ctx: String, _ text: String) -> VisitResult
+    func visitLineBreak(_ ctx: String) -> VisitResult
+    func visitHorizontalRule(_ ctx: String) -> VisitResult
+    func visitCustomElement(_ ctx: String, _ tagName: String, _ html: String) -> VisitResult
+    func visitDefinitionListStart(_ ctx: String) -> VisitResult
+    func visitDefinitionTerm(_ ctx: String, _ text: String) -> VisitResult
+    func visitDefinitionDescription(_ ctx: String, _ text: String) -> VisitResult
+    func visitDefinitionListEnd(_ ctx: String, _ output: String) -> VisitResult
+    func visitForm(_ ctx: String, _ action: String?, _ method: String?) -> VisitResult
+    func visitInput(_ ctx: String, _ inputType: String, _ name: String?, _ value: String?) -> VisitResult
+    func visitButton(_ ctx: String, _ text: String) -> VisitResult
+    func visitAudio(_ ctx: String, _ src: String?) -> VisitResult
+    func visitVideo(_ ctx: String, _ src: String?) -> VisitResult
+    func visitIframe(_ ctx: String, _ src: String?) -> VisitResult
+    func visitDetails(_ ctx: String, _ open: Bool) -> VisitResult
+    func visitSummary(_ ctx: String, _ text: String) -> VisitResult
+    func visitFigureStart(_ ctx: String) -> VisitResult
+    func visitFigcaption(_ ctx: String, _ text: String) -> VisitResult
+    func visitFigureEnd(_ ctx: String, _ output: String) -> VisitResult
+}
+
+/// Default implementation: every method returns `.continue_` so conforming
+/// types only need to implement the callbacks they care about.
+public extension HtmlVisitorProtocol {
+    func visitText(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitElementStart(_ _ctx: String) -> VisitResult { return .continue_ }
+    func visitElementEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
+    func visitLink(_ _ctx: String, _ _href: String, _ _text: String, _ _title: String?) -> VisitResult { return .continue_ }
+    func visitImage(_ _ctx: String, _ _src: String, _ _alt: String, _ _title: String?) -> VisitResult { return .continue_ }
+    func visitHeading(_ _ctx: String, _ _level: UInt32, _ _text: String, _ _id: String?) -> VisitResult { return .continue_ }
+    func visitCodeBlock(_ _ctx: String, _ _lang: String?, _ _code: String) -> VisitResult { return .continue_ }
+    func visitCodeInline(_ _ctx: String, _ _code: String) -> VisitResult { return .continue_ }
+    func visitListItem(_ _ctx: String, _ _ordered: Bool, _ _marker: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitListStart(_ _ctx: String, _ _ordered: Bool) -> VisitResult { return .continue_ }
+    func visitListEnd(_ _ctx: String, _ _ordered: Bool, _ _output: String) -> VisitResult { return .continue_ }
+    func visitTableStart(_ _ctx: String) -> VisitResult { return .continue_ }
+    func visitTableRow(_ _ctx: String, _ _cells: RustVec<String>, _ _isHeader: Bool) -> VisitResult { return .continue_ }
+    func visitTableEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
+    func visitBlockquote(_ _ctx: String, _ _content: String, _ _depth: Int) -> VisitResult { return .continue_ }
+    func visitStrong(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitEmphasis(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitStrikethrough(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitUnderline(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitSubscript(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitSuperscript(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitMark(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitLineBreak(_ _ctx: String) -> VisitResult { return .continue_ }
+    func visitHorizontalRule(_ _ctx: String) -> VisitResult { return .continue_ }
+    func visitCustomElement(_ _ctx: String, _ _tagName: String, _ _html: String) -> VisitResult { return .continue_ }
+    func visitDefinitionListStart(_ _ctx: String) -> VisitResult { return .continue_ }
+    func visitDefinitionTerm(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitDefinitionDescription(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitDefinitionListEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
+    func visitForm(_ _ctx: String, _ _action: String?, _ _method: String?) -> VisitResult { return .continue_ }
+    func visitInput(_ _ctx: String, _ _inputType: String, _ _name: String?, _ _value: String?) -> VisitResult { return .continue_ }
+    func visitButton(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitAudio(_ _ctx: String, _ _src: String?) -> VisitResult { return .continue_ }
+    func visitVideo(_ _ctx: String, _ _src: String?) -> VisitResult { return .continue_ }
+    func visitIframe(_ _ctx: String, _ _src: String?) -> VisitResult { return .continue_ }
+    func visitDetails(_ _ctx: String, _ _open: Bool) -> VisitResult { return .continue_ }
+    func visitSummary(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitFigureStart(_ _ctx: String) -> VisitResult { return .continue_ }
+    func visitFigcaption(_ _ctx: String, _ _text: String) -> VisitResult { return .continue_ }
+    func visitFigureEnd(_ _ctx: String, _ _output: String) -> VisitResult { return .continue_ }
+}
+
+/// Opaque wrapper that swift-bridge retains on the Rust side.
+/// Each `alef_*` method is called by the Rust extern "Swift" machinery;
+/// it delegates to the inner `HtmlVisitorProtocol` conformer.
+public final class SwiftHtmlVisitorBox {
+    private let inner: any HtmlVisitorProtocol
+    public init(_ inner: any HtmlVisitorProtocol) { self.inner = inner }
+    public func alef_visit_text(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitText(ctx, text)
+    }
+    public func alef_visit_element_start(_ ctx: String) -> VisitResult {
+        return inner.visitElementStart(ctx)
+    }
+    public func alef_visit_element_end(_ ctx: String, _ output: String) -> VisitResult {
+        return inner.visitElementEnd(ctx, output)
+    }
+    public func alef_visit_link(_ ctx: String, _ href: String, _ text: String, _ title: String?) -> VisitResult {
+        return inner.visitLink(ctx, href, text, title)
+    }
+    public func alef_visit_image(_ ctx: String, _ src: String, _ alt: String, _ title: String?) -> VisitResult {
+        return inner.visitImage(ctx, src, alt, title)
+    }
+    public func alef_visit_heading(_ ctx: String, _ level: UInt32, _ text: String, _ id: String?) -> VisitResult {
+        return inner.visitHeading(ctx, level, text, id)
+    }
+    public func alef_visit_code_block(_ ctx: String, _ lang: String?, _ code: String) -> VisitResult {
+        return inner.visitCodeBlock(ctx, lang, code)
+    }
+    public func alef_visit_code_inline(_ ctx: String, _ code: String) -> VisitResult {
+        return inner.visitCodeInline(ctx, code)
+    }
+    public func alef_visit_list_item(_ ctx: String, _ ordered: Bool, _ marker: String, _ text: String) -> VisitResult {
+        return inner.visitListItem(ctx, ordered, marker, text)
+    }
+    public func alef_visit_list_start(_ ctx: String, _ ordered: Bool) -> VisitResult {
+        return inner.visitListStart(ctx, ordered)
+    }
+    public func alef_visit_list_end(_ ctx: String, _ ordered: Bool, _ output: String) -> VisitResult {
+        return inner.visitListEnd(ctx, ordered, output)
+    }
+    public func alef_visit_table_start(_ ctx: String) -> VisitResult {
+        return inner.visitTableStart(ctx)
+    }
+    public func alef_visit_table_row(_ ctx: String, _ cells: RustVec<String>, _ is_header: Bool) -> VisitResult {
+        return inner.visitTableRow(ctx, cells, is_header)
+    }
+    public func alef_visit_table_end(_ ctx: String, _ output: String) -> VisitResult {
+        return inner.visitTableEnd(ctx, output)
+    }
+    public func alef_visit_blockquote(_ ctx: String, _ content: String, _ depth: Int) -> VisitResult {
+        return inner.visitBlockquote(ctx, content, depth)
+    }
+    public func alef_visit_strong(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitStrong(ctx, text)
+    }
+    public func alef_visit_emphasis(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitEmphasis(ctx, text)
+    }
+    public func alef_visit_strikethrough(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitStrikethrough(ctx, text)
+    }
+    public func alef_visit_underline(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitUnderline(ctx, text)
+    }
+    public func alef_visit_subscript(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitSubscript(ctx, text)
+    }
+    public func alef_visit_superscript(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitSuperscript(ctx, text)
+    }
+    public func alef_visit_mark(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitMark(ctx, text)
+    }
+    public func alef_visit_line_break(_ ctx: String) -> VisitResult {
+        return inner.visitLineBreak(ctx)
+    }
+    public func alef_visit_horizontal_rule(_ ctx: String) -> VisitResult {
+        return inner.visitHorizontalRule(ctx)
+    }
+    public func alef_visit_custom_element(_ ctx: String, _ tag_name: String, _ html: String) -> VisitResult {
+        return inner.visitCustomElement(ctx, tag_name, html)
+    }
+    public func alef_visit_definition_list_start(_ ctx: String) -> VisitResult {
+        return inner.visitDefinitionListStart(ctx)
+    }
+    public func alef_visit_definition_term(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitDefinitionTerm(ctx, text)
+    }
+    public func alef_visit_definition_description(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitDefinitionDescription(ctx, text)
+    }
+    public func alef_visit_definition_list_end(_ ctx: String, _ output: String) -> VisitResult {
+        return inner.visitDefinitionListEnd(ctx, output)
+    }
+    public func alef_visit_form(_ ctx: String, _ action: String?, _ method: String?) -> VisitResult {
+        return inner.visitForm(ctx, action, method)
+    }
+    public func alef_visit_input(_ ctx: String, _ input_type: String, _ name: String?, _ value: String?) -> VisitResult {
+        return inner.visitInput(ctx, input_type, name, value)
+    }
+    public func alef_visit_button(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitButton(ctx, text)
+    }
+    public func alef_visit_audio(_ ctx: String, _ src: String?) -> VisitResult {
+        return inner.visitAudio(ctx, src)
+    }
+    public func alef_visit_video(_ ctx: String, _ src: String?) -> VisitResult {
+        return inner.visitVideo(ctx, src)
+    }
+    public func alef_visit_iframe(_ ctx: String, _ src: String?) -> VisitResult {
+        return inner.visitIframe(ctx, src)
+    }
+    public func alef_visit_details(_ ctx: String, _ open: Bool) -> VisitResult {
+        return inner.visitDetails(ctx, open)
+    }
+    public func alef_visit_summary(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitSummary(ctx, text)
+    }
+    public func alef_visit_figure_start(_ ctx: String) -> VisitResult {
+        return inner.visitFigureStart(ctx)
+    }
+    public func alef_visit_figcaption(_ ctx: String, _ text: String) -> VisitResult {
+        return inner.visitFigcaption(ctx, text)
+    }
+    public func alef_visit_figure_end(_ ctx: String, _ output: String) -> VisitResult {
+        return inner.visitFigureEnd(ctx, output)
+    }
+}
+
+/// Wrap a `HtmlVisitorProtocol` conformer in an opaque `VisitorHandle` handle
+/// that can be passed to `conversionOptionsFromJsonWithVisitor(...)` on the Rust side.
+public func makeHtmlVisitorHandle(_ visitor: any HtmlVisitorProtocol) -> VisitorHandle {
+    return RustBridge.makeHtmlVisitorHandle(SwiftHtmlVisitorBox(visitor))
 }

@@ -54,7 +54,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.0.7
+    rev: v1.0.8
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -145,6 +145,8 @@ repos:
       - id: detekt
         files: ^packages/kotlin-android/.*\.kts?$
         args: ["--build-upon-default-config"]
+      - id: ktlint
+        files: ^packages/kotlin-android/.*\.kts?$
       - id: swift-format
         files: ^packages/swift/.*\.swift$
       - id: swiftlint

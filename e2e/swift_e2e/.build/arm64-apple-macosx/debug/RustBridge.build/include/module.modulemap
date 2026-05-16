@@ -1,0 +1,3 @@
+module RustBridge {
+    header "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/e2e/swift_e2e/.build/arm64-apple-macosx/debug/RustBridge.build/include/RustBridge-Swift.h"
+}

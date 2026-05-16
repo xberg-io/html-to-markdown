@@ -7,7 +7,8 @@
     clippy::manual_flatten,
     clippy::too_many_arguments,
     clippy::unit_arg,
-    clippy::type_complexity
+    clippy::type_complexity,
+    clippy::useless_conversion
 )]
 mod frb_generated;
 pub use flutter_rust_bridge::DartFnFuture;
@@ -123,6 +124,18 @@ pub struct ConversionOptionsBuilder {
     pub(crate) inner: html_to_markdown_rs::options::ConversionOptionsBuilder,
 }
 
+impl From<html_to_markdown_rs::options::ConversionOptionsBuilder> for ConversionOptionsBuilder {
+    fn from(inner: html_to_markdown_rs::options::ConversionOptionsBuilder) -> Self {
+        Self { inner }
+    }
+}
+
+impl From<ConversionOptionsBuilder> for html_to_markdown_rs::options::ConversionOptionsBuilder {
+    fn from(value: ConversionOptionsBuilder) -> Self {
+        value.inner
+    }
+}
+
 #[frb(mirror(ConversionOptionsUpdate))]
 pub struct ConversionOptionsUpdate {
     pub heading_style: Option<HeadingStyle>,
@@ -163,7 +176,7 @@ pub struct ConversionOptionsUpdate {
     pub max_image_size: Option<i64>,
     pub capture_svg: Option<bool>,
     pub infer_dimensions: Option<bool>,
-    pub max_depth: Option<Option<i64>>,
+    pub max_depth: Option<i64>,
     pub exclude_selectors: Option<Vec<String>>,
     pub visitor: Option<VisitorHandle>,
 }
@@ -251,6 +264,18 @@ pub struct VisitorHandle {
     pub(crate) inner: html_to_markdown_rs::visitor::VisitorHandle,
 }
 
+impl From<html_to_markdown_rs::visitor::VisitorHandle> for VisitorHandle {
+    fn from(inner: html_to_markdown_rs::visitor::VisitorHandle) -> Self {
+        Self { inner }
+    }
+}
+
+impl From<VisitorHandle> for html_to_markdown_rs::visitor::VisitorHandle {
+    fn from(value: VisitorHandle) -> Self {
+        value.inner
+    }
+}
+
 #[frb(mirror(NodeContext))]
 pub struct NodeContext {
     pub node_type: NodeType,
@@ -262,39 +287,35 @@ pub struct NodeContext {
     pub is_inline: bool,
 }
 
-#[allow(unused_imports)]
-use html_to_markdown_rs::visitor::VisitorHandle;
 impl ConversionOptionsBuilder {
     #[frb]
-    pub fn strip_tags(&self, tags: Vec<String>) -> ConversionOptionsBuilder {
+    pub fn strip_tags(self, tags: Vec<String>) -> ConversionOptionsBuilder {
         (|v| ConversionOptionsBuilder::from(v))(self.inner.strip_tags(tags))
     }
     #[frb]
-    pub fn preserve_tags(&self, tags: Vec<String>) -> ConversionOptionsBuilder {
+    pub fn preserve_tags(self, tags: Vec<String>) -> ConversionOptionsBuilder {
         (|v| ConversionOptionsBuilder::from(v))(self.inner.preserve_tags(tags))
     }
     #[frb]
-    pub fn keep_inline_images_in(&self, tags: Vec<String>) -> ConversionOptionsBuilder {
+    pub fn keep_inline_images_in(self, tags: Vec<String>) -> ConversionOptionsBuilder {
         (|v| ConversionOptionsBuilder::from(v))(self.inner.keep_inline_images_in(tags))
     }
     #[frb]
-    pub fn exclude_selectors(&self, selectors: Vec<String>) -> ConversionOptionsBuilder {
+    pub fn exclude_selectors(self, selectors: Vec<String>) -> ConversionOptionsBuilder {
         (|v| ConversionOptionsBuilder::from(v))(self.inner.exclude_selectors(selectors))
     }
     #[frb]
-    pub fn visitor(&self, visitor: Option<VisitorHandle>) -> ConversionOptionsBuilder {
-        (|v| ConversionOptionsBuilder::from(v))(self.inner.visitor(
-            visitor.map(|v| unsafe { ::std::mem::transmute::<VisitorHandle, html_to_markdown_rs::VisitorHandle>(v) }),
-        ))
+    pub fn visitor(self, visitor: Option<VisitorHandle>) -> ConversionOptionsBuilder {
+        (|v| ConversionOptionsBuilder::from(v))(self.inner.visitor(visitor.map(|h| h.inner)))
     }
     #[frb]
-    pub fn preprocessing(&self, preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder {
+    pub fn preprocessing(self, preprocessing: PreprocessingOptions) -> ConversionOptionsBuilder {
         (|v| ConversionOptionsBuilder::from(v))(self.inner.preprocessing(unsafe {
             ::std::mem::transmute::<PreprocessingOptions, html_to_markdown_rs::PreprocessingOptions>(preprocessing)
         }))
     }
     #[frb]
-    pub fn build(&self) -> ConversionOptions {
+    pub fn build(self) -> ConversionOptions {
         (|v| ConversionOptions::from(v))(self.inner.build())
     }
 }
@@ -562,7 +583,7 @@ pub enum VisitResult {
     Error { field0: String },
 }
 
-// From<kreuzberg::T> conversions for bridge return types.
+// From<SourceT> conversions for bridge return types.
 
 impl From<html_to_markdown_rs::metadata::DocumentMetadata> for DocumentMetadata {
     fn from(v: html_to_markdown_rs::metadata::DocumentMetadata) -> Self {
@@ -586,7 +607,7 @@ impl From<html_to_markdown_rs::metadata::HeaderMetadata> for HeaderMetadata {
     fn from(v: html_to_markdown_rs::metadata::HeaderMetadata) -> Self {
         HeaderMetadata {
             level: v.level as _,
-            text: v.text,
+            text: v.text.into(),
             id: v.id.map(|s| s.into()),
             depth: v.depth as _,
             html_offset: v.html_offset as _,
@@ -597,8 +618,8 @@ impl From<html_to_markdown_rs::metadata::HeaderMetadata> for HeaderMetadata {
 impl From<html_to_markdown_rs::metadata::LinkMetadata> for LinkMetadata {
     fn from(v: html_to_markdown_rs::metadata::LinkMetadata) -> Self {
         LinkMetadata {
-            href: v.href,
-            text: v.text,
+            href: v.href.into(),
+            text: v.text.into(),
             title: v.title.map(|s| s.into()),
             link_type: LinkType::from(v.link_type),
             rel: v.rel.into_iter().map(|s| s.into()).collect(),
@@ -610,7 +631,7 @@ impl From<html_to_markdown_rs::metadata::LinkMetadata> for LinkMetadata {
 impl From<html_to_markdown_rs::metadata::ImageMetadata> for ImageMetadata {
     fn from(v: html_to_markdown_rs::metadata::ImageMetadata) -> Self {
         ImageMetadata {
-            src: v.src,
+            src: v.src.into(),
             alt: v.alt.map(|s| s.into()),
             title: v.title.map(|s| s.into()),
             dimensions: Default::default(),
@@ -624,7 +645,7 @@ impl From<html_to_markdown_rs::metadata::StructuredData> for StructuredData {
     fn from(v: html_to_markdown_rs::metadata::StructuredData) -> Self {
         StructuredData {
             data_type: StructuredDataType::from(v.data_type),
-            raw_json: v.raw_json,
+            raw_json: v.raw_json.into(),
             schema_type: v.schema_type.map(|s| s.into()),
         }
     }
@@ -648,13 +669,13 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             heading_style: HeadingStyle::from(v.heading_style),
             list_indent_type: ListIndentType::from(v.list_indent_type),
             list_indent_width: v.list_indent_width as _,
-            bullets: v.bullets,
-            strong_em_symbol: v.strong_em_symbol,
+            bullets: v.bullets.into(),
+            strong_em_symbol: v.strong_em_symbol.to_string(),
             escape_asterisks: v.escape_asterisks as _,
             escape_underscores: v.escape_underscores as _,
             escape_misc: v.escape_misc as _,
             escape_ascii: v.escape_ascii as _,
-            code_language: v.code_language,
+            code_language: v.code_language.into(),
             autolinks: v.autolinks as _,
             default_title: v.default_title as _,
             br_in_tables: v.br_in_tables as _,
@@ -665,13 +686,13 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             wrap: v.wrap as _,
             wrap_width: v.wrap_width as _,
             convert_as_inline: v.convert_as_inline as _,
-            sub_symbol: v.sub_symbol,
-            sup_symbol: v.sup_symbol,
+            sub_symbol: v.sub_symbol.into(),
+            sup_symbol: v.sup_symbol.into(),
             newline_style: NewlineStyle::from(v.newline_style),
             code_block_style: CodeBlockStyle::from(v.code_block_style),
             keep_inline_images_in: v.keep_inline_images_in.into_iter().map(|s| s.into()).collect(),
             preprocessing: PreprocessingOptions::from(v.preprocessing),
-            encoding: v.encoding,
+            encoding: v.encoding.into(),
             debug: v.debug as _,
             strip_tags: v.strip_tags.into_iter().map(|s| s.into()).collect(),
             preserve_tags: v.preserve_tags.into_iter().map(|s| s.into()).collect(),
@@ -697,7 +718,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             list_indent_type: v.list_indent_type.map(ListIndentType::from),
             list_indent_width: v.list_indent_width.map(|x| x as _),
             bullets: v.bullets.map(|s| s.into()),
-            strong_em_symbol: v.strong_em_symbol.map(|s| s.into()),
+            strong_em_symbol: v.strong_em_symbol.map(|c| c.to_string()),
             escape_asterisks: v.escape_asterisks.map(|x| x as _),
             escape_underscores: v.escape_underscores.map(|x| x as _),
             escape_misc: v.escape_misc.map(|x| x as _),
@@ -733,7 +754,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             max_image_size: v.max_image_size.map(|x| x as _),
             capture_svg: v.capture_svg.map(|x| x as _),
             infer_dimensions: v.infer_dimensions.map(|x| x as _),
-            max_depth: v.max_depth,
+            max_depth: v.max_depth.flatten().map(|x| x as _),
             exclude_selectors: v
                 .exclude_selectors
                 .map(|vec| vec.into_iter().map(|s| s.into()).collect()),
@@ -776,7 +797,7 @@ impl From<html_to_markdown_rs::DocumentStructure> for DocumentStructure {
 impl From<html_to_markdown_rs::DocumentNode> for DocumentNode {
     fn from(v: html_to_markdown_rs::DocumentNode) -> Self {
         DocumentNode {
-            id: v.id,
+            id: v.id.into(),
             content: NodeContent::from(v.content),
             parent: v.parent.map(|x| x as _),
             children: v.children.into_iter().map(|x| x as _).collect(),
@@ -824,7 +845,7 @@ impl From<html_to_markdown_rs::TableGrid> for TableGrid {
 impl From<html_to_markdown_rs::GridCell> for GridCell {
     fn from(v: html_to_markdown_rs::GridCell) -> Self {
         GridCell {
-            content: v.content,
+            content: v.content.into(),
             row: v.row as _,
             col: v.col as _,
             row_span: v.row_span as _,
@@ -838,7 +859,7 @@ impl From<html_to_markdown_rs::TableData> for TableData {
     fn from(v: html_to_markdown_rs::TableData) -> Self {
         TableData {
             grid: TableGrid::from(v.grid),
-            markdown: v.markdown,
+            markdown: v.markdown.into(),
         }
     }
 }
@@ -846,7 +867,7 @@ impl From<html_to_markdown_rs::TableData> for TableData {
 impl From<html_to_markdown_rs::ProcessingWarning> for ProcessingWarning {
     fn from(v: html_to_markdown_rs::ProcessingWarning) -> Self {
         ProcessingWarning {
-            message: v.message,
+            message: v.message.into(),
             kind: WarningKind::from(v.kind),
         }
     }
@@ -856,7 +877,7 @@ impl From<html_to_markdown_rs::NodeContext> for NodeContext {
     fn from(v: html_to_markdown_rs::NodeContext) -> Self {
         NodeContext {
             node_type: NodeType::from(v.node_type),
-            tag_name: v.tag_name,
+            tag_name: v.tag_name.into(),
             attributes: v.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
             depth: v.depth as _,
             index_in_parent: v.index_in_parent as _,
@@ -1002,11 +1023,11 @@ impl From<html_to_markdown_rs::NodeContent> for NodeContent {
         match v {
             html_to_markdown_rs::NodeContent::Heading { level, text } => NodeContent::Heading {
                 level: level as _,
-                text: text.into(),
+                text,
             },
-            html_to_markdown_rs::NodeContent::Paragraph { text } => NodeContent::Paragraph { text: text.into() },
+            html_to_markdown_rs::NodeContent::Paragraph { text } => NodeContent::Paragraph { text },
             html_to_markdown_rs::NodeContent::List { ordered } => NodeContent::List { ordered: ordered as _ },
-            html_to_markdown_rs::NodeContent::ListItem { text } => NodeContent::ListItem { text: text.into() },
+            html_to_markdown_rs::NodeContent::ListItem { text } => NodeContent::ListItem { text },
             html_to_markdown_rs::NodeContent::Table { grid } => NodeContent::Table {
                 grid: TableGrid::from(grid),
             },
@@ -1020,19 +1041,15 @@ impl From<html_to_markdown_rs::NodeContent> for NodeContent {
                 image_index: image_index.map(|x| x as _).unwrap_or_default(),
             },
             html_to_markdown_rs::NodeContent::Code { text, language } => NodeContent::Code {
-                text: text.into(),
+                text,
                 language: language.unwrap_or_default(),
             },
             html_to_markdown_rs::NodeContent::Quote => NodeContent::Quote,
             html_to_markdown_rs::NodeContent::DefinitionList => NodeContent::DefinitionList,
-            html_to_markdown_rs::NodeContent::DefinitionItem { term, definition } => NodeContent::DefinitionItem {
-                term: term.into(),
-                definition: definition.into(),
-            },
-            html_to_markdown_rs::NodeContent::RawBlock { format, content } => NodeContent::RawBlock {
-                format: format.into(),
-                content: content.into(),
-            },
+            html_to_markdown_rs::NodeContent::DefinitionItem { term, definition } => {
+                NodeContent::DefinitionItem { term, definition }
+            }
+            html_to_markdown_rs::NodeContent::RawBlock { format, content } => NodeContent::RawBlock { format, content },
             html_to_markdown_rs::NodeContent::MetadataBlock { entries } => NodeContent::MetadataBlock {
                 entries: entries
                     .into_iter()
@@ -1064,7 +1081,7 @@ impl From<html_to_markdown_rs::AnnotationKind> for AnnotationKind {
             html_to_markdown_rs::AnnotationKind::Superscript => AnnotationKind::Superscript,
             html_to_markdown_rs::AnnotationKind::Highlight => AnnotationKind::Highlight,
             html_to_markdown_rs::AnnotationKind::Link { url, title } => AnnotationKind::Link {
-                url: url.into(),
+                url,
                 title: title.unwrap_or_default(),
             },
         }
@@ -1183,18 +1200,19 @@ impl From<html_to_markdown_rs::VisitResult> for VisitResult {
     fn from(v: html_to_markdown_rs::VisitResult) -> Self {
         match v {
             html_to_markdown_rs::VisitResult::Continue => VisitResult::Continue,
-            html_to_markdown_rs::VisitResult::Custom(f0) => VisitResult::Custom { field0: f0.into() },
+            html_to_markdown_rs::VisitResult::Custom(f0) => VisitResult::Custom { field0: f0 },
             html_to_markdown_rs::VisitResult::Skip => VisitResult::Skip,
             html_to_markdown_rs::VisitResult::PreserveHtml => VisitResult::PreserveHtml,
-            html_to_markdown_rs::VisitResult::Error(f0) => VisitResult::Error { field0: f0.into() },
+            html_to_markdown_rs::VisitResult::Error(f0) => VisitResult::Error { field0: f0 },
         }
     }
 }
 
-// From<T> for kreuzberg::T conversions (mirror-to-core direction).
+// From<T> for SourceT conversions (mirror-to-core direction).
 // Used in bridge functions for types with sanitized fields, and by
 // nested conversions within those types.
 
+#[allow(clippy::needless_update)]
 impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions {
     fn from(v: ConversionOptions) -> Self {
         html_to_markdown_rs::options::ConversionOptions {
@@ -1202,7 +1220,7 @@ impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions
             list_indent_type: v.list_indent_type.into(),
             list_indent_width: v.list_indent_width as _,
             bullets: v.bullets.into(),
-            strong_em_symbol: v.strong_em_symbol.into(),
+            strong_em_symbol: v.strong_em_symbol.chars().next().unwrap_or_default(),
             escape_asterisks: v.escape_asterisks as _,
             escape_underscores: v.escape_underscores as _,
             escape_misc: v.escape_misc as _,
@@ -1342,6 +1360,18 @@ impl From<OutputFormat> for html_to_markdown_rs::options::OutputFormat {
     }
 }
 
+impl From<VisitResult> for html_to_markdown_rs::VisitResult {
+    fn from(v: VisitResult) -> Self {
+        match v {
+            VisitResult::Continue => html_to_markdown_rs::VisitResult::Continue,
+            VisitResult::Custom { field0 } => html_to_markdown_rs::VisitResult::Custom(field0),
+            VisitResult::Skip => html_to_markdown_rs::VisitResult::Skip,
+            VisitResult::PreserveHtml => html_to_markdown_rs::VisitResult::PreserveHtml,
+            VisitResult::Error { field0 } => html_to_markdown_rs::VisitResult::Error(field0),
+        }
+    }
+}
+
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
 ///
@@ -1353,7 +1383,7 @@ pub fn convert(html: String, options: Option<ConversionOptions>) -> Result<Conve
         &html,
         options.map(html_to_markdown_rs::options::ConversionOptions::from),
     )
-    .map(|v| ConversionResult::from(v))
+    .map(ConversionResult::from)
     .map_err(|e| e.to_string())
 }
 
@@ -1492,14 +1522,754 @@ pub fn create_node_context_from_json(json: String) -> Result<NodeContext, String
         .map_err(|e| e.to_string())
 }
 
-/// FRB opaque handle holding Dart callbacks for each trait method.
-/// Dart-side: register callbacks via `create_{snake}_dart_impl(...)` factory.
-#[frb(opaque)]
-pub struct HtmlVisitorDartImpl {}
+/// Internal Rust-side storage for Dart-provided visitor callbacks.
+/// Not exposed via FRB (private to the bridge crate); the public factory
+/// `create_{trait_snake}(...)` wraps this in the trait's configured `type_alias`
+/// (e.g. `VisitorHandle`) which FRB does expose as opaque.
+struct HtmlVisitorDartImpl {
+    visit_text: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_element_start: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_element_end: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_link: Box<
+        dyn Fn(NodeContext, String, String, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
+            + Send
+            + Sync,
+    >,
+    visit_image: Box<
+        dyn Fn(NodeContext, String, String, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
+            + Send
+            + Sync,
+    >,
+    visit_heading: Box<
+        dyn Fn(NodeContext, i64, String, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
+            + Send
+            + Sync,
+    >,
+    visit_code_block: Box<
+        dyn Fn(NodeContext, Option<String>, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync,
+    >,
+    visit_code_inline: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_list_item:
+        Box<dyn Fn(NodeContext, bool, String, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_list_start: Box<dyn Fn(NodeContext, bool) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_list_end:
+        Box<dyn Fn(NodeContext, bool, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_table_start: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_table_row:
+        Box<dyn Fn(NodeContext, Vec<String>, bool) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_table_end: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_blockquote:
+        Box<dyn Fn(NodeContext, String, i64) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_strong: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_emphasis: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_strikethrough:
+        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_underline: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_subscript: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_superscript: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_mark: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_line_break: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_horizontal_rule: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_custom_element:
+        Box<dyn Fn(NodeContext, String, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_list_start:
+        Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_term:
+        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_description:
+        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_list_end:
+        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_form: Box<
+        dyn Fn(NodeContext, Option<String>, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
+            + Send
+            + Sync,
+    >,
+    visit_input: Box<
+        dyn Fn(NodeContext, String, Option<String>, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
+            + Send
+            + Sync,
+    >,
+    visit_button: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_audio:
+        Box<dyn Fn(NodeContext, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_video:
+        Box<dyn Fn(NodeContext, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_iframe:
+        Box<dyn Fn(NodeContext, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_details: Box<dyn Fn(NodeContext, bool) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_summary: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_figure_start: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_figcaption: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_figure_end: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+}
+impl ::std::fmt::Debug for HtmlVisitorDartImpl {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.debug_struct("HtmlVisitorDartImpl").finish_non_exhaustive()
+    }
+}
 
-impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {}
+impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
+    fn visit_text(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_text)(_ctx, _text).await });
+        __result.into()
+    }
 
-/// Create a `HtmlVisitorDartImpl` from Dart callback closures.
-pub fn create_html_visitor_dart_impl() -> HtmlVisitorDartImpl {
-    HtmlVisitorDartImpl {}
+    fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_element_start)(_ctx).await });
+        __result.into()
+    }
+
+    fn visit_element_end(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _output = _output.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_element_end)(_ctx, _output).await });
+        __result.into()
+    }
+
+    fn visit_link(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _href: &str,
+        _text: &str,
+        _title: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _href = _href.to_string();
+        let _text = _text.to_string();
+        let _title = _title.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_link)(_ctx, _href, _text, _title).await });
+        __result.into()
+    }
+
+    fn visit_image(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _src: &str,
+        _alt: &str,
+        _title: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _src = _src.to_string();
+        let _alt = _alt.to_string();
+        let _title = _title.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_image)(_ctx, _src, _alt, _title).await });
+        __result.into()
+    }
+
+    fn visit_heading(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _level: u32,
+        _text: &str,
+        _id: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _level = _level as i64;
+        let _text = _text.to_string();
+        let _id = _id.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_heading)(_ctx, _level, _text, _id).await });
+        __result.into()
+    }
+
+    fn visit_code_block(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _lang: Option<&str>,
+        _code: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _lang = _lang.map(|x| x.to_string());
+        let _code = _code.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_code_block)(_ctx, _lang, _code).await });
+        __result.into()
+    }
+
+    fn visit_code_inline(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _code: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _code = _code.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_code_inline)(_ctx, _code).await });
+        __result.into()
+    }
+
+    fn visit_list_item(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _ordered: bool,
+        _marker: &str,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _marker = _marker.to_string();
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_list_item)(_ctx, _ordered, _marker, _text).await });
+        __result.into()
+    }
+
+    fn visit_list_start(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _ordered: bool,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_list_start)(_ctx, _ordered).await });
+        __result.into()
+    }
+
+    fn visit_list_end(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _ordered: bool,
+        _output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _output = _output.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_list_end)(_ctx, _ordered, _output).await });
+        __result.into()
+    }
+
+    fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_table_start)(_ctx).await });
+        __result.into()
+    }
+
+    fn visit_table_row(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _cells: &[String],
+        _is_header: bool,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _cells = _cells.to_vec();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_table_row)(_ctx, _cells, _is_header).await });
+        __result.into()
+    }
+
+    fn visit_table_end(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _output = _output.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_table_end)(_ctx, _output).await });
+        __result.into()
+    }
+
+    fn visit_blockquote(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _content: &str,
+        _depth: usize,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _content = _content.to_string();
+        let _depth = _depth as i64;
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_blockquote)(_ctx, _content, _depth).await });
+        __result.into()
+    }
+
+    fn visit_strong(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_strong)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_emphasis(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_emphasis)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_strikethrough(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_strikethrough)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_underline(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_underline)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_subscript(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_subscript)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_superscript(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_superscript)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_mark(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_mark)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_line_break)(_ctx).await });
+        __result.into()
+    }
+
+    fn visit_horizontal_rule(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_horizontal_rule)(_ctx).await });
+        __result.into()
+    }
+
+    fn visit_custom_element(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _tag_name: &str,
+        _html: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _tag_name = _tag_name.to_string();
+        let _html = _html.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_custom_element)(_ctx, _tag_name, _html).await });
+        __result.into()
+    }
+
+    fn visit_definition_list_start(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_definition_list_start)(_ctx).await });
+        __result.into()
+    }
+
+    fn visit_definition_term(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_definition_term)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_definition_description(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_definition_description)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_definition_list_end(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _output = _output.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_definition_list_end)(_ctx, _output).await });
+        __result.into()
+    }
+
+    fn visit_form(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _action: Option<&str>,
+        _method: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _action = _action.map(|x| x.to_string());
+        let _method = _method.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_form)(_ctx, _action, _method).await });
+        __result.into()
+    }
+
+    fn visit_input(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _input_type: &str,
+        _name: Option<&str>,
+        _value: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _input_type = _input_type.to_string();
+        let _name = _name.map(|x| x.to_string());
+        let _value = _value.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_input)(_ctx, _input_type, _name, _value).await });
+        __result.into()
+    }
+
+    fn visit_button(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_button)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_audio(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _src: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _src = _src.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_audio)(_ctx, _src).await });
+        __result.into()
+    }
+
+    fn visit_video(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _src: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _src = _src.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_video)(_ctx, _src).await });
+        __result.into()
+    }
+
+    fn visit_iframe(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _src: Option<&str>,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _src = _src.map(|x| x.to_string());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_iframe)(_ctx, _src).await });
+        __result.into()
+    }
+
+    fn visit_details(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _open: bool,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_details)(_ctx, _open).await });
+        __result.into()
+    }
+
+    fn visit_summary(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_summary)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_figure_start)(_ctx).await });
+        __result.into()
+    }
+
+    fn visit_figcaption(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _text = _text.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_figcaption)(_ctx, _text).await });
+        __result.into()
+    }
+
+    fn visit_figure_end(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext,
+        _output: &str,
+    ) -> html_to_markdown_rs::VisitResult {
+        let _ctx = NodeContext::from(_ctx.clone());
+        let _output = _output.to_string();
+        let __result = ::tokio::runtime::Builder::new_current_thread()
+            .build()
+            .expect("build alef visitor tokio runtime")
+            .block_on(async { (self.visit_figure_end)(_ctx, _output).await });
+        __result.into()
+    }
+}
+
+/// Construct a `VisitorHandle` from Dart callback closures.
+/// FRB synthesises a Dart-callable function type for each closure parameter,
+/// which is the whole point of taking them as `impl Fn(...) -> DartFnFuture<R>`
+/// parameters rather than storing them as `Box<dyn Fn(...)>` fields on an
+/// opaque struct (FRB v2 cannot generate callable closure types in that shape).
+pub async fn create_html_visitor(
+    visit_text: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_element_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_element_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_link: impl Fn(NodeContext, String, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_image: impl Fn(NodeContext, String, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_heading: impl Fn(NodeContext, i64, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_code_block: impl Fn(NodeContext, Option<String>, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_code_inline: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_list_item: impl Fn(NodeContext, bool, String, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_list_start: impl Fn(NodeContext, bool) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_list_end: impl Fn(NodeContext, bool, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_table_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_table_row: impl Fn(NodeContext, Vec<String>, bool) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_table_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_blockquote: impl Fn(NodeContext, String, i64) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_strong: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_emphasis: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_strikethrough: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_underline: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_subscript: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_superscript: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_mark: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_line_break: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_horizontal_rule: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_custom_element: impl Fn(NodeContext, String, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_definition_list_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_definition_term: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_definition_description: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_definition_list_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_form: impl Fn(NodeContext, Option<String>, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_input: impl Fn(NodeContext, String, Option<String>, Option<String>) -> DartFnFuture<VisitResult>
+    + Send
+    + Sync
+    + 'static,
+    visit_button: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_audio: impl Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_video: impl Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_iframe: impl Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_details: impl Fn(NodeContext, bool) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_summary: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_figure_start: impl Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_figcaption: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+    visit_figure_end: impl Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync + 'static,
+) -> VisitorHandle {
+    let __impl = HtmlVisitorDartImpl {
+        visit_text: Box::new(visit_text),
+        visit_element_start: Box::new(visit_element_start),
+        visit_element_end: Box::new(visit_element_end),
+        visit_link: Box::new(visit_link),
+        visit_image: Box::new(visit_image),
+        visit_heading: Box::new(visit_heading),
+        visit_code_block: Box::new(visit_code_block),
+        visit_code_inline: Box::new(visit_code_inline),
+        visit_list_item: Box::new(visit_list_item),
+        visit_list_start: Box::new(visit_list_start),
+        visit_list_end: Box::new(visit_list_end),
+        visit_table_start: Box::new(visit_table_start),
+        visit_table_row: Box::new(visit_table_row),
+        visit_table_end: Box::new(visit_table_end),
+        visit_blockquote: Box::new(visit_blockquote),
+        visit_strong: Box::new(visit_strong),
+        visit_emphasis: Box::new(visit_emphasis),
+        visit_strikethrough: Box::new(visit_strikethrough),
+        visit_underline: Box::new(visit_underline),
+        visit_subscript: Box::new(visit_subscript),
+        visit_superscript: Box::new(visit_superscript),
+        visit_mark: Box::new(visit_mark),
+        visit_line_break: Box::new(visit_line_break),
+        visit_horizontal_rule: Box::new(visit_horizontal_rule),
+        visit_custom_element: Box::new(visit_custom_element),
+        visit_definition_list_start: Box::new(visit_definition_list_start),
+        visit_definition_term: Box::new(visit_definition_term),
+        visit_definition_description: Box::new(visit_definition_description),
+        visit_definition_list_end: Box::new(visit_definition_list_end),
+        visit_form: Box::new(visit_form),
+        visit_input: Box::new(visit_input),
+        visit_button: Box::new(visit_button),
+        visit_audio: Box::new(visit_audio),
+        visit_video: Box::new(visit_video),
+        visit_iframe: Box::new(visit_iframe),
+        visit_details: Box::new(visit_details),
+        visit_summary: Box::new(visit_summary),
+        visit_figure_start: Box::new(visit_figure_start),
+        visit_figcaption: Box::new(visit_figcaption),
+        visit_figure_end: Box::new(visit_figure_end),
+    };
+    let __inner: html_to_markdown_rs::visitor::VisitorHandle = std::sync::Arc::new(std::sync::Mutex::new(__impl));
+    VisitorHandle::from(__inner)
+}
+
+/// Build a `ConversionOptions` from a JSON blob and attach a Dart-built
+/// `VisitorHandle` to its `visitor` field. The mirror struct uses `final`
+/// dart fields, so callers cannot patch the visitor in after JSON load —
+/// this helper does the merge on the Rust side instead.
+#[frb]
+pub fn create_conversion_options_from_json_with_visitor(
+    json: String,
+    visitor: Option<VisitorHandle>,
+) -> Result<ConversionOptions, String> {
+    let mut __core: html_to_markdown_rs::options::ConversionOptions =
+        serde_json::from_str(&json).map_err(|e| e.to_string())?;
+    __core.visitor = visitor.map(<html_to_markdown_rs::visitor::VisitorHandle>::from);
+    Ok(ConversionOptions::from(__core))
 }

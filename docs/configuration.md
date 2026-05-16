@@ -6,8 +6,8 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 
 ### Output Format
 
-| Option          | Type                                              | Default      | Description                                                                                |
-| --------------- | ------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| Option          | Type                                  | Default      | Description                                                                                      |
+| --------------- | ------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------ |
 | `output_format` | `"markdown"` \| `"djot"` \| `"plain"` | `"markdown"` | Target output format. `"plain"` strips all markup and link targets, returning only visible text. |
 
 ### Headings
@@ -111,8 +111,8 @@ All options are passed via `ConversionOptions` (builder pattern in Rust, keyword
 
 ### Metadata Extraction
 
-| Option             | Type   | Default | Description                                                                        |
-| ------------------ | ------ | ------- | ---------------------------------------------------------------------------------- |
+| Option             | Type   | Default | Description                                                                                                                                                                                   |
+| ------------------ | ------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `extract_metadata` | `bool` | `true`  | Populate `result.metadata` (title, description, Open Graph, Twitter Card, JSON-LD, links, images). Table extraction into `result.tables` runs unconditionally — it is not gated by this flag. |
 
 ### Document Structure

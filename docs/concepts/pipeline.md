@@ -51,14 +51,14 @@ Whitespace normalization, trailing-newline cleanup, reference-style link definit
 
 Tables, inline images, metadata, and document structure are assembled into the final `ConversionResult`:
 
-| Field      | Type                          | Populated when                            |
-| ---------- | ----------------------------- | ----------------------------------------- |
-| `content`  | `Option<String>`              | always (None only for extraction-only)    |
-| `metadata` | `HtmlMetadata`                | always (feature `metadata` enabled)       |
-| `tables`   | `Vec<TableData>`              | always                                    |
-| `images`   | `Vec<InlineImage>`            | `extract_images: true`                    |
-| `document` | `Option<DocumentStructure>`   | `include_document_structure: true`        |
-| `warnings` | `Vec<ProcessingWarning>`      | always (non-fatal issues during the walk) |
+| Field      | Type                        | Populated when                            |
+| ---------- | --------------------------- | ----------------------------------------- |
+| `content`  | `Option<String>`            | always (None only for extraction-only)    |
+| `metadata` | `HtmlMetadata`              | always (feature `metadata` enabled)       |
+| `tables`   | `Vec<TableData>`            | always                                    |
+| `images`   | `Vec<InlineImage>`          | `extract_images: true`                    |
+| `document` | `Option<DocumentStructure>` | `include_document_structure: true`        |
+| `warnings` | `Vec<ProcessingWarning>`    | always (non-fatal issues during the walk) |
 
 ## Output formats
 

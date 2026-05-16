@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
   <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.4.1" alt="Go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3.5.0" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
     <img src="https://img.shields.io/nuget/v/KreuzbergDev.HtmlToMarkdown?label=C%23&color=007ec6" alt="C#">
@@ -64,16 +64,13 @@ High-performance HTML to Markdown converter with a clean Python API (powered by 
 The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
 stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
 
-
 ## Installation
 
 ```bash
 pip install html-to-markdown
 ```
 
-
 Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyPI.
-
 
 ## Performance Snapshot
 
@@ -83,7 +80,6 @@ Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyP
 | Lists (Timeline) | 129KB | 0.62ms | 208 MB/s |
 | Tables (Countries) | 360KB | 2.02ms | 178 MB/s |
 | Mixed (Python wiki) | 656KB | 4.56ms | 144 MB/s |
-
 
 ## Quick Start
 
@@ -96,7 +92,6 @@ html = "<h1>Hello</h1><p>This is <strong>fast</strong>!</p>"
 result = convert(html)
 markdown = result.content
 ```
-
 
 With conversion options:
 
@@ -112,11 +107,9 @@ result = convert(html, options)
 markdown = result.content
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`convert(html: str, options?: ConversionOptions, visitor?: object) -> ConversionResult`**
 
@@ -133,7 +126,6 @@ document = result.document          # Document-level info
 images   = result.images            # Extracted images
 warnings = result.warnings          # Any conversion warnings
 ```
-
 
 ### Options
 
@@ -167,7 +159,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -182,13 +173,11 @@ djot = convert(html, ConversionOptions(output_format="djot"))
 # Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```python
 from html_to_markdown import convert, ConversionOptions
@@ -199,9 +188,7 @@ plain = convert(html, ConversionOptions(output_format="plain"))
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -219,7 +206,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -233,7 +219,6 @@ print(result.metadata.links)                   # All hyperlinks
 print(result.metadata.images)                  # All images with alt text
 print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 ```
-
 
 ## Visitor Pattern
 
@@ -250,7 +235,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ```python
 from html_to_markdown import convert
@@ -272,7 +256,6 @@ html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 result = convert(html, visitor=MyVisitor())
 markdown = result.content
 ```
-
 
 ## Examples
 

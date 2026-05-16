@@ -1,0 +1,4 @@
+module RustBridgeC {
+    umbrella header "/Users/naamanhirschfeld/workspace/kreuzberg-dev/html-to-markdown/packages/swift/Sources/RustBridgeC/RustBridgeC.h"
+    export *
+}

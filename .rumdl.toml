@@ -27,7 +27,17 @@ exclude = [
 # MD046: Code block style (MkDocs tabs indent fenced blocks)
 # MD051: Link fragment checking (incompatible with MkDocs anchor generation)
 # MD076: Blank lines between list items (intentional formatting in READMEs)
-disable = ["MD012", "MD013", "MD024", "MD033", "MD036", "MD041", "MD046", "MD051", "MD076"]
+disable = [
+  "MD012",
+  "MD013",
+  "MD024",
+  "MD033",
+  "MD036",
+  "MD041",
+  "MD046",
+  "MD051",
+  "MD076",
+]
 
 # MD024: Allow duplicate heading names if they are not siblings
 [MD024]
