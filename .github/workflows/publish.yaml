@@ -93,7 +93,7 @@ jobs:
       release_zig: ${{ steps.meta.outputs.release_zig }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ (inputs.republish == true && (inputs.ref || github.event.repository.default_branch)) || inputs.ref || inputs.tag || github.ref }}
           fetch-depth: 0
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -462,7 +462,7 @@ jobs:
         # windows-11-arm: cibuildwheel does not yet support aarch64-pc-windows-msvc target
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -497,7 +497,7 @@ jobs:
             python scripts\prepare_wheel.py
           upload-artifact: "false"
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: python-wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
@@ -509,7 +509,7 @@ jobs:
     if: ${{ needs.prepare.outputs.release_python == 'true' && (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -532,7 +532,7 @@ jobs:
             || cp target/release/html-to-markdown.exe packages/python/html_to_markdown/_cli/
           cd packages/python && maturin sdist --out dist/
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: python-sdist
           path: packages/python/dist/*.tar.gz
@@ -544,7 +544,7 @@ jobs:
     if: ${{ needs.prepare.outputs.release_node == 'true' && (needs.check-npm.outputs.node_exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -565,7 +565,7 @@ jobs:
           mkdir -p typescript-defs
           cp crates/html-to-markdown-node/index.js crates/html-to-markdown-node/index.d.ts typescript-defs/
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: node-typescript-defs
           path: typescript-defs/
@@ -619,7 +619,7 @@ jobs:
               use_napi_cross: false,
             }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -646,7 +646,7 @@ jobs:
           use-napi-cross: ${{ matrix.use_napi_cross }}
           pack-target-tarball: node-bindings-${{ matrix.target }}.tar.gz
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: node-bindings-${{ matrix.target }}
           path: node-bindings-${{ matrix.target }}.tar.gz
@@ -659,7 +659,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -679,7 +679,7 @@ jobs:
           crate-dir: crates/html-to-markdown-wasm
           pack-tarball: "false"
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: wasm-bundle
           path: |
@@ -709,7 +709,7 @@ jobs:
           - { os: windows-latest, label: windows-x64 }
           # windows-11-arm: deferred until rb-sys + Magnus toolchain validated on aarch64-pc-windows-msvc
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -763,7 +763,7 @@ jobs:
         with:
           cache-key-prefix: publish-ruby-${{ matrix.label }}
 
-      - uses: ruby/setup-ruby@v1.308.0.308.0
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler: "4.0.3"
@@ -812,7 +812,7 @@ jobs:
             esac
           done
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: rubygems-${{ matrix.label }}
           path: packages/ruby/pkg/*.gem
@@ -836,7 +836,7 @@ jobs:
           - { os: windows-latest, label: windows-x86_64, target: x86_64-pc-windows-msvc }
           # windows-arm64: deferred until ext-php-rs cross-compile to aarch64-pc-windows-msvc is validated
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -882,7 +882,7 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
           output-dir: dist/php-package
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: php-package-${{ matrix.platform.label }}-php${{ matrix.php }}
           path: |
@@ -910,7 +910,7 @@ jobs:
           - { os: windows-latest, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, target: aarch64-pc-windows-msvc }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -956,7 +956,7 @@ jobs:
             tar -czf "${STAGE}.tar.gz" "$STAGE"
           fi
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: cli-${{ matrix.target }}
           path: |
@@ -982,7 +982,7 @@ jobs:
           - { os: windows-latest, platform: windows-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, platform: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -1009,7 +1009,7 @@ jobs:
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang go --target ${{ matrix.target }} -o dist/go-ffi
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: go-ffi-${{ matrix.platform }}
           path: dist/go-ffi
@@ -1032,7 +1032,7 @@ jobs:
           - { os: windows-latest, platform: windows-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, platform: windows-arm64, target: aarch64-pc-windows-msvc }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -1058,7 +1058,7 @@ jobs:
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang ffi --target ${{ matrix.target }} -o dist/c-ffi
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: c-ffi-${{ matrix.platform }}
           path: dist/c-ffi
@@ -1081,7 +1081,7 @@ jobs:
           - { os: windows-latest, platform: windows-x86_64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, platform: windows-aarch64, target: aarch64-pc-windows-msvc }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -1114,7 +1114,7 @@ jobs:
           done
           ls -la "dist/java-ffi/${{ matrix.platform }}/native/"
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: java-ffi-${{ matrix.platform }}
           path: dist/java-ffi
@@ -1138,7 +1138,7 @@ jobs:
           - { os: windows-latest, rid: win-x64, target: x86_64-pc-windows-msvc }
           - { os: windows-11-arm, rid: win-arm64, target: aarch64-pc-windows-msvc }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -1171,7 +1171,7 @@ jobs:
           done
           ls -la "dist/csharp-ffi/${{ matrix.rid }}/native/"
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: csharp-ffi-${{ matrix.rid }}
           path: dist/csharp-ffi
@@ -1193,7 +1193,7 @@ jobs:
           - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
           - { os: macos-15-intel, label: macos-x86_64, target: x86_64-apple-darwin }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -1235,7 +1235,7 @@ jobs:
             rm -f "${ARTIFACT}"
           done
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: elixir-${{ matrix.label }}
           path: dist/elixir/*.tar.gz
@@ -1250,13 +1250,13 @@ jobs:
     env:
       MIX_ENV: dev
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
           submodules: recursive
 
-      - uses: erlef/setup-beam@v1.24.0.24.0
+      - uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.19"
           otp-version: "28.1"
@@ -1280,7 +1280,7 @@ jobs:
           find packages/elixir/native -type d -name target -prune -exec rm -rf {} + 2>/dev/null || true
           (cd packages/elixir && mix hex.build)
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: elixir-hex-package
           path: packages/elixir/html_to_markdown-*.tar
@@ -1292,7 +1292,7 @@ jobs:
     if: ${{ needs.prepare.outputs.release_crates == 'true' && (needs.check-cratesio.outputs.all_exist != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
@@ -1320,7 +1320,7 @@ jobs:
             echo "::warning::Skipping html-to-markdown-cli crate packaging; html-to-markdown-rs ${RELEASE_VERSION} is not yet on crates.io."
           fi
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: cargo-crates
           path: crate-artifacts/*.crate
@@ -1334,7 +1334,7 @@ jobs:
     if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.cli-binaries.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: cli-*
           path: dist/cli
@@ -1355,7 +1355,7 @@ jobs:
     if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.go-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: go-ffi-*
           path: dist/go-ffi
@@ -1376,7 +1376,7 @@ jobs:
     if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.c-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: c-ffi-*
           path: dist/c-ffi
@@ -1397,7 +1397,7 @@ jobs:
     if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.elixir-natives.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: elixir-*
           path: dist/elixir
@@ -1416,7 +1416,7 @@ jobs:
     if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.php-extension.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: php-package-*
           path: dist/php-package
@@ -1444,7 +1444,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
@@ -1470,12 +1470,12 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: python-wheels-*
           path: dist
           merge-multiple: true
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           name: python-sdist
           path: dist
@@ -1494,13 +1494,13 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: rubygems-*
           path: dist
           merge-multiple: true
 
-      - uses: ruby/setup-ruby@v1.308.0.308.0
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
@@ -1525,18 +1525,18 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: node-bindings-*
           path: node-artifacts
           merge-multiple: true
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           name: node-typescript-defs
           path: typescript-defs
@@ -1673,12 +1673,12 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           name: wasm-bundle
           path: crates/html-to-markdown-wasm
@@ -1728,12 +1728,12 @@ jobs:
     if: ${{ needs.prepare.outputs.release_java == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.java-natives.result == 'success' && (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: java-ffi-*
           path: java-ffi-artifacts
@@ -1790,12 +1790,12 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: csharp-ffi-*
           path: dist/csharp-ffi
@@ -1840,12 +1840,12 @@ jobs:
     if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
 
-      - uses: erlef/setup-beam@v1.24.0.24.0
+      - uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.19"
           otp-version: "28.1"
@@ -1878,7 +1878,7 @@ jobs:
       matrix:
         abi: [arm64-v8a, x86_64]
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
@@ -1895,7 +1895,7 @@ jobs:
           lib-name: html_to_markdown_ffi
           abis: ${{ matrix.abi }}
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: kotlin-android-${{ matrix.abi }}
           path: target/android-libs/${{ matrix.abi }}/libhtml_to_markdown_ffi.so
@@ -1907,12 +1907,12 @@ jobs:
     if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven-kotlin.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           pattern: kotlin-android-*
           path: kotlin-android-artifacts
@@ -1947,7 +1947,7 @@ jobs:
     if: ${{ needs.prepare.outputs.release_swift == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-spi-swift.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
@@ -1968,7 +1968,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
@@ -1984,7 +1984,7 @@ jobs:
     if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-zig.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.ref }}
           submodules: recursive
@@ -2014,11 +2014,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           repository: kreuzberg-dev/homebrew-tap
           token: ${{ secrets.HOMEBREW_TOKEN }}
@@ -2069,7 +2069,7 @@ jobs:
           - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
           - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
@@ -2090,7 +2090,7 @@ jobs:
           github-repo: kreuzberg-dev/html-to-markdown
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/upload-artifact@v7
         with:
           name: homebrew-bottle-json-${{ matrix.bottle_tag }}
           path: ${{ github.workspace }}/bottle-json/*.json
@@ -2105,17 +2105,17 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 
-      - uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+      - uses: actions/checkout@v6
         with:
           repository: kreuzberg-dev/homebrew-tap
           token: ${{ secrets.HOMEBREW_TOKEN }}
           path: homebrew-tap
 
-      - uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+      - uses: actions/download-artifact@v8
         with:
           path: ${{ github.workspace }}/bottle-json
           pattern: homebrew-bottle-json-*

@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.16.24"
+alef_version = "0.16.29"
 languages = [
   "python",
   "node",
@@ -271,7 +271,16 @@ check = "cd packages/r && Rscript -e 'lintr::lint_dir(\"R\")'"
 
 [crates.lint.ffi]
 precondition = "test -d e2e/c"
-format = "find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
+# Chain alef's default Rust formatting (cargo fmt --all + cargo sort -w) with
+# the C e2e formatting. Without the cargo fmt step here, the consumer-level
+# `[crates.lint.ffi].format` override fully replaces alef's default formatter
+# for `Language::Ffi` — and since the default formatter is the one responsible
+# for workspace-wide Rust formatting (FFI/PyO3/NAPI/Magnus/ext-php-rs/Rustler/
+# wasm-bindgen all emit `.rs` files into the consumer workspace), every
+# alef-generated `.rs` file ships unformatted, and prek's `cargo fmt` hook
+# rewrites them after `alef finalize_hashes` runs, invalidating the embedded
+# hash and breaking `alef verify`.
+format = "cargo fmt --all && cargo sort -w >/dev/null && find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
 check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missingIncludeSystem --suppress=unusedStructMember e2e/c/"
 
 [crates.lint.kotlin_android]

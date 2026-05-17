@@ -43,9 +43,6 @@ importers:
       rollup:
         specifier: ^4.53.3
         version: 4.60.3
-      vite-plugin-wasm:
-        specifier: ^3.4.0
-        version: 3.6.0(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7))
       vitest:
         specifier: ^4.1.5
         version: 4.1.5(@types/node@25.8.0)(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7))
@@ -1449,11 +1446,6 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
-  vite-plugin-wasm@3.6.0:
-    resolution: {integrity: sha512-mL/QPziiIA4RAA6DkaZZzOstdwbW5jO4Vz7Zenj0wieKWBlNvIvX5L5ljum9lcUX0ShNfBgCNLKTjNkRVVqcsw==}
-    peerDependencies:
-      vite: ^2 || ^3 || ^4 || ^5 || ^6 || ^7 || ^8
-
   vite@7.3.3:
     resolution: {integrity: sha512-/4XH147Ui7OGTjg3HbdWe5arnZQSbfuRzdr9Ec7TQi5I7R+ir0Rlc9GIvD4v0XZurELqA035KVXJXpR61xhiTA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -2783,10 +2775,6 @@ snapshots:
       - terser
       - tsx
       - yaml
-
-  vite-plugin-wasm@3.6.0(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)):
-    dependencies:
-      vite: 8.0.10(@types/node@25.8.0)(esbuild@0.27.7)
 
   vite@7.3.3(@types/node@25.8.0)(lightningcss@1.32.0):
     dependencies:

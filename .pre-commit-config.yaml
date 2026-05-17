@@ -65,7 +65,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.10
+    rev: v1.1.11
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -253,12 +253,8 @@ repos:
         args: ["--minimum-tokens=120"]
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions.
-  # NOTE: pinned to v0.16.22 (not v0.16.23) because v0.16.23 was tagged
-  # without uploading platform binaries — the hook downloads the prebuilt
-  # tarball and 404s on that release. Bump again once a release with
-  # `alef-aarch64-apple-darwin.tar.gz` ships.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.24
+    rev: v0.16.25
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

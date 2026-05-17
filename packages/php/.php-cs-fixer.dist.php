@@ -7,14 +7,14 @@ declare(strict_types=1);
 // rule would otherwise rewrite into constructor-promoted properties, deleting
 // the explicit class-level property declarations phpstan needs to see.
 // Excluding stubs/ keeps the stub structure intact for static analysis.
-$finder = new PhpCsFixer\Finder()
+$finder = (new PhpCsFixer\Finder())
     ->in(array_filter([
         __DIR__ . '/src',
         is_dir(__DIR__ . '/tests') ? __DIR__ . '/tests' : null,
     ]))
     ->notPath('stubs');
 
-return new PhpCsFixer\Config()
+return (new PhpCsFixer\Config())
     ->setUnsupportedPhpVersionAllowed(true)
     ->setRules([
         '@PSR12' => true,

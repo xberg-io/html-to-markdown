@@ -16,4 +16,6 @@ namespace HtmlToMarkdown;
  * can be shared across threads — required by callers that stash configs inside
  * axum/rmcp/tokio Send-bound contexts.
  */
-final class VisitorHandle {}
+final class VisitorHandle
+{
+}

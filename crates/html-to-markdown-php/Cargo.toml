@@ -10,10 +10,12 @@ categories = ["text-processing"]
 
 # `serde_json` and `tokio` are emitted unconditionally above so the manifest
 # is stable across regens, but for umbrella crates with no async fns and no
-# JSON-marshalled return types they are genuinely unused. List them here so
-# `cargo machete` doesn't flag the no-async-no-json case as a real finding.
+# JSON-marshalled return types they are genuinely unused. The conditional
+# `async-trait` / `futures-util` deps are similarly flagged when the
+# umbrella has trait-bridge / streaming adapters configured but no actual
+# async-trait callsite in the generated PHP shim.
 [package.metadata.cargo-machete]
-ignored = ["serde_json", "tokio"]
+ignored = ["serde_json", "tokio", "async-trait"]
 
 [lib]
 crate-type = ["cdylib"]

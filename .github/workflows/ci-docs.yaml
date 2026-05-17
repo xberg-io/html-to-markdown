@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2.0.2
+        uses: actions/checkout@v6
 
       - name: Lint documentation
         uses: kreuzberg-dev/actions/lint-docs@main
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2.0.2
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

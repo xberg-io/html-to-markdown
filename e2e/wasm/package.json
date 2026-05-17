@@ -7,7 +7,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@kreuzberg/html-to-markdown-wasm": "file:../../crates/html-to-markdown-wasm/nodejs",
+    "@kreuzberg/html-to-markdown-wasm": "file:../../crates/html-to-markdown-wasm",
     "rollup": "^4.53.3",
     "vitest": "^4.1.5"
   }
