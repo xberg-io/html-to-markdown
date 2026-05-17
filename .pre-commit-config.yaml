@@ -65,7 +65,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.5
+    rev: v1.1.10
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -135,6 +135,11 @@ repos:
       - id: godoc-lint
         files: ^packages/go/.*\.go$
         exclude: ^(e2e/|test_apps/)
+        # godoc-lint auto-discovers every go.mod under CWD; h2m has go.mods
+        # under e2e/go/ and test_apps/go/ that aren't `go mod tidy`-clean.
+        # Scope it to packages/go (same as golangci-lint).
+        env:
+          KREUZBERG_GO_MOD_DIRS: "packages/go"
       - id: javadoc-lint
         files: ^packages/java/src/main/.*\.java$
       - id: cs-xmldoc-lint
@@ -253,7 +258,7 @@ repos:
   # tarball and 404s on that release. Bump again once a release with
   # `alef-aarch64-apple-darwin.tar.gz` ships.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.22
+    rev: v0.16.23
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
