@@ -63,11 +63,13 @@
 High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
 This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
 
+
 ## Installation
 
 ```bash
 pnpm add @kreuzberg/html-to-markdown
 ```
+
 
 Requires Node.js 18+ or Bun. Native bindings provide superior performance.
 
@@ -101,6 +103,7 @@ Alternatively, use the WebAssembly version for browser/edge environments:
 npm install @kreuzberg/html-to-markdown-wasm
 ```
 
+
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
@@ -109,6 +112,7 @@ npm install @kreuzberg/html-to-markdown-wasm
 | Lists (Timeline) | 129KB | 0.58ms | 222 MB/s |
 | Tables (Countries) | 360KB | 1.89ms | 190 MB/s |
 | Mixed (Python wiki) | 656KB | 4.21ms | 156 MB/s |
+
 
 ## Quick Start
 
@@ -121,6 +125,7 @@ const result = convert("<h1>Hello World</h1>");
 const markdown: string = result.content;
 console.log(markdown); // # Hello World
 ```
+
 
 With conversion options:
 
@@ -137,9 +142,11 @@ const result = convert("<h1>Title</h1><p>Content</p>", options);
 const markdown = result.content;
 ```
 
+
 ## API Reference
 
 ### Core Function
+
 
 **`convert(html: string, options?: ConversionOptions, visitor?: Visitor): ConversionResult`**
 
@@ -156,6 +163,7 @@ const document = result.document; // Document-level info
 const images = result.images; // Extracted images
 const warnings = result.warnings; // Any conversion warnings
 ```
+
 
 ### Options
 
@@ -189,6 +197,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
+
 ```typescript
 import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
 
@@ -203,11 +212,13 @@ const djot = convert(html, { outputFormat: "djot" });
 // Result: "This is *bold* and _italic_ text."
 ```
 
+
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 ```typescript
 import { convert } from "@kreuzberg/html-to-markdown";
@@ -218,7 +229,9 @@ const plain = convert(html, { outputFormat: "plain" });
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -236,6 +249,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
+
 ```typescript
 import { convert } from "@kreuzberg/html-to-markdown";
 
@@ -249,6 +263,7 @@ console.log(result.metadata?.links); // All hyperlinks
 console.log(result.metadata?.images); // All images with alt text
 console.log(result.metadata?.structuredData); // JSON-LD, Microdata, RDFa
 ```
+
 
 ## Visitor Pattern
 
@@ -265,6 +280,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
+
 
 ```typescript
 import {
@@ -296,6 +312,7 @@ const html = '<a href="https://old-cdn.com/file.pdf">Download</a>';
 const result = convert(html, {}, visitor);
 const markdown = result.content;
 ```
+
 
 ## Examples
 

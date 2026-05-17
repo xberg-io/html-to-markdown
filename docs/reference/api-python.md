@@ -1237,14 +1237,14 @@ Errors that can occur during HTML to Markdown conversion.
 
 **Base class:** `ConversionError(Exception)`
 
-| Exception                            | Description                             |
-| ------------------------------------ | --------------------------------------- |
-| `ParseError(ConversionError)`        | HTML parsing error                      |
-| `SanitizationError(ConversionError)` | HTML sanitization error                 |
-| `ConfigError(ConversionError)`       | Invalid configuration                   |
-| `IoError(ConversionError)`           | I/O error                               |
-| `Panic(ConversionError)`             | Internal error caught during conversion |
-| `InvalidInput(ConversionError)`      | Invalid input data                      |
-| `Other(ConversionError)`             | Generic conversion error                |
+| Exception | Description |
+|-----------|-------------|
+| `ParseError(ConversionError)` | HTML parsing error |
+| `SanitizationError(ConversionError)` | HTML sanitization error |
+| `ConfigError(ConversionError)` | Invalid configuration |
+| `IoError(ConversionError)` | I/O error |
+| `Panic(ConversionError)` | Internal error caught during conversion |
+| `InvalidInput(ConversionError)` | Invalid input data |
+| `Other(ConversionError)` | Generic conversion error |
 
 ---

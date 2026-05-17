@@ -8,13 +8,13 @@ readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
 
-# Deps below are emitted unconditionally by the alef Python scaffold for
-# manifest stability across regens. h2m's Python binding has no trait
-# bridges and no async/streaming today, so `async-trait`, `tokio`, and
-# `pyo3-async-runtimes` are unused. Silence cargo-machete rather than
-# flapping on every prek run.
+# `pyo3-async-runtimes` and `serde_json` are emitted unconditionally above so
+# the manifest is stable across regens, but for umbrella crates with no
+# async fns or no JSON-marshalled return types they are genuinely unused.
+# List them here so `cargo machete` doesn't flag the no-async-no-json case
+# as a real finding.
 [package.metadata.cargo-machete]
-ignored = ["async-trait", "pyo3-async-runtimes", "tokio"]
+ignored = ["pyo3-async-runtimes", "serde_json"]
 
 [lib]
 name = "_html_to_markdown"
