@@ -100,7 +100,7 @@ HTML preprocessing options for document cleanup before conversion.
 A structured table grid with cell-level data including spans.
 
 | Field   | Type            | Default  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------- | --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------- |
+| ------- | --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `rows`  | `u32`           | —        | Number of rows.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `cols`  | `u32`           | —        | Number of columns.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `cells` | `Vec<GridCell>` | `vec![]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\ | \\  | cols == 0`) produces an empty vec. |
@@ -363,13 +363,13 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
 
@@ -379,7 +379,7 @@ For a typical element like `<div><p>text</p></div>`:
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
@@ -411,7 +411,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### CodeBlockStyle
+##### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -425,7 +425,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HeadingStyle
+##### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -439,7 +439,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### HighlightStyle
+##### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -454,7 +454,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### ImageType
+##### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -469,7 +469,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### LinkStyle
+##### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -483,7 +483,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### LinkType
+##### LinkType
 
 Link classification based on href value and document context.
 
@@ -500,7 +500,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### ListIndentType
+##### ListIndentType
 
 List indentation character type.
 
@@ -513,7 +513,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### NewlineStyle
+##### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -526,7 +526,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### NodeContent
+##### NodeContent
 
 The semantic content type of a document node.
 
@@ -550,7 +550,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### NodeType
+##### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -650,7 +650,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### OutputFormat
+##### OutputFormat
 
 Output format for conversion.
 
@@ -664,7 +664,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### PreprocessingPreset
+##### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -678,7 +678,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### StructuredDataType
+##### StructuredDataType
 
 Structured data format type.
 
@@ -692,7 +692,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### TextDirection
+##### TextDirection
 
 Text directionality of document content.
 
@@ -706,7 +706,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### VisitResult
+##### VisitResult
 
 Result of a visitor callback.
 
@@ -724,7 +724,7 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### WarningKind
+##### WarningKind
 
 Categories of processing warnings.
 
@@ -739,7 +739,7 @@ Categories of processing warnings.
 
 ---
 
-#### WhitespaceMode
+##### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 

@@ -15,9 +15,9 @@
 
 use futures_util::StreamExt;
 use futures_util::stream::BoxStream;
-use jni::JNIEnv;
 use jni::objects::{JClass, JObject, JString};
 use jni::sys::{jboolean, jbyteArray, jlong, jstring};
+use jni::{AttachGuard, Env, EnvUnowned};
 use std::sync::Mutex;
 use std::sync::OnceLock;
 use tokio::runtime::Runtime;
@@ -32,28 +32,30 @@ fn runtime() -> &'static Runtime {
     RT.get_or_init(|| Runtime::new().expect("create tokio runtime"))
 }
 
-fn jstring_to_string(env: &mut JNIEnv, s: JString) -> std::result::Result<String, jni::errors::Error> {
-    let jstr = env.get_string(&s)?;
-    Ok(jstr.into())
+fn jstring_to_string(env: &mut Env<'_>, s: JString) -> std::result::Result<String, jni::errors::Error> {
+    s.try_to_string(env)
 }
 
-fn string_to_jstring(env: &mut JNIEnv, s: &str) -> jstring {
+fn string_to_jstring(env: &mut Env<'_>, s: &str) -> jstring {
     match env.new_string(s) {
         Ok(o) => o.into_raw(),
         Err(_) => std::ptr::null_mut(),
     }
 }
 
-fn throw_jni_error(env: &mut JNIEnv, msg: &str) {
+fn throw_jni_error(env: &mut Env<'_>, msg: &str) {
     // If the error class cannot be found (misconfigured AAR), fall back to a
     // generic RuntimeException so the caller always gets *some* exception rather
     // than a silent null/zero return that looks like a valid result.
-    if env.throw_new(ERROR_CLASS, msg).is_err() {
-        let _ = env.throw_new("java/lang/RuntimeException", msg);
+    let class_jni = jni::strings::JNIString::from(ERROR_CLASS);
+    let msg_jni = jni::strings::JNIString::from(msg);
+    if env.throw_new(&class_jni, &msg_jni).is_err() {
+        let fallback = jni::strings::JNIString::from("java/lang/RuntimeException");
+        let _ = env.throw_new(&fallback, &msg_jni);
     }
 }
 
-fn run_or_throw<T, F>(env: &mut JNIEnv, f: F) -> Option<T>
+fn run_or_throw<T, F>(env: &mut Env<'_>, f: F) -> Option<T>
 where
     F: FnOnce() -> T + std::panic::UnwindSafe,
 {
@@ -73,47 +75,50 @@ where
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_nativeConvert(
-    mut env: JNIEnv,
+    mut env: EnvUnowned,
     _class: JClass,
     html: JString,
     options: JString,
 ) -> jstring {
-    let html = match jstring_to_string(&mut env, html) {
+    // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
+    let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
+    let env = __jni_attach_guard.borrow_env_mut();
+    let html = match jstring_to_string(env, html) {
         Ok(s) => s,
         Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
+            throw_jni_error(env, &format!("{e}"));
             return std::ptr::null_mut();
         }
     };
-    let options_str = match jstring_to_string(&mut env, options) {
+    let options_str = match jstring_to_string(env, options) {
         Ok(s) => s,
         Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
+            throw_jni_error(env, &format!("{e}"));
             return std::ptr::null_mut();
         }
     };
     let options: core_crate::ConversionOptions = match serde_json::from_str(&options_str) {
         Ok(v) => v,
         Err(e) => {
-            throw_jni_error(&mut env, &format!("deserialize: {e}"));
+            throw_jni_error(env, &format!("deserialize: {e}"));
             return std::ptr::null_mut();
         }
     };
     let result = core_crate::convert(&html, Some(options));
     match result {
         Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
+            throw_jni_error(env, &format!("{e}"));
             std::ptr::null_mut()
         }
         Ok(v) => {
             let s = match serde_json::to_string(&v) {
                 Ok(s) => s,
                 Err(e) => {
-                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    throw_jni_error(env, &format!("serialize: {e}"));
                     return std::ptr::null_mut();
                 }
             };
-            string_to_jstring(&mut env, &s)
+            string_to_jstring(env, &s)
         }
     }
 }

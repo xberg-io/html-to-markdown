@@ -247,13 +247,13 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-# Method Naming Convention
+## Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-# Execution Order
+## Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
 
@@ -263,15 +263,15 @@ For a typical element like `<div><p>text</p></div>`:
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-# Performance Notes
+## Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-##### Methods
+### Methods
 
-###### htm_visit_text()
+#### htm_visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -281,7 +281,7 @@ Visit text nodes (most frequent callback - ~100+ per document).
 HtmVisitResult htm_visit_text(HtmNodeContext ctx, const char* text);
 ```
 
-###### htm_visit_element_start()
+##### htm_visit_element_start()
 
 Called before entering any element.
 
@@ -679,7 +679,7 @@ HtmVisitResult htm_visit_figure_end(HtmNodeContext ctx, const char* output);
 
 ---
 
-#### HtmImageMetadata
+##### HtmImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -697,7 +697,7 @@ for image analysis and optimization.
 
 ---
 
-#### HtmLinkMetadata
+##### HtmLinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -714,7 +714,7 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 
 ---
 
-#### HtmNodeContext
+##### HtmNodeContext
 
 Context information passed to all visitor methods.
 
@@ -733,7 +733,7 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-#### HtmPreprocessingOptions
+##### HtmPreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -744,7 +744,7 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool`                   | `true`             | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms`      | `bool`                   | `true`             | Remove form elements (forms, inputs, buttons, etc.)            |
 
-##### Methods
+###### Methods
 
 ###### htm_default()
 
@@ -764,7 +764,7 @@ HtmPreprocessingOptions htm_from(HtmPreprocessingOptionsUpdate update);
 
 ---
 
-#### HtmProcessingWarning
+##### HtmProcessingWarning
 
 A non-fatal diagnostic produced during HTML conversion.
 
@@ -789,7 +789,7 @@ See `WarningKind` for the full taxonomy of warning categories.
 
 ---
 
-#### HtmStructuredData
+##### HtmStructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -804,7 +804,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-#### HtmTableData
+##### HtmTableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -815,19 +815,19 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-#### HtmTableGrid
+##### HtmTableGrid
 
 A structured table grid with cell-level data including spans.
 
 | Field   | Type           | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------- | -------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------- |
+| ------- | -------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `rows`  | `uint32_t`     | —       | Number of rows.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `cols`  | `uint32_t`     | —       | Number of columns.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `cells` | `HtmGridCell*` | `NULL`  | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\ | \\  | cols == 0`) produces an empty vec. |
 
 ---
 
-#### HtmTextAnnotation
+##### HtmTextAnnotation
 
 A styling or semantic annotation that applies to a byte range within a node's text.
 
@@ -852,7 +852,7 @@ See `AnnotationKind` for the full list of supported annotation types.
 
 ---
 
-#### HtmVisitorHandle
+##### HtmVisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -862,9 +862,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-### Enums
+#### Enums
 
-#### HtmTextDirection
+##### HtmTextDirection
 
 Text directionality of document content.
 
@@ -878,7 +878,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-#### HtmLinkType
+##### HtmLinkType
 
 Link classification based on href value and document context.
 
@@ -895,7 +895,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-#### HtmImageType
+##### HtmImageType
 
 Image source classification for proper handling and processing.
 
@@ -910,7 +910,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-#### HtmStructuredDataType
+##### HtmStructuredDataType
 
 Structured data format type.
 
@@ -924,7 +924,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-#### HtmPreprocessingPreset
+##### HtmPreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -938,7 +938,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-#### HtmHeadingStyle
+##### HtmHeadingStyle
 
 Heading style options for Markdown output.
 
@@ -952,7 +952,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-#### HtmListIndentType
+##### HtmListIndentType
 
 List indentation character type.
 
@@ -965,7 +965,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-#### HtmWhitespaceMode
+##### HtmWhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -978,7 +978,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-#### HtmNewlineStyle
+##### HtmNewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -991,7 +991,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-#### HtmCodeBlockStyle
+##### HtmCodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1005,7 +1005,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-#### HtmHighlightStyle
+##### HtmHighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1020,7 +1020,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-#### HtmLinkStyle
+##### HtmLinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1034,7 +1034,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-#### HtmOutputFormat
+##### HtmOutputFormat
 
 Output format for conversion.
 
@@ -1048,7 +1048,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-#### HtmNodeContent
+##### HtmNodeContent
 
 The semantic content type of a document node.
 
@@ -1072,7 +1072,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-#### HtmAnnotationKind
+##### HtmAnnotationKind
 
 The type of an inline text annotation.
 
@@ -1092,7 +1092,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-#### HtmWarningKind
+##### HtmWarningKind
 
 Categories of processing warnings.
 
@@ -1107,7 +1107,7 @@ Categories of processing warnings.
 
 ---
 
-#### HtmNodeType
+##### HtmNodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1207,7 +1207,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-#### HtmVisitResult
+##### HtmVisitResult
 
 Result of a visitor callback.
 
@@ -1225,9 +1225,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-### Errors
+#### Errors
 
-#### HtmConversionError
+##### HtmConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 

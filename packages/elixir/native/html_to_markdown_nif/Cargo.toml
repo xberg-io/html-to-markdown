@@ -8,23 +8,23 @@ readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
 
+[workspace]
+
 [lib]
 name = "html_to_markdown_nif"
 
 crate-type = ["cdylib"]
 
 [dependencies]
+async-trait = "0.1"
 html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = [
-  "full",
-  "metadata",
-  "visitor",
-  "serde",
-  "inline-images",
+    "full",
+    "metadata",
+    "visitor",
+    "serde",
+    "inline-images",
 ] }
 rustler = "0.37"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-async-trait = "0.1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
-
-[workspace]

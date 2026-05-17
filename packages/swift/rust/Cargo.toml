@@ -5,14 +5,15 @@ version = "3.5.0"
 edition = "2024"
 license = "MIT"
 
-# `async-trait` and `serde` are conditionally referenced by alef-emitted
-# code: only when the umbrella crate declares trait bridges (inbound
-# plugins) or `Serialize`/`Deserialize`-derived response types. They are
-# listed unconditionally in `[dependencies]` so the manifest is stable
+# `async-trait`, `serde`, and `tokio` are conditionally referenced by
+# alef-emitted code: only when the umbrella crate declares trait bridges
+# (inbound plugins), `Serialize`/`Deserialize`-derived response types, or
+# async adapter shims that block on a Tokio current-thread runtime. They
+# are listed unconditionally in `[dependencies]` so the manifest is stable
 # across regens, and ignored here so cargo-machete does not flag the
-# downstream (no-adapters, no-derives) case as unused.
+# downstream (no-adapters, no-derives, no-async) case as unused.
 [package.metadata.cargo-machete]
-ignored = ["async-trait", "serde"]
+ignored = ["async-trait", "serde", "tokio"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
@@ -27,7 +28,7 @@ bench = false
 [dependencies]
 async-trait = "0.1"
 html_to_markdown_rs = { path = "../../../crates/html-to-markdown", features = [
-  "full",
+    "full",
 ], package = "html-to-markdown-rs" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
