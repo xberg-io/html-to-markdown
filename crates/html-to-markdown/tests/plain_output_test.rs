@@ -170,6 +170,24 @@ fn test_plain_heading_no_markers() {
     assert!(result.contains("Content"));
 }
 
+/// Regression for <https://github.com/kreuzberg-dev/html-to-markdown/issues/362> — the byte-oriented
+/// post-processor mangled multibyte UTF-8 sequences (e.g. en-dash U+2013) whenever they followed
+/// an inline element. Lock the four-case matrix from the issue body so a future rewrite cannot
+/// silently regress.
+#[test]
+fn test_plain_utf8_after_inline_markup_preserved() {
+    let cases = [
+        ("abc \u{2013} def", "abc \u{2013} def\n"),
+        ("<i>abc</i> \u{2013} def", "abc \u{2013} def\n"),
+        ("plain \u{2014} text", "plain \u{2014} text\n"),
+        ("<strong>bold</strong> \u{20ac}1.00", "bold \u{20ac}1.00\n"),
+    ];
+    for (input, expected) in cases {
+        let result = convert(input, Some(plain_options())).unwrap();
+        assert_eq!(result, expected, "for input: {input:?}");
+    }
+}
+
 #[test]
 fn test_plain_parse_variants() {
     assert_eq!(OutputFormat::parse("plain"), OutputFormat::Plain);

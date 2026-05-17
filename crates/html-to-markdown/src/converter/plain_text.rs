@@ -474,43 +474,35 @@ fn ensure_newline(buf: &mut String) {
 }
 
 /// Single-pass post-processor: trims trailing whitespace per line, collapses runs of 3+
-/// newlines to exactly 2, and normalizes the trailing newline. Walking `chars()` (not
-/// bytes) ensures multibyte UTF-8 codepoints are never split.
+/// newlines to exactly 2 (one blank line between paragraphs), and normalizes the trailing
+/// newline. Uses `str::lines()` so multibyte UTF-8 codepoints are never split mid-character
+/// — the original byte-oriented implementation cast `u8 as char`, mangling anything outside
+/// ASCII (see issue #362).
 ///
-/// A line that is empty after trailing-whitespace trim is treated as part of the adjacent
-/// newline run (it does not reset the consecutive-newline counter), so space-only lines
-/// between paragraphs collapse to a single blank line without absorbing a counter slot.
+/// Empty / whitespace-only input lines are folded into the surrounding newline run, so any
+/// number of space-only lines between paragraphs collapses to a single blank line.
 ///
-/// Kept as a named function rather than inlined so the markdown converter's symmetrical
-/// `post_process` call site reads consistently with this one.
+/// Algorithm contributed by @xitep in
+/// <https://github.com/kreuzberg-dev/html-to-markdown/issues/362>: 2–7× faster than the
+/// previous char-by-char rewrite while preserving identical semantics.
 fn normalize_plain_output(buf: &mut String) {
     let input = std::mem::take(buf);
     let mut out = String::with_capacity(input.len());
-    let mut line_start = 0usize;
-    let mut consecutive_newlines = 0usize;
-    for ch in input.chars() {
-        if ch == '\n' {
-            let trimmed_len = out[line_start..].trim_end().len();
-            out.truncate(line_start + trimmed_len);
-            // Only reset the newline counter when the trimmed line has content; a
-            // whitespace-only line continues the surrounding newline run.
-            if out.len() > line_start {
-                consecutive_newlines = 0;
-            }
-            consecutive_newlines += 1;
-            if consecutive_newlines <= 2 {
+    let mut last_was_blank = false;
+    for line in input.lines().map(str::trim_end) {
+        if line.is_empty() {
+            if !last_was_blank {
                 out.push('\n');
-                line_start = out.len();
+                last_was_blank = true;
             }
         } else {
-            // Only non-whitespace content resets the newline counter; whitespace chars
-            // may still belong to a space-only line that will be collapsed on the next '\n'.
-            if !ch.is_whitespace() {
-                consecutive_newlines = 0;
-            }
-            out.push(ch);
+            out.push_str(line);
+            out.push('\n');
+            last_was_blank = false;
         }
     }
+    // Drop any trailing blank lines so non-empty output ends with exactly one '\n'
+    // (and empty-ish input — only blanks — collapses to an empty string).
     let keep = out.trim_end_matches('\n').len();
     out.truncate(keep);
     if !out.is_empty() {
