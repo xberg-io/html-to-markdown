@@ -1,0 +1,12 @@
+.{
+    .name = .html_to_markdown_rs,
+    .version = "3.5.0",
+    .fingerprint = 0x9867ae0a5bf2d542,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

@@ -1,8 +1,7 @@
 ---
 title: "Ruby API Reference"
 ---
-
-## Ruby API Reference <span class="version-badge">v3.4.1</span>
+## Ruby API Reference <span class="version-badge">v3.5.0</span>
 
 ### Functions
 
@@ -20,7 +19,6 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```ruby
 def self.convert(html, options: nil)
 ```
-
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -58,17 +56,17 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `br_in_tables` | `Boolean` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `:double_equal` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
 | `extract_metadata` | `Boolean` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
-| `whitespace_mode` | `WhitespaceMode` | `:normalized` | Controls how whitespace is normalised during conversion. |
+| `whitespace_mode` | `WhitespaceMode` | `:normalized` | Controls how whitespace sequences are normalised in the converted output. - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters (spaces, tabs, newlines) to a single space, matching browser rendering behaviour. - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source HTML, including runs of spaces and embedded newlines. Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted content outside `<pre>` tags). For most documents `Normalized` produces cleaner output. |
 | `strip_newlines` | `Boolean` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `Boolean` | `false` | Wrap long lines at `wrap_width` characters. |
-| `wrap_width` | `Integer` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
+| `wrap_width` | `Integer` | `80` | Maximum output line width in characters when `wrap` is `true` (default `80`). Lines are broken at word boundaries so that no line exceeds this length. A value of `0` is treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is `false`. |
 | `convert_as_inline` | `Boolean` | `false` | Treat the entire document as inline content (no block-level wrappers). |
 | `sub_symbol` | `String` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
 | `sup_symbol` | `String` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newline_style` | `NewlineStyle` | `:spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `code_block_style` | `CodeBlockStyle` | `:backticks` | Style used for fenced code blocks (backticks or tilde). |
 | `keep_inline_images_in` | `Array<String>` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Pre-processing options applied to the HTML before conversion. |
+| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `String` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `Boolean` | `false` | Emit debug information during conversion. |
 | `strip_tags` | `Array<String>` | `[]` | HTML tag names whose content is stripped from the output entirely. |
@@ -94,37 +92,6 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ```ruby
 def self.default()
 ```
-
-###### builder()
-
-Create a new builder with default values.
-
-**Signature:**
-
-```ruby
-def self.builder()
-```
-
-###### apply_update()
-
-Apply a partial update to these conversion options.
-
-**Signature:**
-
-```ruby
-def apply_update(update)
-```
-
-###### from_update()
-
-Create from a partial update, applying to defaults.
-
-**Signature:**
-
-```ruby
-def self.from_update(update)
-```
-
 ###### from()
 
 **Signature:**
@@ -145,92 +112,12 @@ metadata, extracted tables, images, and processing warnings.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `content` | `String?` | `nil` | Converted text output (markdown, djot, or plain text). `nil` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
-| `document` | `DocumentStructure?` | `nil` | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options. |
+| `document` | `DocumentStructure?` | `nil` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `nil` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `Array<TableData>` | `[]` | Extracted tables with structured cell data and markdown representation. |
 | `images` | `Array<String>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
 | `warnings` | `Array<ProcessingWarning>` | `[]` | Non-fatal processing warnings. |
 
-
----
-
-#### ConversionOptionsBuilder
-
-Builder for `ConversionOptions`.
-
-All fields start with default values. Call `.build()` to produce the final options.
-
-##### Methods
-
-###### strip_tags()
-
-Set the list of HTML tag names whose content is stripped from output.
-
-**Signature:**
-
-```ruby
-def strip_tags(tags)
-```
-
-###### preserve_tags()
-
-Set the list of HTML tag names that are preserved verbatim in output.
-
-**Signature:**
-
-```ruby
-def preserve_tags(tags)
-```
-
-###### keep_inline_images_in()
-
-Set the list of HTML tag names whose `<img>` children are kept inline.
-
-**Signature:**
-
-```ruby
-def keep_inline_images_in(tags)
-```
-
-###### exclude_selectors()
-
-Set the list of CSS selectors for elements to exclude entirely from output.
-
-**Signature:**
-
-```ruby
-def exclude_selectors(selectors)
-```
-
-###### visitor()
-
-Set the visitor used during conversion.
-
-**Signature:**
-
-```ruby
-def visitor(visitor)
-```
-
-###### preprocessing()
-
-Set the pre-processing options applied to the HTML before conversion.
-
-**Signature:**
-
-```ruby
-def preprocessing(preprocessing)
-```
-
-###### build()
-
-Build the final `ConversionOptions`.
-
-**Signature:**
-
-```ruby
-def build()
-```
 
 ---
 
@@ -269,7 +156,7 @@ A single node in the document tree.
 | `parent` | `Integer?` | `nil` | Index of the parent node (None for root nodes). |
 | `children` | `Array<Integer>` | — | Indices of child nodes in reading order. |
 | `annotations` | `Array<TextAnnotation>` | — | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
-| `attributes` | `Hash{String=>String}?` | `nil` | Format-specific attributes (e.g. class, id, data-* attributes). |
+| `attributes` | `Hash{String=>String}?` | `nil` | Format-specific attributes preserved from the source HTML element. Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`, `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no HTML entity decoding is applied here. The map is `nil` when no attributes are present (omitted entirely in serialized output). Not every HTML attribute is preserved: only attributes that carry semantic or structural significance for the node type are collected. For example, heading nodes capture the `"id"` attribute for anchor linking; other element-level attributes may be silently dropped. |
 
 
 ---
@@ -363,31 +250,30 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-## Method Naming Convention
+# Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-## Execution Order
+# Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
-
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-## Performance Notes
+# Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+##### Methods
 
-#### visit_text()
+###### visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -396,8 +282,7 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```ruby
 def visit_text(ctx, text)
 ```
-
-##### visit_element_start()
+###### visit_element_start()
 
 Called before entering any element.
 
@@ -409,7 +294,6 @@ visitors to implement generic element handling before tag-specific logic.
 ```ruby
 def visit_element_start(ctx)
 ```
-
 ###### visit_element_end()
 
 Called after exiting any element.
@@ -422,7 +306,6 @@ Visitors can inspect or replace this output.
 ```ruby
 def visit_element_end(ctx, output)
 ```
-
 ###### visit_link()
 
 Visit anchor links `<a href="...">`.
@@ -432,7 +315,6 @@ Visit anchor links `<a href="...">`.
 ```ruby
 def visit_link(ctx, href, text, title)
 ```
-
 ###### visit_image()
 
 Visit images `<img src="...">`.
@@ -442,7 +324,6 @@ Visit images `<img src="...">`.
 ```ruby
 def visit_image(ctx, src, alt, title)
 ```
-
 ###### visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
@@ -452,7 +333,6 @@ Visit heading elements `<h1>` through `<h6>`.
 ```ruby
 def visit_heading(ctx, level, text, id)
 ```
-
 ###### visit_code_block()
 
 Visit code blocks `<pre><code>`.
@@ -462,7 +342,6 @@ Visit code blocks `<pre><code>`.
 ```ruby
 def visit_code_block(ctx, lang, code)
 ```
-
 ###### visit_code_inline()
 
 Visit inline code `<code>`.
@@ -472,7 +351,6 @@ Visit inline code `<code>`.
 ```ruby
 def visit_code_inline(ctx, code)
 ```
-
 ###### visit_list_item()
 
 Visit list items `<li>`.
@@ -482,7 +360,6 @@ Visit list items `<li>`.
 ```ruby
 def visit_list_item(ctx, ordered, marker, text)
 ```
-
 ###### visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
@@ -492,7 +369,6 @@ Called before processing a list `<ul>` or `<ol>`.
 ```ruby
 def visit_list_start(ctx, ordered)
 ```
-
 ###### visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
@@ -502,7 +378,6 @@ Called after processing a list `</ul>` or `</ol>`.
 ```ruby
 def visit_list_end(ctx, ordered, output)
 ```
-
 ###### visit_table_start()
 
 Called before processing a table `<table>`.
@@ -512,7 +387,6 @@ Called before processing a table `<table>`.
 ```ruby
 def visit_table_start(ctx)
 ```
-
 ###### visit_table_row()
 
 Visit table rows `<tr>`.
@@ -522,7 +396,6 @@ Visit table rows `<tr>`.
 ```ruby
 def visit_table_row(ctx, cells, is_header)
 ```
-
 ###### visit_table_end()
 
 Called after processing a table `</table>`.
@@ -532,7 +405,6 @@ Called after processing a table `</table>`.
 ```ruby
 def visit_table_end(ctx, output)
 ```
-
 ###### visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
@@ -542,7 +414,6 @@ Visit blockquote elements `<blockquote>`.
 ```ruby
 def visit_blockquote(ctx, content, depth)
 ```
-
 ###### visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
@@ -552,7 +423,6 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```ruby
 def visit_strong(ctx, text)
 ```
-
 ###### visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
@@ -562,7 +432,6 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```ruby
 def visit_emphasis(ctx, text)
 ```
-
 ###### visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
@@ -572,7 +441,6 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```ruby
 def visit_strikethrough(ctx, text)
 ```
-
 ###### visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
@@ -582,7 +450,6 @@ Visit underline elements `<u>`, `<ins>`.
 ```ruby
 def visit_underline(ctx, text)
 ```
-
 ###### visit_subscript()
 
 Visit subscript elements `<sub>`.
@@ -592,7 +459,6 @@ Visit subscript elements `<sub>`.
 ```ruby
 def visit_subscript(ctx, text)
 ```
-
 ###### visit_superscript()
 
 Visit superscript elements `<sup>`.
@@ -602,7 +468,6 @@ Visit superscript elements `<sup>`.
 ```ruby
 def visit_superscript(ctx, text)
 ```
-
 ###### visit_mark()
 
 Visit mark/highlight elements `<mark>`.
@@ -612,7 +477,6 @@ Visit mark/highlight elements `<mark>`.
 ```ruby
 def visit_mark(ctx, text)
 ```
-
 ###### visit_line_break()
 
 Visit line break elements `<br>`.
@@ -622,7 +486,6 @@ Visit line break elements `<br>`.
 ```ruby
 def visit_line_break(ctx)
 ```
-
 ###### visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
@@ -632,7 +495,6 @@ Visit horizontal rule elements `<hr>`.
 ```ruby
 def visit_horizontal_rule(ctx)
 ```
-
 ###### visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
@@ -642,7 +504,6 @@ Visit custom elements (web components) or unknown tags.
 ```ruby
 def visit_custom_element(ctx, tag_name, html)
 ```
-
 ###### visit_definition_list_start()
 
 Visit definition list `<dl>`.
@@ -652,7 +513,6 @@ Visit definition list `<dl>`.
 ```ruby
 def visit_definition_list_start(ctx)
 ```
-
 ###### visit_definition_term()
 
 Visit definition term `<dt>`.
@@ -662,7 +522,6 @@ Visit definition term `<dt>`.
 ```ruby
 def visit_definition_term(ctx, text)
 ```
-
 ###### visit_definition_description()
 
 Visit definition description `<dd>`.
@@ -672,7 +531,6 @@ Visit definition description `<dd>`.
 ```ruby
 def visit_definition_description(ctx, text)
 ```
-
 ###### visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
@@ -682,7 +540,6 @@ Called after processing a definition list `</dl>`.
 ```ruby
 def visit_definition_list_end(ctx, output)
 ```
-
 ###### visit_form()
 
 Visit form elements `<form>`.
@@ -692,7 +549,6 @@ Visit form elements `<form>`.
 ```ruby
 def visit_form(ctx, action, method)
 ```
-
 ###### visit_input()
 
 Visit input elements `<input>`.
@@ -702,7 +558,6 @@ Visit input elements `<input>`.
 ```ruby
 def visit_input(ctx, input_type, name, value)
 ```
-
 ###### visit_button()
 
 Visit button elements `<button>`.
@@ -712,7 +567,6 @@ Visit button elements `<button>`.
 ```ruby
 def visit_button(ctx, text)
 ```
-
 ###### visit_audio()
 
 Visit audio elements `<audio>`.
@@ -722,7 +576,6 @@ Visit audio elements `<audio>`.
 ```ruby
 def visit_audio(ctx, src)
 ```
-
 ###### visit_video()
 
 Visit video elements `<video>`.
@@ -732,7 +585,6 @@ Visit video elements `<video>`.
 ```ruby
 def visit_video(ctx, src)
 ```
-
 ###### visit_iframe()
 
 Visit iframe elements `<iframe>`.
@@ -742,7 +594,6 @@ Visit iframe elements `<iframe>`.
 ```ruby
 def visit_iframe(ctx, src)
 ```
-
 ###### visit_details()
 
 Visit details elements `<details>`.
@@ -752,7 +603,6 @@ Visit details elements `<details>`.
 ```ruby
 def visit_details(ctx, open)
 ```
-
 ###### visit_summary()
 
 Visit summary elements `<summary>`.
@@ -762,7 +612,6 @@ Visit summary elements `<summary>`.
 ```ruby
 def visit_summary(ctx, text)
 ```
-
 ###### visit_figure_start()
 
 Visit figure elements `<figure>`.
@@ -772,7 +621,6 @@ Visit figure elements `<figure>`.
 ```ruby
 def visit_figure_start(ctx)
 ```
-
 ###### visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
@@ -782,7 +630,6 @@ Visit figcaption elements `<figcaption>`.
 ```ruby
 def visit_figcaption(ctx, text)
 ```
-
 ###### visit_figure_end()
 
 Called after processing a figure `</figure>`.
@@ -795,7 +642,7 @@ def visit_figure_end(ctx, output)
 
 ---
 
-##### ImageMetadata
+#### ImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -814,7 +661,7 @@ for image analysis and optimization.
 
 ---
 
-##### LinkMetadata
+#### LinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -829,25 +676,10 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 | `rel` | `Array<String>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `Hash{String=>String}` | — | Additional HTML attributes |
 
-###### Methods
-
-###### classify_link()
-
-Classify a link based on href value.
-
-**Returns:**
-
-Appropriate `LinkType` based on protocol and content.
-
-**Signature:**
-
-```ruby
-def self.classify_link(href)
-```
 
 ---
 
-##### NodeContext
+#### NodeContext
 
 Context information passed to all visitor methods.
 
@@ -867,7 +699,7 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-##### PreprocessingOptions
+#### PreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -878,7 +710,7 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `Boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `Boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-###### Methods
+##### Methods
 
 ###### default()
 
@@ -887,37 +719,6 @@ HTML preprocessing options for document cleanup before conversion.
 ```ruby
 def self.default()
 ```
-
-###### apply_update()
-
-Apply a partial update to these preprocessing options.
-
-Any specified fields in the update will override the current values.
-Unspecified fields (None) are left unchanged.
-
-**Signature:**
-
-```ruby
-def apply_update(update)
-```
-
-###### from_update()
-
-Create new preprocessing options from a partial update.
-
-Creates a new `PreprocessingOptions` struct with defaults, then applies the update.
-Fields not specified in the update keep their default values.
-
-**Returns:**
-
-New `PreprocessingOptions` with specified updates applied to defaults
-
-**Signature:**
-
-```ruby
-def self.from_update(update)
-```
-
 ###### from()
 
 **Signature:**
@@ -928,9 +729,23 @@ def self.from(update)
 
 ---
 
-##### ProcessingWarning
+#### ProcessingWarning
 
-A non-fatal warning generated during HTML processing.
+A non-fatal diagnostic produced during HTML conversion.
+
+Warnings indicate that conversion completed but some content may have been handled
+differently than expected — for example, an image that could not be extracted, a truncated
+input, or malformed HTML that was repaired with best-effort parsing.
+
+Conversion always succeeds (returns `ConversionResult`) even when warnings are
+present. Callers should inspect `warnings` and decide how to
+handle them based on their tolerance for partial results:
+
+- **Logging pipelines**: emit each warning at `WARN` level and continue.
+- **Strict pipelines**: treat any warning as a hard error by checking
+  `result.warnings.is_empty()` before using the output.
+
+See `WarningKind` for the full taxonomy of warning categories.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -940,7 +755,7 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-##### StructuredData
+#### StructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -956,7 +771,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-##### TableData
+#### TableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -968,7 +783,7 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-##### TableGrid
+#### TableGrid
 
 A structured table grid with cell-level data including spans.
 
@@ -976,16 +791,27 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `Integer` | — | Number of rows. |
 | `cols` | `Integer` | — | Number of columns. |
-| `cells` | `Array<GridCell>` | `[]` | All cells in the table (may be fewer than rows*cols due to spans). |
+| `cells` | `Array<GridCell>` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\|\\| cols == 0`) produces an empty vec. |
 
 
 ---
 
-##### TextAnnotation
+#### TextAnnotation
 
-An inline text annotation with byte-range offsets.
+A styling or semantic annotation that applies to a byte range within a node's text.
 
-Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+Unlike `DocumentNode`, which captures block-level structure (headings, paragraphs, etc.),
+a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+similar — that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
+
+Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
+follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
+text is `text[start as usize..end as usize]`.
+
+Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+stored in the order they are encountered during DOM traversal.
+
+See `AnnotationKind` for the full list of supported annotation types.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -996,7 +822,7 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-##### VisitorHandle
+#### VisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -1007,9 +833,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-#### Enums
+### Enums
 
-##### TextDirection
+#### TextDirection
 
 Text directionality of document content.
 
@@ -1024,7 +850,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-##### LinkType
+#### LinkType
 
 Link classification based on href value and document context.
 
@@ -1042,7 +868,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-##### ImageType
+#### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -1058,7 +884,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-##### StructuredDataType
+#### StructuredDataType
 
 Structured data format type.
 
@@ -1073,7 +899,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-##### PreprocessingPreset
+#### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -1088,7 +914,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-##### HeadingStyle
+#### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -1103,7 +929,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-##### ListIndentType
+#### ListIndentType
 
 List indentation character type.
 
@@ -1117,7 +943,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-##### WhitespaceMode
+#### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -1131,7 +957,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-##### NewlineStyle
+#### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -1145,7 +971,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-##### CodeBlockStyle
+#### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1160,7 +986,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-##### HighlightStyle
+#### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1176,7 +1002,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-##### LinkStyle
+#### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1191,7 +1017,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-##### OutputFormat
+#### OutputFormat
 
 Output format for conversion.
 
@@ -1206,7 +1032,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-##### NodeContent
+#### NodeContent
 
 The semantic content type of a document node.
 
@@ -1231,7 +1057,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-##### AnnotationKind
+#### AnnotationKind
 
 The type of an inline text annotation.
 
@@ -1247,12 +1073,12 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 | `subscript` | Subscript text. |
 | `superscript` | Superscript text. |
 | `highlight` | Highlighted / marked text. |
-| `link` | A hyperlink. — Fields: `url`: `String`, `title`: `String` |
+| `link` | A hyperlink sourced from an `<a href="...">` element. — Fields: `url`: `String`, `title`: `String` |
 
 
 ---
 
-##### WarningKind
+#### WarningKind
 
 Categories of processing warnings.
 
@@ -1268,7 +1094,7 @@ Categories of processing warnings.
 
 ---
 
-##### NodeType
+#### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1369,7 +1195,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-##### VisitResult
+#### VisitResult
 
 Result of a visitor callback.
 
@@ -1388,9 +1214,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### Errors
+### Errors
 
-##### ConversionError
+#### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 

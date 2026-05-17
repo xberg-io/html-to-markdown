@@ -39,7 +39,20 @@ pub struct StructureCollector {
 }
 
 impl StructureCollector {
-    /// Create a new empty collector.
+    /// Create a new empty collector ready to accumulate nodes for a single conversion pass.
+    ///
+    /// The intended lifecycle is:
+    ///
+    /// 1. Create one `StructureCollector` (or wrap it in a [`StructureCollectorHandle`]) at the
+    ///    start of a conversion.
+    /// 2. Thread the handle through the converter context; individual element handlers call the
+    ///    `push_*` methods as they encounter headings, paragraphs, lists, tables, and so on.
+    /// 3. Call [`Self::finish`] exactly once to consume the collector and obtain the completed
+    ///    [`super::document::DocumentStructure`] together with the flat list of extracted
+    ///    [`super::tables::TableData`] entries.
+    ///
+    /// `StructureCollector` is not `Send` (it uses `Rc<RefCell<…>>` handles internally) and must
+    /// not be shared across threads. Create a fresh collector per conversion.
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
@@ -136,7 +149,7 @@ impl StructureCollector {
 
     /// Open a list container.
     ///
-    /// Returns the node index; call [`push_list_end`] to close it.
+    /// Returns the node index; call [`Self::push_list_end`] to close it.
     pub fn push_list_start(&mut self, ordered: bool) -> u32 {
         let parent = self.current_structural_parent();
         let label = if ordered { "ordered" } else { "unordered" };
@@ -190,7 +203,7 @@ impl StructureCollector {
     ///
     /// Adds the table to the document tree as a [`NodeContent::Table`] node and also
     /// appends a [`TableData`] entry (grid + markdown) to the flat tables list that is
-    /// exposed via [`ConversionResult::tables`].
+    /// exposed via [`crate::ConversionResult::tables`].
     ///
     /// Returns the node index.
     pub fn push_table_data(&mut self, grid: TableGrid, markdown: String) -> u32 {
@@ -214,7 +227,7 @@ impl StructureCollector {
 
     /// Record a table (grid only, no markdown rendering).
     ///
-    /// Prefer [`push_table_data`] when the markdown rendering is available; use this
+    /// Prefer [`Self::push_table_data`] when the markdown rendering is available; use this
     /// method only when the markdown is not yet computed.
     ///
     /// Returns the node index.
@@ -286,7 +299,7 @@ impl StructureCollector {
 
     /// Open a blockquote container.
     ///
-    /// Returns the node index; call [`push_quote_end`] to close it.
+    /// Returns the node index; call [`Self::push_quote_end`] to close it.
     pub fn push_quote_start(&mut self) -> u32 {
         let parent = self.current_structural_parent();
         let id = Self::generate_id("quote", "blockquote", self.nodes.len() as u32);
@@ -337,7 +350,7 @@ impl StructureCollector {
     /// [`TableData`] entries.
     ///
     /// Returns `(DocumentStructure, Vec<TableData>)`.  The tables vec contains one entry per
-    /// `<table>` element that was processed via [`push_table_data`].
+    /// `<table>` element that was processed via [`Self::push_table_data`].
     pub fn finish(self) -> (DocumentStructure, Vec<TableData>) {
         let doc = DocumentStructure {
             nodes: self.nodes,

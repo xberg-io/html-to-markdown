@@ -473,54 +473,53 @@ fn ensure_newline(buf: &mut String) {
     }
 }
 
-/// Collapse runs of 3 or more consecutive newlines to exactly 2 in a single pass.
-fn collapse_triple_newlines(buf: &mut String) {
-    let bytes = buf.as_bytes();
-    let mut result = String::with_capacity(buf.len());
-    let mut newline_count = 0usize;
-    for &b in bytes {
-        if b == b'\n' {
-            newline_count += 1;
-            if newline_count <= 2 {
-                result.push('\n');
+/// Single-pass post-processor: trims trailing whitespace per line, collapses runs of 3+
+/// newlines to exactly 2, and normalizes the trailing newline. Walking `chars()` (not
+/// bytes) ensures multibyte UTF-8 codepoints are never split.
+///
+/// A line that is empty after trailing-whitespace trim is treated as part of the adjacent
+/// newline run (it does not reset the consecutive-newline counter), so space-only lines
+/// between paragraphs collapse to a single blank line without absorbing a counter slot.
+///
+/// Kept as a named function rather than inlined so the markdown converter's symmetrical
+/// `post_process` call site reads consistently with this one.
+fn normalize_plain_output(buf: &mut String) {
+    let input = std::mem::take(buf);
+    let mut out = String::with_capacity(input.len());
+    let mut line_start = 0usize;
+    let mut consecutive_newlines = 0usize;
+    for ch in input.chars() {
+        if ch == '\n' {
+            let trimmed_len = out[line_start..].trim_end().len();
+            out.truncate(line_start + trimmed_len);
+            // Only reset the newline counter when the trimmed line has content; a
+            // whitespace-only line continues the surrounding newline run.
+            if out.len() > line_start {
+                consecutive_newlines = 0;
+            }
+            consecutive_newlines += 1;
+            if consecutive_newlines <= 2 {
+                out.push('\n');
+                line_start = out.len();
             }
         } else {
-            newline_count = 0;
-            result.push(b as char);
+            // Only non-whitespace content resets the newline counter; whitespace chars
+            // may still belong to a space-only line that will be collapsed on the next '\n'.
+            if !ch.is_whitespace() {
+                consecutive_newlines = 0;
+            }
+            out.push(ch);
         }
     }
-    *buf = result;
-}
-
-/// Trim trailing whitespace from every line in a buffer without allocating per-line strings.
-///
-/// Uses a single allocation of the same capacity, writing each line's trimmed content
-/// and inserting newline separators directly.
-fn trim_line_ends(buf: &mut String) {
-    let mut result = String::with_capacity(buf.len());
-    for line in buf.lines() {
-        if !result.is_empty() {
-            result.push('\n');
-        }
-        result.push_str(line.trim_end());
+    let keep = out.trim_end_matches('\n').len();
+    out.truncate(keep);
+    if !out.is_empty() {
+        out.push('\n');
     }
-    *buf = result;
+    *buf = out;
 }
 
-/// Post-process: collapse 3+ newlines to 2, trim line-end whitespace, ensure single trailing newline.
+/// Post-process the accumulated plain-text buffer.
 fn post_process(buf: &mut String) {
-    // Collapse runs of 3+ newlines to exactly 2
-    collapse_triple_newlines(buf);
-
-    // Trim trailing whitespace from each line in-place
-    trim_line_ends(buf);
-
-    // Trim to single trailing newline
-    let keep = buf.trim_end_matches('\n').len();
-    if keep == 0 {
-        buf.clear();
-    } else {
-        buf.truncate(keep);
-        buf.push('\n');
-    }
+    normalize_plain_output(buf);
 }

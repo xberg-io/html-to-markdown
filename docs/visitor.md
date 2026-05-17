@@ -189,6 +189,18 @@ All 40 methods have default implementations that return `Continue`. Override onl
 === "WASM"
 --8<-- "snippets/wasm/visitor/basic_visitor.md"
 
+=== "Swift"
+--8<-- "snippets/swift/visitor/basic_visitor.md"
+
+=== "Dart"
+--8<-- "snippets/dart/visitor/basic_visitor.md"
+
+=== "Kotlin"
+--8<-- "snippets/kotlin_android/visitor/basic_visitor.md"
+
+=== "Zig"
+--8<-- "snippets/zig/visitor/basic_visitor.md"
+
 ## Common Patterns
 
 ### Link rewriting

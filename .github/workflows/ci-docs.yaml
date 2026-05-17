@@ -1,6 +1,12 @@
 name: CI Docs
 
 on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "zensical.toml"
+      - "mkdocs.yml"
+      - ".github/workflows/ci-docs.yaml"
   push:
     branches: [main]
     paths:
@@ -20,6 +26,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Lint documentation
+        uses: kreuzberg-dev/actions/lint-docs@main
+        with:
+          working-directory: .
+          strict: "true"
+          validate-snippets: "true"
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -28,20 +47,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v6 # v6
+      - name: Build documentation
+        uses: kreuzberg-dev/actions/build-docs@main
         with:
-          python-version: "3.13"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7 # v7
-        with:
-          enable-cache: true
-
-      - name: Install dependencies and build docs
-        run: |
-          uv sync --group doc --no-editable --no-install-workspace --no-install-project
-          uv run --no-sync zensical build --clean
+          working-directory: .
+          strict: "true"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5 # v4

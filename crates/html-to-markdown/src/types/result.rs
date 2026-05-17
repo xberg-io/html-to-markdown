@@ -32,7 +32,17 @@ pub struct ConversionResult {
 
     /// Structured document tree with semantic elements.
     ///
-    /// Populated when `include_document_structure` is `true` in options.
+    /// Populated when `ConversionOptions::include_document_structure` is `true`. `None`
+    /// otherwise (the default), which avoids the overhead of building the tree.
+    ///
+    /// When present, the tree mirrors the converted document: headings open
+    /// [`crate::types::document::NodeContent::Group`] sections, paragraphs and list items carry
+    /// inline [`crate::types::document::TextAnnotation`]s, and tables reference the same
+    /// [`crate::types::tables::TableGrid`] data exposed in [`Self::tables`].
+    ///
+    /// Note: this field is independent of the `metadata` feature flag. Document structure
+    /// collection is always available at runtime; it is gated only by the runtime option, not
+    /// by a compile-time feature.
     pub document: Option<DocumentStructure>,
 
     /// Extracted HTML metadata (title, OG, links, images, structured data).

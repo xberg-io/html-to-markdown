@@ -15,14 +15,14 @@ and browsers for document indexing and presentation.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `title` | `str | None` | `None` | Document title from `<title>` tag |
-| `description` | `str | None` | `None` | Document description from `<meta name="description">` tag |
+| `title` | `str \| None` | `None` | Document title from `<title>` tag |
+| `description` | `str \| None` | `None` | Document description from `<meta name="description">` tag |
 | `keywords` | `list[str]` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
-| `author` | `str | None` | `None` | Document author from `<meta name="author">` tag |
-| `canonical_url` | `str | None` | `None` | Canonical URL from `<link rel="canonical">` tag |
-| `base_href` | `str | None` | `None` | Base URL from `<base href="">` tag for resolving relative URLs |
-| `language` | `str | None` | `None` | Document language from `lang` attribute |
-| `text_direction` | `TextDirection | None` | `None` | Document text direction from `dir` attribute |
+| `author` | `str \| None` | `None` | Document author from `<meta name="author">` tag |
+| `canonical_url` | `str \| None` | `None` | Canonical URL from `<link rel="canonical">` tag |
+| `base_href` | `str \| None` | `None` | Base URL from `<base href="">` tag for resolving relative URLs |
+| `language` | `str \| None` | `None` | Document language from `lang` attribute |
+| `text_direction` | `TextDirection \| None` | `None` | Document text direction from `dir` attribute |
 | `open_graph` | `dict[str, str]` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
 | `twitter_card` | `dict[str, str]` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
 | `meta_tags` | `dict[str, str]` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
@@ -69,17 +69,17 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `br_in_tables` | `bool` | `False` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `HighlightStyle.DOUBLE_EQUAL` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
 | `extract_metadata` | `bool` | `True` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `True`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
-| `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode.NORMALIZED` | Controls how whitespace is normalised during conversion. |
+| `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode.NORMALIZED` | Controls how whitespace sequences are normalised in the converted output. - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters (spaces, tabs, newlines) to a single space, matching browser rendering behaviour. - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source HTML, including runs of spaces and embedded newlines. Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted content outside `<pre>` tags). For most documents `Normalized` produces cleaner output. |
 | `strip_newlines` | `bool` | `False` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `False` | Wrap long lines at `wrap_width` characters. |
-| `wrap_width` | `int` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
+| `wrap_width` | `int` | `80` | Maximum output line width in characters when `wrap` is `True` (default `80`). Lines are broken at word boundaries so that no line exceeds this length. A value of `0` is treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is `False`. |
 | `convert_as_inline` | `bool` | `False` | Treat the entire document as inline content (no block-level wrappers). |
 | `sub_symbol` | `str` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
 | `sup_symbol` | `str` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newline_style` | `NewlineStyle` | `NewlineStyle.SPACES` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `code_block_style` | `CodeBlockStyle` | `CodeBlockStyle.BACKTICKS` | Style used for fenced code blocks (backticks or tilde). |
 | `keep_inline_images_in` | `list[str]` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Pre-processing options applied to the HTML before conversion. |
+| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `str` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `bool` | `False` | Emit debug information during conversion. |
 | `strip_tags` | `list[str]` | `[]` | HTML tag names whose content is stripped from the output entirely. |
@@ -92,9 +92,9 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `max_image_size` | `int` | `5242880` | Maximum decoded image size in bytes (default 5MB). |
 | `capture_svg` | `bool` | `False` | Capture SVG elements as images. |
 | `infer_dimensions` | `bool` | `True` | Infer image dimensions from data. |
-| `max_depth` | `int | None` | `None` | Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are silently truncated. |
+| `max_depth` | `int \| None` | `None` | Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are silently truncated. |
 | `exclude_selectors` | `list[str]` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
-| `visitor` | `VisitorHandle | None` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
+| `visitor` | `VisitorHandle \| None` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ---
 
@@ -120,8 +120,8 @@ metadata, extracted tables, images, and processing warnings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `str | None` | `None` | Converted text output (markdown, djot, or plain text). `None` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
-| `document` | `DocumentStructure | None` | `None` | Structured document tree with semantic elements. Populated when `include_document_structure` is `True` in options. |
+| `content` | `str \| None` | `None` | Converted text output (markdown, djot, or plain text). `None` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
+| `document` | `DocumentStructure \| None` | `None` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `True`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `list[TableData]` | `[]` | Extracted tables with structured cell data and markdown representation. |
 | `images` | `list[str]` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `True` in options. |
@@ -137,7 +137,7 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `int` | — | Number of rows. |
 | `cols` | `int` | — | Number of columns. |
-| `cells` | `list[GridCell]` | `[]` | All cells in the table (may be fewer than rows*cols due to spans). |
+| `cells` | `list[GridCell]` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\|\\| cols == 0`) produces an empty vec. |
 
 ---
 

@@ -3,7 +3,21 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-/// A non-fatal warning generated during HTML processing.
+/// A non-fatal diagnostic produced during HTML conversion.
+///
+/// Warnings indicate that conversion completed but some content may have been handled
+/// differently than expected — for example, an image that could not be extracted, a truncated
+/// input, or malformed HTML that was repaired with best-effort parsing.
+///
+/// Conversion always succeeds (returns [`crate::ConversionResult`]) even when warnings are
+/// present. Callers should inspect [`crate::ConversionResult::warnings`] and decide how to
+/// handle them based on their tolerance for partial results:
+///
+/// - **Logging pipelines**: emit each warning at `WARN` level and continue.
+/// - **Strict pipelines**: treat any warning as a hard error by checking
+///   `result.warnings.is_empty()` before using the output.
+///
+/// See [`WarningKind`] for the full taxonomy of warning categories.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct ProcessingWarning {

@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update PHP dependencies within major versions (composer update --with-dependencies)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/php && composer update --with-dependencies
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade PHP dependencies to latest including breaking changes (composer update --with-all-dependencies)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/php && composer update --with-all-dependencies
+        ignore_error: false

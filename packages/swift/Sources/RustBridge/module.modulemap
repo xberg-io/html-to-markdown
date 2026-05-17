@@ -1,0 +1,2 @@
+// This modulemap is unused — the RustBridgeC target provides the C types.
+// SwiftPM discovers RustBridgeC.h via the publicHeadersPath setting.

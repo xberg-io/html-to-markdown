@@ -5,6 +5,20 @@ All notable changes to html-to-markdown will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **wasm: `NodeContent::MetadataBlock { entries }` round-trips correctly as `[[k,v],...]`** — the `entries: Vec<(String, String)>` field is now stored as `JsValue` in the wasm binding struct and serialized/deserialized via `serde_wasm_bindgen` instead of `Vec<String>`, preserving the nested-array wire format that serde produces for tuple vecs.
+
+### Added
+
+- **Kotlin Android binding** — `dev.kreuzberg:html-to-markdown-android` on Maven Central. Standalone Android library (AAR) with bundled `libhtml_to_markdown_ffi.so` for `arm64-v8a` and `x86_64` ABIs; minSdk 21, compileSdk 35. JVM Kotlin users continue to consume the existing Java package (`dev.kreuzberg:html-to-markdown`) directly — Kotlin/JVM treats Java classes as native and Panama FFM is unavailable on Android, which is why Android needs its own package.
+- **Swift binding** — `HtmlToMarkdown` Swift Package on Swift Package Index. SPM-only (no CocoaPods); macOS 13+, iOS 16+; powered by `swift-bridge`.
+- **Dart binding** — `h2m` on pub.dev. Built with `flutter_rust_bridge` 2.12; supports Flutter Android/iOS targets plus server Dart on Linux/macOS/Windows. Package name `h2m` because `html_to_markdown` and `html-to-markdown` are taken on pub.dev.
+- **Zig binding** — published via GitHub Releases (`build.zig.zon` + tarball SHA-256 in release notes). Requires Zig 0.16+; links the existing `html_to_markdown_ffi` C library — no separate Rust bridge crate.
+- **ffi**: `htm_visitor_handle_from_callbacks` exports a vtable-style visitor-handle constructor for zig and other C consumers. Wraps a `HtmVisitorCallbacks` struct into the `VisitorHandle` shape expected by `htm_conversion_options_builder_visitor`.
+
 ## [3.4.1] - 2026-05-13
 
 ### Changed

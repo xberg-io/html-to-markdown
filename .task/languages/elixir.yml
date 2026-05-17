@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Elixir dependencies within major versions (mix deps.update --all)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/elixir && mix deps.update --all
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Elixir dependencies to latest including breaking changes (mix hex.outdated + mix deps.update)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/elixir && mix hex.outdated --all && mix deps.update --all
+        ignore_error: false

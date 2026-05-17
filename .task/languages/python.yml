@@ -47,6 +47,22 @@ tasks:
     cmds:
       - alef test --e2e --lang python
 
+  update:
+    desc: "Update Python dependencies within major versions (uv sync)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd {{.PYTHON_PKG}} && uv sync --upgrade-package "*" --no-prerelease
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Python dependencies to latest including breaking changes (uv sync --upgrade)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd {{.PYTHON_PKG}} && uv sync --upgrade
+        ignore_error: false
+
   clean:
     desc: "Clean Python build artifacts"
     cmds:

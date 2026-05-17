@@ -40,6 +40,18 @@
 === "WASM"
 --8<-- "snippets/wasm/getting-started/basic_usage.md"
 
+=== "Swift"
+--8<-- "snippets/swift/getting-started/basic_usage.md"
+
+=== "Dart"
+--8<-- "snippets/dart/getting-started/basic_usage.md"
+
+=== "Kotlin"
+--8<-- "snippets/kotlin_android/getting-started/basic_usage.md"
+
+=== "Zig"
+--8<-- "snippets/zig/getting-started/basic_usage.md"
+
 ## ConversionResult Fields
 
 Every call to `convert()` returns a `ConversionResult` with the following fields:
@@ -87,6 +99,18 @@ Control output style, metadata extraction, and more via `ConversionOptions`.
 === "R"
 --8<-- "snippets/r/getting-started/with_options.md"
 
+=== "Swift"
+--8<-- "snippets/swift/getting-started/with_options.md"
+
+=== "Dart"
+--8<-- "snippets/dart/getting-started/with_options.md"
+
+=== "Kotlin"
+--8<-- "snippets/kotlin_android/getting-started/with_options.md"
+
+=== "Zig"
+--8<-- "snippets/zig/getting-started/with_options.md"
+
 ## Metadata Extraction
 
 Enable `extract_metadata` to populate the `metadata` field with structured data parsed from the HTML `<head>` and document body.
@@ -120,6 +144,18 @@ Enable `extract_metadata` to populate the `metadata` field with structured data 
 
 === "R"
 --8<-- "snippets/r/metadata/basic_extraction.md"
+
+=== "Swift"
+--8<-- "snippets/swift/metadata/basic_extraction.md"
+
+=== "Dart"
+--8<-- "snippets/dart/metadata/basic_extraction.md"
+
+=== "Kotlin"
+--8<-- "snippets/kotlin_android/metadata/basic_extraction.md"
+
+=== "Zig"
+--8<-- "snippets/zig/metadata/basic_extraction.md"
 
 ### Metadata Fields
 

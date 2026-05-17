@@ -54,10 +54,11 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.0.7
+    rev: v1.1.2
     hooks:
       - id: cargo-sort
         args: [-w]
+        exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
       - id: cargo-fmt
         args: ["--all"]
       - id: cargo-check
@@ -93,6 +94,72 @@ repos:
         exclude: ^(e2e/|test_apps/)
       - id: cargo-deny
         args: ["check"]
+      - id: rustdoc-lint
+        # Scope to the core library only. The binding wrappers (node/py/php/
+        # wasm/jni/ffi/cli) are alef-generated — rustdoc gaps there are alef's
+        # responsibility, fixed upstream and pulled in via the next alef-rev bump.
+        files: ^crates/html-to-markdown/src/.*\.rs$
+        exclude: /tests/
+        args: ["-p", "html-to-markdown-rs"]
+      - id: pydocstyle
+        files: ^packages/python/.*\.py$
+        exclude: ^packages/python/(tests/|.*_native\.py$)
+      # tsdoc-lint disabled — h2m's TypeScript binding uses biome+oxlint, not
+      # eslint, so the hook would no-op anyway. Re-enable after wiring eslint +
+      # eslint-plugin-tsdoc + eslint-plugin-jsdoc in packages/typescript/.
+      # - id: tsdoc-lint
+      #   files: ^packages/typescript/src/.*\.ts$
+      #   exclude: \.d\.ts$
+      - id: alef-docs-fresh
+      # yard-coverage disabled — h2m's root Gemfile doesn't include yard;
+      # bundle exec yard fails and the hook doesn't fall back to direct
+      # `yard` on PATH. Add `gem 'yard', group: :development` to enable.
+      # - id: yard-coverage
+      #   files: ^packages/ruby/lib/.*\.rb$
+      #   exclude: ^packages/ruby/lib/html_to_markdown/native\.rb$
+      - id: roxygen2-check
+        files: ^packages/r/R/.*\.R$
+      # godoc-lint disabled — hook v1.1.2 invokes `golangci-lint --disable-all`
+      # which is not accepted by golangci-lint v2.x. Re-enable after
+      # pre-commit-hooks fix lands.
+      # - id: godoc-lint
+      #   files: ^packages/go/.*\.go$
+      #   exclude: ^(e2e/|test_apps/)
+      - id: javadoc-lint
+        files: ^packages/java/src/main/.*\.java$
+      - id: cs-xmldoc-lint
+        files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
+      # ex-doc-coverage disabled — mix docs requires compiling the elixir
+      # binding, which downloads the precompiled NIF for the current crate
+      # version. Pre-tag v3.5.0 the NIF is not yet released, so download
+      # 404s. Re-enable after v3.5.0 NIF artifact is published, or wire
+      # `:force_build` in packages/elixir/config/dev.exs.
+      # - id: ex-doc-coverage
+      #   files: ^packages/elixir/lib/.*\.ex$
+      - id: phpdoc-lint
+        files: ^packages/php/src/.*\.php$
+      - id: dart-doc-lint
+        files: ^packages/dart/lib/.*\.dart$
+        exclude: ^packages/dart/lib/src/rust/
+      # swift-doc-coverage disabled — requires swift-docc-plugin in
+      # packages/swift/Package.swift. Re-enable after Package.swift adds the
+      # plugin dep.
+      # - id: swift-doc-coverage
+      #   files: ^packages/swift/Sources/HtmlToMarkdown/.*\.swift$
+      # zig-doc-lint disabled — prek/identify doesn't classify .zig files
+      # as type 'zig', so prek skips with "no files to check". Re-enable
+      # after pre-commit-hooks switches the manifest to a files-based pattern.
+      # - id: zig-doc-lint
+      #   files: ^packages/zig/src/.*\.zig$
+      #   exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
+      # kotlin-dokka disabled — requires Dokka Gradle plugin in
+      # packages/kotlin-android/build.gradle.kts; not yet wired.
+      # - id: kotlin-dokka
+      #   files: ^packages/kotlin-android/src/main/.*\.kt$
+      # markdownlint-rumdl-strict is not wired here — h2m's docs use mkdocs/
+      # zensical extensions (HTML grids, indented code, long URL tables) that
+      # the bundled strict config over-flags. The auto-fixing `rumdl-fmt` hook
+      # below already catches the issues we care about.
       - id: shfmt
         args: ["-w", "-i", "2"]
       - id: shellcheck
@@ -139,6 +206,27 @@ repos:
         files: ^packages/elixir/
       - id: java-verify
         files: ^packages/java/
+      - id: ktfmt
+        files: ^packages/kotlin-android/.*\.kts?$
+        args: ["--kotlinlang-style"]
+      - id: detekt
+        files: ^packages/kotlin-android/.*\.kts?$
+        args: ["--build-upon-default-config"]
+      - id: ktlint
+        files: ^packages/kotlin-android/.*\.kts?$
+      - id: swift-format
+        files: ^packages/swift/.*\.swift$
+      - id: swiftlint
+        files: ^packages/swift/.*\.swift$
+      - id: dart-format
+        files: ^packages/dart/.*\.dart$
+      - id: dart-analyze
+        files: ^packages/dart/.*\.dart$
+        exclude: ^(test_apps/|e2e/dart/)
+      - id: zig-fmt
+        files: ^packages/zig/.*\.zig$
+      - id: zig-build-check
+        files: ^packages/zig/.*\.zig$
       - id: textlint
         files: ^docs/.*\.md$
         exclude: ^docs/(reference/|api-|snippets/|migration/)
@@ -154,7 +242,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.15.66
+    rev: v0.16.21
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

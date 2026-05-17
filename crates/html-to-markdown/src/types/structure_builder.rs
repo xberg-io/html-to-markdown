@@ -2,7 +2,7 @@
 //!
 //! Walk the DOM once, mapping each HTML element to the appropriate [`NodeContent`] variant,
 //! collecting inline [`TextAnnotation`]s, tracking parent/child relationships, and generating
-//! heading-based [`Group`] hierarchy.
+//! heading-based [`NodeContent::Group`] hierarchy.
 
 use std::collections::HashMap;
 
@@ -367,7 +367,28 @@ impl BuilderState {
 ///
 /// Walks the DOM once, mapping HTML elements to semantic [`NodeContent`] variants,
 /// tracking parent/child relationships, extracting inline [`TextAnnotation`]s, and
-/// constructing heading-based [`Group`] nodes.
+/// constructing heading-based [`NodeContent::Group`] nodes.
+///
+/// This function is infallible: malformed or unexpected HTML is silently skipped rather than
+/// returned as an error. Callers that need warnings about skipped content should use the
+/// incremental `StructureCollector` directly and inspect the conversion pipeline's warning
+/// channel.
+///
+/// The returned [`DocumentStructure`] has `source_format` set to `"html"`. The node array is
+/// in document reading order; each node carries index-based `parent` and `children` references
+/// into the same array.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use html_to_markdown_rs::types::build_document_structure;
+///
+/// let dom = tl::parse("<h1>Title</h1><p>Body</p>", tl::ParserOptions::default())
+///     .expect("valid HTML");
+/// let doc = build_document_structure(&dom);
+/// assert_eq!(doc.source_format.as_deref(), Some("html"));
+/// assert!(!doc.nodes.is_empty());
+/// ```
 pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
     let parser = dom.parser();
     let mut state = BuilderState::new();

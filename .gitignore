@@ -176,6 +176,16 @@ node_modules/
 vendor/bundle/
 vendor/
 
+
+# Build caches (added by docs-quality sweep)
+**/.zig-cache/
+**/.dart_tool/
+**/.build/
+e2e/kotlin_android/build/
+packages/kotlin-android/build/
+
+**/logs/
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
 .claude/

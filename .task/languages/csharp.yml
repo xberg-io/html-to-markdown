@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update C# dependencies within major versions (dotnet outdated -u --version-lock Minor)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/csharp && dotnet outdated -u --version-lock Minor
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade C# dependencies to latest including breaking changes (dotnet outdated -u)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/csharp && dotnet outdated -u
+        ignore_error: false

@@ -29,6 +29,26 @@ includes:
     taskfile: ./.task/languages/rust.yml
   python:
     taskfile: ./.task/languages/python.yml
+  node:
+    taskfile: ./.task/languages/node.yml
+  ruby:
+    taskfile: ./.task/languages/ruby.yml
+  php:
+    taskfile: ./.task/languages/php.yml
+  go:
+    taskfile: ./.task/languages/go.yml
+  java:
+    taskfile: ./.task/languages/java.yml
+  csharp:
+    taskfile: ./.task/languages/csharp.yml
+  elixir:
+    taskfile: ./.task/languages/elixir.yml
+  dart:
+    taskfile: ./.task/languages/dart.yml
+  swift:
+    taskfile: ./.task/languages/swift.yml
+  kotlin_android:
+    taskfile: ./.task/languages/kotlin_android.yml
   version:
     taskfile: ./.task/tools/version-sync.yml
   docs:
@@ -177,12 +197,40 @@ tasks:
     desc: "Update all dependencies (within major versions)"
     cmds:
       - alef update
+      - cmd: npx --yes actions-up@latest --yes --style preserve
+        ignore_error: false
+      - task: rust:update
+      - task: python:update
+      - task: node:update
+      - task: ruby:update
+      - task: php:update
+      - task: go:update
+      - task: java:update
+      - task: csharp:update
+      - task: elixir:update
+      - task: dart:update
+      - task: swift:update
+      - task: kotlin_android:update
       - prek autoupdate
 
   upgrade:
     desc: "Upgrade all dependencies to latest (including breaking changes)"
     cmds:
       - alef update --latest
+      - cmd: npx --yes actions-up@latest --yes --mode major --style preserve
+        ignore_error: false
+      - task: rust:upgrade
+      - task: python:upgrade
+      - task: node:upgrade
+      - task: ruby:upgrade
+      - task: php:upgrade
+      - task: go:upgrade
+      - task: java:upgrade
+      - task: csharp:upgrade
+      - task: elixir:upgrade
+      - task: dart:upgrade
+      - task: swift:upgrade
+      - task: kotlin_android:upgrade
       - prek autoupdate
 
   # === Coverage ===
@@ -440,6 +488,10 @@ tasks:
       - task: e2e:test:csharp
       - task: e2e:test:elixir
       - task: e2e:test:r
+      - task: e2e:test:swift
+      - task: e2e:test:dart
+      - task: e2e:test:zig
+      - task: e2e:test:kotlin_android
 
   e2e:test:python:
     desc: "Comprehensive tests for Python package"
@@ -499,6 +551,31 @@ tasks:
     dir: packages/r
     cmds:
       - Rscript -e 'devtools::test()'
+
+  e2e:test:swift:
+    desc: "Comprehensive tests for Swift package"
+    dir: test_apps/swift_e2e
+    cmds:
+      - swift test
+
+  e2e:test:dart:
+    desc: "Comprehensive tests for Dart package"
+    dir: test_apps/dart
+    cmds:
+      - dart pub get
+      - dart test
+
+  e2e:test:zig:
+    desc: "Comprehensive tests for Zig package"
+    dir: test_apps/zig
+    cmds:
+      - zig build test
+
+  e2e:test:kotlin_android:
+    desc: "Comprehensive tests for Kotlin/Android AAR (host JVM tests)"
+    dir: test_apps/kotlin_android
+    cmds:
+      - ./gradlew test
 
   # === test_apps aggregators (mirrors lllm naming convention) ===
   test-apps:smoke:

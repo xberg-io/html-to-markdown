@@ -63,13 +63,25 @@ pub struct ConversionOptions {
     /// Default `true`. Disabling skips the metadata pass only — table
     /// extraction into `result.tables` runs unconditionally.
     pub extract_metadata: bool,
-    /// Controls how whitespace is normalised during conversion.
+    /// Controls how whitespace sequences are normalised in the converted output.
+    ///
+    /// - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
+    ///   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+    /// - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
+    ///   source HTML, including runs of spaces and embedded newlines.
+    ///
+    /// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
+    /// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
     pub whitespace_mode: WhitespaceMode,
     /// Strip all newlines from the output, producing a single-line result.
     pub strip_newlines: bool,
     /// Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
     pub wrap: bool,
-    /// Maximum line width when [`wrap`](Self::wrap) is enabled (default `80`).
+    /// Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
+    ///
+    /// Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
+    /// is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
+    /// effect when `wrap` is `false`.
     pub wrap_width: usize,
     /// Treat the entire document as inline content (no block-level wrappers).
     pub convert_as_inline: bool,
@@ -83,7 +95,15 @@ pub struct ConversionOptions {
     pub code_block_style: CodeBlockStyle,
     /// HTML tag names whose `<img>` children are kept inline instead of block.
     pub keep_inline_images_in: Vec<String>,
-    /// Pre-processing options applied to the HTML before conversion.
+    /// Options for the HTML pre-processing pass applied before conversion begins.
+    ///
+    /// Pre-processing runs before the HTML is handed to the converter and can perform operations
+    /// such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
+    /// vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
+    ///
+    /// Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
+    /// passes. Set individual fields on [`PreprocessingOptions`] (or construct via
+    /// [`ConversionOptions::builder`]) to opt in or out of specific passes.
     pub preprocessing: PreprocessingOptions,
     /// Expected character encoding of the input HTML (default `"utf-8"`).
     pub encoding: String,
@@ -185,8 +205,31 @@ impl Default for ConversionOptions {
 }
 
 impl ConversionOptions {
-    /// Create a new builder with default values.
+    /// Create a [`ConversionOptionsBuilder`] pre-populated with default values.
+    ///
+    /// All fields start at their documented defaults. Use the setter methods on the returned
+    /// builder to override individual fields, then call [`ConversionOptionsBuilder::build`] to
+    /// produce the final [`ConversionOptions`].
+    ///
+    /// No fields are required — calling `.build()` immediately yields a valid options struct
+    /// identical to [`ConversionOptions::default()`].
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use html_to_markdown_rs::{ConversionOptions, options::validation::{HeadingStyle, WhitespaceMode}};
+    ///
+    /// let options = ConversionOptions::builder()
+    ///     .heading_style(HeadingStyle::AtxClosed)
+    ///     .wrap(true)
+    ///     .wrap_width(100)
+    ///     .whitespace_mode(WhitespaceMode::Normalized)
+    ///     .build();
+    ///
+    /// assert_eq!(options.wrap_width, 100);
+    /// ```
     #[must_use]
+    #[cfg_attr(alef, alef(skip))]
     pub fn builder() -> ConversionOptionsBuilder {
         ConversionOptionsBuilder(Self::default())
     }
@@ -198,6 +241,7 @@ impl ConversionOptions {
 ///
 /// All fields start with default values. Call `.build()` to produce the final options.
 #[derive(Debug, Clone)]
+#[cfg_attr(alef, alef(skip))]
 pub struct ConversionOptionsBuilder(ConversionOptions);
 
 macro_rules! builder_setter {
@@ -222,6 +266,7 @@ macro_rules! builder_setter_into {
     };
 }
 
+#[cfg_attr(alef, alef(skip))]
 impl ConversionOptionsBuilder {
     // Output control
     builder_setter!(output_format, OutputFormat);
@@ -428,6 +473,7 @@ pub struct ConversionOptionsUpdate {
 
 impl ConversionOptions {
     /// Apply a partial update to these conversion options.
+    #[cfg_attr(alef, alef(skip))]
     pub fn apply_update(&mut self, update: ConversionOptionsUpdate) {
         macro_rules! apply {
             ($field:ident) => {
@@ -486,6 +532,7 @@ impl ConversionOptions {
 
     /// Create from a partial update, applying to defaults.
     #[must_use]
+    #[cfg_attr(alef, alef(skip))]
     pub fn from_update(update: ConversionOptionsUpdate) -> Self {
         let mut options = Self::default();
         options.apply_update(update);

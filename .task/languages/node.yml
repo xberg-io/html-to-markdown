@@ -1,0 +1,25 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Node.js dependencies within major versions (pnpm up)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/typescript && pnpm up
+        ignore_error: false
+      - cmd: |
+          cd packages/wasm && pnpm up
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Node.js dependencies to latest including breaking changes (pnpm up --latest)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/typescript && pnpm up --latest
+        ignore_error: false
+      - cmd: |
+          cd packages/wasm && pnpm up --latest
+        ignore_error: false

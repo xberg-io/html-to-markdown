@@ -25,3 +25,30 @@ tasks:
     desc: Lint prose with textlint
     cmds:
       - npx textlint 'docs/**/*.md'
+
+  snippets:validate:
+    desc: Validate all docs/snippets via alef-snippets (syntax level)
+    cmds:
+      - alef-snippets validate --snippets docs/snippets --level syntax --timeout 120 -j 4
+
+  snippets:validate:lang:
+    desc: 'Validate snippets for one language (set LANG=dart|kotlin|swift|...)'
+    cmds:
+      - alef-snippets validate --snippets docs/snippets --level syntax --languages {{.LANG}} --timeout 120 -j 4
+    requires:
+      vars: [LANG]
+
+  snippets:list:
+    desc: List all discovered docs/snippets
+    cmds:
+      - alef-snippets list --snippets docs/snippets
+
+  snippets:gaps:
+    desc: Report snippet coverage gaps (missing variants, unreferenced files, etc.)
+    cmds:
+      - alef-snippets gaps --snippets docs/snippets --docs docs --required-languages rust,python,typescript,go,ruby,php,java,csharp,elixir,r,c,swift,dart,kotlin,zig
+
+  snippets:audit:
+    desc: Run structural audit (frontmatter, fences, includes)
+    cmds:
+      - alef-snippets audit --snippets docs/snippets --docs docs

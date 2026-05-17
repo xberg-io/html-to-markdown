@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Swift dependencies (swift package update; SPM has no conservative flag)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/swift && swift package update
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Swift dependencies (swift package update; SPM has no major-version flag)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/swift && swift package update
+        ignore_error: false

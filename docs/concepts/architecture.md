@@ -66,13 +66,13 @@ The FFI crate exposes a minimal, null-safe C API (`htm_convert`, `htm_conversion
 
 The core library compiles with five Cargo features. Bindings enable the subset they expose.
 
-| Feature         | What it gates                                                         |
-| --------------- | --------------------------------------------------------------------- |
-| `metadata`      | Metadata extraction and `HtmlMetadata` types (on by default)          |
-| `visitor`       | `HtmlVisitor` trait and `ConversionError::Visitor`                    |
-| `inline-images` | Data-URI decoder and inline SVG extractor                             |
-| `serde`         | `Serialize`/`Deserialize` on option and result types                  |
-| `full`          | All four optional features combined                                   |
+| Feature         | What it gates                                                |
+| --------------- | ------------------------------------------------------------ |
+| `metadata`      | Metadata extraction and `HtmlMetadata` types (on by default) |
+| `visitor`       | `HtmlVisitor` trait and `ConversionError::Visitor`           |
+| `inline-images` | Data-URI decoder and inline SVG extractor                    |
+| `serde`         | `Serialize`/`Deserialize` on option and result types         |
+| `full`          | All four optional features combined                          |
 
 The WASM build omits `inline-images` (no filesystem, no image decoder in the browser sandbox).
 

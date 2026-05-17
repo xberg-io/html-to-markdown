@@ -1,6 +1,8 @@
 [default.extend-words]
 # Tools and proper nouns that look like typos
 delocate = "delocate"
+# Jackson Java package path segment `databind.ser.std.StdSerializer`
+ser = "ser"
 
 [files]
 extend-exclude = [
@@ -22,4 +24,13 @@ extend-exclude = [
   "dist/",
   ".alef/",
   "*.svg",
+  # Gradle/Kotlin build outputs
+  "e2e/kotlin_android/build/",
+  "packages/kotlin-android/build/",
+  # Zig build cache (cimport.zig pulls in darwin headers with ARM SME refs)
+  "**/.zig-cache/",
+  # Dart build cache
+  "**/.dart_tool/",
+  # Swift build cache
+  "**/.build/",
 ]

@@ -87,6 +87,10 @@ jobs:
       release_php: ${{ steps.meta.outputs.release_php }}
       release_elixir: ${{ steps.meta.outputs.release_elixir }}
       release_c_ffi: ${{ steps.meta.outputs.release_c_ffi }}
+      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin_android }}
+      release_swift: ${{ steps.meta.outputs.release_swift }}
+      release_dart: ${{ steps.meta.outputs.release_dart }}
+      release_zig: ${{ steps.meta.outputs.release_zig }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -377,6 +381,68 @@ jobs:
           tag: ${{ needs.prepare.outputs.tag }}
           asset-prefix: libhtml_to_markdown_nif-
 
+  check-maven-kotlin:
+    name: Check Maven Central for Kotlin Android
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_kotlin_android == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: maven
+          package: "dev.kreuzberg:html-to-markdown-kotlin"
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-pub:
+    name: Check pub.dev for Dart package
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_dart == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: pub
+          package: html_to_markdown
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-spi-swift:
+    name: Check Swift Package Index for tag
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_swift == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: swift
+          package: html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repo: ${{ github.repository }}
+
+  check-zig:
+    name: Check Zig package presence
+    needs: prepare
+    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_zig == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: zig
+          package: html-to-markdown
+          version: ${{ needs.prepare.outputs.version }}
+          repo: ${{ github.repository }}
+
   # ─── Build matrix jobs ────────────────────────────────────────────────
 
   python-wheels:
@@ -515,13 +581,43 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-latest, target: aarch64-apple-darwin, rust_target: "", use_napi_cross: false }
-          - { os: macos-15-intel, target: x86_64-apple-darwin, rust_target: "", use_napi_cross: false }
-          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, rust_target: "", use_napi_cross: false }
-          - { os: ubuntu-latest, target: aarch64-unknown-linux-gnu, rust_target: aarch64-unknown-linux-gnu, use_napi_cross: true }
+          - {
+              os: macos-latest,
+              target: aarch64-apple-darwin,
+              rust_target: "",
+              use_napi_cross: false,
+            }
+          - {
+              os: macos-15-intel,
+              target: x86_64-apple-darwin,
+              rust_target: "",
+              use_napi_cross: false,
+            }
+          - {
+              os: ubuntu-latest,
+              target: x86_64-unknown-linux-gnu,
+              rust_target: "",
+              use_napi_cross: false,
+            }
+          - {
+              os: ubuntu-latest,
+              target: aarch64-unknown-linux-gnu,
+              rust_target: aarch64-unknown-linux-gnu,
+              use_napi_cross: true,
+            }
           # musl + armv7 deferred — napi-cross artifact path mismatch ("No dist dir found") blocks every cross-compiled binding.
-          - { os: windows-latest, target: x86_64-pc-windows-msvc, rust_target: "", use_napi_cross: false }
-          - { os: windows-latest, target: aarch64-pc-windows-msvc, rust_target: aarch64-pc-windows-msvc, use_napi_cross: false }
+          - {
+              os: windows-latest,
+              target: x86_64-pc-windows-msvc,
+              rust_target: "",
+              use_napi_cross: false,
+            }
+          - {
+              os: windows-latest,
+              target: aarch64-pc-windows-msvc,
+              rust_target: aarch64-pc-windows-msvc,
+              use_napi_cross: false,
+            }
     steps:
       - uses: actions/checkout@v6
         with:
@@ -1772,6 +1868,136 @@ jobs:
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
 
+  kotlin-android-natives:
+    name: Build Kotlin Android natives (${{ matrix.abi }})
+    needs: [prepare]
+    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        abi: [arm64-v8a, x86_64]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          targets: aarch64-linux-android,x86_64-linux-android
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: kreuzberg-dev/actions/build-android-natives@v1
+        with:
+          crate-name: html-to-markdown-ffi
+          lib-name: html_to_markdown_ffi
+          abis: ${{ matrix.abi }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: kotlin-android-${{ matrix.abi }}
+          path: target/android-libs/${{ matrix.abi }}/libhtml_to_markdown_ffi.so
+          retention-days: 7
+
+  publish-kotlin-android:
+    name: Publish Kotlin Android to Maven Central
+    needs: [prepare, kotlin-android-natives, check-maven-kotlin]
+    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven-kotlin.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: kotlin-android-*
+          path: kotlin-android-artifacts
+          merge-multiple: true
+
+      - name: Stage Android natives into Kotlin Android module
+        shell: bash
+        run: |
+          for abi in arm64-v8a x86_64; do
+            dest="packages/kotlin-android/src/main/jniLibs/${abi}"
+            mkdir -p "$dest"
+            src="kotlin-android-artifacts/${abi}/libhtml_to_markdown_ffi.so"
+            if [[ -f "$src" ]]; then
+              cp -v "$src" "$dest/"
+            fi
+          done
+
+      - uses: kreuzberg-dev/actions/publish-maven-gradle@v1
+        with:
+          working-directory: packages/kotlin-android
+          gradle-task: publishAndReleaseToMavenCentral
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+  publish-swift:
+    name: Publish Swift to Swift Package Index
+    needs: [prepare, check-spi-swift]
+    if: ${{ needs.prepare.outputs.release_swift == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-spi-swift.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/publish-swift@v1
+        with:
+          working-directory: packages/swift
+          tag: ${{ needs.prepare.outputs.tag }}
+          ping-spi: "true"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+
+  publish-dart:
+    name: Publish Dart to pub.dev
+    needs: [prepare, check-pub]
+    if: ${{ needs.prepare.outputs.release_dart == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/publish-pub@v1
+        with:
+          package-dir: packages/dart
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+
+  publish-zig:
+    name: Publish Zig package metadata
+    needs: [prepare, check-zig]
+    if: ${{ needs.prepare.outputs.release_zig == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-zig.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.ref }}
+          submodules: recursive
+
+      - uses: kreuzberg-dev/actions/publish-zig@v1
+        with:
+          working-directory: packages/zig
+          tag: ${{ needs.prepare.outputs.tag }}
+          update-release-notes: "true"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # ─── Homebrew (formula update + bottles) ──────────────────────────────
   #
   # Topology (mirrors kreuzberg's; html-to-markdown ships TWO formulas):
@@ -1967,6 +2193,10 @@ jobs:
       - publish-nuget
       - publish-hex
       - publish-homebrew-bottles
+      - publish-kotlin-android
+      - publish-swift
+      - publish-dart
+      - publish-zig
       - upload-cli-release
       - upload-go-release
       - upload-c-ffi-release
@@ -2000,6 +2230,10 @@ jobs:
       - publish-nuget
       - publish-hex
       - publish-homebrew-bottles
+      - publish-kotlin-android
+      - publish-swift
+      - publish-dart
+      - publish-zig
       - upload-cli-release
       - upload-go-release
       - upload-c-ffi-release

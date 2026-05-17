@@ -271,3 +271,40 @@ fn test_plain_ordered_list_inside_unordered() {
         "Expected '1. Numbered' in output, got: {result}"
     );
 }
+
+// Regression tests for issue #362 — UTF-8 mangling in plain-text post-process.
+
+#[test]
+fn test_plain_preserves_em_dash_after_markup() {
+    // Exact repro from issue #362: bytes-cast path split the 3-byte en-dash (U+2013)
+    // into three Latin-1 chars, producing "â<ctrl><ctrl>" corruption.
+    let html = "<i>abc</i> \u{2013} def";
+    let result = convert(html, Some(plain_options())).unwrap();
+    assert_eq!(result, "abc \u{2013} def\n");
+}
+
+#[test]
+fn test_plain_preserves_cjk_emoji_mixed() {
+    // Exercises every multibyte class that the old bytes-cast path could corrupt:
+    // en-dash (U+2013, 3 bytes), CJK (U+4E16 世, 3 bytes), emoji (U+1F980 🦀, 4 bytes).
+    let html = "<p>Hello <i>world</i> \u{2013} <strong>世界</strong> loves 🦀</p>";
+    let result = convert(html, Some(plain_options())).unwrap();
+    assert_eq!(result, "Hello world \u{2013} 世界 loves 🦀\n");
+}
+
+#[test]
+fn test_plain_collapses_trim_induced_newlines() {
+    // Whitespace-only lines between paragraphs must collapse to a single blank line after
+    // trailing-whitespace trim, not produce 3+ newlines that survive post-processing.
+    let html = "<p>x</p>   \n   \n   \n<p>y</p>";
+    let result = convert(html, Some(plain_options())).unwrap();
+    assert_eq!(result, "x\n\ny\n");
+}
+
+#[test]
+fn test_plain_empty_whitespace_input() {
+    // All-whitespace content should produce an empty string, not a bare newline.
+    let html = "<p>   </p>\n\n\n";
+    let result = convert(html, Some(plain_options())).unwrap();
+    assert_eq!(result, "");
+}

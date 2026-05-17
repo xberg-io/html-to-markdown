@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Dart dependencies within major versions (dart pub upgrade)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/dart && dart pub upgrade
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Dart dependencies to latest including breaking changes (dart pub upgrade --major-versions)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/dart && dart pub upgrade --major-versions
+        ignore_error: false

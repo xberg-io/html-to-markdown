@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Go dependencies within major versions (go get -u=patch + go mod tidy)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/go && go get -u=patch ./... && go mod tidy
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Go dependencies to latest including breaking changes (go get -u + go mod tidy)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/go && go get -u ./... && go mod tidy
+        ignore_error: false

@@ -1,0 +1,5 @@
+analyzer:
+  exclude:
+    - test_apps/dart/**
+    - e2e/dart/**
+    - packages/dart/**

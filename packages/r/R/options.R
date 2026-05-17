@@ -1,4 +1,4 @@
-#' Create a ConversionOptions list for HTML-to-Markdown conversion
+#' Create a ConversionOptions list for generated bindings
 #'
 #' All parameters default to `NULL`, which means the Rust default is used.
 #' Pass named arguments to override individual settings.
@@ -18,17 +18,17 @@
 #' @param br_in_tables Render `<br>` elements inside table cells as literal line breaks
 #' @param highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`)
 #' @param extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction
-#' @param whitespace_mode Controls how whitespace is normalised during conversion
+#' @param whitespace_mode Controls how whitespace sequences are normalised in the converted output
 #' @param strip_newlines Strip all newlines from the output, producing a single-line result
 #' @param wrap Wrap long lines at [`wrap_width`](Self::wrap_width) characters
-#' @param wrap_width Maximum line width when [`wrap`](Self::wrap) is enabled (default `80`)
+#' @param wrap_width Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`)
 #' @param convert_as_inline Treat the entire document as inline content (no block-level wrappers)
 #' @param sub_symbol Markdown notation for subscript text (e.g. `"~"`)
 #' @param sup_symbol Markdown notation for superscript text (e.g. `"^"`)
 #' @param newline_style How to encode hard line breaks (`<br>`) in Markdown
 #' @param code_block_style Style used for fenced code blocks (backticks or tilde)
 #' @param keep_inline_images_in HTML tag names whose `<img>` children are kept inline instead of block
-#' @param preprocessing Pre-processing options applied to the HTML before conversion
+#' @param preprocessing Options for the HTML pre-processing pass applied before conversion begins
 #' @param encoding Expected character encoding of the input HTML (default `"utf-8"`)
 #' @param debug Emit debug information during conversion
 #' @param strip_tags HTML tag names whose content is stripped from the output entirely

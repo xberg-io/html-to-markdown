@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Kotlin/Android dependencies within major versions (gradlew dependencyUpdates)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/kotlin-android && ./gradlew dependencyUpdates
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Kotlin/Android dependencies to latest including breaking changes (gradlew useLatestVersions)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/kotlin-android && ./gradlew useLatestVersions
+        ignore_error: false

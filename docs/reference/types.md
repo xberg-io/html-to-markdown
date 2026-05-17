@@ -18,7 +18,7 @@ metadata, extracted tables, images, and processing warnings.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `content` | `Option<String>` | `Default::default()` | Converted text output (markdown, djot, or plain text). `None` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
-| `document` | `Option<DocumentStructure>` | `Default::default()` | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options. |
+| `document` | `Option<DocumentStructure>` | `Default::default()` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `Vec<TableData>` | `vec![]` | Extracted tables with structured cell data and markdown representation. |
 | `images` | `Vec<String>` | `vec![]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
@@ -53,17 +53,17 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `br_in_tables` | `bool` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlight_style` | `HighlightStyle` | `HighlightStyle::DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
 | `extract_metadata` | `bool` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
-| `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode::Normalized` | Controls how whitespace is normalised during conversion. |
+| `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode::Normalized` | Controls how whitespace sequences are normalised in the converted output. - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters (spaces, tabs, newlines) to a single space, matching browser rendering behaviour. - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source HTML, including runs of spaces and embedded newlines. Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted content outside `<pre>` tags). For most documents `Normalized` produces cleaner output. |
 | `strip_newlines` | `bool` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `false` | Wrap long lines at `wrap_width` characters. |
-| `wrap_width` | `usize` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
+| `wrap_width` | `usize` | `80` | Maximum output line width in characters when `wrap` is `true` (default `80`). Lines are broken at word boundaries so that no line exceeds this length. A value of `0` is treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is `false`. |
 | `convert_as_inline` | `bool` | `false` | Treat the entire document as inline content (no block-level wrappers). |
 | `sub_symbol` | `String` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
 | `sup_symbol` | `String` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newline_style` | `NewlineStyle` | `NewlineStyle::Spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `code_block_style` | `CodeBlockStyle` | `CodeBlockStyle::Backticks` | Style used for fenced code blocks (backticks or tilde). |
 | `keep_inline_images_in` | `Vec<String>` | `vec![]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Pre-processing options applied to the HTML before conversion. |
+| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `String` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `bool` | `false` | Emit debug information during conversion. |
 | `strip_tags` | `Vec<String>` | `vec![]` | HTML tag names whose content is stripped from the output entirely. |
@@ -103,7 +103,7 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `u32` | — | Number of rows. |
 | `cols` | `u32` | — | Number of columns. |
-| `cells` | `Vec<GridCell>` | `vec![]` | All cells in the table (may be fewer than rows*cols due to spans). |
+| `cells` | `Vec<GridCell>` | `vec![]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\|\\| cols == 0`) produces an empty vec. |
 
 ---
 
@@ -227,7 +227,7 @@ A single node in the document tree.
 | `parent` | `Option<u32>` | `None` | Index of the parent node (None for root nodes). |
 | `children` | `Vec<u32>` | — | Indices of child nodes in reading order. |
 | `annotations` | `Vec<TextAnnotation>` | — | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
-| `attributes` | `HashMap<String, String>` | `None` | Format-specific attributes (e.g. class, id, data-* attributes). |
+| `attributes` | `HashMap<String, String>` | `None` | Format-specific attributes preserved from the source HTML element. Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`, `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no HTML entity decoding is applied here. The map is `None` when no attributes are present (omitted entirely in serialized output). Not every HTML attribute is preserved: only attributes that carry semantic or structural significance for the node type are collected. For example, heading nodes capture the `"id"` attribute for anchor linking; other element-level attributes may be silently dropped. |
 
 ---
 
@@ -293,21 +293,22 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-#### ConversionOptionsBuilder
-
-Builder for `ConversionOptions`.
-
-All fields start with default values. Call `.build()` to produce the final options.
-
-*Opaque type — fields are not directly accessible.*
-
----
-
 #### TextAnnotation
 
-An inline text annotation with byte-range offsets.
+A styling or semantic annotation that applies to a byte range within a node's text.
 
-Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+Unlike `DocumentNode`, which captures block-level structure (headings, paragraphs, etc.),
+a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+similar — that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
+
+Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
+follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
+text is `text[start as usize..end as usize]`.
+
+Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+stored in the order they are encountered during DOM traversal.
+
+See `AnnotationKind` for the full list of supported annotation types.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -319,7 +320,21 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 #### ProcessingWarning
 
-A non-fatal warning generated during HTML processing.
+A non-fatal diagnostic produced during HTML conversion.
+
+Warnings indicate that conversion completed but some content may have been handled
+differently than expected — for example, an image that could not be extracted, a truncated
+input, or malformed HTML that was repaired with best-effort parsing.
+
+Conversion always succeeds (returns `ConversionResult`) even when warnings are
+present. Callers should inspect `warnings` and decide how to
+handle them based on their tolerance for partial results:
+
+- **Logging pipelines**: emit each warning at `WARN` level and continue.
+- **Strict pipelines**: treat any warning as a hard error by checking
+  `result.warnings.is_empty()` before using the output.
+
+See `WarningKind` for the full taxonomy of warning categories.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -348,23 +363,22 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-## Method Naming Convention
+# Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-## Execution Order
+# Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
-
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-## Performance Notes
+# Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
@@ -392,11 +406,11 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 | `Subscript` | `subscript` | Subscript text. |
 | `Superscript` | `superscript` | Superscript text. |
 | `Highlight` | `highlight` | Highlighted / marked text. |
-| `Link` | `link` | A hyperlink. — Fields: `url`: `String`, `title`: `String` |
+| `Link` | `link` | A hyperlink sourced from an `<a href="...">` element. — Fields: `url`: `String`, `title`: `String` |
 
 ---
 
-##### CodeBlockStyle
+#### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -410,7 +424,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-##### HeadingStyle
+#### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -424,7 +438,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-##### HighlightStyle
+#### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -439,7 +453,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-##### ImageType
+#### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -454,7 +468,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-##### LinkStyle
+#### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -468,7 +482,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-##### LinkType
+#### LinkType
 
 Link classification based on href value and document context.
 
@@ -485,7 +499,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-##### ListIndentType
+#### ListIndentType
 
 List indentation character type.
 
@@ -498,7 +512,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-##### NewlineStyle
+#### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -511,7 +525,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-##### NodeContent
+#### NodeContent
 
 The semantic content type of a document node.
 
@@ -535,7 +549,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-##### NodeType
+#### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -635,7 +649,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-##### OutputFormat
+#### OutputFormat
 
 Output format for conversion.
 
@@ -649,7 +663,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-##### PreprocessingPreset
+#### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -663,7 +677,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-##### StructuredDataType
+#### StructuredDataType
 
 Structured data format type.
 
@@ -677,7 +691,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-##### TextDirection
+#### TextDirection
 
 Text directionality of document content.
 
@@ -691,7 +705,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-##### VisitResult
+#### VisitResult
 
 Result of a visitor callback.
 
@@ -709,7 +723,7 @@ preserving HTML, or signaling errors.
 
 ---
 
-##### WarningKind
+#### WarningKind
 
 Categories of processing warnings.
 
@@ -724,7 +738,7 @@ Categories of processing warnings.
 
 ---
 
-##### WhitespaceMode
+#### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 

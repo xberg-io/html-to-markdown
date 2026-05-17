@@ -69,14 +69,14 @@ tasks:
     cmds:
       - cmd: |
           {{if eq OS "windows"}}
-          RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
+          RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-swift --exclude html-to-markdown-rs-dart --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
           {{else}}
           RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --lcov --output-path rust-coverage.lcov -j {{.NUM_CPUS}}
           {{end}}
         ignore_error: false
       - cmd: |
           {{if eq OS "windows"}}
-          cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --summary-only
+          cargo llvm-cov --features metadata,visitor,inline-images --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-swift --exclude html-to-markdown-rs-dart --exclude benchmark-harness --summary-only
           {{else}}
           cargo llvm-cov --all-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude benchmark-harness --summary-only
           {{end}}

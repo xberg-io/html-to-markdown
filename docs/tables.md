@@ -70,6 +70,18 @@ Table extraction runs on every call. There is no opt-in flag. Set `output_format
 === "WASM"
 --8<-- "snippets/wasm/table-extraction/basic_extraction.md"
 
+=== "Swift"
+--8<-- "snippets/swift/table-extraction/basic_extraction.md"
+
+=== "Dart"
+--8<-- "snippets/dart/table-extraction/basic_extraction.md"
+
+=== "Kotlin"
+--8<-- "snippets/kotlin_android/table-extraction/basic_extraction.md"
+
+=== "Zig"
+--8<-- "snippets/zig/table-extraction/basic_extraction.md"
+
 ## Relationship to `result.content`
 
 The Markdown in `TableData.markdown` is the same Markdown that appears inline inside `result.content`. The grid exists for code that needs cell-level access: headers vs body rows, span detection, or programmatic lookup by `(row, col)`.

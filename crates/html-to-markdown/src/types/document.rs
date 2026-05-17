@@ -37,7 +37,16 @@ pub struct DocumentNode {
     /// Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     pub annotations: Vec<TextAnnotation>,
-    /// Format-specific attributes (e.g. class, id, data-* attributes).
+    /// Format-specific attributes preserved from the source HTML element.
+    ///
+    /// Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
+    /// `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
+    /// no HTML entity decoding is applied here.
+    ///
+    /// The map is `None` when no attributes are present (omitted entirely in serialized output).
+    /// Not every HTML attribute is preserved: only attributes that carry semantic or structural
+    /// significance for the node type are collected. For example, heading nodes capture the `"id"`
+    /// attribute for anchor linking; other element-level attributes may be silently dropped.
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub attributes: Option<HashMap<String, String>>,
 }
@@ -133,9 +142,20 @@ pub enum NodeContent {
     },
 }
 
-/// An inline text annotation with byte-range offsets.
+/// A styling or semantic annotation that applies to a byte range within a node's text.
 ///
-/// Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+/// Unlike [`DocumentNode`], which captures block-level structure (headings, paragraphs, etc.),
+/// a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+/// similar — that spans a contiguous run of bytes inside `DocumentNode::content`'s text field.
+///
+/// Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
+/// follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
+/// text is `text[start as usize..end as usize]`.
+///
+/// Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+/// stored in the order they are encountered during DOM traversal.
+///
+/// See [`AnnotationKind`] for the full list of supported annotation types.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TextAnnotation {
@@ -171,11 +191,19 @@ pub enum AnnotationKind {
     Superscript,
     /// Highlighted / marked text.
     Highlight,
-    /// A hyperlink.
+    /// A hyperlink sourced from an `<a href="...">` element.
     Link {
-        /// The link URL.
+        /// The URL from the `href` attribute, copied verbatim from the source HTML.
+        ///
+        /// No URL decoding or normalization is performed: percent-encoded sequences, relative
+        /// paths, and protocol-relative URLs (`//example.com`) are all preserved exactly as
+        /// written in the source. Callers that need an absolute URL must resolve it against the
+        /// document base URL themselves.
         url: String,
-        /// Optional link title attribute.
+        /// The `title` attribute of the `<a>` element, if present.
+        ///
+        /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
+        /// is copied verbatim — HTML entities within the title are not decoded.
         #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
         title: Option<String>,
     },

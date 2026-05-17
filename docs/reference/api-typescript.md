@@ -1,8 +1,7 @@
 ---
 title: "TypeScript API Reference"
 ---
-
-## TypeScript API Reference <span class="version-badge">v3.4.1</span>
+## TypeScript API Reference <span class="version-badge">v3.5.0</span>
 
 ### Functions
 
@@ -20,13 +19,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ```typescript
 function convert(html: string, options?: ConversionOptions): ConversionResult
 ```
-
 **Parameters:**
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `html` | `string` | Yes | The html |
-| `options` | `ConversionOptions | null` | No | The options to use |
+| `options` | `ConversionOptions \| null` | No | The options to use |
 
 **Returns:** `ConversionResult`
 **Errors:** Throws `Error` with a descriptive message.
@@ -58,17 +56,17 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `brInTables` | `boolean` | `false` | Render `<br>` elements inside table cells as literal line breaks. |
 | `highlightStyle` | `HighlightStyle` | `HighlightStyle.DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
 | `extractMetadata` | `boolean` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
-| `whitespaceMode` | `WhitespaceMode` | `WhitespaceMode.Normalized` | Controls how whitespace is normalised during conversion. |
+| `whitespaceMode` | `WhitespaceMode` | `WhitespaceMode.Normalized` | Controls how whitespace sequences are normalised in the converted output. - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters (spaces, tabs, newlines) to a single space, matching browser rendering behaviour. - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source HTML, including runs of spaces and embedded newlines. Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted content outside `<pre>` tags). For most documents `Normalized` produces cleaner output. |
 | `stripNewlines` | `boolean` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `boolean` | `false` | Wrap long lines at `wrap_width` characters. |
-| `wrapWidth` | `number` | `80` | Maximum line width when `wrap` is enabled (default `80`). |
+| `wrapWidth` | `number` | `80` | Maximum output line width in characters when `wrap` is `true` (default `80`). Lines are broken at word boundaries so that no line exceeds this length. A value of `0` is treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is `false`. |
 | `convertAsInline` | `boolean` | `false` | Treat the entire document as inline content (no block-level wrappers). |
 | `subSymbol` | `string` | `""` | Markdown notation for subscript text (e.g. `"~"`). |
 | `supSymbol` | `string` | `""` | Markdown notation for superscript text (e.g. `"^"`). |
 | `newlineStyle` | `NewlineStyle` | `NewlineStyle.Spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `codeBlockStyle` | `CodeBlockStyle` | `CodeBlockStyle.Backticks` | Style used for fenced code blocks (backticks or tilde). |
 | `keepInlineImagesIn` | `Array<string>` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Pre-processing options applied to the HTML before conversion. |
+| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `string` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `boolean` | `false` | Emit debug information during conversion. |
 | `stripTags` | `Array<string>` | `[]` | HTML tag names whose content is stripped from the output entirely. |
@@ -81,9 +79,9 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `maxImageSize` | `number` | `5242880` | Maximum decoded image size in bytes (default 5MB). |
 | `captureSvg` | `boolean` | `false` | Capture SVG elements as images. |
 | `inferDimensions` | `boolean` | `true` | Infer image dimensions from data. |
-| `maxDepth` | `number | null` | `null` | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated. |
+| `maxDepth` | `number \| null` | `null` | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated. |
 | `excludeSelectors` | `Array<string>` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
-| `visitor` | `VisitorHandle | null` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
+| `visitor` | `VisitorHandle \| null` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ##### Methods
 
@@ -94,37 +92,6 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 ```typescript
 static default(): ConversionOptions
 ```
-
-###### builder()
-
-Create a new builder with default values.
-
-**Signature:**
-
-```typescript
-static builder(): ConversionOptionsBuilder
-```
-
-###### applyUpdate()
-
-Apply a partial update to these conversion options.
-
-**Signature:**
-
-```typescript
-applyUpdate(update: ConversionOptionsUpdate): void
-```
-
-###### fromUpdate()
-
-Create from a partial update, applying to defaults.
-
-**Signature:**
-
-```typescript
-static fromUpdate(update: ConversionOptionsUpdate): ConversionOptions
-```
-
 ###### from()
 
 **Signature:**
@@ -144,93 +111,13 @@ metadata, extracted tables, images, and processing warnings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `string | null` | `null` | Converted text output (markdown, djot, or plain text). `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
-| `document` | `DocumentStructure | null` | `null` | Structured document tree with semantic elements. Populated when `include_document_structure` is `true` in options. |
+| `content` | `string \| null` | `null` | Converted text output (markdown, djot, or plain text). `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode. |
+| `document` | `DocumentStructure \| null` | `null` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `null` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `Array<TableData>` | `[]` | Extracted tables with structured cell data and markdown representation. |
 | `images` | `Array<string>` | `[]` | Extracted inline images (data URIs and SVGs). Populated when `extract_images` is `true` in options. |
 | `warnings` | `Array<ProcessingWarning>` | `[]` | Non-fatal processing warnings. |
 
-
----
-
-#### ConversionOptionsBuilder
-
-Builder for `ConversionOptions`.
-
-All fields start with default values. Call `.build()` to produce the final options.
-
-##### Methods
-
-###### stripTags()
-
-Set the list of HTML tag names whose content is stripped from output.
-
-**Signature:**
-
-```typescript
-stripTags(tags: Array<string>): ConversionOptionsBuilder
-```
-
-###### preserveTags()
-
-Set the list of HTML tag names that are preserved verbatim in output.
-
-**Signature:**
-
-```typescript
-preserveTags(tags: Array<string>): ConversionOptionsBuilder
-```
-
-###### keepInlineImagesIn()
-
-Set the list of HTML tag names whose `<img>` children are kept inline.
-
-**Signature:**
-
-```typescript
-keepInlineImagesIn(tags: Array<string>): ConversionOptionsBuilder
-```
-
-###### excludeSelectors()
-
-Set the list of CSS selectors for elements to exclude entirely from output.
-
-**Signature:**
-
-```typescript
-excludeSelectors(selectors: Array<string>): ConversionOptionsBuilder
-```
-
-###### visitor()
-
-Set the visitor used during conversion.
-
-**Signature:**
-
-```typescript
-visitor(visitor: VisitorHandle): ConversionOptionsBuilder
-```
-
-###### preprocessing()
-
-Set the pre-processing options applied to the HTML before conversion.
-
-**Signature:**
-
-```typescript
-preprocessing(preprocessing: PreprocessingOptions): ConversionOptionsBuilder
-```
-
-###### build()
-
-Build the final `ConversionOptions`.
-
-**Signature:**
-
-```typescript
-build(): ConversionOptions
-```
 
 ---
 
@@ -243,14 +130,14 @@ and browsers for document indexing and presentation.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `title` | `string | null` | `null` | Document title from `<title>` tag |
-| `description` | `string | null` | `null` | Document description from `<meta name="description">` tag |
+| `title` | `string \| null` | `null` | Document title from `<title>` tag |
+| `description` | `string \| null` | `null` | Document description from `<meta name="description">` tag |
 | `keywords` | `Array<string>` | `[]` | Document keywords from `<meta name="keywords">` tag, split on commas |
-| `author` | `string | null` | `null` | Document author from `<meta name="author">` tag |
-| `canonicalUrl` | `string | null` | `null` | Canonical URL from `<link rel="canonical">` tag |
-| `baseHref` | `string | null` | `null` | Base URL from `<base href="">` tag for resolving relative URLs |
-| `language` | `string | null` | `null` | Document language from `lang` attribute |
-| `textDirection` | `TextDirection | null` | `null` | Document text direction from `dir` attribute |
+| `author` | `string \| null` | `null` | Document author from `<meta name="author">` tag |
+| `canonicalUrl` | `string \| null` | `null` | Canonical URL from `<link rel="canonical">` tag |
+| `baseHref` | `string \| null` | `null` | Base URL from `<base href="">` tag for resolving relative URLs |
+| `language` | `string \| null` | `null` | Document language from `lang` attribute |
+| `textDirection` | `TextDirection \| null` | `null` | Document text direction from `dir` attribute |
 | `openGraph` | `Record<string, string>` | `{}` | Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc. |
 | `twitterCard` | `Record<string, string>` | `{}` | Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc. |
 | `metaTags` | `Record<string, string>` | `{}` | Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content |
@@ -266,10 +153,10 @@ A single node in the document tree.
 |-------|------|---------|-------------|
 | `id` | `string` | — | Deterministic node identifier. |
 | `content` | `NodeContent` | — | The semantic content of this node. |
-| `parent` | `number | null` | `null` | Index of the parent node (None for root nodes). |
+| `parent` | `number \| null` | `null` | Index of the parent node (None for root nodes). |
 | `children` | `Array<number>` | — | Indices of child nodes in reading order. |
 | `annotations` | `Array<TextAnnotation>` | — | Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. |
-| `attributes` | `Record<string, string> | null` | `null` | Format-specific attributes (e.g. class, id, data-* attributes). |
+| `attributes` | `Record<string, string> \| null` | `null` | Format-specific attributes preserved from the source HTML element. Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`, `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no HTML entity decoding is applied here. The map is `null` when no attributes are present (omitted entirely in serialized output). Not every HTML attribute is preserved: only attributes that carry semantic or structural significance for the node type are collected. For example, heading nodes capture the `"id"` attribute for anchor linking; other element-level attributes may be silently dropped. |
 
 
 ---
@@ -283,7 +170,7 @@ Uses a flat node array with index-based parent/child references for efficient tr
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `nodes` | `Array<DocumentNode>` | — | All nodes in document reading order. |
-| `sourceFormat` | `string | null` | `null` | The source format (always "html" for this library). |
+| `sourceFormat` | `string \| null` | `null` | The source format (always "html" for this library). |
 
 
 ---
@@ -315,7 +202,7 @@ and position in the document structure.
 |-------|------|---------|-------------|
 | `level` | `number` | — | Header level: 1 (h1) through 6 (h6) |
 | `text` | `string` | — | Normalized text content of the header |
-| `id` | `string | null` | `null` | HTML id attribute if present |
+| `id` | `string \| null` | `null` | HTML id attribute if present |
 | `depth` | `number` | — | Document tree depth at the header element |
 | `htmlOffset` | `number` | — | Byte offset in original HTML document |
 
@@ -363,31 +250,30 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-## Method Naming Convention
+# Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-## Execution Order
+# Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
-
 1. `visit_element_start` for `<div>`
 2. `visit_element_start` for `<p>`
 3. `visit_text` for "text"
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-## Performance Notes
+# Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+##### Methods
 
-#### visitText()
+###### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -396,8 +282,7 @@ Visit text nodes (most frequent callback - ~100+ per document).
 ```typescript
 visitText(ctx: NodeContext, text: string): VisitResult
 ```
-
-##### visitElementStart()
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -409,7 +294,6 @@ visitors to implement generic element handling before tag-specific logic.
 ```typescript
 visitElementStart(ctx: NodeContext): VisitResult
 ```
-
 ###### visitElementEnd()
 
 Called after exiting any element.
@@ -422,7 +306,6 @@ Visitors can inspect or replace this output.
 ```typescript
 visitElementEnd(ctx: NodeContext, output: string): VisitResult
 ```
-
 ###### visitLink()
 
 Visit anchor links `<a href="...">`.
@@ -432,7 +315,6 @@ Visit anchor links `<a href="...">`.
 ```typescript
 visitLink(ctx: NodeContext, href: string, text: string, title: string): VisitResult
 ```
-
 ###### visitImage()
 
 Visit images `<img src="...">`.
@@ -442,7 +324,6 @@ Visit images `<img src="...">`.
 ```typescript
 visitImage(ctx: NodeContext, src: string, alt: string, title: string): VisitResult
 ```
-
 ###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
@@ -452,7 +333,6 @@ Visit heading elements `<h1>` through `<h6>`.
 ```typescript
 visitHeading(ctx: NodeContext, level: number, text: string, id: string): VisitResult
 ```
-
 ###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
@@ -462,7 +342,6 @@ Visit code blocks `<pre><code>`.
 ```typescript
 visitCodeBlock(ctx: NodeContext, lang: string, code: string): VisitResult
 ```
-
 ###### visitCodeInline()
 
 Visit inline code `<code>`.
@@ -472,7 +351,6 @@ Visit inline code `<code>`.
 ```typescript
 visitCodeInline(ctx: NodeContext, code: string): VisitResult
 ```
-
 ###### visitListItem()
 
 Visit list items `<li>`.
@@ -482,7 +360,6 @@ Visit list items `<li>`.
 ```typescript
 visitListItem(ctx: NodeContext, ordered: boolean, marker: string, text: string): VisitResult
 ```
-
 ###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
@@ -492,7 +369,6 @@ Called before processing a list `<ul>` or `<ol>`.
 ```typescript
 visitListStart(ctx: NodeContext, ordered: boolean): VisitResult
 ```
-
 ###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
@@ -502,7 +378,6 @@ Called after processing a list `</ul>` or `</ol>`.
 ```typescript
 visitListEnd(ctx: NodeContext, ordered: boolean, output: string): VisitResult
 ```
-
 ###### visitTableStart()
 
 Called before processing a table `<table>`.
@@ -512,7 +387,6 @@ Called before processing a table `<table>`.
 ```typescript
 visitTableStart(ctx: NodeContext): VisitResult
 ```
-
 ###### visitTableRow()
 
 Visit table rows `<tr>`.
@@ -522,7 +396,6 @@ Visit table rows `<tr>`.
 ```typescript
 visitTableRow(ctx: NodeContext, cells: Array<string>, isHeader: boolean): VisitResult
 ```
-
 ###### visitTableEnd()
 
 Called after processing a table `</table>`.
@@ -532,7 +405,6 @@ Called after processing a table `</table>`.
 ```typescript
 visitTableEnd(ctx: NodeContext, output: string): VisitResult
 ```
-
 ###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
@@ -542,7 +414,6 @@ Visit blockquote elements `<blockquote>`.
 ```typescript
 visitBlockquote(ctx: NodeContext, content: string, depth: number): VisitResult
 ```
-
 ###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
@@ -552,7 +423,6 @@ Visit strong/bold elements `<strong>`, `<b>`.
 ```typescript
 visitStrong(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
@@ -562,7 +432,6 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 ```typescript
 visitEmphasis(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
@@ -572,7 +441,6 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 ```typescript
 visitStrikethrough(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
@@ -582,7 +450,6 @@ Visit underline elements `<u>`, `<ins>`.
 ```typescript
 visitUnderline(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitSubscript()
 
 Visit subscript elements `<sub>`.
@@ -592,7 +459,6 @@ Visit subscript elements `<sub>`.
 ```typescript
 visitSubscript(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
@@ -602,7 +468,6 @@ Visit superscript elements `<sup>`.
 ```typescript
 visitSuperscript(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
@@ -612,7 +477,6 @@ Visit mark/highlight elements `<mark>`.
 ```typescript
 visitMark(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitLineBreak()
 
 Visit line break elements `<br>`.
@@ -622,7 +486,6 @@ Visit line break elements `<br>`.
 ```typescript
 visitLineBreak(ctx: NodeContext): VisitResult
 ```
-
 ###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
@@ -632,7 +495,6 @@ Visit horizontal rule elements `<hr>`.
 ```typescript
 visitHorizontalRule(ctx: NodeContext): VisitResult
 ```
-
 ###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
@@ -642,7 +504,6 @@ Visit custom elements (web components) or unknown tags.
 ```typescript
 visitCustomElement(ctx: NodeContext, tagName: string, html: string): VisitResult
 ```
-
 ###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
@@ -652,7 +513,6 @@ Visit definition list `<dl>`.
 ```typescript
 visitDefinitionListStart(ctx: NodeContext): VisitResult
 ```
-
 ###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
@@ -662,7 +522,6 @@ Visit definition term `<dt>`.
 ```typescript
 visitDefinitionTerm(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
@@ -672,7 +531,6 @@ Visit definition description `<dd>`.
 ```typescript
 visitDefinitionDescription(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
@@ -682,7 +540,6 @@ Called after processing a definition list `</dl>`.
 ```typescript
 visitDefinitionListEnd(ctx: NodeContext, output: string): VisitResult
 ```
-
 ###### visitForm()
 
 Visit form elements `<form>`.
@@ -692,7 +549,6 @@ Visit form elements `<form>`.
 ```typescript
 visitForm(ctx: NodeContext, action: string, method: string): VisitResult
 ```
-
 ###### visitInput()
 
 Visit input elements `<input>`.
@@ -702,7 +558,6 @@ Visit input elements `<input>`.
 ```typescript
 visitInput(ctx: NodeContext, inputType: string, name: string, value: string): VisitResult
 ```
-
 ###### visitButton()
 
 Visit button elements `<button>`.
@@ -712,7 +567,6 @@ Visit button elements `<button>`.
 ```typescript
 visitButton(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitAudio()
 
 Visit audio elements `<audio>`.
@@ -722,7 +576,6 @@ Visit audio elements `<audio>`.
 ```typescript
 visitAudio(ctx: NodeContext, src: string): VisitResult
 ```
-
 ###### visitVideo()
 
 Visit video elements `<video>`.
@@ -732,7 +585,6 @@ Visit video elements `<video>`.
 ```typescript
 visitVideo(ctx: NodeContext, src: string): VisitResult
 ```
-
 ###### visitIframe()
 
 Visit iframe elements `<iframe>`.
@@ -742,7 +594,6 @@ Visit iframe elements `<iframe>`.
 ```typescript
 visitIframe(ctx: NodeContext, src: string): VisitResult
 ```
-
 ###### visitDetails()
 
 Visit details elements `<details>`.
@@ -752,7 +603,6 @@ Visit details elements `<details>`.
 ```typescript
 visitDetails(ctx: NodeContext, open: boolean): VisitResult
 ```
-
 ###### visitSummary()
 
 Visit summary elements `<summary>`.
@@ -762,7 +612,6 @@ Visit summary elements `<summary>`.
 ```typescript
 visitSummary(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitFigureStart()
 
 Visit figure elements `<figure>`.
@@ -772,7 +621,6 @@ Visit figure elements `<figure>`.
 ```typescript
 visitFigureStart(ctx: NodeContext): VisitResult
 ```
-
 ###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
@@ -782,7 +630,6 @@ Visit figcaption elements `<figcaption>`.
 ```typescript
 visitFigcaption(ctx: NodeContext, text: string): VisitResult
 ```
-
 ###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
@@ -795,7 +642,7 @@ visitFigureEnd(ctx: NodeContext, output: string): VisitResult
 
 ---
 
-##### ImageMetadata
+#### ImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -805,16 +652,16 @@ for image analysis and optimization.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `src` | `string` | — | Image source (URL, data URI, or SVG content identifier) |
-| `alt` | `string | null` | `null` | Alternative text from alt attribute (for accessibility) |
-| `title` | `string | null` | `null` | Title attribute (often shown as tooltip) |
-| `dimensions` | `Array<number> | null` | `null` | Image dimensions as (width, height) if available |
+| `alt` | `string \| null` | `null` | Alternative text from alt attribute (for accessibility) |
+| `title` | `string \| null` | `null` | Title attribute (often shown as tooltip) |
+| `dimensions` | `Array<number> \| null` | `null` | Image dimensions as (width, height) if available |
 | `imageType` | `ImageType` | — | Image type classification |
 | `attributes` | `Record<string, string>` | — | Additional HTML attributes |
 
 
 ---
 
-##### LinkMetadata
+#### LinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -824,30 +671,15 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 |-------|------|---------|-------------|
 | `href` | `string` | — | The href URL value |
 | `text` | `string` | — | Link text content (normalized, concatenated if mixed with elements) |
-| `title` | `string | null` | `null` | Optional title attribute (often shown as tooltip) |
+| `title` | `string \| null` | `null` | Optional title attribute (often shown as tooltip) |
 | `linkType` | `LinkType` | — | Link type classification |
 | `rel` | `Array<string>` | — | Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") |
 | `attributes` | `Record<string, string>` | — | Additional HTML attributes |
 
-###### Methods
-
-###### classifyLink()
-
-Classify a link based on href value.
-
-**Returns:**
-
-Appropriate `LinkType` based on protocol and content.
-
-**Signature:**
-
-```typescript
-static classifyLink(href: string): LinkType
-```
 
 ---
 
-##### NodeContext
+#### NodeContext
 
 Context information passed to all visitor methods.
 
@@ -861,13 +693,13 @@ including its type, attributes, position in the DOM tree, and parent context.
 | `attributes` | `Record<string, string>` | — | All HTML attributes as key-value pairs |
 | `depth` | `number` | — | Depth in the DOM tree (0 = root) |
 | `indexInParent` | `number` | — | Index among siblings (0-based) |
-| `parentTag` | `string | null` | `null` | Parent element's tag name (None if root) |
+| `parentTag` | `string \| null` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `boolean` | — | Whether this element is treated as inline vs block |
 
 
 ---
 
-##### PreprocessingOptions
+#### PreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -878,7 +710,7 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-###### Methods
+##### Methods
 
 ###### default()
 
@@ -887,37 +719,6 @@ HTML preprocessing options for document cleanup before conversion.
 ```typescript
 static default(): PreprocessingOptions
 ```
-
-###### applyUpdate()
-
-Apply a partial update to these preprocessing options.
-
-Any specified fields in the update will override the current values.
-Unspecified fields (None) are left unchanged.
-
-**Signature:**
-
-```typescript
-applyUpdate(update: PreprocessingOptionsUpdate): void
-```
-
-###### fromUpdate()
-
-Create new preprocessing options from a partial update.
-
-Creates a new `PreprocessingOptions` struct with defaults, then applies the update.
-Fields not specified in the update keep their default values.
-
-**Returns:**
-
-New `PreprocessingOptions` with specified updates applied to defaults
-
-**Signature:**
-
-```typescript
-static fromUpdate(update: PreprocessingOptionsUpdate): PreprocessingOptions
-```
-
 ###### from()
 
 **Signature:**
@@ -928,9 +729,23 @@ static from(update: PreprocessingOptionsUpdate): PreprocessingOptions
 
 ---
 
-##### ProcessingWarning
+#### ProcessingWarning
 
-A non-fatal warning generated during HTML processing.
+A non-fatal diagnostic produced during HTML conversion.
+
+Warnings indicate that conversion completed but some content may have been handled
+differently than expected — for example, an image that could not be extracted, a truncated
+input, or malformed HTML that was repaired with best-effort parsing.
+
+Conversion always succeeds (returns `ConversionResult`) even when warnings are
+present. Callers should inspect `warnings` and decide how to
+handle them based on their tolerance for partial results:
+
+- **Logging pipelines**: emit each warning at `WARN` level and continue.
+- **Strict pipelines**: treat any warning as a hard error by checking
+  `result.warnings.is_empty()` before using the output.
+
+See `WarningKind` for the full taxonomy of warning categories.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -940,7 +755,7 @@ A non-fatal warning generated during HTML processing.
 
 ---
 
-##### StructuredData
+#### StructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -951,12 +766,12 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 |-------|------|---------|-------------|
 | `dataType` | `StructuredDataType` | — | Type of structured data (JSON-LD, Microdata, RDFa) |
 | `rawJson` | `string` | — | Raw JSON string (for JSON-LD) or serialized representation |
-| `schemaType` | `string | null` | `null` | Schema type if detectable (e.g., "Article", "Event", "Product") |
+| `schemaType` | `string \| null` | `null` | Schema type if detectable (e.g., "Article", "Event", "Product") |
 
 
 ---
 
-##### TableData
+#### TableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -968,7 +783,7 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-##### TableGrid
+#### TableGrid
 
 A structured table grid with cell-level data including spans.
 
@@ -976,16 +791,27 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `number` | — | Number of rows. |
 | `cols` | `number` | — | Number of columns. |
-| `cells` | `Array<GridCell>` | `[]` | All cells in the table (may be fewer than rows*cols due to spans). |
+| `cells` | `Array<GridCell>` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\|\\| cols == 0`) produces an empty vec. |
 
 
 ---
 
-##### TextAnnotation
+#### TextAnnotation
 
-An inline text annotation with byte-range offsets.
+A styling or semantic annotation that applies to a byte range within a node's text.
 
-Annotations describe formatting (bold, italic, etc.) and links within a node's text content.
+Unlike `DocumentNode`, which captures block-level structure (headings, paragraphs, etc.),
+a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+similar — that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
+
+Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
+follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
+text is `text[start as usize..end as usize]`.
+
+Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+stored in the order they are encountered during DOM traversal.
+
+See `AnnotationKind` for the full list of supported annotation types.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -996,7 +822,7 @@ Annotations describe formatting (bold, italic, etc.) and links within a node's t
 
 ---
 
-##### VisitorHandle
+#### VisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -1007,9 +833,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-#### Enums
+### Enums
 
-##### TextDirection
+#### TextDirection
 
 Text directionality of document content.
 
@@ -1024,7 +850,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-##### LinkType
+#### LinkType
 
 Link classification based on href value and document context.
 
@@ -1042,7 +868,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-##### ImageType
+#### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -1058,7 +884,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-##### StructuredDataType
+#### StructuredDataType
 
 Structured data format type.
 
@@ -1073,7 +899,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-##### PreprocessingPreset
+#### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -1088,7 +914,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-##### HeadingStyle
+#### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -1103,7 +929,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-##### ListIndentType
+#### ListIndentType
 
 List indentation character type.
 
@@ -1117,7 +943,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-##### WhitespaceMode
+#### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -1131,7 +957,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-##### NewlineStyle
+#### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -1145,7 +971,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-##### CodeBlockStyle
+#### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1160,7 +986,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-##### HighlightStyle
+#### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1176,7 +1002,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-##### LinkStyle
+#### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1191,7 +1017,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-##### OutputFormat
+#### OutputFormat
 
 Output format for conversion.
 
@@ -1206,7 +1032,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-##### NodeContent
+#### NodeContent
 
 The semantic content type of a document node.
 
@@ -1231,7 +1057,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-##### AnnotationKind
+#### AnnotationKind
 
 The type of an inline text annotation.
 
@@ -1247,12 +1073,12 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 | `Subscript` | Subscript text. |
 | `Superscript` | Superscript text. |
 | `Highlight` | Highlighted / marked text. |
-| `Link` | A hyperlink. — Fields: `url`: `string`, `title`: `string` |
+| `Link` | A hyperlink sourced from an `<a href="...">` element. — Fields: `url`: `string`, `title`: `string` |
 
 
 ---
 
-##### WarningKind
+#### WarningKind
 
 Categories of processing warnings.
 
@@ -1268,7 +1094,7 @@ Categories of processing warnings.
 
 ---
 
-##### NodeType
+#### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1369,7 +1195,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-##### VisitResult
+#### VisitResult
 
 Result of a visitor callback.
 
@@ -1388,9 +1214,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### Errors
+### Errors
 
-##### ConversionError
+#### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 

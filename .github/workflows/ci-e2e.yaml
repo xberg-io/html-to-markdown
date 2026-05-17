@@ -94,6 +94,10 @@ jobs:
       elixir: ${{ steps.filter.outputs.elixir }}
       r: ${{ steps.filter.outputs.r }}
       wasm: ${{ steps.filter.outputs.wasm }}
+      kotlin: ${{ steps.filter.outputs.kotlin }}
+      swift: ${{ steps.filter.outputs.swift }}
+      dart: ${{ steps.filter.outputs.dart }}
+      zig: ${{ steps.filter.outputs.zig }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -180,6 +184,23 @@ jobs:
               - 'crates/html-to-markdown-wasm-wasi/**'
               - 'packages/wasm/**'
               - 'e2e/wasm/**'
+              - 'fixtures/**'
+            kotlin:
+              - 'packages/kotlin-android/**'
+              - 'crates/html-to-markdown-ffi/**'
+              - 'fixtures/**'
+            swift:
+              - 'packages/swift/**'
+              - 'e2e/swift_e2e/**'
+              - 'fixtures/**'
+            dart:
+              - 'packages/dart/**'
+              - 'e2e/dart/**'
+              - 'fixtures/**'
+            zig:
+              - 'packages/zig/**'
+              - 'e2e/zig/**'
+              - 'crates/html-to-markdown-ffi/**'
               - 'fixtures/**'
 
   build-ffi:
@@ -1220,3 +1241,148 @@ jobs:
         working-directory: crates/html-to-markdown-wasm
         run: ../../scripts/ci/wasm/test-wasm-rust.sh
         shell: bash
+
+  build-kotlin-android:
+    needs: [changes]
+    name: "Build: Kotlin Android"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.ffi == 'true' ||
+      needs.changes.outputs.kotlin == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+        id: checkout
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          targets: aarch64-linux-android,x86_64-linux-android
+          cache-key-prefix: kotlin-android
+
+      - name: Setup Android SDK/NDK
+        uses: android-actions/setup-android@v3 # v3
+
+      - name: Build Android native libraries
+        uses: kreuzberg-dev/actions/build-android-natives@v1 # v1
+        with:
+          crate-name: html-to-markdown-ffi
+          lib-name: html_to_markdown_ffi
+          abis: arm64-v8a,x86_64
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  test-swift:
+    needs: [changes]
+    name: "Test: Swift"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.swift == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: swift
+
+      - name: Setup Swift
+        uses: kreuzberg-dev/actions/setup-swift@v1 # v1
+        with:
+          version: "6.0"
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
+      - name: Run E2E tests
+        run: alef test --e2e --lang swift
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  test-dart:
+    needs: [changes]
+    name: "Test: Dart"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.dart == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: dart
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1 # v1
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
+      - name: Run E2E tests
+        run: alef test --e2e --lang dart
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1
+
+  test-zig:
+    needs: [changes]
+    name: "Test: Zig"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.ffi == 'true' ||
+      needs.changes.outputs.zig == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6 # v6
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: zig
+
+      - name: Setup Zig
+        uses: kreuzberg-dev/actions/setup-zig@v1 # v1
+        with:
+          version: "0.16.0"
+
+      - name: Install alef
+        uses: kreuzberg-dev/actions/install-alef@v1 # v1
+
+      - name: Run E2E tests
+        run: alef test --e2e --lang zig
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always()
+        uses: kreuzberg-dev/actions/cleanup-rust-cache@v1 # v1

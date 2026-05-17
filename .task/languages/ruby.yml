@@ -1,0 +1,19 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Ruby dependencies within major versions (bundle update --conservative)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/ruby && bundle update --conservative
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Ruby dependencies to latest including breaking changes (bundle update)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/ruby && bundle update
+        ignore_error: false

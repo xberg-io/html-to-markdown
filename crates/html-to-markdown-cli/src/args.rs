@@ -218,11 +218,11 @@ pub struct Cli {
     #[arg(help_heading = "Tables")]
     pub br_in_tables: bool,
 
-    /// Style for <mark> elements
+    /// Style for `<mark>` elements
     ///
     /// How to represent highlighted text:
     /// - 'double-equal': ==text== (default)
-    /// - 'html': <mark>text</mark>
+    /// - 'html': `<mark>text</mark>`
     /// - 'bold': **text**
     /// - 'none': plain text
     #[arg(long, value_name = "STYLE")]
@@ -264,7 +264,7 @@ pub struct Cli {
     /// Print processing warnings to stderr
     ///
     /// Emits each non-fatal warning to stderr in the format:
-    /// "Warning [<kind>]: <message>"
+    /// `Warning [<kind>]: <message>`
     #[arg(long)]
     #[arg(help_heading = "JSON Output")]
     pub show_warnings: bool,
@@ -367,7 +367,7 @@ pub struct Cli {
 
     /// Keep navigation elements
     ///
-    /// Don't remove <nav>, menus, etc. during preprocessing
+    /// Don't remove `<nav>`, menus, etc. during preprocessing
     #[arg(long)]
     #[arg(help_heading = "Preprocessing")]
     #[arg(requires = "preprocess")]
@@ -375,7 +375,7 @@ pub struct Cli {
 
     /// Keep form elements
     ///
-    /// Don't remove <form>, <input>, etc. during preprocessing
+    /// Don't remove `<form>`, `<input>`, etc. during preprocessing
     #[arg(long)]
     #[arg(help_heading = "Preprocessing")]
     #[arg(requires = "preprocess")]
