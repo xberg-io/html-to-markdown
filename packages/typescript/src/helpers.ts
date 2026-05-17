@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import type { JsConversionOptions, JsConversionResult } from "@kreuzberg/html-to-markdown-node";
+import type { ConversionOptions, ConversionResult } from "@kreuzberg/html-to-markdown-node";
 import { convert } from "@kreuzberg/html-to-markdown-node";
 
 /**
@@ -7,10 +7,10 @@ import { convert } from "@kreuzberg/html-to-markdown-node";
  */
 export async function convertFile(
   path: string,
-  options?: Partial<JsConversionOptions>,
-): Promise<JsConversionResult> {
+  options?: Partial<ConversionOptions>,
+): Promise<ConversionResult> {
   const html = await readFile(path, "utf-8");
-  return convert(html, options as JsConversionOptions | undefined);
+  return convert(html, options as ConversionOptions | undefined);
 }
 
 /**
@@ -18,12 +18,12 @@ export async function convertFile(
  */
 export async function convertStream(
   stream: NodeJS.ReadableStream,
-  options?: Partial<JsConversionOptions>,
-): Promise<JsConversionResult> {
+  options?: Partial<ConversionOptions>,
+): Promise<ConversionResult> {
   const chunks: Buffer[] = [];
   for await (const chunk of stream) {
     chunks.push(Buffer.from(chunk));
   }
   const html = Buffer.concat(chunks).toString("utf-8");
-  return convert(html, options as JsConversionOptions | undefined);
+  return convert(html, options as ConversionOptions | undefined);
 }
