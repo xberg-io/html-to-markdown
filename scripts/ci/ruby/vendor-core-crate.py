@@ -228,6 +228,9 @@ license = "{metadata["license"]}"
 repository = "{metadata["repository"]}"
 homepage = "{metadata["homepage"]}"
 
+[workspace.lints.rust]
+unexpected_cfgs = {{ level = "warn", check-cfg = ['cfg(alef)'] }}
+
 [workspace.dependencies]
 {deps_str}
 """
@@ -372,13 +375,8 @@ def main() -> None:
                 flags=re.MULTILINE,
             )
 
-            # Remove [lints] workspace = true section
-            content = re.sub(
-                r"\[lints\]\s*\nworkspace\s*=\s*true\s*\n?",
-                "",
-                content,
-                flags=re.MULTILINE,
-            )
+            # Keep [lints] workspace = true so the crate inherits the vendor
+            # workspace's [workspace.lints.rust] (notably check-cfg=['cfg(alef)']).
 
             with open(crate_toml, "w") as f:
                 f.write(content)
