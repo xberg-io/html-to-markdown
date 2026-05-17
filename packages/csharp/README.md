@@ -81,6 +81,7 @@ dotnet add package KreuzbergDev.HtmlToMarkdown
 ## Performance Snapshot
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB |  | 392.9 MB/s |

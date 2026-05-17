@@ -78,6 +78,7 @@ Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyP
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.62ms | 208 MB/s |

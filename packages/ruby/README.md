@@ -77,6 +77,7 @@ Requires Ruby 3.2+ with Magnus native extension bindings. Published for Linux, m
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB | 0.71ms | 182 MB/s |

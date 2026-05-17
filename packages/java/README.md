@@ -98,6 +98,7 @@ implementation("dev.kreuzberg:html-to-markdown:3.5.0")
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
+
 | Document | Size | Latency | Throughput |
 |----------|------|---------|------------|
 | Lists (Timeline) | 129KB |  | 291.5 MB/s |
