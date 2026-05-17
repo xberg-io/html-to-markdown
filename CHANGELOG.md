@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`compact_tables` option** — set `compact_tables: true` on `ConversionOptions` to emit GFM tables with no column padding. Cells are flushed to content width and separator rows use exactly `---` per column, producing token-efficient output for RAG / LLM pipelines. Default `false`; existing output is unchanged.
+
 - **Kotlin Android binding** — `dev.kreuzberg:html-to-markdown-android` on Maven Central. Standalone Android library (AAR) with bundled `libhtml_to_markdown_ffi.so` for `arm64-v8a` and `x86_64` ABIs; minSdk 21, compileSdk 35. JVM Kotlin users continue to consume the existing Java package (`dev.kreuzberg:html-to-markdown`) directly — Kotlin/JVM treats Java classes as native and Panama FFM is unavailable on Android, which is why Android needs its own package.
 - **Swift binding** — `HtmlToMarkdown` Swift Package on Swift Package Index. SPM-only (no CocoaPods); macOS 13+, iOS 16+; powered by `swift-bridge`.
 - **Dart binding** — `h2m` on pub.dev. Built with `flutter_rust_bridge` 2.12; supports Flutter Android/iOS targets plus server Dart on Linux/macOS/Windows. Package name `h2m` because `html_to_markdown` and `html-to-markdown` are taken on pub.dev.

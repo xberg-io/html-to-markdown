@@ -55,6 +55,14 @@ pub struct ConversionOptions {
     pub default_title: bool,
     /// Render `<br>` elements inside table cells as literal line breaks.
     pub br_in_tables: bool,
+    /// Emit tables without column padding (compact GFM format).
+    ///
+    /// When `true`, column widths are not computed and cells are emitted with
+    /// no trailing spaces. Separator rows use exactly `---` per column.
+    /// Produces token-efficient output suitable for RAG / LLM contexts.
+    ///
+    /// Default `false` (aligned padding preserved).
+    pub compact_tables: bool,
     /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
     pub highlight_style: HighlightStyle,
     /// Populate `result.metadata` with `<head>` / `<meta>` extraction
@@ -171,6 +179,7 @@ impl Default for ConversionOptions {
             autolinks: true,
             default_title: false,
             br_in_tables: false,
+            compact_tables: false,
             highlight_style: HighlightStyle::default(),
             extract_metadata: true,
             whitespace_mode: WhitespaceMode::default(),
@@ -288,6 +297,7 @@ impl ConversionOptionsBuilder {
     builder_setter!(autolinks, bool);
     builder_setter!(default_title, bool);
     builder_setter!(br_in_tables, bool);
+    builder_setter!(compact_tables, bool);
     builder_setter_into!(sub_symbol, String);
     builder_setter_into!(sup_symbol, String);
 
@@ -411,6 +421,8 @@ pub struct ConversionOptionsUpdate {
     pub default_title: Option<bool>,
     /// Optional override for [`ConversionOptions::br_in_tables`].
     pub br_in_tables: Option<bool>,
+    /// Optional override for [`ConversionOptions::compact_tables`].
+    pub compact_tables: Option<bool>,
     /// Optional override for [`ConversionOptions::highlight_style`].
     pub highlight_style: Option<HighlightStyle>,
     /// Optional override for [`ConversionOptions::extract_metadata`].
@@ -495,6 +507,7 @@ impl ConversionOptions {
         apply!(autolinks);
         apply!(default_title);
         apply!(br_in_tables);
+        apply!(compact_tables);
         apply!(highlight_style);
         apply!(extract_metadata);
         apply!(whitespace_mode);

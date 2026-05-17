@@ -219,7 +219,12 @@ pub fn handle_table(
         // Pre-pass: compute per-column max content widths for aligned padding.
         // Uses a rowspan tracker so spanned columns are skipped just as they
         // are in the render pass, keeping column indices correctly aligned.
-        let col_widths = {
+        // Skipped entirely when compact_tables is true — passing an empty slice
+        // to convert_table_row disables all padding and reduces separator dashes
+        // to the GFM minimum (---).
+        let col_widths: Vec<usize> = if options.compact_tables {
+            Vec::new()
+        } else {
             let mut widths: Vec<usize> = Vec::new();
             let mut prepass_rowspan: Vec<Option<usize>> = Vec::new();
             let children = tag.children();

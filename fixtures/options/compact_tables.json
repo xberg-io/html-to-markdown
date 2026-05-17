@@ -1,0 +1,61 @@
+[
+  {
+    "id": "options_compact_tables_true",
+    "description": "compact_tables emits unpadded cells and minimal --- separators",
+    "input": {
+      "html": "<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>100</td></tr><tr><td>Bob</td><td>42</td></tr></tbody></table>",
+      "options": {
+        "compact_tables": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "| --- |"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "| ----- |"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "| 42 |"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "| 42    |"
+      }
+    ]
+  },
+  {
+    "id": "options_compact_tables_false",
+    "description": "compact_tables false (default) pads cells to column width",
+    "input": {
+      "html": "<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>100</td></tr><tr><td>Bob</td><td>42</td></tr></tbody></table>",
+      "options": {
+        "compact_tables": false
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "| ----- |"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "| 42    |"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "| --- |"
+      }
+    ]
+  }
+]
