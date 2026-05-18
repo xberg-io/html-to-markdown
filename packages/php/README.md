@@ -65,11 +65,13 @@ Provides a type-safe API with full PHPStan level 9 support, modern PHP 8.2+ feat
 
 Note: The package was previously published as `goldziher/html-to-markdown`, which still works for backward compatibility.
 
+
 ## Installation
 
 ```bash
 composer require kreuzberg-dev/html-to-markdown
 ```
+
 
 Requires PHP 8.2+. Install the native extension via PIE:
 
@@ -83,15 +85,17 @@ Or use Composer (requires ext-html_to_markdown):
 composer require kreuzberg-dev/html-to-markdown
 ```
 
+
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document           | Size  | Ops/sec |
-| ------------------ | ----- | ------- |
-| Lists (Timeline)   | 129KB | 3346    |
-| Tables (Countries) | 360KB | 973     |
-| Medium (Python)    | 657KB | 485     |
+| Document | Size | Ops/sec |
+|----------|------|---------|
+| Lists (Timeline) | 129KB | 3346 |
+| Tables (Countries) | 360KB | 973 |
+| Medium (Python) | 657KB | 485 |
+
 
 ## Quick Start
 
@@ -103,6 +107,7 @@ use HtmlToMarkdown\HtmlToMarkdown;
 $result = HtmlToMarkdown::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
 echo $result->content;
 ```
+
 
 With conversion options:
 
@@ -119,9 +124,11 @@ $result = HtmlToMarkdown::convert('<h1>Hello</h1>', $options);
 echo $result->content;
 ```
 
+
 ## API Reference
 
 ### Core Function
+
 
 **`Converter::convert(string $html, ?ConversionOptions $options = null, ?VisitorInterface $visitor = null): array`**
 
@@ -139,6 +146,7 @@ $document = $result['document'];   // Document-level info
 $images   = $result['images'];     // Extracted images
 $warnings = $result['warnings'];   // Any conversion warnings
 ```
+
 
 ### Options
 
@@ -172,6 +180,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
+
 ```php
 use HtmlToMarkdown\Converter;
 use HtmlToMarkdown\ConversionOptions;
@@ -187,11 +196,13 @@ $djot = Converter::convert($html, new ConversionOptions(outputFormat: 'djot'));
 // Result: "This is *bold* and _italic_ text."
 ```
 
+
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 ```php
 use HtmlToMarkdown\Converter;
@@ -203,7 +214,9 @@ $plain = Converter::convert($html, new ConversionOptions(outputFormat: 'plain'))
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -220,6 +233,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 **Zero Overhead When Disabled:** Metadata extraction adds negligible overhead and happens during the HTML parsing pass. Pass `extract_metadata: true` in `ConversionOptions` to enable it; the result is available at `result.metadata`.
 
 ### Example: Quick Start
+
 
 ```php
 <?php
@@ -240,6 +254,7 @@ print_r($result['metadata']->images);             // All images with alt text
 print_r($result['metadata']->structured_data);    // JSON-LD, Microdata, RDFa
 ```
 
+
 ## Visitor Pattern
 
 The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
@@ -255,6 +270,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
+
 
 ```php
 <?php
@@ -289,6 +305,7 @@ $result = Converter::create()->convert(
 );
 $markdown = $result['content'];
 ```
+
 
 ## Examples
 

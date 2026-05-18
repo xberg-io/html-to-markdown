@@ -63,23 +63,27 @@
 Blazing-fast HTML to Markdown conversion for Ruby, powered by the same Rust engine used by our Python, Node.js, WebAssembly, and PHP packages.
 Ship identical Markdown across every runtime while enjoying native extension performance with Magnus bindings.
 
+
 ## Installation
 
 ```bash
 gem install html-to-markdown
 ```
 
+
 Requires Ruby 3.2+ with Magnus native extension bindings. Published for Linux, macOS.
+
 
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document            | Size  | Latency | Throughput |
-| ------------------- | ----- | ------- | ---------- |
-| Lists (Timeline)    | 129KB | 0.71ms  | 182 MB/s   |
-| Tables (Countries)  | 360KB | 2.15ms  | 167 MB/s   |
-| Mixed (Python wiki) | 656KB | 4.89ms  | 134 MB/s   |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB | 0.71ms | 182 MB/s |
+| Tables (Countries) | 360KB | 2.15ms | 167 MB/s |
+| Mixed (Python wiki) | 656KB | 4.89ms | 134 MB/s |
+
 
 ## Quick Start
 
@@ -93,6 +97,7 @@ result = HtmlToMarkdown.convert(html)
 markdown = result[:content]
 ```
 
+
 With conversion options:
 
 ```ruby
@@ -103,9 +108,11 @@ result = HtmlToMarkdown.convert(html, heading_style: :atx, code_block_style: :fe
 markdown = result[:content]
 ```
 
+
 ## API Reference
 
 ### Core Function
+
 
 **`convert(html, options: nil, visitor: nil) -> ConversionResult`**
 
@@ -122,6 +129,7 @@ document = result[:document]      # Document-level info
 images   = result[:images]        # Extracted images
 warnings = result[:warnings]      # Any conversion warnings
 ```
+
 
 ### Options
 
@@ -155,6 +163,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
+
 ```ruby
 require 'html_to_markdown'
 
@@ -169,11 +178,13 @@ djot = HtmlToMarkdown.convert(html, output_format: 'djot')
 # Result: "This is *bold* and _italic_ text."
 ```
 
+
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 ```ruby
 require 'html_to_markdown'
@@ -184,7 +195,9 @@ plain = HtmlToMarkdown.convert(html, output_format: 'plain')
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -202,6 +215,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
+
 ```ruby
 require 'html_to_markdown'
 
@@ -215,6 +229,7 @@ puts result[:metadata][:links]                    # All hyperlinks
 puts result[:metadata][:images]                   # All images with alt text
 puts result[:metadata][:structured_data]          # JSON-LD, Microdata, RDFa
 ```
+
 
 ## Visitor Pattern
 
@@ -231,6 +246,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
+
 
 ```ruby
 require 'html_to_markdown'
@@ -254,6 +270,7 @@ html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 result = HtmlToMarkdown.convert(html, visitor: MyVisitor.new)
 markdown = result[:content]
 ```
+
 
 ## Examples
 
