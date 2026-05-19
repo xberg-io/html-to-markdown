@@ -28,9 +28,9 @@ package dev.kreuzberg.android
  */
 data class ConversionOptions(
     /** Heading style to use in Markdown output (ATX `#` or Setext underline). */
-    val headingStyle: HeadingStyle,
+    val headingStyle: String,
     /** How to indent nested list items (spaces or tab). */
-    val listIndentType: ListIndentType,
+    val listIndentType: String,
     /** Number of spaces (or tabs) to use for each level of list indentation. */
     val listIndentWidth: Long,
     /** Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). */
@@ -64,7 +64,7 @@ data class ConversionOptions(
      */
     val compactTables: Boolean,
     /** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
-    val highlightStyle: HighlightStyle,
+    val highlightStyle: String,
     /**
      * Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open
      * Graph, Twitter Card, JSON-LD, …).
@@ -84,7 +84,7 @@ data class ConversionOptions(
      * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
      * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
      */
-    val whitespaceMode: WhitespaceMode,
+    val whitespaceMode: String,
     /** Strip all newlines from the output, producing a single-line result. */
     val stripNewlines: Boolean,
     /** Wrap long lines at `wrap_width` characters. */
@@ -104,9 +104,9 @@ data class ConversionOptions(
     /** Markdown notation for superscript text (e.g. `"^"`). */
     val supSymbol: String,
     /** How to encode hard line breaks (`<br>`) in Markdown. */
-    val newlineStyle: NewlineStyle,
+    val newlineStyle: String,
     /** Style used for fenced code blocks (backticks or tilde). */
-    val codeBlockStyle: CodeBlockStyle,
+    val codeBlockStyle: String,
     /** HTML tag names whose `<img>` children are kept inline instead of block. */
     val keepInlineImagesIn: List<String>,
     /**
@@ -132,9 +132,9 @@ data class ConversionOptions(
     /** Skip conversion of `<img>` elements (omit images from output). */
     val skipImages: Boolean,
     /** Link rendering style (inline or reference). */
-    val linkStyle: LinkStyle,
+    val linkStyle: String,
     /** Target output format (Markdown, plain text, etc.). */
-    val outputFormat: OutputFormat,
+    val outputFormat: String,
     /** Include structured document tree in result. */
     val includeDocumentStructure: Boolean,
     /** Extract inline images from data URIs and SVGs. */

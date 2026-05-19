@@ -29,9 +29,9 @@ package dev.kreuzberg.android
  */
 data class ConversionOptionsUpdate(
     /** Optional override for `ConversionOptions.heading_style`. */
-    val headingStyle: HeadingStyle?,
+    val headingStyle: String?,
     /** Optional override for `ConversionOptions.list_indent_type`. */
-    val listIndentType: ListIndentType?,
+    val listIndentType: String?,
     /** Optional override for `ConversionOptions.list_indent_width`. */
     val listIndentWidth: Long?,
     /** Optional override for `ConversionOptions.bullets`. */
@@ -57,11 +57,11 @@ data class ConversionOptionsUpdate(
     /** Optional override for `ConversionOptions.compact_tables`. */
     val compactTables: Boolean?,
     /** Optional override for `ConversionOptions.highlight_style`. */
-    val highlightStyle: HighlightStyle?,
+    val highlightStyle: String?,
     /** Optional override for `ConversionOptions.extract_metadata`. */
     val extractMetadata: Boolean?,
     /** Optional override for `ConversionOptions.whitespace_mode`. */
-    val whitespaceMode: WhitespaceMode?,
+    val whitespaceMode: String?,
     /** Optional override for `ConversionOptions.strip_newlines`. */
     val stripNewlines: Boolean?,
     /** Optional override for `ConversionOptions.wrap`. */
@@ -75,9 +75,9 @@ data class ConversionOptionsUpdate(
     /** Optional override for `ConversionOptions.sup_symbol`. */
     val supSymbol: String?,
     /** Optional override for `ConversionOptions.newline_style`. */
-    val newlineStyle: NewlineStyle?,
+    val newlineStyle: String?,
     /** Optional override for `ConversionOptions.code_block_style`. */
-    val codeBlockStyle: CodeBlockStyle?,
+    val codeBlockStyle: String?,
     /** Optional override for `ConversionOptions.keep_inline_images_in`. */
     val keepInlineImagesIn: List<String>?,
     /** Optional override for `ConversionOptions.preprocessing`. */
@@ -93,9 +93,9 @@ data class ConversionOptionsUpdate(
     /** Optional override for `ConversionOptions.skip_images`. */
     val skipImages: Boolean?,
     /** Optional override for `ConversionOptions.link_style`. */
-    val linkStyle: LinkStyle?,
+    val linkStyle: String?,
     /** Optional override for `ConversionOptions.output_format`. */
-    val outputFormat: OutputFormat?,
+    val outputFormat: String?,
     /** Optional override for `ConversionOptions.include_document_structure`. */
     val includeDocumentStructure: Boolean?,
     /** Optional override for `ConversionOptions.extract_images`. */

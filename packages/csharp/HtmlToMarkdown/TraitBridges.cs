@@ -30,7 +30,7 @@ public interface IHtmlVisitor {
     VisitResult VisitImage(NodeContext Ctx, string Src, string Alt, string Title);
 
     /// <summary>visit_heading</summary>
-    VisitResult VisitHeading(NodeContext Ctx, uint Level, string Text, string Id);
+    VisitResult VisitHeading(NodeContext Ctx, uint Level, string Text, string ID);
 
     /// <summary>visit_code_block</summary>
     VisitResult VisitCodeBlock(NodeContext Ctx, string Lang, string Code);
@@ -164,7 +164,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
     private delegate int VisitImageFn(IntPtr userData, IntPtr Ctx, IntPtr Src, IntPtr Alt, IntPtr Title, out IntPtr outResult);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitHeadingFn(IntPtr userData, IntPtr Ctx, uint Level, IntPtr Text, IntPtr Id, out IntPtr outResult);
+    private delegate int VisitHeadingFn(IntPtr userData, IntPtr Ctx, uint Level, IntPtr Text, IntPtr ID, out IntPtr outResult);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int VisitCodeBlockFn(IntPtr userData, IntPtr Ctx, IntPtr Lang, IntPtr Code, out IntPtr outResult);
@@ -568,13 +568,13 @@ public sealed class HtmlVisitorBridge : IDisposable {
         }
     }
 
-    private int VisitHeadingFnCallback(IntPtr userData, IntPtr Ctx, uint Level, IntPtr Text, IntPtr Id, out IntPtr outResult) {
+    private int VisitHeadingFnCallback(IntPtr userData, IntPtr Ctx, uint Level, IntPtr Text, IntPtr ID, out IntPtr outResult) {
         try {
             var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
-            var managed_Id = Marshal.PtrToStringUTF8(Id) ?? string.Empty;
-            var result = _impl.VisitHeading(managed_Ctx, Level, managed_Text, managed_Id);
+            var managed_ID = Marshal.PtrToStringUTF8(ID) ?? string.Empty;
+            var result = _impl.VisitHeading(managed_Ctx, Level, managed_Text, managed_ID);
             outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {

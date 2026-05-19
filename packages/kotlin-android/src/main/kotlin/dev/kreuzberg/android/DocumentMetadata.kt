@@ -43,7 +43,7 @@ data class DocumentMetadata(
     /** Document language from `lang` attribute */
     val language: String?,
     /** Document text direction from `dir` attribute */
-    val textDirection: TextDirection?,
+    val textDirection: String?,
     /**
      * Open Graph metadata (og:* properties) for social media Keys like "title", "description",
      * "image", "url", etc.

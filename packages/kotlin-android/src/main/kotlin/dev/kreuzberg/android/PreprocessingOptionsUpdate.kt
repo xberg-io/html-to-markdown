@@ -32,7 +32,7 @@ data class PreprocessingOptionsUpdate(
     /** Optional global preprocessing enablement override */
     val enabled: Boolean?,
     /** Optional preprocessing preset level override (Minimal, Standard, Aggressive) */
-    val preset: PreprocessingPreset?,
+    val preset: String?,
     /** Optional navigation element removal override (nav, breadcrumbs, menus, sidebars) */
     val removeNavigation: Boolean?,
     /** Optional form element removal override (forms, inputs, buttons, etc.) */

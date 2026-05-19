@@ -48,7 +48,7 @@ pub struct DocumentMetadata {
     /// Document language from `lang` attribute
     pub language: Option<String>,
     /// Document text direction from `dir` attribute
-    pub text_direction: Option<TextDirection>,
+    pub text_direction: Option<String>,
     /// Open Graph metadata (og:* properties) for social media
     /// Keys like "title", "description", "image", "url", etc.
     pub open_graph: std::collections::HashMap<String, String>,
@@ -239,9 +239,9 @@ pub struct HtmlMetadata {
 #[frb(mirror(ConversionOptions))]
 pub struct ConversionOptions {
     /// Heading style to use in Markdown output (ATX `#` or Setext underline).
-    pub heading_style: HeadingStyle,
+    pub heading_style: String,
     /// How to indent nested list items (spaces or tab).
-    pub list_indent_type: ListIndentType,
+    pub list_indent_type: String,
     /// Number of spaces (or tabs) to use for each level of list indentation.
     pub list_indent_width: i64,
     /// Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).
@@ -273,7 +273,7 @@ pub struct ConversionOptions {
     /// Default `false` (aligned padding preserved).
     pub compact_tables: bool,
     /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
-    pub highlight_style: HighlightStyle,
+    pub highlight_style: String,
     /// Populate `result.metadata` with `<head>` / `<meta>` extraction
     /// (title, description, Open Graph, Twitter Card, JSON-LD, …).
     ///
@@ -289,7 +289,7 @@ pub struct ConversionOptions {
     ///
     /// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
     /// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
-    pub whitespace_mode: WhitespaceMode,
+    pub whitespace_mode: String,
     /// Strip all newlines from the output, producing a single-line result.
     pub strip_newlines: bool,
     /// Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
@@ -307,9 +307,9 @@ pub struct ConversionOptions {
     /// Markdown notation for superscript text (e.g. `"^"`).
     pub sup_symbol: String,
     /// How to encode hard line breaks (`<br>`) in Markdown.
-    pub newline_style: NewlineStyle,
+    pub newline_style: String,
     /// Style used for fenced code blocks (backticks or tilde).
-    pub code_block_style: CodeBlockStyle,
+    pub code_block_style: String,
     /// HTML tag names whose `<img>` children are kept inline instead of block.
     pub keep_inline_images_in: Vec<String>,
     /// Options for the HTML pre-processing pass applied before conversion begins.
@@ -333,9 +333,9 @@ pub struct ConversionOptions {
     /// Skip conversion of `<img>` elements (omit images from output).
     pub skip_images: bool,
     /// Link rendering style (inline or reference).
-    pub link_style: LinkStyle,
+    pub link_style: String,
     /// Target output format (Markdown, plain text, etc.).
-    pub output_format: OutputFormat,
+    pub output_format: String,
     /// Include structured document tree in result.
     pub include_document_structure: bool,
     /// Extract inline images from data URIs and SVGs.
@@ -375,9 +375,9 @@ pub struct ConversionOptions {
 #[frb(mirror(ConversionOptionsUpdate))]
 pub struct ConversionOptionsUpdate {
     /// Optional override for [`ConversionOptions::heading_style`].
-    pub heading_style: Option<HeadingStyle>,
+    pub heading_style: Option<String>,
     /// Optional override for [`ConversionOptions::list_indent_type`].
-    pub list_indent_type: Option<ListIndentType>,
+    pub list_indent_type: Option<String>,
     /// Optional override for [`ConversionOptions::list_indent_width`].
     pub list_indent_width: Option<i64>,
     /// Optional override for [`ConversionOptions::bullets`].
@@ -403,11 +403,11 @@ pub struct ConversionOptionsUpdate {
     /// Optional override for [`ConversionOptions::compact_tables`].
     pub compact_tables: Option<bool>,
     /// Optional override for [`ConversionOptions::highlight_style`].
-    pub highlight_style: Option<HighlightStyle>,
+    pub highlight_style: Option<String>,
     /// Optional override for [`ConversionOptions::extract_metadata`].
     pub extract_metadata: Option<bool>,
     /// Optional override for [`ConversionOptions::whitespace_mode`].
-    pub whitespace_mode: Option<WhitespaceMode>,
+    pub whitespace_mode: Option<String>,
     /// Optional override for [`ConversionOptions::strip_newlines`].
     pub strip_newlines: Option<bool>,
     /// Optional override for [`ConversionOptions::wrap`].
@@ -421,9 +421,9 @@ pub struct ConversionOptionsUpdate {
     /// Optional override for [`ConversionOptions::sup_symbol`].
     pub sup_symbol: Option<String>,
     /// Optional override for [`ConversionOptions::newline_style`].
-    pub newline_style: Option<NewlineStyle>,
+    pub newline_style: Option<String>,
     /// Optional override for [`ConversionOptions::code_block_style`].
-    pub code_block_style: Option<CodeBlockStyle>,
+    pub code_block_style: Option<String>,
     /// Optional override for [`ConversionOptions::keep_inline_images_in`].
     pub keep_inline_images_in: Option<Vec<String>>,
     /// Optional override for [`ConversionOptions::preprocessing`].
@@ -439,9 +439,9 @@ pub struct ConversionOptionsUpdate {
     /// Optional override for [`ConversionOptions::skip_images`].
     pub skip_images: Option<bool>,
     /// Optional override for [`ConversionOptions::link_style`].
-    pub link_style: Option<LinkStyle>,
+    pub link_style: Option<String>,
     /// Optional override for [`ConversionOptions::output_format`].
-    pub output_format: Option<OutputFormat>,
+    pub output_format: Option<String>,
     /// Optional override for [`ConversionOptions::include_document_structure`].
     pub include_document_structure: Option<bool>,
     /// Optional override for [`ConversionOptions::extract_images`].
@@ -466,7 +466,7 @@ pub struct PreprocessingOptions {
     /// Enable HTML preprocessing globally
     pub enabled: bool,
     /// Preprocessing preset level (Minimal, Standard, Aggressive)
-    pub preset: PreprocessingPreset,
+    pub preset: String,
     /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
     pub remove_navigation: bool,
     /// Remove form elements (forms, inputs, buttons, etc.)
@@ -483,7 +483,7 @@ pub struct PreprocessingOptionsUpdate {
     /// Optional global preprocessing enablement override
     pub enabled: Option<bool>,
     /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
-    pub preset: Option<PreprocessingPreset>,
+    pub preset: Option<String>,
     /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
     pub remove_navigation: Option<bool>,
     /// Optional form element removal override (forms, inputs, buttons, etc.)
@@ -715,19 +715,6 @@ pub struct NodeContext {
     pub is_inline: bool,
 }
 
-/// Text directionality of document content.
-///
-/// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
-#[frb(mirror(TextDirection))]
-pub enum TextDirection {
-    /// Left-to-right text flow (default for Latin scripts)
-    LeftToRight,
-    /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
-    RightToLeft,
-    /// Automatic directionality detection
-    Auto,
-}
-
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
@@ -773,118 +760,6 @@ pub enum StructuredDataType {
     Microdata,
     /// RDF in Attributes (RDFa) markup
     RDFa,
-}
-
-/// HTML preprocessing aggressiveness level.
-///
-/// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
-#[frb(mirror(PreprocessingPreset))]
-pub enum PreprocessingPreset {
-    /// Minimal cleanup. Remove only essential noise (scripts, styles).
-    Minimal,
-    /// Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
-    Standard,
-    /// Aggressive cleanup. Remove extensive non-content elements and structure.
-    Aggressive,
-}
-
-/// Heading style options for Markdown output.
-///
-/// Controls how headings (h1-h6) are rendered in the output Markdown.
-#[frb(mirror(HeadingStyle))]
-pub enum HeadingStyle {
-    /// Underlined style (=== for h1, --- for h2).
-    Underlined,
-    /// ATX style (# for h1, ## for h2, etc.). Default.
-    Atx,
-    /// ATX closed style (# title #, with closing hashes).
-    AtxClosed,
-}
-
-/// List indentation character type.
-///
-/// Controls whether list items are indented with spaces or tabs.
-#[frb(mirror(ListIndentType))]
-pub enum ListIndentType {
-    /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
-    Spaces,
-    /// Use tabs for indentation.
-    Tabs,
-}
-
-/// Whitespace handling strategy during conversion.
-///
-/// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
-#[frb(mirror(WhitespaceMode))]
-pub enum WhitespaceMode {
-    /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
-    Normalized,
-    /// Preserve all whitespace exactly as it appears in the HTML.
-    Strict,
-}
-
-/// Line break syntax in Markdown output.
-///
-/// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
-#[frb(mirror(NewlineStyle))]
-pub enum NewlineStyle {
-    /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
-    Spaces,
-    /// Backslash at end of line. Alternative Markdown syntax.
-    Backslash,
-}
-
-/// Code block fence style in Markdown output.
-///
-/// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
-#[frb(mirror(CodeBlockStyle))]
-pub enum CodeBlockStyle {
-    /// Indented code blocks (4 spaces). `CommonMark` standard.
-    Indented,
-    /// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
-    Backticks,
-    /// Fenced code blocks with tildes (~~~). Supports language hints.
-    Tildes,
-}
-
-/// Highlight rendering style for `<mark>` elements.
-///
-/// Controls how highlighted text is rendered in Markdown output.
-#[frb(mirror(HighlightStyle))]
-pub enum HighlightStyle {
-    /// Double equals syntax (==text==). Default. Pandoc-compatible.
-    DoubleEqual,
-    /// Preserve as HTML (==text==). Original HTML tag.
-    Html,
-    /// Render as bold (**text**). Uses strong emphasis.
-    Bold,
-    /// Strip formatting, render as plain text. No markup.
-    None,
-}
-
-/// Link rendering style in Markdown output.
-///
-/// Controls whether links and images use inline `[text](url)` syntax or
-/// reference-style `[text][1]` syntax with definitions collected at the end.
-#[frb(mirror(LinkStyle))]
-pub enum LinkStyle {
-    /// Inline links: `[text](url)`. Default.
-    Inline,
-    /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
-    Reference,
-}
-
-/// Output format for conversion.
-///
-/// Specifies the target markup language format for the conversion output.
-#[frb(mirror(OutputFormat))]
-pub enum OutputFormat {
-    /// Standard Markdown (CommonMark compatible). Default.
-    Markdown,
-    /// Djot lightweight markup language.
-    Djot,
-    /// Plain text output (no markup, visible text only).
-    Plain,
 }
 
 /// The semantic content type of a document node.
@@ -1248,7 +1123,7 @@ impl From<html_to_markdown_rs::metadata::DocumentMetadata> for DocumentMetadata 
             canonical_url: v.canonical_url.map(|s| s.into()),
             base_href: v.base_href.map(|s| s.into()),
             language: v.language.map(|s| s.into()),
-            text_direction: v.text_direction.map(TextDirection::from),
+            text_direction: Default::default(),
             open_graph: v.open_graph.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
             twitter_card: v.twitter_card.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
             meta_tags: v.meta_tags.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
@@ -1319,8 +1194,8 @@ impl From<html_to_markdown_rs::metadata::HtmlMetadata> for HtmlMetadata {
 impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions {
     fn from(v: html_to_markdown_rs::options::ConversionOptions) -> Self {
         ConversionOptions {
-            heading_style: HeadingStyle::from(v.heading_style),
-            list_indent_type: ListIndentType::from(v.list_indent_type),
+            heading_style: Default::default(),
+            list_indent_type: Default::default(),
             list_indent_width: v.list_indent_width as _,
             bullets: v.bullets.into(),
             strong_em_symbol: v.strong_em_symbol.to_string(),
@@ -1333,17 +1208,17 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             default_title: v.default_title as _,
             br_in_tables: v.br_in_tables as _,
             compact_tables: v.compact_tables as _,
-            highlight_style: HighlightStyle::from(v.highlight_style),
+            highlight_style: Default::default(),
             extract_metadata: v.extract_metadata as _,
-            whitespace_mode: WhitespaceMode::from(v.whitespace_mode),
+            whitespace_mode: Default::default(),
             strip_newlines: v.strip_newlines as _,
             wrap: v.wrap as _,
             wrap_width: v.wrap_width as _,
             convert_as_inline: v.convert_as_inline as _,
             sub_symbol: v.sub_symbol.into(),
             sup_symbol: v.sup_symbol.into(),
-            newline_style: NewlineStyle::from(v.newline_style),
-            code_block_style: CodeBlockStyle::from(v.code_block_style),
+            newline_style: Default::default(),
+            code_block_style: Default::default(),
             keep_inline_images_in: v.keep_inline_images_in.into_iter().map(|s| s.into()).collect(),
             preprocessing: PreprocessingOptions::from(v.preprocessing),
             encoding: v.encoding.into(),
@@ -1351,8 +1226,8 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             strip_tags: v.strip_tags.into_iter().map(|s| s.into()).collect(),
             preserve_tags: v.preserve_tags.into_iter().map(|s| s.into()).collect(),
             skip_images: v.skip_images as _,
-            link_style: LinkStyle::from(v.link_style),
-            output_format: OutputFormat::from(v.output_format),
+            link_style: Default::default(),
+            output_format: Default::default(),
             include_document_structure: v.include_document_structure as _,
             extract_images: v.extract_images as _,
             max_image_size: v.max_image_size as _,
@@ -1368,8 +1243,8 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
 impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionOptionsUpdate {
     fn from(v: html_to_markdown_rs::options::ConversionOptionsUpdate) -> Self {
         ConversionOptionsUpdate {
-            heading_style: v.heading_style.map(HeadingStyle::from),
-            list_indent_type: v.list_indent_type.map(ListIndentType::from),
+            heading_style: Default::default(),
+            list_indent_type: Default::default(),
             list_indent_width: v.list_indent_width.map(|x| x as _),
             bullets: v.bullets.map(|s| s.into()),
             strong_em_symbol: v.strong_em_symbol.map(|c| c.to_string()),
@@ -1382,17 +1257,17 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             default_title: v.default_title.map(|x| x as _),
             br_in_tables: v.br_in_tables.map(|x| x as _),
             compact_tables: v.compact_tables.map(|x| x as _),
-            highlight_style: v.highlight_style.map(HighlightStyle::from),
+            highlight_style: Default::default(),
             extract_metadata: v.extract_metadata.map(|x| x as _),
-            whitespace_mode: v.whitespace_mode.map(WhitespaceMode::from),
+            whitespace_mode: Default::default(),
             strip_newlines: v.strip_newlines.map(|x| x as _),
             wrap: v.wrap.map(|x| x as _),
             wrap_width: v.wrap_width.map(|x| x as _),
             convert_as_inline: v.convert_as_inline.map(|x| x as _),
             sub_symbol: v.sub_symbol.map(|s| s.into()),
             sup_symbol: v.sup_symbol.map(|s| s.into()),
-            newline_style: v.newline_style.map(NewlineStyle::from),
-            code_block_style: v.code_block_style.map(CodeBlockStyle::from),
+            newline_style: Default::default(),
+            code_block_style: Default::default(),
             keep_inline_images_in: v
                 .keep_inline_images_in
                 .map(|vec| vec.into_iter().map(|s| s.into()).collect()),
@@ -1402,8 +1277,8 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             strip_tags: v.strip_tags.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
             preserve_tags: v.preserve_tags.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
             skip_images: v.skip_images.map(|x| x as _),
-            link_style: v.link_style.map(LinkStyle::from),
-            output_format: v.output_format.map(OutputFormat::from),
+            link_style: Default::default(),
+            output_format: Default::default(),
             include_document_structure: v.include_document_structure.map(|x| x as _),
             extract_images: v.extract_images.map(|x| x as _),
             max_image_size: v.max_image_size.map(|x| x as _),
@@ -1422,7 +1297,7 @@ impl From<html_to_markdown_rs::options::PreprocessingOptions> for PreprocessingO
     fn from(v: html_to_markdown_rs::options::PreprocessingOptions) -> Self {
         PreprocessingOptions {
             enabled: v.enabled as _,
-            preset: PreprocessingPreset::from(v.preset),
+            preset: Default::default(),
             remove_navigation: v.remove_navigation as _,
             remove_forms: v.remove_forms as _,
         }
@@ -1433,7 +1308,7 @@ impl From<html_to_markdown_rs::options::PreprocessingOptionsUpdate> for Preproce
     fn from(v: html_to_markdown_rs::options::PreprocessingOptionsUpdate) -> Self {
         PreprocessingOptionsUpdate {
             enabled: v.enabled.map(|x| x as _),
-            preset: v.preset.map(PreprocessingPreset::from),
+            preset: Default::default(),
             remove_navigation: v.remove_navigation.map(|x| x as _),
             remove_forms: v.remove_forms.map(|x| x as _),
         }
@@ -1542,16 +1417,6 @@ impl From<html_to_markdown_rs::NodeContext> for NodeContext {
     }
 }
 
-impl From<html_to_markdown_rs::metadata::TextDirection> for TextDirection {
-    fn from(v: html_to_markdown_rs::metadata::TextDirection) -> Self {
-        match v {
-            html_to_markdown_rs::metadata::TextDirection::LeftToRight => TextDirection::LeftToRight,
-            html_to_markdown_rs::metadata::TextDirection::RightToLeft => TextDirection::RightToLeft,
-            html_to_markdown_rs::metadata::TextDirection::Auto => TextDirection::Auto,
-        }
-    }
-}
-
 impl From<html_to_markdown_rs::metadata::LinkType> for LinkType {
     fn from(v: html_to_markdown_rs::metadata::LinkType) -> Self {
         match v {
@@ -1582,93 +1447,6 @@ impl From<html_to_markdown_rs::metadata::StructuredDataType> for StructuredDataT
             html_to_markdown_rs::metadata::StructuredDataType::JsonLd => StructuredDataType::JsonLd,
             html_to_markdown_rs::metadata::StructuredDataType::Microdata => StructuredDataType::Microdata,
             html_to_markdown_rs::metadata::StructuredDataType::RDFa => StructuredDataType::RDFa,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::PreprocessingPreset> for PreprocessingPreset {
-    fn from(v: html_to_markdown_rs::options::PreprocessingPreset) -> Self {
-        match v {
-            html_to_markdown_rs::options::PreprocessingPreset::Minimal => PreprocessingPreset::Minimal,
-            html_to_markdown_rs::options::PreprocessingPreset::Standard => PreprocessingPreset::Standard,
-            html_to_markdown_rs::options::PreprocessingPreset::Aggressive => PreprocessingPreset::Aggressive,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::HeadingStyle> for HeadingStyle {
-    fn from(v: html_to_markdown_rs::options::HeadingStyle) -> Self {
-        match v {
-            html_to_markdown_rs::options::HeadingStyle::Underlined => HeadingStyle::Underlined,
-            html_to_markdown_rs::options::HeadingStyle::Atx => HeadingStyle::Atx,
-            html_to_markdown_rs::options::HeadingStyle::AtxClosed => HeadingStyle::AtxClosed,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::ListIndentType> for ListIndentType {
-    fn from(v: html_to_markdown_rs::options::ListIndentType) -> Self {
-        match v {
-            html_to_markdown_rs::options::ListIndentType::Spaces => ListIndentType::Spaces,
-            html_to_markdown_rs::options::ListIndentType::Tabs => ListIndentType::Tabs,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::WhitespaceMode> for WhitespaceMode {
-    fn from(v: html_to_markdown_rs::options::WhitespaceMode) -> Self {
-        match v {
-            html_to_markdown_rs::options::WhitespaceMode::Normalized => WhitespaceMode::Normalized,
-            html_to_markdown_rs::options::WhitespaceMode::Strict => WhitespaceMode::Strict,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::NewlineStyle> for NewlineStyle {
-    fn from(v: html_to_markdown_rs::options::NewlineStyle) -> Self {
-        match v {
-            html_to_markdown_rs::options::NewlineStyle::Spaces => NewlineStyle::Spaces,
-            html_to_markdown_rs::options::NewlineStyle::Backslash => NewlineStyle::Backslash,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::CodeBlockStyle> for CodeBlockStyle {
-    fn from(v: html_to_markdown_rs::options::CodeBlockStyle) -> Self {
-        match v {
-            html_to_markdown_rs::options::CodeBlockStyle::Indented => CodeBlockStyle::Indented,
-            html_to_markdown_rs::options::CodeBlockStyle::Backticks => CodeBlockStyle::Backticks,
-            html_to_markdown_rs::options::CodeBlockStyle::Tildes => CodeBlockStyle::Tildes,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::HighlightStyle> for HighlightStyle {
-    fn from(v: html_to_markdown_rs::options::HighlightStyle) -> Self {
-        match v {
-            html_to_markdown_rs::options::HighlightStyle::DoubleEqual => HighlightStyle::DoubleEqual,
-            html_to_markdown_rs::options::HighlightStyle::Html => HighlightStyle::Html,
-            html_to_markdown_rs::options::HighlightStyle::Bold => HighlightStyle::Bold,
-            html_to_markdown_rs::options::HighlightStyle::None => HighlightStyle::None,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::LinkStyle> for LinkStyle {
-    fn from(v: html_to_markdown_rs::options::LinkStyle) -> Self {
-        match v {
-            html_to_markdown_rs::options::LinkStyle::Inline => LinkStyle::Inline,
-            html_to_markdown_rs::options::LinkStyle::Reference => LinkStyle::Reference,
-        }
-    }
-}
-
-impl From<html_to_markdown_rs::options::OutputFormat> for OutputFormat {
-    fn from(v: html_to_markdown_rs::options::OutputFormat) -> Self {
-        match v {
-            html_to_markdown_rs::options::OutputFormat::Markdown => OutputFormat::Markdown,
-            html_to_markdown_rs::options::OutputFormat::Djot => OutputFormat::Djot,
-            html_to_markdown_rs::options::OutputFormat::Plain => OutputFormat::Plain,
         }
     }
 }
@@ -1871,8 +1649,8 @@ impl From<html_to_markdown_rs::VisitResult> for VisitResult {
 impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions {
     fn from(v: ConversionOptions) -> Self {
         html_to_markdown_rs::options::ConversionOptions {
-            heading_style: v.heading_style.into(),
-            list_indent_type: v.list_indent_type.into(),
+            heading_style: Default::default(),
+            list_indent_type: Default::default(),
             list_indent_width: v.list_indent_width as _,
             bullets: v.bullets.into(),
             strong_em_symbol: v.strong_em_symbol.chars().next().unwrap_or_default(),
@@ -1885,17 +1663,17 @@ impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions
             default_title: v.default_title as _,
             br_in_tables: v.br_in_tables as _,
             compact_tables: v.compact_tables as _,
-            highlight_style: v.highlight_style.into(),
+            highlight_style: Default::default(),
             extract_metadata: v.extract_metadata as _,
-            whitespace_mode: v.whitespace_mode.into(),
+            whitespace_mode: Default::default(),
             strip_newlines: v.strip_newlines as _,
             wrap: v.wrap as _,
             wrap_width: v.wrap_width as _,
             convert_as_inline: v.convert_as_inline as _,
             sub_symbol: v.sub_symbol.into(),
             sup_symbol: v.sup_symbol.into(),
-            newline_style: v.newline_style.into(),
-            code_block_style: v.code_block_style.into(),
+            newline_style: Default::default(),
+            code_block_style: Default::default(),
             keep_inline_images_in: v.keep_inline_images_in.into_iter().map(Into::into).collect(),
             preprocessing: v.preprocessing.into(),
             encoding: v.encoding.into(),
@@ -1903,8 +1681,8 @@ impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions
             strip_tags: v.strip_tags.into_iter().map(Into::into).collect(),
             preserve_tags: v.preserve_tags.into_iter().map(Into::into).collect(),
             skip_images: v.skip_images as _,
-            link_style: v.link_style.into(),
-            output_format: v.output_format.into(),
+            link_style: Default::default(),
+            output_format: Default::default(),
             include_document_structure: v.include_document_structure as _,
             extract_images: v.extract_images as _,
             max_image_size: v.max_image_size as _,
@@ -1922,96 +1700,9 @@ impl From<PreprocessingOptions> for html_to_markdown_rs::options::PreprocessingO
     fn from(v: PreprocessingOptions) -> Self {
         html_to_markdown_rs::options::PreprocessingOptions {
             enabled: v.enabled as _,
-            preset: v.preset.into(),
+            preset: Default::default(),
             remove_navigation: v.remove_navigation as _,
             remove_forms: v.remove_forms as _,
-        }
-    }
-}
-
-impl From<PreprocessingPreset> for html_to_markdown_rs::options::PreprocessingPreset {
-    fn from(v: PreprocessingPreset) -> Self {
-        match v {
-            PreprocessingPreset::Minimal => html_to_markdown_rs::options::PreprocessingPreset::Minimal,
-            PreprocessingPreset::Standard => html_to_markdown_rs::options::PreprocessingPreset::Standard,
-            PreprocessingPreset::Aggressive => html_to_markdown_rs::options::PreprocessingPreset::Aggressive,
-        }
-    }
-}
-
-impl From<HeadingStyle> for html_to_markdown_rs::options::HeadingStyle {
-    fn from(v: HeadingStyle) -> Self {
-        match v {
-            HeadingStyle::Underlined => html_to_markdown_rs::options::HeadingStyle::Underlined,
-            HeadingStyle::Atx => html_to_markdown_rs::options::HeadingStyle::Atx,
-            HeadingStyle::AtxClosed => html_to_markdown_rs::options::HeadingStyle::AtxClosed,
-        }
-    }
-}
-
-impl From<ListIndentType> for html_to_markdown_rs::options::ListIndentType {
-    fn from(v: ListIndentType) -> Self {
-        match v {
-            ListIndentType::Spaces => html_to_markdown_rs::options::ListIndentType::Spaces,
-            ListIndentType::Tabs => html_to_markdown_rs::options::ListIndentType::Tabs,
-        }
-    }
-}
-
-impl From<WhitespaceMode> for html_to_markdown_rs::options::WhitespaceMode {
-    fn from(v: WhitespaceMode) -> Self {
-        match v {
-            WhitespaceMode::Normalized => html_to_markdown_rs::options::WhitespaceMode::Normalized,
-            WhitespaceMode::Strict => html_to_markdown_rs::options::WhitespaceMode::Strict,
-        }
-    }
-}
-
-impl From<NewlineStyle> for html_to_markdown_rs::options::NewlineStyle {
-    fn from(v: NewlineStyle) -> Self {
-        match v {
-            NewlineStyle::Spaces => html_to_markdown_rs::options::NewlineStyle::Spaces,
-            NewlineStyle::Backslash => html_to_markdown_rs::options::NewlineStyle::Backslash,
-        }
-    }
-}
-
-impl From<CodeBlockStyle> for html_to_markdown_rs::options::CodeBlockStyle {
-    fn from(v: CodeBlockStyle) -> Self {
-        match v {
-            CodeBlockStyle::Indented => html_to_markdown_rs::options::CodeBlockStyle::Indented,
-            CodeBlockStyle::Backticks => html_to_markdown_rs::options::CodeBlockStyle::Backticks,
-            CodeBlockStyle::Tildes => html_to_markdown_rs::options::CodeBlockStyle::Tildes,
-        }
-    }
-}
-
-impl From<HighlightStyle> for html_to_markdown_rs::options::HighlightStyle {
-    fn from(v: HighlightStyle) -> Self {
-        match v {
-            HighlightStyle::DoubleEqual => html_to_markdown_rs::options::HighlightStyle::DoubleEqual,
-            HighlightStyle::Html => html_to_markdown_rs::options::HighlightStyle::Html,
-            HighlightStyle::Bold => html_to_markdown_rs::options::HighlightStyle::Bold,
-            HighlightStyle::None => html_to_markdown_rs::options::HighlightStyle::None,
-        }
-    }
-}
-
-impl From<LinkStyle> for html_to_markdown_rs::options::LinkStyle {
-    fn from(v: LinkStyle) -> Self {
-        match v {
-            LinkStyle::Inline => html_to_markdown_rs::options::LinkStyle::Inline,
-            LinkStyle::Reference => html_to_markdown_rs::options::LinkStyle::Reference,
-        }
-    }
-}
-
-impl From<OutputFormat> for html_to_markdown_rs::options::OutputFormat {
-    fn from(v: OutputFormat) -> Self {
-        match v {
-            OutputFormat::Markdown => html_to_markdown_rs::options::OutputFormat::Markdown,
-            OutputFormat::Djot => html_to_markdown_rs::options::OutputFormat::Djot,
-            OutputFormat::Plain => html_to_markdown_rs::options::OutputFormat::Plain,
         }
     }
 }

@@ -226,7 +226,6 @@ ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__fr
 #' @field visitor Optional override for [`ConversionOptions::visitor`].
 #' @export
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
-ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
 `$.ConversionOptionsUpdate` <- function(self, name) {
   func <- ConversionOptionsUpdate[[name]]
@@ -263,7 +262,6 @@ PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptio
 #' @field remove_forms Optional form element removal override (forms, inputs, buttons, etc.)
 #' @export
 PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
-PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__PreprocessingOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
 `$.PreprocessingOptionsUpdate` <- function(self, name) {
   func <- PreprocessingOptionsUpdate[[name]]

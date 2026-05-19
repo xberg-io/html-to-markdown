@@ -42,7 +42,48 @@ public typealias DocumentMetadata = RustBridge.DocumentMetadata
 /// assert_eq!(header.level, 1);
 /// assert!(header.is_valid());
 /// ```
-public typealias HeaderMetadata = RustBridge.HeaderMetadata
+public struct HeaderMetadata: Codable, Sendable, Hashable {
+    /// Header level: 1 (h1) through 6 (h6)
+    public let level: UInt8
+    /// Normalized text content of the header
+    public let text: String
+    /// HTML id attribute if present
+    public let id: String?
+    /// Document tree depth at the header element
+    public let depth: UInt
+    /// Byte offset in original HTML document
+    public let htmlOffset: UInt
+    public init(level: UInt8, text: String, id: String? = nil, depth: UInt, htmlOffset: UInt) {
+        self.level = level
+        self.text = text
+        self.id = id
+        self.depth = depth
+        self.htmlOffset = htmlOffset
+    }
+    private enum CodingKeys: String, CodingKey {
+        case level = "level"
+        case text = "text"
+        case id = "id"
+        case depth = "depth"
+        case htmlOffset = "html_offset"
+    }
+}
+
+// MARK: - Internal FFI conversions for HeaderMetadata
+internal extension HeaderMetadata {
+    init(_ rb: RustBridge.HeaderMetadata) throws {
+        self.level = rb.level()
+        self.text = rb.text().toString()
+        self.id = rb.id()?.toString()
+        self.depth = rb.depth()
+        self.htmlOffset = rb.html_offset()
+    }
+    func intoRust() throws -> RustBridge.HeaderMetadata {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.headerMetadataFromJson(json)
+    }
+}
 
 /// Hyperlink metadata with categorization and attributes.
 ///
@@ -102,7 +143,38 @@ public typealias ImageMetadata = RustBridge.ImageMetadata
 ///
 /// assert_eq!(schema.data_type, StructuredDataType::JsonLd);
 /// ```
-public typealias StructuredData = RustBridge.StructuredData
+public struct StructuredData: Codable, Sendable, Hashable {
+    /// Type of structured data (JSON-LD, Microdata, RDFa)
+    public let dataType: StructuredDataType
+    /// Raw JSON string (for JSON-LD) or serialized representation
+    public let rawJson: String
+    /// Schema type if detectable (e.g., "Article", "Event", "Product")
+    public let schemaType: String?
+    public init(dataType: StructuredDataType, rawJson: String, schemaType: String? = nil) {
+        self.dataType = dataType
+        self.rawJson = rawJson
+        self.schemaType = schemaType
+    }
+    private enum CodingKeys: String, CodingKey {
+        case dataType = "data_type"
+        case rawJson = "raw_json"
+        case schemaType = "schema_type"
+    }
+}
+
+// MARK: - Internal FFI conversions for StructuredData
+internal extension StructuredData {
+    init(_ rb: RustBridge.StructuredData) throws {
+        self.dataType = StructuredDataType(rawValue: rb.data_type().toString()) ?? { fatalError("Unknown StructuredDataType: \(rb.data_type().toString())") }()
+        self.rawJson = rb.raw_json().toString()
+        self.schemaType = rb.schema_type()?.toString()
+    }
+    func intoRust() throws -> RustBridge.StructuredData {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.structuredDataFromJson(json)
+    }
+}
 
 /// Comprehensive metadata extraction result from HTML document.
 ///
@@ -148,14 +220,82 @@ public typealias ConversionOptions = RustBridge.ConversionOptions
 public typealias ConversionOptionsUpdate = RustBridge.ConversionOptionsUpdate
 
 /// HTML preprocessing options for document cleanup before conversion.
-public typealias PreprocessingOptions = RustBridge.PreprocessingOptions
+public struct PreprocessingOptions: Codable, Sendable, Hashable {
+    /// Enable HTML preprocessing globally
+    public let enabled: Bool
+    /// Preprocessing preset level (Minimal, Standard, Aggressive)
+    public let preset: String
+    /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
+    public let removeNavigation: Bool
+    /// Remove form elements (forms, inputs, buttons, etc.)
+    public let removeForms: Bool
+    public init(enabled: Bool, preset: String, removeNavigation: Bool, removeForms: Bool) {
+        self.enabled = enabled
+        self.preset = preset
+        self.removeNavigation = removeNavigation
+        self.removeForms = removeForms
+    }
+    private enum CodingKeys: String, CodingKey {
+        case enabled = "enabled"
+        case preset = "preset"
+        case removeNavigation = "remove_navigation"
+        case removeForms = "remove_forms"
+    }
+}
+
+// MARK: - Internal FFI conversions for PreprocessingOptions
+internal extension PreprocessingOptions {
+    init(_ rb: RustBridge.PreprocessingOptions) throws {
+        self.enabled = rb.enabled()
+        self.preset = rb.preset().toString()
+        self.removeNavigation = rb.remove_navigation()
+        self.removeForms = rb.remove_forms()
+    }
+    func intoRust() throws -> RustBridge.PreprocessingOptions {
+        return RustBridge.PreprocessingOptions(self.enabled, self.preset, self.removeNavigation, self.removeForms)
+    }
+}
 
 /// Partial update for `PreprocessingOptions`.
 ///
 /// This struct uses `Option<T>` to represent optional fields that can be selectively updated.
 /// Only specified fields (Some values) will override existing options; None values leave the
 /// corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
-public typealias PreprocessingOptionsUpdate = RustBridge.PreprocessingOptionsUpdate
+public struct PreprocessingOptionsUpdate: Codable, Sendable, Hashable {
+    /// Optional global preprocessing enablement override
+    public let enabled: Bool?
+    /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
+    public let preset: String?
+    /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
+    public let removeNavigation: Bool?
+    /// Optional form element removal override (forms, inputs, buttons, etc.)
+    public let removeForms: Bool?
+    public init(enabled: Bool? = nil, preset: String? = nil, removeNavigation: Bool? = nil, removeForms: Bool? = nil) {
+        self.enabled = enabled
+        self.preset = preset
+        self.removeNavigation = removeNavigation
+        self.removeForms = removeForms
+    }
+    private enum CodingKeys: String, CodingKey {
+        case enabled = "enabled"
+        case preset = "preset"
+        case removeNavigation = "remove_navigation"
+        case removeForms = "remove_forms"
+    }
+}
+
+// MARK: - Internal FFI conversions for PreprocessingOptionsUpdate
+internal extension PreprocessingOptionsUpdate {
+    init(_ rb: RustBridge.PreprocessingOptionsUpdate) throws {
+        self.enabled = rb.enabled()
+        self.preset = rb.preset()?.toString()
+        self.removeNavigation = rb.remove_navigation()
+        self.removeForms = rb.remove_forms()
+    }
+    func intoRust() throws -> RustBridge.PreprocessingOptionsUpdate {
+        return RustBridge.PreprocessingOptionsUpdate(self.enabled, self.preset, self.removeNavigation, self.removeForms)
+    }
+}
 
 /// A structured document tree representing the semantic content of an HTML document.
 ///
@@ -198,13 +338,120 @@ public typealias TextAnnotation = RustBridge.TextAnnotation
 public typealias ConversionResult = RustBridge.ConversionResult
 
 /// A structured table grid with cell-level data including spans.
-public typealias TableGrid = RustBridge.TableGrid
+public struct TableGrid: Codable, Sendable, Hashable {
+    /// Number of rows.
+    public let rows: UInt32
+    /// Number of columns.
+    public let cols: UInt32
+    /// All cells in the table as a flat, sparse list.
+    ///
+    /// The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
+    /// that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
+    /// in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
+    /// and `col_span` fields set accordingly.
+    ///
+    /// To reconstruct the full visual grid, iterate over all cells and mark the rectangular
+    /// region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
+    /// `(row, col)` position that is not the origin of any cell is covered by a span from an
+    /// earlier cell.
+    ///
+    /// The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
+    /// produces an empty vec.
+    public let cells: [GridCell]
+    public init(rows: UInt32, cols: UInt32, cells: [GridCell]) {
+        self.rows = rows
+        self.cols = cols
+        self.cells = cells
+    }
+}
+
+// MARK: - Internal FFI conversions for TableGrid
+internal extension TableGrid {
+    init(_ rb: RustBridge.TableGrid) throws {
+        self.rows = rb.rows()
+        self.cols = rb.cols()
+        self.cells = try rb.cells().map { try GridCell($0) }
+    }
+    func intoRust() throws -> RustBridge.TableGrid {
+        let __cells = RustVec<RustBridge.GridCell>()
+        for __elem in self.cells { __cells.push(value: try __elem.intoRust()) }
+        return RustBridge.TableGrid(self.rows, self.cols, __cells)
+    }
+}
 
 /// A single cell in a table grid.
-public typealias GridCell = RustBridge.GridCell
+public struct GridCell: Codable, Sendable, Hashable {
+    /// The text content of the cell.
+    public let content: String
+    /// 0-indexed row position.
+    public let row: UInt32
+    /// 0-indexed column position.
+    public let col: UInt32
+    /// Number of rows this cell spans (default 1).
+    public let rowSpan: UInt32
+    /// Number of columns this cell spans (default 1).
+    public let colSpan: UInt32
+    /// Whether this is a header cell (`<th>`).
+    public let isHeader: Bool
+    public init(content: String, row: UInt32, col: UInt32, rowSpan: UInt32, colSpan: UInt32, isHeader: Bool) {
+        self.content = content
+        self.row = row
+        self.col = col
+        self.rowSpan = rowSpan
+        self.colSpan = colSpan
+        self.isHeader = isHeader
+    }
+    private enum CodingKeys: String, CodingKey {
+        case content = "content"
+        case row = "row"
+        case col = "col"
+        case rowSpan = "row_span"
+        case colSpan = "col_span"
+        case isHeader = "is_header"
+    }
+}
+
+// MARK: - Internal FFI conversions for GridCell
+internal extension GridCell {
+    init(_ rb: RustBridge.GridCell) throws {
+        self.content = rb.content().toString()
+        self.row = rb.row()
+        self.col = rb.col()
+        self.rowSpan = rb.row_span()
+        self.colSpan = rb.col_span()
+        self.isHeader = rb.is_header()
+    }
+    func intoRust() throws -> RustBridge.GridCell {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.gridCellFromJson(json)
+    }
+}
 
 /// A top-level extracted table with both structured data and markdown representation.
-public typealias TableData = RustBridge.TableData
+public struct TableData: Codable, Sendable, Hashable {
+    /// The structured table grid.
+    public let grid: TableGrid
+    /// The markdown rendering of this table.
+    public let markdown: String
+    public init(grid: TableGrid, markdown: String) {
+        self.grid = grid
+        self.markdown = markdown
+    }
+}
+
+// MARK: - Internal FFI conversions for TableData
+internal extension TableData {
+    init(_ rb: RustBridge.TableData) throws {
+        self.grid = try TableGrid(rb.grid())
+        self.markdown = rb.markdown().toString()
+    }
+    func intoRust() throws -> RustBridge.TableData {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.tableDataFromJson(json)
+    }
+}
 
 /// A non-fatal diagnostic produced during HTML conversion.
 ///
@@ -221,7 +468,29 @@ public typealias TableData = RustBridge.TableData
 ///   `result.warnings.is_empty()` before using the output.
 ///
 /// See [`WarningKind`] for the full taxonomy of warning categories.
-public typealias ProcessingWarning = RustBridge.ProcessingWarning
+public struct ProcessingWarning: Codable, Sendable, Hashable {
+    /// Human-readable warning message.
+    public let message: String
+    /// The category of warning.
+    public let kind: WarningKind
+    public init(message: String, kind: WarningKind) {
+        self.message = message
+        self.kind = kind
+    }
+}
+
+// MARK: - Internal FFI conversions for ProcessingWarning
+internal extension ProcessingWarning {
+    init(_ rb: RustBridge.ProcessingWarning) throws {
+        self.message = rb.message().toString()
+        self.kind = WarningKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown WarningKind: \(rb.kind().toString())") }()
+    }
+    func intoRust() throws -> RustBridge.ProcessingWarning {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.processingWarningFromJson(json)
+    }
+}
 
 /// Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 ///
@@ -236,22 +505,10 @@ public typealias VisitorHandle = RustBridge.VisitorHandle
 /// including its type, attributes, position in the DOM tree, and parent context.
 public typealias NodeContext = RustBridge.NodeContext
 
-/// Text directionality of document content.
-///
-/// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
-public enum TextDirection {
-    /// Left-to-right text flow (default for Latin scripts)
-    case leftToRight
-    /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
-    case rightToLeft
-    /// Automatic directionality detection
-    case auto
-}
-
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
-public enum LinkType {
+public enum LinkType: String, Codable, Sendable, Hashable {
     /// Anchor link within same document (href starts with #)
     case anchor
     /// Internal link within same domain
@@ -269,11 +526,11 @@ public enum LinkType {
 /// Image source classification for proper handling and processing.
 ///
 /// Determines whether an image is embedded (data URI), inline SVG, external, or relative.
-public enum ImageType {
+public enum ImageType: String, Codable, Sendable, Hashable {
     /// Data URI embedded image (base64 or other encoding)
-    case dataUri
+    case dataUri = "data_uri"
     /// Inline SVG element
-    case inlineSvg
+    case inlineSvg = "inline_svg"
     /// External image URL (http/https)
     case external
     /// Relative image path
@@ -283,60 +540,14 @@ public enum ImageType {
 /// Structured data format type.
 ///
 /// Identifies the schema/format used for structured data markup.
-public enum StructuredDataType {
+public enum StructuredDataType: String, Codable, Sendable, Hashable {
     /// JSON-LD (JSON for Linking Data) script blocks
-    case jsonLd
+    case jsonLd = "json_ld"
     /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
     case microdata
     /// RDF in Attributes (RDFa) markup
-    case rdFa
+    case rdFa = "rdfa"
 }
-
-/// HTML preprocessing aggressiveness level.
-///
-/// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
-public typealias PreprocessingPreset = RustBridge.PreprocessingPreset
-
-/// Heading style options for Markdown output.
-///
-/// Controls how headings (h1-h6) are rendered in the output Markdown.
-public typealias HeadingStyle = RustBridge.HeadingStyle
-
-/// List indentation character type.
-///
-/// Controls whether list items are indented with spaces or tabs.
-public typealias ListIndentType = RustBridge.ListIndentType
-
-/// Whitespace handling strategy during conversion.
-///
-/// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
-public typealias WhitespaceMode = RustBridge.WhitespaceMode
-
-/// Line break syntax in Markdown output.
-///
-/// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
-public typealias NewlineStyle = RustBridge.NewlineStyle
-
-/// Code block fence style in Markdown output.
-///
-/// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
-public typealias CodeBlockStyle = RustBridge.CodeBlockStyle
-
-/// Highlight rendering style for `<mark>` elements.
-///
-/// Controls how highlighted text is rendered in Markdown output.
-public typealias HighlightStyle = RustBridge.HighlightStyle
-
-/// Link rendering style in Markdown output.
-///
-/// Controls whether links and images use inline `[text](url)` syntax or
-/// reference-style `[text][1]` syntax with definitions collected at the end.
-public typealias LinkStyle = RustBridge.LinkStyle
-
-/// Output format for conversion.
-///
-/// Specifies the target markup language format for the conversion output.
-public typealias OutputFormat = RustBridge.OutputFormat
 
 /// The semantic content type of a document node.
 ///
@@ -395,202 +606,202 @@ public enum AnnotationKind {
 }
 
 /// Categories of processing warnings.
-public enum WarningKind {
+public enum WarningKind: String, Codable, Sendable, Hashable {
     /// An image could not be extracted (e.g. invalid data URI, unsupported format).
-    case imageExtractionFailed
+    case imageExtractionFailed = "image_extraction_failed"
     /// The input encoding was not recognized; fell back to UTF-8.
-    case encodingFallback
+    case encodingFallback = "encoding_fallback"
     /// The input was truncated due to size limits.
-    case truncatedInput
+    case truncatedInput = "truncated_input"
     /// The HTML was malformed but processing continued with best effort.
-    case malformedHtml
+    case malformedHtml = "malformed_html"
     /// Sanitization was applied to remove potentially unsafe content.
-    case sanitizationApplied
+    case sanitizationApplied = "sanitization_applied"
     /// DOM traversal was truncated because max_depth was exceeded.
-    case depthLimitExceeded
+    case depthLimitExceeded = "depth_limit_exceeded"
 }
 
 /// Node type enumeration covering all HTML element types.
 ///
 /// This enum categorizes all HTML elements that the converter recognizes,
 /// providing a coarse-grained classification for visitor dispatch.
-public enum NodeType {
+public enum NodeType: String, Codable, Sendable, Hashable {
     /// Text node (most frequent - 100+ per document)
-    case text
+    case text = "Text"
     /// Generic element node
-    case element
+    case element = "Element"
     /// Heading elements (h1-h6)
-    case heading
+    case heading = "Heading"
     /// Paragraph element
-    case paragraph
+    case paragraph = "Paragraph"
     /// Generic div container
-    case div
+    case div = "Div"
     /// Blockquote element
-    case blockquote
+    case blockquote = "Blockquote"
     /// Preformatted text block
-    case pre
+    case pre = "Pre"
     /// Horizontal rule
-    case hr
+    case hr = "Hr"
     /// Ordered or unordered list (ul, ol)
-    case list
+    case list = "List"
     /// List item (li)
-    case listItem
+    case listItem = "ListItem"
     /// Definition list (dl)
-    case definitionList
+    case definitionList = "DefinitionList"
     /// Definition term (dt)
-    case definitionTerm
+    case definitionTerm = "DefinitionTerm"
     /// Definition description (dd)
-    case definitionDescription
+    case definitionDescription = "DefinitionDescription"
     /// Table element
-    case table
+    case table = "Table"
     /// Table row (tr)
-    case tableRow
+    case tableRow = "TableRow"
     /// Table cell (td, th)
-    case tableCell
+    case tableCell = "TableCell"
     /// Table header cell (th)
-    case tableHeader
+    case tableHeader = "TableHeader"
     /// Table body (tbody)
-    case tableBody
+    case tableBody = "TableBody"
     /// Table head (thead)
-    case tableHead
+    case tableHead = "TableHead"
     /// Table foot (tfoot)
-    case tableFoot
+    case tableFoot = "TableFoot"
     /// Anchor link (a)
-    case link
+    case link = "Link"
     /// Image (img)
-    case image
+    case image = "Image"
     /// Strong/bold (strong, b)
-    case strong
+    case strong = "Strong"
     /// Emphasis/italic (em, i)
-    case em
+    case em = "Em"
     /// Inline code (code)
-    case code
+    case code = "Code"
     /// Strikethrough (s, del, strike)
-    case strikethrough
+    case strikethrough = "Strikethrough"
     /// Underline (u, ins)
-    case underline
+    case underline = "Underline"
     /// Subscript (sub)
-    case `subscript`
+    case `subscript` = "Subscript"
     /// Superscript (sup)
-    case superscript
+    case superscript = "Superscript"
     /// Mark/highlight (mark)
-    case mark
+    case mark = "Mark"
     /// Small text (small)
-    case small
+    case small = "Small"
     /// Line break (br)
-    case br
+    case br = "Br"
     /// Span element
-    case span
+    case span = "Span"
     /// Article element
-    case article
+    case article = "Article"
     /// Section element
-    case section
+    case section = "Section"
     /// Navigation element
-    case nav
+    case nav = "Nav"
     /// Aside element
-    case aside
+    case aside = "Aside"
     /// Header element
-    case header
+    case header = "Header"
     /// Footer element
-    case footer
+    case footer = "Footer"
     /// Main element
-    case main
+    case main = "Main"
     /// Figure element
-    case figure
+    case figure = "Figure"
     /// Figure caption
-    case figcaption
+    case figcaption = "Figcaption"
     /// Time element
-    case time
+    case time = "Time"
     /// Details element
-    case details
+    case details = "Details"
     /// Summary element
-    case summary
+    case summary = "Summary"
     /// Form element
-    case form
+    case form = "Form"
     /// Input element
-    case input
+    case input = "Input"
     /// Select element
-    case select
+    case select = "Select"
     /// Option element
-    case option
+    case option = "Option"
     /// Button element
-    case button
+    case button = "Button"
     /// Textarea element
-    case textarea
+    case textarea = "Textarea"
     /// Label element
-    case label
+    case label = "Label"
     /// Fieldset element
-    case fieldset
+    case fieldset = "Fieldset"
     /// Legend element
-    case legend
+    case legend = "Legend"
     /// Audio element
-    case audio
+    case audio = "Audio"
     /// Video element
-    case video
+    case video = "Video"
     /// Picture element
-    case picture
+    case picture = "Picture"
     /// Source element
-    case source
+    case source = "Source"
     /// Iframe element
-    case iframe
+    case iframe = "Iframe"
     /// SVG element
-    case svg
+    case svg = "Svg"
     /// Canvas element
-    case canvas
+    case canvas = "Canvas"
     /// Ruby annotation
-    case ruby
+    case ruby = "Ruby"
     /// Ruby text
-    case rt
+    case rt = "Rt"
     /// Ruby parenthesis
-    case rp
+    case rp = "Rp"
     /// Abbreviation
-    case abbr
+    case abbr = "Abbr"
     /// Keyboard input
-    case kbd
+    case kbd = "Kbd"
     /// Sample output
-    case samp
+    case samp = "Samp"
     /// Variable
-    case `var`
+    case `var` = "Var"
     /// Citation
-    case cite
+    case cite = "Cite"
     /// Quote
-    case q
+    case q = "Q"
     /// Deleted text
-    case del
+    case del = "Del"
     /// Inserted text
-    case ins
+    case ins = "Ins"
     /// Data element
-    case data
+    case data = "Data"
     /// Meter element
-    case meter
+    case meter = "Meter"
     /// Progress element
-    case progress
+    case progress = "Progress"
     /// Output element
-    case output
+    case output = "Output"
     /// Template element
-    case template
+    case template = "Template"
     /// Slot element
-    case slot
+    case slot = "Slot"
     /// HTML root element
-    case html
+    case html = "Html"
     /// Head element
-    case head
+    case head = "Head"
     /// Body element
-    case body
+    case body = "Body"
     /// Title element
-    case title
+    case title = "Title"
     /// Meta element
-    case meta
+    case meta = "Meta"
     /// Link element (not anchor)
-    case linkTag
+    case linkTag = "LinkTag"
     /// Style element
-    case style
+    case style = "Style"
     /// Script element
-    case script
+    case script = "Script"
     /// Base element
-    case base
+    case base = "Base"
     /// Custom element (web components) or unknown tag
-    case custom
+    case custom = "Custom"
 }
 
 /// Result of a visitor callback.
@@ -645,14 +856,6 @@ public enum ConversionError: Swift.Error {
 
 public func conversionOptionsFromJson(_ json: String) throws -> ConversionOptions {
     return try RustBridge.conversionOptionsFromJson(json)
-}
-
-public func conversionOptionsUpdateFromJson(_ json: String) throws -> ConversionOptionsUpdate {
-    return try RustBridge.conversionOptionsUpdateFromJson(json)
-}
-
-public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> PreprocessingOptionsUpdate {
-    return try RustBridge.preprocessingOptionsUpdateFromJson(json)
 }
 
 public func nodeContextFromJson(_ json: String) throws -> NodeContext {
@@ -941,4 +1144,35 @@ private func jsonEscapeStr(_ s: String) -> String {
 /// that can be passed to `conversionOptionsFromJsonWithVisitor(...)` on the Rust side.
 public func makeHtmlVisitorHandle(_ visitor: any HtmlVisitorProtocol) -> VisitorHandle {
     return RustBridge.makeHtmlVisitorHandle(SwiftHtmlVisitorBox(_HtmlVisitorProtocolAdapter(visitor)))
+}
+
+// MARK: - Free-function Forwarders
+// Re-export every public free function on the source Rust crate as a
+// top-level `public func` on the host module so consumers do not need to
+// `import RustBridge` directly. Forwarders take Swift-native parameter
+// types and convert to the swift-bridge runtime types internally.
+
+/// Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images,
+/// and warnings.
+///
+/// # Arguments
+///
+/// * `html` — the HTML string to convert.
+/// * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
+///
+/// # Example
+///
+/// ```
+/// use html_to_markdown_rs::convert;
+///
+/// let html = "<h1>Hello World</h1>";
+/// let result = convert(html, None).unwrap();
+/// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+/// ```
+///
+/// # Errors
+///
+/// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
+public func convert(html: String, options: ConversionOptions?) throws -> ConversionResult {
+    return try RustBridge.convert(html, options)
 }

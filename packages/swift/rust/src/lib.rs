@@ -16,6 +16,21 @@
     clippy::inherent_to_string
 )]
 
+/// Process-wide tokio runtime shared across every swift-bridge async wrapper.
+///
+/// alef-emitted; see shims.rs for the rationale (orphaned reqwest connection
+/// pools when each call creates and drops its own current-thread runtime).
+fn __alef_tokio_runtime() -> &'static ::tokio::runtime::Runtime {
+    use std::sync::OnceLock;
+    static RT: OnceLock<::tokio::runtime::Runtime> = OnceLock::new();
+    RT.get_or_init(|| {
+        ::tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .expect("build process-wide alef tokio runtime")
+    })
+}
+
 #[swift_bridge::bridge]
 mod ffi {
     extern "Rust" {
@@ -29,7 +44,7 @@ mod ffi {
             canonical_url: Option<String>,
             base_href: Option<String>,
             language: Option<String>,
-            text_direction: Option<TextDirection>,
+            text_direction: Option<String>,
             open_graph: String,
             twitter_card: String,
             meta_tags: String,
@@ -104,8 +119,8 @@ mod ffi {
         type ConversionOptions;
         #[swift_bridge(init)]
         fn new(
-            heading_style: HeadingStyle,
-            list_indent_type: ListIndentType,
+            heading_style: String,
+            list_indent_type: String,
             list_indent_width: usize,
             bullets: String,
             strong_em_symbol: String,
@@ -118,17 +133,17 @@ mod ffi {
             default_title: bool,
             br_in_tables: bool,
             compact_tables: bool,
-            highlight_style: HighlightStyle,
+            highlight_style: String,
             extract_metadata: bool,
-            whitespace_mode: WhitespaceMode,
+            whitespace_mode: String,
             strip_newlines: bool,
             wrap: bool,
             wrap_width: usize,
             convert_as_inline: bool,
             sub_symbol: String,
             sup_symbol: String,
-            newline_style: NewlineStyle,
-            code_block_style: CodeBlockStyle,
+            newline_style: String,
+            code_block_style: String,
             keep_inline_images_in: Vec<String>,
             preprocessing: PreprocessingOptions,
             encoding: String,
@@ -136,8 +151,8 @@ mod ffi {
             strip_tags: Vec<String>,
             preserve_tags: Vec<String>,
             skip_images: bool,
-            link_style: LinkStyle,
-            output_format: OutputFormat,
+            link_style: String,
+            output_format: String,
             include_document_structure: bool,
             extract_images: bool,
             max_image_size: u64,
@@ -195,8 +210,8 @@ mod ffi {
         type ConversionOptionsUpdate;
         #[swift_bridge(init)]
         fn new(
-            heading_style: Option<HeadingStyle>,
-            list_indent_type: Option<ListIndentType>,
+            heading_style: Option<String>,
+            list_indent_type: Option<String>,
             list_indent_width: Option<usize>,
             bullets: Option<String>,
             strong_em_symbol: Option<String>,
@@ -209,17 +224,17 @@ mod ffi {
             default_title: Option<bool>,
             br_in_tables: Option<bool>,
             compact_tables: Option<bool>,
-            highlight_style: Option<HighlightStyle>,
+            highlight_style: Option<String>,
             extract_metadata: Option<bool>,
-            whitespace_mode: Option<WhitespaceMode>,
+            whitespace_mode: Option<String>,
             strip_newlines: Option<bool>,
             wrap: Option<bool>,
             wrap_width: Option<usize>,
             convert_as_inline: Option<bool>,
             sub_symbol: Option<String>,
             sup_symbol: Option<String>,
-            newline_style: Option<NewlineStyle>,
-            code_block_style: Option<CodeBlockStyle>,
+            newline_style: Option<String>,
+            code_block_style: Option<String>,
             keep_inline_images_in: Option<Vec<String>>,
             preprocessing: Option<PreprocessingOptionsUpdate>,
             encoding: Option<String>,
@@ -227,8 +242,8 @@ mod ffi {
             strip_tags: Option<Vec<String>>,
             preserve_tags: Option<Vec<String>>,
             skip_images: Option<bool>,
-            link_style: Option<LinkStyle>,
-            output_format: Option<OutputFormat>,
+            link_style: Option<String>,
+            output_format: Option<String>,
             include_document_structure: Option<bool>,
             extract_images: Option<bool>,
             max_image_size: Option<u64>,
@@ -285,12 +300,7 @@ mod ffi {
     extern "Rust" {
         type PreprocessingOptions;
         #[swift_bridge(init)]
-        fn new(
-            enabled: bool,
-            preset: PreprocessingPreset,
-            remove_navigation: bool,
-            remove_forms: bool,
-        ) -> PreprocessingOptions;
+        fn new(enabled: bool, preset: String, remove_navigation: bool, remove_forms: bool) -> PreprocessingOptions;
         fn enabled(&self) -> bool;
         fn preset(&self) -> String;
         fn remove_navigation(&self) -> bool;
@@ -302,7 +312,7 @@ mod ffi {
         #[swift_bridge(init)]
         fn new(
             enabled: Option<bool>,
-            preset: Option<PreprocessingPreset>,
+            preset: Option<String>,
             remove_navigation: Option<bool>,
             remove_forms: Option<bool>,
         ) -> PreprocessingOptionsUpdate;
@@ -400,11 +410,6 @@ mod ffi {
     }
 
     extern "Rust" {
-        type TextDirection;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
         type LinkType;
         fn to_string(&self) -> String;
     }
@@ -416,51 +421,6 @@ mod ffi {
 
     extern "Rust" {
         type StructuredDataType;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type PreprocessingPreset;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type HeadingStyle;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type ListIndentType;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type WhitespaceMode;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type NewlineStyle;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type CodeBlockStyle;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type HighlightStyle;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type LinkStyle;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
-        type OutputFormat;
         fn to_string(&self) -> String;
     }
 
@@ -569,10 +529,6 @@ mod ffi {
 
         #[swift_bridge(swift_name = "conversionOptionsFromJson")]
         fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String>;
-        #[swift_bridge(swift_name = "conversionOptionsUpdateFromJson")]
-        fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String>;
-        #[swift_bridge(swift_name = "preprocessingOptionsUpdateFromJson")]
-        fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String>;
         #[swift_bridge(swift_name = "nodeContextFromJson")]
         fn node_context_from_json(json: String) -> Result<NodeContext, String>;
     }
@@ -611,7 +567,7 @@ impl DocumentMetadata {
         canonical_url: Option<String>,
         base_href: Option<String>,
         language: Option<String>,
-        text_direction: Option<TextDirection>,
+        text_direction: Option<String>,
         open_graph: String,
         twitter_card: String,
         meta_tags: String,
@@ -664,7 +620,13 @@ impl DocumentMetadata {
                 }
             }
         }
-        // alef: text_direction (TextDirection) is an enum; reverse From not generated — left at default
+        if let Some(s) = text_direction {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.text_direction = Some(t);
+                }
+            }
+        }
         if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&open_graph) {
             if let Ok(t) = ::serde_json::from_value(v) {
                 __target.open_graph = t;
@@ -709,8 +671,8 @@ impl DocumentMetadata {
     pub fn text_direction(&self) -> Option<String> {
         self.0
             .text_direction
-            .clone()
-            .map(|w| TextDirection::from(w).to_string())
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn open_graph(&self) -> String {
         serde_json::to_string(&self.0.open_graph).expect("serializable open_graph")
@@ -856,8 +818,8 @@ impl HtmlMetadata {
 pub struct ConversionOptions(pub html_to_markdown_rs::options::ConversionOptions);
 impl ConversionOptions {
     pub fn new(
-        heading_style: HeadingStyle,
-        list_indent_type: ListIndentType,
+        heading_style: String,
+        list_indent_type: String,
         list_indent_width: usize,
         bullets: String,
         strong_em_symbol: String,
@@ -870,17 +832,17 @@ impl ConversionOptions {
         default_title: bool,
         br_in_tables: bool,
         compact_tables: bool,
-        highlight_style: HighlightStyle,
+        highlight_style: String,
         extract_metadata: bool,
-        whitespace_mode: WhitespaceMode,
+        whitespace_mode: String,
         strip_newlines: bool,
         wrap: bool,
         wrap_width: usize,
         convert_as_inline: bool,
         sub_symbol: String,
         sup_symbol: String,
-        newline_style: NewlineStyle,
-        code_block_style: CodeBlockStyle,
+        newline_style: String,
+        code_block_style: String,
         keep_inline_images_in: Vec<String>,
         preprocessing: PreprocessingOptions,
         encoding: String,
@@ -888,8 +850,8 @@ impl ConversionOptions {
         strip_tags: Vec<String>,
         preserve_tags: Vec<String>,
         skip_images: bool,
-        link_style: LinkStyle,
-        output_format: OutputFormat,
+        link_style: String,
+        output_format: String,
         include_document_structure: bool,
         extract_images: bool,
         max_image_size: u64,
@@ -900,8 +862,16 @@ impl ConversionOptions {
         visitor: Option<VisitorHandle>,
     ) -> ConversionOptions {
         let mut __target: html_to_markdown_rs::options::ConversionOptions = ::std::default::Default::default();
-        // alef: heading_style (HeadingStyle) is an enum; reverse From not generated — left at default
-        // alef: list_indent_type (ListIndentType) is an enum; reverse From not generated — left at default
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&heading_style) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.heading_style = t;
+            }
+        }
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&list_indent_type) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.list_indent_type = t;
+            }
+        }
         __target.list_indent_width = list_indent_width;
         if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&bullets) {
             if let Ok(t) = ::serde_json::from_value(v) {
@@ -922,9 +892,17 @@ impl ConversionOptions {
         __target.default_title = default_title;
         __target.br_in_tables = br_in_tables;
         __target.compact_tables = compact_tables;
-        // alef: highlight_style (HighlightStyle) is an enum; reverse From not generated — left at default
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&highlight_style) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.highlight_style = t;
+            }
+        }
         __target.extract_metadata = extract_metadata;
-        // alef: whitespace_mode (WhitespaceMode) is an enum; reverse From not generated — left at default
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&whitespace_mode) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.whitespace_mode = t;
+            }
+        }
         __target.strip_newlines = strip_newlines;
         __target.wrap = wrap;
         __target.wrap_width = wrap_width;
@@ -939,8 +917,16 @@ impl ConversionOptions {
                 __target.sup_symbol = t;
             }
         }
-        // alef: newline_style (NewlineStyle) is an enum; reverse From not generated — left at default
-        // alef: code_block_style (CodeBlockStyle) is an enum; reverse From not generated — left at default
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&newline_style) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.newline_style = t;
+            }
+        }
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&code_block_style) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.code_block_style = t;
+            }
+        }
         if let Ok(__v) = ::serde_json::to_value(keep_inline_images_in) {
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.keep_inline_images_in = t;
@@ -964,8 +950,16 @@ impl ConversionOptions {
             }
         }
         __target.skip_images = skip_images;
-        // alef: link_style (LinkStyle) is an enum; reverse From not generated — left at default
-        // alef: output_format (OutputFormat) is an enum; reverse From not generated — left at default
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&link_style) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.link_style = t;
+            }
+        }
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&output_format) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.output_format = t;
+            }
+        }
         __target.include_document_structure = include_document_structure;
         __target.extract_images = extract_images;
         __target.max_image_size = max_image_size;
@@ -983,10 +977,10 @@ impl ConversionOptions {
         ConversionOptions(__target)
     }
     pub fn heading_style(&self) -> String {
-        HeadingStyle::from(self.0.heading_style.clone()).to_string()
+        serde_json::to_string(&self.0.heading_style).unwrap_or_default()
     }
     pub fn list_indent_type(&self) -> String {
-        ListIndentType::from(self.0.list_indent_type.clone()).to_string()
+        serde_json::to_string(&self.0.list_indent_type).unwrap_or_default()
     }
     pub fn list_indent_width(&self) -> usize {
         ::serde_json::to_value(&self.0.list_indent_width)
@@ -1052,7 +1046,7 @@ impl ConversionOptions {
             .unwrap_or_default()
     }
     pub fn highlight_style(&self) -> String {
-        HighlightStyle::from(self.0.highlight_style.clone()).to_string()
+        serde_json::to_string(&self.0.highlight_style).unwrap_or_default()
     }
     pub fn extract_metadata(&self) -> bool {
         ::serde_json::to_value(&self.0.extract_metadata)
@@ -1061,7 +1055,7 @@ impl ConversionOptions {
             .unwrap_or_default()
     }
     pub fn whitespace_mode(&self) -> String {
-        WhitespaceMode::from(self.0.whitespace_mode.clone()).to_string()
+        serde_json::to_string(&self.0.whitespace_mode).unwrap_or_default()
     }
     pub fn strip_newlines(&self) -> bool {
         ::serde_json::to_value(&self.0.strip_newlines)
@@ -1094,10 +1088,10 @@ impl ConversionOptions {
         self.0.sup_symbol.clone()
     }
     pub fn newline_style(&self) -> String {
-        NewlineStyle::from(self.0.newline_style.clone()).to_string()
+        serde_json::to_string(&self.0.newline_style).unwrap_or_default()
     }
     pub fn code_block_style(&self) -> String {
-        CodeBlockStyle::from(self.0.code_block_style.clone()).to_string()
+        serde_json::to_string(&self.0.code_block_style).unwrap_or_default()
     }
     pub fn keep_inline_images_in(&self) -> Vec<String> {
         ::serde_json::to_value(&self.0.keep_inline_images_in)
@@ -1136,10 +1130,10 @@ impl ConversionOptions {
             .unwrap_or_default()
     }
     pub fn link_style(&self) -> String {
-        LinkStyle::from(self.0.link_style.clone()).to_string()
+        serde_json::to_string(&self.0.link_style).unwrap_or_default()
     }
     pub fn output_format(&self) -> String {
-        OutputFormat::from(self.0.output_format.clone()).to_string()
+        serde_json::to_string(&self.0.output_format).unwrap_or_default()
     }
     pub fn include_document_structure(&self) -> bool {
         ::serde_json::to_value(&self.0.include_document_structure)
@@ -1192,8 +1186,8 @@ impl ConversionOptions {
 pub struct ConversionOptionsUpdate(pub html_to_markdown_rs::options::ConversionOptionsUpdate);
 impl ConversionOptionsUpdate {
     pub fn new(
-        heading_style: Option<HeadingStyle>,
-        list_indent_type: Option<ListIndentType>,
+        heading_style: Option<String>,
+        list_indent_type: Option<String>,
         list_indent_width: Option<usize>,
         bullets: Option<String>,
         strong_em_symbol: Option<String>,
@@ -1206,17 +1200,17 @@ impl ConversionOptionsUpdate {
         default_title: Option<bool>,
         br_in_tables: Option<bool>,
         compact_tables: Option<bool>,
-        highlight_style: Option<HighlightStyle>,
+        highlight_style: Option<String>,
         extract_metadata: Option<bool>,
-        whitespace_mode: Option<WhitespaceMode>,
+        whitespace_mode: Option<String>,
         strip_newlines: Option<bool>,
         wrap: Option<bool>,
         wrap_width: Option<usize>,
         convert_as_inline: Option<bool>,
         sub_symbol: Option<String>,
         sup_symbol: Option<String>,
-        newline_style: Option<NewlineStyle>,
-        code_block_style: Option<CodeBlockStyle>,
+        newline_style: Option<String>,
+        code_block_style: Option<String>,
         keep_inline_images_in: Option<Vec<String>>,
         preprocessing: Option<PreprocessingOptionsUpdate>,
         encoding: Option<String>,
@@ -1224,8 +1218,8 @@ impl ConversionOptionsUpdate {
         strip_tags: Option<Vec<String>>,
         preserve_tags: Option<Vec<String>>,
         skip_images: Option<bool>,
-        link_style: Option<LinkStyle>,
-        output_format: Option<OutputFormat>,
+        link_style: Option<String>,
+        output_format: Option<String>,
         include_document_structure: Option<bool>,
         extract_images: Option<bool>,
         max_image_size: Option<u64>,
@@ -1236,8 +1230,20 @@ impl ConversionOptionsUpdate {
         visitor: Option<VisitorHandle>,
     ) -> ConversionOptionsUpdate {
         let mut __target: html_to_markdown_rs::options::ConversionOptionsUpdate = ::std::default::Default::default();
-        // alef: heading_style (HeadingStyle) is an enum; reverse From not generated — left at default
-        // alef: list_indent_type (ListIndentType) is an enum; reverse From not generated — left at default
+        if let Some(s) = heading_style {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.heading_style = Some(t);
+                }
+            }
+        }
+        if let Some(s) = list_indent_type {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.list_indent_type = Some(t);
+                }
+            }
+        }
         __target.list_indent_width = list_indent_width;
         if let Some(s) = bullets {
             if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
@@ -1262,9 +1268,21 @@ impl ConversionOptionsUpdate {
         __target.default_title = default_title;
         __target.br_in_tables = br_in_tables;
         __target.compact_tables = compact_tables;
-        // alef: highlight_style (HighlightStyle) is an enum; reverse From not generated — left at default
+        if let Some(s) = highlight_style {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.highlight_style = Some(t);
+                }
+            }
+        }
         __target.extract_metadata = extract_metadata;
-        // alef: whitespace_mode (WhitespaceMode) is an enum; reverse From not generated — left at default
+        if let Some(s) = whitespace_mode {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.whitespace_mode = Some(t);
+                }
+            }
+        }
         __target.strip_newlines = strip_newlines;
         __target.wrap = wrap;
         __target.wrap_width = wrap_width;
@@ -1283,8 +1301,20 @@ impl ConversionOptionsUpdate {
                 }
             }
         }
-        // alef: newline_style (NewlineStyle) is an enum; reverse From not generated — left at default
-        // alef: code_block_style (CodeBlockStyle) is an enum; reverse From not generated — left at default
+        if let Some(s) = newline_style {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.newline_style = Some(t);
+                }
+            }
+        }
+        if let Some(s) = code_block_style {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.code_block_style = Some(t);
+                }
+            }
+        }
         if let Ok(__v) = ::serde_json::to_value(keep_inline_images_in) {
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.keep_inline_images_in = t;
@@ -1312,8 +1342,20 @@ impl ConversionOptionsUpdate {
             }
         }
         __target.skip_images = skip_images;
-        // alef: link_style (LinkStyle) is an enum; reverse From not generated — left at default
-        // alef: output_format (OutputFormat) is an enum; reverse From not generated — left at default
+        if let Some(s) = link_style {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.link_style = Some(t);
+                }
+            }
+        }
+        if let Some(s) = output_format {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.output_format = Some(t);
+                }
+            }
+        }
         __target.include_document_structure = include_document_structure;
         __target.extract_images = extract_images;
         __target.max_image_size = max_image_size;
@@ -1335,13 +1377,16 @@ impl ConversionOptionsUpdate {
         ConversionOptionsUpdate(__target)
     }
     pub fn heading_style(&self) -> Option<String> {
-        self.0.heading_style.clone().map(|w| HeadingStyle::from(w).to_string())
+        self.0
+            .heading_style
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn list_indent_type(&self) -> Option<String> {
         self.0
             .list_indent_type
-            .clone()
-            .map(|w| ListIndentType::from(w).to_string())
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn list_indent_width(&self) -> Option<usize> {
         self.0.list_indent_width.as_ref().and_then(|v| {
@@ -1418,8 +1463,8 @@ impl ConversionOptionsUpdate {
     pub fn highlight_style(&self) -> Option<String> {
         self.0
             .highlight_style
-            .clone()
-            .map(|w| HighlightStyle::from(w).to_string())
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn extract_metadata(&self) -> Option<bool> {
         self.0.extract_metadata.as_ref().and_then(|v| {
@@ -1431,8 +1476,8 @@ impl ConversionOptionsUpdate {
     pub fn whitespace_mode(&self) -> Option<String> {
         self.0
             .whitespace_mode
-            .clone()
-            .map(|w| WhitespaceMode::from(w).to_string())
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn strip_newlines(&self) -> Option<bool> {
         self.0.strip_newlines.as_ref().and_then(|v| {
@@ -1469,13 +1514,16 @@ impl ConversionOptionsUpdate {
         self.0.sup_symbol.clone()
     }
     pub fn newline_style(&self) -> Option<String> {
-        self.0.newline_style.clone().map(|w| NewlineStyle::from(w).to_string())
+        self.0
+            .newline_style
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn code_block_style(&self) -> Option<String> {
         self.0
             .code_block_style
-            .clone()
-            .map(|w| CodeBlockStyle::from(w).to_string())
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn keep_inline_images_in(&self) -> Option<Vec<String>> {
         self.0.keep_inline_images_in.as_ref().and_then(|v| {
@@ -1519,10 +1567,13 @@ impl ConversionOptionsUpdate {
         })
     }
     pub fn link_style(&self) -> Option<String> {
-        self.0.link_style.clone().map(|w| LinkStyle::from(w).to_string())
+        self.0.link_style.as_ref().and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn output_format(&self) -> Option<String> {
-        self.0.output_format.clone().map(|w| OutputFormat::from(w).to_string())
+        self.0
+            .output_format
+            .as_ref()
+            .and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn include_document_structure(&self) -> Option<bool> {
         self.0.include_document_structure.as_ref().and_then(|v| {
@@ -1576,15 +1627,14 @@ impl ConversionOptionsUpdate {
 
 pub struct PreprocessingOptions(pub html_to_markdown_rs::options::PreprocessingOptions);
 impl PreprocessingOptions {
-    pub fn new(
-        enabled: bool,
-        preset: PreprocessingPreset,
-        remove_navigation: bool,
-        remove_forms: bool,
-    ) -> PreprocessingOptions {
+    pub fn new(enabled: bool, preset: String, remove_navigation: bool, remove_forms: bool) -> PreprocessingOptions {
         let mut __target: html_to_markdown_rs::options::PreprocessingOptions = ::std::default::Default::default();
         __target.enabled = enabled;
-        // alef: preset (PreprocessingPreset) is an enum; reverse From not generated — left at default
+        if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&preset) {
+            if let Ok(t) = ::serde_json::from_value(v) {
+                __target.preset = t;
+            }
+        }
         __target.remove_navigation = remove_navigation;
         __target.remove_forms = remove_forms;
         PreprocessingOptions(__target)
@@ -1596,7 +1646,7 @@ impl PreprocessingOptions {
             .unwrap_or_default()
     }
     pub fn preset(&self) -> String {
-        PreprocessingPreset::from(self.0.preset.clone()).to_string()
+        serde_json::to_string(&self.0.preset).unwrap_or_default()
     }
     pub fn remove_navigation(&self) -> bool {
         ::serde_json::to_value(&self.0.remove_navigation)
@@ -1616,13 +1666,19 @@ pub struct PreprocessingOptionsUpdate(pub html_to_markdown_rs::options::Preproce
 impl PreprocessingOptionsUpdate {
     pub fn new(
         enabled: Option<bool>,
-        preset: Option<PreprocessingPreset>,
+        preset: Option<String>,
         remove_navigation: Option<bool>,
         remove_forms: Option<bool>,
     ) -> PreprocessingOptionsUpdate {
         let mut __target: html_to_markdown_rs::options::PreprocessingOptionsUpdate = ::std::default::Default::default();
         __target.enabled = enabled;
-        // alef: preset (PreprocessingPreset) is an enum; reverse From not generated — left at default
+        if let Some(s) = preset {
+            if let Ok(v) = ::serde_json::from_str::<::serde_json::Value>(&s) {
+                if let Ok(t) = ::serde_json::from_value(v) {
+                    __target.preset = Some(t);
+                }
+            }
+        }
         __target.remove_navigation = remove_navigation;
         __target.remove_forms = remove_forms;
         PreprocessingOptionsUpdate(__target)
@@ -1635,7 +1691,7 @@ impl PreprocessingOptionsUpdate {
         })
     }
     pub fn preset(&self) -> Option<String> {
-        self.0.preset.clone().map(|w| PreprocessingPreset::from(w).to_string())
+        self.0.preset.as_ref().and_then(|v| serde_json::to_string(v).ok())
     }
     pub fn remove_navigation(&self) -> Option<bool> {
         self.0.remove_navigation.as_ref().and_then(|v| {
@@ -1883,32 +1939,6 @@ impl NodeContext {
     }
 }
 
-pub enum TextDirection {
-    LeftToRight,
-    RightToLeft,
-    Auto,
-}
-
-impl From<html_to_markdown_rs::metadata::TextDirection> for TextDirection {
-    fn from(val: html_to_markdown_rs::metadata::TextDirection) -> Self {
-        match val {
-            html_to_markdown_rs::metadata::TextDirection::LeftToRight => Self::LeftToRight,
-            html_to_markdown_rs::metadata::TextDirection::RightToLeft => Self::RightToLeft,
-            html_to_markdown_rs::metadata::TextDirection::Auto => Self::Auto,
-        }
-    }
-}
-
-impl TextDirection {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::LeftToRight => "ltr".to_string(),
-            Self::RightToLeft => "rtl".to_string(),
-            Self::Auto => "auto".to_string(),
-        }
-    }
-}
-
 pub enum LinkType {
     Anchor,
     Internal,
@@ -1995,231 +2025,6 @@ impl StructuredDataType {
             Self::JsonLd => "json_ld".to_string(),
             Self::Microdata => "microdata".to_string(),
             Self::RDFa => "rdfa".to_string(),
-        }
-    }
-}
-
-pub enum PreprocessingPreset {
-    Minimal,
-    Standard,
-    Aggressive,
-}
-
-impl From<html_to_markdown_rs::options::PreprocessingPreset> for PreprocessingPreset {
-    fn from(val: html_to_markdown_rs::options::PreprocessingPreset) -> Self {
-        match val {
-            html_to_markdown_rs::options::PreprocessingPreset::Minimal => Self::Minimal,
-            html_to_markdown_rs::options::PreprocessingPreset::Standard => Self::Standard,
-            html_to_markdown_rs::options::PreprocessingPreset::Aggressive => Self::Aggressive,
-        }
-    }
-}
-
-impl PreprocessingPreset {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Minimal => "Minimal".to_string(),
-            Self::Standard => "Standard".to_string(),
-            Self::Aggressive => "Aggressive".to_string(),
-        }
-    }
-}
-
-pub enum HeadingStyle {
-    Underlined,
-    Atx,
-    AtxClosed,
-}
-
-impl From<html_to_markdown_rs::options::HeadingStyle> for HeadingStyle {
-    fn from(val: html_to_markdown_rs::options::HeadingStyle) -> Self {
-        match val {
-            html_to_markdown_rs::options::HeadingStyle::Underlined => Self::Underlined,
-            html_to_markdown_rs::options::HeadingStyle::Atx => Self::Atx,
-            html_to_markdown_rs::options::HeadingStyle::AtxClosed => Self::AtxClosed,
-        }
-    }
-}
-
-impl HeadingStyle {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Underlined => "Underlined".to_string(),
-            Self::Atx => "Atx".to_string(),
-            Self::AtxClosed => "AtxClosed".to_string(),
-        }
-    }
-}
-
-pub enum ListIndentType {
-    Spaces,
-    Tabs,
-}
-
-impl From<html_to_markdown_rs::options::ListIndentType> for ListIndentType {
-    fn from(val: html_to_markdown_rs::options::ListIndentType) -> Self {
-        match val {
-            html_to_markdown_rs::options::ListIndentType::Spaces => Self::Spaces,
-            html_to_markdown_rs::options::ListIndentType::Tabs => Self::Tabs,
-        }
-    }
-}
-
-impl ListIndentType {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Spaces => "Spaces".to_string(),
-            Self::Tabs => "Tabs".to_string(),
-        }
-    }
-}
-
-pub enum WhitespaceMode {
-    Normalized,
-    Strict,
-}
-
-impl From<html_to_markdown_rs::options::WhitespaceMode> for WhitespaceMode {
-    fn from(val: html_to_markdown_rs::options::WhitespaceMode) -> Self {
-        match val {
-            html_to_markdown_rs::options::WhitespaceMode::Normalized => Self::Normalized,
-            html_to_markdown_rs::options::WhitespaceMode::Strict => Self::Strict,
-        }
-    }
-}
-
-impl WhitespaceMode {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Normalized => "Normalized".to_string(),
-            Self::Strict => "Strict".to_string(),
-        }
-    }
-}
-
-pub enum NewlineStyle {
-    Spaces,
-    Backslash,
-}
-
-impl From<html_to_markdown_rs::options::NewlineStyle> for NewlineStyle {
-    fn from(val: html_to_markdown_rs::options::NewlineStyle) -> Self {
-        match val {
-            html_to_markdown_rs::options::NewlineStyle::Spaces => Self::Spaces,
-            html_to_markdown_rs::options::NewlineStyle::Backslash => Self::Backslash,
-        }
-    }
-}
-
-impl NewlineStyle {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Spaces => "Spaces".to_string(),
-            Self::Backslash => "Backslash".to_string(),
-        }
-    }
-}
-
-pub enum CodeBlockStyle {
-    Indented,
-    Backticks,
-    Tildes,
-}
-
-impl From<html_to_markdown_rs::options::CodeBlockStyle> for CodeBlockStyle {
-    fn from(val: html_to_markdown_rs::options::CodeBlockStyle) -> Self {
-        match val {
-            html_to_markdown_rs::options::CodeBlockStyle::Indented => Self::Indented,
-            html_to_markdown_rs::options::CodeBlockStyle::Backticks => Self::Backticks,
-            html_to_markdown_rs::options::CodeBlockStyle::Tildes => Self::Tildes,
-        }
-    }
-}
-
-impl CodeBlockStyle {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Indented => "Indented".to_string(),
-            Self::Backticks => "Backticks".to_string(),
-            Self::Tildes => "Tildes".to_string(),
-        }
-    }
-}
-
-pub enum HighlightStyle {
-    DoubleEqual,
-    Html,
-    Bold,
-    None,
-}
-
-impl From<html_to_markdown_rs::options::HighlightStyle> for HighlightStyle {
-    fn from(val: html_to_markdown_rs::options::HighlightStyle) -> Self {
-        match val {
-            html_to_markdown_rs::options::HighlightStyle::DoubleEqual => Self::DoubleEqual,
-            html_to_markdown_rs::options::HighlightStyle::Html => Self::Html,
-            html_to_markdown_rs::options::HighlightStyle::Bold => Self::Bold,
-            html_to_markdown_rs::options::HighlightStyle::None => Self::None,
-        }
-    }
-}
-
-impl HighlightStyle {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::DoubleEqual => "DoubleEqual".to_string(),
-            Self::Html => "Html".to_string(),
-            Self::Bold => "Bold".to_string(),
-            Self::None => "None".to_string(),
-        }
-    }
-}
-
-pub enum LinkStyle {
-    Inline,
-    Reference,
-}
-
-impl From<html_to_markdown_rs::options::LinkStyle> for LinkStyle {
-    fn from(val: html_to_markdown_rs::options::LinkStyle) -> Self {
-        match val {
-            html_to_markdown_rs::options::LinkStyle::Inline => Self::Inline,
-            html_to_markdown_rs::options::LinkStyle::Reference => Self::Reference,
-        }
-    }
-}
-
-impl LinkStyle {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Inline => "Inline".to_string(),
-            Self::Reference => "Reference".to_string(),
-        }
-    }
-}
-
-pub enum OutputFormat {
-    Markdown,
-    Djot,
-    Plain,
-}
-
-impl From<html_to_markdown_rs::options::OutputFormat> for OutputFormat {
-    fn from(val: html_to_markdown_rs::options::OutputFormat) -> Self {
-        match val {
-            html_to_markdown_rs::options::OutputFormat::Markdown => Self::Markdown,
-            html_to_markdown_rs::options::OutputFormat::Djot => Self::Djot,
-            html_to_markdown_rs::options::OutputFormat::Plain => Self::Plain,
-        }
-    }
-}
-
-impl OutputFormat {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Markdown => "Markdown".to_string(),
-            Self::Djot => "Djot".to_string(),
-            Self::Plain => "Plain".to_string(),
         }
     }
 }
@@ -3213,18 +3018,6 @@ pub fn conversion_options_from_json_with_visitor(
 pub fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String> {
     serde_json::from_str::<html_to_markdown_rs::options::ConversionOptions>(&json)
         .map(ConversionOptions)
-        .map_err(|e| e.to_string())
-}
-
-pub fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String> {
-    serde_json::from_str::<html_to_markdown_rs::options::ConversionOptionsUpdate>(&json)
-        .map(ConversionOptionsUpdate)
-        .map_err(|e| e.to_string())
-}
-
-pub fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String> {
-    serde_json::from_str::<html_to_markdown_rs::options::PreprocessingOptionsUpdate>(&json)
-        .map(PreprocessingOptionsUpdate)
         .map_err(|e| e.to_string())
 }
 

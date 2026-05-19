@@ -63,16 +63,13 @@
 High-performance HTML to Markdown converter for Swift via `swift-bridge`. Distributed through the Swift Package Manager; targets macOS 13+ and iOS 16+.
 Ship identical Markdown across every runtime while keeping idiomatic Swift APIs and Codable-friendly result types.
 
-
 ## Installation
 
 ```bash
 .package(url: "https://github.com/kreuzberg-dev/html-to-markdown.git", from: "3.5.0")
 ```
 
-
 ## Performance Snapshot
-
 
 ## Quick Start
 
@@ -86,7 +83,6 @@ let result = try convert(html, nil)
 let markdown = result.content()?.toString() ?? ""
 print(markdown)
 ```
-
 
 With conversion options:
 
@@ -103,11 +99,9 @@ let markdown = result.content()?.toString() ?? ""
 print(markdown)
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 ### Options
 
@@ -141,16 +135,13 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -168,7 +159,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ## Visitor Pattern
 
 The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
@@ -184,7 +174,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

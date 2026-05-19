@@ -17,12 +17,6 @@
  */
 typedef struct HTMAnnotationKind HTMAnnotationKind;
 /**
- * Code block fence style in Markdown output.
- *
- * Determines how code blocks (`<pre><code>`) are rendered in Markdown.
- */
-typedef struct HTMCodeBlockStyle HTMCodeBlockStyle;
-/**
  * Main conversion options for HTML to Markdown conversion.
  *
  * Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
@@ -108,18 +102,6 @@ typedef struct HTMGridCell HTMGridCell;
  * \endcode
  */
 typedef struct HTMHeaderMetadata HTMHeaderMetadata;
-/**
- * Heading style options for Markdown output.
- *
- * Controls how headings (h1-h6) are rendered in the output Markdown.
- */
-typedef struct HTMHeadingStyle HTMHeadingStyle;
-/**
- * Highlight rendering style for `<mark>` elements.
- *
- * Controls how highlighted text is rendered in Markdown output.
- */
-typedef struct HTMHighlightStyle HTMHighlightStyle;
 /**
  * Comprehensive metadata extraction result from HTML document.
  *
@@ -212,30 +194,11 @@ typedef struct HTMImageType HTMImageType;
  */
 typedef struct HTMLinkMetadata HTMLinkMetadata;
 /**
- * Link rendering style in Markdown output.
- *
- * Controls whether links and images use inline `text (url)` syntax or
- * reference-style `[text][1]` syntax with definitions collected at the end.
- */
-typedef struct HTMLinkStyle HTMLinkStyle;
-/**
  * Link classification based on href value and document context.
  *
  * Used to categorize links during extraction for filtering and analysis.
  */
 typedef struct HTMLinkType HTMLinkType;
-/**
- * List indentation character type.
- *
- * Controls whether list items are indented with spaces or tabs.
- */
-typedef struct HTMListIndentType HTMListIndentType;
-/**
- * Line break syntax in Markdown output.
- *
- * Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
- */
-typedef struct HTMNewlineStyle HTMNewlineStyle;
 /**
  * The semantic content type of a document node.
  *
@@ -257,12 +220,6 @@ typedef struct HTMNodeContext HTMNodeContext;
  */
 typedef struct HTMNodeType HTMNodeType;
 /**
- * Output format for conversion.
- *
- * Specifies the target markup language format for the conversion output.
- */
-typedef struct HTMOutputFormat HTMOutputFormat;
-/**
  * HTML preprocessing options for document cleanup before conversion.
  */
 typedef struct HTMPreprocessingOptions HTMPreprocessingOptions;
@@ -274,12 +231,6 @@ typedef struct HTMPreprocessingOptions HTMPreprocessingOptions;
  * corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
  */
 typedef struct HTMPreprocessingOptionsUpdate HTMPreprocessingOptionsUpdate;
-/**
- * HTML preprocessing aggressiveness level.
- *
- * Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
- */
-typedef struct HTMPreprocessingPreset HTMPreprocessingPreset;
 /**
  * A non-fatal diagnostic produced during HTML conversion.
  *
@@ -346,12 +297,6 @@ typedef struct HTMTableGrid HTMTableGrid;
  */
 typedef struct HTMTextAnnotation HTMTextAnnotation;
 /**
- * Text directionality of document content.
- *
- * Corresponds to the HTML `dir` attribute and `bdi` element directionality.
- */
-typedef struct HTMTextDirection HTMTextDirection;
-/**
  * Result of a visitor callback.
  *
  * Allows visitors to control the conversion flow by either proceeding
@@ -371,12 +316,6 @@ typedef struct HTMVisitorHandle HTMVisitorHandle;
  * Categories of processing warnings.
  */
 typedef struct HTMWarningKind HTMWarningKind;
-/**
- * Whitespace handling strategy during conversion.
- *
- * Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
- */
-typedef struct HTMWhitespaceMode HTMWhitespaceMode;
 
 
 /**
@@ -1358,13 +1297,6 @@ char *htm_document_metadata_base_href(const HTMDocumentMetadata *ptr);
 char *htm_document_metadata_language(const HTMDocumentMetadata *ptr);
 
 /**
- * Get the `text_direction` field from a `DocumentMetadata`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMTextDirection *htm_document_metadata_text_direction(const HTMDocumentMetadata *ptr);
-
-/**
  * Get the `open_graph` field from a `DocumentMetadata`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -1719,20 +1651,6 @@ char *htm_conversion_options_to_json(const HTMConversionOptions *ptr);
 void htm_conversion_options_free(HTMConversionOptions *ptr);
 
 /**
- * Get the `heading_style` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMHeadingStyle *htm_conversion_options_heading_style(const HTMConversionOptions *ptr);
-
-/**
- * Get the `list_indent_type` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMListIndentType *htm_conversion_options_list_indent_type(const HTMConversionOptions *ptr);
-
-/**
  * Get the `list_indent_width` field from a `ConversionOptions`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -1817,25 +1735,11 @@ int32_t htm_conversion_options_br_in_tables(const HTMConversionOptions *ptr);
 int32_t htm_conversion_options_compact_tables(const HTMConversionOptions *ptr);
 
 /**
- * Get the `highlight_style` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMHighlightStyle *htm_conversion_options_highlight_style(const HTMConversionOptions *ptr);
-
-/**
  * Get the `extract_metadata` field from a `ConversionOptions`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_extract_metadata(const HTMConversionOptions *ptr);
-
-/**
- * Get the `whitespace_mode` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMWhitespaceMode *htm_conversion_options_whitespace_mode(const HTMConversionOptions *ptr);
 
 /**
  * Get the `strip_newlines` field from a `ConversionOptions`.
@@ -1878,20 +1782,6 @@ char *htm_conversion_options_sub_symbol(const HTMConversionOptions *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 char *htm_conversion_options_sup_symbol(const HTMConversionOptions *ptr);
-
-/**
- * Get the `newline_style` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMNewlineStyle *htm_conversion_options_newline_style(const HTMConversionOptions *ptr);
-
-/**
- * Get the `code_block_style` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMCodeBlockStyle *htm_conversion_options_code_block_style(const HTMConversionOptions *ptr);
 
 /**
  * Get the `keep_inline_images_in` field from a `ConversionOptions`.
@@ -1941,20 +1831,6 @@ char *htm_conversion_options_preserve_tags(const HTMConversionOptions *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_skip_images(const HTMConversionOptions *ptr);
-
-/**
- * Get the `link_style` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMLinkStyle *htm_conversion_options_link_style(const HTMConversionOptions *ptr);
-
-/**
- * Get the `output_format` field from a `ConversionOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMOutputFormat *htm_conversion_options_output_format(const HTMConversionOptions *ptr);
 
 /**
  * Get the `include_document_structure` field from a `ConversionOptions`.
@@ -2019,12 +1895,6 @@ HTMVisitorHandle *htm_conversion_options_visitor(const HTMConversionOptions *ptr
 HTMConversionOptions *htm_conversion_options_default(void);
 
 /**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-HTMConversionOptions *htm_conversion_options_from(const HTMConversionOptionsUpdate *update);
-
-/**
  * Create a `ConversionOptionsUpdate` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -2038,20 +1908,6 @@ HTMConversionOptionsUpdate *htm_conversion_options_update_from_json(const char *
  * Pointer must have been returned by this library, or be null.
  */
 void htm_conversion_options_update_free(HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `heading_style` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMHeadingStyle *htm_conversion_options_update_heading_style(const HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `list_indent_type` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMListIndentType *htm_conversion_options_update_list_indent_type(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `list_indent_width` field from a `ConversionOptionsUpdate`.
@@ -2138,25 +1994,11 @@ int32_t htm_conversion_options_update_br_in_tables(const HTMConversionOptionsUpd
 int32_t htm_conversion_options_update_compact_tables(const HTMConversionOptionsUpdate *ptr);
 
 /**
- * Get the `highlight_style` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMHighlightStyle *htm_conversion_options_update_highlight_style(const HTMConversionOptionsUpdate *ptr);
-
-/**
  * Get the `extract_metadata` field from a `ConversionOptionsUpdate`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_update_extract_metadata(const HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `whitespace_mode` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMWhitespaceMode *htm_conversion_options_update_whitespace_mode(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `strip_newlines` field from a `ConversionOptionsUpdate`.
@@ -2199,20 +2041,6 @@ char *htm_conversion_options_update_sub_symbol(const HTMConversionOptionsUpdate 
  * Pointer must be a valid handle returned by this library.
  */
 char *htm_conversion_options_update_sup_symbol(const HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `newline_style` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMNewlineStyle *htm_conversion_options_update_newline_style(const HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `code_block_style` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMCodeBlockStyle *htm_conversion_options_update_code_block_style(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `keep_inline_images_in` field from a `ConversionOptionsUpdate`.
@@ -2262,20 +2090,6 @@ char *htm_conversion_options_update_preserve_tags(const HTMConversionOptionsUpda
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_update_skip_images(const HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `link_style` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMLinkStyle *htm_conversion_options_update_link_style(const HTMConversionOptionsUpdate *ptr);
-
-/**
- * Get the `output_format` field from a `ConversionOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMOutputFormat *htm_conversion_options_update_output_format(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `include_document_structure` field from a `ConversionOptionsUpdate`.
@@ -2364,13 +2178,6 @@ void htm_preprocessing_options_free(HTMPreprocessingOptions *ptr);
 int32_t htm_preprocessing_options_enabled(const HTMPreprocessingOptions *ptr);
 
 /**
- * Get the `preset` field from a `PreprocessingOptions`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMPreprocessingPreset *htm_preprocessing_options_preset(const HTMPreprocessingOptions *ptr);
-
-/**
  * Get the `remove_navigation` field from a `PreprocessingOptions`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -2389,12 +2196,6 @@ int32_t htm_preprocessing_options_remove_forms(const HTMPreprocessingOptions *pt
  * freed with the appropriate free function.
  */
 HTMPreprocessingOptions *htm_preprocessing_options_default(void);
-
-/**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-HTMPreprocessingOptions *htm_preprocessing_options_from(const HTMPreprocessingOptionsUpdate *update);
 
 /**
  * Create a `PreprocessingOptionsUpdate` from a JSON string. Returns null on failure.
@@ -2417,13 +2218,6 @@ void htm_preprocessing_options_update_free(HTMPreprocessingOptionsUpdate *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_preprocessing_options_update_enabled(const HTMPreprocessingOptionsUpdate *ptr);
-
-/**
- * Get the `preset` field from a `PreprocessingOptionsUpdate`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-HTMPreprocessingPreset *htm_preprocessing_options_update_preset(const HTMPreprocessingOptionsUpdate *ptr);
 
 /**
  * Get the `remove_navigation` field from a `PreprocessingOptionsUpdate`.
@@ -2906,21 +2700,6 @@ char *htm_node_context_parent_tag(const HTMNodeContext *ptr);
 int32_t htm_node_context_is_inline(const HTMNodeContext *ptr);
 
 /**
- * Convert an integer to a `TextDirection` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_text_direction_from_i32(int32_t value);
-
-/**
- * Convert a `TextDirection` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_text_direction_from_str(const char *name);
-
-/**
  * Convert an integer to a `LinkType` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -2964,141 +2743,6 @@ int32_t htm_structured_data_type_from_i32(int32_t value);
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t htm_structured_data_type_from_str(const char *name);
-
-/**
- * Convert an integer to a `PreprocessingPreset` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_preprocessing_preset_from_i32(int32_t value);
-
-/**
- * Convert a `PreprocessingPreset` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_preprocessing_preset_from_str(const char *name);
-
-/**
- * Convert an integer to a `HeadingStyle` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_heading_style_from_i32(int32_t value);
-
-/**
- * Convert a `HeadingStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_heading_style_from_str(const char *name);
-
-/**
- * Convert an integer to a `ListIndentType` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_list_indent_type_from_i32(int32_t value);
-
-/**
- * Convert a `ListIndentType` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_list_indent_type_from_str(const char *name);
-
-/**
- * Convert an integer to a `WhitespaceMode` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_whitespace_mode_from_i32(int32_t value);
-
-/**
- * Convert a `WhitespaceMode` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_whitespace_mode_from_str(const char *name);
-
-/**
- * Convert an integer to a `NewlineStyle` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_newline_style_from_i32(int32_t value);
-
-/**
- * Convert a `NewlineStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_newline_style_from_str(const char *name);
-
-/**
- * Convert an integer to a `CodeBlockStyle` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_code_block_style_from_i32(int32_t value);
-
-/**
- * Convert a `CodeBlockStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_code_block_style_from_str(const char *name);
-
-/**
- * Convert an integer to a `HighlightStyle` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_highlight_style_from_i32(int32_t value);
-
-/**
- * Convert a `HighlightStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_highlight_style_from_str(const char *name);
-
-/**
- * Convert an integer to a `LinkStyle` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_link_style_from_i32(int32_t value);
-
-/**
- * Convert a `LinkStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_link_style_from_str(const char *name);
-
-/**
- * Convert an integer to a `OutputFormat` variant. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t htm_output_format_from_i32(int32_t value);
-
-/**
- * Convert a `OutputFormat` variant name (C string) to its integer value. Returns -1 on invalid input.
- * # Safety
- * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
- */
-int32_t htm_output_format_from_str(const char *name);
 
 /**
  * Convert an integer to a `NodeContent` variant. Returns -1 on invalid input.
@@ -3176,31 +2820,6 @@ int32_t htm_visit_result_from_i32(int32_t value);
 int32_t htm_visit_result_from_str(const char *name);
 
 /**
- * Free a heap-allocated `TextDirection` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_text_direction_free(HTMTextDirection *ptr);
-
-/**
- * Serialize a heap-allocated `TextDirection` to a JSON string.
- * # Safety
- * `ptr` must be a valid, non-null pointer returned by a `htm` function.
- * The returned string must be freed with `htm_free_string`.
- */
-char *htm_text_direction_to_json(const HTMTextDirection *ptr);
-
-/**
- * Render a heap-allocated `TextDirection` as its string representation
- * (the unit-variant name as serialized by serde — e.g. `"completed"`,
- * without surrounding JSON quotes).
- * # Safety
- * `ptr` must be a valid, non-null pointer returned by a `htm` function.
- * The returned string must be freed with `htm_free_string`.
- */
-char *htm_text_direction_to_string(const HTMTextDirection *ptr);
-
-/**
  * Free a heap-allocated `LinkType` returned by a pointer-returning FFI function.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -3274,69 +2893,6 @@ char *htm_structured_data_type_to_json(const HTMStructuredDataType *ptr);
  * The returned string must be freed with `htm_free_string`.
  */
 char *htm_structured_data_type_to_string(const HTMStructuredDataType *ptr);
-
-/**
- * Free a heap-allocated `PreprocessingPreset` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_preprocessing_preset_free(HTMPreprocessingPreset *ptr);
-
-/**
- * Free a heap-allocated `HeadingStyle` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_heading_style_free(HTMHeadingStyle *ptr);
-
-/**
- * Free a heap-allocated `ListIndentType` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_list_indent_type_free(HTMListIndentType *ptr);
-
-/**
- * Free a heap-allocated `WhitespaceMode` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_whitespace_mode_free(HTMWhitespaceMode *ptr);
-
-/**
- * Free a heap-allocated `NewlineStyle` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_newline_style_free(HTMNewlineStyle *ptr);
-
-/**
- * Free a heap-allocated `CodeBlockStyle` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_code_block_style_free(HTMCodeBlockStyle *ptr);
-
-/**
- * Free a heap-allocated `HighlightStyle` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_highlight_style_free(HTMHighlightStyle *ptr);
-
-/**
- * Free a heap-allocated `LinkStyle` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_link_style_free(HTMLinkStyle *ptr);
-
-/**
- * Free a heap-allocated `OutputFormat` returned by a pointer-returning FFI function.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void htm_output_format_free(HTMOutputFormat *ptr);
 
 /**
  * Free a heap-allocated `NodeContent` returned by a pointer-returning FFI function.

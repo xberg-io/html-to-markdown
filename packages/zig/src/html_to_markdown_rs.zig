@@ -65,7 +65,7 @@ pub const DocumentMetadata = struct {
     /// Document language from `lang` attribute
     language: ?[]const u8,
     /// Document text direction from `dir` attribute
-    text_direction: ?TextDirection,
+    text_direction: ?[]const u8,
     /// Open Graph metadata (og:* properties) for social media
     /// Keys like "title", "description", "image", "url", etc.
     open_graph: std.StringHashMap([]const u8),
@@ -166,9 +166,9 @@ pub const HtmlMetadata = struct {
 /// Use `ConversionOptions.builder()` to construct, or `the default constructor` for defaults.
 pub const ConversionOptions = struct {
     /// Heading style to use in Markdown output (ATX `#` or Setext underline).
-    heading_style: HeadingStyle,
+    heading_style: []const u8,
     /// How to indent nested list items (spaces or tab).
-    list_indent_type: ListIndentType,
+    list_indent_type: []const u8,
     /// Number of spaces (or tabs) to use for each level of list indentation.
     list_indent_width: u64,
     /// Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).
@@ -200,7 +200,7 @@ pub const ConversionOptions = struct {
     /// Default `false` (aligned padding preserved).
     compact_tables: bool,
     /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
-    highlight_style: HighlightStyle,
+    highlight_style: []const u8,
     /// Populate `result.metadata` with `<head>` / `<meta>` extraction
     /// (title, description, Open Graph, Twitter Card, JSON-LD, …).
     ///
@@ -216,7 +216,7 @@ pub const ConversionOptions = struct {
     ///
     /// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
     /// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
-    whitespace_mode: WhitespaceMode,
+    whitespace_mode: []const u8,
     /// Strip all newlines from the output, producing a single-line result.
     strip_newlines: bool,
     /// Wrap long lines at `wrap_width` characters.
@@ -234,9 +234,9 @@ pub const ConversionOptions = struct {
     /// Markdown notation for superscript text (e.g. `"^"`).
     sup_symbol: []const u8,
     /// How to encode hard line breaks (`<br>`) in Markdown.
-    newline_style: NewlineStyle,
+    newline_style: []const u8,
     /// Style used for fenced code blocks (backticks or tilde).
-    code_block_style: CodeBlockStyle,
+    code_block_style: []const u8,
     /// HTML tag names whose `<img>` children are kept inline instead of block.
     keep_inline_images_in: []const []const u8,
     /// Options for the HTML pre-processing pass applied before conversion begins.
@@ -260,9 +260,9 @@ pub const ConversionOptions = struct {
     /// Skip conversion of `<img>` elements (omit images from output).
     skip_images: bool,
     /// Link rendering style (inline or reference).
-    link_style: LinkStyle,
+    link_style: []const u8,
     /// Target output format (Markdown, plain text, etc.).
-    output_format: OutputFormat,
+    output_format: []const u8,
     /// Include structured document tree in result.
     include_document_structure: bool,
     /// Extract inline images from data URIs and SVGs.
@@ -301,9 +301,9 @@ pub const ConversionOptions = struct {
 /// options from language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
 pub const ConversionOptionsUpdate = struct {
     /// Optional override for `ConversionOptions.heading_style`.
-    heading_style: ?HeadingStyle,
+    heading_style: ?[]const u8,
     /// Optional override for `ConversionOptions.list_indent_type`.
-    list_indent_type: ?ListIndentType,
+    list_indent_type: ?[]const u8,
     /// Optional override for `ConversionOptions.list_indent_width`.
     list_indent_width: ?u64,
     /// Optional override for `ConversionOptions.bullets`.
@@ -329,11 +329,11 @@ pub const ConversionOptionsUpdate = struct {
     /// Optional override for `ConversionOptions.compact_tables`.
     compact_tables: ?bool,
     /// Optional override for `ConversionOptions.highlight_style`.
-    highlight_style: ?HighlightStyle,
+    highlight_style: ?[]const u8,
     /// Optional override for `ConversionOptions.extract_metadata`.
     extract_metadata: ?bool,
     /// Optional override for `ConversionOptions.whitespace_mode`.
-    whitespace_mode: ?WhitespaceMode,
+    whitespace_mode: ?[]const u8,
     /// Optional override for `ConversionOptions.strip_newlines`.
     strip_newlines: ?bool,
     /// Optional override for `ConversionOptions.wrap`.
@@ -347,9 +347,9 @@ pub const ConversionOptionsUpdate = struct {
     /// Optional override for `ConversionOptions.sup_symbol`.
     sup_symbol: ?[]const u8,
     /// Optional override for `ConversionOptions.newline_style`.
-    newline_style: ?NewlineStyle,
+    newline_style: ?[]const u8,
     /// Optional override for `ConversionOptions.code_block_style`.
-    code_block_style: ?CodeBlockStyle,
+    code_block_style: ?[]const u8,
     /// Optional override for `ConversionOptions.keep_inline_images_in`.
     keep_inline_images_in: ?[]const []const u8,
     /// Optional override for `ConversionOptions.preprocessing`.
@@ -365,9 +365,9 @@ pub const ConversionOptionsUpdate = struct {
     /// Optional override for `ConversionOptions.skip_images`.
     skip_images: ?bool,
     /// Optional override for `ConversionOptions.link_style`.
-    link_style: ?LinkStyle,
+    link_style: ?[]const u8,
     /// Optional override for `ConversionOptions.output_format`.
-    output_format: ?OutputFormat,
+    output_format: ?[]const u8,
     /// Optional override for `ConversionOptions.include_document_structure`.
     include_document_structure: ?bool,
     /// Optional override for `ConversionOptions.extract_images`.
@@ -391,7 +391,7 @@ pub const PreprocessingOptions = struct {
     /// Enable HTML preprocessing globally
     enabled: bool,
     /// Preprocessing preset level (Minimal, Standard, Aggressive)
-    preset: PreprocessingPreset,
+    preset: []const u8,
     /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
     remove_navigation: bool,
     /// Remove form elements (forms, inputs, buttons, etc.)
@@ -407,7 +407,7 @@ pub const PreprocessingOptionsUpdate = struct {
     /// Optional global preprocessing enablement override
     enabled: ?bool,
     /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
-    preset: ?PreprocessingPreset,
+    preset: ?[]const u8,
     /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
     remove_navigation: ?bool,
     /// Optional form element removal override (forms, inputs, buttons, etc.)
@@ -598,18 +598,6 @@ pub const NodeContext = struct {
     is_inline: bool,
 };
 
-/// Text directionality of document content.
-///
-/// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
-pub const TextDirection = enum {
-    /// Left-to-right text flow (default for Latin scripts)
-    ltr,
-    /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
-    rtl,
-    /// Automatic directionality detection
-    auto,
-};
-
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
@@ -652,109 +640,6 @@ pub const StructuredDataType = enum {
     microdata,
     /// RDF in Attributes (RDFa) markup
     rdfa,
-};
-
-/// HTML preprocessing aggressiveness level.
-///
-/// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
-pub const PreprocessingPreset = enum {
-    /// Minimal cleanup. Remove only essential noise (scripts, styles).
-    minimal,
-    /// Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
-    standard,
-    /// Aggressive cleanup. Remove extensive non-content elements and structure.
-    aggressive,
-};
-
-/// Heading style options for Markdown output.
-///
-/// Controls how headings (h1-h6) are rendered in the output Markdown.
-pub const HeadingStyle = enum {
-    /// Underlined style (=== for h1, --- for h2).
-    underlined,
-    /// ATX style (# for h1, ## for h2, etc.). Default.
-    atx,
-    /// ATX closed style (# title #, with closing hashes).
-    atx_closed,
-};
-
-/// List indentation character type.
-///
-/// Controls whether list items are indented with spaces or tabs.
-pub const ListIndentType = enum {
-    /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
-    spaces,
-    /// Use tabs for indentation.
-    tabs,
-};
-
-/// Whitespace handling strategy during conversion.
-///
-/// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
-pub const WhitespaceMode = enum {
-    /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
-    normalized,
-    /// Preserve all whitespace exactly as it appears in the HTML.
-    strict,
-};
-
-/// Line break syntax in Markdown output.
-///
-/// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
-pub const NewlineStyle = enum {
-    /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
-    spaces,
-    /// Backslash at end of line. Alternative Markdown syntax.
-    backslash,
-};
-
-/// Code block fence style in Markdown output.
-///
-/// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
-pub const CodeBlockStyle = enum {
-    /// Indented code blocks (4 spaces). `CommonMark` standard.
-    indented,
-    /// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
-    backticks,
-    /// Fenced code blocks with tildes (~~~). Supports language hints.
-    tildes,
-};
-
-/// Highlight rendering style for `<mark>` elements.
-///
-/// Controls how highlighted text is rendered in Markdown output.
-pub const HighlightStyle = enum {
-    /// Double equals syntax (==text==). Default. Pandoc-compatible.
-    double_equal,
-    /// Preserve as HTML (==text==). Original HTML tag.
-    html,
-    /// Render as bold (**text**). Uses strong emphasis.
-    bold,
-    /// Strip formatting, render as plain text. No markup.
-    none,
-};
-
-/// Link rendering style in Markdown output.
-///
-/// Controls whether links and images use inline `[text](url)` syntax or
-/// reference-style `[text][1]` syntax with definitions collected at the end.
-pub const LinkStyle = enum {
-    /// Inline links: `[text](url)`. Default.
-    inline_,
-    /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
-    reference,
-};
-
-/// Output format for conversion.
-///
-/// Specifies the target markup language format for the conversion output.
-pub const OutputFormat = enum {
-    /// Standard Markdown (CommonMark compatible). Default.
-    markdown,
-    /// Djot lightweight markup language.
-    djot,
-    /// Plain text output (no markup, visible text only).
-    plain,
 };
 
 /// The semantic content type of a document node.

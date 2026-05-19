@@ -26,7 +26,7 @@ data class PreprocessingOptions(
     /** Enable HTML preprocessing globally */
     val enabled: Boolean,
     /** Preprocessing preset level (Minimal, Standard, Aggressive) */
-    val preset: PreprocessingPreset,
+    val preset: String,
     /** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
     val removeNavigation: Boolean,
     /** Remove form elements (forms, inputs, buttons, etc.) */

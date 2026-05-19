@@ -63,16 +63,13 @@
 High-performance HTML to Markdown converter for Dart via `flutter_rust_bridge`. Pure-Dart binding (no Flutter SDK required) suitable for server and CLI workloads; Flutter apps can also consume it via the standard pub.dev workflow.
 Published as `h2m` on pub.dev because `html_to_markdown` and `html-to-markdown` are taken.
 
-
 ## Installation
 
 ```bash
 dart pub add h2m
 ```
 
-
 ## Performance Snapshot
-
 
 ## Quick Start
 
@@ -91,7 +88,6 @@ Future<void> main() async {
   print(result.content);
 }
 ```
-
 
 With conversion options:
 
@@ -113,11 +109,9 @@ Future<void> main() async {
 }
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 ### Options
 
@@ -151,16 +145,13 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -178,7 +169,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ## Visitor Pattern
 
 The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
@@ -194,7 +184,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

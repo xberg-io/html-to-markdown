@@ -63,7 +63,6 @@
 High-performance HTML to Markdown converter with Java Panama FFI bindings to the Rust core.
 Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion with full metadata extraction support.
 
-
 ## Installation
 
 ```bash
@@ -74,7 +73,6 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
     <classifier>linux</classifier> <!-- or macos, windows -->
 </dependency>
 ```
-
 
 Requires Java 25+ with Panama FFI support.
 
@@ -94,17 +92,15 @@ Requires Java 25+ with Panama FFI support.
 implementation("dev.kreuzberg:html-to-markdown:3.5.0")
 ```
 
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 291.5 MB/s |
-| Tables (Countries) | 360KB |  | 272.0 MB/s |
-| Mixed (Python) | 656KB |  | 258.5 MB/s |
-
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 291.5 MB/s |
+| Tables (Countries) | 360KB |         | 272.0 MB/s |
+| Mixed (Python)     | 656KB |         | 258.5 MB/s |
 
 ## Quick Start
 
@@ -122,7 +118,6 @@ public class Example {
     }
 }
 ```
-
 
 With conversion options:
 
@@ -149,11 +144,9 @@ public class MetadataExample {
 }
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`HtmlToMarkdown.convert(String html) : ConversionResult`**
 **`HtmlToMarkdown.convert(String html, ConversionOptions options) : ConversionResult`**
@@ -166,7 +159,6 @@ String   markdown = result.content();   // Converted Markdown string
 Metadata metadata = result.metadata();  // null unless extractMetadata(true)
 List<?>  tables   = result.tables();    // empty unless extractTables(true)
 ```
-
 
 ### Options
 
@@ -200,7 +192,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```java
 import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
 import dev.kreuzberg.htmltomarkdown.ConversionOptions;
@@ -218,13 +209,11 @@ String djot = HtmlToMarkdown.convert(html,
 // Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```java
 import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
@@ -238,9 +227,7 @@ String plain = HtmlToMarkdown.convert(html,
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -257,7 +244,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

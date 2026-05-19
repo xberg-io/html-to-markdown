@@ -9,7 +9,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
@@ -260,20 +260,6 @@ sealed class AnnotationKind with _$AnnotationKind {
   }) = AnnotationKind_Link;
 }
 
-/// Code block fence style in Markdown output.
-///
-/// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
-enum CodeBlockStyle {
-  /// Indented code blocks (4 spaces). `CommonMark` standard.
-  indented,
-
-  /// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
-  backticks,
-
-  /// Fenced code blocks with tildes (~~~). Supports language hints.
-  tildes,
-}
-
 /// Main conversion options for HTML to Markdown conversion.
 ///
 /// Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
@@ -291,10 +277,10 @@ enum CodeBlockStyle {
 /// ```
 class ConversionOptions {
   /// Heading style to use in Markdown output (ATX `#` or Setext underline).
-  final HeadingStyle headingStyle;
+  final String headingStyle;
 
   /// How to indent nested list items (spaces or tab).
-  final ListIndentType listIndentType;
+  final String listIndentType;
 
   /// Number of spaces (or tabs) to use for each level of list indentation.
   final PlatformInt64 listIndentWidth;
@@ -339,7 +325,7 @@ class ConversionOptions {
   final bool compactTables;
 
   /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
-  final HighlightStyle highlightStyle;
+  final String highlightStyle;
 
   /// Populate `result.metadata` with `<head>` / `<meta>` extraction
   /// (title, description, Open Graph, Twitter Card, JSON-LD, …).
@@ -357,7 +343,7 @@ class ConversionOptions {
   ///
   /// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
   /// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
-  final WhitespaceMode whitespaceMode;
+  final String whitespaceMode;
 
   /// Strip all newlines from the output, producing a single-line result.
   final bool stripNewlines;
@@ -382,10 +368,10 @@ class ConversionOptions {
   final String supSymbol;
 
   /// How to encode hard line breaks (`<br>`) in Markdown.
-  final NewlineStyle newlineStyle;
+  final String newlineStyle;
 
   /// Style used for fenced code blocks (backticks or tilde).
-  final CodeBlockStyle codeBlockStyle;
+  final String codeBlockStyle;
 
   /// HTML tag names whose `<img>` children are kept inline instead of block.
   final List<String> keepInlineImagesIn;
@@ -417,10 +403,10 @@ class ConversionOptions {
   final bool skipImages;
 
   /// Link rendering style (inline or reference).
-  final LinkStyle linkStyle;
+  final String linkStyle;
 
   /// Target output format (Markdown, plain text, etc.).
-  final OutputFormat outputFormat;
+  final String outputFormat;
 
   /// Include structured document tree in result.
   final bool includeDocumentStructure;
@@ -605,10 +591,10 @@ class ConversionOptions {
 /// options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
 class ConversionOptionsUpdate {
   /// Optional override for [`ConversionOptions::heading_style`].
-  final HeadingStyle? headingStyle;
+  final String? headingStyle;
 
   /// Optional override for [`ConversionOptions::list_indent_type`].
-  final ListIndentType? listIndentType;
+  final String? listIndentType;
 
   /// Optional override for [`ConversionOptions::list_indent_width`].
   final PlatformInt64? listIndentWidth;
@@ -647,13 +633,13 @@ class ConversionOptionsUpdate {
   final bool? compactTables;
 
   /// Optional override for [`ConversionOptions::highlight_style`].
-  final HighlightStyle? highlightStyle;
+  final String? highlightStyle;
 
   /// Optional override for [`ConversionOptions::extract_metadata`].
   final bool? extractMetadata;
 
   /// Optional override for [`ConversionOptions::whitespace_mode`].
-  final WhitespaceMode? whitespaceMode;
+  final String? whitespaceMode;
 
   /// Optional override for [`ConversionOptions::strip_newlines`].
   final bool? stripNewlines;
@@ -674,10 +660,10 @@ class ConversionOptionsUpdate {
   final String? supSymbol;
 
   /// Optional override for [`ConversionOptions::newline_style`].
-  final NewlineStyle? newlineStyle;
+  final String? newlineStyle;
 
   /// Optional override for [`ConversionOptions::code_block_style`].
-  final CodeBlockStyle? codeBlockStyle;
+  final String? codeBlockStyle;
 
   /// Optional override for [`ConversionOptions::keep_inline_images_in`].
   final List<String>? keepInlineImagesIn;
@@ -701,10 +687,10 @@ class ConversionOptionsUpdate {
   final bool? skipImages;
 
   /// Optional override for [`ConversionOptions::link_style`].
-  final LinkStyle? linkStyle;
+  final String? linkStyle;
 
   /// Optional override for [`ConversionOptions::output_format`].
-  final OutputFormat? outputFormat;
+  final String? outputFormat;
 
   /// Optional override for [`ConversionOptions::include_document_structure`].
   final bool? includeDocumentStructure;
@@ -990,7 +976,7 @@ class DocumentMetadata {
   final String? language;
 
   /// Document text direction from `dir` attribute
-  final TextDirection? textDirection;
+  final String? textDirection;
 
   /// Open Graph metadata (og:* properties) for social media
   /// Keys like "title", "description", "image", "url", etc.
@@ -1248,37 +1234,6 @@ class HeaderMetadata {
           htmlOffset == other.htmlOffset;
 }
 
-/// Heading style options for Markdown output.
-///
-/// Controls how headings (h1-h6) are rendered in the output Markdown.
-enum HeadingStyle {
-  /// Underlined style (=== for h1, --- for h2).
-  underlined,
-
-  /// ATX style (# for h1, ## for h2, etc.). Default.
-  atx,
-
-  /// ATX closed style (# title #, with closing hashes).
-  atxClosed,
-}
-
-/// Highlight rendering style for `<mark>` elements.
-///
-/// Controls how highlighted text is rendered in Markdown output.
-enum HighlightStyle {
-  /// Double equals syntax (==text==). Default. Pandoc-compatible.
-  doubleEqual,
-
-  /// Preserve as HTML (==text==). Original HTML tag.
-  html,
-
-  /// Render as bold (**text**). Uses strong emphasis.
-  bold,
-
-  /// Strip formatting, render as plain text. No markup.
-  none,
-}
-
 /// Comprehensive metadata extraction result from HTML document.
 ///
 /// Contains all extracted metadata types in a single structure,
@@ -1496,18 +1451,6 @@ class LinkMetadata {
           attributes == other.attributes;
 }
 
-/// Link rendering style in Markdown output.
-///
-/// Controls whether links and images use inline `[text](url)` syntax or
-/// reference-style `[text][1]` syntax with definitions collected at the end.
-enum LinkStyle {
-  /// Inline links: `[text](url)`. Default.
-  inline,
-
-  /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
-  reference,
-}
-
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
@@ -1529,28 +1472,6 @@ enum LinkType {
 
   /// Other protocol or unclassifiable
   other,
-}
-
-/// List indentation character type.
-///
-/// Controls whether list items are indented with spaces or tabs.
-enum ListIndentType {
-  /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
-  spaces,
-
-  /// Use tabs for indentation.
-  tabs,
-}
-
-/// Line break syntax in Markdown output.
-///
-/// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
-enum NewlineStyle {
-  /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
-  spaces,
-
-  /// Backslash at end of line. Alternative Markdown syntax.
-  backslash,
 }
 
 @freezed
@@ -1984,27 +1905,13 @@ enum NodeType {
   custom,
 }
 
-/// Output format for conversion.
-///
-/// Specifies the target markup language format for the conversion output.
-enum OutputFormat {
-  /// Standard Markdown (CommonMark compatible). Default.
-  markdown,
-
-  /// Djot lightweight markup language.
-  djot,
-
-  /// Plain text output (no markup, visible text only).
-  plain,
-}
-
 /// HTML preprocessing options for document cleanup before conversion.
 class PreprocessingOptions {
   /// Enable HTML preprocessing globally
   final bool enabled;
 
   /// Preprocessing preset level (Minimal, Standard, Aggressive)
-  final PreprocessingPreset preset;
+  final String preset;
 
   /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
   final bool removeNavigation;
@@ -2047,7 +1954,7 @@ class PreprocessingOptionsUpdate {
   final bool? enabled;
 
   /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
-  final PreprocessingPreset? preset;
+  final String? preset;
 
   /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
   final bool? removeNavigation;
@@ -2078,20 +1985,6 @@ class PreprocessingOptionsUpdate {
           preset == other.preset &&
           removeNavigation == other.removeNavigation &&
           removeForms == other.removeForms;
-}
-
-/// HTML preprocessing aggressiveness level.
-///
-/// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
-enum PreprocessingPreset {
-  /// Minimal cleanup. Remove only essential noise (scripts, styles).
-  minimal,
-
-  /// Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
-  standard,
-
-  /// Aggressive cleanup. Remove extensive non-content elements and structure.
-  aggressive,
 }
 
 /// A non-fatal diagnostic produced during HTML conversion.
@@ -2298,20 +2191,6 @@ class TextAnnotation {
           kind == other.kind;
 }
 
-/// Text directionality of document content.
-///
-/// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
-enum TextDirection {
-  /// Left-to-right text flow (default for Latin scripts)
-  leftToRight,
-
-  /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
-  rightToLeft,
-
-  /// Automatic directionality detection
-  auto,
-}
-
 @freezed
 sealed class VisitResult with _$VisitResult {
   const VisitResult._();
@@ -2361,15 +2240,4 @@ enum WarningKind {
 
   /// DOM traversal was truncated because max_depth was exceeded.
   depthLimitExceeded,
-}
-
-/// Whitespace handling strategy during conversion.
-///
-/// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
-enum WhitespaceMode {
-  /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
-  normalized,
-
-  /// Preserve all whitespace exactly as it appears in the HTML.
-  strict,
 }
