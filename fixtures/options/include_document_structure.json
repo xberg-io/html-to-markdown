@@ -1,0 +1,44 @@
+[
+  {
+    "id": "options_include_document_structure_true",
+    "description": "Setting include_document_structure populates the structured document tree on the result",
+    "input": {
+      "html": "<article><h1>Heading</h1><p>Paragraph body.</p></article>",
+      "options": {
+        "include_document_structure": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "Heading"
+      }
+    ]
+  },
+  {
+    "id": "options_include_document_structure_false",
+    "description": "Disabling include_document_structure still produces content without the document tree overhead",
+    "input": {
+      "html": "<article><h1>Heading</h1><p>Paragraph body.</p></article>",
+      "options": {
+        "include_document_structure": false
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "Heading"
+      }
+    ]
+  }
+]

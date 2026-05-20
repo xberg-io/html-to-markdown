@@ -1,0 +1,46 @@
+[
+  {
+    "id": "options_infer_dimensions_true",
+    "description": "Enabling infer_dimensions decodes image bytes to populate dimension metadata when extract_images is on",
+    "input": {
+      "html": "<p>With dims: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>",
+      "options": {
+        "extract_images": true,
+        "infer_dimensions": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "With dims"
+      }
+    ]
+  },
+  {
+    "id": "options_infer_dimensions_false",
+    "description": "Disabling infer_dimensions skips the decode step and still produces content",
+    "input": {
+      "html": "<p>No dims: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>",
+      "options": {
+        "extract_images": true,
+        "infer_dimensions": false
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "No dims"
+      }
+    ]
+  }
+]
