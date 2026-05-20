@@ -303,10 +303,8 @@ const markdown = result.content;
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **npm:** [npmjs.com/@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown)
 - **WASM:** [npmjs.com/@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

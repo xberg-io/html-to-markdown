@@ -571,7 +571,7 @@ public typealias OutputFormat = RustBridge.OutputFormat
 /// The semantic content type of a document node.
 ///
 /// Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
-public enum NodeContent {
+public enum NodeContent: Codable, Sendable, Hashable {
     /// A heading element (h1-h6).
     case heading(level: UInt8, text: String)
     /// A paragraph of text.
@@ -610,7 +610,7 @@ extension NodeContent {
 /// The type of an inline text annotation.
 ///
 /// Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
-public enum AnnotationKind {
+public enum AnnotationKind: Codable, Sendable, Hashable {
     /// Bold / strong emphasis.
     case bold
     /// Italic / emphasis.
@@ -856,7 +856,7 @@ extension NodeType {
 /// Allows visitors to control the conversion flow by either proceeding
 /// with default behavior, providing custom output, skipping elements,
 /// preserving HTML, or signaling errors.
-public enum VisitResult {
+public enum VisitResult: Codable, Sendable, Hashable {
     /// Continue with default conversion behavior
     case `continue`
     /// Replace default output with custom markdown

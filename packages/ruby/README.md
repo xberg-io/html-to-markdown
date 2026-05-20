@@ -260,9 +260,7 @@ markdown = result[:content]
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **RubyGems:** [rubygems.org/gems/html-to-markdown](https://rubygems.org/gems/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

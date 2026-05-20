@@ -219,6 +219,9 @@ public func conversionOptionsFromJson<GenericIntoRustString: IntoRustString>(_ j
 public func nodeContextFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> NodeContext {
     try { let val = __swift_bridge__$node_context_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return NodeContext(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
+public func documentMetadataFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> DocumentMetadata {
+    try { let val = __swift_bridge__$document_metadata_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return DocumentMetadata(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
 public func headerMetadataFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> HeaderMetadata {
     try { let val = __swift_bridge__$header_metadata_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return HeaderMetadata(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
@@ -231,6 +234,18 @@ public func imageMetadataFromJson<GenericIntoRustString: IntoRustString>(_ json:
 public func structuredDataFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> StructuredData {
     try { let val = __swift_bridge__$structured_data_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return StructuredData(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
+public func htmlMetadataFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> HtmlMetadata {
+    try { let val = __swift_bridge__$html_metadata_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return HtmlMetadata(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func conversionOptionsUpdateFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ConversionOptionsUpdate {
+    try { let val = __swift_bridge__$conversion_options_update_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ConversionOptionsUpdate(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func preprocessingOptionsFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PreprocessingOptions {
+    try { let val = __swift_bridge__$preprocessing_options_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PreprocessingOptions(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func preprocessingOptionsUpdateFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> PreprocessingOptionsUpdate {
+    try { let val = __swift_bridge__$preprocessing_options_update_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return PreprocessingOptionsUpdate(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
 public func documentStructureFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> DocumentStructure {
     try { let val = __swift_bridge__$document_structure_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return DocumentStructure(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
@@ -240,6 +255,12 @@ public func documentNodeFromJson<GenericIntoRustString: IntoRustString>(_ json: 
 public func textAnnotationFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> TextAnnotation {
     try { let val = __swift_bridge__$text_annotation_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return TextAnnotation(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
+public func conversionResultFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ConversionResult {
+    try { let val = __swift_bridge__$conversion_result_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ConversionResult(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func tableGridFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> TableGrid {
+    try { let val = __swift_bridge__$table_grid_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return TableGrid(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
 public func gridCellFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> GridCell {
     try { let val = __swift_bridge__$grid_cell_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return GridCell(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
@@ -248,6 +269,33 @@ public func tableDataFromJson<GenericIntoRustString: IntoRustString>(_ json: Gen
 }
 public func processingWarningFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ProcessingWarning {
     try { let val = __swift_bridge__$processing_warning_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ProcessingWarning(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func textDirectionFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> TextDirection {
+    try { let val = __swift_bridge__$text_direction_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return TextDirection(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func linkTypeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> LinkType {
+    try { let val = __swift_bridge__$link_type_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return LinkType(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func imageTypeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> ImageType {
+    try { let val = __swift_bridge__$image_type_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return ImageType(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func structuredDataTypeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> StructuredDataType {
+    try { let val = __swift_bridge__$structured_data_type_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return StructuredDataType(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func nodeContentFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> NodeContent {
+    try { let val = __swift_bridge__$node_content_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return NodeContent(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func annotationKindFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> AnnotationKind {
+    try { let val = __swift_bridge__$annotation_kind_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return AnnotationKind(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func warningKindFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> WarningKind {
+    try { let val = __swift_bridge__$warning_kind_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return WarningKind(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func nodeTypeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> NodeType {
+    try { let val = __swift_bridge__$node_type_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return NodeType(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
+}
+public func visitResultFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> VisitResult {
+    try { let val = __swift_bridge__$visit_result_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return VisitResult(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
 
 public class DocumentMetadata: DocumentMetadataRefMut {
@@ -297,11 +345,11 @@ extension DocumentMetadataRef {
         { let val = __swift_bridge__$DocumentMetadata$author(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func canonical_url() -> Optional<RustString> {
+    public func canonicalUrl() -> Optional<RustString> {
         { let val = __swift_bridge__$DocumentMetadata$canonical_url(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func base_href() -> Optional<RustString> {
+    public func baseHref() -> Optional<RustString> {
         { let val = __swift_bridge__$DocumentMetadata$base_href(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
@@ -309,19 +357,19 @@ extension DocumentMetadataRef {
         { let val = __swift_bridge__$DocumentMetadata$language(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func text_direction() -> Optional<RustString> {
+    public func textDirection() -> Optional<RustString> {
         { let val = __swift_bridge__$DocumentMetadata$text_direction(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func open_graph() -> RustString {
+    public func openGraph() -> RustString {
         RustString(ptr: __swift_bridge__$DocumentMetadata$open_graph(ptr))
     }
 
-    public func twitter_card() -> RustString {
+    public func twitterCard() -> RustString {
         RustString(ptr: __swift_bridge__$DocumentMetadata$twitter_card(ptr))
     }
 
-    public func meta_tags() -> RustString {
+    public func metaTags() -> RustString {
         RustString(ptr: __swift_bridge__$DocumentMetadata$meta_tags(ptr))
     }
 }
@@ -417,7 +465,7 @@ extension HeaderMetadataRef {
         __swift_bridge__$HeaderMetadata$depth(ptr)
     }
 
-    public func html_offset() -> UInt {
+    public func htmlOffset() -> UInt {
         __swift_bridge__$HeaderMetadata$html_offset(ptr)
     }
 }
@@ -509,7 +557,7 @@ extension LinkMetadataRef {
         { let val = __swift_bridge__$LinkMetadata$title(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func link_type() -> RustString {
+    public func linkType() -> RustString {
         RustString(ptr: __swift_bridge__$LinkMetadata$link_type(ptr))
     }
 
@@ -613,7 +661,7 @@ extension ImageMetadataRef {
         { let val = __swift_bridge__$ImageMetadata$dimensions(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
     }
 
-    public func image_type() -> RustString {
+    public func imageType() -> RustString {
         RustString(ptr: __swift_bridge__$ImageMetadata$image_type(ptr))
     }
 
@@ -697,15 +745,15 @@ public class StructuredDataRef {
     }
 }
 extension StructuredDataRef {
-    public func data_type() -> RustString {
+    public func dataType() -> RustString {
         RustString(ptr: __swift_bridge__$StructuredData$data_type(ptr))
     }
 
-    public func raw_json() -> RustString {
+    public func rawJson() -> RustString {
         RustString(ptr: __swift_bridge__$StructuredData$raw_json(ptr))
     }
 
-    public func schema_type() -> Optional<RustString> {
+    public func schemaType() -> Optional<RustString> {
         { let val = __swift_bridge__$StructuredData$schema_type(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 }
@@ -806,7 +854,7 @@ extension HtmlMetadataRef {
         RustVec(ptr: __swift_bridge__$HtmlMetadata$images(ptr))
     }
 
-    public func structured_data() -> RustVec<StructuredData> {
+    public func structuredData() -> RustVec<StructuredData> {
         RustVec(ptr: __swift_bridge__$HtmlMetadata$structured_data(ptr))
     }
 }
@@ -891,15 +939,15 @@ public class ConversionOptionsRef {
     }
 }
 extension ConversionOptionsRef {
-    public func heading_style() -> RustString {
+    public func headingStyle() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$heading_style(ptr))
     }
 
-    public func list_indent_type() -> RustString {
+    public func listIndentType() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$list_indent_type(ptr))
     }
 
-    public func list_indent_width() -> UInt {
+    public func listIndentWidth() -> UInt {
         __swift_bridge__$ConversionOptions$list_indent_width(ptr)
     }
 
@@ -907,27 +955,27 @@ extension ConversionOptionsRef {
         RustString(ptr: __swift_bridge__$ConversionOptions$bullets(ptr))
     }
 
-    public func strong_em_symbol() -> RustString {
+    public func strongEmSymbol() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$strong_em_symbol(ptr))
     }
 
-    public func escape_asterisks() -> Bool {
+    public func escapeAsterisks() -> Bool {
         __swift_bridge__$ConversionOptions$escape_asterisks(ptr)
     }
 
-    public func escape_underscores() -> Bool {
+    public func escapeUnderscores() -> Bool {
         __swift_bridge__$ConversionOptions$escape_underscores(ptr)
     }
 
-    public func escape_misc() -> Bool {
+    public func escapeMisc() -> Bool {
         __swift_bridge__$ConversionOptions$escape_misc(ptr)
     }
 
-    public func escape_ascii() -> Bool {
+    public func escapeAscii() -> Bool {
         __swift_bridge__$ConversionOptions$escape_ascii(ptr)
     }
 
-    public func code_language() -> RustString {
+    public func codeLanguage() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$code_language(ptr))
     }
 
@@ -935,31 +983,31 @@ extension ConversionOptionsRef {
         __swift_bridge__$ConversionOptions$autolinks(ptr)
     }
 
-    public func default_title() -> Bool {
+    public func defaultTitle() -> Bool {
         __swift_bridge__$ConversionOptions$default_title(ptr)
     }
 
-    public func br_in_tables() -> Bool {
+    public func brInTables() -> Bool {
         __swift_bridge__$ConversionOptions$br_in_tables(ptr)
     }
 
-    public func compact_tables() -> Bool {
+    public func compactTables() -> Bool {
         __swift_bridge__$ConversionOptions$compact_tables(ptr)
     }
 
-    public func highlight_style() -> RustString {
+    public func highlightStyle() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$highlight_style(ptr))
     }
 
-    public func extract_metadata() -> Bool {
+    public func extractMetadata() -> Bool {
         __swift_bridge__$ConversionOptions$extract_metadata(ptr)
     }
 
-    public func whitespace_mode() -> RustString {
+    public func whitespaceMode() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$whitespace_mode(ptr))
     }
 
-    public func strip_newlines() -> Bool {
+    public func stripNewlines() -> Bool {
         __swift_bridge__$ConversionOptions$strip_newlines(ptr)
     }
 
@@ -967,31 +1015,31 @@ extension ConversionOptionsRef {
         __swift_bridge__$ConversionOptions$wrap(ptr)
     }
 
-    public func wrap_width() -> UInt {
+    public func wrapWidth() -> UInt {
         __swift_bridge__$ConversionOptions$wrap_width(ptr)
     }
 
-    public func convert_as_inline() -> Bool {
+    public func convertAsInline() -> Bool {
         __swift_bridge__$ConversionOptions$convert_as_inline(ptr)
     }
 
-    public func sub_symbol() -> RustString {
+    public func subSymbol() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$sub_symbol(ptr))
     }
 
-    public func sup_symbol() -> RustString {
+    public func supSymbol() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$sup_symbol(ptr))
     }
 
-    public func newline_style() -> RustString {
+    public func newlineStyle() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$newline_style(ptr))
     }
 
-    public func code_block_style() -> RustString {
+    public func codeBlockStyle() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$code_block_style(ptr))
     }
 
-    public func keep_inline_images_in() -> RustVec<RustString> {
+    public func keepInlineImagesIn() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$ConversionOptions$keep_inline_images_in(ptr))
     }
 
@@ -1007,51 +1055,51 @@ extension ConversionOptionsRef {
         __swift_bridge__$ConversionOptions$debug(ptr)
     }
 
-    public func strip_tags() -> RustVec<RustString> {
+    public func stripTags() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$ConversionOptions$strip_tags(ptr))
     }
 
-    public func preserve_tags() -> RustVec<RustString> {
+    public func preserveTags() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$ConversionOptions$preserve_tags(ptr))
     }
 
-    public func skip_images() -> Bool {
+    public func skipImages() -> Bool {
         __swift_bridge__$ConversionOptions$skip_images(ptr)
     }
 
-    public func link_style() -> RustString {
+    public func linkStyle() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$link_style(ptr))
     }
 
-    public func output_format() -> RustString {
+    public func outputFormat() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptions$output_format(ptr))
     }
 
-    public func include_document_structure() -> Bool {
+    public func includeDocumentStructure() -> Bool {
         __swift_bridge__$ConversionOptions$include_document_structure(ptr)
     }
 
-    public func extract_images() -> Bool {
+    public func extractImages() -> Bool {
         __swift_bridge__$ConversionOptions$extract_images(ptr)
     }
 
-    public func max_image_size() -> UInt64 {
+    public func maxImageSize() -> UInt64 {
         __swift_bridge__$ConversionOptions$max_image_size(ptr)
     }
 
-    public func capture_svg() -> Bool {
+    public func captureSvg() -> Bool {
         __swift_bridge__$ConversionOptions$capture_svg(ptr)
     }
 
-    public func infer_dimensions() -> Bool {
+    public func inferDimensions() -> Bool {
         __swift_bridge__$ConversionOptions$infer_dimensions(ptr)
     }
 
-    public func max_depth() -> Optional<UInt> {
+    public func maxDepth() -> Optional<UInt> {
         __swift_bridge__$ConversionOptions$max_depth(ptr).intoSwiftRepr()
     }
 
-    public func exclude_selectors() -> RustVec<RustString> {
+    public func excludeSelectors() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$ConversionOptions$exclude_selectors(ptr))
     }
 
@@ -1140,15 +1188,15 @@ public class ConversionOptionsUpdateRef {
     }
 }
 extension ConversionOptionsUpdateRef {
-    public func heading_style() -> Optional<RustString> {
+    public func headingStyle() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$heading_style(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func list_indent_type() -> Optional<RustString> {
+    public func listIndentType() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$list_indent_type(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func list_indent_width() -> Optional<UInt> {
+    public func listIndentWidth() -> Optional<UInt> {
         __swift_bridge__$ConversionOptionsUpdate$list_indent_width(ptr).intoSwiftRepr()
     }
 
@@ -1156,27 +1204,27 @@ extension ConversionOptionsUpdateRef {
         { let val = __swift_bridge__$ConversionOptionsUpdate$bullets(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func strong_em_symbol() -> Optional<RustString> {
+    public func strongEmSymbol() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$strong_em_symbol(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func escape_asterisks() -> Optional<Bool> {
+    public func escapeAsterisks() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$escape_asterisks(ptr).intoSwiftRepr()
     }
 
-    public func escape_underscores() -> Optional<Bool> {
+    public func escapeUnderscores() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$escape_underscores(ptr).intoSwiftRepr()
     }
 
-    public func escape_misc() -> Optional<Bool> {
+    public func escapeMisc() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$escape_misc(ptr).intoSwiftRepr()
     }
 
-    public func escape_ascii() -> Optional<Bool> {
+    public func escapeAscii() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$escape_ascii(ptr).intoSwiftRepr()
     }
 
-    public func code_language() -> Optional<RustString> {
+    public func codeLanguage() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$code_language(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
@@ -1184,31 +1232,31 @@ extension ConversionOptionsUpdateRef {
         __swift_bridge__$ConversionOptionsUpdate$autolinks(ptr).intoSwiftRepr()
     }
 
-    public func default_title() -> Optional<Bool> {
+    public func defaultTitle() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$default_title(ptr).intoSwiftRepr()
     }
 
-    public func br_in_tables() -> Optional<Bool> {
+    public func brInTables() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$br_in_tables(ptr).intoSwiftRepr()
     }
 
-    public func compact_tables() -> Optional<Bool> {
+    public func compactTables() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$compact_tables(ptr).intoSwiftRepr()
     }
 
-    public func highlight_style() -> Optional<RustString> {
+    public func highlightStyle() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$highlight_style(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func extract_metadata() -> Optional<Bool> {
+    public func extractMetadata() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$extract_metadata(ptr).intoSwiftRepr()
     }
 
-    public func whitespace_mode() -> Optional<RustString> {
+    public func whitespaceMode() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$whitespace_mode(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func strip_newlines() -> Optional<Bool> {
+    public func stripNewlines() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$strip_newlines(ptr).intoSwiftRepr()
     }
 
@@ -1216,31 +1264,31 @@ extension ConversionOptionsUpdateRef {
         __swift_bridge__$ConversionOptionsUpdate$wrap(ptr).intoSwiftRepr()
     }
 
-    public func wrap_width() -> Optional<UInt> {
+    public func wrapWidth() -> Optional<UInt> {
         __swift_bridge__$ConversionOptionsUpdate$wrap_width(ptr).intoSwiftRepr()
     }
 
-    public func convert_as_inline() -> Optional<Bool> {
+    public func convertAsInline() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$convert_as_inline(ptr).intoSwiftRepr()
     }
 
-    public func sub_symbol() -> Optional<RustString> {
+    public func subSymbol() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$sub_symbol(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func sup_symbol() -> Optional<RustString> {
+    public func supSymbol() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$sup_symbol(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func newline_style() -> Optional<RustString> {
+    public func newlineStyle() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$newline_style(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func code_block_style() -> Optional<RustString> {
+    public func codeBlockStyle() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$code_block_style(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func keep_inline_images_in() -> Optional<RustVec<RustString>> {
+    public func keepInlineImagesIn() -> Optional<RustVec<RustString>> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$keep_inline_images_in(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
     }
 
@@ -1256,51 +1304,51 @@ extension ConversionOptionsUpdateRef {
         __swift_bridge__$ConversionOptionsUpdate$debug(ptr).intoSwiftRepr()
     }
 
-    public func strip_tags() -> Optional<RustVec<RustString>> {
+    public func stripTags() -> Optional<RustVec<RustString>> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$strip_tags(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
     }
 
-    public func preserve_tags() -> Optional<RustVec<RustString>> {
+    public func preserveTags() -> Optional<RustVec<RustString>> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$preserve_tags(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
     }
 
-    public func skip_images() -> Optional<Bool> {
+    public func skipImages() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$skip_images(ptr).intoSwiftRepr()
     }
 
-    public func link_style() -> Optional<RustString> {
+    public func linkStyle() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$link_style(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func output_format() -> Optional<RustString> {
+    public func outputFormat() -> Optional<RustString> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$output_format(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func include_document_structure() -> Optional<Bool> {
+    public func includeDocumentStructure() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$include_document_structure(ptr).intoSwiftRepr()
     }
 
-    public func extract_images() -> Optional<Bool> {
+    public func extractImages() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$extract_images(ptr).intoSwiftRepr()
     }
 
-    public func max_image_size() -> Optional<UInt64> {
+    public func maxImageSize() -> Optional<UInt64> {
         __swift_bridge__$ConversionOptionsUpdate$max_image_size(ptr).intoSwiftRepr()
     }
 
-    public func capture_svg() -> Optional<Bool> {
+    public func captureSvg() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$capture_svg(ptr).intoSwiftRepr()
     }
 
-    public func infer_dimensions() -> Optional<Bool> {
+    public func inferDimensions() -> Optional<Bool> {
         __swift_bridge__$ConversionOptionsUpdate$infer_dimensions(ptr).intoSwiftRepr()
     }
 
-    public func max_depth() -> RustString {
+    public func maxDepth() -> RustString {
         RustString(ptr: __swift_bridge__$ConversionOptionsUpdate$max_depth(ptr))
     }
 
-    public func exclude_selectors() -> Optional<RustVec<RustString>> {
+    public func excludeSelectors() -> Optional<RustVec<RustString>> {
         { let val = __swift_bridge__$ConversionOptionsUpdate$exclude_selectors(ptr); if val != nil { return RustVec(ptr: val!) } else { return nil } }()
     }
 
@@ -1397,11 +1445,11 @@ extension PreprocessingOptionsRef {
         RustString(ptr: __swift_bridge__$PreprocessingOptions$preset(ptr))
     }
 
-    public func remove_navigation() -> Bool {
+    public func removeNavigation() -> Bool {
         __swift_bridge__$PreprocessingOptions$remove_navigation(ptr)
     }
 
-    public func remove_forms() -> Bool {
+    public func removeForms() -> Bool {
         __swift_bridge__$PreprocessingOptions$remove_forms(ptr)
     }
 }
@@ -1494,11 +1542,11 @@ extension PreprocessingOptionsUpdateRef {
         { let val = __swift_bridge__$PreprocessingOptionsUpdate$preset(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func remove_navigation() -> Optional<Bool> {
+    public func removeNavigation() -> Optional<Bool> {
         __swift_bridge__$PreprocessingOptionsUpdate$remove_navigation(ptr).intoSwiftRepr()
     }
 
-    public func remove_forms() -> Optional<Bool> {
+    public func removeForms() -> Optional<Bool> {
         __swift_bridge__$PreprocessingOptionsUpdate$remove_forms(ptr).intoSwiftRepr()
     }
 }
@@ -1582,7 +1630,7 @@ extension DocumentStructureRef {
         RustVec(ptr: __swift_bridge__$DocumentStructure$nodes(ptr))
     }
 
-    public func source_format() -> Optional<RustString> {
+    public func sourceFormat() -> Optional<RustString> {
         { let val = __swift_bridge__$DocumentStructure$source_format(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 }
@@ -2056,15 +2104,15 @@ extension GridCellRef {
         __swift_bridge__$GridCell$col(ptr)
     }
 
-    public func row_span() -> UInt32 {
+    public func rowSpan() -> UInt32 {
         __swift_bridge__$GridCell$row_span(ptr)
     }
 
-    public func col_span() -> UInt32 {
+    public func colSpan() -> UInt32 {
         __swift_bridge__$GridCell$col_span(ptr)
     }
 
-    public func is_header() -> Bool {
+    public func isHeader() -> Bool {
         __swift_bridge__$GridCell$is_header(ptr)
     }
 }
@@ -2387,11 +2435,11 @@ public class NodeContextRef {
     }
 }
 extension NodeContextRef {
-    public func node_type() -> RustString {
+    public func nodeType() -> RustString {
         RustString(ptr: __swift_bridge__$NodeContext$node_type(ptr))
     }
 
-    public func tag_name() -> RustString {
+    public func tagName() -> RustString {
         RustString(ptr: __swift_bridge__$NodeContext$tag_name(ptr))
     }
 
@@ -2403,15 +2451,15 @@ extension NodeContextRef {
         __swift_bridge__$NodeContext$depth(ptr)
     }
 
-    public func index_in_parent() -> UInt {
+    public func indexInParent() -> UInt {
         __swift_bridge__$NodeContext$index_in_parent(ptr)
     }
 
-    public func parent_tag() -> Optional<RustString> {
+    public func parentTag() -> Optional<RustString> {
         { let val = __swift_bridge__$NodeContext$parent_tag(ptr); if val != nil { return RustString(ptr: val!) } else { return nil } }()
     }
 
-    public func is_inline() -> Bool {
+    public func isInline() -> Bool {
         __swift_bridge__$NodeContext$is_inline(ptr)
     }
 }

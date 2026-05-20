@@ -295,9 +295,7 @@ $markdown = $result['content'];
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Packagist:** [packagist.org/packages/kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

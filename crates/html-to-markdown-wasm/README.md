@@ -167,7 +167,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev
