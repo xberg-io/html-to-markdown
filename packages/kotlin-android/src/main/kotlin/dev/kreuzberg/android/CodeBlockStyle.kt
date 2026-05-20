@@ -32,5 +32,5 @@ enum class CodeBlockStyle {
     /** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
     BACKTICKS,
     /** Fenced code blocks with tildes (~~~). Supports language hints. */
-    TILDES,
+    TILDES;
 }

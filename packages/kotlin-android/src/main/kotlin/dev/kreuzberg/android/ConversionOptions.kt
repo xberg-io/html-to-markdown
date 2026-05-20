@@ -56,9 +56,9 @@ data class ConversionOptions(
     /**
      * Emit tables without column padding (compact GFM format).
      *
-     * When `true`, column widths are not computed and cells are emitted with no trailing spaces.
-     * Separator rows use exactly `---` per column. Produces token-efficient output suitable for RAG
-     * / LLM contexts.
+     * When `true`, column widths are not computed and cells are emitted with
+     * no trailing spaces. Separator rows use exactly `---` per column.
+     * Produces token-efficient output suitable for RAG / LLM contexts.
      *
      * Default `false` (aligned padding preserved).
      */
@@ -66,11 +66,11 @@ data class ConversionOptions(
     /** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
     val highlightStyle: HighlightStyle,
     /**
-     * Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open
-     * Graph, Twitter Card, JSON-LD, …).
+     * Populate `result.metadata` with `<head>` / `<meta>` extraction
+     * (title, description, Open Graph, Twitter Card, JSON-LD, …).
      *
-     * Default `true`. Disabling skips the metadata pass only — table extraction into
-     * `result.tables` runs unconditionally.
+     * Default `true`. Disabling skips the metadata pass only — table
+     * extraction into `result.tables` runs unconditionally.
      */
     val extractMetadata: Boolean,
     /**
@@ -78,8 +78,8 @@ data class ConversionOptions(
      *
      * - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters
      *   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
-     * - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source
-     *   HTML, including runs of spaces and embedded newlines.
+     * - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the
+     *   source HTML, including runs of spaces and embedded newlines.
      *
      * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
      * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
@@ -92,9 +92,9 @@ data class ConversionOptions(
     /**
      * Maximum output line width in characters when `wrap` is `true` (default `80`).
      *
-     * Lines are broken at word boundaries so that no line exceeds this length. A value of `0` is
-     * treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is
-     * `false`.
+     * Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
+     * is treated as "no limit" — equivalent to leaving `wrap` disabled. Has no
+     * effect when `wrap` is `false`.
      */
     val wrapWidth: Long,
     /** Treat the entire document as inline content (no block-level wrappers). */
@@ -116,9 +116,9 @@ data class ConversionOptions(
      * such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
      * vendor-specific markup. See `PreprocessingOptions` for the full set of knobs.
      *
-     * Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set
-     * individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to
-     * opt in or out of specific passes.
+     * Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning
+     * passes. Set individual fields on `PreprocessingOptions` (or construct via
+     * `ConversionOptions.builder`) to opt in or out of specific passes.
      */
     val preprocessing: PreprocessingOptions,
     /** Expected character encoding of the input HTML (default `"utf-8"`). */
@@ -146,28 +146,29 @@ data class ConversionOptions(
     /** Infer image dimensions from data. */
     val inferDimensions: Boolean,
     /**
-     * Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are
-     * silently truncated.
+     * Maximum DOM traversal depth. `null` means unlimited.
+     * When set, subtrees beyond this depth are silently truncated.
      */
     val maxDepth: Long?,
     /**
      * CSS selectors for elements to exclude entirely (element + all content).
      *
-     * Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and
-     * all their descendants are dropped from the output. Supports any CSS selector that `tl`
-     * supports: tag names, `.class`, `#id`, `[attribute]`, etc.
+     * Unlike `strip_tags` (which removes the tag wrapper but keeps children),
+     * excluded elements and all their descendants are dropped from the output.
+     * Supports any CSS selector that `tl` supports: tag names, `.class`,
+     * `#id`, `[attribute]`, etc.
      *
      * Invalid selectors are silently skipped at conversion time.
      *
-     * Example: `vec![".cookie-banner".into(), "#ad-container".into(),
-     * "[role='complementary']".into()]`
+     * Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
      */
     val excludeSelectors: List<String>,
     /**
      * Optional visitor for custom traversal logic.
      *
-     * When set, the visitor's callbacks are invoked for matching HTML elements during conversion,
-     * allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`.
+     * When set, the visitor's callbacks are invoked for matching HTML elements
+     * during conversion, allowing custom output, skipping, or HTML preservation.
+     * See `HtmlVisitor`.
      */
-    val visitor: VisitorHandle?,
+    val visitor: VisitorHandle?
 )

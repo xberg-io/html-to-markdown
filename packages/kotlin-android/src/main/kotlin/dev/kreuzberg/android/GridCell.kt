@@ -34,5 +34,5 @@ data class GridCell(
     /** Number of columns this cell spans (default 1). */
     val colSpan: Int,
     /** Whether this is a header cell (`<th>`). */
-    val isHeader: Boolean,
+    val isHeader: Boolean
 )

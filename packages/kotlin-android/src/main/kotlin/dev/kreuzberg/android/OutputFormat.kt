@@ -32,5 +32,5 @@ enum class OutputFormat {
     /** Djot lightweight markup language. */
     DJOT,
     /** Plain text output (no markup, visible text only). */
-    PLAIN,
+    PLAIN;
 }

@@ -13,7 +13,7 @@ use crate::options::validation::{
 ///
 /// # Example
 ///
-/// ```text
+/// ```rust
 /// use html_to_markdown_rs::ConversionOptions;
 ///
 /// let options = ConversionOptions::builder()

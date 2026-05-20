@@ -32,5 +32,5 @@ enum class WhitespaceMode {
      */
     NORMALIZED,
     /** Preserve all whitespace exactly as it appears in the HTML. */
-    STRICT,
+    STRICT;
 }

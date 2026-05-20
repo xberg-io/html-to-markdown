@@ -45,6 +45,13 @@ class ResultTest {
     }
 
     @Test
+    fun test_result_warning_kind_image_extraction_failed() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: result_warning_kind_image_extraction_failed */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
     fun test_result_warnings_empty_for_clean_input() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: result_warnings_empty_for_clean_input */)

@@ -1,0 +1,107 @@
+[
+  {
+    "id": "metadata_link_type_external_classified",
+    "description": "An https link is extracted into metadata.links when extract_metadata is true",
+    "input": {
+      "html": "<p>See <a href=\"https://example.com\">Example</a> for details.</p>",
+      "options": {
+        "extract_metadata": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.links",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "metadata_link_type_email_classified",
+    "description": "A mailto link is extracted into metadata.links when extract_metadata is true",
+    "input": {
+      "html": "<p>Contact <a href=\"mailto:hello@example.com\">us</a> directly.</p>",
+      "options": {
+        "extract_metadata": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.links",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "metadata_link_type_anchor_classified",
+    "description": "A fragment anchor link is extracted into metadata.links when extract_metadata is true",
+    "input": {
+      "html": "<p>Jump to <a href=\"#section\">section</a> below.</p>",
+      "options": {
+        "extract_metadata": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.links",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "metadata_image_type_data_uri_classified",
+    "description": "A data-URI image is extracted into metadata.images when extract_metadata is true",
+    "input": {
+      "html": "<p><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>",
+      "options": {
+        "extract_metadata": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.images",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "metadata_image_type_external_classified",
+    "description": "An https image URL is extracted into metadata.images when extract_metadata is true",
+    "input": {
+      "html": "<p><img src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>",
+      "options": {
+        "extract_metadata": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "metadata.images",
+        "value": 1
+      }
+    ]
+  }
+]

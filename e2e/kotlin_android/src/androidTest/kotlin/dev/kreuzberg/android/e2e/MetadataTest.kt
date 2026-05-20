@@ -66,6 +66,20 @@ class MetadataTest {
     }
 
     @Test
+    fun test_metadata_image_type_data_uri_classified() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: metadata_image_type_data_uri_classified */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_metadata_image_type_external_classified() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: metadata_image_type_external_classified */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
     fun test_metadata_keywords_meta() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: metadata_keywords_meta */)
@@ -76,6 +90,27 @@ class MetadataTest {
     fun test_metadata_lang_attribute() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: metadata_lang_attribute */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_metadata_link_type_anchor_classified() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: metadata_link_type_anchor_classified */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_metadata_link_type_email_classified() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: metadata_link_type_email_classified */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_metadata_link_type_external_classified() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: metadata_link_type_external_classified */)
         // TODO: assert result is not an error
     }
 

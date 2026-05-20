@@ -32,5 +32,5 @@ enum class PreprocessingPreset {
     /** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
     STANDARD,
     /** Aggressive cleanup. Remove extensive non-content elements and structure. */
-    AGGRESSIVE,
+    AGGRESSIVE;
 }

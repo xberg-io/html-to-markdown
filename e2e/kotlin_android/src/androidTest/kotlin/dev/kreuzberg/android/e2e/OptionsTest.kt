@@ -416,6 +416,13 @@ class OptionsTest {
     }
 
     @Test
+    fun test_options_preprocessing_enabled_false_skips_cleanup() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_preprocessing_enabled_false_skips_cleanup */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
     fun test_options_preprocessing_minimal() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_preprocessing_minimal */)
@@ -426,6 +433,13 @@ class OptionsTest {
     fun test_options_preprocessing_remove_forms() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: options_preprocessing_remove_forms */)
+        // TODO: assert result is not an error
+    }
+
+    @Test
+    fun test_options_preprocessing_remove_navigation_false_keeps_nav() {
+        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
+        val result = client.convert(/* fixture: options_preprocessing_remove_navigation_false_keeps_nav */)
         // TODO: assert result is not an error
     }
 

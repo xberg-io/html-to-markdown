@@ -1348,15 +1348,3 @@ extension Optional where Wrapped == Bool {
         __private__OptionBool(self)
     }
 }
-
-// alef: RustStringRef.toString() shim
-// swift-bridge emits `extension RustString { func toString() }` but the
-// borrowed-reference companion `RustStringRef` (yielded by
-// `RustVecIterator<RustString>.next`) does not get the same shortcut.
-// Without this, `RustVec<RustString>().map { $0.toString() }` fails to
-// resolve because `$0` lands on `RustStringRef`, not `RustString`.
-extension RustStringRef {
-    public func toString() -> String {
-        self.as_str().toString()
-    }
-}

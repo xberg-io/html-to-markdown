@@ -38,5 +38,5 @@ data class LinkMetadata(
     /** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
     val rel: List<String>,
     /** Additional HTML attributes */
-    val attributes: Map<String, String>,
+    val attributes: Map<String, String>
 )

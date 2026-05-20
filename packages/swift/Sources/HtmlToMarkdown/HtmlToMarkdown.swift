@@ -71,7 +71,7 @@ public struct HeaderMetadata: Codable, Sendable, Hashable {
 
 // MARK: - Internal FFI conversions for HeaderMetadata
 internal extension HeaderMetadata {
-    init(_ rb: RustBridge.HeaderMetadata) throws {
+    init(_ rb: RustBridge.HeaderMetadataRef) throws {
         self.level = rb.level()
         self.text = rb.text().toString()
         self.id = rb.id()?.toString()
@@ -164,7 +164,7 @@ public struct StructuredData: Codable, Sendable, Hashable {
 
 // MARK: - Internal FFI conversions for StructuredData
 internal extension StructuredData {
-    init(_ rb: RustBridge.StructuredData) throws {
+    init(_ rb: RustBridge.StructuredDataRef) throws {
         self.dataType = StructuredDataType(rawValue: rb.data_type().toString()) ?? { fatalError("Unknown StructuredDataType: \(rb.data_type().toString())") }()
         self.rawJson = rb.raw_json().toString()
         self.schemaType = rb.schema_type()?.toString()
@@ -202,7 +202,7 @@ public typealias HtmlMetadata = RustBridge.HtmlMetadata
 ///
 /// # Example
 ///
-/// ```text
+/// ```rust
 /// use html_to_markdown_rs::ConversionOptions;
 ///
 /// let options = ConversionOptions::builder()
@@ -299,7 +299,7 @@ public struct TableGrid: Codable, Sendable, Hashable {
 
 // MARK: - Internal FFI conversions for TableGrid
 internal extension TableGrid {
-    init(_ rb: RustBridge.TableGrid) throws {
+    init(_ rb: RustBridge.TableGridRef) throws {
         self.rows = rb.rows()
         self.cols = rb.cols()
         self.cells = try rb.cells().map { try GridCell($0) }
@@ -345,7 +345,7 @@ public struct GridCell: Codable, Sendable, Hashable {
 
 // MARK: - Internal FFI conversions for GridCell
 internal extension GridCell {
-    init(_ rb: RustBridge.GridCell) throws {
+    init(_ rb: RustBridge.GridCellRef) throws {
         self.content = rb.content().toString()
         self.row = rb.row()
         self.col = rb.col()
@@ -374,7 +374,7 @@ public struct TableData: Codable, Sendable, Hashable {
 
 // MARK: - Internal FFI conversions for TableData
 internal extension TableData {
-    init(_ rb: RustBridge.TableData) throws {
+    init(_ rb: RustBridge.TableDataRef) throws {
         self.grid = try TableGrid(rb.grid())
         self.markdown = rb.markdown().toString()
     }
@@ -413,7 +413,7 @@ public struct ProcessingWarning: Codable, Sendable, Hashable {
 
 // MARK: - Internal FFI conversions for ProcessingWarning
 internal extension ProcessingWarning {
-    init(_ rb: RustBridge.ProcessingWarning) throws {
+    init(_ rb: RustBridge.ProcessingWarningRef) throws {
         self.message = rb.message().toString()
         self.kind = WarningKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown WarningKind: \(rb.kind().toString())") }()
     }
@@ -448,6 +448,13 @@ public enum TextDirection: String, Codable, Sendable, Hashable {
     /// Automatic directionality detection
     case auto
 }
+extension TextDirection {
+    func intoRust() throws -> RustBridge.TextDirection {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.textDirectionFromJson(json)
+    }
+}
 
 /// Link classification based on href value and document context.
 ///
@@ -466,6 +473,13 @@ public enum LinkType: String, Codable, Sendable, Hashable {
     /// Other protocol or unclassifiable
     case other
 }
+extension LinkType {
+    func intoRust() throws -> RustBridge.LinkType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.linkTypeFromJson(json)
+    }
+}
 
 /// Image source classification for proper handling and processing.
 ///
@@ -480,6 +494,13 @@ public enum ImageType: String, Codable, Sendable, Hashable {
     /// Relative image path
     case relative
 }
+extension ImageType {
+    func intoRust() throws -> RustBridge.ImageType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.imageTypeFromJson(json)
+    }
+}
 
 /// Structured data format type.
 ///
@@ -491,6 +512,13 @@ public enum StructuredDataType: String, Codable, Sendable, Hashable {
     case microdata
     /// RDF in Attributes (RDFa) markup
     case rdFa = "rdfa"
+}
+extension StructuredDataType {
+    func intoRust() throws -> RustBridge.StructuredDataType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.structuredDataTypeFromJson(json)
+    }
 }
 
 /// HTML preprocessing aggressiveness level.
@@ -570,6 +598,13 @@ public enum NodeContent {
     /// A section grouping container (auto-generated from heading hierarchy).
     case group(label: String?, headingLevel: UInt8?, headingText: String?)
 }
+extension NodeContent {
+    func intoRust() throws -> RustBridge.NodeContent {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.nodeContentFromJson(json)
+    }
+}
 
 /// The type of an inline text annotation.
 ///
@@ -594,6 +629,13 @@ public enum AnnotationKind {
     /// A hyperlink sourced from an `<a href="...">` element.
     case link(url: String, title: String?)
 }
+extension AnnotationKind {
+    func intoRust() throws -> RustBridge.AnnotationKind {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.annotationKindFromJson(json)
+    }
+}
 
 /// Categories of processing warnings.
 public enum WarningKind: String, Codable, Sendable, Hashable {
@@ -609,6 +651,13 @@ public enum WarningKind: String, Codable, Sendable, Hashable {
     case sanitizationApplied = "sanitization_applied"
     /// DOM traversal was truncated because max_depth was exceeded.
     case depthLimitExceeded = "depth_limit_exceeded"
+}
+extension WarningKind {
+    func intoRust() throws -> RustBridge.WarningKind {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.warningKindFromJson(json)
+    }
 }
 
 /// Node type enumeration covering all HTML element types.
@@ -793,6 +842,13 @@ public enum NodeType: String, Codable, Sendable, Hashable {
     /// Custom element (web components) or unknown tag
     case custom = "Custom"
 }
+extension NodeType {
+    func intoRust() throws -> RustBridge.NodeType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.nodeTypeFromJson(json)
+    }
+}
 
 /// Result of a visitor callback.
 ///
@@ -820,6 +876,13 @@ public enum VisitResult {
     /// The conversion process halts and returns this error message.
     case error(field0: String)
 }
+extension VisitResult {
+    func intoRust() throws -> RustBridge.VisitResult {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.visitResultFromJson(json)
+    }
+}
 
 /// Errors that can occur during HTML to Markdown conversion.
 public enum ConversionError: Swift.Error {
@@ -844,12 +907,131 @@ public enum ConversionError: Swift.Error {
 // First-class struct types (Codable) use JSONDecoder directly.
 // Opaque RustBridge types forward to RustBridge.
 
+public func documentMetadataFromJson(_ json: String) throws -> DocumentMetadata {
+    return try RustBridge.documentMetadataFromJson(json)
+}
+
+public func headerMetadataFromJson(_ json: String) throws -> HeaderMetadata {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(HeaderMetadata.self, from: data)
+}
+
+public func linkMetadataFromJson(_ json: String) throws -> LinkMetadata {
+    return try RustBridge.linkMetadataFromJson(json)
+}
+
+public func imageMetadataFromJson(_ json: String) throws -> ImageMetadata {
+    return try RustBridge.imageMetadataFromJson(json)
+}
+
+public func structuredDataFromJson(_ json: String) throws -> StructuredData {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(StructuredData.self, from: data)
+}
+
+public func htmlMetadataFromJson(_ json: String) throws -> HtmlMetadata {
+    return try RustBridge.htmlMetadataFromJson(json)
+}
+
 public func conversionOptionsFromJson(_ json: String) throws -> ConversionOptions {
     return try RustBridge.conversionOptionsFromJson(json)
 }
 
+public func conversionOptionsUpdateFromJson(_ json: String) throws -> ConversionOptionsUpdate {
+    return try RustBridge.conversionOptionsUpdateFromJson(json)
+}
+
+public func preprocessingOptionsFromJson(_ json: String) throws -> PreprocessingOptions {
+    return try RustBridge.preprocessingOptionsFromJson(json)
+}
+
+public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> PreprocessingOptionsUpdate {
+    return try RustBridge.preprocessingOptionsUpdateFromJson(json)
+}
+
+public func documentStructureFromJson(_ json: String) throws -> DocumentStructure {
+    return try RustBridge.documentStructureFromJson(json)
+}
+
+public func documentNodeFromJson(_ json: String) throws -> DocumentNode {
+    return try RustBridge.documentNodeFromJson(json)
+}
+
+public func textAnnotationFromJson(_ json: String) throws -> TextAnnotation {
+    return try RustBridge.textAnnotationFromJson(json)
+}
+
+public func conversionResultFromJson(_ json: String) throws -> ConversionResult {
+    return try RustBridge.conversionResultFromJson(json)
+}
+
+public func tableGridFromJson(_ json: String) throws -> TableGrid {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TableGrid.self, from: data)
+}
+
+public func gridCellFromJson(_ json: String) throws -> GridCell {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(GridCell.self, from: data)
+}
+
+public func tableDataFromJson(_ json: String) throws -> TableData {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TableData.self, from: data)
+}
+
+public func processingWarningFromJson(_ json: String) throws -> ProcessingWarning {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(ProcessingWarning.self, from: data)
+}
+
 public func nodeContextFromJson(_ json: String) throws -> NodeContext {
     return try RustBridge.nodeContextFromJson(json)
+}
+
+public func textDirectionFromJson(_ json: String) throws -> TextDirection {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TextDirection.self, from: data)
+}
+
+public func linkTypeFromJson(_ json: String) throws -> LinkType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(LinkType.self, from: data)
+}
+
+public func imageTypeFromJson(_ json: String) throws -> ImageType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(ImageType.self, from: data)
+}
+
+public func structuredDataTypeFromJson(_ json: String) throws -> StructuredDataType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(StructuredDataType.self, from: data)
+}
+
+public func nodeContentFromJson(_ json: String) throws -> NodeContent {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(NodeContent.self, from: data)
+}
+
+public func annotationKindFromJson(_ json: String) throws -> AnnotationKind {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(AnnotationKind.self, from: data)
+}
+
+public func warningKindFromJson(_ json: String) throws -> WarningKind {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(WarningKind.self, from: data)
+}
+
+public func nodeTypeFromJson(_ json: String) throws -> NodeType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(NodeType.self, from: data)
+}
+
+public func visitResultFromJson(_ json: String) throws -> VisitResult {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(VisitResult.self, from: data)
 }
 
 /// Swift protocol that Swift classes implement to provide visitor callbacks.
