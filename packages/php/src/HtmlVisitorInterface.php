@@ -7,8 +7,8 @@ namespace HtmlToMarkdown;
 /**
  * Callback interface for custom HTML traversal and transformation.
  *
- * Implement this interface and pass your implementation to `ConversionOptions::$visitor`
- * to customize how the HTML document is traversed and converted to Markdown.
+ * Implement this interface and pass your implementation to the `visitor` field of
+ * `ConversionOptions` to customize how the HTML document is traversed and converted to Markdown.
  *
  * All methods have default no-op implementations that return `VisitResult::Continue`.
  * Override only the methods you need.

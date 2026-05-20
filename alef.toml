@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.2"
+alef_version = "0.17.3"
 languages = [
   "python",
   "node",
@@ -119,6 +119,7 @@ sources = [
   "crates/html-to-markdown/src/metadata/types.rs",
   "crates/html-to-markdown/src/visitor/traits.rs",
   "crates/html-to-markdown/src/visitor/types.rs",
+  "crates/html-to-markdown/src/visitor/default_impl.rs",
 ]
 version_from = "Cargo.toml"
 workspace_root = "."

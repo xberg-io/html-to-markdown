@@ -424,11 +424,12 @@ internal extension ProcessingWarning {
     }
 }
 
-/// Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
+/// Shareable, thread-safe handle to a user-provided HTML visitor implementation.
 ///
-/// `Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
-/// can be shared across threads — required by callers that stash configs inside
-/// axum/rmcp/tokio Send-bound contexts.
+/// Pass an instance wrapped in this handle to `ConversionOptions` to
+/// customise how the HTML document is traversed and converted to Markdown.
+/// The handle may be cloned and shared across threads without additional
+/// synchronisation on the caller's side.
 public typealias VisitorHandle = RustBridge.VisitorHandle
 
 /// Context information passed to all visitor methods.
