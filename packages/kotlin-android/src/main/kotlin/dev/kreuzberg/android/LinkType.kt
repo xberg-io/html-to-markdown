@@ -27,28 +27,16 @@ package dev.kreuzberg.android
  * Used to categorize links during extraction for filtering and analysis.
  */
 enum class LinkType {
-    /**
-     * Anchor link within same document (href starts with #)
-     */
+    /** Anchor link within same document (href starts with #) */
     ANCHOR,
-    /**
-     * Internal link within same domain
-     */
+    /** Internal link within same domain */
     INTERNAL,
-    /**
-     * External link to different domain
-     */
+    /** External link to different domain */
     EXTERNAL,
-    /**
-     * Email link (mailto:)
-     */
+    /** Email link (mailto:) */
     EMAIL,
-    /**
-     * Phone link (tel:)
-     */
+    /** Phone link (tel:) */
     PHONE,
-    /**
-     * Other protocol or unclassifiable
-     */
-    OTHER;
+    /** Other protocol or unclassifiable */
+    OTHER,
 }

@@ -24,176 +24,92 @@ package dev.kreuzberg.android
 /**
  * Partial update for `ConversionOptions`.
  *
- * Uses `Option<T>` fields for selective updates. Bindings use this to construct
- * options from language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
+ * Uses `Option<T>` fields for selective updates. Bindings use this to construct options from
+ * language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
  */
 data class ConversionOptionsUpdate(
-    /**
-     * Optional override for `ConversionOptions.heading_style`.
-     */
+    /** Optional override for `ConversionOptions.heading_style`. */
     val headingStyle: HeadingStyle?,
-    /**
-     * Optional override for `ConversionOptions.list_indent_type`.
-     */
+    /** Optional override for `ConversionOptions.list_indent_type`. */
     val listIndentType: ListIndentType?,
-    /**
-     * Optional override for `ConversionOptions.list_indent_width`.
-     */
+    /** Optional override for `ConversionOptions.list_indent_width`. */
     val listIndentWidth: Long?,
-    /**
-     * Optional override for `ConversionOptions.bullets`.
-     */
+    /** Optional override for `ConversionOptions.bullets`. */
     val bullets: String?,
-    /**
-     * Optional override for `ConversionOptions.strong_em_symbol`.
-     */
+    /** Optional override for `ConversionOptions.strong_em_symbol`. */
     val strongEmSymbol: String?,
-    /**
-     * Optional override for `ConversionOptions.escape_asterisks`.
-     */
+    /** Optional override for `ConversionOptions.escape_asterisks`. */
     val escapeAsterisks: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.escape_underscores`.
-     */
+    /** Optional override for `ConversionOptions.escape_underscores`. */
     val escapeUnderscores: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.escape_misc`.
-     */
+    /** Optional override for `ConversionOptions.escape_misc`. */
     val escapeMisc: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.escape_ascii`.
-     */
+    /** Optional override for `ConversionOptions.escape_ascii`. */
     val escapeAscii: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.code_language`.
-     */
+    /** Optional override for `ConversionOptions.code_language`. */
     val codeLanguage: String?,
-    /**
-     * Optional override for `ConversionOptions.autolinks`.
-     */
+    /** Optional override for `ConversionOptions.autolinks`. */
     val autolinks: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.default_title`.
-     */
+    /** Optional override for `ConversionOptions.default_title`. */
     val defaultTitle: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.br_in_tables`.
-     */
+    /** Optional override for `ConversionOptions.br_in_tables`. */
     val brInTables: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.compact_tables`.
-     */
+    /** Optional override for `ConversionOptions.compact_tables`. */
     val compactTables: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.highlight_style`.
-     */
+    /** Optional override for `ConversionOptions.highlight_style`. */
     val highlightStyle: HighlightStyle?,
-    /**
-     * Optional override for `ConversionOptions.extract_metadata`.
-     */
+    /** Optional override for `ConversionOptions.extract_metadata`. */
     val extractMetadata: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.whitespace_mode`.
-     */
+    /** Optional override for `ConversionOptions.whitespace_mode`. */
     val whitespaceMode: WhitespaceMode?,
-    /**
-     * Optional override for `ConversionOptions.strip_newlines`.
-     */
+    /** Optional override for `ConversionOptions.strip_newlines`. */
     val stripNewlines: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.wrap`.
-     */
+    /** Optional override for `ConversionOptions.wrap`. */
     val wrap: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.wrap_width`.
-     */
+    /** Optional override for `ConversionOptions.wrap_width`. */
     val wrapWidth: Long?,
-    /**
-     * Optional override for `ConversionOptions.convert_as_inline`.
-     */
+    /** Optional override for `ConversionOptions.convert_as_inline`. */
     val convertAsInline: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.sub_symbol`.
-     */
+    /** Optional override for `ConversionOptions.sub_symbol`. */
     val subSymbol: String?,
-    /**
-     * Optional override for `ConversionOptions.sup_symbol`.
-     */
+    /** Optional override for `ConversionOptions.sup_symbol`. */
     val supSymbol: String?,
-    /**
-     * Optional override for `ConversionOptions.newline_style`.
-     */
+    /** Optional override for `ConversionOptions.newline_style`. */
     val newlineStyle: NewlineStyle?,
-    /**
-     * Optional override for `ConversionOptions.code_block_style`.
-     */
+    /** Optional override for `ConversionOptions.code_block_style`. */
     val codeBlockStyle: CodeBlockStyle?,
-    /**
-     * Optional override for `ConversionOptions.keep_inline_images_in`.
-     */
+    /** Optional override for `ConversionOptions.keep_inline_images_in`. */
     val keepInlineImagesIn: List<String>?,
-    /**
-     * Optional override for `ConversionOptions.preprocessing`.
-     */
+    /** Optional override for `ConversionOptions.preprocessing`. */
     val preprocessing: PreprocessingOptionsUpdate?,
-    /**
-     * Optional override for `ConversionOptions.encoding`.
-     */
+    /** Optional override for `ConversionOptions.encoding`. */
     val encoding: String?,
-    /**
-     * Optional override for `ConversionOptions.debug`.
-     */
+    /** Optional override for `ConversionOptions.debug`. */
     val debug: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.strip_tags`.
-     */
+    /** Optional override for `ConversionOptions.strip_tags`. */
     val stripTags: List<String>?,
-    /**
-     * Optional override for `ConversionOptions.preserve_tags`.
-     */
+    /** Optional override for `ConversionOptions.preserve_tags`. */
     val preserveTags: List<String>?,
-    /**
-     * Optional override for `ConversionOptions.skip_images`.
-     */
+    /** Optional override for `ConversionOptions.skip_images`. */
     val skipImages: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.link_style`.
-     */
+    /** Optional override for `ConversionOptions.link_style`. */
     val linkStyle: LinkStyle?,
-    /**
-     * Optional override for `ConversionOptions.output_format`.
-     */
+    /** Optional override for `ConversionOptions.output_format`. */
     val outputFormat: OutputFormat?,
-    /**
-     * Optional override for `ConversionOptions.include_document_structure`.
-     */
+    /** Optional override for `ConversionOptions.include_document_structure`. */
     val includeDocumentStructure: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.extract_images`.
-     */
+    /** Optional override for `ConversionOptions.extract_images`. */
     val extractImages: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.max_image_size`.
-     */
+    /** Optional override for `ConversionOptions.max_image_size`. */
     val maxImageSize: Long?,
-    /**
-     * Optional override for `ConversionOptions.capture_svg`.
-     */
+    /** Optional override for `ConversionOptions.capture_svg`. */
     val captureSvg: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.infer_dimensions`.
-     */
+    /** Optional override for `ConversionOptions.infer_dimensions`. */
     val inferDimensions: Boolean?,
-    /**
-     * Optional override for `ConversionOptions.max_depth`.
-     */
+    /** Optional override for `ConversionOptions.max_depth`. */
     val maxDepth: Long??,
-    /**
-     * Optional override for `ConversionOptions.exclude_selectors`.
-     */
+    /** Optional override for `ConversionOptions.exclude_selectors`. */
     val excludeSelectors: List<String>?,
-    /**
-     * Optional override for `ConversionOptions.visitor`.
-     */
-    val visitor: VisitorHandle?
+    /** Optional override for `ConversionOptions.visitor`. */
+    val visitor: VisitorHandle?,
 )

@@ -27,28 +27,16 @@ package dev.kreuzberg.android
  * Represents `<a>` elements with parsed href values, text content, and link type classification.
  */
 data class LinkMetadata(
-    /**
-     * The href URL value
-     */
+    /** The href URL value */
     val href: String,
-    /**
-     * Link text content (normalized, concatenated if mixed with elements)
-     */
+    /** Link text content (normalized, concatenated if mixed with elements) */
     val text: String,
-    /**
-     * Optional title attribute (often shown as tooltip)
-     */
+    /** Optional title attribute (often shown as tooltip) */
     val title: String?,
-    /**
-     * Link type classification
-     */
+    /** Link type classification */
     val linkType: LinkType,
-    /**
-     * Rel attribute values (e.g., "nofollow", "stylesheet", "canonical")
-     */
+    /** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
     val rel: List<String>,
-    /**
-     * Additional HTML attributes
-     */
-    val attributes: Map<String, String>
+    /** Additional HTML attributes */
+    val attributes: Map<String, String>,
 )

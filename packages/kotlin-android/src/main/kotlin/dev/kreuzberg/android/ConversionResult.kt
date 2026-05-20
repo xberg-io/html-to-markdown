@@ -24,40 +24,34 @@ package dev.kreuzberg.android
 /**
  * The primary result of HTML conversion and extraction.
  *
- * Contains the converted text output, optional structured document tree,
- * metadata, extracted tables, images, and processing warnings.
+ * Contains the converted text output, optional structured document tree, metadata, extracted
+ * tables, images, and processing warnings.
  */
 data class ConversionResult(
     /**
      * Converted text output (markdown, djot, or plain text).
      *
-     * `null` when `output_format` is set to `OutputFormat.None`,
-     * indicating extraction-only mode.
+     * `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode.
      */
     val content: String?,
     /**
      * Structured document tree with semantic elements.
      *
-     * Populated when `ConversionOptions.include_document_structure` is `true`. `null`
-     * otherwise (the default), which avoids the overhead of building the tree.
+     * Populated when `ConversionOptions.include_document_structure` is `true`. `null` otherwise
+     * (the default), which avoids the overhead of building the tree.
      *
-     * When present, the tree mirrors the converted document: headings open
-     * `Group` sections, paragraphs and list items carry
-     * inline `TextAnnotation`s, and tables reference the same
+     * When present, the tree mirrors the converted document: headings open `Group` sections,
+     * paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same
      * `TableGrid` data exposed in `Self.tables`.
      *
-     * Note: this field is independent of the `metadata` feature flag. Document structure
-     * collection is always available at runtime; it is gated only by the runtime option, not
-     * by a compile-time feature.
+     * Note: this field is independent of the `metadata` feature flag. Document structure collection
+     * is always available at runtime; it is gated only by the runtime option, not by a compile-time
+     * feature.
      */
     val document: DocumentStructure?,
-    /**
-     * Extracted HTML metadata (title, OG, links, images, structured data).
-     */
+    /** Extracted HTML metadata (title, OG, links, images, structured data). */
     val metadata: HtmlMetadata,
-    /**
-     * Extracted tables with structured cell data and markdown representation.
-     */
+    /** Extracted tables with structured cell data and markdown representation. */
     val tables: List<TableData>,
     /**
      * Extracted inline images (data URIs and SVGs).
@@ -65,8 +59,6 @@ data class ConversionResult(
      * Populated when `extract_images` is `true` in options.
      */
     val images: List<String>,
-    /**
-     * Non-fatal processing warnings.
-     */
-    val warnings: List<ProcessingWarning>
+    /** Non-fatal processing warnings. */
+    val warnings: List<ProcessingWarning>,
 )

@@ -148,20 +148,53 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_box_autoadd_bool(dynamic raw);
 
   @protected
+  CodeBlockStyle dco_decode_box_autoadd_code_block_style(dynamic raw);
+
+  @protected
   ConversionOptions dco_decode_box_autoadd_conversion_options(dynamic raw);
 
   @protected
   DocumentStructure dco_decode_box_autoadd_document_structure(dynamic raw);
 
   @protected
+  HeadingStyle dco_decode_box_autoadd_heading_style(dynamic raw);
+
+  @protected
+  HighlightStyle dco_decode_box_autoadd_highlight_style(dynamic raw);
+
+  @protected
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+
+  @protected
+  LinkStyle dco_decode_box_autoadd_link_style(dynamic raw);
+
+  @protected
+  ListIndentType dco_decode_box_autoadd_list_indent_type(dynamic raw);
+
+  @protected
+  NewlineStyle dco_decode_box_autoadd_newline_style(dynamic raw);
+
+  @protected
+  OutputFormat dco_decode_box_autoadd_output_format(dynamic raw);
 
   @protected
   PreprocessingOptionsUpdate
   dco_decode_box_autoadd_preprocessing_options_update(dynamic raw);
 
   @protected
+  PreprocessingPreset dco_decode_box_autoadd_preprocessing_preset(dynamic raw);
+
+  @protected
   TableGrid dco_decode_box_autoadd_table_grid(dynamic raw);
+
+  @protected
+  TextDirection dco_decode_box_autoadd_text_direction(dynamic raw);
+
+  @protected
+  WhitespaceMode dco_decode_box_autoadd_whitespace_mode(dynamic raw);
+
+  @protected
+  CodeBlockStyle dco_decode_code_block_style(dynamic raw);
 
   @protected
   ConversionOptions dco_decode_conversion_options(dynamic raw);
@@ -188,6 +221,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   HeaderMetadata dco_decode_header_metadata(dynamic raw);
 
   @protected
+  HeadingStyle dco_decode_heading_style(dynamic raw);
+
+  @protected
+  HighlightStyle dco_decode_highlight_style(dynamic raw);
+
+  @protected
   HtmlMetadata dco_decode_html_metadata(dynamic raw);
 
   @protected
@@ -209,6 +248,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LinkMetadata dco_decode_link_metadata(dynamic raw);
 
   @protected
+  LinkStyle dco_decode_link_style(dynamic raw);
+
+  @protected
   LinkType dco_decode_link_type(dynamic raw);
 
   @protected
@@ -225,6 +267,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ImageMetadata> dco_decode_list_image_metadata(dynamic raw);
+
+  @protected
+  ListIndentType dco_decode_list_indent_type(dynamic raw);
 
   @protected
   List<LinkMetadata> dco_decode_list_link_metadata(dynamic raw);
@@ -251,6 +296,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<TextAnnotation> dco_decode_list_text_annotation(dynamic raw);
 
   @protected
+  NewlineStyle dco_decode_newline_style(dynamic raw);
+
+  @protected
   NodeContent dco_decode_node_content(dynamic raw);
 
   @protected
@@ -275,17 +323,49 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
   @protected
+  CodeBlockStyle? dco_decode_opt_box_autoadd_code_block_style(dynamic raw);
+
+  @protected
   ConversionOptions? dco_decode_opt_box_autoadd_conversion_options(dynamic raw);
 
   @protected
   DocumentStructure? dco_decode_opt_box_autoadd_document_structure(dynamic raw);
 
   @protected
+  HeadingStyle? dco_decode_opt_box_autoadd_heading_style(dynamic raw);
+
+  @protected
+  HighlightStyle? dco_decode_opt_box_autoadd_highlight_style(dynamic raw);
+
+  @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+
+  @protected
+  LinkStyle? dco_decode_opt_box_autoadd_link_style(dynamic raw);
+
+  @protected
+  ListIndentType? dco_decode_opt_box_autoadd_list_indent_type(dynamic raw);
+
+  @protected
+  NewlineStyle? dco_decode_opt_box_autoadd_newline_style(dynamic raw);
+
+  @protected
+  OutputFormat? dco_decode_opt_box_autoadd_output_format(dynamic raw);
 
   @protected
   PreprocessingOptionsUpdate?
   dco_decode_opt_box_autoadd_preprocessing_options_update(dynamic raw);
+
+  @protected
+  PreprocessingPreset? dco_decode_opt_box_autoadd_preprocessing_preset(
+    dynamic raw,
+  );
+
+  @protected
+  TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw);
+
+  @protected
+  WhitespaceMode? dco_decode_opt_box_autoadd_whitespace_mode(dynamic raw);
 
   @protected
   List<String>? dco_decode_opt_list_String(dynamic raw);
@@ -294,12 +374,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
 
   @protected
+  OutputFormat dco_decode_output_format(dynamic raw);
+
+  @protected
   PreprocessingOptions dco_decode_preprocessing_options(dynamic raw);
 
   @protected
   PreprocessingOptionsUpdate dco_decode_preprocessing_options_update(
     dynamic raw,
   );
+
+  @protected
+  PreprocessingPreset dco_decode_preprocessing_preset(dynamic raw);
 
   @protected
   ProcessingWarning dco_decode_processing_warning(dynamic raw);
@@ -323,6 +409,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TextAnnotation dco_decode_text_annotation(dynamic raw);
 
   @protected
+  TextDirection dco_decode_text_direction(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
@@ -336,6 +425,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WarningKind dco_decode_warning_kind(dynamic raw);
+
+  @protected
+  WhitespaceMode dco_decode_whitespace_mode(dynamic raw);
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
@@ -379,6 +471,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
+  CodeBlockStyle sse_decode_box_autoadd_code_block_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ConversionOptions sse_decode_box_autoadd_conversion_options(
     SseDeserializer deserializer,
   );
@@ -389,7 +486,35 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  HeadingStyle sse_decode_box_autoadd_heading_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  HighlightStyle sse_decode_box_autoadd_highlight_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
+  LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer);
+
+  @protected
+  ListIndentType sse_decode_box_autoadd_list_indent_type(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NewlineStyle sse_decode_box_autoadd_newline_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  OutputFormat sse_decode_box_autoadd_output_format(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingOptionsUpdate
@@ -398,7 +523,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PreprocessingPreset sse_decode_box_autoadd_preprocessing_preset(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   TableGrid sse_decode_box_autoadd_table_grid(SseDeserializer deserializer);
+
+  @protected
+  TextDirection sse_decode_box_autoadd_text_direction(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  WhitespaceMode sse_decode_box_autoadd_whitespace_mode(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  CodeBlockStyle sse_decode_code_block_style(SseDeserializer deserializer);
 
   @protected
   ConversionOptions sse_decode_conversion_options(SseDeserializer deserializer);
@@ -427,6 +570,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   HeaderMetadata sse_decode_header_metadata(SseDeserializer deserializer);
 
   @protected
+  HeadingStyle sse_decode_heading_style(SseDeserializer deserializer);
+
+  @protected
+  HighlightStyle sse_decode_highlight_style(SseDeserializer deserializer);
+
+  @protected
   HtmlMetadata sse_decode_html_metadata(SseDeserializer deserializer);
 
   @protected
@@ -446,6 +595,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LinkMetadata sse_decode_link_metadata(SseDeserializer deserializer);
+
+  @protected
+  LinkStyle sse_decode_link_style(SseDeserializer deserializer);
 
   @protected
   LinkType sse_decode_link_type(SseDeserializer deserializer);
@@ -470,6 +622,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ImageMetadata> sse_decode_list_image_metadata(
     SseDeserializer deserializer,
   );
+
+  @protected
+  ListIndentType sse_decode_list_indent_type(SseDeserializer deserializer);
 
   @protected
   List<LinkMetadata> sse_decode_list_link_metadata(
@@ -506,6 +661,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  NewlineStyle sse_decode_newline_style(SseDeserializer deserializer);
+
+  @protected
   NodeContent sse_decode_node_content(SseDeserializer deserializer);
 
   @protected
@@ -532,6 +690,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
+  CodeBlockStyle? sse_decode_opt_box_autoadd_code_block_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ConversionOptions? sse_decode_opt_box_autoadd_conversion_options(
     SseDeserializer deserializer,
   );
@@ -542,11 +705,56 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  HeadingStyle? sse_decode_opt_box_autoadd_heading_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  HighlightStyle? sse_decode_opt_box_autoadd_highlight_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
+  LinkStyle? sse_decode_opt_box_autoadd_link_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ListIndentType? sse_decode_opt_box_autoadd_list_indent_type(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NewlineStyle? sse_decode_opt_box_autoadd_newline_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  OutputFormat? sse_decode_opt_box_autoadd_output_format(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingOptionsUpdate?
   sse_decode_opt_box_autoadd_preprocessing_options_update(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PreprocessingPreset? sse_decode_opt_box_autoadd_preprocessing_preset(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  TextDirection? sse_decode_opt_box_autoadd_text_direction(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  WhitespaceMode? sse_decode_opt_box_autoadd_whitespace_mode(
     SseDeserializer deserializer,
   );
 
@@ -557,12 +765,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
 
   @protected
+  OutputFormat sse_decode_output_format(SseDeserializer deserializer);
+
+  @protected
   PreprocessingOptions sse_decode_preprocessing_options(
     SseDeserializer deserializer,
   );
 
   @protected
   PreprocessingOptionsUpdate sse_decode_preprocessing_options_update(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PreprocessingPreset sse_decode_preprocessing_preset(
     SseDeserializer deserializer,
   );
 
@@ -592,6 +808,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TextAnnotation sse_decode_text_annotation(SseDeserializer deserializer);
 
   @protected
+  TextDirection sse_decode_text_direction(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
@@ -605,6 +824,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WarningKind sse_decode_warning_kind(SseDeserializer deserializer);
+
+  @protected
+  WhitespaceMode sse_decode_whitespace_mode(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -757,6 +979,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_code_block_style(
+    CodeBlockStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_conversion_options(
     ConversionOptions self,
     SseSerializer serializer,
@@ -769,8 +997,44 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_heading_style(
+    HeadingStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_highlight_style(
+    HighlightStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_i_64(
     PlatformInt64 self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_link_style(
+    LinkStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_list_indent_type(
+    ListIndentType self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_newline_style(
+    NewlineStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_output_format(
+    OutputFormat self,
     SseSerializer serializer,
   );
 
@@ -781,8 +1045,32 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_preprocessing_preset(
+    PreprocessingPreset self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_table_grid(
     TableGrid self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_text_direction(
+    TextDirection self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_whitespace_mode(
+    WhitespaceMode self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_code_block_style(
+    CodeBlockStyle self,
     SseSerializer serializer,
   );
 
@@ -829,6 +1117,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_heading_style(HeadingStyle self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_highlight_style(
+    HighlightStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_html_metadata(HtmlMetadata self, SseSerializer serializer);
 
   @protected
@@ -848,6 +1145,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_link_metadata(LinkMetadata self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_link_style(LinkStyle self, SseSerializer serializer);
 
   @protected
   void sse_encode_link_type(LinkType self, SseSerializer serializer);
@@ -873,6 +1173,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_image_metadata(
     List<ImageMetadata> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_indent_type(
+    ListIndentType self,
     SseSerializer serializer,
   );
 
@@ -925,6 +1231,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_newline_style(NewlineStyle self, SseSerializer serializer);
+
+  @protected
   void sse_encode_node_content(NodeContent self, SseSerializer serializer);
 
   @protected
@@ -953,6 +1262,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_code_block_style(
+    CodeBlockStyle? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_conversion_options(
     ConversionOptions? self,
     SseSerializer serializer,
@@ -965,14 +1280,68 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_heading_style(
+    HeadingStyle? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_highlight_style(
+    HighlightStyle? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_i_64(
     PlatformInt64? self,
     SseSerializer serializer,
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_link_style(
+    LinkStyle? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_list_indent_type(
+    ListIndentType? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_newline_style(
+    NewlineStyle? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_output_format(
+    OutputFormat? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_preprocessing_options_update(
     PreprocessingOptionsUpdate? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_preprocessing_preset(
+    PreprocessingPreset? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_text_direction(
+    TextDirection? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_whitespace_mode(
+    WhitespaceMode? self,
     SseSerializer serializer,
   );
 
@@ -986,6 +1355,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_output_format(OutputFormat self, SseSerializer serializer);
+
+  @protected
   void sse_encode_preprocessing_options(
     PreprocessingOptions self,
     SseSerializer serializer,
@@ -994,6 +1366,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_preprocessing_options_update(
     PreprocessingOptionsUpdate self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_preprocessing_preset(
+    PreprocessingPreset self,
     SseSerializer serializer,
   );
 
@@ -1034,6 +1412,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_text_direction(TextDirection self, SseSerializer serializer);
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
@@ -1047,6 +1428,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_warning_kind(WarningKind self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_whitespace_mode(
+    WhitespaceMode self,
+    SseSerializer serializer,
+  );
 }
 
 // Section: wire_class

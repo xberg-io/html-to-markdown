@@ -865,8 +865,8 @@ const _: fn() = || {
     }
     {
         let ConversionOptions = None::<crate::ConversionOptions>.unwrap();
-        let _: String = ConversionOptions.heading_style;
-        let _: String = ConversionOptions.list_indent_type;
+        let _: crate::HeadingStyle = ConversionOptions.heading_style;
+        let _: crate::ListIndentType = ConversionOptions.list_indent_type;
         let _: i64 = ConversionOptions.list_indent_width;
         let _: String = ConversionOptions.bullets;
         let _: String = ConversionOptions.strong_em_symbol;
@@ -879,17 +879,17 @@ const _: fn() = || {
         let _: bool = ConversionOptions.default_title;
         let _: bool = ConversionOptions.br_in_tables;
         let _: bool = ConversionOptions.compact_tables;
-        let _: String = ConversionOptions.highlight_style;
+        let _: crate::HighlightStyle = ConversionOptions.highlight_style;
         let _: bool = ConversionOptions.extract_metadata;
-        let _: String = ConversionOptions.whitespace_mode;
+        let _: crate::WhitespaceMode = ConversionOptions.whitespace_mode;
         let _: bool = ConversionOptions.strip_newlines;
         let _: bool = ConversionOptions.wrap;
         let _: i64 = ConversionOptions.wrap_width;
         let _: bool = ConversionOptions.convert_as_inline;
         let _: String = ConversionOptions.sub_symbol;
         let _: String = ConversionOptions.sup_symbol;
-        let _: String = ConversionOptions.newline_style;
-        let _: String = ConversionOptions.code_block_style;
+        let _: crate::NewlineStyle = ConversionOptions.newline_style;
+        let _: crate::CodeBlockStyle = ConversionOptions.code_block_style;
         let _: Vec<String> = ConversionOptions.keep_inline_images_in;
         let _: crate::PreprocessingOptions = ConversionOptions.preprocessing;
         let _: String = ConversionOptions.encoding;
@@ -897,8 +897,8 @@ const _: fn() = || {
         let _: Vec<String> = ConversionOptions.strip_tags;
         let _: Vec<String> = ConversionOptions.preserve_tags;
         let _: bool = ConversionOptions.skip_images;
-        let _: String = ConversionOptions.link_style;
-        let _: String = ConversionOptions.output_format;
+        let _: crate::LinkStyle = ConversionOptions.link_style;
+        let _: crate::OutputFormat = ConversionOptions.output_format;
         let _: bool = ConversionOptions.include_document_structure;
         let _: bool = ConversionOptions.extract_images;
         let _: i64 = ConversionOptions.max_image_size;
@@ -910,8 +910,8 @@ const _: fn() = || {
     }
     {
         let ConversionOptionsUpdate = None::<crate::ConversionOptionsUpdate>.unwrap();
-        let _: Option<String> = ConversionOptionsUpdate.heading_style;
-        let _: Option<String> = ConversionOptionsUpdate.list_indent_type;
+        let _: Option<crate::HeadingStyle> = ConversionOptionsUpdate.heading_style;
+        let _: Option<crate::ListIndentType> = ConversionOptionsUpdate.list_indent_type;
         let _: Option<i64> = ConversionOptionsUpdate.list_indent_width;
         let _: Option<String> = ConversionOptionsUpdate.bullets;
         let _: Option<String> = ConversionOptionsUpdate.strong_em_symbol;
@@ -924,17 +924,17 @@ const _: fn() = || {
         let _: Option<bool> = ConversionOptionsUpdate.default_title;
         let _: Option<bool> = ConversionOptionsUpdate.br_in_tables;
         let _: Option<bool> = ConversionOptionsUpdate.compact_tables;
-        let _: Option<String> = ConversionOptionsUpdate.highlight_style;
+        let _: Option<crate::HighlightStyle> = ConversionOptionsUpdate.highlight_style;
         let _: Option<bool> = ConversionOptionsUpdate.extract_metadata;
-        let _: Option<String> = ConversionOptionsUpdate.whitespace_mode;
+        let _: Option<crate::WhitespaceMode> = ConversionOptionsUpdate.whitespace_mode;
         let _: Option<bool> = ConversionOptionsUpdate.strip_newlines;
         let _: Option<bool> = ConversionOptionsUpdate.wrap;
         let _: Option<i64> = ConversionOptionsUpdate.wrap_width;
         let _: Option<bool> = ConversionOptionsUpdate.convert_as_inline;
         let _: Option<String> = ConversionOptionsUpdate.sub_symbol;
         let _: Option<String> = ConversionOptionsUpdate.sup_symbol;
-        let _: Option<String> = ConversionOptionsUpdate.newline_style;
-        let _: Option<String> = ConversionOptionsUpdate.code_block_style;
+        let _: Option<crate::NewlineStyle> = ConversionOptionsUpdate.newline_style;
+        let _: Option<crate::CodeBlockStyle> = ConversionOptionsUpdate.code_block_style;
         let _: Option<Vec<String>> = ConversionOptionsUpdate.keep_inline_images_in;
         let _: Option<crate::PreprocessingOptionsUpdate> = ConversionOptionsUpdate.preprocessing;
         let _: Option<String> = ConversionOptionsUpdate.encoding;
@@ -942,8 +942,8 @@ const _: fn() = || {
         let _: Option<Vec<String>> = ConversionOptionsUpdate.strip_tags;
         let _: Option<Vec<String>> = ConversionOptionsUpdate.preserve_tags;
         let _: Option<bool> = ConversionOptionsUpdate.skip_images;
-        let _: Option<String> = ConversionOptionsUpdate.link_style;
-        let _: Option<String> = ConversionOptionsUpdate.output_format;
+        let _: Option<crate::LinkStyle> = ConversionOptionsUpdate.link_style;
+        let _: Option<crate::OutputFormat> = ConversionOptionsUpdate.output_format;
         let _: Option<bool> = ConversionOptionsUpdate.include_document_structure;
         let _: Option<bool> = ConversionOptionsUpdate.extract_images;
         let _: Option<i64> = ConversionOptionsUpdate.max_image_size;
@@ -971,7 +971,7 @@ const _: fn() = || {
         let _: Option<String> = DocumentMetadata.canonical_url;
         let _: Option<String> = DocumentMetadata.base_href;
         let _: Option<String> = DocumentMetadata.language;
-        let _: Option<String> = DocumentMetadata.text_direction;
+        let _: Option<crate::TextDirection> = DocumentMetadata.text_direction;
         let _: std::collections::HashMap<String, String> = DocumentMetadata.open_graph;
         let _: std::collections::HashMap<String, String> = DocumentMetadata.twitter_card;
         let _: std::collections::HashMap<String, String> = DocumentMetadata.meta_tags;
@@ -1099,14 +1099,14 @@ const _: fn() = || {
     {
         let PreprocessingOptions = None::<crate::PreprocessingOptions>.unwrap();
         let _: bool = PreprocessingOptions.enabled;
-        let _: String = PreprocessingOptions.preset;
+        let _: crate::PreprocessingPreset = PreprocessingOptions.preset;
         let _: bool = PreprocessingOptions.remove_navigation;
         let _: bool = PreprocessingOptions.remove_forms;
     }
     {
         let PreprocessingOptionsUpdate = None::<crate::PreprocessingOptionsUpdate>.unwrap();
         let _: Option<bool> = PreprocessingOptionsUpdate.enabled;
-        let _: Option<String> = PreprocessingOptionsUpdate.preset;
+        let _: Option<crate::PreprocessingPreset> = PreprocessingOptionsUpdate.preset;
         let _: Option<bool> = PreprocessingOptionsUpdate.remove_navigation;
         let _: Option<bool> = PreprocessingOptionsUpdate.remove_forms;
     }
@@ -1780,11 +1780,24 @@ impl SseDecode for bool {
     }
 }
 
+impl SseDecode for crate::CodeBlockStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::CodeBlockStyle::Indented,
+            1 => crate::CodeBlockStyle::Backticks,
+            2 => crate::CodeBlockStyle::Tildes,
+            _ => unreachable!("Invalid variant for CodeBlockStyle: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::ConversionOptions {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_headingStyle = <String>::sse_decode(deserializer);
-        let mut var_listIndentType = <String>::sse_decode(deserializer);
+        let mut var_headingStyle = <crate::HeadingStyle>::sse_decode(deserializer);
+        let mut var_listIndentType = <crate::ListIndentType>::sse_decode(deserializer);
         let mut var_listIndentWidth = <i64>::sse_decode(deserializer);
         let mut var_bullets = <String>::sse_decode(deserializer);
         let mut var_strongEmSymbol = <String>::sse_decode(deserializer);
@@ -1797,17 +1810,17 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_defaultTitle = <bool>::sse_decode(deserializer);
         let mut var_brInTables = <bool>::sse_decode(deserializer);
         let mut var_compactTables = <bool>::sse_decode(deserializer);
-        let mut var_highlightStyle = <String>::sse_decode(deserializer);
+        let mut var_highlightStyle = <crate::HighlightStyle>::sse_decode(deserializer);
         let mut var_extractMetadata = <bool>::sse_decode(deserializer);
-        let mut var_whitespaceMode = <String>::sse_decode(deserializer);
+        let mut var_whitespaceMode = <crate::WhitespaceMode>::sse_decode(deserializer);
         let mut var_stripNewlines = <bool>::sse_decode(deserializer);
         let mut var_wrap = <bool>::sse_decode(deserializer);
         let mut var_wrapWidth = <i64>::sse_decode(deserializer);
         let mut var_convertAsInline = <bool>::sse_decode(deserializer);
         let mut var_subSymbol = <String>::sse_decode(deserializer);
         let mut var_supSymbol = <String>::sse_decode(deserializer);
-        let mut var_newlineStyle = <String>::sse_decode(deserializer);
-        let mut var_codeBlockStyle = <String>::sse_decode(deserializer);
+        let mut var_newlineStyle = <crate::NewlineStyle>::sse_decode(deserializer);
+        let mut var_codeBlockStyle = <crate::CodeBlockStyle>::sse_decode(deserializer);
         let mut var_keepInlineImagesIn = <Vec<String>>::sse_decode(deserializer);
         let mut var_preprocessing = <crate::PreprocessingOptions>::sse_decode(deserializer);
         let mut var_encoding = <String>::sse_decode(deserializer);
@@ -1815,8 +1828,8 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_stripTags = <Vec<String>>::sse_decode(deserializer);
         let mut var_preserveTags = <Vec<String>>::sse_decode(deserializer);
         let mut var_skipImages = <bool>::sse_decode(deserializer);
-        let mut var_linkStyle = <String>::sse_decode(deserializer);
-        let mut var_outputFormat = <String>::sse_decode(deserializer);
+        let mut var_linkStyle = <crate::LinkStyle>::sse_decode(deserializer);
+        let mut var_outputFormat = <crate::OutputFormat>::sse_decode(deserializer);
         let mut var_includeDocumentStructure = <bool>::sse_decode(deserializer);
         let mut var_extractImages = <bool>::sse_decode(deserializer);
         let mut var_maxImageSize = <i64>::sse_decode(deserializer);
@@ -1875,8 +1888,8 @@ impl SseDecode for crate::ConversionOptions {
 impl SseDecode for crate::ConversionOptionsUpdate {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_headingStyle = <Option<String>>::sse_decode(deserializer);
-        let mut var_listIndentType = <Option<String>>::sse_decode(deserializer);
+        let mut var_headingStyle = <Option<crate::HeadingStyle>>::sse_decode(deserializer);
+        let mut var_listIndentType = <Option<crate::ListIndentType>>::sse_decode(deserializer);
         let mut var_listIndentWidth = <Option<i64>>::sse_decode(deserializer);
         let mut var_bullets = <Option<String>>::sse_decode(deserializer);
         let mut var_strongEmSymbol = <Option<String>>::sse_decode(deserializer);
@@ -1889,17 +1902,17 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_defaultTitle = <Option<bool>>::sse_decode(deserializer);
         let mut var_brInTables = <Option<bool>>::sse_decode(deserializer);
         let mut var_compactTables = <Option<bool>>::sse_decode(deserializer);
-        let mut var_highlightStyle = <Option<String>>::sse_decode(deserializer);
+        let mut var_highlightStyle = <Option<crate::HighlightStyle>>::sse_decode(deserializer);
         let mut var_extractMetadata = <Option<bool>>::sse_decode(deserializer);
-        let mut var_whitespaceMode = <Option<String>>::sse_decode(deserializer);
+        let mut var_whitespaceMode = <Option<crate::WhitespaceMode>>::sse_decode(deserializer);
         let mut var_stripNewlines = <Option<bool>>::sse_decode(deserializer);
         let mut var_wrap = <Option<bool>>::sse_decode(deserializer);
         let mut var_wrapWidth = <Option<i64>>::sse_decode(deserializer);
         let mut var_convertAsInline = <Option<bool>>::sse_decode(deserializer);
         let mut var_subSymbol = <Option<String>>::sse_decode(deserializer);
         let mut var_supSymbol = <Option<String>>::sse_decode(deserializer);
-        let mut var_newlineStyle = <Option<String>>::sse_decode(deserializer);
-        let mut var_codeBlockStyle = <Option<String>>::sse_decode(deserializer);
+        let mut var_newlineStyle = <Option<crate::NewlineStyle>>::sse_decode(deserializer);
+        let mut var_codeBlockStyle = <Option<crate::CodeBlockStyle>>::sse_decode(deserializer);
         let mut var_keepInlineImagesIn = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_preprocessing = <Option<crate::PreprocessingOptionsUpdate>>::sse_decode(deserializer);
         let mut var_encoding = <Option<String>>::sse_decode(deserializer);
@@ -1907,8 +1920,8 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_stripTags = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_preserveTags = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_skipImages = <Option<bool>>::sse_decode(deserializer);
-        let mut var_linkStyle = <Option<String>>::sse_decode(deserializer);
-        let mut var_outputFormat = <Option<String>>::sse_decode(deserializer);
+        let mut var_linkStyle = <Option<crate::LinkStyle>>::sse_decode(deserializer);
+        let mut var_outputFormat = <Option<crate::OutputFormat>>::sse_decode(deserializer);
         let mut var_includeDocumentStructure = <Option<bool>>::sse_decode(deserializer);
         let mut var_extractImages = <Option<bool>>::sse_decode(deserializer);
         let mut var_maxImageSize = <Option<i64>>::sse_decode(deserializer);
@@ -1994,7 +2007,7 @@ impl SseDecode for crate::DocumentMetadata {
         let mut var_canonicalUrl = <Option<String>>::sse_decode(deserializer);
         let mut var_baseHref = <Option<String>>::sse_decode(deserializer);
         let mut var_language = <Option<String>>::sse_decode(deserializer);
-        let mut var_textDirection = <Option<String>>::sse_decode(deserializer);
+        let mut var_textDirection = <Option<crate::TextDirection>>::sse_decode(deserializer);
         let mut var_openGraph = <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         let mut var_twitterCard = <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         let mut var_metaTags = <std::collections::HashMap<String, String>>::sse_decode(deserializer);
@@ -2080,6 +2093,33 @@ impl SseDecode for crate::HeaderMetadata {
             id: var_id,
             depth: var_depth,
             html_offset: var_htmlOffset,
+        };
+    }
+}
+
+impl SseDecode for crate::HeadingStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::HeadingStyle::Underlined,
+            1 => crate::HeadingStyle::Atx,
+            2 => crate::HeadingStyle::AtxClosed,
+            _ => unreachable!("Invalid variant for HeadingStyle: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::HighlightStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::HighlightStyle::DoubleEqual,
+            1 => crate::HighlightStyle::Html,
+            2 => crate::HighlightStyle::Bold,
+            3 => crate::HighlightStyle::None,
+            _ => unreachable!("Invalid variant for HighlightStyle: {}", inner),
         };
     }
 }
@@ -2177,6 +2217,18 @@ impl SseDecode for crate::LinkMetadata {
     }
 }
 
+impl SseDecode for crate::LinkStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::LinkStyle::Inline,
+            1 => crate::LinkStyle::Reference,
+            _ => unreachable!("Invalid variant for LinkStyle: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::LinkType {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2250,6 +2302,18 @@ impl SseDecode for Vec<crate::ImageMetadata> {
             ans_.push(<crate::ImageMetadata>::sse_decode(deserializer));
         }
         return ans_;
+    }
+}
+
+impl SseDecode for crate::ListIndentType {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::ListIndentType::Spaces,
+            1 => crate::ListIndentType::Tabs,
+            _ => unreachable!("Invalid variant for ListIndentType: {}", inner),
+        };
     }
 }
 
@@ -2346,6 +2410,18 @@ impl SseDecode for Vec<crate::TextAnnotation> {
             ans_.push(<crate::TextAnnotation>::sse_decode(deserializer));
         }
         return ans_;
+    }
+}
+
+impl SseDecode for crate::NewlineStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::NewlineStyle::Spaces,
+            1 => crate::NewlineStyle::Backslash,
+            _ => unreachable!("Invalid variant for NewlineStyle: {}", inner),
+        };
     }
 }
 
@@ -2603,6 +2679,17 @@ impl SseDecode for Option<bool> {
     }
 }
 
+impl SseDecode for Option<crate::CodeBlockStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::CodeBlockStyle>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::ConversionOptions> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2625,6 +2712,28 @@ impl SseDecode for Option<crate::DocumentStructure> {
     }
 }
 
+impl SseDecode for Option<crate::HeadingStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::HeadingStyle>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::HighlightStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::HighlightStyle>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<i64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2636,11 +2745,88 @@ impl SseDecode for Option<i64> {
     }
 }
 
+impl SseDecode for Option<crate::LinkStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::LinkStyle>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::ListIndentType> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::ListIndentType>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::NewlineStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::NewlineStyle>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::OutputFormat> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::OutputFormat>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::PreprocessingOptionsUpdate> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<crate::PreprocessingOptionsUpdate>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::PreprocessingPreset> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::PreprocessingPreset>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::TextDirection> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::TextDirection>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::WhitespaceMode> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::WhitespaceMode>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -2669,11 +2855,24 @@ impl SseDecode for Option<Vec<i64>> {
     }
 }
 
+impl SseDecode for crate::OutputFormat {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::OutputFormat::Markdown,
+            1 => crate::OutputFormat::Djot,
+            2 => crate::OutputFormat::Plain,
+            _ => unreachable!("Invalid variant for OutputFormat: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::PreprocessingOptions {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_enabled = <bool>::sse_decode(deserializer);
-        let mut var_preset = <String>::sse_decode(deserializer);
+        let mut var_preset = <crate::PreprocessingPreset>::sse_decode(deserializer);
         let mut var_removeNavigation = <bool>::sse_decode(deserializer);
         let mut var_removeForms = <bool>::sse_decode(deserializer);
         return crate::PreprocessingOptions {
@@ -2689,7 +2888,7 @@ impl SseDecode for crate::PreprocessingOptionsUpdate {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_enabled = <Option<bool>>::sse_decode(deserializer);
-        let mut var_preset = <Option<String>>::sse_decode(deserializer);
+        let mut var_preset = <Option<crate::PreprocessingPreset>>::sse_decode(deserializer);
         let mut var_removeNavigation = <Option<bool>>::sse_decode(deserializer);
         let mut var_removeForms = <Option<bool>>::sse_decode(deserializer);
         return crate::PreprocessingOptionsUpdate {
@@ -2697,6 +2896,19 @@ impl SseDecode for crate::PreprocessingOptionsUpdate {
             preset: var_preset,
             remove_navigation: var_removeNavigation,
             remove_forms: var_removeForms,
+        };
+    }
+}
+
+impl SseDecode for crate::PreprocessingPreset {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::PreprocessingPreset::Minimal,
+            1 => crate::PreprocessingPreset::Standard,
+            2 => crate::PreprocessingPreset::Aggressive,
+            _ => unreachable!("Invalid variant for PreprocessingPreset: {}", inner),
         };
     }
 }
@@ -2789,6 +3001,19 @@ impl SseDecode for crate::TextAnnotation {
     }
 }
 
+impl SseDecode for crate::TextDirection {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::TextDirection::LeftToRight,
+            1 => crate::TextDirection::RightToLeft,
+            2 => crate::TextDirection::Auto,
+            _ => unreachable!("Invalid variant for TextDirection: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for u8 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2849,6 +3074,18 @@ impl SseDecode for crate::WarningKind {
             4 => crate::WarningKind::SanitizationApplied,
             5 => crate::WarningKind::DepthLimitExceeded,
             _ => unreachable!("Invalid variant for WarningKind: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::WhitespaceMode {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::WhitespaceMode::Normalized,
+            1 => crate::WhitespaceMode::Strict,
+            _ => unreachable!("Invalid variant for WhitespaceMode: {}", inner),
         };
     }
 }
@@ -2943,6 +3180,23 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::AnnotationKind> {
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::AnnotationKind> {}
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::AnnotationKind>> for crate::AnnotationKind {
     fn into_into_dart(self) -> FrbWrapper<crate::AnnotationKind> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::CodeBlockStyle> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::CodeBlockStyle::Indented => 0.into_dart(),
+            crate::CodeBlockStyle::Backticks => 1.into_dart(),
+            crate::CodeBlockStyle::Tildes => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::CodeBlockStyle> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::CodeBlockStyle>> for crate::CodeBlockStyle {
+    fn into_into_dart(self) -> FrbWrapper<crate::CodeBlockStyle> {
         self.into()
     }
 }
@@ -3179,6 +3433,41 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::HeaderMetadata>> for cr
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::HeadingStyle> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::HeadingStyle::Underlined => 0.into_dart(),
+            crate::HeadingStyle::Atx => 1.into_dart(),
+            crate::HeadingStyle::AtxClosed => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::HeadingStyle> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::HeadingStyle>> for crate::HeadingStyle {
+    fn into_into_dart(self) -> FrbWrapper<crate::HeadingStyle> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::HighlightStyle> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::HighlightStyle::DoubleEqual => 0.into_dart(),
+            crate::HighlightStyle::Html => 1.into_dart(),
+            crate::HighlightStyle::Bold => 2.into_dart(),
+            crate::HighlightStyle::None => 3.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::HighlightStyle> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::HighlightStyle>> for crate::HighlightStyle {
+    fn into_into_dart(self) -> FrbWrapper<crate::HighlightStyle> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::HtmlMetadata> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3256,6 +3545,22 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::LinkMetadata>> for crat
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::LinkStyle> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::LinkStyle::Inline => 0.into_dart(),
+            crate::LinkStyle::Reference => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::LinkStyle> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::LinkStyle>> for crate::LinkStyle {
+    fn into_into_dart(self) -> FrbWrapper<crate::LinkStyle> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::LinkType> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self.0 {
@@ -3272,6 +3577,38 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::LinkType> {
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::LinkType> {}
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::LinkType>> for crate::LinkType {
     fn into_into_dart(self) -> FrbWrapper<crate::LinkType> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ListIndentType> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::ListIndentType::Spaces => 0.into_dart(),
+            crate::ListIndentType::Tabs => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::ListIndentType> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::ListIndentType>> for crate::ListIndentType {
+    fn into_into_dart(self) -> FrbWrapper<crate::ListIndentType> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::NewlineStyle> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::NewlineStyle::Spaces => 0.into_dart(),
+            crate::NewlineStyle::Backslash => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::NewlineStyle> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::NewlineStyle>> for crate::NewlineStyle {
+    fn into_into_dart(self) -> FrbWrapper<crate::NewlineStyle> {
         self.into()
     }
 }
@@ -3470,6 +3807,23 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::NodeType>> for crate::N
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::OutputFormat> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::OutputFormat::Markdown => 0.into_dart(),
+            crate::OutputFormat::Djot => 1.into_dart(),
+            crate::OutputFormat::Plain => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::OutputFormat> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::OutputFormat>> for crate::OutputFormat {
+    fn into_into_dart(self) -> FrbWrapper<crate::OutputFormat> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::PreprocessingOptions> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3504,6 +3858,23 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::PreprocessingOptionsUpd
     for crate::PreprocessingOptionsUpdate
 {
     fn into_into_dart(self) -> FrbWrapper<crate::PreprocessingOptionsUpdate> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::PreprocessingPreset> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::PreprocessingPreset::Minimal => 0.into_dart(),
+            crate::PreprocessingPreset::Standard => 1.into_dart(),
+            crate::PreprocessingPreset::Aggressive => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::PreprocessingPreset> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::PreprocessingPreset>> for crate::PreprocessingPreset {
+    fn into_into_dart(self) -> FrbWrapper<crate::PreprocessingPreset> {
         self.into()
     }
 }
@@ -3608,6 +3979,23 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::TextAnnotation>> for cr
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::TextDirection> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::TextDirection::LeftToRight => 0.into_dart(),
+            crate::TextDirection::RightToLeft => 1.into_dart(),
+            crate::TextDirection::Auto => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::TextDirection> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::TextDirection>> for crate::TextDirection {
+    fn into_into_dart(self) -> FrbWrapper<crate::TextDirection> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::VisitResult> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self.0 {
@@ -3645,6 +4033,22 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::WarningKind> {
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::WarningKind> {}
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::WarningKind>> for crate::WarningKind {
     fn into_into_dart(self) -> FrbWrapper<crate::WarningKind> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::WhitespaceMode> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::WhitespaceMode::Normalized => 0.into_dart(),
+            crate::WhitespaceMode::Strict => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::WhitespaceMode> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::WhitespaceMode>> for crate::WhitespaceMode {
+    fn into_into_dart(self) -> FrbWrapper<crate::WhitespaceMode> {
         self.into()
     }
 }
@@ -3743,11 +4147,28 @@ impl SseEncode for bool {
     }
 }
 
+impl SseEncode for crate::CodeBlockStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::CodeBlockStyle::Indented => 0,
+                crate::CodeBlockStyle::Backticks => 1,
+                crate::CodeBlockStyle::Tildes => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for crate::ConversionOptions {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.heading_style, serializer);
-        <String>::sse_encode(self.list_indent_type, serializer);
+        <crate::HeadingStyle>::sse_encode(self.heading_style, serializer);
+        <crate::ListIndentType>::sse_encode(self.list_indent_type, serializer);
         <i64>::sse_encode(self.list_indent_width, serializer);
         <String>::sse_encode(self.bullets, serializer);
         <String>::sse_encode(self.strong_em_symbol, serializer);
@@ -3760,17 +4181,17 @@ impl SseEncode for crate::ConversionOptions {
         <bool>::sse_encode(self.default_title, serializer);
         <bool>::sse_encode(self.br_in_tables, serializer);
         <bool>::sse_encode(self.compact_tables, serializer);
-        <String>::sse_encode(self.highlight_style, serializer);
+        <crate::HighlightStyle>::sse_encode(self.highlight_style, serializer);
         <bool>::sse_encode(self.extract_metadata, serializer);
-        <String>::sse_encode(self.whitespace_mode, serializer);
+        <crate::WhitespaceMode>::sse_encode(self.whitespace_mode, serializer);
         <bool>::sse_encode(self.strip_newlines, serializer);
         <bool>::sse_encode(self.wrap, serializer);
         <i64>::sse_encode(self.wrap_width, serializer);
         <bool>::sse_encode(self.convert_as_inline, serializer);
         <String>::sse_encode(self.sub_symbol, serializer);
         <String>::sse_encode(self.sup_symbol, serializer);
-        <String>::sse_encode(self.newline_style, serializer);
-        <String>::sse_encode(self.code_block_style, serializer);
+        <crate::NewlineStyle>::sse_encode(self.newline_style, serializer);
+        <crate::CodeBlockStyle>::sse_encode(self.code_block_style, serializer);
         <Vec<String>>::sse_encode(self.keep_inline_images_in, serializer);
         <crate::PreprocessingOptions>::sse_encode(self.preprocessing, serializer);
         <String>::sse_encode(self.encoding, serializer);
@@ -3778,8 +4199,8 @@ impl SseEncode for crate::ConversionOptions {
         <Vec<String>>::sse_encode(self.strip_tags, serializer);
         <Vec<String>>::sse_encode(self.preserve_tags, serializer);
         <bool>::sse_encode(self.skip_images, serializer);
-        <String>::sse_encode(self.link_style, serializer);
-        <String>::sse_encode(self.output_format, serializer);
+        <crate::LinkStyle>::sse_encode(self.link_style, serializer);
+        <crate::OutputFormat>::sse_encode(self.output_format, serializer);
         <bool>::sse_encode(self.include_document_structure, serializer);
         <bool>::sse_encode(self.extract_images, serializer);
         <i64>::sse_encode(self.max_image_size, serializer);
@@ -3794,8 +4215,8 @@ impl SseEncode for crate::ConversionOptions {
 impl SseEncode for crate::ConversionOptionsUpdate {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Option<String>>::sse_encode(self.heading_style, serializer);
-        <Option<String>>::sse_encode(self.list_indent_type, serializer);
+        <Option<crate::HeadingStyle>>::sse_encode(self.heading_style, serializer);
+        <Option<crate::ListIndentType>>::sse_encode(self.list_indent_type, serializer);
         <Option<i64>>::sse_encode(self.list_indent_width, serializer);
         <Option<String>>::sse_encode(self.bullets, serializer);
         <Option<String>>::sse_encode(self.strong_em_symbol, serializer);
@@ -3808,17 +4229,17 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<bool>>::sse_encode(self.default_title, serializer);
         <Option<bool>>::sse_encode(self.br_in_tables, serializer);
         <Option<bool>>::sse_encode(self.compact_tables, serializer);
-        <Option<String>>::sse_encode(self.highlight_style, serializer);
+        <Option<crate::HighlightStyle>>::sse_encode(self.highlight_style, serializer);
         <Option<bool>>::sse_encode(self.extract_metadata, serializer);
-        <Option<String>>::sse_encode(self.whitespace_mode, serializer);
+        <Option<crate::WhitespaceMode>>::sse_encode(self.whitespace_mode, serializer);
         <Option<bool>>::sse_encode(self.strip_newlines, serializer);
         <Option<bool>>::sse_encode(self.wrap, serializer);
         <Option<i64>>::sse_encode(self.wrap_width, serializer);
         <Option<bool>>::sse_encode(self.convert_as_inline, serializer);
         <Option<String>>::sse_encode(self.sub_symbol, serializer);
         <Option<String>>::sse_encode(self.sup_symbol, serializer);
-        <Option<String>>::sse_encode(self.newline_style, serializer);
-        <Option<String>>::sse_encode(self.code_block_style, serializer);
+        <Option<crate::NewlineStyle>>::sse_encode(self.newline_style, serializer);
+        <Option<crate::CodeBlockStyle>>::sse_encode(self.code_block_style, serializer);
         <Option<Vec<String>>>::sse_encode(self.keep_inline_images_in, serializer);
         <Option<crate::PreprocessingOptionsUpdate>>::sse_encode(self.preprocessing, serializer);
         <Option<String>>::sse_encode(self.encoding, serializer);
@@ -3826,8 +4247,8 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<Vec<String>>>::sse_encode(self.strip_tags, serializer);
         <Option<Vec<String>>>::sse_encode(self.preserve_tags, serializer);
         <Option<bool>>::sse_encode(self.skip_images, serializer);
-        <Option<String>>::sse_encode(self.link_style, serializer);
-        <Option<String>>::sse_encode(self.output_format, serializer);
+        <Option<crate::LinkStyle>>::sse_encode(self.link_style, serializer);
+        <Option<crate::OutputFormat>>::sse_encode(self.output_format, serializer);
         <Option<bool>>::sse_encode(self.include_document_structure, serializer);
         <Option<bool>>::sse_encode(self.extract_images, serializer);
         <Option<i64>>::sse_encode(self.max_image_size, serializer);
@@ -3861,7 +4282,7 @@ impl SseEncode for crate::DocumentMetadata {
         <Option<String>>::sse_encode(self.canonical_url, serializer);
         <Option<String>>::sse_encode(self.base_href, serializer);
         <Option<String>>::sse_encode(self.language, serializer);
-        <Option<String>>::sse_encode(self.text_direction, serializer);
+        <Option<crate::TextDirection>>::sse_encode(self.text_direction, serializer);
         <std::collections::HashMap<String, String>>::sse_encode(self.open_graph, serializer);
         <std::collections::HashMap<String, String>>::sse_encode(self.twitter_card, serializer);
         <std::collections::HashMap<String, String>>::sse_encode(self.meta_tags, serializer);
@@ -3908,6 +4329,41 @@ impl SseEncode for crate::HeaderMetadata {
         <Option<String>>::sse_encode(self.id, serializer);
         <i64>::sse_encode(self.depth, serializer);
         <i64>::sse_encode(self.html_offset, serializer);
+    }
+}
+
+impl SseEncode for crate::HeadingStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::HeadingStyle::Underlined => 0,
+                crate::HeadingStyle::Atx => 1,
+                crate::HeadingStyle::AtxClosed => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::HighlightStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::HighlightStyle::DoubleEqual => 0,
+                crate::HighlightStyle::Html => 1,
+                crate::HighlightStyle::Bold => 2,
+                crate::HighlightStyle::None => 3,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -3985,6 +4441,22 @@ impl SseEncode for crate::LinkMetadata {
     }
 }
 
+impl SseEncode for crate::LinkStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::LinkStyle::Inline => 0,
+                crate::LinkStyle::Reference => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for crate::LinkType {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4052,6 +4524,22 @@ impl SseEncode for Vec<crate::ImageMetadata> {
         for item in self {
             <crate::ImageMetadata>::sse_encode(item, serializer);
         }
+    }
+}
+
+impl SseEncode for crate::ListIndentType {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::ListIndentType::Spaces => 0,
+                crate::ListIndentType::Tabs => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -4132,6 +4620,22 @@ impl SseEncode for Vec<crate::TextAnnotation> {
         for item in self {
             <crate::TextAnnotation>::sse_encode(item, serializer);
         }
+    }
+}
+
+impl SseEncode for crate::NewlineStyle {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::NewlineStyle::Spaces => 0,
+                crate::NewlineStyle::Backslash => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -4367,6 +4871,16 @@ impl SseEncode for Option<bool> {
     }
 }
 
+impl SseEncode for Option<crate::CodeBlockStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::CodeBlockStyle>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::ConversionOptions> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4387,6 +4901,26 @@ impl SseEncode for Option<crate::DocumentStructure> {
     }
 }
 
+impl SseEncode for Option<crate::HeadingStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::HeadingStyle>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::HighlightStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::HighlightStyle>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<i64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4397,12 +4931,82 @@ impl SseEncode for Option<i64> {
     }
 }
 
+impl SseEncode for Option<crate::LinkStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::LinkStyle>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::ListIndentType> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::ListIndentType>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::NewlineStyle> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::NewlineStyle>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::OutputFormat> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::OutputFormat>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::PreprocessingOptionsUpdate> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::PreprocessingOptionsUpdate>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::PreprocessingPreset> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::PreprocessingPreset>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::TextDirection> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::TextDirection>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::WhitespaceMode> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::WhitespaceMode>::sse_encode(value, serializer);
         }
     }
 }
@@ -4427,11 +5031,28 @@ impl SseEncode for Option<Vec<i64>> {
     }
 }
 
+impl SseEncode for crate::OutputFormat {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::OutputFormat::Markdown => 0,
+                crate::OutputFormat::Djot => 1,
+                crate::OutputFormat::Plain => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for crate::PreprocessingOptions {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.enabled, serializer);
-        <String>::sse_encode(self.preset, serializer);
+        <crate::PreprocessingPreset>::sse_encode(self.preset, serializer);
         <bool>::sse_encode(self.remove_navigation, serializer);
         <bool>::sse_encode(self.remove_forms, serializer);
     }
@@ -4441,9 +5062,26 @@ impl SseEncode for crate::PreprocessingOptionsUpdate {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<bool>>::sse_encode(self.enabled, serializer);
-        <Option<String>>::sse_encode(self.preset, serializer);
+        <Option<crate::PreprocessingPreset>>::sse_encode(self.preset, serializer);
         <Option<bool>>::sse_encode(self.remove_navigation, serializer);
         <Option<bool>>::sse_encode(self.remove_forms, serializer);
+    }
+}
+
+impl SseEncode for crate::PreprocessingPreset {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::PreprocessingPreset::Minimal => 0,
+                crate::PreprocessingPreset::Standard => 1,
+                crate::PreprocessingPreset::Aggressive => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -4515,6 +5153,23 @@ impl SseEncode for crate::TextAnnotation {
     }
 }
 
+impl SseEncode for crate::TextDirection {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::TextDirection::LeftToRight => 0,
+                crate::TextDirection::RightToLeft => 1,
+                crate::TextDirection::Auto => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for u8 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4573,6 +5228,22 @@ impl SseEncode for crate::WarningKind {
                 crate::WarningKind::MalformedHtml => 3,
                 crate::WarningKind::SanitizationApplied => 4,
                 crate::WarningKind::DepthLimitExceeded => 5,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::WhitespaceMode {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::WhitespaceMode::Normalized => 0,
+                crate::WhitespaceMode::Strict => 1,
                 _ => {
                     unimplemented!("");
                 }

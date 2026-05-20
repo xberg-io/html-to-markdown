@@ -24,13 +24,13 @@ package dev.kreuzberg.android
 /**
  * A non-fatal diagnostic produced during HTML conversion.
  *
- * Warnings indicate that conversion completed but some content may have been handled
- * differently than expected — for example, an image that could not be extracted, a truncated
- * input, or malformed HTML that was repaired with best-effort parsing.
+ * Warnings indicate that conversion completed but some content may have been handled differently
+ * than expected — for example, an image that could not be extracted, a truncated input, or
+ * malformed HTML that was repaired with best-effort parsing.
  *
- * Conversion always succeeds (returns `ConversionResult`) even when warnings are
- * present. Callers should inspect `warnings` and decide how to
- * handle them based on their tolerance for partial results:
+ * Conversion always succeeds (returns `ConversionResult`) even when warnings are present. Callers
+ * should inspect `warnings` and decide how to handle them based on their tolerance for partial
+ * results:
  *
  * - **Logging pipelines**: emit each warning at `WARN` level and continue.
  * - **Strict pipelines**: treat any warning as a hard error by checking
@@ -39,12 +39,8 @@ package dev.kreuzberg.android
  * See `WarningKind` for the full taxonomy of warning categories.
  */
 data class ProcessingWarning(
-    /**
-     * Human-readable warning message.
-     */
+    /** Human-readable warning message. */
     val message: String,
-    /**
-     * The category of warning.
-     */
-    val kind: WarningKind
+    /** The category of warning. */
+    val kind: WarningKind,
 )

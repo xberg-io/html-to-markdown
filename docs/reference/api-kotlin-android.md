@@ -87,24 +87,15 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `excludeSelectors`         | `List<String>`         | `[]`                         | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`                                                                                               |
 | `visitor`                  | `VisitorHandle?`       | `null`                       | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`.                                                                                                                                                                                                                                                                                                                                                               |
 
-##### Methods
+### Methods
 
-###### default()
+#### default()
 
 **Signature:**
 
 ```kotlin
 @JvmStatic
 fun default(): ConversionOptions
-```
-
-###### from()
-
-**Signature:**
-
-```kotlin
-@JvmStatic
-fun from(update: ConversionOptionsUpdate): ConversionOptions
 ```
 
 ---
@@ -208,9 +199,9 @@ and position in the document structure.
 | `depth`      | `Long`    | —       | Document tree depth at the header element |
 | `htmlOffset` | `Long`    | —       | Byte offset in original HTML document     |
 
-##### Methods
+### Methods
 
-###### isValid()
+#### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -251,13 +242,13 @@ Implement this trait to customize the conversion behavior for any HTML element t
 All methods have default implementations that return `VisitResult.Continue`, allowing
 selective override of only the elements you care about.
 
-## Method Naming Convention
+### Method Naming Convention
 
 - `visit_*_start`: Called before entering an element (pre-order traversal)
 - `visit_*_end`: Called after exiting an element (post-order traversal)
 - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
 
-## Execution Order
+### Execution Order
 
 For a typical element like `<div><p>text</p></div>`:
 
@@ -267,7 +258,7 @@ For a typical element like `<div><p>text</p></div>`:
 4. `visit_element_end` for `<p>`
 5. `visit_element_end` for `</div>`
 
-## Performance Notes
+### Performance Notes
 
 - `visit_text` is the most frequently called method (~100+ times per document)
 - Return `VisitResult.Continue` quickly for elements you don't need to customize
@@ -285,7 +276,7 @@ Visit text nodes (most frequent callback - ~100+ per document).
 fun visitText(ctx: NodeContext, text: String): VisitResult
 ```
 
-##### visitElementStart()
+#### visitElementStart()
 
 Called before entering any element.
 
@@ -298,7 +289,7 @@ visitors to implement generic element handling before tag-specific logic.
 fun visitElementStart(ctx: NodeContext): VisitResult
 ```
 
-###### visitElementEnd()
+#### visitElementEnd()
 
 Called after exiting any element.
 
@@ -311,7 +302,7 @@ Visitors can inspect or replace this output.
 fun visitElementEnd(ctx: NodeContext, output: String): VisitResult
 ```
 
-###### visitLink()
+#### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -321,7 +312,7 @@ Visit anchor links `<a href="...">`.
 fun visitLink(ctx: NodeContext, href: String, text: String, title: String? = null): VisitResult
 ```
 
-###### visitImage()
+#### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -331,7 +322,7 @@ Visit images `<img src="...">`.
 fun visitImage(ctx: NodeContext, src: String, alt: String, title: String? = null): VisitResult
 ```
 
-###### visitHeading()
+#### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -341,7 +332,7 @@ Visit heading elements `<h1>` through `<h6>`.
 fun visitHeading(ctx: NodeContext, level: Int, text: String, id: String? = null): VisitResult
 ```
 
-###### visitCodeBlock()
+#### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -351,7 +342,7 @@ Visit code blocks `<pre><code>`.
 fun visitCodeBlock(ctx: NodeContext, lang: String? = null, code: String): VisitResult
 ```
 
-###### visitCodeInline()
+#### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -361,7 +352,7 @@ Visit inline code `<code>`.
 fun visitCodeInline(ctx: NodeContext, code: String): VisitResult
 ```
 
-###### visitListItem()
+#### visitListItem()
 
 Visit list items `<li>`.
 
@@ -371,7 +362,7 @@ Visit list items `<li>`.
 fun visitListItem(ctx: NodeContext, ordered: Boolean, marker: String, text: String): VisitResult
 ```
 
-###### visitListStart()
+#### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -381,7 +372,7 @@ Called before processing a list `<ul>` or `<ol>`.
 fun visitListStart(ctx: NodeContext, ordered: Boolean): VisitResult
 ```
 
-###### visitListEnd()
+#### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -391,7 +382,7 @@ Called after processing a list `</ul>` or `</ol>`.
 fun visitListEnd(ctx: NodeContext, ordered: Boolean, output: String): VisitResult
 ```
 
-###### visitTableStart()
+#### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -401,7 +392,7 @@ Called before processing a table `<table>`.
 fun visitTableStart(ctx: NodeContext): VisitResult
 ```
 
-###### visitTableRow()
+#### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -411,7 +402,7 @@ Visit table rows `<tr>`.
 fun visitTableRow(ctx: NodeContext, cells: List<String>, isHeader: Boolean): VisitResult
 ```
 
-###### visitTableEnd()
+#### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -421,7 +412,7 @@ Called after processing a table `</table>`.
 fun visitTableEnd(ctx: NodeContext, output: String): VisitResult
 ```
 
-###### visitBlockquote()
+#### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -431,7 +422,7 @@ Visit blockquote elements `<blockquote>`.
 fun visitBlockquote(ctx: NodeContext, content: String, depth: Long): VisitResult
 ```
 
-###### visitStrong()
+#### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -441,7 +432,7 @@ Visit strong/bold elements `<strong>`, `<b>`.
 fun visitStrong(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitEmphasis()
+#### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -451,7 +442,7 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 fun visitEmphasis(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitStrikethrough()
+#### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -461,7 +452,7 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 fun visitStrikethrough(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitUnderline()
+#### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -471,7 +462,7 @@ Visit underline elements `<u>`, `<ins>`.
 fun visitUnderline(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitSubscript()
+#### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -481,7 +472,7 @@ Visit subscript elements `<sub>`.
 fun visitSubscript(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitSuperscript()
+#### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -491,7 +482,7 @@ Visit superscript elements `<sup>`.
 fun visitSuperscript(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitMark()
+#### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -501,7 +492,7 @@ Visit mark/highlight elements `<mark>`.
 fun visitMark(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitLineBreak()
+#### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -511,7 +502,7 @@ Visit line break elements `<br>`.
 fun visitLineBreak(ctx: NodeContext): VisitResult
 ```
 
-###### visitHorizontalRule()
+#### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -521,7 +512,7 @@ Visit horizontal rule elements `<hr>`.
 fun visitHorizontalRule(ctx: NodeContext): VisitResult
 ```
 
-###### visitCustomElement()
+#### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -531,7 +522,7 @@ Visit custom elements (web components) or unknown tags.
 fun visitCustomElement(ctx: NodeContext, tagName: String, html: String): VisitResult
 ```
 
-###### visitDefinitionListStart()
+#### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -541,7 +532,7 @@ Visit definition list `<dl>`.
 fun visitDefinitionListStart(ctx: NodeContext): VisitResult
 ```
 
-###### visitDefinitionTerm()
+#### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -551,7 +542,7 @@ Visit definition term `<dt>`.
 fun visitDefinitionTerm(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitDefinitionDescription()
+#### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -561,7 +552,7 @@ Visit definition description `<dd>`.
 fun visitDefinitionDescription(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitDefinitionListEnd()
+#### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -571,7 +562,7 @@ Called after processing a definition list `</dl>`.
 fun visitDefinitionListEnd(ctx: NodeContext, output: String): VisitResult
 ```
 
-###### visitForm()
+#### visitForm()
 
 Visit form elements `<form>`.
 
@@ -581,7 +572,7 @@ Visit form elements `<form>`.
 fun visitForm(ctx: NodeContext, action: String? = null, method: String? = null): VisitResult
 ```
 
-###### visitInput()
+#### visitInput()
 
 Visit input elements `<input>`.
 
@@ -591,7 +582,7 @@ Visit input elements `<input>`.
 fun visitInput(ctx: NodeContext, inputType: String, name: String? = null, value: String? = null): VisitResult
 ```
 
-###### visitButton()
+#### visitButton()
 
 Visit button elements `<button>`.
 
@@ -601,7 +592,7 @@ Visit button elements `<button>`.
 fun visitButton(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitAudio()
+#### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -611,7 +602,7 @@ Visit audio elements `<audio>`.
 fun visitAudio(ctx: NodeContext, src: String? = null): VisitResult
 ```
 
-###### visitVideo()
+#### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -621,7 +612,7 @@ Visit video elements `<video>`.
 fun visitVideo(ctx: NodeContext, src: String? = null): VisitResult
 ```
 
-###### visitIframe()
+#### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -631,7 +622,7 @@ Visit iframe elements `<iframe>`.
 fun visitIframe(ctx: NodeContext, src: String? = null): VisitResult
 ```
 
-###### visitDetails()
+#### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -641,7 +632,7 @@ Visit details elements `<details>`.
 fun visitDetails(ctx: NodeContext, open: Boolean): VisitResult
 ```
 
-###### visitSummary()
+#### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -651,7 +642,7 @@ Visit summary elements `<summary>`.
 fun visitSummary(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitFigureStart()
+#### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -661,7 +652,7 @@ Visit figure elements `<figure>`.
 fun visitFigureStart(ctx: NodeContext): VisitResult
 ```
 
-###### visitFigcaption()
+#### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -671,7 +662,7 @@ Visit figcaption elements `<figcaption>`.
 fun visitFigcaption(ctx: NodeContext, text: String): VisitResult
 ```
 
-###### visitFigureEnd()
+#### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -683,7 +674,7 @@ fun visitFigureEnd(ctx: NodeContext, output: String): VisitResult
 
 ---
 
-##### ImageMetadata
+#### ImageMetadata
 
 Image metadata with source and dimensions.
 
@@ -701,7 +692,7 @@ for image analysis and optimization.
 
 ---
 
-##### LinkMetadata
+#### LinkMetadata
 
 Hyperlink metadata with categorization and attributes.
 
@@ -718,7 +709,7 @@ Represents `<a>` elements with parsed href values, text content, and link type c
 
 ---
 
-##### NodeContext
+#### NodeContext
 
 Context information passed to all visitor methods.
 
@@ -737,7 +728,7 @@ including its type, attributes, position in the DOM tree, and parent context.
 
 ---
 
-##### PreprocessingOptions
+#### PreprocessingOptions
 
 HTML preprocessing options for document cleanup before conversion.
 
@@ -748,9 +739,9 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `Boolean`             | `true`                         | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms`      | `Boolean`             | `true`                         | Remove form elements (forms, inputs, buttons, etc.)            |
 
-###### Methods
+### Methods
 
-###### default()
+#### default()
 
 **Signature:**
 
@@ -759,18 +750,9 @@ HTML preprocessing options for document cleanup before conversion.
 fun default(): PreprocessingOptions
 ```
 
-###### from()
-
-**Signature:**
-
-```kotlin
-@JvmStatic
-fun from(update: PreprocessingOptionsUpdate): PreprocessingOptions
-```
-
 ---
 
-##### ProcessingWarning
+#### ProcessingWarning
 
 A non-fatal diagnostic produced during HTML conversion.
 
@@ -795,7 +777,7 @@ See `WarningKind` for the full taxonomy of warning categories.
 
 ---
 
-##### StructuredData
+#### StructuredData
 
 Structured data block (JSON-LD, Microdata, or RDFa).
 
@@ -810,7 +792,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 
 ---
 
-##### TableData
+#### TableData
 
 A top-level extracted table with both structured data and markdown representation.
 
@@ -821,19 +803,19 @@ A top-level extracted table with both structured data and markdown representatio
 
 ---
 
-##### TableGrid
+#### TableGrid
 
 A structured table grid with cell-level data including spans.
 
-| Field   | Type             | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------- | ---------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ---------------------------------- |
-| `rows`  | `Int`            | —       | Number of rows.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `cols`  | `Int`            | —       | Number of columns.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `cells` | `List<GridCell>` | `[]`    | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \\ | \\  | cols == 0`) produces an empty vec. |
+| Field   | Type             | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------- | ---------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rows`  | `Int`            | —       | Number of rows.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `cols`  | `Int`            | —       | Number of columns.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `cells` | `List<GridCell>` | `[]`    | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty vec. |
 
 ---
 
-##### TextAnnotation
+#### TextAnnotation
 
 A styling or semantic annotation that applies to a byte range within a node's text.
 
@@ -858,7 +840,7 @@ See `AnnotationKind` for the full list of supported annotation types.
 
 ---
 
-##### VisitorHandle
+#### VisitorHandle
 
 Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
 
@@ -868,9 +850,9 @@ axum/rmcp/tokio Send-bound contexts.
 
 ---
 
-#### Enums
+### Enums
 
-##### TextDirection
+#### TextDirection
 
 Text directionality of document content.
 
@@ -884,7 +866,7 @@ Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 
 ---
 
-##### LinkType
+#### LinkType
 
 Link classification based on href value and document context.
 
@@ -901,7 +883,7 @@ Used to categorize links during extraction for filtering and analysis.
 
 ---
 
-##### ImageType
+#### ImageType
 
 Image source classification for proper handling and processing.
 
@@ -916,7 +898,7 @@ Determines whether an image is embedded (data URI), inline SVG, external, or rel
 
 ---
 
-##### StructuredDataType
+#### StructuredDataType
 
 Structured data format type.
 
@@ -930,7 +912,7 @@ Identifies the schema/format used for structured data markup.
 
 ---
 
-##### PreprocessingPreset
+#### PreprocessingPreset
 
 HTML preprocessing aggressiveness level.
 
@@ -944,7 +926,7 @@ Controls the extent of cleanup performed before conversion. Higher levels remove
 
 ---
 
-##### HeadingStyle
+#### HeadingStyle
 
 Heading style options for Markdown output.
 
@@ -958,7 +940,7 @@ Controls how headings (h1-h6) are rendered in the output Markdown.
 
 ---
 
-##### ListIndentType
+#### ListIndentType
 
 List indentation character type.
 
@@ -971,7 +953,7 @@ Controls whether list items are indented with spaces or tabs.
 
 ---
 
-##### WhitespaceMode
+#### WhitespaceMode
 
 Whitespace handling strategy during conversion.
 
@@ -984,7 +966,7 @@ Determines how sequences of whitespace characters (spaces, tabs, newlines) are p
 
 ---
 
-##### NewlineStyle
+#### NewlineStyle
 
 Line break syntax in Markdown output.
 
@@ -997,7 +979,7 @@ Controls how soft line breaks (from `<br>` or line breaks in source) are rendere
 
 ---
 
-##### CodeBlockStyle
+#### CodeBlockStyle
 
 Code block fence style in Markdown output.
 
@@ -1011,7 +993,7 @@ Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 
 ---
 
-##### HighlightStyle
+#### HighlightStyle
 
 Highlight rendering style for `<mark>` elements.
 
@@ -1026,7 +1008,7 @@ Controls how highlighted text is rendered in Markdown output.
 
 ---
 
-##### LinkStyle
+#### LinkStyle
 
 Link rendering style in Markdown output.
 
@@ -1040,7 +1022,7 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 
 ---
 
-##### OutputFormat
+#### OutputFormat
 
 Output format for conversion.
 
@@ -1054,7 +1036,7 @@ Specifies the target markup language format for the conversion output.
 
 ---
 
-##### NodeContent
+#### NodeContent
 
 The semantic content type of a document node.
 
@@ -1078,7 +1060,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 
 ---
 
-##### AnnotationKind
+#### AnnotationKind
 
 The type of an inline text annotation.
 
@@ -1098,7 +1080,7 @@ Uses internally tagged representation (`"annotation_type": "bold"`) for JSON ser
 
 ---
 
-##### WarningKind
+#### WarningKind
 
 Categories of processing warnings.
 
@@ -1113,7 +1095,7 @@ Categories of processing warnings.
 
 ---
 
-##### NodeType
+#### NodeType
 
 Node type enumeration covering all HTML element types.
 
@@ -1213,7 +1195,7 @@ providing a coarse-grained classification for visitor dispatch.
 
 ---
 
-##### VisitResult
+#### VisitResult
 
 Result of a visitor callback.
 
@@ -1231,9 +1213,9 @@ preserving HTML, or signaling errors.
 
 ---
 
-#### Errors
+### Errors
 
-##### ConversionError
+#### ConversionError
 
 Errors that can occur during HTML to Markdown conversion.
 

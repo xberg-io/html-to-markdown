@@ -24,32 +24,20 @@ package dev.kreuzberg.android
 /**
  * Image metadata with source and dimensions.
  *
- * Captures `<img>` elements and inline `<svg>` elements with metadata
- * for image analysis and optimization.
+ * Captures `<img>` elements and inline `<svg>` elements with metadata for image analysis and
+ * optimization.
  */
 data class ImageMetadata(
-    /**
-     * Image source (URL, data URI, or SVG content identifier)
-     */
+    /** Image source (URL, data URI, or SVG content identifier) */
     val src: String,
-    /**
-     * Alternative text from alt attribute (for accessibility)
-     */
+    /** Alternative text from alt attribute (for accessibility) */
     val alt: String?,
-    /**
-     * Title attribute (often shown as tooltip)
-     */
+    /** Title attribute (often shown as tooltip) */
     val title: String?,
-    /**
-     * Image dimensions as (width, height) if available
-     */
+    /** Image dimensions as (width, height) if available */
     val dimensions: List<Int>?,
-    /**
-     * Image type classification
-     */
+    /** Image type classification */
     val imageType: ImageType,
-    /**
-     * Additional HTML attributes
-     */
-    val attributes: Map<String, String>
+    /** Additional HTML attributes */
+    val attributes: Map<String, String>,
 )

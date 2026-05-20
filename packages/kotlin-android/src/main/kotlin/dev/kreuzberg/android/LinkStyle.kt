@@ -24,16 +24,12 @@ package dev.kreuzberg.android
 /**
  * Link rendering style in Markdown output.
  *
- * Controls whether links and images use inline `[text](url)` syntax or
- * reference-style `[text][1]` syntax with definitions collected at the end.
+ * Controls whether links and images use inline `[text](url)` syntax or reference-style `[text][1]`
+ * syntax with definitions collected at the end.
  */
 enum class LinkStyle {
-    /**
-     * Inline links: `[text](url)`. Default.
-     */
+    /** Inline links: `[text](url)`. Default. */
     INLINE,
-    /**
-     * Reference-style links: `[text][1]` with `[1]: url` at end of document.
-     */
-    REFERENCE;
+    /** Reference-style links: `[text][1]` with `[1]: url` at end of document. */
+    REFERENCE,
 }

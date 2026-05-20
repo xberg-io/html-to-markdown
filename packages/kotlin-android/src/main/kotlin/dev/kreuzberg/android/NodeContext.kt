@@ -24,36 +24,22 @@ package dev.kreuzberg.android
 /**
  * Context information passed to all visitor methods.
  *
- * Provides comprehensive metadata about the current node being visited,
- * including its type, attributes, position in the DOM tree, and parent context.
+ * Provides comprehensive metadata about the current node being visited, including its type,
+ * attributes, position in the DOM tree, and parent context.
  */
 data class NodeContext(
-    /**
-     * Coarse-grained node type classification
-     */
+    /** Coarse-grained node type classification */
     val nodeType: NodeType,
-    /**
-     * Raw HTML tag name (e.g., "div", "h1", "custom-element")
-     */
+    /** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
     val tagName: String,
-    /**
-     * All HTML attributes as key-value pairs
-     */
+    /** All HTML attributes as key-value pairs */
     val attributes: Map<String, String>,
-    /**
-     * Depth in the DOM tree (0 = root)
-     */
+    /** Depth in the DOM tree (0 = root) */
     val depth: Long,
-    /**
-     * Index among siblings (0-based)
-     */
+    /** Index among siblings (0-based) */
     val indexInParent: Long,
-    /**
-     * Parent element's tag name (None if root)
-     */
+    /** Parent element's tag name (None if root) */
     val parentTag: String?,
-    /**
-     * Whether this element is treated as inline vs block
-     */
-    val isInline: Boolean
+    /** Whether this element is treated as inline vs block */
+    val isInline: Boolean,
 )

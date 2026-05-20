@@ -21,32 +21,18 @@
 
 package dev.kreuzberg.android
 
-/**
- * A single cell in a table grid.
- */
+/** A single cell in a table grid. */
 data class GridCell(
-    /**
-     * The text content of the cell.
-     */
+    /** The text content of the cell. */
     val content: String,
-    /**
-     * 0-indexed row position.
-     */
+    /** 0-indexed row position. */
     val row: Int,
-    /**
-     * 0-indexed column position.
-     */
+    /** 0-indexed column position. */
     val col: Int,
-    /**
-     * Number of rows this cell spans (default 1).
-     */
+    /** Number of rows this cell spans (default 1). */
     val rowSpan: Int,
-    /**
-     * Number of columns this cell spans (default 1).
-     */
+    /** Number of columns this cell spans (default 1). */
     val colSpan: Int,
-    /**
-     * Whether this is a header cell (`<th>`).
-     */
-    val isHeader: Boolean
+    /** Whether this is a header cell (`<th>`). */
+    val isHeader: Boolean,
 )

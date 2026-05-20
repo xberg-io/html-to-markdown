@@ -2035,6 +2035,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CodeBlockStyle dco_decode_box_autoadd_code_block_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_code_block_style(raw);
+  }
+
+  @protected
   ConversionOptions dco_decode_box_autoadd_conversion_options(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_conversion_options(raw);
@@ -2047,9 +2053,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  HeadingStyle dco_decode_box_autoadd_heading_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_heading_style(raw);
+  }
+
+  @protected
+  HighlightStyle dco_decode_box_autoadd_highlight_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_highlight_style(raw);
+  }
+
+  @protected
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_i_64(raw);
+  }
+
+  @protected
+  LinkStyle dco_decode_box_autoadd_link_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_link_style(raw);
+  }
+
+  @protected
+  ListIndentType dco_decode_box_autoadd_list_indent_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_list_indent_type(raw);
+  }
+
+  @protected
+  NewlineStyle dco_decode_box_autoadd_newline_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_newline_style(raw);
+  }
+
+  @protected
+  OutputFormat dco_decode_box_autoadd_output_format(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_output_format(raw);
   }
 
   @protected
@@ -2060,9 +2102,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PreprocessingPreset dco_decode_box_autoadd_preprocessing_preset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_preprocessing_preset(raw);
+  }
+
+  @protected
   TableGrid dco_decode_box_autoadd_table_grid(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_table_grid(raw);
+  }
+
+  @protected
+  TextDirection dco_decode_box_autoadd_text_direction(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_text_direction(raw);
+  }
+
+  @protected
+  WhitespaceMode dco_decode_box_autoadd_whitespace_mode(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_whitespace_mode(raw);
+  }
+
+  @protected
+  CodeBlockStyle dco_decode_code_block_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return CodeBlockStyle.values[raw as int];
   }
 
   @protected
@@ -2072,8 +2138,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 42)
       throw Exception('unexpected arr length: expect 42 but see ${arr.length}');
     return ConversionOptions(
-      headingStyle: dco_decode_String(arr[0]),
-      listIndentType: dco_decode_String(arr[1]),
+      headingStyle: dco_decode_heading_style(arr[0]),
+      listIndentType: dco_decode_list_indent_type(arr[1]),
       listIndentWidth: dco_decode_i_64(arr[2]),
       bullets: dco_decode_String(arr[3]),
       strongEmSymbol: dco_decode_String(arr[4]),
@@ -2086,17 +2152,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       defaultTitle: dco_decode_bool(arr[11]),
       brInTables: dco_decode_bool(arr[12]),
       compactTables: dco_decode_bool(arr[13]),
-      highlightStyle: dco_decode_String(arr[14]),
+      highlightStyle: dco_decode_highlight_style(arr[14]),
       extractMetadata: dco_decode_bool(arr[15]),
-      whitespaceMode: dco_decode_String(arr[16]),
+      whitespaceMode: dco_decode_whitespace_mode(arr[16]),
       stripNewlines: dco_decode_bool(arr[17]),
       wrap: dco_decode_bool(arr[18]),
       wrapWidth: dco_decode_i_64(arr[19]),
       convertAsInline: dco_decode_bool(arr[20]),
       subSymbol: dco_decode_String(arr[21]),
       supSymbol: dco_decode_String(arr[22]),
-      newlineStyle: dco_decode_String(arr[23]),
-      codeBlockStyle: dco_decode_String(arr[24]),
+      newlineStyle: dco_decode_newline_style(arr[23]),
+      codeBlockStyle: dco_decode_code_block_style(arr[24]),
       keepInlineImagesIn: dco_decode_list_String(arr[25]),
       preprocessing: dco_decode_preprocessing_options(arr[26]),
       encoding: dco_decode_String(arr[27]),
@@ -2104,8 +2170,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       stripTags: dco_decode_list_String(arr[29]),
       preserveTags: dco_decode_list_String(arr[30]),
       skipImages: dco_decode_bool(arr[31]),
-      linkStyle: dco_decode_String(arr[32]),
-      outputFormat: dco_decode_String(arr[33]),
+      linkStyle: dco_decode_link_style(arr[32]),
+      outputFormat: dco_decode_output_format(arr[33]),
       includeDocumentStructure: dco_decode_bool(arr[34]),
       extractImages: dco_decode_bool(arr[35]),
       maxImageSize: dco_decode_i_64(arr[36]),
@@ -2127,8 +2193,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 42)
       throw Exception('unexpected arr length: expect 42 but see ${arr.length}');
     return ConversionOptionsUpdate(
-      headingStyle: dco_decode_opt_String(arr[0]),
-      listIndentType: dco_decode_opt_String(arr[1]),
+      headingStyle: dco_decode_opt_box_autoadd_heading_style(arr[0]),
+      listIndentType: dco_decode_opt_box_autoadd_list_indent_type(arr[1]),
       listIndentWidth: dco_decode_opt_box_autoadd_i_64(arr[2]),
       bullets: dco_decode_opt_String(arr[3]),
       strongEmSymbol: dco_decode_opt_String(arr[4]),
@@ -2141,17 +2207,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       defaultTitle: dco_decode_opt_box_autoadd_bool(arr[11]),
       brInTables: dco_decode_opt_box_autoadd_bool(arr[12]),
       compactTables: dco_decode_opt_box_autoadd_bool(arr[13]),
-      highlightStyle: dco_decode_opt_String(arr[14]),
+      highlightStyle: dco_decode_opt_box_autoadd_highlight_style(arr[14]),
       extractMetadata: dco_decode_opt_box_autoadd_bool(arr[15]),
-      whitespaceMode: dco_decode_opt_String(arr[16]),
+      whitespaceMode: dco_decode_opt_box_autoadd_whitespace_mode(arr[16]),
       stripNewlines: dco_decode_opt_box_autoadd_bool(arr[17]),
       wrap: dco_decode_opt_box_autoadd_bool(arr[18]),
       wrapWidth: dco_decode_opt_box_autoadd_i_64(arr[19]),
       convertAsInline: dco_decode_opt_box_autoadd_bool(arr[20]),
       subSymbol: dco_decode_opt_String(arr[21]),
       supSymbol: dco_decode_opt_String(arr[22]),
-      newlineStyle: dco_decode_opt_String(arr[23]),
-      codeBlockStyle: dco_decode_opt_String(arr[24]),
+      newlineStyle: dco_decode_opt_box_autoadd_newline_style(arr[23]),
+      codeBlockStyle: dco_decode_opt_box_autoadd_code_block_style(arr[24]),
       keepInlineImagesIn: dco_decode_opt_list_String(arr[25]),
       preprocessing: dco_decode_opt_box_autoadd_preprocessing_options_update(
         arr[26],
@@ -2161,8 +2227,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       stripTags: dco_decode_opt_list_String(arr[29]),
       preserveTags: dco_decode_opt_list_String(arr[30]),
       skipImages: dco_decode_opt_box_autoadd_bool(arr[31]),
-      linkStyle: dco_decode_opt_String(arr[32]),
-      outputFormat: dco_decode_opt_String(arr[33]),
+      linkStyle: dco_decode_opt_box_autoadd_link_style(arr[32]),
+      outputFormat: dco_decode_opt_box_autoadd_output_format(arr[33]),
       includeDocumentStructure: dco_decode_opt_box_autoadd_bool(arr[34]),
       extractImages: dco_decode_opt_box_autoadd_bool(arr[35]),
       maxImageSize: dco_decode_opt_box_autoadd_i_64(arr[36]),
@@ -2207,7 +2273,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       canonicalUrl: dco_decode_opt_String(arr[4]),
       baseHref: dco_decode_opt_String(arr[5]),
       language: dco_decode_opt_String(arr[6]),
-      textDirection: dco_decode_opt_String(arr[7]),
+      textDirection: dco_decode_opt_box_autoadd_text_direction(arr[7]),
       openGraph: dco_decode_Map_String_String_None(arr[8]),
       twitterCard: dco_decode_Map_String_String_None(arr[9]),
       metaTags: dco_decode_Map_String_String_None(arr[10]),
@@ -2271,6 +2337,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       depth: dco_decode_i_64(arr[3]),
       htmlOffset: dco_decode_i_64(arr[4]),
     );
+  }
+
+  @protected
+  HeadingStyle dco_decode_heading_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return HeadingStyle.values[raw as int];
+  }
+
+  @protected
+  HighlightStyle dco_decode_highlight_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return HighlightStyle.values[raw as int];
   }
 
   @protected
@@ -2345,6 +2423,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LinkStyle dco_decode_link_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return LinkStyle.values[raw as int];
+  }
+
+  @protected
   LinkType dco_decode_link_type(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return LinkType.values[raw as int];
@@ -2378,6 +2462,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<ImageMetadata> dco_decode_list_image_metadata(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_image_metadata).toList();
+  }
+
+  @protected
+  ListIndentType dco_decode_list_indent_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ListIndentType.values[raw as int];
   }
 
   @protected
@@ -2426,6 +2516,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<TextAnnotation> dco_decode_list_text_annotation(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_text_annotation).toList();
+  }
+
+  @protected
+  NewlineStyle dco_decode_newline_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return NewlineStyle.values[raw as int];
   }
 
   @protected
@@ -2542,6 +2638,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CodeBlockStyle? dco_decode_opt_box_autoadd_code_block_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_code_block_style(raw);
+  }
+
+  @protected
   ConversionOptions? dco_decode_opt_box_autoadd_conversion_options(
     dynamic raw,
   ) {
@@ -2558,9 +2660,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  HeadingStyle? dco_decode_opt_box_autoadd_heading_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_heading_style(raw);
+  }
+
+  @protected
+  HighlightStyle? dco_decode_opt_box_autoadd_highlight_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_highlight_style(raw);
+  }
+
+  @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
+  }
+
+  @protected
+  LinkStyle? dco_decode_opt_box_autoadd_link_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_link_style(raw);
+  }
+
+  @protected
+  ListIndentType? dco_decode_opt_box_autoadd_list_indent_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_list_indent_type(raw);
+  }
+
+  @protected
+  NewlineStyle? dco_decode_opt_box_autoadd_newline_style(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_newline_style(raw);
+  }
+
+  @protected
+  OutputFormat? dco_decode_opt_box_autoadd_output_format(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_output_format(raw);
   }
 
   @protected
@@ -2570,6 +2708,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return raw == null
         ? null
         : dco_decode_box_autoadd_preprocessing_options_update(raw);
+  }
+
+  @protected
+  PreprocessingPreset? dco_decode_opt_box_autoadd_preprocessing_preset(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_preprocessing_preset(raw);
+  }
+
+  @protected
+  TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_text_direction(raw);
+  }
+
+  @protected
+  WhitespaceMode? dco_decode_opt_box_autoadd_whitespace_mode(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_whitespace_mode(raw);
   }
 
   @protected
@@ -2585,6 +2745,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  OutputFormat dco_decode_output_format(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return OutputFormat.values[raw as int];
+  }
+
+  @protected
   PreprocessingOptions dco_decode_preprocessing_options(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2592,7 +2758,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return PreprocessingOptions(
       enabled: dco_decode_bool(arr[0]),
-      preset: dco_decode_String(arr[1]),
+      preset: dco_decode_preprocessing_preset(arr[1]),
       removeNavigation: dco_decode_bool(arr[2]),
       removeForms: dco_decode_bool(arr[3]),
     );
@@ -2608,10 +2774,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return PreprocessingOptionsUpdate(
       enabled: dco_decode_opt_box_autoadd_bool(arr[0]),
-      preset: dco_decode_opt_String(arr[1]),
+      preset: dco_decode_opt_box_autoadd_preprocessing_preset(arr[1]),
       removeNavigation: dco_decode_opt_box_autoadd_bool(arr[2]),
       removeForms: dco_decode_opt_box_autoadd_bool(arr[3]),
     );
+  }
+
+  @protected
+  PreprocessingPreset dco_decode_preprocessing_preset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PreprocessingPreset.values[raw as int];
   }
 
   @protected
@@ -2694,6 +2866,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TextDirection dco_decode_text_direction(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TextDirection.values[raw as int];
+  }
+
+  @protected
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -2734,6 +2912,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WarningKind dco_decode_warning_kind(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return WarningKind.values[raw as int];
+  }
+
+  @protected
+  WhitespaceMode dco_decode_whitespace_mode(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WhitespaceMode.values[raw as int];
   }
 
   @protected
@@ -2845,6 +3029,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CodeBlockStyle sse_decode_box_autoadd_code_block_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_code_block_style(deserializer));
+  }
+
+  @protected
   ConversionOptions sse_decode_box_autoadd_conversion_options(
     SseDeserializer deserializer,
   ) {
@@ -2861,9 +3053,55 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  HeadingStyle sse_decode_box_autoadd_heading_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_heading_style(deserializer));
+  }
+
+  @protected
+  HighlightStyle sse_decode_box_autoadd_highlight_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_highlight_style(deserializer));
+  }
+
+  @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_i_64(deserializer));
+  }
+
+  @protected
+  LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_link_style(deserializer));
+  }
+
+  @protected
+  ListIndentType sse_decode_box_autoadd_list_indent_type(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_list_indent_type(deserializer));
+  }
+
+  @protected
+  NewlineStyle sse_decode_box_autoadd_newline_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_newline_style(deserializer));
+  }
+
+  @protected
+  OutputFormat sse_decode_box_autoadd_output_format(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_output_format(deserializer));
   }
 
   @protected
@@ -2876,9 +3114,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PreprocessingPreset sse_decode_box_autoadd_preprocessing_preset(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_preprocessing_preset(deserializer));
+  }
+
+  @protected
   TableGrid sse_decode_box_autoadd_table_grid(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_table_grid(deserializer));
+  }
+
+  @protected
+  TextDirection sse_decode_box_autoadd_text_direction(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_text_direction(deserializer));
+  }
+
+  @protected
+  WhitespaceMode sse_decode_box_autoadd_whitespace_mode(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_whitespace_mode(deserializer));
+  }
+
+  @protected
+  CodeBlockStyle sse_decode_code_block_style(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return CodeBlockStyle.values[inner];
   }
 
   @protected
@@ -2886,8 +3155,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_headingStyle = sse_decode_String(deserializer);
-    var var_listIndentType = sse_decode_String(deserializer);
+    var var_headingStyle = sse_decode_heading_style(deserializer);
+    var var_listIndentType = sse_decode_list_indent_type(deserializer);
     var var_listIndentWidth = sse_decode_i_64(deserializer);
     var var_bullets = sse_decode_String(deserializer);
     var var_strongEmSymbol = sse_decode_String(deserializer);
@@ -2900,17 +3169,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_defaultTitle = sse_decode_bool(deserializer);
     var var_brInTables = sse_decode_bool(deserializer);
     var var_compactTables = sse_decode_bool(deserializer);
-    var var_highlightStyle = sse_decode_String(deserializer);
+    var var_highlightStyle = sse_decode_highlight_style(deserializer);
     var var_extractMetadata = sse_decode_bool(deserializer);
-    var var_whitespaceMode = sse_decode_String(deserializer);
+    var var_whitespaceMode = sse_decode_whitespace_mode(deserializer);
     var var_stripNewlines = sse_decode_bool(deserializer);
     var var_wrap = sse_decode_bool(deserializer);
     var var_wrapWidth = sse_decode_i_64(deserializer);
     var var_convertAsInline = sse_decode_bool(deserializer);
     var var_subSymbol = sse_decode_String(deserializer);
     var var_supSymbol = sse_decode_String(deserializer);
-    var var_newlineStyle = sse_decode_String(deserializer);
-    var var_codeBlockStyle = sse_decode_String(deserializer);
+    var var_newlineStyle = sse_decode_newline_style(deserializer);
+    var var_codeBlockStyle = sse_decode_code_block_style(deserializer);
     var var_keepInlineImagesIn = sse_decode_list_String(deserializer);
     var var_preprocessing = sse_decode_preprocessing_options(deserializer);
     var var_encoding = sse_decode_String(deserializer);
@@ -2918,8 +3187,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_stripTags = sse_decode_list_String(deserializer);
     var var_preserveTags = sse_decode_list_String(deserializer);
     var var_skipImages = sse_decode_bool(deserializer);
-    var var_linkStyle = sse_decode_String(deserializer);
-    var var_outputFormat = sse_decode_String(deserializer);
+    var var_linkStyle = sse_decode_link_style(deserializer);
+    var var_outputFormat = sse_decode_output_format(deserializer);
     var var_includeDocumentStructure = sse_decode_bool(deserializer);
     var var_extractImages = sse_decode_bool(deserializer);
     var var_maxImageSize = sse_decode_i_64(deserializer);
@@ -2982,8 +3251,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_headingStyle = sse_decode_opt_String(deserializer);
-    var var_listIndentType = sse_decode_opt_String(deserializer);
+    var var_headingStyle = sse_decode_opt_box_autoadd_heading_style(
+      deserializer,
+    );
+    var var_listIndentType = sse_decode_opt_box_autoadd_list_indent_type(
+      deserializer,
+    );
     var var_listIndentWidth = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_bullets = sse_decode_opt_String(deserializer);
     var var_strongEmSymbol = sse_decode_opt_String(deserializer);
@@ -2996,17 +3269,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_defaultTitle = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_brInTables = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_compactTables = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_highlightStyle = sse_decode_opt_String(deserializer);
+    var var_highlightStyle = sse_decode_opt_box_autoadd_highlight_style(
+      deserializer,
+    );
     var var_extractMetadata = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_whitespaceMode = sse_decode_opt_String(deserializer);
+    var var_whitespaceMode = sse_decode_opt_box_autoadd_whitespace_mode(
+      deserializer,
+    );
     var var_stripNewlines = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_wrap = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_wrapWidth = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_convertAsInline = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_subSymbol = sse_decode_opt_String(deserializer);
     var var_supSymbol = sse_decode_opt_String(deserializer);
-    var var_newlineStyle = sse_decode_opt_String(deserializer);
-    var var_codeBlockStyle = sse_decode_opt_String(deserializer);
+    var var_newlineStyle = sse_decode_opt_box_autoadd_newline_style(
+      deserializer,
+    );
+    var var_codeBlockStyle = sse_decode_opt_box_autoadd_code_block_style(
+      deserializer,
+    );
     var var_keepInlineImagesIn = sse_decode_opt_list_String(deserializer);
     var var_preprocessing =
         sse_decode_opt_box_autoadd_preprocessing_options_update(deserializer);
@@ -3015,8 +3296,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_stripTags = sse_decode_opt_list_String(deserializer);
     var var_preserveTags = sse_decode_opt_list_String(deserializer);
     var var_skipImages = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_linkStyle = sse_decode_opt_String(deserializer);
-    var var_outputFormat = sse_decode_opt_String(deserializer);
+    var var_linkStyle = sse_decode_opt_box_autoadd_link_style(deserializer);
+    var var_outputFormat = sse_decode_opt_box_autoadd_output_format(
+      deserializer,
+    );
     var var_includeDocumentStructure = sse_decode_opt_box_autoadd_bool(
       deserializer,
     );
@@ -3107,7 +3390,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_canonicalUrl = sse_decode_opt_String(deserializer);
     var var_baseHref = sse_decode_opt_String(deserializer);
     var var_language = sse_decode_opt_String(deserializer);
-    var var_textDirection = sse_decode_opt_String(deserializer);
+    var var_textDirection = sse_decode_opt_box_autoadd_text_direction(
+      deserializer,
+    );
     var var_openGraph = sse_decode_Map_String_String_None(deserializer);
     var var_twitterCard = sse_decode_Map_String_String_None(deserializer);
     var var_metaTags = sse_decode_Map_String_String_None(deserializer);
@@ -3192,6 +3477,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  HeadingStyle sse_decode_heading_style(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return HeadingStyle.values[inner];
+  }
+
+  @protected
+  HighlightStyle sse_decode_highlight_style(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return HighlightStyle.values[inner];
+  }
+
+  @protected
   HtmlMetadata sse_decode_html_metadata(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_document = sse_decode_document_metadata(deserializer);
@@ -3272,6 +3571,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LinkStyle sse_decode_link_style(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return LinkStyle.values[inner];
+  }
+
+  @protected
   LinkType sse_decode_link_type(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
@@ -3342,6 +3648,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ans_.add(sse_decode_image_metadata(deserializer));
     }
     return ans_;
+  }
+
+  @protected
+  ListIndentType sse_decode_list_indent_type(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ListIndentType.values[inner];
   }
 
   @protected
@@ -3438,6 +3751,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ans_.add(sse_decode_text_annotation(deserializer));
     }
     return ans_;
+  }
+
+  @protected
+  NewlineStyle sse_decode_newline_style(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return NewlineStyle.values[inner];
   }
 
   @protected
@@ -3587,6 +3907,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CodeBlockStyle? sse_decode_opt_box_autoadd_code_block_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_code_block_style(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   ConversionOptions? sse_decode_opt_box_autoadd_conversion_options(
     SseDeserializer deserializer,
   ) {
@@ -3613,11 +3946,89 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  HeadingStyle? sse_decode_opt_box_autoadd_heading_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_heading_style(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  HighlightStyle? sse_decode_opt_box_autoadd_highlight_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_highlight_style(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_i_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  LinkStyle? sse_decode_opt_box_autoadd_link_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_link_style(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ListIndentType? sse_decode_opt_box_autoadd_list_indent_type(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_list_indent_type(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  NewlineStyle? sse_decode_opt_box_autoadd_newline_style(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_newline_style(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  OutputFormat? sse_decode_opt_box_autoadd_output_format(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_output_format(deserializer));
     } else {
       return null;
     }
@@ -3634,6 +4045,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       return (sse_decode_box_autoadd_preprocessing_options_update(
         deserializer,
       ));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  PreprocessingPreset? sse_decode_opt_box_autoadd_preprocessing_preset(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_preprocessing_preset(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TextDirection? sse_decode_opt_box_autoadd_text_direction(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_text_direction(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  WhitespaceMode? sse_decode_opt_box_autoadd_whitespace_mode(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_whitespace_mode(deserializer));
     } else {
       return null;
     }
@@ -3664,12 +4114,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  OutputFormat sse_decode_output_format(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return OutputFormat.values[inner];
+  }
+
+  @protected
   PreprocessingOptions sse_decode_preprocessing_options(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_enabled = sse_decode_bool(deserializer);
-    var var_preset = sse_decode_String(deserializer);
+    var var_preset = sse_decode_preprocessing_preset(deserializer);
     var var_removeNavigation = sse_decode_bool(deserializer);
     var var_removeForms = sse_decode_bool(deserializer);
     return PreprocessingOptions(
@@ -3686,7 +4143,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_enabled = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_preset = sse_decode_opt_String(deserializer);
+    var var_preset = sse_decode_opt_box_autoadd_preprocessing_preset(
+      deserializer,
+    );
     var var_removeNavigation = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_removeForms = sse_decode_opt_box_autoadd_bool(deserializer);
     return PreprocessingOptionsUpdate(
@@ -3695,6 +4154,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       removeNavigation: var_removeNavigation,
       removeForms: var_removeForms,
     );
+  }
+
+  @protected
+  PreprocessingPreset sse_decode_preprocessing_preset(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return PreprocessingPreset.values[inner];
   }
 
   @protected
@@ -3766,6 +4234,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TextDirection sse_decode_text_direction(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return TextDirection.values[inner];
+  }
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8();
@@ -3810,6 +4285,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return WarningKind.values[inner];
+  }
+
+  @protected
+  WhitespaceMode sse_decode_whitespace_mode(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return WhitespaceMode.values[inner];
   }
 
   @protected
@@ -4147,6 +4629,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_code_block_style(
+    CodeBlockStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_code_block_style(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_conversion_options(
     ConversionOptions self,
     SseSerializer serializer,
@@ -4165,12 +4656,66 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_heading_style(
+    HeadingStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_heading_style(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_highlight_style(
+    HighlightStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_highlight_style(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_i_64(
     PlatformInt64 self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_link_style(
+    LinkStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_link_style(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_list_indent_type(
+    ListIndentType self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_indent_type(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_newline_style(
+    NewlineStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_newline_style(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_output_format(
+    OutputFormat self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_output_format(self, serializer);
   }
 
   @protected
@@ -4183,6 +4728,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_preprocessing_preset(
+    PreprocessingPreset self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_preprocessing_preset(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_table_grid(
     TableGrid self,
     SseSerializer serializer,
@@ -4192,13 +4746,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_text_direction(
+    TextDirection self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_text_direction(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_whitespace_mode(
+    WhitespaceMode self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_whitespace_mode(self, serializer);
+  }
+
+  @protected
+  void sse_encode_code_block_style(
+    CodeBlockStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_conversion_options(
     ConversionOptions self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.headingStyle, serializer);
-    sse_encode_String(self.listIndentType, serializer);
+    sse_encode_heading_style(self.headingStyle, serializer);
+    sse_encode_list_indent_type(self.listIndentType, serializer);
     sse_encode_i_64(self.listIndentWidth, serializer);
     sse_encode_String(self.bullets, serializer);
     sse_encode_String(self.strongEmSymbol, serializer);
@@ -4211,17 +4792,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.defaultTitle, serializer);
     sse_encode_bool(self.brInTables, serializer);
     sse_encode_bool(self.compactTables, serializer);
-    sse_encode_String(self.highlightStyle, serializer);
+    sse_encode_highlight_style(self.highlightStyle, serializer);
     sse_encode_bool(self.extractMetadata, serializer);
-    sse_encode_String(self.whitespaceMode, serializer);
+    sse_encode_whitespace_mode(self.whitespaceMode, serializer);
     sse_encode_bool(self.stripNewlines, serializer);
     sse_encode_bool(self.wrap, serializer);
     sse_encode_i_64(self.wrapWidth, serializer);
     sse_encode_bool(self.convertAsInline, serializer);
     sse_encode_String(self.subSymbol, serializer);
     sse_encode_String(self.supSymbol, serializer);
-    sse_encode_String(self.newlineStyle, serializer);
-    sse_encode_String(self.codeBlockStyle, serializer);
+    sse_encode_newline_style(self.newlineStyle, serializer);
+    sse_encode_code_block_style(self.codeBlockStyle, serializer);
     sse_encode_list_String(self.keepInlineImagesIn, serializer);
     sse_encode_preprocessing_options(self.preprocessing, serializer);
     sse_encode_String(self.encoding, serializer);
@@ -4229,8 +4810,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.stripTags, serializer);
     sse_encode_list_String(self.preserveTags, serializer);
     sse_encode_bool(self.skipImages, serializer);
-    sse_encode_String(self.linkStyle, serializer);
-    sse_encode_String(self.outputFormat, serializer);
+    sse_encode_link_style(self.linkStyle, serializer);
+    sse_encode_output_format(self.outputFormat, serializer);
     sse_encode_bool(self.includeDocumentStructure, serializer);
     sse_encode_bool(self.extractImages, serializer);
     sse_encode_i_64(self.maxImageSize, serializer);
@@ -4250,8 +4831,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_String(self.headingStyle, serializer);
-    sse_encode_opt_String(self.listIndentType, serializer);
+    sse_encode_opt_box_autoadd_heading_style(self.headingStyle, serializer);
+    sse_encode_opt_box_autoadd_list_indent_type(
+      self.listIndentType,
+      serializer,
+    );
     sse_encode_opt_box_autoadd_i_64(self.listIndentWidth, serializer);
     sse_encode_opt_String(self.bullets, serializer);
     sse_encode_opt_String(self.strongEmSymbol, serializer);
@@ -4264,17 +4848,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_bool(self.defaultTitle, serializer);
     sse_encode_opt_box_autoadd_bool(self.brInTables, serializer);
     sse_encode_opt_box_autoadd_bool(self.compactTables, serializer);
-    sse_encode_opt_String(self.highlightStyle, serializer);
+    sse_encode_opt_box_autoadd_highlight_style(self.highlightStyle, serializer);
     sse_encode_opt_box_autoadd_bool(self.extractMetadata, serializer);
-    sse_encode_opt_String(self.whitespaceMode, serializer);
+    sse_encode_opt_box_autoadd_whitespace_mode(self.whitespaceMode, serializer);
     sse_encode_opt_box_autoadd_bool(self.stripNewlines, serializer);
     sse_encode_opt_box_autoadd_bool(self.wrap, serializer);
     sse_encode_opt_box_autoadd_i_64(self.wrapWidth, serializer);
     sse_encode_opt_box_autoadd_bool(self.convertAsInline, serializer);
     sse_encode_opt_String(self.subSymbol, serializer);
     sse_encode_opt_String(self.supSymbol, serializer);
-    sse_encode_opt_String(self.newlineStyle, serializer);
-    sse_encode_opt_String(self.codeBlockStyle, serializer);
+    sse_encode_opt_box_autoadd_newline_style(self.newlineStyle, serializer);
+    sse_encode_opt_box_autoadd_code_block_style(
+      self.codeBlockStyle,
+      serializer,
+    );
     sse_encode_opt_list_String(self.keepInlineImagesIn, serializer);
     sse_encode_opt_box_autoadd_preprocessing_options_update(
       self.preprocessing,
@@ -4285,8 +4872,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_list_String(self.stripTags, serializer);
     sse_encode_opt_list_String(self.preserveTags, serializer);
     sse_encode_opt_box_autoadd_bool(self.skipImages, serializer);
-    sse_encode_opt_String(self.linkStyle, serializer);
-    sse_encode_opt_String(self.outputFormat, serializer);
+    sse_encode_opt_box_autoadd_link_style(self.linkStyle, serializer);
+    sse_encode_opt_box_autoadd_output_format(self.outputFormat, serializer);
     sse_encode_opt_box_autoadd_bool(self.includeDocumentStructure, serializer);
     sse_encode_opt_box_autoadd_bool(self.extractImages, serializer);
     sse_encode_opt_box_autoadd_i_64(self.maxImageSize, serializer);
@@ -4327,7 +4914,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.canonicalUrl, serializer);
     sse_encode_opt_String(self.baseHref, serializer);
     sse_encode_opt_String(self.language, serializer);
-    sse_encode_opt_String(self.textDirection, serializer);
+    sse_encode_opt_box_autoadd_text_direction(self.textDirection, serializer);
     sse_encode_Map_String_String_None(self.openGraph, serializer);
     sse_encode_Map_String_String_None(self.twitterCard, serializer);
     sse_encode_Map_String_String_None(self.metaTags, serializer);
@@ -4376,6 +4963,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.id, serializer);
     sse_encode_i_64(self.depth, serializer);
     sse_encode_i_64(self.htmlOffset, serializer);
+  }
+
+  @protected
+  void sse_encode_heading_style(HeadingStyle self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_highlight_style(
+    HighlightStyle self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -4432,6 +5034,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_link_type(self.linkType, serializer);
     sse_encode_list_String(self.rel, serializer);
     sse_encode_Map_String_String_None(self.attributes, serializer);
+  }
+
+  @protected
+  void sse_encode_link_style(LinkStyle self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -4495,6 +5103,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (final item in self) {
       sse_encode_image_metadata(item, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_list_indent_type(
+    ListIndentType self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -4587,6 +5204,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (final item in self) {
       sse_encode_text_annotation(item, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_newline_style(NewlineStyle self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -4721,6 +5344,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_code_block_style(
+    CodeBlockStyle? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_code_block_style(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_conversion_options(
     ConversionOptions? self,
     SseSerializer serializer,
@@ -4747,6 +5383,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_heading_style(
+    HeadingStyle? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_heading_style(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_highlight_style(
+    HighlightStyle? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_highlight_style(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_i_64(
     PlatformInt64? self,
     SseSerializer serializer,
@@ -4760,6 +5422,58 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_link_style(
+    LinkStyle? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_link_style(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_list_indent_type(
+    ListIndentType? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_list_indent_type(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_newline_style(
+    NewlineStyle? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_newline_style(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_output_format(
+    OutputFormat? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_output_format(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_preprocessing_options_update(
     PreprocessingOptionsUpdate? self,
     SseSerializer serializer,
@@ -4769,6 +5483,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_preprocessing_options_update(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_preprocessing_preset(
+    PreprocessingPreset? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_preprocessing_preset(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_text_direction(
+    TextDirection? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_text_direction(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_whitespace_mode(
+    WhitespaceMode? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_whitespace_mode(self, serializer);
     }
   }
 
@@ -4799,13 +5552,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_output_format(OutputFormat self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_preprocessing_options(
     PreprocessingOptions self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_bool(self.enabled, serializer);
-    sse_encode_String(self.preset, serializer);
+    sse_encode_preprocessing_preset(self.preset, serializer);
     sse_encode_bool(self.removeNavigation, serializer);
     sse_encode_bool(self.removeForms, serializer);
   }
@@ -4817,9 +5576,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_box_autoadd_bool(self.enabled, serializer);
-    sse_encode_opt_String(self.preset, serializer);
+    sse_encode_opt_box_autoadd_preprocessing_preset(self.preset, serializer);
     sse_encode_opt_box_autoadd_bool(self.removeNavigation, serializer);
     sse_encode_opt_box_autoadd_bool(self.removeForms, serializer);
+  }
+
+  @protected
+  void sse_encode_preprocessing_preset(
+    PreprocessingPreset self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -4889,6 +5657,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_text_direction(TextDirection self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
@@ -4926,6 +5700,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_warning_kind(WarningKind self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_whitespace_mode(
+    WhitespaceMode self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
   }

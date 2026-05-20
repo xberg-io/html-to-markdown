@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.0"
+alef_version = "0.17.2"
 languages = [
   "python",
   "node",
@@ -589,7 +589,6 @@ outputFormat = "OutputFormat"
 module = "HtmlToMarkdown"
 function = "convert"
 options_type = "ConversionOptions"
-options_via = "conversionoptions_default"
 returns_result = true
 
 [crates.e2e.call.overrides.elixir.enum_fields]

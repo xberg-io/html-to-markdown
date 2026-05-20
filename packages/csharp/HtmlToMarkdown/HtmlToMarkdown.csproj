@@ -10,11 +10,14 @@
     <Authors>Kreuzberg Team</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="../../../LICENSE" Pack="true" PackagePath="/" />
     <None Include="runtimes/**" Pack="true" PackagePath="runtimes/" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../src/**/*.cs" />
   </ItemGroup>
 </Project>

@@ -21,32 +21,18 @@
 
 package dev.kreuzberg.android
 
-/**
- * Categories of processing warnings.
- */
+/** Categories of processing warnings. */
 enum class WarningKind {
-    /**
-     * An image could not be extracted (e.g. invalid data URI, unsupported format).
-     */
+    /** An image could not be extracted (e.g. invalid data URI, unsupported format). */
     IMAGE_EXTRACTION_FAILED,
-    /**
-     * The input encoding was not recognized; fell back to UTF-8.
-     */
+    /** The input encoding was not recognized; fell back to UTF-8. */
     ENCODING_FALLBACK,
-    /**
-     * The input was truncated due to size limits.
-     */
+    /** The input was truncated due to size limits. */
     TRUNCATED_INPUT,
-    /**
-     * The HTML was malformed but processing continued with best effort.
-     */
+    /** The HTML was malformed but processing continued with best effort. */
     MALFORMED_HTML,
-    /**
-     * Sanitization was applied to remove potentially unsafe content.
-     */
+    /** Sanitization was applied to remove potentially unsafe content. */
     SANITIZATION_APPLIED,
-    /**
-     * DOM traversal was truncated because max_depth was exceeded.
-     */
-    DEPTH_LIMIT_EXCEEDED;
+    /** DOM traversal was truncated because max_depth was exceeded. */
+    DEPTH_LIMIT_EXCEEDED,
 }

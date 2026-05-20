@@ -21,25 +21,15 @@
 
 package dev.kreuzberg.android
 
-/**
- * A single node in the document tree.
- */
+/** A single node in the document tree. */
 data class DocumentNode(
-    /**
-     * Deterministic node identifier.
-     */
+    /** Deterministic node identifier. */
     val id: String,
-    /**
-     * The semantic content of this node.
-     */
+    /** The semantic content of this node. */
     val content: NodeContent,
-    /**
-     * Index of the parent node (None for root nodes).
-     */
+    /** Index of the parent node (None for root nodes). */
     val parent: Int?,
-    /**
-     * Indices of child nodes in reading order.
-     */
+    /** Indices of child nodes in reading order. */
     val children: List<Int>,
     /**
      * Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
@@ -49,13 +39,13 @@ data class DocumentNode(
      * Format-specific attributes preserved from the source HTML element.
      *
      * Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
-     * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
-     * no HTML entity decoding is applied here.
+     * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no
+     * HTML entity decoding is applied here.
      *
-     * The map is `null` when no attributes are present (omitted entirely in serialized output).
-     * Not every HTML attribute is preserved: only attributes that carry semantic or structural
+     * The map is `null` when no attributes are present (omitted entirely in serialized output). Not
+     * every HTML attribute is preserved: only attributes that carry semantic or structural
      * significance for the node type are collected. For example, heading nodes capture the `"id"`
      * attribute for anchor linking; other element-level attributes may be silently dropped.
      */
-    val attributes: Map<String, String>?
+    val attributes: Map<String, String>?,
 )

@@ -24,25 +24,17 @@ package dev.kreuzberg.android
 /**
  * Partial update for `PreprocessingOptions`.
  *
- * This struct uses `Option<T>` to represent optional fields that can be selectively updated.
- * Only specified fields (Some values) will override existing options; None values leave the
+ * This struct uses `Option<T>` to represent optional fields that can be selectively updated. Only
+ * specified fields (Some values) will override existing options; None values leave the
  * corresponding fields unchanged when applied via `PreprocessingOptions.apply_update`.
  */
 data class PreprocessingOptionsUpdate(
-    /**
-     * Optional global preprocessing enablement override
-     */
+    /** Optional global preprocessing enablement override */
     val enabled: Boolean?,
-    /**
-     * Optional preprocessing preset level override (Minimal, Standard, Aggressive)
-     */
+    /** Optional preprocessing preset level override (Minimal, Standard, Aggressive) */
     val preset: PreprocessingPreset?,
-    /**
-     * Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
-     */
+    /** Optional navigation element removal override (nav, breadcrumbs, menus, sidebars) */
     val removeNavigation: Boolean?,
-    /**
-     * Optional form element removal override (forms, inputs, buttons, etc.)
-     */
-    val removeForms: Boolean?
+    /** Optional form element removal override (forms, inputs, buttons, etc.) */
+    val removeForms: Boolean?,
 )

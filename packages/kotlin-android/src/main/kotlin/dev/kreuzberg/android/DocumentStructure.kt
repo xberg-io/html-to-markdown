@@ -27,12 +27,8 @@ package dev.kreuzberg.android
  * Uses a flat node array with index-based parent/child references for efficient traversal.
  */
 data class DocumentStructure(
-    /**
-     * All nodes in document reading order.
-     */
+    /** All nodes in document reading order. */
     val nodes: List<DocumentNode>,
-    /**
-     * The source format (always "html" for this library).
-     */
-    val sourceFormat: String?
+    /** The source format (always "html" for this library). */
+    val sourceFormat: String?,
 )

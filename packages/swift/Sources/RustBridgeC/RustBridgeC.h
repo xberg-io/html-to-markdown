@@ -413,6 +413,18 @@ void* __swift_bridge__$Vec_NodeContext$get_mut(void* vec_ptr, uintptr_t index);
 uintptr_t __swift_bridge__$Vec_NodeContext$len(void* vec_ptr);
 void* __swift_bridge__$Vec_NodeContext$as_ptr(void* vec_ptr);
 
+typedef struct TextDirection TextDirection;
+void __swift_bridge__$TextDirection$_free(void* self);
+
+void* __swift_bridge__$Vec_TextDirection$new(void);
+void __swift_bridge__$Vec_TextDirection$drop(void* vec_ptr);
+void __swift_bridge__$Vec_TextDirection$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_TextDirection$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_TextDirection$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_TextDirection$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_TextDirection$len(void* vec_ptr);
+void* __swift_bridge__$Vec_TextDirection$as_ptr(void* vec_ptr);
+
 typedef struct LinkType LinkType;
 void __swift_bridge__$LinkType$_free(void* self);
 
@@ -448,6 +460,114 @@ void* __swift_bridge__$Vec_StructuredDataType$get(void* vec_ptr, uintptr_t index
 void* __swift_bridge__$Vec_StructuredDataType$get_mut(void* vec_ptr, uintptr_t index);
 uintptr_t __swift_bridge__$Vec_StructuredDataType$len(void* vec_ptr);
 void* __swift_bridge__$Vec_StructuredDataType$as_ptr(void* vec_ptr);
+
+typedef struct PreprocessingPreset PreprocessingPreset;
+void __swift_bridge__$PreprocessingPreset$_free(void* self);
+
+void* __swift_bridge__$Vec_PreprocessingPreset$new(void);
+void __swift_bridge__$Vec_PreprocessingPreset$drop(void* vec_ptr);
+void __swift_bridge__$Vec_PreprocessingPreset$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_PreprocessingPreset$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_PreprocessingPreset$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_PreprocessingPreset$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_PreprocessingPreset$len(void* vec_ptr);
+void* __swift_bridge__$Vec_PreprocessingPreset$as_ptr(void* vec_ptr);
+
+typedef struct HeadingStyle HeadingStyle;
+void __swift_bridge__$HeadingStyle$_free(void* self);
+
+void* __swift_bridge__$Vec_HeadingStyle$new(void);
+void __swift_bridge__$Vec_HeadingStyle$drop(void* vec_ptr);
+void __swift_bridge__$Vec_HeadingStyle$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_HeadingStyle$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_HeadingStyle$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_HeadingStyle$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_HeadingStyle$len(void* vec_ptr);
+void* __swift_bridge__$Vec_HeadingStyle$as_ptr(void* vec_ptr);
+
+typedef struct ListIndentType ListIndentType;
+void __swift_bridge__$ListIndentType$_free(void* self);
+
+void* __swift_bridge__$Vec_ListIndentType$new(void);
+void __swift_bridge__$Vec_ListIndentType$drop(void* vec_ptr);
+void __swift_bridge__$Vec_ListIndentType$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_ListIndentType$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_ListIndentType$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_ListIndentType$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_ListIndentType$len(void* vec_ptr);
+void* __swift_bridge__$Vec_ListIndentType$as_ptr(void* vec_ptr);
+
+typedef struct WhitespaceMode WhitespaceMode;
+void __swift_bridge__$WhitespaceMode$_free(void* self);
+
+void* __swift_bridge__$Vec_WhitespaceMode$new(void);
+void __swift_bridge__$Vec_WhitespaceMode$drop(void* vec_ptr);
+void __swift_bridge__$Vec_WhitespaceMode$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_WhitespaceMode$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_WhitespaceMode$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_WhitespaceMode$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_WhitespaceMode$len(void* vec_ptr);
+void* __swift_bridge__$Vec_WhitespaceMode$as_ptr(void* vec_ptr);
+
+typedef struct NewlineStyle NewlineStyle;
+void __swift_bridge__$NewlineStyle$_free(void* self);
+
+void* __swift_bridge__$Vec_NewlineStyle$new(void);
+void __swift_bridge__$Vec_NewlineStyle$drop(void* vec_ptr);
+void __swift_bridge__$Vec_NewlineStyle$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_NewlineStyle$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_NewlineStyle$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_NewlineStyle$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_NewlineStyle$len(void* vec_ptr);
+void* __swift_bridge__$Vec_NewlineStyle$as_ptr(void* vec_ptr);
+
+typedef struct CodeBlockStyle CodeBlockStyle;
+void __swift_bridge__$CodeBlockStyle$_free(void* self);
+
+void* __swift_bridge__$Vec_CodeBlockStyle$new(void);
+void __swift_bridge__$Vec_CodeBlockStyle$drop(void* vec_ptr);
+void __swift_bridge__$Vec_CodeBlockStyle$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_CodeBlockStyle$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_CodeBlockStyle$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_CodeBlockStyle$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_CodeBlockStyle$len(void* vec_ptr);
+void* __swift_bridge__$Vec_CodeBlockStyle$as_ptr(void* vec_ptr);
+
+typedef struct HighlightStyle HighlightStyle;
+void __swift_bridge__$HighlightStyle$_free(void* self);
+
+void* __swift_bridge__$Vec_HighlightStyle$new(void);
+void __swift_bridge__$Vec_HighlightStyle$drop(void* vec_ptr);
+void __swift_bridge__$Vec_HighlightStyle$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_HighlightStyle$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_HighlightStyle$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_HighlightStyle$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_HighlightStyle$len(void* vec_ptr);
+void* __swift_bridge__$Vec_HighlightStyle$as_ptr(void* vec_ptr);
+
+typedef struct LinkStyle LinkStyle;
+void __swift_bridge__$LinkStyle$_free(void* self);
+
+void* __swift_bridge__$Vec_LinkStyle$new(void);
+void __swift_bridge__$Vec_LinkStyle$drop(void* vec_ptr);
+void __swift_bridge__$Vec_LinkStyle$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_LinkStyle$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_LinkStyle$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_LinkStyle$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_LinkStyle$len(void* vec_ptr);
+void* __swift_bridge__$Vec_LinkStyle$as_ptr(void* vec_ptr);
+
+typedef struct OutputFormat OutputFormat;
+void __swift_bridge__$OutputFormat$_free(void* self);
+
+void* __swift_bridge__$Vec_OutputFormat$new(void);
+void __swift_bridge__$Vec_OutputFormat$drop(void* vec_ptr);
+void __swift_bridge__$Vec_OutputFormat$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_OutputFormat$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_OutputFormat$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_OutputFormat$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_OutputFormat$len(void* vec_ptr);
+void* __swift_bridge__$Vec_OutputFormat$as_ptr(void* vec_ptr);
 
 typedef struct NodeContent NodeContent;
 void __swift_bridge__$NodeContent$_free(void* self);
@@ -693,9 +813,19 @@ uintptr_t __swift_bridge__$NodeContext$depth(void* self);
 uintptr_t __swift_bridge__$NodeContext$index_in_parent(void* self);
 void* __swift_bridge__$NodeContext$parent_tag(void* self);
 bool __swift_bridge__$NodeContext$is_inline(void* self);
+void* __swift_bridge__$TextDirection$to_string(void* self);
 void* __swift_bridge__$LinkType$to_string(void* self);
 void* __swift_bridge__$ImageType$to_string(void* self);
 void* __swift_bridge__$StructuredDataType$to_string(void* self);
+void* __swift_bridge__$PreprocessingPreset$to_string(void* self);
+void* __swift_bridge__$HeadingStyle$to_string(void* self);
+void* __swift_bridge__$ListIndentType$to_string(void* self);
+void* __swift_bridge__$WhitespaceMode$to_string(void* self);
+void* __swift_bridge__$NewlineStyle$to_string(void* self);
+void* __swift_bridge__$CodeBlockStyle$to_string(void* self);
+void* __swift_bridge__$HighlightStyle$to_string(void* self);
+void* __swift_bridge__$LinkStyle$to_string(void* self);
+void* __swift_bridge__$OutputFormat$to_string(void* self);
 void* __swift_bridge__$NodeContent$to_string(void* self);
 void* __swift_bridge__$AnnotationKind$to_string(void* self);
 void* __swift_bridge__$WarningKind$to_string(void* self);

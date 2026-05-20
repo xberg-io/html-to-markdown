@@ -27,16 +27,10 @@ package dev.kreuzberg.android
  * Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
  */
 enum class PreprocessingPreset {
-    /**
-     * Minimal cleanup. Remove only essential noise (scripts, styles).
-     */
+    /** Minimal cleanup. Remove only essential noise (scripts, styles). */
     MINIMAL,
-    /**
-     * Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
-     */
+    /** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
     STANDARD,
-    /**
-     * Aggressive cleanup. Remove extensive non-content elements and structure.
-     */
-    AGGRESSIVE;
+    /** Aggressive cleanup. Remove extensive non-content elements and structure. */
+    AGGRESSIVE,
 }
