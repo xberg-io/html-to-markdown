@@ -14,7 +14,7 @@ pub fn tag_name_eq(a: impl AsRef<str>, b: &str) -> bool {
 
 /// Remove trailing spaces and tabs from a string.
 pub fn trim_trailing_whitespace(output: &mut String) {
-    while output.ends_with(' ') || output.ends_with('\t') {
+    while output.ends_with([' ', '\t']) {
         output.pop();
     }
 }
@@ -40,8 +40,18 @@ pub fn trim_line_end_whitespace(output: &mut String) {
         }
     }
 
-    cleaned.push('\n');
-    *output = cleaned;
+    let trimmed = cleaned.trim_end_matches('\n');
+    if trimmed.is_empty() {
+        *output = String::new();
+    } else {
+        if trimmed.len() < cleaned.len() {
+            // ~ one trimmed '\n' is one byte
+            cleaned.truncate(trimmed.len() + 1);
+        } else {
+            cleaned.push('\n');
+        }
+        *output = cleaned;
+    }
 }
 
 // has_inline_block_misnest and should_drop_for_preprocessing moved back to main.rs
@@ -449,4 +459,48 @@ pub fn is_inline_element(tag_name: &str) -> bool {
             | "progress"
             | "meter"
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_trim_line_end_whitespace() {
+        let mut s = "".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("", s.as_str());
+
+        let mut s = "\t\n\t\n".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("", s.as_str());
+
+        let mut s = "hello, world  ".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello, world  \n", s.as_str());
+
+        let mut s = "hello, world  \n".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello, world  \n", s.as_str());
+
+        let mut s = "hello, world  ".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello, world  \n", s.as_str());
+
+        let mut s = "hello, world  \n\n\n".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello, world  \n", s.as_str());
+
+        let mut s = "hello  \n- world\n".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello  \n- world\n", s.as_str());
+
+        let mut s = "hello, world\t\t  ".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello, world  \n", s.as_str());
+
+        let mut s = "hello, world\t\t  \n.abc def \t \t".to_owned();
+        trim_line_end_whitespace(&mut s);
+        assert_eq!("hello, world  \n.abc def\n", s.as_str());
+    }
 }
