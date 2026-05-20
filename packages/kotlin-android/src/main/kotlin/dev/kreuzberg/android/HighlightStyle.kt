@@ -34,5 +34,5 @@ enum class HighlightStyle {
     /** Render as bold (**text**). Uses strong emphasis. */
     BOLD,
     /** Strip formatting, render as plain text. No markup. */
-    NONE;
+    NONE,
 }

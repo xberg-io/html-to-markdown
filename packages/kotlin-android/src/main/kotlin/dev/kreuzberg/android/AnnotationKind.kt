@@ -26,37 +26,45 @@ package dev.kreuzberg.android
  *
  * Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
  */
-@com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = AnnotationKindDeserializer::class)
+@com.fasterxml.jackson.databind.annotation.JsonDeserialize(
+    using = AnnotationKindDeserializer::class
+)
 @com.fasterxml.jackson.databind.annotation.JsonSerialize(using = AnnotationKindSerializer::class)
 sealed class AnnotationKind {
     /** Bold / strong emphasis. */
     object Bold : AnnotationKind()
+
     /** Italic / emphasis. */
     object Italic : AnnotationKind()
+
     /** Underline. */
     object Underline : AnnotationKind()
+
     /** Strikethrough / deleted text. */
     object Strikethrough : AnnotationKind()
+
     /** Inline code. */
     object Code : AnnotationKind()
+
     /** Subscript text. */
     object Subscript : AnnotationKind()
+
     /** Superscript text. */
     object Superscript : AnnotationKind()
+
     /** Highlighted / marked text. */
     object Highlight : AnnotationKind()
+
     /** A hyperlink sourced from an `<a href="...">` element. */
     @com.fasterxml.jackson.databind.annotation.JsonDeserialize
     @com.fasterxml.jackson.databind.annotation.JsonSerialize
-    data class Link(
-        val url: String,
-        val title: String?
-    ) : AnnotationKind()
+    data class Link(val url: String, val title: String?) : AnnotationKind()
 }
 
-private class AnnotationKindDeserializer : com.fasterxml.jackson.databind.deser.std.StdDeserializer<AnnotationKind>(
-    AnnotationKind::class.java
-) {
+private class AnnotationKindDeserializer :
+    com.fasterxml.jackson.databind.deser.std.StdDeserializer<AnnotationKind>(
+        AnnotationKind::class.java
+    ) {
     @Suppress("LongMethod")
     override fun deserialize(
         parser: com.fasterxml.jackson.core.JsonParser,
@@ -65,7 +73,10 @@ private class AnnotationKindDeserializer : com.fasterxml.jackson.databind.deser.
         val node = parser.codec.readTree<com.fasterxml.jackson.databind.node.ObjectNode>(parser)
         val tag = node.get("annotation_type")?.asText()
         @Suppress("UNCHECKED_CAST")
-        val payload = (node.deepCopy() as com.fasterxml.jackson.databind.node.ObjectNode).apply { remove("annotation_type") }
+        val payload =
+            (node.deepCopy() as com.fasterxml.jackson.databind.node.ObjectNode).apply {
+                remove("annotation_type")
+            }
         return when (tag) {
             "bold" -> AnnotationKind.Bold
             "italic" -> AnnotationKind.Italic
@@ -75,18 +86,23 @@ private class AnnotationKindDeserializer : com.fasterxml.jackson.databind.deser.
             "subscript" -> AnnotationKind.Subscript
             "superscript" -> AnnotationKind.Superscript
             "highlight" -> AnnotationKind.Highlight
-            "link" -> ctx.readTreeAsValue<AnnotationKind.Link>(payload, AnnotationKind.Link::class.java)
-            else -> throw com.fasterxml.jackson.databind.exc.InvalidFormatException(
-                parser,
-                "Unknown AnnotationKind tag",
-                tag,
-                AnnotationKind::class.java,
-            )
+            "link" ->
+                ctx.readTreeAsValue<AnnotationKind.Link>(payload, AnnotationKind.Link::class.java)
+            else ->
+                throw com.fasterxml.jackson.databind.exc.InvalidFormatException(
+                    parser,
+                    "Unknown AnnotationKind tag",
+                    tag,
+                    AnnotationKind::class.java,
+                )
         }
     }
 }
 
-private class AnnotationKindSerializer : com.fasterxml.jackson.databind.ser.std.StdSerializer<AnnotationKind>(AnnotationKind::class.java) {
+private class AnnotationKindSerializer :
+    com.fasterxml.jackson.databind.ser.std.StdSerializer<AnnotationKind>(
+        AnnotationKind::class.java
+    ) {
     @Suppress("LongMethod")
     override fun serialize(
         value: AnnotationKind,
@@ -97,56 +113,58 @@ private class AnnotationKindSerializer : com.fasterxml.jackson.databind.ser.std.
         val mapper =
             (gen.codec as? com.fasterxml.jackson.databind.ObjectMapper)
                 ?: com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules()
-        val node: com.fasterxml.jackson.databind.node.ObjectNode = when (value) {
-            is AnnotationKind.Bold -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "bold")
-                n
+        val node: com.fasterxml.jackson.databind.node.ObjectNode =
+            when (value) {
+                is AnnotationKind.Bold -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "bold")
+                    n
+                }
+                is AnnotationKind.Italic -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "italic")
+                    n
+                }
+                is AnnotationKind.Underline -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "underline")
+                    n
+                }
+                is AnnotationKind.Strikethrough -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "strikethrough")
+                    n
+                }
+                is AnnotationKind.Code -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "code")
+                    n
+                }
+                is AnnotationKind.Subscript -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "subscript")
+                    n
+                }
+                is AnnotationKind.Superscript -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "superscript")
+                    n
+                }
+                is AnnotationKind.Highlight -> {
+                    val n = mapper.createObjectNode()
+                    n.put("annotation_type", "highlight")
+                    n
+                }
+                is AnnotationKind.Link -> {
+                    @Suppress("UNCHECKED_CAST")
+                    val n =
+                        mapper.valueToTree<com.fasterxml.jackson.databind.node.ObjectNode>(
+                            value as AnnotationKind.Link
+                        ) as com.fasterxml.jackson.databind.node.ObjectNode
+                    n.put("annotation_type", "link")
+                    n
+                }
             }
-            is AnnotationKind.Italic -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "italic")
-                n
-            }
-            is AnnotationKind.Underline -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "underline")
-                n
-            }
-            is AnnotationKind.Strikethrough -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "strikethrough")
-                n
-            }
-            is AnnotationKind.Code -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "code")
-                n
-            }
-            is AnnotationKind.Subscript -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "subscript")
-                n
-            }
-            is AnnotationKind.Superscript -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "superscript")
-                n
-            }
-            is AnnotationKind.Highlight -> {
-                val n = mapper.createObjectNode()
-                n.put("annotation_type", "highlight")
-                n
-            }
-            is AnnotationKind.Link -> {
-                @Suppress("UNCHECKED_CAST")
-                val n = mapper.valueToTree<com.fasterxml.jackson.databind.node.ObjectNode>(
-                    value as AnnotationKind.Link
-                ) as com.fasterxml.jackson.databind.node.ObjectNode
-                n.put("annotation_type", "link")
-                n
-            }
-        }
         mapper.writeTree(gen, node)
     }
 }

@@ -34,5 +34,5 @@ enum class WarningKind {
     /** Sanitization was applied to remove potentially unsafe content. */
     SANITIZATION_APPLIED,
     /** DOM traversal was truncated because max_depth was exceeded. */
-    DEPTH_LIMIT_EXCEEDED;
+    DEPTH_LIMIT_EXCEEDED,
 }

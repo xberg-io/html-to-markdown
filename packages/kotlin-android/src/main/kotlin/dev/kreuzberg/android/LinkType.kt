@@ -38,5 +38,5 @@ enum class LinkType {
     /** Phone link (tel:) */
     PHONE,
     /** Other protocol or unclassifiable */
-    OTHER;
+    OTHER,
 }

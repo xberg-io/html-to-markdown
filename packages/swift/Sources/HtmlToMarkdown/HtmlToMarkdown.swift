@@ -76,7 +76,7 @@ internal extension HeaderMetadata {
         self.text = rb.text().toString()
         self.id = rb.id()?.toString()
         self.depth = rb.depth()
-        self.htmlOffset = rb.html_offset()
+        self.htmlOffset = rb.htmlOffset()
     }
     func intoRust() throws -> RustBridge.HeaderMetadata {
         let data = try JSONEncoder().encode(self)
@@ -165,9 +165,9 @@ public struct StructuredData: Codable, Sendable, Hashable {
 // MARK: - Internal FFI conversions for StructuredData
 internal extension StructuredData {
     init(_ rb: RustBridge.StructuredDataRef) throws {
-        self.dataType = StructuredDataType(rawValue: rb.data_type().toString()) ?? { fatalError("Unknown StructuredDataType: \(rb.data_type().toString())") }()
-        self.rawJson = rb.raw_json().toString()
-        self.schemaType = rb.schema_type()?.toString()
+        self.dataType = StructuredDataType(rawValue: rb.dataType().toString()) ?? { fatalError("Unknown StructuredDataType: \(rb.dataType().toString())") }()
+        self.rawJson = rb.rawJson().toString()
+        self.schemaType = rb.schemaType()?.toString()
     }
     func intoRust() throws -> RustBridge.StructuredData {
         let data = try JSONEncoder().encode(self)
@@ -349,9 +349,9 @@ internal extension GridCell {
         self.content = rb.content().toString()
         self.row = rb.row()
         self.col = rb.col()
-        self.rowSpan = rb.row_span()
-        self.colSpan = rb.col_span()
-        self.isHeader = rb.is_header()
+        self.rowSpan = rb.rowSpan()
+        self.colSpan = rb.colSpan()
+        self.isHeader = rb.isHeader()
     }
     func intoRust() throws -> RustBridge.GridCell {
         let data = try JSONEncoder().encode(self)
@@ -1130,165 +1130,165 @@ public extension HtmlVisitorProtocol {
 private final class _HtmlVisitorProtocolAdapter: _SwiftHtmlVisitorBoxDelegate {
     private let inner: any HtmlVisitorProtocol
     init(_ inner: any HtmlVisitorProtocol) { self.inner = inner }
-    func visit_text(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitText(ctx_decoded, text.toString()))
+    func visitText(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitText(ctxDecoded, text.toString()))
     }
-    func visit_element_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitElementStart(ctx_decoded))
+    func visitElementStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitElementStart(ctxDecoded))
     }
-    func visit_element_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitElementEnd(ctx_decoded, output.toString()))
+    func visitElementEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitElementEnd(ctxDecoded, output.toString()))
     }
-    func visit_link(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitLink(ctx_decoded, href.toString(), text.toString(), title?.toString()))
+    func visitLink(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitLink(ctxDecoded, href.toString(), text.toString(), title?.toString()))
     }
-    func visit_image(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitImage(ctx_decoded, src.toString(), alt.toString(), title?.toString()))
+    func visitImage(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitImage(ctxDecoded, src.toString(), alt.toString(), title?.toString()))
     }
-    func visit_heading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitHeading(ctx_decoded, level, text.toString(), id?.toString()))
+    func visitHeading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitHeading(ctxDecoded, level, text.toString(), id?.toString()))
     }
-    func visit_code_block(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitCodeBlock(ctx_decoded, lang?.toString(), code.toString()))
+    func visitCodeBlock(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCodeBlock(ctxDecoded, lang?.toString(), code.toString()))
     }
-    func visit_code_inline(_ ctx: RustString, _ code: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitCodeInline(ctx_decoded, code.toString()))
+    func visitCodeInline(_ ctx: RustString, _ code: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCodeInline(ctxDecoded, code.toString()))
     }
-    func visit_list_item(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitListItem(ctx_decoded, ordered, marker.toString(), text.toString()))
+    func visitListItem(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListItem(ctxDecoded, ordered, marker.toString(), text.toString()))
     }
-    func visit_list_start(_ ctx: RustString, _ ordered: Bool) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitListStart(ctx_decoded, ordered))
+    func visitListStart(_ ctx: RustString, _ ordered: Bool) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListStart(ctxDecoded, ordered))
     }
-    func visit_list_end(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitListEnd(ctx_decoded, ordered, output.toString()))
+    func visitListEnd(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListEnd(ctxDecoded, ordered, output.toString()))
     }
-    func visit_table_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitTableStart(ctx_decoded))
+    func visitTableStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableStart(ctxDecoded))
     }
-    func visit_table_row(_ ctx: RustString, _ cells: RustVec<RustString>, _ is_header: Bool) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitTableRow(ctx_decoded, cells, is_header))
+    func visitTableRow(_ ctx: RustString, _ cells: RustVec<RustString>, _ isHeader: Bool) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableRow(ctxDecoded, cells, isHeader))
     }
-    func visit_table_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitTableEnd(ctx_decoded, output.toString()))
+    func visitTableEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableEnd(ctxDecoded, output.toString()))
     }
-    func visit_blockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitBlockquote(ctx_decoded, content.toString(), Int(depth)))
+    func visitBlockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitBlockquote(ctxDecoded, content.toString(), Int(depth)))
     }
-    func visit_strong(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitStrong(ctx_decoded, text.toString()))
+    func visitStrong(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitStrong(ctxDecoded, text.toString()))
     }
-    func visit_emphasis(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitEmphasis(ctx_decoded, text.toString()))
+    func visitEmphasis(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitEmphasis(ctxDecoded, text.toString()))
     }
-    func visit_strikethrough(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitStrikethrough(ctx_decoded, text.toString()))
+    func visitStrikethrough(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitStrikethrough(ctxDecoded, text.toString()))
     }
-    func visit_underline(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitUnderline(ctx_decoded, text.toString()))
+    func visitUnderline(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitUnderline(ctxDecoded, text.toString()))
     }
-    func visit_subscript(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitSubscript(ctx_decoded, text.toString()))
+    func visitSubscript(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSubscript(ctxDecoded, text.toString()))
     }
-    func visit_superscript(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitSuperscript(ctx_decoded, text.toString()))
+    func visitSuperscript(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSuperscript(ctxDecoded, text.toString()))
     }
-    func visit_mark(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitMark(ctx_decoded, text.toString()))
+    func visitMark(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitMark(ctxDecoded, text.toString()))
     }
-    func visit_line_break(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitLineBreak(ctx_decoded))
+    func visitLineBreak(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitLineBreak(ctxDecoded))
     }
-    func visit_horizontal_rule(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitHorizontalRule(ctx_decoded))
+    func visitHorizontalRule(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitHorizontalRule(ctxDecoded))
     }
-    func visit_custom_element(_ ctx: RustString, _ tag_name: RustString, _ html: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitCustomElement(ctx_decoded, tag_name.toString(), html.toString()))
+    func visitCustomElement(_ ctx: RustString, _ tagName: RustString, _ html: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCustomElement(ctxDecoded, tagName.toString(), html.toString()))
     }
-    func visit_definition_list_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionListStart(ctx_decoded))
+    func visitDefinitionListStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionListStart(ctxDecoded))
     }
-    func visit_definition_term(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionTerm(ctx_decoded, text.toString()))
+    func visitDefinitionTerm(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionTerm(ctxDecoded, text.toString()))
     }
-    func visit_definition_description(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionDescription(ctx_decoded, text.toString()))
+    func visitDefinitionDescription(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionDescription(ctxDecoded, text.toString()))
     }
-    func visit_definition_list_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionListEnd(ctx_decoded, output.toString()))
+    func visitDefinitionListEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionListEnd(ctxDecoded, output.toString()))
     }
-    func visit_form(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitForm(ctx_decoded, action?.toString(), method?.toString()))
+    func visitForm(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitForm(ctxDecoded, action?.toString(), method?.toString()))
     }
-    func visit_input(_ ctx: RustString, _ input_type: RustString, _ name: RustString?, _ value: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitInput(ctx_decoded, input_type.toString(), name?.toString(), value?.toString()))
+    func visitInput(_ ctx: RustString, _ inputType: RustString, _ name: RustString?, _ value: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitInput(ctxDecoded, inputType.toString(), name?.toString(), value?.toString()))
     }
-    func visit_button(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitButton(ctx_decoded, text.toString()))
+    func visitButton(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitButton(ctxDecoded, text.toString()))
     }
-    func visit_audio(_ ctx: RustString, _ src: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitAudio(ctx_decoded, src?.toString()))
+    func visitAudio(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitAudio(ctxDecoded, src?.toString()))
     }
-    func visit_video(_ ctx: RustString, _ src: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitVideo(ctx_decoded, src?.toString()))
+    func visitVideo(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitVideo(ctxDecoded, src?.toString()))
     }
-    func visit_iframe(_ ctx: RustString, _ src: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitIframe(ctx_decoded, src?.toString()))
+    func visitIframe(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitIframe(ctxDecoded, src?.toString()))
     }
-    func visit_details(_ ctx: RustString, _ open: Bool) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDetails(ctx_decoded, open))
+    func visitDetails(_ ctx: RustString, _ open_: Bool) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDetails(ctxDecoded, open_))
     }
-    func visit_summary(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitSummary(ctx_decoded, text.toString()))
+    func visitSummary(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSummary(ctxDecoded, text.toString()))
     }
-    func visit_figure_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitFigureStart(ctx_decoded))
+    func visitFigureStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigureStart(ctxDecoded))
     }
-    func visit_figcaption(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitFigcaption(ctx_decoded, text.toString()))
+    func visitFigcaption(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigcaption(ctxDecoded, text.toString()))
     }
-    func visit_figure_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitFigureEnd(ctx_decoded, output.toString()))
+    func visitFigureEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigureEnd(ctxDecoded, output.toString()))
     }
 }
 

@@ -32,5 +32,5 @@ enum class TextDirection {
     /** Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) */
     RIGHT_TO_LEFT,
     /** Automatic directionality detection */
-    AUTO;
+    AUTO,
 }

@@ -30,5 +30,5 @@ data class PreprocessingOptions(
     /** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
     val removeNavigation: Boolean,
     /** Remove form elements (forms, inputs, buttons, etc.) */
-    val removeForms: Boolean
+    val removeForms: Boolean,
 )

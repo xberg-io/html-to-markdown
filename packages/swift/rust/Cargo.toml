@@ -26,14 +26,14 @@ doctest = false
 bench = false
 
 [dependencies]
-async-trait = "0.1"
 html_to_markdown_rs = { path = "../../../crates/html-to-markdown", features = [
-    "full",
+  "full",
 ], package = "html-to-markdown-rs" }
+async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-swift-bridge = "0.1.59"
 tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros"] }
+swift-bridge = "0.1.59"
 
 [build-dependencies]
 swift-bridge-build = "0.1.59"

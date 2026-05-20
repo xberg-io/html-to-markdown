@@ -34,5 +34,5 @@ enum class ImageType {
     /** External image URL (http/https) */
     EXTERNAL,
     /** Relative image path */
-    RELATIVE;
+    RELATIVE,
 }

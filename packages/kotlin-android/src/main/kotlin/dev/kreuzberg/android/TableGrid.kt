@@ -30,18 +30,17 @@ data class TableGrid(
     /**
      * All cells in the table as a flat, sparse list.
      *
-     * The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
-     * that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
-     * in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
-     * and `col_span` fields set accordingly.
+     * The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that
+     * are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the
+     * list. Only the top-left "origin" cell of a span is present, with its `row_span` and
+     * `col_span` fields set accordingly.
      *
-     * To reconstruct the full visual grid, iterate over all cells and mark the rectangular
-     * region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
-     * `(row, col)` position that is not the origin of any cell is covered by a span from an
-     * earlier cell.
+     * To reconstruct the full visual grid, iterate over all cells and mark the rectangular region
+     * `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)`
+     * position that is not the origin of any cell is covered by a span from an earlier cell.
      *
-     * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
-     * produces an empty vec.
+     * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`) produces
+     * an empty vec.
      */
-    val cells: List<GridCell>
+    val cells: List<GridCell>,
 )

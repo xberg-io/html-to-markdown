@@ -53,12 +53,18 @@ mod ffi {
         fn description(&self) -> Option<String>;
         fn keywords(&self) -> Vec<String>;
         fn author(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "canonicalUrl")]
         fn canonical_url(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "baseHref")]
         fn base_href(&self) -> Option<String>;
         fn language(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "textDirection")]
         fn text_direction(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "openGraph")]
         fn open_graph(&self) -> String;
+        #[swift_bridge(swift_name = "twitterCard")]
         fn twitter_card(&self) -> String;
+        #[swift_bridge(swift_name = "metaTags")]
         fn meta_tags(&self) -> String;
     }
 
@@ -68,6 +74,7 @@ mod ffi {
         fn text(&self) -> String;
         fn id(&self) -> Option<String>;
         fn depth(&self) -> usize;
+        #[swift_bridge(swift_name = "htmlOffset")]
         fn html_offset(&self) -> usize;
     }
 
@@ -76,6 +83,7 @@ mod ffi {
         fn href(&self) -> String;
         fn text(&self) -> String;
         fn title(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "linkType")]
         fn link_type(&self) -> String;
         fn rel(&self) -> Vec<String>;
         fn attributes(&self) -> String;
@@ -87,14 +95,18 @@ mod ffi {
         fn alt(&self) -> Option<String>;
         fn title(&self) -> Option<String>;
         fn dimensions(&self) -> Option<Vec<u32>>;
+        #[swift_bridge(swift_name = "imageType")]
         fn image_type(&self) -> String;
         fn attributes(&self) -> String;
     }
 
     extern "Rust" {
         type StructuredData;
+        #[swift_bridge(swift_name = "dataType")]
         fn data_type(&self) -> String;
+        #[swift_bridge(swift_name = "rawJson")]
         fn raw_json(&self) -> String;
+        #[swift_bridge(swift_name = "schemaType")]
         fn schema_type(&self) -> Option<String>;
     }
 
@@ -112,6 +124,7 @@ mod ffi {
         fn headers(&self) -> Vec<HeaderMetadata>;
         fn links(&self) -> Vec<LinkMetadata>;
         fn images(&self) -> Vec<ImageMetadata>;
+        #[swift_bridge(swift_name = "structuredData")]
         fn structured_data(&self) -> Vec<StructuredData>;
     }
 
@@ -162,46 +175,81 @@ mod ffi {
             exclude_selectors: Vec<String>,
             visitor: Option<VisitorHandle>,
         ) -> ConversionOptions;
+        #[swift_bridge(swift_name = "headingStyle")]
         fn heading_style(&self) -> String;
+        #[swift_bridge(swift_name = "listIndentType")]
         fn list_indent_type(&self) -> String;
+        #[swift_bridge(swift_name = "listIndentWidth")]
         fn list_indent_width(&self) -> usize;
         fn bullets(&self) -> String;
+        #[swift_bridge(swift_name = "strongEmSymbol")]
         fn strong_em_symbol(&self) -> String;
+        #[swift_bridge(swift_name = "escapeAsterisks")]
         fn escape_asterisks(&self) -> bool;
+        #[swift_bridge(swift_name = "escapeUnderscores")]
         fn escape_underscores(&self) -> bool;
+        #[swift_bridge(swift_name = "escapeMisc")]
         fn escape_misc(&self) -> bool;
+        #[swift_bridge(swift_name = "escapeAscii")]
         fn escape_ascii(&self) -> bool;
+        #[swift_bridge(swift_name = "codeLanguage")]
         fn code_language(&self) -> String;
         fn autolinks(&self) -> bool;
+        #[swift_bridge(swift_name = "defaultTitle")]
         fn default_title(&self) -> bool;
+        #[swift_bridge(swift_name = "brInTables")]
         fn br_in_tables(&self) -> bool;
+        #[swift_bridge(swift_name = "compactTables")]
         fn compact_tables(&self) -> bool;
+        #[swift_bridge(swift_name = "highlightStyle")]
         fn highlight_style(&self) -> String;
+        #[swift_bridge(swift_name = "extractMetadata")]
         fn extract_metadata(&self) -> bool;
+        #[swift_bridge(swift_name = "whitespaceMode")]
         fn whitespace_mode(&self) -> String;
+        #[swift_bridge(swift_name = "stripNewlines")]
         fn strip_newlines(&self) -> bool;
         fn wrap(&self) -> bool;
+        #[swift_bridge(swift_name = "wrapWidth")]
         fn wrap_width(&self) -> usize;
+        #[swift_bridge(swift_name = "convertAsInline")]
         fn convert_as_inline(&self) -> bool;
+        #[swift_bridge(swift_name = "subSymbol")]
         fn sub_symbol(&self) -> String;
+        #[swift_bridge(swift_name = "supSymbol")]
         fn sup_symbol(&self) -> String;
+        #[swift_bridge(swift_name = "newlineStyle")]
         fn newline_style(&self) -> String;
+        #[swift_bridge(swift_name = "codeBlockStyle")]
         fn code_block_style(&self) -> String;
+        #[swift_bridge(swift_name = "keepInlineImagesIn")]
         fn keep_inline_images_in(&self) -> Vec<String>;
         fn preprocessing(&self) -> PreprocessingOptions;
         fn encoding(&self) -> String;
         fn debug(&self) -> bool;
+        #[swift_bridge(swift_name = "stripTags")]
         fn strip_tags(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "preserveTags")]
         fn preserve_tags(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "skipImages")]
         fn skip_images(&self) -> bool;
+        #[swift_bridge(swift_name = "linkStyle")]
         fn link_style(&self) -> String;
+        #[swift_bridge(swift_name = "outputFormat")]
         fn output_format(&self) -> String;
+        #[swift_bridge(swift_name = "includeDocumentStructure")]
         fn include_document_structure(&self) -> bool;
+        #[swift_bridge(swift_name = "extractImages")]
         fn extract_images(&self) -> bool;
+        #[swift_bridge(swift_name = "maxImageSize")]
         fn max_image_size(&self) -> u64;
+        #[swift_bridge(swift_name = "captureSvg")]
         fn capture_svg(&self) -> bool;
+        #[swift_bridge(swift_name = "inferDimensions")]
         fn infer_dimensions(&self) -> bool;
+        #[swift_bridge(swift_name = "maxDepth")]
         fn max_depth(&self) -> Option<usize>;
+        #[swift_bridge(swift_name = "excludeSelectors")]
         fn exclude_selectors(&self) -> Vec<String>;
         fn visitor(&self) -> Option<VisitorHandle>;
     }
@@ -253,46 +301,81 @@ mod ffi {
             exclude_selectors: Option<Vec<String>>,
             visitor: Option<VisitorHandle>,
         ) -> ConversionOptionsUpdate;
+        #[swift_bridge(swift_name = "headingStyle")]
         fn heading_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "listIndentType")]
         fn list_indent_type(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "listIndentWidth")]
         fn list_indent_width(&self) -> Option<usize>;
         fn bullets(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "strongEmSymbol")]
         fn strong_em_symbol(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "escapeAsterisks")]
         fn escape_asterisks(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "escapeUnderscores")]
         fn escape_underscores(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "escapeMisc")]
         fn escape_misc(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "escapeAscii")]
         fn escape_ascii(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "codeLanguage")]
         fn code_language(&self) -> Option<String>;
         fn autolinks(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "defaultTitle")]
         fn default_title(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "brInTables")]
         fn br_in_tables(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "compactTables")]
         fn compact_tables(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "highlightStyle")]
         fn highlight_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "extractMetadata")]
         fn extract_metadata(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "whitespaceMode")]
         fn whitespace_mode(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "stripNewlines")]
         fn strip_newlines(&self) -> Option<bool>;
         fn wrap(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "wrapWidth")]
         fn wrap_width(&self) -> Option<usize>;
+        #[swift_bridge(swift_name = "convertAsInline")]
         fn convert_as_inline(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "subSymbol")]
         fn sub_symbol(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "supSymbol")]
         fn sup_symbol(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "newlineStyle")]
         fn newline_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "codeBlockStyle")]
         fn code_block_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "keepInlineImagesIn")]
         fn keep_inline_images_in(&self) -> Option<Vec<String>>;
         fn preprocessing(&self) -> Option<PreprocessingOptionsUpdate>;
         fn encoding(&self) -> Option<String>;
         fn debug(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "stripTags")]
         fn strip_tags(&self) -> Option<Vec<String>>;
+        #[swift_bridge(swift_name = "preserveTags")]
         fn preserve_tags(&self) -> Option<Vec<String>>;
+        #[swift_bridge(swift_name = "skipImages")]
         fn skip_images(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "linkStyle")]
         fn link_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "outputFormat")]
         fn output_format(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "includeDocumentStructure")]
         fn include_document_structure(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "extractImages")]
         fn extract_images(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "maxImageSize")]
         fn max_image_size(&self) -> Option<u64>;
+        #[swift_bridge(swift_name = "captureSvg")]
         fn capture_svg(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "inferDimensions")]
         fn infer_dimensions(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "maxDepth")]
         fn max_depth(&self) -> String;
+        #[swift_bridge(swift_name = "excludeSelectors")]
         fn exclude_selectors(&self) -> Option<Vec<String>>;
         fn visitor(&self) -> Option<VisitorHandle>;
     }
@@ -308,7 +391,9 @@ mod ffi {
         ) -> PreprocessingOptions;
         fn enabled(&self) -> bool;
         fn preset(&self) -> String;
+        #[swift_bridge(swift_name = "removeNavigation")]
         fn remove_navigation(&self) -> bool;
+        #[swift_bridge(swift_name = "removeForms")]
         fn remove_forms(&self) -> bool;
     }
 
@@ -323,13 +408,16 @@ mod ffi {
         ) -> PreprocessingOptionsUpdate;
         fn enabled(&self) -> Option<bool>;
         fn preset(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "removeNavigation")]
         fn remove_navigation(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "removeForms")]
         fn remove_forms(&self) -> Option<bool>;
     }
 
     extern "Rust" {
         type DocumentStructure;
         fn nodes(&self) -> Vec<DocumentNode>;
+        #[swift_bridge(swift_name = "sourceFormat")]
         fn source_format(&self) -> Option<String>;
     }
 
@@ -382,8 +470,11 @@ mod ffi {
         fn content(&self) -> String;
         fn row(&self) -> u32;
         fn col(&self) -> u32;
+        #[swift_bridge(swift_name = "rowSpan")]
         fn row_span(&self) -> u32;
+        #[swift_bridge(swift_name = "colSpan")]
         fn col_span(&self) -> u32;
+        #[swift_bridge(swift_name = "isHeader")]
         fn is_header(&self) -> bool;
     }
 
@@ -405,12 +496,17 @@ mod ffi {
 
     extern "Rust" {
         type NodeContext;
+        #[swift_bridge(swift_name = "nodeType")]
         fn node_type(&self) -> String;
+        #[swift_bridge(swift_name = "tagName")]
         fn tag_name(&self) -> String;
         fn attributes(&self) -> String;
         fn depth(&self) -> usize;
+        #[swift_bridge(swift_name = "indexInParent")]
         fn index_in_parent(&self) -> usize;
+        #[swift_bridge(swift_name = "parentTag")]
         fn parent_tag(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "isInline")]
         fn is_inline(&self) -> bool;
     }
 

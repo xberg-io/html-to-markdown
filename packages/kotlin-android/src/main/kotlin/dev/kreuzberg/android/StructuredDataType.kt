@@ -32,5 +32,5 @@ enum class StructuredDataType {
     /** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
     MICRODATA,
     /** RDF in Attributes (RDFa) markup */
-    R_D_FA;
+    R_D_FA,
 }
