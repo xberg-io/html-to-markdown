@@ -16,10 +16,10 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
+  "html-to-markdown>=3.5.0",
   "pytest>=7.4",
   "pytest-asyncio>=0.23",
   "pytest-timeout>=2.1",
-  "html-to-markdown>=3.5.0",
 ]
 
 [tool.setuptools]

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "result_warning_kind_image_extraction_failed",
+    "description": "A malformed data URI with extract_images enabled produces an ImageExtractionFailed warning",
+    "input": {
+      "html": "<p>Text<img src=\"data:BADMIME\" alt=\"broken\">end</p>",
+      "options": {
+        "extract_images": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "count_min",
+        "field": "warnings",
+        "value": 1
+      }
+    ]
+  }
+]

@@ -86,7 +86,6 @@ val result = HtmlToMarkdownRs.convert(html)
 val markdown: String? = result.content
 ```
 
-
 With conversion options:
 
 ```kotlin
@@ -108,7 +107,6 @@ val html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>"
 val result = HtmlToMarkdownRs.convert(html, options)
 val markdown: String? = result.content
 ```
-
 
 ## API Reference
 
@@ -180,7 +178,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

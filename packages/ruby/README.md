@@ -97,7 +97,6 @@ result = HtmlToMarkdown.convert(html)
 markdown = result[:content]
 ```
 
-
 With conversion options:
 
 ```ruby
@@ -108,11 +107,9 @@ result = HtmlToMarkdown.convert(html, heading_style: :atx, code_block_style: :fe
 markdown = result[:content]
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`convert(html, options: nil, visitor: nil) -> ConversionResult`**
 
@@ -277,9 +274,7 @@ markdown = result[:content]
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **RubyGems:** [rubygems.org/gems/html-to-markdown](https://rubygems.org/gems/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

@@ -101,7 +101,6 @@ var result = HtmlToMarkdownConverter.Convert(html);
 Console.WriteLine(result.Content);
 ```
 
-
 With conversion options:
 
 ```csharp
@@ -120,11 +119,9 @@ var result = HtmlToMarkdownConverter.Convert(html, options);
 Console.WriteLine(result.Content);
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`HtmlToMarkdownConverter.Convert(string html, ConversionOptions? options = null) : ConversionResult`**
 
@@ -228,9 +225,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **NuGet:** [nuget.org/packages/KreuzbergDev.HtmlToMarkdown](https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

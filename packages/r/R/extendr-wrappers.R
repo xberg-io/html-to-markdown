@@ -65,6 +65,8 @@ HeaderMetadata$is_valid <- function() .Call("wrap__HeaderMetadata__is_valid", se
 }
 #' @export
 `[[.HeaderMetadata` <- `$.HeaderMetadata`
+#' @export
+is_valid.HeaderMetadata <- function(x, ...) x$is_valid(...)
 #' Hyperlink metadata with categorization and attributes
 #'
 #' Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -226,7 +228,6 @@ ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__fr
 #' @field visitor Optional override for [`ConversionOptions::visitor`].
 #' @export
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
-ConversionOptionsUpdate$from_json <- function(json) .Call("wrap__ConversionOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
 `$.ConversionOptionsUpdate` <- function(self, name) {
   func <- ConversionOptionsUpdate[[name]]
@@ -263,7 +264,6 @@ PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptio
 #' @field remove_forms Optional form element removal override (forms, inputs, buttons, etc.)
 #' @export
 PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
-PreprocessingOptionsUpdate$from_json <- function(json) .Call("wrap__PreprocessingOptionsUpdate__from_json", json, PACKAGE = "htmltomarkdown")
 #' @export
 `$.PreprocessingOptionsUpdate` <- function(self, name) {
   func <- PreprocessingOptionsUpdate[[name]]
@@ -427,3 +427,5 @@ AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_jso
 }
 #' @export
 `[[.AnnotationKind` <- `$.AnnotationKind`
+#' @export
+is_valid <- function(x, ...) UseMethod("is_valid")

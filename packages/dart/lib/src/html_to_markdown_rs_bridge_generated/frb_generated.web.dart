@@ -21,86 +21,101 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_VisitorHandlePtr => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
+  get rust_arc_decrement_strong_count_VisitorHandlePtr => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle;
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
 
   @protected
   VisitorHandle
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          dynamic raw);
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext)
-      dco_decode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String)
-      dco_decode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String, String)
-      dco_decode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String, String, String?)
-      dco_decode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64)
-      dco_decode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String, String?, String?)
-      dco_decode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, bool)
-      dco_decode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, bool, String)
-      dco_decode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, bool, String, String)
-      dco_decode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?)
-      dco_decode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, List<String>, bool)
-      dco_decode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String?)
-      dco_decode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String?, String)
-      dco_decode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   FutureOr<VisitResult> Function(NodeContext, String?, String?)
-      dco_decode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(
-          dynamic raw);
+  dco_decode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(
+    dynamic raw,
+  );
 
   @protected
   Object dco_decode_DartOpaque(dynamic raw);
@@ -110,8 +125,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VisitorHandle
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          dynamic raw);
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    dynamic raw,
+  );
 
   @protected
   String dco_decode_String(dynamic raw);
@@ -124,8 +140,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VisitorHandle
-      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          dynamic raw);
+  dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    dynamic raw,
+  );
 
   @protected
   bool dco_decode_box_autoadd_bool(dynamic raw);
@@ -162,7 +179,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreprocessingOptionsUpdate
-      dco_decode_box_autoadd_preprocessing_options_update(dynamic raw);
+  dco_decode_box_autoadd_preprocessing_options_update(dynamic raw);
 
   @protected
   PreprocessingPreset dco_decode_box_autoadd_preprocessing_preset(dynamic raw);
@@ -298,8 +315,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VisitorHandle?
-      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          dynamic raw);
+  dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    dynamic raw,
+  );
 
   @protected
   bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
@@ -336,11 +354,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreprocessingOptionsUpdate?
-      dco_decode_opt_box_autoadd_preprocessing_options_update(dynamic raw);
+  dco_decode_opt_box_autoadd_preprocessing_options_update(dynamic raw);
 
   @protected
   PreprocessingPreset? dco_decode_opt_box_autoadd_preprocessing_preset(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw);
@@ -362,7 +381,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreprocessingOptionsUpdate dco_decode_preprocessing_options_update(
-      dynamic raw);
+    dynamic raw,
+  );
 
   @protected
   PreprocessingPreset dco_decode_preprocessing_preset(dynamic raw);
@@ -414,20 +434,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VisitorHandle
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          SseDeserializer deserializer);
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    SseDeserializer deserializer,
+  );
 
   @protected
   Object sse_decode_DartOpaque(SseDeserializer deserializer);
 
   @protected
   Map<String, String> sse_decode_Map_String_String_None(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   VisitorHandle
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          SseDeserializer deserializer);
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    SseDeserializer deserializer,
+  );
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -440,31 +463,37 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VisitorHandle
-      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          SseDeserializer deserializer);
+  sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
   CodeBlockStyle sse_decode_box_autoadd_code_block_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConversionOptions sse_decode_box_autoadd_conversion_options(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   DocumentStructure sse_decode_box_autoadd_document_structure(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   HeadingStyle sse_decode_box_autoadd_heading_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   HighlightStyle sse_decode_box_autoadd_highlight_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
@@ -474,35 +503,42 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ListIndentType sse_decode_box_autoadd_list_indent_type(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   NewlineStyle sse_decode_box_autoadd_newline_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   OutputFormat sse_decode_box_autoadd_output_format(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingOptionsUpdate
-      sse_decode_box_autoadd_preprocessing_options_update(
-          SseDeserializer deserializer);
+  sse_decode_box_autoadd_preprocessing_options_update(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingPreset sse_decode_box_autoadd_preprocessing_preset(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   TableGrid sse_decode_box_autoadd_table_grid(SseDeserializer deserializer);
 
   @protected
   TextDirection sse_decode_box_autoadd_text_direction(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   WhitespaceMode sse_decode_box_autoadd_whitespace_mode(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   CodeBlockStyle sse_decode_code_block_style(SseDeserializer deserializer);
@@ -512,7 +548,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ConversionOptionsUpdate sse_decode_conversion_options_update(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConversionResult sse_decode_conversion_result(SseDeserializer deserializer);
@@ -570,25 +607,29 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<DocumentNode> sse_decode_list_document_node(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<GridCell> sse_decode_list_grid_cell(SseDeserializer deserializer);
 
   @protected
   List<HeaderMetadata> sse_decode_list_header_metadata(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<ImageMetadata> sse_decode_list_image_metadata(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ListIndentType sse_decode_list_indent_type(SseDeserializer deserializer);
 
   @protected
   List<LinkMetadata> sse_decode_list_link_metadata(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   Int64List sse_decode_list_prim_i_64_strict(SseDeserializer deserializer);
@@ -598,22 +639,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ProcessingWarning> sse_decode_list_processing_warning(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<(String, String)> sse_decode_list_record_string_string(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<StructuredData> sse_decode_list_structured_data(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<TableData> sse_decode_list_table_data(SseDeserializer deserializer);
 
   @protected
   List<TextAnnotation> sse_decode_list_text_annotation(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   NewlineStyle sse_decode_newline_style(SseDeserializer deserializer);
@@ -629,74 +674,89 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Map<String, String>? sse_decode_opt_Map_String_String_None(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
   VisitorHandle?
-      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          SseDeserializer deserializer);
+  sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
   CodeBlockStyle? sse_decode_opt_box_autoadd_code_block_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ConversionOptions? sse_decode_opt_box_autoadd_conversion_options(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   DocumentStructure? sse_decode_opt_box_autoadd_document_structure(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   HeadingStyle? sse_decode_opt_box_autoadd_heading_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   HighlightStyle? sse_decode_opt_box_autoadd_highlight_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
   LinkStyle? sse_decode_opt_box_autoadd_link_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ListIndentType? sse_decode_opt_box_autoadd_list_indent_type(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   NewlineStyle? sse_decode_opt_box_autoadd_newline_style(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   OutputFormat? sse_decode_opt_box_autoadd_output_format(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingOptionsUpdate?
-      sse_decode_opt_box_autoadd_preprocessing_options_update(
-          SseDeserializer deserializer);
+  sse_decode_opt_box_autoadd_preprocessing_options_update(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingPreset? sse_decode_opt_box_autoadd_preprocessing_preset(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   TextDirection? sse_decode_opt_box_autoadd_text_direction(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   WhitespaceMode? sse_decode_opt_box_autoadd_whitespace_mode(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
@@ -709,29 +769,34 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreprocessingOptions sse_decode_preprocessing_options(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingOptionsUpdate sse_decode_preprocessing_options_update(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreprocessingPreset sse_decode_preprocessing_preset(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   ProcessingWarning sse_decode_processing_warning(SseDeserializer deserializer);
 
   @protected
   (String, String) sse_decode_record_string_string(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   StructuredData sse_decode_structured_data(SseDeserializer deserializer);
 
   @protected
   StructuredDataType sse_decode_structured_data_type(
-      SseDeserializer deserializer);
+    SseDeserializer deserializer,
+  );
 
   @protected
   TableData sse_decode_table_data(SseDeserializer deserializer);
@@ -765,233 +830,300 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_AnyhowException(
-      AnyhowException self, SseSerializer serializer);
+    AnyhowException self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          VisitorHandle self, SseSerializer serializer);
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    VisitorHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String, String) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String, String, String?)
-              self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String, String, String?) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64)
-              self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String, String?, String?)
-              self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String, String?, String?) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, bool) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, bool) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, bool, String) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, bool, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, bool, String, String)
-              self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, bool, String, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(
-                  NodeContext, PlatformInt64, String, String?)
-              self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?)
+    self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, List<String>, bool) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, List<String>, bool) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String?) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String?) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String?, String) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String?, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(
-          FutureOr<VisitResult> Function(NodeContext, String?, String?) self,
-          SseSerializer serializer);
+  sse_encode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(
+    FutureOr<VisitResult> Function(NodeContext, String?, String?) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_DartOpaque(Object self, SseSerializer serializer);
 
   @protected
   void sse_encode_Map_String_String_None(
-      Map<String, String> self, SseSerializer serializer);
+    Map<String, String> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          VisitorHandle self, SseSerializer serializer);
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    VisitorHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
   void sse_encode_annotation_kind(
-      AnnotationKind self, SseSerializer serializer);
+    AnnotationKind self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
   void
-      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          VisitorHandle self, SseSerializer serializer);
+  sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    VisitorHandle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_code_block_style(
-      CodeBlockStyle self, SseSerializer serializer);
+    CodeBlockStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_conversion_options(
-      ConversionOptions self, SseSerializer serializer);
+    ConversionOptions self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_document_structure(
-      DocumentStructure self, SseSerializer serializer);
+    DocumentStructure self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_heading_style(
-      HeadingStyle self, SseSerializer serializer);
+    HeadingStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_highlight_style(
-      HighlightStyle self, SseSerializer serializer);
+    HighlightStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_i_64(
-      PlatformInt64 self, SseSerializer serializer);
+    PlatformInt64 self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_link_style(
-      LinkStyle self, SseSerializer serializer);
+    LinkStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_list_indent_type(
-      ListIndentType self, SseSerializer serializer);
+    ListIndentType self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_newline_style(
-      NewlineStyle self, SseSerializer serializer);
+    NewlineStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_output_format(
-      OutputFormat self, SseSerializer serializer);
+    OutputFormat self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_preprocessing_options_update(
-      PreprocessingOptionsUpdate self, SseSerializer serializer);
+    PreprocessingOptionsUpdate self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_preprocessing_preset(
-      PreprocessingPreset self, SseSerializer serializer);
+    PreprocessingPreset self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_table_grid(
-      TableGrid self, SseSerializer serializer);
+    TableGrid self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_text_direction(
-      TextDirection self, SseSerializer serializer);
+    TextDirection self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_whitespace_mode(
-      WhitespaceMode self, SseSerializer serializer);
+    WhitespaceMode self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_code_block_style(
-      CodeBlockStyle self, SseSerializer serializer);
+    CodeBlockStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_conversion_options(
-      ConversionOptions self, SseSerializer serializer);
+    ConversionOptions self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_conversion_options_update(
-      ConversionOptionsUpdate self, SseSerializer serializer);
+    ConversionOptionsUpdate self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_conversion_result(
-      ConversionResult self, SseSerializer serializer);
+    ConversionResult self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_document_metadata(
-      DocumentMetadata self, SseSerializer serializer);
+    DocumentMetadata self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_document_node(DocumentNode self, SseSerializer serializer);
 
   @protected
   void sse_encode_document_structure(
-      DocumentStructure self, SseSerializer serializer);
+    DocumentStructure self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_grid_cell(GridCell self, SseSerializer serializer);
 
   @protected
   void sse_encode_header_metadata(
-      HeaderMetadata self, SseSerializer serializer);
+    HeaderMetadata self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_heading_style(HeadingStyle self, SseSerializer serializer);
 
   @protected
   void sse_encode_highlight_style(
-      HighlightStyle self, SseSerializer serializer);
+    HighlightStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_html_metadata(HtmlMetadata self, SseSerializer serializer);
@@ -1025,54 +1157,78 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_document_node(
-      List<DocumentNode> self, SseSerializer serializer);
+    List<DocumentNode> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_grid_cell(List<GridCell> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_header_metadata(
-      List<HeaderMetadata> self, SseSerializer serializer);
+    List<HeaderMetadata> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_image_metadata(
-      List<ImageMetadata> self, SseSerializer serializer);
+    List<ImageMetadata> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_indent_type(
-      ListIndentType self, SseSerializer serializer);
+    ListIndentType self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_link_metadata(
-      List<LinkMetadata> self, SseSerializer serializer);
+    List<LinkMetadata> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_prim_i_64_strict(
-      Int64List self, SseSerializer serializer);
+    Int64List self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_prim_u_8_strict(
-      Uint8List self, SseSerializer serializer);
+    Uint8List self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_processing_warning(
-      List<ProcessingWarning> self, SseSerializer serializer);
+    List<ProcessingWarning> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_record_string_string(
-      List<(String, String)> self, SseSerializer serializer);
+    List<(String, String)> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_structured_data(
-      List<StructuredData> self, SseSerializer serializer);
+    List<StructuredData> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_table_data(
-      List<TableData> self, SseSerializer serializer);
+    List<TableData> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_text_annotation(
-      List<TextAnnotation> self, SseSerializer serializer);
+    List<TextAnnotation> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_newline_style(NewlineStyle self, SseSerializer serializer);
@@ -1088,112 +1244,160 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_Map_String_String_None(
-      Map<String, String>? self, SseSerializer serializer);
+    Map<String, String>? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
   void
-      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          VisitorHandle? self, SseSerializer serializer);
+  sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    VisitorHandle? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_code_block_style(
-      CodeBlockStyle? self, SseSerializer serializer);
+    CodeBlockStyle? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_conversion_options(
-      ConversionOptions? self, SseSerializer serializer);
+    ConversionOptions? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_document_structure(
-      DocumentStructure? self, SseSerializer serializer);
+    DocumentStructure? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_heading_style(
-      HeadingStyle? self, SseSerializer serializer);
+    HeadingStyle? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_highlight_style(
-      HighlightStyle? self, SseSerializer serializer);
+    HighlightStyle? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_i_64(
-      PlatformInt64? self, SseSerializer serializer);
+    PlatformInt64? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_link_style(
-      LinkStyle? self, SseSerializer serializer);
+    LinkStyle? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_list_indent_type(
-      ListIndentType? self, SseSerializer serializer);
+    ListIndentType? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_newline_style(
-      NewlineStyle? self, SseSerializer serializer);
+    NewlineStyle? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_output_format(
-      OutputFormat? self, SseSerializer serializer);
+    OutputFormat? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_preprocessing_options_update(
-      PreprocessingOptionsUpdate? self, SseSerializer serializer);
+    PreprocessingOptionsUpdate? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_preprocessing_preset(
-      PreprocessingPreset? self, SseSerializer serializer);
+    PreprocessingPreset? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_text_direction(
-      TextDirection? self, SseSerializer serializer);
+    TextDirection? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_whitespace_mode(
-      WhitespaceMode? self, SseSerializer serializer);
+    WhitespaceMode? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_list_prim_i_64_strict(
-      Int64List? self, SseSerializer serializer);
+    Int64List? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_output_format(OutputFormat self, SseSerializer serializer);
 
   @protected
   void sse_encode_preprocessing_options(
-      PreprocessingOptions self, SseSerializer serializer);
+    PreprocessingOptions self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_preprocessing_options_update(
-      PreprocessingOptionsUpdate self, SseSerializer serializer);
+    PreprocessingOptionsUpdate self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_preprocessing_preset(
-      PreprocessingPreset self, SseSerializer serializer);
+    PreprocessingPreset self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_processing_warning(
-      ProcessingWarning self, SseSerializer serializer);
+    ProcessingWarning self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_record_string_string(
-      (String, String) self, SseSerializer serializer);
+    (String, String) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_structured_data(
-      StructuredData self, SseSerializer serializer);
+    StructuredData self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_structured_data_type(
-      StructuredDataType self, SseSerializer serializer);
+    StructuredDataType self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_table_data(TableData self, SseSerializer serializer);
@@ -1203,7 +1407,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_text_annotation(
-      TextAnnotation self, SseSerializer serializer);
+    TextAnnotation self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_text_direction(TextDirection self, SseSerializer serializer);
@@ -1225,7 +1431,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_whitespace_mode(
-      WhitespaceMode self, SseSerializer serializer);
+    WhitespaceMode self,
+    SseSerializer serializer,
+  );
 }
 
 // Section: wire_class
@@ -1233,17 +1441,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 class RustLibWire implements BaseWire {
   RustLibWire.fromExternalLibrary(ExternalLibrary lib);
 
-  void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          int ptr) =>
-      wasmModule
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-              ptr);
+  void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+        ptr,
+      );
 
-  void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          int ptr) =>
-      wasmModule
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-              ptr);
+  void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+        ptr,
+      );
 }
 
 @JS('wasm_bindgen')
@@ -1253,10 +1465,12 @@ external RustLibWasmModule get wasmModule;
 @anonymous
 extension type RustLibWasmModule._(JSObject _) implements JSObject {
   external void
-      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          int ptr);
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    int ptr,
+  );
 
   external void
-      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-          int ptr);
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+    int ptr,
+  );
 }

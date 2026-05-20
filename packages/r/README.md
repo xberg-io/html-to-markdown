@@ -108,7 +108,6 @@ markdown <- result$content
 cat(markdown)
 ```
 
-
 With conversion options:
 
 ```r
@@ -124,11 +123,9 @@ result <- convert("<h1>Hello</h1><p>World</p>", opts)
 cat(result$content)
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`convert(html, options = NULL)`**
 
@@ -258,7 +255,6 @@ cat(result$content)
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

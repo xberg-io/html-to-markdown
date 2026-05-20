@@ -836,19 +836,33 @@ void* __swift_bridge__$alef_phantom_vec_html_visitor(void);
 void* __swift_bridge__$make_html_visitor_handle(void* swift_box);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_from_json_with_visitor(void* json, void* visitor);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_from_json(void* json);
-struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_update_from_json(void* json);
-struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_update_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$node_context_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$document_metadata_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$header_metadata_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$link_metadata_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$image_metadata_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$structured_data_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$html_metadata_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_update_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$preprocessing_options_update_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$document_structure_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$document_node_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$text_annotation_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$conversion_result_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$table_grid_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$grid_cell_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$table_data_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$processing_warning_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$text_direction_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$link_type_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$image_type_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$structured_data_type_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$node_content_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$annotation_kind_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$warning_kind_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$node_type_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$visit_result_from_json(void* json);
 
 
 #endif /* RUST_BRIDGE_C_H */

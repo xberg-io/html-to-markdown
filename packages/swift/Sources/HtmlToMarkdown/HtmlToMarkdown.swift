@@ -42,7 +42,48 @@ public typealias DocumentMetadata = RustBridge.DocumentMetadata
 /// assert_eq!(header.level, 1);
 /// assert!(header.is_valid());
 /// ```
-public typealias HeaderMetadata = RustBridge.HeaderMetadata
+public struct HeaderMetadata: Codable, Sendable, Hashable {
+    /// Header level: 1 (h1) through 6 (h6)
+    public let level: UInt8
+    /// Normalized text content of the header
+    public let text: String
+    /// HTML id attribute if present
+    public let id: String?
+    /// Document tree depth at the header element
+    public let depth: UInt
+    /// Byte offset in original HTML document
+    public let htmlOffset: UInt
+    public init(level: UInt8, text: String, id: String? = nil, depth: UInt, htmlOffset: UInt) {
+        self.level = level
+        self.text = text
+        self.id = id
+        self.depth = depth
+        self.htmlOffset = htmlOffset
+    }
+    private enum CodingKeys: String, CodingKey {
+        case level = "level"
+        case text = "text"
+        case id = "id"
+        case depth = "depth"
+        case htmlOffset = "html_offset"
+    }
+}
+
+// MARK: - Internal FFI conversions for HeaderMetadata
+internal extension HeaderMetadata {
+    init(_ rb: RustBridge.HeaderMetadataRef) throws {
+        self.level = rb.level()
+        self.text = rb.text().toString()
+        self.id = rb.id()?.toString()
+        self.depth = rb.depth()
+        self.htmlOffset = rb.htmlOffset()
+    }
+    func intoRust() throws -> RustBridge.HeaderMetadata {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.headerMetadataFromJson(json)
+    }
+}
 
 /// Hyperlink metadata with categorization and attributes.
 ///
@@ -102,7 +143,38 @@ public typealias ImageMetadata = RustBridge.ImageMetadata
 ///
 /// assert_eq!(schema.data_type, StructuredDataType::JsonLd);
 /// ```
-public typealias StructuredData = RustBridge.StructuredData
+public struct StructuredData: Codable, Sendable, Hashable {
+    /// Type of structured data (JSON-LD, Microdata, RDFa)
+    public let dataType: StructuredDataType
+    /// Raw JSON string (for JSON-LD) or serialized representation
+    public let rawJson: String
+    /// Schema type if detectable (e.g., "Article", "Event", "Product")
+    public let schemaType: String?
+    public init(dataType: StructuredDataType, rawJson: String, schemaType: String? = nil) {
+        self.dataType = dataType
+        self.rawJson = rawJson
+        self.schemaType = schemaType
+    }
+    private enum CodingKeys: String, CodingKey {
+        case dataType = "data_type"
+        case rawJson = "raw_json"
+        case schemaType = "schema_type"
+    }
+}
+
+// MARK: - Internal FFI conversions for StructuredData
+internal extension StructuredData {
+    init(_ rb: RustBridge.StructuredDataRef) throws {
+        self.dataType = StructuredDataType(rawValue: rb.dataType().toString()) ?? { fatalError("Unknown StructuredDataType: \(rb.dataType().toString())") }()
+        self.rawJson = rb.rawJson().toString()
+        self.schemaType = rb.schemaType()?.toString()
+    }
+    func intoRust() throws -> RustBridge.StructuredData {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.structuredDataFromJson(json)
+    }
+}
 
 /// Comprehensive metadata extraction result from HTML document.
 ///
@@ -130,7 +202,7 @@ public typealias HtmlMetadata = RustBridge.HtmlMetadata
 ///
 /// # Example
 ///
-/// ```text
+/// ```rust
 /// use html_to_markdown_rs::ConversionOptions;
 ///
 /// let options = ConversionOptions::builder()
@@ -198,13 +270,120 @@ public typealias TextAnnotation = RustBridge.TextAnnotation
 public typealias ConversionResult = RustBridge.ConversionResult
 
 /// A structured table grid with cell-level data including spans.
-public typealias TableGrid = RustBridge.TableGrid
+public struct TableGrid: Codable, Sendable, Hashable {
+    /// Number of rows.
+    public let rows: UInt32
+    /// Number of columns.
+    public let cols: UInt32
+    /// All cells in the table as a flat, sparse list.
+    ///
+    /// The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
+    /// that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
+    /// in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
+    /// and `col_span` fields set accordingly.
+    ///
+    /// To reconstruct the full visual grid, iterate over all cells and mark the rectangular
+    /// region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
+    /// `(row, col)` position that is not the origin of any cell is covered by a span from an
+    /// earlier cell.
+    ///
+    /// The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
+    /// produces an empty vec.
+    public let cells: [GridCell]
+    public init(rows: UInt32, cols: UInt32, cells: [GridCell]) {
+        self.rows = rows
+        self.cols = cols
+        self.cells = cells
+    }
+}
+
+// MARK: - Internal FFI conversions for TableGrid
+internal extension TableGrid {
+    init(_ rb: RustBridge.TableGridRef) throws {
+        self.rows = rb.rows()
+        self.cols = rb.cols()
+        self.cells = try rb.cells().map { try GridCell($0) }
+    }
+    func intoRust() throws -> RustBridge.TableGrid {
+        let __cells = RustVec<RustBridge.GridCell>()
+        for __elem in self.cells { __cells.push(value: try __elem.intoRust()) }
+        return RustBridge.TableGrid(self.rows, self.cols, __cells)
+    }
+}
 
 /// A single cell in a table grid.
-public typealias GridCell = RustBridge.GridCell
+public struct GridCell: Codable, Sendable, Hashable {
+    /// The text content of the cell.
+    public let content: String
+    /// 0-indexed row position.
+    public let row: UInt32
+    /// 0-indexed column position.
+    public let col: UInt32
+    /// Number of rows this cell spans (default 1).
+    public let rowSpan: UInt32
+    /// Number of columns this cell spans (default 1).
+    public let colSpan: UInt32
+    /// Whether this is a header cell (`<th>`).
+    public let isHeader: Bool
+    public init(content: String, row: UInt32, col: UInt32, rowSpan: UInt32, colSpan: UInt32, isHeader: Bool) {
+        self.content = content
+        self.row = row
+        self.col = col
+        self.rowSpan = rowSpan
+        self.colSpan = colSpan
+        self.isHeader = isHeader
+    }
+    private enum CodingKeys: String, CodingKey {
+        case content = "content"
+        case row = "row"
+        case col = "col"
+        case rowSpan = "row_span"
+        case colSpan = "col_span"
+        case isHeader = "is_header"
+    }
+}
+
+// MARK: - Internal FFI conversions for GridCell
+internal extension GridCell {
+    init(_ rb: RustBridge.GridCellRef) throws {
+        self.content = rb.content().toString()
+        self.row = rb.row()
+        self.col = rb.col()
+        self.rowSpan = rb.rowSpan()
+        self.colSpan = rb.colSpan()
+        self.isHeader = rb.isHeader()
+    }
+    func intoRust() throws -> RustBridge.GridCell {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.gridCellFromJson(json)
+    }
+}
 
 /// A top-level extracted table with both structured data and markdown representation.
-public typealias TableData = RustBridge.TableData
+public struct TableData: Codable, Sendable, Hashable {
+    /// The structured table grid.
+    public let grid: TableGrid
+    /// The markdown rendering of this table.
+    public let markdown: String
+    public init(grid: TableGrid, markdown: String) {
+        self.grid = grid
+        self.markdown = markdown
+    }
+}
+
+// MARK: - Internal FFI conversions for TableData
+internal extension TableData {
+    init(_ rb: RustBridge.TableDataRef) throws {
+        self.grid = try TableGrid(rb.grid())
+        self.markdown = rb.markdown().toString()
+    }
+    func intoRust() throws -> RustBridge.TableData {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.tableDataFromJson(json)
+    }
+}
 
 /// A non-fatal diagnostic produced during HTML conversion.
 ///
@@ -221,13 +400,36 @@ public typealias TableData = RustBridge.TableData
 ///   `result.warnings.is_empty()` before using the output.
 ///
 /// See [`WarningKind`] for the full taxonomy of warning categories.
-public typealias ProcessingWarning = RustBridge.ProcessingWarning
+public struct ProcessingWarning: Codable, Sendable, Hashable {
+    /// Human-readable warning message.
+    public let message: String
+    /// The category of warning.
+    public let kind: WarningKind
+    public init(message: String, kind: WarningKind) {
+        self.message = message
+        self.kind = kind
+    }
+}
 
-/// Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
+// MARK: - Internal FFI conversions for ProcessingWarning
+internal extension ProcessingWarning {
+    init(_ rb: RustBridge.ProcessingWarningRef) throws {
+        self.message = rb.message().toString()
+        self.kind = WarningKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown WarningKind: \(rb.kind().toString())") }()
+    }
+    func intoRust() throws -> RustBridge.ProcessingWarning {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.processingWarningFromJson(json)
+    }
+}
+
+/// Shareable, thread-safe handle to a user-provided HTML visitor implementation.
 ///
-/// `Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
-/// can be shared across threads — required by callers that stash configs inside
-/// axum/rmcp/tokio Send-bound contexts.
+/// Pass an instance wrapped in this handle to `ConversionOptions` to
+/// customise how the HTML document is traversed and converted to Markdown.
+/// The handle may be cloned and shared across threads without additional
+/// synchronisation on the caller's side.
 public typealias VisitorHandle = RustBridge.VisitorHandle
 
 /// Context information passed to all visitor methods.
@@ -239,19 +441,26 @@ public typealias NodeContext = RustBridge.NodeContext
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
-public enum TextDirection {
+public enum TextDirection: String, Codable, Sendable, Hashable {
     /// Left-to-right text flow (default for Latin scripts)
-    case leftToRight
+    case leftToRight = "ltr"
     /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
-    case rightToLeft
+    case rightToLeft = "rtl"
     /// Automatic directionality detection
     case auto
+}
+extension TextDirection {
+    func intoRust() throws -> RustBridge.TextDirection {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.textDirectionFromJson(json)
+    }
 }
 
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
-public enum LinkType {
+public enum LinkType: String, Codable, Sendable, Hashable {
     /// Anchor link within same document (href starts with #)
     case anchor
     /// Internal link within same domain
@@ -265,31 +474,52 @@ public enum LinkType {
     /// Other protocol or unclassifiable
     case other
 }
+extension LinkType {
+    func intoRust() throws -> RustBridge.LinkType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.linkTypeFromJson(json)
+    }
+}
 
 /// Image source classification for proper handling and processing.
 ///
 /// Determines whether an image is embedded (data URI), inline SVG, external, or relative.
-public enum ImageType {
+public enum ImageType: String, Codable, Sendable, Hashable {
     /// Data URI embedded image (base64 or other encoding)
-    case dataUri
+    case dataUri = "data_uri"
     /// Inline SVG element
-    case inlineSvg
+    case inlineSvg = "inline_svg"
     /// External image URL (http/https)
     case external
     /// Relative image path
     case relative
 }
+extension ImageType {
+    func intoRust() throws -> RustBridge.ImageType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.imageTypeFromJson(json)
+    }
+}
 
 /// Structured data format type.
 ///
 /// Identifies the schema/format used for structured data markup.
-public enum StructuredDataType {
+public enum StructuredDataType: String, Codable, Sendable, Hashable {
     /// JSON-LD (JSON for Linking Data) script blocks
-    case jsonLd
+    case jsonLd = "json_ld"
     /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
     case microdata
     /// RDF in Attributes (RDFa) markup
-    case rdFa
+    case rdFa = "rdfa"
+}
+extension StructuredDataType {
+    func intoRust() throws -> RustBridge.StructuredDataType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.structuredDataTypeFromJson(json)
+    }
 }
 
 /// HTML preprocessing aggressiveness level.
@@ -341,7 +571,7 @@ public typealias OutputFormat = RustBridge.OutputFormat
 /// The semantic content type of a document node.
 ///
 /// Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
-public enum NodeContent {
+public enum NodeContent: Codable, Sendable, Hashable {
     /// A heading element (h1-h6).
     case heading(level: UInt8, text: String)
     /// A paragraph of text.
@@ -369,11 +599,18 @@ public enum NodeContent {
     /// A section grouping container (auto-generated from heading hierarchy).
     case group(label: String?, headingLevel: UInt8?, headingText: String?)
 }
+extension NodeContent {
+    func intoRust() throws -> RustBridge.NodeContent {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.nodeContentFromJson(json)
+    }
+}
 
 /// The type of an inline text annotation.
 ///
 /// Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
-public enum AnnotationKind {
+public enum AnnotationKind: Codable, Sendable, Hashable {
     /// Bold / strong emphasis.
     case bold
     /// Italic / emphasis.
@@ -393,204 +630,225 @@ public enum AnnotationKind {
     /// A hyperlink sourced from an `<a href="...">` element.
     case link(url: String, title: String?)
 }
+extension AnnotationKind {
+    func intoRust() throws -> RustBridge.AnnotationKind {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.annotationKindFromJson(json)
+    }
+}
 
 /// Categories of processing warnings.
-public enum WarningKind {
+public enum WarningKind: String, Codable, Sendable, Hashable {
     /// An image could not be extracted (e.g. invalid data URI, unsupported format).
-    case imageExtractionFailed
+    case imageExtractionFailed = "image_extraction_failed"
     /// The input encoding was not recognized; fell back to UTF-8.
-    case encodingFallback
+    case encodingFallback = "encoding_fallback"
     /// The input was truncated due to size limits.
-    case truncatedInput
+    case truncatedInput = "truncated_input"
     /// The HTML was malformed but processing continued with best effort.
-    case malformedHtml
+    case malformedHtml = "malformed_html"
     /// Sanitization was applied to remove potentially unsafe content.
-    case sanitizationApplied
+    case sanitizationApplied = "sanitization_applied"
     /// DOM traversal was truncated because max_depth was exceeded.
-    case depthLimitExceeded
+    case depthLimitExceeded = "depth_limit_exceeded"
+}
+extension WarningKind {
+    func intoRust() throws -> RustBridge.WarningKind {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.warningKindFromJson(json)
+    }
 }
 
 /// Node type enumeration covering all HTML element types.
 ///
 /// This enum categorizes all HTML elements that the converter recognizes,
 /// providing a coarse-grained classification for visitor dispatch.
-public enum NodeType {
+public enum NodeType: String, Codable, Sendable, Hashable {
     /// Text node (most frequent - 100+ per document)
-    case text
+    case text = "Text"
     /// Generic element node
-    case element
+    case element = "Element"
     /// Heading elements (h1-h6)
-    case heading
+    case heading = "Heading"
     /// Paragraph element
-    case paragraph
+    case paragraph = "Paragraph"
     /// Generic div container
-    case div
+    case div = "Div"
     /// Blockquote element
-    case blockquote
+    case blockquote = "Blockquote"
     /// Preformatted text block
-    case pre
+    case pre = "Pre"
     /// Horizontal rule
-    case hr
+    case hr = "Hr"
     /// Ordered or unordered list (ul, ol)
-    case list
+    case list = "List"
     /// List item (li)
-    case listItem
+    case listItem = "ListItem"
     /// Definition list (dl)
-    case definitionList
+    case definitionList = "DefinitionList"
     /// Definition term (dt)
-    case definitionTerm
+    case definitionTerm = "DefinitionTerm"
     /// Definition description (dd)
-    case definitionDescription
+    case definitionDescription = "DefinitionDescription"
     /// Table element
-    case table
+    case table = "Table"
     /// Table row (tr)
-    case tableRow
+    case tableRow = "TableRow"
     /// Table cell (td, th)
-    case tableCell
+    case tableCell = "TableCell"
     /// Table header cell (th)
-    case tableHeader
+    case tableHeader = "TableHeader"
     /// Table body (tbody)
-    case tableBody
+    case tableBody = "TableBody"
     /// Table head (thead)
-    case tableHead
+    case tableHead = "TableHead"
     /// Table foot (tfoot)
-    case tableFoot
+    case tableFoot = "TableFoot"
     /// Anchor link (a)
-    case link
+    case link = "Link"
     /// Image (img)
-    case image
+    case image = "Image"
     /// Strong/bold (strong, b)
-    case strong
+    case strong = "Strong"
     /// Emphasis/italic (em, i)
-    case em
+    case em = "Em"
     /// Inline code (code)
-    case code
+    case code = "Code"
     /// Strikethrough (s, del, strike)
-    case strikethrough
+    case strikethrough = "Strikethrough"
     /// Underline (u, ins)
-    case underline
+    case underline = "Underline"
     /// Subscript (sub)
-    case `subscript`
+    case `subscript` = "Subscript"
     /// Superscript (sup)
-    case superscript
+    case superscript = "Superscript"
     /// Mark/highlight (mark)
-    case mark
+    case mark = "Mark"
     /// Small text (small)
-    case small
+    case small = "Small"
     /// Line break (br)
-    case br
+    case br = "Br"
     /// Span element
-    case span
+    case span = "Span"
     /// Article element
-    case article
+    case article = "Article"
     /// Section element
-    case section
+    case section = "Section"
     /// Navigation element
-    case nav
+    case nav = "Nav"
     /// Aside element
-    case aside
+    case aside = "Aside"
     /// Header element
-    case header
+    case header = "Header"
     /// Footer element
-    case footer
+    case footer = "Footer"
     /// Main element
-    case main
+    case main = "Main"
     /// Figure element
-    case figure
+    case figure = "Figure"
     /// Figure caption
-    case figcaption
+    case figcaption = "Figcaption"
     /// Time element
-    case time
+    case time = "Time"
     /// Details element
-    case details
+    case details = "Details"
     /// Summary element
-    case summary
+    case summary = "Summary"
     /// Form element
-    case form
+    case form = "Form"
     /// Input element
-    case input
+    case input = "Input"
     /// Select element
-    case select
+    case select = "Select"
     /// Option element
-    case option
+    case option = "Option"
     /// Button element
-    case button
+    case button = "Button"
     /// Textarea element
-    case textarea
+    case textarea = "Textarea"
     /// Label element
-    case label
+    case label = "Label"
     /// Fieldset element
-    case fieldset
+    case fieldset = "Fieldset"
     /// Legend element
-    case legend
+    case legend = "Legend"
     /// Audio element
-    case audio
+    case audio = "Audio"
     /// Video element
-    case video
+    case video = "Video"
     /// Picture element
-    case picture
+    case picture = "Picture"
     /// Source element
-    case source
+    case source = "Source"
     /// Iframe element
-    case iframe
+    case iframe = "Iframe"
     /// SVG element
-    case svg
+    case svg = "Svg"
     /// Canvas element
-    case canvas
+    case canvas = "Canvas"
     /// Ruby annotation
-    case ruby
+    case ruby = "Ruby"
     /// Ruby text
-    case rt
+    case rt = "Rt"
     /// Ruby parenthesis
-    case rp
+    case rp = "Rp"
     /// Abbreviation
-    case abbr
+    case abbr = "Abbr"
     /// Keyboard input
-    case kbd
+    case kbd = "Kbd"
     /// Sample output
-    case samp
+    case samp = "Samp"
     /// Variable
-    case `var`
+    case `var` = "Var"
     /// Citation
-    case cite
+    case cite = "Cite"
     /// Quote
-    case q
+    case q = "Q"
     /// Deleted text
-    case del
+    case del = "Del"
     /// Inserted text
-    case ins
+    case ins = "Ins"
     /// Data element
-    case data
+    case data = "Data"
     /// Meter element
-    case meter
+    case meter = "Meter"
     /// Progress element
-    case progress
+    case progress = "Progress"
     /// Output element
-    case output
+    case output = "Output"
     /// Template element
-    case template
+    case template = "Template"
     /// Slot element
-    case slot
+    case slot = "Slot"
     /// HTML root element
-    case html
+    case html = "Html"
     /// Head element
-    case head
+    case head = "Head"
     /// Body element
-    case body
+    case body = "Body"
     /// Title element
-    case title
+    case title = "Title"
     /// Meta element
-    case meta
+    case meta = "Meta"
     /// Link element (not anchor)
-    case linkTag
+    case linkTag = "LinkTag"
     /// Style element
-    case style
+    case style = "Style"
     /// Script element
-    case script
+    case script = "Script"
     /// Base element
-    case base
+    case base = "Base"
     /// Custom element (web components) or unknown tag
-    case custom
+    case custom = "Custom"
+}
+extension NodeType {
+    func intoRust() throws -> RustBridge.NodeType {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.nodeTypeFromJson(json)
+    }
 }
 
 /// Result of a visitor callback.
@@ -598,7 +856,7 @@ public enum NodeType {
 /// Allows visitors to control the conversion flow by either proceeding
 /// with default behavior, providing custom output, skipping elements,
 /// preserving HTML, or signaling errors.
-public enum VisitResult {
+public enum VisitResult: Codable, Sendable, Hashable {
     /// Continue with default conversion behavior
     case `continue`
     /// Replace default output with custom markdown
@@ -618,6 +876,13 @@ public enum VisitResult {
     ///
     /// The conversion process halts and returns this error message.
     case error(field0: String)
+}
+extension VisitResult {
+    func intoRust() throws -> RustBridge.VisitResult {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.visitResultFromJson(json)
+    }
 }
 
 /// Errors that can occur during HTML to Markdown conversion.
@@ -643,6 +908,32 @@ public enum ConversionError: Swift.Error {
 // First-class struct types (Codable) use JSONDecoder directly.
 // Opaque RustBridge types forward to RustBridge.
 
+public func documentMetadataFromJson(_ json: String) throws -> DocumentMetadata {
+    return try RustBridge.documentMetadataFromJson(json)
+}
+
+public func headerMetadataFromJson(_ json: String) throws -> HeaderMetadata {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(HeaderMetadata.self, from: data)
+}
+
+public func linkMetadataFromJson(_ json: String) throws -> LinkMetadata {
+    return try RustBridge.linkMetadataFromJson(json)
+}
+
+public func imageMetadataFromJson(_ json: String) throws -> ImageMetadata {
+    return try RustBridge.imageMetadataFromJson(json)
+}
+
+public func structuredDataFromJson(_ json: String) throws -> StructuredData {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(StructuredData.self, from: data)
+}
+
+public func htmlMetadataFromJson(_ json: String) throws -> HtmlMetadata {
+    return try RustBridge.htmlMetadataFromJson(json)
+}
+
 public func conversionOptionsFromJson(_ json: String) throws -> ConversionOptions {
     return try RustBridge.conversionOptionsFromJson(json)
 }
@@ -651,12 +942,97 @@ public func conversionOptionsUpdateFromJson(_ json: String) throws -> Conversion
     return try RustBridge.conversionOptionsUpdateFromJson(json)
 }
 
+public func preprocessingOptionsFromJson(_ json: String) throws -> PreprocessingOptions {
+    return try RustBridge.preprocessingOptionsFromJson(json)
+}
+
 public func preprocessingOptionsUpdateFromJson(_ json: String) throws -> PreprocessingOptionsUpdate {
     return try RustBridge.preprocessingOptionsUpdateFromJson(json)
 }
 
+public func documentStructureFromJson(_ json: String) throws -> DocumentStructure {
+    return try RustBridge.documentStructureFromJson(json)
+}
+
+public func documentNodeFromJson(_ json: String) throws -> DocumentNode {
+    return try RustBridge.documentNodeFromJson(json)
+}
+
+public func textAnnotationFromJson(_ json: String) throws -> TextAnnotation {
+    return try RustBridge.textAnnotationFromJson(json)
+}
+
+public func conversionResultFromJson(_ json: String) throws -> ConversionResult {
+    return try RustBridge.conversionResultFromJson(json)
+}
+
+public func tableGridFromJson(_ json: String) throws -> TableGrid {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TableGrid.self, from: data)
+}
+
+public func gridCellFromJson(_ json: String) throws -> GridCell {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(GridCell.self, from: data)
+}
+
+public func tableDataFromJson(_ json: String) throws -> TableData {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TableData.self, from: data)
+}
+
+public func processingWarningFromJson(_ json: String) throws -> ProcessingWarning {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(ProcessingWarning.self, from: data)
+}
+
 public func nodeContextFromJson(_ json: String) throws -> NodeContext {
     return try RustBridge.nodeContextFromJson(json)
+}
+
+public func textDirectionFromJson(_ json: String) throws -> TextDirection {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TextDirection.self, from: data)
+}
+
+public func linkTypeFromJson(_ json: String) throws -> LinkType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(LinkType.self, from: data)
+}
+
+public func imageTypeFromJson(_ json: String) throws -> ImageType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(ImageType.self, from: data)
+}
+
+public func structuredDataTypeFromJson(_ json: String) throws -> StructuredDataType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(StructuredDataType.self, from: data)
+}
+
+public func nodeContentFromJson(_ json: String) throws -> NodeContent {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(NodeContent.self, from: data)
+}
+
+public func annotationKindFromJson(_ json: String) throws -> AnnotationKind {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(AnnotationKind.self, from: data)
+}
+
+public func warningKindFromJson(_ json: String) throws -> WarningKind {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(WarningKind.self, from: data)
+}
+
+public func nodeTypeFromJson(_ json: String) throws -> NodeType {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(NodeType.self, from: data)
+}
+
+public func visitResultFromJson(_ json: String) throws -> VisitResult {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(VisitResult.self, from: data)
 }
 
 /// Swift protocol that Swift classes implement to provide visitor callbacks.
@@ -755,165 +1131,165 @@ public extension HtmlVisitorProtocol {
 private final class _HtmlVisitorProtocolAdapter: _SwiftHtmlVisitorBoxDelegate {
     private let inner: any HtmlVisitorProtocol
     init(_ inner: any HtmlVisitorProtocol) { self.inner = inner }
-    func visit_text(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitText(ctx_decoded, text.toString()))
+    func visitText(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitText(ctxDecoded, text.toString()))
     }
-    func visit_element_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitElementStart(ctx_decoded))
+    func visitElementStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitElementStart(ctxDecoded))
     }
-    func visit_element_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitElementEnd(ctx_decoded, output.toString()))
+    func visitElementEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitElementEnd(ctxDecoded, output.toString()))
     }
-    func visit_link(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitLink(ctx_decoded, href.toString(), text.toString(), title?.toString()))
+    func visitLink(_ ctx: RustString, _ href: RustString, _ text: RustString, _ title: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitLink(ctxDecoded, href.toString(), text.toString(), title?.toString()))
     }
-    func visit_image(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitImage(ctx_decoded, src.toString(), alt.toString(), title?.toString()))
+    func visitImage(_ ctx: RustString, _ src: RustString, _ alt: RustString, _ title: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitImage(ctxDecoded, src.toString(), alt.toString(), title?.toString()))
     }
-    func visit_heading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitHeading(ctx_decoded, level, text.toString(), id?.toString()))
+    func visitHeading(_ ctx: RustString, _ level: UInt32, _ text: RustString, _ id: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitHeading(ctxDecoded, level, text.toString(), id?.toString()))
     }
-    func visit_code_block(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitCodeBlock(ctx_decoded, lang?.toString(), code.toString()))
+    func visitCodeBlock(_ ctx: RustString, _ lang: RustString?, _ code: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCodeBlock(ctxDecoded, lang?.toString(), code.toString()))
     }
-    func visit_code_inline(_ ctx: RustString, _ code: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitCodeInline(ctx_decoded, code.toString()))
+    func visitCodeInline(_ ctx: RustString, _ code: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCodeInline(ctxDecoded, code.toString()))
     }
-    func visit_list_item(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitListItem(ctx_decoded, ordered, marker.toString(), text.toString()))
+    func visitListItem(_ ctx: RustString, _ ordered: Bool, _ marker: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListItem(ctxDecoded, ordered, marker.toString(), text.toString()))
     }
-    func visit_list_start(_ ctx: RustString, _ ordered: Bool) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitListStart(ctx_decoded, ordered))
+    func visitListStart(_ ctx: RustString, _ ordered: Bool) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListStart(ctxDecoded, ordered))
     }
-    func visit_list_end(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitListEnd(ctx_decoded, ordered, output.toString()))
+    func visitListEnd(_ ctx: RustString, _ ordered: Bool, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitListEnd(ctxDecoded, ordered, output.toString()))
     }
-    func visit_table_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitTableStart(ctx_decoded))
+    func visitTableStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableStart(ctxDecoded))
     }
-    func visit_table_row(_ ctx: RustString, _ cells: RustVec<RustString>, _ is_header: Bool) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitTableRow(ctx_decoded, cells, is_header))
+    func visitTableRow(_ ctx: RustString, _ cells: RustVec<RustString>, _ isHeader: Bool) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableRow(ctxDecoded, cells, isHeader))
     }
-    func visit_table_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitTableEnd(ctx_decoded, output.toString()))
+    func visitTableEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitTableEnd(ctxDecoded, output.toString()))
     }
-    func visit_blockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitBlockquote(ctx_decoded, content.toString(), Int(depth)))
+    func visitBlockquote(_ ctx: RustString, _ content: RustString, _ depth: UInt) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitBlockquote(ctxDecoded, content.toString(), Int(depth)))
     }
-    func visit_strong(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitStrong(ctx_decoded, text.toString()))
+    func visitStrong(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitStrong(ctxDecoded, text.toString()))
     }
-    func visit_emphasis(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitEmphasis(ctx_decoded, text.toString()))
+    func visitEmphasis(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitEmphasis(ctxDecoded, text.toString()))
     }
-    func visit_strikethrough(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitStrikethrough(ctx_decoded, text.toString()))
+    func visitStrikethrough(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitStrikethrough(ctxDecoded, text.toString()))
     }
-    func visit_underline(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitUnderline(ctx_decoded, text.toString()))
+    func visitUnderline(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitUnderline(ctxDecoded, text.toString()))
     }
-    func visit_subscript(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitSubscript(ctx_decoded, text.toString()))
+    func visitSubscript(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSubscript(ctxDecoded, text.toString()))
     }
-    func visit_superscript(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitSuperscript(ctx_decoded, text.toString()))
+    func visitSuperscript(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSuperscript(ctxDecoded, text.toString()))
     }
-    func visit_mark(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitMark(ctx_decoded, text.toString()))
+    func visitMark(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitMark(ctxDecoded, text.toString()))
     }
-    func visit_line_break(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitLineBreak(ctx_decoded))
+    func visitLineBreak(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitLineBreak(ctxDecoded))
     }
-    func visit_horizontal_rule(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitHorizontalRule(ctx_decoded))
+    func visitHorizontalRule(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitHorizontalRule(ctxDecoded))
     }
-    func visit_custom_element(_ ctx: RustString, _ tag_name: RustString, _ html: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitCustomElement(ctx_decoded, tag_name.toString(), html.toString()))
+    func visitCustomElement(_ ctx: RustString, _ tagName: RustString, _ html: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitCustomElement(ctxDecoded, tagName.toString(), html.toString()))
     }
-    func visit_definition_list_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionListStart(ctx_decoded))
+    func visitDefinitionListStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionListStart(ctxDecoded))
     }
-    func visit_definition_term(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionTerm(ctx_decoded, text.toString()))
+    func visitDefinitionTerm(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionTerm(ctxDecoded, text.toString()))
     }
-    func visit_definition_description(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionDescription(ctx_decoded, text.toString()))
+    func visitDefinitionDescription(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionDescription(ctxDecoded, text.toString()))
     }
-    func visit_definition_list_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDefinitionListEnd(ctx_decoded, output.toString()))
+    func visitDefinitionListEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDefinitionListEnd(ctxDecoded, output.toString()))
     }
-    func visit_form(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitForm(ctx_decoded, action?.toString(), method?.toString()))
+    func visitForm(_ ctx: RustString, _ action: RustString?, _ method: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitForm(ctxDecoded, action?.toString(), method?.toString()))
     }
-    func visit_input(_ ctx: RustString, _ input_type: RustString, _ name: RustString?, _ value: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitInput(ctx_decoded, input_type.toString(), name?.toString(), value?.toString()))
+    func visitInput(_ ctx: RustString, _ inputType: RustString, _ name: RustString?, _ value: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitInput(ctxDecoded, inputType.toString(), name?.toString(), value?.toString()))
     }
-    func visit_button(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitButton(ctx_decoded, text.toString()))
+    func visitButton(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitButton(ctxDecoded, text.toString()))
     }
-    func visit_audio(_ ctx: RustString, _ src: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitAudio(ctx_decoded, src?.toString()))
+    func visitAudio(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitAudio(ctxDecoded, src?.toString()))
     }
-    func visit_video(_ ctx: RustString, _ src: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitVideo(ctx_decoded, src?.toString()))
+    func visitVideo(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitVideo(ctxDecoded, src?.toString()))
     }
-    func visit_iframe(_ ctx: RustString, _ src: RustString?) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitIframe(ctx_decoded, src?.toString()))
+    func visitIframe(_ ctx: RustString, _ src: RustString?) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitIframe(ctxDecoded, src?.toString()))
     }
-    func visit_details(_ ctx: RustString, _ open: Bool) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitDetails(ctx_decoded, open))
+    func visitDetails(_ ctx: RustString, _ open_: Bool) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitDetails(ctxDecoded, open_))
     }
-    func visit_summary(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitSummary(ctx_decoded, text.toString()))
+    func visitSummary(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitSummary(ctxDecoded, text.toString()))
     }
-    func visit_figure_start(_ ctx: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitFigureStart(ctx_decoded))
+    func visitFigureStart(_ ctx: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigureStart(ctxDecoded))
     }
-    func visit_figcaption(_ ctx: RustString, _ text: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitFigcaption(ctx_decoded, text.toString()))
+    func visitFigcaption(_ ctx: RustString, _ text: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigcaption(ctxDecoded, text.toString()))
     }
-    func visit_figure_end(_ ctx: RustString, _ output: RustString) -> String {
-        let ctx_decoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
-        return visit_result_toJson(inner.visitFigureEnd(ctx_decoded, output.toString()))
+    func visitFigureEnd(_ ctx: RustString, _ output: RustString) -> String {
+        let ctxDecoded: NodeContext = (try? nodeContextFromJson(ctx.toString())) ?? (try! nodeContextFromJson("{}"))
+        return visit_result_toJson(inner.visitFigureEnd(ctxDecoded, output.toString()))
     }
 }
 
@@ -941,4 +1317,35 @@ private func jsonEscapeStr(_ s: String) -> String {
 /// that can be passed to `conversionOptionsFromJsonWithVisitor(...)` on the Rust side.
 public func makeHtmlVisitorHandle(_ visitor: any HtmlVisitorProtocol) -> VisitorHandle {
     return RustBridge.makeHtmlVisitorHandle(SwiftHtmlVisitorBox(_HtmlVisitorProtocolAdapter(visitor)))
+}
+
+// MARK: - Free-function Forwarders
+// Re-export every public free function on the source Rust crate as a
+// top-level `public func` on the host module so consumers do not need to
+// `import RustBridge` directly. Forwarders take Swift-native parameter
+// types and convert to the swift-bridge runtime types internally.
+
+/// Convert HTML to Markdown, returning a [`ConversionResult`] with content, metadata, images,
+/// and warnings.
+///
+/// # Arguments
+///
+/// * `html` — the HTML string to convert.
+/// * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
+///
+/// # Example
+///
+/// ```
+/// use html_to_markdown_rs::convert;
+///
+/// let html = "<h1>Hello World</h1>";
+/// let result = convert(html, None).unwrap();
+/// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+/// ```
+///
+/// # Errors
+///
+/// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
+public func convert(html: String, options: ConversionOptions?) throws -> ConversionResult {
+    return try RustBridge.convert(html, options)
 }

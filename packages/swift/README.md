@@ -87,7 +87,6 @@ let markdown = result.content()?.toString() ?? ""
 print(markdown)
 ```
 
-
 With conversion options:
 
 ```swift
@@ -102,7 +101,6 @@ let result = try convert(html, options)
 let markdown = result.content()?.toString() ?? ""
 print(markdown)
 ```
-
 
 ## API Reference
 
@@ -191,7 +189,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

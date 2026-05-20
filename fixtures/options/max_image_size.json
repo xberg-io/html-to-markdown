@@ -1,0 +1,46 @@
+[
+  {
+    "id": "options_max_image_size_generous_limit",
+    "description": "A generous max_image_size accommodates a small data-URI image without warnings",
+    "input": {
+      "html": "<p>Image: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>",
+      "options": {
+        "extract_images": true,
+        "max_image_size": 10485760
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "Image"
+      }
+    ]
+  },
+  {
+    "id": "options_max_image_size_tiny_limit_safe",
+    "description": "A tiny max_image_size does not crash conversion even when the image exceeds the limit",
+    "input": {
+      "html": "<p>Tiny limit: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>",
+      "options": {
+        "extract_images": true,
+        "max_image_size": 10
+      }
+    },
+    "assertions": [
+      {
+        "type": "not_empty",
+        "field": "content"
+      },
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "Tiny limit"
+      }
+    ]
+  }
+]

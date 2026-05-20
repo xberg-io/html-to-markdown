@@ -75,5 +75,50 @@
         "value": "Submit"
       }
     ]
+  },
+  {
+    "id": "options_preprocessing_remove_navigation_false_keeps_nav",
+    "description": "Setting remove_navigation to false preserves nav and aside elements",
+    "input": {
+      "html": "<nav>SiteMenu</nav><main><p>MainContent</p></main><aside>SidebarText</aside>",
+      "options": {
+        "preprocessing": {
+          "remove_navigation": false
+        }
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "SiteMenu",
+          "MainContent",
+          "SidebarText"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "options_preprocessing_enabled_false_skips_cleanup",
+    "description": "Disabling preprocessing entirely preserves elements the standard preset would remove",
+    "input": {
+      "html": "<nav>NavSection</nav><p>Paragraph</p>",
+      "options": {
+        "preprocessing": {
+          "enabled": false
+        }
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "NavSection",
+          "Paragraph"
+        ]
+      }
+    ]
   }
 ]

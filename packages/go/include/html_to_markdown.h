@@ -360,11 +360,12 @@ typedef struct HTMTextDirection HTMTextDirection;
  */
 typedef struct HTMVisitResult HTMVisitResult;
 /**
- * Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
+ * Shareable, thread-safe handle to a user-provided HTML visitor implementation.
  *
- * `Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
- * can be shared across threads â required by callers that stash configs inside
- * axum/rmcp/tokio Send-bound contexts.
+ * Pass an instance wrapped in this handle to `ConversionOptions` to
+ * customise how the HTML document is traversed and converted to Markdown.
+ * The handle may be cloned and shared across threads without additional
+ * synchronisation on the caller's side.
  */
 typedef struct HTMVisitorHandle HTMVisitorHandle;
 /**
@@ -2019,12 +2020,6 @@ HTMVisitorHandle *htm_conversion_options_visitor(const HTMConversionOptions *ptr
 HTMConversionOptions *htm_conversion_options_default(void);
 
 /**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-HTMConversionOptions *htm_conversion_options_from(const HTMConversionOptionsUpdate *update);
-
-/**
  * Create a `ConversionOptionsUpdate` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -2389,12 +2384,6 @@ int32_t htm_preprocessing_options_remove_forms(const HTMPreprocessingOptions *pt
  * freed with the appropriate free function.
  */
 HTMPreprocessingOptions *htm_preprocessing_options_default(void);
-
-/**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-HTMPreprocessingOptions *htm_preprocessing_options_from(const HTMPreprocessingOptionsUpdate *update);
 
 /**
  * Create a `PreprocessingOptionsUpdate` from a JSON string. Returns null on failure.

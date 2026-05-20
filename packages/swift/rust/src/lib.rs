@@ -16,6 +16,21 @@
     clippy::inherent_to_string
 )]
 
+/// Process-wide tokio runtime shared across every swift-bridge async wrapper.
+///
+/// alef-emitted; see shims.rs for the rationale (orphaned reqwest connection
+/// pools when each call creates and drops its own current-thread runtime).
+fn __alef_tokio_runtime() -> &'static ::tokio::runtime::Runtime {
+    use std::sync::OnceLock;
+    static RT: OnceLock<::tokio::runtime::Runtime> = OnceLock::new();
+    RT.get_or_init(|| {
+        ::tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .expect("build process-wide alef tokio runtime")
+    })
+}
+
 #[swift_bridge::bridge]
 mod ffi {
     extern "Rust" {
@@ -38,12 +53,18 @@ mod ffi {
         fn description(&self) -> Option<String>;
         fn keywords(&self) -> Vec<String>;
         fn author(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "canonicalUrl")]
         fn canonical_url(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "baseHref")]
         fn base_href(&self) -> Option<String>;
         fn language(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "textDirection")]
         fn text_direction(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "openGraph")]
         fn open_graph(&self) -> String;
+        #[swift_bridge(swift_name = "twitterCard")]
         fn twitter_card(&self) -> String;
+        #[swift_bridge(swift_name = "metaTags")]
         fn meta_tags(&self) -> String;
     }
 
@@ -53,6 +74,7 @@ mod ffi {
         fn text(&self) -> String;
         fn id(&self) -> Option<String>;
         fn depth(&self) -> usize;
+        #[swift_bridge(swift_name = "htmlOffset")]
         fn html_offset(&self) -> usize;
     }
 
@@ -61,6 +83,7 @@ mod ffi {
         fn href(&self) -> String;
         fn text(&self) -> String;
         fn title(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "linkType")]
         fn link_type(&self) -> String;
         fn rel(&self) -> Vec<String>;
         fn attributes(&self) -> String;
@@ -72,14 +95,18 @@ mod ffi {
         fn alt(&self) -> Option<String>;
         fn title(&self) -> Option<String>;
         fn dimensions(&self) -> Option<Vec<u32>>;
+        #[swift_bridge(swift_name = "imageType")]
         fn image_type(&self) -> String;
         fn attributes(&self) -> String;
     }
 
     extern "Rust" {
         type StructuredData;
+        #[swift_bridge(swift_name = "dataType")]
         fn data_type(&self) -> String;
+        #[swift_bridge(swift_name = "rawJson")]
         fn raw_json(&self) -> String;
+        #[swift_bridge(swift_name = "schemaType")]
         fn schema_type(&self) -> Option<String>;
     }
 
@@ -97,6 +124,7 @@ mod ffi {
         fn headers(&self) -> Vec<HeaderMetadata>;
         fn links(&self) -> Vec<LinkMetadata>;
         fn images(&self) -> Vec<ImageMetadata>;
+        #[swift_bridge(swift_name = "structuredData")]
         fn structured_data(&self) -> Vec<StructuredData>;
     }
 
@@ -147,46 +175,81 @@ mod ffi {
             exclude_selectors: Vec<String>,
             visitor: Option<VisitorHandle>,
         ) -> ConversionOptions;
+        #[swift_bridge(swift_name = "headingStyle")]
         fn heading_style(&self) -> String;
+        #[swift_bridge(swift_name = "listIndentType")]
         fn list_indent_type(&self) -> String;
+        #[swift_bridge(swift_name = "listIndentWidth")]
         fn list_indent_width(&self) -> usize;
         fn bullets(&self) -> String;
+        #[swift_bridge(swift_name = "strongEmSymbol")]
         fn strong_em_symbol(&self) -> String;
+        #[swift_bridge(swift_name = "escapeAsterisks")]
         fn escape_asterisks(&self) -> bool;
+        #[swift_bridge(swift_name = "escapeUnderscores")]
         fn escape_underscores(&self) -> bool;
+        #[swift_bridge(swift_name = "escapeMisc")]
         fn escape_misc(&self) -> bool;
+        #[swift_bridge(swift_name = "escapeAscii")]
         fn escape_ascii(&self) -> bool;
+        #[swift_bridge(swift_name = "codeLanguage")]
         fn code_language(&self) -> String;
         fn autolinks(&self) -> bool;
+        #[swift_bridge(swift_name = "defaultTitle")]
         fn default_title(&self) -> bool;
+        #[swift_bridge(swift_name = "brInTables")]
         fn br_in_tables(&self) -> bool;
+        #[swift_bridge(swift_name = "compactTables")]
         fn compact_tables(&self) -> bool;
+        #[swift_bridge(swift_name = "highlightStyle")]
         fn highlight_style(&self) -> String;
+        #[swift_bridge(swift_name = "extractMetadata")]
         fn extract_metadata(&self) -> bool;
+        #[swift_bridge(swift_name = "whitespaceMode")]
         fn whitespace_mode(&self) -> String;
+        #[swift_bridge(swift_name = "stripNewlines")]
         fn strip_newlines(&self) -> bool;
         fn wrap(&self) -> bool;
+        #[swift_bridge(swift_name = "wrapWidth")]
         fn wrap_width(&self) -> usize;
+        #[swift_bridge(swift_name = "convertAsInline")]
         fn convert_as_inline(&self) -> bool;
+        #[swift_bridge(swift_name = "subSymbol")]
         fn sub_symbol(&self) -> String;
+        #[swift_bridge(swift_name = "supSymbol")]
         fn sup_symbol(&self) -> String;
+        #[swift_bridge(swift_name = "newlineStyle")]
         fn newline_style(&self) -> String;
+        #[swift_bridge(swift_name = "codeBlockStyle")]
         fn code_block_style(&self) -> String;
+        #[swift_bridge(swift_name = "keepInlineImagesIn")]
         fn keep_inline_images_in(&self) -> Vec<String>;
         fn preprocessing(&self) -> PreprocessingOptions;
         fn encoding(&self) -> String;
         fn debug(&self) -> bool;
+        #[swift_bridge(swift_name = "stripTags")]
         fn strip_tags(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "preserveTags")]
         fn preserve_tags(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "skipImages")]
         fn skip_images(&self) -> bool;
+        #[swift_bridge(swift_name = "linkStyle")]
         fn link_style(&self) -> String;
+        #[swift_bridge(swift_name = "outputFormat")]
         fn output_format(&self) -> String;
+        #[swift_bridge(swift_name = "includeDocumentStructure")]
         fn include_document_structure(&self) -> bool;
+        #[swift_bridge(swift_name = "extractImages")]
         fn extract_images(&self) -> bool;
+        #[swift_bridge(swift_name = "maxImageSize")]
         fn max_image_size(&self) -> u64;
+        #[swift_bridge(swift_name = "captureSvg")]
         fn capture_svg(&self) -> bool;
+        #[swift_bridge(swift_name = "inferDimensions")]
         fn infer_dimensions(&self) -> bool;
+        #[swift_bridge(swift_name = "maxDepth")]
         fn max_depth(&self) -> Option<usize>;
+        #[swift_bridge(swift_name = "excludeSelectors")]
         fn exclude_selectors(&self) -> Vec<String>;
         fn visitor(&self) -> Option<VisitorHandle>;
     }
@@ -238,46 +301,81 @@ mod ffi {
             exclude_selectors: Option<Vec<String>>,
             visitor: Option<VisitorHandle>,
         ) -> ConversionOptionsUpdate;
+        #[swift_bridge(swift_name = "headingStyle")]
         fn heading_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "listIndentType")]
         fn list_indent_type(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "listIndentWidth")]
         fn list_indent_width(&self) -> Option<usize>;
         fn bullets(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "strongEmSymbol")]
         fn strong_em_symbol(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "escapeAsterisks")]
         fn escape_asterisks(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "escapeUnderscores")]
         fn escape_underscores(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "escapeMisc")]
         fn escape_misc(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "escapeAscii")]
         fn escape_ascii(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "codeLanguage")]
         fn code_language(&self) -> Option<String>;
         fn autolinks(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "defaultTitle")]
         fn default_title(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "brInTables")]
         fn br_in_tables(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "compactTables")]
         fn compact_tables(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "highlightStyle")]
         fn highlight_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "extractMetadata")]
         fn extract_metadata(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "whitespaceMode")]
         fn whitespace_mode(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "stripNewlines")]
         fn strip_newlines(&self) -> Option<bool>;
         fn wrap(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "wrapWidth")]
         fn wrap_width(&self) -> Option<usize>;
+        #[swift_bridge(swift_name = "convertAsInline")]
         fn convert_as_inline(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "subSymbol")]
         fn sub_symbol(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "supSymbol")]
         fn sup_symbol(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "newlineStyle")]
         fn newline_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "codeBlockStyle")]
         fn code_block_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "keepInlineImagesIn")]
         fn keep_inline_images_in(&self) -> Option<Vec<String>>;
         fn preprocessing(&self) -> Option<PreprocessingOptionsUpdate>;
         fn encoding(&self) -> Option<String>;
         fn debug(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "stripTags")]
         fn strip_tags(&self) -> Option<Vec<String>>;
+        #[swift_bridge(swift_name = "preserveTags")]
         fn preserve_tags(&self) -> Option<Vec<String>>;
+        #[swift_bridge(swift_name = "skipImages")]
         fn skip_images(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "linkStyle")]
         fn link_style(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "outputFormat")]
         fn output_format(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "includeDocumentStructure")]
         fn include_document_structure(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "extractImages")]
         fn extract_images(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "maxImageSize")]
         fn max_image_size(&self) -> Option<u64>;
+        #[swift_bridge(swift_name = "captureSvg")]
         fn capture_svg(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "inferDimensions")]
         fn infer_dimensions(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "maxDepth")]
         fn max_depth(&self) -> String;
+        #[swift_bridge(swift_name = "excludeSelectors")]
         fn exclude_selectors(&self) -> Option<Vec<String>>;
         fn visitor(&self) -> Option<VisitorHandle>;
     }
@@ -293,7 +391,9 @@ mod ffi {
         ) -> PreprocessingOptions;
         fn enabled(&self) -> bool;
         fn preset(&self) -> String;
+        #[swift_bridge(swift_name = "removeNavigation")]
         fn remove_navigation(&self) -> bool;
+        #[swift_bridge(swift_name = "removeForms")]
         fn remove_forms(&self) -> bool;
     }
 
@@ -308,13 +408,16 @@ mod ffi {
         ) -> PreprocessingOptionsUpdate;
         fn enabled(&self) -> Option<bool>;
         fn preset(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "removeNavigation")]
         fn remove_navigation(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "removeForms")]
         fn remove_forms(&self) -> Option<bool>;
     }
 
     extern "Rust" {
         type DocumentStructure;
         fn nodes(&self) -> Vec<DocumentNode>;
+        #[swift_bridge(swift_name = "sourceFormat")]
         fn source_format(&self) -> Option<String>;
     }
 
@@ -367,8 +470,11 @@ mod ffi {
         fn content(&self) -> String;
         fn row(&self) -> u32;
         fn col(&self) -> u32;
+        #[swift_bridge(swift_name = "rowSpan")]
         fn row_span(&self) -> u32;
+        #[swift_bridge(swift_name = "colSpan")]
         fn col_span(&self) -> u32;
+        #[swift_bridge(swift_name = "isHeader")]
         fn is_header(&self) -> bool;
     }
 
@@ -390,12 +496,17 @@ mod ffi {
 
     extern "Rust" {
         type NodeContext;
+        #[swift_bridge(swift_name = "nodeType")]
         fn node_type(&self) -> String;
+        #[swift_bridge(swift_name = "tagName")]
         fn tag_name(&self) -> String;
         fn attributes(&self) -> String;
         fn depth(&self) -> usize;
+        #[swift_bridge(swift_name = "indexInParent")]
         fn index_in_parent(&self) -> usize;
+        #[swift_bridge(swift_name = "parentTag")]
         fn parent_tag(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "isInline")]
         fn is_inline(&self) -> bool;
     }
 
@@ -569,15 +680,13 @@ mod ffi {
 
         #[swift_bridge(swift_name = "conversionOptionsFromJson")]
         fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String>;
-        #[swift_bridge(swift_name = "conversionOptionsUpdateFromJson")]
-        fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String>;
-        #[swift_bridge(swift_name = "preprocessingOptionsUpdateFromJson")]
-        fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String>;
         #[swift_bridge(swift_name = "nodeContextFromJson")]
         fn node_context_from_json(json: String) -> Result<NodeContext, String>;
     }
     extern "Rust" {
 
+        #[swift_bridge(swift_name = "documentMetadataFromJson")]
+        fn document_metadata_from_json(json: String) -> Result<DocumentMetadata, String>;
         #[swift_bridge(swift_name = "headerMetadataFromJson")]
         fn header_metadata_from_json(json: String) -> Result<HeaderMetadata, String>;
         #[swift_bridge(swift_name = "linkMetadataFromJson")]
@@ -586,18 +695,51 @@ mod ffi {
         fn image_metadata_from_json(json: String) -> Result<ImageMetadata, String>;
         #[swift_bridge(swift_name = "structuredDataFromJson")]
         fn structured_data_from_json(json: String) -> Result<StructuredData, String>;
+        #[swift_bridge(swift_name = "htmlMetadataFromJson")]
+        fn html_metadata_from_json(json: String) -> Result<HtmlMetadata, String>;
+        #[swift_bridge(swift_name = "conversionOptionsUpdateFromJson")]
+        fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String>;
+        #[swift_bridge(swift_name = "preprocessingOptionsFromJson")]
+        fn preprocessing_options_from_json(json: String) -> Result<PreprocessingOptions, String>;
+        #[swift_bridge(swift_name = "preprocessingOptionsUpdateFromJson")]
+        fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String>;
         #[swift_bridge(swift_name = "documentStructureFromJson")]
         fn document_structure_from_json(json: String) -> Result<DocumentStructure, String>;
         #[swift_bridge(swift_name = "documentNodeFromJson")]
         fn document_node_from_json(json: String) -> Result<DocumentNode, String>;
         #[swift_bridge(swift_name = "textAnnotationFromJson")]
         fn text_annotation_from_json(json: String) -> Result<TextAnnotation, String>;
+        #[swift_bridge(swift_name = "conversionResultFromJson")]
+        fn conversion_result_from_json(json: String) -> Result<ConversionResult, String>;
+        #[swift_bridge(swift_name = "tableGridFromJson")]
+        fn table_grid_from_json(json: String) -> Result<TableGrid, String>;
         #[swift_bridge(swift_name = "gridCellFromJson")]
         fn grid_cell_from_json(json: String) -> Result<GridCell, String>;
         #[swift_bridge(swift_name = "tableDataFromJson")]
         fn table_data_from_json(json: String) -> Result<TableData, String>;
         #[swift_bridge(swift_name = "processingWarningFromJson")]
         fn processing_warning_from_json(json: String) -> Result<ProcessingWarning, String>;
+    }
+    extern "Rust" {
+
+        #[swift_bridge(swift_name = "textDirectionFromJson")]
+        fn text_direction_from_json(json: String) -> Result<TextDirection, String>;
+        #[swift_bridge(swift_name = "linkTypeFromJson")]
+        fn link_type_from_json(json: String) -> Result<LinkType, String>;
+        #[swift_bridge(swift_name = "imageTypeFromJson")]
+        fn image_type_from_json(json: String) -> Result<ImageType, String>;
+        #[swift_bridge(swift_name = "structuredDataTypeFromJson")]
+        fn structured_data_type_from_json(json: String) -> Result<StructuredDataType, String>;
+        #[swift_bridge(swift_name = "nodeContentFromJson")]
+        fn node_content_from_json(json: String) -> Result<NodeContent, String>;
+        #[swift_bridge(swift_name = "annotationKindFromJson")]
+        fn annotation_kind_from_json(json: String) -> Result<AnnotationKind, String>;
+        #[swift_bridge(swift_name = "warningKindFromJson")]
+        fn warning_kind_from_json(json: String) -> Result<WarningKind, String>;
+        #[swift_bridge(swift_name = "nodeTypeFromJson")]
+        fn node_type_from_json(json: String) -> Result<NodeType, String>;
+        #[swift_bridge(swift_name = "visitResultFromJson")]
+        fn visit_result_from_json(json: String) -> Result<VisitResult, String>;
     }
 }
 
@@ -3215,81 +3357,138 @@ pub fn conversion_options_from_json(json: String) -> Result<ConversionOptions, S
         .map(ConversionOptions)
         .map_err(|e| e.to_string())
 }
-
-pub fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String> {
-    serde_json::from_str::<html_to_markdown_rs::options::ConversionOptionsUpdate>(&json)
-        .map(ConversionOptionsUpdate)
-        .map_err(|e| e.to_string())
-}
-
-pub fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String> {
-    serde_json::from_str::<html_to_markdown_rs::options::PreprocessingOptionsUpdate>(&json)
-        .map(PreprocessingOptionsUpdate)
-        .map_err(|e| e.to_string())
-}
-
 pub fn node_context_from_json(json: String) -> Result<NodeContext, String> {
     serde_json::from_str::<html_to_markdown_rs::NodeContext>(&json)
         .map(NodeContext)
         .map_err(|e| e.to_string())
 }
-
+pub fn document_metadata_from_json(json: String) -> Result<DocumentMetadata, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::DocumentMetadata>(&json)
+        .map(DocumentMetadata)
+        .map_err(|e| e.to_string())
+}
 pub fn header_metadata_from_json(json: String) -> Result<HeaderMetadata, String> {
     serde_json::from_str::<html_to_markdown_rs::metadata::HeaderMetadata>(&json)
         .map(HeaderMetadata)
         .map_err(|e| e.to_string())
 }
-
 pub fn link_metadata_from_json(json: String) -> Result<LinkMetadata, String> {
     serde_json::from_str::<html_to_markdown_rs::metadata::LinkMetadata>(&json)
         .map(LinkMetadata)
         .map_err(|e| e.to_string())
 }
-
 pub fn image_metadata_from_json(json: String) -> Result<ImageMetadata, String> {
     serde_json::from_str::<html_to_markdown_rs::metadata::ImageMetadata>(&json)
         .map(ImageMetadata)
         .map_err(|e| e.to_string())
 }
-
 pub fn structured_data_from_json(json: String) -> Result<StructuredData, String> {
     serde_json::from_str::<html_to_markdown_rs::metadata::StructuredData>(&json)
         .map(StructuredData)
         .map_err(|e| e.to_string())
 }
-
+pub fn html_metadata_from_json(json: String) -> Result<HtmlMetadata, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::HtmlMetadata>(&json)
+        .map(HtmlMetadata)
+        .map_err(|e| e.to_string())
+}
+pub fn conversion_options_update_from_json(json: String) -> Result<ConversionOptionsUpdate, String> {
+    serde_json::from_str::<html_to_markdown_rs::options::ConversionOptionsUpdate>(&json)
+        .map(ConversionOptionsUpdate)
+        .map_err(|e| e.to_string())
+}
+pub fn preprocessing_options_from_json(json: String) -> Result<PreprocessingOptions, String> {
+    serde_json::from_str::<html_to_markdown_rs::options::PreprocessingOptions>(&json)
+        .map(PreprocessingOptions)
+        .map_err(|e| e.to_string())
+}
+pub fn preprocessing_options_update_from_json(json: String) -> Result<PreprocessingOptionsUpdate, String> {
+    serde_json::from_str::<html_to_markdown_rs::options::PreprocessingOptionsUpdate>(&json)
+        .map(PreprocessingOptionsUpdate)
+        .map_err(|e| e.to_string())
+}
 pub fn document_structure_from_json(json: String) -> Result<DocumentStructure, String> {
     serde_json::from_str::<html_to_markdown_rs::DocumentStructure>(&json)
         .map(DocumentStructure)
         .map_err(|e| e.to_string())
 }
-
 pub fn document_node_from_json(json: String) -> Result<DocumentNode, String> {
     serde_json::from_str::<html_to_markdown_rs::DocumentNode>(&json)
         .map(DocumentNode)
         .map_err(|e| e.to_string())
 }
-
 pub fn text_annotation_from_json(json: String) -> Result<TextAnnotation, String> {
     serde_json::from_str::<html_to_markdown_rs::TextAnnotation>(&json)
         .map(TextAnnotation)
         .map_err(|e| e.to_string())
 }
-
+pub fn conversion_result_from_json(json: String) -> Result<ConversionResult, String> {
+    serde_json::from_str::<html_to_markdown_rs::ConversionResult>(&json)
+        .map(ConversionResult)
+        .map_err(|e| e.to_string())
+}
+pub fn table_grid_from_json(json: String) -> Result<TableGrid, String> {
+    serde_json::from_str::<html_to_markdown_rs::TableGrid>(&json)
+        .map(TableGrid)
+        .map_err(|e| e.to_string())
+}
 pub fn grid_cell_from_json(json: String) -> Result<GridCell, String> {
     serde_json::from_str::<html_to_markdown_rs::GridCell>(&json)
         .map(GridCell)
         .map_err(|e| e.to_string())
 }
-
 pub fn table_data_from_json(json: String) -> Result<TableData, String> {
     serde_json::from_str::<html_to_markdown_rs::TableData>(&json)
         .map(TableData)
         .map_err(|e| e.to_string())
 }
-
 pub fn processing_warning_from_json(json: String) -> Result<ProcessingWarning, String> {
     serde_json::from_str::<html_to_markdown_rs::ProcessingWarning>(&json)
         .map(ProcessingWarning)
+        .map_err(|e| e.to_string())
+}
+pub fn text_direction_from_json(json: String) -> Result<TextDirection, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::TextDirection>(&json)
+        .map(TextDirection::from)
+        .map_err(|e| e.to_string())
+}
+pub fn link_type_from_json(json: String) -> Result<LinkType, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::LinkType>(&json)
+        .map(LinkType::from)
+        .map_err(|e| e.to_string())
+}
+pub fn image_type_from_json(json: String) -> Result<ImageType, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::ImageType>(&json)
+        .map(ImageType::from)
+        .map_err(|e| e.to_string())
+}
+pub fn structured_data_type_from_json(json: String) -> Result<StructuredDataType, String> {
+    serde_json::from_str::<html_to_markdown_rs::metadata::StructuredDataType>(&json)
+        .map(StructuredDataType::from)
+        .map_err(|e| e.to_string())
+}
+pub fn node_content_from_json(json: String) -> Result<NodeContent, String> {
+    serde_json::from_str::<html_to_markdown_rs::NodeContent>(&json)
+        .map(NodeContent::from)
+        .map_err(|e| e.to_string())
+}
+pub fn annotation_kind_from_json(json: String) -> Result<AnnotationKind, String> {
+    serde_json::from_str::<html_to_markdown_rs::AnnotationKind>(&json)
+        .map(AnnotationKind::from)
+        .map_err(|e| e.to_string())
+}
+pub fn warning_kind_from_json(json: String) -> Result<WarningKind, String> {
+    serde_json::from_str::<html_to_markdown_rs::WarningKind>(&json)
+        .map(WarningKind::from)
+        .map_err(|e| e.to_string())
+}
+pub fn node_type_from_json(json: String) -> Result<NodeType, String> {
+    serde_json::from_str::<html_to_markdown_rs::NodeType>(&json)
+        .map(NodeType::from)
+        .map_err(|e| e.to_string())
+}
+pub fn visit_result_from_json(json: String) -> Result<VisitResult, String> {
+    serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
+        .map(VisitResult::from)
         .map_err(|e| e.to_string())
 }

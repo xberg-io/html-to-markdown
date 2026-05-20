@@ -1,0 +1,34 @@
+[scan]
+include = [
+  ".github/workflows/**/*.yml",
+  ".github/workflows/**/*.yaml",
+  ".github/actions/**/action.yml",
+  ".github/actions/**/action.yaml",
+  "action.yml",
+  "action.yaml",
+]
+exclude = [
+  # publish.yaml uses multi-line `uses:` + `with:` entries that gau v0.1.1
+  # cannot rewrite ("uses value is not a simple single-line rewrite target").
+  # Re-include once upstream gh-actions-updater handles those.
+  ".github/workflows/publish.yaml",
+]
+recursive = false
+
+[cache]
+enabled = true
+ttl = "6h"
+
+[update]
+mode = "latest-tag"
+exclude = []
+include_prereleases = false
+preserve_major = true
+missing_ref = "warn"
+
+[output]
+format = "human"
+color = "auto"
+
+[github]
+api_url = "https://api.github.com"

@@ -93,7 +93,6 @@ pub fn main() !void {
 }
 ```
 
-
 With conversion options:
 
 ```zig
@@ -112,7 +111,6 @@ pub fn main() !void {
     std.debug.print("{s}\n", .{result_json});
 }
 ```
-
 
 ## API Reference
 
@@ -184,7 +182,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

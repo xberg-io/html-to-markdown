@@ -197,7 +197,7 @@ tasks:
     desc: "Update all dependencies (within major versions)"
     cmds:
       - alef update
-      - cmd: npx --yes actions-up@latest --yes --style preserve
+      - cmd: gau --update .
         ignore_error: false
       - task: rust:update
       - task: python:update
@@ -217,7 +217,7 @@ tasks:
     desc: "Upgrade all dependencies to latest (including breaking changes)"
     cmds:
       - alef update --latest
-      - cmd: npx --yes actions-up@latest --yes --mode major --style preserve
+      - cmd: gau --update .
         ignore_error: false
       - task: rust:upgrade
       - task: python:upgrade

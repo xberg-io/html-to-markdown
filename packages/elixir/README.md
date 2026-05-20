@@ -104,7 +104,6 @@ Basic conversion:
 IO.puts(result.content)
 ```
 
-
 With conversion options:
 
 ```elixir
@@ -113,11 +112,9 @@ opts = %HtmlToMarkdown.Options{wrap: true, wrap_width: 40}
 IO.puts(result.content)
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`HtmlToMarkdown.convert(html, options \\ nil) :: {:ok, ConversionResult.t()} | {:error, term()}`**
 
@@ -280,9 +277,7 @@ result.content
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Hex.pm:** [hex.pm/packages/html_to_markdown](https://hex.pm/packages/html_to_markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

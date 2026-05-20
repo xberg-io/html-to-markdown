@@ -108,7 +108,6 @@ $result = HtmlToMarkdown::convert('<h1>Hello</h1><p>This is <strong>fast</strong
 echo $result->content;
 ```
 
-
 With conversion options:
 
 ```php
@@ -124,11 +123,9 @@ $result = HtmlToMarkdown::convert('<h1>Hello</h1>', $options);
 echo $result->content;
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`Converter::convert(string $html, ?ConversionOptions $options = null, ?VisitorInterface $visitor = null): array`**
 
@@ -312,9 +309,7 @@ $markdown = $result['content'];
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **Packagist:** [packagist.org/packages/kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

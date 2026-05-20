@@ -19,4 +19,6 @@ object HtmlToMarkdownRsBridge {
 
     @Throws(HtmlToMarkdownRsBridgeException::class)
     external fun nativeConvert(html: String, options: String): String
+
+    // JNI trait-bridge external funs — implementations are Rust JNI shims.
 }

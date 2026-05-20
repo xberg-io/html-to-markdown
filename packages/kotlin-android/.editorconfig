@@ -26,6 +26,10 @@ ktlint_standard_indent = disabled
 # `string-template-indent` depends on `indent`; must be disabled together.
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_filename = disabled
+# ktfmt collapses `fun foo(): T = callbackFlow { ... }` to one line for
+# expression-bodied functions; ktlint's multiline-expression-wrapping then
+# rejects it. Defer to ktfmt — disable the ktlint rule for the generated tree.
+ktlint_standard_multiline-expression-wrapping = disabled
 
 [*.gradle.kts]
 indent_style = space
@@ -42,6 +46,7 @@ ktlint_standard_indent = disabled
 # `string-template-indent` depends on `indent`; must be disabled together.
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_filename = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
 
 [*.{xml,pro,gitignore}]
 indent_style = space

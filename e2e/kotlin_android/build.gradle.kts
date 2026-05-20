@@ -22,10 +22,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     sourceSets {
         getByName("test") {
             // Include the AAR-bundled Java facade as test sources
@@ -50,10 +46,15 @@ android {
     }
 }
 
-repositories {
-    mavenCentral()
-    google()
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
 }
+
+// Repositories declared in settings.gradle.kts via
+// dependencyResolutionManagement (FAIL_ON_PROJECT_REPOS). Re-declaring them
+// here triggers Gradle "repository was added by build file" errors.
 
 dependencies {
     // JNA for loading the native library from java.library.path

@@ -227,7 +227,7 @@ pub struct HtmlMetadata {
 ///
 /// # Example
 ///
-/// ```text
+/// ```rust
 /// use html_to_markdown_rs::ConversionOptions;
 ///
 /// let options = ConversionOptions::builder()
@@ -671,11 +671,12 @@ pub struct ProcessingWarning {
     pub kind: WarningKind,
 }
 
-/// Type alias for a visitor handle (`Arc`-wrapped `Mutex` for thread-safe shared mutation).
+/// Shareable, thread-safe handle to a user-provided HTML visitor implementation.
 ///
-/// `Send + Sync` so that types embedding a `VisitorHandle` (e.g. `ConversionOptions`)
-/// can be shared across threads — required by callers that stash configs inside
-/// axum/rmcp/tokio Send-bound contexts.
+/// Pass an instance wrapped in this handle to `ConversionOptions` to
+/// customise how the HTML document is traversed and converted to Markdown.
+/// The handle may be cloned and shared across threads without additional
+/// synchronisation on the caller's side.
 #[frb(opaque)]
 pub struct VisitorHandle {
     pub(crate) inner: html_to_markdown_rs::visitor::VisitorHandle,
@@ -1234,6 +1235,25 @@ pub enum VisitResult {
     ///
     /// The conversion process halts and returns this error message.
     Error { field0: String },
+}
+
+/// Errors that can occur during HTML to Markdown conversion.
+#[frb(mirror(ConversionError))]
+pub enum ConversionError {
+    /// HTML parsing error
+    ParseError { field0: String },
+    /// HTML sanitization error
+    SanitizationError { field0: String },
+    /// Invalid configuration
+    ConfigError { field0: String },
+    /// I/O error
+    IoError { field0: String },
+    /// Panic caught during conversion to prevent unwinding across FFI boundaries
+    Panic { field0: String },
+    /// Invalid input data
+    InvalidInput { field0: String },
+    /// Generic conversion error
+    Other { field0: String },
 }
 
 // From<SourceT> conversions for bridge return types.

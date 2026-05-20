@@ -6,7 +6,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
-# `futures-util`, `serde_json`, and `tokio` are emitted unconditionally above
+# `futures-util`, `serde_json`, and `tokio` are emitted unconditionally below
 # so the manifest is stable across regens (they are used when the umbrella
 # crate declares async fns, streaming adapters, or JSON-marshalled types),
 # but for an umbrella crate that has none of those they are genuinely unused.

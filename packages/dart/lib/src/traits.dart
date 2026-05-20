@@ -161,7 +161,11 @@ abstract class HtmlVisitor {
   /// - `text`: The link text content (already converted to markdown)
   /// - `title`: Optional title attribute
   Future<VisitResult> visitLink(
-      NodeContext ctx, String href, String text, String? title);
+    NodeContext ctx,
+    String href,
+    String text,
+    String? title,
+  );
 
   /// Visit images `<img src="...">`.
   ///
@@ -171,7 +175,11 @@ abstract class HtmlVisitor {
   /// - `alt`: The alt text
   /// - `title`: Optional title attribute
   Future<VisitResult> visitImage(
-      NodeContext ctx, String src, String alt, String? title);
+    NodeContext ctx,
+    String src,
+    String alt,
+    String? title,
+  );
 
   /// Visit heading elements `<h1>` through `<h6>`.
   ///
@@ -181,7 +189,11 @@ abstract class HtmlVisitor {
   /// - `text`: The heading text content
   /// - `id`: Optional id attribute (for anchor links)
   Future<VisitResult> visitHeading(
-      NodeContext ctx, int level, String text, String? id);
+    NodeContext ctx,
+    int level,
+    String text,
+    String? id,
+  );
 
   /// Visit code blocks `<pre><code>`.
   ///
@@ -190,7 +202,10 @@ abstract class HtmlVisitor {
   /// - `lang`: Optional language specifier (from class attribute)
   /// - `code`: The code content
   Future<VisitResult> visitCodeBlock(
-      NodeContext ctx, String? lang, String code);
+    NodeContext ctx,
+    String? lang,
+    String code,
+  );
 
   /// Visit inline code `<code>`.
   ///
@@ -207,14 +222,21 @@ abstract class HtmlVisitor {
   /// - `marker`: The list marker (e.g., "-", "1.", "a)")
   /// - `text`: The list item content (already converted)
   Future<VisitResult> visitListItem(
-      NodeContext ctx, bool ordered, String marker, String text);
+    NodeContext ctx,
+    bool ordered,
+    String marker,
+    String text,
+  );
 
   /// Called before processing a list `<ul>` or `<ol>`.
   Future<VisitResult> visitListStart(NodeContext ctx, bool ordered);
 
   /// Called after processing a list `</ul>` or `</ol>`.
   Future<VisitResult> visitListEnd(
-      NodeContext ctx, bool ordered, String output);
+    NodeContext ctx,
+    bool ordered,
+    String output,
+  );
 
   /// Called before processing a table `<table>`.
   Future<VisitResult> visitTableStart(NodeContext ctx);
@@ -226,7 +248,10 @@ abstract class HtmlVisitor {
   /// - `cells`: Cell contents (already converted to markdown)
   /// - `is_header`: Whether this row is in `<thead>`
   Future<VisitResult> visitTableRow(
-      NodeContext ctx, List<String> cells, bool isHeader);
+    NodeContext ctx,
+    List<String> cells,
+    bool isHeader,
+  );
 
   /// Called after processing a table `</table>`.
   Future<VisitResult> visitTableEnd(NodeContext ctx, String output);
@@ -238,7 +263,10 @@ abstract class HtmlVisitor {
   /// - `content`: The blockquote content (already converted)
   /// - `depth`: Nesting depth (for nested blockquotes)
   Future<VisitResult> visitBlockquote(
-      NodeContext ctx, String content, int depth);
+    NodeContext ctx,
+    String content,
+    int depth,
+  );
 
   /// Visit strong/bold elements `<strong>`, `<b>`.
   Future<VisitResult> visitStrong(NodeContext ctx, String text);
@@ -274,7 +302,10 @@ abstract class HtmlVisitor {
   /// - `tag_name`: The custom element's tag name
   /// - `html`: The raw HTML of this element
   Future<VisitResult> visitCustomElement(
-      NodeContext ctx, String tagName, String html);
+    NodeContext ctx,
+    String tagName,
+    String html,
+  );
 
   /// Visit definition list `<dl>`.
   Future<VisitResult> visitDefinitionListStart(NodeContext ctx);
@@ -290,11 +321,18 @@ abstract class HtmlVisitor {
 
   /// Visit form elements `<form>`.
   Future<VisitResult> visitForm(
-      NodeContext ctx, String? action, String? method);
+    NodeContext ctx,
+    String? action,
+    String? method,
+  );
 
   /// Visit input elements `<input>`.
   Future<VisitResult> visitInput(
-      NodeContext ctx, String inputType, String? name, String? value);
+    NodeContext ctx,
+    String inputType,
+    String? name,
+    String? value,
+  );
 
   /// Visit button elements `<button>`.
   Future<VisitResult> visitButton(NodeContext ctx, String text);

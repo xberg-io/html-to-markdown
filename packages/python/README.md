@@ -71,7 +71,6 @@ stays identical across runtimes. Wheels are published for Linux, macOS, and Wind
 pip install html-to-markdown
 ```
 
-
 Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyPI.
 
 
@@ -98,7 +97,6 @@ result = convert(html)
 markdown = result.content
 ```
 
-
 With conversion options:
 
 ```python
@@ -113,11 +111,9 @@ result = convert(html, options)
 markdown = result.content
 ```
 
-
 ## API Reference
 
 ### Core Function
-
 
 **`convert(html: str, options?: ConversionOptions, visitor?: object) -> ConversionResult`**
 
@@ -280,9 +276,7 @@ markdown = result.content
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
-
 - **PyPI:** [pypi.org/project/html-to-markdown](https://pypi.org/project/html-to-markdown/)
-
 - **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
 
 ## Part of Kreuzberg.dev

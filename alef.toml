@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.16.37"
+alef_version = "0.17.8"
 languages = [
   "python",
   "node",
@@ -119,6 +119,7 @@ sources = [
   "crates/html-to-markdown/src/metadata/types.rs",
   "crates/html-to-markdown/src/visitor/traits.rs",
   "crates/html-to-markdown/src/visitor/types.rs",
+  "crates/html-to-markdown/src/visitor/default_impl.rs",
 ]
 version_from = "Cargo.toml"
 workspace_root = "."
@@ -305,8 +306,8 @@ e2e = "cd e2e/python && uv run pytest tests/ -q"
 
 [crates.test.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-before = "cd crates/html-to-markdown-node && napi build --platform --release && cd ../../packages/typescript && pnpm install --silent && pnpm run build"
-e2e = "cd e2e/node && pnpm install --silent && pnpm exec vitest run"
+before = "cd crates/html-to-markdown-node && napi build --platform --release && cd ../../packages/typescript && pnpm install && pnpm run build"
+e2e = "cd e2e/node && pnpm install && pnpm exec vitest run"
 
 [crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"
@@ -589,7 +590,6 @@ outputFormat = "OutputFormat"
 module = "HtmlToMarkdown"
 function = "convert"
 options_type = "ConversionOptions"
-options_via = "conversionoptions_default"
 returns_result = true
 
 [crates.e2e.call.overrides.elixir.enum_fields]

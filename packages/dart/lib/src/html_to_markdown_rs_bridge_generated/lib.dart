@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ConversionError`, `HtmlVisitorDartImpl`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
@@ -17,13 +17,14 @@ part 'lib.freezed.dart';
 /// **Errors:**
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-Future<ConversionResult> convert(
-        {required String html, ConversionOptions? options}) =>
-    RustLib.instance.api.crateConvert(html: html, options: options);
+Future<ConversionResult> convert({
+  required String html,
+  ConversionOptions? options,
+}) => RustLib.instance.api.crateConvert(html: html, options: options);
 
-Future<DocumentMetadata> createDocumentMetadataFromJson(
-        {required String json}) =>
-    RustLib.instance.api.crateCreateDocumentMetadataFromJson(json: json);
+Future<DocumentMetadata> createDocumentMetadataFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreateDocumentMetadataFromJson(json: json);
 
 Future<HeaderMetadata> createHeaderMetadataFromJson({required String json}) =>
     RustLib.instance.api.crateCreateHeaderMetadataFromJson(json: json);
@@ -40,26 +41,28 @@ Future<StructuredData> createStructuredDataFromJson({required String json}) =>
 Future<HtmlMetadata> createHtmlMetadataFromJson({required String json}) =>
     RustLib.instance.api.crateCreateHtmlMetadataFromJson(json: json);
 
-Future<ConversionOptions> createConversionOptionsFromJson(
-        {required String json}) =>
-    RustLib.instance.api.crateCreateConversionOptionsFromJson(json: json);
+Future<ConversionOptions> createConversionOptionsFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreateConversionOptionsFromJson(json: json);
 
-Future<ConversionOptionsUpdate> createConversionOptionsUpdateFromJson(
-        {required String json}) =>
+Future<ConversionOptionsUpdate> createConversionOptionsUpdateFromJson({
+  required String json,
+}) =>
     RustLib.instance.api.crateCreateConversionOptionsUpdateFromJson(json: json);
 
-Future<PreprocessingOptions> createPreprocessingOptionsFromJson(
-        {required String json}) =>
-    RustLib.instance.api.crateCreatePreprocessingOptionsFromJson(json: json);
+Future<PreprocessingOptions> createPreprocessingOptionsFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreatePreprocessingOptionsFromJson(json: json);
 
-Future<PreprocessingOptionsUpdate> createPreprocessingOptionsUpdateFromJson(
-        {required String json}) =>
-    RustLib.instance.api
-        .crateCreatePreprocessingOptionsUpdateFromJson(json: json);
+Future<PreprocessingOptionsUpdate> createPreprocessingOptionsUpdateFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreatePreprocessingOptionsUpdateFromJson(
+  json: json,
+);
 
-Future<DocumentStructure> createDocumentStructureFromJson(
-        {required String json}) =>
-    RustLib.instance.api.crateCreateDocumentStructureFromJson(json: json);
+Future<DocumentStructure> createDocumentStructureFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreateDocumentStructureFromJson(json: json);
 
 Future<DocumentNode> createDocumentNodeFromJson({required String json}) =>
     RustLib.instance.api.crateCreateDocumentNodeFromJson(json: json);
@@ -67,9 +70,9 @@ Future<DocumentNode> createDocumentNodeFromJson({required String json}) =>
 Future<TextAnnotation> createTextAnnotationFromJson({required String json}) =>
     RustLib.instance.api.crateCreateTextAnnotationFromJson(json: json);
 
-Future<ConversionResult> createConversionResultFromJson(
-        {required String json}) =>
-    RustLib.instance.api.crateCreateConversionResultFromJson(json: json);
+Future<ConversionResult> createConversionResultFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreateConversionResultFromJson(json: json);
 
 Future<TableGrid> createTableGridFromJson({required String json}) =>
     RustLib.instance.api.crateCreateTableGridFromJson(json: json);
@@ -80,9 +83,9 @@ Future<GridCell> createGridCellFromJson({required String json}) =>
 Future<TableData> createTableDataFromJson({required String json}) =>
     RustLib.instance.api.crateCreateTableDataFromJson(json: json);
 
-Future<ProcessingWarning> createProcessingWarningFromJson(
-        {required String json}) =>
-    RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
+Future<ProcessingWarning> createProcessingWarningFromJson({
+  required String json,
+}) => RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
 
 Future<NodeContext> createNodeContextFromJson({required String json}) =>
     RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
@@ -92,74 +95,121 @@ Future<NodeContext> createNodeContextFromJson({required String json}) =>
 /// which is the whole point of taking them as `impl Fn(...) -> DartFnFuture<R>`
 /// parameters rather than storing them as `Box<dyn Fn(...)>` fields on an
 /// opaque struct (FRB v2 cannot generate callable closure types in that shape).
-Future<VisitorHandle> createHtmlVisitor(
-        {required FutureOr<VisitResult> Function(NodeContext, String) visitText,
-        required FutureOr<VisitResult> Function(NodeContext) visitElementStart,
-        required FutureOr<VisitResult> Function(NodeContext, String)
-            visitElementEnd,
-        required FutureOr<VisitResult> Function(
-                NodeContext, String, String, String?)
-            visitLink,
-        required FutureOr<VisitResult> Function(
-                NodeContext, String, String, String?)
-            visitImage,
-        required FutureOr<VisitResult> Function(
-                NodeContext, PlatformInt64, String, String?)
-            visitHeading,
-        required FutureOr<VisitResult> Function(NodeContext, String?, String)
-            visitCodeBlock,
-        required FutureOr<VisitResult> Function(NodeContext, String)
-            visitCodeInline,
-        required FutureOr<VisitResult> Function(
-                NodeContext, bool, String, String)
-            visitListItem,
-        required FutureOr<VisitResult> Function(NodeContext, bool)
-            visitListStart,
-        required FutureOr<VisitResult> Function(NodeContext, bool, String)
-            visitListEnd,
-        required FutureOr<VisitResult> Function(NodeContext) visitTableStart,
-        required FutureOr<VisitResult> Function(NodeContext, List<String>, bool)
-            visitTableRow,
-        required FutureOr<VisitResult> Function(NodeContext, String)
-            visitTableEnd,
-        required FutureOr<VisitResult> Function(
-                NodeContext, String, PlatformInt64)
-            visitBlockquote,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitStrong,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitEmphasis,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitStrikethrough,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitUnderline,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitSubscript,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitSuperscript,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitMark,
-        required FutureOr<VisitResult> Function(NodeContext) visitLineBreak,
-        required FutureOr<VisitResult> Function(NodeContext) visitHorizontalRule,
-        required FutureOr<VisitResult> Function(NodeContext, String, String) visitCustomElement,
-        required FutureOr<VisitResult> Function(NodeContext) visitDefinitionListStart,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitDefinitionTerm,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitDefinitionDescription,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitDefinitionListEnd,
-        required FutureOr<VisitResult> Function(NodeContext, String?, String?) visitForm,
-        required FutureOr<VisitResult> Function(NodeContext, String, String?, String?) visitInput,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitButton,
-        required FutureOr<VisitResult> Function(NodeContext, String?) visitAudio,
-        required FutureOr<VisitResult> Function(NodeContext, String?) visitVideo,
-        required FutureOr<VisitResult> Function(NodeContext, String?) visitIframe,
-        required FutureOr<VisitResult> Function(NodeContext, bool) visitDetails,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitSummary,
-        required FutureOr<VisitResult> Function(NodeContext) visitFigureStart,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitFigcaption,
-        required FutureOr<VisitResult> Function(NodeContext, String) visitFigureEnd}) =>
-    RustLib.instance.api.crateCreateHtmlVisitor(visitText: visitText, visitElementStart: visitElementStart, visitElementEnd: visitElementEnd, visitLink: visitLink, visitImage: visitImage, visitHeading: visitHeading, visitCodeBlock: visitCodeBlock, visitCodeInline: visitCodeInline, visitListItem: visitListItem, visitListStart: visitListStart, visitListEnd: visitListEnd, visitTableStart: visitTableStart, visitTableRow: visitTableRow, visitTableEnd: visitTableEnd, visitBlockquote: visitBlockquote, visitStrong: visitStrong, visitEmphasis: visitEmphasis, visitStrikethrough: visitStrikethrough, visitUnderline: visitUnderline, visitSubscript: visitSubscript, visitSuperscript: visitSuperscript, visitMark: visitMark, visitLineBreak: visitLineBreak, visitHorizontalRule: visitHorizontalRule, visitCustomElement: visitCustomElement, visitDefinitionListStart: visitDefinitionListStart, visitDefinitionTerm: visitDefinitionTerm, visitDefinitionDescription: visitDefinitionDescription, visitDefinitionListEnd: visitDefinitionListEnd, visitForm: visitForm, visitInput: visitInput, visitButton: visitButton, visitAudio: visitAudio, visitVideo: visitVideo, visitIframe: visitIframe, visitDetails: visitDetails, visitSummary: visitSummary, visitFigureStart: visitFigureStart, visitFigcaption: visitFigcaption, visitFigureEnd: visitFigureEnd);
+Future<VisitorHandle> createHtmlVisitor({
+  required FutureOr<VisitResult> Function(NodeContext, String) visitText,
+  required FutureOr<VisitResult> Function(NodeContext) visitElementStart,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitElementEnd,
+  required FutureOr<VisitResult> Function(NodeContext, String, String, String?)
+  visitLink,
+  required FutureOr<VisitResult> Function(NodeContext, String, String, String?)
+  visitImage,
+  required FutureOr<VisitResult> Function(
+    NodeContext,
+    PlatformInt64,
+    String,
+    String?,
+  )
+  visitHeading,
+  required FutureOr<VisitResult> Function(NodeContext, String?, String)
+  visitCodeBlock,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitCodeInline,
+  required FutureOr<VisitResult> Function(NodeContext, bool, String, String)
+  visitListItem,
+  required FutureOr<VisitResult> Function(NodeContext, bool) visitListStart,
+  required FutureOr<VisitResult> Function(NodeContext, bool, String)
+  visitListEnd,
+  required FutureOr<VisitResult> Function(NodeContext) visitTableStart,
+  required FutureOr<VisitResult> Function(NodeContext, List<String>, bool)
+  visitTableRow,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitTableEnd,
+  required FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64)
+  visitBlockquote,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitStrong,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitEmphasis,
+  required FutureOr<VisitResult> Function(NodeContext, String)
+  visitStrikethrough,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitUnderline,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitSubscript,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitSuperscript,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitMark,
+  required FutureOr<VisitResult> Function(NodeContext) visitLineBreak,
+  required FutureOr<VisitResult> Function(NodeContext) visitHorizontalRule,
+  required FutureOr<VisitResult> Function(NodeContext, String, String)
+  visitCustomElement,
+  required FutureOr<VisitResult> Function(NodeContext) visitDefinitionListStart,
+  required FutureOr<VisitResult> Function(NodeContext, String)
+  visitDefinitionTerm,
+  required FutureOr<VisitResult> Function(NodeContext, String)
+  visitDefinitionDescription,
+  required FutureOr<VisitResult> Function(NodeContext, String)
+  visitDefinitionListEnd,
+  required FutureOr<VisitResult> Function(NodeContext, String?, String?)
+  visitForm,
+  required FutureOr<VisitResult> Function(NodeContext, String, String?, String?)
+  visitInput,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitButton,
+  required FutureOr<VisitResult> Function(NodeContext, String?) visitAudio,
+  required FutureOr<VisitResult> Function(NodeContext, String?) visitVideo,
+  required FutureOr<VisitResult> Function(NodeContext, String?) visitIframe,
+  required FutureOr<VisitResult> Function(NodeContext, bool) visitDetails,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitSummary,
+  required FutureOr<VisitResult> Function(NodeContext) visitFigureStart,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitFigcaption,
+  required FutureOr<VisitResult> Function(NodeContext, String) visitFigureEnd,
+}) => RustLib.instance.api.crateCreateHtmlVisitor(
+  visitText: visitText,
+  visitElementStart: visitElementStart,
+  visitElementEnd: visitElementEnd,
+  visitLink: visitLink,
+  visitImage: visitImage,
+  visitHeading: visitHeading,
+  visitCodeBlock: visitCodeBlock,
+  visitCodeInline: visitCodeInline,
+  visitListItem: visitListItem,
+  visitListStart: visitListStart,
+  visitListEnd: visitListEnd,
+  visitTableStart: visitTableStart,
+  visitTableRow: visitTableRow,
+  visitTableEnd: visitTableEnd,
+  visitBlockquote: visitBlockquote,
+  visitStrong: visitStrong,
+  visitEmphasis: visitEmphasis,
+  visitStrikethrough: visitStrikethrough,
+  visitUnderline: visitUnderline,
+  visitSubscript: visitSubscript,
+  visitSuperscript: visitSuperscript,
+  visitMark: visitMark,
+  visitLineBreak: visitLineBreak,
+  visitHorizontalRule: visitHorizontalRule,
+  visitCustomElement: visitCustomElement,
+  visitDefinitionListStart: visitDefinitionListStart,
+  visitDefinitionTerm: visitDefinitionTerm,
+  visitDefinitionDescription: visitDefinitionDescription,
+  visitDefinitionListEnd: visitDefinitionListEnd,
+  visitForm: visitForm,
+  visitInput: visitInput,
+  visitButton: visitButton,
+  visitAudio: visitAudio,
+  visitVideo: visitVideo,
+  visitIframe: visitIframe,
+  visitDetails: visitDetails,
+  visitSummary: visitSummary,
+  visitFigureStart: visitFigureStart,
+  visitFigcaption: visitFigcaption,
+  visitFigureEnd: visitFigureEnd,
+);
 
 /// Build a `ConversionOptions` from a JSON blob and attach a Dart-built
 /// `VisitorHandle` to its `visitor` field. The mirror struct uses `final`
 /// dart fields, so callers cannot patch the visitor in after JSON load —
 /// this helper does the merge on the Rust side instead.
-Future<ConversionOptions> createConversionOptionsFromJsonWithVisitor(
-        {required String json, VisitorHandle? visitor}) =>
-    RustLib.instance.api.crateCreateConversionOptionsFromJsonWithVisitor(
-        json: json, visitor: visitor);
+Future<ConversionOptions> createConversionOptionsFromJsonWithVisitor({
+  required String json,
+  VisitorHandle? visitor,
+}) => RustLib.instance.api.crateCreateConversionOptionsFromJsonWithVisitor(
+  json: json,
+  visitor: visitor,
+);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<VisitorHandle>>
 abstract class VisitorHandle implements RustOpaqueInterface {}
@@ -222,7 +272,6 @@ enum CodeBlockStyle {
 
   /// Fenced code blocks with tildes (~~~). Supports language hints.
   tildes,
-  ;
 }
 
 /// Main conversion options for HTML to Markdown conversion.
@@ -231,7 +280,7 @@ enum CodeBlockStyle {
 ///
 /// # Example
 ///
-/// ```text
+/// ```rust
 /// use html_to_markdown_rs::ConversionOptions;
 ///
 /// let options = ConversionOptions::builder()
@@ -1071,10 +1120,7 @@ class DocumentStructure {
   /// The source format (always "html" for this crate).
   final String? sourceFormat;
 
-  const DocumentStructure({
-    required this.nodes,
-    this.sourceFormat,
-  });
+  const DocumentStructure({required this.nodes, this.sourceFormat});
 
   @override
   int get hashCode => nodes.hashCode ^ sourceFormat.hashCode;
@@ -1214,7 +1260,6 @@ enum HeadingStyle {
 
   /// ATX closed style (# title #, with closing hashes).
   atxClosed,
-  ;
 }
 
 /// Highlight rendering style for `<mark>` elements.
@@ -1232,7 +1277,6 @@ enum HighlightStyle {
 
   /// Strip formatting, render as plain text. No markup.
   none,
-  ;
 }
 
 /// Comprehensive metadata extraction result from HTML document.
@@ -1381,7 +1425,6 @@ enum ImageType {
 
   /// Relative image path
   relative,
-  ;
 }
 
 /// Hyperlink metadata with categorization and attributes.
@@ -1463,7 +1506,6 @@ enum LinkStyle {
 
   /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
   reference,
-  ;
 }
 
 /// Link classification based on href value and document context.
@@ -1487,7 +1529,6 @@ enum LinkType {
 
   /// Other protocol or unclassifiable
   other,
-  ;
 }
 
 /// List indentation character type.
@@ -1499,7 +1540,6 @@ enum ListIndentType {
 
   /// Use tabs for indentation.
   tabs,
-  ;
 }
 
 /// Line break syntax in Markdown output.
@@ -1511,7 +1551,6 @@ enum NewlineStyle {
 
   /// Backslash at end of line. Alternative Markdown syntax.
   backslash,
-  ;
 }
 
 @freezed
@@ -1943,7 +1982,6 @@ enum NodeType {
 
   /// Custom element (web components) or unknown tag
   custom,
-  ;
 }
 
 /// Output format for conversion.
@@ -1958,7 +1996,6 @@ enum OutputFormat {
 
   /// Plain text output (no markup, visible text only).
   plain,
-  ;
 }
 
 /// HTML preprocessing options for document cleanup before conversion.
@@ -2055,7 +2092,6 @@ enum PreprocessingPreset {
 
   /// Aggressive cleanup. Remove extensive non-content elements and structure.
   aggressive,
-  ;
 }
 
 /// A non-fatal diagnostic produced during HTML conversion.
@@ -2080,10 +2116,7 @@ class ProcessingWarning {
   /// The category of warning.
   final WarningKind kind;
 
-  const ProcessingWarning({
-    required this.message,
-    required this.kind,
-  });
+  const ProcessingWarning({required this.message, required this.kind});
 
   @override
   int get hashCode => message.hashCode ^ kind.hashCode;
@@ -2155,7 +2188,6 @@ enum StructuredDataType {
 
   /// RDF in Attributes (RDFa) markup
   rdFa,
-  ;
 }
 
 /// A top-level extracted table with both structured data and markdown representation.
@@ -2166,10 +2198,7 @@ class TableData {
   /// The markdown rendering of this table.
   final String markdown;
 
-  const TableData({
-    required this.grid,
-    required this.markdown,
-  });
+  const TableData({required this.grid, required this.markdown});
 
   @override
   int get hashCode => grid.hashCode ^ markdown.hashCode;
@@ -2281,7 +2310,6 @@ enum TextDirection {
 
   /// Automatic directionality detection
   auto,
-  ;
 }
 
 @freezed
@@ -2295,9 +2323,8 @@ sealed class VisitResult with _$VisitResult {
   ///
   /// The visitor takes full responsibility for the markdown output
   /// of this node and its children.
-  const factory VisitResult.custom({
-    required String field0,
-  }) = VisitResult_Custom;
+  const factory VisitResult.custom({required String field0}) =
+      VisitResult_Custom;
 
   /// Skip this element entirely (don't output anything)
   ///
@@ -2312,9 +2339,7 @@ sealed class VisitResult with _$VisitResult {
   /// Stop conversion with an error
   ///
   /// The conversion process halts and returns this error message.
-  const factory VisitResult.error({
-    required String field0,
-  }) = VisitResult_Error;
+  const factory VisitResult.error({required String field0}) = VisitResult_Error;
 }
 
 /// Categories of processing warnings.
@@ -2336,7 +2361,6 @@ enum WarningKind {
 
   /// DOM traversal was truncated because max_depth was exceeded.
   depthLimitExceeded,
-  ;
 }
 
 /// Whitespace handling strategy during conversion.
@@ -2348,5 +2372,4 @@ enum WhitespaceMode {
 
   /// Preserve all whitespace exactly as it appears in the HTML.
   strict,
-  ;
 }
