@@ -26,18 +26,13 @@ pub fn trim_line_end_whitespace(output: &mut String) {
     }
 
     let mut cleaned = String::with_capacity(output.len());
-    for (idx, line) in output.split('\n').enumerate() {
-        if idx > 0 {
-            cleaned.push('\n');
-        }
-
-        let has_soft_break = line.ends_with("  ");
-        let trimmed = line.trim_end_matches([' ', '\t']);
-
-        cleaned.push_str(trimmed);
-        if has_soft_break {
-            cleaned.push_str("  ");
-        }
+    for line in output.split('\n') {
+        let (line, suffix) = line
+            .strip_suffix("  ")
+            .map(|line| (line, "  \n"))
+            .unwrap_or((line, "\n"));
+        cleaned.push_str(line.trim_end_matches([' ', '\t']));
+        cleaned.push_str(suffix);
     }
 
     let trimmed = cleaned.trim_end_matches('\n');
@@ -45,7 +40,6 @@ pub fn trim_line_end_whitespace(output: &mut String) {
         *output = String::new();
     } else {
         if trimmed.len() < cleaned.len() {
-            // ~ one trimmed '\n' is one byte
             cleaned.truncate(trimmed.len() + 1);
         } else {
             cleaned.push('\n');
