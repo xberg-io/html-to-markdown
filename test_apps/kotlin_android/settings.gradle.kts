@@ -16,4 +16,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "dev.kreuzberg:html-to-markdown-android-e2e"
+rootProject.name = "html-to-markdown-android-e2e"

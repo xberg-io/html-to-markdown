@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.8"
+alef_version = "0.17.11"
 languages = [
   "python",
   "node",
@@ -561,6 +561,7 @@ module = "HtmlToMarkdown"
 class = "HtmlToMarkdown"
 function = "convert"
 options_type = "ConversionOptions"
+options_via = "from_json"
 
 [crates.e2e.call.overrides.php.enum_fields]
 headingStyle = "HeadingStyle"

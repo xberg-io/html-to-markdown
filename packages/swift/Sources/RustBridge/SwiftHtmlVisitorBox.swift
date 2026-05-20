@@ -99,7 +99,7 @@ public final class SwiftHtmlVisitorBox {
     public func alef_visit_table_start(ctx: RustString) -> String {
         return delegate.visitTableStart(ctx)
     }
-    public func alef_visit_table_row(ctx: RustString, cells: RustVec<RustString>, isHeader: Bool) -> String {
+    public func alef_visit_table_row(ctx: RustString, cells: RustVec<RustString>, is_header isHeader: Bool) -> String {
         return delegate.visitTableRow(ctx, cells, isHeader)
     }
     public func alef_visit_table_end(ctx: RustString, output: RustString) -> String {
@@ -135,7 +135,7 @@ public final class SwiftHtmlVisitorBox {
     public func alef_visit_horizontal_rule(ctx: RustString) -> String {
         return delegate.visitHorizontalRule(ctx)
     }
-    public func alef_visit_custom_element(ctx: RustString, tagName: RustString, html: RustString) -> String {
+    public func alef_visit_custom_element(ctx: RustString, tag_name tagName: RustString, html: RustString) -> String {
         return delegate.visitCustomElement(ctx, tagName, html)
     }
     public func alef_visit_definition_list_start(ctx: RustString) -> String {
@@ -153,7 +153,7 @@ public final class SwiftHtmlVisitorBox {
     public func alef_visit_form(ctx: RustString, action: RustString?, method: RustString?) -> String {
         return delegate.visitForm(ctx, action, method)
     }
-    public func alef_visit_input(ctx: RustString, inputType: RustString, name: RustString?, value: RustString?) -> String {
+    public func alef_visit_input(ctx: RustString, input_type inputType: RustString, name: RustString?, value: RustString?) -> String {
         return delegate.visitInput(ctx, inputType, name, value)
     }
     public func alef_visit_button(ctx: RustString, text: RustString) -> String {
@@ -168,7 +168,7 @@ public final class SwiftHtmlVisitorBox {
     public func alef_visit_iframe(ctx: RustString, src: RustString?) -> String {
         return delegate.visitIframe(ctx, src)
     }
-    public func alef_visit_details(ctx: RustString, open_: Bool) -> String {
+    public func alef_visit_details(ctx: RustString, open open_: Bool) -> String {
         return delegate.visitDetails(ctx, open_)
     }
     public func alef_visit_summary(ctx: RustString, text: RustString) -> String {

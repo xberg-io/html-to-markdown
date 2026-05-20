@@ -182,6 +182,7 @@ vendor/
 **/.dart_tool/
 **/.build/
 e2e/kotlin_android/build/
+test_apps/kotlin_android/build/
 packages/kotlin-android/build/
 **/.gradle/
 

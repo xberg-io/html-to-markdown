@@ -63,13 +63,11 @@
 High-performance HTML to Markdown converter with C#/.NET bindings using P/Invoke to the Rust core.
 Provides type-safe record-based APIs for metadata extraction, visitor patterns, and thread-safe concurrent conversion.
 
-
 ## Installation
 
 ```bash
 dotnet add package KreuzbergDev.HtmlToMarkdown
 ```
-
 
 Requires .NET 8.0+ SDK.
 
@@ -77,17 +75,15 @@ Requires .NET 8.0+ SDK.
 dotnet add package KreuzbergDev.HtmlToMarkdown
 ```
 
-
 ## Performance Snapshot
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 392.9 MB/s |
-| Tables (Countries) | 360KB |  | 300.1 MB/s |
-| Mixed (Python) | 656KB |  | 292.3 MB/s |
-
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 392.9 MB/s |
+| Tables (Countries) | 360KB |         | 300.1 MB/s |
+| Mixed (Python)     | 656KB |         | 292.3 MB/s |
 
 ## Quick Start
 
@@ -134,7 +130,6 @@ var metadata = result.Metadata;   // null unless ExtractMetadata = true
 var tables   = result.Tables;     // empty unless ExtractTables = true
 ```
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -167,7 +162,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```csharp
 using HtmlToMarkdown;
 
@@ -182,13 +176,11 @@ var djot = Converter.Convert(html, new ConversionOptions { OutputFormat = "djot"
 // Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```csharp
 using HtmlToMarkdown;
@@ -199,9 +191,7 @@ var plain = Converter.Convert(html, new ConversionOptions { OutputFormat = "plai
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -218,7 +208,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

@@ -203,7 +203,7 @@ public typealias HtmlMetadata = RustBridge.HtmlMetadata
 /// # Example
 ///
 /// ```rust
-/// use html_to_markdown_rs::ConversionOptions;
+/// use html_to_markdown_rs::{ConversionOptions, HeadingStyle};
 ///
 /// let options = ConversionOptions::builder()
 ///     .heading_style(HeadingStyle::Atx)

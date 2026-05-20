@@ -27,7 +27,7 @@ typedef struct HTMCodeBlockStyle HTMCodeBlockStyle;
  *
  * Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
  * \code
- * use html_to_markdown_rs::ConversionOptions;
+ * use html_to_markdown_rs::{ConversionOptions, HeadingStyle};
  *
  * let options = ConversionOptions::builder()
  *     .heading_style(HeadingStyle::Atx)
