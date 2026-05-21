@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **core: avoid stack overflow on documents with many unclosed list items** — preprocessing now applies the HTML5 implicit-close rule for `<li>`, `<dt>`, and `<dd>` before the `tl` parser sees the document, so a 15k-item changelog with bare `<li>` tags (e.g. `https://curl.se/changes.html`) is parsed as siblings instead of a 448-deep chain. Eliminates a process abort (`fatal runtime error: stack overflow`) that bypassed `Result::Err` and `std::panic::catch_unwind`. (#379)
 - **wasm: `NodeContent::MetadataBlock { entries }` round-trips correctly as `[[k,v],...]`** — the `entries: Vec<(String, String)>` field is now stored as `JsValue` in the wasm binding struct and serialized/deserialized via `serde_wasm_bindgen` instead of `Vec<String>`, preserving the nested-array wire format that serde produces for tuple vecs.
 
 ### Added

@@ -23,8 +23,8 @@ use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_d
 use crate::converter::utility::caching::build_dom_context;
 use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::utility::preprocessing::{
-    normalize_bogus_comment_endings, normalize_split_closing_tags, preprocess_html, strip_hidden_elements,
-    strip_script_and_style_tags,
+    normalize_bogus_comment_endings, normalize_split_closing_tags, normalize_unclosed_list_items, preprocess_html,
+    strip_hidden_elements, strip_script_and_style_tags,
 };
 use crate::converter::utility::serialization::serialize_tag_to_html;
 use crate::options::OutputFormat;
@@ -71,6 +71,12 @@ pub fn convert_html_impl(
     // The `tl` parser does not handle such end-tags and leaves the element unclosed,
     // causing all subsequent siblings to be absorbed as children.
     let stripped = normalize_split_closing_tags(&stripped);
+    // Insert missing `</li>`, `</dt>`, `</dd>` close tags that the HTML5 spec
+    // says are implicitly added when a new list-item starts or the parent list
+    // closes.  Without this, `tl` nests each item inside the previous one,
+    // building a chain as deep as the number of items and causing a stack
+    // overflow on large changelogs with hundreds of unclosed `<li>` tags.
+    let stripped = normalize_unclosed_list_items(&stripped);
     let mut preprocessed = preprocess_html(&stripped).into_owned();
     let mut preprocessed_len = preprocessed.len();
 

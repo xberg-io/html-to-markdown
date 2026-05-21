@@ -734,6 +734,267 @@ pub fn matches_end_tag_start(bytes: &[u8], start: usize, tag: &[u8]) -> bool {
     matches_tag_start(bytes, start + 1, tag)
 }
 
+/// Close implicitly-terminated list-item elements that `tl` would otherwise
+/// absorb as deep children, causing stack overflows on large documents.
+///
+/// The HTML5 parsing spec (§13.2.6.4.7 "in body" insertion mode) states that
+/// an open `<li>`, `<dt>`, or `<dd>` tag is *implicitly closed* when:
+///
+/// - Another `<li>` / `<dt>` / `<dd>` open tag is encountered, or
+/// - The closing `</ul>`, `</ol>`, or `</dl>` tag is reached.
+///
+/// The `tl` parser is not a full HTML5 parser; it does not apply implicit
+/// closure rules.  When it encounters `<li>content<li>more` it treats the
+/// second `<li>` as a child of the first, producing a linear chain of depth
+/// equal to the number of items.  A list with 400 unclosed `<li>` items
+/// causes `walk_node` to recurse 400 levels deep; with 467 such lists in a
+/// single document (curl.se/changes.html) the cumulative stack depth triggers
+/// an OS-level stack overflow.
+///
+/// This function rewrites the source HTML in one linear pass before `tl` sees
+/// it, inserting the missing `</li>`, `</dt>`, and `</dd>` close tags exactly
+/// where the HTML5 spec says they belong.
+///
+/// # Scope
+///
+/// Only the three list-item element types are handled here; `<p>` and other
+/// auto-closing block elements are intentionally left to the existing
+/// `has_inline_block_misnest` → `repair_with_html5ever` path.
+pub fn normalize_unclosed_list_items(input: &str) -> Cow<'_, str> {
+    // Fast-path: skip the scan entirely when there are no list-item tags.
+    // `<li`, `<dt`, and `<dd` share the first two bytes `<l`, `<d` — if
+    // neither byte sequence can appear there is nothing to do.
+    let bytes = input.as_bytes();
+    let len = bytes.len();
+    if len < 4
+        || (!bytes.windows(3).any(|w| {
+            w.eq_ignore_ascii_case(b"<li") || w.eq_ignore_ascii_case(b"<dt") || w.eq_ignore_ascii_case(b"<dd")
+        }))
+    {
+        return Cow::Borrowed(input);
+    }
+
+    // `open_item` tracks the tag name of the currently-open list-item element
+    // (one of "li", "dt", "dd"), or `None` when no such element is open.
+    // We use a simple single-element stack because `<li>` cannot contain
+    // another `<li>` without an intervening `</li>` in well-formed HTML —
+    // the only nesting that is legal is inside a child `<ul>`/`<ol>`/`<dl>`.
+    // We therefore reset the stack on every `</ul>`, `</ol>`, `</dl>`.
+    let mut open_item: Option<&'static str> = None;
+    // Depth of `<ul>` / `<ol>` / `<dl>` nesting.  We only track open
+    // list-item state for the innermost list (depth == 1 at the item level).
+    // When a nested list opens we push a "saved" state; when it closes we
+    // restore it.  We use a `Vec` because nesting can be arbitrary.
+    let mut list_stack: Vec<Option<&'static str>> = Vec::new();
+
+    // Tracks whether the current scan position is inside a `<pre>` or
+    // `<code>` block, an HTML comment, or an attribute value — all of which
+    // must be passed through verbatim.
+    let mut in_pre_or_code: usize = 0; // nesting depth counter
+    let mut in_comment = false;
+
+    let mut idx = 0usize;
+    let mut last_flush = 0usize;
+    let mut output: Option<String> = None;
+
+    // Helper: emit `close_tag` just before position `pos` by flushing the
+    // bytes up to `pos` and then appending the close tag.
+    macro_rules! emit_close_before {
+        ($pos:expr, $close_tag:expr) => {{
+            let out = output.get_or_insert_with(|| String::with_capacity(len + 64));
+            out.push_str(&input[last_flush..$pos]);
+            out.push_str($close_tag);
+            last_flush = $pos;
+        }};
+    }
+
+    while idx < len {
+        let b = bytes[idx];
+
+        // ── HTML comment handling ─────────────────────────────────────────────
+        if in_comment {
+            if b == b'-' && idx + 2 < len && bytes[idx + 1] == b'-' && bytes[idx + 2] == b'>' {
+                in_comment = false;
+                idx += 3;
+            } else {
+                idx += 1;
+            }
+            continue;
+        }
+
+        if b == b'<' && idx + 3 < len && bytes[idx + 1] == b'!' && bytes[idx + 2] == b'-' && bytes[idx + 3] == b'-' {
+            in_comment = true;
+            idx += 4;
+            continue;
+        }
+
+        // ── Non-tag character ─────────────────────────────────────────────────
+        if b != b'<' {
+            idx += 1;
+            continue;
+        }
+
+        // ── We are at `<` ─────────────────────────────────────────────────────
+        let tag_start = idx;
+        idx += 1;
+        if idx >= len {
+            break;
+        }
+
+        let is_close = bytes[idx] == b'/';
+        if is_close {
+            idx += 1;
+            if idx >= len {
+                break;
+            }
+        }
+
+        // Skip whitespace after `<` or `</`
+        while idx < len && bytes[idx].is_ascii_whitespace() {
+            idx += 1;
+        }
+
+        // Collect tag name (ASCII alphanumeric + hyphens)
+        let name_start = idx;
+        while idx < len {
+            let ch = bytes[idx];
+            if ch == b'>' || ch == b'/' || ch.is_ascii_whitespace() {
+                break;
+            }
+            idx += 1;
+        }
+        let name_bytes = &bytes[name_start..idx];
+        if name_bytes.is_empty() {
+            continue;
+        }
+
+        // Advance to the closing `>` of this tag (skip quoted attribute values)
+        {
+            let mut in_single_quote = false;
+            let mut in_double_quote = false;
+            while idx < len {
+                match bytes[idx] {
+                    b'\'' if !in_double_quote => {
+                        in_single_quote = !in_single_quote;
+                        idx += 1;
+                    }
+                    b'"' if !in_single_quote => {
+                        in_double_quote = !in_double_quote;
+                        idx += 1;
+                    }
+                    b'>' if !in_single_quote && !in_double_quote => {
+                        idx += 1;
+                        break;
+                    }
+                    _ => {
+                        idx += 1;
+                    }
+                }
+            }
+        }
+
+        // ── Classify the tag ─────────────────────────────────────────────────
+        let tag_is_verbatim = name_bytes.eq_ignore_ascii_case(b"pre")
+            || name_bytes.eq_ignore_ascii_case(b"code")
+            || name_bytes.eq_ignore_ascii_case(b"script")
+            || name_bytes.eq_ignore_ascii_case(b"style");
+
+        if tag_is_verbatim {
+            if is_close {
+                in_pre_or_code = in_pre_or_code.saturating_sub(1);
+            } else {
+                in_pre_or_code += 1;
+            }
+            continue;
+        }
+
+        // Inside verbatim blocks: pass through unchanged.
+        if in_pre_or_code > 0 {
+            continue;
+        }
+
+        let is_list_container = name_bytes.eq_ignore_ascii_case(b"ul")
+            || name_bytes.eq_ignore_ascii_case(b"ol")
+            || name_bytes.eq_ignore_ascii_case(b"dl");
+
+        let is_li = name_bytes.eq_ignore_ascii_case(b"li");
+        let is_def_term = name_bytes.eq_ignore_ascii_case(b"dt");
+        let is_def_desc = name_bytes.eq_ignore_ascii_case(b"dd");
+        let is_list_item = is_li || is_def_term || is_def_desc;
+
+        if is_close {
+            if is_list_container {
+                // Closing a list: implicitly close any open list-item inside it.
+                if let Some(item) = open_item.take() {
+                    let close_tag = match item {
+                        "li" => "</li>",
+                        "dt" => "</dt>",
+                        "dd" => "</dd>",
+                        _ => unreachable!(),
+                    };
+                    emit_close_before!(tag_start, close_tag);
+                }
+                // Restore the outer list's open-item state from the stack.
+                open_item = list_stack.pop().unwrap_or(None);
+            } else if is_list_item {
+                // Explicit close: clear the open-item state.
+                open_item = None;
+            }
+        } else {
+            // Opening tag
+            if is_list_container {
+                // Save the current open-item state and start fresh for the nested list.
+                list_stack.push(open_item.take());
+            } else if is_list_item {
+                // Determine the tag name as a static str so we can store it.
+                let item_name: &'static str = if is_li {
+                    "li"
+                } else if is_def_term {
+                    "dt"
+                } else {
+                    "dd"
+                };
+
+                if let Some(prev_item) = open_item.replace(item_name) {
+                    // The previous list-item was not explicitly closed; insert its
+                    // closing tag immediately before this new opening tag.
+                    let close_tag = match prev_item {
+                        "li" => "</li>",
+                        "dt" => "</dt>",
+                        "dd" => "</dd>",
+                        _ => unreachable!(),
+                    };
+                    emit_close_before!(tag_start, close_tag);
+                }
+            }
+        }
+    }
+
+    // If a list-item was still open at the very end, close it.
+    if let Some(item) = open_item.take() {
+        let close_tag = match item {
+            "li" => "</li>",
+            "dt" => "</dt>",
+            "dd" => "</dd>",
+            _ => unreachable!(),
+        };
+        let out = output.get_or_insert_with(|| String::with_capacity(len + 16));
+        out.push_str(&input[last_flush..]);
+        out.push_str(close_tag);
+        last_flush = len;
+    }
+
+    match output {
+        Some(mut out) => {
+            if last_flush < len {
+                out.push_str(&input[last_flush..]);
+            }
+            Cow::Owned(out)
+        }
+        None => Cow::Borrowed(input),
+    }
+}
+
 /// Sanitize malformed markdown-like URLs in HTML attributes.
 ///
 /// Handles cases like: `//[domain.com/path](http://domain.com/path)`
@@ -878,7 +1139,10 @@ fn tag_has_hidden_attribute(tag: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{normalize_bogus_comment_endings, normalize_split_closing_tags, sanitize_markdown_url};
+    use super::{
+        normalize_bogus_comment_endings, normalize_split_closing_tags, normalize_unclosed_list_items,
+        sanitize_markdown_url,
+    };
 
     // ── normalize_bogus_comment_endings ───────────────────────────────────────
 
@@ -998,5 +1262,81 @@ mod tests {
         let input = "https://example.com/normal";
         let sanitized = sanitize_markdown_url(input);
         assert_eq!(sanitized, input);
+    }
+
+    // ── normalize_unclosed_list_items ─────────────────────────────────────────
+
+    #[test]
+    fn normalize_unclosed_list_items_leaves_well_formed_list_unchanged() {
+        let input = "<ul><li>A</li><li>B</li></ul>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(result.as_ref(), input);
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_closes_unclosed_li_before_next_li() {
+        let input = "<ul><li>A<li>B</ul>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(result.as_ref(), "<ul><li>A</li><li>B</li></ul>");
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_closes_chain_of_unclosed_li() {
+        let input = "<ul><li>A<li>B<li>C</ul>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(result.as_ref(), "<ul><li>A</li><li>B</li><li>C</li></ul>");
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_does_not_modify_input_without_list_items() {
+        let input = "<p>Hello</p><div>World</div>";
+        let result = normalize_unclosed_list_items(input);
+        // Fast-path: no list-item tags → Borrowed
+        assert!(matches!(result, std::borrow::Cow::Borrowed(_)));
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_handles_nested_list_correctly() {
+        // Nested ul: the inner li items should not close prematurely via the outer li
+        let input = "<ul><li>Outer<ul><li>Inner A<li>Inner B</ul><li>Outer B</ul>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(
+            result.as_ref(),
+            "<ul><li>Outer<ul><li>Inner A</li><li>Inner B</li></ul></li><li>Outer B</li></ul>"
+        );
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_handles_dt_and_dd() {
+        let input = "<dl><dt>Term A<dd>Def A<dt>Term B<dd>Def B</dl>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(
+            result.as_ref(),
+            "<dl><dt>Term A</dt><dd>Def A</dd><dt>Term B</dt><dd>Def B</dd></dl>"
+        );
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_does_not_touch_content_in_pre() {
+        // Content inside <pre> must be passed through verbatim even if it looks like a tag.
+        let input = "<ul><li>A<pre><li>not-a-list-item</pre><li>B</ul>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(
+            result.as_ref(),
+            "<ul><li>A<pre><li>not-a-list-item</pre></li><li>B</li></ul>"
+        );
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_skips_html_comments() {
+        let input = "<ul><li>A<!-- <li>comment --><li>B</ul>";
+        let result = normalize_unclosed_list_items(input);
+        assert_eq!(result.as_ref(), "<ul><li>A<!-- <li>comment --></li><li>B</li></ul>");
+    }
+
+    #[test]
+    fn normalize_unclosed_list_items_empty_input() {
+        let result = normalize_unclosed_list_items("");
+        assert_eq!(result.as_ref(), "");
     }
 }

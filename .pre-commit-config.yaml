@@ -39,7 +39,11 @@ repos:
           )$
       - id: check-merge-conflict
       - id: check-added-large-files
-        exclude: uv.lock
+        exclude: |
+          (?x)^(
+            uv\.lock
+            |crates/html-to-markdown/tests/fixtures/regressions/.*
+          )$
       - id: detect-private-key
       - id: check-json
         exclude: tsconfig\.base\.json
