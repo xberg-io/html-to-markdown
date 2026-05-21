@@ -72,14 +72,14 @@ function requireNative() {
   } else if (process.platform === "android") {
     if (process.arch === "arm64") {
       try {
-        return require("./index.android-arm64.node");
+        return require("./html-to-markdown-node.android-arm64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-android-arm64");
+        const binding = require("@kreuzberg/html-to-markdown-node-android-arm64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-android-arm64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-android-arm64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -95,14 +95,14 @@ function requireNative() {
       }
     } else if (process.arch === "arm") {
       try {
-        return require("./index.android-arm-eabi.node");
+        return require("./html-to-markdown-node.android-arm-eabi.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-android-arm-eabi");
+        const binding = require("@kreuzberg/html-to-markdown-node-android-arm-eabi");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-android-arm-eabi/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-android-arm-eabi/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -126,14 +126,14 @@ function requireNative() {
         process.config?.variables?.node_target_type === "shared_library"
       ) {
         try {
-          return require("./index.win32-x64-gnu.node");
+          return require("./html-to-markdown-node.win32-x64-gnu.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-win32-x64-gnu");
+          const binding = require("@kreuzberg/html-to-markdown-node-win32-x64-gnu");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-win32-x64-gnu/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-win32-x64-gnu/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -149,14 +149,14 @@ function requireNative() {
         }
       } else {
         try {
-          return require("./index.win32-x64-msvc.node");
+          return require("./html-to-markdown-node.win32-x64-msvc.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-win32-x64-msvc");
+          const binding = require("@kreuzberg/html-to-markdown-node-win32-x64-msvc");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-win32-x64-msvc/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-win32-x64-msvc/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -173,14 +173,14 @@ function requireNative() {
       }
     } else if (process.arch === "ia32") {
       try {
-        return require("./index.win32-ia32-msvc.node");
+        return require("./html-to-markdown-node.win32-ia32-msvc.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-win32-ia32-msvc");
+        const binding = require("@kreuzberg/html-to-markdown-node-win32-ia32-msvc");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-win32-ia32-msvc/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-win32-ia32-msvc/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -196,14 +196,14 @@ function requireNative() {
       }
     } else if (process.arch === "arm64") {
       try {
-        return require("./index.win32-arm64-msvc.node");
+        return require("./html-to-markdown-node.win32-arm64-msvc.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-win32-arm64-msvc");
+        const binding = require("@kreuzberg/html-to-markdown-node-win32-arm64-msvc");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-win32-arm64-msvc/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-win32-arm64-msvc/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -222,14 +222,14 @@ function requireNative() {
     }
   } else if (process.platform === "darwin") {
     try {
-      return require("./index.darwin-universal.node");
+      return require("./html-to-markdown-node.darwin-universal.node");
     } catch (e) {
       loadErrors.push(e);
     }
     try {
-      const binding = require("html-to-markdown-monorepo-darwin-universal");
+      const binding = require("@kreuzberg/html-to-markdown-node-darwin-universal");
       const bindingPackageVersion =
-        require("html-to-markdown-monorepo-darwin-universal/package.json").version;
+        require("@kreuzberg/html-to-markdown-node-darwin-universal/package.json").version;
       if (
         bindingPackageVersion !== "3.5.0" &&
         process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -245,14 +245,14 @@ function requireNative() {
     }
     if (process.arch === "x64") {
       try {
-        return require("./index.darwin-x64.node");
+        return require("./html-to-markdown-node.darwin-x64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-darwin-x64");
+        const binding = require("@kreuzberg/html-to-markdown-node-darwin-x64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-darwin-x64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-darwin-x64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -268,14 +268,14 @@ function requireNative() {
       }
     } else if (process.arch === "arm64") {
       try {
-        return require("./index.darwin-arm64.node");
+        return require("./html-to-markdown-node.darwin-arm64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-darwin-arm64");
+        const binding = require("@kreuzberg/html-to-markdown-node-darwin-arm64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-darwin-arm64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-darwin-arm64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -295,14 +295,14 @@ function requireNative() {
   } else if (process.platform === "freebsd") {
     if (process.arch === "x64") {
       try {
-        return require("./index.freebsd-x64.node");
+        return require("./html-to-markdown-node.freebsd-x64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-freebsd-x64");
+        const binding = require("@kreuzberg/html-to-markdown-node-freebsd-x64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-freebsd-x64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-freebsd-x64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -318,14 +318,14 @@ function requireNative() {
       }
     } else if (process.arch === "arm64") {
       try {
-        return require("./index.freebsd-arm64.node");
+        return require("./html-to-markdown-node.freebsd-arm64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-freebsd-arm64");
+        const binding = require("@kreuzberg/html-to-markdown-node-freebsd-arm64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-freebsd-arm64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-freebsd-arm64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -346,14 +346,14 @@ function requireNative() {
     if (process.arch === "x64") {
       if (isMusl()) {
         try {
-          return require("./index.linux-x64-musl.node");
+          return require("./html-to-markdown-node.linux-x64-musl.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-x64-musl");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-x64-musl");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-x64-musl/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-x64-musl/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -369,14 +369,14 @@ function requireNative() {
         }
       } else {
         try {
-          return require("./index.linux-x64-gnu.node");
+          return require("./html-to-markdown-node.linux-x64-gnu.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-x64-gnu");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-x64-gnu");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-x64-gnu/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-x64-gnu/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -394,14 +394,14 @@ function requireNative() {
     } else if (process.arch === "arm64") {
       if (isMusl()) {
         try {
-          return require("./index.linux-arm64-musl.node");
+          return require("./html-to-markdown-node.linux-arm64-musl.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-arm64-musl");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-arm64-musl");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-arm64-musl/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-arm64-musl/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -417,14 +417,14 @@ function requireNative() {
         }
       } else {
         try {
-          return require("./index.linux-arm64-gnu.node");
+          return require("./html-to-markdown-node.linux-arm64-gnu.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-arm64-gnu");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-arm64-gnu");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-arm64-gnu/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-arm64-gnu/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -442,14 +442,14 @@ function requireNative() {
     } else if (process.arch === "arm") {
       if (isMusl()) {
         try {
-          return require("./index.linux-arm-musleabihf.node");
+          return require("./html-to-markdown-node.linux-arm-musleabihf.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-arm-musleabihf");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-arm-musleabihf");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-arm-musleabihf/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-arm-musleabihf/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -465,14 +465,14 @@ function requireNative() {
         }
       } else {
         try {
-          return require("./index.linux-arm-gnueabihf.node");
+          return require("./html-to-markdown-node.linux-arm-gnueabihf.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-arm-gnueabihf");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-arm-gnueabihf");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-arm-gnueabihf/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-arm-gnueabihf/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -490,14 +490,14 @@ function requireNative() {
     } else if (process.arch === "loong64") {
       if (isMusl()) {
         try {
-          return require("./index.linux-loong64-musl.node");
+          return require("./html-to-markdown-node.linux-loong64-musl.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-loong64-musl");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-loong64-musl");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-loong64-musl/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-loong64-musl/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -513,14 +513,14 @@ function requireNative() {
         }
       } else {
         try {
-          return require("./index.linux-loong64-gnu.node");
+          return require("./html-to-markdown-node.linux-loong64-gnu.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-loong64-gnu");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-loong64-gnu");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-loong64-gnu/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-loong64-gnu/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -538,14 +538,14 @@ function requireNative() {
     } else if (process.arch === "riscv64") {
       if (isMusl()) {
         try {
-          return require("./index.linux-riscv64-musl.node");
+          return require("./html-to-markdown-node.linux-riscv64-musl.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-riscv64-musl");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-riscv64-musl");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-riscv64-musl/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-riscv64-musl/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -561,14 +561,14 @@ function requireNative() {
         }
       } else {
         try {
-          return require("./index.linux-riscv64-gnu.node");
+          return require("./html-to-markdown-node.linux-riscv64-gnu.node");
         } catch (e) {
           loadErrors.push(e);
         }
         try {
-          const binding = require("html-to-markdown-monorepo-linux-riscv64-gnu");
+          const binding = require("@kreuzberg/html-to-markdown-node-linux-riscv64-gnu");
           const bindingPackageVersion =
-            require("html-to-markdown-monorepo-linux-riscv64-gnu/package.json").version;
+            require("@kreuzberg/html-to-markdown-node-linux-riscv64-gnu/package.json").version;
           if (
             bindingPackageVersion !== "3.5.0" &&
             process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -585,14 +585,14 @@ function requireNative() {
       }
     } else if (process.arch === "ppc64") {
       try {
-        return require("./index.linux-ppc64-gnu.node");
+        return require("./html-to-markdown-node.linux-ppc64-gnu.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-linux-ppc64-gnu");
+        const binding = require("@kreuzberg/html-to-markdown-node-linux-ppc64-gnu");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-linux-ppc64-gnu/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-linux-ppc64-gnu/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -608,14 +608,14 @@ function requireNative() {
       }
     } else if (process.arch === "s390x") {
       try {
-        return require("./index.linux-s390x-gnu.node");
+        return require("./html-to-markdown-node.linux-s390x-gnu.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-linux-s390x-gnu");
+        const binding = require("@kreuzberg/html-to-markdown-node-linux-s390x-gnu");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-linux-s390x-gnu/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-linux-s390x-gnu/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -635,14 +635,14 @@ function requireNative() {
   } else if (process.platform === "openharmony") {
     if (process.arch === "arm64") {
       try {
-        return require("./index.openharmony-arm64.node");
+        return require("./html-to-markdown-node.openharmony-arm64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-openharmony-arm64");
+        const binding = require("@kreuzberg/html-to-markdown-node-openharmony-arm64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-openharmony-arm64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-openharmony-arm64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -658,14 +658,14 @@ function requireNative() {
       }
     } else if (process.arch === "x64") {
       try {
-        return require("./index.openharmony-x64.node");
+        return require("./html-to-markdown-node.openharmony-x64.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-openharmony-x64");
+        const binding = require("@kreuzberg/html-to-markdown-node-openharmony-x64");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-openharmony-x64/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-openharmony-x64/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -681,14 +681,14 @@ function requireNative() {
       }
     } else if (process.arch === "arm") {
       try {
-        return require("./index.openharmony-arm.node");
+        return require("./html-to-markdown-node.openharmony-arm.node");
       } catch (e) {
         loadErrors.push(e);
       }
       try {
-        const binding = require("html-to-markdown-monorepo-openharmony-arm");
+        const binding = require("@kreuzberg/html-to-markdown-node-openharmony-arm");
         const bindingPackageVersion =
-          require("html-to-markdown-monorepo-openharmony-arm/package.json").version;
+          require("@kreuzberg/html-to-markdown-node-openharmony-arm/package.json").version;
         if (
           bindingPackageVersion !== "3.5.0" &&
           process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -718,7 +718,7 @@ if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
   let wasiBinding = null;
   let wasiBindingError = null;
   try {
-    wasiBinding = require("./index.wasi.cjs");
+    wasiBinding = require("./html-to-markdown-node.wasi.cjs");
     nativeBinding = wasiBinding;
   } catch (err) {
     if (process.env.NAPI_RS_FORCE_WASI) {
@@ -727,7 +727,7 @@ if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
   }
   if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
     try {
-      wasiBinding = require("html-to-markdown-monorepo-wasm32-wasi");
+      wasiBinding = require("@kreuzberg/html-to-markdown-node-wasm32-wasi");
       nativeBinding = wasiBinding;
     } catch (err) {
       if (process.env.NAPI_RS_FORCE_WASI) {

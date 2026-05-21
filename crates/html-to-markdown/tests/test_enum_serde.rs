@@ -1,3 +1,5 @@
+//! Integration tests for serde round-trip of public enum types.
+
 use html_to_markdown_rs::options::ConversionOptions;
 
 #[test]

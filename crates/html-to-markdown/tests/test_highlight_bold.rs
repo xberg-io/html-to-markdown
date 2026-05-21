@@ -1,3 +1,5 @@
+//! Integration test for `HighlightStyle::Bold` rendering.
+
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle};
 
 #[test]

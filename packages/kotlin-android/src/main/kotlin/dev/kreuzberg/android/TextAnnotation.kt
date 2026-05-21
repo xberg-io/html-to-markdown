@@ -24,16 +24,16 @@ package dev.kreuzberg.android
 /**
  * A styling or semantic annotation that applies to a byte range within a node's text.
  *
- * Unlike `DocumentNode`, which captures block-level structure (headings, paragraphs, etc.), a
- * `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and similar —
- * that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
+ * Unlike `DocumentNode`, which captures block-level structure (headings, paragraphs, etc.),
+ * a `TextAnnotation` describes inline-level markup — bold, italic, links, code spans, and
+ * similar — that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
  *
  * Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
  * follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
  * text is `text[start as usize..end as usize]`.
  *
- * Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are stored in
- * the order they are encountered during DOM traversal.
+ * Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
+ * stored in the order they are encountered during DOM traversal.
  *
  * See `AnnotationKind` for the full list of supported annotation types.
  */
@@ -43,5 +43,6 @@ data class TextAnnotation(
     /** End byte offset (exclusive) into the parent node's text. */
     val end: Int,
     /** The type of annotation. */
-    val kind: AnnotationKind,
+    @field:com.fasterxml.jackson.databind.annotation.JsonSerialize(`as` = AnnotationKind::class)
+    val kind: AnnotationKind
 )

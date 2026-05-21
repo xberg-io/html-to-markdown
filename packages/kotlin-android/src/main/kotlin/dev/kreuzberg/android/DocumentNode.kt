@@ -26,6 +26,7 @@ data class DocumentNode(
     /** Deterministic node identifier. */
     val id: String,
     /** The semantic content of this node. */
+    @field:com.fasterxml.jackson.databind.annotation.JsonSerialize(`as` = NodeContent::class)
     val content: NodeContent,
     /** Index of the parent node (None for root nodes). */
     val parent: Int? = null,
@@ -39,13 +40,13 @@ data class DocumentNode(
      * Format-specific attributes preserved from the source HTML element.
      *
      * Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
-     * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source — no
-     * HTML entity decoding is applied here.
+     * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
+     * no HTML entity decoding is applied here.
      *
-     * The map is `null` when no attributes are present (omitted entirely in serialized output). Not
-     * every HTML attribute is preserved: only attributes that carry semantic or structural
+     * The map is `null` when no attributes are present (omitted entirely in serialized output).
+     * Not every HTML attribute is preserved: only attributes that carry semantic or structural
      * significance for the node type are collected. For example, heading nodes capture the `"id"`
      * attribute for anchor linking; other element-level attributes may be silently dropped.
      */
-    val attributes: Map<String, String>? = null,
+    val attributes: Map<String, String>? = null
 )

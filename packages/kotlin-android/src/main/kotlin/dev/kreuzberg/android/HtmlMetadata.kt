@@ -24,12 +24,12 @@ package dev.kreuzberg.android
 /**
  * Comprehensive metadata extraction result from HTML document.
  *
- * Contains all extracted metadata types in a single structure, suitable for serialization and
- * transmission across language boundaries.
+ * Contains all extracted metadata types in a single structure,
+ * suitable for serialization and transmission across language boundaries.
  */
 data class HtmlMetadata(
     /** Document-level metadata (title, description, canonical, etc.) */
-    val document: DocumentMetadata,
+    val document: DocumentMetadata = DocumentMetadata(),
     /** Extracted header elements with hierarchy */
     val headers: List<HeaderMetadata> = emptyList(),
     /** Extracted hyperlinks with type classification */
@@ -37,5 +37,5 @@ data class HtmlMetadata(
     /** Extracted images with source and dimensions */
     val images: List<ImageMetadata> = emptyList(),
     /** Extracted structured data blocks */
-    val structuredData: List<StructuredData> = emptyList(),
+    val structuredData: List<StructuredData> = emptyList()
 )

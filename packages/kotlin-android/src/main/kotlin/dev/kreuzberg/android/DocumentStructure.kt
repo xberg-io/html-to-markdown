@@ -30,5 +30,5 @@ data class DocumentStructure(
     /** All nodes in document reading order. */
     val nodes: List<DocumentNode> = emptyList(),
     /** The source format (always "html" for this library). */
-    val sourceFormat: String? = null,
+    val sourceFormat: String? = null
 )

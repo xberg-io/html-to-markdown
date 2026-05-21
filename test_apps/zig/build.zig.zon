@@ -3,7 +3,9 @@
     .version = "0.1.0",
     .fingerprint = 0xf16334c0592376fc,
     .minimum_zig_version = "0.16.0",
-    .dependencies = .{},
+    .dependencies = .{
+        .html_to_markdown = .{ .path = "../../packages/zig" },
+    },
     .paths = .{
         "build.zig",
         "build.zig.zon",

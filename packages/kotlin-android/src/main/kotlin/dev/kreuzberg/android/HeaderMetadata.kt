@@ -24,8 +24,8 @@ package dev.kreuzberg.android
 /**
  * Header element metadata with hierarchy tracking.
  *
- * Captures heading elements (h1-h6) with their text content, identifiers, and position in the
- * document structure.
+ * Captures heading elements (h1-h6) with their text content, identifiers,
+ * and position in the document structure.
  */
 data class HeaderMetadata(
     /** Header level: 1 (h1) through 6 (h6) */
@@ -37,5 +37,5 @@ data class HeaderMetadata(
     /** Document tree depth at the header element */
     val depth: Long,
     /** Byte offset in original HTML document */
-    val htmlOffset: Long,
+    val htmlOffset: Long
 )

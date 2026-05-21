@@ -28,29 +28,30 @@ package dev.kreuzberg.android
  */
 enum class HeadingStyle {
     /** Underlined style (=== for h1, --- for h2). */
-    @com.fasterxml.jackson.annotation.JsonProperty("Underlined") UNDERLINED,
+    @com.fasterxml.jackson.annotation.JsonProperty("Underlined")
+    UNDERLINED,
     /** ATX style (# for h1, ## for h2, etc.). Default. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Atx") ATX,
+    @com.fasterxml.jackson.annotation.JsonProperty("Atx")
+    ATX,
     /** ATX closed style (# title #, with closing hashes). */
-    @com.fasterxml.jackson.annotation.JsonProperty("AtxClosed") ATX_CLOSED;
+    @com.fasterxml.jackson.annotation.JsonProperty("AtxClosed")
+    ATX_CLOSED;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String =
-        when (this) {
-            UNDERLINED -> "Underlined"
-            ATX -> "Atx"
-            ATX_CLOSED -> "AtxClosed"
-        }
+    fun toWire(): String = when (this) {
+        UNDERLINED -> "Underlined"
+        ATX -> "Atx"
+        ATX_CLOSED -> "AtxClosed"
+    }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): HeadingStyle =
-            when (value) {
-                "Underlined" -> UNDERLINED
-                "Atx" -> ATX
-                "AtxClosed" -> ATX_CLOSED
-                else -> throw IllegalArgumentException("Unknown HeadingStyle value: $value")
-            }
+        fun fromWire(value: String): HeadingStyle = when (value) {
+            "Underlined" -> UNDERLINED
+            "Atx" -> ATX
+            "AtxClosed" -> ATX_CLOSED
+            else -> throw IllegalArgumentException("Unknown HeadingStyle value: $value")
+        }
     }
 }

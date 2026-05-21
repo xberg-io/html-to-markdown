@@ -4,11 +4,11 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     const test_step = b.step("test", "Run tests");
-    const ffi_path = b.option([]const u8, "ffi_path", "Path to directory containing libhtml_to_markdown_ffi") orelse "../../target/debug";
+    const ffi_path = b.option([]const u8, "ffi_path", "Path to directory containing libhtml_to_markdown_ffi") orelse "../../target/release";
     const ffi_include = b.option([]const u8, "ffi_include_path", "Path to directory containing FFI header") orelse "../../crates/html-to-markdown-ffi/include";
 
     const html_to_markdown_rs_module = b.addModule("html_to_markdown_rs", .{
-        .root_source_file = b.path("../../packages/zig/src/html_to_markdown.zig"),
+        .root_source_file = b.path("../../packages/zig/src/html_to_markdown_rs.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
