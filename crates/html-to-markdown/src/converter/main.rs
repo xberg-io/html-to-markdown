@@ -289,24 +289,14 @@ pub fn convert_html_impl(
 
     // If plain text was requested, discard the markdown output and return plain text.
     // The full pipeline was still run above so that metadata + visitor callbacks fire.
-    if is_plain_text {
-        let plain = extract_plain_text(&dom, parser, options);
-        let (document, tables) = finish_structure_collector(structure_collector);
-        return Ok((plain, document, tables));
-    }
-
-    trim_line_end_whitespace(&mut output);
-    let trimmed = output.trim_end_matches('\n');
-    let markdown = if trimmed.is_empty() {
-        String::new()
+    let output = if is_plain_text {
+        extract_plain_text(&dom, parser, options)
     } else {
-        format!("{trimmed}\n")
+        trim_line_end_whitespace(&mut output);
+        output
     };
-
-    // Finish the structure collector if present.
     let (document, tables) = finish_structure_collector(structure_collector);
-
-    Ok((markdown, document, tables))
+    Ok((output, document, tables))
 }
 
 /// Consume the structure collector and return the [`DocumentStructure`] and extracted

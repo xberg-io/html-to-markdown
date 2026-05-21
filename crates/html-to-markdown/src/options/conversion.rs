@@ -14,7 +14,7 @@ use crate::options::validation::{
 /// # Example
 ///
 /// ```rust
-/// use html_to_markdown_rs::ConversionOptions;
+/// use html_to_markdown_rs::{ConversionOptions, options::validation::HeadingStyle};
 ///
 /// let options = ConversionOptions::builder()
 ///     .heading_style(HeadingStyle::Atx)
