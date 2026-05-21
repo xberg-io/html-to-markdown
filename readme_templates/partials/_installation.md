@@ -4,6 +4,8 @@
 
 {% if language == 'python' %}
 Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyPI.
+
+**Troubleshooting on Windows:** If `pip install` fails on Python 3.14+, use `pip install --only-binary=:all: html-to-markdown` to force the prebuilt wheel. If sdist fallback is required, install Microsoft Visual Studio Build Tools with the "Desktop development with C++" workload and ensure MSVC's `link.exe` precedes GNU variants in `PATH` (check with `where link`). Update `pip` with `pip install --upgrade pip` to ensure correct wheel matching for Python 3.14.
 {% elif language == 'typescript' %}
 
 Requires Node.js 18+ or Bun. Native bindings provide superior performance.

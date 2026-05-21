@@ -360,6 +360,24 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
 ---
 
+## Troubleshooting on Windows
+
+If `pip install html-to-markdown` fails on Windows 11 with Python 3.14 or later, try these steps:
+
+1. **Force the prebuilt wheel:**
+
+   ```bash
+   pip install --only-binary=:all: html-to-markdown
+   ```
+
+   This prevents fallback to source build. If this fails, a wheel resolution issue exists — try updating `pip` or `uv`.
+
+2. **Enable MSVC compiler (if sdist build is required):** Install Microsoft Visual Studio Build Tools with the "Desktop development with C++" workload. Then ensure MSVC's `link.exe` precedes any GNU variants in `PATH`. Check with `where link` — the first result should be a path under `VC\Tools\MSVC`.
+
+3. **Update pip or uv:** Python 3.14 wheel tags are recent. Run `pip install --upgrade pip` or `uv self update` to ensure correct wheel matching.
+
+---
+
 ## CLI
 
 Install via Cargo:
