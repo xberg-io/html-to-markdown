@@ -100,7 +100,7 @@ jobs:
         uses: kreuzberg-dev/actions/setup-elixir@v1 # v1
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.308.0
+        uses: ruby/setup-ruby@v1.310.0
         with:
           ruby-version: "3.4"
           bundler-cache: false

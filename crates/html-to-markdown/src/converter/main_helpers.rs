@@ -461,7 +461,7 @@ mod tests {
 
     #[test]
     fn test_trim_line_end_whitespace() {
-        let mut s = "".to_owned();
+        let mut s = String::new();
         trim_line_end_whitespace(&mut s);
         assert_eq!("", s.as_str());
 
