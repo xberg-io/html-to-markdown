@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.14"
+alef_version = "0.17.15"
 languages = [
   "python",
   "node",
@@ -229,8 +229,8 @@ functions = ["convert"]
 
 [crates.lint.python]
 precondition = "command -v ruff >/dev/null 2>&1"
-before = "cd packages/python && uv sync"
-typecheck = "cd packages/python && uv run mypy ."
+before = "cd packages/python && uv sync --no-install-project --no-install-workspace"
+typecheck = "cd packages/python && uv run --no-sync mypy ."
 
 [crates.lint.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
@@ -301,7 +301,7 @@ check = "cd packages/zig && zig fmt --check src"
 
 [crates.test.python]
 precondition = "command -v uv >/dev/null 2>&1"
-before = "cd e2e/python && uv sync && uv pip install --refresh ../../packages/python"
+before = "cd e2e/python && uv sync --no-install-project --no-install-workspace && uv pip install --refresh ../../packages/python"
 e2e = "cd e2e/python && uv run pytest tests/ -q"
 
 [crates.test.node]
@@ -452,13 +452,7 @@ languages = [
   "dart",
   "zig",
 ]
-result_fields = [
-  "content",
-  "document",
-  "metadata",
-  "tables",
-  "warnings",
-]
+result_fields = ["content", "document", "metadata", "tables", "warnings"]
 fields_optional = [
   "content",
   "document",
@@ -618,6 +612,7 @@ result_is_r_list = true
 
 [crates.e2e.call.overrides.wasm]
 options_type = "WasmConversionOptions"
+bigint_fields = ["maxImageSize"]
 
 [crates.e2e.call.overrides.wasm.enum_fields]
 headingStyle = "WasmHeadingStyle"
