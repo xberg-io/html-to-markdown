@@ -24,7 +24,13 @@
         "field": "content",
         "value": "Listen to this:"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_audio_skip",
@@ -55,7 +61,13 @@
         "field": "content",
         "value": "music.ogg"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_video_custom",
@@ -87,7 +99,13 @@
         "field": "content",
         "value": "Great content!"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_video_skip",
@@ -118,7 +136,13 @@
         "field": "content",
         "value": "demo.webm"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_iframe_custom",
@@ -150,7 +174,13 @@
         "field": "content",
         "value": "End of map"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_iframe_skip",
@@ -181,6 +211,12 @@
         "field": "content",
         "value": "widget.example.com"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   }
 ]

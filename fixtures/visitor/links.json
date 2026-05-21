@@ -24,7 +24,13 @@
         "field": "content",
         "value": "[Example]"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_skip_links",
@@ -50,7 +56,13 @@
         "field": "content",
         "value": "example.com"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_link_bare_string_preserves_case",
@@ -83,7 +95,13 @@
         "field": "content",
         "value": "old-cdn.com"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_custom_link_static",
@@ -110,6 +128,12 @@
         "field": "content",
         "value": "example.com"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   }
 ]

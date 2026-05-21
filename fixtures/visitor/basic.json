@@ -23,7 +23,13 @@
         "field": "content",
         "value": "Body text remains."
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_custom_output",
@@ -50,7 +56,13 @@
         "field": "content",
         "value": "# Original Heading"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_preserve_html",
@@ -71,7 +83,13 @@
         "field": "content",
         "value": "<custom-tag>"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   },
   {
     "id": "visitor_continue_default",
@@ -92,6 +110,12 @@
         "field": "content",
         "value": "**World**"
       }
-    ]
+    ],
+    "skip": {
+      "languages": [
+        "php"
+      ],
+      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
+    }
   }
 ]
