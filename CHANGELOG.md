@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **bindings: regenerated with alef 0.17.23.** Picks up everything from 0.17.18 plus kotlin-android codegen fixes from 0.17.22 and 0.17.23 (sealed-class default values, primitive field defaults). Earlier 0.17.18 fixes include: Swift visitor `case continue` (was `continue_`), Swift contains-matching across stringy DTO fields, C# enum `[JsonConverter]` restoration, C# nullable option-fields with `WhenWritingNull`, JNI empty-string sentinels, Kotlin-Android trait-bridge field exclusion, Kotlin `kotlin.collections.List/Map` disambiguation in sealed-class siblings, PHP `with_visitor` wither emission for trait-bridge fields, PyO3 streaming wrapper type identity, Go unresolved-Named fallback, Java `FormatMetadataDisplay.java` gated emission, Ruby empty-enum-string skip, Dart positional-vs-named heuristic, R four-fix codegen sweep, Zig fixture language filter, WASM camelCase input DTOs, csharp PascalCase adapter names, php optional config defaults, python streaming-error detection, elixir options-as-JSON-string for Rustler facades, kotlin Jackson `@JsonValue`/`@JsonCreator`. Includes C visitor test suite (208 → 262 tests).
+
 ### Tests
 
 - **e2e/php: skip visitor fixtures in `fixtures/edge-cases/visitor_errors.json`** — five visitor fixtures (`visitor_custom_element_with_nesting`, `visitor_unknown_tag_preservation`, `visitor_deeply_nested_skip`, `visitor_element_start_skip_entire_subtree`, `visitor_element_end_modification`) now carry `"skip": { "languages": ["php"] }` matching the rest of the visitor fixtures already in `fixtures/visitor/*.json`. The PHP `ext-php-rs` binding does not yet support callable visitor handles (no `VisitorHandle::from_php_object()` method), so these tests were emitting unbuildable test code. Generated PHP tests dropped from 262 to 208; suite is fully green.

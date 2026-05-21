@@ -81,7 +81,7 @@
     },
     {
       "name": "freezed_annotation",
-      "rootUri": "file:///Users/naamanhirschfeld/.pub-cache/hosted/pub.dev/freezed_annotation-2.4.4",
+      "rootUri": "file:///Users/naamanhirschfeld/.pub-cache/hosted/pub.dev/freezed_annotation-3.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -101,7 +101,7 @@
       "name": "h2m",
       "rootUri": "../../../packages/dart",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.11"
     },
     {
       "name": "http",
@@ -327,6 +327,6 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.11.6",
+  "generatorVersion": "3.12.0",
   "pubCache": "file:///Users/naamanhirschfeld/.pub-cache"
 }

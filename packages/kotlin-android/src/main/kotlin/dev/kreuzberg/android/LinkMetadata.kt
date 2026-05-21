@@ -32,11 +32,11 @@ data class LinkMetadata(
     /** Link text content (normalized, concatenated if mixed with elements) */
     val text: String,
     /** Optional title attribute (often shown as tooltip) */
-    val title: String?,
+    val title: String? = null,
     /** Link type classification */
     val linkType: LinkType,
     /** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
-    val rel: List<String>,
+    val rel: List<String> = emptyList(),
     /** Additional HTML attributes */
-    val attributes: Map<String, String>,
+    val attributes: Map<String, String> = emptyMap(),
 )

@@ -28,7 +28,7 @@ package dev.kreuzberg.android
  */
 data class DocumentStructure(
     /** All nodes in document reading order. */
-    val nodes: List<DocumentNode>,
+    val nodes: List<DocumentNode> = emptyList(),
     /** The source format (always "html" for this library). */
-    val sourceFormat: String?,
+    val sourceFormat: String? = null,
 )

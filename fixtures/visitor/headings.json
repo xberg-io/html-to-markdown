@@ -25,13 +25,7 @@
         "field": "content",
         "value": "important section title"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_custom_heading",
@@ -63,12 +57,6 @@
         "field": "content",
         "value": "Content below heading."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   }
 ]

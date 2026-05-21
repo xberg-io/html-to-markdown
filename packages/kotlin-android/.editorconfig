@@ -30,6 +30,11 @@ ktlint_standard_filename = disabled
 # expression-bodied functions; ktlint's multiline-expression-wrapping then
 # rejects it. Defer to ktfmt — disable the ktlint rule for the generated tree.
 ktlint_standard_multiline-expression-wrapping = disabled
+# ktlint --format and ktfmt fight on chained-call layout (`.foo()\n.bar()`
+# vs `.foo().bar()`) and on multi-line `if/else` bodies. ktfmt is the
+# canonical formatter for emitted code, so disable the ktlint counter-rules.
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_multiline-if-else = disabled
 
 [*.gradle.kts]
 indent_style = space
@@ -47,6 +52,8 @@ ktlint_standard_indent = disabled
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_filename = disabled
 ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_multiline-if-else = disabled
 
 [*.{xml,pro,gitignore}]
 indent_style = space

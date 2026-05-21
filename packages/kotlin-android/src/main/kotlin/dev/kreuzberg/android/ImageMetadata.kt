@@ -31,13 +31,13 @@ data class ImageMetadata(
     /** Image source (URL, data URI, or SVG content identifier) */
     val src: String,
     /** Alternative text from alt attribute (for accessibility) */
-    val alt: String?,
+    val alt: String? = null,
     /** Title attribute (often shown as tooltip) */
-    val title: String?,
+    val title: String? = null,
     /** Image dimensions as (width, height) if available */
-    val dimensions: List<Int>?,
+    val dimensions: List<Int>? = null,
     /** Image type classification */
     val imageType: ImageType,
     /** Additional HTML attributes */
-    val attributes: Map<String, String>,
+    val attributes: Map<String, String> = emptyMap(),
 )

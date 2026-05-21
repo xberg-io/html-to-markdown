@@ -30,13 +30,7 @@
         "field": "content",
         "value": "photoone.jpg"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_skip_images",
@@ -72,13 +66,7 @@
         "field": "content",
         "value": "A photo"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_custom_image",
@@ -105,12 +93,6 @@
         "field": "content",
         "value": "banner.png"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   }
 ]

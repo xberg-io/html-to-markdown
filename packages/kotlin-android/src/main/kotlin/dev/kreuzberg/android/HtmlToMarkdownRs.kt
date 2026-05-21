@@ -21,12 +21,14 @@
 
 package dev.kreuzberg.android
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object HtmlToMarkdownRs {
-    private val mapper = jacksonObjectMapper()
+    private val mapper =
+        jacksonObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
 
     /**
      * Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images, and

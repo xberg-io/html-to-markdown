@@ -6,7 +6,7 @@ exclude: ^docs/snippets/|vendor/|node_modules/|target/|dist/|artifacts/|scripts/
 repos:
   # AI-Rulez: auto-generate AI assistant configuration files
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.1.6
+    rev: v4.2.1
     hooks:
       - id: ai-rulez-generate
 
@@ -69,7 +69,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.12
+    rev: v1.1.17
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -258,7 +258,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.17.12
+    rev: v0.17.23
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

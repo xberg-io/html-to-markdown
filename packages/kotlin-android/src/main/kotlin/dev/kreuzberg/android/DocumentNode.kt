@@ -28,13 +28,13 @@ data class DocumentNode(
     /** The semantic content of this node. */
     val content: NodeContent,
     /** Index of the parent node (None for root nodes). */
-    val parent: Int?,
+    val parent: Int? = null,
     /** Indices of child nodes in reading order. */
-    val children: List<Int>,
+    val children: List<Int> = emptyList(),
     /**
      * Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
      */
-    val annotations: List<TextAnnotation>,
+    val annotations: List<TextAnnotation> = emptyList(),
     /**
      * Format-specific attributes preserved from the source HTML element.
      *
@@ -47,5 +47,5 @@ data class DocumentNode(
      * significance for the node type are collected. For example, heading nodes capture the `"id"`
      * attribute for anchor linking; other element-level attributes may be silently dropped.
      */
-    val attributes: Map<String, String>?,
+    val attributes: Map<String, String>? = null,
 )

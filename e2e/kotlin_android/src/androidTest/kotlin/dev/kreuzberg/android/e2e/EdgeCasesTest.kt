@@ -122,41 +122,6 @@ class EdgeCasesTest {
     }
 
     @Test
-    fun test_visitor_custom_element_with_nesting() {
-        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
-        val result = client.convert(/* fixture: visitor_custom_element_with_nesting */)
-        // TODO: assert result is not an error
-    }
-
-    @Test
-    fun test_visitor_deeply_nested_skip() {
-        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
-        val result = client.convert(/* fixture: visitor_deeply_nested_skip */)
-        // TODO: assert result is not an error
-    }
-
-    @Test
-    fun test_visitor_element_end_modification() {
-        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
-        val result = client.convert(/* fixture: visitor_element_end_modification */)
-        // TODO: assert result is not an error
-    }
-
-    @Test
-    fun test_visitor_element_start_skip_entire_subtree() {
-        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
-        val result = client.convert(/* fixture: visitor_element_start_skip_entire_subtree */)
-        // TODO: assert result is not an error
-    }
-
-    @Test
-    fun test_visitor_unknown_tag_preservation() {
-        val client = dev.kreuzberg.android.HtmlToMarkdownRs()
-        val result = client.convert(/* fixture: visitor_unknown_tag_preservation */)
-        // TODO: assert result is not an error
-    }
-
-    @Test
     fun test_whitespace_only() {
         val client = dev.kreuzberg.android.HtmlToMarkdownRs()
         val result = client.convert(/* fixture: whitespace_only */)

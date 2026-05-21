@@ -24,15 +24,42 @@ package dev.kreuzberg.android
 /** Categories of processing warnings. */
 enum class WarningKind {
     /** An image could not be extracted (e.g. invalid data URI, unsupported format). */
+    @com.fasterxml.jackson.annotation.JsonProperty("image_extraction_failed")
     IMAGE_EXTRACTION_FAILED,
     /** The input encoding was not recognized; fell back to UTF-8. */
-    ENCODING_FALLBACK,
+    @com.fasterxml.jackson.annotation.JsonProperty("encoding_fallback") ENCODING_FALLBACK,
     /** The input was truncated due to size limits. */
-    TRUNCATED_INPUT,
+    @com.fasterxml.jackson.annotation.JsonProperty("truncated_input") TRUNCATED_INPUT,
     /** The HTML was malformed but processing continued with best effort. */
-    MALFORMED_HTML,
+    @com.fasterxml.jackson.annotation.JsonProperty("malformed_html") MALFORMED_HTML,
     /** Sanitization was applied to remove potentially unsafe content. */
-    SANITIZATION_APPLIED,
+    @com.fasterxml.jackson.annotation.JsonProperty("sanitization_applied") SANITIZATION_APPLIED,
     /** DOM traversal was truncated because max_depth was exceeded. */
-    DEPTH_LIMIT_EXCEEDED,
+    @com.fasterxml.jackson.annotation.JsonProperty("depth_limit_exceeded") DEPTH_LIMIT_EXCEEDED;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            IMAGE_EXTRACTION_FAILED -> "image_extraction_failed"
+            ENCODING_FALLBACK -> "encoding_fallback"
+            TRUNCATED_INPUT -> "truncated_input"
+            MALFORMED_HTML -> "malformed_html"
+            SANITIZATION_APPLIED -> "sanitization_applied"
+            DEPTH_LIMIT_EXCEEDED -> "depth_limit_exceeded"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): WarningKind =
+            when (value) {
+                "image_extraction_failed" -> IMAGE_EXTRACTION_FAILED
+                "encoding_fallback" -> ENCODING_FALLBACK
+                "truncated_input" -> TRUNCATED_INPUT
+                "malformed_html" -> MALFORMED_HTML
+                "sanitization_applied" -> SANITIZATION_APPLIED
+                "depth_limit_exceeded" -> DEPTH_LIMIT_EXCEEDED
+                else -> throw IllegalArgumentException("Unknown WarningKind value: $value")
+            }
+    }
 }

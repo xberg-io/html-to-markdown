@@ -31,11 +31,11 @@ data class HtmlMetadata(
     /** Document-level metadata (title, description, canonical, etc.) */
     val document: DocumentMetadata,
     /** Extracted header elements with hierarchy */
-    val headers: List<HeaderMetadata>,
+    val headers: List<HeaderMetadata> = emptyList(),
     /** Extracted hyperlinks with type classification */
-    val links: List<LinkMetadata>,
+    val links: List<LinkMetadata> = emptyList(),
     /** Extracted images with source and dimensions */
-    val images: List<ImageMetadata>,
+    val images: List<ImageMetadata> = emptyList(),
     /** Extracted structured data blocks */
-    val structuredData: List<StructuredData>,
+    val structuredData: List<StructuredData> = emptyList(),
 )

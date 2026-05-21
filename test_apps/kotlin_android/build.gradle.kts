@@ -80,7 +80,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:6.1.0")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:6.1.0")
 
-
     // Kotlin stdlib test helpers
     testImplementation(kotlin("test"))
 }
@@ -89,10 +88,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 
     // Resolve the native library location (e.g., ../../target/release)
-    val libPath = System.getProperty("kb.lib.path") ?: "${rootDir}/../../target/release"
+    val libPath = System.getProperty("kb.lib.path") ?: "$rootDir/../../target/release"
     systemProperty("java.library.path", libPath)
     systemProperty("jna.library.path", libPath)
 
     // Resolve fixture paths (e.g. "docx/fake.docx") against test_documents/
-    workingDir = file("${rootDir}/../../test_documents")
+    workingDir = file("$rootDir/../../test_documents")
 }

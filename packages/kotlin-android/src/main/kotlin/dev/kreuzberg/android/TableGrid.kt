@@ -24,9 +24,9 @@ package dev.kreuzberg.android
 /** A structured table grid with cell-level data including spans. */
 data class TableGrid(
     /** Number of rows. */
-    val rows: Int,
+    val rows: Int = 0,
     /** Number of columns. */
-    val cols: Int,
+    val cols: Int = 0,
     /**
      * All cells in the table as a flat, sparse list.
      *
@@ -42,5 +42,5 @@ data class TableGrid(
      * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`) produces
      * an empty vec.
      */
-    val cells: List<GridCell>,
+    val cells: List<GridCell> = emptyList(),
 )

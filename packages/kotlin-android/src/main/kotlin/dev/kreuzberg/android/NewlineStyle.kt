@@ -28,7 +28,25 @@ package dev.kreuzberg.android
  */
 enum class NewlineStyle {
     /** Two trailing spaces at end of line. Default. Standard Markdown syntax. */
-    SPACES,
+    @com.fasterxml.jackson.annotation.JsonProperty("Spaces") SPACES,
     /** Backslash at end of line. Alternative Markdown syntax. */
-    BACKSLASH,
+    @com.fasterxml.jackson.annotation.JsonProperty("Backslash") BACKSLASH;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            SPACES -> "Spaces"
+            BACKSLASH -> "Backslash"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): NewlineStyle =
+            when (value) {
+                "Spaces" -> SPACES
+                "Backslash" -> BACKSLASH
+                else -> throw IllegalArgumentException("Unknown NewlineStyle value: $value")
+            }
+    }
 }

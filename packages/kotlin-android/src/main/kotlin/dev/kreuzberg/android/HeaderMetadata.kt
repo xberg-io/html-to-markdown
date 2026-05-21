@@ -33,7 +33,7 @@ data class HeaderMetadata(
     /** Normalized text content of the header */
     val text: String,
     /** HTML id attribute if present */
-    val id: String?,
+    val id: String? = null,
     /** Document tree depth at the header element */
     val depth: Long,
     /** Byte offset in original HTML document */

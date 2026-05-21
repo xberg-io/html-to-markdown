@@ -33,13 +33,13 @@ data class NodeContext(
     /** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
     val tagName: String,
     /** All HTML attributes as key-value pairs */
-    val attributes: Map<String, String>,
+    val attributes: Map<String, String> = emptyMap(),
     /** Depth in the DOM tree (0 = root) */
     val depth: Long,
     /** Index among siblings (0-based) */
     val indexInParent: Long,
     /** Parent element's tag name (None if root) */
-    val parentTag: String?,
+    val parentTag: String? = null,
     /** Whether this element is treated as inline vs block */
     val isInline: Boolean,
 )

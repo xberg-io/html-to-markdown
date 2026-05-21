@@ -16,9 +16,9 @@
     "README.md"
   ],
   "type": "module",
-  "main": "pkg/nodejs/html-to-markdown_wasm.js",
-  "module": "pkg/web/html-to-markdown_wasm.js",
-  "types": "pkg/nodejs/html-to-markdown_wasm.d.ts",
+  "main": "pkg/nodejs/html_to_markdown_wasm.js",
+  "module": "pkg/web/html_to_markdown_wasm.js",
+  "types": "pkg/nodejs/html_to_markdown_wasm.d.ts",
   "scripts": {
     "build": "wasm-pack build --target nodejs --out-dir pkg/nodejs",
     "build:ci": "wasm-pack build --release --target nodejs --out-dir pkg/nodejs",

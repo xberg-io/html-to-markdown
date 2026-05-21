@@ -28,31 +28,31 @@ package dev.kreuzberg.android
  */
 data class ConversionOptions(
     /** Heading style to use in Markdown output (ATX `#` or Setext underline). */
-    val headingStyle: HeadingStyle,
+    val headingStyle: HeadingStyle = HeadingStyle.ATX,
     /** How to indent nested list items (spaces or tab). */
-    val listIndentType: ListIndentType,
+    val listIndentType: ListIndentType = ListIndentType.SPACES,
     /** Number of spaces (or tabs) to use for each level of list indentation. */
-    val listIndentWidth: Long,
+    val listIndentWidth: Long = 2L,
     /** Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). */
-    val bullets: String,
+    val bullets: String = "-*+",
     /** Character used for bold/italic emphasis markers (`*` or `_`). */
-    val strongEmSymbol: String,
+    val strongEmSymbol: String = "*",
     /** Escape `*` characters in plain text to avoid unintended bold/italic. */
-    val escapeAsterisks: Boolean,
+    val escapeAsterisks: Boolean = false,
     /** Escape `_` characters in plain text to avoid unintended bold/italic. */
-    val escapeUnderscores: Boolean,
+    val escapeUnderscores: Boolean = false,
     /** Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. */
-    val escapeMisc: Boolean,
+    val escapeMisc: Boolean = false,
     /** Escape ASCII characters that have special meaning in certain Markdown dialects. */
-    val escapeAscii: Boolean,
+    val escapeAscii: Boolean = false,
     /** Default language annotation for fenced code blocks that have no language hint. */
-    val codeLanguage: String,
+    val codeLanguage: String = "",
     /** Automatically convert bare URLs into Markdown autolinks. */
-    val autolinks: Boolean,
+    val autolinks: Boolean = true,
     /** Emit a default title when no `<title>` tag is present. */
-    val defaultTitle: Boolean,
+    val defaultTitle: Boolean = false,
     /** Render `<br>` elements inside table cells as literal line breaks. */
-    val brInTables: Boolean,
+    val brInTables: Boolean = false,
     /**
      * Emit tables without column padding (compact GFM format).
      *
@@ -62,9 +62,9 @@ data class ConversionOptions(
      *
      * Default `false` (aligned padding preserved).
      */
-    val compactTables: Boolean,
+    val compactTables: Boolean = false,
     /** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
-    val highlightStyle: HighlightStyle,
+    val highlightStyle: HighlightStyle = HighlightStyle.DOUBLE_EQUAL,
     /**
      * Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open
      * Graph, Twitter Card, JSON-LD, …).
@@ -72,7 +72,7 @@ data class ConversionOptions(
      * Default `true`. Disabling skips the metadata pass only — table extraction into
      * `result.tables` runs unconditionally.
      */
-    val extractMetadata: Boolean,
+    val extractMetadata: Boolean = true,
     /**
      * Controls how whitespace sequences are normalised in the converted output.
      *
@@ -84,11 +84,11 @@ data class ConversionOptions(
      * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
      * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
      */
-    val whitespaceMode: WhitespaceMode,
+    val whitespaceMode: WhitespaceMode = WhitespaceMode.NORMALIZED,
     /** Strip all newlines from the output, producing a single-line result. */
-    val stripNewlines: Boolean,
+    val stripNewlines: Boolean = false,
     /** Wrap long lines at `wrap_width` characters. */
-    val wrap: Boolean,
+    val wrap: Boolean = false,
     /**
      * Maximum output line width in characters when `wrap` is `true` (default `80`).
      *
@@ -96,19 +96,19 @@ data class ConversionOptions(
      * treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is
      * `false`.
      */
-    val wrapWidth: Long,
+    val wrapWidth: Long = 80L,
     /** Treat the entire document as inline content (no block-level wrappers). */
-    val convertAsInline: Boolean,
+    val convertAsInline: Boolean = false,
     /** Markdown notation for subscript text (e.g. `"~"`). */
-    val subSymbol: String,
+    val subSymbol: String = "",
     /** Markdown notation for superscript text (e.g. `"^"`). */
-    val supSymbol: String,
+    val supSymbol: String = "",
     /** How to encode hard line breaks (`<br>`) in Markdown. */
-    val newlineStyle: NewlineStyle,
+    val newlineStyle: NewlineStyle = NewlineStyle.SPACES,
     /** Style used for fenced code blocks (backticks or tilde). */
-    val codeBlockStyle: CodeBlockStyle,
+    val codeBlockStyle: CodeBlockStyle = CodeBlockStyle.BACKTICKS,
     /** HTML tag names whose `<img>` children are kept inline instead of block. */
-    val keepInlineImagesIn: List<String>,
+    val keepInlineImagesIn: List<String> = emptyList(),
     /**
      * Options for the HTML pre-processing pass applied before conversion begins.
      *
@@ -122,34 +122,34 @@ data class ConversionOptions(
      */
     val preprocessing: PreprocessingOptions,
     /** Expected character encoding of the input HTML (default `"utf-8"`). */
-    val encoding: String,
+    val encoding: String = "utf-8",
     /** Emit debug information during conversion. */
-    val debug: Boolean,
+    val debug: Boolean = false,
     /** HTML tag names whose content is stripped from the output entirely. */
-    val stripTags: List<String>,
+    val stripTags: List<String> = emptyList(),
     /** HTML tag names that are preserved verbatim in the output. */
-    val preserveTags: List<String>,
+    val preserveTags: List<String> = emptyList(),
     /** Skip conversion of `<img>` elements (omit images from output). */
-    val skipImages: Boolean,
+    val skipImages: Boolean = false,
     /** Link rendering style (inline or reference). */
-    val linkStyle: LinkStyle,
+    val linkStyle: LinkStyle = LinkStyle.INLINE,
     /** Target output format (Markdown, plain text, etc.). */
-    val outputFormat: OutputFormat,
+    val outputFormat: OutputFormat = OutputFormat.MARKDOWN,
     /** Include structured document tree in result. */
-    val includeDocumentStructure: Boolean,
+    val includeDocumentStructure: Boolean = false,
     /** Extract inline images from data URIs and SVGs. */
-    val extractImages: Boolean,
+    val extractImages: Boolean = false,
     /** Maximum decoded image size in bytes (default 5MB). */
-    val maxImageSize: Long,
+    val maxImageSize: Long = 5242880L,
     /** Capture SVG elements as images. */
-    val captureSvg: Boolean,
+    val captureSvg: Boolean = false,
     /** Infer image dimensions from data. */
-    val inferDimensions: Boolean,
+    val inferDimensions: Boolean = true,
     /**
      * Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are
      * silently truncated.
      */
-    val maxDepth: Long?,
+    val maxDepth: Long? = null,
     /**
      * CSS selectors for elements to exclude entirely (element + all content).
      *
@@ -162,12 +162,5 @@ data class ConversionOptions(
      * Example: `vec![".cookie-banner".into(), "#ad-container".into(),
      * "[role='complementary']".into()]`
      */
-    val excludeSelectors: List<String>,
-    /**
-     * Optional visitor for custom traversal logic.
-     *
-     * When set, the visitor's callbacks are invoked for matching HTML elements during conversion,
-     * allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`.
-     */
-    val visitor: VisitorHandle?,
+    val excludeSelectors: List<String> = emptyList(),
 )

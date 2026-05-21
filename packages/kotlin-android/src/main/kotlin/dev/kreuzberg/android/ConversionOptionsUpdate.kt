@@ -29,87 +29,85 @@ package dev.kreuzberg.android
  */
 data class ConversionOptionsUpdate(
     /** Optional override for `ConversionOptions.heading_style`. */
-    val headingStyle: HeadingStyle?,
+    val headingStyle: HeadingStyle? = null,
     /** Optional override for `ConversionOptions.list_indent_type`. */
-    val listIndentType: ListIndentType?,
+    val listIndentType: ListIndentType? = null,
     /** Optional override for `ConversionOptions.list_indent_width`. */
-    val listIndentWidth: Long?,
+    val listIndentWidth: Long? = null,
     /** Optional override for `ConversionOptions.bullets`. */
-    val bullets: String?,
+    val bullets: String? = null,
     /** Optional override for `ConversionOptions.strong_em_symbol`. */
-    val strongEmSymbol: String?,
+    val strongEmSymbol: String? = null,
     /** Optional override for `ConversionOptions.escape_asterisks`. */
-    val escapeAsterisks: Boolean?,
+    val escapeAsterisks: Boolean? = null,
     /** Optional override for `ConversionOptions.escape_underscores`. */
-    val escapeUnderscores: Boolean?,
+    val escapeUnderscores: Boolean? = null,
     /** Optional override for `ConversionOptions.escape_misc`. */
-    val escapeMisc: Boolean?,
+    val escapeMisc: Boolean? = null,
     /** Optional override for `ConversionOptions.escape_ascii`. */
-    val escapeAscii: Boolean?,
+    val escapeAscii: Boolean? = null,
     /** Optional override for `ConversionOptions.code_language`. */
-    val codeLanguage: String?,
+    val codeLanguage: String? = null,
     /** Optional override for `ConversionOptions.autolinks`. */
-    val autolinks: Boolean?,
+    val autolinks: Boolean? = null,
     /** Optional override for `ConversionOptions.default_title`. */
-    val defaultTitle: Boolean?,
+    val defaultTitle: Boolean? = null,
     /** Optional override for `ConversionOptions.br_in_tables`. */
-    val brInTables: Boolean?,
+    val brInTables: Boolean? = null,
     /** Optional override for `ConversionOptions.compact_tables`. */
-    val compactTables: Boolean?,
+    val compactTables: Boolean? = null,
     /** Optional override for `ConversionOptions.highlight_style`. */
-    val highlightStyle: HighlightStyle?,
+    val highlightStyle: HighlightStyle? = null,
     /** Optional override for `ConversionOptions.extract_metadata`. */
-    val extractMetadata: Boolean?,
+    val extractMetadata: Boolean? = null,
     /** Optional override for `ConversionOptions.whitespace_mode`. */
-    val whitespaceMode: WhitespaceMode?,
+    val whitespaceMode: WhitespaceMode? = null,
     /** Optional override for `ConversionOptions.strip_newlines`. */
-    val stripNewlines: Boolean?,
+    val stripNewlines: Boolean? = null,
     /** Optional override for `ConversionOptions.wrap`. */
-    val wrap: Boolean?,
+    val wrap: Boolean? = null,
     /** Optional override for `ConversionOptions.wrap_width`. */
-    val wrapWidth: Long?,
+    val wrapWidth: Long? = null,
     /** Optional override for `ConversionOptions.convert_as_inline`. */
-    val convertAsInline: Boolean?,
+    val convertAsInline: Boolean? = null,
     /** Optional override for `ConversionOptions.sub_symbol`. */
-    val subSymbol: String?,
+    val subSymbol: String? = null,
     /** Optional override for `ConversionOptions.sup_symbol`. */
-    val supSymbol: String?,
+    val supSymbol: String? = null,
     /** Optional override for `ConversionOptions.newline_style`. */
-    val newlineStyle: NewlineStyle?,
+    val newlineStyle: NewlineStyle? = null,
     /** Optional override for `ConversionOptions.code_block_style`. */
-    val codeBlockStyle: CodeBlockStyle?,
+    val codeBlockStyle: CodeBlockStyle? = null,
     /** Optional override for `ConversionOptions.keep_inline_images_in`. */
-    val keepInlineImagesIn: List<String>?,
+    val keepInlineImagesIn: List<String>? = null,
     /** Optional override for `ConversionOptions.preprocessing`. */
-    val preprocessing: PreprocessingOptionsUpdate?,
+    val preprocessing: PreprocessingOptionsUpdate? = null,
     /** Optional override for `ConversionOptions.encoding`. */
-    val encoding: String?,
+    val encoding: String? = null,
     /** Optional override for `ConversionOptions.debug`. */
-    val debug: Boolean?,
+    val debug: Boolean? = null,
     /** Optional override for `ConversionOptions.strip_tags`. */
-    val stripTags: List<String>?,
+    val stripTags: List<String>? = null,
     /** Optional override for `ConversionOptions.preserve_tags`. */
-    val preserveTags: List<String>?,
+    val preserveTags: List<String>? = null,
     /** Optional override for `ConversionOptions.skip_images`. */
-    val skipImages: Boolean?,
+    val skipImages: Boolean? = null,
     /** Optional override for `ConversionOptions.link_style`. */
-    val linkStyle: LinkStyle?,
+    val linkStyle: LinkStyle? = null,
     /** Optional override for `ConversionOptions.output_format`. */
-    val outputFormat: OutputFormat?,
+    val outputFormat: OutputFormat? = null,
     /** Optional override for `ConversionOptions.include_document_structure`. */
-    val includeDocumentStructure: Boolean?,
+    val includeDocumentStructure: Boolean? = null,
     /** Optional override for `ConversionOptions.extract_images`. */
-    val extractImages: Boolean?,
+    val extractImages: Boolean? = null,
     /** Optional override for `ConversionOptions.max_image_size`. */
-    val maxImageSize: Long?,
+    val maxImageSize: Long? = null,
     /** Optional override for `ConversionOptions.capture_svg`. */
-    val captureSvg: Boolean?,
+    val captureSvg: Boolean? = null,
     /** Optional override for `ConversionOptions.infer_dimensions`. */
-    val inferDimensions: Boolean?,
+    val inferDimensions: Boolean? = null,
     /** Optional override for `ConversionOptions.max_depth`. */
-    val maxDepth: Long??,
+    val maxDepth: Long?? = null,
     /** Optional override for `ConversionOptions.exclude_selectors`. */
-    val excludeSelectors: List<String>?,
-    /** Optional override for `ConversionOptions.visitor`. */
-    val visitor: VisitorHandle?,
+    val excludeSelectors: List<String>? = null,
 )

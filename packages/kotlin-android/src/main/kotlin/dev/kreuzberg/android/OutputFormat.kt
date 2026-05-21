@@ -28,9 +28,29 @@ package dev.kreuzberg.android
  */
 enum class OutputFormat {
     /** Standard Markdown (CommonMark compatible). Default. */
-    MARKDOWN,
+    @com.fasterxml.jackson.annotation.JsonProperty("Markdown") MARKDOWN,
     /** Djot lightweight markup language. */
-    DJOT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Djot") DJOT,
     /** Plain text output (no markup, visible text only). */
-    PLAIN,
+    @com.fasterxml.jackson.annotation.JsonProperty("Plain") PLAIN;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            MARKDOWN -> "Markdown"
+            DJOT -> "Djot"
+            PLAIN -> "Plain"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): OutputFormat =
+            when (value) {
+                "Markdown" -> MARKDOWN
+                "Djot" -> DJOT
+                "Plain" -> PLAIN
+                else -> throw IllegalArgumentException("Unknown OutputFormat value: $value")
+            }
+    }
 }

@@ -30,7 +30,25 @@ enum class WhitespaceMode {
     /**
      * Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
      */
-    NORMALIZED,
+    @com.fasterxml.jackson.annotation.JsonProperty("Normalized") NORMALIZED,
     /** Preserve all whitespace exactly as it appears in the HTML. */
-    STRICT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Strict") STRICT;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            NORMALIZED -> "Normalized"
+            STRICT -> "Strict"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): WhitespaceMode =
+            when (value) {
+                "Normalized" -> NORMALIZED
+                "Strict" -> STRICT
+                else -> throw IllegalArgumentException("Unknown WhitespaceMode value: $value")
+            }
+    }
 }

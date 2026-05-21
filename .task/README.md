@@ -140,7 +140,7 @@ tasks:
     desc: "Install Python dependencies with uv"
     dir: "{{.PYTHON_WORK_DIR}}"
     cmds:
-      - uv sync
+      - uv sync --no-install-project --no-install-workspace
       - uv pip install -e .
 
   build:

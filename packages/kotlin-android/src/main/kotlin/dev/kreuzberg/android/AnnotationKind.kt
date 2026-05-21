@@ -56,8 +56,12 @@ sealed class AnnotationKind {
     object Highlight : AnnotationKind()
 
     /** A hyperlink sourced from an `<a href="...">` element. */
-    @com.fasterxml.jackson.databind.annotation.JsonDeserialize
-    @com.fasterxml.jackson.databind.annotation.JsonSerialize
+    @com.fasterxml.jackson.databind.annotation.JsonDeserialize(
+        using = com.fasterxml.jackson.databind.JsonDeserializer.None::class
+    )
+    @com.fasterxml.jackson.databind.annotation.JsonSerialize(
+        using = com.fasterxml.jackson.databind.JsonSerializer.None::class
+    )
     data class Link(val url: String, val title: String?) : AnnotationKind()
 }
 

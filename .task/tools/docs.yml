@@ -19,7 +19,7 @@ tasks:
   lint:links:
     desc: Check links with lychee
     cmds:
-      - lychee --offline docs/ README.md
+      - lychee --offline --root-dir "$PWD/docs" --exclude-path "docs/overrides" docs/ README.md
 
   lint:prose:
     desc: Lint prose with textlint

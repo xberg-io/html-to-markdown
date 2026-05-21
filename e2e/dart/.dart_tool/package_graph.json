@@ -1,16 +1,28 @@
 {
-  "roots": ["e2e_dart"],
+  "roots": [
+    "e2e_dart"
+  ],
   "packages": [
     {
       "name": "e2e_dart",
       "version": "0.1.0",
-      "dependencies": ["h2m"],
-      "devDependencies": ["http", "test"]
+      "dependencies": [
+        "h2m"
+      ],
+      "devDependencies": [
+        "http",
+        "test"
+      ]
     },
     {
       "name": "http",
       "version": "1.6.0",
-      "dependencies": ["async", "http_parser", "meta", "web"]
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
+      ]
     },
     {
       "name": "test",
@@ -46,7 +58,11 @@
     {
       "name": "h2m",
       "version": "3.5.0",
-      "dependencies": ["flutter_rust_bridge", "freezed_annotation", "json_annotation"]
+      "dependencies": [
+        "flutter_rust_bridge",
+        "freezed_annotation",
+        "json_annotation"
+      ]
     },
     {
       "name": "web",
@@ -61,32 +77,54 @@
     {
       "name": "http_parser",
       "version": "4.1.2",
-      "dependencies": ["collection", "source_span", "string_scanner", "typed_data"]
+      "dependencies": [
+        "collection",
+        "source_span",
+        "string_scanner",
+        "typed_data"
+      ]
     },
     {
       "name": "async",
       "version": "2.13.1",
-      "dependencies": ["collection", "meta"]
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
     },
     {
       "name": "yaml",
       "version": "3.1.3",
-      "dependencies": ["collection", "source_span", "string_scanner"]
+      "dependencies": [
+        "collection",
+        "source_span",
+        "string_scanner"
+      ]
     },
     {
       "name": "webkit_inspection_protocol",
       "version": "1.2.1",
-      "dependencies": ["logging"]
+      "dependencies": [
+        "logging"
+      ]
     },
     {
       "name": "web_socket_channel",
       "version": "3.0.3",
-      "dependencies": ["async", "crypto", "stream_channel", "web", "web_socket"]
+      "dependencies": [
+        "async",
+        "crypto",
+        "stream_channel",
+        "web",
+        "web_socket"
+      ]
     },
     {
       "name": "typed_data",
       "version": "1.4.0",
-      "dependencies": ["collection"]
+      "dependencies": [
+        "collection"
+      ]
     },
     {
       "name": "test_core",
@@ -133,32 +171,54 @@
     {
       "name": "stream_channel",
       "version": "2.1.4",
-      "dependencies": ["async"]
+      "dependencies": [
+        "async"
+      ]
     },
     {
       "name": "stack_trace",
       "version": "1.12.1",
-      "dependencies": ["path"]
+      "dependencies": [
+        "path"
+      ]
     },
     {
       "name": "source_span",
       "version": "1.10.2",
-      "dependencies": ["collection", "path", "term_glyph"]
+      "dependencies": [
+        "collection",
+        "path",
+        "term_glyph"
+      ]
     },
     {
       "name": "shelf_web_socket",
       "version": "3.0.0",
-      "dependencies": ["shelf", "stream_channel", "web_socket_channel"]
+      "dependencies": [
+        "shelf",
+        "stream_channel",
+        "web_socket_channel"
+      ]
     },
     {
       "name": "shelf_static",
       "version": "1.1.3",
-      "dependencies": ["convert", "http_parser", "mime", "path", "shelf"]
+      "dependencies": [
+        "convert",
+        "http_parser",
+        "mime",
+        "path",
+        "shelf"
+      ]
     },
     {
       "name": "shelf_packages_handler",
       "version": "3.0.2",
-      "dependencies": ["path", "shelf", "shelf_static"]
+      "dependencies": [
+        "path",
+        "shelf",
+        "shelf_static"
+      ]
     },
     {
       "name": "shelf",
@@ -175,7 +235,10 @@
     {
       "name": "pool",
       "version": "1.5.2",
-      "dependencies": ["async", "stack_trace"]
+      "dependencies": [
+        "async",
+        "stack_trace"
+      ]
     },
     {
       "name": "path",
@@ -185,7 +248,9 @@
     {
       "name": "package_config",
       "version": "2.2.0",
-      "dependencies": ["path"]
+      "dependencies": [
+        "path"
+      ]
     },
     {
       "name": "node_preamble",
@@ -195,17 +260,29 @@
     {
       "name": "matcher",
       "version": "0.12.20",
-      "dependencies": ["async", "meta", "stack_trace", "term_glyph", "test_api"]
+      "dependencies": [
+        "async",
+        "meta",
+        "stack_trace",
+        "term_glyph",
+        "test_api"
+      ]
     },
     {
       "name": "io",
       "version": "1.0.5",
-      "dependencies": ["meta", "path", "string_scanner"]
+      "dependencies": [
+        "meta",
+        "path",
+        "string_scanner"
+      ]
     },
     {
       "name": "http_multi_server",
       "version": "3.2.2",
-      "dependencies": ["async"]
+      "dependencies": [
+        "async"
+      ]
     },
     {
       "name": "coverage",
@@ -232,7 +309,10 @@
     {
       "name": "boolean_selector",
       "version": "2.1.2",
-      "dependencies": ["source_span", "string_scanner"]
+      "dependencies": [
+        "source_span",
+        "string_scanner"
+      ]
     },
     {
       "name": "analyzer",
@@ -255,22 +335,37 @@
     {
       "name": "json_annotation",
       "version": "4.11.0",
-      "dependencies": ["meta"]
+      "dependencies": [
+        "meta"
+      ]
     },
     {
       "name": "freezed_annotation",
-      "version": "2.4.4",
-      "dependencies": ["collection", "json_annotation", "meta"]
+      "version": "3.1.0",
+      "dependencies": [
+        "collection",
+        "json_annotation",
+        "meta"
+      ]
     },
     {
       "name": "flutter_rust_bridge",
       "version": "2.12.0",
-      "dependencies": ["args", "async", "build_cli_annotations", "meta", "path", "web"]
+      "dependencies": [
+        "args",
+        "async",
+        "build_cli_annotations",
+        "meta",
+        "path",
+        "web"
+      ]
     },
     {
       "name": "string_scanner",
       "version": "1.4.1",
-      "dependencies": ["source_span"]
+      "dependencies": [
+        "source_span"
+      ]
     },
     {
       "name": "logging",
@@ -280,12 +375,16 @@
     {
       "name": "web_socket",
       "version": "1.0.1",
-      "dependencies": ["web"]
+      "dependencies": [
+        "web"
+      ]
     },
     {
       "name": "crypto",
       "version": "3.0.7",
-      "dependencies": ["typed_data"]
+      "dependencies": [
+        "typed_data"
+      ]
     },
     {
       "name": "vm_service",
@@ -295,22 +394,37 @@
     {
       "name": "source_maps",
       "version": "0.10.13",
-      "dependencies": ["source_span"]
+      "dependencies": [
+        "source_span"
+      ]
     },
     {
       "name": "source_map_stack_trace",
       "version": "2.1.2",
-      "dependencies": ["path", "source_maps", "stack_trace"]
+      "dependencies": [
+        "path",
+        "source_maps",
+        "stack_trace"
+      ]
     },
     {
       "name": "glob",
       "version": "2.1.3",
-      "dependencies": ["async", "collection", "file", "path", "string_scanner"]
+      "dependencies": [
+        "async",
+        "collection",
+        "file",
+        "path",
+        "string_scanner"
+      ]
     },
     {
       "name": "frontend_server_client",
       "version": "4.0.0",
-      "dependencies": ["async", "path"]
+      "dependencies": [
+        "async",
+        "path"
+      ]
     },
     {
       "name": "args",
@@ -330,37 +444,56 @@
     {
       "name": "convert",
       "version": "3.1.2",
-      "dependencies": ["typed_data"]
+      "dependencies": [
+        "typed_data"
+      ]
     },
     {
       "name": "cli_config",
       "version": "0.2.0",
-      "dependencies": ["args", "yaml"]
+      "dependencies": [
+        "args",
+        "yaml"
+      ]
     },
     {
       "name": "watcher",
       "version": "1.2.1",
-      "dependencies": ["async", "path"]
+      "dependencies": [
+        "async",
+        "path"
+      ]
     },
     {
       "name": "pub_semver",
       "version": "2.2.0",
-      "dependencies": ["collection"]
+      "dependencies": [
+        "collection"
+      ]
     },
     {
       "name": "_fe_analyzer_shared",
       "version": "100.0.0",
-      "dependencies": ["meta", "source_span"]
+      "dependencies": [
+        "meta",
+        "source_span"
+      ]
     },
     {
       "name": "build_cli_annotations",
       "version": "2.1.1",
-      "dependencies": ["args", "meta"]
+      "dependencies": [
+        "args",
+        "meta"
+      ]
     },
     {
       "name": "file",
       "version": "7.0.1",
-      "dependencies": ["meta", "path"]
+      "dependencies": [
+        "meta",
+        "path"
+      ]
     }
   ],
   "configVersion": 1

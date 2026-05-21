@@ -28,9 +28,29 @@ package dev.kreuzberg.android
  */
 enum class StructuredDataType {
     /** JSON-LD (JSON for Linking Data) script blocks */
-    JSON_LD,
+    @com.fasterxml.jackson.annotation.JsonProperty("json_ld") JSON_LD,
     /** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
-    MICRODATA,
+    @com.fasterxml.jackson.annotation.JsonProperty("microdata") MICRODATA,
     /** RDF in Attributes (RDFa) markup */
-    R_D_FA,
+    @com.fasterxml.jackson.annotation.JsonProperty("rdfa") R_D_FA;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            JSON_LD -> "json_ld"
+            MICRODATA -> "microdata"
+            R_D_FA -> "rdfa"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): StructuredDataType =
+            when (value) {
+                "json_ld" -> JSON_LD
+                "microdata" -> MICRODATA
+                "rdfa" -> R_D_FA
+                else -> throw IllegalArgumentException("Unknown StructuredDataType value: $value")
+            }
+    }
 }

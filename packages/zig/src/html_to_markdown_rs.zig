@@ -1587,18 +1587,3 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
     };
 }
-
-/// Shareable, thread-safe handle to a user-provided HTML visitor implementation.
-///
-/// Pass an instance wrapped in this handle to `ConversionOptions` to
-/// customise how the HTML document is traversed and converted to Markdown.
-/// The handle may be cloned and shared across threads without additional
-/// synchronisation on the caller's side.
-pub const VisitorHandle = struct {
-    _handle: *anyopaque,
-
-    /// Release the underlying FFI handle. Safe to call once per instance.
-    pub fn free(self: *VisitorHandle) void {
-        c.htm_visitor_handle_free(@as(*c.HTMVisitorHandle, @ptrCast(self._handle)));
-    }
-};

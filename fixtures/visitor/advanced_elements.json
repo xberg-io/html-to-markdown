@@ -36,13 +36,7 @@
         "field": "content",
         "value": "Definition"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_definition_list_custom_format",
@@ -83,13 +77,7 @@
         "field": "content",
         "value": "> A scripting language for web browsers"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_details_summary_custom",
@@ -116,13 +104,7 @@
         "field": "content",
         "value": "This content is initially hidden."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_details_summary_skip",
@@ -158,13 +140,7 @@
         "field": "content",
         "value": "Secret details"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_figure_custom",
@@ -196,13 +172,7 @@
         "field": "content",
         "value": "Explanation of the figure."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_figure_skip",
@@ -238,13 +208,7 @@
         "field": "content",
         "value": "chart.svg"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_figure_custom_wrap",
@@ -280,12 +244,6 @@
         "field": "content",
         "value": "Gallery"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   }
 ]

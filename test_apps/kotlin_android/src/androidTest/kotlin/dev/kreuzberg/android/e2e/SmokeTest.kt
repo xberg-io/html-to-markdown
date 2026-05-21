@@ -7,7 +7,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SmokeTest {
-
     companion object {
         @BeforeClass
         @JvmStatic
@@ -36,5 +35,4 @@ class SmokeTest {
         val result = client.convert(/* fixture: smoke_simple_paragraph */)
         // TODO: assert result is not an error
     }
-
 }

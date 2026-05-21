@@ -28,13 +28,7 @@
         "field": "content",
         "value": "let x = 42"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_custom_emphasis",
@@ -61,13 +55,7 @@
         "field": "content",
         "value": "*important*"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_custom_blockquote",
@@ -94,13 +82,7 @@
         "field": "content",
         "value": "A wise quote."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_skip_strong",
@@ -126,12 +108,6 @@
         "field": "content",
         "value": "Normal"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   }
 ]

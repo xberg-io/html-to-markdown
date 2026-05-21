@@ -7,7 +7,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ConversionTest {
-
     companion object {
         @BeforeClass
         @JvmStatic
@@ -498,5 +497,4 @@ class ConversionTest {
         val result = client.convert(/* fixture: unordered_list */)
         // TODO: assert result is not an error
     }
-
 }

@@ -11,9 +11,9 @@ tasks:
         ignore_error: false
 
   upgrade:
-    desc: "Upgrade Kotlin/Android dependencies to latest including breaking changes (gradlew useLatestVersions)"
+    desc: "Report Kotlin/Android dependency upgrades (gradlew dependencyUpdates — Android SDK / AGP bumps need manual review for binary-compat impact)"
     silent: false
     cmds:
       - cmd: |
-          cd packages/kotlin-android && ./gradlew useLatestVersions
+          cd packages/kotlin-android && ./gradlew dependencyUpdates
         ignore_error: false

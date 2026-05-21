@@ -29,7 +29,25 @@ package dev.kreuzberg.android
  */
 enum class LinkStyle {
     /** Inline links: `[text](url)`. Default. */
-    INLINE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Inline") INLINE,
     /** Reference-style links: `[text][1]` with `[1]: url` at end of document. */
-    REFERENCE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Reference") REFERENCE;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            INLINE -> "Inline"
+            REFERENCE -> "Reference"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): LinkStyle =
+            when (value) {
+                "Inline" -> INLINE
+                "Reference" -> REFERENCE
+                else -> throw IllegalArgumentException("Unknown LinkStyle value: $value")
+            }
+    }
 }

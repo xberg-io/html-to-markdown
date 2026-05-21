@@ -19,7 +19,7 @@ html_to_markdown_rs = { path = "../../../crates/html-to-markdown", package = "ht
     "full",
 ] }
 serde_json = "1"
-tokio = { version = "1", features = ["rt"] }
+tokio = { version = "1", features = ["rt-multi-thread"] }
 
 [lints.rust]
 # flutter_rust_bridge uses #[cfg(frb_expand)] internally during macro expansion.

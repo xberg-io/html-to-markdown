@@ -282,212 +282,212 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private void BuildVtable() {
         // Allocate unmanaged vtable struct (array of function pointers)
-        _vtable = Marshal.AllocHGlobal(IntPtr.Size * 41);
+        _vtable = global::System.Runtime.InteropServices.Marshal.AllocHGlobal(IntPtr.Size * 41);
 
         // Slot 0: visit_text_fn
         var visitTextFn = new VisitTextFn(VisitTextFnCallback);
         _delegates[0] = visitTextFn;
-        Marshal.WriteIntPtr(_vtable, 0, Marshal.GetFunctionPointerForDelegate(visitTextFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 0, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTextFn));
 
         // Slot 1: visit_element_start_fn
         var visitElementStartFn = new VisitElementStartFn(VisitElementStartFnCallback);
         _delegates[1] = visitElementStartFn;
-        Marshal.WriteIntPtr(_vtable, 8, Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 8, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
 
         // Slot 2: visit_element_end_fn
         var visitElementEndFn = new VisitElementEndFn(VisitElementEndFnCallback);
         _delegates[2] = visitElementEndFn;
-        Marshal.WriteIntPtr(_vtable, 16, Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 16, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
 
         // Slot 3: visit_link_fn
         var visitLinkFn = new VisitLinkFn(VisitLinkFnCallback);
         _delegates[3] = visitLinkFn;
-        Marshal.WriteIntPtr(_vtable, 24, Marshal.GetFunctionPointerForDelegate(visitLinkFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 24, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitLinkFn));
 
         // Slot 4: visit_image_fn
         var visitImageFn = new VisitImageFn(VisitImageFnCallback);
         _delegates[4] = visitImageFn;
-        Marshal.WriteIntPtr(_vtable, 32, Marshal.GetFunctionPointerForDelegate(visitImageFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 32, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitImageFn));
 
         // Slot 5: visit_heading_fn
         var visitHeadingFn = new VisitHeadingFn(VisitHeadingFnCallback);
         _delegates[5] = visitHeadingFn;
-        Marshal.WriteIntPtr(_vtable, 40, Marshal.GetFunctionPointerForDelegate(visitHeadingFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 40, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitHeadingFn));
 
         // Slot 6: visit_code_block_fn
         var visitCodeBlockFn = new VisitCodeBlockFn(VisitCodeBlockFnCallback);
         _delegates[6] = visitCodeBlockFn;
-        Marshal.WriteIntPtr(_vtable, 48, Marshal.GetFunctionPointerForDelegate(visitCodeBlockFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 48, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCodeBlockFn));
 
         // Slot 7: visit_code_inline_fn
         var visitCodeInlineFn = new VisitCodeInlineFn(VisitCodeInlineFnCallback);
         _delegates[7] = visitCodeInlineFn;
-        Marshal.WriteIntPtr(_vtable, 56, Marshal.GetFunctionPointerForDelegate(visitCodeInlineFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 56, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCodeInlineFn));
 
         // Slot 8: visit_list_item_fn
         var visitListItemFn = new VisitListItemFn(VisitListItemFnCallback);
         _delegates[8] = visitListItemFn;
-        Marshal.WriteIntPtr(_vtable, 64, Marshal.GetFunctionPointerForDelegate(visitListItemFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 64, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListItemFn));
 
         // Slot 9: visit_list_start_fn
         var visitListStartFn = new VisitListStartFn(VisitListStartFnCallback);
         _delegates[9] = visitListStartFn;
-        Marshal.WriteIntPtr(_vtable, 72, Marshal.GetFunctionPointerForDelegate(visitListStartFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 72, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListStartFn));
 
         // Slot 10: visit_list_end_fn
         var visitListEndFn = new VisitListEndFn(VisitListEndFnCallback);
         _delegates[10] = visitListEndFn;
-        Marshal.WriteIntPtr(_vtable, 80, Marshal.GetFunctionPointerForDelegate(visitListEndFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 80, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListEndFn));
 
         // Slot 11: visit_table_start_fn
         var visitTableStartFn = new VisitTableStartFn(VisitTableStartFnCallback);
         _delegates[11] = visitTableStartFn;
-        Marshal.WriteIntPtr(_vtable, 88, Marshal.GetFunctionPointerForDelegate(visitTableStartFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 88, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableStartFn));
 
         // Slot 12: visit_table_row_fn
         var visitTableRowFn = new VisitTableRowFn(VisitTableRowFnCallback);
         _delegates[12] = visitTableRowFn;
-        Marshal.WriteIntPtr(_vtable, 96, Marshal.GetFunctionPointerForDelegate(visitTableRowFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 96, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableRowFn));
 
         // Slot 13: visit_table_end_fn
         var visitTableEndFn = new VisitTableEndFn(VisitTableEndFnCallback);
         _delegates[13] = visitTableEndFn;
-        Marshal.WriteIntPtr(_vtable, 104, Marshal.GetFunctionPointerForDelegate(visitTableEndFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 104, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableEndFn));
 
         // Slot 14: visit_blockquote_fn
         var visitBlockquoteFn = new VisitBlockquoteFn(VisitBlockquoteFnCallback);
         _delegates[14] = visitBlockquoteFn;
-        Marshal.WriteIntPtr(_vtable, 112, Marshal.GetFunctionPointerForDelegate(visitBlockquoteFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 112, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitBlockquoteFn));
 
         // Slot 15: visit_strong_fn
         var visitStrongFn = new VisitStrongFn(VisitStrongFnCallback);
         _delegates[15] = visitStrongFn;
-        Marshal.WriteIntPtr(_vtable, 120, Marshal.GetFunctionPointerForDelegate(visitStrongFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 120, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitStrongFn));
 
         // Slot 16: visit_emphasis_fn
         var visitEmphasisFn = new VisitEmphasisFn(VisitEmphasisFnCallback);
         _delegates[16] = visitEmphasisFn;
-        Marshal.WriteIntPtr(_vtable, 128, Marshal.GetFunctionPointerForDelegate(visitEmphasisFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 128, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitEmphasisFn));
 
         // Slot 17: visit_strikethrough_fn
         var visitStrikethroughFn = new VisitStrikethroughFn(VisitStrikethroughFnCallback);
         _delegates[17] = visitStrikethroughFn;
-        Marshal.WriteIntPtr(_vtable, 136, Marshal.GetFunctionPointerForDelegate(visitStrikethroughFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 136, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitStrikethroughFn));
 
         // Slot 18: visit_underline_fn
         var visitUnderlineFn = new VisitUnderlineFn(VisitUnderlineFnCallback);
         _delegates[18] = visitUnderlineFn;
-        Marshal.WriteIntPtr(_vtable, 144, Marshal.GetFunctionPointerForDelegate(visitUnderlineFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 144, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitUnderlineFn));
 
         // Slot 19: visit_subscript_fn
         var visitSubscriptFn = new VisitSubscriptFn(VisitSubscriptFnCallback);
         _delegates[19] = visitSubscriptFn;
-        Marshal.WriteIntPtr(_vtable, 152, Marshal.GetFunctionPointerForDelegate(visitSubscriptFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 152, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSubscriptFn));
 
         // Slot 20: visit_superscript_fn
         var visitSuperscriptFn = new VisitSuperscriptFn(VisitSuperscriptFnCallback);
         _delegates[20] = visitSuperscriptFn;
-        Marshal.WriteIntPtr(_vtable, 160, Marshal.GetFunctionPointerForDelegate(visitSuperscriptFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 160, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSuperscriptFn));
 
         // Slot 21: visit_mark_fn
         var visitMarkFn = new VisitMarkFn(VisitMarkFnCallback);
         _delegates[21] = visitMarkFn;
-        Marshal.WriteIntPtr(_vtable, 168, Marshal.GetFunctionPointerForDelegate(visitMarkFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 168, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitMarkFn));
 
         // Slot 22: visit_line_break_fn
         var visitLineBreakFn = new VisitLineBreakFn(VisitLineBreakFnCallback);
         _delegates[22] = visitLineBreakFn;
-        Marshal.WriteIntPtr(_vtable, 176, Marshal.GetFunctionPointerForDelegate(visitLineBreakFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 176, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitLineBreakFn));
 
         // Slot 23: visit_horizontal_rule_fn
         var visitHorizontalRuleFn = new VisitHorizontalRuleFn(VisitHorizontalRuleFnCallback);
         _delegates[23] = visitHorizontalRuleFn;
-        Marshal.WriteIntPtr(_vtable, 184, Marshal.GetFunctionPointerForDelegate(visitHorizontalRuleFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 184, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitHorizontalRuleFn));
 
         // Slot 24: visit_custom_element_fn
         var visitCustomElementFn = new VisitCustomElementFn(VisitCustomElementFnCallback);
         _delegates[24] = visitCustomElementFn;
-        Marshal.WriteIntPtr(_vtable, 192, Marshal.GetFunctionPointerForDelegate(visitCustomElementFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 192, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCustomElementFn));
 
         // Slot 25: visit_definition_list_start_fn
         var visitDefinitionListStartFn = new VisitDefinitionListStartFn(VisitDefinitionListStartFnCallback);
         _delegates[25] = visitDefinitionListStartFn;
-        Marshal.WriteIntPtr(_vtable, 200, Marshal.GetFunctionPointerForDelegate(visitDefinitionListStartFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 200, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionListStartFn));
 
         // Slot 26: visit_definition_term_fn
         var visitDefinitionTermFn = new VisitDefinitionTermFn(VisitDefinitionTermFnCallback);
         _delegates[26] = visitDefinitionTermFn;
-        Marshal.WriteIntPtr(_vtable, 208, Marshal.GetFunctionPointerForDelegate(visitDefinitionTermFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 208, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionTermFn));
 
         // Slot 27: visit_definition_description_fn
         var visitDefinitionDescriptionFn = new VisitDefinitionDescriptionFn(VisitDefinitionDescriptionFnCallback);
         _delegates[27] = visitDefinitionDescriptionFn;
-        Marshal.WriteIntPtr(_vtable, 216, Marshal.GetFunctionPointerForDelegate(visitDefinitionDescriptionFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 216, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionDescriptionFn));
 
         // Slot 28: visit_definition_list_end_fn
         var visitDefinitionListEndFn = new VisitDefinitionListEndFn(VisitDefinitionListEndFnCallback);
         _delegates[28] = visitDefinitionListEndFn;
-        Marshal.WriteIntPtr(_vtable, 224, Marshal.GetFunctionPointerForDelegate(visitDefinitionListEndFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 224, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionListEndFn));
 
         // Slot 29: visit_form_fn
         var visitFormFn = new VisitFormFn(VisitFormFnCallback);
         _delegates[29] = visitFormFn;
-        Marshal.WriteIntPtr(_vtable, 232, Marshal.GetFunctionPointerForDelegate(visitFormFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 232, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFormFn));
 
         // Slot 30: visit_input_fn
         var visitInputFn = new VisitInputFn(VisitInputFnCallback);
         _delegates[30] = visitInputFn;
-        Marshal.WriteIntPtr(_vtable, 240, Marshal.GetFunctionPointerForDelegate(visitInputFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 240, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitInputFn));
 
         // Slot 31: visit_button_fn
         var visitButtonFn = new VisitButtonFn(VisitButtonFnCallback);
         _delegates[31] = visitButtonFn;
-        Marshal.WriteIntPtr(_vtable, 248, Marshal.GetFunctionPointerForDelegate(visitButtonFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 248, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitButtonFn));
 
         // Slot 32: visit_audio_fn
         var visitAudioFn = new VisitAudioFn(VisitAudioFnCallback);
         _delegates[32] = visitAudioFn;
-        Marshal.WriteIntPtr(_vtable, 256, Marshal.GetFunctionPointerForDelegate(visitAudioFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 256, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitAudioFn));
 
         // Slot 33: visit_video_fn
         var visitVideoFn = new VisitVideoFn(VisitVideoFnCallback);
         _delegates[33] = visitVideoFn;
-        Marshal.WriteIntPtr(_vtable, 264, Marshal.GetFunctionPointerForDelegate(visitVideoFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 264, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitVideoFn));
 
         // Slot 34: visit_iframe_fn
         var visitIframeFn = new VisitIframeFn(VisitIframeFnCallback);
         _delegates[34] = visitIframeFn;
-        Marshal.WriteIntPtr(_vtable, 272, Marshal.GetFunctionPointerForDelegate(visitIframeFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 272, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitIframeFn));
 
         // Slot 35: visit_details_fn
         var visitDetailsFn = new VisitDetailsFn(VisitDetailsFnCallback);
         _delegates[35] = visitDetailsFn;
-        Marshal.WriteIntPtr(_vtable, 280, Marshal.GetFunctionPointerForDelegate(visitDetailsFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 280, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDetailsFn));
 
         // Slot 36: visit_summary_fn
         var visitSummaryFn = new VisitSummaryFn(VisitSummaryFnCallback);
         _delegates[36] = visitSummaryFn;
-        Marshal.WriteIntPtr(_vtable, 288, Marshal.GetFunctionPointerForDelegate(visitSummaryFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 288, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSummaryFn));
 
         // Slot 37: visit_figure_start_fn
         var visitFigureStartFn = new VisitFigureStartFn(VisitFigureStartFnCallback);
         _delegates[37] = visitFigureStartFn;
-        Marshal.WriteIntPtr(_vtable, 296, Marshal.GetFunctionPointerForDelegate(visitFigureStartFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 296, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigureStartFn));
 
         // Slot 38: visit_figcaption_fn
         var visitFigcaptionFn = new VisitFigcaptionFn(VisitFigcaptionFnCallback);
         _delegates[38] = visitFigcaptionFn;
-        Marshal.WriteIntPtr(_vtable, 304, Marshal.GetFunctionPointerForDelegate(visitFigcaptionFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 304, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigcaptionFn));
 
         // Slot 39: visit_figure_end_fn
         var visitFigureEndFn = new VisitFigureEndFn(VisitFigureEndFnCallback);
         _delegates[39] = visitFigureEndFn;
-        Marshal.WriteIntPtr(_vtable, 312, Marshal.GetFunctionPointerForDelegate(visitFigureEndFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 312, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigureEndFn));
 
         // Slot 40: free_user_data
         var freeFn = new FreeUserDataFn(FreeUserDataCallback);
         _delegates[40] = freeFn;
-        Marshal.WriteIntPtr(_vtable, 320, Marshal.GetFunctionPointerForDelegate(freeFn));
+        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 320, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(freeFn));
 
     }
 
@@ -497,11 +497,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitTextFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitText(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -511,10 +511,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitElementStartFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitElementStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -524,11 +524,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitElementEndFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Output, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
+            var managed_Output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitElementEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -538,13 +538,13 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitLinkFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Href, IntPtr Text, IntPtr Title, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Href = Marshal.PtrToStringUTF8(Href) ?? string.Empty;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
-            var managed_Title = Marshal.PtrToStringUTF8(Title) ?? string.Empty;
+            var managed_Href = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Href) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Title = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Title) ?? string.Empty;
             var result = _impl.VisitLink(managed_Ctx, managed_Href, managed_Text, managed_Title);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -554,13 +554,13 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitImageFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Src, IntPtr Alt, IntPtr Title, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
-            var managed_Alt = Marshal.PtrToStringUTF8(Alt) ?? string.Empty;
-            var managed_Title = Marshal.PtrToStringUTF8(Title) ?? string.Empty;
+            var managed_Src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Src) ?? string.Empty;
+            var managed_Alt = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Alt) ?? string.Empty;
+            var managed_Title = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Title) ?? string.Empty;
             var result = _impl.VisitImage(managed_Ctx, managed_Src, managed_Alt, managed_Title);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -570,12 +570,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitHeadingFnCallback(IntPtr userData, IntPtr Ctx, uint Level, IntPtr Text, IntPtr Id, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
-            var managed_Id = Marshal.PtrToStringUTF8(Id) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Id = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Id) ?? string.Empty;
             var result = _impl.VisitHeading(managed_Ctx, Level, managed_Text, managed_Id);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -585,12 +585,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitCodeBlockFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Lang, IntPtr Code, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Lang = Marshal.PtrToStringUTF8(Lang) ?? string.Empty;
-            var managed_Code = Marshal.PtrToStringUTF8(Code) ?? string.Empty;
+            var managed_Lang = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Lang) ?? string.Empty;
+            var managed_Code = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Code) ?? string.Empty;
             var result = _impl.VisitCodeBlock(managed_Ctx, managed_Lang, managed_Code);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -600,11 +600,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitCodeInlineFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Code, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Code = Marshal.PtrToStringUTF8(Code) ?? string.Empty;
+            var managed_Code = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Code) ?? string.Empty;
             var result = _impl.VisitCodeInline(managed_Ctx, managed_Code);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -614,12 +614,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitListItemFnCallback(IntPtr userData, IntPtr Ctx, bool Ordered, IntPtr Marker, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Marker = Marshal.PtrToStringUTF8(Marker) ?? string.Empty;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Marker = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Marker) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitListItem(managed_Ctx, Ordered, managed_Marker, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -629,10 +629,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitListStartFnCallback(IntPtr userData, IntPtr Ctx, bool Ordered, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitListStart(managed_Ctx, Ordered);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -642,11 +642,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitListEndFnCallback(IntPtr userData, IntPtr Ctx, bool Ordered, IntPtr Output, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
+            var managed_Output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitListEnd(managed_Ctx, Ordered, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -656,10 +656,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitTableStartFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitTableStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -669,12 +669,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitTableRowFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Cells, bool IsHeader, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var json_Cells = Marshal.PtrToStringUTF8(Cells) ?? "{}";
+            var json_Cells = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Cells) ?? "{}";
             var managed_Cells = JsonSerializer.Deserialize<List<string>>(json_Cells)!;
             var result = _impl.VisitTableRow(managed_Ctx, managed_Cells, IsHeader);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -684,11 +684,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitTableEndFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Output, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
+            var managed_Output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitTableEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -698,11 +698,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitBlockquoteFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Content, ulong Depth, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Content = Marshal.PtrToStringUTF8(Content) ?? string.Empty;
+            var managed_Content = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Content) ?? string.Empty;
             var result = _impl.VisitBlockquote(managed_Ctx, managed_Content, Depth);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -712,11 +712,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitStrongFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitStrong(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -726,11 +726,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitEmphasisFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitEmphasis(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -740,11 +740,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitStrikethroughFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitStrikethrough(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -754,11 +754,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitUnderlineFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitUnderline(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -768,11 +768,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitSubscriptFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitSubscript(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -782,11 +782,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitSuperscriptFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitSuperscript(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -796,11 +796,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitMarkFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitMark(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -810,10 +810,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitLineBreakFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitLineBreak(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -823,10 +823,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitHorizontalRuleFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitHorizontalRule(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -836,12 +836,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitCustomElementFnCallback(IntPtr userData, IntPtr Ctx, IntPtr TagName, IntPtr Html, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_TagName = Marshal.PtrToStringUTF8(TagName) ?? string.Empty;
-            var managed_Html = Marshal.PtrToStringUTF8(Html) ?? string.Empty;
+            var managed_TagName = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(TagName) ?? string.Empty;
+            var managed_Html = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Html) ?? string.Empty;
             var result = _impl.VisitCustomElement(managed_Ctx, managed_TagName, managed_Html);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -851,10 +851,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitDefinitionListStartFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitDefinitionListStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -864,11 +864,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitDefinitionTermFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitDefinitionTerm(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -878,11 +878,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitDefinitionDescriptionFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitDefinitionDescription(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -892,11 +892,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitDefinitionListEndFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Output, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
+            var managed_Output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitDefinitionListEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -906,12 +906,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitFormFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Action, IntPtr Method, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Action = Marshal.PtrToStringUTF8(Action) ?? string.Empty;
-            var managed_Method = Marshal.PtrToStringUTF8(Method) ?? string.Empty;
+            var managed_Action = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Action) ?? string.Empty;
+            var managed_Method = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Method) ?? string.Empty;
             var result = _impl.VisitForm(managed_Ctx, managed_Action, managed_Method);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -921,13 +921,13 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitInputFnCallback(IntPtr userData, IntPtr Ctx, IntPtr InputType, IntPtr Name, IntPtr Value, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_InputType = Marshal.PtrToStringUTF8(InputType) ?? string.Empty;
-            var managed_Name = Marshal.PtrToStringUTF8(Name) ?? string.Empty;
-            var managed_Value = Marshal.PtrToStringUTF8(Value) ?? string.Empty;
+            var managed_InputType = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(InputType) ?? string.Empty;
+            var managed_Name = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Name) ?? string.Empty;
+            var managed_Value = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Value) ?? string.Empty;
             var result = _impl.VisitInput(managed_Ctx, managed_InputType, managed_Name, managed_Value);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -937,11 +937,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitButtonFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitButton(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -951,11 +951,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitAudioFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Src, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
+            var managed_Src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Src) ?? string.Empty;
             var result = _impl.VisitAudio(managed_Ctx, managed_Src);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -965,11 +965,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitVideoFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Src, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
+            var managed_Src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Src) ?? string.Empty;
             var result = _impl.VisitVideo(managed_Ctx, managed_Src);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -979,11 +979,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitIframeFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Src, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Src = Marshal.PtrToStringUTF8(Src) ?? string.Empty;
+            var managed_Src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Src) ?? string.Empty;
             var result = _impl.VisitIframe(managed_Ctx, managed_Src);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -993,10 +993,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitDetailsFnCallback(IntPtr userData, IntPtr Ctx, bool Open, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitDetails(managed_Ctx, Open);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1006,11 +1006,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitSummaryFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitSummary(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1020,10 +1020,10 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitFigureStartFnCallback(IntPtr userData, IntPtr Ctx, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
             var result = _impl.VisitFigureStart(managed_Ctx);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1033,11 +1033,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitFigcaptionFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Text, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Text = Marshal.PtrToStringUTF8(Text) ?? string.Empty;
+            var managed_Text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Text) ?? string.Empty;
             var result = _impl.VisitFigcaption(managed_Ctx, managed_Text);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1047,11 +1047,11 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     private int VisitFigureEndFnCallback(IntPtr userData, IntPtr Ctx, IntPtr Output, out IntPtr outResult) {
         try {
-            var json_Ctx = Marshal.PtrToStringUTF8(Ctx) ?? "{}";
+            var json_Ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Ctx) ?? "{}";
             var managed_Ctx = JsonSerializer.Deserialize<NodeContext>(json_Ctx)!;
-            var managed_Output = Marshal.PtrToStringUTF8(Output) ?? string.Empty;
+            var managed_Output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(Output) ?? string.Empty;
             var result = _impl.VisitFigureEnd(managed_Ctx, managed_Output);
-            outResult = Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
+            outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(result.ToFfiJson());
             return 0;
         } catch (Exception) {
             outResult = IntPtr.Zero;
@@ -1076,7 +1076,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
         _disposed = true;
 
         if (_vtable != IntPtr.Zero) {
-            Marshal.FreeHGlobal(_vtable);
+            global::System.Runtime.InteropServices.Marshal.FreeHGlobal(_vtable);
             _vtable = IntPtr.Zero;
         }
 
@@ -1110,8 +1110,8 @@ public static class HtmlVisitorRegistry {
             if (result != 0) {
                 userDataHandle.Free();
                 bridge.Dispose();
-                var errorMsg = Marshal.PtrToStringUTF8(outError) ?? "Unknown error";
-                Marshal.FreeCoTaskMem(outError);
+                var errorMsg = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(outError) ?? "Unknown error";
+                global::System.Runtime.InteropServices.Marshal.FreeCoTaskMem(outError);
                 throw new InvalidOperationException($"Failed to register {name}: {errorMsg}");
             }
 

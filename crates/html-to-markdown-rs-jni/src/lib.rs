@@ -98,14 +98,18 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_android_HtmlToMarkdownRsBridge_
             return std::ptr::null_mut();
         }
     };
-    let options: core_crate::ConversionOptions = match serde_json::from_str(&options_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(env, &format!("deserialize: {e}"));
-            return std::ptr::null_mut();
+    let options: Option<core_crate::ConversionOptions> = if options_str.is_empty() {
+        None
+    } else {
+        match serde_json::from_str::<core_crate::ConversionOptions>(&options_str) {
+            Ok(v) => Some(v),
+            Err(e) => {
+                throw_jni_error(env, &format!("deserialize: {e}"));
+                return std::ptr::null_mut();
+            }
         }
     };
-    let result = core_crate::convert(&html, Some(options));
+    let result = core_crate::convert(&html, options);
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));

@@ -18,7 +18,7 @@ defmodule HtmlToMarkdown.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/kreuzberg-dev/html-to-markdown"},
-      files: ~w(lib native .formatter.exs mix.exs README* checksum-*.exs)
+      files: ~w(.formatter.exs mix.exs README* native ../../packages/elixir/native/html_to_markdown_nif/src/*.ex)
     ]
   end
 

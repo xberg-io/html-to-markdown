@@ -3,13 +3,13 @@
 Gem::Specification.new do |spec|
   spec.name = 'html-to-markdown'
   spec.version = '3.5.0'
-  spec.authors       = ["Kreuzberg Team"]
+  spec.authors       = ['Kreuzberg Team']
   spec.summary       = 'High-performance HTML to Markdown converter'
   spec.description   = 'High-performance HTML to Markdown converter'
   spec.homepage      = 'https://github.com/kreuzberg-dev/html-to-markdown'
   spec.license       = 'MIT'
   spec.required_ruby_version = '>= 3.2.0'
-  spec.metadata['keywords'] = ['html', 'markdown', 'converter'].join(',')
+  spec.metadata['keywords'] = %w[html markdown converter].join(',')
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files         = Dir.glob(%w[lib/**/* ext/**/* sig/**/* Steepfile])

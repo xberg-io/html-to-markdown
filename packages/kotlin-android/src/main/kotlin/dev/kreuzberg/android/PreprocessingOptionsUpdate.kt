@@ -30,11 +30,11 @@ package dev.kreuzberg.android
  */
 data class PreprocessingOptionsUpdate(
     /** Optional global preprocessing enablement override */
-    val enabled: Boolean?,
+    val enabled: Boolean? = null,
     /** Optional preprocessing preset level override (Minimal, Standard, Aggressive) */
-    val preset: PreprocessingPreset?,
+    val preset: PreprocessingPreset? = null,
     /** Optional navigation element removal override (nav, breadcrumbs, menus, sidebars) */
-    val removeNavigation: Boolean?,
+    val removeNavigation: Boolean? = null,
     /** Optional form element removal override (forms, inputs, buttons, etc.) */
-    val removeForms: Boolean?,
+    val removeForms: Boolean? = null,
 )

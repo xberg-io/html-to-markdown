@@ -28,9 +28,29 @@ package dev.kreuzberg.android
  */
 enum class CodeBlockStyle {
     /** Indented code blocks (4 spaces). `CommonMark` standard. */
-    INDENTED,
+    @com.fasterxml.jackson.annotation.JsonProperty("Indented") INDENTED,
     /** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
-    BACKTICKS,
+    @com.fasterxml.jackson.annotation.JsonProperty("Backticks") BACKTICKS,
     /** Fenced code blocks with tildes (~~~). Supports language hints. */
-    TILDES,
+    @com.fasterxml.jackson.annotation.JsonProperty("Tildes") TILDES;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            INDENTED -> "Indented"
+            BACKTICKS -> "Backticks"
+            TILDES -> "Tildes"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): CodeBlockStyle =
+            when (value) {
+                "Indented" -> INDENTED
+                "Backticks" -> BACKTICKS
+                "Tildes" -> TILDES
+                else -> throw IllegalArgumentException("Unknown CodeBlockStyle value: $value")
+            }
+    }
 }

@@ -28,13 +28,7 @@
         "field": "content",
         "value": "underlined part"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_underline_custom",
@@ -61,13 +55,7 @@
         "field": "content",
         "value": "**"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_subscript_custom",
@@ -94,13 +82,7 @@
         "field": "content",
         "value": "is water"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_subscript_skip",
@@ -121,13 +103,7 @@
         "field": "content",
         "value": "The formula CHO is sugar."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_superscript_custom",
@@ -154,13 +130,7 @@
         "field": "content",
         "value": "revolutionized physics"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_superscript_skip",
@@ -181,13 +151,7 @@
         "field": "content",
         "value": "The equation x + y = z has no solutions."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_mark_custom",
@@ -214,13 +178,7 @@
         "field": "content",
         "value": "This is a"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_mark_skip",
@@ -251,13 +209,7 @@
         "field": "content",
         "value": "for security."
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_line_break_custom",
@@ -284,13 +236,7 @@
         "field": "content",
         "value": "\n\n"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_line_break_skip",
@@ -311,13 +257,7 @@
         "field": "content",
         "value": "Address Line 1Address Line 2Address Line 3"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_horizontal_rule_custom",
@@ -354,13 +294,7 @@
         "field": "content",
         "value": "---"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   },
   {
     "id": "visitor_horizontal_rule_skip",
@@ -396,12 +330,6 @@
         "field": "content",
         "value": "---"
       }
-    ],
-    "skip": {
-      "languages": [
-        "php"
-      ],
-      "reason": "PHP binding lacks visitor callback support in ext-php-rs"
-    }
+    ]
   }
 ]

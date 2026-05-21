@@ -9,7 +9,7 @@ tasks:
   install:
     desc: "Install Python dependencies with uv"
     cmds:
-      - cd {{.PYTHON_PKG}} && uv sync
+      - cd {{.PYTHON_PKG}} && uv sync --no-install-project --no-install-workspace
       - cd {{.PYTHON_PKG}} && uv pip install -e .
 
   build:
@@ -52,7 +52,7 @@ tasks:
     silent: false
     cmds:
       - cmd: |
-          cd {{.PYTHON_PKG}} && uv sync --upgrade-package "*" --no-prerelease
+          cd {{.PYTHON_PKG}} && uv sync --upgrade-package "*" --no-prerelease --no-install-project --no-install-workspace
         ignore_error: false
 
   upgrade:
@@ -60,7 +60,7 @@ tasks:
     silent: false
     cmds:
       - cmd: |
-          cd {{.PYTHON_PKG}} && uv sync --upgrade
+          cd {{.PYTHON_PKG}} && uv sync --upgrade --no-install-project --no-install-workspace
         ignore_error: false
 
   clean:

@@ -33,5 +33,5 @@ data class StructuredData(
     /** Raw JSON string (for JSON-LD) or serialized representation */
     val rawJson: String,
     /** Schema type if detectable (e.g., "Article", "Event", "Product") */
-    val schemaType: String?,
+    val schemaType: String? = null,
 )

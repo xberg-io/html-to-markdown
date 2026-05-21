@@ -28,11 +28,33 @@ package dev.kreuzberg.android
  */
 enum class ImageType {
     /** Data URI embedded image (base64 or other encoding) */
-    DATA_URI,
+    @com.fasterxml.jackson.annotation.JsonProperty("data_uri") DATA_URI,
     /** Inline SVG element */
-    INLINE_SVG,
+    @com.fasterxml.jackson.annotation.JsonProperty("inline_svg") INLINE_SVG,
     /** External image URL (http/https) */
-    EXTERNAL,
+    @com.fasterxml.jackson.annotation.JsonProperty("external") EXTERNAL,
     /** Relative image path */
-    RELATIVE,
+    @com.fasterxml.jackson.annotation.JsonProperty("relative") RELATIVE;
+
+    @com.fasterxml.jackson.annotation.JsonValue
+    fun toWire(): String =
+        when (this) {
+            DATA_URI -> "data_uri"
+            INLINE_SVG -> "inline_svg"
+            EXTERNAL -> "external"
+            RELATIVE -> "relative"
+        }
+
+    companion object {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        @JvmStatic
+        fun fromWire(value: String): ImageType =
+            when (value) {
+                "data_uri" -> DATA_URI
+                "inline_svg" -> INLINE_SVG
+                "external" -> EXTERNAL
+                "relative" -> RELATIVE
+                else -> throw IllegalArgumentException("Unknown ImageType value: $value")
+            }
+    }
 }

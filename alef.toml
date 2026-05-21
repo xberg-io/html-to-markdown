@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.15"
+alef_version = "0.17.23"
 languages = [
   "python",
   "node",
@@ -182,6 +182,12 @@ namespace = "dev.kreuzberg.android"
 artifact_id = "html-to-markdown-android"
 group_id = "dev.kreuzberg"
 abis = ["arm64-v8a", "x86_64"]
+# `serde` enables the Serialize/Deserialize derives on options/result types so
+# the JNI shim can JSON-marshal them across the host boundary. `metadata`
+# powers ConversionResult.metadata, surfaced to Kotlin callers. `inline-images`
+# enables the image-extraction pipeline so callers can set `extract_images = true`
+# and receive Base64-encoded thumbnails / ImageExtractionFailed warnings.
+features = ["serde", "metadata", "inline-images"]
 # JNI trait-handle bridge (mirror dart trait_bridge) is not yet implemented in
 # alef-backend-jni; Option<VisitorHandle> cannot be serde-deserialised from JSON.
 exclude_functions = ["visitor"]

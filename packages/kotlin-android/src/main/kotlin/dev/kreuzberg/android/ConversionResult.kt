@@ -33,7 +33,7 @@ data class ConversionResult(
      *
      * `null` when `output_format` is set to `OutputFormat.None`, indicating extraction-only mode.
      */
-    val content: String?,
+    val content: String? = null,
     /**
      * Structured document tree with semantic elements.
      *
@@ -48,17 +48,17 @@ data class ConversionResult(
      * is always available at runtime; it is gated only by the runtime option, not by a compile-time
      * feature.
      */
-    val document: DocumentStructure?,
+    val document: DocumentStructure? = null,
     /** Extracted HTML metadata (title, OG, links, images, structured data). */
     val metadata: HtmlMetadata,
     /** Extracted tables with structured cell data and markdown representation. */
-    val tables: List<TableData>,
+    val tables: List<TableData> = emptyList(),
     /**
      * Extracted inline images (data URIs and SVGs).
      *
      * Populated when `extract_images` is `true` in options.
      */
-    val images: List<String>,
+    val images: List<String> = emptyList(),
     /** Non-fatal processing warnings. */
-    val warnings: List<ProcessingWarning>,
+    val warnings: List<ProcessingWarning> = emptyList(),
 )
