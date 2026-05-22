@@ -73,7 +73,7 @@
   <a href="https://discord.gg/xt9WY3GnKR">
     <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
   </a>
-  <a href="https://html-to-markdown.kreuzberg.dev">
+  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
     <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>

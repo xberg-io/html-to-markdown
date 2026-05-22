@@ -617,18 +617,6 @@ void* __swift_bridge__$Vec_NodeType$get_mut(void* vec_ptr, uintptr_t index);
 uintptr_t __swift_bridge__$Vec_NodeType$len(void* vec_ptr);
 void* __swift_bridge__$Vec_NodeType$as_ptr(void* vec_ptr);
 
-typedef struct VisitResult VisitResult;
-void __swift_bridge__$VisitResult$_free(void* self);
-
-void* __swift_bridge__$Vec_VisitResult$new(void);
-void __swift_bridge__$Vec_VisitResult$drop(void* vec_ptr);
-void __swift_bridge__$Vec_VisitResult$push(void* vec_ptr, void* item_ptr);
-void* __swift_bridge__$Vec_VisitResult$pop(void* vec_ptr);
-void* __swift_bridge__$Vec_VisitResult$get(void* vec_ptr, uintptr_t index);
-void* __swift_bridge__$Vec_VisitResult$get_mut(void* vec_ptr, uintptr_t index);
-uintptr_t __swift_bridge__$Vec_VisitResult$len(void* vec_ptr);
-void* __swift_bridge__$Vec_VisitResult$as_ptr(void* vec_ptr);
-
 typedef struct HtmlVisitorBox HtmlVisitorBox;
 void __swift_bridge__$HtmlVisitorBox$_free(void* self);
 
@@ -830,7 +818,6 @@ void* __swift_bridge__$NodeContent$to_string(void* self);
 void* __swift_bridge__$AnnotationKind$to_string(void* self);
 void* __swift_bridge__$WarningKind$to_string(void* self);
 void* __swift_bridge__$NodeType$to_string(void* self);
-void* __swift_bridge__$VisitResult$to_string(void* self);
 struct __private__ResultPtrAndPtr __swift_bridge__$convert(void* html, void* options);
 void* __swift_bridge__$alef_phantom_vec_html_visitor(void);
 void* __swift_bridge__$make_html_visitor_handle(void* swift_box);
@@ -862,7 +849,6 @@ struct __private__ResultPtrAndPtr __swift_bridge__$node_content_from_json(void* 
 struct __private__ResultPtrAndPtr __swift_bridge__$annotation_kind_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$warning_kind_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$node_type_from_json(void* json);
-struct __private__ResultPtrAndPtr __swift_bridge__$visit_result_from_json(void* json);
 
 
 #endif /* RUST_BRIDGE_C_H */

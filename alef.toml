@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.29"
+alef_version = "0.17.32"
 languages = [
   "python",
   "node",
@@ -397,7 +397,10 @@ e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release 
 
 [crates.test.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi"
+# Kotlin/Android is a JNI binding — its host-JVM e2e loads `libhtm_jni`
+# (the `html-to-markdown-rs-jni` crate's `[lib] name = "htm_jni"` cdylib),
+# not the C FFI dylib. Build the JNI crate so it lands in target/release/.
+before = "cargo build --release -p html-to-markdown-rs-jni"
 e2e = "cd e2e/kotlin_android && gradle test --no-daemon"
 
 [crates.test.swift]

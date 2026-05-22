@@ -888,13 +888,6 @@ public enum VisitResult: Codable, Sendable, Hashable {
     /// The conversion process halts and returns this error message.
     case error(field0: String)
 }
-extension VisitResult {
-    func intoRust() throws -> RustBridge.VisitResult {
-        let data = try JSONEncoder().encode(self)
-        let json = String(data: data, encoding: .utf8) ?? "null"
-        return try RustBridge.visitResultFromJson(json)
-    }
-}
 
 /// Errors that can occur during HTML to Markdown conversion.
 public enum ConversionError: Swift.Error {
@@ -1367,3 +1360,12 @@ public func conversionOptionsFromJsonWithVisitor(_ json: String, _ visitor: Visi
 public func convert(html: String, options: ConversionOptions?) throws -> ConversionResult {
     return try RustBridge.convert(html, options)
 }
+
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ConversionOptions: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.PreprocessingOptions: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ConversionResult: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.VisitorHandle: @unchecked Sendable {}

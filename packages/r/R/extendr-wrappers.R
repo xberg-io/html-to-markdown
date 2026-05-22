@@ -31,12 +31,14 @@ convert <- function(html, options) .Call("wrap__convert", html, options, PACKAGE
 #' @field base_href Base URL from `<base href="">` tag for resolving relative URLs
 #' @field language Document language from `lang` attribute
 #' @field text_direction Document text direction from `dir` attribute
-#' @field open_graph Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image", "url", etc.
-#' @field twitter_card Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title", "description", "image", etc.
-#' @field meta_tags Additional meta tags not covered by specific fields Keys are meta name/property attributes, values are content
+#' @field open_graph Open Graph metadata (og:* properties) for social media Keys like "title", "description", "image",
+#' @field twitter_card Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title",
+#' @field meta_tags Additional meta tags not covered by specific fields Keys are meta name/property attributes, values
 #' @export
 DocumentMetadata <- new.env(parent = emptyenv())
-DocumentMetadata$from_json <- function(json) .Call("wrap__DocumentMetadata__from_json", json, PACKAGE = "htmltomarkdown")
+DocumentMetadata$from_json <- function(json) {
+  .Call("wrap__DocumentMetadata__from_json", json, PACKAGE = "htmltomarkdown")
+}
 #' @export
 `$.DocumentMetadata` <- function(self, name) {
   func <- DocumentMetadata[[name]]
@@ -141,7 +143,7 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field br_in_tables Render `<br>` elements inside table cells as literal line breaks.
 #' @field compact_tables Emit tables without column padding (compact GFM format).
 #' @field highlight_style Style used for `<mark>` / highlighted text (e.g. `==text==`).
-#' @field extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …).
+#' @field extract_metadata Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open
 #' @field whitespace_mode Controls how whitespace sequences are normalised in the converted output.
 #' @field strip_newlines Strip all newlines from the output, producing a single-line result.
 #' @field wrap Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
@@ -165,13 +167,15 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field max_image_size Maximum decoded image size in bytes (default 5MB).
 #' @field capture_svg Capture SVG elements as images.
 #' @field infer_dimensions Infer image dimensions from data.
-#' @field max_depth Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are silently truncated.
+#' @field max_depth Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are
 #' @field exclude_selectors CSS selectors for elements to exclude entirely (element + all content).
 #' @field visitor Optional visitor for custom traversal logic.
 #' @export
 ConversionOptions <- new.env(parent = emptyenv())
 ConversionOptions$default <- function() .Call("wrap__ConversionOptions__default", PACKAGE = "htmltomarkdown")
-ConversionOptions$from_json <- function(json) .Call("wrap__ConversionOptions__from_json", json, PACKAGE = "htmltomarkdown")
+ConversionOptions$from_json <- function(json) {
+  .Call("wrap__ConversionOptions__from_json", json, PACKAGE = "htmltomarkdown")
+}
 #' @export
 `$.ConversionOptions` <- function(self, name) {
   func <- ConversionOptions[[name]]
@@ -244,7 +248,9 @@ ConversionOptionsUpdate <- new.env(parent = emptyenv())
 #' @export
 PreprocessingOptions <- new.env(parent = emptyenv())
 PreprocessingOptions$default <- function() .Call("wrap__PreprocessingOptions__default", PACKAGE = "htmltomarkdown")
-PreprocessingOptions$from_json <- function(json) .Call("wrap__PreprocessingOptions__from_json", json, PACKAGE = "htmltomarkdown")
+PreprocessingOptions$from_json <- function(json) {
+  .Call("wrap__PreprocessingOptions__from_json", json, PACKAGE = "htmltomarkdown")
+}
 #' @export
 `$.PreprocessingOptions` <- function(self, name) {
   func <- PreprocessingOptions[[name]]

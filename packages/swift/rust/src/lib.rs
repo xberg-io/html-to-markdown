@@ -596,11 +596,6 @@ mod ffi {
     }
 
     extern "Rust" {
-        type VisitResult;
-        fn to_string(&self) -> String;
-    }
-
-    extern "Rust" {
         fn convert(html: String, options: Option<ConversionOptions>) -> Result<ConversionResult, String>;
     }
 
@@ -738,8 +733,6 @@ mod ffi {
         fn warning_kind_from_json(json: String) -> Result<WarningKind, String>;
         #[swift_bridge(swift_name = "nodeTypeFromJson")]
         fn node_type_from_json(json: String) -> Result<NodeType, String>;
-        #[swift_bridge(swift_name = "visitResultFromJson")]
-        fn visit_result_from_json(json: String) -> Result<VisitResult, String>;
     }
 }
 
@@ -3551,10 +3544,5 @@ pub fn warning_kind_from_json(json: String) -> Result<WarningKind, String> {
 pub fn node_type_from_json(json: String) -> Result<NodeType, String> {
     serde_json::from_str::<html_to_markdown_rs::NodeType>(&json)
         .map(NodeType::from)
-        .map_err(|e| e.to_string())
-}
-pub fn visit_result_from_json(json: String) -> Result<VisitResult, String> {
-    serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json)
-        .map(VisitResult::from)
         .map_err(|e| e.to_string())
 }
