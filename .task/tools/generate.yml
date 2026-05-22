@@ -2,16 +2,14 @@ version: "3"
 
 tasks:
   generate-readme:
-    desc: Generate package READMEs using alef and format with rumdl
+    desc: Generate package READMEs using alef
     cmds:
       - alef readme
-      - rumdl fmt --no-exclude packages/*/README.md packages/*/*/README.md crates/*/README.md
 
   generate-readme:check:
     desc: Validate READMEs match generated output (CI mode)
     cmds:
       - alef readme
-      - rumdl fmt --no-exclude packages/*/README.md packages/*/*/README.md crates/*/README.md
       - git diff --exit-code -- packages/*/README.md packages/*/*/README.md crates/*/README.md
 
   generate-docs:
