@@ -19,7 +19,7 @@
   {% elif language == 'elixir' %}
 - **Hex.pm:** [hex.pm/packages/html_to_markdown](https://hex.pm/packages/html_to_markdown)
   {% endif %}
-- **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
+- **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
 ## Part of Kreuzberg.dev
 
@@ -57,5 +57,5 @@ If you find this library useful, consider [sponsoring the project](https://githu
 Have questions or run into issues? We're here to help:
 
 - **GitHub Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
-- **Discussions:** [github.com/kreuzberg-dev/html-to-markdown/discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
-- **Discord Community:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
+- **Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+- **Discord Community:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)

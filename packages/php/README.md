@@ -61,16 +61,20 @@
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
     <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
   </a>
-  <a href="https://html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/Live%20Demo-open-007ec6" alt="Live Demo">
+</div>
+
+<div align="center" style="margin: 24px 0 0;">
+  <a href="https://kreuzberg.dev">
+    <img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
 
-<img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/419fc06c-8313-4324-b159-4b4d3cfce5c0" />
-
-<div align="center" style="margin-top: 20px;">
-  <a href="https://discord.gg/pXxagNK2zN">
-      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Discord">
+<div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
+  <a href="https://discord.gg/xt9WY3GnKR">
+    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+  </a>
+  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
+    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>
 
@@ -79,11 +83,20 @@ Provides a type-safe API with full PHPStan level 9 support, modern PHP 8.2+ feat
 
 Note: The package was previously published as `goldziher/html-to-markdown`, which still works for backward compatibility.
 
+
+## What This Package Provides
+
+- **Same renderer as every binding** — output matches Rust, Python, Node.js, Ruby, PHP, Go, Java, .NET, Elixir, R, Dart, Swift, Zig, C FFI, and WASM.
+- **Structured conversion result** — Markdown plus metadata, links, headings, images, tables, and warnings where the binding exposes them.
+- **Production defaults** — HTML is parsed with the Rust core, sanitized by default, and rendered without runtime-specific Markdown drift.
+- **PHP extension** — typed PHP 8.2+ API with stubs suitable for PHPStan and production Composer projects.
+
 ## Installation
 
 ```bash
 composer require kreuzberg-dev/html-to-markdown
 ```
+
 
 Requires PHP 8.2+. Install the native extension via PIE:
 
@@ -97,15 +110,17 @@ Or use Composer (requires ext-html_to_markdown):
 composer require kreuzberg-dev/html-to-markdown
 ```
 
+
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document           | Size  | Ops/sec |
-| ------------------ | ----- | ------- |
-| Lists (Timeline)   | 129KB | 3346    |
-| Tables (Countries) | 360KB | 973     |
-| Medium (Python)    | 657KB | 485     |
+| Document | Size | Ops/sec |
+|----------|------|---------|
+| Lists (Timeline) | 129KB | 3346 |
+| Tables (Countries) | 360KB | 973 |
+| Medium (Python) | 657KB | 485 |
+
 
 ## Quick Start
 
@@ -154,6 +169,7 @@ $images   = $result['images'];     // Extracted images
 $warnings = $result['warnings'];   // Any conversion warnings
 ```
 
+
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -186,6 +202,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
+
 ```php
 use HtmlToMarkdown\Converter;
 use HtmlToMarkdown\ConversionOptions;
@@ -201,11 +218,13 @@ $djot = Converter::convert($html, new ConversionOptions(outputFormat: 'djot'));
 // Result: "This is *bold* and _italic_ text."
 ```
 
+
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 ```php
 use HtmlToMarkdown\Converter;
@@ -217,7 +236,9 @@ $plain = Converter::convert($html, new ConversionOptions(outputFormat: 'plain'))
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -234,6 +255,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 **Zero Overhead When Disabled:** Metadata extraction adds negligible overhead and happens during the HTML parsing pass. Pass `extract_metadata: true` in `ConversionOptions` to enable it; the result is available at `result.metadata`.
 
 ### Example: Quick Start
+
 
 ```php
 <?php
@@ -254,6 +276,7 @@ print_r($result['metadata']->images);             // All images with alt text
 print_r($result['metadata']->structured_data);    // JSON-LD, Microdata, RDFa
 ```
 
+
 ## Visitor Pattern
 
 The visitor pattern enables custom HTML→Markdown conversion logic by providing callbacks for specific HTML elements during traversal. Pass a visitor as the third argument to `convert()`.
@@ -269,6 +292,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
+
 
 ```php
 <?php
@@ -304,13 +328,14 @@ $result = Converter::create()->convert(
 $markdown = $result['content'];
 ```
 
+
 ## Examples
 
 ## Links
 
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
 - **Packagist:** [packagist.org/packages/kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
-- **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
+- **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
 ## Part of Kreuzberg.dev
 
@@ -348,5 +373,5 @@ If you find this library useful, consider [sponsoring the project](https://githu
 Have questions or run into issues? We're here to help:
 
 - **GitHub Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
-- **Discussions:** [github.com/kreuzberg-dev/html-to-markdown/discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
-- **Discord Community:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
+- **Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+- **Discord Community:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)

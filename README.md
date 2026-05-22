@@ -61,22 +61,26 @@
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
     <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
   </a>
-  <a href="https://html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/Live%20Demo-open-007ec6" alt="Live Demo">
+</div>
+
+<div align="center" style="margin: 24px 0 0;">
+  <a href="https://kreuzberg.dev">
+    <img width="3384" height="573" alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
 
-<img width="3384" height="573" alt="Banner" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
-
-<div align="center" style="margin-top: 20px;">
-  <a href="https://discord.gg/pXxagNK2zN">
-      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Discord">
+<div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
+  <a href="https://discord.gg/xt9WY3GnKR">
+    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+  </a>
+  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
+    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>
 
 High-performance HTML to Markdown conversion powered by Rust. Ships as native bindings for **Rust, Python, TypeScript/Node.js, Ruby, PHP, Go, Java, C#, Elixir, R, C (FFI), and WebAssembly** with identical rendering across all runtimes.
 
-**[Documentation](https://docs.html-to-markdown.kreuzberg.dev)** | **[Live Demo](https://docs.html-to-markdown.kreuzberg.dev/demo/)** | **[API Reference](https://docs.rs/html-to-markdown-rs/)**
+**[Documentation](https://docs.html-to-markdown.kreuzberg.dev)** | **[API Reference](https://docs.rs/html-to-markdown-rs/)**
 
 ## Highlights
 
@@ -109,7 +113,7 @@ cargo install html-to-markdown-cli
 brew install kreuzberg-dev/tap/html-to-markdown
 ```
 
-See the **[Installation Guide](https://docs.html-to-markdown.kreuzberg.dev/getting-started/installation/)** for all languages including PHP, Go, Java, C#, Elixir, R, and WASM.
+See the package READMEs for all languages including PHP, Go, Java, C#, Elixir, R, and WASM.
 
 ### Usage
 

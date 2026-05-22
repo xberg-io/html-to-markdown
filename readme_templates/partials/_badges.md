@@ -59,15 +59,19 @@
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
     <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
   </a>
-  <a href="https://html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/Live%20Demo-open-007ec6" alt="Live Demo">
+</div>
+
+<div align="center" style="margin: 24px 0 0;">
+  <a href="https://kreuzberg.dev">
+    <img width="1128" height="191" alt="html-to-markdown" src="{{ banner_url }}" />
   </a>
 </div>
 
-<img width="1128" height="191" alt="html-to-markdown" src="{{ banner_url }}" />
-
-<div align="center" style="margin-top: 20px;">
-  <a href="{{ discord_url }}">
-      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Discord">
+<div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
+  <a href="https://discord.gg/xt9WY3GnKR">
+    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+  </a>
+  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
+    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>

@@ -61,27 +61,40 @@
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
     <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
   </a>
-  <a href="https://html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/Live%20Demo-open-007ec6" alt="Live Demo">
+</div>
+
+<div align="center" style="margin: 24px 0 0;">
+  <a href="https://kreuzberg.dev">
+    <img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
 
-<img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/419fc06c-8313-4324-b159-4b4d3cfce5c0" />
-
-<div align="center" style="margin-top: 20px;">
-  <a href="https://discord.gg/pXxagNK2zN">
-      <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Discord">
+<div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
+  <a href="https://discord.gg/xt9WY3GnKR">
+    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+  </a>
+  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
+    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>
 
 High-performance HTML to Markdown converter for Node.js and Bun with full TypeScript support.
 This package wraps native `@kreuzberg/html-to-markdown` bindings and provides a type-safe API.
 
+
+## What This Package Provides
+
+- **Same renderer as every binding** — output matches Rust, Python, Node.js, Ruby, PHP, Go, Java, .NET, Elixir, R, Dart, Swift, Zig, C FFI, and WASM.
+- **Structured conversion result** — Markdown plus metadata, links, headings, images, tables, and warnings where the binding exposes them.
+- **Production defaults** — HTML is parsed with the Rust core, sanitized by default, and rendered without runtime-specific Markdown drift.
+- **Node-first TypeScript API** — native NAPI package, typed options/results, async-friendly integration for Node.js and Bun.
+
 ## Installation
 
 ```bash
 pnpm add @kreuzberg/html-to-markdown
 ```
+
 
 Requires Node.js 18+ or Bun. Native bindings provide superior performance.
 
@@ -115,15 +128,17 @@ Alternatively, use the WebAssembly version for browser/edge environments:
 npm install @kreuzberg/html-to-markdown-wasm
 ```
 
+
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document            | Size  | Latency | Throughput |
-| ------------------- | ----- | ------- | ---------- |
-| Lists (Timeline)    | 129KB | 0.58ms  | 222 MB/s   |
-| Tables (Countries)  | 360KB | 1.89ms  | 190 MB/s   |
-| Mixed (Python wiki) | 656KB | 4.21ms  | 156 MB/s   |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB | 0.58ms | 222 MB/s |
+| Tables (Countries) | 360KB | 1.89ms | 190 MB/s |
+| Mixed (Python wiki) | 656KB | 4.21ms | 156 MB/s |
+
 
 ## Quick Start
 
@@ -172,6 +187,7 @@ const images = result.images; // Extracted images
 const warnings = result.warnings; // Any conversion warnings
 ```
 
+
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -204,6 +220,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
+
 ```typescript
 import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
 
@@ -218,11 +235,13 @@ const djot = convert(html, { outputFormat: "djot" });
 // Result: "This is *bold* and _italic_ text."
 ```
 
+
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
+
 
 ```typescript
 import { convert } from "@kreuzberg/html-to-markdown";
@@ -233,7 +252,9 @@ const plain = convert(html, { outputFormat: "plain" });
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -251,6 +272,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
+
 ```typescript
 import { convert } from "@kreuzberg/html-to-markdown";
 
@@ -264,6 +286,7 @@ console.log(result.metadata?.links); // All hyperlinks
 console.log(result.metadata?.images); // All images with alt text
 console.log(result.metadata?.structuredData); // JSON-LD, Microdata, RDFa
 ```
+
 
 ## Visitor Pattern
 
@@ -280,6 +303,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
+
 
 ```typescript
 import {
@@ -312,6 +336,7 @@ const result = convert(html, {}, visitor);
 const markdown = result.content;
 ```
 
+
 ## Examples
 
 ## Links
@@ -319,7 +344,7 @@ const markdown = result.content;
 - **GitHub:** [github.com/kreuzberg-dev/html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown)
 - **npm:** [npmjs.com/@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
 - **WASM:** [npmjs.com/@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)
-- **Discord:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
+- **Discord:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)
 
 ## Part of Kreuzberg.dev
 
@@ -357,5 +382,5 @@ If you find this library useful, consider [sponsoring the project](https://githu
 Have questions or run into issues? We're here to help:
 
 - **GitHub Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
-- **Discussions:** [github.com/kreuzberg-dev/html-to-markdown/discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
-- **Discord Community:** [discord.gg/pXxagNK2zN](https://discord.gg/pXxagNK2zN)
+- **Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
+- **Discord Community:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)

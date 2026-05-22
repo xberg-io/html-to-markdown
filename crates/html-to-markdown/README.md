@@ -6,13 +6,13 @@ High-performance HTML to Markdown converter built with Rust.
 
 This crate is the core engine compiled into the Python wheels, Ruby gem, Node.js NAPI bindings, WebAssembly package, and CLI, ensuring identical Markdown output across every language.
 
-[![Crates.io](https://img.shields.io/crates/v/html-to-markdown-rs.svg)](https://crates.io/crates/html-to-markdown-rs)
-[![npm version](https://img.shields.io/npm/v/@kreuzberg/html-to-markdown.svg?logo=npm)](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
-[![PyPI version](https://img.shields.io/pypi/v/html-to-markdown.svg?logo=pypi)](https://pypi.org/project/html-to-markdown/)
-[![Gem Version](https://badge.fury.io/rb/html-to-markdown.svg)](https://rubygems.org/gems/html-to-markdown)
-[![Packagist](https://img.shields.io/packagist/v/kreuzberg-dev/html-to-markdown.svg)](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
-[![docs.rs](https://docs.rs/html-to-markdown-rs/badge.svg)](https://docs.rs/html-to-markdown-rs)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/html-to-markdown-rs.svg?color=007ec6)](https://crates.io/crates/html-to-markdown-rs)
+[![npm version](https://img.shields.io/npm/v/@kreuzberg/html-to-markdown.svg?logo=npm&color=007ec6)](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)
+[![PyPI version](https://img.shields.io/pypi/v/html-to-markdown.svg?logo=pypi&color=007ec6)](https://pypi.org/project/html-to-markdown/)
+[![Gem Version](https://img.shields.io/gem/v/html-to-markdown.svg?color=007ec6)](https://rubygems.org/gems/html-to-markdown)
+[![Packagist](https://img.shields.io/packagist/v/kreuzberg-dev/html-to-markdown.svg?color=007ec6)](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)
+[![docs.rs](https://img.shields.io/badge/docs.rs-html--to--markdown--rs-007ec6)](https://docs.rs/html-to-markdown-rs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-007ec6)](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/LICENSE)
 
 Fast, reliable HTML to Markdown conversion with full CommonMark compliance. Built with `html5ever` for correctness and a DOM-based filter for safe preprocessing.
 
@@ -268,7 +268,7 @@ This is the core Rust library. For other languages:
 
 - [Full Documentation](https://docs.html-to-markdown.kreuzberg.dev)
 - [API Reference](https://docs.rs/html-to-markdown-rs)
-- [Migration Guide (v2 -> v3)](https://docs.html-to-markdown.kreuzberg.dev/migration/v3/)
+- [Documentation](https://docs.html-to-markdown.kreuzberg.dev/)
 - [Contributing Guide](https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CONTRIBUTING.md)
 
 ## Performance

@@ -839,8 +839,8 @@ keywords = ["html", "markdown", "converter"]
 [crates.readme]
 template_dir = "readme_templates"
 snippets_dir = "docs/snippets"
-discord_url = "https://discord.gg/pXxagNK2zN"
-banner_url = "https://github.com/user-attachments/assets/419fc06c-8313-4324-b159-4b4d3cfce5c0"
+discord_url = "https://discord.gg/xt9WY3GnKR"
+banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 
 [crates.readme.languages.python]
 name = "Python"
