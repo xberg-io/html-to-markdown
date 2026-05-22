@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -38,5 +39,5 @@ data class LinkMetadata(
     /** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
     val rel: List<String> = emptyList(),
     /** Additional HTML attributes */
-    val attributes: Map<String, String> = emptyMap()
+    val attributes: Map<String, String> = emptyMap(),
 )

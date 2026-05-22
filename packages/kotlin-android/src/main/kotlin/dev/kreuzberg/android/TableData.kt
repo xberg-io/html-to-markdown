@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -26,5 +27,5 @@ data class TableData(
     /** The structured table grid. */
     val grid: TableGrid,
     /** The markdown rendering of this table. */
-    val markdown: String
+    val markdown: String,
 )

@@ -61,7 +61,7 @@ repos:
 
   # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.13
+    rev: v0.15.14
     hooks:
       - id: ruff
         args: [--fix]
@@ -258,7 +258,7 @@ repos:
         exclude: ^test_apps/
   # Alef: verify bindings and sync versions.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.17.24
+    rev: v0.17.25
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

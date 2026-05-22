@@ -17,89 +17,167 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
 
-/** Managed interface for the HtmlVisitor plugin trait. */
+/**
+ * Visitor trait for HTML→Markdown conversion.
+ *
+ * Implement this trait to customize the conversion behavior for any HTML element type. All methods
+ * have default implementations that return `VisitResult.Continue`, allowing selective override of
+ * only the elements you care about.
+ *
+ * # Method Naming Convention
+ *
+ * - `visit_*_start`: Called before entering an element (pre-order traversal)
+ * - `visit_*_end`: Called after exiting an element (post-order traversal)
+ * - `visit_*`: Called for specific element types (e.g., `visit_link`, `visit_image`)
+ *
+ * # Execution Order
+ *
+ * For a typical element like `<div><p>text</p></div>`:
+ * 1. `visit_element_start` for `<div>`
+ * 2. `visit_element_start` for `<p>`
+ * 3. `visit_text` for "text"
+ * 4. `visit_element_end` for `<p>`
+ * 5. `visit_element_end` for `</div>`
+ *
+ * # Performance Notes
+ *
+ * - `visit_text` is the most frequently called method (~100+ times per document)
+ * - Return `VisitResult.Continue` quickly for elements you don't need to customize
+ * - Avoid heavy computation in visitor methods; consider caching if needed
+ */
 interface IHtmlVisitor {
+    /** Visit text nodes (most frequent callback - ~100+ per document). */
     fun visitText(ctx: NodeContext, text: String): VisitResult
 
+    /**
+     * Called before entering any element.
+     *
+     * This is the first callback invoked for every HTML element, allowing visitors to implement
+     * generic element handling before tag-specific logic.
+     */
     fun visitElementStart(ctx: NodeContext): VisitResult
 
+    /**
+     * Called after exiting any element.
+     *
+     * Receives the default markdown output that would be generated. Visitors can inspect or replace
+     * this output.
+     */
     fun visitElementEnd(ctx: NodeContext, output: String): VisitResult
 
-    fun visitLink(ctx: NodeContext, href: String, text: String, title: String): VisitResult
+    /** Visit anchor links `<a href="...">`. */
+    fun visitLink(ctx: NodeContext, href: String, text: String, title: String?): VisitResult
 
-    fun visitImage(ctx: NodeContext, src: String, alt: String, title: String): VisitResult
+    /** Visit images `<img src="...">`. */
+    fun visitImage(ctx: NodeContext, src: String, alt: String, title: String?): VisitResult
 
-    fun visitHeading(ctx: NodeContext, level: Int, text: String, id: String): VisitResult
+    /** Visit heading elements `<h1>` through `<h6>`. */
+    fun visitHeading(ctx: NodeContext, level: Int, text: String, id: String?): VisitResult
 
-    fun visitCodeBlock(ctx: NodeContext, lang: String, code: String): VisitResult
+    /** Visit code blocks `<pre><code>`. */
+    fun visitCodeBlock(ctx: NodeContext, lang: String?, code: String): VisitResult
 
+    /** Visit inline code `<code>`. */
     fun visitCodeInline(ctx: NodeContext, code: String): VisitResult
 
+    /** Visit list items `<li>`. */
     fun visitListItem(ctx: NodeContext, ordered: Boolean, marker: String, text: String): VisitResult
 
+    /** Called before processing a list `<ul>` or `<ol>`. */
     fun visitListStart(ctx: NodeContext, ordered: Boolean): VisitResult
 
+    /** Called after processing a list `</ul>` or `</ol>`. */
     fun visitListEnd(ctx: NodeContext, ordered: Boolean, output: String): VisitResult
 
+    /** Called before processing a table `<table>`. */
     fun visitTableStart(ctx: NodeContext): VisitResult
 
+    /** Visit table rows `<tr>`. */
     fun visitTableRow(ctx: NodeContext, cells: List<String>, isHeader: Boolean): VisitResult
 
+    /** Called after processing a table `</table>`. */
     fun visitTableEnd(ctx: NodeContext, output: String): VisitResult
 
+    /** Visit blockquote elements `<blockquote>`. */
     fun visitBlockquote(ctx: NodeContext, content: String, depth: Long): VisitResult
 
+    /** Visit strong/bold elements `<strong>`, `<b>`. */
     fun visitStrong(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit emphasis/italic elements `<em>`, `<i>`. */
     fun visitEmphasis(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit strikethrough elements `<s>`, `<del>`, `<strike>`. */
     fun visitStrikethrough(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit underline elements `<u>`, `<ins>`. */
     fun visitUnderline(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit subscript elements `<sub>`. */
     fun visitSubscript(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit superscript elements `<sup>`. */
     fun visitSuperscript(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit mark/highlight elements `<mark>`. */
     fun visitMark(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit line break elements `<br>`. */
     fun visitLineBreak(ctx: NodeContext): VisitResult
 
+    /** Visit horizontal rule elements `<hr>`. */
     fun visitHorizontalRule(ctx: NodeContext): VisitResult
 
+    /** Visit custom elements (web components) or unknown tags. */
     fun visitCustomElement(ctx: NodeContext, tagName: String, html: String): VisitResult
 
+    /** Visit definition list `<dl>`. */
     fun visitDefinitionListStart(ctx: NodeContext): VisitResult
 
+    /** Visit definition term `<dt>`. */
     fun visitDefinitionTerm(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit definition description `<dd>`. */
     fun visitDefinitionDescription(ctx: NodeContext, text: String): VisitResult
 
+    /** Called after processing a definition list `</dl>`. */
     fun visitDefinitionListEnd(ctx: NodeContext, output: String): VisitResult
 
-    fun visitForm(ctx: NodeContext, action: String, method: String): VisitResult
+    /** Visit form elements `<form>`. */
+    fun visitForm(ctx: NodeContext, action: String?, method: String?): VisitResult
 
-    fun visitInput(ctx: NodeContext, inputType: String, name: String, value: String): VisitResult
+    /** Visit input elements `<input>`. */
+    fun visitInput(ctx: NodeContext, inputType: String, name: String?, value: String?): VisitResult
 
+    /** Visit button elements `<button>`. */
     fun visitButton(ctx: NodeContext, text: String): VisitResult
 
-    fun visitAudio(ctx: NodeContext, src: String): VisitResult
+    /** Visit audio elements `<audio>`. */
+    fun visitAudio(ctx: NodeContext, src: String?): VisitResult
 
-    fun visitVideo(ctx: NodeContext, src: String): VisitResult
+    /** Visit video elements `<video>`. */
+    fun visitVideo(ctx: NodeContext, src: String?): VisitResult
 
-    fun visitIframe(ctx: NodeContext, src: String): VisitResult
+    /** Visit iframe elements `<iframe>`. */
+    fun visitIframe(ctx: NodeContext, src: String?): VisitResult
 
+    /** Visit details elements `<details>`. */
     fun visitDetails(ctx: NodeContext, open: Boolean): VisitResult
 
+    /** Visit summary elements `<summary>`. */
     fun visitSummary(ctx: NodeContext, text: String): VisitResult
 
+    /** Visit figure elements `<figure>`. */
     fun visitFigureStart(ctx: NodeContext): VisitResult
 
+    /** Visit figcaption elements `<figcaption>`. */
     fun visitFigcaption(ctx: NodeContext, text: String): VisitResult
 
+    /** Called after processing a figure `</figure>`. */
     fun visitFigureEnd(ctx: NodeContext, output: String): VisitResult
 }

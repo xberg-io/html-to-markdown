@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -24,8 +25,8 @@ package dev.kreuzberg.android
 /**
  * Context information passed to all visitor methods.
  *
- * Provides comprehensive metadata about the current node being visited,
- * including its type, attributes, position in the DOM tree, and parent context.
+ * Provides comprehensive metadata about the current node being visited, including its type,
+ * attributes, position in the DOM tree, and parent context.
  */
 data class NodeContext(
     /** Coarse-grained node type classification */
@@ -41,5 +42,5 @@ data class NodeContext(
     /** Parent element's tag name (None if root) */
     val parentTag: String? = null,
     /** Whether this element is treated as inline vs block */
-    val isInline: Boolean
+    val isInline: Boolean,
 )

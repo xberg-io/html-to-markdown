@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -24,8 +25,8 @@ package dev.kreuzberg.android
 /**
  * Structured data block (JSON-LD, Microdata, or RDFa).
  *
- * Represents machine-readable structured data found in the document.
- * JSON-LD blocks are collected as raw JSON strings for flexibility.
+ * Represents machine-readable structured data found in the document. JSON-LD blocks are collected
+ * as raw JSON strings for flexibility.
  */
 data class StructuredData(
     /** Type of structured data (JSON-LD, Microdata, RDFa) */
@@ -33,5 +34,5 @@ data class StructuredData(
     /** Raw JSON string (for JSON-LD) or serialized representation */
     val rawJson: String,
     /** Schema type if detectable (e.g., "Article", "Event", "Product") */
-    val schemaType: String? = null
+    val schemaType: String? = null,
 )

@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -24,8 +25,8 @@ package dev.kreuzberg.android
 /**
  * Partial update for `PreprocessingOptions`.
  *
- * This struct uses `Option<T>` to represent optional fields that can be selectively updated.
- * Only specified fields (Some values) will override existing options; None values leave the
+ * This struct uses `Option<T>` to represent optional fields that can be selectively updated. Only
+ * specified fields (Some values) will override existing options; None values leave the
  * corresponding fields unchanged when applied via `PreprocessingOptions.apply_update`.
  */
 data class PreprocessingOptionsUpdate(
@@ -36,5 +37,5 @@ data class PreprocessingOptionsUpdate(
     /** Optional navigation element removal override (nav, breadcrumbs, menus, sidebars) */
     val removeNavigation: Boolean? = null,
     /** Optional form element removal override (forms, inputs, buttons, etc.) */
-    val removeForms: Boolean? = null
+    val removeForms: Boolean? = null,
 )

@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -28,30 +29,29 @@ package dev.kreuzberg.android
  */
 enum class PreprocessingPreset {
     /** Minimal cleanup. Remove only essential noise (scripts, styles). */
-    @com.fasterxml.jackson.annotation.JsonProperty("Minimal")
-    MINIMAL,
+    @com.fasterxml.jackson.annotation.JsonProperty("Minimal") MINIMAL,
     /** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Standard")
-    STANDARD,
+    @com.fasterxml.jackson.annotation.JsonProperty("Standard") STANDARD,
     /** Aggressive cleanup. Remove extensive non-content elements and structure. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Aggressive")
-    AGGRESSIVE;
+    @com.fasterxml.jackson.annotation.JsonProperty("Aggressive") AGGRESSIVE;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        MINIMAL -> "Minimal"
-        STANDARD -> "Standard"
-        AGGRESSIVE -> "Aggressive"
-    }
+    fun toWire(): String =
+        when (this) {
+            MINIMAL -> "Minimal"
+            STANDARD -> "Standard"
+            AGGRESSIVE -> "Aggressive"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): PreprocessingPreset = when (value) {
-            "Minimal" -> MINIMAL
-            "Standard" -> STANDARD
-            "Aggressive" -> AGGRESSIVE
-            else -> throw IllegalArgumentException("Unknown PreprocessingPreset value: $value")
-        }
+        fun fromWire(value: String): PreprocessingPreset =
+            when (value) {
+                "Minimal" -> MINIMAL
+                "Standard" -> STANDARD
+                "Aggressive" -> AGGRESSIVE
+                else -> throw IllegalArgumentException("Unknown PreprocessingPreset value: $value")
+            }
     }
 }

@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.android
@@ -30,5 +31,5 @@ data class PreprocessingOptions(
     /** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
     val removeNavigation: Boolean = true,
     /** Remove form elements (forms, inputs, buttons, etc.) */
-    val removeForms: Boolean = true
+    val removeForms: Boolean = true,
 )
