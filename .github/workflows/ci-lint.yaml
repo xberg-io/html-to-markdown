@@ -172,7 +172,7 @@ jobs:
         shell: bash
 
       - name: Install rumdl
-        run: pip install 'rumdl==0.1.91'
+        run: pip install 'rumdl==0.1.95'
         shell: bash
 
       - name: Validate READMEs
