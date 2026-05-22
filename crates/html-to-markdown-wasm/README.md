@@ -82,6 +82,7 @@ Pure WebAssembly build of html-to-markdown for browsers, Deno, Cloudflare Worker
 runtimes without a Node.js native-addon ABI. Single `.wasm` artifact loaded via `wasm-bindgen`,
 shipped with TypeScript types and dist targets for nodejs, web, bundler, and deno.
 
+
 ## What This Package Provides
 
 - **Same renderer as every binding** — output matches Rust, Python, Node.js, Ruby, PHP, Go, Java, .NET, Elixir, R, Dart, Swift, Zig, C FFI, and WASM.
@@ -94,7 +95,9 @@ shipped with TypeScript types and dist targets for nodejs, web, bundler, and den
 pnpm add @kreuzberg/html-to-markdown-wasm
 ```
 
+
 ## Performance Snapshot
+
 
 ## Quick Start
 
@@ -130,6 +133,7 @@ console.log(markdown);
 
 ### Core Function
 
+
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -162,13 +166,16 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
+
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
+
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
+
 
 ## Metadata Extraction
 
@@ -185,6 +192,7 @@ The metadata extraction feature enables comprehensive document analysis during c
 **Zero Overhead When Disabled:** Metadata extraction adds negligible overhead and happens during the HTML parsing pass. Pass `extract_metadata: true` in `ConversionOptions` to enable it; the result is available at `result.metadata`.
 
 ### Example: Quick Start
+
 
 ## Examples
 
