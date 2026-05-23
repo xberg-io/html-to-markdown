@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require 'bundler'
-Bundler::GemHelper.install_tasks name: 'html_to_markdown'
-require 'rake/extensiontask'
-require 'rspec/core/rake_task'
+require "bundler"
+Bundler::GemHelper.install_tasks name: "html_to_markdown"
+require "rake/extensiontask"
+require "rspec/core/rake_task"
 
-GEMSPEC = Gem::Specification.load(File.expand_path('html_to_markdown.gemspec', __dir__))
+GEMSPEC = Gem::Specification.load(File.expand_path("html_to_markdown.gemspec", __dir__))
 
-Rake::ExtensionTask.new('html_to_markdown_rb', GEMSPEC) do |ext|
-  ext.lib_dir = 'lib'
-  ext.ext_dir = 'ext/html_to_markdown_rb'
+Rake::ExtensionTask.new("html_to_markdown_rb", GEMSPEC) do |ext|
+  ext.lib_dir = "lib"
+  ext.ext_dir = "ext/html_to_markdown_rb"
   ext.cross_compile = true
   ext.cross_platform = %w[
     x86_64-linux

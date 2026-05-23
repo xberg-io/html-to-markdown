@@ -93,10 +93,5 @@ overrides = [
   # sees only the static-type discrepancy. Disable the four error codes the
   # discrepancy raises until the codegen emits matching `_to_rust_*` calls and
   # casts the return values.
-  { module = "html_to_markdown.api", disable_error_code = [
-    "call-arg",
-    "arg-type",
-    "return-value",
-    "attr-defined",
-  ] },
+  { module = "html_to_markdown.api", disable_error_code = [ "call-arg", "arg-type", "return-value", "attr-defined" ] },
 ]

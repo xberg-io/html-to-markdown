@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require 'html_to_markdown'
+require "html_to_markdown"

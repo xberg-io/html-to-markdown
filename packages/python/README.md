@@ -82,7 +82,6 @@ High-performance HTML to Markdown converter with a clean Python API (powered by 
 The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
 stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
 
-
 ## What This Package Provides
 
 - **Same renderer as every binding** — output matches Rust, Python, Node.js, Ruby, PHP, Go, Java, .NET, Elixir, R, Dart, Swift, Zig, C FFI, and WASM.
@@ -100,17 +99,15 @@ Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyP
 
 **Troubleshooting on Windows:** If `pip install` fails on Python 3.14+, use `pip install --only-binary=:all: html-to-markdown` to force the prebuilt wheel. If sdist fallback is required, install Microsoft Visual Studio Build Tools with the "Desktop development with C++" workload and ensure MSVC's `link.exe` precedes GNU variants in `PATH` (check with `where link`). Update `pip` with `pip install --upgrade pip` to ensure correct wheel matching for Python 3.14.
 
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB | 0.62ms | 208 MB/s |
-| Tables (Countries) | 360KB | 2.02ms | 178 MB/s |
-| Mixed (Python wiki) | 656KB | 4.56ms | 144 MB/s |
-
+| Document            | Size  | Latency | Throughput |
+| ------------------- | ----- | ------- | ---------- |
+| Lists (Timeline)    | 129KB | 0.62ms  | 208 MB/s   |
+| Tables (Countries)  | 360KB | 2.02ms  | 178 MB/s   |
+| Mixed (Python wiki) | 656KB | 4.56ms  | 144 MB/s   |
 
 ## Quick Start
 
@@ -158,7 +155,6 @@ images   = result.images            # Extracted images
 warnings = result.warnings          # Any conversion warnings
 ```
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -191,7 +187,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -206,13 +201,11 @@ djot = convert(html, ConversionOptions(output_format="djot"))
 # Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```python
 from html_to_markdown import convert, ConversionOptions
@@ -223,9 +216,7 @@ plain = convert(html, ConversionOptions(output_format="plain"))
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -243,7 +234,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -257,7 +247,6 @@ print(result.metadata.links)                   # All hyperlinks
 print(result.metadata.images)                  # All images with alt text
 print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 ```
-
 
 ## Visitor Pattern
 
@@ -274,7 +263,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ```python
 from html_to_markdown import convert
@@ -296,7 +284,6 @@ html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 result = convert(html, visitor=MyVisitor())
 markdown = result.content
 ```
-
 
 ## Examples
 

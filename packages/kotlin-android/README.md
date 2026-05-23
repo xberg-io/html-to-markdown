@@ -81,7 +81,6 @@
 High-performance HTML to Markdown converter for Android, packaged as an AAR with bundled JNI libraries for `arm64-v8a` and `x86_64`.
 Server-side Kotlin/JVM consumers should use the `dev.kreuzberg:html-to-markdown` Java package directly — Kotlin/JVM treats Java classes as native, and Panama FFM is unavailable on Android, which is why Android ships as its own artifact.
 
-
 ## What This Package Provides
 
 - **Same renderer as every binding** — output matches Rust, Python, Node.js, Ruby, PHP, Go, Java, .NET, Elixir, R, Dart, Swift, Zig, C FFI, and WASM.
@@ -95,9 +94,7 @@ Server-side Kotlin/JVM consumers should use the `dev.kreuzberg:html-to-markdown`
 implementation("dev.kreuzberg:html-to-markdown-android:3.5.0")
 ```
 
-
 ## Performance Snapshot
-
 
 ## Quick Start
 
@@ -137,7 +134,6 @@ val markdown: String? = result.content
 
 ### Core Function
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -170,16 +166,13 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -196,7 +189,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ## Examples
 

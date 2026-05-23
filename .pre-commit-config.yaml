@@ -69,7 +69,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.17
+    rev: v1.1.18
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -258,7 +258,7 @@ repos:
         exclude: ^(test_apps/|e2e/java/)
   # Alef: verify bindings and sync versions.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.17.25
+    rev: v0.18.1
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -277,7 +277,7 @@ repos:
 
   # Java cpd — kept upstream (not yet in shared repo)
   - repo: https://github.com/crate-ci/typos
-    rev: v1.46.2
+    rev: v1.46.3
     hooks:
       - id: typos
         args: [--force-exclude]
