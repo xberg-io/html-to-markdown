@@ -456,15 +456,6 @@ jobs:
           working-directory: packages/ruby
           windows-toolchain: UCRT64
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.12"
-
-      - name: Vendor core crate
-        run: python3 scripts/ci/ruby/vendor-core-crate.py
-        shell: bash
-
       - name: Build CLI binary
         uses: kreuzberg-dev/actions/build-rust-cli@v1 # v1
         with:
@@ -793,15 +784,6 @@ jobs:
           bundler-cache: false
           working-directory: packages/ruby
           windows-toolchain: UCRT64
-
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.12"
-
-      - name: Vendor core crate
-        run: python3 scripts/ci/ruby/vendor-core-crate.py
-        shell: bash
 
       - name: Build CLI binary
         uses: kreuzberg-dev/actions/build-rust-cli@v1 # v1
