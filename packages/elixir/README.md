@@ -2,7 +2,7 @@
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
   <a href="https://github.com/kreuzberg-dev/alef">
-    <img src="https://img.shields.io/badge/bindings%20by-alef%20%D7%90-007ec6" alt="Bindings by alef">
+    <img src="https://img.shields.io/badge/Bindings-alef%20%D7%90-007ec6" alt="Bindings">
   </a>
   <!-- Language Bindings -->
   <a href="https://crates.io/crates/html-to-markdown-rs">
@@ -59,28 +59,27 @@
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
+    <img src="https://img.shields.io/badge/Docs-html--to--markdown-007ec6" alt="Documentation">
   </a>
 </div>
 
 <div align="center" style="margin: 24px 0 0;">
   <a href="https://kreuzberg.dev">
-    <img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
+    <img alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
   <a href="https://discord.gg/xt9WY3GnKR">
-    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+    <img height="22" src="https://img.shields.io/badge/Discord-Chat-007ec6?logo=discord&logoColor=white" alt="Join Discord">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
-    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
+    <img height="22" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>
 
 Elixir bindings for the Rust html-to-markdown engine. The package exposes a fast HTML to Markdown converter implemented with Rustler.
 Ship identical Markdown across every runtime while enjoying native performance with Rustler NIF bindings.
-
 
 ## What This Package Provides
 
@@ -95,30 +94,27 @@ Ship identical Markdown across every runtime while enjoying native performance w
 Add {:html_to_markdown, "~> 3.0"} to mix.exs deps
 ```
 
-
 Requires Elixir 1.19+ and OTP 28. Add to your `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:html_to_markdown, "~> 3.5.0"}
+    {:html_to_markdown, "~> 3.5.0-rc.1"}
   ]
 end
 ```
-
 
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 321.7 MB/s |
-| Tables (Countries) | 360KB |  | 293.8 MB/s |
-| Medium (Python) | 656KB |  | 281.5 MB/s |
-| Large (Rust) | 567KB |  | 268.7 MB/s |
-| Small (Intro) | 463KB |  | 262.9 MB/s |
-
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 321.7 MB/s |
+| Tables (Countries) | 360KB |         | 293.8 MB/s |
+| Medium (Python)    | 656KB |         | 281.5 MB/s |
+| Large (Rust)       | 567KB |         | 268.7 MB/s |
+| Small (Intro)      | 463KB |         | 262.9 MB/s |
 
 ## Quick Start
 
@@ -155,7 +151,6 @@ result.images     # Extracted images
 result.warnings   # Any conversion warnings
 ```
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -188,7 +183,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```elixir
 html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
@@ -201,13 +195,11 @@ html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 # Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```elixir
 html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
@@ -216,9 +208,7 @@ html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -236,7 +226,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ```elixir
 html = "<h1>Article</h1><img src=\"test.jpg\" alt=\"test\">"
 opts = %HtmlToMarkdown.Options{extract_metadata: true}
@@ -249,7 +238,6 @@ IO.inspect(result.metadata["links"])              # All hyperlinks
 IO.inspect(result.metadata["images"])             # All images with alt text
 IO.inspect(result.metadata["structured_data"])    # JSON-LD, Microdata, RDFa
 ```
-
 
 ## Visitor Pattern
 
@@ -266,7 +254,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ```elixir
 defmodule MyVisitor do
@@ -296,7 +283,6 @@ opts = %HtmlToMarkdown.Options{visitor: MyVisitor}
 result.content
 ```
 
-
 ## Examples
 
 ## Links
@@ -307,7 +293,7 @@ result.content
 
 ## Part of Kreuzberg.dev
 
-- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 90+ formats with optional OCR.
 - [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.

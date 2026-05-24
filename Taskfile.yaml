@@ -349,6 +349,26 @@ tasks:
     cmds:
       - alef test --e2e --lang c
 
+  dart:e2e:
+    desc: "Build Dart binding and run e2e/dart fixture tests"
+    cmds:
+      - alef test --e2e --lang dart
+
+  swift:e2e:
+    desc: "Build Swift bridge and run e2e/swift_e2e fixture tests"
+    cmds:
+      - alef test --e2e --lang swift
+
+  zig:e2e:
+    desc: "Build FFI and run e2e/zig fixture tests"
+    cmds:
+      - alef test --e2e --lang zig
+
+  kotlin_android:e2e:
+    desc: "Build JNI and run e2e/kotlin_android fixture tests (host JVM)"
+    cmds:
+      - alef test --e2e --lang kotlin_android
+
   e2e:all:
     desc: "Build all bindings and run all local e2e fixture tests"
     cmds:

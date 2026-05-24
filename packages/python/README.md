@@ -2,7 +2,7 @@
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
   <a href="https://github.com/kreuzberg-dev/alef">
-    <img src="https://img.shields.io/badge/bindings%20by-alef%20%D7%90-007ec6" alt="Bindings by alef">
+    <img src="https://img.shields.io/badge/Bindings-alef%20%D7%90-007ec6" alt="Bindings">
   </a>
   <!-- Language Bindings -->
   <a href="https://crates.io/crates/html-to-markdown-rs">
@@ -59,29 +59,28 @@
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
+    <img src="https://img.shields.io/badge/Docs-html--to--markdown-007ec6" alt="Documentation">
   </a>
 </div>
 
 <div align="center" style="margin: 24px 0 0;">
   <a href="https://kreuzberg.dev">
-    <img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
+    <img alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
   <a href="https://discord.gg/xt9WY3GnKR">
-    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+    <img height="22" src="https://img.shields.io/badge/Discord-Chat-007ec6?logo=discord&logoColor=white" alt="Join Discord">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
-    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
+    <img height="22" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>
 
 High-performance HTML to Markdown converter with a clean Python API (powered by a Rust core).
 The same engine also drives the Node.js, Ruby, PHP, and WebAssembly bindings, so rendered Markdown
 stays identical across runtimes. Wheels are published for Linux, macOS, and Windows.
-
 
 ## What This Package Provides
 
@@ -100,17 +99,15 @@ Requires Python 3.10+. Wheels are published for Linux, macOS, and Windows on PyP
 
 **Troubleshooting on Windows:** If `pip install` fails on Python 3.14+, use `pip install --only-binary=:all: html-to-markdown` to force the prebuilt wheel. If sdist fallback is required, install Microsoft Visual Studio Build Tools with the "Desktop development with C++" workload and ensure MSVC's `link.exe` precedes GNU variants in `PATH` (check with `where link`). Update `pip` with `pip install --upgrade pip` to ensure correct wheel matching for Python 3.14.
 
-
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB | 0.62ms | 208 MB/s |
-| Tables (Countries) | 360KB | 2.02ms | 178 MB/s |
-| Mixed (Python wiki) | 656KB | 4.56ms | 144 MB/s |
-
+| Document            | Size  | Latency | Throughput |
+| ------------------- | ----- | ------- | ---------- |
+| Lists (Timeline)    | 129KB | 0.62ms  | 208 MB/s   |
+| Tables (Countries)  | 360KB | 2.02ms  | 178 MB/s   |
+| Mixed (Python wiki) | 656KB | 4.56ms  | 144 MB/s   |
 
 ## Quick Start
 
@@ -158,7 +155,6 @@ images   = result.images            # Extracted images
 warnings = result.warnings          # Any conversion warnings
 ```
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -191,7 +187,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -206,13 +201,11 @@ djot = convert(html, ConversionOptions(output_format="djot"))
 # Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```python
 from html_to_markdown import convert, ConversionOptions
@@ -223,9 +216,7 @@ plain = convert(html, ConversionOptions(output_format="plain"))
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Metadata Extraction
 
@@ -243,7 +234,6 @@ The metadata extraction feature enables comprehensive document analysis during c
 
 ### Example: Quick Start
 
-
 ```python
 from html_to_markdown import convert, ConversionOptions
 
@@ -257,7 +247,6 @@ print(result.metadata.links)                   # All hyperlinks
 print(result.metadata.images)                  # All images with alt text
 print(result.metadata.structured_data)         # JSON-LD, Microdata, RDFa
 ```
-
 
 ## Visitor Pattern
 
@@ -274,7 +263,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 **Supported Visitor Methods:** 40+ callbacks for text, inline elements, links, images, headings, lists, blocks, and tables.
 
 ### Example: Quick Start
-
 
 ```python
 from html_to_markdown import convert
@@ -297,7 +285,6 @@ result = convert(html, visitor=MyVisitor())
 markdown = result.content
 ```
 
-
 ## Examples
 
 ## Links
@@ -308,7 +295,7 @@ markdown = result.content
 
 ## Part of Kreuzberg.dev
 
-- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 90+ formats with optional OCR.
 - [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.

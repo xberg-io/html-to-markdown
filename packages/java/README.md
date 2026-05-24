@@ -2,7 +2,7 @@
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
   <a href="https://github.com/kreuzberg-dev/alef">
-    <img src="https://img.shields.io/badge/bindings%20by-alef%20%D7%90-007ec6" alt="Bindings by alef">
+    <img src="https://img.shields.io/badge/Bindings-alef%20%D7%90-007ec6" alt="Bindings">
   </a>
   <!-- Language Bindings -->
   <a href="https://crates.io/crates/html-to-markdown-rs">
@@ -59,28 +59,27 @@
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev">
-    <img src="https://img.shields.io/badge/docs-kreuzberg.dev-007ec6" alt="Documentation">
+    <img src="https://img.shields.io/badge/Docs-html--to--markdown-007ec6" alt="Documentation">
   </a>
 </div>
 
 <div align="center" style="margin: 24px 0 0;">
   <a href="https://kreuzberg.dev">
-    <img width="1128" height="191" alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
+    <img alt="html-to-markdown" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px;">
   <a href="https://discord.gg/xt9WY3GnKR">
-    <img height="32" src="https://img.shields.io/badge/Discord-Join%20our%20community-007ec6?logo=discord&logoColor=white" alt="Join Discord">
+    <img height="22" src="https://img.shields.io/badge/Discord-Chat-007ec6?logo=discord&logoColor=white" alt="Join Discord">
   </a>
   <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
-    <img height="32" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
+    <img height="22" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>
 
 High-performance HTML to Markdown converter with Java Panama FFI bindings to the Rust core.
 Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion with full metadata extraction support.
-
 
 ## What This Package Provides
 
@@ -100,7 +99,6 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
 </dependency>
 ```
 
-
 Requires Java 25+ with Panama FFI support.
 
 **Maven:**
@@ -109,27 +107,25 @@ Requires Java 25+ with Panama FFI support.
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.0-rc.1</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("dev.kreuzberg:html-to-markdown:3.5.0")
+implementation("dev.kreuzberg:html-to-markdown:3.5.0-rc.1")
 ```
-
 
 ## Performance Snapshot
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 291.5 MB/s |
-| Tables (Countries) | 360KB |  | 272.0 MB/s |
-| Mixed (Python) | 656KB |  | 258.5 MB/s |
-
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 291.5 MB/s |
+| Tables (Countries) | 360KB |         | 272.0 MB/s |
+| Mixed (Python)     | 656KB |         | 258.5 MB/s |
 
 ## Quick Start
 
@@ -189,7 +185,6 @@ Metadata metadata = result.metadata();  // null unless extractMetadata(true)
 List<?>  tables   = result.tables();    // empty unless extractTables(true)
 ```
 
-
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
@@ -222,7 +217,6 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-
 ```java
 import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
 import dev.kreuzberg.htmltomarkdown.ConversionOptions;
@@ -240,13 +234,11 @@ String djot = HtmlToMarkdown.convert(html,
 // Result: "This is *bold* and _italic_ text."
 ```
 
-
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
 ## Plain Text Output
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
-
 
 ```java
 import dev.kreuzberg.htmltomarkdown.HtmlToMarkdown;
@@ -260,9 +252,7 @@ String plain = HtmlToMarkdown.convert(html,
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
-
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
-
 
 ## Visitor Pattern
 
@@ -280,7 +270,6 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 
 ### Example: Quick Start
 
-
 ## Examples
 
 ## Links
@@ -291,7 +280,7 @@ The visitor pattern enables custom HTML→Markdown conversion logic by providing
 
 ## Part of Kreuzberg.dev
 
-- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 90+ formats with optional OCR.
 - [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.

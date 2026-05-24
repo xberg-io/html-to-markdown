@@ -1,89 +1,48 @@
 {
   "name": "kreuzberg-dev/html-to-markdown",
-  "description": "Modern PHP API for the html_to_markdown native extension powered by the Rust html-to-markdown engine.",
-  "type": "php-ext",
+  "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
-  "homepage": "https://github.com/kreuzberg-dev/html-to-markdown",
-  "support": {
-    "issues": "https://github.com/kreuzberg-dev/html-to-markdown/issues",
-    "source": "https://github.com/kreuzberg-dev/html-to-markdown"
-  },
-  "authors": [
-    {
-      "name": "Na'aman Hirschfeld",
-      "email": "naaman@kreuzberg.dev",
-      "role": "Lead Developer"
-    }
-  ],
+  "type": "php-ext",
   "require": {
-    "php": "^8.4"
+    "php": ">=8.2"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "3.95.*",
     "phpstan/phpstan": "^2.1",
-    "phpunit/phpunit": "^13.1",
-    "squizlabs/php_codesniffer": "^4.0"
-  },
-  "suggest": {
-    "ext-html_to_markdown": "Provides native conversion. Install via PIE (kreuzberg-dev/html-to-markdown) or download the release binary."
-  },
-  "provide": {
-    "ext-html_to_markdown": "*"
+    "friendsofphp/php-cs-fixer": "^3.95",
+    "phpunit/phpunit": "^13.1"
   },
   "autoload": {
     "psr-4": {
       "HtmlToMarkdown\\": "packages/php/src/"
-    },
-    "files": [
-      "packages/php/src/functions.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "HtmlToMarkdown\\Tests\\": "packages/php/tests/"
     }
   },
   "scripts": {
-    "phpstan": "php -d detect_unicode=0 vendor/bin/phpstan --configuration=packages/php/phpstan.neon",
-    "csfixer": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config packages/php/php-cs-fixer.php packages/php/src packages/php/tests",
-    "format": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config packages/php/php-cs-fixer.php packages/php/src packages/php/tests",
-    "format:check": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config packages/php/php-cs-fixer.php --dry-run packages/php/src packages/php/tests",
-    "test": "php packages/php/bin/run-tests.php",
+    "phpstan": "php -d detect_unicode=0 vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M",
+    "format": "php vendor/bin/php-cs-fixer fix --quiet",
+    "format:check": "php vendor/bin/php-cs-fixer fix --dry-run --quiet",
+    "test": "php vendor/bin/phpunit",
     "lint": "@phpstan",
-    "lint:fix": "PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config packages/php/php-cs-fixer.php packages/php/src packages/php/tests && php -d detect_unicode=0 vendor/bin/phpstan --configuration=packages/php/phpstan.neon"
-  },
-  "config": {
-    "sort-packages": true,
-    "platform": {
-      "php": "8.4.1"
-    },
-    "allow-plugins": {
-      "phpstan/extension-installer": true
-    }
-  },
-  "extra": {
-    "html-to-markdown": {
-      "binary-base-url": "https://github.com/kreuzberg-dev/html-to-markdown/releases/download"
-    }
+    "lint:fix": "php vendor/bin/php-cs-fixer fix --quiet && php -d detect_unicode=0 vendor/bin/phpstan --configuration=phpstan.neon --memory-limit=512M"
   },
   "php-ext": {
     "extension-name": "html_to_markdown",
     "support-zts": true,
     "support-nts": true,
-    "build-path": "crates/html-to-markdown-php",
     "download-url-method": [
       "pre-packaged-binary",
       "composer-default"
-    ],
-    "configure-options": [
-      {
-        "name": "with-cargo-bin",
-        "description": "Path to the cargo executable used to build the extension.",
-        "needs-value": true
-      }
     ]
   },
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "version": "3.5.0"
+  "keywords": [
+    "html",
+    "markdown",
+    "converter"
+  ],
+  "extra": {
+    "pie": {
+      "binary": {
+        "url-template": "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v{Version}/php_html_to_markdown-{Version}_php{PhpVersion}-{Arch}-{OS}-{Libc}-{TSMode}.tgz"
+      }
+    }
+  }
 }

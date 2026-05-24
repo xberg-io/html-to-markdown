@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-node-darwin-x64",
-  "version": "3.5.0",
+  "version": "3.5.0-rc.1",
   "description": "High-performance HTML to Markdown converter - Node.js native bindings",
   "keywords": [
     "converter",

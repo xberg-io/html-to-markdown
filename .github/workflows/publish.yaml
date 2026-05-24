@@ -87,7 +87,7 @@ jobs:
       release_php: ${{ steps.meta.outputs.release_php }}
       release_elixir: ${{ steps.meta.outputs.release_elixir }}
       release_c_ffi: ${{ steps.meta.outputs.release_c_ffi }}
-      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin_android }}
+      release_kotlin: ${{ steps.meta.outputs.release_kotlin }}
       release_swift: ${{ steps.meta.outputs.release_swift }}
       release_dart: ${{ steps.meta.outputs.release_dart }}
       release_zig: ${{ steps.meta.outputs.release_zig }}
@@ -123,7 +123,7 @@ jobs:
   validate-versions:
     name: Validate language manifest versions
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -143,7 +143,7 @@ jobs:
   check-pypi:
     name: Check PyPI for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_python == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_python == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -158,7 +158,7 @@ jobs:
   check-npm:
     name: Check npm for existing versions
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_node == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_node == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       node_exists: ${{ steps.check.outputs.exists }}
@@ -176,7 +176,7 @@ jobs:
   check-wasm:
     name: Check npm for existing WASM package
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_wasm == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_wasm == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -191,7 +191,7 @@ jobs:
   check-rubygems:
     name: Check RubyGems for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_ruby == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_ruby == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -206,7 +206,7 @@ jobs:
   check-maven:
     name: Check Maven Central for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_java == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_java == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -221,7 +221,7 @@ jobs:
   check-nuget:
     name: Check NuGet for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_csharp == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_csharp == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -236,7 +236,7 @@ jobs:
   check-packagist:
     name: Check Packagist for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_php == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_php == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -251,7 +251,7 @@ jobs:
   check-cratesio:
     name: Check crates.io for existing versions
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_crates == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_crates == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       rs_exists: ${{ steps.check.outputs.exists }}
@@ -280,7 +280,7 @@ jobs:
   check-hex:
     name: Check Hex.pm for existing version
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_elixir == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_elixir == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -295,7 +295,7 @@ jobs:
   check-homebrew:
     name: Check Homebrew tap for formula
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_homebrew == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_homebrew == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -312,7 +312,7 @@ jobs:
   check-cli:
     name: Check GitHub Release for CLI assets
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_cli == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_cli == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -330,7 +330,7 @@ jobs:
   check-go:
     name: Check GitHub Release for Go FFI assets
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_go == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_go == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -348,7 +348,7 @@ jobs:
   check-c-ffi:
     name: Check GitHub Release for C FFI assets
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_c_ffi == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_c_ffi == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -366,7 +366,7 @@ jobs:
   check-elixir-release:
     name: Check GitHub Release for Elixir NIF assets
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_elixir == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_elixir == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -384,7 +384,7 @@ jobs:
   check-maven-kotlin:
     name: Check Maven Central for Kotlin Android
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_kotlin_android == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_kotlin == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -399,7 +399,7 @@ jobs:
   check-pub:
     name: Check pub.dev for Dart package
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_dart == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_dart == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -414,7 +414,7 @@ jobs:
   check-spi-swift:
     name: Check Swift Package Index for tag
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_swift == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -430,7 +430,7 @@ jobs:
   check-zig:
     name: Check Zig package presence
     needs: prepare
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.release_zig == 'true' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_zig == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
@@ -471,6 +471,19 @@ jobs:
       - name: Free disk space
         if: runner.os == 'Linux'
         uses: kreuzberg-dev/actions/free-disk-space-linux@v1
+
+      - name: Setup Rust on host (macOS, Windows)
+        # cibuildwheel's before-build runs `cargo build` which auto-installs
+        # the toolchain pinned by rust-toolchain.toml via rustup. On macOS-arm64
+        # this collides with the runner's pre-installed clippy/rustfmt and
+        # rustup aborts with "detected conflict: bin/cargo-clippy". Pre-install
+        # via actions-rust-lang/setup-rust-toolchain so the toolchain is ready
+        # by the time cibuildwheel runs cargo. No-op for Linux (cibw runs in
+        # a manylinux container — host rust is invisible there).
+        if: runner.os != 'Linux'
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          use-sccache: "false"
 
       - name: Build wheels
         uses: kreuzberg-dev/actions/build-python-wheels@v1
@@ -1221,15 +1234,21 @@ jobs:
             --manifest-path packages/elixir/native/html_to_markdown_nif/Cargo.toml
           NIF_DIR="packages/elixir/native/html_to_markdown_nif"
           if [[ "${RUNNER_OS}" == "macOS" ]]; then
-            LIB_NAME="libhtml_to_markdown_nif.dylib"
+            EXT="dylib"
+          elif [[ "${RUNNER_OS}" == "Windows" ]]; then
+            EXT="dll"
           else
-            LIB_NAME="libhtml_to_markdown_nif.so"
+            EXT="so"
           fi
+          LIB_NAME="libhtml_to_markdown_nif.${EXT}"
           LIB_PATH="${NIF_DIR}/target/${TARGET}/release/${LIB_NAME}"
           [[ -f "$LIB_PATH" ]] || LIB_PATH="${NIF_DIR}/target/release/${LIB_NAME}"
           mkdir -p dist/elixir
           for NIF_VERSION in 2.16 2.17; do
-            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.so"
+            # rustler_precompiled / generate-elixir-checksums uses the platform
+            # extension (.so / .dylib / .dll) in the artifact filename — must
+            # match so the consumer can locate the right tarball per platform.
+            ARTIFACT="libhtml_to_markdown_nif-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${EXT}"
             cp "$LIB_PATH" "${ARTIFACT}"
             tar -czf "dist/elixir/${ARTIFACT}.tar.gz" "${ARTIFACT}"
             rm -f "${ARTIFACT}"
@@ -1331,7 +1350,7 @@ jobs:
   upload-cli-release:
     name: Upload CLI binaries to GitHub Release
     needs: [prepare, cli-binaries]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.cli-binaries.result == 'success' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.cli-binaries.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -1352,7 +1371,7 @@ jobs:
   upload-go-release:
     name: Upload Go FFI archives to GitHub Release
     needs: [prepare, go-ffi-libraries]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.go-ffi-libraries.result == 'success' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.go-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -1373,7 +1392,7 @@ jobs:
   upload-c-ffi-release:
     name: Upload C FFI archives to GitHub Release
     needs: [prepare, c-ffi-libraries]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.c-ffi-libraries.result == 'success' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.c-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -1394,7 +1413,7 @@ jobs:
   upload-elixir-release:
     name: Upload Elixir NIF archives to GitHub Release
     needs: [prepare, elixir-natives]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.elixir-natives.result == 'success' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.elixir-natives.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -1413,7 +1432,7 @@ jobs:
   upload-php-pie-release:
     name: Upload PHP PIE archives to GitHub Release
     needs: [prepare, php-extension]
-    if: ${{ needs.prepare.outputs.is_tag == 'true' && needs.php-extension.result == 'success' }}
+    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.php-extension.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
@@ -1589,8 +1608,6 @@ jobs:
           packages-dir: crates/html-to-markdown-node/npm
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Wait for npm indexing (linux-x64-gnu)
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
@@ -1616,8 +1633,6 @@ jobs:
           package-dir: crates/html-to-markdown-node
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Wait for main Node package indexing
         if: ${{ needs.prepare.outputs.dry_run != 'true' && needs.check-npm.outputs.ts_exists != 'true' }}
@@ -1661,8 +1676,6 @@ jobs:
           package-dir: packages/typescript
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-wasm:
     name: Publish WASM package
@@ -1703,8 +1716,6 @@ jobs:
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           provenance: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-packagist:
     name: Trigger Packagist update
@@ -1871,7 +1882,7 @@ jobs:
   kotlin-android-natives:
     name: Build Kotlin Android natives (${{ matrix.abi }})
     needs: [prepare]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.release_kotlin == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -1904,7 +1915,7 @@ jobs:
   publish-kotlin-android:
     name: Publish Kotlin Android to Maven Central
     needs: [prepare, kotlin-android-natives, check-maven-kotlin]
-    if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven-kotlin.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: ${{ needs.prepare.outputs.release_kotlin == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-maven-kotlin.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -2056,7 +2067,7 @@ jobs:
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula]
-    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.publish-homebrew-formula.result == 'success' }}
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.publish-homebrew-formula.result == 'success' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write

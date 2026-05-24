@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.32"
+alef_version = "0.18.1"
 languages = [
   "python",
   "node",
@@ -134,6 +134,7 @@ output = "packages/python/html_to_markdown/"
 
 [crates.node]
 package_name = "@kreuzberg/html-to-markdown-node"
+crate_dir = "crates/html-to-markdown-node"
 
 [crates.ruby]
 gem_name = "html-to-markdown"
@@ -204,6 +205,9 @@ pubspec_name = "h2m"
 lib_name = "h2m"
 style = "frb"
 features = ["full"]
+
+[crates.wasm]
+crate_dir = "crates/html-to-markdown-wasm"
 
 [crates.zig]
 module_name = "html_to_markdown_rs"
@@ -285,6 +289,18 @@ precondition = "test -d e2e/c"
 format = "cargo fmt --all && cargo sort -w >/dev/null && find e2e/c -name '*.c' -o -name '*.h' | xargs clang-format -i"
 check = "cppcheck --std=c11 --enable=warning,style,performance --suppress=missingIncludeSystem --suppress=unusedStructMember e2e/c/"
 
+[crates.lint.wasm]
+precondition = "command -v pnpm >/dev/null 2>&1"
+# Scope oxfmt to src/ — the default scopes oxfmt to the whole crate dir, which
+# pulls Cargo.toml into oxfmt's TOML formatter. oxfmt's TOML defaults (collapse
+# short arrays to one line, 2-space indent on multi-line arrays) disagree with
+# the canonical `cargo sort -w` shape that the polyrepo prek hook enforces
+# (multi-line arrays, 4-space indent), producing a hash-vs-format ping-pong on
+# every commit. Restrict oxfmt to src/ so Cargo.toml is owned solely by the
+# alef template and prek's `cargo sort -w`.
+format = "pnpm exec oxfmt crates/html-to-markdown-wasm/src/"
+check = "pnpm exec oxlint crates/html-to-markdown-wasm/src/"
+
 [crates.lint.kotlin_android]
 precondition = "command -v gradle >/dev/null 2>&1"
 format = "cd packages/kotlin-android && gradle ktlintFormat --no-daemon"
@@ -312,7 +328,10 @@ e2e = "cd e2e/python && uv run --no-sync pytest tests/ -q"
 
 [crates.test.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
-before = "cd crates/html-to-markdown-node && napi build --platform --release && cd ../../packages/typescript && pnpm install && pnpm run build"
+# Invoke the napi build via `pnpm run build` (the crate package.json's `build`
+# script) so the `@napi-rs/cli` binary resolves from node_modules/.bin — a bare
+# `napi` is not on PATH in CI. `pnpm install` first guarantees node_modules.
+before = "cd crates/html-to-markdown-node && pnpm install && pnpm run build && cd ../../packages/typescript && pnpm install && pnpm run build"
 e2e = "cd e2e/node && pnpm install && pnpm exec vitest run"
 
 [crates.test.go]
