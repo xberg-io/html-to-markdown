@@ -1876,7 +1876,7 @@ jobs:
   kotlin-android-natives:
     name: Build Kotlin Android natives (${{ matrix.abi }})
     needs: [prepare]
-    if: ${{ needs.prepare.outputs.release_kotlin == 'true' && needs.prepare.outputs.is_tag == 'true' }}
+    if: ${{ needs.prepare.outputs.release_kotlin == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
