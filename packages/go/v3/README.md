@@ -108,11 +108,11 @@ Alternatively, you can manually set `CGO_CFLAGS` and `CGO_LDFLAGS` environment v
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
 
-| Document            | Size  | Latency | Throughput |
-| ------------------- | ----- | ------- | ---------- |
-| Lists (Timeline)    | 129KB | 0.46ms  | 277.5 MB/s |
-| Tables (Countries)  | 360KB | 1.37ms  | 262.1 MB/s |
-| Mixed (Python wiki) | 656KB | 2.75ms  | 237.9 MB/s |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB | 0.46ms | 277.5 MB/s |
+| Tables (Countries) | 360KB | 1.37ms | 262.1 MB/s |
+| Mixed (Python wiki) | 656KB | 2.75ms | 237.9 MB/s |
 
 ## Quick Start
 

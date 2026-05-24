@@ -518,8 +518,8 @@ jobs:
 
   python-sdist:
     name: Build Python sdist
-    needs: [prepare, check-pypi]
-    if: ${{ needs.prepare.outputs.release_python == 'true' && (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    needs: [prepare, check-pypi, publish-crates]
+    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_python == 'true' && (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -533,22 +533,24 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Build sdist via maturin
-        # Inline: maturin sdist is a one-liner; no shared action wraps it.
+      - name: Build and bundle CLI binary
         # The CLI binary is bundled into the sdist so it can be installed via pipx.
         shell: bash
         run: |
-          python -m pip install --upgrade pip maturin
           cargo build --release --package html-to-markdown-cli
           mkdir -p packages/python/html_to_markdown/_cli
           cp target/release/html-to-markdown packages/python/html_to_markdown/_cli/ 2>/dev/null \
             || cp target/release/html-to-markdown.exe packages/python/html_to_markdown/_cli/
-          cd packages/python && maturin sdist --out dist/
+
+      - uses: kreuzberg-dev/actions/build-python-sdist@v1
+        with:
+          package-dir: packages/python
+          output-dir: dist
 
       - uses: actions/upload-artifact@v7
         with:
           name: python-sdist
-          path: packages/python/dist/*.tar.gz
+          path: dist/*.tar.gz
           retention-days: 14
 
   node-typescript-defs:
@@ -705,8 +707,8 @@ jobs:
 
   ruby-gem:
     name: Build Ruby gem (${{ matrix.label }})
-    needs: [prepare, check-rubygems]
-    if: ${{ needs.prepare.outputs.release_ruby == 'true' && (needs.check-rubygems.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    needs: [prepare, check-rubygems, publish-crates]
+    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_ruby == 'true' && (needs.check-rubygems.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
     env:
@@ -833,8 +835,8 @@ jobs:
 
   php-extension:
     name: Build PHP extension (php${{ matrix.php }} ${{ matrix.platform.label }})
-    needs: [prepare, check-packagist]
-    if: ${{ needs.prepare.outputs.release_php == 'true' && (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    needs: [prepare, check-packagist, publish-crates]
+    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_php == 'true' && (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     strategy:
@@ -981,7 +983,7 @@ jobs:
   go-ffi-libraries:
     name: Build Go FFI library (${{ matrix.platform }})
     needs: [prepare, check-go]
-    if: ${{ needs.prepare.outputs.release_go == 'true' && (needs.check-go.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: ${{ needs.prepare.outputs.release_go == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-go.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
     strategy:
@@ -1193,8 +1195,8 @@ jobs:
 
   elixir-natives:
     name: Build Elixir NIF (${{ matrix.label }})
-    needs: [prepare, check-elixir-release]
-    if: ${{ needs.prepare.outputs.release_elixir == 'true' && (needs.check-elixir-release.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    needs: [prepare, check-elixir-release, publish-crates]
+    if: ${{ !cancelled() && needs.publish-crates.result != 'failure' && needs.prepare.outputs.release_elixir == 'true' && (needs.check-elixir-release.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 180
     strategy:
@@ -1220,6 +1222,13 @@ jobs:
         with:
           target: ${{ matrix.target }}
           cache-key-prefix: publish-elixir-${{ matrix.label }}
+
+      # Inline build: rewrite the NIF crate's workspace path-deps to registry
+      # version-deps so the hex source-fallback resolves on a consumer.
+      - name: Rewrite native dependencies to registry versions
+        uses: kreuzberg-dev/actions/rewrite-native-deps@v1
+        with:
+          lang: elixir
 
       - name: Build NIF
         # Inline: rustler_precompiled expects flat .so/.dylib artifacts named
@@ -1282,22 +1291,11 @@ jobs:
 
       - uses: kreuzberg-dev/actions/setup-rust@v1
 
-      - name: Install Hex/Rebar and dependencies
-        # Inline: trio of one-liners; not worth a shared action.
-        shell: bash
-        run: |
-          mix local.hex --force
-          mix local.rebar --force
-          (cd packages/elixir && mix deps.get)
-
-      - name: Build Hex tarball
-        # Inline: hex.build needs the per-package working dir and target/
-        # cleanup to fit under the 128 MiB Hex upload limit. Tightly coupled
-        # to Hex packaging conventions.
-        shell: bash
-        run: |
-          find packages/elixir/native -type d -name target -prune -exec rm -rf {} + 2>/dev/null || true
-          (cd packages/elixir && mix hex.build)
+      - uses: kreuzberg-dev/actions/build-elixir-hex@v1
+        with:
+          package-dir: packages/elixir
+          nif-crate-path: packages/elixir/native/html_to_markdown_nif
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
       - uses: actions/upload-artifact@v7
         with:
@@ -2020,7 +2018,7 @@ jobs:
   publish-homebrew-formula:
     name: Update Homebrew formulas
     needs: [prepare, check-homebrew, upload-cli-release, upload-c-ffi-release]
-    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.upload-cli-release.result == 'success' && needs.upload-c-ffi-release.result == 'success' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -2035,16 +2033,14 @@ jobs:
           token: ${{ secrets.HOMEBREW_TOKEN }}
           path: homebrew-tap
 
-      - name: Update formula files
-        # Inline: html-to-markdown ships two formulas (CLI + libffi) updated
-        # together by a repo-specific generator. The shared publish-homebrew
-        # action targets single-formula repos.
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ needs.prepare.outputs.tag }}
-          VERSION: ${{ needs.prepare.outputs.version }}
-          TAP_DIR: ${{ github.workspace }}/homebrew-tap
-        run: scripts/publish/update-homebrew-formula.sh
+      - uses: kreuzberg-dev/actions/publish-homebrew-source-formulas@v1
+        with:
+          tap-dir: ${{ github.workspace }}/homebrew-tap
+          config-file: scripts/publish/homebrew.json
+          tag: ${{ needs.prepare.outputs.tag }}
+          version: ${{ needs.prepare.outputs.version }}
+          github-repo: ${{ github.repository }}
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
 
       - name: Commit and push to tap
         if: ${{ needs.prepare.outputs.dry_run != 'true' }}
@@ -2080,7 +2076,10 @@ jobs:
           - { os: ubuntu-latest, bottle_tag: x86_64_linux, install_brew: true }
           - { os: ubuntu-24.04-arm, bottle_tag: arm64_linux, install_brew: true }
     steps:
-      - uses: actions/checkout@v6
+      # Pinned to checkout@v5: v6 hits an includeIf credential regression on
+      # macos-15-intel runners (same workaround liter-llm uses). Other jobs
+      # stay on @v6; this matrix is the one that includes Intel macOS.
+      - uses: actions/checkout@v5
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
 

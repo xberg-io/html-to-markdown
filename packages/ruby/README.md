@@ -100,11 +100,11 @@ Requires Ruby 3.2+ with Magnus native extension bindings. Published for Linux, m
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document            | Size  | Latency | Throughput |
-| ------------------- | ----- | ------- | ---------- |
-| Lists (Timeline)    | 129KB | 0.71ms  | 182 MB/s   |
-| Tables (Countries)  | 360KB | 2.15ms  | 167 MB/s   |
-| Mixed (Python wiki) | 656KB | 4.89ms  | 134 MB/s   |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB | 0.71ms | 182 MB/s |
+| Tables (Countries) | 360KB | 2.15ms | 167 MB/s |
+| Mixed (Python wiki) | 656KB | 4.89ms | 134 MB/s |
 
 ## Quick Start
 

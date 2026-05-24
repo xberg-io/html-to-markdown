@@ -1638,7 +1638,7 @@ sealed class NodeContent with _$NodeContent {
   /// A block of key-value metadata pairs (from `<head>` meta tags).
   const factory NodeContent.metadataBlock({
     /// Key-value metadata pairs.
-    required List<String> entries,
+    required List<List<String>> entries,
   }) = NodeContent_MetadataBlock;
 
   /// A section grouping container (auto-generated from heading hierarchy).

@@ -61,7 +61,7 @@ mavenPublishing {
         AndroidSingleVariantLibrary(
             variant = "release",
             sourcesJar = com.vanniktech.maven.publish.SourcesJar.Sources(),
-            javadocJar = com.vanniktech.maven.publish.JavadocJar.Javadoc(),
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
         )
     )
 
@@ -71,7 +71,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.kreuzberg",
         artifactId = "html-to-markdown-android",
-        version = "3.5.0-rc.1",
+        version = "3.5.0-rc.2",
     )
 
     pom {

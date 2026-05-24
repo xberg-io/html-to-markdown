@@ -130,11 +130,11 @@ npm install @kreuzberg/html-to-markdown-wasm
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document            | Size  | Latency | Throughput |
-| ------------------- | ----- | ------- | ---------- |
-| Lists (Timeline)    | 129KB | 0.58ms  | 222 MB/s   |
-| Tables (Countries)  | 360KB | 1.89ms  | 190 MB/s   |
-| Mixed (Python wiki) | 656KB | 4.21ms  | 156 MB/s   |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB | 0.58ms | 222 MB/s |
+| Tables (Countries) | 360KB | 1.89ms | 190 MB/s |
+| Mixed (Python wiki) | 656KB | 4.21ms | 156 MB/s |
 
 ## Quick Start
 

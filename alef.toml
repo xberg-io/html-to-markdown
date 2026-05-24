@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.18.1"
+alef_version = "0.19.4"
 languages = [
   "python",
   "node",
@@ -169,6 +169,11 @@ artifact_id = "html-to-markdown"
 
 [crates.csharp]
 namespace = "HtmlToMarkdown"
+# Plain `HtmlToMarkdown` is owned by another publisher on NuGet; the org-owned
+# package is `KreuzbergDev.HtmlToMarkdown` (8K+ downloads). Without this
+# override, alef defaults the csproj <PackageId> to `namespace` and the
+# publish gets rejected with HTTP 403.
+package_id = "KreuzbergDev.HtmlToMarkdown"
 
 [crates.r]
 package_name = "htmltomarkdown"

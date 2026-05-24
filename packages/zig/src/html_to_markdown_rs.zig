@@ -211,6 +211,7 @@ pub const ConversionOptions = struct {
     ///
     /// - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters
     ///   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+    ///
     /// - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the
     ///   source HTML, including runs of spaces and embedded newlines.
     ///
@@ -800,7 +801,7 @@ pub const NodeContent = union(enum) {
         content: []const u8,
     },
     /// A block of key-value metadata pairs (from `<head>` meta tags).
-    metadata_block: []const []const u8,
+    metadata_block: []const []const []const u8,
     /// A section grouping container (auto-generated from heading hierarchy).
     group: struct {
         label: ?[]const u8,
