@@ -2,7 +2,7 @@
 title: "Python API Reference"
 ---
 
-## Python API Reference <span class="version-badge">v3.5.0</span>
+## Python API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -177,8 +177,8 @@ A single cell in a table grid.
 | `content`   | `str`  | —                      | The text content of the cell.                  |
 | `row`       | `int`  | —                      | 0-indexed row position.                        |
 | `col`       | `int`  | —                      | 0-indexed column position.                     |
-| `row_span`  | `int`  | —                      | Number of rows this cell spans (default 1).    |
-| `col_span`  | `int`  | —                      | Number of columns this cell spans (default 1). |
+| `row_span`  | `int`  | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `col_span`  | `int`  | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `is_header` | `bool` | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

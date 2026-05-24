@@ -2,7 +2,7 @@
 title: "Kotlin (Android) API Reference"
 ---
 
-## Kotlin (Android) API Reference <span class="version-badge">v3.5.0</span>
+## Kotlin (Android) API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -178,8 +178,8 @@ A single cell in a table grid.
 | `content`  | `String`  | —                      | The text content of the cell.                  |
 | `row`      | `Int`     | —                      | 0-indexed row position.                        |
 | `col`      | `Int`     | —                      | 0-indexed column position.                     |
-| `rowSpan`  | `Int`     | —                      | Number of rows this cell spans (default 1).    |
-| `colSpan`  | `Int`     | —                      | Number of columns this cell spans (default 1). |
+| `rowSpan`  | `Int`     | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `colSpan`  | `Int`     | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `isHeader` | `Boolean` | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

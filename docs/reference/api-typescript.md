@@ -2,7 +2,7 @@
 title: "TypeScript API Reference"
 ---
 
-## TypeScript API Reference <span class="version-badge">v3.5.0</span>
+## TypeScript API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -176,8 +176,8 @@ A single cell in a table grid.
 | `content`  | `string`  | —                      | The text content of the cell.                  |
 | `row`      | `number`  | —                      | 0-indexed row position.                        |
 | `col`      | `number`  | —                      | 0-indexed column position.                     |
-| `rowSpan`  | `number`  | —                      | Number of rows this cell spans (default 1).    |
-| `colSpan`  | `number`  | —                      | Number of columns this cell spans (default 1). |
+| `rowSpan`  | `number`  | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `colSpan`  | `number`  | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `isHeader` | `boolean` | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

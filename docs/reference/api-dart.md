@@ -2,7 +2,7 @@
 title: "Dart API Reference"
 ---
 
-## Dart API Reference <span class="version-badge">v3.5.0</span>
+## Dart API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -176,8 +176,8 @@ A single cell in a table grid.
 | `content`  | `String` | —                      | The text content of the cell.                  |
 | `row`      | `int`    | —                      | 0-indexed row position.                        |
 | `col`      | `int`    | —                      | 0-indexed column position.                     |
-| `rowSpan`  | `int`    | —                      | Number of rows this cell spans (default 1).    |
-| `colSpan`  | `int`    | —                      | Number of columns this cell spans (default 1). |
+| `rowSpan`  | `int`    | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `colSpan`  | `int`    | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `isHeader` | `bool`   | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

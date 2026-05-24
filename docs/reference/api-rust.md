@@ -2,7 +2,7 @@
 title: "Rust API Reference"
 ---
 
-## Rust API Reference <span class="version-badge">v3.5.0</span>
+## Rust API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -176,8 +176,8 @@ A single cell in a table grid.
 | `content`   | `String` | —                      | The text content of the cell.                  |
 | `row`       | `u32`    | —                      | 0-indexed row position.                        |
 | `col`       | `u32`    | —                      | 0-indexed column position.                     |
-| `row_span`  | `u32`    | —                      | Number of rows this cell spans (default 1).    |
-| `col_span`  | `u32`    | —                      | Number of columns this cell spans (default 1). |
+| `row_span`  | `u32`    | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `col_span`  | `u32`    | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `is_header` | `bool`   | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

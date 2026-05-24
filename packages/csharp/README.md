@@ -104,11 +104,11 @@ dotnet add package KreuzbergDev.HtmlToMarkdown
 
 **Apple M4** · `Convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 392.9 MB/s |
-| Tables (Countries) | 360KB |  | 300.1 MB/s |
-| Mixed (Python) | 656KB |  | 292.3 MB/s |
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 392.9 MB/s |
+| Tables (Countries) | 360KB |         | 300.1 MB/s |
+| Mixed (Python)     | 656KB |         | 292.3 MB/s |
 
 ## Quick Start
 

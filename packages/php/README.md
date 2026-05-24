@@ -112,11 +112,11 @@ composer require kreuzberg-dev/html-to-markdown
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Ops/sec |
-|----------|------|---------|
-| Lists (Timeline) | 129KB | 3346 |
-| Tables (Countries) | 360KB | 973 |
-| Medium (Python) | 657KB | 485 |
+| Document           | Size  | Ops/sec |
+| ------------------ | ----- | ------- |
+| Lists (Timeline)   | 129KB | 3346    |
+| Tables (Countries) | 360KB | 973     |
+| Medium (Python)    | 657KB | 485     |
 
 ## Quick Start
 

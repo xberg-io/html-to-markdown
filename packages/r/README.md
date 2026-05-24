@@ -110,11 +110,11 @@ devtools::install_github("kreuzberg-dev/html-to-markdown", subdir = "packages/r"
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB | 0.68ms | 190 MB/s |
-| Tables (Countries) | 360KB | 2.10ms | 171 MB/s |
-| Mixed (Python wiki) | 656KB | 4.75ms | 138 MB/s |
+| Document            | Size  | Latency | Throughput |
+| ------------------- | ----- | ------- | ---------- |
+| Lists (Timeline)    | 129KB | 0.68ms  | 190 MB/s   |
+| Tables (Countries)  | 360KB | 2.10ms  | 171 MB/s   |
+| Mixed (Python wiki) | 656KB | 4.75ms  | 138 MB/s   |
 
 ## Quick Start
 

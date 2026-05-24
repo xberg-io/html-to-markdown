@@ -2,7 +2,7 @@
 title: "Elixir API Reference"
 ---
 
-## Elixir API Reference <span class="version-badge">v3.5.0</span>
+## Elixir API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -177,8 +177,8 @@ A single cell in a table grid.
 | `content`   | `String.t()` | —                      | The text content of the cell.                  |
 | `row`       | `integer()`  | —                      | 0-indexed row position.                        |
 | `col`       | `integer()`  | —                      | 0-indexed column position.                     |
-| `row_span`  | `integer()`  | —                      | Number of rows this cell spans (default 1).    |
-| `col_span`  | `integer()`  | —                      | Number of columns this cell spans (default 1). |
+| `row_span`  | `integer()`  | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `col_span`  | `integer()`  | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `is_header` | `boolean()`  | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

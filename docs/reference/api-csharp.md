@@ -2,7 +2,7 @@
 title: "C# API Reference"
 ---
 
-## C# API Reference <span class="version-badge">v3.5.0</span>
+## C# API Reference <span class="version-badge">v3.5.0-rc.1</span>
 
 ### Functions
 
@@ -176,8 +176,8 @@ A single cell in a table grid.
 | `Content`  | `string` | —                      | The text content of the cell.                  |
 | `Row`      | `uint`   | —                      | 0-indexed row position.                        |
 | `Col`      | `uint`   | —                      | 0-indexed column position.                     |
-| `RowSpan`  | `uint`   | —                      | Number of rows this cell spans (default 1).    |
-| `ColSpan`  | `uint`   | —                      | Number of columns this cell spans (default 1). |
+| `RowSpan`  | `uint`   | `/* serde(default) */` | Number of rows this cell spans (default 1).    |
+| `ColSpan`  | `uint`   | `/* serde(default) */` | Number of columns this cell spans (default 1). |
 | `IsHeader` | `bool`   | `/* serde(default) */` | Whether this is a header cell (`<th>`).        |
 
 ---

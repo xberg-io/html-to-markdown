@@ -99,7 +99,7 @@ Requires Elixir 1.19+ and OTP 28. Add to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:html_to_markdown, "~> 3.5.0"}
+    {:html_to_markdown, "~> 3.5.0-rc.1"}
   ]
 end
 ```
@@ -108,13 +108,13 @@ end
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document | Size | Latency | Throughput |
-|----------|------|---------|------------|
-| Lists (Timeline) | 129KB |  | 321.7 MB/s |
-| Tables (Countries) | 360KB |  | 293.8 MB/s |
-| Medium (Python) | 656KB |  | 281.5 MB/s |
-| Large (Rust) | 567KB |  | 268.7 MB/s |
-| Small (Intro) | 463KB |  | 262.9 MB/s |
+| Document           | Size  | Latency | Throughput |
+| ------------------ | ----- | ------- | ---------- |
+| Lists (Timeline)   | 129KB |         | 321.7 MB/s |
+| Tables (Countries) | 360KB |         | 293.8 MB/s |
+| Medium (Python)    | 656KB |         | 281.5 MB/s |
+| Large (Rust)       | 567KB |         | 268.7 MB/s |
+| Small (Intro)      | 463KB |         | 262.9 MB/s |
 
 ## Quick Start
 
