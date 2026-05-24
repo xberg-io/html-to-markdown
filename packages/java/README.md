@@ -121,11 +121,11 @@ implementation("dev.kreuzberg:html-to-markdown:3.5.0-rc.1")
 
 **Apple M4** · `convert()` · Real Wikipedia documents
 
-| Document           | Size  | Latency | Throughput |
-| ------------------ | ----- | ------- | ---------- |
-| Lists (Timeline)   | 129KB |         | 291.5 MB/s |
-| Tables (Countries) | 360KB |         | 272.0 MB/s |
-| Mixed (Python)     | 656KB |         | 258.5 MB/s |
+| Document | Size | Latency | Throughput |
+|----------|------|---------|------------|
+| Lists (Timeline) | 129KB |  | 291.5 MB/s |
+| Tables (Countries) | 360KB |  | 272.0 MB/s |
+| Mixed (Python) | 656KB |  | 258.5 MB/s |
 
 ## Quick Start
 

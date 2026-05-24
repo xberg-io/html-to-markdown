@@ -14,7 +14,7 @@ crate-type = ["staticlib", "lib"]
 [dependencies]
 async-trait = "0.1"
 extendr-api = "0.9"
-html-to-markdown-rs = { path = "../../../../crates/html-to-markdown", features = [
+html-to-markdown-rs = { version = "3.5.0-rc.1", path = "../../../../crates/html-to-markdown", features = [
     "full",
     "metadata",
     "visitor",

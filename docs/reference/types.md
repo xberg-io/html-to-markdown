@@ -547,7 +547,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `DefinitionList` | `definition_list` | A definition list container.                                                                                                                       |
 | `DefinitionItem` | `definition_item` | A definition list entry with term and description. — Fields: `term`: `String`, `definition`: `String`                                              |
 | `RawBlock`       | `raw_block`       | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `String`, `content`: `String`                                |
-| `MetadataBlock`  | `metadata_block`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Vec<String>`                                                  |
+| `MetadataBlock`  | `metadata_block`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `Vec<Vec<String>>`                                             |
 | `Group`          | `group`           | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `String`, `heading_level`: `u8`, `heading_text`: `String` |
 
 ---

@@ -258,7 +258,7 @@ repos:
         exclude: ^(test_apps/|e2e/java/)
   # Alef: verify bindings and sync versions.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.18.1
+    rev: v0.19.0
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

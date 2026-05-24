@@ -251,7 +251,33 @@ public typealias DocumentNode = RustBridge.DocumentNode
 /// stored in the order they are encountered during DOM traversal.
 ///
 /// See [`AnnotationKind`] for the full list of supported annotation types.
-public typealias TextAnnotation = RustBridge.TextAnnotation
+public struct TextAnnotation: Codable, Sendable, Hashable {
+    /// Start byte offset (inclusive) into the parent node's text.
+    public let start: UInt32
+    /// End byte offset (exclusive) into the parent node's text.
+    public let end: UInt32
+    /// The type of annotation.
+    public let kind: AnnotationKind
+    public init(start: UInt32, end: UInt32, kind: AnnotationKind) {
+        self.start = start
+        self.end = end
+        self.kind = kind
+    }
+}
+
+// MARK: - Internal FFI conversions for TextAnnotation
+internal extension TextAnnotation {
+    init(_ rb: RustBridge.TextAnnotationRef) throws {
+        self.start = rb.start()
+        self.end = rb.end()
+        self.kind = try AnnotationKind(rb.kind())
+    }
+    func intoRust() throws -> RustBridge.TextAnnotation {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.textAnnotationFromJson(json)
+    }
+}
 
 /// The primary result of HTML conversion and extraction.
 ///
@@ -606,7 +632,7 @@ public enum NodeContent: Codable, Sendable, Hashable {
     /// A raw block preserved as-is (e.g. `<script>`, `<style>` content).
     case rawBlock(format: String, content: String)
     /// A block of key-value metadata pairs (from `<head>` meta tags).
-    case metadataBlock(entries: [String])
+    case metadataBlock(entries: [[String]])
     /// A section grouping container (auto-generated from heading hierarchy).
     case group(label: String?, headingLevel: UInt8?, headingText: String?)
 }
@@ -963,7 +989,8 @@ public func documentNodeFromJson(_ json: String) throws -> DocumentNode {
 }
 
 public func textAnnotationFromJson(_ json: String) throws -> TextAnnotation {
-    return try RustBridge.textAnnotationFromJson(json)
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TextAnnotation.self, from: data)
 }
 
 public func conversionResultFromJson(_ json: String) throws -> ConversionResult {

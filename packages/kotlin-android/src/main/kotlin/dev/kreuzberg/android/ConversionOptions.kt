@@ -79,6 +79,7 @@ data class ConversionOptions(
      *
      * - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters
      *   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+     *
      * - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source
      *   HTML, including runs of spaces and embedded newlines.
      *

@@ -1053,7 +1053,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `HTM_DEFINITION_LIST` | A definition list container.                                                                                                                                      |
 | `HTM_DEFINITION_ITEM` | A definition list entry with term and description. — Fields: `term`: `const char*`, `definition`: `const char*`                                                   |
 | `HTM_RAW_BLOCK`       | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `const char*`, `content`: `const char*`                                     |
-| `HTM_METADATA_BLOCK`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `const char**`                                                                |
+| `HTM_METADATA_BLOCK`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `const char***`                                                               |
 | `HTM_GROUP`           | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `const char*`, `heading_level`: `uint8_t`, `heading_text`: `const char*` |
 
 ---

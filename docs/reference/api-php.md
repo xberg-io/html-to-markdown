@@ -1053,7 +1053,7 @@ Uses internally tagged representation (`"node_type": "heading"`) for JSON serial
 | `DefinitionList` | A definition list container.                                                                                                                      |
 | `DefinitionItem` | A definition list entry with term and description. — Fields: `term`: `string`, `definition`: `string`                                             |
 | `RawBlock`       | A raw block preserved as-is (e.g. `<script>`, `<style>` content). — Fields: `format`: `string`, `content`: `string`                               |
-| `MetadataBlock`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `array<string>`                                               |
+| `MetadataBlock`  | A block of key-value metadata pairs (from `<head>` meta tags). — Fields: `entries`: `array<array<string>>`                                        |
 | `Group`          | A section grouping container (auto-generated from heading hierarchy). — Fields: `label`: `string`, `headingLevel`: `int`, `headingText`: `string` |
 
 ---

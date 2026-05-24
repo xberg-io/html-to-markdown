@@ -957,7 +957,7 @@ pub enum NodeContent {
     /// A block of key-value metadata pairs (from `<head>` meta tags).
     MetadataBlock {
         /// Key-value metadata pairs.
-        entries: Vec<String>,
+        entries: Vec<Vec<String>>,
     },
     /// A section grouping container (auto-generated from heading hierarchy).
     Group {
@@ -1728,7 +1728,7 @@ impl From<html_to_markdown_rs::NodeContent> for NodeContent {
             html_to_markdown_rs::NodeContent::MetadataBlock { entries } => NodeContent::MetadataBlock {
                 entries: entries
                     .into_iter()
-                    .map(|e| serde_json::to_string(&e).unwrap_or_default())
+                    .map(|(a, b)| vec![a.to_string(), b.to_string()])
                     .collect(),
             },
             html_to_markdown_rs::NodeContent::Group {

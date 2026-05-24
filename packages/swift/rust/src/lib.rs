@@ -2426,18 +2426,37 @@ impl OutputFormat {
 }
 
 pub enum NodeContent {
+    Heading,
+    Paragraph,
+    List,
+    ListItem,
+    Table,
+    Image,
+    Code,
     Quote,
     DefinitionList,
-    /// Data variants not directly bridgeable — represented as Unknown.
-    Unknown,
+    DefinitionItem,
+    RawBlock,
+    MetadataBlock,
+    Group,
 }
 
 impl From<html_to_markdown_rs::NodeContent> for NodeContent {
     fn from(val: html_to_markdown_rs::NodeContent) -> Self {
         match val {
+            html_to_markdown_rs::NodeContent::Heading { .. } => Self::Heading,
+            html_to_markdown_rs::NodeContent::Paragraph { .. } => Self::Paragraph,
+            html_to_markdown_rs::NodeContent::List { .. } => Self::List,
+            html_to_markdown_rs::NodeContent::ListItem { .. } => Self::ListItem,
+            html_to_markdown_rs::NodeContent::Table { .. } => Self::Table,
+            html_to_markdown_rs::NodeContent::Image { .. } => Self::Image,
+            html_to_markdown_rs::NodeContent::Code { .. } => Self::Code,
             html_to_markdown_rs::NodeContent::Quote => Self::Quote,
             html_to_markdown_rs::NodeContent::DefinitionList => Self::DefinitionList,
-            _ => Self::Unknown,
+            html_to_markdown_rs::NodeContent::DefinitionItem { .. } => Self::DefinitionItem,
+            html_to_markdown_rs::NodeContent::RawBlock { .. } => Self::RawBlock,
+            html_to_markdown_rs::NodeContent::MetadataBlock { .. } => Self::MetadataBlock,
+            html_to_markdown_rs::NodeContent::Group { .. } => Self::Group,
         }
     }
 }
@@ -2445,9 +2464,19 @@ impl From<html_to_markdown_rs::NodeContent> for NodeContent {
 impl NodeContent {
     pub fn to_string(&self) -> String {
         match self {
+            Self::Heading => "heading".to_string(),
+            Self::Paragraph => "paragraph".to_string(),
+            Self::List => "list".to_string(),
+            Self::ListItem => "list_item".to_string(),
+            Self::Table => "table".to_string(),
+            Self::Image => "image".to_string(),
+            Self::Code => "code".to_string(),
             Self::Quote => "quote".to_string(),
             Self::DefinitionList => "definition_list".to_string(),
-            Self::Unknown => "unknown".to_string(),
+            Self::DefinitionItem => "definition_item".to_string(),
+            Self::RawBlock => "raw_block".to_string(),
+            Self::MetadataBlock => "metadata_block".to_string(),
+            Self::Group => "group".to_string(),
         }
     }
 }
@@ -2461,8 +2490,7 @@ pub enum AnnotationKind {
     Subscript,
     Superscript,
     Highlight,
-    /// Data variants not directly bridgeable — represented as Unknown.
-    Unknown,
+    Link,
 }
 
 impl From<html_to_markdown_rs::AnnotationKind> for AnnotationKind {
@@ -2476,7 +2504,7 @@ impl From<html_to_markdown_rs::AnnotationKind> for AnnotationKind {
             html_to_markdown_rs::AnnotationKind::Subscript => Self::Subscript,
             html_to_markdown_rs::AnnotationKind::Superscript => Self::Superscript,
             html_to_markdown_rs::AnnotationKind::Highlight => Self::Highlight,
-            _ => Self::Unknown,
+            html_to_markdown_rs::AnnotationKind::Link { .. } => Self::Link,
         }
     }
 }
@@ -2492,7 +2520,7 @@ impl AnnotationKind {
             Self::Subscript => "subscript".to_string(),
             Self::Superscript => "superscript".to_string(),
             Self::Highlight => "highlight".to_string(),
-            Self::Unknown => "unknown".to_string(),
+            Self::Link => "link".to_string(),
         }
     }
 }
@@ -2815,19 +2843,20 @@ impl NodeType {
 
 pub enum VisitResult {
     Continue,
+    Custom,
     Skip,
     PreserveHtml,
-    /// Data variants not directly bridgeable — represented as Unknown.
-    Unknown,
+    Error,
 }
 
 impl From<html_to_markdown_rs::VisitResult> for VisitResult {
     fn from(val: html_to_markdown_rs::VisitResult) -> Self {
         match val {
             html_to_markdown_rs::VisitResult::Continue => Self::Continue,
+            html_to_markdown_rs::VisitResult::Custom(..) => Self::Custom,
             html_to_markdown_rs::VisitResult::Skip => Self::Skip,
             html_to_markdown_rs::VisitResult::PreserveHtml => Self::PreserveHtml,
-            _ => Self::Unknown,
+            html_to_markdown_rs::VisitResult::Error(..) => Self::Error,
         }
     }
 }
@@ -2836,9 +2865,10 @@ impl VisitResult {
     pub fn to_string(&self) -> String {
         match self {
             Self::Continue => "Continue".to_string(),
+            Self::Custom => "Custom".to_string(),
             Self::Skip => "Skip".to_string(),
             Self::PreserveHtml => "PreserveHtml".to_string(),
-            Self::Unknown => "unknown".to_string(),
+            Self::Error => "Error".to_string(),
         }
     }
 }
