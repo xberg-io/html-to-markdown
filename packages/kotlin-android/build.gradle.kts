@@ -3,11 +3,7 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-buildscript {
-    dependencies {
-        classpath("com.vanniktech:gradle-maven-publish-plugin:0.36.0")
-    }
-}
+buildscript { dependencies { classpath("com.vanniktech:gradle-maven-publish-plugin:0.36.0") } }
 
 plugins {
     id("com.android.library") version "8.13.0"
@@ -31,18 +27,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    sourceSets {
-        getByName("main") {
-            jniLibs.srcDirs("src/main/jniLibs")
-        }
-    }
+    sourceSets { getByName("main") { jniLibs.srcDirs("src/main/jniLibs") } }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
+kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
 
 ktlint {
     version.set("1.8.0")
@@ -71,10 +59,10 @@ dependencies {
 mavenPublishing {
     configure(
         AndroidSingleVariantLibrary(
-        variant = "release",
-        sourcesJar = com.vanniktech.maven.publish.SourcesJar.Sources(),
-        javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
-    )
+            variant = "release",
+            sourcesJar = com.vanniktech.maven.publish.SourcesJar.Sources(),
+            javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
+        )
     )
 
     publishToMavenCentral()
@@ -106,7 +94,9 @@ mavenPublishing {
         scm {
             url.set("https://github.com/kreuzberg-dev/html-to-markdown")
             connection.set("scm:git:git://github.com/kreuzberg-dev/html-to-markdown.git")
-            developerConnection.set("scm:git:ssh://git@github.com:kreuzberg-dev/html-to-markdown.git")
+            developerConnection.set(
+                "scm:git:ssh://git@github.com:kreuzberg-dev/html-to-markdown.git"
+            )
         }
     }
 }

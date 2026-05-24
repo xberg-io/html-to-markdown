@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **repo**: Add `.gitattributes` marking all alef-generated output directories (`packages/**`, `crates/*-{py,php,ffi,node,wasm}/**`, `e2e/**`) as `linguist-generated=true` so generated files collapse in GitHub PR diffs.
 
+- **ci(publish): replace inline Homebrew formula updater with `kreuzberg-dev/actions/publish-homebrew-source-formulas@v1`.** The `publish-homebrew-formula` job previously ran a 184-line `scripts/publish/update-homebrew-formula.sh` Bash heredoc that wrote `html-to-markdown.rb` + `libhtml-to-markdown.rb` from scratch (h2m is a dual-formula tap; the shared single-formula `publish-homebrew@v1` doesn't apply). The new shared action does the same job from per-formula `.rb.tmpl` templates + a `scripts/publish/homebrew.json` manifest, downloading release assets via `gh release download` and substituting their SHA256s into `${cli_*_sha}` / `${ffi_*_sha}` placeholders. The script is deleted; the formula generation rules now live in version-controlled Ruby templates rather than a bash heredoc. The job's gate now also passes on `dry_run == 'true'` (was `is_tag == 'true'` only) so dry-run pipelines exercise the bottle pipeline downstream — the new action substitutes a zero-SHA placeholder for missing assets on dry-run.
+
+- **ci(publish): pin `actions/checkout@v5` on the `homebrew-bottles` matrix job.** v6 hits an includeIf credential regression on the `macos-15-intel` runner that this matrix includes (same workaround liter-llm applies on its Homebrew matrix). Other jobs stay on `@v6`.
+
+### Fixed
+
+- **ci(publish): replace inline Elixir Hex packaging with `kreuzberg-dev/actions/build-elixir-hex@v1`.** The `elixir-package` job in `.github/workflows/publish.yaml` previously ran `mix deps.get` + `mix hex.build` inline with no path-dep rewrite and no `Cargo.lock` generation. `Cargo.lock` is gitignored, so on a fresh CI checkout `mix hex.build` failed at the `files` list check with `Missing files: native/html_to_markdown_nif/Cargo.lock` — the proximate blocker on v3.5.0-rc.2 dry-run after the Go FFI fix landed. The new shared action wraps `rewrite-native-deps@v1` (default-on, dry-run-guarded) and falls back to `cargo generate-lockfile` on dry-run so the lockfile exists for `mix hex.build` even when the rewrite is skipped. Hex source-package builds now match the python-sdist / ruby-gem pattern (rewrite baked into the shared action; cannot be omitted).
+
 ## [3.5.0-rc.2] - 2026-05-24
 
 ### Changed

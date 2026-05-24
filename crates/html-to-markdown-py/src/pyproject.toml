@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "maturin"
-requires = [ "maturin>=1.0,<2.0" ]
+requires = [ "maturin>=1,<2" ]
 
 [project]
 name = "html-to-markdown"
@@ -20,8 +20,9 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
 ]
 urls.repository = "https://github.com/kreuzberg-dev/html-to-markdown"
+
 [dependency-groups]
-dev = [ "mypy>=1.19.0", "ruff>=0.14.8" ]
+dev = [ "mypy>=1.19", "ruff>=0.14.8" ]
 
 [tool.maturin]
 module-name = "html_to_markdown._html_to_markdown"
@@ -34,8 +35,8 @@ python-packages = [ "html_to_markdown" ]
 [tool.ruff]
 target-version = "py310"
 line-length = 120
-format.docstring-code-format = true
 format.docstring-code-line-length = 120
+format.docstring-code-format = true
 lint.select = [ "ALL" ]
 lint.ignore = [
   "ANN401",
@@ -62,8 +63,7 @@ lint.ignore = [
   "TD",
   "TRY",
 ]
-lint.mccabe.max-complexity = 15
-lint.per-file-ignores."tests/**" = [ "ANN", "D103", "PLR2004", "S101" ]
+lint.per-file-ignores."html_to_markdown/__init__.py" = [ "I001" ]
 # The alef Python codegen still emits cosmetic warnings on the wrapper
 # modules: api.py keeps the legacy `from typing import AsyncIterator` and a
 # single-line import block, options.py carries # noqa: TC001 / F401 markers
@@ -72,7 +72,8 @@ lint.per-file-ignores."tests/**" = [ "ANN", "D103", "PLR2004", "S101" ]
 # the codegen is updated to emit ruff-clean output.
 lint.per-file-ignores."html_to_markdown/api.py" = [ "F401", "I001", "UP035" ]
 lint.per-file-ignores."html_to_markdown/options.py" = [ "F401", "RUF100" ]
-lint.per-file-ignores."html_to_markdown/__init__.py" = [ "I001" ]
+lint.per-file-ignores."tests/**" = [ "ANN", "D103", "PLR2004", "S101" ]
+lint.mccabe.max-complexity = 15
 lint.pydocstyle.convention = "google"
 lint.pylint.max-args = 10
 lint.pylint.max-branches = 15
