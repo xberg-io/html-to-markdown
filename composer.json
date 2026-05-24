@@ -13,7 +13,7 @@
   },
   "autoload": {
     "psr-4": {
-      "HtmlToMarkdown\\": "packages/php/src/"
+      "HtmlToMarkdown\\": "crates/html-to-markdown-php/src//src/"
     }
   },
   "scripts": {

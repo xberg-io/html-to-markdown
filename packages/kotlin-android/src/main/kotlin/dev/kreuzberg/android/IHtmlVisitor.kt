@@ -38,6 +38,7 @@ package dev.kreuzberg.android
  * # Execution Order
  *
  * For a typical element like `<div><p>text</p></div>`:
+ *
  * 1. `visit_element_start` for `<div>`
  * 2. `visit_element_start` for `<p>`
  * 3. `visit_text` for "text"

@@ -1074,7 +1074,7 @@ const _: fn() = || {
             let _: String = content;
         }
         crate::NodeContent::MetadataBlock { entries } => {
-            let _: Vec<String> = entries;
+            let _: Vec<Vec<String>> = entries;
         }
         crate::NodeContent::Group {
             label,
@@ -2329,6 +2329,18 @@ impl SseDecode for Vec<crate::LinkMetadata> {
     }
 }
 
+impl SseDecode for Vec<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<Vec<String>>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<i64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2495,7 +2507,7 @@ impl SseDecode for crate::NodeContent {
                 };
             }
             11 => {
-                let mut var_entries = <Vec<String>>::sse_decode(deserializer);
+                let mut var_entries = <Vec<Vec<String>>>::sse_decode(deserializer);
                 return crate::NodeContent::MetadataBlock { entries: var_entries };
             }
             12 => {
@@ -4553,6 +4565,16 @@ impl SseEncode for Vec<crate::LinkMetadata> {
     }
 }
 
+impl SseEncode for Vec<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <Vec<String>>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<i64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4697,7 +4719,7 @@ impl SseEncode for crate::NodeContent {
             }
             crate::NodeContent::MetadataBlock { entries } => {
                 <i32>::sse_encode(11, serializer);
-                <Vec<String>>::sse_encode(entries, serializer);
+                <Vec<Vec<String>>>::sse_encode(entries, serializer);
             }
             crate::NodeContent::Group {
                 label,

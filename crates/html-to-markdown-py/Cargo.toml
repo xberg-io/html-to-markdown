@@ -1,12 +1,25 @@
 [package]
 name = "html-to-markdown-py"
-version = "3.5.0-rc.1"
+version = "3.5.0-rc.2"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
 readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
+
+[lib]
+name = "_html_to_markdown"
+crate-type = ["cdylib"]
+
+[dependencies]
+html-to-markdown-rs = { version = "3.5.0-rc.2", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+pyo3 = { version = "0.28" }
+pyo3-async-runtimes = { version = "0.28", features = ["tokio-runtime"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+async-trait = "0.1"
+tokio = { version = "1", features = ["rt-multi-thread"] }
 
 # `pyo3-async-runtimes` and `serde_json` are emitted unconditionally above so
 # the manifest is stable across regens, but for umbrella crates with no
@@ -17,24 +30,5 @@ categories = ["text-processing"]
 [package.metadata.cargo-machete]
 ignored = ["pyo3-async-runtimes", "serde_json", "async-trait", "tokio"]
 
-[lib]
-name = "_html_to_markdown"
-crate-type = ["cdylib"]
-
 [features]
 extension-module = ["pyo3/extension-module", "pyo3/abi3-py310"]
-
-[dependencies]
-async-trait = "0.1"
-html-to-markdown-rs = { path = "../html-to-markdown", features = [
-    "full",
-    "metadata",
-    "visitor",
-    "serde",
-    "inline-images",
-] }
-pyo3 = { version = "0.28" }
-pyo3-async-runtimes = { version = "0.28", features = ["tokio-runtime"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-tokio = { version = "1", features = ["rt-multi-thread"] }
