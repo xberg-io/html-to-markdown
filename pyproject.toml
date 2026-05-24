@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=69" ]
+requires = ["setuptools>=69"]
 
 [project]
 name = "html-to-markdown-workspace"
@@ -31,15 +31,15 @@ dev = [
   "ruff>=0.14.10",
   "uv-bump",
 ]
-doc = [ "zensical" ]
+doc = ["zensical"]
 
 [tool.setuptools]
 packages = []
 
 [tool.uv]
-default-groups = [ "dev" ]
+default-groups = ["dev"]
 sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
-workspace.members = [ "packages/python" ]
+workspace.members = ["packages/python"]
 cache-keys = [
   { file = "pyproject.toml" },
   { file = "Cargo.toml" },
@@ -52,10 +52,10 @@ cache-keys = [
 [tool.ruff]
 target-version = "py310"
 line-length = 120
-src = [ "packages/python/html_to_markdown", "packages/python/tests", "scripts" ]
+src = ["packages/python/html_to_markdown", "packages/python/tests", "scripts"]
 format.docstring-code-line-length = 120
 format.docstring-code-format = true
-lint.select = [ "ALL" ]
+lint.select = ["ALL"]
 lint.ignore = [
   "ANN401",
   "ASYNC109",
@@ -73,21 +73,21 @@ lint.ignore = [
   "E501",
   "EM",
   "FBT",
-  "FIX",      # Allow todo and fixme comments
+  "FIX", # Allow todo and fixme comments
   "ISC001",
   "PD011",
   "PGH003",
   "PLR0913",
   "PLR2004",
   "S104",
-  "TD",       # Allow todo and fixme comments
+  "TD", # Allow todo and fixme comments
   "TRY",
 ]
-lint.per-file-ignores."e2e/python/**/*.*" = [ "D", "INP001", "PT018", "S" ]
-lint.per-file-ignores."packages/python/tests/**/*.*" = [ "ARG", "D", "PD", "PT006", "PT013", "S" ]
-lint.per-file-ignores."packages/python/tests/benchmark_*_test.py" = [ "T201" ]
-lint.per-file-ignores."scripts/*.py" = [ "INP001", "S607", "T201" ]
-lint.isort.known-first-party = [ "html_to_markdown", "tests" ]
+lint.per-file-ignores."e2e/python/**/*.*" = ["D", "INP001", "PT018", "S"]
+lint.per-file-ignores."packages/python/tests/**/*.*" = ["ARG", "D", "PD", "PT006", "PT013", "S"]
+lint.per-file-ignores."packages/python/tests/benchmark_*_test.py" = ["T201"]
+lint.per-file-ignores."scripts/*.py" = ["INP001", "S607", "T201"]
+lint.isort.known-first-party = ["html_to_markdown", "tests"]
 lint.pydocstyle.convention = "pep257"
 
 [tool.mypy]
@@ -97,11 +97,11 @@ implicit_reexport = false
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
-disable_error_code = [ "import-untyped", "import-not-found" ]
+disable_error_code = ["import-untyped", "import-not-found"]
 namespace_packages = true
-files = [ "packages/python" ]
+files = ["packages/python"]
 explicit_package_bases = true
-mypy_path = [ "packages/python" ]
+mypy_path = ["packages/python"]
 exclude = [
   "^crates/",
   "^e2e/",
@@ -124,7 +124,7 @@ overrides = [
 [tool.pytest]
 ini_options.asyncio_mode = "auto"
 ini_options.asyncio_default_fixture_loop_scope = "function"
-ini_options.testpaths = [ "packages/python/tests" ]
+ini_options.testpaths = ["packages/python/tests"]
 ini_options.filterwarnings = [
   "error",
   "ignore::pytest.PytestConfigWarning",
@@ -133,8 +133,8 @@ ini_options.filterwarnings = [
 ]
 
 [tool.coverage]
-run.omit = [ "packages/python/tests/*" ]
-run.source = [ "packages/python/html_to_markdown" ]
-report.exclude_lines = [ "if TYPE_CHECKING:" ]
+run.omit = ["packages/python/tests/*"]
+run.source = ["packages/python/html_to_markdown"]
+report.exclude_lines = ["if TYPE_CHECKING:"]
 report.fail_under = 0
 report.show_missing = true

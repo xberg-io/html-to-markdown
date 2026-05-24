@@ -15,13 +15,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.5.0-rc.1", path = "../../../../../crates/html-to-markdown", features = [
-    "full",
-    "metadata",
-    "visitor",
-    "serde",
-    "inline-images",
-] }
+html-to-markdown-rs = { version = "3.5.0-rc.1", path = "../../../../../crates/html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
 magnus = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

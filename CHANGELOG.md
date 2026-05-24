@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **bindings: regenerated with alef 0.19.1.** Picks up the Swift FFI fix: `packages/swift/Sources/RustBridgeC/RustBridgeC.h` now contains the full concatenated SwiftBridgeCore + binding-crate headers (was a placeholder under 0.19.0, breaking `swift build` with `cannot find type 'RustStr' in scope`); `packages/swift/Sources/HtmlToMarkdown/HtmlToMarkdown.swift` gains complete `Codable` conformance for `NodeContent` (custom `init(from:)`/`encode(to:)` over the tag/value layout); JNI gains a `jni_call_string_method` helper consolidating the boilerplate around `Object`-returning `String` method calls. `alef sync-versions` also re-resolved `test_apps/` dependency pins from the published registries (npm/PyPI/NuGet/RubyGems/Maven/Crates/Go/CRAN) — h2m's last successful publish is `3.4.0`, so the e2e test apps now reference `3.4.0` (or the rc tag where pinned), not the unreleased `3.5.0-rc.1` workspace version.
+
 ## [3.5.0-rc.1] - 2026-05-24
 
 ### Changed

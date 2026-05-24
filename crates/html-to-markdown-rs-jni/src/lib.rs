@@ -44,6 +44,20 @@ fn string_to_jstring(env: &mut Env<'_>, s: &str) -> jstring {
     }
 }
 
+fn jni_call_string_method(
+    env: &mut Env<'_>,
+    obj: JObject,
+    method_name: &str,
+    method_sig: &str,
+) -> std::result::Result<String, jni::errors::Error> {
+    let class = env.get_object_class(obj)?;
+    let method_id = env.get_method_id(&class, method_name, method_sig)?;
+    let result = env
+        .call_method_unchecked(obj, method_id, jni::objects::ReturnType::Object, &[])?
+        .l()?;
+    jstring_to_string(env, JString::from(result))
+}
+
 fn throw_jni_error(env: &mut Env<'_>, msg: &str) {
     // If the error class cannot be found (misconfigured AAR), fall back to a
     // generic RuntimeException so the caller always gets *some* exception rather
