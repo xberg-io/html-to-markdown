@@ -1,12 +1,23 @@
 [package]
 name = "html-to-markdown-php"
-version = "3.5.0-rc.2"
+version = "3.5.0-rc.3"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
 readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+html-to-markdown-rs = { version = "3.5.0-rc.3", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+ext-php-rs = "0.15"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
 
 # `serde_json` and `tokio` are emitted unconditionally above so the manifest
 # is stable across regens, but for umbrella crates with no async fns and no
@@ -17,16 +28,5 @@ categories = ["text-processing"]
 [package.metadata.cargo-machete]
 ignored = ["serde_json", "tokio", "async-trait"]
 
-[lib]
-crate-type = ["cdylib"]
-
 [features]
 extension-module = []
-
-[dependencies]
-async-trait = "0.1"
-ext-php-rs = "0.15"
-html-to-markdown-rs = { version = "3.5.0-rc.2", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-tokio = { version = "1", features = ["full"] }

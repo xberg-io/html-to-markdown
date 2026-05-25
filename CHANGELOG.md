@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0-rc.3] - 2026-05-25
+
+### Fixed
+
+- **ci(actions/build-elixir-hex): generate `Cargo.lock` unconditionally after `rewrite-native-deps`.** The fallback `cargo generate-lockfile` only ran on dry-run, but the lockfile is gitignored — real-release runs hit `Missing files: native/html_to_markdown_nif/Cargo.lock` at `mix hex.build`. Now runs in both modes. (kreuzberg-dev/actions v1.6.6, floating `v1` retagged.)
+
+- **ci(publish): split Dart pub.dev publishing into a workflow_dispatch flow so OIDC trusted publishing succeeds.** pub.dev's OIDC verifier rejects tokens minted by `release` events (`Authentication failed!`) and only accepts `push` / `workflow_dispatch`. The publish workflow now assembles the Dart package as an artifact under the `release`-triggered run, then dispatches a separate `publish-pubdev.yaml` workflow (`workflow_dispatch`) that downloads the artifact and runs `dart-lang/publish-pub@v1`. The dispatched job inherits a token GitHub's OIDC provider mints with `event_name == workflow_dispatch`, which pub.dev's audit accepts.
+
+- **ci(actions/homebrew-build-bottles): suppress `brew config` SIGPIPE under `pipefail` on arm64 Linux runners.** The arm64 runner's `/usr/bin/ldd` writes more output than `head -20` consumes; under `set -o pipefail` the broken-pipe propagated out of the early diagnostic block and aborted the script before any bottle work. Temporarily disables `pipefail` for the diagnostic stanza only — strict mode is restored before the build phase. (kreuzberg-dev/actions v1.6.7, floating `v1` retagged.)
+
+- **bindings: regenerated with alef 0.19.5.** Picks up the Kotlin Android trait-bridge codegen fixes that caused the v3.5.0-rc.2 `:compileReleaseKotlin` failure (`Unresolved reference 'HtmlToMarkdownRsBridge'`): `bridge_obj` filename is now used for trait-bridge codegen so the file matches the object name; trait-bridge emission is skipped when the bridge function is excluded via `kotlin_android.exclude_functions`. Also picks up the alef 0.19.5 cumulative sweep: WASM emitter JSON-deserializes structured sub-config fields; swift-bridge restores JSON deserialization step in pre-call AHashMap binding; alef-emitter removes stray `>` after `.collect::<Vec<Vec<String>>>()`; PHP/Ruby/Elixir/Swift/Dart bridges emit pre-call `AHashMap` binding + `ahash = "0.8"` scaffold dep for `Cow<'static, str>` key map params; WASM wraps sanitized `Vec<Vec<String>>` fields with `serde_wasm_bindgen::to_value()`; WASM deduplicates input DTO struct generation across functions sharing the same config type; FFI preserves `AHashMap<Cow<'static, str>, _>` param types across the wrapper boundary; setup-defaults-ruby appends `--add-checksums` to default `bundle install`; scaffold-ffi injects workspace version into every internal workspace dependency so `cargo publish` accepts the FFI crate.
+
+- **ci(e2e): pin `erlef/setup-beam@v1.24.0`** (was `@v1.24` floating minor) to avoid silent action upgrades during the rc cycle.
+
+- **release: cut v3.5.0-rc.3.** Aligned every workspace manifest on `3.5.0-rc.3` via `alef sync-versions --set 3.5.0-rc.3` + full `alef generate` regen against alef 0.19.5.
+
 ## [3.5.0-rc.2] - 2026-05-25
 
 ### Changed
