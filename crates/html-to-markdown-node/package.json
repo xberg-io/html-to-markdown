@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-node",
-  "version": "3.5.0-rc.2",
+  "version": "3.5.0",
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
   "repository": {
@@ -24,6 +24,7 @@
   },
   "napi": {
     "binaryName": "html-to-markdown-node",
+    "packageName": "@kreuzberg/html-to-markdown-node",
     "targets": [
       "x86_64-unknown-linux-gnu",
       "aarch64-unknown-linux-gnu",

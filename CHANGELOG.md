@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-05-25
+
+### Fixed
+
+- **bindings: regenerated with alef 0.19.6.** Node optional-dep package names now carry the `@kreuzberg/` scope (`@kreuzberg/html-to-markdown-node-<target>`) so `requireOptionalDependency()` resolves the published per-platform packages instead of an unscoped name that does not exist on npm. `test_apps/` restructured by alef to the new layout (per-language runners under `test_apps/<lang>/{ffi,htm_test,run_tests}` for C; legacy in-tree test files removed). Additional alef-emitter, swift-bridge, FFI param handling, and ahash-scaffold fixes carried through from the 0.19.x line.
+
+- **ci(publish-hex): bump to kreuzberg-dev/actions@v1.6.9 — generate `Cargo.lock` before `mix hex.publish`.** `publish-hex@v1` runs a fresh `actions/checkout`, so the gitignored `packages/elixir/native/html_to_markdown_nif/Cargo.lock` is absent and `mix hex.publish` fails with `Missing files: native/html_to_markdown_nif/Cargo.lock`. v1.6.9 mirrors the `build-elixir-hex` fix and runs `cargo generate-lockfile` for every `native/**/Cargo.toml` before publishing. (`v1` floating tag retagged.)
+
+- **ci(publish): rename Go FFI tarballs to use `-go-` infix instead of `-ffi-`.** alef 0.19.6's Go packager (`alef publish package --lang go`) emitted `{crate}-ffi-v{version}-{platform}.tar.gz`, colliding with the C FFI packager's prefix. `check-registry` asset-prefix probes and `verify-release-assets` pattern lists could not distinguish Go from C FFI tarballs, so `verify-release-assets` failed on the missing `html-to-markdown-rs-go-*.tar.gz` pattern. Workaround: rename `-ffi-v` → `-go-v` immediately after `alef publish package --lang go` in the workflow. The alef-side fix is already on alef main; the workaround can be dropped once the local alef pin moves to a release that ships it.
+
+- **release: cut v3.5.0.** Promoted from v3.5.0-rc.3 after the dry-run/republish cycle (publish run 26393110006) reached fully green (31 success / 0 failed / 56 skipped). Aligned every workspace manifest on `3.5.0` via `alef sync-versions --set 3.5.0` + full `alef generate` regen.
+
+## [3.5.0-rc.3] - 2026-05-25
+
+### Fixed
+
+- **ci(actions/build-elixir-hex): generate `Cargo.lock` unconditionally after `rewrite-native-deps`.** The fallback `cargo generate-lockfile` only ran on dry-run, but the lockfile is gitignored — real-release runs hit `Missing files: native/html_to_markdown_nif/Cargo.lock` at `mix hex.build`. Now runs in both modes. (kreuzberg-dev/actions v1.6.6, floating `v1` retagged.)
+
+- **ci(publish): split Dart pub.dev publishing into a workflow_dispatch flow so OIDC trusted publishing succeeds.** pub.dev's OIDC verifier rejects tokens minted by `release` events (`Authentication failed!`) and only accepts `push` / `workflow_dispatch`. The publish workflow now assembles the Dart package as an artifact under the `release`-triggered run, then dispatches a separate `publish-pubdev.yaml` workflow (`workflow_dispatch`) that downloads the artifact and runs `dart-lang/publish-pub@v1`. The dispatched job inherits a token GitHub's OIDC provider mints with `event_name == workflow_dispatch`, which pub.dev's audit accepts.
+
+- **ci(actions/homebrew-build-bottles): suppress `brew config` SIGPIPE under `pipefail` on arm64 Linux runners.** The arm64 runner's `/usr/bin/ldd` writes more output than `head -20` consumes; under `set -o pipefail` the broken-pipe propagated out of the early diagnostic block and aborted the script before any bottle work. Temporarily disables `pipefail` for the diagnostic stanza only — strict mode is restored before the build phase. (kreuzberg-dev/actions v1.6.7, floating `v1` retagged.)
+
+- **bindings: regenerated with alef 0.19.5.** Picks up the Kotlin Android trait-bridge codegen fixes that caused the v3.5.0-rc.2 `:compileReleaseKotlin` failure (`Unresolved reference 'HtmlToMarkdownRsBridge'`): `bridge_obj` filename is now used for trait-bridge codegen so the file matches the object name; trait-bridge emission is skipped when the bridge function is excluded via `kotlin_android.exclude_functions`. Also picks up the alef 0.19.5 cumulative sweep: WASM emitter JSON-deserializes structured sub-config fields; swift-bridge restores JSON deserialization step in pre-call AHashMap binding; alef-emitter removes stray `>` after `.collect::<Vec<Vec<String>>>()`; PHP/Ruby/Elixir/Swift/Dart bridges emit pre-call `AHashMap` binding + `ahash = "0.8"` scaffold dep for `Cow<'static, str>` key map params; WASM wraps sanitized `Vec<Vec<String>>` fields with `serde_wasm_bindgen::to_value()`; WASM deduplicates input DTO struct generation across functions sharing the same config type; FFI preserves `AHashMap<Cow<'static, str>, _>` param types across the wrapper boundary; setup-defaults-ruby appends `--add-checksums` to default `bundle install`; scaffold-ffi injects workspace version into every internal workspace dependency so `cargo publish` accepts the FFI crate.
+
+- **ci(e2e): pin `erlef/setup-beam@v1.24.0`** (was `@v1.24` floating minor) to avoid silent action upgrades during the rc cycle.
+
+- **release: cut v3.5.0-rc.3.** Aligned every workspace manifest on `3.5.0-rc.3` via `alef sync-versions --set 3.5.0-rc.3` + full `alef generate` regen against alef 0.19.5.
+
+## [3.5.0-rc.2] - 2026-05-25
+
 ### Changed
 
 - **ci(publish): replace inline Homebrew formula updater with `kreuzberg-dev/actions/publish-homebrew-source-formulas@v1`.** The `publish-homebrew-formula` job previously ran a 184-line `scripts/publish/update-homebrew-formula.sh` Bash heredoc that wrote `html-to-markdown.rb` + `libhtml-to-markdown.rb` from scratch (h2m is a dual-formula tap; the shared single-formula `publish-homebrew@v1` doesn't apply). The new shared action does the same job from per-formula `.rb.tmpl` templates + a `scripts/publish/homebrew.json` manifest, downloading release assets via `gh release download` and substituting their SHA256s into `${cli_*_sha}` / `${ffi_*_sha}` placeholders. The script is deleted; the formula generation rules now live in version-controlled Ruby templates rather than a bash heredoc. The job's gate now also passes on `dry_run == 'true'` (was `is_tag == 'true'` only) so dry-run pipelines exercise the bottle pipeline downstream — the new action substitutes a zero-SHA placeholder for missing assets on dry-run.
@@ -17,11 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **list**: Fix content duplication in Markdown output and the document structure collector when list items contain nested `ul` or `ol` children. `item.rs` previously captured the full rendered output of an `<li>` — including the rendered nested-list Markdown — as the item's text. A `text_end_pos` cursor now advances only past non-list children, so the structure collector records only the item's own text and the Markdown output for outer and mid items is not repeated. Affected: any `ul > li > ul` or `ol > li > ol` (arbitrarily nested) HTML structure. (#385)
 
+- **ci(publish): skip `publish-hex` and `homebrew-bottles` on dry-run.** Both jobs need real GitHub Release assets (`generate-elixir-checksums` downloads NIF tarballs; `brew install --build-bottle` downloads CLI/FFI source tarballs), but `upload-release-assets@v1` only logs on dry-run — the release doesn't exist. Both jobs failed every dry-run after surviving every other stage. Gated their `if:` on `dry_run != 'true'`; real-release runs continue to exercise them.
+
 - **ci(publish): replace inline Elixir Hex packaging with `kreuzberg-dev/actions/build-elixir-hex@v1`.** The `elixir-package` job in `.github/workflows/publish.yaml` previously ran `mix deps.get` + `mix hex.build` inline with no path-dep rewrite and no `Cargo.lock` generation. `Cargo.lock` is gitignored, so on a fresh CI checkout `mix hex.build` failed at the `files` list check with `Missing files: native/html_to_markdown_nif/Cargo.lock` — the proximate blocker on v3.5.0-rc.2 dry-run after the Go FFI fix landed. The new shared action wraps `rewrite-native-deps@v1` (default-on, dry-run-guarded) and falls back to `cargo generate-lockfile` on dry-run so the lockfile exists for `mix hex.build` even when the rewrite is skipped. Hex source-package builds now match the python-sdist / ruby-gem pattern (rewrite baked into the shared action; cannot be omitted).
-
-## [3.5.0-rc.2] - 2026-05-24
-
-### Changed
 
 - **release: cut v3.5.0-rc.2.** Aligned every workspace manifest (Cargo + npm + PyPI + Maven + Composer + Gemfile + Hex + pub.dev + Zig + R + Cocoa + NuGet + `Cargo.lock`) on `3.5.0-rc.2` via `alef sync-versions --set 3.5.0-rc.2` and re-generated all bindings, READMEs, docs reference pages, e2e suites, and `test_apps/` registry pins against alef 0.19.2.
 

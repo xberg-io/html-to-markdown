@@ -99,7 +99,7 @@ Requires Elixir 1.19+ and OTP 28. Add to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:html_to_markdown, "~> 3.5.0-rc.2"}
+    {:html_to_markdown, "~> 3.5.0"}
   ]
 end
 ```

@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-wasm",
-  "version": "3.5.0-rc.2",
+  "version": "3.5.0",
   "private": false,
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",

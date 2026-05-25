@@ -21,16 +21,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    sourceSets {
-        getByName("test") {
-            // Include the AAR-bundled Java facade as test sources
-            java.srcDir("../../packages/kotlin-android/src/main/java")
-            // Include the AAR-bundled Kotlin wrapper as test sources
-            kotlin.srcDir("../../packages/kotlin-android/src/main/kotlin")
-        }
-    }
-
     testOptions {
         // Gradle Managed Virtual Devices for on-device instrumented tests.
         // Run: ./gradlew pixel6api34DebugAndroidTest
@@ -57,9 +47,8 @@ kotlin {
 // here triggers Gradle "repository was added by build file" errors.
 
 dependencies {
-    // JNA for loading the native library from java.library.path
-    testImplementation("net.java.dev.jna:jna:5.18.1")
-
+    // Published Android AAR from Maven Central
+    testImplementation("dev.kreuzberg:html-to-markdown-android:3.5.0")
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -87,12 +76,4 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-
-    // Resolve the native library location (e.g., ../../target/release)
-    val libPath = System.getProperty("kb.lib.path") ?: "${rootDir}/../../target/release"
-    systemProperty("java.library.path", libPath)
-    systemProperty("jna.library.path", libPath)
-
-    // Resolve fixture paths (e.g. "docx/fake.docx") against test_documents/
-    workingDir = file("${rootDir}/../../test_documents")
 }

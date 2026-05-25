@@ -4,7 +4,12 @@
     .fingerprint = 0xf16334c0592376fc,
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
-        .html_to_markdown = .{ .path = "../../packages/zig" },
+        .html_to_markdown = .{
+            .url = "https://github.com/kreuzberg-dev/html-to-markdown-rs/releases/download/v3.5.0/html-to-markdown-rs-zig-v3.5.0.tar.gz",
+            // alef: hash not pinned — run `zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown-rs/releases/download/v3.5.0/html-to-markdown-rs-zig-v3.5.0.tar.gz` once to populate,
+            //       then set `hash` under [crates.e2e.registry.packages.zig] in alef.toml.
+            .hash = "TODO",
+        },
     },
     .paths = .{
         "build.zig",

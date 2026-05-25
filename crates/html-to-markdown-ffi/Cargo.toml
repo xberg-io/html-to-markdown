@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-ffi"
-version = "3.5.0-rc.2"
+version = "3.5.0"
 edition = "2021"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -9,28 +9,29 @@ keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
 repository = "https://github.com/kreuzberg-dev/html-to-markdown"
 
-# `serde_json` and `tokio` are emitted unconditionally above so the manifest
-# is stable across regens (and so the C FFI codegen can pull them in when an
-# async / Result-typed function appears in the API surface), but for umbrella
-# crates with no async fns and no JSON-marshalled return types they are
-# genuinely unused. The conditional `async-trait` / `futures-util` deps are
-# similarly flagged when the umbrella has trait-bridge / streaming adapters
-# configured but no actual async-trait / async-stream callsite in the
-# generated FFI shim.
-[package.metadata.cargo-machete]
-ignored = ["serde_json", "tokio", "async-trait"]
-
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
-[features]
-default = []
-
 [dependencies]
-async-trait = "0.1"
-html-to-markdown-rs = { path = "../html-to-markdown", version = "3.5.0-rc.2", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+html-to-markdown-rs = { path = "../html-to-markdown", version = "3.5.0", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+ahash = "0.8"
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+
+# `serde_json`, `ahash`, and `tokio` are emitted unconditionally above so the
+# manifest is stable across regens (and so the C FFI codegen can pull them in
+# when an async / Result-typed function appears in the API surface), but for
+# umbrella crates with no async fns and no JSON-marshalled return types they
+# are genuinely unused. The conditional `async-trait` / `futures-util` deps
+# are similarly flagged when the umbrella has trait-bridge / streaming adapters
+# configured but no actual async-trait / async-stream callsite in the generated
+# FFI shim.
+[package.metadata.cargo-machete]
+ignored = ["ahash", "serde_json", "tokio", "async-trait"]
+
+[features]
+default = []
 
 [build-dependencies]
 cbindgen = "0.29"

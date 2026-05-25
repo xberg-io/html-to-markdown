@@ -274,7 +274,7 @@ tasks:
 
   # === Alef lifecycle ===
   alef:generate:
-    desc: "Run full alef pipeline (generate + stubs + scaffold + readme + sync + e2e) and `alef docs` (docs/reference for Zensical)"
+    desc: "Run full alef pipeline (generate + stubs + scaffold + readme + sync + e2e + test-apps) and `alef docs` (docs/reference for Zensical)"
     cmds:
       - alef generate
       - alef stubs
@@ -282,7 +282,7 @@ tasks:
       - alef readme
       - alef sync-versions
       - alef e2e generate
-      - alef e2e generate --registry
+      - alef test-apps generate
       - alef docs
 
   alef:verify:
@@ -400,6 +400,7 @@ tasks:
       - task: e2e:smoke:wasm
       - task: e2e:smoke:ruby
       - task: e2e:smoke:php
+      - task: e2e:smoke:php_ext
       - task: e2e:smoke:go
       - task: e2e:smoke:java
       - task: e2e:smoke:csharp
@@ -407,6 +408,7 @@ tasks:
       - task: e2e:smoke:r
       - task: e2e:smoke:rust
       - task: e2e:smoke:c
+      - task: e2e:smoke:homebrew
 
   e2e:smoke:python:
     desc: "Smoke test Python package from PyPI"
@@ -495,6 +497,18 @@ tasks:
     dir: test_apps/c
     cmds:
       - make test
+
+  e2e:smoke:php_ext:
+    desc: "Smoke test PHP native extension installed via PIE"
+    dir: test_apps/php_ext
+    cmds:
+      - ./run_tests.sh
+
+  e2e:smoke:homebrew:
+    desc: "Smoke test the Homebrew CLI + FFI formulae"
+    dir: test_apps/homebrew
+    cmds:
+      - ./run_tests.sh
 
   e2e:test:all:
     desc: "Run comprehensive tests for all published packages"

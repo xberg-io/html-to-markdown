@@ -37,62 +37,65 @@ function requireOptionalDependency(name) {
 }
 
 const tryLoadBinding = () => {
+  // Local `.node` files are named after `napi.binaryName` (binary file name on disk).
+  // Optional-dep packages are named after `napi.packageName` (npm subpackage names),
+  // which inherits any scope prefix from the parent package.
   const targets = [
     [
       "linux",
       "x64",
       "gnu",
       "./html-to-markdown-node.linux-x64-gnu.node",
-      "html-to-markdown-node-linux-x64-gnu",
+      "@kreuzberg/html-to-markdown-node-linux-x64-gnu",
     ],
     [
       "linux",
       "x64",
       "musl",
       "./html-to-markdown-node.linux-x64-musl.node",
-      "html-to-markdown-node-linux-x64-musl",
+      "@kreuzberg/html-to-markdown-node-linux-x64-musl",
     ],
     [
       "linux",
       "arm64",
       "gnu",
       "./html-to-markdown-node.linux-arm64-gnu.node",
-      "html-to-markdown-node-linux-arm64-gnu",
+      "@kreuzberg/html-to-markdown-node-linux-arm64-gnu",
     ],
     [
       "linux",
       "arm64",
       "musl",
       "./html-to-markdown-node.linux-arm64-musl.node",
-      "html-to-markdown-node-linux-arm64-musl",
+      "@kreuzberg/html-to-markdown-node-linux-arm64-musl",
     ],
     [
       "darwin",
       "x64",
       null,
       "./html-to-markdown-node.darwin-x64.node",
-      "html-to-markdown-node-darwin-x64",
+      "@kreuzberg/html-to-markdown-node-darwin-x64",
     ],
     [
       "darwin",
       "arm64",
       null,
       "./html-to-markdown-node.darwin-arm64.node",
-      "html-to-markdown-node-darwin-arm64",
+      "@kreuzberg/html-to-markdown-node-darwin-arm64",
     ],
     [
       "win32",
       "x64",
       null,
       "./html-to-markdown-node.win32-x64-msvc.node",
-      "html-to-markdown-node-win32-x64-msvc",
+      "@kreuzberg/html-to-markdown-node-win32-x64-msvc",
     ],
     [
       "win32",
       "arm64",
       null,
       "./html-to-markdown-node.win32-arm64-msvc.node",
-      "html-to-markdown-node-win32-arm64-msvc",
+      "@kreuzberg/html-to-markdown-node-win32-arm64-msvc",
     ],
   ];
 

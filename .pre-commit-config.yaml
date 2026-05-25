@@ -257,8 +257,11 @@ repos:
         args: ["--minimum-tokens=120"]
         exclude: ^(test_apps/|e2e/java/)
   # Alef: verify bindings and sync versions.
+  # Pinned to the last tagged release. alef main is currently on 0.19.8
+  # (unreleased — pending Swift trait-bridge phantom fix and the test-apps
+  # subcommand split). Bump this pin once the next alef tag lands.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.19.4
+    rev: v0.19.7
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -271,7 +274,7 @@ repos:
 
   # GitHub Actions: pin maintenance
   - repo: https://github.com/Goldziher/gh-actions-updater
-    rev: v0.1.3
+    rev: v0.1.4
     hooks:
       - id: gh-actions-updater
 

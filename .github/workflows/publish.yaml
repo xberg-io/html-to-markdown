@@ -411,21 +411,33 @@ jobs:
           package: html_to_markdown
           version: ${{ needs.prepare.outputs.version }}
 
-  check-spi-swift:
-    name: Check Swift Package Index for tag
-    needs: prepare
-    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.prepare.outputs.release_swift == 'true' }}
+  assemble-dart-package:
+    name: Assemble Dart package artifact
+    needs: [prepare, check-pub]
+    if: ${{ needs.prepare.outputs.release_dart == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
     steps:
-      - id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
+      - uses: actions/checkout@v6
         with:
-          registry: swift
-          package: html-to-markdown
-          version: ${{ needs.prepare.outputs.version }}
-          repo: ${{ github.repository }}
+          ref: ${{ needs.prepare.outputs.ref }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dart-package-assembled
+          path: packages/dart
+          if-no-files-found: error
+          retention-days: 7
+
+  # Swift Package Index has no central registry — packages are consumed
+  # directly from git tags, so the tag push IS the publish event. The
+  # previous `check-spi-swift` + `publish-swift` jobs only pinged SPI for
+  # fast re-indexing (SPI auto-discovers within ~1h without a ping), so
+  # they have been dropped to cut runner cost. The `release_swift` output
+  # from `prepare` is still emitted but no longer consumed.
+  #
+  # Zig is similarly tag-based, but the publish-zig job is retained because
+  # it appends the tarball URL + SHA-256 to the release notes so consumers
+  # can copy-paste straight into `build.zig.zon`.
 
   check-zig:
     name: Check Zig package presence
@@ -1023,6 +1035,20 @@ jobs:
         run: |
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang go --target ${{ matrix.target }} -o dist/go-ffi
+          # Workaround: alef 0.19.6 packages Go FFI archives with the same
+          # `-ffi-` infix as the C FFI packager, which collides with the
+          # `html-to-markdown-rs-ffi-*` asset-prefix probe used by check-go and
+          # the verify-release-assets pattern list. Rename `-ffi-v` → `-go-v` so
+          # downstream gating can distinguish Go from C FFI tarballs. Drop this
+          # block once h2m's alef.toml moves to a release that ships the
+          # alef-side fix (alef/src/publish/package/go.rs already uses `-go-`
+          # on main).
+          shopt -s nullglob
+          for archive in dist/go-ffi/*-ffi-v*.tar.gz; do
+            renamed="${archive/-ffi-v/-go-v}"
+            mv "$archive" "$renamed"
+          done
+          shopt -u nullglob
 
       - uses: actions/upload-artifact@v7
         with:
@@ -1846,7 +1872,10 @@ jobs:
   publish-hex:
     name: Publish Hex package
     needs: [prepare, elixir-package, upload-elixir-release, check-hex]
-    if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+    # Skipped on dry-run: generate-elixir-checksums downloads NIF tarballs from
+    # the GitHub Release, which doesn't exist on dry-run (upload-release-assets
+    # only logs in dry-run mode). Real-release runs exercise this path.
+    if: ${{ needs.prepare.outputs.release_elixir == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.elixir-package.result == 'success' && (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1950,42 +1979,24 @@ jobs:
           MAVEN_GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-  publish-swift:
-    name: Publish Swift to Swift Package Index
-    needs: [prepare, check-spi-swift]
-    if: ${{ needs.prepare.outputs.release_swift == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-spi-swift.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-          submodules: recursive
-
-      - uses: kreuzberg-dev/actions/publish-swift@v1
-        with:
-          working-directory: packages/swift
-          tag: ${{ needs.prepare.outputs.tag }}
-          ping-spi: "true"
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-
-  publish-dart:
-    name: Publish Dart to pub.dev
-    needs: [prepare, check-pub]
-    if: ${{ needs.prepare.outputs.release_dart == 'true' && needs.prepare.outputs.is_tag == 'true' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
+  trigger-pubdev:
+    name: Trigger pub.dev publish workflow
+    needs: [prepare, check-pub, assemble-dart-package]
+    # pub.dev OIDC rejects tokens from `release` events. We dispatch a separate
+    # workflow whose `workflow_dispatch` event produces an accepted token.
+    if: ${{ needs.prepare.outputs.release_dart == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+      actions: write
     steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.ref }}
-          submodules: recursive
-
-      - uses: kreuzberg-dev/actions/publish-pub@v1
-        with:
-          package-dir: packages/dart
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
+      - name: Dispatch publish-pubdev workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh workflow run publish-pubdev.yaml \
+            --ref ${{ github.ref_name }} \
+            -f run_id=${{ github.run_id }}
 
   publish-zig:
     name: Publish Zig package metadata
@@ -2063,7 +2074,10 @@ jobs:
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
     needs: [prepare, publish-homebrew-formula]
-    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.publish-homebrew-formula.result == 'success' }}
+    # Skipped on dry-run: `brew install --build-bottle` downloads CLI/FFI source
+    # tarballs from the GitHub Release, which doesn't exist on dry-run (formula
+    # is rendered locally only; tap isn't pushed). Real-release runs cover this.
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -2204,8 +2218,7 @@ jobs:
       - publish-hex
       - publish-homebrew-bottles
       - publish-kotlin-android
-      - publish-swift
-      - publish-dart
+      - trigger-pubdev
       - publish-zig
       - upload-cli-release
       - upload-go-release
@@ -2241,8 +2254,7 @@ jobs:
       - publish-hex
       - publish-homebrew-bottles
       - publish-kotlin-android
-      - publish-swift
-      - publish-dart
+      - trigger-pubdev
       - publish-zig
       - upload-cli-release
       - upload-go-release

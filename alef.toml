@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.19.4"
+alef_version = "0.19.8"
 languages = [
   "python",
   "node",
@@ -311,6 +311,18 @@ precondition = "command -v gradle >/dev/null 2>&1"
 format = "cd packages/kotlin-android && gradle ktlintFormat --no-daemon"
 check = "cd packages/kotlin-android && gradle ktlintCheck --no-daemon"
 
+[crates.update.kotlin_android]
+# The com.github.ben-manes.versions plugin (current pin 0.52.0, latest 0.53.0)
+# throws `java.util.ConcurrentModificationException` under Gradle 9.5.1 on every
+# `:dependencyUpdates` invocation. The plugin has not shipped a release since
+# 2024-11 and the incompatibility is unpatched upstream. `task upgrade` and
+# `alef update --latest` both consequently fail on the kotlin_android step.
+# Skip the probe with an inert echo until either the plugin ships a Gradle 9
+# fix or we swap to `nl.littlerobots.version-catalog-update`.
+precondition = "command -v gradle >/dev/null 2>&1"
+update = "echo '[kotlin_android] skip: ben-manes/gradle-versions-plugin incompatible with Gradle 9.x'"
+upgrade = "echo '[kotlin_android] skip: ben-manes/gradle-versions-plugin incompatible with Gradle 9.x'"
+
 [crates.lint.swift]
 precondition = "command -v swift >/dev/null 2>&1"
 format = "swift format --in-place --recursive packages/swift/Sources"
@@ -450,11 +462,16 @@ build_release = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --relea
 [crates.publish]
 core_crate = "crates/html-to-markdown"
 
-[crates.publish.languages.ruby]
-vendor_mode = "core-only"
+# Ruby and Elixir use the alef default `vendor_mode = "registry"` —
+# `alef publish prepare` rewrites the `path = "../../../../../crates/...` core
+# dep in the NIF/gem Cargo.toml to a published `version = "<workspace>"` dep
+# resolved from crates.io. The shared `build-ruby-gem` / `build-elixir-hex`
+# actions also run the same rewrite at workflow time as a belt-and-braces
+# guard. Overriding to `core-only` here would silently vendor the core crate
+# into `packages/{ruby,elixir}/vendor/` and leave the manifest pointing at
+# the workspace path, which fails to resolve on consumer machines.
 
 [crates.publish.languages.elixir]
-vendor_mode = "core-only"
 nif_versions = ["2.16", "2.17"]
 
 [crates.publish.languages.r]
@@ -472,6 +489,7 @@ languages = [
   "node",
   "ruby",
   "php",
+  "php_ext",
   "c",
   "go",
   "java",
@@ -484,6 +502,7 @@ languages = [
   "swift",
   "dart",
   "zig",
+  "homebrew",
 ]
 result_fields = ["content", "document", "metadata", "tables", "warnings"]
 fields_optional = [
@@ -764,6 +783,20 @@ version = "^3.5.0"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
+version = "3.5.0"
+# hash populated by `zig fetch --save https://github.com/.../html-to-markdown-zig-v3.5.0.tar.gz`
+# once the v3.5.0 zig tarball lands on the release. Until then the generator
+# emits a placeholder comment in build.zig.zon directing the developer to
+# populate it.
+
+[crates.e2e.registry.packages.php_ext]
+name = "kreuzberg-dev/html-to-markdown-ext"
+version = "3.5.0"
+
+[crates.e2e.registry.packages.homebrew]
+tap = "kreuzberg-dev/tap"
+cli_formula = "html-to-markdown"
+ffi_formula = "libhtml-to-markdown"
 version = "3.5.0"
 
 [crates.e2e.packages.rust]
