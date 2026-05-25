@@ -20,6 +20,7 @@ import (
 const (
 	moduleVersion = "3.5.1"
 	repoURL       = "https://github.com/kreuzberg-dev/html-to-markdown"
+	assetPrefix   = "html-to-markdown-rs"
 )
 
 func main() {
@@ -96,7 +97,7 @@ func downloadAndExtractLibrary(cacheDir string) error {
 
 	// Clean version for asset name
 	version := strings.TrimPrefix(moduleVersion, "v")
-	assetName := fmt.Sprintf("html-to-markdown-rs-go-v%s-%s-%s.tar.gz", version, osName, goarch)
+	assetName := fmt.Sprintf("%s-go-v%s-%s-%s.tar.gz", assetPrefix, version, osName, goarch)
 	downloadURL := fmt.Sprintf("%s/releases/download/v%s/%s", repoURL, version, assetName)
 
 	// Create cache directory

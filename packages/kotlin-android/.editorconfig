@@ -10,8 +10,8 @@ trim_trailing_whitespace = true
 [*.kt]
 indent_style = space
 indent_size = 4
-# Java packages derived from hyphenated GitHub orgs (e.g. `kreuzberg-dev` →
-# `com.github.kreuzberg_dev`) carry underscores; allow them for the
+# Java packages derived from hyphenated GitHub orgs (e.g. `sample-org` →
+# `com.github.sample_org`) carry underscores; allow them for the
 # co-located Java facade and its Kotlin wrappers.
 ktlint_standard_package-name = disabled
 # ktfmt and ktlint disagree on class/function/parameter splitting heuristics

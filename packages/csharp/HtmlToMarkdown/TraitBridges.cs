@@ -1092,6 +1092,20 @@ public static class HtmlVisitorRegistry {
     private static readonly ConcurrentDictionary<string, HtmlVisitorBridge> _bridges =
         new ConcurrentDictionary<string, HtmlVisitorBridge>();
 
+    /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>
+    public static IntPtr RegisterHtmlVisitor(IHtmlVisitor impl) {
+        if (impl == null)
+            throw new ArgumentNullException(nameof(impl));
+
+        var bridge = new HtmlVisitorBridge(impl);
+        var userDataHandle = GCHandle.Alloc(bridge, GCHandleType.Normal);
+        var userData = GCHandle.ToIntPtr(userDataHandle);
+        var name = "bridge_" + Guid.NewGuid().ToString();
+
+        _bridges.TryAdd(name, bridge);
+        return userData;
+    }
+
     /// <summary>Register a HtmlVisitor implementation</summary>
 
     public static void Register(IHtmlVisitor impl, string name) {

@@ -27,8 +27,8 @@ EXT_NAME="html_to_markdown"
 
 # Determine OS-specific extension suffix.
 case "$(uname -s)" in
-  Darwin) EXT_SUFFIX=".dylib" ;;
-  *)      EXT_SUFFIX=".so" ;;
+Darwin) EXT_SUFFIX=".dylib" ;;
+*) EXT_SUFFIX=".so" ;;
 esac
 
 EXT_PATH="$EXT_DIR/$EXT_NAME$EXT_SUFFIX"

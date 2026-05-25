@@ -8,11 +8,9 @@ readme = false
 keywords = ["html", "markdown", "converter"]
 categories = ["text-processing"]
 
-# `ahash` is conditionally referenced: only when the umbrella crate exposes
-# `AHashMap<Cow<str>, _>` parameters (the conditional `__*_ahash` shim rebuilds).
-# `futures-util` is similarly conditional on streaming adapters being declared.
+# `ahash` and `futures-util` are conditionally included but not directly used in PHP code.
 [package.metadata.cargo-machete]
-ignored = ["tokio", "async-trait", "ahash"]
+ignored = ["tokio", "ahash", "async-trait"]
 
 [lib]
 crate-type = ["cdylib"]

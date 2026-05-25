@@ -261,7 +261,7 @@ repos:
   # (unreleased). The alef-sync-versions hook will try to bump this to
   # match alef/Cargo.toml; revert before committing release-prep.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.19.9
+    rev: v0.19.10
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
@@ -274,7 +274,7 @@ repos:
 
   # GitHub Actions: pin maintenance
   - repo: https://github.com/Goldziher/gh-actions-updater
-    rev: v0.1.4
+    rev: v0.1.5
     hooks:
       - id: gh-actions-updater
 

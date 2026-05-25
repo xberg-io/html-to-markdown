@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -31,16 +30,10 @@ android {
     }
 
     testOptions {
-        // Gradle Managed Virtual Devices for on-device instrumented tests.
-        // Run: ./gradlew pixel6api34DebugAndroidTest
-        managedDevices {
-            devices {
-                create<ManagedVirtualDevice>("pixel6api34") {
-                    device = "Pixel 6"
-                    apiLevel = 34
-                    systemImageSource = "aosp"
-                }
-            }
+        // Host JVM unit tests: no Android device/emulator required.
+        // Tests run against the published AAR and JVM-side deps via `gradle test`.
+        unitTests {
+            isReturnDefaultValues = true
         }
     }
 }
@@ -56,9 +49,6 @@ kotlin {
 // here triggers Gradle "repository was added by build file" errors.
 
 dependencies {
-    // JNA for loading the native library from java.library.path
-    testImplementation("net.java.dev.jna:jna:5.18.1")
-
 
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
@@ -83,6 +73,10 @@ dependencies {
 
     // Kotlin stdlib test helpers
     testImplementation(kotlin("test"))
+
+    // JNA for loading the native library from java.library.path
+    testImplementation("net.java.dev.jna:jna:5.18.1")
+
 }
 
 tasks.withType<Test> {
