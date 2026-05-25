@@ -48,7 +48,7 @@ kotlin {
 
 dependencies {
     // Published Android AAR from Maven Central
-    testImplementation("dev.kreuzberg:html-to-markdown-android:3.5.0")
+    testImplementation("dev.kreuzberg:html-to-markdown-android:3.5.1")
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")

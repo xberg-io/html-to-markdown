@@ -8,271 +8,129 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ConversionError`, `HtmlVisitorDartImpl`
+            // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ConversionError`, `HtmlVisitorDartImpl`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
-/// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
+
+            /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
 ///
 /// **Errors:**
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
-Future<ConversionResult> convert({
-  required String html,
-  ConversionOptions? options,
-}) => RustLib.instance.api.crateConvert(html: html, options: options);
+Future<ConversionResult>  convert({required String html , ConversionOptions? options }) => RustLib.instance.api.crateConvert(html: html, options: options);
 
-Future<DocumentMetadata> createDocumentMetadataFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreateDocumentMetadataFromJson(json: json);
+Future<DocumentMetadata>  createDocumentMetadataFromJson({required String json }) => RustLib.instance.api.crateCreateDocumentMetadataFromJson(json: json);
 
-Future<HeaderMetadata> createHeaderMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateHeaderMetadataFromJson(json: json);
+Future<HeaderMetadata>  createHeaderMetadataFromJson({required String json }) => RustLib.instance.api.crateCreateHeaderMetadataFromJson(json: json);
 
-Future<LinkMetadata> createLinkMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateLinkMetadataFromJson(json: json);
+Future<LinkMetadata>  createLinkMetadataFromJson({required String json }) => RustLib.instance.api.crateCreateLinkMetadataFromJson(json: json);
 
-Future<ImageMetadata> createImageMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateImageMetadataFromJson(json: json);
+Future<ImageMetadata>  createImageMetadataFromJson({required String json }) => RustLib.instance.api.crateCreateImageMetadataFromJson(json: json);
 
-Future<StructuredData> createStructuredDataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateStructuredDataFromJson(json: json);
+Future<StructuredData>  createStructuredDataFromJson({required String json }) => RustLib.instance.api.crateCreateStructuredDataFromJson(json: json);
 
-Future<HtmlMetadata> createHtmlMetadataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateHtmlMetadataFromJson(json: json);
+Future<HtmlMetadata>  createHtmlMetadataFromJson({required String json }) => RustLib.instance.api.crateCreateHtmlMetadataFromJson(json: json);
 
-Future<ConversionOptions> createConversionOptionsFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreateConversionOptionsFromJson(json: json);
+Future<ConversionOptions>  createConversionOptionsFromJson({required String json }) => RustLib.instance.api.crateCreateConversionOptionsFromJson(json: json);
 
-Future<ConversionOptionsUpdate> createConversionOptionsUpdateFromJson({
-  required String json,
-}) =>
-    RustLib.instance.api.crateCreateConversionOptionsUpdateFromJson(json: json);
+Future<ConversionOptionsUpdate>  createConversionOptionsUpdateFromJson({required String json }) => RustLib.instance.api.crateCreateConversionOptionsUpdateFromJson(json: json);
 
-Future<PreprocessingOptions> createPreprocessingOptionsFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreatePreprocessingOptionsFromJson(json: json);
+Future<PreprocessingOptions>  createPreprocessingOptionsFromJson({required String json }) => RustLib.instance.api.crateCreatePreprocessingOptionsFromJson(json: json);
 
-Future<PreprocessingOptionsUpdate> createPreprocessingOptionsUpdateFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreatePreprocessingOptionsUpdateFromJson(
-  json: json,
-);
+Future<PreprocessingOptionsUpdate>  createPreprocessingOptionsUpdateFromJson({required String json }) => RustLib.instance.api.crateCreatePreprocessingOptionsUpdateFromJson(json: json);
 
-Future<DocumentStructure> createDocumentStructureFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreateDocumentStructureFromJson(json: json);
+Future<DocumentStructure>  createDocumentStructureFromJson({required String json }) => RustLib.instance.api.crateCreateDocumentStructureFromJson(json: json);
 
-Future<DocumentNode> createDocumentNodeFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateDocumentNodeFromJson(json: json);
+Future<DocumentNode>  createDocumentNodeFromJson({required String json }) => RustLib.instance.api.crateCreateDocumentNodeFromJson(json: json);
 
-Future<TextAnnotation> createTextAnnotationFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateTextAnnotationFromJson(json: json);
+Future<TextAnnotation>  createTextAnnotationFromJson({required String json }) => RustLib.instance.api.crateCreateTextAnnotationFromJson(json: json);
 
-Future<ConversionResult> createConversionResultFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreateConversionResultFromJson(json: json);
+Future<ConversionResult>  createConversionResultFromJson({required String json }) => RustLib.instance.api.crateCreateConversionResultFromJson(json: json);
 
-Future<TableGrid> createTableGridFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateTableGridFromJson(json: json);
+Future<TableGrid>  createTableGridFromJson({required String json }) => RustLib.instance.api.crateCreateTableGridFromJson(json: json);
 
-Future<GridCell> createGridCellFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateGridCellFromJson(json: json);
+Future<GridCell>  createGridCellFromJson({required String json }) => RustLib.instance.api.crateCreateGridCellFromJson(json: json);
 
-Future<TableData> createTableDataFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateTableDataFromJson(json: json);
+Future<TableData>  createTableDataFromJson({required String json }) => RustLib.instance.api.crateCreateTableDataFromJson(json: json);
 
-Future<ProcessingWarning> createProcessingWarningFromJson({
-  required String json,
-}) => RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
+Future<ProcessingWarning>  createProcessingWarningFromJson({required String json }) => RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
 
-Future<NodeContext> createNodeContextFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
+Future<NodeContext>  createNodeContextFromJson({required String json }) => RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
 
 /// Construct a `VisitorHandle` from Dart callback closures.
 /// FRB synthesises a Dart-callable function type for each closure parameter,
 /// which is the whole point of taking them as `impl Fn(...) -> DartFnFuture<R>`
 /// parameters rather than storing them as `Box<dyn Fn(...)>` fields on an
 /// opaque struct (FRB v2 cannot generate callable closure types in that shape).
-Future<VisitorHandle> createHtmlVisitor({
-  required FutureOr<VisitResult> Function(NodeContext, String) visitText,
-  required FutureOr<VisitResult> Function(NodeContext) visitElementStart,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitElementEnd,
-  required FutureOr<VisitResult> Function(NodeContext, String, String, String?)
-  visitLink,
-  required FutureOr<VisitResult> Function(NodeContext, String, String, String?)
-  visitImage,
-  required FutureOr<VisitResult> Function(
-    NodeContext,
-    PlatformInt64,
-    String,
-    String?,
-  )
-  visitHeading,
-  required FutureOr<VisitResult> Function(NodeContext, String?, String)
-  visitCodeBlock,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitCodeInline,
-  required FutureOr<VisitResult> Function(NodeContext, bool, String, String)
-  visitListItem,
-  required FutureOr<VisitResult> Function(NodeContext, bool) visitListStart,
-  required FutureOr<VisitResult> Function(NodeContext, bool, String)
-  visitListEnd,
-  required FutureOr<VisitResult> Function(NodeContext) visitTableStart,
-  required FutureOr<VisitResult> Function(NodeContext, List<String>, bool)
-  visitTableRow,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitTableEnd,
-  required FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64)
-  visitBlockquote,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitStrong,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitEmphasis,
-  required FutureOr<VisitResult> Function(NodeContext, String)
-  visitStrikethrough,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitUnderline,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitSubscript,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitSuperscript,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitMark,
-  required FutureOr<VisitResult> Function(NodeContext) visitLineBreak,
-  required FutureOr<VisitResult> Function(NodeContext) visitHorizontalRule,
-  required FutureOr<VisitResult> Function(NodeContext, String, String)
-  visitCustomElement,
-  required FutureOr<VisitResult> Function(NodeContext) visitDefinitionListStart,
-  required FutureOr<VisitResult> Function(NodeContext, String)
-  visitDefinitionTerm,
-  required FutureOr<VisitResult> Function(NodeContext, String)
-  visitDefinitionDescription,
-  required FutureOr<VisitResult> Function(NodeContext, String)
-  visitDefinitionListEnd,
-  required FutureOr<VisitResult> Function(NodeContext, String?, String?)
-  visitForm,
-  required FutureOr<VisitResult> Function(NodeContext, String, String?, String?)
-  visitInput,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitButton,
-  required FutureOr<VisitResult> Function(NodeContext, String?) visitAudio,
-  required FutureOr<VisitResult> Function(NodeContext, String?) visitVideo,
-  required FutureOr<VisitResult> Function(NodeContext, String?) visitIframe,
-  required FutureOr<VisitResult> Function(NodeContext, bool) visitDetails,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitSummary,
-  required FutureOr<VisitResult> Function(NodeContext) visitFigureStart,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitFigcaption,
-  required FutureOr<VisitResult> Function(NodeContext, String) visitFigureEnd,
-}) => RustLib.instance.api.crateCreateHtmlVisitor(
-  visitText: visitText,
-  visitElementStart: visitElementStart,
-  visitElementEnd: visitElementEnd,
-  visitLink: visitLink,
-  visitImage: visitImage,
-  visitHeading: visitHeading,
-  visitCodeBlock: visitCodeBlock,
-  visitCodeInline: visitCodeInline,
-  visitListItem: visitListItem,
-  visitListStart: visitListStart,
-  visitListEnd: visitListEnd,
-  visitTableStart: visitTableStart,
-  visitTableRow: visitTableRow,
-  visitTableEnd: visitTableEnd,
-  visitBlockquote: visitBlockquote,
-  visitStrong: visitStrong,
-  visitEmphasis: visitEmphasis,
-  visitStrikethrough: visitStrikethrough,
-  visitUnderline: visitUnderline,
-  visitSubscript: visitSubscript,
-  visitSuperscript: visitSuperscript,
-  visitMark: visitMark,
-  visitLineBreak: visitLineBreak,
-  visitHorizontalRule: visitHorizontalRule,
-  visitCustomElement: visitCustomElement,
-  visitDefinitionListStart: visitDefinitionListStart,
-  visitDefinitionTerm: visitDefinitionTerm,
-  visitDefinitionDescription: visitDefinitionDescription,
-  visitDefinitionListEnd: visitDefinitionListEnd,
-  visitForm: visitForm,
-  visitInput: visitInput,
-  visitButton: visitButton,
-  visitAudio: visitAudio,
-  visitVideo: visitVideo,
-  visitIframe: visitIframe,
-  visitDetails: visitDetails,
-  visitSummary: visitSummary,
-  visitFigureStart: visitFigureStart,
-  visitFigcaption: visitFigcaption,
-  visitFigureEnd: visitFigureEnd,
-);
+Future<VisitorHandle>  createHtmlVisitor({required FutureOr<VisitResult> Function(NodeContext, String) visitText , required FutureOr<VisitResult> Function(NodeContext) visitElementStart , required FutureOr<VisitResult> Function(NodeContext, String) visitElementEnd , required FutureOr<VisitResult> Function(NodeContext, String, String, String?) visitLink , required FutureOr<VisitResult> Function(NodeContext, String, String, String?) visitImage , required FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?) visitHeading , required FutureOr<VisitResult> Function(NodeContext, String?, String) visitCodeBlock , required FutureOr<VisitResult> Function(NodeContext, String) visitCodeInline , required FutureOr<VisitResult> Function(NodeContext, bool, String, String) visitListItem , required FutureOr<VisitResult> Function(NodeContext, bool) visitListStart , required FutureOr<VisitResult> Function(NodeContext, bool, String) visitListEnd , required FutureOr<VisitResult> Function(NodeContext) visitTableStart , required FutureOr<VisitResult> Function(NodeContext, List<String>, bool) visitTableRow , required FutureOr<VisitResult> Function(NodeContext, String) visitTableEnd , required FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64) visitBlockquote , required FutureOr<VisitResult> Function(NodeContext, String) visitStrong , required FutureOr<VisitResult> Function(NodeContext, String) visitEmphasis , required FutureOr<VisitResult> Function(NodeContext, String) visitStrikethrough , required FutureOr<VisitResult> Function(NodeContext, String) visitUnderline , required FutureOr<VisitResult> Function(NodeContext, String) visitSubscript , required FutureOr<VisitResult> Function(NodeContext, String) visitSuperscript , required FutureOr<VisitResult> Function(NodeContext, String) visitMark , required FutureOr<VisitResult> Function(NodeContext) visitLineBreak , required FutureOr<VisitResult> Function(NodeContext) visitHorizontalRule , required FutureOr<VisitResult> Function(NodeContext, String, String) visitCustomElement , required FutureOr<VisitResult> Function(NodeContext) visitDefinitionListStart , required FutureOr<VisitResult> Function(NodeContext, String) visitDefinitionTerm , required FutureOr<VisitResult> Function(NodeContext, String) visitDefinitionDescription , required FutureOr<VisitResult> Function(NodeContext, String) visitDefinitionListEnd , required FutureOr<VisitResult> Function(NodeContext, String?, String?) visitForm , required FutureOr<VisitResult> Function(NodeContext, String, String?, String?) visitInput , required FutureOr<VisitResult> Function(NodeContext, String) visitButton , required FutureOr<VisitResult> Function(NodeContext, String?) visitAudio , required FutureOr<VisitResult> Function(NodeContext, String?) visitVideo , required FutureOr<VisitResult> Function(NodeContext, String?) visitIframe , required FutureOr<VisitResult> Function(NodeContext, bool) visitDetails , required FutureOr<VisitResult> Function(NodeContext, String) visitSummary , required FutureOr<VisitResult> Function(NodeContext) visitFigureStart , required FutureOr<VisitResult> Function(NodeContext, String) visitFigcaption , required FutureOr<VisitResult> Function(NodeContext, String) visitFigureEnd }) => RustLib.instance.api.crateCreateHtmlVisitor(visitText: visitText, visitElementStart: visitElementStart, visitElementEnd: visitElementEnd, visitLink: visitLink, visitImage: visitImage, visitHeading: visitHeading, visitCodeBlock: visitCodeBlock, visitCodeInline: visitCodeInline, visitListItem: visitListItem, visitListStart: visitListStart, visitListEnd: visitListEnd, visitTableStart: visitTableStart, visitTableRow: visitTableRow, visitTableEnd: visitTableEnd, visitBlockquote: visitBlockquote, visitStrong: visitStrong, visitEmphasis: visitEmphasis, visitStrikethrough: visitStrikethrough, visitUnderline: visitUnderline, visitSubscript: visitSubscript, visitSuperscript: visitSuperscript, visitMark: visitMark, visitLineBreak: visitLineBreak, visitHorizontalRule: visitHorizontalRule, visitCustomElement: visitCustomElement, visitDefinitionListStart: visitDefinitionListStart, visitDefinitionTerm: visitDefinitionTerm, visitDefinitionDescription: visitDefinitionDescription, visitDefinitionListEnd: visitDefinitionListEnd, visitForm: visitForm, visitInput: visitInput, visitButton: visitButton, visitAudio: visitAudio, visitVideo: visitVideo, visitIframe: visitIframe, visitDetails: visitDetails, visitSummary: visitSummary, visitFigureStart: visitFigureStart, visitFigcaption: visitFigcaption, visitFigureEnd: visitFigureEnd);
 
 /// Build a `ConversionOptions` from a JSON blob and attach a Dart-built
 /// `VisitorHandle` to its `visitor` field. The mirror struct uses `final`
 /// dart fields, so callers cannot patch the visitor in after JSON load —
 /// this helper does the merge on the Rust side instead.
-Future<ConversionOptions> createConversionOptionsFromJsonWithVisitor({
-  required String json,
-  VisitorHandle? visitor,
-}) => RustLib.instance.api.crateCreateConversionOptionsFromJsonWithVisitor(
-  json: json,
-  visitor: visitor,
-);
+Future<ConversionOptions>  createConversionOptionsFromJsonWithVisitor({required String json , VisitorHandle? visitor }) => RustLib.instance.api.crateCreateConversionOptionsFromJsonWithVisitor(json: json, visitor: visitor);
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<VisitorHandle>>
-abstract class VisitorHandle implements RustOpaqueInterface {}
+            
+                // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<VisitorHandle>>
+                abstract class VisitorHandle implements RustOpaqueInterface {
+                    
+
+                    
+                }
+                
 
 @freezed
-sealed class AnnotationKind with _$AnnotationKind {
-  const AnnotationKind._();
+                sealed class AnnotationKind with _$AnnotationKind  {
+                    const AnnotationKind._();
 
-  /// Bold / strong emphasis.
-  const factory AnnotationKind.bold() = AnnotationKind_Bold;
+                     /// Bold / strong emphasis.
+const factory AnnotationKind.bold() = AnnotationKind_Bold;
+ /// Italic / emphasis.
+const factory AnnotationKind.italic() = AnnotationKind_Italic;
+ /// Underline.
+const factory AnnotationKind.underline() = AnnotationKind_Underline;
+ /// Strikethrough / deleted text.
+const factory AnnotationKind.strikethrough() = AnnotationKind_Strikethrough;
+ /// Inline code.
+const factory AnnotationKind.code() = AnnotationKind_Code;
+ /// Subscript text.
+const factory AnnotationKind.subscript() = AnnotationKind_Subscript;
+ /// Superscript text.
+const factory AnnotationKind.superscript() = AnnotationKind_Superscript;
+ /// Highlighted / marked text.
+const factory AnnotationKind.highlight() = AnnotationKind_Highlight;
+ /// A hyperlink sourced from an `<a href="...">` element.
+const factory AnnotationKind.link({ /// The URL from the `href` attribute, copied verbatim from the source HTML.
+///
+/// No URL decoding or normalization is performed: percent-encoded sequences, relative
+/// paths, and protocol-relative URLs (`//example.com`) are all preserved exactly as
+/// written in the source. Callers that need an absolute URL must resolve it against the
+/// document base URL themselves.
+  required String url ,/// The `title` attribute of the `<a>` element, if present.
+///
+/// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
+/// is copied verbatim — HTML entities within the title are not decoded.
+  required String title , }) = AnnotationKind_Link;
 
-  /// Italic / emphasis.
-  const factory AnnotationKind.italic() = AnnotationKind_Italic;
+                    
 
-  /// Underline.
-  const factory AnnotationKind.underline() = AnnotationKind_Underline;
-
-  /// Strikethrough / deleted text.
-  const factory AnnotationKind.strikethrough() = AnnotationKind_Strikethrough;
-
-  /// Inline code.
-  const factory AnnotationKind.code() = AnnotationKind_Code;
-
-  /// Subscript text.
-  const factory AnnotationKind.subscript() = AnnotationKind_Subscript;
-
-  /// Superscript text.
-  const factory AnnotationKind.superscript() = AnnotationKind_Superscript;
-
-  /// Highlighted / marked text.
-  const factory AnnotationKind.highlight() = AnnotationKind_Highlight;
-
-  /// A hyperlink sourced from an `<a href="...">` element.
-  const factory AnnotationKind.link({
-    /// The URL from the `href` attribute, copied verbatim from the source HTML.
-    ///
-    /// No URL decoding or normalization is performed: percent-encoded sequences, relative
-    /// paths, and protocol-relative URLs (`//example.com`) are all preserved exactly as
-    /// written in the source. Callers that need an absolute URL must resolve it against the
-    /// document base URL themselves.
-    required String url,
-
-    /// The `title` attribute of the `<a>` element, if present.
-    ///
-    /// `None` when the `<a>` tag has no `title="..."` attribute. When present, the value
-    /// is copied verbatim — HTML entities within the title are not decoded.
-    required String title,
-  }) = AnnotationKind_Link;
-}
+                    
+                }
 
 /// Code block fence style in Markdown output.
 ///
 /// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
 enum CodeBlockStyle {
-  /// Indented code blocks (4 spaces). `CommonMark` standard.
-  indented,
-
-  /// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
-  backticks,
-
-  /// Fenced code blocks with tildes (~~~). Supports language hints.
-  tildes,
-}
+                    /// Indented code blocks (4 spaces). `CommonMark` standard.
+indented,
+/// Fenced code blocks with backticks (```). Default (GFM). Supports language hints.
+backticks,
+/// Fenced code blocks with tildes (~~~). Supports language hints.
+tildes,
+                    ;
+                    
+                }
 
 /// Main conversion options for HTML to Markdown conversion.
 ///
@@ -289,585 +147,265 @@ enum CodeBlockStyle {
 ///     .wrap_width(100)
 ///     .build();
 /// ```
-class ConversionOptions {
-  /// Heading style to use in Markdown output (ATX `#` or Setext underline).
-  final HeadingStyle headingStyle;
+class ConversionOptions  {
+                /// Heading style to use in Markdown output (ATX `#` or Setext underline).
+final HeadingStyle headingStyle;
+/// How to indent nested list items (spaces or tab).
+final ListIndentType listIndentType;
+/// Number of spaces (or tabs) to use for each level of list indentation.
+final PlatformInt64 listIndentWidth;
+/// Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).
+final String bullets;
+/// Character used for bold/italic emphasis markers (`*` or `_`).
+final String strongEmSymbol;
+/// Escape `*` characters in plain text to avoid unintended bold/italic.
+final bool escapeAsterisks;
+/// Escape `_` characters in plain text to avoid unintended bold/italic.
+final bool escapeUnderscores;
+/// Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text.
+final bool escapeMisc;
+/// Escape ASCII characters that have special meaning in certain Markdown dialects.
+final bool escapeAscii;
+/// Default language annotation for fenced code blocks that have no language hint.
+final String codeLanguage;
+/// Automatically convert bare URLs into Markdown autolinks.
+final bool autolinks;
+/// Emit a default title when no `<title>` tag is present.
+final bool defaultTitle;
+/// Render `<br>` elements inside table cells as literal line breaks.
+final bool brInTables;
+/// Emit tables without column padding (compact GFM format).
+///
+/// When `true`, column widths are not computed and cells are emitted with
+/// no trailing spaces. Separator rows use exactly `---` per column.
+/// Produces token-efficient output suitable for RAG / LLM contexts.
+///
+/// Default `false` (aligned padding preserved).
+final bool compactTables;
+/// Style used for `<mark>` / highlighted text (e.g. `==text==`).
+final HighlightStyle highlightStyle;
+/// Populate `result.metadata` with `<head>` / `<meta>` extraction
+/// (title, description, Open Graph, Twitter Card, JSON-LD, …).
+///
+/// Default `true`. Disabling skips the metadata pass only — table
+/// extraction into `result.tables` runs unconditionally.
+final bool extractMetadata;
+/// Controls how whitespace sequences are normalised in the converted output.
+///
+/// - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
+///   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+/// - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
+///   source HTML, including runs of spaces and embedded newlines.
+///
+/// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
+/// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
+final WhitespaceMode whitespaceMode;
+/// Strip all newlines from the output, producing a single-line result.
+final bool stripNewlines;
+/// Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
+final bool wrap;
+/// Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
+///
+/// Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
+/// is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
+/// effect when `wrap` is `false`.
+final PlatformInt64 wrapWidth;
+/// Treat the entire document as inline content (no block-level wrappers).
+final bool convertAsInline;
+/// Markdown notation for subscript text (e.g. `"~"`).
+final String subSymbol;
+/// Markdown notation for superscript text (e.g. `"^"`).
+final String supSymbol;
+/// How to encode hard line breaks (`<br>`) in Markdown.
+final NewlineStyle newlineStyle;
+/// Style used for fenced code blocks (backticks or tilde).
+final CodeBlockStyle codeBlockStyle;
+/// HTML tag names whose `<img>` children are kept inline instead of block.
+final List<String> keepInlineImagesIn;
+/// Options for the HTML pre-processing pass applied before conversion begins.
+///
+/// Pre-processing runs before the HTML is handed to the converter and can perform operations
+/// such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
+/// vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
+///
+/// Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
+/// passes. Set individual fields on [`PreprocessingOptions`] (or construct via
+/// [`ConversionOptions::builder`]) to opt in or out of specific passes.
+final PreprocessingOptions preprocessing;
+/// Expected character encoding of the input HTML (default `"utf-8"`).
+final String encoding;
+/// Emit debug information during conversion.
+final bool debug;
+/// HTML tag names whose content is stripped from the output entirely.
+final List<String> stripTags;
+/// HTML tag names that are preserved verbatim in the output.
+final List<String> preserveTags;
+/// Skip conversion of `<img>` elements (omit images from output).
+final bool skipImages;
+/// Link rendering style (inline or reference).
+final LinkStyle linkStyle;
+/// Target output format (Markdown, plain text, etc.).
+final OutputFormat outputFormat;
+/// Include structured document tree in result.
+final bool includeDocumentStructure;
+/// Extract inline images from data URIs and SVGs.
+final bool extractImages;
+/// Maximum decoded image size in bytes (default 5MB).
+final PlatformInt64 maxImageSize;
+/// Capture SVG elements as images.
+final bool captureSvg;
+/// Infer image dimensions from data.
+final bool inferDimensions;
+/// Maximum DOM traversal depth. `None` means unlimited.
+/// When set, subtrees beyond this depth are silently truncated.
+final PlatformInt64? maxDepth;
+/// CSS selectors for elements to exclude entirely (element + all content).
+///
+/// Unlike `strip_tags` (which removes the tag wrapper but keeps children),
+/// excluded elements and all their descendants are dropped from the output.
+/// Supports any CSS selector that `tl` supports: tag names, `.class`,
+/// `#id`, `[attribute]`, etc.
+///
+/// Invalid selectors are silently skipped at conversion time.
+///
+/// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
+final List<String> excludeSelectors;
+/// Optional visitor for custom traversal logic.
+///
+/// When set, the visitor's callbacks are invoked for matching HTML elements
+/// during conversion, allowing custom output, skipping, or HTML preservation.
+/// See `HtmlVisitor`.
+final VisitorHandle? visitor;
 
-  /// How to indent nested list items (spaces or tab).
-  final ListIndentType listIndentType;
+                const ConversionOptions({required this.headingStyle ,required this.listIndentType ,required this.listIndentWidth ,required this.bullets ,required this.strongEmSymbol ,required this.escapeAsterisks ,required this.escapeUnderscores ,required this.escapeMisc ,required this.escapeAscii ,required this.codeLanguage ,required this.autolinks ,required this.defaultTitle ,required this.brInTables ,required this.compactTables ,required this.highlightStyle ,required this.extractMetadata ,required this.whitespaceMode ,required this.stripNewlines ,required this.wrap ,required this.wrapWidth ,required this.convertAsInline ,required this.subSymbol ,required this.supSymbol ,required this.newlineStyle ,required this.codeBlockStyle ,required this.keepInlineImagesIn ,required this.preprocessing ,required this.encoding ,required this.debug ,required this.stripTags ,required this.preserveTags ,required this.skipImages ,required this.linkStyle ,required this.outputFormat ,required this.includeDocumentStructure ,required this.extractImages ,required this.maxImageSize ,required this.captureSvg ,required this.inferDimensions ,this.maxDepth ,required this.excludeSelectors ,this.visitor ,});
 
-  /// Number of spaces (or tabs) to use for each level of list indentation.
-  final PlatformInt64 listIndentWidth;
+                
+                
 
-  /// Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`).
-  final String bullets;
+                
+        @override
+        int get hashCode => headingStyle.hashCode^listIndentType.hashCode^listIndentWidth.hashCode^bullets.hashCode^strongEmSymbol.hashCode^escapeAsterisks.hashCode^escapeUnderscores.hashCode^escapeMisc.hashCode^escapeAscii.hashCode^codeLanguage.hashCode^autolinks.hashCode^defaultTitle.hashCode^brInTables.hashCode^compactTables.hashCode^highlightStyle.hashCode^extractMetadata.hashCode^whitespaceMode.hashCode^stripNewlines.hashCode^wrap.hashCode^wrapWidth.hashCode^convertAsInline.hashCode^subSymbol.hashCode^supSymbol.hashCode^newlineStyle.hashCode^codeBlockStyle.hashCode^keepInlineImagesIn.hashCode^preprocessing.hashCode^encoding.hashCode^debug.hashCode^stripTags.hashCode^preserveTags.hashCode^skipImages.hashCode^linkStyle.hashCode^outputFormat.hashCode^includeDocumentStructure.hashCode^extractImages.hashCode^maxImageSize.hashCode^captureSvg.hashCode^inferDimensions.hashCode^maxDepth.hashCode^excludeSelectors.hashCode^visitor.hashCode;
+        
 
-  /// Character used for bold/italic emphasis markers (`*` or `_`).
-  final String strongEmSymbol;
-
-  /// Escape `*` characters in plain text to avoid unintended bold/italic.
-  final bool escapeAsterisks;
-
-  /// Escape `_` characters in plain text to avoid unintended bold/italic.
-  final bool escapeUnderscores;
-
-  /// Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text.
-  final bool escapeMisc;
-
-  /// Escape ASCII characters that have special meaning in certain Markdown dialects.
-  final bool escapeAscii;
-
-  /// Default language annotation for fenced code blocks that have no language hint.
-  final String codeLanguage;
-
-  /// Automatically convert bare URLs into Markdown autolinks.
-  final bool autolinks;
-
-  /// Emit a default title when no `<title>` tag is present.
-  final bool defaultTitle;
-
-  /// Render `<br>` elements inside table cells as literal line breaks.
-  final bool brInTables;
-
-  /// Emit tables without column padding (compact GFM format).
-  ///
-  /// When `true`, column widths are not computed and cells are emitted with
-  /// no trailing spaces. Separator rows use exactly `---` per column.
-  /// Produces token-efficient output suitable for RAG / LLM contexts.
-  ///
-  /// Default `false` (aligned padding preserved).
-  final bool compactTables;
-
-  /// Style used for `<mark>` / highlighted text (e.g. `==text==`).
-  final HighlightStyle highlightStyle;
-
-  /// Populate `result.metadata` with `<head>` / `<meta>` extraction
-  /// (title, description, Open Graph, Twitter Card, JSON-LD, …).
-  ///
-  /// Default `true`. Disabling skips the metadata pass only — table
-  /// extraction into `result.tables` runs unconditionally.
-  final bool extractMetadata;
-
-  /// Controls how whitespace sequences are normalised in the converted output.
-  ///
-  /// - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
-  ///   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
-  /// - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
-  ///   source HTML, including runs of spaces and embedded newlines.
-  ///
-  /// Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
-  /// content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
-  final WhitespaceMode whitespaceMode;
-
-  /// Strip all newlines from the output, producing a single-line result.
-  final bool stripNewlines;
-
-  /// Wrap long lines at [`wrap_width`](Self::wrap_width) characters.
-  final bool wrap;
-
-  /// Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
-  ///
-  /// Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
-  /// is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
-  /// effect when `wrap` is `false`.
-  final PlatformInt64 wrapWidth;
-
-  /// Treat the entire document as inline content (no block-level wrappers).
-  final bool convertAsInline;
-
-  /// Markdown notation for subscript text (e.g. `"~"`).
-  final String subSymbol;
-
-  /// Markdown notation for superscript text (e.g. `"^"`).
-  final String supSymbol;
-
-  /// How to encode hard line breaks (`<br>`) in Markdown.
-  final NewlineStyle newlineStyle;
-
-  /// Style used for fenced code blocks (backticks or tilde).
-  final CodeBlockStyle codeBlockStyle;
-
-  /// HTML tag names whose `<img>` children are kept inline instead of block.
-  final List<String> keepInlineImagesIn;
-
-  /// Options for the HTML pre-processing pass applied before conversion begins.
-  ///
-  /// Pre-processing runs before the HTML is handed to the converter and can perform operations
-  /// such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
-  /// vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
-  ///
-  /// Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
-  /// passes. Set individual fields on [`PreprocessingOptions`] (or construct via
-  /// [`ConversionOptions::builder`]) to opt in or out of specific passes.
-  final PreprocessingOptions preprocessing;
-
-  /// Expected character encoding of the input HTML (default `"utf-8"`).
-  final String encoding;
-
-  /// Emit debug information during conversion.
-  final bool debug;
-
-  /// HTML tag names whose content is stripped from the output entirely.
-  final List<String> stripTags;
-
-  /// HTML tag names that are preserved verbatim in the output.
-  final List<String> preserveTags;
-
-  /// Skip conversion of `<img>` elements (omit images from output).
-  final bool skipImages;
-
-  /// Link rendering style (inline or reference).
-  final LinkStyle linkStyle;
-
-  /// Target output format (Markdown, plain text, etc.).
-  final OutputFormat outputFormat;
-
-  /// Include structured document tree in result.
-  final bool includeDocumentStructure;
-
-  /// Extract inline images from data URIs and SVGs.
-  final bool extractImages;
-
-  /// Maximum decoded image size in bytes (default 5MB).
-  final PlatformInt64 maxImageSize;
-
-  /// Capture SVG elements as images.
-  final bool captureSvg;
-
-  /// Infer image dimensions from data.
-  final bool inferDimensions;
-
-  /// Maximum DOM traversal depth. `None` means unlimited.
-  /// When set, subtrees beyond this depth are silently truncated.
-  final PlatformInt64? maxDepth;
-
-  /// CSS selectors for elements to exclude entirely (element + all content).
-  ///
-  /// Unlike `strip_tags` (which removes the tag wrapper but keeps children),
-  /// excluded elements and all their descendants are dropped from the output.
-  /// Supports any CSS selector that `tl` supports: tag names, `.class`,
-  /// `#id`, `[attribute]`, etc.
-  ///
-  /// Invalid selectors are silently skipped at conversion time.
-  ///
-  /// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
-  final List<String> excludeSelectors;
-
-  /// Optional visitor for custom traversal logic.
-  ///
-  /// When set, the visitor's callbacks are invoked for matching HTML elements
-  /// during conversion, allowing custom output, skipping, or HTML preservation.
-  /// See `HtmlVisitor`.
-  final VisitorHandle? visitor;
-
-  const ConversionOptions({
-    required this.headingStyle,
-    required this.listIndentType,
-    required this.listIndentWidth,
-    required this.bullets,
-    required this.strongEmSymbol,
-    required this.escapeAsterisks,
-    required this.escapeUnderscores,
-    required this.escapeMisc,
-    required this.escapeAscii,
-    required this.codeLanguage,
-    required this.autolinks,
-    required this.defaultTitle,
-    required this.brInTables,
-    required this.compactTables,
-    required this.highlightStyle,
-    required this.extractMetadata,
-    required this.whitespaceMode,
-    required this.stripNewlines,
-    required this.wrap,
-    required this.wrapWidth,
-    required this.convertAsInline,
-    required this.subSymbol,
-    required this.supSymbol,
-    required this.newlineStyle,
-    required this.codeBlockStyle,
-    required this.keepInlineImagesIn,
-    required this.preprocessing,
-    required this.encoding,
-    required this.debug,
-    required this.stripTags,
-    required this.preserveTags,
-    required this.skipImages,
-    required this.linkStyle,
-    required this.outputFormat,
-    required this.includeDocumentStructure,
-    required this.extractImages,
-    required this.maxImageSize,
-    required this.captureSvg,
-    required this.inferDimensions,
-    this.maxDepth,
-    required this.excludeSelectors,
-    this.visitor,
-  });
-
-  @override
-  int get hashCode =>
-      headingStyle.hashCode ^
-      listIndentType.hashCode ^
-      listIndentWidth.hashCode ^
-      bullets.hashCode ^
-      strongEmSymbol.hashCode ^
-      escapeAsterisks.hashCode ^
-      escapeUnderscores.hashCode ^
-      escapeMisc.hashCode ^
-      escapeAscii.hashCode ^
-      codeLanguage.hashCode ^
-      autolinks.hashCode ^
-      defaultTitle.hashCode ^
-      brInTables.hashCode ^
-      compactTables.hashCode ^
-      highlightStyle.hashCode ^
-      extractMetadata.hashCode ^
-      whitespaceMode.hashCode ^
-      stripNewlines.hashCode ^
-      wrap.hashCode ^
-      wrapWidth.hashCode ^
-      convertAsInline.hashCode ^
-      subSymbol.hashCode ^
-      supSymbol.hashCode ^
-      newlineStyle.hashCode ^
-      codeBlockStyle.hashCode ^
-      keepInlineImagesIn.hashCode ^
-      preprocessing.hashCode ^
-      encoding.hashCode ^
-      debug.hashCode ^
-      stripTags.hashCode ^
-      preserveTags.hashCode ^
-      skipImages.hashCode ^
-      linkStyle.hashCode ^
-      outputFormat.hashCode ^
-      includeDocumentStructure.hashCode ^
-      extractImages.hashCode ^
-      maxImageSize.hashCode ^
-      captureSvg.hashCode ^
-      inferDimensions.hashCode ^
-      maxDepth.hashCode ^
-      excludeSelectors.hashCode ^
-      visitor.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConversionOptions &&
-          runtimeType == other.runtimeType &&
-          headingStyle == other.headingStyle &&
-          listIndentType == other.listIndentType &&
-          listIndentWidth == other.listIndentWidth &&
-          bullets == other.bullets &&
-          strongEmSymbol == other.strongEmSymbol &&
-          escapeAsterisks == other.escapeAsterisks &&
-          escapeUnderscores == other.escapeUnderscores &&
-          escapeMisc == other.escapeMisc &&
-          escapeAscii == other.escapeAscii &&
-          codeLanguage == other.codeLanguage &&
-          autolinks == other.autolinks &&
-          defaultTitle == other.defaultTitle &&
-          brInTables == other.brInTables &&
-          compactTables == other.compactTables &&
-          highlightStyle == other.highlightStyle &&
-          extractMetadata == other.extractMetadata &&
-          whitespaceMode == other.whitespaceMode &&
-          stripNewlines == other.stripNewlines &&
-          wrap == other.wrap &&
-          wrapWidth == other.wrapWidth &&
-          convertAsInline == other.convertAsInline &&
-          subSymbol == other.subSymbol &&
-          supSymbol == other.supSymbol &&
-          newlineStyle == other.newlineStyle &&
-          codeBlockStyle == other.codeBlockStyle &&
-          keepInlineImagesIn == other.keepInlineImagesIn &&
-          preprocessing == other.preprocessing &&
-          encoding == other.encoding &&
-          debug == other.debug &&
-          stripTags == other.stripTags &&
-          preserveTags == other.preserveTags &&
-          skipImages == other.skipImages &&
-          linkStyle == other.linkStyle &&
-          outputFormat == other.outputFormat &&
-          includeDocumentStructure == other.includeDocumentStructure &&
-          extractImages == other.extractImages &&
-          maxImageSize == other.maxImageSize &&
-          captureSvg == other.captureSvg &&
-          inferDimensions == other.inferDimensions &&
-          maxDepth == other.maxDepth &&
-          excludeSelectors == other.excludeSelectors &&
-          visitor == other.visitor;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ConversionOptions &&
+                runtimeType == other.runtimeType
+                && headingStyle == other.headingStyle&& listIndentType == other.listIndentType&& listIndentWidth == other.listIndentWidth&& bullets == other.bullets&& strongEmSymbol == other.strongEmSymbol&& escapeAsterisks == other.escapeAsterisks&& escapeUnderscores == other.escapeUnderscores&& escapeMisc == other.escapeMisc&& escapeAscii == other.escapeAscii&& codeLanguage == other.codeLanguage&& autolinks == other.autolinks&& defaultTitle == other.defaultTitle&& brInTables == other.brInTables&& compactTables == other.compactTables&& highlightStyle == other.highlightStyle&& extractMetadata == other.extractMetadata&& whitespaceMode == other.whitespaceMode&& stripNewlines == other.stripNewlines&& wrap == other.wrap&& wrapWidth == other.wrapWidth&& convertAsInline == other.convertAsInline&& subSymbol == other.subSymbol&& supSymbol == other.supSymbol&& newlineStyle == other.newlineStyle&& codeBlockStyle == other.codeBlockStyle&& keepInlineImagesIn == other.keepInlineImagesIn&& preprocessing == other.preprocessing&& encoding == other.encoding&& debug == other.debug&& stripTags == other.stripTags&& preserveTags == other.preserveTags&& skipImages == other.skipImages&& linkStyle == other.linkStyle&& outputFormat == other.outputFormat&& includeDocumentStructure == other.includeDocumentStructure&& extractImages == other.extractImages&& maxImageSize == other.maxImageSize&& captureSvg == other.captureSvg&& inferDimensions == other.inferDimensions&& maxDepth == other.maxDepth&& excludeSelectors == other.excludeSelectors&& visitor == other.visitor;
+        
+            }
 
 /// Partial update for `ConversionOptions`.
 ///
 /// Uses `Option<T>` fields for selective updates. Bindings use this to construct
 /// options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
-class ConversionOptionsUpdate {
-  /// Optional override for [`ConversionOptions::heading_style`].
-  final HeadingStyle? headingStyle;
+class ConversionOptionsUpdate  {
+                /// Optional override for [`ConversionOptions::heading_style`].
+final HeadingStyle? headingStyle;
+/// Optional override for [`ConversionOptions::list_indent_type`].
+final ListIndentType? listIndentType;
+/// Optional override for [`ConversionOptions::list_indent_width`].
+final PlatformInt64? listIndentWidth;
+/// Optional override for [`ConversionOptions::bullets`].
+final String? bullets;
+/// Optional override for [`ConversionOptions::strong_em_symbol`].
+final String? strongEmSymbol;
+/// Optional override for [`ConversionOptions::escape_asterisks`].
+final bool? escapeAsterisks;
+/// Optional override for [`ConversionOptions::escape_underscores`].
+final bool? escapeUnderscores;
+/// Optional override for [`ConversionOptions::escape_misc`].
+final bool? escapeMisc;
+/// Optional override for [`ConversionOptions::escape_ascii`].
+final bool? escapeAscii;
+/// Optional override for [`ConversionOptions::code_language`].
+final String? codeLanguage;
+/// Optional override for [`ConversionOptions::autolinks`].
+final bool? autolinks;
+/// Optional override for [`ConversionOptions::default_title`].
+final bool? defaultTitle;
+/// Optional override for [`ConversionOptions::br_in_tables`].
+final bool? brInTables;
+/// Optional override for [`ConversionOptions::compact_tables`].
+final bool? compactTables;
+/// Optional override for [`ConversionOptions::highlight_style`].
+final HighlightStyle? highlightStyle;
+/// Optional override for [`ConversionOptions::extract_metadata`].
+final bool? extractMetadata;
+/// Optional override for [`ConversionOptions::whitespace_mode`].
+final WhitespaceMode? whitespaceMode;
+/// Optional override for [`ConversionOptions::strip_newlines`].
+final bool? stripNewlines;
+/// Optional override for [`ConversionOptions::wrap`].
+final bool? wrap;
+/// Optional override for [`ConversionOptions::wrap_width`].
+final PlatformInt64? wrapWidth;
+/// Optional override for [`ConversionOptions::convert_as_inline`].
+final bool? convertAsInline;
+/// Optional override for [`ConversionOptions::sub_symbol`].
+final String? subSymbol;
+/// Optional override for [`ConversionOptions::sup_symbol`].
+final String? supSymbol;
+/// Optional override for [`ConversionOptions::newline_style`].
+final NewlineStyle? newlineStyle;
+/// Optional override for [`ConversionOptions::code_block_style`].
+final CodeBlockStyle? codeBlockStyle;
+/// Optional override for [`ConversionOptions::keep_inline_images_in`].
+final List<String>? keepInlineImagesIn;
+/// Optional override for [`ConversionOptions::preprocessing`].
+final PreprocessingOptionsUpdate? preprocessing;
+/// Optional override for [`ConversionOptions::encoding`].
+final String? encoding;
+/// Optional override for [`ConversionOptions::debug`].
+final bool? debug;
+/// Optional override for [`ConversionOptions::strip_tags`].
+final List<String>? stripTags;
+/// Optional override for [`ConversionOptions::preserve_tags`].
+final List<String>? preserveTags;
+/// Optional override for [`ConversionOptions::skip_images`].
+final bool? skipImages;
+/// Optional override for [`ConversionOptions::link_style`].
+final LinkStyle? linkStyle;
+/// Optional override for [`ConversionOptions::output_format`].
+final OutputFormat? outputFormat;
+/// Optional override for [`ConversionOptions::include_document_structure`].
+final bool? includeDocumentStructure;
+/// Optional override for [`ConversionOptions::extract_images`].
+final bool? extractImages;
+/// Optional override for [`ConversionOptions::max_image_size`].
+final PlatformInt64? maxImageSize;
+/// Optional override for [`ConversionOptions::capture_svg`].
+final bool? captureSvg;
+/// Optional override for [`ConversionOptions::infer_dimensions`].
+final bool? inferDimensions;
+/// Optional override for [`ConversionOptions::max_depth`].
+final PlatformInt64? maxDepth;
+/// Optional override for [`ConversionOptions::exclude_selectors`].
+final List<String>? excludeSelectors;
+/// Optional override for [`ConversionOptions::visitor`].
+final VisitorHandle? visitor;
 
-  /// Optional override for [`ConversionOptions::list_indent_type`].
-  final ListIndentType? listIndentType;
+                const ConversionOptionsUpdate({this.headingStyle ,this.listIndentType ,this.listIndentWidth ,this.bullets ,this.strongEmSymbol ,this.escapeAsterisks ,this.escapeUnderscores ,this.escapeMisc ,this.escapeAscii ,this.codeLanguage ,this.autolinks ,this.defaultTitle ,this.brInTables ,this.compactTables ,this.highlightStyle ,this.extractMetadata ,this.whitespaceMode ,this.stripNewlines ,this.wrap ,this.wrapWidth ,this.convertAsInline ,this.subSymbol ,this.supSymbol ,this.newlineStyle ,this.codeBlockStyle ,this.keepInlineImagesIn ,this.preprocessing ,this.encoding ,this.debug ,this.stripTags ,this.preserveTags ,this.skipImages ,this.linkStyle ,this.outputFormat ,this.includeDocumentStructure ,this.extractImages ,this.maxImageSize ,this.captureSvg ,this.inferDimensions ,this.maxDepth ,this.excludeSelectors ,this.visitor ,});
 
-  /// Optional override for [`ConversionOptions::list_indent_width`].
-  final PlatformInt64? listIndentWidth;
+                
+                
 
-  /// Optional override for [`ConversionOptions::bullets`].
-  final String? bullets;
+                
+        @override
+        int get hashCode => headingStyle.hashCode^listIndentType.hashCode^listIndentWidth.hashCode^bullets.hashCode^strongEmSymbol.hashCode^escapeAsterisks.hashCode^escapeUnderscores.hashCode^escapeMisc.hashCode^escapeAscii.hashCode^codeLanguage.hashCode^autolinks.hashCode^defaultTitle.hashCode^brInTables.hashCode^compactTables.hashCode^highlightStyle.hashCode^extractMetadata.hashCode^whitespaceMode.hashCode^stripNewlines.hashCode^wrap.hashCode^wrapWidth.hashCode^convertAsInline.hashCode^subSymbol.hashCode^supSymbol.hashCode^newlineStyle.hashCode^codeBlockStyle.hashCode^keepInlineImagesIn.hashCode^preprocessing.hashCode^encoding.hashCode^debug.hashCode^stripTags.hashCode^preserveTags.hashCode^skipImages.hashCode^linkStyle.hashCode^outputFormat.hashCode^includeDocumentStructure.hashCode^extractImages.hashCode^maxImageSize.hashCode^captureSvg.hashCode^inferDimensions.hashCode^maxDepth.hashCode^excludeSelectors.hashCode^visitor.hashCode;
+        
 
-  /// Optional override for [`ConversionOptions::strong_em_symbol`].
-  final String? strongEmSymbol;
-
-  /// Optional override for [`ConversionOptions::escape_asterisks`].
-  final bool? escapeAsterisks;
-
-  /// Optional override for [`ConversionOptions::escape_underscores`].
-  final bool? escapeUnderscores;
-
-  /// Optional override for [`ConversionOptions::escape_misc`].
-  final bool? escapeMisc;
-
-  /// Optional override for [`ConversionOptions::escape_ascii`].
-  final bool? escapeAscii;
-
-  /// Optional override for [`ConversionOptions::code_language`].
-  final String? codeLanguage;
-
-  /// Optional override for [`ConversionOptions::autolinks`].
-  final bool? autolinks;
-
-  /// Optional override for [`ConversionOptions::default_title`].
-  final bool? defaultTitle;
-
-  /// Optional override for [`ConversionOptions::br_in_tables`].
-  final bool? brInTables;
-
-  /// Optional override for [`ConversionOptions::compact_tables`].
-  final bool? compactTables;
-
-  /// Optional override for [`ConversionOptions::highlight_style`].
-  final HighlightStyle? highlightStyle;
-
-  /// Optional override for [`ConversionOptions::extract_metadata`].
-  final bool? extractMetadata;
-
-  /// Optional override for [`ConversionOptions::whitespace_mode`].
-  final WhitespaceMode? whitespaceMode;
-
-  /// Optional override for [`ConversionOptions::strip_newlines`].
-  final bool? stripNewlines;
-
-  /// Optional override for [`ConversionOptions::wrap`].
-  final bool? wrap;
-
-  /// Optional override for [`ConversionOptions::wrap_width`].
-  final PlatformInt64? wrapWidth;
-
-  /// Optional override for [`ConversionOptions::convert_as_inline`].
-  final bool? convertAsInline;
-
-  /// Optional override for [`ConversionOptions::sub_symbol`].
-  final String? subSymbol;
-
-  /// Optional override for [`ConversionOptions::sup_symbol`].
-  final String? supSymbol;
-
-  /// Optional override for [`ConversionOptions::newline_style`].
-  final NewlineStyle? newlineStyle;
-
-  /// Optional override for [`ConversionOptions::code_block_style`].
-  final CodeBlockStyle? codeBlockStyle;
-
-  /// Optional override for [`ConversionOptions::keep_inline_images_in`].
-  final List<String>? keepInlineImagesIn;
-
-  /// Optional override for [`ConversionOptions::preprocessing`].
-  final PreprocessingOptionsUpdate? preprocessing;
-
-  /// Optional override for [`ConversionOptions::encoding`].
-  final String? encoding;
-
-  /// Optional override for [`ConversionOptions::debug`].
-  final bool? debug;
-
-  /// Optional override for [`ConversionOptions::strip_tags`].
-  final List<String>? stripTags;
-
-  /// Optional override for [`ConversionOptions::preserve_tags`].
-  final List<String>? preserveTags;
-
-  /// Optional override for [`ConversionOptions::skip_images`].
-  final bool? skipImages;
-
-  /// Optional override for [`ConversionOptions::link_style`].
-  final LinkStyle? linkStyle;
-
-  /// Optional override for [`ConversionOptions::output_format`].
-  final OutputFormat? outputFormat;
-
-  /// Optional override for [`ConversionOptions::include_document_structure`].
-  final bool? includeDocumentStructure;
-
-  /// Optional override for [`ConversionOptions::extract_images`].
-  final bool? extractImages;
-
-  /// Optional override for [`ConversionOptions::max_image_size`].
-  final PlatformInt64? maxImageSize;
-
-  /// Optional override for [`ConversionOptions::capture_svg`].
-  final bool? captureSvg;
-
-  /// Optional override for [`ConversionOptions::infer_dimensions`].
-  final bool? inferDimensions;
-
-  /// Optional override for [`ConversionOptions::max_depth`].
-  final PlatformInt64? maxDepth;
-
-  /// Optional override for [`ConversionOptions::exclude_selectors`].
-  final List<String>? excludeSelectors;
-
-  /// Optional override for [`ConversionOptions::visitor`].
-  final VisitorHandle? visitor;
-
-  const ConversionOptionsUpdate({
-    this.headingStyle,
-    this.listIndentType,
-    this.listIndentWidth,
-    this.bullets,
-    this.strongEmSymbol,
-    this.escapeAsterisks,
-    this.escapeUnderscores,
-    this.escapeMisc,
-    this.escapeAscii,
-    this.codeLanguage,
-    this.autolinks,
-    this.defaultTitle,
-    this.brInTables,
-    this.compactTables,
-    this.highlightStyle,
-    this.extractMetadata,
-    this.whitespaceMode,
-    this.stripNewlines,
-    this.wrap,
-    this.wrapWidth,
-    this.convertAsInline,
-    this.subSymbol,
-    this.supSymbol,
-    this.newlineStyle,
-    this.codeBlockStyle,
-    this.keepInlineImagesIn,
-    this.preprocessing,
-    this.encoding,
-    this.debug,
-    this.stripTags,
-    this.preserveTags,
-    this.skipImages,
-    this.linkStyle,
-    this.outputFormat,
-    this.includeDocumentStructure,
-    this.extractImages,
-    this.maxImageSize,
-    this.captureSvg,
-    this.inferDimensions,
-    this.maxDepth,
-    this.excludeSelectors,
-    this.visitor,
-  });
-
-  @override
-  int get hashCode =>
-      headingStyle.hashCode ^
-      listIndentType.hashCode ^
-      listIndentWidth.hashCode ^
-      bullets.hashCode ^
-      strongEmSymbol.hashCode ^
-      escapeAsterisks.hashCode ^
-      escapeUnderscores.hashCode ^
-      escapeMisc.hashCode ^
-      escapeAscii.hashCode ^
-      codeLanguage.hashCode ^
-      autolinks.hashCode ^
-      defaultTitle.hashCode ^
-      brInTables.hashCode ^
-      compactTables.hashCode ^
-      highlightStyle.hashCode ^
-      extractMetadata.hashCode ^
-      whitespaceMode.hashCode ^
-      stripNewlines.hashCode ^
-      wrap.hashCode ^
-      wrapWidth.hashCode ^
-      convertAsInline.hashCode ^
-      subSymbol.hashCode ^
-      supSymbol.hashCode ^
-      newlineStyle.hashCode ^
-      codeBlockStyle.hashCode ^
-      keepInlineImagesIn.hashCode ^
-      preprocessing.hashCode ^
-      encoding.hashCode ^
-      debug.hashCode ^
-      stripTags.hashCode ^
-      preserveTags.hashCode ^
-      skipImages.hashCode ^
-      linkStyle.hashCode ^
-      outputFormat.hashCode ^
-      includeDocumentStructure.hashCode ^
-      extractImages.hashCode ^
-      maxImageSize.hashCode ^
-      captureSvg.hashCode ^
-      inferDimensions.hashCode ^
-      maxDepth.hashCode ^
-      excludeSelectors.hashCode ^
-      visitor.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConversionOptionsUpdate &&
-          runtimeType == other.runtimeType &&
-          headingStyle == other.headingStyle &&
-          listIndentType == other.listIndentType &&
-          listIndentWidth == other.listIndentWidth &&
-          bullets == other.bullets &&
-          strongEmSymbol == other.strongEmSymbol &&
-          escapeAsterisks == other.escapeAsterisks &&
-          escapeUnderscores == other.escapeUnderscores &&
-          escapeMisc == other.escapeMisc &&
-          escapeAscii == other.escapeAscii &&
-          codeLanguage == other.codeLanguage &&
-          autolinks == other.autolinks &&
-          defaultTitle == other.defaultTitle &&
-          brInTables == other.brInTables &&
-          compactTables == other.compactTables &&
-          highlightStyle == other.highlightStyle &&
-          extractMetadata == other.extractMetadata &&
-          whitespaceMode == other.whitespaceMode &&
-          stripNewlines == other.stripNewlines &&
-          wrap == other.wrap &&
-          wrapWidth == other.wrapWidth &&
-          convertAsInline == other.convertAsInline &&
-          subSymbol == other.subSymbol &&
-          supSymbol == other.supSymbol &&
-          newlineStyle == other.newlineStyle &&
-          codeBlockStyle == other.codeBlockStyle &&
-          keepInlineImagesIn == other.keepInlineImagesIn &&
-          preprocessing == other.preprocessing &&
-          encoding == other.encoding &&
-          debug == other.debug &&
-          stripTags == other.stripTags &&
-          preserveTags == other.preserveTags &&
-          skipImages == other.skipImages &&
-          linkStyle == other.linkStyle &&
-          outputFormat == other.outputFormat &&
-          includeDocumentStructure == other.includeDocumentStructure &&
-          extractImages == other.extractImages &&
-          maxImageSize == other.maxImageSize &&
-          captureSvg == other.captureSvg &&
-          inferDimensions == other.inferDimensions &&
-          maxDepth == other.maxDepth &&
-          excludeSelectors == other.excludeSelectors &&
-          visitor == other.visitor;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ConversionOptionsUpdate &&
+                runtimeType == other.runtimeType
+                && headingStyle == other.headingStyle&& listIndentType == other.listIndentType&& listIndentWidth == other.listIndentWidth&& bullets == other.bullets&& strongEmSymbol == other.strongEmSymbol&& escapeAsterisks == other.escapeAsterisks&& escapeUnderscores == other.escapeUnderscores&& escapeMisc == other.escapeMisc&& escapeAscii == other.escapeAscii&& codeLanguage == other.codeLanguage&& autolinks == other.autolinks&& defaultTitle == other.defaultTitle&& brInTables == other.brInTables&& compactTables == other.compactTables&& highlightStyle == other.highlightStyle&& extractMetadata == other.extractMetadata&& whitespaceMode == other.whitespaceMode&& stripNewlines == other.stripNewlines&& wrap == other.wrap&& wrapWidth == other.wrapWidth&& convertAsInline == other.convertAsInline&& subSymbol == other.subSymbol&& supSymbol == other.supSymbol&& newlineStyle == other.newlineStyle&& codeBlockStyle == other.codeBlockStyle&& keepInlineImagesIn == other.keepInlineImagesIn&& preprocessing == other.preprocessing&& encoding == other.encoding&& debug == other.debug&& stripTags == other.stripTags&& preserveTags == other.preserveTags&& skipImages == other.skipImages&& linkStyle == other.linkStyle&& outputFormat == other.outputFormat&& includeDocumentStructure == other.includeDocumentStructure&& extractImages == other.extractImages&& maxImageSize == other.maxImageSize&& captureSvg == other.captureSvg&& inferDimensions == other.inferDimensions&& maxDepth == other.maxDepth&& excludeSelectors == other.excludeSelectors&& visitor == other.visitor;
+        
+            }
 
 /// The primary result of HTML conversion and extraction.
 ///
@@ -883,72 +421,56 @@ class ConversionOptionsUpdate {
 /// assert!(result.content.is_some());
 /// assert!(result.warnings.is_empty());
 /// ```
-class ConversionResult {
-  /// Converted text output (markdown, djot, or plain text).
-  ///
-  /// `None` when `output_format` is set to `OutputFormat::None`,
-  /// indicating extraction-only mode.
-  final String? content;
+class ConversionResult  {
+                /// Converted text output (markdown, djot, or plain text).
+///
+/// `None` when `output_format` is set to `OutputFormat::None`,
+/// indicating extraction-only mode.
+final String? content;
+/// Structured document tree with semantic elements.
+///
+/// Populated when `ConversionOptions::include_document_structure` is `true`. `None`
+/// otherwise (the default), which avoids the overhead of building the tree.
+///
+/// When present, the tree mirrors the converted document: headings open
+/// `Group` sections, paragraphs and list items carry
+/// inline `TextAnnotation`s, and tables reference the same
+/// `TableGrid` data exposed in [`Self::tables`].
+///
+/// Note: this field is independent of the `metadata` feature flag. Document structure
+/// collection is always available at runtime; it is gated only by the runtime option, not
+/// by a compile-time feature.
+final DocumentStructure? document;
+/// Extracted HTML metadata (title, OG, links, images, structured data).
+final HtmlMetadata metadata;
+/// Extracted tables with structured cell data and markdown representation.
+final List<TableData> tables;
+/// Extracted inline images (data URIs and SVGs).
+///
+/// Populated when `extract_images` is `true` in options.
+final List<String> images;
+/// Non-fatal processing warnings.
+final List<ProcessingWarning> warnings;
 
-  /// Structured document tree with semantic elements.
-  ///
-  /// Populated when `ConversionOptions::include_document_structure` is `true`. `None`
-  /// otherwise (the default), which avoids the overhead of building the tree.
-  ///
-  /// When present, the tree mirrors the converted document: headings open
-  /// `Group` sections, paragraphs and list items carry
-  /// inline `TextAnnotation`s, and tables reference the same
-  /// `TableGrid` data exposed in [`Self::tables`].
-  ///
-  /// Note: this field is independent of the `metadata` feature flag. Document structure
-  /// collection is always available at runtime; it is gated only by the runtime option, not
-  /// by a compile-time feature.
-  final DocumentStructure? document;
+                const ConversionResult({this.content ,this.document ,required this.metadata ,required this.tables ,required this.images ,required this.warnings ,});
 
-  /// Extracted HTML metadata (title, OG, links, images, structured data).
-  final HtmlMetadata metadata;
+                
+                
 
-  /// Extracted tables with structured cell data and markdown representation.
-  final List<TableData> tables;
+                
+        @override
+        int get hashCode => content.hashCode^document.hashCode^metadata.hashCode^tables.hashCode^images.hashCode^warnings.hashCode;
+        
 
-  /// Extracted inline images (data URIs and SVGs).
-  ///
-  /// Populated when `extract_images` is `true` in options.
-  final List<String> images;
-
-  /// Non-fatal processing warnings.
-  final List<ProcessingWarning> warnings;
-
-  const ConversionResult({
-    this.content,
-    this.document,
-    required this.metadata,
-    required this.tables,
-    required this.images,
-    required this.warnings,
-  });
-
-  @override
-  int get hashCode =>
-      content.hashCode ^
-      document.hashCode ^
-      metadata.hashCode ^
-      tables.hashCode ^
-      images.hashCode ^
-      warnings.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ConversionResult &&
-          runtimeType == other.runtimeType &&
-          content == other.content &&
-          document == other.document &&
-          metadata == other.metadata &&
-          tables == other.tables &&
-          images == other.images &&
-          warnings == other.warnings;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ConversionResult &&
+                runtimeType == other.runtimeType
+                && content == other.content&& document == other.document&& metadata == other.metadata&& tables == other.tables&& images == other.images&& warnings == other.warnings;
+        
+            }
 
 /// Document-level metadata extracted from `<head>` and top-level elements.
 ///
@@ -967,223 +489,160 @@ class ConversionResult {
 ///
 /// assert_eq!(doc.title, Some("My Article".to_string()));
 /// ```
-class DocumentMetadata {
-  /// Document title from `<title>` tag
-  final String? title;
+class DocumentMetadata  {
+                /// Document title from `<title>` tag
+final String? title;
+/// Document description from `<meta name="description">` tag
+final String? description;
+/// Document keywords from `<meta name="keywords">` tag, split on commas
+final List<String> keywords;
+/// Document author from `<meta name="author">` tag
+final String? author;
+/// Canonical URL from `<link rel="canonical">` tag
+final String? canonicalUrl;
+/// Base URL from `<base href="">` tag for resolving relative URLs
+final String? baseHref;
+/// Document language from `lang` attribute
+final String? language;
+/// Document text direction from `dir` attribute
+final TextDirection? textDirection;
+/// Open Graph metadata (og:* properties) for social media
+/// Keys like "title", "description", "image", "url", etc.
+final Map<String, String> openGraph;
+/// Twitter Card metadata (twitter:* properties)
+/// Keys like "card", "site", "creator", "title", "description", "image", etc.
+final Map<String, String> twitterCard;
+/// Additional meta tags not covered by specific fields
+/// Keys are meta name/property attributes, values are content
+final Map<String, String> metaTags;
 
-  /// Document description from `<meta name="description">` tag
-  final String? description;
+                const DocumentMetadata({this.title ,this.description ,required this.keywords ,this.author ,this.canonicalUrl ,this.baseHref ,this.language ,this.textDirection ,required this.openGraph ,required this.twitterCard ,required this.metaTags ,});
 
-  /// Document keywords from `<meta name="keywords">` tag, split on commas
-  final List<String> keywords;
+                
+                
 
-  /// Document author from `<meta name="author">` tag
-  final String? author;
+                
+        @override
+        int get hashCode => title.hashCode^description.hashCode^keywords.hashCode^author.hashCode^canonicalUrl.hashCode^baseHref.hashCode^language.hashCode^textDirection.hashCode^openGraph.hashCode^twitterCard.hashCode^metaTags.hashCode;
+        
 
-  /// Canonical URL from `<link rel="canonical">` tag
-  final String? canonicalUrl;
-
-  /// Base URL from `<base href="">` tag for resolving relative URLs
-  final String? baseHref;
-
-  /// Document language from `lang` attribute
-  final String? language;
-
-  /// Document text direction from `dir` attribute
-  final TextDirection? textDirection;
-
-  /// Open Graph metadata (og:* properties) for social media
-  /// Keys like "title", "description", "image", "url", etc.
-  final Map<String, String> openGraph;
-
-  /// Twitter Card metadata (twitter:* properties)
-  /// Keys like "card", "site", "creator", "title", "description", "image", etc.
-  final Map<String, String> twitterCard;
-
-  /// Additional meta tags not covered by specific fields
-  /// Keys are meta name/property attributes, values are content
-  final Map<String, String> metaTags;
-
-  const DocumentMetadata({
-    this.title,
-    this.description,
-    required this.keywords,
-    this.author,
-    this.canonicalUrl,
-    this.baseHref,
-    this.language,
-    this.textDirection,
-    required this.openGraph,
-    required this.twitterCard,
-    required this.metaTags,
-  });
-
-  @override
-  int get hashCode =>
-      title.hashCode ^
-      description.hashCode ^
-      keywords.hashCode ^
-      author.hashCode ^
-      canonicalUrl.hashCode ^
-      baseHref.hashCode ^
-      language.hashCode ^
-      textDirection.hashCode ^
-      openGraph.hashCode ^
-      twitterCard.hashCode ^
-      metaTags.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentMetadata &&
-          runtimeType == other.runtimeType &&
-          title == other.title &&
-          description == other.description &&
-          keywords == other.keywords &&
-          author == other.author &&
-          canonicalUrl == other.canonicalUrl &&
-          baseHref == other.baseHref &&
-          language == other.language &&
-          textDirection == other.textDirection &&
-          openGraph == other.openGraph &&
-          twitterCard == other.twitterCard &&
-          metaTags == other.metaTags;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is DocumentMetadata &&
+                runtimeType == other.runtimeType
+                && title == other.title&& description == other.description&& keywords == other.keywords&& author == other.author&& canonicalUrl == other.canonicalUrl&& baseHref == other.baseHref&& language == other.language&& textDirection == other.textDirection&& openGraph == other.openGraph&& twitterCard == other.twitterCard&& metaTags == other.metaTags;
+        
+            }
 
 /// A single node in the document tree.
-class DocumentNode {
-  /// Deterministic node identifier.
-  final String id;
+class DocumentNode  {
+                /// Deterministic node identifier.
+final String id;
+/// The semantic content of this node.
+final NodeContent content;
+/// Index of the parent node (None for root nodes).
+final PlatformInt64? parent;
+/// Indices of child nodes in reading order.
+final Int64List children;
+/// Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
+final List<TextAnnotation> annotations;
+/// Format-specific attributes preserved from the source HTML element.
+///
+/// Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
+/// `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
+/// no HTML entity decoding is applied here.
+///
+/// The map is `None` when no attributes are present (omitted entirely in serialized output).
+/// Not every HTML attribute is preserved: only attributes that carry semantic or structural
+/// significance for the node type are collected. For example, heading nodes capture the `"id"`
+/// attribute for anchor linking; other element-level attributes may be silently dropped.
+final Map<String, String>? attributes;
 
-  /// The semantic content of this node.
-  final NodeContent content;
+                const DocumentNode({required this.id ,required this.content ,this.parent ,required this.children ,required this.annotations ,this.attributes ,});
 
-  /// Index of the parent node (None for root nodes).
-  final PlatformInt64? parent;
+                
+                
 
-  /// Indices of child nodes in reading order.
-  final Int64List children;
+                
+        @override
+        int get hashCode => id.hashCode^content.hashCode^parent.hashCode^children.hashCode^annotations.hashCode^attributes.hashCode;
+        
 
-  /// Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text.
-  final List<TextAnnotation> annotations;
-
-  /// Format-specific attributes preserved from the source HTML element.
-  ///
-  /// Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
-  /// `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
-  /// no HTML entity decoding is applied here.
-  ///
-  /// The map is `None` when no attributes are present (omitted entirely in serialized output).
-  /// Not every HTML attribute is preserved: only attributes that carry semantic or structural
-  /// significance for the node type are collected. For example, heading nodes capture the `"id"`
-  /// attribute for anchor linking; other element-level attributes may be silently dropped.
-  final Map<String, String>? attributes;
-
-  const DocumentNode({
-    required this.id,
-    required this.content,
-    this.parent,
-    required this.children,
-    required this.annotations,
-    this.attributes,
-  });
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      content.hashCode ^
-      parent.hashCode ^
-      children.hashCode ^
-      annotations.hashCode ^
-      attributes.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentNode &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          content == other.content &&
-          parent == other.parent &&
-          children == other.children &&
-          annotations == other.annotations &&
-          attributes == other.attributes;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is DocumentNode &&
+                runtimeType == other.runtimeType
+                && id == other.id&& content == other.content&& parent == other.parent&& children == other.children&& annotations == other.annotations&& attributes == other.attributes;
+        
+            }
 
 /// A structured document tree representing the semantic content of an HTML document.
 ///
 /// Uses a flat node array with index-based parent/child references for efficient traversal.
-class DocumentStructure {
-  /// All nodes in document reading order.
-  final List<DocumentNode> nodes;
+class DocumentStructure  {
+                /// All nodes in document reading order.
+final List<DocumentNode> nodes;
+/// The source format (always "html" for this crate).
+final String? sourceFormat;
 
-  /// The source format (always "html" for this crate).
-  final String? sourceFormat;
+                const DocumentStructure({required this.nodes ,this.sourceFormat ,});
 
-  const DocumentStructure({required this.nodes, this.sourceFormat});
+                
+                
 
-  @override
-  int get hashCode => nodes.hashCode ^ sourceFormat.hashCode;
+                
+        @override
+        int get hashCode => nodes.hashCode^sourceFormat.hashCode;
+        
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DocumentStructure &&
-          runtimeType == other.runtimeType &&
-          nodes == other.nodes &&
-          sourceFormat == other.sourceFormat;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is DocumentStructure &&
+                runtimeType == other.runtimeType
+                && nodes == other.nodes&& sourceFormat == other.sourceFormat;
+        
+            }
 
 /// A single cell in a table grid.
-class GridCell {
-  /// The text content of the cell.
-  final String content;
+class GridCell  {
+                /// The text content of the cell.
+final String content;
+/// 0-indexed row position.
+final PlatformInt64 row;
+/// 0-indexed column position.
+final PlatformInt64 col;
+/// Number of rows this cell spans (default 1).
+final PlatformInt64 rowSpan;
+/// Number of columns this cell spans (default 1).
+final PlatformInt64 colSpan;
+/// Whether this is a header cell (`<th>`).
+final bool isHeader;
 
-  /// 0-indexed row position.
-  final PlatformInt64 row;
+                const GridCell({required this.content ,required this.row ,required this.col ,required this.rowSpan ,required this.colSpan ,required this.isHeader ,});
 
-  /// 0-indexed column position.
-  final PlatformInt64 col;
+                
+                
 
-  /// Number of rows this cell spans (default 1).
-  final PlatformInt64 rowSpan;
+                
+        @override
+        int get hashCode => content.hashCode^row.hashCode^col.hashCode^rowSpan.hashCode^colSpan.hashCode^isHeader.hashCode;
+        
 
-  /// Number of columns this cell spans (default 1).
-  final PlatformInt64 colSpan;
-
-  /// Whether this is a header cell (`<th>`).
-  final bool isHeader;
-
-  const GridCell({
-    required this.content,
-    required this.row,
-    required this.col,
-    required this.rowSpan,
-    required this.colSpan,
-    required this.isHeader,
-  });
-
-  @override
-  int get hashCode =>
-      content.hashCode ^
-      row.hashCode ^
-      col.hashCode ^
-      rowSpan.hashCode ^
-      colSpan.hashCode ^
-      isHeader.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GridCell &&
-          runtimeType == other.runtimeType &&
-          content == other.content &&
-          row == other.row &&
-          col == other.col &&
-          rowSpan == other.rowSpan &&
-          colSpan == other.colSpan &&
-          isHeader == other.isHeader;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is GridCell &&
+                runtimeType == other.runtimeType
+                && content == other.content&& row == other.row&& col == other.col&& rowSpan == other.rowSpan&& colSpan == other.colSpan&& isHeader == other.isHeader;
+        
+            }
 
 /// Header element metadata with hierarchy tracking.
 ///
@@ -1204,80 +663,67 @@ class GridCell {
 /// assert_eq!(header.level, 1);
 /// assert!(header.is_valid());
 /// ```
-class HeaderMetadata {
-  /// Header level: 1 (h1) through 6 (h6)
-  final PlatformInt64 level;
+class HeaderMetadata  {
+                /// Header level: 1 (h1) through 6 (h6)
+final PlatformInt64 level;
+/// Normalized text content of the header
+final String text;
+/// HTML id attribute if present
+final String? id;
+/// Document tree depth at the header element
+final PlatformInt64 depth;
+/// Byte offset in original HTML document
+final PlatformInt64 htmlOffset;
 
-  /// Normalized text content of the header
-  final String text;
+                const HeaderMetadata({required this.level ,required this.text ,this.id ,required this.depth ,required this.htmlOffset ,});
 
-  /// HTML id attribute if present
-  final String? id;
+                
+                
 
-  /// Document tree depth at the header element
-  final PlatformInt64 depth;
+                
+        @override
+        int get hashCode => level.hashCode^text.hashCode^id.hashCode^depth.hashCode^htmlOffset.hashCode;
+        
 
-  /// Byte offset in original HTML document
-  final PlatformInt64 htmlOffset;
-
-  const HeaderMetadata({
-    required this.level,
-    required this.text,
-    this.id,
-    required this.depth,
-    required this.htmlOffset,
-  });
-
-  @override
-  int get hashCode =>
-      level.hashCode ^
-      text.hashCode ^
-      id.hashCode ^
-      depth.hashCode ^
-      htmlOffset.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HeaderMetadata &&
-          runtimeType == other.runtimeType &&
-          level == other.level &&
-          text == other.text &&
-          id == other.id &&
-          depth == other.depth &&
-          htmlOffset == other.htmlOffset;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is HeaderMetadata &&
+                runtimeType == other.runtimeType
+                && level == other.level&& text == other.text&& id == other.id&& depth == other.depth&& htmlOffset == other.htmlOffset;
+        
+            }
 
 /// Heading style options for Markdown output.
 ///
 /// Controls how headings (h1-h6) are rendered in the output Markdown.
 enum HeadingStyle {
-  /// Underlined style (=== for h1, --- for h2).
-  underlined,
-
-  /// ATX style (# for h1, ## for h2, etc.). Default.
-  atx,
-
-  /// ATX closed style (# title #, with closing hashes).
-  atxClosed,
-}
+                    /// Underlined style (=== for h1, --- for h2).
+underlined,
+/// ATX style (# for h1, ## for h2, etc.). Default.
+atx,
+/// ATX closed style (# title #, with closing hashes).
+atxClosed,
+                    ;
+                    
+                }
 
 /// Highlight rendering style for `<mark>` elements.
 ///
 /// Controls how highlighted text is rendered in Markdown output.
 enum HighlightStyle {
-  /// Double equals syntax (==text==). Default. Pandoc-compatible.
-  doubleEqual,
-
-  /// Preserve as HTML (==text==). Original HTML tag.
-  html,
-
-  /// Render as bold (**text**). Uses strong emphasis.
-  bold,
-
-  /// Strip formatting, render as plain text. No markup.
-  none,
-}
+                    /// Double equals syntax (==text==). Default. Pandoc-compatible.
+doubleEqual,
+/// Preserve as HTML (==text==). Original HTML tag.
+html,
+/// Render as bold (**text**). Uses strong emphasis.
+bold,
+/// Strip formatting, render as plain text. No markup.
+none,
+                    ;
+                    
+                }
 
 /// Comprehensive metadata extraction result from HTML document.
 ///
@@ -1297,49 +743,37 @@ enum HighlightStyle {
 ///
 /// assert!(metadata.headers.is_empty());
 /// ```
-class HtmlMetadata {
-  /// Document-level metadata (title, description, canonical, etc.)
-  final DocumentMetadata document;
+class HtmlMetadata  {
+                /// Document-level metadata (title, description, canonical, etc.)
+final DocumentMetadata document;
+/// Extracted header elements with hierarchy
+final List<HeaderMetadata> headers;
+/// Extracted hyperlinks with type classification
+final List<LinkMetadata> links;
+/// Extracted images with source and dimensions
+final List<ImageMetadata> images;
+/// Extracted structured data blocks
+final List<StructuredData> structuredData;
 
-  /// Extracted header elements with hierarchy
-  final List<HeaderMetadata> headers;
+                const HtmlMetadata({required this.document ,required this.headers ,required this.links ,required this.images ,required this.structuredData ,});
 
-  /// Extracted hyperlinks with type classification
-  final List<LinkMetadata> links;
+                
+                
 
-  /// Extracted images with source and dimensions
-  final List<ImageMetadata> images;
+                
+        @override
+        int get hashCode => document.hashCode^headers.hashCode^links.hashCode^images.hashCode^structuredData.hashCode;
+        
 
-  /// Extracted structured data blocks
-  final List<StructuredData> structuredData;
-
-  const HtmlMetadata({
-    required this.document,
-    required this.headers,
-    required this.links,
-    required this.images,
-    required this.structuredData,
-  });
-
-  @override
-  int get hashCode =>
-      document.hashCode ^
-      headers.hashCode ^
-      links.hashCode ^
-      images.hashCode ^
-      structuredData.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HtmlMetadata &&
-          runtimeType == other.runtimeType &&
-          document == other.document &&
-          headers == other.headers &&
-          links == other.links &&
-          images == other.images &&
-          structuredData == other.structuredData;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is HtmlMetadata &&
+                runtimeType == other.runtimeType
+                && document == other.document&& headers == other.headers&& links == other.links&& images == other.images&& structuredData == other.structuredData;
+        
+            }
 
 /// Image metadata with source and dimensions.
 ///
@@ -1360,72 +794,55 @@ class HtmlMetadata {
 ///
 /// assert_eq!(img.image_type, ImageType::External);
 /// ```
-class ImageMetadata {
-  /// Image source (URL, data URI, or SVG content identifier)
-  final String src;
+class ImageMetadata  {
+                /// Image source (URL, data URI, or SVG content identifier)
+final String src;
+/// Alternative text from alt attribute (for accessibility)
+final String? alt;
+/// Title attribute (often shown as tooltip)
+final String? title;
+/// Image dimensions as (width, height) if available
+final Int64List? dimensions;
+/// Image type classification
+final ImageType imageType;
+/// Additional HTML attributes
+final Map<String, String> attributes;
 
-  /// Alternative text from alt attribute (for accessibility)
-  final String? alt;
+                const ImageMetadata({required this.src ,this.alt ,this.title ,this.dimensions ,required this.imageType ,required this.attributes ,});
 
-  /// Title attribute (often shown as tooltip)
-  final String? title;
+                
+                
 
-  /// Image dimensions as (width, height) if available
-  final Int64List? dimensions;
+                
+        @override
+        int get hashCode => src.hashCode^alt.hashCode^title.hashCode^dimensions.hashCode^imageType.hashCode^attributes.hashCode;
+        
 
-  /// Image type classification
-  final ImageType imageType;
-
-  /// Additional HTML attributes
-  final Map<String, String> attributes;
-
-  const ImageMetadata({
-    required this.src,
-    this.alt,
-    this.title,
-    this.dimensions,
-    required this.imageType,
-    required this.attributes,
-  });
-
-  @override
-  int get hashCode =>
-      src.hashCode ^
-      alt.hashCode ^
-      title.hashCode ^
-      dimensions.hashCode ^
-      imageType.hashCode ^
-      attributes.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ImageMetadata &&
-          runtimeType == other.runtimeType &&
-          src == other.src &&
-          alt == other.alt &&
-          title == other.title &&
-          dimensions == other.dimensions &&
-          imageType == other.imageType &&
-          attributes == other.attributes;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ImageMetadata &&
+                runtimeType == other.runtimeType
+                && src == other.src&& alt == other.alt&& title == other.title&& dimensions == other.dimensions&& imageType == other.imageType&& attributes == other.attributes;
+        
+            }
 
 /// Image source classification for proper handling and processing.
 ///
 /// Determines whether an image is embedded (data URI), inline SVG, external, or relative.
 enum ImageType {
-  /// Data URI embedded image (base64 or other encoding)
-  dataUri,
-
-  /// Inline SVG element
-  inlineSvg,
-
-  /// External image URL (http/https)
-  external_,
-
-  /// Relative image path
-  relative,
-}
+                    /// Data URI embedded image (base64 or other encoding)
+dataUri,
+/// Inline SVG element
+inlineSvg,
+/// External image URL (http/https)
+external_,
+/// Relative image path
+relative,
+                    ;
+                    
+                }
 
 /// Hyperlink metadata with categorization and attributes.
 ///
@@ -1446,653 +863,470 @@ enum ImageType {
 /// assert_eq!(link.link_type, LinkType::External);
 /// assert_eq!(link.text, "Example");
 /// ```
-class LinkMetadata {
-  /// The href URL value
-  final String href;
+class LinkMetadata  {
+                /// The href URL value
+final String href;
+/// Link text content (normalized, concatenated if mixed with elements)
+final String text;
+/// Optional title attribute (often shown as tooltip)
+final String? title;
+/// Link type classification
+final LinkType linkType;
+/// Rel attribute values (e.g., "nofollow", "stylesheet", "canonical")
+final List<String> rel;
+/// Additional HTML attributes
+final Map<String, String> attributes;
 
-  /// Link text content (normalized, concatenated if mixed with elements)
-  final String text;
+                const LinkMetadata({required this.href ,required this.text ,this.title ,required this.linkType ,required this.rel ,required this.attributes ,});
 
-  /// Optional title attribute (often shown as tooltip)
-  final String? title;
+                
+                
 
-  /// Link type classification
-  final LinkType linkType;
+                
+        @override
+        int get hashCode => href.hashCode^text.hashCode^title.hashCode^linkType.hashCode^rel.hashCode^attributes.hashCode;
+        
 
-  /// Rel attribute values (e.g., "nofollow", "stylesheet", "canonical")
-  final List<String> rel;
-
-  /// Additional HTML attributes
-  final Map<String, String> attributes;
-
-  const LinkMetadata({
-    required this.href,
-    required this.text,
-    this.title,
-    required this.linkType,
-    required this.rel,
-    required this.attributes,
-  });
-
-  @override
-  int get hashCode =>
-      href.hashCode ^
-      text.hashCode ^
-      title.hashCode ^
-      linkType.hashCode ^
-      rel.hashCode ^
-      attributes.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LinkMetadata &&
-          runtimeType == other.runtimeType &&
-          href == other.href &&
-          text == other.text &&
-          title == other.title &&
-          linkType == other.linkType &&
-          rel == other.rel &&
-          attributes == other.attributes;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is LinkMetadata &&
+                runtimeType == other.runtimeType
+                && href == other.href&& text == other.text&& title == other.title&& linkType == other.linkType&& rel == other.rel&& attributes == other.attributes;
+        
+            }
 
 /// Link rendering style in Markdown output.
 ///
 /// Controls whether links and images use inline `[text](url)` syntax or
 /// reference-style `[text][1]` syntax with definitions collected at the end.
 enum LinkStyle {
-  /// Inline links: `[text](url)`. Default.
-  inline,
-
-  /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
-  reference,
-}
+                    /// Inline links: `[text](url)`. Default.
+inline,
+/// Reference-style links: `[text][1]` with `[1]: url` at end of document.
+reference,
+                    ;
+                    
+                }
 
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
 enum LinkType {
-  /// Anchor link within same document (href starts with #)
-  anchor,
-
-  /// Internal link within same domain
-  internal,
-
-  /// External link to different domain
-  external_,
-
-  /// Email link (mailto:)
-  email,
-
-  /// Phone link (tel:)
-  phone,
-
-  /// Other protocol or unclassifiable
-  other,
-}
+                    /// Anchor link within same document (href starts with #)
+anchor,
+/// Internal link within same domain
+internal,
+/// External link to different domain
+external_,
+/// Email link (mailto:)
+email,
+/// Phone link (tel:)
+phone,
+/// Other protocol or unclassifiable
+other,
+                    ;
+                    
+                }
 
 /// List indentation character type.
 ///
 /// Controls whether list items are indented with spaces or tabs.
 enum ListIndentType {
-  /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
-  spaces,
-
-  /// Use tabs for indentation.
-  tabs,
-}
+                    /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
+spaces,
+/// Use tabs for indentation.
+tabs,
+                    ;
+                    
+                }
 
 /// Line break syntax in Markdown output.
 ///
 /// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
 enum NewlineStyle {
-  /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
-  spaces,
-
-  /// Backslash at end of line. Alternative Markdown syntax.
-  backslash,
-}
+                    /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
+spaces,
+/// Backslash at end of line. Alternative Markdown syntax.
+backslash,
+                    ;
+                    
+                }
 
 @freezed
-sealed class NodeContent with _$NodeContent {
-  const NodeContent._();
+                sealed class NodeContent with _$NodeContent  {
+                    const NodeContent._();
 
-  /// A heading element (h1-h6).
-  const factory NodeContent.heading({
-    /// Heading level (1-6).
-    required PlatformInt64 level,
+                     /// A heading element (h1-h6).
+const factory NodeContent.heading({ /// Heading level (1-6).
+  required PlatformInt64 level ,/// The heading text content.
+  required String text , }) = NodeContent_Heading;
+ /// A paragraph of text.
+const factory NodeContent.paragraph({ /// The paragraph text content.
+  required String text , }) = NodeContent_Paragraph;
+ /// A list container (ordered or unordered). Children are `ListItem` nodes.
+const factory NodeContent.list({ /// Whether this is an ordered list.
+  required bool ordered , }) = NodeContent_List;
+ /// A single list item.
+const factory NodeContent.listItem({ /// The list item text content.
+  required String text , }) = NodeContent_ListItem;
+ /// A table with structured cell data.
+const factory NodeContent.table({ /// The table grid structure.
+  required TableGrid grid , }) = NodeContent_Table;
+ /// An image element.
+const factory NodeContent.image({ /// Alt text or caption.
+  required String description ,/// Image source URL.
+  required String src ,/// Index into `ConversionResult.images` when image extraction is enabled.
+  required PlatformInt64 imageIndex , }) = NodeContent_Image;
+ /// A code block or inline code.
+const factory NodeContent.code({ /// The code text content.
+  required String text ,/// Programming language (from class="language-*" or similar).
+  required String language , }) = NodeContent_Code;
+ /// A block quote container.
+const factory NodeContent.quote() = NodeContent_Quote;
+ /// A definition list container.
+const factory NodeContent.definitionList() = NodeContent_DefinitionList;
+ /// A definition list entry with term and description.
+const factory NodeContent.definitionItem({ /// The term being defined.
+  required String term ,/// The definition text.
+  required String definition , }) = NodeContent_DefinitionItem;
+ /// A raw block preserved as-is (e.g. `<script>`, `<style>` content).
+const factory NodeContent.rawBlock({ /// The format of the raw content (e.g. "html", "css", "javascript").
+  required String format ,/// The raw content.
+  required String content , }) = NodeContent_RawBlock;
+ /// A block of key-value metadata pairs (from `<head>` meta tags).
+const factory NodeContent.metadataBlock({ /// Key-value metadata pairs.
+  required List<List<String>> entries , }) = NodeContent_MetadataBlock;
+ /// A section grouping container (auto-generated from heading hierarchy).
+const factory NodeContent.group({ /// Optional section label.
+  required String label ,/// The heading level that created this group.
+  required PlatformInt64 headingLevel ,/// The heading text that created this group.
+  required String headingText , }) = NodeContent_Group;
 
-    /// The heading text content.
-    required String text,
-  }) = NodeContent_Heading;
+                    
 
-  /// A paragraph of text.
-  const factory NodeContent.paragraph({
-    /// The paragraph text content.
-    required String text,
-  }) = NodeContent_Paragraph;
-
-  /// A list container (ordered or unordered). Children are `ListItem` nodes.
-  const factory NodeContent.list({
-    /// Whether this is an ordered list.
-    required bool ordered,
-  }) = NodeContent_List;
-
-  /// A single list item.
-  const factory NodeContent.listItem({
-    /// The list item text content.
-    required String text,
-  }) = NodeContent_ListItem;
-
-  /// A table with structured cell data.
-  const factory NodeContent.table({
-    /// The table grid structure.
-    required TableGrid grid,
-  }) = NodeContent_Table;
-
-  /// An image element.
-  const factory NodeContent.image({
-    /// Alt text or caption.
-    required String description,
-
-    /// Image source URL.
-    required String src,
-
-    /// Index into `ConversionResult.images` when image extraction is enabled.
-    required PlatformInt64 imageIndex,
-  }) = NodeContent_Image;
-
-  /// A code block or inline code.
-  const factory NodeContent.code({
-    /// The code text content.
-    required String text,
-
-    /// Programming language (from class="language-*" or similar).
-    required String language,
-  }) = NodeContent_Code;
-
-  /// A block quote container.
-  const factory NodeContent.quote() = NodeContent_Quote;
-
-  /// A definition list container.
-  const factory NodeContent.definitionList() = NodeContent_DefinitionList;
-
-  /// A definition list entry with term and description.
-  const factory NodeContent.definitionItem({
-    /// The term being defined.
-    required String term,
-
-    /// The definition text.
-    required String definition,
-  }) = NodeContent_DefinitionItem;
-
-  /// A raw block preserved as-is (e.g. `<script>`, `<style>` content).
-  const factory NodeContent.rawBlock({
-    /// The format of the raw content (e.g. "html", "css", "javascript").
-    required String format,
-
-    /// The raw content.
-    required String content,
-  }) = NodeContent_RawBlock;
-
-  /// A block of key-value metadata pairs (from `<head>` meta tags).
-  const factory NodeContent.metadataBlock({
-    /// Key-value metadata pairs.
-    required List<List<String>> entries,
-  }) = NodeContent_MetadataBlock;
-
-  /// A section grouping container (auto-generated from heading hierarchy).
-  const factory NodeContent.group({
-    /// Optional section label.
-    required String label,
-
-    /// The heading level that created this group.
-    required PlatformInt64 headingLevel,
-
-    /// The heading text that created this group.
-    required String headingText,
-  }) = NodeContent_Group;
-}
+                    
+                }
 
 /// Context information passed to all visitor methods.
 ///
 /// Provides comprehensive metadata about the current node being visited,
 /// including its type, attributes, position in the DOM tree, and parent context.
-class NodeContext {
-  /// Coarse-grained node type classification
-  final NodeType nodeType;
+class NodeContext  {
+                /// Coarse-grained node type classification
+final NodeType nodeType;
+/// Raw HTML tag name (e.g., "div", "h1", "custom-element")
+final String tagName;
+/// All HTML attributes as key-value pairs
+final Map<String, String> attributes;
+/// Depth in the DOM tree (0 = root)
+final PlatformInt64 depth;
+/// Index among siblings (0-based)
+final PlatformInt64 indexInParent;
+/// Parent element's tag name (None if root)
+final String? parentTag;
+/// Whether this element is treated as inline vs block
+final bool isInline;
 
-  /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
-  final String tagName;
+                const NodeContext({required this.nodeType ,required this.tagName ,required this.attributes ,required this.depth ,required this.indexInParent ,this.parentTag ,required this.isInline ,});
 
-  /// All HTML attributes as key-value pairs
-  final Map<String, String> attributes;
+                
+                
 
-  /// Depth in the DOM tree (0 = root)
-  final PlatformInt64 depth;
+                
+        @override
+        int get hashCode => nodeType.hashCode^tagName.hashCode^attributes.hashCode^depth.hashCode^indexInParent.hashCode^parentTag.hashCode^isInline.hashCode;
+        
 
-  /// Index among siblings (0-based)
-  final PlatformInt64 indexInParent;
-
-  /// Parent element's tag name (None if root)
-  final String? parentTag;
-
-  /// Whether this element is treated as inline vs block
-  final bool isInline;
-
-  const NodeContext({
-    required this.nodeType,
-    required this.tagName,
-    required this.attributes,
-    required this.depth,
-    required this.indexInParent,
-    this.parentTag,
-    required this.isInline,
-  });
-
-  @override
-  int get hashCode =>
-      nodeType.hashCode ^
-      tagName.hashCode ^
-      attributes.hashCode ^
-      depth.hashCode ^
-      indexInParent.hashCode ^
-      parentTag.hashCode ^
-      isInline.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is NodeContext &&
-          runtimeType == other.runtimeType &&
-          nodeType == other.nodeType &&
-          tagName == other.tagName &&
-          attributes == other.attributes &&
-          depth == other.depth &&
-          indexInParent == other.indexInParent &&
-          parentTag == other.parentTag &&
-          isInline == other.isInline;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is NodeContext &&
+                runtimeType == other.runtimeType
+                && nodeType == other.nodeType&& tagName == other.tagName&& attributes == other.attributes&& depth == other.depth&& indexInParent == other.indexInParent&& parentTag == other.parentTag&& isInline == other.isInline;
+        
+            }
 
 /// Node type enumeration covering all HTML element types.
 ///
 /// This enum categorizes all HTML elements that the converter recognizes,
 /// providing a coarse-grained classification for visitor dispatch.
 enum NodeType {
-  /// Text node (most frequent - 100+ per document)
-  text,
-
-  /// Generic element node
-  element,
-
-  /// Heading elements (h1-h6)
-  heading,
-
-  /// Paragraph element
-  paragraph,
-
-  /// Generic div container
-  div,
-
-  /// Blockquote element
-  blockquote,
-
-  /// Preformatted text block
-  pre,
-
-  /// Horizontal rule
-  hr,
-
-  /// Ordered or unordered list (ul, ol)
-  list,
-
-  /// List item (li)
-  listItem,
-
-  /// Definition list (dl)
-  definitionList,
-
-  /// Definition term (dt)
-  definitionTerm,
-
-  /// Definition description (dd)
-  definitionDescription,
-
-  /// Table element
-  table,
-
-  /// Table row (tr)
-  tableRow,
-
-  /// Table cell (td, th)
-  tableCell,
-
-  /// Table header cell (th)
-  tableHeader,
-
-  /// Table body (tbody)
-  tableBody,
-
-  /// Table head (thead)
-  tableHead,
-
-  /// Table foot (tfoot)
-  tableFoot,
-
-  /// Anchor link (a)
-  link,
-
-  /// Image (img)
-  image,
-
-  /// Strong/bold (strong, b)
-  strong,
-
-  /// Emphasis/italic (em, i)
-  em,
-
-  /// Inline code (code)
-  code,
-
-  /// Strikethrough (s, del, strike)
-  strikethrough,
-
-  /// Underline (u, ins)
-  underline,
-
-  /// Subscript (sub)
-  subscript,
-
-  /// Superscript (sup)
-  superscript,
-
-  /// Mark/highlight (mark)
-  mark,
-
-  /// Small text (small)
-  small,
-
-  /// Line break (br)
-  br,
-
-  /// Span element
-  span,
-
-  /// Article element
-  article,
-
-  /// Section element
-  section,
-
-  /// Navigation element
-  nav,
-
-  /// Aside element
-  aside,
-
-  /// Header element
-  header,
-
-  /// Footer element
-  footer,
-
-  /// Main element
-  main,
-
-  /// Figure element
-  figure,
-
-  /// Figure caption
-  figcaption,
-
-  /// Time element
-  time,
-
-  /// Details element
-  details,
-
-  /// Summary element
-  summary,
-
-  /// Form element
-  form,
-
-  /// Input element
-  input,
-
-  /// Select element
-  select,
-
-  /// Option element
-  option,
-
-  /// Button element
-  button,
-
-  /// Textarea element
-  textarea,
-
-  /// Label element
-  label,
-
-  /// Fieldset element
-  fieldset,
-
-  /// Legend element
-  legend,
-
-  /// Audio element
-  audio,
-
-  /// Video element
-  video,
-
-  /// Picture element
-  picture,
-
-  /// Source element
-  source,
-
-  /// Iframe element
-  iframe,
-
-  /// SVG element
-  svg,
-
-  /// Canvas element
-  canvas,
-
-  /// Ruby annotation
-  ruby,
-
-  /// Ruby text
-  rt,
-
-  /// Ruby parenthesis
-  rp,
-
-  /// Abbreviation
-  abbr,
-
-  /// Keyboard input
-  kbd,
-
-  /// Sample output
-  samp,
-
-  /// Variable
-  var_,
-
-  /// Citation
-  cite,
-
-  /// Quote
-  q,
-
-  /// Deleted text
-  del,
-
-  /// Inserted text
-  ins,
-
-  /// Data element
-  data,
-
-  /// Meter element
-  meter,
-
-  /// Progress element
-  progress,
-
-  /// Output element
-  output,
-
-  /// Template element
-  template,
-
-  /// Slot element
-  slot,
-
-  /// HTML root element
-  html,
-
-  /// Head element
-  head,
-
-  /// Body element
-  body,
-
-  /// Title element
-  title,
-
-  /// Meta element
-  meta,
-
-  /// Link element (not anchor)
-  linkTag,
-
-  /// Style element
-  style,
-
-  /// Script element
-  script,
-
-  /// Base element
-  base,
-
-  /// Custom element (web components) or unknown tag
-  custom,
-}
+                    /// Text node (most frequent - 100+ per document)
+text,
+/// Generic element node
+element,
+/// Heading elements (h1-h6)
+heading,
+/// Paragraph element
+paragraph,
+/// Generic div container
+div,
+/// Blockquote element
+blockquote,
+/// Preformatted text block
+pre,
+/// Horizontal rule
+hr,
+/// Ordered or unordered list (ul, ol)
+list,
+/// List item (li)
+listItem,
+/// Definition list (dl)
+definitionList,
+/// Definition term (dt)
+definitionTerm,
+/// Definition description (dd)
+definitionDescription,
+/// Table element
+table,
+/// Table row (tr)
+tableRow,
+/// Table cell (td, th)
+tableCell,
+/// Table header cell (th)
+tableHeader,
+/// Table body (tbody)
+tableBody,
+/// Table head (thead)
+tableHead,
+/// Table foot (tfoot)
+tableFoot,
+/// Anchor link (a)
+link,
+/// Image (img)
+image,
+/// Strong/bold (strong, b)
+strong,
+/// Emphasis/italic (em, i)
+em,
+/// Inline code (code)
+code,
+/// Strikethrough (s, del, strike)
+strikethrough,
+/// Underline (u, ins)
+underline,
+/// Subscript (sub)
+subscript,
+/// Superscript (sup)
+superscript,
+/// Mark/highlight (mark)
+mark,
+/// Small text (small)
+small,
+/// Line break (br)
+br,
+/// Span element
+span,
+/// Article element
+article,
+/// Section element
+section,
+/// Navigation element
+nav,
+/// Aside element
+aside,
+/// Header element
+header,
+/// Footer element
+footer,
+/// Main element
+main,
+/// Figure element
+figure,
+/// Figure caption
+figcaption,
+/// Time element
+time,
+/// Details element
+details,
+/// Summary element
+summary,
+/// Form element
+form,
+/// Input element
+input,
+/// Select element
+select,
+/// Option element
+option,
+/// Button element
+button,
+/// Textarea element
+textarea,
+/// Label element
+label,
+/// Fieldset element
+fieldset,
+/// Legend element
+legend,
+/// Audio element
+audio,
+/// Video element
+video,
+/// Picture element
+picture,
+/// Source element
+source,
+/// Iframe element
+iframe,
+/// SVG element
+svg,
+/// Canvas element
+canvas,
+/// Ruby annotation
+ruby,
+/// Ruby text
+rt,
+/// Ruby parenthesis
+rp,
+/// Abbreviation
+abbr,
+/// Keyboard input
+kbd,
+/// Sample output
+samp,
+/// Variable
+var_,
+/// Citation
+cite,
+/// Quote
+q,
+/// Deleted text
+del,
+/// Inserted text
+ins,
+/// Data element
+data,
+/// Meter element
+meter,
+/// Progress element
+progress,
+/// Output element
+output,
+/// Template element
+template,
+/// Slot element
+slot,
+/// HTML root element
+html,
+/// Head element
+head,
+/// Body element
+body,
+/// Title element
+title,
+/// Meta element
+meta,
+/// Link element (not anchor)
+linkTag,
+/// Style element
+style,
+/// Script element
+script,
+/// Base element
+base,
+/// Custom element (web components) or unknown tag
+custom,
+                    ;
+                    
+                }
 
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.
 enum OutputFormat {
-  /// Standard Markdown (CommonMark compatible). Default.
-  markdown,
-
-  /// Djot lightweight markup language.
-  djot,
-
-  /// Plain text output (no markup, visible text only).
-  plain,
-}
+                    /// Standard Markdown (CommonMark compatible). Default.
+markdown,
+/// Djot lightweight markup language.
+djot,
+/// Plain text output (no markup, visible text only).
+plain,
+                    ;
+                    
+                }
 
 /// HTML preprocessing options for document cleanup before conversion.
-class PreprocessingOptions {
-  /// Enable HTML preprocessing globally
-  final bool enabled;
+class PreprocessingOptions  {
+                /// Enable HTML preprocessing globally
+final bool enabled;
+/// Preprocessing preset level (Minimal, Standard, Aggressive)
+final PreprocessingPreset preset;
+/// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
+final bool removeNavigation;
+/// Remove form elements (forms, inputs, buttons, etc.)
+final bool removeForms;
 
-  /// Preprocessing preset level (Minimal, Standard, Aggressive)
-  final PreprocessingPreset preset;
+                const PreprocessingOptions({required this.enabled ,required this.preset ,required this.removeNavigation ,required this.removeForms ,});
 
-  /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)
-  final bool removeNavigation;
+                
+                
 
-  /// Remove form elements (forms, inputs, buttons, etc.)
-  final bool removeForms;
+                
+        @override
+        int get hashCode => enabled.hashCode^preset.hashCode^removeNavigation.hashCode^removeForms.hashCode;
+        
 
-  const PreprocessingOptions({
-    required this.enabled,
-    required this.preset,
-    required this.removeNavigation,
-    required this.removeForms,
-  });
-
-  @override
-  int get hashCode =>
-      enabled.hashCode ^
-      preset.hashCode ^
-      removeNavigation.hashCode ^
-      removeForms.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PreprocessingOptions &&
-          runtimeType == other.runtimeType &&
-          enabled == other.enabled &&
-          preset == other.preset &&
-          removeNavigation == other.removeNavigation &&
-          removeForms == other.removeForms;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is PreprocessingOptions &&
+                runtimeType == other.runtimeType
+                && enabled == other.enabled&& preset == other.preset&& removeNavigation == other.removeNavigation&& removeForms == other.removeForms;
+        
+            }
 
 /// Partial update for `PreprocessingOptions`.
 ///
 /// This struct uses `Option<T>` to represent optional fields that can be selectively updated.
 /// Only specified fields (Some values) will override existing options; None values leave the
 /// corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
-class PreprocessingOptionsUpdate {
-  /// Optional global preprocessing enablement override
-  final bool? enabled;
+class PreprocessingOptionsUpdate  {
+                /// Optional global preprocessing enablement override
+final bool? enabled;
+/// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
+final PreprocessingPreset? preset;
+/// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
+final bool? removeNavigation;
+/// Optional form element removal override (forms, inputs, buttons, etc.)
+final bool? removeForms;
 
-  /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
-  final PreprocessingPreset? preset;
+                const PreprocessingOptionsUpdate({this.enabled ,this.preset ,this.removeNavigation ,this.removeForms ,});
 
-  /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
-  final bool? removeNavigation;
+                
+                
 
-  /// Optional form element removal override (forms, inputs, buttons, etc.)
-  final bool? removeForms;
+                
+        @override
+        int get hashCode => enabled.hashCode^preset.hashCode^removeNavigation.hashCode^removeForms.hashCode;
+        
 
-  const PreprocessingOptionsUpdate({
-    this.enabled,
-    this.preset,
-    this.removeNavigation,
-    this.removeForms,
-  });
-
-  @override
-  int get hashCode =>
-      enabled.hashCode ^
-      preset.hashCode ^
-      removeNavigation.hashCode ^
-      removeForms.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PreprocessingOptionsUpdate &&
-          runtimeType == other.runtimeType &&
-          enabled == other.enabled &&
-          preset == other.preset &&
-          removeNavigation == other.removeNavigation &&
-          removeForms == other.removeForms;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is PreprocessingOptionsUpdate &&
+                runtimeType == other.runtimeType
+                && enabled == other.enabled&& preset == other.preset&& removeNavigation == other.removeNavigation&& removeForms == other.removeForms;
+        
+            }
 
 /// HTML preprocessing aggressiveness level.
 ///
 /// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
 enum PreprocessingPreset {
-  /// Minimal cleanup. Remove only essential noise (scripts, styles).
-  minimal,
-
-  /// Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
-  standard,
-
-  /// Aggressive cleanup. Remove extensive non-content elements and structure.
-  aggressive,
-}
+                    /// Minimal cleanup. Remove only essential noise (scripts, styles).
+minimal,
+/// Standard cleanup. Default. Removes navigation, forms, and other auxiliary content.
+standard,
+/// Aggressive cleanup. Remove extensive non-content elements and structure.
+aggressive,
+                    ;
+                    
+                }
 
 /// A non-fatal diagnostic produced during HTML conversion.
 ///
@@ -2109,26 +1343,31 @@ enum PreprocessingPreset {
 ///   `result.warnings.is_empty()` before using the output.
 ///
 /// See [`WarningKind`] for the full taxonomy of warning categories.
-class ProcessingWarning {
-  /// Human-readable warning message.
-  final String message;
+class ProcessingWarning  {
+                /// Human-readable warning message.
+final String message;
+/// The category of warning.
+final WarningKind kind;
 
-  /// The category of warning.
-  final WarningKind kind;
+                const ProcessingWarning({required this.message ,required this.kind ,});
 
-  const ProcessingWarning({required this.message, required this.kind});
+                
+                
 
-  @override
-  int get hashCode => message.hashCode ^ kind.hashCode;
+                
+        @override
+        int get hashCode => message.hashCode^kind.hashCode;
+        
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ProcessingWarning &&
-          runtimeType == other.runtimeType &&
-          message == other.message &&
-          kind == other.kind;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is ProcessingWarning &&
+                runtimeType == other.runtimeType
+                && message == other.message&& kind == other.kind;
+        
+            }
 
 /// Structured data block (JSON-LD, Microdata, or RDFa).
 ///
@@ -2146,114 +1385,116 @@ class ProcessingWarning {
 ///
 /// assert_eq!(schema.data_type, StructuredDataType::JsonLd);
 /// ```
-class StructuredData {
-  /// Type of structured data (JSON-LD, Microdata, RDFa)
-  final StructuredDataType dataType;
+class StructuredData  {
+                /// Type of structured data (JSON-LD, Microdata, RDFa)
+final StructuredDataType dataType;
+/// Raw JSON string (for JSON-LD) or serialized representation
+final String rawJson;
+/// Schema type if detectable (e.g., "Article", "Event", "Product")
+final String? schemaType;
 
-  /// Raw JSON string (for JSON-LD) or serialized representation
-  final String rawJson;
+                const StructuredData({required this.dataType ,required this.rawJson ,this.schemaType ,});
 
-  /// Schema type if detectable (e.g., "Article", "Event", "Product")
-  final String? schemaType;
+                
+                
 
-  const StructuredData({
-    required this.dataType,
-    required this.rawJson,
-    this.schemaType,
-  });
+                
+        @override
+        int get hashCode => dataType.hashCode^rawJson.hashCode^schemaType.hashCode;
+        
 
-  @override
-  int get hashCode =>
-      dataType.hashCode ^ rawJson.hashCode ^ schemaType.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is StructuredData &&
-          runtimeType == other.runtimeType &&
-          dataType == other.dataType &&
-          rawJson == other.rawJson &&
-          schemaType == other.schemaType;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is StructuredData &&
+                runtimeType == other.runtimeType
+                && dataType == other.dataType&& rawJson == other.rawJson&& schemaType == other.schemaType;
+        
+            }
 
 /// Structured data format type.
 ///
 /// Identifies the schema/format used for structured data markup.
 enum StructuredDataType {
-  /// JSON-LD (JSON for Linking Data) script blocks
-  jsonLd,
-
-  /// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
-  microdata,
-
-  /// RDF in Attributes (RDFa) markup
-  rdFa,
-}
+                    /// JSON-LD (JSON for Linking Data) script blocks
+jsonLd,
+/// HTML5 Microdata attributes (itemscope, itemtype, itemprop)
+microdata,
+/// RDF in Attributes (RDFa) markup
+rdFa,
+                    ;
+                    
+                }
 
 /// A top-level extracted table with both structured data and markdown representation.
-class TableData {
-  /// The structured table grid.
-  final TableGrid grid;
+class TableData  {
+                /// The structured table grid.
+final TableGrid grid;
+/// The markdown rendering of this table.
+final String markdown;
 
-  /// The markdown rendering of this table.
-  final String markdown;
+                const TableData({required this.grid ,required this.markdown ,});
 
-  const TableData({required this.grid, required this.markdown});
+                
+                
 
-  @override
-  int get hashCode => grid.hashCode ^ markdown.hashCode;
+                
+        @override
+        int get hashCode => grid.hashCode^markdown.hashCode;
+        
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TableData &&
-          runtimeType == other.runtimeType &&
-          grid == other.grid &&
-          markdown == other.markdown;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TableData &&
+                runtimeType == other.runtimeType
+                && grid == other.grid&& markdown == other.markdown;
+        
+            }
 
 /// A structured table grid with cell-level data including spans.
-class TableGrid {
-  /// Number of rows.
-  final PlatformInt64 rows;
+class TableGrid  {
+                /// Number of rows.
+final PlatformInt64 rows;
+/// Number of columns.
+final PlatformInt64 cols;
+/// All cells in the table as a flat, sparse list.
+///
+/// The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
+/// that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
+/// in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
+/// and `col_span` fields set accordingly.
+///
+/// To reconstruct the full visual grid, iterate over all cells and mark the rectangular
+/// region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
+/// `(row, col)` position that is not the origin of any cell is covered by a span from an
+/// earlier cell.
+///
+/// The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
+/// produces an empty vec.
+final List<GridCell> cells;
 
-  /// Number of columns.
-  final PlatformInt64 cols;
+                const TableGrid({required this.rows ,required this.cols ,required this.cells ,});
 
-  /// All cells in the table as a flat, sparse list.
-  ///
-  /// The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
-  /// that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
-  /// in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
-  /// and `col_span` fields set accordingly.
-  ///
-  /// To reconstruct the full visual grid, iterate over all cells and mark the rectangular
-  /// region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
-  /// `(row, col)` position that is not the origin of any cell is covered by a span from an
-  /// earlier cell.
-  ///
-  /// The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
-  /// produces an empty vec.
-  final List<GridCell> cells;
+                
+                
 
-  const TableGrid({
-    required this.rows,
-    required this.cols,
-    required this.cells,
-  });
+                
+        @override
+        int get hashCode => rows.hashCode^cols.hashCode^cells.hashCode;
+        
 
-  @override
-  int get hashCode => rows.hashCode ^ cols.hashCode ^ cells.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TableGrid &&
-          runtimeType == other.runtimeType &&
-          rows == other.rows &&
-          cols == other.cols &&
-          cells == other.cells;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TableGrid &&
+                runtimeType == other.runtimeType
+                && rows == other.rows&& cols == other.cols&& cells == other.cells;
+        
+            }
 
 /// A styling or semantic annotation that applies to a byte range within a node's text.
 ///
@@ -2269,107 +1510,104 @@ class TableGrid {
 /// stored in the order they are encountered during DOM traversal.
 ///
 /// See [`AnnotationKind`] for the full list of supported annotation types.
-class TextAnnotation {
-  /// Start byte offset (inclusive) into the parent node's text.
-  final PlatformInt64 start;
+class TextAnnotation  {
+                /// Start byte offset (inclusive) into the parent node's text.
+final PlatformInt64 start;
+/// End byte offset (exclusive) into the parent node's text.
+final PlatformInt64 end;
+/// The type of annotation.
+final AnnotationKind kind;
 
-  /// End byte offset (exclusive) into the parent node's text.
-  final PlatformInt64 end;
+                const TextAnnotation({required this.start ,required this.end ,required this.kind ,});
 
-  /// The type of annotation.
-  final AnnotationKind kind;
+                
+                
 
-  const TextAnnotation({
-    required this.start,
-    required this.end,
-    required this.kind,
-  });
+                
+        @override
+        int get hashCode => start.hashCode^end.hashCode^kind.hashCode;
+        
 
-  @override
-  int get hashCode => start.hashCode ^ end.hashCode ^ kind.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TextAnnotation &&
-          runtimeType == other.runtimeType &&
-          start == other.start &&
-          end == other.end &&
-          kind == other.kind;
-}
+                
+        @override
+        bool operator ==(Object other) =>
+            identical(this, other) ||
+            other is TextAnnotation &&
+                runtimeType == other.runtimeType
+                && start == other.start&& end == other.end&& kind == other.kind;
+        
+            }
 
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
 enum TextDirection {
-  /// Left-to-right text flow (default for Latin scripts)
-  leftToRight,
-
-  /// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
-  rightToLeft,
-
-  /// Automatic directionality detection
-  auto,
-}
+                    /// Left-to-right text flow (default for Latin scripts)
+leftToRight,
+/// Right-to-left text flow (Hebrew, Arabic, Urdu, etc.)
+rightToLeft,
+/// Automatic directionality detection
+auto,
+                    ;
+                    
+                }
 
 @freezed
-sealed class VisitResult with _$VisitResult {
-  const VisitResult._();
+                sealed class VisitResult with _$VisitResult  {
+                    const VisitResult._();
 
-  /// Continue with default conversion behavior
-  const factory VisitResult.continue_() = VisitResult_Continue;
+                     /// Continue with default conversion behavior
+const factory VisitResult.continue_() = VisitResult_Continue;
+ /// Replace default output with custom markdown
+///
+/// The visitor takes full responsibility for the markdown output
+/// of this node and its children.
+const factory VisitResult.custom({   required String field0 , }) = VisitResult_Custom;
+ /// Skip this element entirely (don't output anything)
+///
+/// The element and all its children are ignored in the output.
+const factory VisitResult.skip() = VisitResult_Skip;
+ /// Preserve original HTML (don't convert to markdown)
+///
+/// The element's raw HTML is included verbatim in the output.
+const factory VisitResult.preserveHtml() = VisitResult_PreserveHtml;
+ /// Stop conversion with an error
+///
+/// The conversion process halts and returns this error message.
+const factory VisitResult.error({   required String field0 , }) = VisitResult_Error;
 
-  /// Replace default output with custom markdown
-  ///
-  /// The visitor takes full responsibility for the markdown output
-  /// of this node and its children.
-  const factory VisitResult.custom({required String field0}) =
-      VisitResult_Custom;
+                    
 
-  /// Skip this element entirely (don't output anything)
-  ///
-  /// The element and all its children are ignored in the output.
-  const factory VisitResult.skip() = VisitResult_Skip;
-
-  /// Preserve original HTML (don't convert to markdown)
-  ///
-  /// The element's raw HTML is included verbatim in the output.
-  const factory VisitResult.preserveHtml() = VisitResult_PreserveHtml;
-
-  /// Stop conversion with an error
-  ///
-  /// The conversion process halts and returns this error message.
-  const factory VisitResult.error({required String field0}) = VisitResult_Error;
-}
+                    
+                }
 
 /// Categories of processing warnings.
 enum WarningKind {
-  /// An image could not be extracted (e.g. invalid data URI, unsupported format).
-  imageExtractionFailed,
-
-  /// The input encoding was not recognized; fell back to UTF-8.
-  encodingFallback,
-
-  /// The input was truncated due to size limits.
-  truncatedInput,
-
-  /// The HTML was malformed but processing continued with best effort.
-  malformedHtml,
-
-  /// Sanitization was applied to remove potentially unsafe content.
-  sanitizationApplied,
-
-  /// DOM traversal was truncated because max_depth was exceeded.
-  depthLimitExceeded,
-}
+                    /// An image could not be extracted (e.g. invalid data URI, unsupported format).
+imageExtractionFailed,
+/// The input encoding was not recognized; fell back to UTF-8.
+encodingFallback,
+/// The input was truncated due to size limits.
+truncatedInput,
+/// The HTML was malformed but processing continued with best effort.
+malformedHtml,
+/// Sanitization was applied to remove potentially unsafe content.
+sanitizationApplied,
+/// DOM traversal was truncated because max_depth was exceeded.
+depthLimitExceeded,
+                    ;
+                    
+                }
 
 /// Whitespace handling strategy during conversion.
 ///
 /// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
 enum WhitespaceMode {
-  /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
-  normalized,
-
-  /// Preserve all whitespace exactly as it appears in the HTML.
-  strict,
-}
+                    /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
+normalized,
+/// Preserve all whitespace exactly as it appears in the HTML.
+strict,
+                    ;
+                    
+                }
+            

@@ -1,6 +1,0 @@
-parameters:
-  level: 9
-  paths:
-    - SmokeTest.php
-    - ComprehensiveTest.php
-  treatMissingClosureParamTypeAsAny: false

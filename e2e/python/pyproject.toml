@@ -32,7 +32,7 @@ packages = []
 sources.html-to-markdown = { path = "../../packages/python" }
 
 [tool.ruff]
-lint.ignore = [ "PLR2004" ]
+lint.ignore = ["PLR2004"]
 lint.per-file-ignores."tests/**" = [
   "B017",
   "PT011",
@@ -42,7 +42,7 @@ lint.per-file-ignores."tests/**" = [
 
 [tool.pytest]
 ini_options.asyncio_mode = "auto"
-ini_options.testpaths = [ "tests" ]
+ini_options.testpaths = ["tests"]
 ini_options.python_files = "test_*.py"
 ini_options.python_functions = "test_*"
 ini_options.addopts = "-v --strict-markers --tb=short"

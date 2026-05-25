@@ -10,1487 +10,730 @@ import 'frb_generated.dart';
 import 'lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
 
-abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
-  RustLibApiImplPlatform({
-    required super.handler,
-    required super.wire,
-    required super.generalizedFrbRustBinding,
-    required super.portManager,
-  });
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_VisitorHandlePtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr;
-
-  @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw);
-
-  @protected
-  VisitorHandle
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext)
-  dco_decode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String)
-  dco_decode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String, String)
-  dco_decode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String, String, String?)
-  dco_decode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64)
-  dco_decode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String, String?, String?)
-  dco_decode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, bool)
-  dco_decode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, bool, String)
-  dco_decode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, bool, String, String)
-  dco_decode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?)
-  dco_decode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, List<String>, bool)
-  dco_decode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String?)
-  dco_decode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String?, String)
-  dco_decode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
-
-  @protected
-  FutureOr<VisitResult> Function(NodeContext, String?, String?)
-  dco_decode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(
-    dynamic raw,
-  );
 
-  @protected
-  Object dco_decode_DartOpaque(dynamic raw);
 
-  @protected
-  Map<String, String> dco_decode_Map_String_String_None(dynamic raw);
 
-  @protected
-  VisitorHandle
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    dynamic raw,
-  );
+                abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
+                  RustLibApiImplPlatform({
+                    required super.handler,
+                    required super.wire,
+                    required super.generalizedFrbRustBinding,
+                    required super.portManager,
+                  });
 
-  @protected
-  String dco_decode_String(dynamic raw);
+                  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_VisitorHandlePtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr;
 
-  @protected
-  AnnotationKind dco_decode_annotation_kind(dynamic raw);
 
-  @protected
-  bool dco_decode_bool(dynamic raw);
 
-  @protected
-  VisitorHandle
-  dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    dynamic raw,
-  );
+                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw);
 
-  @protected
-  bool dco_decode_box_autoadd_bool(dynamic raw);
+@protected VisitorHandle dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(dynamic raw);
 
-  @protected
-  CodeBlockStyle dco_decode_box_autoadd_code_block_style(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext) dco_decode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  ConversionOptions dco_decode_box_autoadd_conversion_options(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String) dco_decode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  DocumentStructure dco_decode_box_autoadd_document_structure(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String, String) dco_decode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  HeadingStyle dco_decode_box_autoadd_heading_style(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String, String, String?) dco_decode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  HighlightStyle dco_decode_box_autoadd_highlight_style(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64) dco_decode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String, String?, String?) dco_decode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  LinkStyle dco_decode_box_autoadd_link_style(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, bool) dco_decode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  ListIndentType dco_decode_box_autoadd_list_indent_type(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, bool, String) dco_decode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  NewlineStyle dco_decode_box_autoadd_newline_style(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, bool, String, String) dco_decode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  OutputFormat dco_decode_box_autoadd_output_format(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?) dco_decode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  PreprocessingOptionsUpdate
-  dco_decode_box_autoadd_preprocessing_options_update(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, List<String>, bool) dco_decode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  PreprocessingPreset dco_decode_box_autoadd_preprocessing_preset(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String?) dco_decode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  TableGrid dco_decode_box_autoadd_table_grid(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String?, String) dco_decode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  TextDirection dco_decode_box_autoadd_text_direction(dynamic raw);
+@protected FutureOr<VisitResult> Function(NodeContext, String?, String?) dco_decode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(dynamic raw);
 
-  @protected
-  WhitespaceMode dco_decode_box_autoadd_whitespace_mode(dynamic raw);
+@protected Object dco_decode_DartOpaque(dynamic raw);
 
-  @protected
-  CodeBlockStyle dco_decode_code_block_style(dynamic raw);
+@protected Map<String, String> dco_decode_Map_String_String_None(dynamic raw);
 
-  @protected
-  ConversionOptions dco_decode_conversion_options(dynamic raw);
+@protected VisitorHandle dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(dynamic raw);
 
-  @protected
-  ConversionOptionsUpdate dco_decode_conversion_options_update(dynamic raw);
+@protected String dco_decode_String(dynamic raw);
 
-  @protected
-  ConversionResult dco_decode_conversion_result(dynamic raw);
+@protected AnnotationKind dco_decode_annotation_kind(dynamic raw);
 
-  @protected
-  DocumentMetadata dco_decode_document_metadata(dynamic raw);
+@protected bool dco_decode_bool(dynamic raw);
 
-  @protected
-  DocumentNode dco_decode_document_node(dynamic raw);
+@protected VisitorHandle dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(dynamic raw);
 
-  @protected
-  DocumentStructure dco_decode_document_structure(dynamic raw);
+@protected bool dco_decode_box_autoadd_bool(dynamic raw);
 
-  @protected
-  GridCell dco_decode_grid_cell(dynamic raw);
+@protected CodeBlockStyle dco_decode_box_autoadd_code_block_style(dynamic raw);
 
-  @protected
-  HeaderMetadata dco_decode_header_metadata(dynamic raw);
+@protected ConversionOptions dco_decode_box_autoadd_conversion_options(dynamic raw);
 
-  @protected
-  HeadingStyle dco_decode_heading_style(dynamic raw);
+@protected DocumentStructure dco_decode_box_autoadd_document_structure(dynamic raw);
 
-  @protected
-  HighlightStyle dco_decode_highlight_style(dynamic raw);
+@protected HeadingStyle dco_decode_box_autoadd_heading_style(dynamic raw);
 
-  @protected
-  HtmlMetadata dco_decode_html_metadata(dynamic raw);
+@protected HighlightStyle dco_decode_box_autoadd_highlight_style(dynamic raw);
 
-  @protected
-  int dco_decode_i_32(dynamic raw);
+@protected PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_i_64(dynamic raw);
+@protected LinkStyle dco_decode_box_autoadd_link_style(dynamic raw);
 
-  @protected
-  ImageMetadata dco_decode_image_metadata(dynamic raw);
+@protected ListIndentType dco_decode_box_autoadd_list_indent_type(dynamic raw);
 
-  @protected
-  ImageType dco_decode_image_type(dynamic raw);
+@protected NewlineStyle dco_decode_box_autoadd_newline_style(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_isize(dynamic raw);
+@protected OutputFormat dco_decode_box_autoadd_output_format(dynamic raw);
 
-  @protected
-  LinkMetadata dco_decode_link_metadata(dynamic raw);
+@protected PreprocessingOptionsUpdate dco_decode_box_autoadd_preprocessing_options_update(dynamic raw);
 
-  @protected
-  LinkStyle dco_decode_link_style(dynamic raw);
+@protected PreprocessingPreset dco_decode_box_autoadd_preprocessing_preset(dynamic raw);
 
-  @protected
-  LinkType dco_decode_link_type(dynamic raw);
+@protected TableGrid dco_decode_box_autoadd_table_grid(dynamic raw);
 
-  @protected
-  List<String> dco_decode_list_String(dynamic raw);
+@protected TextDirection dco_decode_box_autoadd_text_direction(dynamic raw);
 
-  @protected
-  List<DocumentNode> dco_decode_list_document_node(dynamic raw);
+@protected WhitespaceMode dco_decode_box_autoadd_whitespace_mode(dynamic raw);
 
-  @protected
-  List<GridCell> dco_decode_list_grid_cell(dynamic raw);
+@protected CodeBlockStyle dco_decode_code_block_style(dynamic raw);
 
-  @protected
-  List<HeaderMetadata> dco_decode_list_header_metadata(dynamic raw);
+@protected ConversionOptions dco_decode_conversion_options(dynamic raw);
 
-  @protected
-  List<ImageMetadata> dco_decode_list_image_metadata(dynamic raw);
+@protected ConversionOptionsUpdate dco_decode_conversion_options_update(dynamic raw);
 
-  @protected
-  ListIndentType dco_decode_list_indent_type(dynamic raw);
+@protected ConversionResult dco_decode_conversion_result(dynamic raw);
 
-  @protected
-  List<LinkMetadata> dco_decode_list_link_metadata(dynamic raw);
+@protected DocumentMetadata dco_decode_document_metadata(dynamic raw);
 
-  @protected
-  List<List<String>> dco_decode_list_list_String(dynamic raw);
+@protected DocumentNode dco_decode_document_node(dynamic raw);
 
-  @protected
-  Int64List dco_decode_list_prim_i_64_strict(dynamic raw);
+@protected DocumentStructure dco_decode_document_structure(dynamic raw);
 
-  @protected
-  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+@protected GridCell dco_decode_grid_cell(dynamic raw);
 
-  @protected
-  List<ProcessingWarning> dco_decode_list_processing_warning(dynamic raw);
+@protected HeaderMetadata dco_decode_header_metadata(dynamic raw);
 
-  @protected
-  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
+@protected HeadingStyle dco_decode_heading_style(dynamic raw);
 
-  @protected
-  List<StructuredData> dco_decode_list_structured_data(dynamic raw);
+@protected HighlightStyle dco_decode_highlight_style(dynamic raw);
 
-  @protected
-  List<TableData> dco_decode_list_table_data(dynamic raw);
+@protected HtmlMetadata dco_decode_html_metadata(dynamic raw);
 
-  @protected
-  List<TextAnnotation> dco_decode_list_text_annotation(dynamic raw);
+@protected int dco_decode_i_32(dynamic raw);
 
-  @protected
-  NewlineStyle dco_decode_newline_style(dynamic raw);
+@protected PlatformInt64 dco_decode_i_64(dynamic raw);
 
-  @protected
-  NodeContent dco_decode_node_content(dynamic raw);
+@protected ImageMetadata dco_decode_image_metadata(dynamic raw);
 
-  @protected
-  NodeContext dco_decode_node_context(dynamic raw);
+@protected ImageType dco_decode_image_type(dynamic raw);
 
-  @protected
-  NodeType dco_decode_node_type(dynamic raw);
+@protected PlatformInt64 dco_decode_isize(dynamic raw);
 
-  @protected
-  Map<String, String>? dco_decode_opt_Map_String_String_None(dynamic raw);
+@protected LinkMetadata dco_decode_link_metadata(dynamic raw);
 
-  @protected
-  String? dco_decode_opt_String(dynamic raw);
+@protected LinkStyle dco_decode_link_style(dynamic raw);
 
-  @protected
-  VisitorHandle?
-  dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    dynamic raw,
-  );
+@protected LinkType dco_decode_link_type(dynamic raw);
 
-  @protected
-  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+@protected List<String> dco_decode_list_String(dynamic raw);
 
-  @protected
-  CodeBlockStyle? dco_decode_opt_box_autoadd_code_block_style(dynamic raw);
+@protected List<DocumentNode> dco_decode_list_document_node(dynamic raw);
 
-  @protected
-  ConversionOptions? dco_decode_opt_box_autoadd_conversion_options(dynamic raw);
+@protected List<GridCell> dco_decode_list_grid_cell(dynamic raw);
 
-  @protected
-  DocumentStructure? dco_decode_opt_box_autoadd_document_structure(dynamic raw);
+@protected List<HeaderMetadata> dco_decode_list_header_metadata(dynamic raw);
 
-  @protected
-  HeadingStyle? dco_decode_opt_box_autoadd_heading_style(dynamic raw);
+@protected List<ImageMetadata> dco_decode_list_image_metadata(dynamic raw);
 
-  @protected
-  HighlightStyle? dco_decode_opt_box_autoadd_highlight_style(dynamic raw);
+@protected ListIndentType dco_decode_list_indent_type(dynamic raw);
 
-  @protected
-  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+@protected List<LinkMetadata> dco_decode_list_link_metadata(dynamic raw);
 
-  @protected
-  LinkStyle? dco_decode_opt_box_autoadd_link_style(dynamic raw);
+@protected List<List<String>> dco_decode_list_list_String(dynamic raw);
 
-  @protected
-  ListIndentType? dco_decode_opt_box_autoadd_list_indent_type(dynamic raw);
+@protected Int64List dco_decode_list_prim_i_64_strict(dynamic raw);
 
-  @protected
-  NewlineStyle? dco_decode_opt_box_autoadd_newline_style(dynamic raw);
+@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
-  @protected
-  OutputFormat? dco_decode_opt_box_autoadd_output_format(dynamic raw);
+@protected List<ProcessingWarning> dco_decode_list_processing_warning(dynamic raw);
 
-  @protected
-  PreprocessingOptionsUpdate?
-  dco_decode_opt_box_autoadd_preprocessing_options_update(dynamic raw);
+@protected List<(String,String)> dco_decode_list_record_string_string(dynamic raw);
 
-  @protected
-  PreprocessingPreset? dco_decode_opt_box_autoadd_preprocessing_preset(
-    dynamic raw,
-  );
+@protected List<StructuredData> dco_decode_list_structured_data(dynamic raw);
 
-  @protected
-  TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw);
+@protected List<TableData> dco_decode_list_table_data(dynamic raw);
 
-  @protected
-  WhitespaceMode? dco_decode_opt_box_autoadd_whitespace_mode(dynamic raw);
+@protected List<TextAnnotation> dco_decode_list_text_annotation(dynamic raw);
 
-  @protected
-  List<String>? dco_decode_opt_list_String(dynamic raw);
+@protected NewlineStyle dco_decode_newline_style(dynamic raw);
 
-  @protected
-  Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
+@protected NodeContent dco_decode_node_content(dynamic raw);
 
-  @protected
-  OutputFormat dco_decode_output_format(dynamic raw);
+@protected NodeContext dco_decode_node_context(dynamic raw);
 
-  @protected
-  PreprocessingOptions dco_decode_preprocessing_options(dynamic raw);
+@protected NodeType dco_decode_node_type(dynamic raw);
 
-  @protected
-  PreprocessingOptionsUpdate dco_decode_preprocessing_options_update(
-    dynamic raw,
-  );
+@protected Map<String, String>? dco_decode_opt_Map_String_String_None(dynamic raw);
 
-  @protected
-  PreprocessingPreset dco_decode_preprocessing_preset(dynamic raw);
+@protected String? dco_decode_opt_String(dynamic raw);
 
-  @protected
-  ProcessingWarning dco_decode_processing_warning(dynamic raw);
+@protected VisitorHandle? dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(dynamic raw);
 
-  @protected
-  (String, String) dco_decode_record_string_string(dynamic raw);
+@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
-  @protected
-  StructuredData dco_decode_structured_data(dynamic raw);
+@protected CodeBlockStyle? dco_decode_opt_box_autoadd_code_block_style(dynamic raw);
 
-  @protected
-  StructuredDataType dco_decode_structured_data_type(dynamic raw);
+@protected ConversionOptions? dco_decode_opt_box_autoadd_conversion_options(dynamic raw);
 
-  @protected
-  TableData dco_decode_table_data(dynamic raw);
+@protected DocumentStructure? dco_decode_opt_box_autoadd_document_structure(dynamic raw);
 
-  @protected
-  TableGrid dco_decode_table_grid(dynamic raw);
+@protected HeadingStyle? dco_decode_opt_box_autoadd_heading_style(dynamic raw);
 
-  @protected
-  TextAnnotation dco_decode_text_annotation(dynamic raw);
+@protected HighlightStyle? dco_decode_opt_box_autoadd_highlight_style(dynamic raw);
 
-  @protected
-  TextDirection dco_decode_text_direction(dynamic raw);
+@protected PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
-  @protected
-  int dco_decode_u_8(dynamic raw);
+@protected LinkStyle? dco_decode_opt_box_autoadd_link_style(dynamic raw);
 
-  @protected
-  void dco_decode_unit(dynamic raw);
+@protected ListIndentType? dco_decode_opt_box_autoadd_list_indent_type(dynamic raw);
 
-  @protected
-  BigInt dco_decode_usize(dynamic raw);
+@protected NewlineStyle? dco_decode_opt_box_autoadd_newline_style(dynamic raw);
 
-  @protected
-  VisitResult dco_decode_visit_result(dynamic raw);
+@protected OutputFormat? dco_decode_opt_box_autoadd_output_format(dynamic raw);
 
-  @protected
-  WarningKind dco_decode_warning_kind(dynamic raw);
+@protected PreprocessingOptionsUpdate? dco_decode_opt_box_autoadd_preprocessing_options_update(dynamic raw);
 
-  @protected
-  WhitespaceMode dco_decode_whitespace_mode(dynamic raw);
+@protected PreprocessingPreset? dco_decode_opt_box_autoadd_preprocessing_preset(dynamic raw);
 
-  @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+@protected TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw);
 
-  @protected
-  VisitorHandle
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    SseDeserializer deserializer,
-  );
+@protected WhitespaceMode? dco_decode_opt_box_autoadd_whitespace_mode(dynamic raw);
 
-  @protected
-  Object sse_decode_DartOpaque(SseDeserializer deserializer);
+@protected List<String>? dco_decode_opt_list_String(dynamic raw);
 
-  @protected
-  Map<String, String> sse_decode_Map_String_String_None(
-    SseDeserializer deserializer,
-  );
+@protected Int64List? dco_decode_opt_list_prim_i_64_strict(dynamic raw);
 
-  @protected
-  VisitorHandle
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    SseDeserializer deserializer,
-  );
+@protected OutputFormat dco_decode_output_format(dynamic raw);
 
-  @protected
-  String sse_decode_String(SseDeserializer deserializer);
+@protected PreprocessingOptions dco_decode_preprocessing_options(dynamic raw);
 
-  @protected
-  AnnotationKind sse_decode_annotation_kind(SseDeserializer deserializer);
+@protected PreprocessingOptionsUpdate dco_decode_preprocessing_options_update(dynamic raw);
 
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+@protected PreprocessingPreset dco_decode_preprocessing_preset(dynamic raw);
 
-  @protected
-  VisitorHandle
-  sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    SseDeserializer deserializer,
-  );
+@protected ProcessingWarning dco_decode_processing_warning(dynamic raw);
 
-  @protected
-  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+@protected (String,String) dco_decode_record_string_string(dynamic raw);
 
-  @protected
-  CodeBlockStyle sse_decode_box_autoadd_code_block_style(
-    SseDeserializer deserializer,
-  );
+@protected StructuredData dco_decode_structured_data(dynamic raw);
 
-  @protected
-  ConversionOptions sse_decode_box_autoadd_conversion_options(
-    SseDeserializer deserializer,
-  );
+@protected StructuredDataType dco_decode_structured_data_type(dynamic raw);
 
-  @protected
-  DocumentStructure sse_decode_box_autoadd_document_structure(
-    SseDeserializer deserializer,
-  );
+@protected TableData dco_decode_table_data(dynamic raw);
 
-  @protected
-  HeadingStyle sse_decode_box_autoadd_heading_style(
-    SseDeserializer deserializer,
-  );
+@protected TableGrid dco_decode_table_grid(dynamic raw);
 
-  @protected
-  HighlightStyle sse_decode_box_autoadd_highlight_style(
-    SseDeserializer deserializer,
-  );
+@protected TextAnnotation dco_decode_text_annotation(dynamic raw);
 
-  @protected
-  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+@protected TextDirection dco_decode_text_direction(dynamic raw);
 
-  @protected
-  LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer);
+@protected int dco_decode_u_8(dynamic raw);
 
-  @protected
-  ListIndentType sse_decode_box_autoadd_list_indent_type(
-    SseDeserializer deserializer,
-  );
+@protected void dco_decode_unit(dynamic raw);
 
-  @protected
-  NewlineStyle sse_decode_box_autoadd_newline_style(
-    SseDeserializer deserializer,
-  );
+@protected BigInt dco_decode_usize(dynamic raw);
 
-  @protected
-  OutputFormat sse_decode_box_autoadd_output_format(
-    SseDeserializer deserializer,
-  );
+@protected VisitResult dco_decode_visit_result(dynamic raw);
 
-  @protected
-  PreprocessingOptionsUpdate
-  sse_decode_box_autoadd_preprocessing_options_update(
-    SseDeserializer deserializer,
-  );
+@protected WarningKind dco_decode_warning_kind(dynamic raw);
 
-  @protected
-  PreprocessingPreset sse_decode_box_autoadd_preprocessing_preset(
-    SseDeserializer deserializer,
-  );
+@protected WhitespaceMode dco_decode_whitespace_mode(dynamic raw);
 
-  @protected
-  TableGrid sse_decode_box_autoadd_table_grid(SseDeserializer deserializer);
+@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
-  @protected
-  TextDirection sse_decode_box_autoadd_text_direction(
-    SseDeserializer deserializer,
-  );
+@protected VisitorHandle sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(SseDeserializer deserializer);
 
-  @protected
-  WhitespaceMode sse_decode_box_autoadd_whitespace_mode(
-    SseDeserializer deserializer,
-  );
+@protected Object sse_decode_DartOpaque(SseDeserializer deserializer);
 
-  @protected
-  CodeBlockStyle sse_decode_code_block_style(SseDeserializer deserializer);
+@protected Map<String, String> sse_decode_Map_String_String_None(SseDeserializer deserializer);
 
-  @protected
-  ConversionOptions sse_decode_conversion_options(SseDeserializer deserializer);
+@protected VisitorHandle sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(SseDeserializer deserializer);
 
-  @protected
-  ConversionOptionsUpdate sse_decode_conversion_options_update(
-    SseDeserializer deserializer,
-  );
+@protected String sse_decode_String(SseDeserializer deserializer);
 
-  @protected
-  ConversionResult sse_decode_conversion_result(SseDeserializer deserializer);
+@protected AnnotationKind sse_decode_annotation_kind(SseDeserializer deserializer);
 
-  @protected
-  DocumentMetadata sse_decode_document_metadata(SseDeserializer deserializer);
+@protected bool sse_decode_bool(SseDeserializer deserializer);
 
-  @protected
-  DocumentNode sse_decode_document_node(SseDeserializer deserializer);
+@protected VisitorHandle sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(SseDeserializer deserializer);
 
-  @protected
-  DocumentStructure sse_decode_document_structure(SseDeserializer deserializer);
+@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
-  @protected
-  GridCell sse_decode_grid_cell(SseDeserializer deserializer);
+@protected CodeBlockStyle sse_decode_box_autoadd_code_block_style(SseDeserializer deserializer);
 
-  @protected
-  HeaderMetadata sse_decode_header_metadata(SseDeserializer deserializer);
+@protected ConversionOptions sse_decode_box_autoadd_conversion_options(SseDeserializer deserializer);
 
-  @protected
-  HeadingStyle sse_decode_heading_style(SseDeserializer deserializer);
+@protected DocumentStructure sse_decode_box_autoadd_document_structure(SseDeserializer deserializer);
 
-  @protected
-  HighlightStyle sse_decode_highlight_style(SseDeserializer deserializer);
+@protected HeadingStyle sse_decode_box_autoadd_heading_style(SseDeserializer deserializer);
 
-  @protected
-  HtmlMetadata sse_decode_html_metadata(SseDeserializer deserializer);
+@protected HighlightStyle sse_decode_box_autoadd_highlight_style(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
+@protected PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+@protected LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer);
 
-  @protected
-  ImageMetadata sse_decode_image_metadata(SseDeserializer deserializer);
+@protected ListIndentType sse_decode_box_autoadd_list_indent_type(SseDeserializer deserializer);
 
-  @protected
-  ImageType sse_decode_image_type(SseDeserializer deserializer);
+@protected NewlineStyle sse_decode_box_autoadd_newline_style(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64 sse_decode_isize(SseDeserializer deserializer);
+@protected OutputFormat sse_decode_box_autoadd_output_format(SseDeserializer deserializer);
 
-  @protected
-  LinkMetadata sse_decode_link_metadata(SseDeserializer deserializer);
+@protected PreprocessingOptionsUpdate sse_decode_box_autoadd_preprocessing_options_update(SseDeserializer deserializer);
 
-  @protected
-  LinkStyle sse_decode_link_style(SseDeserializer deserializer);
+@protected PreprocessingPreset sse_decode_box_autoadd_preprocessing_preset(SseDeserializer deserializer);
 
-  @protected
-  LinkType sse_decode_link_type(SseDeserializer deserializer);
+@protected TableGrid sse_decode_box_autoadd_table_grid(SseDeserializer deserializer);
 
-  @protected
-  List<String> sse_decode_list_String(SseDeserializer deserializer);
+@protected TextDirection sse_decode_box_autoadd_text_direction(SseDeserializer deserializer);
 
-  @protected
-  List<DocumentNode> sse_decode_list_document_node(
-    SseDeserializer deserializer,
-  );
+@protected WhitespaceMode sse_decode_box_autoadd_whitespace_mode(SseDeserializer deserializer);
 
-  @protected
-  List<GridCell> sse_decode_list_grid_cell(SseDeserializer deserializer);
+@protected CodeBlockStyle sse_decode_code_block_style(SseDeserializer deserializer);
 
-  @protected
-  List<HeaderMetadata> sse_decode_list_header_metadata(
-    SseDeserializer deserializer,
-  );
+@protected ConversionOptions sse_decode_conversion_options(SseDeserializer deserializer);
 
-  @protected
-  List<ImageMetadata> sse_decode_list_image_metadata(
-    SseDeserializer deserializer,
-  );
+@protected ConversionOptionsUpdate sse_decode_conversion_options_update(SseDeserializer deserializer);
 
-  @protected
-  ListIndentType sse_decode_list_indent_type(SseDeserializer deserializer);
+@protected ConversionResult sse_decode_conversion_result(SseDeserializer deserializer);
 
-  @protected
-  List<LinkMetadata> sse_decode_list_link_metadata(
-    SseDeserializer deserializer,
-  );
+@protected DocumentMetadata sse_decode_document_metadata(SseDeserializer deserializer);
 
-  @protected
-  List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
+@protected DocumentNode sse_decode_document_node(SseDeserializer deserializer);
 
-  @protected
-  Int64List sse_decode_list_prim_i_64_strict(SseDeserializer deserializer);
+@protected DocumentStructure sse_decode_document_structure(SseDeserializer deserializer);
 
-  @protected
-  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+@protected GridCell sse_decode_grid_cell(SseDeserializer deserializer);
 
-  @protected
-  List<ProcessingWarning> sse_decode_list_processing_warning(
-    SseDeserializer deserializer,
-  );
+@protected HeaderMetadata sse_decode_header_metadata(SseDeserializer deserializer);
 
-  @protected
-  List<(String, String)> sse_decode_list_record_string_string(
-    SseDeserializer deserializer,
-  );
+@protected HeadingStyle sse_decode_heading_style(SseDeserializer deserializer);
 
-  @protected
-  List<StructuredData> sse_decode_list_structured_data(
-    SseDeserializer deserializer,
-  );
+@protected HighlightStyle sse_decode_highlight_style(SseDeserializer deserializer);
 
-  @protected
-  List<TableData> sse_decode_list_table_data(SseDeserializer deserializer);
+@protected HtmlMetadata sse_decode_html_metadata(SseDeserializer deserializer);
 
-  @protected
-  List<TextAnnotation> sse_decode_list_text_annotation(
-    SseDeserializer deserializer,
-  );
+@protected int sse_decode_i_32(SseDeserializer deserializer);
 
-  @protected
-  NewlineStyle sse_decode_newline_style(SseDeserializer deserializer);
+@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
-  @protected
-  NodeContent sse_decode_node_content(SseDeserializer deserializer);
+@protected ImageMetadata sse_decode_image_metadata(SseDeserializer deserializer);
 
-  @protected
-  NodeContext sse_decode_node_context(SseDeserializer deserializer);
+@protected ImageType sse_decode_image_type(SseDeserializer deserializer);
 
-  @protected
-  NodeType sse_decode_node_type(SseDeserializer deserializer);
+@protected PlatformInt64 sse_decode_isize(SseDeserializer deserializer);
 
-  @protected
-  Map<String, String>? sse_decode_opt_Map_String_String_None(
-    SseDeserializer deserializer,
-  );
+@protected LinkMetadata sse_decode_link_metadata(SseDeserializer deserializer);
 
-  @protected
-  String? sse_decode_opt_String(SseDeserializer deserializer);
+@protected LinkStyle sse_decode_link_style(SseDeserializer deserializer);
 
-  @protected
-  VisitorHandle?
-  sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    SseDeserializer deserializer,
-  );
+@protected LinkType sse_decode_link_type(SseDeserializer deserializer);
 
-  @protected
-  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+@protected List<String> sse_decode_list_String(SseDeserializer deserializer);
 
-  @protected
-  CodeBlockStyle? sse_decode_opt_box_autoadd_code_block_style(
-    SseDeserializer deserializer,
-  );
+@protected List<DocumentNode> sse_decode_list_document_node(SseDeserializer deserializer);
 
-  @protected
-  ConversionOptions? sse_decode_opt_box_autoadd_conversion_options(
-    SseDeserializer deserializer,
-  );
+@protected List<GridCell> sse_decode_list_grid_cell(SseDeserializer deserializer);
 
-  @protected
-  DocumentStructure? sse_decode_opt_box_autoadd_document_structure(
-    SseDeserializer deserializer,
-  );
+@protected List<HeaderMetadata> sse_decode_list_header_metadata(SseDeserializer deserializer);
 
-  @protected
-  HeadingStyle? sse_decode_opt_box_autoadd_heading_style(
-    SseDeserializer deserializer,
-  );
+@protected List<ImageMetadata> sse_decode_list_image_metadata(SseDeserializer deserializer);
 
-  @protected
-  HighlightStyle? sse_decode_opt_box_autoadd_highlight_style(
-    SseDeserializer deserializer,
-  );
+@protected ListIndentType sse_decode_list_indent_type(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+@protected List<LinkMetadata> sse_decode_list_link_metadata(SseDeserializer deserializer);
 
-  @protected
-  LinkStyle? sse_decode_opt_box_autoadd_link_style(
-    SseDeserializer deserializer,
-  );
+@protected List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
 
-  @protected
-  ListIndentType? sse_decode_opt_box_autoadd_list_indent_type(
-    SseDeserializer deserializer,
-  );
+@protected Int64List sse_decode_list_prim_i_64_strict(SseDeserializer deserializer);
 
-  @protected
-  NewlineStyle? sse_decode_opt_box_autoadd_newline_style(
-    SseDeserializer deserializer,
-  );
+@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
-  @protected
-  OutputFormat? sse_decode_opt_box_autoadd_output_format(
-    SseDeserializer deserializer,
-  );
+@protected List<ProcessingWarning> sse_decode_list_processing_warning(SseDeserializer deserializer);
 
-  @protected
-  PreprocessingOptionsUpdate?
-  sse_decode_opt_box_autoadd_preprocessing_options_update(
-    SseDeserializer deserializer,
-  );
+@protected List<(String,String)> sse_decode_list_record_string_string(SseDeserializer deserializer);
 
-  @protected
-  PreprocessingPreset? sse_decode_opt_box_autoadd_preprocessing_preset(
-    SseDeserializer deserializer,
-  );
+@protected List<StructuredData> sse_decode_list_structured_data(SseDeserializer deserializer);
 
-  @protected
-  TextDirection? sse_decode_opt_box_autoadd_text_direction(
-    SseDeserializer deserializer,
-  );
+@protected List<TableData> sse_decode_list_table_data(SseDeserializer deserializer);
 
-  @protected
-  WhitespaceMode? sse_decode_opt_box_autoadd_whitespace_mode(
-    SseDeserializer deserializer,
-  );
+@protected List<TextAnnotation> sse_decode_list_text_annotation(SseDeserializer deserializer);
 
-  @protected
-  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
+@protected NewlineStyle sse_decode_newline_style(SseDeserializer deserializer);
 
-  @protected
-  Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
+@protected NodeContent sse_decode_node_content(SseDeserializer deserializer);
 
-  @protected
-  OutputFormat sse_decode_output_format(SseDeserializer deserializer);
+@protected NodeContext sse_decode_node_context(SseDeserializer deserializer);
 
-  @protected
-  PreprocessingOptions sse_decode_preprocessing_options(
-    SseDeserializer deserializer,
-  );
+@protected NodeType sse_decode_node_type(SseDeserializer deserializer);
 
-  @protected
-  PreprocessingOptionsUpdate sse_decode_preprocessing_options_update(
-    SseDeserializer deserializer,
-  );
+@protected Map<String, String>? sse_decode_opt_Map_String_String_None(SseDeserializer deserializer);
 
-  @protected
-  PreprocessingPreset sse_decode_preprocessing_preset(
-    SseDeserializer deserializer,
-  );
+@protected String? sse_decode_opt_String(SseDeserializer deserializer);
 
-  @protected
-  ProcessingWarning sse_decode_processing_warning(SseDeserializer deserializer);
+@protected VisitorHandle? sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(SseDeserializer deserializer);
 
-  @protected
-  (String, String) sse_decode_record_string_string(
-    SseDeserializer deserializer,
-  );
+@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
-  @protected
-  StructuredData sse_decode_structured_data(SseDeserializer deserializer);
+@protected CodeBlockStyle? sse_decode_opt_box_autoadd_code_block_style(SseDeserializer deserializer);
 
-  @protected
-  StructuredDataType sse_decode_structured_data_type(
-    SseDeserializer deserializer,
-  );
+@protected ConversionOptions? sse_decode_opt_box_autoadd_conversion_options(SseDeserializer deserializer);
 
-  @protected
-  TableData sse_decode_table_data(SseDeserializer deserializer);
+@protected DocumentStructure? sse_decode_opt_box_autoadd_document_structure(SseDeserializer deserializer);
 
-  @protected
-  TableGrid sse_decode_table_grid(SseDeserializer deserializer);
+@protected HeadingStyle? sse_decode_opt_box_autoadd_heading_style(SseDeserializer deserializer);
 
-  @protected
-  TextAnnotation sse_decode_text_annotation(SseDeserializer deserializer);
+@protected HighlightStyle? sse_decode_opt_box_autoadd_highlight_style(SseDeserializer deserializer);
 
-  @protected
-  TextDirection sse_decode_text_direction(SseDeserializer deserializer);
+@protected PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_u_8(SseDeserializer deserializer);
+@protected LinkStyle? sse_decode_opt_box_autoadd_link_style(SseDeserializer deserializer);
 
-  @protected
-  void sse_decode_unit(SseDeserializer deserializer);
+@protected ListIndentType? sse_decode_opt_box_autoadd_list_indent_type(SseDeserializer deserializer);
 
-  @protected
-  BigInt sse_decode_usize(SseDeserializer deserializer);
+@protected NewlineStyle? sse_decode_opt_box_autoadd_newline_style(SseDeserializer deserializer);
 
-  @protected
-  VisitResult sse_decode_visit_result(SseDeserializer deserializer);
+@protected OutputFormat? sse_decode_opt_box_autoadd_output_format(SseDeserializer deserializer);
 
-  @protected
-  WarningKind sse_decode_warning_kind(SseDeserializer deserializer);
+@protected PreprocessingOptionsUpdate? sse_decode_opt_box_autoadd_preprocessing_options_update(SseDeserializer deserializer);
 
-  @protected
-  WhitespaceMode sse_decode_whitespace_mode(SseDeserializer deserializer);
+@protected PreprocessingPreset? sse_decode_opt_box_autoadd_preprocessing_preset(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_AnyhowException(
-    AnyhowException self,
-    SseSerializer serializer,
-  );
+@protected TextDirection? sse_decode_opt_box_autoadd_text_direction(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    VisitorHandle self,
-    SseSerializer serializer,
-  );
+@protected WhitespaceMode? sse_decode_opt_box_autoadd_whitespace_mode(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext) self,
-    SseSerializer serializer,
-  );
+@protected List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String) self,
-    SseSerializer serializer,
-  );
+@protected Int64List? sse_decode_opt_list_prim_i_64_strict(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String, String) self,
-    SseSerializer serializer,
-  );
+@protected OutputFormat sse_decode_output_format(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String, String, String?) self,
-    SseSerializer serializer,
-  );
+@protected PreprocessingOptions sse_decode_preprocessing_options(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64) self,
-    SseSerializer serializer,
-  );
+@protected PreprocessingOptionsUpdate sse_decode_preprocessing_options_update(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String, String?, String?) self,
-    SseSerializer serializer,
-  );
+@protected PreprocessingPreset sse_decode_preprocessing_preset(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, bool) self,
-    SseSerializer serializer,
-  );
+@protected ProcessingWarning sse_decode_processing_warning(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, bool, String) self,
-    SseSerializer serializer,
-  );
+@protected (String,String) sse_decode_record_string_string(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, bool, String, String) self,
-    SseSerializer serializer,
-  );
+@protected StructuredData sse_decode_structured_data(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?)
-    self,
-    SseSerializer serializer,
-  );
+@protected StructuredDataType sse_decode_structured_data_type(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, List<String>, bool) self,
-    SseSerializer serializer,
-  );
+@protected TableData sse_decode_table_data(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String?) self,
-    SseSerializer serializer,
-  );
+@protected TableGrid sse_decode_table_grid(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String?, String) self,
-    SseSerializer serializer,
-  );
+@protected TextAnnotation sse_decode_text_annotation(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(
-    FutureOr<VisitResult> Function(NodeContext, String?, String?) self,
-    SseSerializer serializer,
-  );
+@protected TextDirection sse_decode_text_direction(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_DartOpaque(Object self, SseSerializer serializer);
+@protected int sse_decode_u_8(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_Map_String_String_None(
-    Map<String, String> self,
-    SseSerializer serializer,
-  );
+@protected void sse_decode_unit(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    VisitorHandle self,
-    SseSerializer serializer,
-  );
+@protected BigInt sse_decode_usize(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_String(String self, SseSerializer serializer);
+@protected VisitResult sse_decode_visit_result(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_annotation_kind(
-    AnnotationKind self,
-    SseSerializer serializer,
-  );
+@protected WarningKind sse_decode_warning_kind(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
+@protected WhitespaceMode sse_decode_whitespace_mode(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    VisitorHandle self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(VisitorHandle self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_code_block_style(
-    CodeBlockStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_conversion_options(
-    ConversionOptions self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_document_structure(
-    DocumentStructure self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_heading_style(
-    HeadingStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_highlight_style(
-    HighlightStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_i_64(
-    PlatformInt64 self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_link_style(
-    LinkStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_list_indent_type(
-    ListIndentType self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_newline_style(
-    NewlineStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_output_format(
-    OutputFormat self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_preprocessing_options_update(
-    PreprocessingOptionsUpdate self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_preprocessing_preset(
-    PreprocessingPreset self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_DartFn_Inputs_node_context_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext) self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_table_grid(
-    TableGrid self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_DartFn_Inputs_node_context_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String) self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_text_direction(
-    TextDirection self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_DartFn_Inputs_node_context_String_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String, String) self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_whitespace_mode(
-    WhitespaceMode self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_code_block_style(
-    CodeBlockStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_conversion_options(
-    ConversionOptions self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_conversion_options_update(
-    ConversionOptionsUpdate self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_conversion_result(
-    ConversionResult self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_document_metadata(
-    DocumentMetadata self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_document_node(DocumentNode self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_document_structure(
-    DocumentStructure self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_grid_cell(GridCell self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_header_metadata(
-    HeaderMetadata self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_heading_style(HeadingStyle self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_highlight_style(
-    HighlightStyle self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_html_metadata(HtmlMetadata self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_image_metadata(ImageMetadata self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_image_type(ImageType self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_isize(PlatformInt64 self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_link_metadata(LinkMetadata self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_link_style(LinkStyle self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_link_type(LinkType self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_String(List<String> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_document_node(
-    List<DocumentNode> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_grid_cell(List<GridCell> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_header_metadata(
-    List<HeaderMetadata> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_image_metadata(
-    List<ImageMetadata> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_indent_type(
-    ListIndentType self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_link_metadata(
-    List<LinkMetadata> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_list_String(
-    List<List<String>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_i_64_strict(
-    Int64List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_u_8_strict(
-    Uint8List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_processing_warning(
-    List<ProcessingWarning> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_record_string_string(
-    List<(String, String)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_structured_data(
-    List<StructuredData> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_table_data(
-    List<TableData> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_text_annotation(
-    List<TextAnnotation> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_newline_style(NewlineStyle self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_node_content(NodeContent self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_node_context(NodeContext self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_node_type(NodeType self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_Map_String_String_None(
-    Map<String, String>? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_String(String? self, SseSerializer serializer);
-
-  @protected
-  void
-  sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    VisitorHandle? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_code_block_style(
-    CodeBlockStyle? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_conversion_options(
-    ConversionOptions? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_document_structure(
-    DocumentStructure? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_heading_style(
-    HeadingStyle? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_highlight_style(
-    HighlightStyle? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_64(
-    PlatformInt64? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_link_style(
-    LinkStyle? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_list_indent_type(
-    ListIndentType? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_newline_style(
-    NewlineStyle? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_output_format(
-    OutputFormat? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_preprocessing_options_update(
-    PreprocessingOptionsUpdate? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_preprocessing_preset(
-    PreprocessingPreset? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_text_direction(
-    TextDirection? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_whitespace_mode(
-    WhitespaceMode? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_list_prim_i_64_strict(
-    Int64List? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_output_format(OutputFormat self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_preprocessing_options(
-    PreprocessingOptions self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_preprocessing_options_update(
-    PreprocessingOptionsUpdate self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_preprocessing_preset(
-    PreprocessingPreset self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_processing_warning(
-    ProcessingWarning self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_record_string_string(
-    (String, String) self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_structured_data(
-    StructuredData self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_structured_data_type(
-    StructuredDataType self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_table_data(TableData self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_table_grid(TableGrid self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_text_annotation(
-    TextAnnotation self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_text_direction(TextDirection self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_u_8(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_unit(void self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_visit_result(VisitResult self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_warning_kind(WarningKind self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_whitespace_mode(
-    WhitespaceMode self,
-    SseSerializer serializer,
-  );
-}
+@protected void sse_encode_DartFn_Inputs_node_context_String_String_opt_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String, String, String?) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_String_i_64_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String, PlatformInt64) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_String_opt_String_opt_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String, String?, String?) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_bool_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, bool) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_bool_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, bool, String) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_bool_String_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, bool, String, String) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_i_64_String_opt_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, PlatformInt64, String, String?) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_list_String_bool_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, List<String>, bool) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_opt_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String?) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_opt_String_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String?, String) self, SseSerializer serializer);
+
+@protected void sse_encode_DartFn_Inputs_node_context_opt_String_opt_String_Output_visit_result_AnyhowException(FutureOr<VisitResult> Function(NodeContext, String?, String?) self, SseSerializer serializer);
+
+@protected void sse_encode_DartOpaque(Object self, SseSerializer serializer);
+
+@protected void sse_encode_Map_String_String_None(Map<String, String> self, SseSerializer serializer);
+
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(VisitorHandle self, SseSerializer serializer);
+
+@protected void sse_encode_String(String self, SseSerializer serializer);
+
+@protected void sse_encode_annotation_kind(AnnotationKind self, SseSerializer serializer);
+
+@protected void sse_encode_bool(bool self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(VisitorHandle self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_code_block_style(CodeBlockStyle self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_conversion_options(ConversionOptions self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_document_structure(DocumentStructure self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_heading_style(HeadingStyle self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_highlight_style(HighlightStyle self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_i_64(PlatformInt64 self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_link_style(LinkStyle self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_list_indent_type(ListIndentType self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_newline_style(NewlineStyle self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_output_format(OutputFormat self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_preprocessing_options_update(PreprocessingOptionsUpdate self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_preprocessing_preset(PreprocessingPreset self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_table_grid(TableGrid self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_text_direction(TextDirection self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_whitespace_mode(WhitespaceMode self, SseSerializer serializer);
+
+@protected void sse_encode_code_block_style(CodeBlockStyle self, SseSerializer serializer);
+
+@protected void sse_encode_conversion_options(ConversionOptions self, SseSerializer serializer);
+
+@protected void sse_encode_conversion_options_update(ConversionOptionsUpdate self, SseSerializer serializer);
+
+@protected void sse_encode_conversion_result(ConversionResult self, SseSerializer serializer);
+
+@protected void sse_encode_document_metadata(DocumentMetadata self, SseSerializer serializer);
+
+@protected void sse_encode_document_node(DocumentNode self, SseSerializer serializer);
+
+@protected void sse_encode_document_structure(DocumentStructure self, SseSerializer serializer);
+
+@protected void sse_encode_grid_cell(GridCell self, SseSerializer serializer);
+
+@protected void sse_encode_header_metadata(HeaderMetadata self, SseSerializer serializer);
+
+@protected void sse_encode_heading_style(HeadingStyle self, SseSerializer serializer);
+
+@protected void sse_encode_highlight_style(HighlightStyle self, SseSerializer serializer);
+
+@protected void sse_encode_html_metadata(HtmlMetadata self, SseSerializer serializer);
+
+@protected void sse_encode_i_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+
+@protected void sse_encode_image_metadata(ImageMetadata self, SseSerializer serializer);
+
+@protected void sse_encode_image_type(ImageType self, SseSerializer serializer);
+
+@protected void sse_encode_isize(PlatformInt64 self, SseSerializer serializer);
+
+@protected void sse_encode_link_metadata(LinkMetadata self, SseSerializer serializer);
+
+@protected void sse_encode_link_style(LinkStyle self, SseSerializer serializer);
+
+@protected void sse_encode_link_type(LinkType self, SseSerializer serializer);
+
+@protected void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+@protected void sse_encode_list_document_node(List<DocumentNode> self, SseSerializer serializer);
+
+@protected void sse_encode_list_grid_cell(List<GridCell> self, SseSerializer serializer);
+
+@protected void sse_encode_list_header_metadata(List<HeaderMetadata> self, SseSerializer serializer);
+
+@protected void sse_encode_list_image_metadata(List<ImageMetadata> self, SseSerializer serializer);
+
+@protected void sse_encode_list_indent_type(ListIndentType self, SseSerializer serializer);
+
+@protected void sse_encode_list_link_metadata(List<LinkMetadata> self, SseSerializer serializer);
+
+@protected void sse_encode_list_list_String(List<List<String>> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_i_64_strict(Int64List self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer);
+
+@protected void sse_encode_list_processing_warning(List<ProcessingWarning> self, SseSerializer serializer);
+
+@protected void sse_encode_list_record_string_string(List<(String,String)> self, SseSerializer serializer);
+
+@protected void sse_encode_list_structured_data(List<StructuredData> self, SseSerializer serializer);
+
+@protected void sse_encode_list_table_data(List<TableData> self, SseSerializer serializer);
+
+@protected void sse_encode_list_text_annotation(List<TextAnnotation> self, SseSerializer serializer);
+
+@protected void sse_encode_newline_style(NewlineStyle self, SseSerializer serializer);
+
+@protected void sse_encode_node_content(NodeContent self, SseSerializer serializer);
+
+@protected void sse_encode_node_context(NodeContext self, SseSerializer serializer);
+
+@protected void sse_encode_node_type(NodeType self, SseSerializer serializer);
+
+@protected void sse_encode_opt_Map_String_String_None(Map<String, String>? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(VisitorHandle? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_code_block_style(CodeBlockStyle? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_conversion_options(ConversionOptions? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_document_structure(DocumentStructure? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_heading_style(HeadingStyle? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_highlight_style(HighlightStyle? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_i_64(PlatformInt64? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_link_style(LinkStyle? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_list_indent_type(ListIndentType? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_newline_style(NewlineStyle? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_output_format(OutputFormat? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_preprocessing_options_update(PreprocessingOptionsUpdate? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_preprocessing_preset(PreprocessingPreset? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_text_direction(TextDirection? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_whitespace_mode(WhitespaceMode? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_prim_i_64_strict(Int64List? self, SseSerializer serializer);
+
+@protected void sse_encode_output_format(OutputFormat self, SseSerializer serializer);
+
+@protected void sse_encode_preprocessing_options(PreprocessingOptions self, SseSerializer serializer);
+
+@protected void sse_encode_preprocessing_options_update(PreprocessingOptionsUpdate self, SseSerializer serializer);
+
+@protected void sse_encode_preprocessing_preset(PreprocessingPreset self, SseSerializer serializer);
+
+@protected void sse_encode_processing_warning(ProcessingWarning self, SseSerializer serializer);
+
+@protected void sse_encode_record_string_string((String,String) self, SseSerializer serializer);
+
+@protected void sse_encode_structured_data(StructuredData self, SseSerializer serializer);
+
+@protected void sse_encode_structured_data_type(StructuredDataType self, SseSerializer serializer);
+
+@protected void sse_encode_table_data(TableData self, SseSerializer serializer);
+
+@protected void sse_encode_table_grid(TableGrid self, SseSerializer serializer);
+
+@protected void sse_encode_text_annotation(TextAnnotation self, SseSerializer serializer);
+
+@protected void sse_encode_text_direction(TextDirection self, SseSerializer serializer);
+
+@protected void sse_encode_u_8(int self, SseSerializer serializer);
+
+@protected void sse_encode_unit(void self, SseSerializer serializer);
+
+@protected void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+@protected void sse_encode_visit_result(VisitResult self, SseSerializer serializer);
+
+@protected void sse_encode_warning_kind(WarningKind self, SseSerializer serializer);
+
+@protected void sse_encode_whitespace_mode(WhitespaceMode self, SseSerializer serializer);
+                }
+                
+
 
 // Section: wire_class
 
-class RustLibWire implements BaseWire {
-  factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
-      RustLibWire(lib.ffiDynamicLibrary);
 
-  /// Holds the symbol lookup function.
-  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-  _lookup;
+        class RustLibWire implements BaseWire {
 
-  /// The symbols are looked up in [dynamicLibrary].
-  RustLibWire(ffi.DynamicLibrary dynamicLibrary)
-    : _lookup = dynamicLibrary.lookup;
+            factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
+              RustLibWire(lib.ffiDynamicLibrary);
+        
+            /// Holds the symbol lookup function.
+            final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
+                _lookup;
+  
+            /// The symbols are looked up in [dynamicLibrary].
+            RustLibWire(ffi.DynamicLibrary dynamicLibrary)
+                : _lookup = dynamicLibrary.lookup;
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-      ptr,
-    );
-  }
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_h2m_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_h2m_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_h2m_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-}
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_h2m_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandlePtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+        }
+        

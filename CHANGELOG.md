@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **bindings(swift): resolve Swift Package Manager "unsafe build flags" rejection for v3.5.2+.** Swift 6.0+ strictly rejects packages with `unsafeFlags` in public products to prevent supply-chain code injection. The root `Package.swift` used by external consumers (via `.package(url: "...", from: "...")`) is now removed from git; it will be regenerated at release time with `.binaryTarget` pointing to pre-built xcframework/artifactbundle assets. For v3.5.2+, consumers will receive binary distribution (no Rust compilation required). For source builds, developers use `cd packages/swift && swift build` after `cargo build -p html-to-markdown-rs-swift`. The in-tree `packages/swift/Package.swift` retains `unsafeFlags` for local development. This fixes the blocking error for v3.5.1 external consumers attempting to depend on the package.
+
 ## [3.5.1] - 2026-05-25
 
 ### Fixed

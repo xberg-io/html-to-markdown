@@ -1,2 +1,0 @@
----
-BUNDLE_BUILD__HTML___TO___MARKDOWN: "--with-cflags=-Wno-error=unused-command-line-argument-hard-error-in-future"

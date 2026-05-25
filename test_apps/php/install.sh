@@ -2,9 +2,12 @@
 # alef-generated installer for registry-mode PHP test_app.
 # Installs the kreuzberg-dev/html-to-markdown-rs extension via PIE before `composer install` runs.
 # Requires `composer` and `php` on PATH; bootstraps `php/pie` if needed.
+# Version is alef-injected at generate time so the script is self-contained.
 set -euo pipefail
 
-VERSION="${1:?usage: $0 <version>}"
+# Version override: pass as $1 to test an arbitrary tag; defaults to the
+# alef-pinned version from `[crates.e2e.registry.packages.php].version`.
+VERSION="${1:->=3.5.1}"
 
 # PIE >= 1.3.7 supports the array-form `php-ext.download-url-method`
 # our composer.json emits; 1.4.x is preferred. Install pie globally if
