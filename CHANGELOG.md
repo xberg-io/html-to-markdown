@@ -7,9 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- **ci(publish): skip `publish-hex` and `homebrew-bottles` on dry-run.** Both jobs need real GitHub Release assets (`generate-elixir-checksums` downloads NIF tarballs; `brew install --build-bottle` downloads CLI/FFI source tarballs), but `upload-release-assets@v1` only logs on dry-run — the release doesn't exist. Both jobs failed every dry-run after surviving every other stage. Gated their `if:` on `dry_run != 'true'`; real-release runs continue to exercise them.
+## [3.5.0-rc.2] - 2026-05-25
 
 ### Changed
 
@@ -19,11 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **ci(publish): skip `publish-hex` and `homebrew-bottles` on dry-run.** Both jobs need real GitHub Release assets (`generate-elixir-checksums` downloads NIF tarballs; `brew install --build-bottle` downloads CLI/FFI source tarballs), but `upload-release-assets@v1` only logs on dry-run — the release doesn't exist. Both jobs failed every dry-run after surviving every other stage. Gated their `if:` on `dry_run != 'true'`; real-release runs continue to exercise them.
+
 - **ci(publish): replace inline Elixir Hex packaging with `kreuzberg-dev/actions/build-elixir-hex@v1`.** The `elixir-package` job in `.github/workflows/publish.yaml` previously ran `mix deps.get` + `mix hex.build` inline with no path-dep rewrite and no `Cargo.lock` generation. `Cargo.lock` is gitignored, so on a fresh CI checkout `mix hex.build` failed at the `files` list check with `Missing files: native/html_to_markdown_nif/Cargo.lock` — the proximate blocker on v3.5.0-rc.2 dry-run after the Go FFI fix landed. The new shared action wraps `rewrite-native-deps@v1` (default-on, dry-run-guarded) and falls back to `cargo generate-lockfile` on dry-run so the lockfile exists for `mix hex.build` even when the rewrite is skipped. Hex source-package builds now match the python-sdist / ruby-gem pattern (rewrite baked into the shared action; cannot be omitted).
-
-## [3.5.0-rc.2] - 2026-05-24
-
-### Changed
 
 - **release: cut v3.5.0-rc.2.** Aligned every workspace manifest (Cargo + npm + PyPI + Maven + Composer + Gemfile + Hex + pub.dev + Zig + R + Cocoa + NuGet + `Cargo.lock`) on `3.5.0-rc.2` via `alef sync-versions --set 3.5.0-rc.2` and re-generated all bindings, READMEs, docs reference pages, e2e suites, and `test_apps/` registry pins against alef 0.19.2.
 
