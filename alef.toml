@@ -462,11 +462,16 @@ build_release = "cd packages/ruby/ext/html_to_markdown_rb && cargo build --relea
 [crates.publish]
 core_crate = "crates/html-to-markdown"
 
-[crates.publish.languages.ruby]
-vendor_mode = "core-only"
+# Ruby and Elixir use the alef default `vendor_mode = "registry"` —
+# `alef publish prepare` rewrites the `path = "../../../../../crates/...` core
+# dep in the NIF/gem Cargo.toml to a published `version = "<workspace>"` dep
+# resolved from crates.io. The shared `build-ruby-gem` / `build-elixir-hex`
+# actions also run the same rewrite at workflow time as a belt-and-braces
+# guard. Overriding to `core-only` here would silently vendor the core crate
+# into `packages/{ruby,elixir}/vendor/` and leave the manifest pointing at
+# the workspace path, which fails to resolve on consumer machines.
 
 [crates.publish.languages.elixir]
-vendor_mode = "core-only"
 nif_versions = ["2.16", "2.17"]
 
 [crates.publish.languages.r]
