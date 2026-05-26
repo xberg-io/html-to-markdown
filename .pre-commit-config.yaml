@@ -1,286 +1,210 @@
 default_install_hook_types:
-  - pre-commit
-  - commit-msg
+- pre-commit
+- commit-msg
 exclude: ^docs/snippets/|vendor/|node_modules/|target/|dist/|artifacts/|scripts/ci/|\.cache/|rust-vendor/|\.venv/
-
 repos:
-  # AI-Rulez: auto-generate AI assistant configuration files
-  - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.2.1
-    hooks:
-      - id: ai-rulez-generate
-
-  # Commit message linting
-  - repo: https://github.com/Goldziher/gitfluff
-    rev: v0.8.0
-    hooks:
-      - id: gitfluff-lint
-        args: ["--write"]
-        stages: [commit-msg]
-
-  # General file checks
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: trailing-whitespace
-        exclude: \.github/copilot-instructions\.md
-      - id: end-of-file-fixer
-        # Skip intentionally-empty marker files. `.gitkeep` placeholders,
-        # PEP-561 `py.typed` markers, namespace-package `__init__.py` shims,
-        # and the empty `checkstyle.properties` config file are meant to stay
-        # zero-byte / trailing-newline-free; the hook would otherwise loop.
-        exclude: |
-          (?x)^(
-            \.github/copilot-instructions\.md|
-            .*/\.gitkeep|
-            .*/py\.typed|
-            packages/java/checkstyle\.properties|
-            (e2e/python|e2e/python/tests)/__init__\.py
-          )$
-      - id: check-merge-conflict
-      - id: check-added-large-files
-        exclude: |
-          (?x)^(
-            uv\.lock
-            |crates/html-to-markdown/tests/fixtures/regressions/.*
-          )$
-      - id: detect-private-key
-      - id: check-json
-        exclude: tsconfig\.base\.json
-      - id: check-yaml
-        args: ["--allow-multiple-documents", "--unsafe"]
-      - id: check-toml
-      - id: check-case-conflict
-
-  # TOML formatting
-  - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: "v2.21.2"
-    hooks:
-      - id: pyproject-fmt
-        exclude: ^test_apps/python/pyproject\.toml$
-
-  # Python: ruff (linting + formatting) + mypy (type checking)
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.14
-    hooks:
-      - id: ruff
-        args: [--fix]
-      - id: ruff-format
-
-  # Node/TS/WASM: oxlint
-  - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.19
-    hooks:
-      - id: cargo-sort
-        args: [-w]
-        exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
-      - id: cargo-fmt
-        args: ["--all"]
-      - id: cargo-check
-        args:
-          [
-            "--workspace",
-            "--exclude=html-to-markdown-php",
-            "--exclude=html-to-markdown-py",
-            "--exclude=html-to-markdown-node",
-            "--exclude=html_to_markdown_rs-e2e-rust",
-            "--all-features",
-            "--all-targets",
-          ]
-      - id: cargo-clippy
-        args:
-          [
-            "--fix",
-            "--allow-dirty",
-            "--allow-staged",
-            "--workspace",
-            "--exclude=html-to-markdown-php",
-            "--exclude=html-to-markdown-py",
-            "--exclude=html-to-markdown-node",
-            "--exclude=html_to_markdown_rs-e2e-rust",
-            "--all-features",
-            "--all-targets",
-            "--",
-            "-D",
-            "warnings",
-          ]
-      - id: cargo-machete
-        args: [crates/]
-        exclude: ^(e2e/|test_apps/)
-      - id: cargo-deny
-        args: ["check"]
-      - id: rustdoc-lint
-        # Scope to the core library only. The binding wrappers (node/py/php/
-        # wasm/jni/ffi/cli) are alef-generated — rustdoc gaps there are alef's
-        # responsibility, fixed upstream and pulled in via the next alef-rev bump.
-        files: ^crates/html-to-markdown/src/.*\.rs$
-        exclude: /tests/
-        args: ["-p", "html-to-markdown-rs"]
-      - id: pydocstyle
-        files: ^packages/python/.*\.py$
-        exclude: ^packages/python/(tests/|.*_native\.py$)
-      # tsdoc-lint disabled — h2m's TypeScript binding uses biome+oxlint, not
-      # eslint, so the hook would no-op anyway. Re-enable after wiring eslint +
-      # eslint-plugin-tsdoc + eslint-plugin-jsdoc in packages/typescript/.
-      # - id: tsdoc-lint
-      #   files: ^packages/typescript/src/.*\.ts$
-      #   exclude: \.d\.ts$
-      - id: alef-docs-fresh
-      # yard-coverage disabled — h2m has no `yard` gem on PATH or in the
-      # repo Gemfile. The hook tries `bundle exec yard` and then falls back
-      # to a PATH `yard`, but neither resolves here. Re-enable after adding
-      # `gem 'yard', group: :development` to packages/ruby/Gemfile (or
-      # installing yard system-wide).
-      # - id: yard-coverage
-      #   files: ^packages/ruby/lib/.*\.rb$
-      #   exclude: ^packages/ruby/lib/html_to_markdown/native\.rb$
-      - id: roxygen2-check
-        files: ^packages/r/R/.*\.R$
-      - id: godoc-lint
-        files: ^packages/go/.*\.go$
-        exclude: ^(e2e/|test_apps/)
-        # godoc-lint auto-discovers every go.mod under CWD; h2m has go.mods
-        # under e2e/go/ and test_apps/go/ that aren't `go mod tidy`-clean.
-        # Scope it to packages/go (same as golangci-lint).
-        env:
-          KREUZBERG_GO_MOD_DIRS: "packages/go"
-      - id: javadoc-lint
-        files: ^packages/java/src/main/.*\.java$
-      - id: cs-xmldoc-lint
-        files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
-      # ex-doc-coverage disabled — mix docs requires compiling the elixir
-      # binding, which downloads the precompiled NIF for the current crate
-      # version. Pre-tag v3.5.0 the NIF is not yet released, so download
-      # 404s. Re-enable after v3.5.0 NIF artifact is published, or wire
-      # `:force_build` in packages/elixir/config/dev.exs.
-      # - id: ex-doc-coverage
-      #   files: ^packages/elixir/lib/.*\.ex$
-      - id: phpdoc-lint
-        files: ^packages/php/src/.*\.php$
-      - id: dart-doc-lint
-        files: ^packages/dart/lib/.*\.dart$
-        exclude: ^packages/dart/lib/src/rust/
-      # swift-doc-coverage disabled — requires swift-docc-plugin in
-      # packages/swift/Package.swift. Re-enable after Package.swift adds the
-      # plugin dep.
-      # - id: swift-doc-coverage
-      #   files: ^packages/swift/Sources/HtmlToMarkdown/.*\.swift$
-      - id: zig-doc-lint
-        files: ^packages/zig/src/.*\.zig$
-        exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
-      # kotlin-dokka disabled — requires Dokka Gradle plugin in
-      # packages/kotlin-android/build.gradle.kts; not yet wired.
-      # - id: kotlin-dokka
-      #   files: ^packages/kotlin-android/src/main/.*\.kt$
-      # markdownlint-rumdl-strict is not wired here — h2m's docs use mkdocs/
-      # zensical extensions (HTML grids, indented code, long URL tables) that
-      # the bundled strict config over-flags. The auto-fixing `rumdl-fmt` hook
-      # below already catches the issues we care about.
-      - id: shfmt
-        args: ["-w", "-i", "2"]
-      - id: shellcheck
-      - id: clang-format
-        args: ["--style=file"]
-        files: ^crates/html-to-markdown-ffi/tests/c/
-      - id: clang-tidy
-        files: ^crates/html-to-markdown-ffi/tests/c/
-      - id: checkstyle
-        args: ["-c", "packages/java/checkstyle.xml", "-p", "packages/java/checkstyle.properties"]
-        exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
-      - id: mypy
-        exclude: "e2e/|tests/|scripts/|^packages/r/"
-      - id: go-fmt
-        exclude: ^(e2e/|test_apps/)
-      - id: golangci-lint
-        exclude: ^(e2e/|test_apps/)
-        env:
-          KREUZBERG_GO_MOD_DIRS: "packages/go"
-      - id: govulncheck
-        exclude: ^(e2e/|test_apps/)
-      - id: rubocop
-        files: ^packages/ruby/.*\.rb$
-        exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-      - id: rubocop-lint
-        files: ^packages/ruby/.*\.(rb|rbs)$
-        exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-      - id: steep
-        files: ^packages/ruby/.*\.(rb|rbs)$
-        exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
-      - id: dotnet-format
-        files: ^packages/csharp/.*\.cs$
-      - id: dotnet-format-check
-        files: ^packages/csharp/.*\.cs$
-      - id: php-cs-fixer
-        files: ^packages/php/.*\.php$
-        exclude: ^packages/php/stubs/
-      - id: phpstan
-        files: ^packages/php/(src|tests)/.*\.php$
-        args: ["analyse", "--no-progress", "--configuration", "packages/php/phpstan.neon"]
-      - id: mix-format
-        files: ^packages/elixir/
-      - id: mix-credo
-        files: ^packages/elixir/
-      - id: java-verify
-        files: ^packages/java/
-      - id: ktfmt
-        files: ^packages/kotlin-android/.*\.kts?$
-        args: ["--kotlinlang-style"]
-      - id: detekt
-        files: ^packages/kotlin-android/.*\.kts?$
-        args: ["--build-upon-default-config"]
-      - id: ktlint
-        files: ^packages/kotlin-android/.*\.kts?$
-      - id: swift-format
-        files: ^packages/swift/.*\.swift$
-      - id: swiftlint
-        files: ^packages/swift/.*\.swift$
-      - id: dart-format
-        files: ^packages/dart/.*\.dart$
-      - id: dart-analyze
-        files: ^packages/dart/.*\.dart$
-        exclude: ^(test_apps/|e2e/dart/)
-      - id: zig-fmt
-        files: ^packages/zig/.*\.zig$
-      - id: zig-build-check
-        files: ^packages/zig/.*\.zig$
-      - id: textlint
-        files: ^docs/.*\.md$
-        exclude: ^docs/(reference/|api-|snippets/|migration/)
-        args: ["--fix", "--config", ".textlintrc.json"]
-
-      - id: oxlint
-      - id: oxfmt
-      - id: cppcheck
-        args: ["--suppress=unusedStructMember"]
-      - id: rumdl-fmt
-      - id: cpd
-        args: ["--minimum-tokens=120"]
-        exclude: ^(test_apps/|e2e/java/)
-  # Alef: verify bindings and sync versions.
-  # Pinned to the last tagged alef release. alef main is on 0.19.8
-  # (unreleased). The alef-sync-versions hook will try to bump this to
-  # match alef/Cargo.toml; revert before committing release-prep.
-  - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.19.14
-    hooks:
-      - id: alef-verify
-      - id: alef-sync-versions
-
-  # GitHub Actions: linting
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
-    hooks:
-      - id: actionlint
-
-  # GitHub Actions: pin maintenance
-  - repo: https://github.com/Goldziher/gh-actions-updater
-    rev: v0.1.5
-    hooks:
-      - id: gh-actions-updater
-
-  # Java cpd — kept upstream (not yet in shared repo)
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.46.3
-    hooks:
-      - id: typos
-        args: [--force-exclude]
+- repo: https://github.com/Goldziher/gitfluff
+  rev: v0.8.0
+  hooks:
+  - id: gitfluff-lint
+    args:
+    - --write
+    stages:
+    - commit-msg
+- repo: https://github.com/kreuzberg-dev/pre-commit-hooks
+  rev: v1.2.0
+  hooks:
+  - id: ai-rulez-generate
+  - id: trailing-whitespace
+    exclude: \.github/copilot-instructions\.md
+  - id: end-of-file-fixer
+    exclude: "(?x)^(\n  \\.github/copilot-instructions\\.md|\n  .*/\\.gitkeep|\n  .*/py\\.typed|\n  packages/java/checkstyle\\\
+      .properties|\n  (e2e/python|e2e/python/tests)/__init__\\.py\n)$\n"
+  - id: check-merge-conflict
+  - id: check-added-large-files
+    exclude: "(?x)^(\n  uv\\.lock\n  |crates/html-to-markdown/tests/fixtures/regressions/.*\n)$\n"
+  - id: detect-private-key
+  - id: check-json
+    exclude: tsconfig\.base\.json
+  - id: check-yaml
+    args:
+    - --allow-multiple-documents
+    - --unsafe
+  - id: check-toml
+  - id: check-case-conflict
+  - id: pyproject-fmt
+    exclude: ^test_apps/python/pyproject\.toml$
+  - id: ruff
+  - id: ruff-format
+  - id: cargo-sort
+    args:
+    - -w
+    exclude: ^(e2e/rust/|test_apps/rust/|packages/dart/rust/)Cargo\.toml$
+  - id: cargo-fmt
+    args:
+    - --all
+  - id: cargo-check
+    args:
+    - --workspace
+    - --exclude=html-to-markdown-php
+    - --exclude=html-to-markdown-py
+    - --exclude=html-to-markdown-node
+    - --exclude=html_to_markdown_rs-e2e-rust
+    - --all-features
+    - --all-targets
+  - id: cargo-clippy
+    args:
+    - --fix
+    - --allow-dirty
+    - --allow-staged
+    - --workspace
+    - --exclude=html-to-markdown-php
+    - --exclude=html-to-markdown-py
+    - --exclude=html-to-markdown-node
+    - --exclude=html_to_markdown_rs-e2e-rust
+    - --all-features
+    - --all-targets
+    - --
+    - -D
+    - warnings
+  - id: cargo-machete
+    args:
+    - crates/
+    exclude: ^(e2e/|test_apps/)
+  - id: cargo-deny
+    args:
+    - check
+  - id: rustdoc-lint
+    files: ^crates/html-to-markdown/src/.*\.rs$
+    exclude: /tests/
+    args:
+    - -p
+    - html-to-markdown-rs
+  - id: pydocstyle
+    files: ^packages/python/.*\.py$
+    exclude: ^packages/python/(tests/|.*_native\.py$)
+  - id: alef-docs-fresh
+  - id: roxygen2-check
+    files: ^packages/r/R/.*\.R$
+  - id: godoc-lint
+    files: ^packages/go/.*\.go$
+    exclude: ^(e2e/|test_apps/)
+    env:
+      KREUZBERG_GO_MOD_DIRS: packages/go
+  - id: javadoc-lint
+    files: ^packages/java/src/main/.*\.java$
+  - id: cs-xmldoc-lint
+    files: ^packages/csharp/HtmlToMarkdown/.*\.cs$
+  - id: phpdoc-lint
+    files: ^packages/php/src/.*\.php$
+  - id: dart-doc-lint
+    files: ^packages/dart/lib/.*\.dart$
+    exclude: ^packages/dart/lib/src/rust/
+  - id: zig-doc-lint
+    files: ^packages/zig/src/.*\.zig$
+    exclude: ^packages/zig/src/html_to_markdown_rs\.zig$
+  - id: shfmt
+    args:
+    - -w
+    - -i
+    - '2'
+  - id: shellcheck
+  - id: clang-format
+    args:
+    - --style=file
+    files: ^crates/html-to-markdown-ffi/tests/c/
+  - id: clang-tidy
+    files: ^crates/html-to-markdown-ffi/tests/c/
+  - id: checkstyle
+    args:
+    - -c
+    - packages/java/checkstyle.xml
+    - -p
+    - packages/java/checkstyle.properties
+    exclude: ^(\.mvn/wrapper/|e2e/|test_apps/|packages/java/src/)
+  - id: mypy
+    exclude: e2e/|tests/|scripts/|^packages/r/
+  - id: go-fmt
+    exclude: ^(e2e/|test_apps/)
+  - id: golangci-lint
+    exclude: ^(e2e/|test_apps/)
+    env:
+      KREUZBERG_GO_MOD_DIRS: packages/go
+  - id: govulncheck
+    exclude: ^(e2e/|test_apps/)
+  - id: rubocop
+    files: ^packages/ruby/.*\.rb$
+    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+  - id: rubocop-lint
+    files: ^packages/ruby/.*\.(rb|rbs)$
+    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+  - id: steep
+    files: ^packages/ruby/.*\.(rb|rbs)$
+    exclude: ^packages/ruby/(ext/|lib/html_to_markdown/native\.rb$)
+  - id: dotnet-format
+    files: ^packages/csharp/.*\.cs$
+  - id: dotnet-format-check
+    files: ^packages/csharp/.*\.cs$
+  - id: php-cs-fixer
+    files: ^packages/php/.*\.php$
+    exclude: ^packages/php/stubs/
+  - id: phpstan
+    files: ^packages/php/(src|tests)/.*\.php$
+    args:
+    - analyse
+    - --no-progress
+    - --configuration
+    - packages/php/phpstan.neon
+  - id: mix-format
+    files: ^packages/elixir/
+  - id: mix-credo
+    files: ^packages/elixir/
+  - id: java-verify
+    files: ^packages/java/
+  - id: ktfmt
+    files: ^packages/kotlin-android/.*\.kts?$
+    args:
+    - --kotlinlang-style
+  - id: detekt
+    files: ^packages/kotlin-android/.*\.kts?$
+    args:
+    - --build-upon-default-config
+  - id: ktlint
+    files: ^packages/kotlin-android/.*\.kts?$
+  - id: swift-format
+    files: ^packages/swift/.*\.swift$
+  - id: swiftlint
+    files: ^packages/swift/.*\.swift$
+  - id: dart-format
+    files: ^packages/dart/.*\.dart$
+  - id: dart-analyze
+    files: ^packages/dart/.*\.dart$
+    exclude: ^(test_apps/|e2e/dart/)
+  - id: zig-fmt
+    files: ^packages/zig/.*\.zig$
+  - id: zig-build-check
+    files: ^packages/zig/.*\.zig$
+  - id: textlint
+    files: ^docs/.*\.md$
+    exclude: ^docs/(reference/|api-|snippets/|migration/)
+    args:
+    - --fix
+    - --config
+    - .textlintrc.json
+  - id: oxlint
+  - id: oxfmt
+  - id: cppcheck
+    args:
+    - --suppress=unusedStructMember
+  - id: rumdl-fmt
+  - id: cpd
+    args:
+    - --minimum-tokens=120
+    exclude: ^(test_apps/|e2e/java/)
+  - id: alef-verify
+  - id: alef-sync-versions
+  - id: actionlint
+  - id: gh-actions-updater
+  - id: typos
+    args:
+    - --force-exclude
