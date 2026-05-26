@@ -373,7 +373,7 @@ e2e = "cd e2e/java && mvn test -q"
 
 [crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
-before = "cargo build --release -p html-to-markdown-ffi && cp target/release/libhtml_to_markdown_ffi.dylib packages/csharp/HtmlToMarkdown/runtimes/osx-arm64/native/html_to_markdown_ffi.dylib"
+before = "cargo build --release -p html-to-markdown-ffi && scripts/ci/csharp/copy-ffi.sh"
 e2e = "dotnet test e2e/csharp"
 
 [crates.setup.node]
