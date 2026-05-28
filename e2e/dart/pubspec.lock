@@ -135,7 +135,7 @@ packages:
       path: "../../packages/dart"
       relative: true
     source: path
-    version: "3.5.3"
+    version: "3.5.4"
   http:
     dependency: "direct dev"
     description:

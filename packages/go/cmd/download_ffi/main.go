@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	moduleVersion = "3.5.3"
+	moduleVersion = "3.5.4"
 	repoURL       = "https://github.com/kreuzberg-dev/html-to-markdown"
 	assetPrefix   = "html-to-markdown-rs"
 )
@@ -74,7 +74,6 @@ func determinePaths() (string, string, error) {
 
 	return libDir, libPath, nil
 }
-
 
 func libFilename(libName, goos string) string {
 	switch goos {

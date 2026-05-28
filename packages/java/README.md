@@ -107,14 +107,14 @@ Requires Java 25+ with Panama FFI support.
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.5.3</version>
+    <version>3.5.4</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("dev.kreuzberg:html-to-markdown:3.5.3")
+implementation("dev.kreuzberg:html-to-markdown:3.5.4")
 ```
 
 ## Performance Snapshot
