@@ -15,5 +15,5 @@ tasks:
     silent: false
     cmds:
       - cmd: |
-          cd packages/elixir && mix hex.outdated --all && mix deps.update --all
+          cd packages/elixir && { mix hex.outdated --all || true; } && mix deps.update --all
         ignore_error: false

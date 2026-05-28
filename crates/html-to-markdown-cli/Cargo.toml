@@ -29,7 +29,7 @@ html-to-markdown-rs = { workspace = true, features = [
     "visitor",
     "serde",
 ] }
-reqwest = { version = "0.13.3", default-features = false, features = [
+reqwest = { version = "0.13.4", default-features = false, features = [
     "blocking",
     "rustls",
     "gzip",
