@@ -841,9 +841,13 @@ jobs:
           esac
 
           if [ -n "${{ matrix.dock_platform }}" ]; then
-            # Cross-compile for Windows via Docker using rb-sys-dock
+            # Cross-compile for Windows via Docker using rb-sys-dock.
+            # The rb-sys-dock container ships its own Ruby toolchain; bundler
+            # must `install` inside the container before `exec rake` so the
+            # lockfile materializes against the container's Ruby version
+            # rather than the host's.
             gem install rb_sys
-            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bundle exec rake "native[$target]" gem
+            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake \"native[$target]\" gem"
           else
             # Native build on matching architecture
             bundle exec rake "native[$target]" gem
