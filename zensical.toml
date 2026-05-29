@@ -54,6 +54,8 @@ nav = [
     { "Contributing" = "contributing.md" },
     { "Changelog" = "https://github.com/kreuzberg-dev/html-to-markdown/blob/main/CHANGELOG.md" },
   ] },
+
+  { "Ecosystem" = "ecosystem.md" },
 ]
 
 [project.theme]
