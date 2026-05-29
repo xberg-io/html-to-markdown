@@ -11,7 +11,9 @@ declare(strict_types=1);
 namespace HtmlToMarkdown\E2e;
 
 use PHPUnit\Framework\TestCase;
-use HtmlToMarkdown\HtmlToMarkdown;use HtmlToMarkdown\ConversionOptions;
+use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\ConversionOptions;
+
 /** E2e tests for category: structure. */
 final class StructureTest extends TestCase
 {

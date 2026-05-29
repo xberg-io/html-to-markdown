@@ -5,7 +5,7 @@
 # Issues & docs: https://github.com/sample_crate-dev/alef
 """Public API for the conversion library.
 
-Version: 3.5.5
+Version: 3.5.7
 """
 
 from ._html_to_markdown import (
@@ -109,4 +109,4 @@ __all__ = [
     "convert",
 ]
 
-__version__ = "3.5.5"
+__version__ = "3.5.7"

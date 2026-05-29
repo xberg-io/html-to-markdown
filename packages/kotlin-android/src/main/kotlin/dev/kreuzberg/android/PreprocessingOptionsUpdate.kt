@@ -25,8 +25,8 @@ package dev.kreuzberg.android
 /**
  * Partial update for `PreprocessingOptions`.
  *
- * This struct uses `Option<T>` to represent optional fields that can be selectively updated. Only
- * specified fields (Some values) will override existing options; None values leave the
+ * This struct uses `Option<T>` to represent optional fields that can be selectively updated.
+ * Only specified fields (Some values) will override existing options; None values leave the
  * corresponding fields unchanged when applied via `PreprocessingOptions.apply_update`.
  */
 data class PreprocessingOptionsUpdate(

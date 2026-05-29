@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.7] - 2026-05-29
+
+### Fixed
+
+- **release: sync workspace `Cargo.toml` version.** v3.5.6's release commit (`2c37942f8`) claimed to bump the workspace version 3.5.5 → 3.5.6 but the change never actually landed in the commit. Every binding manifest (Cargo.toml, pyproject.toml, gemspec, mix.exs, pom.xml, .csproj, package.json, …) stayed pinned at 3.5.5, so the v3.5.6 publish workflow built v3.5.5 binaries against the v3.5.6 tag and uploaded them as `*-v3.5.5-*.tar.gz` assets to the v3.5.6 GitHub Release. crates.io / PyPI / Hex / RubyGems / Maven publishes were either no-ops (3.5.5 already exists) or rejected; npm + WASM + NuGet + Homebrew steps also failed. v3.5.6 is skipped; v3.5.7 is the corrected ship of every fix originally rolled into v3.5.6.
+- **alef pin: 0.20.11 → 0.20.12** (auto-synced by `alef sync-versions`).
+
+### Chore
+
+- **bindings: regenerated against alef v0.20.12** with workspace version correctly bumped to 3.5.7 first, so every manifest now matches the release tag.
+
 ## [3.5.5] - 2026-05-28
 
 ### Fixed

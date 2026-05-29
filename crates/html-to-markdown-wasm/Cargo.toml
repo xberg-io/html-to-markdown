@@ -6,7 +6,7 @@
 
 [package]
 name = "html-to-markdown-wasm"
-version = "3.5.5"
+version = "3.5.7"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"

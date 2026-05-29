@@ -2,6 +2,6 @@
 
 All notable changes to this package will be documented in this file.
 
-## 3.5.5
+## 3.5.7
 
 - Initial release.

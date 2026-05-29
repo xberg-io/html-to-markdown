@@ -106,7 +106,6 @@ import (
 	"sync/atomic"
 	"unsafe"
 )
-
 // NodeContext carries context information passed to every visitor callback.
 // It is decoded from the JSON-encoded context string passed by the C layer.
 type NodeContext struct {

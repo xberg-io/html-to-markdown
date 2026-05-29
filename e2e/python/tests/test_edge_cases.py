@@ -177,9 +177,7 @@ def test_malformed_unclosed_paragraph() -> None:
 
 def test_script_tags_only() -> None:
     """Document with only script tags produces empty output (scripts are stripped)."""
-    html = (
-        "<html><head><script>alert('xss')</script></head><body><script>document.write('hello')</script></body></html>"
-    )
+    html = "<html><head><script>alert('xss')</script></head><body><script>document.write('hello')</script></body></html>"
 
     result = convert(html, None)
     assert result.content.strip() == ""  # noqa: S101
@@ -187,9 +185,7 @@ def test_script_tags_only() -> None:
 
 def test_style_tags_only() -> None:
     """Document with only style tags produces empty output (styles are stripped)."""
-    html = (
-        "<html><head><style>body { color: red; }</style></head><body><style>.foo { margin: 0; }</style></body></html>"
-    )
+    html = "<html><head><style>body { color: red; }</style></head><body><style>.foo { margin: 0; }</style></body></html>"
 
     result = convert(html, None)
     assert result.content.strip() == ""  # noqa: S101
@@ -197,7 +193,6 @@ def test_style_tags_only() -> None:
 
 def test_visitor_custom_element_with_nesting() -> None:
     """Visitor handles custom elements with nested content."""
-
     class _TestVisitor:
         def visit_custom_element(self, ctx, tag_name, html):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "[CUSTOM WIDGET]"}
@@ -207,12 +202,11 @@ def test_visitor_custom_element_with_nesting() -> None:
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "[CUSTOM WIDGET]" in result.content  # noqa: S101
-    assert result.content is None or "Widget content here" not in result.content  # noqa: S101
+    assert result.content is None or not ("Widget content here" in result.content)  # noqa: S101
 
 
 def test_visitor_deeply_nested_skip() -> None:
     """Visitor skips deeply nested elements."""
-
     class _TestVisitor:
         def visit_mark(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -224,12 +218,11 @@ def test_visitor_deeply_nested_skip() -> None:
     assert "Outer" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "text" in result.content  # noqa: S101
-    assert result.content is None or "highlight" not in result.content  # noqa: S101
+    assert result.content is None or not ("highlight" in result.content)  # noqa: S101
 
 
 def test_visitor_element_end_modification() -> None:
     """Visitor modifies element at end after children processed."""
-
     class _TestVisitor:
         def visit_element_end(self, ctx, output, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "MODIFIED OUTPUT"}
@@ -242,7 +235,6 @@ def test_visitor_element_end_modification() -> None:
 
 def test_visitor_element_start_skip_entire_subtree() -> None:
     """Visitor skips at element_start level removes entire subtree."""
-
     class _TestVisitor:
         def visit_element_start(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -250,20 +242,17 @@ def test_visitor_element_start_skip_entire_subtree() -> None:
     html = "<div><h1>Title</h1><p>Content</p></div>"
 
     result = convert(html, None, visitor=_TestVisitor())
-    assert result.content is None or "Title" not in result.content  # noqa: S101
-    assert result.content is None or "Content" not in result.content  # noqa: S101
+    assert result.content is None or not ("Title" in result.content)  # noqa: S101
+    assert result.content is None or not ("Content" in result.content)  # noqa: S101
 
 
 def test_visitor_unknown_tag_preservation() -> None:
     """Visitor preserves unknown HTML tags as raw HTML."""
-
     class _TestVisitor:
         def visit_custom_element(self, ctx, tag_name, html):  # noqa: A002, ANN001, ANN202, ARG002
             return "preserve_html"
 
-    html = (
-        "<article><p>Article text</p><x-custom>Custom element with content</x-custom><p>More article text</p></article>"
-    )
+    html = "<article><p>Article text</p><x-custom>Custom element with content</x-custom><p>More article text</p></article>"
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
@@ -284,7 +273,7 @@ def test_whitespace_only() -> None:
 
 def test_xss_onclick_handler_removed() -> None:
     """onclick and other on* event handlers are removed from elements."""
-    html = '<p><a href="https://example.com" onclick="alert(\'xss\')">Click me</a></p><button onmouseover="steal_data()">Hover me</button>'
+    html = "<p><a href=\"https://example.com\" onclick=\"alert('xss')\">Click me</a></p><button onmouseover=\"steal_data()\">Hover me</button>"
 
     result = convert(html, None)
     assert result.content  # noqa: S101

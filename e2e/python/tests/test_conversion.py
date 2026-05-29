@@ -275,9 +275,7 @@ def test_heading_h6() -> None:
 
 def test_image_figure_figcaption() -> None:
     """Figure with figcaption preserves both image and caption."""
-    html = (
-        '<figure><img src="sunset.jpg" alt="A sunset"><figcaption>Beautiful sunset over the ocean</figcaption></figure>'
-    )
+    html = '<figure><img src="sunset.jpg" alt="A sunset"><figcaption>Beautiful sunset over the ocean</figcaption></figure>'
 
     result = convert(html, None)
     assert result.content is not None  # noqa: S101

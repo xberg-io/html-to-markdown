@@ -2,7 +2,6 @@
 
 package dev.kreuzberg.android
 
-class HtmlToMarkdownRsBridgeException(message: String?, cause: Throwable?) :
-    RuntimeException(message, cause) {
+class HtmlToMarkdownRsBridgeException(message: String?, cause: Throwable?) : RuntimeException(message, cause) {
     constructor(message: String?) : this(message, null)
 }

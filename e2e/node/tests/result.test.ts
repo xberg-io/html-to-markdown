@@ -4,156 +4,124 @@
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/sample_crate-dev/alef
 
-import { describe, expect, it } from "vitest";
-import { convert, type ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { describe, expect, it } from 'vitest';import { convert, type ConversionOptions } from '@kreuzberg/html-to-markdown';
 function _alefE2eText(value: unknown): string {
-	return value == null ? "" : String(value);
+  return value == null ? "" : String(value);
 }
 
 function _alefE2eItemTexts(item: unknown): string[] {
-	if (item == null || typeof item !== "object") {
-		return [_alefE2eText(item)];
-	}
-	const record = item as Record<string, unknown>;
-	const itemsText = Array.isArray(record.items) ? record.items.map(_alefE2eText).join(" ") : "";
-	return [
-		_alefE2eText(item),
-		_alefE2eText(record.kind),
-		_alefE2eText(record.name),
-		_alefE2eText(record.source),
-		_alefE2eText(record.alias),
-		_alefE2eText(record.text),
-		_alefE2eText(record.signature),
-		itemsText,
-	];
+  if (item == null || typeof item !== "object") {
+    return [_alefE2eText(item)];
+  }
+  const record = item as Record<string, unknown>;
+  const itemsText = Array.isArray(record.items) ? record.items.map(_alefE2eText).join(" ") : "";
+  return [_alefE2eText(item), _alefE2eText(record.kind), _alefE2eText(record.name), _alefE2eText(record.source), _alefE2eText(record.alias), _alefE2eText(record.text), _alefE2eText(record.signature), itemsText];
 }
 
 function _alefE2eFormatMetadataDisplay(fm: unknown): string {
-	if (fm == null) return "";
-	if (typeof fm !== "object") return String(fm);
-	const record = fm as Record<string, unknown>;
-	const formatType = record.format_type;
+  if (fm == null) return "";
+  if (typeof fm !== "object") return String(fm);
+  const record = fm as Record<string, unknown>;
+  const formatType = record.format_type;
 
-	// FormatMetadata is a tagged union: { format_type: 'image', image: { format: 'PNG', ... }, ... }
-	// Extract the display string based on the variant type
-	if (formatType === "image" && typeof record.image === "object") {
-		const imageData = record.image as Record<string, unknown>;
-		if (typeof imageData.format === "string") return imageData.format;
-	}
+  // FormatMetadata is a tagged union: { format_type: 'image', image: { format: 'PNG', ... }, ... }
+  // Extract the display string based on the variant type
+  if (formatType === "image" && typeof record.image === "object") {
+    const imageData = record.image as Record<string, unknown>;
+    if (typeof imageData.format === "string") return imageData.format;
+  }
 
-	// Fallback: return format_type variant name
-	if (typeof record.format_type === "string") return record.format_type;
-	return "";
+  // Fallback: return format_type variant name
+  if (typeof record.format_type === "string") return record.format_type;
+  return "";
 }
 
-describe("result", () => {
-	it("result_tables_empty_when_no_tables: Result tables array is empty when input has no tables", () => {
-		const result = convert("<p>No tables here</p>", { includeDocumentStructure: true } as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.tables.length).toBe(0);
-	}, 30000);
-	it("result_tables_multiple: Multiple tables each appear in the tables array", () => {
-		const result = convert(
-			"<table><tr><th>A</th></tr><tr><td>1</td></tr></table><p>Between</p><table><tr><th>B</th></tr><tr><td>2</td></tr></table>",
-			{ includeDocumentStructure: true } as ConversionOptions,
-		);
-		expect(result.tables.length).toBeGreaterThanOrEqual(2);
-	}, 30000);
-	it("result_tables_simple: Simple table populates the tables array in result", () => {
-		const result = convert(
-			"<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>",
-			{ includeDocumentStructure: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.tables.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("result_tables_without_structure_flag: Tables array is empty when includeDocumentStructure is false", () => {
-		const result = convert("<table><tr><th>X</th></tr><tr><td>Y</td></tr></table>", undefined);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.tables.length).toBe(0);
-	}, 30000);
-	it("result_warning_kind_image_extraction_failed: A malformed data URI with extract_images enabled produces an ImageExtractionFailed warning", () => {
-		const result = convert('<p>Text<img src="data:BADMIME" alt="broken">end</p>', {
-			extractImages: true,
-		} as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.warnings.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("result_warnings_empty_for_clean_input: Warnings array is empty for well-formed HTML without problematic content", () => {
-		const result = convert(
-			"<h1>Title</h1><p>Clean content with <a href='https://example.com'>a link</a>.</p>",
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.warnings.length).toBe(0);
-	}, 30000);
-	it("result_warnings_empty_for_complex_input: Warnings array is empty for complex but valid HTML", () => {
-		const result = convert(
-			"<article><h1>Article</h1><p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p><table><tr><th>Col</th></tr><tr><td>Val</td></tr></table><ul><li>Item 1</li><li>Item 2</li></ul></article>",
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.warnings.length).toBe(0);
-	}, 30000);
-	it("result_warnings_empty_for_malformed_html: Warnings array is empty even for malformed HTML (parser is lenient)", () => {
-		const result = convert("<p>Unclosed paragraph<div>Mixed nesting</p></div>", undefined);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.warnings.length).toBe(0);
-	}, 30000);
+
+describe('result', () => {  it('result_tables_empty_when_no_tables: Result tables array is empty when input has no tables', () => {    const result = convert("<p>No tables here</p>", { includeDocumentStructure: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.tables.length).toBe(0);
+
+  }, 30000);
+  it('result_tables_multiple: Multiple tables each appear in the tables array', () => {    const result = convert("<table><tr><th>A</th></tr><tr><td>1</td></tr></table><p>Between</p><table><tr><th>B</th></tr><tr><td>2</td></tr></table>", { includeDocumentStructure: true } as ConversionOptions);    expect(result.tables.length).toBeGreaterThanOrEqual(2);
+
+  }, 30000);
+  it('result_tables_simple: Simple table populates the tables array in result', () => {    const result = convert("<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>", { includeDocumentStructure: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.tables.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('result_tables_without_structure_flag: Tables array is empty when includeDocumentStructure is false', () => {    const result = convert("<table><tr><th>X</th></tr><tr><td>Y</td></tr></table>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.tables.length).toBe(0);
+
+  }, 30000);
+  it('result_warning_kind_image_extraction_failed: A malformed data URI with extract_images enabled produces an ImageExtractionFailed warning', () => {    const result = convert("<p>Text<img src=\"data:BADMIME\" alt=\"broken\">end</p>", { extractImages: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.warnings.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('result_warnings_empty_for_clean_input: Warnings array is empty for well-formed HTML without problematic content', () => {    const result = convert("<h1>Title</h1><p>Clean content with <a href='https://example.com'>a link</a>.</p>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.warnings.length).toBe(0);
+
+  }, 30000);
+  it('result_warnings_empty_for_complex_input: Warnings array is empty for complex but valid HTML', () => {    const result = convert("<article><h1>Article</h1><p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p><table><tr><th>Col</th></tr><tr><td>Val</td></tr></table><ul><li>Item 1</li><li>Item 2</li></ul></article>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.warnings.length).toBe(0);
+
+  }, 30000);
+  it('result_warnings_empty_for_malformed_html: Warnings array is empty even for malformed HTML (parser is lenient)', () => {    const result = convert("<p>Unclosed paragraph<div>Mixed nesting</p></div>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.warnings.length).toBe(0);
+
+  }, 30000);
 });

@@ -7,7 +7,7 @@
 set -euo pipefail
 
 REPO_URL="https://github.com/kreuzberg-dev/html-to-markdown"
-VERSION="3.5.5"
+VERSION="3.5.7"
 FFI_PKG_NAME="html_to_markdown_ffi"
 FFI_DIR="ffi"
 

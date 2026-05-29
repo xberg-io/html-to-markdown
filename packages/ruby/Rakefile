@@ -5,20 +5,32 @@ Bundler::GemHelper.install_tasks name: "html_to_markdown"
 require "rb_sys/extensiontask"
 require "rspec/core/rake_task"
 
-GEMSPEC = Gem::Specification.load(File.expand_path("html_to_markdown.gemspec", __dir__))
+GEM_ROOT = __dir__
+GEMSPEC = Gem::Specification.load(File.expand_path("html_to_markdown.gemspec", GEM_ROOT))
 
-RbSys::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
-  ext.lib_dir = "lib"
-  ext.ext_dir = "ext/html_to_markdown_rb"
-  ext.cross_compile = true
-  ext.cross_platform = %w[
-    x86_64-linux
-    aarch64-linux
-    x86_64-darwin
-    arm64-darwin
-    x64-mingw32
-    x64-mingw-ucrt
-  ]
+# RbSys::ExtensionTask runs `cargo metadata` from Dir.pwd to look up the
+# native crate. The native binding crate at ext/html_to_markdown_rb/native is excluded
+# from the parent Cargo workspace (so the parent does not pull in rb_sys
+# deps), so the lookup raises PackageNotFoundError when the Rakefile runs
+# from the gem root. Run init from the native dir so cargo metadata finds the
+# standalone Cargo.toml; absolute lib_dir keeps the rake task pointing at the
+# gem root.
+EXT_NATIVE_DIR = File.expand_path("ext/html_to_markdown_rb/native", GEM_ROOT)
+
+Dir.chdir(EXT_NATIVE_DIR) do
+  RbSys::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
+    ext.lib_dir = File.expand_path("lib", GEM_ROOT)
+    ext.ext_dir = EXT_NATIVE_DIR
+    ext.cross_compile = true
+    ext.cross_platform = %w[
+      x86_64-linux
+      aarch64-linux
+      x86_64-darwin
+      arm64-darwin
+      x64-mingw32
+      x64-mingw-ucrt
+    ]
+  end
 end
 
 RSpec::Core::RakeTask.new(:spec)

@@ -21,9 +21,8 @@ final class HtmlToMarkdown
      * @throws \HtmlToMarkdown\HtmlToMarkdownException
      */
     public static function convert(
-        string $html,
-        ?ConversionOptions $options = null,
-    ): ConversionResult {
+string $html, ?ConversionOptions $options = null): ConversionResult
+    {
         return \HtmlToMarkdown\HtmlToMarkdownApi::convert($html, $options); // delegate to native extension class
     }
 }

@@ -15,6 +15,7 @@ namespace HtmlToMarkdown;
  */
 interface HtmlVisitorInterface
 {
+
     /**
      * Visit text nodes (most frequent callback - ~100+ per document).
      *

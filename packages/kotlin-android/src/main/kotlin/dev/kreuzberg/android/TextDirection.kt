@@ -29,29 +29,30 @@ package dev.kreuzberg.android
  */
 enum class TextDirection {
     /** Left-to-right text flow (default for Latin scripts) */
-    @com.fasterxml.jackson.annotation.JsonProperty("ltr") LEFT_TO_RIGHT,
+    @com.fasterxml.jackson.annotation.JsonProperty("ltr")
+    LEFT_TO_RIGHT,
     /** Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) */
-    @com.fasterxml.jackson.annotation.JsonProperty("rtl") RIGHT_TO_LEFT,
+    @com.fasterxml.jackson.annotation.JsonProperty("rtl")
+    RIGHT_TO_LEFT,
     /** Automatic directionality detection */
-    @com.fasterxml.jackson.annotation.JsonProperty("auto") AUTO;
+    @com.fasterxml.jackson.annotation.JsonProperty("auto")
+    AUTO;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String =
-        when (this) {
-            LEFT_TO_RIGHT -> "ltr"
-            RIGHT_TO_LEFT -> "rtl"
-            AUTO -> "auto"
-        }
+    fun toWire(): String = when (this) {
+        LEFT_TO_RIGHT -> "ltr"
+        RIGHT_TO_LEFT -> "rtl"
+        AUTO -> "auto"
+    }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): TextDirection =
-            when (value) {
-                "ltr" -> LEFT_TO_RIGHT
-                "rtl" -> RIGHT_TO_LEFT
-                "auto" -> AUTO
-                else -> throw IllegalArgumentException("Unknown TextDirection value: $value")
-            }
+        fun fromWire(value: String): TextDirection = when (value) {
+            "ltr" -> LEFT_TO_RIGHT
+            "rtl" -> RIGHT_TO_LEFT
+            "auto" -> AUTO
+            else -> throw IllegalArgumentException("Unknown TextDirection value: $value")
+        }
     }
 }

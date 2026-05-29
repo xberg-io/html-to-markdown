@@ -8,7 +8,7 @@
 
 [package]
 name = "html_to_markdown_rs-e2e-rust"
-version = "3.5.5"
+version = "3.5.7"
 edition = "2021"
 license = "MIT"
 publish = false

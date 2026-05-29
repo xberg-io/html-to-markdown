@@ -24,15 +24,15 @@ export declare function convert(html: string, options?: ConversionOptions | unde
  * Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
  */
 export type AnnotationKind =
-	| { annotation_type: "bold" }
-	| { annotation_type: "italic" }
-	| { annotation_type: "underline" }
-	| { annotation_type: "strikethrough" }
-	| { annotation_type: "code" }
-	| { annotation_type: "subscript" }
-	| { annotation_type: "superscript" }
-	| { annotation_type: "highlight" }
-	| { annotation_type: "link"; url: string; title: string };
+  | { annotation_type: 'bold' }
+  | { annotation_type: 'italic' }
+  | { annotation_type: 'underline' }
+  | { annotation_type: 'strikethrough' }
+  | { annotation_type: 'code' }
+  | { annotation_type: 'subscript' }
+  | { annotation_type: 'superscript' }
+  | { annotation_type: 'highlight' }
+  | { annotation_type: 'link'; url: string; title: string }
 
 /**
  * Code block fence style in Markdown output.
@@ -40,12 +40,12 @@ export type AnnotationKind =
  * Determines how code blocks (`<pre><code>`) are rendered in Markdown.
  */
 export declare enum CodeBlockStyle {
-	/** Indented code blocks (4 spaces). `CommonMark` standard. */
-	Indented = "Indented",
-	/** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
-	Backticks = "Backticks",
-	/** Fenced code blocks with tildes (~~~). Supports language hints. */
-	Tildes = "Tildes",
+  /** Indented code blocks (4 spaces). `CommonMark` standard. */
+  Indented = "Indented",
+  /** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
+  Backticks = "Backticks",
+  /** Fenced code blocks with tildes (~~~). Supports language hints. */
+  Tildes = "Tildes",
 }
 
 /**
@@ -54,150 +54,150 @@ export declare enum CodeBlockStyle {
  * Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
  */
 export interface ConversionOptions {
-	/** Heading style to use in Markdown output (ATX `#` or Setext underline). */
-	readonly headingStyle?: HeadingStyle;
-	/** How to indent nested list items (spaces or tab). */
-	readonly listIndentType?: ListIndentType;
-	/** Number of spaces (or tabs) to use for each level of list indentation. */
-	readonly listIndentWidth?: number;
-	/** Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). */
-	readonly bullets?: string;
-	/** Character used for bold/italic emphasis markers (`*` or `_`). */
-	readonly strongEmSymbol?: string;
-	/** Escape `*` characters in plain text to avoid unintended bold/italic. */
-	readonly escapeAsterisks?: boolean;
-	/** Escape `_` characters in plain text to avoid unintended bold/italic. */
-	readonly escapeUnderscores?: boolean;
-	/** Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. */
-	readonly escapeMisc?: boolean;
-	/** Escape ASCII characters that have special meaning in certain Markdown dialects. */
-	readonly escapeAscii?: boolean;
-	/** Default language annotation for fenced code blocks that have no language hint. */
-	readonly codeLanguage?: string;
-	/** Automatically convert bare URLs into Markdown autolinks. */
-	readonly autolinks?: boolean;
-	/** Emit a default title when no `<title>` tag is present. */
-	readonly defaultTitle?: boolean;
-	/** Render `<br>` elements inside table cells as literal line breaks. */
-	readonly brInTables?: boolean;
-	/**
-	 * Emit tables without column padding (compact GFM format).
-	 *
-	 * When `true`, column widths are not computed and cells are emitted with
-	 * no trailing spaces. Separator rows use exactly `---` per column.
-	 * Produces token-efficient output suitable for RAG / LLM contexts.
-	 *
-	 * Default `false` (aligned padding preserved).
-	 */
-	readonly compactTables?: boolean;
-	/** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
-	readonly highlightStyle?: HighlightStyle;
-	/**
-	 * Populate `result.metadata` with `<head>` / `<meta>` extraction
-	 * (title, description, Open Graph, Twitter Card, JSON-LD, …).
-	 *
-	 * Default `true`. Disabling skips the metadata pass only — table
-	 * extraction into `result.tables` runs unconditionally.
-	 */
-	readonly extractMetadata?: boolean;
-	/**
-	 * Controls how whitespace sequences are normalised in the converted output.
-	 *
-	 * - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
-	 *   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
-	 * - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
-	 *   source HTML, including runs of spaces and embedded newlines.
-	 *
-	 * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
-	 * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
-	 */
-	readonly whitespaceMode?: WhitespaceMode;
-	/** Strip all newlines from the output, producing a single-line result. */
-	readonly stripNewlines?: boolean;
-	/** Wrap long lines at [`wrap_width`](Self::wrap_width) characters. */
-	readonly wrap?: boolean;
-	/**
-	 * Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
-	 *
-	 * Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
-	 * is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
-	 * effect when `wrap` is `false`.
-	 */
-	readonly wrapWidth?: number;
-	/** Treat the entire document as inline content (no block-level wrappers). */
-	readonly convertAsInline?: boolean;
-	/** Markdown notation for subscript text (e.g. `"~"`). */
-	readonly subSymbol?: string;
-	/** Markdown notation for superscript text (e.g. `"^"`). */
-	readonly supSymbol?: string;
-	/** How to encode hard line breaks (`<br>`) in Markdown. */
-	readonly newlineStyle?: NewlineStyle;
-	/** Style used for fenced code blocks (backticks or tilde). */
-	readonly codeBlockStyle?: CodeBlockStyle;
-	/** HTML tag names whose `<img>` children are kept inline instead of block. */
-	readonly keepInlineImagesIn?: Array<string>;
-	/**
-	 * Options for the HTML pre-processing pass applied before conversion begins.
-	 *
-	 * Pre-processing runs before the HTML is handed to the converter and can perform operations
-	 * such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
-	 * vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
-	 *
-	 * Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
-	 * passes. Set individual fields on [`PreprocessingOptions`] (or construct via
-	 * [`ConversionOptions::builder`]) to opt in or out of specific passes.
-	 */
-	readonly preprocessing?: PreprocessingOptions;
-	/** Expected character encoding of the input HTML (default `"utf-8"`). */
-	readonly encoding?: string;
-	/** Emit debug information during conversion. */
-	readonly debug?: boolean;
-	/** HTML tag names whose content is stripped from the output entirely. */
-	readonly stripTags?: Array<string>;
-	/** HTML tag names that are preserved verbatim in the output. */
-	readonly preserveTags?: Array<string>;
-	/** Skip conversion of `<img>` elements (omit images from output). */
-	readonly skipImages?: boolean;
-	/** Link rendering style (inline or reference). */
-	readonly linkStyle?: LinkStyle;
-	/** Target output format (Markdown, plain text, etc.). */
-	readonly outputFormat?: OutputFormat;
-	/** Include structured document tree in result. */
-	readonly includeDocumentStructure?: boolean;
-	/** Extract inline images from data URIs and SVGs. */
-	readonly extractImages?: boolean;
-	/** Maximum decoded image size in bytes (default 5MB). */
-	readonly maxImageSize?: number;
-	/** Capture SVG elements as images. */
-	readonly captureSvg?: boolean;
-	/** Infer image dimensions from data. */
-	readonly inferDimensions?: boolean;
-	/**
-	 * Maximum DOM traversal depth. `None` means unlimited.
-	 * When set, subtrees beyond this depth are silently truncated.
-	 */
-	readonly maxDepth?: number;
-	/**
-	 * CSS selectors for elements to exclude entirely (element + all content).
-	 *
-	 * Unlike `strip_tags` (which removes the tag wrapper but keeps children),
-	 * excluded elements and all their descendants are dropped from the output.
-	 * Supports any CSS selector that `tl` supports: tag names, `.class`,
-	 * `#id`, `[attribute]`, etc.
-	 *
-	 * Invalid selectors are silently skipped at conversion time.
-	 *
-	 * Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
-	 */
-	readonly excludeSelectors?: Array<string>;
-	/**
-	 * Optional visitor for custom traversal logic.
-	 *
-	 * When set, the visitor's callbacks are invoked for matching HTML elements
-	 * during conversion, allowing custom output, skipping, or HTML preservation.
-	 * See `HtmlVisitor`.
-	 */
-	readonly visitor?: VisitorHandle;
+  /** Heading style to use in Markdown output (ATX `#` or Setext underline). */
+  readonly headingStyle?: HeadingStyle
+  /** How to indent nested list items (spaces or tab). */
+  readonly listIndentType?: ListIndentType
+  /** Number of spaces (or tabs) to use for each level of list indentation. */
+  readonly listIndentWidth?: number
+  /** Bullet character(s) to use for unordered list items (e.g. `"-"`, `"*"`). */
+  readonly bullets?: string
+  /** Character used for bold/italic emphasis markers (`*` or `_`). */
+  readonly strongEmSymbol?: string
+  /** Escape `*` characters in plain text to avoid unintended bold/italic. */
+  readonly escapeAsterisks?: boolean
+  /** Escape `_` characters in plain text to avoid unintended bold/italic. */
+  readonly escapeUnderscores?: boolean
+  /** Escape miscellaneous Markdown metacharacters (`[]()#` etc.) in plain text. */
+  readonly escapeMisc?: boolean
+  /** Escape ASCII characters that have special meaning in certain Markdown dialects. */
+  readonly escapeAscii?: boolean
+  /** Default language annotation for fenced code blocks that have no language hint. */
+  readonly codeLanguage?: string
+  /** Automatically convert bare URLs into Markdown autolinks. */
+  readonly autolinks?: boolean
+  /** Emit a default title when no `<title>` tag is present. */
+  readonly defaultTitle?: boolean
+  /** Render `<br>` elements inside table cells as literal line breaks. */
+  readonly brInTables?: boolean
+  /**
+   * Emit tables without column padding (compact GFM format).
+   *
+   * When `true`, column widths are not computed and cells are emitted with
+   * no trailing spaces. Separator rows use exactly `---` per column.
+   * Produces token-efficient output suitable for RAG / LLM contexts.
+   *
+   * Default `false` (aligned padding preserved).
+   */
+  readonly compactTables?: boolean
+  /** Style used for `<mark>` / highlighted text (e.g. `==text==`). */
+  readonly highlightStyle?: HighlightStyle
+  /**
+   * Populate `result.metadata` with `<head>` / `<meta>` extraction
+   * (title, description, Open Graph, Twitter Card, JSON-LD, …).
+   *
+   * Default `true`. Disabling skips the metadata pass only — table
+   * extraction into `result.tables` runs unconditionally.
+   */
+  readonly extractMetadata?: boolean
+  /**
+   * Controls how whitespace sequences are normalised in the converted output.
+   *
+   * - [`WhitespaceMode::Normalized`] (default) — collapses consecutive whitespace characters
+   *   (spaces, tabs, newlines) to a single space, matching browser rendering behaviour.
+   * - [`WhitespaceMode::Strict`] — preserves all whitespace exactly as it appears in the
+   *   source HTML, including runs of spaces and embedded newlines.
+   *
+   * Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted
+   * content outside `<pre>` tags). For most documents `Normalized` produces cleaner output.
+   */
+  readonly whitespaceMode?: WhitespaceMode
+  /** Strip all newlines from the output, producing a single-line result. */
+  readonly stripNewlines?: boolean
+  /** Wrap long lines at [`wrap_width`](Self::wrap_width) characters. */
+  readonly wrap?: boolean
+  /**
+   * Maximum output line width in characters when [`wrap`](Self::wrap) is `true` (default `80`).
+   *
+   * Lines are broken at word boundaries so that no line exceeds this length. A value of `0`
+   * is treated as "no limit" — equivalent to leaving [`wrap`](Self::wrap) disabled. Has no
+   * effect when `wrap` is `false`.
+   */
+  readonly wrapWidth?: number
+  /** Treat the entire document as inline content (no block-level wrappers). */
+  readonly convertAsInline?: boolean
+  /** Markdown notation for subscript text (e.g. `"~"`). */
+  readonly subSymbol?: string
+  /** Markdown notation for superscript text (e.g. `"^"`). */
+  readonly supSymbol?: string
+  /** How to encode hard line breaks (`<br>`) in Markdown. */
+  readonly newlineStyle?: NewlineStyle
+  /** Style used for fenced code blocks (backticks or tilde). */
+  readonly codeBlockStyle?: CodeBlockStyle
+  /** HTML tag names whose `<img>` children are kept inline instead of block. */
+  readonly keepInlineImagesIn?: Array<string>
+  /**
+   * Options for the HTML pre-processing pass applied before conversion begins.
+   *
+   * Pre-processing runs before the HTML is handed to the converter and can perform operations
+   * such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising
+   * vendor-specific markup. See [`PreprocessingOptions`] for the full set of knobs.
+   *
+   * Defaults to [`PreprocessingOptions::default()`], which enables the standard cleaning
+   * passes. Set individual fields on [`PreprocessingOptions`] (or construct via
+   * [`ConversionOptions::builder`]) to opt in or out of specific passes.
+   */
+  readonly preprocessing?: PreprocessingOptions
+  /** Expected character encoding of the input HTML (default `"utf-8"`). */
+  readonly encoding?: string
+  /** Emit debug information during conversion. */
+  readonly debug?: boolean
+  /** HTML tag names whose content is stripped from the output entirely. */
+  readonly stripTags?: Array<string>
+  /** HTML tag names that are preserved verbatim in the output. */
+  readonly preserveTags?: Array<string>
+  /** Skip conversion of `<img>` elements (omit images from output). */
+  readonly skipImages?: boolean
+  /** Link rendering style (inline or reference). */
+  readonly linkStyle?: LinkStyle
+  /** Target output format (Markdown, plain text, etc.). */
+  readonly outputFormat?: OutputFormat
+  /** Include structured document tree in result. */
+  readonly includeDocumentStructure?: boolean
+  /** Extract inline images from data URIs and SVGs. */
+  readonly extractImages?: boolean
+  /** Maximum decoded image size in bytes (default 5MB). */
+  readonly maxImageSize?: number
+  /** Capture SVG elements as images. */
+  readonly captureSvg?: boolean
+  /** Infer image dimensions from data. */
+  readonly inferDimensions?: boolean
+  /**
+   * Maximum DOM traversal depth. `None` means unlimited.
+   * When set, subtrees beyond this depth are silently truncated.
+   */
+  readonly maxDepth?: number
+  /**
+   * CSS selectors for elements to exclude entirely (element + all content).
+   *
+   * Unlike `strip_tags` (which removes the tag wrapper but keeps children),
+   * excluded elements and all their descendants are dropped from the output.
+   * Supports any CSS selector that `tl` supports: tag names, `.class`,
+   * `#id`, `[attribute]`, etc.
+   *
+   * Invalid selectors are silently skipped at conversion time.
+   *
+   * Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
+   */
+  readonly excludeSelectors?: Array<string>
+  /**
+   * Optional visitor for custom traversal logic.
+   *
+   * When set, the visitor's callbacks are invoked for matching HTML elements
+   * during conversion, allowing custom output, skipping, or HTML preservation.
+   * See `HtmlVisitor`.
+   */
+  readonly visitor?: VisitorHandle
 }
 
 /**
@@ -207,90 +207,90 @@ export interface ConversionOptions {
  * options from language-native types. Prefer [`ConversionOptionsBuilder`] for Rust code.
  */
 export interface ConversionOptionsUpdate {
-	/** Optional override for [`ConversionOptions::heading_style`]. */
-	readonly headingStyle?: HeadingStyle;
-	/** Optional override for [`ConversionOptions::list_indent_type`]. */
-	readonly listIndentType?: ListIndentType;
-	/** Optional override for [`ConversionOptions::list_indent_width`]. */
-	readonly listIndentWidth?: number;
-	/** Optional override for [`ConversionOptions::bullets`]. */
-	readonly bullets?: string;
-	/** Optional override for [`ConversionOptions::strong_em_symbol`]. */
-	readonly strongEmSymbol?: string;
-	/** Optional override for [`ConversionOptions::escape_asterisks`]. */
-	readonly escapeAsterisks?: boolean;
-	/** Optional override for [`ConversionOptions::escape_underscores`]. */
-	readonly escapeUnderscores?: boolean;
-	/** Optional override for [`ConversionOptions::escape_misc`]. */
-	readonly escapeMisc?: boolean;
-	/** Optional override for [`ConversionOptions::escape_ascii`]. */
-	readonly escapeAscii?: boolean;
-	/** Optional override for [`ConversionOptions::code_language`]. */
-	readonly codeLanguage?: string;
-	/** Optional override for [`ConversionOptions::autolinks`]. */
-	readonly autolinks?: boolean;
-	/** Optional override for [`ConversionOptions::default_title`]. */
-	readonly defaultTitle?: boolean;
-	/** Optional override for [`ConversionOptions::br_in_tables`]. */
-	readonly brInTables?: boolean;
-	/** Optional override for [`ConversionOptions::compact_tables`]. */
-	readonly compactTables?: boolean;
-	/** Optional override for [`ConversionOptions::highlight_style`]. */
-	readonly highlightStyle?: HighlightStyle;
-	/** Optional override for [`ConversionOptions::extract_metadata`]. */
-	readonly extractMetadata?: boolean;
-	/** Optional override for [`ConversionOptions::whitespace_mode`]. */
-	readonly whitespaceMode?: WhitespaceMode;
-	/** Optional override for [`ConversionOptions::strip_newlines`]. */
-	readonly stripNewlines?: boolean;
-	/** Optional override for [`ConversionOptions::wrap`]. */
-	readonly wrap?: boolean;
-	/** Optional override for [`ConversionOptions::wrap_width`]. */
-	readonly wrapWidth?: number;
-	/** Optional override for [`ConversionOptions::convert_as_inline`]. */
-	readonly convertAsInline?: boolean;
-	/** Optional override for [`ConversionOptions::sub_symbol`]. */
-	readonly subSymbol?: string;
-	/** Optional override for [`ConversionOptions::sup_symbol`]. */
-	readonly supSymbol?: string;
-	/** Optional override for [`ConversionOptions::newline_style`]. */
-	readonly newlineStyle?: NewlineStyle;
-	/** Optional override for [`ConversionOptions::code_block_style`]. */
-	readonly codeBlockStyle?: CodeBlockStyle;
-	/** Optional override for [`ConversionOptions::keep_inline_images_in`]. */
-	readonly keepInlineImagesIn?: Array<string>;
-	/** Optional override for [`ConversionOptions::preprocessing`]. */
-	readonly preprocessing?: PreprocessingOptionsUpdate;
-	/** Optional override for [`ConversionOptions::encoding`]. */
-	readonly encoding?: string;
-	/** Optional override for [`ConversionOptions::debug`]. */
-	readonly debug?: boolean;
-	/** Optional override for [`ConversionOptions::strip_tags`]. */
-	readonly stripTags?: Array<string>;
-	/** Optional override for [`ConversionOptions::preserve_tags`]. */
-	readonly preserveTags?: Array<string>;
-	/** Optional override for [`ConversionOptions::skip_images`]. */
-	readonly skipImages?: boolean;
-	/** Optional override for [`ConversionOptions::link_style`]. */
-	readonly linkStyle?: LinkStyle;
-	/** Optional override for [`ConversionOptions::output_format`]. */
-	readonly outputFormat?: OutputFormat;
-	/** Optional override for [`ConversionOptions::include_document_structure`]. */
-	readonly includeDocumentStructure?: boolean;
-	/** Optional override for [`ConversionOptions::extract_images`]. */
-	readonly extractImages?: boolean;
-	/** Optional override for [`ConversionOptions::max_image_size`]. */
-	readonly maxImageSize?: number;
-	/** Optional override for [`ConversionOptions::capture_svg`]. */
-	readonly captureSvg?: boolean;
-	/** Optional override for [`ConversionOptions::infer_dimensions`]. */
-	readonly inferDimensions?: boolean;
-	/** Optional override for [`ConversionOptions::max_depth`]. */
-	readonly maxDepth?: number | null;
-	/** Optional override for [`ConversionOptions::exclude_selectors`]. */
-	readonly excludeSelectors?: Array<string>;
-	/** Optional override for [`ConversionOptions::visitor`]. */
-	readonly visitor?: VisitorHandle;
+  /** Optional override for [`ConversionOptions::heading_style`]. */
+  readonly headingStyle?: HeadingStyle
+  /** Optional override for [`ConversionOptions::list_indent_type`]. */
+  readonly listIndentType?: ListIndentType
+  /** Optional override for [`ConversionOptions::list_indent_width`]. */
+  readonly listIndentWidth?: number
+  /** Optional override for [`ConversionOptions::bullets`]. */
+  readonly bullets?: string
+  /** Optional override for [`ConversionOptions::strong_em_symbol`]. */
+  readonly strongEmSymbol?: string
+  /** Optional override for [`ConversionOptions::escape_asterisks`]. */
+  readonly escapeAsterisks?: boolean
+  /** Optional override for [`ConversionOptions::escape_underscores`]. */
+  readonly escapeUnderscores?: boolean
+  /** Optional override for [`ConversionOptions::escape_misc`]. */
+  readonly escapeMisc?: boolean
+  /** Optional override for [`ConversionOptions::escape_ascii`]. */
+  readonly escapeAscii?: boolean
+  /** Optional override for [`ConversionOptions::code_language`]. */
+  readonly codeLanguage?: string
+  /** Optional override for [`ConversionOptions::autolinks`]. */
+  readonly autolinks?: boolean
+  /** Optional override for [`ConversionOptions::default_title`]. */
+  readonly defaultTitle?: boolean
+  /** Optional override for [`ConversionOptions::br_in_tables`]. */
+  readonly brInTables?: boolean
+  /** Optional override for [`ConversionOptions::compact_tables`]. */
+  readonly compactTables?: boolean
+  /** Optional override for [`ConversionOptions::highlight_style`]. */
+  readonly highlightStyle?: HighlightStyle
+  /** Optional override for [`ConversionOptions::extract_metadata`]. */
+  readonly extractMetadata?: boolean
+  /** Optional override for [`ConversionOptions::whitespace_mode`]. */
+  readonly whitespaceMode?: WhitespaceMode
+  /** Optional override for [`ConversionOptions::strip_newlines`]. */
+  readonly stripNewlines?: boolean
+  /** Optional override for [`ConversionOptions::wrap`]. */
+  readonly wrap?: boolean
+  /** Optional override for [`ConversionOptions::wrap_width`]. */
+  readonly wrapWidth?: number
+  /** Optional override for [`ConversionOptions::convert_as_inline`]. */
+  readonly convertAsInline?: boolean
+  /** Optional override for [`ConversionOptions::sub_symbol`]. */
+  readonly subSymbol?: string
+  /** Optional override for [`ConversionOptions::sup_symbol`]. */
+  readonly supSymbol?: string
+  /** Optional override for [`ConversionOptions::newline_style`]. */
+  readonly newlineStyle?: NewlineStyle
+  /** Optional override for [`ConversionOptions::code_block_style`]. */
+  readonly codeBlockStyle?: CodeBlockStyle
+  /** Optional override for [`ConversionOptions::keep_inline_images_in`]. */
+  readonly keepInlineImagesIn?: Array<string>
+  /** Optional override for [`ConversionOptions::preprocessing`]. */
+  readonly preprocessing?: PreprocessingOptionsUpdate
+  /** Optional override for [`ConversionOptions::encoding`]. */
+  readonly encoding?: string
+  /** Optional override for [`ConversionOptions::debug`]. */
+  readonly debug?: boolean
+  /** Optional override for [`ConversionOptions::strip_tags`]. */
+  readonly stripTags?: Array<string>
+  /** Optional override for [`ConversionOptions::preserve_tags`]. */
+  readonly preserveTags?: Array<string>
+  /** Optional override for [`ConversionOptions::skip_images`]. */
+  readonly skipImages?: boolean
+  /** Optional override for [`ConversionOptions::link_style`]. */
+  readonly linkStyle?: LinkStyle
+  /** Optional override for [`ConversionOptions::output_format`]. */
+  readonly outputFormat?: OutputFormat
+  /** Optional override for [`ConversionOptions::include_document_structure`]. */
+  readonly includeDocumentStructure?: boolean
+  /** Optional override for [`ConversionOptions::extract_images`]. */
+  readonly extractImages?: boolean
+  /** Optional override for [`ConversionOptions::max_image_size`]. */
+  readonly maxImageSize?: number
+  /** Optional override for [`ConversionOptions::capture_svg`]. */
+  readonly captureSvg?: boolean
+  /** Optional override for [`ConversionOptions::infer_dimensions`]. */
+  readonly inferDimensions?: boolean
+  /** Optional override for [`ConversionOptions::max_depth`]. */
+  readonly maxDepth?: number | null
+  /** Optional override for [`ConversionOptions::exclude_selectors`]. */
+  readonly excludeSelectors?: Array<string>
+  /** Optional override for [`ConversionOptions::visitor`]. */
+  readonly visitor?: VisitorHandle
 }
 
 /**
@@ -308,41 +308,41 @@ export interface ConversionOptionsUpdate {
  * ```typescript
  */
 export interface ConversionResult {
-	/**
-	 * Converted text output (markdown, djot, or plain text).
-	 *
-	 * `None` when `output_format` is set to `OutputFormat::None`,
-	 * indicating extraction-only mode.
-	 */
-	readonly content?: string;
-	/**
-	 * Structured document tree with semantic elements.
-	 *
-	 * Populated when `ConversionOptions::include_document_structure` is `true`. `None`
-	 * otherwise (the default), which avoids the overhead of building the tree.
-	 *
-	 * When present, the tree mirrors the converted document: headings open
-	 * `Group` sections, paragraphs and list items carry
-	 * inline `TextAnnotation`s, and tables reference the same
-	 * `TableGrid` data exposed in [`Self::tables`].
-	 *
-	 * Note: this field is independent of the `metadata` feature flag. Document structure
-	 * collection is always available at runtime; it is gated only by the runtime option, not
-	 * by a compile-time feature.
-	 */
-	readonly document?: DocumentStructure;
-	/** Extracted HTML metadata (title, OG, links, images, structured data). */
-	readonly metadata?: HtmlMetadata;
-	/** Extracted tables with structured cell data and markdown representation. */
-	readonly tables?: Array<TableData>;
-	/**
-	 * Extracted inline images (data URIs and SVGs).
-	 *
-	 * Populated when `extract_images` is `true` in options.
-	 */
-	readonly images?: Array<string>;
-	/** Non-fatal processing warnings. */
-	readonly warnings?: Array<ProcessingWarning>;
+  /**
+   * Converted text output (markdown, djot, or plain text).
+   *
+   * `None` when `output_format` is set to `OutputFormat::None`,
+   * indicating extraction-only mode.
+   */
+  readonly content?: string
+  /**
+   * Structured document tree with semantic elements.
+   *
+   * Populated when `ConversionOptions::include_document_structure` is `true`. `None`
+   * otherwise (the default), which avoids the overhead of building the tree.
+   *
+   * When present, the tree mirrors the converted document: headings open
+   * `Group` sections, paragraphs and list items carry
+   * inline `TextAnnotation`s, and tables reference the same
+   * `TableGrid` data exposed in [`Self::tables`].
+   *
+   * Note: this field is independent of the `metadata` feature flag. Document structure
+   * collection is always available at runtime; it is gated only by the runtime option, not
+   * by a compile-time feature.
+   */
+  readonly document?: DocumentStructure
+  /** Extracted HTML metadata (title, OG, links, images, structured data). */
+  readonly metadata?: HtmlMetadata
+  /** Extracted tables with structured cell data and markdown representation. */
+  readonly tables?: Array<TableData>
+  /**
+   * Extracted inline images (data URIs and SVGs).
+   *
+   * Populated when `extract_images` is `true` in options.
+   */
+  readonly images?: Array<string>
+  /** Non-fatal processing warnings. */
+  readonly warnings?: Array<ProcessingWarning>
 }
 
 /**
@@ -352,64 +352,64 @@ export interface ConversionResult {
  * and browsers for document indexing and presentation.
  */
 export interface DocumentMetadata {
-	/** Document title from `<title>` tag */
-	readonly title?: string;
-	/** Document description from `<meta name="description">` tag */
-	readonly description?: string;
-	/** Document keywords from `<meta name="keywords">` tag, split on commas */
-	readonly keywords?: Array<string>;
-	/** Document author from `<meta name="author">` tag */
-	readonly author?: string;
-	/** Canonical URL from `<link rel="canonical">` tag */
-	readonly canonicalUrl?: string;
-	/** Base URL from `<base href="">` tag for resolving relative URLs */
-	readonly baseHref?: string;
-	/** Document language from `lang` attribute */
-	readonly language?: string;
-	/** Document text direction from `dir` attribute */
-	readonly textDirection?: TextDirection;
-	/**
-	 * Open Graph metadata (og:* properties) for social media
-	 * Keys like "title", "description", "image", "url", etc.
-	 */
-	readonly openGraph?: Record<string, string>;
-	/**
-	 * Twitter Card metadata (twitter:* properties)
-	 * Keys like "card", "site", "creator", "title", "description", "image", etc.
-	 */
-	readonly twitterCard?: Record<string, string>;
-	/**
-	 * Additional meta tags not covered by specific fields
-	 * Keys are meta name/property attributes, values are content
-	 */
-	readonly metaTags?: Record<string, string>;
+  /** Document title from `<title>` tag */
+  readonly title?: string
+  /** Document description from `<meta name="description">` tag */
+  readonly description?: string
+  /** Document keywords from `<meta name="keywords">` tag, split on commas */
+  readonly keywords?: Array<string>
+  /** Document author from `<meta name="author">` tag */
+  readonly author?: string
+  /** Canonical URL from `<link rel="canonical">` tag */
+  readonly canonicalUrl?: string
+  /** Base URL from `<base href="">` tag for resolving relative URLs */
+  readonly baseHref?: string
+  /** Document language from `lang` attribute */
+  readonly language?: string
+  /** Document text direction from `dir` attribute */
+  readonly textDirection?: TextDirection
+  /**
+   * Open Graph metadata (og:* properties) for social media
+   * Keys like "title", "description", "image", "url", etc.
+   */
+  readonly openGraph?: Record<string, string>
+  /**
+   * Twitter Card metadata (twitter:* properties)
+   * Keys like "card", "site", "creator", "title", "description", "image", etc.
+   */
+  readonly twitterCard?: Record<string, string>
+  /**
+   * Additional meta tags not covered by specific fields
+   * Keys are meta name/property attributes, values are content
+   */
+  readonly metaTags?: Record<string, string>
 }
 
 /** A single node in the document tree. */
 export interface DocumentNode {
-	/** Deterministic node identifier. */
-	readonly id: string;
-	/** The semantic content of this node. */
-	readonly content: NodeContent;
-	/** Index of the parent node (None for root nodes). */
-	readonly parent?: number;
-	/** Indices of child nodes in reading order. */
-	readonly children: Array<number>;
-	/** Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. */
-	readonly annotations: Array<TextAnnotation>;
-	/**
-	 * Format-specific attributes preserved from the source HTML element.
-	 *
-	 * Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
-	 * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
-	 * no HTML entity decoding is applied here.
-	 *
-	 * The map is `None` when no attributes are present (omitted entirely in serialized output).
-	 * Not every HTML attribute is preserved: only attributes that carry semantic or structural
-	 * significance for the node type are collected. For example, heading nodes capture the `"id"`
-	 * attribute for anchor linking; other element-level attributes may be silently dropped.
-	 */
-	readonly attributes?: Record<string, string>;
+  /** Deterministic node identifier. */
+  readonly id: string
+  /** The semantic content of this node. */
+  readonly content: NodeContent
+  /** Index of the parent node (None for root nodes). */
+  readonly parent?: number
+  /** Indices of child nodes in reading order. */
+  readonly children: Array<number>
+  /** Inline formatting annotations (bold, italic, links, etc.) with byte offsets into the text. */
+  readonly annotations: Array<TextAnnotation>
+  /**
+   * Format-specific attributes preserved from the source HTML element.
+   *
+   * Keys are lowercased attribute names as they appear in the HTML (e.g. `"class"`, `"id"`,
+   * `"data-foo"`). Values are the raw attribute strings, copied verbatim from the source —
+   * no HTML entity decoding is applied here.
+   *
+   * The map is `None` when no attributes are present (omitted entirely in serialized output).
+   * Not every HTML attribute is preserved: only attributes that carry semantic or structural
+   * significance for the node type are collected. For example, heading nodes capture the `"id"`
+   * attribute for anchor linking; other element-level attributes may be silently dropped.
+   */
+  readonly attributes?: Record<string, string>
 }
 
 /**
@@ -418,26 +418,26 @@ export interface DocumentNode {
  * Uses a flat node array with index-based parent/child references for efficient traversal.
  */
 export interface DocumentStructure {
-	/** All nodes in document reading order. */
-	readonly nodes: Array<DocumentNode>;
-	/** The source format (always "html" for this crate). */
-	readonly sourceFormat?: string;
+  /** All nodes in document reading order. */
+  readonly nodes: Array<DocumentNode>
+  /** The source format (always "html" for this crate). */
+  readonly sourceFormat?: string
 }
 
 /** A single cell in a table grid. */
 export interface GridCell {
-	/** The text content of the cell. */
-	readonly content: string;
-	/** 0-indexed row position. */
-	readonly row: number;
-	/** 0-indexed column position. */
-	readonly col: number;
-	/** Number of rows this cell spans (default 1). */
-	readonly rowSpan: number;
-	/** Number of columns this cell spans (default 1). */
-	readonly colSpan: number;
-	/** Whether this is a header cell (`<th>`). */
-	readonly isHeader: boolean;
+  /** The text content of the cell. */
+  readonly content: string
+  /** 0-indexed row position. */
+  readonly row: number
+  /** 0-indexed column position. */
+  readonly col: number
+  /** Number of rows this cell spans (default 1). */
+  readonly rowSpan: number
+  /** Number of columns this cell spans (default 1). */
+  readonly colSpan: number
+  /** Whether this is a header cell (`<th>`). */
+  readonly isHeader: boolean
 }
 
 /**
@@ -447,16 +447,16 @@ export interface GridCell {
  * and position in the document structure.
  */
 export interface HeaderMetadata {
-	/** Header level: 1 (h1) through 6 (h6) */
-	readonly level: number;
-	/** Normalized text content of the header */
-	readonly text: string;
-	/** HTML id attribute if present */
-	readonly id?: string;
-	/** Document tree depth at the header element */
-	readonly depth: number;
-	/** Byte offset in original HTML document */
-	readonly htmlOffset: number;
+  /** Header level: 1 (h1) through 6 (h6) */
+  readonly level: number
+  /** Normalized text content of the header */
+  readonly text: string
+  /** HTML id attribute if present */
+  readonly id?: string
+  /** Document tree depth at the header element */
+  readonly depth: number
+  /** Byte offset in original HTML document */
+  readonly htmlOffset: number
 }
 
 /**
@@ -465,12 +465,12 @@ export interface HeaderMetadata {
  * Controls how headings (h1-h6) are rendered in the output Markdown.
  */
 export declare enum HeadingStyle {
-	/** Underlined style (=== for h1, --- for h2). */
-	Underlined = "Underlined",
-	/** ATX style (# for h1, ## for h2, etc.). Default. */
-	Atx = "Atx",
-	/** ATX closed style (# title #, with closing hashes). */
-	AtxClosed = "AtxClosed",
+  /** Underlined style (=== for h1, --- for h2). */
+  Underlined = "Underlined",
+  /** ATX style (# for h1, ## for h2, etc.). Default. */
+  Atx = "Atx",
+  /** ATX closed style (# title #, with closing hashes). */
+  AtxClosed = "AtxClosed",
 }
 
 /**
@@ -479,14 +479,14 @@ export declare enum HeadingStyle {
  * Controls how highlighted text is rendered in Markdown output.
  */
 export declare enum HighlightStyle {
-	/** Double equals syntax (==text==). Default. Pandoc-compatible. */
-	DoubleEqual = "DoubleEqual",
-	/** Preserve as HTML (==text==). Original HTML tag. */
-	Html = "Html",
-	/** Render as bold (**text**). Uses strong emphasis. */
-	Bold = "Bold",
-	/** Strip formatting, render as plain text. No markup. */
-	None = "None",
+  /** Double equals syntax (==text==). Default. Pandoc-compatible. */
+  DoubleEqual = "DoubleEqual",
+  /** Preserve as HTML (==text==). Original HTML tag. */
+  Html = "Html",
+  /** Render as bold (**text**). Uses strong emphasis. */
+  Bold = "Bold",
+  /** Strip formatting, render as plain text. No markup. */
+  None = "None",
 }
 
 /**
@@ -496,16 +496,16 @@ export declare enum HighlightStyle {
  * suitable for serialization and transmission across language boundaries.
  */
 export interface HtmlMetadata {
-	/** Document-level metadata (title, description, canonical, etc.) */
-	readonly document?: DocumentMetadata;
-	/** Extracted header elements with hierarchy */
-	readonly headers?: Array<HeaderMetadata>;
-	/** Extracted hyperlinks with type classification */
-	readonly links?: Array<LinkMetadata>;
-	/** Extracted images with source and dimensions */
-	readonly images?: Array<ImageMetadata>;
-	/** Extracted structured data blocks */
-	readonly structuredData?: Array<StructuredData>;
+  /** Document-level metadata (title, description, canonical, etc.) */
+  readonly document?: DocumentMetadata
+  /** Extracted header elements with hierarchy */
+  readonly headers?: Array<HeaderMetadata>
+  /** Extracted hyperlinks with type classification */
+  readonly links?: Array<LinkMetadata>
+  /** Extracted images with source and dimensions */
+  readonly images?: Array<ImageMetadata>
+  /** Extracted structured data blocks */
+  readonly structuredData?: Array<StructuredData>
 }
 
 /**
@@ -552,175 +552,170 @@ export interface HtmlMetadata {
  * - Avoid heavy computation in visitor methods; consider caching if needed
  */
 export interface HtmlVisitor {
-	/**
-	 * Visit text nodes (most frequent callback - ~100+ per document).
-	 * @param ctx - Node context (will have `node_type: NodeType::Text`)
-	 *
-	 * @param text - The raw text content (HTML entities already decoded)
-	 */
-	visitText?(ctx: NodeContext, text: string): VisitResult;
-	/**
-	 * Called before entering any element.
-	 *
-	 * This is the first callback invoked for every HTML element, allowing
-	 * visitors to implement generic element handling before tag-specific logic.
-	 */
-	visitElementStart?(ctx: NodeContext): VisitResult;
-	/**
-	 * Called after exiting any element.
-	 *
-	 * Receives the default markdown output that would be generated.
-	 * Visitors can inspect or replace this output.
-	 */
-	visitElementEnd?(ctx: NodeContext, output: string): VisitResult;
-	/**
-	 * Visit anchor links `<a href="...">`.
-	 * @param ctx - Node context with link element metadata
-	 *
-	 * @param href - The link URL (from `href` attribute)
-	 *
-	 * @param text - The link text content (already converted to markdown)
-	 *
-	 * @param title - Optional title attribute
-	 */
-	visitLink?(ctx: NodeContext, href: string, text: string, title?: string | undefined | null): VisitResult;
-	/**
-	 * Visit images `<img src="...">`.
-	 * @param ctx - Node context with image element metadata
-	 *
-	 * @param src - The image source URL
-	 *
-	 * @param alt - The alt text
-	 *
-	 * @param title - Optional title attribute
-	 */
-	visitImage?(ctx: NodeContext, src: string, alt: string, title?: string | undefined | null): VisitResult;
-	/**
-	 * Visit heading elements `<h1>` through `<h6>`.
-	 * @param ctx - Node context with heading metadata
-	 *
-	 * @param level - Heading level (1-6)
-	 *
-	 * @param text - The heading text content
-	 *
-	 * @param id - Optional id attribute (for anchor links)
-	 */
-	visitHeading?(ctx: NodeContext, level: number, text: string, id?: string | undefined | null): VisitResult;
-	/**
-	 * Visit code blocks `<pre><code>`.
-	 * @param ctx - Node context
-	 *
-	 * @param lang - Optional language specifier (from class attribute)
-	 *
-	 * @param code - The code content
-	 */
-	visitCodeBlock?(ctx: NodeContext, code: string, lang?: string | undefined | null): VisitResult;
-	/**
-	 * Visit inline code `<code>`.
-	 * @param ctx - Node context
-	 *
-	 * @param code - The code content
-	 */
-	visitCodeInline?(ctx: NodeContext, code: string): VisitResult;
-	/**
-	 * Visit list items `<li>`.
-	 * @param ctx - Node context
-	 *
-	 * @param ordered - Whether this is an ordered list item
-	 *
-	 * @param marker - The list marker (e.g., "-", "1.", "a)")
-	 *
-	 * @param text - The list item content (already converted)
-	 */
-	visitListItem?(ctx: NodeContext, ordered: boolean, marker: string, text: string): VisitResult;
-	/** Called before processing a list `<ul>` or `<ol>`. */
-	visitListStart?(ctx: NodeContext, ordered: boolean): VisitResult;
-	/** Called after processing a list `</ul>` or `</ol>`. */
-	visitListEnd?(ctx: NodeContext, ordered: boolean, output: string): VisitResult;
-	/** Called before processing a table `<table>`. */
-	visitTableStart?(ctx: NodeContext): VisitResult;
-	/**
-	 * Visit table rows `<tr>`.
-	 * @param ctx - Node context
-	 *
-	 * @param cells - Cell contents (already converted to markdown)
-	 *
-	 * @param is_header - Whether this row is in `<thead>`
-	 */
-	visitTableRow?(ctx: NodeContext, cells: Array<string>, isHeader: boolean): VisitResult;
-	/** Called after processing a table `</table>`. */
-	visitTableEnd?(ctx: NodeContext, output: string): VisitResult;
-	/**
-	 * Visit blockquote elements `<blockquote>`.
-	 * @param ctx - Node context
-	 *
-	 * @param content - The blockquote content (already converted)
-	 *
-	 * @param depth - Nesting depth (for nested blockquotes)
-	 */
-	visitBlockquote?(ctx: NodeContext, content: string, depth: number): VisitResult;
-	/** Visit strong/bold elements `<strong>`, `<b>`. */
-	visitStrong?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit emphasis/italic elements `<em>`, `<i>`. */
-	visitEmphasis?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit strikethrough elements `<s>`, `<del>`, `<strike>`. */
-	visitStrikethrough?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit underline elements `<u>`, `<ins>`. */
-	visitUnderline?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit subscript elements `<sub>`. */
-	visitSubscript?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit superscript elements `<sup>`. */
-	visitSuperscript?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit mark/highlight elements `<mark>`. */
-	visitMark?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit line break elements `<br>`. */
-	visitLineBreak?(ctx: NodeContext): VisitResult;
-	/** Visit horizontal rule elements `<hr>`. */
-	visitHorizontalRule?(ctx: NodeContext): VisitResult;
-	/**
-	 * Visit custom elements (web components) or unknown tags.
-	 * @param ctx - Node context
-	 *
-	 * @param tag_name - The custom element's tag name
-	 *
-	 * @param html - The raw HTML of this element
-	 */
-	visitCustomElement?(ctx: NodeContext, tagName: string, html: string): VisitResult;
-	/** Visit definition list `<dl>`. */
-	visitDefinitionListStart?(ctx: NodeContext): VisitResult;
-	/** Visit definition term `<dt>`. */
-	visitDefinitionTerm?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit definition description `<dd>`. */
-	visitDefinitionDescription?(ctx: NodeContext, text: string): VisitResult;
-	/** Called after processing a definition list `</dl>`. */
-	visitDefinitionListEnd?(ctx: NodeContext, output: string): VisitResult;
-	/** Visit form elements `<form>`. */
-	visitForm?(ctx: NodeContext, action?: string | undefined | null, method?: string | undefined | null): VisitResult;
-	/** Visit input elements `<input>`. */
-	visitInput?(
-		ctx: NodeContext,
-		inputType: string,
-		name?: string | undefined | null,
-		value?: string | undefined | null,
-	): VisitResult;
-	/** Visit button elements `<button>`. */
-	visitButton?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit audio elements `<audio>`. */
-	visitAudio?(ctx: NodeContext, src?: string | undefined | null): VisitResult;
-	/** Visit video elements `<video>`. */
-	visitVideo?(ctx: NodeContext, src?: string | undefined | null): VisitResult;
-	/** Visit iframe elements `<iframe>`. */
-	visitIframe?(ctx: NodeContext, src?: string | undefined | null): VisitResult;
-	/** Visit details elements `<details>`. */
-	visitDetails?(ctx: NodeContext, open: boolean): VisitResult;
-	/** Visit summary elements `<summary>`. */
-	visitSummary?(ctx: NodeContext, text: string): VisitResult;
-	/** Visit figure elements `<figure>`. */
-	visitFigureStart?(ctx: NodeContext): VisitResult;
-	/** Visit figcaption elements `<figcaption>`. */
-	visitFigcaption?(ctx: NodeContext, text: string): VisitResult;
-	/** Called after processing a figure `</figure>`. */
-	visitFigureEnd?(ctx: NodeContext, output: string): VisitResult;
+  /**
+   * Visit text nodes (most frequent callback - ~100+ per document).
+   * @param ctx - Node context (will have `node_type: NodeType::Text`)
+   *
+   * @param text - The raw text content (HTML entities already decoded)
+   */
+  visitText?(ctx: NodeContext, text: string): VisitResult
+  /**
+   * Called before entering any element.
+   *
+   * This is the first callback invoked for every HTML element, allowing
+   * visitors to implement generic element handling before tag-specific logic.
+   */
+  visitElementStart?(ctx: NodeContext): VisitResult
+  /**
+   * Called after exiting any element.
+   *
+   * Receives the default markdown output that would be generated.
+   * Visitors can inspect or replace this output.
+   */
+  visitElementEnd?(ctx: NodeContext, output: string): VisitResult
+  /**
+   * Visit anchor links `<a href="...">`.
+   * @param ctx - Node context with link element metadata
+   *
+   * @param href - The link URL (from `href` attribute)
+   *
+   * @param text - The link text content (already converted to markdown)
+   *
+   * @param title - Optional title attribute
+   */
+  visitLink?(ctx: NodeContext, href: string, text: string, title?: string | undefined | null): VisitResult
+  /**
+   * Visit images `<img src="...">`.
+   * @param ctx - Node context with image element metadata
+   *
+   * @param src - The image source URL
+   *
+   * @param alt - The alt text
+   *
+   * @param title - Optional title attribute
+   */
+  visitImage?(ctx: NodeContext, src: string, alt: string, title?: string | undefined | null): VisitResult
+  /**
+   * Visit heading elements `<h1>` through `<h6>`.
+   * @param ctx - Node context with heading metadata
+   *
+   * @param level - Heading level (1-6)
+   *
+   * @param text - The heading text content
+   *
+   * @param id - Optional id attribute (for anchor links)
+   */
+  visitHeading?(ctx: NodeContext, level: number, text: string, id?: string | undefined | null): VisitResult
+  /**
+   * Visit code blocks `<pre><code>`.
+   * @param ctx - Node context
+   *
+   * @param lang - Optional language specifier (from class attribute)
+   *
+   * @param code - The code content
+   */
+  visitCodeBlock?(ctx: NodeContext, code: string, lang?: string | undefined | null): VisitResult
+  /**
+   * Visit inline code `<code>`.
+   * @param ctx - Node context
+   *
+   * @param code - The code content
+   */
+  visitCodeInline?(ctx: NodeContext, code: string): VisitResult
+  /**
+   * Visit list items `<li>`.
+   * @param ctx - Node context
+   *
+   * @param ordered - Whether this is an ordered list item
+   *
+   * @param marker - The list marker (e.g., "-", "1.", "a)")
+   *
+   * @param text - The list item content (already converted)
+   */
+  visitListItem?(ctx: NodeContext, ordered: boolean, marker: string, text: string): VisitResult
+  /** Called before processing a list `<ul>` or `<ol>`. */
+  visitListStart?(ctx: NodeContext, ordered: boolean): VisitResult
+  /** Called after processing a list `</ul>` or `</ol>`. */
+  visitListEnd?(ctx: NodeContext, ordered: boolean, output: string): VisitResult
+  /** Called before processing a table `<table>`. */
+  visitTableStart?(ctx: NodeContext): VisitResult
+  /**
+   * Visit table rows `<tr>`.
+   * @param ctx - Node context
+   *
+   * @param cells - Cell contents (already converted to markdown)
+   *
+   * @param is_header - Whether this row is in `<thead>`
+   */
+  visitTableRow?(ctx: NodeContext, cells: Array<string>, isHeader: boolean): VisitResult
+  /** Called after processing a table `</table>`. */
+  visitTableEnd?(ctx: NodeContext, output: string): VisitResult
+  /**
+   * Visit blockquote elements `<blockquote>`.
+   * @param ctx - Node context
+   *
+   * @param content - The blockquote content (already converted)
+   *
+   * @param depth - Nesting depth (for nested blockquotes)
+   */
+  visitBlockquote?(ctx: NodeContext, content: string, depth: number): VisitResult
+  /** Visit strong/bold elements `<strong>`, `<b>`. */
+  visitStrong?(ctx: NodeContext, text: string): VisitResult
+  /** Visit emphasis/italic elements `<em>`, `<i>`. */
+  visitEmphasis?(ctx: NodeContext, text: string): VisitResult
+  /** Visit strikethrough elements `<s>`, `<del>`, `<strike>`. */
+  visitStrikethrough?(ctx: NodeContext, text: string): VisitResult
+  /** Visit underline elements `<u>`, `<ins>`. */
+  visitUnderline?(ctx: NodeContext, text: string): VisitResult
+  /** Visit subscript elements `<sub>`. */
+  visitSubscript?(ctx: NodeContext, text: string): VisitResult
+  /** Visit superscript elements `<sup>`. */
+  visitSuperscript?(ctx: NodeContext, text: string): VisitResult
+  /** Visit mark/highlight elements `<mark>`. */
+  visitMark?(ctx: NodeContext, text: string): VisitResult
+  /** Visit line break elements `<br>`. */
+  visitLineBreak?(ctx: NodeContext): VisitResult
+  /** Visit horizontal rule elements `<hr>`. */
+  visitHorizontalRule?(ctx: NodeContext): VisitResult
+  /**
+   * Visit custom elements (web components) or unknown tags.
+   * @param ctx - Node context
+   *
+   * @param tag_name - The custom element's tag name
+   *
+   * @param html - The raw HTML of this element
+   */
+  visitCustomElement?(ctx: NodeContext, tagName: string, html: string): VisitResult
+  /** Visit definition list `<dl>`. */
+  visitDefinitionListStart?(ctx: NodeContext): VisitResult
+  /** Visit definition term `<dt>`. */
+  visitDefinitionTerm?(ctx: NodeContext, text: string): VisitResult
+  /** Visit definition description `<dd>`. */
+  visitDefinitionDescription?(ctx: NodeContext, text: string): VisitResult
+  /** Called after processing a definition list `</dl>`. */
+  visitDefinitionListEnd?(ctx: NodeContext, output: string): VisitResult
+  /** Visit form elements `<form>`. */
+  visitForm?(ctx: NodeContext, action?: string | undefined | null, method?: string | undefined | null): VisitResult
+  /** Visit input elements `<input>`. */
+  visitInput?(ctx: NodeContext, inputType: string, name?: string | undefined | null, value?: string | undefined | null): VisitResult
+  /** Visit button elements `<button>`. */
+  visitButton?(ctx: NodeContext, text: string): VisitResult
+  /** Visit audio elements `<audio>`. */
+  visitAudio?(ctx: NodeContext, src?: string | undefined | null): VisitResult
+  /** Visit video elements `<video>`. */
+  visitVideo?(ctx: NodeContext, src?: string | undefined | null): VisitResult
+  /** Visit iframe elements `<iframe>`. */
+  visitIframe?(ctx: NodeContext, src?: string | undefined | null): VisitResult
+  /** Visit details elements `<details>`. */
+  visitDetails?(ctx: NodeContext, open: boolean): VisitResult
+  /** Visit summary elements `<summary>`. */
+  visitSummary?(ctx: NodeContext, text: string): VisitResult
+  /** Visit figure elements `<figure>`. */
+  visitFigureStart?(ctx: NodeContext): VisitResult
+  /** Visit figcaption elements `<figcaption>`. */
+  visitFigcaption?(ctx: NodeContext, text: string): VisitResult
+  /** Called after processing a figure `</figure>`. */
+  visitFigureEnd?(ctx: NodeContext, output: string): VisitResult
 }
 
 /**
@@ -730,18 +725,18 @@ export interface HtmlVisitor {
  * for image analysis and optimization.
  */
 export interface ImageMetadata {
-	/** Image source (URL, data URI, or SVG content identifier) */
-	readonly src: string;
-	/** Alternative text from alt attribute (for accessibility) */
-	readonly alt?: string;
-	/** Title attribute (often shown as tooltip) */
-	readonly title?: string;
-	/** Image dimensions as (width, height) if available */
-	readonly dimensions?: Array<number>;
-	/** Image type classification */
-	readonly imageType: ImageType;
-	/** Additional HTML attributes */
-	readonly attributes: Record<string, string>;
+  /** Image source (URL, data URI, or SVG content identifier) */
+  readonly src: string
+  /** Alternative text from alt attribute (for accessibility) */
+  readonly alt?: string
+  /** Title attribute (often shown as tooltip) */
+  readonly title?: string
+  /** Image dimensions as (width, height) if available */
+  readonly dimensions?: Array<number>
+  /** Image type classification */
+  readonly imageType: ImageType
+  /** Additional HTML attributes */
+  readonly attributes: Record<string, string>
 }
 
 /**
@@ -750,14 +745,14 @@ export interface ImageMetadata {
  * Determines whether an image is embedded (data URI), inline SVG, external, or relative.
  */
 export declare enum ImageType {
-	/** Data URI embedded image (base64 or other encoding) */
-	DataUri = "data_uri",
-	/** Inline SVG element */
-	InlineSvg = "inline_svg",
-	/** External image URL (http/https) */
-	External = "external",
-	/** Relative image path */
-	Relative = "relative",
+  /** Data URI embedded image (base64 or other encoding) */
+  DataUri = "data_uri",
+  /** Inline SVG element */
+  InlineSvg = "inline_svg",
+  /** External image URL (http/https) */
+  External = "external",
+  /** Relative image path */
+  Relative = "relative",
 }
 
 /**
@@ -766,18 +761,18 @@ export declare enum ImageType {
  * Represents `<a>` elements with parsed href values, text content, and link type classification.
  */
 export interface LinkMetadata {
-	/** The href URL value */
-	readonly href: string;
-	/** Link text content (normalized, concatenated if mixed with elements) */
-	readonly text: string;
-	/** Optional title attribute (often shown as tooltip) */
-	readonly title?: string;
-	/** Link type classification */
-	readonly linkType: LinkType;
-	/** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
-	readonly rel: Array<string>;
-	/** Additional HTML attributes */
-	readonly attributes: Record<string, string>;
+  /** The href URL value */
+  readonly href: string
+  /** Link text content (normalized, concatenated if mixed with elements) */
+  readonly text: string
+  /** Optional title attribute (often shown as tooltip) */
+  readonly title?: string
+  /** Link type classification */
+  readonly linkType: LinkType
+  /** Rel attribute values (e.g., "nofollow", "stylesheet", "canonical") */
+  readonly rel: Array<string>
+  /** Additional HTML attributes */
+  readonly attributes: Record<string, string>
 }
 
 /**
@@ -787,10 +782,10 @@ export interface LinkMetadata {
  * reference-style `[text][1]` syntax with definitions collected at the end.
  */
 export declare enum LinkStyle {
-	/** Inline links: `[text](url)`. Default. */
-	Inline = "Inline",
-	/** Reference-style links: `[text][1]` with `[1]: url` at end of document. */
-	Reference = "Reference",
+  /** Inline links: `[text](url)`. Default. */
+  Inline = "Inline",
+  /** Reference-style links: `[text][1]` with `[1]: url` at end of document. */
+  Reference = "Reference",
 }
 
 /**
@@ -799,18 +794,18 @@ export declare enum LinkStyle {
  * Used to categorize links during extraction for filtering and analysis.
  */
 export declare enum LinkType {
-	/** Anchor link within same document (href starts with #) */
-	Anchor = "anchor",
-	/** Internal link within same domain */
-	Internal = "internal",
-	/** External link to different domain */
-	External = "external",
-	/** Email link (mailto:) */
-	Email = "email",
-	/** Phone link (tel:) */
-	Phone = "phone",
-	/** Other protocol or unclassifiable */
-	Other = "other",
+  /** Anchor link within same document (href starts with #) */
+  Anchor = "anchor",
+  /** Internal link within same domain */
+  Internal = "internal",
+  /** External link to different domain */
+  External = "external",
+  /** Email link (mailto:) */
+  Email = "email",
+  /** Phone link (tel:) */
+  Phone = "phone",
+  /** Other protocol or unclassifiable */
+  Other = "other",
 }
 
 /**
@@ -819,10 +814,10 @@ export declare enum LinkType {
  * Controls whether list items are indented with spaces or tabs.
  */
 export declare enum ListIndentType {
-	/** Use spaces for indentation. Default. Width controlled by `list_indent_width`. */
-	Spaces = "Spaces",
-	/** Use tabs for indentation. */
-	Tabs = "Tabs",
+  /** Use spaces for indentation. Default. Width controlled by `list_indent_width`. */
+  Spaces = "Spaces",
+  /** Use tabs for indentation. */
+  Tabs = "Tabs",
 }
 
 /**
@@ -831,10 +826,10 @@ export declare enum ListIndentType {
  * Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
  */
 export declare enum NewlineStyle {
-	/** Two trailing spaces at end of line. Default. Standard Markdown syntax. */
-	Spaces = "Spaces",
-	/** Backslash at end of line. Alternative Markdown syntax. */
-	Backslash = "Backslash",
+  /** Two trailing spaces at end of line. Default. Standard Markdown syntax. */
+  Spaces = "Spaces",
+  /** Backslash at end of line. Alternative Markdown syntax. */
+  Backslash = "Backslash",
 }
 
 /**
@@ -843,19 +838,19 @@ export declare enum NewlineStyle {
  * Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
  */
 export type NodeContent =
-	| { node_type: "heading"; level: number; text: string }
-	| { node_type: "paragraph"; text: string }
-	| { node_type: "list"; ordered: boolean }
-	| { node_type: "list_item"; text: string }
-	| { node_type: "table"; grid: TableGrid }
-	| { node_type: "image"; description: string; src: string; imageIndex: number }
-	| { node_type: "code"; text: string; language: string }
-	| { node_type: "quote" }
-	| { node_type: "definition_list" }
-	| { node_type: "definition_item"; term: string; definition: string }
-	| { node_type: "raw_block"; format: string; content: string }
-	| { node_type: "metadata_block"; entries: Array<Array<string>> }
-	| { node_type: "group"; label: string; headingLevel: number; headingText: string };
+  | { node_type: 'heading'; level: number; text: string }
+  | { node_type: 'paragraph'; text: string }
+  | { node_type: 'list'; ordered: boolean }
+  | { node_type: 'list_item'; text: string }
+  | { node_type: 'table'; grid: TableGrid }
+  | { node_type: 'image'; description: string; src: string; imageIndex: number }
+  | { node_type: 'code'; text: string; language: string }
+  | { node_type: 'quote' }
+  | { node_type: 'definition_list' }
+  | { node_type: 'definition_item'; term: string; definition: string }
+  | { node_type: 'raw_block'; format: string; content: string }
+  | { node_type: 'metadata_block'; entries: Array<Array<string>> }
+  | { node_type: 'group'; label: string; headingLevel: number; headingText: string }
 
 /**
  * Context information passed to all visitor methods.
@@ -864,20 +859,20 @@ export type NodeContent =
  * including its type, attributes, position in the DOM tree, and parent context.
  */
 export interface NodeContext {
-	/** Coarse-grained node type classification */
-	readonly nodeType: NodeType;
-	/** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
-	readonly tagName: string;
-	/** All HTML attributes as key-value pairs */
-	readonly attributes: Record<string, string>;
-	/** Depth in the DOM tree (0 = root) */
-	readonly depth: number;
-	/** Index among siblings (0-based) */
-	readonly indexInParent: number;
-	/** Parent element's tag name (None if root) */
-	readonly parentTag?: string;
-	/** Whether this element is treated as inline vs block */
-	readonly isInline: boolean;
+  /** Coarse-grained node type classification */
+  readonly nodeType: NodeType
+  /** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
+  readonly tagName: string
+  /** All HTML attributes as key-value pairs */
+  readonly attributes: Record<string, string>
+  /** Depth in the DOM tree (0 = root) */
+  readonly depth: number
+  /** Index among siblings (0-based) */
+  readonly indexInParent: number
+  /** Parent element's tag name (None if root) */
+  readonly parentTag?: string
+  /** Whether this element is treated as inline vs block */
+  readonly isInline: boolean
 }
 
 /**
@@ -887,182 +882,182 @@ export interface NodeContext {
  * providing a coarse-grained classification for visitor dispatch.
  */
 export declare enum NodeType {
-	/** Text node (most frequent - 100+ per document) */
-	Text = "Text",
-	/** Generic element node */
-	Element = "Element",
-	/** Heading elements (h1-h6) */
-	Heading = "Heading",
-	/** Paragraph element */
-	Paragraph = "Paragraph",
-	/** Generic div container */
-	Div = "Div",
-	/** Blockquote element */
-	Blockquote = "Blockquote",
-	/** Preformatted text block */
-	Pre = "Pre",
-	/** Horizontal rule */
-	Hr = "Hr",
-	/** Ordered or unordered list (ul, ol) */
-	List = "List",
-	/** List item (li) */
-	ListItem = "ListItem",
-	/** Definition list (dl) */
-	DefinitionList = "DefinitionList",
-	/** Definition term (dt) */
-	DefinitionTerm = "DefinitionTerm",
-	/** Definition description (dd) */
-	DefinitionDescription = "DefinitionDescription",
-	/** Table element */
-	Table = "Table",
-	/** Table row (tr) */
-	TableRow = "TableRow",
-	/** Table cell (td, th) */
-	TableCell = "TableCell",
-	/** Table header cell (th) */
-	TableHeader = "TableHeader",
-	/** Table body (tbody) */
-	TableBody = "TableBody",
-	/** Table head (thead) */
-	TableHead = "TableHead",
-	/** Table foot (tfoot) */
-	TableFoot = "TableFoot",
-	/** Anchor link (a) */
-	Link = "Link",
-	/** Image (img) */
-	Image = "Image",
-	/** Strong/bold (strong, b) */
-	Strong = "Strong",
-	/** Emphasis/italic (em, i) */
-	Em = "Em",
-	/** Inline code (code) */
-	Code = "Code",
-	/** Strikethrough (s, del, strike) */
-	Strikethrough = "Strikethrough",
-	/** Underline (u, ins) */
-	Underline = "Underline",
-	/** Subscript (sub) */
-	Subscript = "Subscript",
-	/** Superscript (sup) */
-	Superscript = "Superscript",
-	/** Mark/highlight (mark) */
-	Mark = "Mark",
-	/** Small text (small) */
-	Small = "Small",
-	/** Line break (br) */
-	Br = "Br",
-	/** Span element */
-	Span = "Span",
-	/** Article element */
-	Article = "Article",
-	/** Section element */
-	Section = "Section",
-	/** Navigation element */
-	Nav = "Nav",
-	/** Aside element */
-	Aside = "Aside",
-	/** Header element */
-	Header = "Header",
-	/** Footer element */
-	Footer = "Footer",
-	/** Main element */
-	Main = "Main",
-	/** Figure element */
-	Figure = "Figure",
-	/** Figure caption */
-	Figcaption = "Figcaption",
-	/** Time element */
-	Time = "Time",
-	/** Details element */
-	Details = "Details",
-	/** Summary element */
-	Summary = "Summary",
-	/** Form element */
-	Form = "Form",
-	/** Input element */
-	Input = "Input",
-	/** Select element */
-	Select = "Select",
-	/** Option element */
-	Option = "Option",
-	/** Button element */
-	Button = "Button",
-	/** Textarea element */
-	Textarea = "Textarea",
-	/** Label element */
-	Label = "Label",
-	/** Fieldset element */
-	Fieldset = "Fieldset",
-	/** Legend element */
-	Legend = "Legend",
-	/** Audio element */
-	Audio = "Audio",
-	/** Video element */
-	Video = "Video",
-	/** Picture element */
-	Picture = "Picture",
-	/** Source element */
-	Source = "Source",
-	/** Iframe element */
-	Iframe = "Iframe",
-	/** SVG element */
-	Svg = "Svg",
-	/** Canvas element */
-	Canvas = "Canvas",
-	/** Ruby annotation */
-	Ruby = "Ruby",
-	/** Ruby text */
-	Rt = "Rt",
-	/** Ruby parenthesis */
-	Rp = "Rp",
-	/** Abbreviation */
-	Abbr = "Abbr",
-	/** Keyboard input */
-	Kbd = "Kbd",
-	/** Sample output */
-	Samp = "Samp",
-	/** Variable */
-	Var = "Var",
-	/** Citation */
-	Cite = "Cite",
-	/** Quote */
-	Q = "Q",
-	/** Deleted text */
-	Del = "Del",
-	/** Inserted text */
-	Ins = "Ins",
-	/** Data element */
-	Data = "Data",
-	/** Meter element */
-	Meter = "Meter",
-	/** Progress element */
-	Progress = "Progress",
-	/** Output element */
-	Output = "Output",
-	/** Template element */
-	Template = "Template",
-	/** Slot element */
-	Slot = "Slot",
-	/** HTML root element */
-	Html = "Html",
-	/** Head element */
-	Head = "Head",
-	/** Body element */
-	Body = "Body",
-	/** Title element */
-	Title = "Title",
-	/** Meta element */
-	Meta = "Meta",
-	/** Link element (not anchor) */
-	LinkTag = "LinkTag",
-	/** Style element */
-	Style = "Style",
-	/** Script element */
-	Script = "Script",
-	/** Base element */
-	Base = "Base",
-	/** Custom element (web components) or unknown tag */
-	Custom = "Custom",
+  /** Text node (most frequent - 100+ per document) */
+  Text = "Text",
+  /** Generic element node */
+  Element = "Element",
+  /** Heading elements (h1-h6) */
+  Heading = "Heading",
+  /** Paragraph element */
+  Paragraph = "Paragraph",
+  /** Generic div container */
+  Div = "Div",
+  /** Blockquote element */
+  Blockquote = "Blockquote",
+  /** Preformatted text block */
+  Pre = "Pre",
+  /** Horizontal rule */
+  Hr = "Hr",
+  /** Ordered or unordered list (ul, ol) */
+  List = "List",
+  /** List item (li) */
+  ListItem = "ListItem",
+  /** Definition list (dl) */
+  DefinitionList = "DefinitionList",
+  /** Definition term (dt) */
+  DefinitionTerm = "DefinitionTerm",
+  /** Definition description (dd) */
+  DefinitionDescription = "DefinitionDescription",
+  /** Table element */
+  Table = "Table",
+  /** Table row (tr) */
+  TableRow = "TableRow",
+  /** Table cell (td, th) */
+  TableCell = "TableCell",
+  /** Table header cell (th) */
+  TableHeader = "TableHeader",
+  /** Table body (tbody) */
+  TableBody = "TableBody",
+  /** Table head (thead) */
+  TableHead = "TableHead",
+  /** Table foot (tfoot) */
+  TableFoot = "TableFoot",
+  /** Anchor link (a) */
+  Link = "Link",
+  /** Image (img) */
+  Image = "Image",
+  /** Strong/bold (strong, b) */
+  Strong = "Strong",
+  /** Emphasis/italic (em, i) */
+  Em = "Em",
+  /** Inline code (code) */
+  Code = "Code",
+  /** Strikethrough (s, del, strike) */
+  Strikethrough = "Strikethrough",
+  /** Underline (u, ins) */
+  Underline = "Underline",
+  /** Subscript (sub) */
+  Subscript = "Subscript",
+  /** Superscript (sup) */
+  Superscript = "Superscript",
+  /** Mark/highlight (mark) */
+  Mark = "Mark",
+  /** Small text (small) */
+  Small = "Small",
+  /** Line break (br) */
+  Br = "Br",
+  /** Span element */
+  Span = "Span",
+  /** Article element */
+  Article = "Article",
+  /** Section element */
+  Section = "Section",
+  /** Navigation element */
+  Nav = "Nav",
+  /** Aside element */
+  Aside = "Aside",
+  /** Header element */
+  Header = "Header",
+  /** Footer element */
+  Footer = "Footer",
+  /** Main element */
+  Main = "Main",
+  /** Figure element */
+  Figure = "Figure",
+  /** Figure caption */
+  Figcaption = "Figcaption",
+  /** Time element */
+  Time = "Time",
+  /** Details element */
+  Details = "Details",
+  /** Summary element */
+  Summary = "Summary",
+  /** Form element */
+  Form = "Form",
+  /** Input element */
+  Input = "Input",
+  /** Select element */
+  Select = "Select",
+  /** Option element */
+  Option = "Option",
+  /** Button element */
+  Button = "Button",
+  /** Textarea element */
+  Textarea = "Textarea",
+  /** Label element */
+  Label = "Label",
+  /** Fieldset element */
+  Fieldset = "Fieldset",
+  /** Legend element */
+  Legend = "Legend",
+  /** Audio element */
+  Audio = "Audio",
+  /** Video element */
+  Video = "Video",
+  /** Picture element */
+  Picture = "Picture",
+  /** Source element */
+  Source = "Source",
+  /** Iframe element */
+  Iframe = "Iframe",
+  /** SVG element */
+  Svg = "Svg",
+  /** Canvas element */
+  Canvas = "Canvas",
+  /** Ruby annotation */
+  Ruby = "Ruby",
+  /** Ruby text */
+  Rt = "Rt",
+  /** Ruby parenthesis */
+  Rp = "Rp",
+  /** Abbreviation */
+  Abbr = "Abbr",
+  /** Keyboard input */
+  Kbd = "Kbd",
+  /** Sample output */
+  Samp = "Samp",
+  /** Variable */
+  Var = "Var",
+  /** Citation */
+  Cite = "Cite",
+  /** Quote */
+  Q = "Q",
+  /** Deleted text */
+  Del = "Del",
+  /** Inserted text */
+  Ins = "Ins",
+  /** Data element */
+  Data = "Data",
+  /** Meter element */
+  Meter = "Meter",
+  /** Progress element */
+  Progress = "Progress",
+  /** Output element */
+  Output = "Output",
+  /** Template element */
+  Template = "Template",
+  /** Slot element */
+  Slot = "Slot",
+  /** HTML root element */
+  Html = "Html",
+  /** Head element */
+  Head = "Head",
+  /** Body element */
+  Body = "Body",
+  /** Title element */
+  Title = "Title",
+  /** Meta element */
+  Meta = "Meta",
+  /** Link element (not anchor) */
+  LinkTag = "LinkTag",
+  /** Style element */
+  Style = "Style",
+  /** Script element */
+  Script = "Script",
+  /** Base element */
+  Base = "Base",
+  /** Custom element (web components) or unknown tag */
+  Custom = "Custom",
 }
 
 /**
@@ -1071,24 +1066,24 @@ export declare enum NodeType {
  * Specifies the target markup language format for the conversion output.
  */
 export declare enum OutputFormat {
-	/** Standard Markdown (CommonMark compatible). Default. */
-	Markdown = "Markdown",
-	/** Djot lightweight markup language. */
-	Djot = "Djot",
-	/** Plain text output (no markup, visible text only). */
-	Plain = "Plain",
+  /** Standard Markdown (CommonMark compatible). Default. */
+  Markdown = "Markdown",
+  /** Djot lightweight markup language. */
+  Djot = "Djot",
+  /** Plain text output (no markup, visible text only). */
+  Plain = "Plain",
 }
 
 /** HTML preprocessing options for document cleanup before conversion. */
 export interface PreprocessingOptions {
-	/** Enable HTML preprocessing globally */
-	readonly enabled?: boolean;
-	/** Preprocessing preset level (Minimal, Standard, Aggressive) */
-	readonly preset?: PreprocessingPreset;
-	/** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
-	readonly removeNavigation?: boolean;
-	/** Remove form elements (forms, inputs, buttons, etc.) */
-	readonly removeForms?: boolean;
+  /** Enable HTML preprocessing globally */
+  readonly enabled?: boolean
+  /** Preprocessing preset level (Minimal, Standard, Aggressive) */
+  readonly preset?: PreprocessingPreset
+  /** Remove navigation elements (nav, breadcrumbs, menus, sidebars) */
+  readonly removeNavigation?: boolean
+  /** Remove form elements (forms, inputs, buttons, etc.) */
+  readonly removeForms?: boolean
 }
 
 /**
@@ -1099,14 +1094,14 @@ export interface PreprocessingOptions {
  * corresponding fields unchanged when applied via [`PreprocessingOptions::apply_update`].
  */
 export interface PreprocessingOptionsUpdate {
-	/** Optional global preprocessing enablement override */
-	readonly enabled?: boolean;
-	/** Optional preprocessing preset level override (Minimal, Standard, Aggressive) */
-	readonly preset?: PreprocessingPreset;
-	/** Optional navigation element removal override (nav, breadcrumbs, menus, sidebars) */
-	readonly removeNavigation?: boolean;
-	/** Optional form element removal override (forms, inputs, buttons, etc.) */
-	readonly removeForms?: boolean;
+  /** Optional global preprocessing enablement override */
+  readonly enabled?: boolean
+  /** Optional preprocessing preset level override (Minimal, Standard, Aggressive) */
+  readonly preset?: PreprocessingPreset
+  /** Optional navigation element removal override (nav, breadcrumbs, menus, sidebars) */
+  readonly removeNavigation?: boolean
+  /** Optional form element removal override (forms, inputs, buttons, etc.) */
+  readonly removeForms?: boolean
 }
 
 /**
@@ -1115,12 +1110,12 @@ export interface PreprocessingOptionsUpdate {
  * Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
  */
 export declare enum PreprocessingPreset {
-	/** Minimal cleanup. Remove only essential noise (scripts, styles). */
-	Minimal = "Minimal",
-	/** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
-	Standard = "Standard",
-	/** Aggressive cleanup. Remove extensive non-content elements and structure. */
-	Aggressive = "Aggressive",
+  /** Minimal cleanup. Remove only essential noise (scripts, styles). */
+  Minimal = "Minimal",
+  /** Standard cleanup. Default. Removes navigation, forms, and other auxiliary content. */
+  Standard = "Standard",
+  /** Aggressive cleanup. Remove extensive non-content elements and structure. */
+  Aggressive = "Aggressive",
 }
 
 /**
@@ -1141,10 +1136,10 @@ export declare enum PreprocessingPreset {
  * See [`WarningKind`] for the full taxonomy of warning categories.
  */
 export interface ProcessingWarning {
-	/** Human-readable warning message. */
-	readonly message: string;
-	/** The category of warning. */
-	readonly kind: WarningKind;
+  /** Human-readable warning message. */
+  readonly message: string
+  /** The category of warning. */
+  readonly kind: WarningKind
 }
 
 /**
@@ -1154,12 +1149,12 @@ export interface ProcessingWarning {
  * JSON-LD blocks are collected as raw JSON strings for flexibility.
  */
 export interface StructuredData {
-	/** Type of structured data (JSON-LD, Microdata, RDFa) */
-	readonly dataType: StructuredDataType;
-	/** Raw JSON string (for JSON-LD) or serialized representation */
-	readonly rawJson: string;
-	/** Schema type if detectable (e.g., "Article", "Event", "Product") */
-	readonly schemaType?: string;
+  /** Type of structured data (JSON-LD, Microdata, RDFa) */
+  readonly dataType: StructuredDataType
+  /** Raw JSON string (for JSON-LD) or serialized representation */
+  readonly rawJson: string
+  /** Schema type if detectable (e.g., "Article", "Event", "Product") */
+  readonly schemaType?: string
 }
 
 /**
@@ -1168,45 +1163,45 @@ export interface StructuredData {
  * Identifies the schema/format used for structured data markup.
  */
 export declare enum StructuredDataType {
-	/** JSON-LD (JSON for Linking Data) script blocks */
-	JsonLd = "json_ld",
-	/** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
-	Microdata = "microdata",
-	/** RDF in Attributes (RDFa) markup */
-	RDFa = "rdfa",
+  /** JSON-LD (JSON for Linking Data) script blocks */
+  JsonLd = "json_ld",
+  /** HTML5 Microdata attributes (itemscope, itemtype, itemprop) */
+  Microdata = "microdata",
+  /** RDF in Attributes (RDFa) markup */
+  RDFa = "rdfa",
 }
 
 /** A top-level extracted table with both structured data and markdown representation. */
 export interface TableData {
-	/** The structured table grid. */
-	readonly grid: TableGrid;
-	/** The markdown rendering of this table. */
-	readonly markdown: string;
+  /** The structured table grid. */
+  readonly grid: TableGrid
+  /** The markdown rendering of this table. */
+  readonly markdown: string
 }
 
 /** A structured table grid with cell-level data including spans. */
 export interface TableGrid {
-	/** Number of rows. */
-	readonly rows?: number;
-	/** Number of columns. */
-	readonly cols?: number;
-	/**
-	 * All cells in the table as a flat, sparse list.
-	 *
-	 * The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
-	 * that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
-	 * in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
-	 * and `col_span` fields set accordingly.
-	 *
-	 * To reconstruct the full visual grid, iterate over all cells and mark the rectangular
-	 * region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
-	 * `(row, col)` position that is not the origin of any cell is covered by a span from an
-	 * earlier cell.
-	 *
-	 * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
-	 * produces an empty vec.
-	 */
-	readonly cells?: Array<GridCell>;
+  /** Number of rows. */
+  readonly rows?: number
+  /** Number of columns. */
+  readonly cols?: number
+  /**
+   * All cells in the table as a flat, sparse list.
+   *
+   * The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells
+   * that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear
+   * in the list. Only the top-left "origin" cell of a span is present, with its `row_span`
+   * and `col_span` fields set accordingly.
+   *
+   * To reconstruct the full visual grid, iterate over all cells and mark the rectangular
+   * region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any
+   * `(row, col)` position that is not the origin of any cell is covered by a span from an
+   * earlier cell.
+   *
+   * The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 || cols == 0`)
+   * produces an empty vec.
+   */
+  readonly cells?: Array<GridCell>
 }
 
 /**
@@ -1226,12 +1221,12 @@ export interface TableGrid {
  * See [`AnnotationKind`] for the full list of supported annotation types.
  */
 export interface TextAnnotation {
-	/** Start byte offset (inclusive) into the parent node's text. */
-	readonly start: number;
-	/** End byte offset (exclusive) into the parent node's text. */
-	readonly end: number;
-	/** The type of annotation. */
-	readonly kind: AnnotationKind;
+  /** Start byte offset (inclusive) into the parent node's text. */
+  readonly start: number
+  /** End byte offset (exclusive) into the parent node's text. */
+  readonly end: number
+  /** The type of annotation. */
+  readonly kind: AnnotationKind
 }
 
 /**
@@ -1240,12 +1235,12 @@ export interface TextAnnotation {
  * Corresponds to the HTML `dir` attribute and `bdi` element directionality.
  */
 export declare enum TextDirection {
-	/** Left-to-right text flow (default for Latin scripts) */
-	LeftToRight = "ltr",
-	/** Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) */
-	RightToLeft = "rtl",
-	/** Automatic directionality detection */
-	Auto = "auto",
+  /** Left-to-right text flow (default for Latin scripts) */
+  LeftToRight = "ltr",
+  /** Right-to-left text flow (Hebrew, Arabic, Urdu, etc.) */
+  RightToLeft = "rtl",
+  /** Automatic directionality detection */
+  Auto = "auto",
 }
 
 /**
@@ -1256,7 +1251,8 @@ export declare enum TextDirection {
  * The handle may be cloned and shared across threads without additional
  * synchronisation on the caller's side.
  */
-export declare class VisitorHandle {}
+export declare class VisitorHandle {
+}
 
 /**
  * Result of a visitor callback.
@@ -1266,49 +1262,49 @@ export declare class VisitorHandle {}
  * preserving HTML, or signaling errors.
  */
 export declare enum VisitResult {
-	/** Continue with default conversion behavior */
-	Continue = "Continue",
-	/**
-	 * Replace default output with custom markdown
-	 *
-	 * The visitor takes full responsibility for the markdown output
-	 * of this node and its children.
-	 */
-	Custom = "Custom",
-	/**
-	 * Skip this element entirely (don't output anything)
-	 *
-	 * The element and all its children are ignored in the output.
-	 */
-	Skip = "Skip",
-	/**
-	 * Preserve original HTML (don't convert to markdown)
-	 *
-	 * The element's raw HTML is included verbatim in the output.
-	 */
-	PreserveHtml = "PreserveHtml",
-	/**
-	 * Stop conversion with an error
-	 *
-	 * The conversion process halts and returns this error message.
-	 */
-	Error = "Error",
+  /** Continue with default conversion behavior */
+  Continue = "Continue",
+  /**
+   * Replace default output with custom markdown
+   *
+   * The visitor takes full responsibility for the markdown output
+   * of this node and its children.
+   */
+  Custom = "Custom",
+  /**
+   * Skip this element entirely (don't output anything)
+   *
+   * The element and all its children are ignored in the output.
+   */
+  Skip = "Skip",
+  /**
+   * Preserve original HTML (don't convert to markdown)
+   *
+   * The element's raw HTML is included verbatim in the output.
+   */
+  PreserveHtml = "PreserveHtml",
+  /**
+   * Stop conversion with an error
+   *
+   * The conversion process halts and returns this error message.
+   */
+  Error = "Error",
 }
 
 /** Categories of processing warnings. */
 export declare enum WarningKind {
-	/** An image could not be extracted (e.g. invalid data URI, unsupported format). */
-	ImageExtractionFailed = "image_extraction_failed",
-	/** The input encoding was not recognized; fell back to UTF-8. */
-	EncodingFallback = "encoding_fallback",
-	/** The input was truncated due to size limits. */
-	TruncatedInput = "truncated_input",
-	/** The HTML was malformed but processing continued with best effort. */
-	MalformedHtml = "malformed_html",
-	/** Sanitization was applied to remove potentially unsafe content. */
-	SanitizationApplied = "sanitization_applied",
-	/** DOM traversal was truncated because max_depth was exceeded. */
-	DepthLimitExceeded = "depth_limit_exceeded",
+  /** An image could not be extracted (e.g. invalid data URI, unsupported format). */
+  ImageExtractionFailed = "image_extraction_failed",
+  /** The input encoding was not recognized; fell back to UTF-8. */
+  EncodingFallback = "encoding_fallback",
+  /** The input was truncated due to size limits. */
+  TruncatedInput = "truncated_input",
+  /** The HTML was malformed but processing continued with best effort. */
+  MalformedHtml = "malformed_html",
+  /** Sanitization was applied to remove potentially unsafe content. */
+  SanitizationApplied = "sanitization_applied",
+  /** DOM traversal was truncated because max_depth was exceeded. */
+  DepthLimitExceeded = "depth_limit_exceeded",
 }
 
 /**
@@ -1317,8 +1313,8 @@ export declare enum WarningKind {
  * Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
  */
 export declare enum WhitespaceMode {
-	/** Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior. */
-	Normalized = "Normalized",
-	/** Preserve all whitespace exactly as it appears in the HTML. */
-	Strict = "Strict",
+  /** Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior. */
+  Normalized = "Normalized",
+  /** Preserve all whitespace exactly as it appears in the HTML. */
+  Strict = "Strict",
 }

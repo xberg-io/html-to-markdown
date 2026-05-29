@@ -4,489 +4,376 @@
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/sample_crate-dev/alef
 
-import { describe, expect, it } from "vitest";
-import { convert, type ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { describe, expect, it } from 'vitest';import { convert, type ConversionOptions } from '@kreuzberg/html-to-markdown';
 function _alefE2eText(value: unknown): string {
-	return value == null ? "" : String(value);
+  return value == null ? "" : String(value);
 }
 
 function _alefE2eItemTexts(item: unknown): string[] {
-	if (item == null || typeof item !== "object") {
-		return [_alefE2eText(item)];
-	}
-	const record = item as Record<string, unknown>;
-	const itemsText = Array.isArray(record.items) ? record.items.map(_alefE2eText).join(" ") : "";
-	return [
-		_alefE2eText(item),
-		_alefE2eText(record.kind),
-		_alefE2eText(record.name),
-		_alefE2eText(record.source),
-		_alefE2eText(record.alias),
-		_alefE2eText(record.text),
-		_alefE2eText(record.signature),
-		itemsText,
-	];
+  if (item == null || typeof item !== "object") {
+    return [_alefE2eText(item)];
+  }
+  const record = item as Record<string, unknown>;
+  const itemsText = Array.isArray(record.items) ? record.items.map(_alefE2eText).join(" ") : "";
+  return [_alefE2eText(item), _alefE2eText(record.kind), _alefE2eText(record.name), _alefE2eText(record.source), _alefE2eText(record.alias), _alefE2eText(record.text), _alefE2eText(record.signature), itemsText];
 }
 
 function _alefE2eFormatMetadataDisplay(fm: unknown): string {
-	if (fm == null) return "";
-	if (typeof fm !== "object") return String(fm);
-	const record = fm as Record<string, unknown>;
-	const formatType = record.format_type;
+  if (fm == null) return "";
+  if (typeof fm !== "object") return String(fm);
+  const record = fm as Record<string, unknown>;
+  const formatType = record.format_type;
 
-	// FormatMetadata is a tagged union: { format_type: 'image', image: { format: 'PNG', ... }, ... }
-	// Extract the display string based on the variant type
-	if (formatType === "image" && typeof record.image === "object") {
-		const imageData = record.image as Record<string, unknown>;
-		if (typeof imageData.format === "string") return imageData.format;
-	}
+  // FormatMetadata is a tagged union: { format_type: 'image', image: { format: 'PNG', ... }, ... }
+  // Extract the display string based on the variant type
+  if (formatType === "image" && typeof record.image === "object") {
+    const imageData = record.image as Record<string, unknown>;
+    if (typeof imageData.format === "string") return imageData.format;
+  }
 
-	// Fallback: return format_type variant name
-	if (typeof record.format_type === "string") return record.format_type;
-	return "";
+  // Fallback: return format_type variant name
+  if (typeof record.format_type === "string") return record.format_type;
+  return "";
 }
 
-describe("metadata", () => {
-	it("metadata_author_meta: Extract author from <meta name='author'> tag", () => {
-		const result = convert(
-			'<html><head><title>Page</title><meta name="author" content="Jane Doe"></head><body><p>Content</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.author ?? "").trim()).toBe("Jane Doe");
-	}, 30000);
-	it("metadata_canonical_url: Extract canonical URL from <link rel='canonical'> tag", () => {
-		const result = convert(
-			'<html><head><title>Page</title><link rel="canonical" href="https://example.com/canonical-page"></head><body><p>Content</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.canonicalUrl ?? "").trim()).toBe("https://example.com/canonical-page");
-	}, 30000);
-	it("metadata_description_meta: Extract description from <meta name='description'> tag", () => {
-		const result = convert(
-			'<html><head><title>Page</title><meta name="description" content="This is the page description."></head><body><p>Content</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.description ?? "").trim()).toBe("This is the page description.");
-	}, 30000);
-	it("metadata_dublin_core: Extract Dublin Core metadata tags", () => {
-		const result = convert(
-			'<html><head><title>Scholarly Work</title><meta name="DC.title" content="Principles of Knowledge Management"><meta name="DC.creator" content="Dr. Alice Johnson"><meta name="DC.date" content="2023-06-15"><meta name="DC.subject" content="Knowledge Management"><meta name="DC.publisher" content="Academic Press"></head><body><p>This is a scholarly article.</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("scholarly article");
-	}, 30000);
-	it("metadata_extract_all_images: Extract all images from a document into metadata", () => {
-		const result = convert(
-			'<html><head><title>Gallery</title></head><body><img src="https://example.com/photo1.jpg" alt="Photo 1"><img src="https://example.com/photo2.png" alt="Photo 2"><img src="/local/image.webp" alt="Local image"></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.images.length).toBeGreaterThanOrEqual(2);
-	}, 30000);
-	it("metadata_extract_all_links: Extract all links from a document into metadata", () => {
-		const result = convert(
-			'<html><head><title>Links Page</title></head><body><p>Visit <a href="https://example.com">Example</a> or <a href="https://docs.example.com">Docs</a>.</p><p>Also see <a href="/relative/path">relative link</a> and <a href="mailto:hello@example.com">email us</a>.</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.links.length).toBeGreaterThanOrEqual(2);
-	}, 30000);
-	it("metadata_headers_hierarchy: Extract heading hierarchy from document into metadata", () => {
-		const result = convert(
-			"<html><head><title>Docs</title></head><body><h1>Introduction</h1><h2>Getting Started</h2><h3>Installation</h3><h3>Configuration</h3><h2>Advanced Usage</h2><h3>Custom Options</h3></body></html>",
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.headers.length).toBeGreaterThanOrEqual(5);
-	}, 30000);
-	it("metadata_image_type_data_uri_classified: A data-URI image is extracted into metadata.images when extract_metadata is true", () => {
-		const result = convert(
-			'<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel"></p>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.images.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("metadata_image_type_external_classified: An https image URL is extracted into metadata.images when extract_metadata is true", () => {
-		const result = convert('<p><img src="https://example.com/photo.jpg" alt="A photo"></p>', {
-			extractMetadata: true,
-		} as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.images.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("metadata_keywords_meta: Extract keywords from <meta name='keywords'> tag", () => {
-		const result = convert(
-			'<html><head><title>Page</title><meta name="keywords" content="rust, markdown, html, converter"></head><body><p>Content</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.document.keywords.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("metadata_lang_attribute: Extract language from html lang attribute", () => {
-		const result = convert(
-			'<html lang="es"><head><title>Spanish Page</title></head><body><h1>Hola Mundo</h1><p>Este es un documento en español.</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("Hola Mundo");
-	}, 30000);
-	it("metadata_link_type_anchor_classified: A fragment anchor link is extracted into metadata.links when extract_metadata is true", () => {
-		const result = convert('<p>Jump to <a href="#section">section</a> below.</p>', {
-			extractMetadata: true,
-		} as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.links.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("metadata_link_type_email_classified: A mailto link is extracted into metadata.links when extract_metadata is true", () => {
-		const result = convert('<p>Contact <a href="mailto:hello@example.com">us</a> directly.</p>', {
-			extractMetadata: true,
-		} as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.links.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("metadata_link_type_external_classified: An https link is extracted into metadata.links when extract_metadata is true", () => {
-		const result = convert('<p>See <a href="https://example.com">Example</a> for details.</p>', {
-			extractMetadata: true,
-		} as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.metadata.links.length).toBeGreaterThanOrEqual(1);
-	}, 30000);
-	it("metadata_microdata_schema_article: Extract schema.org microdata for Article", () => {
-		const result = convert(
-			'<html><head><title>Article</title></head><body><article itemscope itemtype="https://schema.org/Article"><h1 itemprop="headline">Breaking News Today</h1><span itemprop="author">Jane Reporter</span><span itemprop="datePublished">2024-04-22</span><div itemprop="articleBody"><p>The article content goes here with important information about the breaking news story.</p></div></article></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("Breaking News Today");
-		expect(result.content ?? "").toContain("Jane Reporter");
-		expect(result.content ?? "").toContain("important information");
-	}, 30000);
-	it("metadata_microdata_schema_breadcrumb: Extract schema.org breadcrumb navigation microdata", () => {
-		const result = convert(
-			'<html><head><title>Navigation</title></head><body><nav itemscope itemtype="https://schema.org/BreadcrumbList"><span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="https://example.com"><span itemprop="name">Home</span></a></span><span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="https://example.com/products"><span itemprop="name">Products</span></a></span><span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><span itemprop="name">Current Page</span></span></nav></body></html>',
-			{ extractMetadata: true, preprocessing: { removeNavigation: false } } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("Home");
-		expect(result.content ?? "").toContain("Products");
-		expect(result.content ?? "").toContain("Current Page");
-	}, 30000);
-	it("metadata_microdata_schema_organization: Extract schema.org microdata for Organization", () => {
-		const result = convert(
-			'<html><head><title>Company</title></head><body><div itemscope itemtype="https://schema.org/Organization"><span itemprop="name">Acme Corp</span><span itemprop="foundingDate">2020</span><span itemprop="url">https://acmecorp.example.com</span><span itemprop="logo">https://acmecorp.example.com/logo.png</span></div></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("Acme Corp");
-		expect(result.content ?? "").toContain("2020");
-	}, 30000);
-	it("metadata_microdata_schema_person: Extract schema.org microdata for Person", () => {
-		const result = convert(
-			'<html><head><title>Contact</title></head><body><div itemscope itemtype="https://schema.org/Person"><span itemprop="name">John Smith</span><span itemprop="email">john@example.com</span><span itemprop="telephone">+1-555-0100</span></div></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("John Smith");
-		expect(result.content ?? "").toContain("john@example.com");
-	}, 30000);
-	it("metadata_microdata_schema_product: Extract schema.org microdata for Product", () => {
-		const result = convert(
-			'<html><head><title>Product</title></head><body><div itemscope itemtype="https://schema.org/Product"><h1 itemprop="name">Awesome Widget</h1><span itemprop="description">The best widget on the market</span><span itemprop="price">29.99</span><span itemprop="priceCurrency">USD</span><img itemprop="image" src="widget.jpg" alt="Widget"><span itemprop="ratingValue">4.5</span></div></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("Awesome Widget");
-		expect(result.content ?? "").toContain("best widget");
-		expect(result.content ?? "").toContain("29.99");
-	}, 30000);
-	it("metadata_text_direction_ltr: Extract text direction from lang attribute on html element", () => {
-		const result = convert(
-			'<html lang="en" dir="ltr"><head><title>LTR Document</title></head><body><p>This is left-to-right text.</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("left-to-right text");
-	}, 30000);
-	it("metadata_text_direction_rtl: Extract right-to-left text direction", () => {
-		const result = convert(
-			'<html lang="ar" dir="rtl"><head><title>RTL Document</title></head><body><p>This is right-to-left text.</p></body></html>',
-			{ extractMetadata: true } as ConversionOptions,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content ?? "").toContain("right-to-left text");
-	}, 30000);
-	it("metadata_title_tag: Extract title from <title> tag", () => {
-		const result = convert("<html><head><title>My Page</title></head><body><p>Content</p></body></html>", {
-			extractMetadata: true,
-		} as ConversionOptions);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.title ?? "").trim()).toBe("My Page");
-	}, 30000);
-	it("og_basic_tags: Extract og:title, og:description, and og:image from Open Graph meta tags", () => {
-		const result = convert(
-			'<html><head><title>Fallback Title</title><meta property="og:title" content="OG Title"><meta property="og:description" content="OG description text."><meta property="og:image" content="https://example.com/image.jpg"></head><body><p>Content</p></body></html>',
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.openGraph["title"] ?? "").trim()).toBe("OG Title");
-		expect((result.metadata.document.openGraph["description"] ?? "").trim()).toBe("OG description text.");
-		expect((result.metadata.document.openGraph["image"] ?? "").trim()).toBe("https://example.com/image.jpg");
-	}, 30000);
-	it("og_multiple_tags: Extract multiple Open Graph tags including type, url, and site_name", () => {
-		const result = convert(
-			'<html><head><meta property="og:title" content="Article Title"><meta property="og:type" content="article"><meta property="og:url" content="https://example.com/article"><meta property="og:site_name" content="Example Site"><meta property="og:description" content="An interesting article."><meta property="og:image" content="https://example.com/article.jpg"></head><body><article><p>Article content here.</p></article></body></html>',
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.openGraph["title"] ?? "").trim()).toBe("Article Title");
-		expect((result.metadata.document.openGraph["type"] ?? "").trim()).toBe("article");
-		expect((result.metadata.document.openGraph["url"] ?? "").trim()).toBe("https://example.com/article");
-		expect((result.metadata.document.openGraph["site_name"] ?? "").trim()).toBe("Example Site");
-	}, 30000);
-	it("structured_data_json_ld: JSON-LD script tag is stripped from output (security) but metadata may be extracted", () => {
-		const result = convert(
-			'<html><head><title>Article</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"My Article","author":{"@type":"Person","name":"Jane Doe"},"datePublished":"2024-01-15"}</script></head><body><h1>My Article</h1><p>Article body text.</p></body></html>',
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content).toContain("My Article");
-	}, 30000);
-	it("structured_data_multiple_json_ld: Multiple JSON-LD blocks are all stripped from output", () => {
-		const result = convert(
-			'<html><head><title>Shop Page</title><script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Widget","price":"9.99"}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home"}]}</script></head><body><h1>Widget</h1><p>A great widget for all purposes.</p></body></html>',
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect(result.content).toContain("Widget");
-	}, 30000);
-	it("twitter_card_tags: Extract Twitter card meta tags", () => {
-		const result = convert(
-			'<html><head><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@examplesite"><meta name="twitter:title" content="Twitter Card Title"><meta name="twitter:description" content="Twitter card description."><meta name="twitter:image" content="https://example.com/twitter-image.jpg"></head><body><p>Content</p></body></html>',
-			undefined,
-		);
-		{
-			const _v = result.content;
-			if (typeof _v === "string" || Array.isArray(_v)) {
-				expect(_v.length).toBeGreaterThan(0);
-			} else {
-				expect(_v).toBeDefined();
-				expect(_v).not.toBeNull();
-			}
-		}
-		expect((result.metadata.document.twitterCard["card"] ?? "").trim()).toBe("summary_large_image");
-		expect((result.metadata.document.twitterCard["title"] ?? "").trim()).toBe("Twitter Card Title");
-		expect((result.metadata.document.twitterCard["description"] ?? "").trim()).toBe("Twitter card description.");
-	}, 30000);
+
+describe('metadata', () => {  it('metadata_author_meta: Extract author from <meta name=\'author\'> tag', () => {    const result = convert("<html><head><title>Page</title><meta name=\"author\" content=\"Jane Doe\"></head><body><p>Content</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.author ?? "").trim()).toBe("Jane Doe");
+
+  }, 30000);
+  it('metadata_canonical_url: Extract canonical URL from <link rel=\'canonical\'> tag', () => {    const result = convert("<html><head><title>Page</title><link rel=\"canonical\" href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.canonicalUrl ?? "").trim()).toBe("https://example.com/canonical-page");
+
+  }, 30000);
+  it('metadata_description_meta: Extract description from <meta name=\'description\'> tag', () => {    const result = convert("<html><head><title>Page</title><meta name=\"description\" content=\"This is the page description.\"></head><body><p>Content</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.description ?? "").trim()).toBe("This is the page description.");
+
+  }, 30000);
+  it('metadata_dublin_core: Extract Dublin Core metadata tags', () => {    const result = convert("<html><head><title>Scholarly Work</title><meta name=\"DC.title\" content=\"Principles of Knowledge Management\"><meta name=\"DC.creator\" content=\"Dr. Alice Johnson\"><meta name=\"DC.date\" content=\"2023-06-15\"><meta name=\"DC.subject\" content=\"Knowledge Management\"><meta name=\"DC.publisher\" content=\"Academic Press\"></head><body><p>This is a scholarly article.</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("scholarly article");
+
+  }, 30000);
+  it('metadata_extract_all_images: Extract all images from a document into metadata', () => {    const result = convert("<html><head><title>Gallery</title></head><body><img src=\"https://example.com/photo1.jpg\" alt=\"Photo 1\"><img src=\"https://example.com/photo2.png\" alt=\"Photo 2\"><img src=\"/local/image.webp\" alt=\"Local image\"></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.images.length).toBeGreaterThanOrEqual(2);
+
+  }, 30000);
+  it('metadata_extract_all_links: Extract all links from a document into metadata', () => {    const result = convert("<html><head><title>Links Page</title></head><body><p>Visit <a href=\"https://example.com\">Example</a> or <a href=\"https://docs.example.com\">Docs</a>.</p><p>Also see <a href=\"/relative/path\">relative link</a> and <a href=\"mailto:hello@example.com\">email us</a>.</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.links.length).toBeGreaterThanOrEqual(2);
+
+  }, 30000);
+  it('metadata_headers_hierarchy: Extract heading hierarchy from document into metadata', () => {    const result = convert("<html><head><title>Docs</title></head><body><h1>Introduction</h1><h2>Getting Started</h2><h3>Installation</h3><h3>Configuration</h3><h2>Advanced Usage</h2><h3>Custom Options</h3></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.headers.length).toBeGreaterThanOrEqual(5);
+
+  }, 30000);
+  it('metadata_image_type_data_uri_classified: A data-URI image is extracted into metadata.images when extract_metadata is true', () => {    const result = convert("<p><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.images.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('metadata_image_type_external_classified: An https image URL is extracted into metadata.images when extract_metadata is true', () => {    const result = convert("<p><img src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.images.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('metadata_keywords_meta: Extract keywords from <meta name=\'keywords\'> tag', () => {    const result = convert("<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, markdown, html, converter\"></head><body><p>Content</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.document.keywords.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('metadata_lang_attribute: Extract language from html lang attribute', () => {    const result = convert("<html lang=\"es\"><head><title>Spanish Page</title></head><body><h1>Hola Mundo</h1><p>Este es un documento en español.</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("Hola Mundo");
+
+  }, 30000);
+  it('metadata_link_type_anchor_classified: A fragment anchor link is extracted into metadata.links when extract_metadata is true', () => {    const result = convert("<p>Jump to <a href=\"#section\">section</a> below.</p>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.links.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('metadata_link_type_email_classified: A mailto link is extracted into metadata.links when extract_metadata is true', () => {    const result = convert("<p>Contact <a href=\"mailto:hello@example.com\">us</a> directly.</p>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.links.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('metadata_link_type_external_classified: An https link is extracted into metadata.links when extract_metadata is true', () => {    const result = convert("<p>See <a href=\"https://example.com\">Example</a> for details.</p>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.metadata.links.length).toBeGreaterThanOrEqual(1);
+
+  }, 30000);
+  it('metadata_microdata_schema_article: Extract schema.org microdata for Article', () => {    const result = convert("<html><head><title>Article</title></head><body><article itemscope itemtype=\"https://schema.org/Article\"><h1 itemprop=\"headline\">Breaking News Today</h1><span itemprop=\"author\">Jane Reporter</span><span itemprop=\"datePublished\">2024-04-22</span><div itemprop=\"articleBody\"><p>The article content goes here with important information about the breaking news story.</p></div></article></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("Breaking News Today");
+    expect(result.content ?? "").toContain("Jane Reporter");
+    expect(result.content ?? "").toContain("important information");
+
+  }, 30000);
+  it('metadata_microdata_schema_breadcrumb: Extract schema.org breadcrumb navigation microdata', () => {    const result = convert("<html><head><title>Navigation</title></head><body><nav itemscope itemtype=\"https://schema.org/BreadcrumbList\"><span itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><a itemprop=\"item\" href=\"https://example.com\"><span itemprop=\"name\">Home</span></a></span><span itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><a itemprop=\"item\" href=\"https://example.com/products\"><span itemprop=\"name\">Products</span></a></span><span itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><span itemprop=\"name\">Current Page</span></span></nav></body></html>", { extractMetadata: true, preprocessing: { removeNavigation: false } } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("Home");
+    expect(result.content ?? "").toContain("Products");
+    expect(result.content ?? "").toContain("Current Page");
+
+  }, 30000);
+  it('metadata_microdata_schema_organization: Extract schema.org microdata for Organization', () => {    const result = convert("<html><head><title>Company</title></head><body><div itemscope itemtype=\"https://schema.org/Organization\"><span itemprop=\"name\">Acme Corp</span><span itemprop=\"foundingDate\">2020</span><span itemprop=\"url\">https://acmecorp.example.com</span><span itemprop=\"logo\">https://acmecorp.example.com/logo.png</span></div></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("Acme Corp");
+    expect(result.content ?? "").toContain("2020");
+
+  }, 30000);
+  it('metadata_microdata_schema_person: Extract schema.org microdata for Person', () => {    const result = convert("<html><head><title>Contact</title></head><body><div itemscope itemtype=\"https://schema.org/Person\"><span itemprop=\"name\">John Smith</span><span itemprop=\"email\">john@example.com</span><span itemprop=\"telephone\">+1-555-0100</span></div></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("John Smith");
+    expect(result.content ?? "").toContain("john@example.com");
+
+  }, 30000);
+  it('metadata_microdata_schema_product: Extract schema.org microdata for Product', () => {    const result = convert("<html><head><title>Product</title></head><body><div itemscope itemtype=\"https://schema.org/Product\"><h1 itemprop=\"name\">Awesome Widget</h1><span itemprop=\"description\">The best widget on the market</span><span itemprop=\"price\">29.99</span><span itemprop=\"priceCurrency\">USD</span><img itemprop=\"image\" src=\"widget.jpg\" alt=\"Widget\"><span itemprop=\"ratingValue\">4.5</span></div></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("Awesome Widget");
+    expect(result.content ?? "").toContain("best widget");
+    expect(result.content ?? "").toContain("29.99");
+
+  }, 30000);
+  it('metadata_text_direction_ltr: Extract text direction from lang attribute on html element', () => {    const result = convert("<html lang=\"en\" dir=\"ltr\"><head><title>LTR Document</title></head><body><p>This is left-to-right text.</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("left-to-right text");
+
+  }, 30000);
+  it('metadata_text_direction_rtl: Extract right-to-left text direction', () => {    const result = convert("<html lang=\"ar\" dir=\"rtl\"><head><title>RTL Document</title></head><body><p>This is right-to-left text.</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content ?? "").toContain("right-to-left text");
+
+  }, 30000);
+  it('metadata_title_tag: Extract title from <title> tag', () => {    const result = convert("<html><head><title>My Page</title></head><body><p>Content</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.title ?? "").trim()).toBe("My Page");
+
+  }, 30000);
+  it('og_basic_tags: Extract og:title, og:description, and og:image from Open Graph meta tags', () => {    const result = convert("<html><head><title>Fallback Title</title><meta property=\"og:title\" content=\"OG Title\"><meta property=\"og:description\" content=\"OG description text.\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\"></head><body><p>Content</p></body></html>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.openGraph["title"] ?? "").trim()).toBe("OG Title");
+    expect((result.metadata.document.openGraph["description"] ?? "").trim()).toBe("OG description text.");
+    expect((result.metadata.document.openGraph["image"] ?? "").trim()).toBe("https://example.com/image.jpg");
+
+  }, 30000);
+  it('og_multiple_tags: Extract multiple Open Graph tags including type, url, and site_name', () => {    const result = convert("<html><head><meta property=\"og:title\" content=\"Article Title\"><meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"https://example.com/article\"><meta property=\"og:site_name\" content=\"Example Site\"><meta property=\"og:description\" content=\"An interesting article.\"><meta property=\"og:image\" content=\"https://example.com/article.jpg\"></head><body><article><p>Article content here.</p></article></body></html>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.openGraph["title"] ?? "").trim()).toBe("Article Title");
+    expect((result.metadata.document.openGraph["type"] ?? "").trim()).toBe("article");
+    expect((result.metadata.document.openGraph["url"] ?? "").trim()).toBe("https://example.com/article");
+    expect((result.metadata.document.openGraph["site_name"] ?? "").trim()).toBe("Example Site");
+
+  }, 30000);
+  it('structured_data_json_ld: JSON-LD script tag is stripped from output (security) but metadata may be extracted', () => {    const result = convert("<html><head><title>Article</title><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Article\",\"headline\":\"My Article\",\"author\":{\"@type\":\"Person\",\"name\":\"Jane Doe\"},\"datePublished\":\"2024-01-15\"}</script></head><body><h1>My Article</h1><p>Article body text.</p></body></html>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content).toContain("My Article");
+
+  }, 30000);
+  it('structured_data_multiple_json_ld: Multiple JSON-LD blocks are all stripped from output', () => {    const result = convert("<html><head><title>Shop Page</title><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Product\",\"name\":\"Widget\",\"price\":\"9.99\"}</script><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\"}]}</script></head><body><h1>Widget</h1><p>A great widget for all purposes.</p></body></html>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect(result.content).toContain("Widget");
+
+  }, 30000);
+  it('twitter_card_tags: Extract Twitter card meta tags', () => {    const result = convert("<html><head><meta name=\"twitter:card\" content=\"summary_large_image\"><meta name=\"twitter:site\" content=\"@examplesite\"><meta name=\"twitter:title\" content=\"Twitter Card Title\"><meta name=\"twitter:description\" content=\"Twitter card description.\"><meta name=\"twitter:image\" content=\"https://example.com/twitter-image.jpg\"></head><body><p>Content</p></body></html>", undefined);    {
+        const _v = result.content;
+        if (typeof _v === "string" || Array.isArray(_v)) {
+            expect(_v.length).toBeGreaterThan(0);
+        } else {
+            expect(_v).toBeDefined();
+            expect(_v).not.toBeNull();
+        }
+    }
+    expect((result.metadata.document.twitterCard["card"] ?? "").trim()).toBe("summary_large_image");
+    expect((result.metadata.document.twitterCard["title"] ?? "").trim()).toBe("Twitter Card Title");
+    expect((result.metadata.document.twitterCard["description"] ?? "").trim()).toBe("Twitter card description.");
+
+  }, 30000);
 });

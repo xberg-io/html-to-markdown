@@ -104,7 +104,7 @@ def test_options_code_block_indented() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "print('hello')" in result.content  # noqa: S101
-    assert result.content is None or "```" not in result.content  # noqa: S101
+    assert result.content is None or not ("```" in result.content)  # noqa: S101
 
 
 def test_options_code_block_tildes() -> None:
@@ -153,7 +153,7 @@ def test_options_compact_tables_false() -> None:
     assert "| ----- |" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "| 42    |" in result.content  # noqa: S101
-    assert result.content is None or "| --- |" not in result.content  # noqa: S101
+    assert result.content is None or not ("| --- |" in result.content)  # noqa: S101
 
 
 def test_options_compact_tables_true() -> None:
@@ -164,10 +164,10 @@ def test_options_compact_tables_true() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "| --- |" in result.content  # noqa: S101
-    assert result.content is None or "| ----- |" not in result.content  # noqa: S101
+    assert result.content is None or not ("| ----- |" in result.content)  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "| 42 |" in result.content  # noqa: S101
-    assert result.content is None or "| 42    |" not in result.content  # noqa: S101
+    assert result.content is None or not ("| 42    |" in result.content)  # noqa: S101
 
 
 def test_options_convert_as_inline() -> None:
@@ -282,7 +282,7 @@ def test_options_exclude_selectors_attribute() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Primary text" in result.content  # noqa: S101
-    assert result.content is None or "Sidebar" not in result.content  # noqa: S101
+    assert result.content is None or not ("Sidebar" in result.content)  # noqa: S101
 
 
 def test_options_exclude_selectors_class() -> None:
@@ -293,7 +293,7 @@ def test_options_exclude_selectors_class() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Main content" in result.content  # noqa: S101
-    assert result.content is None or "cookies" not in result.content  # noqa: S101
+    assert result.content is None or not ("cookies" in result.content)  # noqa: S101
 
 
 def test_options_exclude_selectors_empty_noop() -> None:
@@ -314,7 +314,7 @@ def test_options_exclude_selectors_id() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Article text" in result.content  # noqa: S101
-    assert result.content is None or "Buy stuff" not in result.content  # noqa: S101
+    assert result.content is None or not ("Buy stuff" in result.content)  # noqa: S101
 
 
 def test_options_exclude_selectors_multiple() -> None:
@@ -325,22 +325,20 @@ def test_options_exclude_selectors_multiple() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Content" in result.content  # noqa: S101
-    assert result.content is None or "Menu" not in result.content  # noqa: S101
-    assert result.content is None or "Footer" not in result.content  # noqa: S101
+    assert result.content is None or not ("Menu" in result.content)  # noqa: S101
+    assert result.content is None or not ("Footer" in result.content)  # noqa: S101
 
 
 def test_options_exclude_selectors_nested_content_dropped() -> None:
     """All descendants of excluded elements are dropped."""
-    html = (
-        '<body><aside class="sidebar"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>'
-    )
+    html = '<body><aside class="sidebar"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>'
     options = ConversionOptions(exclude_selectors=[".sidebar"])
 
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Main text" in result.content  # noqa: S101
-    assert result.content is None or "Related" not in result.content  # noqa: S101
-    assert result.content is None or "Sidebar text" not in result.content  # noqa: S101
+    assert result.content is None or not ("Related" in result.content)  # noqa: S101
+    assert result.content is None or not ("Sidebar text" in result.content)  # noqa: S101
 
 
 def test_options_exclude_selectors_plain_text_mode() -> None:
@@ -351,7 +349,7 @@ def test_options_exclude_selectors_plain_text_mode() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Article body" in result.content  # noqa: S101
-    assert result.content is None or "Navigation" not in result.content  # noqa: S101
+    assert result.content is None or not ("Navigation" in result.content)  # noqa: S101
 
 
 def test_options_exclude_selectors_vs_strip_tags() -> None:
@@ -362,7 +360,7 @@ def test_options_exclude_selectors_vs_strip_tags() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Outer text" in result.content  # noqa: S101
-    assert result.content is None or "Inner paragraph" not in result.content  # noqa: S101
+    assert result.content is None or not ("Inner paragraph" in result.content)  # noqa: S101
 
 
 def test_options_extract_images_false() -> None:
@@ -459,7 +457,7 @@ def test_options_highlight_none() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "plain" in result.content  # noqa: S101
-    assert result.content is None or "==" not in result.content  # noqa: S101
+    assert result.content is None or not ("==" in result.content)  # noqa: S101
 
 
 def test_options_include_document_structure_false() -> None:
@@ -586,7 +584,7 @@ def test_options_max_depth_truncates() -> None:
     result = convert(html, options)
     assert result.content is not None  # noqa: S101
     assert "Shallow" in result.content  # noqa: S101
-    assert result.content is None or "Too deep" not in result.content  # noqa: S101
+    assert result.content is None or not ("Too deep" in result.content)  # noqa: S101
 
 
 def test_options_max_depth_zero_empty() -> None:
@@ -691,7 +689,7 @@ def test_options_preprocessing_aggressive() -> None:
     assert "Title" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Content" in result.content  # noqa: S101
-    assert result.content is None or "Menu" not in result.content  # noqa: S101
+    assert result.content is None or not ("Menu" in result.content)  # noqa: S101
 
 
 def test_options_preprocessing_enabled_false_skips_cleanup() -> None:
@@ -730,7 +728,7 @@ def test_options_preprocessing_remove_forms() -> None:
     assert "Before" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "After" in result.content  # noqa: S101
-    assert result.content is None or "Submit" not in result.content  # noqa: S101
+    assert result.content is None or not ("Submit" in result.content)  # noqa: S101
 
 
 def test_options_preprocessing_remove_navigation_false_keeps_nav() -> None:
@@ -771,7 +769,7 @@ def test_options_skip_images_true() -> None:
     assert "Before" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "After" in result.content  # noqa: S101
-    assert result.content is None or "photo" not in result.content  # noqa: S101
+    assert result.content is None or not ("photo" in result.content)  # noqa: S101
 
 
 def test_options_strip_newlines() -> None:
