@@ -24,6 +24,15 @@ namespace HtmlToMarkdown
             private static readonly JsonSerializerOptions ConfigOptions = new() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
 
         [Fact]
+        public void Test_Issue396BackticksBlankLineAfterFence()
+        {
+            // Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+            var result = HtmlToMarkdownRs.Convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", new ConversionOptions { CodeBlockStyle = CodeBlockStyle.Backticks });
+    Assert.Equal("Foo\n\n```\n1\n2\n```\n\nBar", result.Content!.Trim());
+
+        }
+
+        [Fact]
         public void Test_OptionsAutolinksFalse()
         {
             // Bare URL links rendered as regular markdown links when autolinks disabled

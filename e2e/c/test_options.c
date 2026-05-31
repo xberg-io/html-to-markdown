@@ -15,6 +15,18 @@
 #include "html_to_markdown.h"
 #include "test_runner.h"
 
+void test_issue_396_backticks_blank_line_after_fence(void) {
+    /* Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396) */
+    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"code_block_style\":\"Backticks\"}");
+    HTMConversionResult* result = htm_convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", options_handle);
+    assert(result != NULL && "expected call to succeed");
+    char* content = htm_conversion_result_content(result);
+    assert(str_trim_eq(content, "Foo\n\n```\n1\n2\n```\n\nBar") == 0 && "equals assertion failed");
+    htm_free_string(content);
+    htm_conversion_options_free(options_handle);
+    htm_conversion_result_free(result);
+}
+
 void test_options_autolinks_false(void) {
     /* Bare URL links rendered as regular markdown links when autolinks disabled */
     HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"autolinks\":false}");

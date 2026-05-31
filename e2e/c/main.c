@@ -478,6 +478,10 @@ int main(void) {
     passed++;
 
     /* Category: options */
+    printf("  Running test_issue_396_backticks_blank_line_after_fence...");
+    test_issue_396_backticks_blank_line_after_fence();
+    printf(" PASSED\n");
+    passed++;
     printf("  Running test_options_autolinks_false...");
     test_options_autolinks_false();
     printf(" PASSED\n");

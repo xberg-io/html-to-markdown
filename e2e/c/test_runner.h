@@ -332,6 +332,7 @@ void test_structured_data_multiple_json_ld(void);
 void test_twitter_card_tags(void);
 
 /* Tests for category: options */
+void test_issue_396_backticks_blank_line_after_fence(void);
 void test_options_autolinks_false(void);
 void test_options_br_in_tables_false(void);
 void test_options_br_in_tables_true(void);

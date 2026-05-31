@@ -24,6 +24,14 @@ class OptionsTest {
         private val MAPPER = ObjectMapper().registerModule(Jdk8Module()).registerKotlinModule().setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
     @Test
+    fun testIssue396BackticksBlankLineAfterFence() = runBlocking {
+        // Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+        val options = MAPPER.readValue("{\"code_block_style\":\"Backticks\"}", ConversionOptions::class.java)
+        val result = dev.kreuzberg.android.HtmlToMarkdownRs.convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", options)
+        assertEquals("Foo\n\n```\n1\n2\n```\n\nBar", result.content.orEmpty().trim())
+    }
+
+    @Test
     fun testOptionsAutolinksFalse() = runBlocking {
         // Bare URL links rendered as regular markdown links when autolinks disabled
         val options = MAPPER.readValue("{\"autolinks\":false}", ConversionOptions::class.java)

@@ -18,6 +18,18 @@ use HtmlToMarkdown\ConversionOptions;
 final class OptionsTest extends TestCase
 {
 
+    /** Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396) */
+    public function test_issue_396_backticks_blank_line_after_fence(): void
+    {
+        $options = \HtmlToMarkdown\ConversionOptions::from_json(json_encode(["codeBlockStyle" => "Backticks"]));
+        $result = HtmlToMarkdown::convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", $options);
+
+            $this->assertEquals("Foo\n\n```\n1\n2\n```\n\nBar", trim(($result->content ?? null)));
+
+
+    }
+
+
     /** Bare URL links rendered as regular markdown links when autolinks disabled */
     public function test_options_autolinks_false(): void
     {

@@ -15,6 +15,27 @@ import (
 	htmd "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 )
 
+func Test_Issue396BackticksBlankLineAfterFence(t *testing.T) {
+	// Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+	var options htmd.ConversionOptions
+	if err := json.Unmarshal([]byte(`{"code_block_style":"backticks"}`), &options); err != nil {
+		t.Fatalf("config parse failed: %v", err)
+	}
+	result, err := htmd.Convert(`<p>Foo</p><pre><code>1
+2
+</code></pre><p>Bar</p>`, &options)
+	if err != nil {
+		t.Fatalf("call failed: %v", err)
+	}
+	var content string
+	if result.Content != nil {
+		content = string(*result.Content)
+	}
+	if strings.TrimSpace(string(content)) != "Foo\n\n```\n1\n2\n```\n\nBar" {
+		t.Errorf("equals mismatch: got %v", content)
+	}
+}
+
 func Test_OptionsAutolinksFalse(t *testing.T) {
 	// Bare URL links rendered as regular markdown links when autolinks disabled
 	var options htmd.ConversionOptions

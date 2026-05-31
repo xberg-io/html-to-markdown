@@ -425,10 +425,10 @@ fn format_code_block(
                 output.push_str(&options.code_language);
             }
             output.push('\n');
-            output.push_str(content);
+            output.push_str(content.trim_end_matches('\n'));
             output.push('\n');
             output.push_str(fence);
-            output.push('\n');
+            output.push_str("\n\n");
         }
     }
 }

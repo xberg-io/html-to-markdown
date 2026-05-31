@@ -44,6 +44,23 @@
     ]
   },
   {
+    "id": "issue_396_backticks_blank_line_after_fence",
+    "description": "Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)",
+    "input": {
+      "html": "<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>",
+      "options": {
+        "code_block_style": "Backticks"
+      }
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Foo\n\n```\n1\n2\n```\n\nBar"
+      }
+    ]
+  },
+  {
     "id": "options_code_language_python",
     "description": "Default code language annotation on blocks without lang attribute",
     "input": {

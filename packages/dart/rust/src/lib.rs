@@ -2255,81 +2255,47 @@ pub fn create_node_context_from_json(json: String) -> Result<NodeContext, String
 /// `create_{trait_snake}(...)` wraps this in the trait's configured `type_alias`
 /// (e.g. `VisitorHandle`) which FRB does expose as opaque.
 struct HtmlVisitorDartImpl {
-    visit_text: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_element_start: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_element_end: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_link: Box<
-        dyn Fn(NodeContext, String, String, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
-            + Send
-            + Sync,
-    >,
-    visit_image: Box<
-        dyn Fn(NodeContext, String, String, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
-            + Send
-            + Sync,
-    >,
-    visit_heading: Box<
-        dyn Fn(NodeContext, i64, String, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
-            + Send
-            + Sync,
-    >,
-    visit_code_block: Box<
-        dyn Fn(NodeContext, Option<String>, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync,
-    >,
-    visit_code_inline: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_list_item:
-        Box<dyn Fn(NodeContext, bool, String, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_list_start: Box<dyn Fn(NodeContext, bool) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_list_end:
-        Box<dyn Fn(NodeContext, bool, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_table_start: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_table_row:
-        Box<dyn Fn(NodeContext, Vec<String>, bool) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_table_end: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_blockquote:
-        Box<dyn Fn(NodeContext, String, i64) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_strong: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_emphasis: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_strikethrough:
-        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_underline: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_subscript: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_superscript: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_mark: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_line_break: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_horizontal_rule: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_custom_element:
-        Box<dyn Fn(NodeContext, String, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_definition_list_start:
-        Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_definition_term:
-        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_definition_description:
-        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_definition_list_end:
-        Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_form: Box<
-        dyn Fn(NodeContext, Option<String>, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
-            + Send
-            + Sync,
-    >,
-    visit_input: Box<
-        dyn Fn(NodeContext, String, Option<String>, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult>
-            + Send
-            + Sync,
-    >,
-    visit_button: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_audio:
-        Box<dyn Fn(NodeContext, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_video:
-        Box<dyn Fn(NodeContext, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_iframe:
-        Box<dyn Fn(NodeContext, Option<String>) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_details: Box<dyn Fn(NodeContext, bool) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_summary: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_figure_start: Box<dyn Fn(NodeContext) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_figcaption: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
-    visit_figure_end: Box<dyn Fn(NodeContext, String) -> flutter_rust_bridge::DartFnFuture<VisitResult> + Send + Sync>,
+    visit_text: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_element_start: Box<dyn Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_element_end: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_link: Box<dyn Fn(NodeContext, String, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_image: Box<dyn Fn(NodeContext, String, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_heading: Box<dyn Fn(NodeContext, i64, String, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_code_block: Box<dyn Fn(NodeContext, Option<String>, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_code_inline: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_list_item: Box<dyn Fn(NodeContext, bool, String, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_list_start: Box<dyn Fn(NodeContext, bool) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_list_end: Box<dyn Fn(NodeContext, bool, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_table_start: Box<dyn Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_table_row: Box<dyn Fn(NodeContext, Vec<String>, bool) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_table_end: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_blockquote: Box<dyn Fn(NodeContext, String, i64) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_strong: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_emphasis: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_strikethrough: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_underline: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_subscript: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_superscript: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_mark: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_line_break: Box<dyn Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_horizontal_rule: Box<dyn Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_custom_element: Box<dyn Fn(NodeContext, String, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_list_start: Box<dyn Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_term: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_description: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_definition_list_end: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_form: Box<dyn Fn(NodeContext, Option<String>, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_input:
+        Box<dyn Fn(NodeContext, String, Option<String>, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_button: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_audio: Box<dyn Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_video: Box<dyn Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_iframe: Box<dyn Fn(NodeContext, Option<String>) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_details: Box<dyn Fn(NodeContext, bool) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_summary: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_figure_start: Box<dyn Fn(NodeContext) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_figcaption: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
+    visit_figure_end: Box<dyn Fn(NodeContext, String) -> DartFnFuture<VisitResult> + Send + Sync>,
 }
 impl ::std::fmt::Debug for HtmlVisitorDartImpl {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {

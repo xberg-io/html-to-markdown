@@ -18,6 +18,17 @@ import dev.kreuzberg.htmltomarkdown.JsonUtil;
 class OptionsTest {
 
     @Test
+    void testIssue396BackticksBlankLineAfterFence() throws Exception {
+        // Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+        var options = JsonUtil.fromJson("{\"code_block_style\":\"Backticks\"}", ConversionOptions.class);
+
+        var result = HtmlToMarkdownRs.convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", options);
+assertEquals("Foo\n\n```\n1\n2\n```\n\nBar", java.util.Optional.ofNullable(result.content()).map(java.util.Objects::toString).orElse("").trim());
+
+    }
+
+
+    @Test
     void testOptionsAutolinksFalse() throws Exception {
         // Bare URL links rendered as regular markdown links when autolinks disabled
         var options = JsonUtil.fromJson("{\"autolinks\":false}", ConversionOptions.class);

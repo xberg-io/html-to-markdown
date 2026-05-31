@@ -47,6 +47,12 @@ void main() {
     await RustLib.init();
   });
 
+  test('Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)', () async {
+    final _options = await createConversionOptionsFromJson(json: '{"code_block_style":"Backticks"}');
+    final result = await H2mBridge.convert('<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>', options: _options);
+    expect(result.content.toString().trim(), equals('Foo\n\n```\n1\n2\n```\n\nBar'.toString().trim()));
+  });
+
   test('Bare URL links rendered as regular markdown links when autolinks disabled', () async {
     final _options = await createConversionOptionsFromJson(json: '{"autolinks":false}');
     final result = await H2mBridge.convert('<p><a href=\'https://example.com\'>https://example.com</a></p>', options: _options);

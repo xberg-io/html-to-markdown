@@ -9,6 +9,12 @@ require 'html_to_markdown'
 require 'json'
 
 RSpec.describe 'options' do
+  it 'issue_396_backticks_blank_line_after_fence: Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)' do
+    result = HtmlToMarkdown.convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", HtmlToMarkdownRs::ConversionOptions.new(code_block_style: 'Backticks'))
+    expect(result.content.to_s.strip).to eq("Foo\n\n```\n1\n2\n```\n\nBar".strip)
+
+  end
+
   it 'options_autolinks_false: Bare URL links rendered as regular markdown links when autolinks disabled' do
     result = HtmlToMarkdown.convert('<p><a href=\'https://example.com\'>https://example.com</a></p>', HtmlToMarkdownRs::ConversionOptions.new(autolinks: false))
     expect(result.content.to_s).to include('example.com')

@@ -15,6 +15,13 @@ import RustBridge
 
 /// E2e tests for category: options.
 final class OptionsTests: XCTestCase {
+    func testIssue396BackticksBlankLineAfterFence() throws {
+        // Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+        let _options = try HtmlToMarkdown.conversionOptionsFromJson("{\"code_block_style\":\"Backticks\"}")
+        let result = try HtmlToMarkdown.convert(html: "<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", options: _options)
+        XCTAssertEqual((result.content()?.toString() ?? "").trimmingCharacters(in: CharacterSet.whitespacesAndNewlines), "Foo\n\n```\n1\n2\n```\n\nBar")
+    }
+
     func testOptionsAutolinksFalse() throws {
         // Bare URL links rendered as regular markdown links when autolinks disabled
         let _options = try HtmlToMarkdown.conversionOptionsFromJson("{\"autolinks\":false}")

@@ -17,12 +17,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **node binding: visitor callbacks (`visitText`, `visitLink`, `visitHeading`, …) now fire**
-  (resolves #395). The previous `JsHtmlVisitorBridge` stored a `napi::bindgen_prelude::Object<'static>`
-  via an unsound `std::mem::transmute`; the borrowed object was already invalid by the time
-  any visitor method ran, so `obj.has_named_property(...)` silently returned `false` and the
-  bridge fell through to `VisitResult::Continue` without dispatching. The regenerated bridge
-  stores raw `napi::sys::napi_env` and `napi::sys::napi_value` pointers and reconstructs
-  `Env`/`Object` references on each callback — matching how the WASM bridge already worked.
+  (resolves #395). `JsHtmlVisitorBridge` now stores a persistent `napi::bindgen_prelude::ObjectRef<false>`
+  obtained via `Object::create_ref()` and materializes a fresh local `Object` handle per callback
+  through `obj_ref.get_value(&env)`. The previous bridge stored raw `napi_value` pointers extracted
+  via `transmute_copy` and reconstructed via `Object::from_raw` — but a `napi_value` is a local handle
+  tied to the HandleScope active at construction time, and by the time visitor methods fired deep
+  inside `convert()` the scope was no longer active, so `get_named_property("visitText")` silently
+  returned `Err` and the bridge fell through to `VisitResult::Continue` without dispatching. A
+  `Drop` impl on the bridge calls `obj_ref.unref(&env)` so the JS object can be GC'd after
+  conversion. Verified against the issue repro: `visitText`/`visitLink`/`visitHeading` all fire.
+  (alef commit `1ffdaafe4`)
+- **code block: `CodeBlockStyle::Backticks` and `Tildes` no longer emit a trailing blank
+  line inside the fence and now insert a blank line after the closing fence** (resolves #396).
+  The fenced emitter pushed `content` verbatim (which already ends in `\n` for any trailing-newline
+  source) plus an extra `\n` before the closing fence, producing `…\n\n```\n`. It also closed with a
+  single `\n`, so following block content butted up against the closing fence with no blank line
+  separator — `Indented` style was unaffected because its content path strips trailing newlines
+  via `.lines().join("\n")` and already emits `\n\n` after. The Backticks/Tildes path now trims
+  trailing newlines from inner content (`content.trim_end_matches('\n')`) before re-emitting a
+  single `\n`, and pushes `\n\n` after the closing fence to match Indented.
 - **php test_app: PIE `install.sh` now installs `kreuzberg-dev/html-to-markdown`** instead of
   the non-existent `kreuzberg-dev/html-to-markdown-rs` (resolves #98 / smoke regression). The
   Packagist project only publishes the un-suffixed name; `alef.toml` was renamed and the regen

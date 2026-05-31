@@ -5,6 +5,11 @@
 # Issues & docs: https://github.com/kreuzberg-dev/alef
 # E2e tests for category: options
 
+test_that("issue_396_backticks_blank_line_after_fence: Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)", {
+  result <- convert(html = "<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", options = ConversionOptions$from_json(jsonlite::toJSON(list("code_block_style" = "backticks"), auto_unbox = TRUE)))
+  expect_equal(trimws(result$content), "Foo\n\n```\n1\n2\n```\n\nBar")
+})
+
 test_that("options_autolinks_false: Bare URL links rendered as regular markdown links when autolinks disabled", {
   result <- convert(html = "<p><a href='https://example.com'>https://example.com</a></p>", options = ConversionOptions$from_json(jsonlite::toJSON(list("autolinks" = FALSE), auto_unbox = TRUE)))
   expect_true(any(grepl("example.com", result$content, fixed = TRUE)))

@@ -140,16 +140,19 @@ abstract class HtmlVisitor {
   /// - `ctx`: Node context (will have `node_type: NodeType::Text`)
   /// - `text`: The raw text content (HTML entities already decoded)
   Future<VisitResult> visitText(NodeContext ctx, String text);
+
   /// Called before entering any element.
   ///
   /// This is the first callback invoked for every HTML element, allowing
   /// visitors to implement generic element handling before tag-specific logic.
   Future<VisitResult> visitElementStart(NodeContext ctx);
+
   /// Called after exiting any element.
   ///
   /// Receives the default markdown output that would be generated.
   /// Visitors can inspect or replace this output.
   Future<VisitResult> visitElementEnd(NodeContext ctx, String output);
+
   /// Visit anchor links `<a href="...">`.
   ///
   /// # Arguments
@@ -157,7 +160,13 @@ abstract class HtmlVisitor {
   /// - `href`: The link URL (from `href` attribute)
   /// - `text`: The link text content (already converted to markdown)
   /// - `title`: Optional title attribute
-  Future<VisitResult> visitLink(NodeContext ctx, String href, String text, String? title);
+  Future<VisitResult> visitLink(
+    NodeContext ctx,
+    String href,
+    String text,
+    String? title,
+  );
+
   /// Visit images `<img src="...">`.
   ///
   /// # Arguments
@@ -165,7 +174,13 @@ abstract class HtmlVisitor {
   /// - `src`: The image source URL
   /// - `alt`: The alt text
   /// - `title`: Optional title attribute
-  Future<VisitResult> visitImage(NodeContext ctx, String src, String alt, String? title);
+  Future<VisitResult> visitImage(
+    NodeContext ctx,
+    String src,
+    String alt,
+    String? title,
+  );
+
   /// Visit heading elements `<h1>` through `<h6>`.
   ///
   /// # Arguments
@@ -173,20 +188,32 @@ abstract class HtmlVisitor {
   /// - `level`: Heading level (1-6)
   /// - `text`: The heading text content
   /// - `id`: Optional id attribute (for anchor links)
-  Future<VisitResult> visitHeading(NodeContext ctx, int level, String text, String? id);
+  Future<VisitResult> visitHeading(
+    NodeContext ctx,
+    int level,
+    String text,
+    String? id,
+  );
+
   /// Visit code blocks `<pre><code>`.
   ///
   /// # Arguments
   /// - `ctx`: Node context
   /// - `lang`: Optional language specifier (from class attribute)
   /// - `code`: The code content
-  Future<VisitResult> visitCodeBlock(NodeContext ctx, String? lang, String code);
+  Future<VisitResult> visitCodeBlock(
+    NodeContext ctx,
+    String? lang,
+    String code,
+  );
+
   /// Visit inline code `<code>`.
   ///
   /// # Arguments
   /// - `ctx`: Node context
   /// - `code`: The code content
   Future<VisitResult> visitCodeInline(NodeContext ctx, String code);
+
   /// Visit list items `<li>`.
   ///
   /// # Arguments
@@ -194,98 +221,146 @@ abstract class HtmlVisitor {
   /// - `ordered`: Whether this is an ordered list item
   /// - `marker`: The list marker (e.g., "-", "1.", "a)")
   /// - `text`: The list item content (already converted)
-  Future<VisitResult> visitListItem(NodeContext ctx, bool ordered, String marker, String text);
+  Future<VisitResult> visitListItem(
+    NodeContext ctx,
+    bool ordered,
+    String marker,
+    String text,
+  );
+
   /// Called before processing a list `<ul>` or `<ol>`.
   Future<VisitResult> visitListStart(NodeContext ctx, bool ordered);
+
   /// Called after processing a list `</ul>` or `</ol>`.
-  Future<VisitResult> visitListEnd(NodeContext ctx, bool ordered, String output);
+  Future<VisitResult> visitListEnd(
+    NodeContext ctx,
+    bool ordered,
+    String output,
+  );
+
   /// Called before processing a table `<table>`.
   Future<VisitResult> visitTableStart(NodeContext ctx);
+
   /// Visit table rows `<tr>`.
   ///
   /// # Arguments
   /// - `ctx`: Node context
   /// - `cells`: Cell contents (already converted to markdown)
   /// - `is_header`: Whether this row is in `<thead>`
-  Future<VisitResult> visitTableRow(NodeContext ctx, List<String> cells, bool isHeader);
+  Future<VisitResult> visitTableRow(
+    NodeContext ctx,
+    List<String> cells,
+    bool isHeader,
+  );
+
   /// Called after processing a table `</table>`.
   Future<VisitResult> visitTableEnd(NodeContext ctx, String output);
+
   /// Visit blockquote elements `<blockquote>`.
   ///
   /// # Arguments
   /// - `ctx`: Node context
   /// - `content`: The blockquote content (already converted)
   /// - `depth`: Nesting depth (for nested blockquotes)
-  Future<VisitResult> visitBlockquote(NodeContext ctx, String content, int depth);
+  Future<VisitResult> visitBlockquote(
+    NodeContext ctx,
+    String content,
+    int depth,
+  );
+
   /// Visit strong/bold elements `<strong>`, `<b>`.
   Future<VisitResult> visitStrong(NodeContext ctx, String text);
+
   /// Visit emphasis/italic elements `<em>`, `<i>`.
   Future<VisitResult> visitEmphasis(NodeContext ctx, String text);
+
   /// Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
   Future<VisitResult> visitStrikethrough(NodeContext ctx, String text);
+
   /// Visit underline elements `<u>`, `<ins>`.
   Future<VisitResult> visitUnderline(NodeContext ctx, String text);
+
   /// Visit subscript elements `<sub>`.
   Future<VisitResult> visitSubscript(NodeContext ctx, String text);
+
   /// Visit superscript elements `<sup>`.
   Future<VisitResult> visitSuperscript(NodeContext ctx, String text);
+
   /// Visit mark/highlight elements `<mark>`.
   Future<VisitResult> visitMark(NodeContext ctx, String text);
+
   /// Visit line break elements `<br>`.
   Future<VisitResult> visitLineBreak(NodeContext ctx);
+
   /// Visit horizontal rule elements `<hr>`.
   Future<VisitResult> visitHorizontalRule(NodeContext ctx);
+
   /// Visit custom elements (web components) or unknown tags.
   ///
   /// # Arguments
   /// - `ctx`: Node context
   /// - `tag_name`: The custom element's tag name
   /// - `html`: The raw HTML of this element
-  Future<VisitResult> visitCustomElement(NodeContext ctx, String tagName, String html);
+  Future<VisitResult> visitCustomElement(
+    NodeContext ctx,
+    String tagName,
+    String html,
+  );
+
   /// Visit definition list `<dl>`.
   Future<VisitResult> visitDefinitionListStart(NodeContext ctx);
+
   /// Visit definition term `<dt>`.
   Future<VisitResult> visitDefinitionTerm(NodeContext ctx, String text);
+
   /// Visit definition description `<dd>`.
   Future<VisitResult> visitDefinitionDescription(NodeContext ctx, String text);
+
   /// Called after processing a definition list `</dl>`.
   Future<VisitResult> visitDefinitionListEnd(NodeContext ctx, String output);
+
   /// Visit form elements `<form>`.
-  Future<VisitResult> visitForm(NodeContext ctx, String? action, String? method);
+  Future<VisitResult> visitForm(
+    NodeContext ctx,
+    String? action,
+    String? method,
+  );
+
   /// Visit input elements `<input>`.
-  Future<VisitResult> visitInput(NodeContext ctx, String inputType, String? name, String? value);
+  Future<VisitResult> visitInput(
+    NodeContext ctx,
+    String inputType,
+    String? name,
+    String? value,
+  );
+
   /// Visit button elements `<button>`.
   Future<VisitResult> visitButton(NodeContext ctx, String text);
+
   /// Visit audio elements `<audio>`.
   Future<VisitResult> visitAudio(NodeContext ctx, String? src);
+
   /// Visit video elements `<video>`.
   Future<VisitResult> visitVideo(NodeContext ctx, String? src);
+
   /// Visit iframe elements `<iframe>`.
   Future<VisitResult> visitIframe(NodeContext ctx, String? src);
+
   /// Visit details elements `<details>`.
   Future<VisitResult> visitDetails(NodeContext ctx, bool open);
+
   /// Visit summary elements `<summary>`.
   Future<VisitResult> visitSummary(NodeContext ctx, String text);
+
   /// Visit figure elements `<figure>`.
   Future<VisitResult> visitFigureStart(NodeContext ctx);
+
   /// Visit figcaption elements `<figcaption>`.
   Future<VisitResult> visitFigcaption(NodeContext ctx, String text);
+
   /// Called after processing a figure `</figure>`.
   Future<VisitResult> visitFigureEnd(NodeContext ctx, String output);
 }
-
-
-/// Opaque JSON carrier for Rust's internal InternalDocument trait contract.
-final class InternalDocumentBridge {
-  const InternalDocumentBridge({required this.json});
-  final String json;
-}
-
-/// OCR backend type identifier — used by e2e test plugin_api stubs.
-enum OcrBackendType { tesseract, easyocr, paddleocr, rapidocr }
-
-/// Processing stage for post-processors — used by e2e test plugin_api stubs.
-enum ProcessingStage { preProcessing, processing, postProcessing }
 
 /// Synchronous extractor trait stub — used by e2e test plugin_api stubs.
 abstract class SyncExtractor {}

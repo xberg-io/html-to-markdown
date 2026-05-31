@@ -67,7 +67,7 @@ public sealed record DocumentMetadata
     /// </summary>
     [JsonConverter(typeof(TextDirectionJsonConverter))]
     [JsonPropertyName("text_direction")]
-    public TextDirection? TextDirection { get; init; } = null;
+    public JsonElement? TextDirection { get; init; } = null;
 
     /// <summary>
     /// Open Graph metadata (og:* properties) for social media

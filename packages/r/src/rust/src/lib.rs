@@ -2411,7 +2411,8 @@ pub fn convert(html: String, options: Robj) -> Result<Robj> {
         .filter(|v| !v.is_null() && !v.is_na());
     let visitor_handle: Option<html_to_markdown_rs::visitor::VisitorHandle> = visitor_robj
         .map(|v| Arc::new(Mutex::new(RHtmlVisitorBridge::new(v))) as html_to_markdown_rs::visitor::VisitorHandle);
-    let mut opts = crate::options::decode_options(options).map_err(|e| extendr_api::Error::Other(e))?;
+    let opts_local = crate::options::decode_options(options).map_err(|e| extendr_api::Error::Other(e))?;
+    let mut opts: html_to_markdown_rs::ConversionOptions = opts_local.into();
     opts.visitor = visitor_handle;
     html_to_markdown_rs::convert(&html, Some(opts))
         .map(crate::types::conversion_result_to_robj)

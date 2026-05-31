@@ -9,6 +9,30 @@ use html_to_markdown_rs::convert;
 use html_to_markdown_rs::ConversionOptions;
 
 #[test]
+fn test_issue_396_backticks_blank_line_after_fence() {
+    // Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+    let html = r#"<p>Foo</p><pre><code>1
+2
+</code></pre><p>Bar</p>"#;
+    let options_json: serde_json::Value = serde_json::from_str(r#"{"code_block_style":"Backticks"}"#).unwrap();
+    let options: ConversionOptions = serde_json::from_value(options_json).unwrap();
+    let result = convert(html, Some(options.clone())).expect("should succeed");
+    let _content = result.content.as_ref().map(|v| v.to_string()).unwrap_or_default();
+    assert_eq!(
+        _content.to_string().as_str().trim(),
+        r#"Foo
+
+```
+1
+2
+```
+
+Bar"#,
+        "equals assertion failed"
+    );
+}
+
+#[test]
 fn test_options_autolinks_false() {
     // Bare URL links rendered as regular markdown links when autolinks disabled
     let html = r#"<p><a href='https://example.com'>https://example.com</a></p>"#;

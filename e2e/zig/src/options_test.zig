@@ -20,6 +20,21 @@ fn suppress_abort() void {
 
 // E2e tests for category: options
 
+test "issue_396_backticks_blank_line_after_fence" {
+    // Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)
+    suppress_abort();
+    var gpa: std.heap.DebugAllocator(.{}) = .init;
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const _result_json = try html_to_markdown_rs.convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", "{\"code_block_style\":\"Backticks\"}");
+    defer std.heap.c_allocator.free(_result_json);
+    var _parsed = try std.json.parseFromSlice(std.json.Value, allocator, _result_json, .{});
+    defer _parsed.deinit();
+    const result = &_parsed.value;
+    try testing.expectEqualStrings("Foo\n\n```\n1\n2\n```\n\nBar", std.mem.trim(u8, result.object.get("content").?.string, " \n\r\t"));
+}
+
 test "options_autolinks_false" {
     // Bare URL links rendered as regular markdown links when autolinks disabled
     suppress_abort();

@@ -1467,9 +1467,10 @@ pub fn convert(
     options: Option<JsConversionOptions>,
     visitor: Option<napi::bindgen_prelude::Object>,
 ) -> Result<JsConversionResult> {
-    let visitor_handle: Option<html_to_markdown_rs::visitor::VisitorHandle> = visitor.map(|v| {
-        let bridge = JsHtmlVisitorBridge::new(v);
-        std::sync::Arc::new(std::sync::Mutex::new(bridge)) as html_to_markdown_rs::visitor::VisitorHandle
+    let visitor_handle: Option<html_to_markdown_rs::visitor::VisitorHandle> = visitor.and_then(|v| {
+        JsHtmlVisitorBridge::new(v).ok().map(|bridge| {
+            std::sync::Arc::new(std::sync::Mutex::new(bridge)) as html_to_markdown_rs::visitor::VisitorHandle
+        })
     });
     let options_core: Option<html_to_markdown_rs::ConversionOptions> = options
         .map(|o| {
@@ -1529,7 +1530,7 @@ fn nodecontext_to_js_object<'e>(
 
 pub struct JsHtmlVisitorBridge {
     env: napi::sys::napi_env,
-    obj: napi::sys::napi_value,
+    obj_ref: Option<napi::bindgen_prelude::ObjectRef<false>>,
 }
 
 impl std::fmt::Debug for JsHtmlVisitorBridge {
@@ -1539,39 +1540,58 @@ impl std::fmt::Debug for JsHtmlVisitorBridge {
 }
 
 impl JsHtmlVisitorBridge {
-    pub fn new(js_obj: napi::bindgen_prelude::Object<'_>) -> Self {
-        // Store raw NAPI pointers instead of typed references.
-        // This avoids lifetime issues with the Object<'static> transmute.
-        // SAFETY: Object<'_> is 3 pointer-sized words: [napi_env, napi_value, is_ref].
-        // We extract these raw pointers which remain valid as long as the object exists.
+    pub fn new(js_obj: napi::bindgen_prelude::Object<'_>) -> napi::Result<Self> {
+        // SAFETY: Object<'_> is laid out as 3 pointer-sized words: [napi_env, napi_value, is_ref].
+        // We extract the raw napi_env pointer so we can reconstruct an Env inside visitor
+        // callbacks. The pointer is stable for the lifetime of the Node process.
         let env = unsafe {
             let raw: [*mut std::ffi::c_void; 3] = std::mem::transmute_copy(&js_obj);
             raw[0] as napi::sys::napi_env
         };
-        let obj = unsafe {
-            let raw: [*mut std::ffi::c_void; 3] = std::mem::transmute_copy(&js_obj);
-            raw[1] as napi::sys::napi_value
-        };
-        Self { env, obj }
+        // Create a persistent napi reference so the JS object survives across the
+        // synchronous convert() call, regardless of HandleScope movement.
+        let obj_ref = js_obj.create_ref::<false>()?;
+        Ok(Self {
+            env,
+            obj_ref: Some(obj_ref),
+        })
     }
 }
 
-// SAFETY: The visitor bridge stores raw napi_env and napi_value pointers.
-// These pointers are obtained from a JS object created on the NAPI event loop thread.
-// Since the bridge is wrapped in Arc<Mutex<>> and only accessed during the convert() call,
-// it is safe to send across threads as long as all napi:: operations reconstructed from
-// these pointers happen on the original event loop thread. The convert() function ensures
-// this by keeping the bridge alive only for the duration of the synchronous NAPI call.
+impl Drop for JsHtmlVisitorBridge {
+    fn drop(&mut self) {
+        // Release the persistent reference so the JS object can be GC'd. unref takes
+        // ownership; the Option lets us move out from &mut self in drop.
+        if let Some(obj_ref) = self.obj_ref.take() {
+            // self.env was captured from the napi_env that owns obj_ref.
+            let env = napi::Env::from_raw(self.env);
+            let _ = obj_ref.unref(&env);
+        }
+    }
+}
+
+// SAFETY: The visitor bridge stores an napi_ref (via ObjectRef), which is valid across
+// threads as long as all napi:: operations using it happen on the original event loop
+// thread where the reference was created. The Arc<Mutex<>> wrapper around the bridge
+// ensures synchronous, single-threaded access during the convert() call.
 unsafe impl Send for JsHtmlVisitorBridge {}
 // SAFETY: see Send impl above.
 unsafe impl Sync for JsHtmlVisitorBridge {}
 
 impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
     fn visit_text(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1653,10 +1673,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         }
     }
     fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1734,10 +1762,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1825,10 +1861,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _text: &str,
         _title: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1944,10 +1988,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _alt: &str,
         _title: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2063,10 +2115,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _text: &str,
         _id: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2181,10 +2241,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _lang: Option<&str>,
         _code: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2289,10 +2357,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _code: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2380,10 +2456,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _marker: &str,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2487,10 +2571,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _ordered: bool,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2574,10 +2666,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ordered: bool,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2668,10 +2768,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         }
     }
     fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2750,10 +2858,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _cells: &[String],
         _is_header: bool,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2848,10 +2964,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2938,10 +3062,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _content: &str,
         _depth: usize,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3039,10 +3171,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3128,10 +3268,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3217,10 +3365,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3306,10 +3462,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3395,10 +3559,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3484,10 +3656,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3569,10 +3749,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         }
     }
     fn visit_mark(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3654,10 +3842,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         }
     }
     fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3731,10 +3927,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         }
     }
     fn visit_horizontal_rule(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3813,10 +4017,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _tag_name: &str,
         _html: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3913,10 +4125,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         &mut self,
         _ctx: &html_to_markdown_rs::NodeContext,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3994,10 +4214,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4083,10 +4311,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4172,10 +4408,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4262,10 +4506,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _action: Option<&str>,
         _method: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4379,10 +4631,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _name: Option<&str>,
         _value: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4503,10 +4763,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4592,10 +4860,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4688,10 +4964,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4784,10 +5068,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4880,10 +5172,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _open: bool,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4966,10 +5266,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -5051,10 +5359,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         }
     }
     fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -5132,10 +5448,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -5221,10 +5545,18 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         _ctx: &html_to_markdown_rs::NodeContext,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
-        // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
-        // We reconstruct the Env and Object from these pointers to call the JS function.
-        let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
+        // self.env is the napi_env that owned the persistent reference; it is stable for
+        // the lifetime of the Node process. Env::from_raw is a safe constructor that
+        // gives us a live Env handle for the current scope.
+        let __env = napi::Env::from_raw(self.env);
+        let obj_ref = match self.obj_ref.as_ref() {
+            Some(r) => r,
+            None => return html_to_markdown_rs::VisitResult::Continue,
+        };
+        let obj = match obj_ref.get_value(&__env) {
+            Ok(o) => o,
+            Err(_) => return html_to_markdown_rs::VisitResult::Continue,
+        };
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<

@@ -4,521 +4,742 @@
 // To verify freshness: alef verify --exit-code
 // Issues & docs: https://github.com/kreuzberg-dev/alef
 
-import { describe, expect, it } from 'vitest';import { convert, type ConversionOptions } from '@kreuzberg/html-to-markdown';
+import { describe, expect, it } from "vitest";
+import { convert, type ConversionOptions } from "@kreuzberg/html-to-markdown";
 function _alefE2eText(value: unknown): string {
-  return value == null ? "" : String(value);
+	return value == null ? "" : String(value);
 }
 
 function _alefE2eItemTexts(item: unknown): string[] {
-  if (item == null || typeof item !== "object") {
-    return [_alefE2eText(item)];
-  }
-  const record = item as Record<string, unknown>;
-  const itemsText = Array.isArray(record.items) ? record.items.map(_alefE2eText).join(" ") : "";
-  return [_alefE2eText(item), _alefE2eText(record.kind), _alefE2eText(record.name), _alefE2eText(record.source), _alefE2eText(record.alias), _alefE2eText(record.text), _alefE2eText(record.signature), itemsText];
+	if (item == null || typeof item !== "object") {
+		return [_alefE2eText(item)];
+	}
+	const record = item as Record<string, unknown>;
+	const itemsText = Array.isArray(record.items) ? record.items.map(_alefE2eText).join(" ") : "";
+	return [
+		_alefE2eText(item),
+		_alefE2eText(record.kind),
+		_alefE2eText(record.name),
+		_alefE2eText(record.source),
+		_alefE2eText(record.alias),
+		_alefE2eText(record.text),
+		_alefE2eText(record.signature),
+		itemsText,
+	];
 }
 
 function _alefE2eFormatMetadataDisplay(fm: unknown): string {
-  if (fm == null) return "";
-  if (typeof fm !== "object") return String(fm);
-  const record = fm as Record<string, unknown>;
-  const formatType = record.format_type;
+	if (fm == null) return "";
+	if (typeof fm !== "object") return String(fm);
+	const record = fm as Record<string, unknown>;
+	const formatType = record.format_type;
 
-  // FormatMetadata is a tagged union: { format_type: 'image', image: { format: 'PNG', ... }, ... }
-  // Extract the display string based on the variant type
-  if (formatType === "image" && typeof record.image === "object") {
-    const imageData = record.image as Record<string, unknown>;
-    if (typeof imageData.format === "string") return imageData.format;
-  }
+	// FormatMetadata is a tagged union: { format_type: 'image', image: { format: 'PNG', ... }, ... }
+	// Extract the display string based on the variant type
+	if (formatType === "image" && typeof record.image === "object") {
+		const imageData = record.image as Record<string, unknown>;
+		if (typeof imageData.format === "string") return imageData.format;
+	}
 
-  // Fallback: return format_type variant name
-  if (typeof record.format_type === "string") return record.format_type;
-  return "";
+	// Fallback: return format_type variant name
+	if (typeof record.format_type === "string") return record.format_type;
+	return "";
 }
 
-
-describe('options', () => {  it('options_autolinks_false: Bare URL links rendered as regular markdown links when autolinks disabled', () => {    const result = convert("<p><a href='https://example.com'>https://example.com</a></p>", { autolinks: false } as ConversionOptions);    expect(result.content).toContain("example.com");
-
-  }, 30000);
-  it('options_br_in_tables_false: BR elements in table cells are stripped when disabled', () => {    const result = convert("<table><tr><th>Col</th></tr><tr><td>A<br>B</td></tr></table>", { brInTables: false } as ConversionOptions);    expect(result.content).toContain("Col");
-
-  }, 30000);
-  it('options_br_in_tables_true: BR elements in table cells render as line breaks', () => {    const result = convert("<table><tr><th>Header</th></tr><tr><td>Line 1<br>Line 2</td></tr></table>", { brInTables: true } as ConversionOptions);    expect(result.content).toContain("Header");
-    expect(result.content).toContain("Line 1");
-    expect(result.content).toContain("Line 2");
-
-  }, 30000);
-  it('options_capture_svg_false: Disabling capture_svg still produces content; SVG is not extracted as an image', () => {    const result = convert("<p>Below SVG:</p><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"10\"><rect width=\"10\" height=\"10\" fill=\"red\"/></svg>", { captureSvg: false, extractImages: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("Below SVG");
-
-  }, 30000);
-  it('options_capture_svg_true: Enabling capture_svg processes inline SVG elements when extract_images is on', () => {    const result = convert("<p>Below SVG:</p><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"10\"><rect width=\"10\" height=\"10\" fill=\"red\"/></svg>", { captureSvg: true, extractImages: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("Below SVG");
-
-  }, 30000);
-  it('options_code_block_backticks: Backticks code block style uses triple backtick fences', () => {    const result = convert("<pre><code class=\"language-js\">console.log('hi');</code></pre>", { codeBlockStyle: "Backticks" } as ConversionOptions);    expect(result.content).toContain("```");
-    expect(result.content).toContain("console.log('hi');");
-
-  }, 30000);
-  it('options_code_block_indented: Code blocks use 4-space indentation', () => {    const result = convert("<pre><code>print('hello')</code></pre>", { codeBlockStyle: "Indented" } as ConversionOptions);    expect(result.content).toContain("print('hello')");
-    expect(result.content).not.toContain("```");
-
-  }, 30000);
-  it('options_code_block_tildes: Code blocks use tilde fences', () => {    const result = convert("<pre><code>let x = 1;</code></pre>", { codeBlockStyle: "Tildes" } as ConversionOptions);    expect(result.content).toContain("~~~");
-    expect(result.content).toContain("let x = 1;");
-
-  }, 30000);
-  it('options_code_block_tildes_style: Tildes code block style uses triple tilde fences', () => {    const result = convert("<pre><code>some code</code></pre>", { codeBlockStyle: "Tildes" } as ConversionOptions);    expect(result.content).toContain("~~~");
-    expect(result.content).toContain("some code");
-
-  }, 30000);
-  it('options_code_language_python: Default code language annotation on blocks without lang attribute', () => {    const result = convert("<pre><code>def hello(): pass</code></pre>", { codeLanguage: "python" } as ConversionOptions);    expect(result.content).toContain("```python");
-    expect(result.content).toContain("def hello");
-
-  }, 30000);
-  it('options_compact_tables_false: compact_tables false (default) pads cells to column width', () => {    const result = convert("<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>100</td></tr><tr><td>Bob</td><td>42</td></tr></tbody></table>", { compactTables: false } as ConversionOptions);    expect(result.content ?? "").toContain("| ----- |");
-    expect(result.content ?? "").toContain("| 42    |");
-    expect(result.content).not.toContain("| --- |");
-
-  }, 30000);
-  it('options_compact_tables_true: compact_tables emits unpadded cells and minimal --- separators', () => {    const result = convert("<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>100</td></tr><tr><td>Bob</td><td>42</td></tr></tbody></table>", { compactTables: true } as ConversionOptions);    expect(result.content ?? "").toContain("| --- |");
-    expect(result.content).not.toContain("| ----- |");
-    expect(result.content ?? "").toContain("| 42 |");
-    expect(result.content).not.toContain("| 42    |");
-
-  }, 30000);
-  it('options_convert_as_inline: Block elements treated as inline', () => {    const result = convert("<p>One</p><p>Two</p>", { convertAsInline: true } as ConversionOptions);    expect(result.content).toContain("One");
-    expect(result.content).toContain("Two");
-
-  }, 30000);
-  it('options_debug_true: Debug mode enabled does not crash and produces output', () => {    const result = convert("<p>Debug test</p>", { debug: true } as ConversionOptions);    expect(result.content).toContain("Debug test");
-
-  }, 30000);
-  it('options_default_title_true: Links without title get empty title attribute when defaultTitle is true', () => {    const result = convert("<p><a href='https://example.com'>Link</a></p>", { defaultTitle: true } as ConversionOptions);    expect(result.content).toContain("Link");
-    expect(result.content).toContain("https://example.com");
-
-  }, 30000);
-  it('options_encoding_utf8: UTF-8 encoding hint for special characters', () => {    const result = convert("<p>Café naïve résumé</p>", { encoding: "utf-8" } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-
-  }, 30000);
-  it('options_escape_ascii_enabled: ASCII Markdown characters are escaped when escapeAscii is true', () => {    const result = convert("<p>Text with # hash and [brackets] and * star</p>", { escapeAscii: true } as ConversionOptions);    expect(result.content).toContain("Text");
-    expect(result.content).toContain("hash");
-    expect(result.content).toContain("brackets");
-    expect(result.content).toContain("star");
-
-  }, 30000);
-  it('options_escape_asterisks: escape_asterisks option escapes asterisks in plain text', () => {    const result = convert("<p>Use 2*3 = 6 in math.</p>", { escapeAsterisks: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("2");
-    expect(result.content).toContain("3");
-    expect(result.content).toContain("6");
-
-  }, 30000);
-  it('options_escape_misc: escape_misc option escapes miscellaneous markdown characters', () => {    const result = convert("<p>Use # and | and ~ in text.</p>", { escapeMisc: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Use");
-    expect(result.content).toContain("and");
-    expect(result.content).toContain("in text.");
-
-  }, 30000);
-  it('options_escape_underscores: escape_underscores option escapes underscores in plain text', () => {    const result = convert("<p>The variable_name is defined.</p>", { escapeUnderscores: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("variable");
-    expect(result.content).toContain("name");
-    expect(result.content).toContain("defined.");
-
-  }, 30000);
-  it('options_exclude_selectors_attribute: Elements matching CSS attribute selector are excluded entirely', () => {    const result = convert("<body><div role=\"complementary\">Sidebar</div><p>Primary text</p></body>", { excludeSelectors: ["[role='complementary']"] } as ConversionOptions);    expect(result.content ?? "").toContain("Primary text");
-    expect(result.content).not.toContain("Sidebar");
-
-  }, 30000);
-  it('options_exclude_selectors_class: Elements matching CSS class selector are excluded entirely', () => {    const result = convert("<body><div class=\"cookie-banner\">Accept cookies</div><p>Main content</p></body>", { excludeSelectors: [".cookie-banner"] } as ConversionOptions);    expect(result.content ?? "").toContain("Main content");
-    expect(result.content).not.toContain("cookies");
-
-  }, 30000);
-  it('options_exclude_selectors_empty_noop: Empty exclude_selectors list does not affect output', () => {    const result = convert("<p>Hello world</p>", { excludeSelectors: [] } as ConversionOptions);    expect(result.content ?? "").toContain("Hello world");
-
-  }, 30000);
-  it('options_exclude_selectors_id: Elements matching CSS id selector are excluded entirely', () => {    const result = convert("<body><div id=\"ad-container\">Buy stuff</div><p>Article text</p></body>", { excludeSelectors: ["#ad-container"] } as ConversionOptions);    expect(result.content ?? "").toContain("Article text");
-    expect(result.content).not.toContain("Buy stuff");
-
-  }, 30000);
-  it('options_exclude_selectors_multiple: Multiple CSS selectors each exclude their matched elements', () => {    const result = convert("<body><nav class=\"nav\">Menu</nav><p>Content</p><footer>Footer</footer></body>", { excludeSelectors: [".nav", "footer"] } as ConversionOptions);    expect(result.content ?? "").toContain("Content");
-    expect(result.content).not.toContain("Menu");
-    expect(result.content).not.toContain("Footer");
-
-  }, 30000);
-  it('options_exclude_selectors_nested_content_dropped: All descendants of excluded elements are dropped', () => {    const result = convert("<body><aside class=\"sidebar\"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>", { excludeSelectors: [".sidebar"] } as ConversionOptions);    expect(result.content ?? "").toContain("Main text");
-    expect(result.content).not.toContain("Related");
-    expect(result.content).not.toContain("Sidebar text");
-
-  }, 30000);
-  it('options_exclude_selectors_plain_text_mode: Exclude selectors work in plain text output mode', () => {    const result = convert("<body><div class=\"nav\">Navigation</div><p>Article body</p></body>", { excludeSelectors: [".nav"], outputFormat: "Plain" } as ConversionOptions);    expect(result.content ?? "").toContain("Article body");
-    expect(result.content).not.toContain("Navigation");
-
-  }, 30000);
-  it('options_exclude_selectors_vs_strip_tags: exclude_selectors drops entire subtree unlike strip_tags which keeps children', () => {    const result = convert("<body><div class=\"wrapper\"><p>Inner paragraph</p></div><p>Outer text</p></body>", { excludeSelectors: [".wrapper"] } as ConversionOptions);    expect(result.content ?? "").toContain("Outer text");
-    expect(result.content).not.toContain("Inner paragraph");
-
-  }, 30000);
-  it('options_extract_images_false: When extract_images is false, conversion still succeeds and inline images are not extracted', () => {    const result = convert("<p>Text with <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"> image.</p>", { extractImages: false } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-
-  }, 30000);
-  it('options_extract_images_true_data_uri: Enabling extract_images processes a data-URI image without crashing', () => {    const result = convert("<p>Before<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\">After</p>", { extractImages: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Before");
-    expect(result.content).toContain("After");
-
-  }, 30000);
-  it('options_extract_metadata_true: Extract metadata returns document metadata when enabled', () => {    const result = convert("<html><head><title>Test Page</title><meta name='description' content='A test page'></head><body><p>Content</p></body></html>", { extractMetadata: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect((result.metadata.document.title ?? "").trim()).toBe("Test Page");
-    expect((result.metadata.document.description ?? "").trim()).toBe("A test page");
-
-  }, 30000);
-  it('options_heading_style_atx: ATX heading style produces hash-prefixed headings', () => {    const result = convert("<h1>Title</h1><h2>Subtitle</h2>", { headingStyle: "Atx" } as ConversionOptions);    expect(result.content).toContain("# Title");
-    expect(result.content).toContain("## Subtitle");
-
-  }, 30000);
-  it('options_heading_style_atx_closed: ATX closed heading style adds closing hashes', () => {    const result = convert("<h1>Closed Heading</h1>", { headingStyle: "AtxClosed" } as ConversionOptions);    expect(result.content).toContain("# Closed Heading #");
-
-  }, 30000);
-  it('options_heading_style_underlined: Underlined heading style produces setext-style headings for h1 and h2', () => {    const result = convert("<h1>Main Title</h1>", { headingStyle: "Underlined" } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Main Title");
-
-  }, 30000);
-  it('options_highlight_bold: Mark tag rendered as bold', () => {    const result = convert("<p>Text with <mark>highlighted</mark> text.</p>", { highlightStyle: "Bold" } as ConversionOptions);    expect(result.content).toContain("**highlighted**");
-
-  }, 30000);
-  it('options_highlight_double_equal: Mark tag with double equal highlight style', () => {    const result = convert("<p>Text with <mark>highlighted</mark> here.</p>", { highlightStyle: "DoubleEqual" } as ConversionOptions);    expect(result.content).toContain("==highlighted==");
-
-  }, 30000);
-  it('options_highlight_none: Mark tag with no highlight style strips the mark', () => {    const result = convert("<p>Text with <mark>plain</mark> content.</p>", { highlightStyle: "None" } as ConversionOptions);    expect(result.content).toContain("plain");
-    expect(result.content).not.toContain("==");
-
-  }, 30000);
-  it('options_include_document_structure_false: Disabling include_document_structure still produces content without the document tree overhead', () => {    const result = convert("<article><h1>Heading</h1><p>Paragraph body.</p></article>", { includeDocumentStructure: false } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("Heading");
-
-  }, 30000);
-  it('options_include_document_structure_true: Setting include_document_structure populates the structured document tree on the result', () => {    const result = convert("<article><h1>Heading</h1><p>Paragraph body.</p></article>", { includeDocumentStructure: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("Heading");
-
-  }, 30000);
-  it('options_infer_dimensions_false: Disabling infer_dimensions skips the decode step and still produces content', () => {    const result = convert("<p>No dims: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>", { extractImages: true, inferDimensions: false } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("No dims");
-
-  }, 30000);
-  it('options_infer_dimensions_true: Enabling infer_dimensions decodes image bytes to populate dimension metadata when extract_images is on', () => {    const result = convert("<p>With dims: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>", { extractImages: true, inferDimensions: true } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("With dims");
-
-  }, 30000);
-  it('options_keep_inline_images_in_paragraph: Images inside specified tags stay inline', () => {    const result = convert("<p>Text <img src='icon.png' alt='icon'> more text</p>", { keepInlineImagesIn: ["p"] } as ConversionOptions);    expect(result.content).toContain("Text");
-    expect(result.content).toContain("more text");
-
-  }, 30000);
-  it('options_link_style_reference: Links use reference-style formatting', () => {    const result = convert("<p><a href='https://example.com'>Example</a> and <a href='https://other.com'>Other</a></p>", { linkStyle: "Reference" } as ConversionOptions);    expect(result.content).toContain("Example");
-    expect(result.content).toContain("Other");
-    expect(result.content).toContain("example.com");
-
-  }, 30000);
-  it('options_list_custom_bullets: Custom bullet character for unordered lists', () => {    const result = convert("<ul><li>Item A</li><li>Item B</li></ul>", { bullets: "*" } as ConversionOptions);    expect(result.content).toContain("* Item A");
-    expect(result.content).toContain("* Item B");
-
-  }, 30000);
-  it('options_list_indent_tabs: Tab indentation type for nested list items', () => {    const result = convert("<ul><li>Parent<ul><li>Child</li></ul></li></ul>", { listIndentType: "Tabs" } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Parent");
-    expect(result.content).toContain("Child");
-
-  }, 30000);
-  it('options_list_indent_width_four: Nested lists indented with 4 spaces per level', () => {    const result = convert("<ul><li>Outer<ul><li>Inner</li></ul></li></ul>", { listIndentWidth: 4 } as ConversionOptions);    expect(result.content).toContain("Outer");
-    expect(result.content).toContain("Inner");
-
-  }, 30000);
-  it('options_max_depth_default_unlimited: Default max_depth (null) converts deeply nested content fully', () => {    const result = convert("<div><div><div><div><p>Deep content</p></div></div></div></div>", undefined);    expect(result.content ?? "").toContain("Deep content");
-
-  }, 30000);
-  it('options_max_depth_truncates: max_depth truncates content beyond the specified depth', () => {    const result = convert("<div><p>Shallow</p><div><div><div><p>Too deep</p></div></div></div></div>", { maxDepth: 3 } as ConversionOptions);    expect(result.content ?? "").toContain("Shallow");
-    expect(result.content).not.toContain("Too deep");
-
-  }, 30000);
-  it('options_max_depth_zero_empty: max_depth of 0 produces empty output', () => {    const result = convert("<p>Hello</p>", { maxDepth: 0 } as ConversionOptions);    expect((result.content ?? "").trim()).toBe("");
-
-  }, 30000);
-  it('options_max_image_size_generous_limit: A generous max_image_size accommodates a small data-URI image without warnings', () => {    const result = convert("<p>Image: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>", { extractImages: true, maxImageSize: 10485760 } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("Image");
-
-  }, 30000);
-  it('options_max_image_size_tiny_limit_safe: A tiny max_image_size does not crash conversion even when the image exceeds the limit', () => {    const result = convert("<p>Tiny limit: <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>", { extractImages: true, maxImageSize: 10 } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content ?? "").toContain("Tiny limit");
-
-  }, 30000);
-  it('options_newline_backslash: Hard line breaks rendered with backslash', () => {    const result = convert("<p>Line one<br>Line two</p>", { newlineStyle: "Backslash" } as ConversionOptions);    expect(result.content).toContain("Line one");
-    expect(result.content).toContain("Line two");
-
-  }, 30000);
-  it('options_newline_spaces: Hard line breaks rendered with trailing spaces', () => {    const result = convert("<p>First<br>Second</p>", { newlineStyle: "Spaces" } as ConversionOptions);    expect(result.content).toContain("First");
-    expect(result.content).toContain("Second");
-
-  }, 30000);
-  it('options_output_format_djot: Djot output format produces djot-compatible markup', () => {    const result = convert("<p>Simple paragraph.</p>", { outputFormat: "Djot" } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Simple paragraph.");
-
-  }, 30000);
-  it('options_output_format_markdown: Default markdown output format produces standard markdown', () => {    const result = convert("<h1>Title</h1><p>Some text.</p>", { headingStyle: "Atx", outputFormat: "Markdown" } as ConversionOptions);    expect(result.content).toContain("# Title");
-    expect(result.content).toContain("Some text.");
-
-  }, 30000);
-  it('options_output_format_plain: Plain text output format strips markdown syntax', () => {    const result = convert("<h1>Title</h1><p>Some <strong>bold</strong> text.</p>", { outputFormat: "Plain" } as ConversionOptions);    expect(result.content).toContain("Title");
-    expect(result.content).toContain("bold");
-    expect(result.content).toContain("text.");
-
-  }, 30000);
-  it('options_preprocessing_aggressive: Aggressive preset removes nav, footer, aside unconditionally', () => {    const result = convert("<nav>Menu</nav><article><h1>Title</h1><p>Content</p></article><aside>Sidebar</aside><footer>Footer</footer>", { preprocessing: { preset: "Aggressive" } } as ConversionOptions);    expect(result.content).toContain("Title");
-    expect(result.content).toContain("Content");
-    expect(result.content).not.toContain("Menu");
-
-  }, 30000);
-  it('options_preprocessing_enabled_false_skips_cleanup: Disabling preprocessing entirely preserves elements the standard preset would remove', () => {    const result = convert("<nav>NavSection</nav><p>Paragraph</p>", { preprocessing: { enabled: false } } as ConversionOptions);    expect(result.content).toContain("NavSection");
-    expect(result.content).toContain("Paragraph");
-
-  }, 30000);
-  it('options_preprocessing_minimal: Minimal preset preserves nav, footer, aside', () => {    const result = convert("<nav>Navigation</nav><p>Content</p><footer>Footer</footer>", { preprocessing: { preset: "Minimal" } } as ConversionOptions);    expect(result.content).toContain("Navigation");
-    expect(result.content).toContain("Content");
-    expect(result.content).toContain("Footer");
-
-  }, 30000);
-  it('options_preprocessing_remove_forms: Forms are removed when remove_forms is true', () => {    const result = convert("<p>Before</p><form><input type='text'/><button>Submit</button></form><p>After</p>", { preprocessing: { removeForms: true } } as ConversionOptions);    expect(result.content).toContain("Before");
-    expect(result.content).toContain("After");
-    expect(result.content).not.toContain("Submit");
-
-  }, 30000);
-  it('options_preprocessing_remove_navigation_false_keeps_nav: Setting remove_navigation to false preserves nav and aside elements', () => {    const result = convert("<nav>SiteMenu</nav><main><p>MainContent</p></main><aside>SidebarText</aside>", { preprocessing: { removeNavigation: false } } as ConversionOptions);    expect(result.content).toContain("SiteMenu");
-    expect(result.content).toContain("MainContent");
-    expect(result.content).toContain("SidebarText");
-
-  }, 30000);
-  it('options_preserve_tags_iframe: Iframe tags preserved as raw HTML in output', () => {    const result = convert("<p>Before</p><iframe src='video.html' width='560'></iframe><p>After</p>", { preserveTags: ["iframe"] } as ConversionOptions);    expect(result.content).toContain("Before");
-    expect(result.content).toContain("After");
-    expect(result.content).toContain("<iframe");
-
-  }, 30000);
-  it('options_skip_images_true: Images are omitted from output when skipImages is true', () => {    const result = convert("<p>Before <img src='test.jpg' alt='photo'> After</p>", { skipImages: true } as ConversionOptions);    expect(result.content).toContain("Before");
-    expect(result.content).toContain("After");
-    expect(result.content).not.toContain("photo");
-
-  }, 30000);
-  it('options_strip_newlines: Strip newlines produces single-line paragraphs', () => {    const result = convert("<p>First paragraph.</p><p>Second paragraph.</p>", { stripNewlines: true } as ConversionOptions);    expect(result.content).toContain("First paragraph.");
-    expect(result.content).toContain("Second paragraph.");
-
-  }, 30000);
-  it('options_strip_tags_div_span: Div and span tags stripped but content preserved', () => {    const result = convert("<div class='wrapper'><p>Inside div</p></div><p>Outside <span class='hl'>span text</span></p>", { stripTags: ["div", "span"] } as ConversionOptions);    expect(result.content).toContain("Inside div");
-    expect(result.content).toContain("span text");
-
-  }, 30000);
-  it('options_strong_em_underscore: Strong and em tags use underscore symbol instead of asterisk', () => {    const result = convert("<p><strong>bold</strong> and <em>italic</em></p>", { strongEmSymbol: "_" } as ConversionOptions);    expect(result.content).toContain("__bold__");
-    expect(result.content).toContain("_italic_");
-
-  }, 30000);
-  it('options_sub_symbol_tilde: Subscript rendered with tilde symbol', () => {    const result = convert("<p>H<sub>2</sub>O</p>", { subSymbol: "~" } as ConversionOptions);    expect(result.content).toContain("~2~");
-
-  }, 30000);
-  it('options_sup_symbol_caret: Superscript rendered with caret symbol', () => {    const result = convert("<p>x<sup>2</sup></p>", { supSymbol: "^" } as ConversionOptions);    expect(result.content).toContain("^2^");
-
-  }, 30000);
-  it('options_url_escape_style_angle_default: Default angle style wraps URLs containing spaces in angle brackets', () => {    const result = convert("<a href=\"/file (1).pdf\">file</a>", { urlEscapeStyle: "angle" } as ConversionOptions);    expect(result.content ?? "").toContain("</file (1).pdf>");
-
-  }, 30000);
-  it('options_url_escape_style_percent_angle_brackets_in_url: Percent style encodes angle brackets in link URLs from issue 392', () => {    const result = convert("<a href=\"/file (1) <draft>.pdf\">file</a>", { urlEscapeStyle: "percent" } as ConversionOptions);    expect(result.content ?? "").toContain("/file%20%281%29%20%3Cdraft%3E.pdf");
-
-  }, 30000);
-  it('options_url_escape_style_percent_image: Percent style encodes special characters in image src URLs', () => {    const result = convert("<img src=\"/img (1) <draft>.png\" alt=\"alt\">", { urlEscapeStyle: "percent" } as ConversionOptions);    expect(result.content ?? "").toContain("/img%20%281%29%20%3Cdraft%3E.png");
-
-  }, 30000);
-  it('options_url_escape_style_percent_link: Percent style encodes spaces and parens in link URLs', () => {    const result = convert("<a href=\"/file (1).pdf\">file</a>", { urlEscapeStyle: "percent" } as ConversionOptions);    expect(result.content ?? "").toContain("/file%20%281%29.pdf");
-    expect(result.content).not.toContain("</");
-
-  }, 30000);
-  it('options_whitespace_normalized: Normalized whitespace mode collapses multiple spaces', () => {    const result = convert("<p>Text   with    extra   spaces.</p>", { whitespaceMode: "Normalized" } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Text");
-    expect(result.content).toContain("with");
-    expect(result.content).toContain("extra");
-    expect(result.content).toContain("spaces.");
-
-  }, 30000);
-  it('options_whitespace_strict: Strict whitespace mode preserves whitespace as-is', () => {    const result = convert("<p>Preserved   spacing.</p>", { whitespaceMode: "Strict" } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("Preserved");
-    expect(result.content).toContain("spacing.");
-
-  }, 30000);
-  it('options_wrap_disabled: Wrap option disabled preserves long lines without breaking', () => {    const result = convert("<p>This is a long paragraph that should not be wrapped at all because wrapping is disabled.</p>", { wrap: false } as ConversionOptions);    expect(result.content).toContain("This is a long paragraph that should not be wrapped at all because wrapping is disabled.");
-
-  }, 30000);
-  it('options_wrap_enabled: Wrap option enabled with custom width wraps long lines', () => {    const result = convert("<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>", { wrap: true, wrapWidth: 40 } as ConversionOptions);    {
-        const _v = result.content;
-        if (typeof _v === "string" || Array.isArray(_v)) {
-            expect(_v.length).toBeGreaterThan(0);
-        } else {
-            expect(_v).toBeDefined();
-            expect(_v).not.toBeNull();
-        }
-    }
-    expect(result.content).toContain("This is a long paragraph");
-
-  }, 30000);
+describe("options", () => {
+	it("issue_396_backticks_blank_line_after_fence: Backticks code block trims trailing newline inside fence and adds blank line after closing fence (issue #396)", () => {
+		const result = convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", {
+			codeBlockStyle: "Backticks",
+		} as ConversionOptions);
+		expect((result.content ?? "").trim()).toBe("Foo\n\n```\n1\n2\n```\n\nBar");
+	}, 30000);
+	it("options_autolinks_false: Bare URL links rendered as regular markdown links when autolinks disabled", () => {
+		const result = convert("<p><a href='https://example.com'>https://example.com</a></p>", {
+			autolinks: false,
+		} as ConversionOptions);
+		expect(result.content).toContain("example.com");
+	}, 30000);
+	it("options_br_in_tables_false: BR elements in table cells are stripped when disabled", () => {
+		const result = convert("<table><tr><th>Col</th></tr><tr><td>A<br>B</td></tr></table>", {
+			brInTables: false,
+		} as ConversionOptions);
+		expect(result.content).toContain("Col");
+	}, 30000);
+	it("options_br_in_tables_true: BR elements in table cells render as line breaks", () => {
+		const result = convert("<table><tr><th>Header</th></tr><tr><td>Line 1<br>Line 2</td></tr></table>", {
+			brInTables: true,
+		} as ConversionOptions);
+		expect(result.content).toContain("Header");
+		expect(result.content).toContain("Line 1");
+		expect(result.content).toContain("Line 2");
+	}, 30000);
+	it("options_capture_svg_false: Disabling capture_svg still produces content; SVG is not extracted as an image", () => {
+		const result = convert(
+			'<p>Below SVG:</p><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>',
+			{ captureSvg: false, extractImages: true } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("Below SVG");
+	}, 30000);
+	it("options_capture_svg_true: Enabling capture_svg processes inline SVG elements when extract_images is on", () => {
+		const result = convert(
+			'<p>Below SVG:</p><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>',
+			{ captureSvg: true, extractImages: true } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("Below SVG");
+	}, 30000);
+	it("options_code_block_backticks: Backticks code block style uses triple backtick fences", () => {
+		const result = convert("<pre><code class=\"language-js\">console.log('hi');</code></pre>", {
+			codeBlockStyle: "Backticks",
+		} as ConversionOptions);
+		expect(result.content).toContain("```");
+		expect(result.content).toContain("console.log('hi');");
+	}, 30000);
+	it("options_code_block_indented: Code blocks use 4-space indentation", () => {
+		const result = convert("<pre><code>print('hello')</code></pre>", {
+			codeBlockStyle: "Indented",
+		} as ConversionOptions);
+		expect(result.content).toContain("print('hello')");
+		expect(result.content).not.toContain("```");
+	}, 30000);
+	it("options_code_block_tildes: Code blocks use tilde fences", () => {
+		const result = convert("<pre><code>let x = 1;</code></pre>", { codeBlockStyle: "Tildes" } as ConversionOptions);
+		expect(result.content).toContain("~~~");
+		expect(result.content).toContain("let x = 1;");
+	}, 30000);
+	it("options_code_block_tildes_style: Tildes code block style uses triple tilde fences", () => {
+		const result = convert("<pre><code>some code</code></pre>", { codeBlockStyle: "Tildes" } as ConversionOptions);
+		expect(result.content).toContain("~~~");
+		expect(result.content).toContain("some code");
+	}, 30000);
+	it("options_code_language_python: Default code language annotation on blocks without lang attribute", () => {
+		const result = convert("<pre><code>def hello(): pass</code></pre>", {
+			codeLanguage: "python",
+		} as ConversionOptions);
+		expect(result.content).toContain("```python");
+		expect(result.content).toContain("def hello");
+	}, 30000);
+	it("options_compact_tables_false: compact_tables false (default) pads cells to column width", () => {
+		const result = convert(
+			"<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>100</td></tr><tr><td>Bob</td><td>42</td></tr></tbody></table>",
+			{ compactTables: false } as ConversionOptions,
+		);
+		expect(result.content ?? "").toContain("| ----- |");
+		expect(result.content ?? "").toContain("| 42    |");
+		expect(result.content).not.toContain("| --- |");
+	}, 30000);
+	it("options_compact_tables_true: compact_tables emits unpadded cells and minimal --- separators", () => {
+		const result = convert(
+			"<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>100</td></tr><tr><td>Bob</td><td>42</td></tr></tbody></table>",
+			{ compactTables: true } as ConversionOptions,
+		);
+		expect(result.content ?? "").toContain("| --- |");
+		expect(result.content).not.toContain("| ----- |");
+		expect(result.content ?? "").toContain("| 42 |");
+		expect(result.content).not.toContain("| 42    |");
+	}, 30000);
+	it("options_convert_as_inline: Block elements treated as inline", () => {
+		const result = convert("<p>One</p><p>Two</p>", { convertAsInline: true } as ConversionOptions);
+		expect(result.content).toContain("One");
+		expect(result.content).toContain("Two");
+	}, 30000);
+	it("options_debug_true: Debug mode enabled does not crash and produces output", () => {
+		const result = convert("<p>Debug test</p>", { debug: true } as ConversionOptions);
+		expect(result.content).toContain("Debug test");
+	}, 30000);
+	it("options_default_title_true: Links without title get empty title attribute when defaultTitle is true", () => {
+		const result = convert("<p><a href='https://example.com'>Link</a></p>", {
+			defaultTitle: true,
+		} as ConversionOptions);
+		expect(result.content).toContain("Link");
+		expect(result.content).toContain("https://example.com");
+	}, 30000);
+	it("options_encoding_utf8: UTF-8 encoding hint for special characters", () => {
+		const result = convert("<p>Café naïve résumé</p>", { encoding: "utf-8" } as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+	}, 30000);
+	it("options_escape_ascii_enabled: ASCII Markdown characters are escaped when escapeAscii is true", () => {
+		const result = convert("<p>Text with # hash and [brackets] and * star</p>", {
+			escapeAscii: true,
+		} as ConversionOptions);
+		expect(result.content).toContain("Text");
+		expect(result.content).toContain("hash");
+		expect(result.content).toContain("brackets");
+		expect(result.content).toContain("star");
+	}, 30000);
+	it("options_escape_asterisks: escape_asterisks option escapes asterisks in plain text", () => {
+		const result = convert("<p>Use 2*3 = 6 in math.</p>", { escapeAsterisks: true } as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("2");
+		expect(result.content).toContain("3");
+		expect(result.content).toContain("6");
+	}, 30000);
+	it("options_escape_misc: escape_misc option escapes miscellaneous markdown characters", () => {
+		const result = convert("<p>Use # and | and ~ in text.</p>", { escapeMisc: true } as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Use");
+		expect(result.content).toContain("and");
+		expect(result.content).toContain("in text.");
+	}, 30000);
+	it("options_escape_underscores: escape_underscores option escapes underscores in plain text", () => {
+		const result = convert("<p>The variable_name is defined.</p>", {
+			escapeUnderscores: true,
+		} as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("variable");
+		expect(result.content).toContain("name");
+		expect(result.content).toContain("defined.");
+	}, 30000);
+	it("options_exclude_selectors_attribute: Elements matching CSS attribute selector are excluded entirely", () => {
+		const result = convert('<body><div role="complementary">Sidebar</div><p>Primary text</p></body>', {
+			excludeSelectors: ["[role='complementary']"],
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Primary text");
+		expect(result.content).not.toContain("Sidebar");
+	}, 30000);
+	it("options_exclude_selectors_class: Elements matching CSS class selector are excluded entirely", () => {
+		const result = convert('<body><div class="cookie-banner">Accept cookies</div><p>Main content</p></body>', {
+			excludeSelectors: [".cookie-banner"],
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Main content");
+		expect(result.content).not.toContain("cookies");
+	}, 30000);
+	it("options_exclude_selectors_empty_noop: Empty exclude_selectors list does not affect output", () => {
+		const result = convert("<p>Hello world</p>", { excludeSelectors: [] } as ConversionOptions);
+		expect(result.content ?? "").toContain("Hello world");
+	}, 30000);
+	it("options_exclude_selectors_id: Elements matching CSS id selector are excluded entirely", () => {
+		const result = convert('<body><div id="ad-container">Buy stuff</div><p>Article text</p></body>', {
+			excludeSelectors: ["#ad-container"],
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Article text");
+		expect(result.content).not.toContain("Buy stuff");
+	}, 30000);
+	it("options_exclude_selectors_multiple: Multiple CSS selectors each exclude their matched elements", () => {
+		const result = convert('<body><nav class="nav">Menu</nav><p>Content</p><footer>Footer</footer></body>', {
+			excludeSelectors: [".nav", "footer"],
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Content");
+		expect(result.content).not.toContain("Menu");
+		expect(result.content).not.toContain("Footer");
+	}, 30000);
+	it("options_exclude_selectors_nested_content_dropped: All descendants of excluded elements are dropped", () => {
+		const result = convert(
+			'<body><aside class="sidebar"><h2>Related</h2><p>Sidebar text</p></aside><main><p>Main text</p></main></body>',
+			{ excludeSelectors: [".sidebar"] } as ConversionOptions,
+		);
+		expect(result.content ?? "").toContain("Main text");
+		expect(result.content).not.toContain("Related");
+		expect(result.content).not.toContain("Sidebar text");
+	}, 30000);
+	it("options_exclude_selectors_plain_text_mode: Exclude selectors work in plain text output mode", () => {
+		const result = convert('<body><div class="nav">Navigation</div><p>Article body</p></body>', {
+			excludeSelectors: [".nav"],
+			outputFormat: "Plain",
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Article body");
+		expect(result.content).not.toContain("Navigation");
+	}, 30000);
+	it("options_exclude_selectors_vs_strip_tags: exclude_selectors drops entire subtree unlike strip_tags which keeps children", () => {
+		const result = convert('<body><div class="wrapper"><p>Inner paragraph</p></div><p>Outer text</p></body>', {
+			excludeSelectors: [".wrapper"],
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Outer text");
+		expect(result.content).not.toContain("Inner paragraph");
+	}, 30000);
+	it("options_extract_images_false: When extract_images is false, conversion still succeeds and inline images are not extracted", () => {
+		const result = convert(
+			'<p>Text with <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel"> image.</p>',
+			{ extractImages: false } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+	}, 30000);
+	it("options_extract_images_true_data_uri: Enabling extract_images processes a data-URI image without crashing", () => {
+		const result = convert(
+			'<p>Before<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel">After</p>',
+			{ extractImages: true } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Before");
+		expect(result.content).toContain("After");
+	}, 30000);
+	it("options_extract_metadata_true: Extract metadata returns document metadata when enabled", () => {
+		const result = convert(
+			"<html><head><title>Test Page</title><meta name='description' content='A test page'></head><body><p>Content</p></body></html>",
+			{ extractMetadata: true } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect((result.metadata.document.title ?? "").trim()).toBe("Test Page");
+		expect((result.metadata.document.description ?? "").trim()).toBe("A test page");
+	}, 30000);
+	it("options_heading_style_atx: ATX heading style produces hash-prefixed headings", () => {
+		const result = convert("<h1>Title</h1><h2>Subtitle</h2>", { headingStyle: "Atx" } as ConversionOptions);
+		expect(result.content).toContain("# Title");
+		expect(result.content).toContain("## Subtitle");
+	}, 30000);
+	it("options_heading_style_atx_closed: ATX closed heading style adds closing hashes", () => {
+		const result = convert("<h1>Closed Heading</h1>", { headingStyle: "AtxClosed" } as ConversionOptions);
+		expect(result.content).toContain("# Closed Heading #");
+	}, 30000);
+	it("options_heading_style_underlined: Underlined heading style produces setext-style headings for h1 and h2", () => {
+		const result = convert("<h1>Main Title</h1>", { headingStyle: "Underlined" } as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Main Title");
+	}, 30000);
+	it("options_highlight_bold: Mark tag rendered as bold", () => {
+		const result = convert("<p>Text with <mark>highlighted</mark> text.</p>", {
+			highlightStyle: "Bold",
+		} as ConversionOptions);
+		expect(result.content).toContain("**highlighted**");
+	}, 30000);
+	it("options_highlight_double_equal: Mark tag with double equal highlight style", () => {
+		const result = convert("<p>Text with <mark>highlighted</mark> here.</p>", {
+			highlightStyle: "DoubleEqual",
+		} as ConversionOptions);
+		expect(result.content).toContain("==highlighted==");
+	}, 30000);
+	it("options_highlight_none: Mark tag with no highlight style strips the mark", () => {
+		const result = convert("<p>Text with <mark>plain</mark> content.</p>", {
+			highlightStyle: "None",
+		} as ConversionOptions);
+		expect(result.content).toContain("plain");
+		expect(result.content).not.toContain("==");
+	}, 30000);
+	it("options_include_document_structure_false: Disabling include_document_structure still produces content without the document tree overhead", () => {
+		const result = convert("<article><h1>Heading</h1><p>Paragraph body.</p></article>", {
+			includeDocumentStructure: false,
+		} as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("Heading");
+	}, 30000);
+	it("options_include_document_structure_true: Setting include_document_structure populates the structured document tree on the result", () => {
+		const result = convert("<article><h1>Heading</h1><p>Paragraph body.</p></article>", {
+			includeDocumentStructure: true,
+		} as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("Heading");
+	}, 30000);
+	it("options_infer_dimensions_false: Disabling infer_dimensions skips the decode step and still produces content", () => {
+		const result = convert(
+			'<p>No dims: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel"></p>',
+			{ extractImages: true, inferDimensions: false } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("No dims");
+	}, 30000);
+	it("options_infer_dimensions_true: Enabling infer_dimensions decodes image bytes to populate dimension metadata when extract_images is on", () => {
+		const result = convert(
+			'<p>With dims: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel"></p>',
+			{ extractImages: true, inferDimensions: true } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("With dims");
+	}, 30000);
+	it("options_keep_inline_images_in_paragraph: Images inside specified tags stay inline", () => {
+		const result = convert("<p>Text <img src='icon.png' alt='icon'> more text</p>", {
+			keepInlineImagesIn: ["p"],
+		} as ConversionOptions);
+		expect(result.content).toContain("Text");
+		expect(result.content).toContain("more text");
+	}, 30000);
+	it("options_link_style_reference: Links use reference-style formatting", () => {
+		const result = convert(
+			"<p><a href='https://example.com'>Example</a> and <a href='https://other.com'>Other</a></p>",
+			{ linkStyle: "Reference" } as ConversionOptions,
+		);
+		expect(result.content).toContain("Example");
+		expect(result.content).toContain("Other");
+		expect(result.content).toContain("example.com");
+	}, 30000);
+	it("options_list_custom_bullets: Custom bullet character for unordered lists", () => {
+		const result = convert("<ul><li>Item A</li><li>Item B</li></ul>", { bullets: "*" } as ConversionOptions);
+		expect(result.content).toContain("* Item A");
+		expect(result.content).toContain("* Item B");
+	}, 30000);
+	it("options_list_indent_tabs: Tab indentation type for nested list items", () => {
+		const result = convert("<ul><li>Parent<ul><li>Child</li></ul></li></ul>", {
+			listIndentType: "Tabs",
+		} as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Parent");
+		expect(result.content).toContain("Child");
+	}, 30000);
+	it("options_list_indent_width_four: Nested lists indented with 4 spaces per level", () => {
+		const result = convert("<ul><li>Outer<ul><li>Inner</li></ul></li></ul>", {
+			listIndentWidth: 4,
+		} as ConversionOptions);
+		expect(result.content).toContain("Outer");
+		expect(result.content).toContain("Inner");
+	}, 30000);
+	it("options_max_depth_default_unlimited: Default max_depth (null) converts deeply nested content fully", () => {
+		const result = convert("<div><div><div><div><p>Deep content</p></div></div></div></div>", undefined);
+		expect(result.content ?? "").toContain("Deep content");
+	}, 30000);
+	it("options_max_depth_truncates: max_depth truncates content beyond the specified depth", () => {
+		const result = convert("<div><p>Shallow</p><div><div><div><p>Too deep</p></div></div></div></div>", {
+			maxDepth: 3,
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("Shallow");
+		expect(result.content).not.toContain("Too deep");
+	}, 30000);
+	it("options_max_depth_zero_empty: max_depth of 0 produces empty output", () => {
+		const result = convert("<p>Hello</p>", { maxDepth: 0 } as ConversionOptions);
+		expect((result.content ?? "").trim()).toBe("");
+	}, 30000);
+	it("options_max_image_size_generous_limit: A generous max_image_size accommodates a small data-URI image without warnings", () => {
+		const result = convert(
+			'<p>Image: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel"></p>',
+			{ extractImages: true, maxImageSize: 10485760 } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("Image");
+	}, 30000);
+	it("options_max_image_size_tiny_limit_safe: A tiny max_image_size does not crash conversion even when the image exceeds the limit", () => {
+		const result = convert(
+			'<p>Tiny limit: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="pixel"></p>',
+			{ extractImages: true, maxImageSize: 10 } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content ?? "").toContain("Tiny limit");
+	}, 30000);
+	it("options_newline_backslash: Hard line breaks rendered with backslash", () => {
+		const result = convert("<p>Line one<br>Line two</p>", { newlineStyle: "Backslash" } as ConversionOptions);
+		expect(result.content).toContain("Line one");
+		expect(result.content).toContain("Line two");
+	}, 30000);
+	it("options_newline_spaces: Hard line breaks rendered with trailing spaces", () => {
+		const result = convert("<p>First<br>Second</p>", { newlineStyle: "Spaces" } as ConversionOptions);
+		expect(result.content).toContain("First");
+		expect(result.content).toContain("Second");
+	}, 30000);
+	it("options_output_format_djot: Djot output format produces djot-compatible markup", () => {
+		const result = convert("<p>Simple paragraph.</p>", { outputFormat: "Djot" } as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Simple paragraph.");
+	}, 30000);
+	it("options_output_format_markdown: Default markdown output format produces standard markdown", () => {
+		const result = convert("<h1>Title</h1><p>Some text.</p>", {
+			headingStyle: "Atx",
+			outputFormat: "Markdown",
+		} as ConversionOptions);
+		expect(result.content).toContain("# Title");
+		expect(result.content).toContain("Some text.");
+	}, 30000);
+	it("options_output_format_plain: Plain text output format strips markdown syntax", () => {
+		const result = convert("<h1>Title</h1><p>Some <strong>bold</strong> text.</p>", {
+			outputFormat: "Plain",
+		} as ConversionOptions);
+		expect(result.content).toContain("Title");
+		expect(result.content).toContain("bold");
+		expect(result.content).toContain("text.");
+	}, 30000);
+	it("options_preprocessing_aggressive: Aggressive preset removes nav, footer, aside unconditionally", () => {
+		const result = convert(
+			"<nav>Menu</nav><article><h1>Title</h1><p>Content</p></article><aside>Sidebar</aside><footer>Footer</footer>",
+			{ preprocessing: { preset: "Aggressive" } } as ConversionOptions,
+		);
+		expect(result.content).toContain("Title");
+		expect(result.content).toContain("Content");
+		expect(result.content).not.toContain("Menu");
+	}, 30000);
+	it("options_preprocessing_enabled_false_skips_cleanup: Disabling preprocessing entirely preserves elements the standard preset would remove", () => {
+		const result = convert("<nav>NavSection</nav><p>Paragraph</p>", {
+			preprocessing: { enabled: false },
+		} as ConversionOptions);
+		expect(result.content).toContain("NavSection");
+		expect(result.content).toContain("Paragraph");
+	}, 30000);
+	it("options_preprocessing_minimal: Minimal preset preserves nav, footer, aside", () => {
+		const result = convert("<nav>Navigation</nav><p>Content</p><footer>Footer</footer>", {
+			preprocessing: { preset: "Minimal" },
+		} as ConversionOptions);
+		expect(result.content).toContain("Navigation");
+		expect(result.content).toContain("Content");
+		expect(result.content).toContain("Footer");
+	}, 30000);
+	it("options_preprocessing_remove_forms: Forms are removed when remove_forms is true", () => {
+		const result = convert("<p>Before</p><form><input type='text'/><button>Submit</button></form><p>After</p>", {
+			preprocessing: { removeForms: true },
+		} as ConversionOptions);
+		expect(result.content).toContain("Before");
+		expect(result.content).toContain("After");
+		expect(result.content).not.toContain("Submit");
+	}, 30000);
+	it("options_preprocessing_remove_navigation_false_keeps_nav: Setting remove_navigation to false preserves nav and aside elements", () => {
+		const result = convert("<nav>SiteMenu</nav><main><p>MainContent</p></main><aside>SidebarText</aside>", {
+			preprocessing: { removeNavigation: false },
+		} as ConversionOptions);
+		expect(result.content).toContain("SiteMenu");
+		expect(result.content).toContain("MainContent");
+		expect(result.content).toContain("SidebarText");
+	}, 30000);
+	it("options_preserve_tags_iframe: Iframe tags preserved as raw HTML in output", () => {
+		const result = convert("<p>Before</p><iframe src='video.html' width='560'></iframe><p>After</p>", {
+			preserveTags: ["iframe"],
+		} as ConversionOptions);
+		expect(result.content).toContain("Before");
+		expect(result.content).toContain("After");
+		expect(result.content).toContain("<iframe");
+	}, 30000);
+	it("options_skip_images_true: Images are omitted from output when skipImages is true", () => {
+		const result = convert("<p>Before <img src='test.jpg' alt='photo'> After</p>", {
+			skipImages: true,
+		} as ConversionOptions);
+		expect(result.content).toContain("Before");
+		expect(result.content).toContain("After");
+		expect(result.content).not.toContain("photo");
+	}, 30000);
+	it("options_strip_newlines: Strip newlines produces single-line paragraphs", () => {
+		const result = convert("<p>First paragraph.</p><p>Second paragraph.</p>", {
+			stripNewlines: true,
+		} as ConversionOptions);
+		expect(result.content).toContain("First paragraph.");
+		expect(result.content).toContain("Second paragraph.");
+	}, 30000);
+	it("options_strip_tags_div_span: Div and span tags stripped but content preserved", () => {
+		const result = convert(
+			"<div class='wrapper'><p>Inside div</p></div><p>Outside <span class='hl'>span text</span></p>",
+			{ stripTags: ["div", "span"] } as ConversionOptions,
+		);
+		expect(result.content).toContain("Inside div");
+		expect(result.content).toContain("span text");
+	}, 30000);
+	it("options_strong_em_underscore: Strong and em tags use underscore symbol instead of asterisk", () => {
+		const result = convert("<p><strong>bold</strong> and <em>italic</em></p>", {
+			strongEmSymbol: "_",
+		} as ConversionOptions);
+		expect(result.content).toContain("__bold__");
+		expect(result.content).toContain("_italic_");
+	}, 30000);
+	it("options_sub_symbol_tilde: Subscript rendered with tilde symbol", () => {
+		const result = convert("<p>H<sub>2</sub>O</p>", { subSymbol: "~" } as ConversionOptions);
+		expect(result.content).toContain("~2~");
+	}, 30000);
+	it("options_sup_symbol_caret: Superscript rendered with caret symbol", () => {
+		const result = convert("<p>x<sup>2</sup></p>", { supSymbol: "^" } as ConversionOptions);
+		expect(result.content).toContain("^2^");
+	}, 30000);
+	it("options_url_escape_style_angle_default: Default angle style wraps URLs containing spaces in angle brackets", () => {
+		const result = convert('<a href="/file (1).pdf">file</a>', { urlEscapeStyle: "angle" } as ConversionOptions);
+		expect(result.content ?? "").toContain("</file (1).pdf>");
+	}, 30000);
+	it("options_url_escape_style_percent_angle_brackets_in_url: Percent style encodes angle brackets in link URLs from issue 392", () => {
+		const result = convert('<a href="/file (1) <draft>.pdf">file</a>', {
+			urlEscapeStyle: "percent",
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("/file%20%281%29%20%3Cdraft%3E.pdf");
+	}, 30000);
+	it("options_url_escape_style_percent_image: Percent style encodes special characters in image src URLs", () => {
+		const result = convert('<img src="/img (1) <draft>.png" alt="alt">', {
+			urlEscapeStyle: "percent",
+		} as ConversionOptions);
+		expect(result.content ?? "").toContain("/img%20%281%29%20%3Cdraft%3E.png");
+	}, 30000);
+	it("options_url_escape_style_percent_link: Percent style encodes spaces and parens in link URLs", () => {
+		const result = convert('<a href="/file (1).pdf">file</a>', { urlEscapeStyle: "percent" } as ConversionOptions);
+		expect(result.content ?? "").toContain("/file%20%281%29.pdf");
+		expect(result.content).not.toContain("</");
+	}, 30000);
+	it("options_whitespace_normalized: Normalized whitespace mode collapses multiple spaces", () => {
+		const result = convert("<p>Text   with    extra   spaces.</p>", {
+			whitespaceMode: "Normalized",
+		} as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Text");
+		expect(result.content).toContain("with");
+		expect(result.content).toContain("extra");
+		expect(result.content).toContain("spaces.");
+	}, 30000);
+	it("options_whitespace_strict: Strict whitespace mode preserves whitespace as-is", () => {
+		const result = convert("<p>Preserved   spacing.</p>", { whitespaceMode: "Strict" } as ConversionOptions);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("Preserved");
+		expect(result.content).toContain("spacing.");
+	}, 30000);
+	it("options_wrap_disabled: Wrap option disabled preserves long lines without breaking", () => {
+		const result = convert(
+			"<p>This is a long paragraph that should not be wrapped at all because wrapping is disabled.</p>",
+			{ wrap: false } as ConversionOptions,
+		);
+		expect(result.content).toContain(
+			"This is a long paragraph that should not be wrapped at all because wrapping is disabled.",
+		);
+	}, 30000);
+	it("options_wrap_enabled: Wrap option enabled with custom width wraps long lines", () => {
+		const result = convert(
+			"<p>This is a long paragraph that should be wrapped at the specified column width when the wrap option is enabled.</p>",
+			{ wrap: true, wrapWidth: 40 } as ConversionOptions,
+		);
+		{
+			const _v = result.content;
+			if (typeof _v === "string" || Array.isArray(_v)) {
+				expect(_v.length).toBeGreaterThan(0);
+			} else {
+				expect(_v).toBeDefined();
+				expect(_v).not.toBeNull();
+			}
+		}
+		expect(result.content).toContain("This is a long paragraph");
+	}, 30000);
 });

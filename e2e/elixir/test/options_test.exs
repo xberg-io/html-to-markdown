@@ -7,6 +7,14 @@
 defmodule E2e.OptionsTest do
   use ExUnit.Case, async: false
 
+  describe "issue_396_backticks_blank_line_after_fence" do
+    test "issue_396_backticks_blank_line_after_fence" do
+      options = %HtmlToMarkdown.ConversionOptions{code_block_style: "Backticks"}
+      {:ok, result} = HtmlToMarkdown.convert("<p>Foo</p><pre><code>1\n2\n</code></pre><p>Bar</p>", options)
+      assert String.trim(result.content) == "Foo\n\n```\n1\n2\n```\n\nBar"
+    end
+  end
+
   describe "options_autolinks_false" do
     test "options_autolinks_false" do
       options = %HtmlToMarkdown.ConversionOptions{autolinks: false}
