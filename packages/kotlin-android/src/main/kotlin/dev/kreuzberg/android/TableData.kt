@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android

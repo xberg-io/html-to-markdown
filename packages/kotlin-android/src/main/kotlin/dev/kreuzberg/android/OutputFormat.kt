@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -29,30 +30,32 @@ package dev.kreuzberg.android
  */
 enum class OutputFormat {
     /** Standard Markdown (CommonMark compatible). Default. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Markdown")
-    MARKDOWN,
+    @com.fasterxml.jackson.annotation.JsonProperty("Markdown") MARKDOWN,
     /** Djot lightweight markup language. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Djot")
-    DJOT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Djot") DJOT,
     /** Plain text output (no markup, visible text only). */
-    @com.fasterxml.jackson.annotation.JsonProperty("Plain")
-    PLAIN;
+    @com.fasterxml.jackson.annotation.JsonProperty("Plain") PLAIN;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        MARKDOWN -> "Markdown"
-        DJOT -> "Djot"
-        PLAIN -> "Plain"
-    }
+    fun toWire(): String =
+        when (this) {
+            MARKDOWN -> "Markdown"
+            DJOT -> "Djot"
+            PLAIN -> "Plain"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): OutputFormat = when (value) {
-            "Markdown", "markdown" -> MARKDOWN
-            "Djot", "djot" -> DJOT
-            "Plain", "plain" -> PLAIN
-            else -> throw IllegalArgumentException("Unknown OutputFormat value: $value")
-        }
+        fun fromWire(value: String): OutputFormat =
+            when (value) {
+                "Markdown",
+                "markdown" -> MARKDOWN
+                "Djot",
+                "djot" -> DJOT
+                "Plain",
+                "plain" -> PLAIN
+                else -> throw IllegalArgumentException("Unknown OutputFormat value: $value")
+            }
     }
 }

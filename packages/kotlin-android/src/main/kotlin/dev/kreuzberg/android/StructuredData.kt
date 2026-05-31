@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,8 +26,8 @@ package dev.kreuzberg.android
 /**
  * Structured data block (JSON-LD, Microdata, or RDFa).
  *
- * Represents machine-readable structured data found in the document.
- * JSON-LD blocks are collected as raw JSON strings for flexibility.
+ * Represents machine-readable structured data found in the document. JSON-LD blocks are collected
+ * as raw JSON strings for flexibility.
  */
 data class StructuredData(
     /** Type of structured data (JSON-LD, Microdata, RDFa) */

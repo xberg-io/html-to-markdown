@@ -34,7 +34,7 @@ inline fn _first_error(comptime E: type) E {
 pub const VisitorHandle = *anyopaque;
 
 /// Errors that can occur during HTML to Markdown conversion.
-pub const ConversionError = error {
+pub const ConversionError = error{
     ParseError,
     SanitizationError,
     ConfigError,
@@ -1098,15 +1098,20 @@ pub const VisitResult = union(enum) {
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
 ///
+///   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+///
+///   - `convert(html, ConversionOptions.default())` — bare options.
+///   - `convert(html, opts)` — bare options.
+///   - `convert(html, Some(opts))` — explicit `Option`.
+///   - `convert(html, None)` — fall back to `ConversionOptions.default`.
+///
 /// **Errors:**
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 pub fn convert(html: []const u8, options: ?[]const u8) ConversionError![]u8 {
-    const html_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{html}, 0);
+    const html_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{html}, 0);
     defer std.heap.c_allocator.free(html_z);
-    const options_z: ?[:0]u8 = if (options) |v| try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{v}, 0) else null;
+    const options_z: ?[:0]u8 = if (options) |v| try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{v}, 0) else null;
     defer if (options_z) |z| std.heap.c_allocator.free(z);
     const options_handle = if (options_z) |z| c.htm_conversion_options_from_json(z) else null;
     if (options_z != null and options_handle == null) return _first_error(ConversionError);
@@ -1122,8 +1127,7 @@ pub fn convert(html: []const u8, options: ?[]const u8) ConversionError![]u8 {
         const slice = std.mem.sliceTo(_json_ptr, 0);
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         break :blk owned;
-    }
-;
+    };
 }
 
 /// Vtable for a Zig implementation of the `HtmlVisitor` trait.

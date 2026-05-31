@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -29,35 +30,37 @@ package dev.kreuzberg.android
  */
 enum class HighlightStyle {
     /** Double equals syntax (==text==). Default. Pandoc-compatible. */
-    @com.fasterxml.jackson.annotation.JsonProperty("DoubleEqual")
-    DOUBLE_EQUAL,
+    @com.fasterxml.jackson.annotation.JsonProperty("DoubleEqual") DOUBLE_EQUAL,
     /** Preserve as HTML (==text==). Original HTML tag. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Html")
-    HTML,
+    @com.fasterxml.jackson.annotation.JsonProperty("Html") HTML,
     /** Render as bold (**text**). Uses strong emphasis. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Bold")
-    BOLD,
+    @com.fasterxml.jackson.annotation.JsonProperty("Bold") BOLD,
     /** Strip formatting, render as plain text. No markup. */
-    @com.fasterxml.jackson.annotation.JsonProperty("None")
-    NONE;
+    @com.fasterxml.jackson.annotation.JsonProperty("None") NONE;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        DOUBLE_EQUAL -> "DoubleEqual"
-        HTML -> "Html"
-        BOLD -> "Bold"
-        NONE -> "None"
-    }
+    fun toWire(): String =
+        when (this) {
+            DOUBLE_EQUAL -> "DoubleEqual"
+            HTML -> "Html"
+            BOLD -> "Bold"
+            NONE -> "None"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): HighlightStyle = when (value) {
-            "DoubleEqual", "doubleequal" -> DOUBLE_EQUAL
-            "Html", "html" -> HTML
-            "Bold", "bold" -> BOLD
-            "None", "none" -> NONE
-            else -> throw IllegalArgumentException("Unknown HighlightStyle value: $value")
-        }
+        fun fromWire(value: String): HighlightStyle =
+            when (value) {
+                "DoubleEqual",
+                "doubleequal" -> DOUBLE_EQUAL
+                "Html",
+                "html" -> HTML
+                "Bold",
+                "bold" -> BOLD
+                "None",
+                "none" -> NONE
+                else -> throw IllegalArgumentException("Unknown HighlightStyle value: $value")
+            }
     }
 }

@@ -2103,6 +2103,13 @@ impl From<VisitResult> for html_to_markdown_rs::VisitResult {
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
 ///
+///   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+///
+///   - `convert(html, ConversionOptions.default())` — bare options.
+///   - `convert(html, opts)` — bare options.
+///   - `convert(html, Some(opts))` — explicit `Option`.
+///   - `convert(html, None)` — fall back to `ConversionOptions.default`.
+///
 /// **Errors:**
 ///
 /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.

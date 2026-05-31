@@ -12,7 +12,7 @@ NULL
 #'
 #' and warnings.
 #' @param html — the HTML string to convert.
-#' @param options — optional conversion options. Defaults to [`ConversionOptions::default`].
+#' @param options — conversion options. The parameter bound is `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:.
 #' @return ConversionResult object (list with class attribute).
 #'
 #' @section Errors:

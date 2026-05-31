@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-05-31
+
 ### Added
+
+- **`convert()` accepts options as a bare `ConversionOptions`** in addition to
+  `Option<ConversionOptions>` (resolves #398). The second parameter now bounds
+  `impl Into<Option<ConversionOptions>>`, so `convert(html, opts)`,
+  `convert(html, Some(opts))`, `convert(html, None)`, and
+  `convert(html, ConversionOptions::default())` are all valid Rust call shapes.
+  Existing callers continue to compile unchanged — this is purely additive
+  flexibility, not a breaking change.
 
 - **`url_escape_style` option** (`UrlEscapeStyle::Angle` | `UrlEscapeStyle::Percent`). When set
   to `Percent`, link and image destinations are percent-encoded instead of wrapped in angle

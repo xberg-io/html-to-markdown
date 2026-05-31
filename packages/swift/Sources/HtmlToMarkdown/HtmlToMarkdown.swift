@@ -270,7 +270,7 @@ internal extension TextAnnotation {
     init(_ rb: RustBridge.TextAnnotationRef) throws {
         self.start = rb.start()
         self.end = rb.end()
-        self.kind = try JSONDecoder().decode(AnnotationKind.self, from: (rb.kind().toString().data(using: .utf8) ?? Data("null".utf8)))
+        self.kind = try JSONDecoder().decode(AnnotationKind.self, from: ((rb.kind().toString()).data(using: .utf8) ?? Data("null".utf8)))
     }
     func intoRust() throws -> RustBridge.TextAnnotation {
         let data = try JSONEncoder().encode(self)
@@ -1592,14 +1592,25 @@ public func conversionOptionsFromJsonWithVisitor(_ json: String, _ visitor: Visi
 /// # Arguments
 ///
 /// * `html` — the HTML string to convert.
-/// * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
+/// * `options` — conversion options. The parameter bound is
+///   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+///   - `convert(html, ConversionOptions::default())` — bare options.
+///   - `convert(html, opts)` — bare options.
+///   - `convert(html, Some(opts))` — explicit `Option`.
+///   - `convert(html, None)` — fall back to [`ConversionOptions::default`].
 ///
 /// # Example
 ///
 /// ```
-/// use html_to_markdown_rs::convert;
+/// use html_to_markdown_rs::{convert, ConversionOptions};
 ///
 /// let html = "<h1>Hello World</h1>";
+///
+/// // Bare options — most ergonomic.
+/// let result = convert(html, ConversionOptions::default()).unwrap();
+/// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+///
+/// // `None` falls back to defaults.
 /// let result = convert(html, None).unwrap();
 /// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
 /// ```

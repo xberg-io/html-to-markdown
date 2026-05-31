@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,8 +26,8 @@ package dev.kreuzberg.android
 /**
  * Partial update for `ConversionOptions`.
  *
- * Uses `Option<T>` fields for selective updates. Bindings use this to construct
- * options from language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
+ * Uses `Option<T>` fields for selective updates. Bindings use this to construct options from
+ * language-native types. Prefer `ConversionOptionsBuilder` for Rust code.
  */
 data class ConversionOptionsUpdate(
     /** Optional override for `ConversionOptions.heading_style`. */

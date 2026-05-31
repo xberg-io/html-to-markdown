@@ -4,7 +4,7 @@ set -euo pipefail
 # Download the Swift artifact bundle and compute its checksum.
 # SwiftPM requires a stable SHA256 checksum for binary targets.
 
-ARTIFACT_URL="https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.5.7/HtmlToMarkdown-rs.artifactbundle.zip"
+ARTIFACT_URL="https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0/HtmlToMarkdown-rs.artifactbundle.zip"
 ARTIFACT_FILE="HtmlToMarkdown-rs.artifactbundle.zip"
 PACKAGE_SWIFT="Package.swift"
 

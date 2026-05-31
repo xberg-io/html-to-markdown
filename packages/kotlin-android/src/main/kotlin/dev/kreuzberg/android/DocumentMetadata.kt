@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,8 +26,8 @@ package dev.kreuzberg.android
 /**
  * Document-level metadata extracted from `<head>` and top-level elements.
  *
- * Contains all metadata typically used by search engines, social media platforms,
- * and browsers for document indexing and presentation.
+ * Contains all metadata typically used by search engines, social media platforms, and browsers for
+ * document indexing and presentation.
  */
 data class DocumentMetadata(
     /** Document title from `<title>` tag */
@@ -46,18 +47,18 @@ data class DocumentMetadata(
     /** Document text direction from `dir` attribute */
     val textDirection: TextDirection? = null,
     /**
-     * Open Graph metadata (og:* properties) for social media
-     * Keys like "title", "description", "image", "url", etc.
+     * Open Graph metadata (og:* properties) for social media Keys like "title", "description",
+     * "image", "url", etc.
      */
     val openGraph: Map<String, String> = emptyMap(),
     /**
-     * Twitter Card metadata (twitter:* properties)
-     * Keys like "card", "site", "creator", "title", "description", "image", etc.
+     * Twitter Card metadata (twitter:* properties) Keys like "card", "site", "creator", "title",
+     * "description", "image", etc.
      */
     val twitterCard: Map<String, String> = emptyMap(),
     /**
-     * Additional meta tags not covered by specific fields
-     * Keys are meta name/property attributes, values are content
+     * Additional meta tags not covered by specific fields Keys are meta name/property attributes,
+     * values are content
      */
     val metaTags: Map<String, String> = emptyMap(),
 )

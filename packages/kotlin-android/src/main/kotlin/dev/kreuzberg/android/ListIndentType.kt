@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -29,25 +30,27 @@ package dev.kreuzberg.android
  */
 enum class ListIndentType {
     /** Use spaces for indentation. Default. Width controlled by `list_indent_width`. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Spaces")
-    SPACES,
+    @com.fasterxml.jackson.annotation.JsonProperty("Spaces") SPACES,
     /** Use tabs for indentation. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Tabs")
-    TABS;
+    @com.fasterxml.jackson.annotation.JsonProperty("Tabs") TABS;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        SPACES -> "Spaces"
-        TABS -> "Tabs"
-    }
+    fun toWire(): String =
+        when (this) {
+            SPACES -> "Spaces"
+            TABS -> "Tabs"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): ListIndentType = when (value) {
-            "Spaces", "spaces" -> SPACES
-            "Tabs", "tabs" -> TABS
-            else -> throw IllegalArgumentException("Unknown ListIndentType value: $value")
-        }
+        fun fromWire(value: String): ListIndentType =
+            when (value) {
+                "Spaces",
+                "spaces" -> SPACES
+                "Tabs",
+                "tabs" -> TABS
+                else -> throw IllegalArgumentException("Unknown ListIndentType value: $value")
+            }
     }
 }

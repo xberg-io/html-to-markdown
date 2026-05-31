@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,8 +26,8 @@ package dev.kreuzberg.android
 /**
  * Context information passed to all visitor methods.
  *
- * Provides comprehensive metadata about the current node being visited,
- * including its type, attributes, position in the DOM tree, and parent context.
+ * Provides comprehensive metadata about the current node being visited, including its type,
+ * attributes, position in the DOM tree, and parent context.
  */
 data class NodeContext(
     /** Coarse-grained node type classification */

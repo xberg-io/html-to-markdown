@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,38 +26,40 @@ package dev.kreuzberg.android
 /**
  * URL encoding strategy for link and image destinations.
  *
- * Controls how special characters in URL destinations are handled when they
- * require escaping to produce valid Markdown.
+ * Controls how special characters in URL destinations are handled when they require escaping to
+ * produce valid Markdown.
  *
- * The `Angle` variant (default) wraps the destination in angle brackets:
- * `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
- * but breaks when the URL itself contains `>`.
+ * The `Angle` variant (default) wraps the destination in angle brackets: `[text](<url with
+ * spaces>)`. This is the CommonMark-specified escape hatch but breaks when the URL itself contains
+ * `>`.
  *
- * The `Percent` variant percent-encodes every character that is not an RFC 3986
- * unreserved character or `/`, producing a destination safe for all Markdown
- * parsers: `[text](url%20with%20spaces)`.
+ * The `Percent` variant percent-encodes every character that is not an RFC 3986 unreserved
+ * character or `/`, producing a destination safe for all Markdown parsers:
+ * `[text](url%20with%20spaces)`.
  */
 enum class UrlEscapeStyle {
     /** Wrap destinations that contain spaces or newlines in angle brackets. Default. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Angle")
-    ANGLE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Angle") ANGLE,
     /** Percent-encode all characters that are not RFC 3986 unreserved or `/`. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Percent")
-    PERCENT;
+    @com.fasterxml.jackson.annotation.JsonProperty("Percent") PERCENT;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        ANGLE -> "Angle"
-        PERCENT -> "Percent"
-    }
+    fun toWire(): String =
+        when (this) {
+            ANGLE -> "Angle"
+            PERCENT -> "Percent"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): UrlEscapeStyle = when (value) {
-            "Angle", "angle" -> ANGLE
-            "Percent", "percent" -> PERCENT
-            else -> throw IllegalArgumentException("Unknown UrlEscapeStyle value: $value")
-        }
+        fun fromWire(value: String): UrlEscapeStyle =
+            when (value) {
+                "Angle",
+                "angle" -> ANGLE
+                "Percent",
+                "percent" -> PERCENT
+                else -> throw IllegalArgumentException("Unknown UrlEscapeStyle value: $value")
+            }
     }
 }

@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,32 +26,34 @@ package dev.kreuzberg.android
 /**
  * Result of a visitor callback.
  *
- * Allows visitors to control the conversion flow by either proceeding
- * with default behavior, providing custom output, skipping elements,
- * preserving HTML, or signaling errors.
+ * Allows visitors to control the conversion flow by either proceeding with default behavior,
+ * providing custom output, skipping elements, preserving HTML, or signaling errors.
  */
 sealed class VisitResult {
     /** Continue with default conversion behavior */
     object Continue : VisitResult()
+
     /**
      * Replace default output with custom markdown
      *
-     * The visitor takes full responsibility for the markdown output
-     * of this node and its children.
+     * The visitor takes full responsibility for the markdown output of this node and its children.
      */
     data class Custom(val value: String) : VisitResult()
+
     /**
      * Skip this element entirely (don't output anything)
      *
      * The element and all its children are ignored in the output.
      */
     object Skip : VisitResult()
+
     /**
      * Preserve original HTML (don't convert to markdown)
      *
      * The element's raw HTML is included verbatim in the output.
      */
     object PreserveHtml : VisitResult()
+
     /**
      * Stop conversion with an error
      *

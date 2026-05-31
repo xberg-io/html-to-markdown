@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -29,30 +30,32 @@ package dev.kreuzberg.android
  */
 enum class CodeBlockStyle {
     /** Indented code blocks (4 spaces). `CommonMark` standard. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Indented")
-    INDENTED,
+    @com.fasterxml.jackson.annotation.JsonProperty("Indented") INDENTED,
     /** Fenced code blocks with backticks (```). Default (GFM). Supports language hints. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Backticks")
-    BACKTICKS,
+    @com.fasterxml.jackson.annotation.JsonProperty("Backticks") BACKTICKS,
     /** Fenced code blocks with tildes (~~~). Supports language hints. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Tildes")
-    TILDES;
+    @com.fasterxml.jackson.annotation.JsonProperty("Tildes") TILDES;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        INDENTED -> "Indented"
-        BACKTICKS -> "Backticks"
-        TILDES -> "Tildes"
-    }
+    fun toWire(): String =
+        when (this) {
+            INDENTED -> "Indented"
+            BACKTICKS -> "Backticks"
+            TILDES -> "Tildes"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): CodeBlockStyle = when (value) {
-            "Indented", "indented" -> INDENTED
-            "Backticks", "backticks" -> BACKTICKS
-            "Tildes", "tildes" -> TILDES
-            else -> throw IllegalArgumentException("Unknown CodeBlockStyle value: $value")
-        }
+        fun fromWire(value: String): CodeBlockStyle =
+            when (value) {
+                "Indented",
+                "indented" -> INDENTED
+                "Backticks",
+                "backticks" -> BACKTICKS
+                "Tildes",
+                "tildes" -> TILDES
+                else -> throw IllegalArgumentException("Unknown CodeBlockStyle value: $value")
+            }
     }
 }

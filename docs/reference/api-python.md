@@ -2,7 +2,7 @@
 title: "Python API Reference"
 ---
 
-## Python API Reference <span class="version-badge">v3.5.7</span>
+## Python API Reference <span class="version-badge">v3.6.0</span>
 
 ### Functions
 
@@ -10,6 +10,13 @@ title: "Python API Reference"
 
 Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 and warnings.
+
+  `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+
+- `convert(html, ConversionOptions.default())` — bare options.
+- `convert(html, opts)` — bare options.
+- `convert(html, Some(opts))` — explicit `Option`.
+- `convert(html, None)` — fall back to `ConversionOptions.default`.
 
 **Errors:**
 

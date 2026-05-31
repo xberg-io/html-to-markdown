@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-py"
-version = "3.5.7"
+version = "3.6.0"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -26,7 +26,7 @@ extension-module = ["pyo3/extension-module", "pyo3/abi3-py310"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.5.7", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
+html-to-markdown-rs = { version = "3.6.0", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
 pyo3 = { version = "0.28" }
 pyo3-async-runtimes = { version = "0.28", features = ["tokio-runtime"] }
 serde = { version = "1", features = ["derive"] }

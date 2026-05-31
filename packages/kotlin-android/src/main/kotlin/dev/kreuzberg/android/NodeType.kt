@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.android
@@ -25,459 +26,462 @@ package dev.kreuzberg.android
 /**
  * Node type enumeration covering all HTML element types.
  *
- * This enum categorizes all HTML elements that the converter recognizes,
- * providing a coarse-grained classification for visitor dispatch.
+ * This enum categorizes all HTML elements that the converter recognizes, providing a coarse-grained
+ * classification for visitor dispatch.
  */
 enum class NodeType {
     /** Text node (most frequent - 100+ per document) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Text")
-    TEXT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Text") TEXT,
     /** Generic element node */
-    @com.fasterxml.jackson.annotation.JsonProperty("Element")
-    ELEMENT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Element") ELEMENT,
     /** Heading elements (h1-h6) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Heading")
-    HEADING,
+    @com.fasterxml.jackson.annotation.JsonProperty("Heading") HEADING,
     /** Paragraph element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Paragraph")
-    PARAGRAPH,
+    @com.fasterxml.jackson.annotation.JsonProperty("Paragraph") PARAGRAPH,
     /** Generic div container */
-    @com.fasterxml.jackson.annotation.JsonProperty("Div")
-    DIV,
+    @com.fasterxml.jackson.annotation.JsonProperty("Div") DIV,
     /** Blockquote element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Blockquote")
-    BLOCKQUOTE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Blockquote") BLOCKQUOTE,
     /** Preformatted text block */
-    @com.fasterxml.jackson.annotation.JsonProperty("Pre")
-    PRE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Pre") PRE,
     /** Horizontal rule */
-    @com.fasterxml.jackson.annotation.JsonProperty("Hr")
-    HR,
+    @com.fasterxml.jackson.annotation.JsonProperty("Hr") HR,
     /** Ordered or unordered list (ul, ol) */
-    @com.fasterxml.jackson.annotation.JsonProperty("List")
-    LIST,
+    @com.fasterxml.jackson.annotation.JsonProperty("List") LIST,
     /** List item (li) */
-    @com.fasterxml.jackson.annotation.JsonProperty("ListItem")
-    LIST_ITEM,
+    @com.fasterxml.jackson.annotation.JsonProperty("ListItem") LIST_ITEM,
     /** Definition list (dl) */
-    @com.fasterxml.jackson.annotation.JsonProperty("DefinitionList")
-    DEFINITION_LIST,
+    @com.fasterxml.jackson.annotation.JsonProperty("DefinitionList") DEFINITION_LIST,
     /** Definition term (dt) */
-    @com.fasterxml.jackson.annotation.JsonProperty("DefinitionTerm")
-    DEFINITION_TERM,
+    @com.fasterxml.jackson.annotation.JsonProperty("DefinitionTerm") DEFINITION_TERM,
     /** Definition description (dd) */
-    @com.fasterxml.jackson.annotation.JsonProperty("DefinitionDescription")
-    DEFINITION_DESCRIPTION,
+    @com.fasterxml.jackson.annotation.JsonProperty("DefinitionDescription") DEFINITION_DESCRIPTION,
     /** Table element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Table")
-    TABLE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Table") TABLE,
     /** Table row (tr) */
-    @com.fasterxml.jackson.annotation.JsonProperty("TableRow")
-    TABLE_ROW,
+    @com.fasterxml.jackson.annotation.JsonProperty("TableRow") TABLE_ROW,
     /** Table cell (td, th) */
-    @com.fasterxml.jackson.annotation.JsonProperty("TableCell")
-    TABLE_CELL,
+    @com.fasterxml.jackson.annotation.JsonProperty("TableCell") TABLE_CELL,
     /** Table header cell (th) */
-    @com.fasterxml.jackson.annotation.JsonProperty("TableHeader")
-    TABLE_HEADER,
+    @com.fasterxml.jackson.annotation.JsonProperty("TableHeader") TABLE_HEADER,
     /** Table body (tbody) */
-    @com.fasterxml.jackson.annotation.JsonProperty("TableBody")
-    TABLE_BODY,
+    @com.fasterxml.jackson.annotation.JsonProperty("TableBody") TABLE_BODY,
     /** Table head (thead) */
-    @com.fasterxml.jackson.annotation.JsonProperty("TableHead")
-    TABLE_HEAD,
+    @com.fasterxml.jackson.annotation.JsonProperty("TableHead") TABLE_HEAD,
     /** Table foot (tfoot) */
-    @com.fasterxml.jackson.annotation.JsonProperty("TableFoot")
-    TABLE_FOOT,
+    @com.fasterxml.jackson.annotation.JsonProperty("TableFoot") TABLE_FOOT,
     /** Anchor link (a) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Link")
-    LINK,
+    @com.fasterxml.jackson.annotation.JsonProperty("Link") LINK,
     /** Image (img) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Image")
-    IMAGE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Image") IMAGE,
     /** Strong/bold (strong, b) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Strong")
-    STRONG,
+    @com.fasterxml.jackson.annotation.JsonProperty("Strong") STRONG,
     /** Emphasis/italic (em, i) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Em")
-    EM,
+    @com.fasterxml.jackson.annotation.JsonProperty("Em") EM,
     /** Inline code (code) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Code")
-    CODE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Code") CODE,
     /** Strikethrough (s, del, strike) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Strikethrough")
-    STRIKETHROUGH,
+    @com.fasterxml.jackson.annotation.JsonProperty("Strikethrough") STRIKETHROUGH,
     /** Underline (u, ins) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Underline")
-    UNDERLINE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Underline") UNDERLINE,
     /** Subscript (sub) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Subscript")
-    SUBSCRIPT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Subscript") SUBSCRIPT,
     /** Superscript (sup) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Superscript")
-    SUPERSCRIPT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Superscript") SUPERSCRIPT,
     /** Mark/highlight (mark) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Mark")
-    MARK,
+    @com.fasterxml.jackson.annotation.JsonProperty("Mark") MARK,
     /** Small text (small) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Small")
-    SMALL,
+    @com.fasterxml.jackson.annotation.JsonProperty("Small") SMALL,
     /** Line break (br) */
-    @com.fasterxml.jackson.annotation.JsonProperty("Br")
-    BR,
+    @com.fasterxml.jackson.annotation.JsonProperty("Br") BR,
     /** Span element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Span")
-    SPAN,
+    @com.fasterxml.jackson.annotation.JsonProperty("Span") SPAN,
     /** Article element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Article")
-    ARTICLE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Article") ARTICLE,
     /** Section element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Section")
-    SECTION,
+    @com.fasterxml.jackson.annotation.JsonProperty("Section") SECTION,
     /** Navigation element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Nav")
-    NAV,
+    @com.fasterxml.jackson.annotation.JsonProperty("Nav") NAV,
     /** Aside element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Aside")
-    ASIDE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Aside") ASIDE,
     /** Header element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Header")
-    HEADER,
+    @com.fasterxml.jackson.annotation.JsonProperty("Header") HEADER,
     /** Footer element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Footer")
-    FOOTER,
+    @com.fasterxml.jackson.annotation.JsonProperty("Footer") FOOTER,
     /** Main element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Main")
-    MAIN,
+    @com.fasterxml.jackson.annotation.JsonProperty("Main") MAIN,
     /** Figure element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Figure")
-    FIGURE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Figure") FIGURE,
     /** Figure caption */
-    @com.fasterxml.jackson.annotation.JsonProperty("Figcaption")
-    FIGCAPTION,
+    @com.fasterxml.jackson.annotation.JsonProperty("Figcaption") FIGCAPTION,
     /** Time element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Time")
-    TIME,
+    @com.fasterxml.jackson.annotation.JsonProperty("Time") TIME,
     /** Details element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Details")
-    DETAILS,
+    @com.fasterxml.jackson.annotation.JsonProperty("Details") DETAILS,
     /** Summary element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Summary")
-    SUMMARY,
+    @com.fasterxml.jackson.annotation.JsonProperty("Summary") SUMMARY,
     /** Form element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Form")
-    FORM,
+    @com.fasterxml.jackson.annotation.JsonProperty("Form") FORM,
     /** Input element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Input")
-    INPUT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Input") INPUT,
     /** Select element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Select")
-    SELECT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Select") SELECT,
     /** Option element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Option")
-    OPTION,
+    @com.fasterxml.jackson.annotation.JsonProperty("Option") OPTION,
     /** Button element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Button")
-    BUTTON,
+    @com.fasterxml.jackson.annotation.JsonProperty("Button") BUTTON,
     /** Textarea element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Textarea")
-    TEXTAREA,
+    @com.fasterxml.jackson.annotation.JsonProperty("Textarea") TEXTAREA,
     /** Label element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Label")
-    LABEL,
+    @com.fasterxml.jackson.annotation.JsonProperty("Label") LABEL,
     /** Fieldset element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Fieldset")
-    FIELDSET,
+    @com.fasterxml.jackson.annotation.JsonProperty("Fieldset") FIELDSET,
     /** Legend element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Legend")
-    LEGEND,
+    @com.fasterxml.jackson.annotation.JsonProperty("Legend") LEGEND,
     /** Audio element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Audio")
-    AUDIO,
+    @com.fasterxml.jackson.annotation.JsonProperty("Audio") AUDIO,
     /** Video element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Video")
-    VIDEO,
+    @com.fasterxml.jackson.annotation.JsonProperty("Video") VIDEO,
     /** Picture element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Picture")
-    PICTURE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Picture") PICTURE,
     /** Source element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Source")
-    SOURCE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Source") SOURCE,
     /** Iframe element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Iframe")
-    IFRAME,
+    @com.fasterxml.jackson.annotation.JsonProperty("Iframe") IFRAME,
     /** SVG element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Svg")
-    SVG,
+    @com.fasterxml.jackson.annotation.JsonProperty("Svg") SVG,
     /** Canvas element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Canvas")
-    CANVAS,
+    @com.fasterxml.jackson.annotation.JsonProperty("Canvas") CANVAS,
     /** Ruby annotation */
-    @com.fasterxml.jackson.annotation.JsonProperty("Ruby")
-    RUBY,
+    @com.fasterxml.jackson.annotation.JsonProperty("Ruby") RUBY,
     /** Ruby text */
-    @com.fasterxml.jackson.annotation.JsonProperty("Rt")
-    RT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Rt") RT,
     /** Ruby parenthesis */
-    @com.fasterxml.jackson.annotation.JsonProperty("Rp")
-    RP,
+    @com.fasterxml.jackson.annotation.JsonProperty("Rp") RP,
     /** Abbreviation */
-    @com.fasterxml.jackson.annotation.JsonProperty("Abbr")
-    ABBR,
+    @com.fasterxml.jackson.annotation.JsonProperty("Abbr") ABBR,
     /** Keyboard input */
-    @com.fasterxml.jackson.annotation.JsonProperty("Kbd")
-    KBD,
+    @com.fasterxml.jackson.annotation.JsonProperty("Kbd") KBD,
     /** Sample output */
-    @com.fasterxml.jackson.annotation.JsonProperty("Samp")
-    SAMP,
+    @com.fasterxml.jackson.annotation.JsonProperty("Samp") SAMP,
     /** Variable */
-    @com.fasterxml.jackson.annotation.JsonProperty("Var")
-    VAR,
+    @com.fasterxml.jackson.annotation.JsonProperty("Var") VAR,
     /** Citation */
-    @com.fasterxml.jackson.annotation.JsonProperty("Cite")
-    CITE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Cite") CITE,
     /** Quote */
     Q,
     /** Deleted text */
-    @com.fasterxml.jackson.annotation.JsonProperty("Del")
-    DEL,
+    @com.fasterxml.jackson.annotation.JsonProperty("Del") DEL,
     /** Inserted text */
-    @com.fasterxml.jackson.annotation.JsonProperty("Ins")
-    INS,
+    @com.fasterxml.jackson.annotation.JsonProperty("Ins") INS,
     /** Data element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Data")
-    DATA,
+    @com.fasterxml.jackson.annotation.JsonProperty("Data") DATA,
     /** Meter element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Meter")
-    METER,
+    @com.fasterxml.jackson.annotation.JsonProperty("Meter") METER,
     /** Progress element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Progress")
-    PROGRESS,
+    @com.fasterxml.jackson.annotation.JsonProperty("Progress") PROGRESS,
     /** Output element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Output")
-    OUTPUT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Output") OUTPUT,
     /** Template element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Template")
-    TEMPLATE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Template") TEMPLATE,
     /** Slot element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Slot")
-    SLOT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Slot") SLOT,
     /** HTML root element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Html")
-    HTML,
+    @com.fasterxml.jackson.annotation.JsonProperty("Html") HTML,
     /** Head element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Head")
-    HEAD,
+    @com.fasterxml.jackson.annotation.JsonProperty("Head") HEAD,
     /** Body element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Body")
-    BODY,
+    @com.fasterxml.jackson.annotation.JsonProperty("Body") BODY,
     /** Title element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Title")
-    TITLE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Title") TITLE,
     /** Meta element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Meta")
-    META,
+    @com.fasterxml.jackson.annotation.JsonProperty("Meta") META,
     /** Link element (not anchor) */
-    @com.fasterxml.jackson.annotation.JsonProperty("LinkTag")
-    LINK_TAG,
+    @com.fasterxml.jackson.annotation.JsonProperty("LinkTag") LINK_TAG,
     /** Style element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Style")
-    STYLE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Style") STYLE,
     /** Script element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Script")
-    SCRIPT,
+    @com.fasterxml.jackson.annotation.JsonProperty("Script") SCRIPT,
     /** Base element */
-    @com.fasterxml.jackson.annotation.JsonProperty("Base")
-    BASE,
+    @com.fasterxml.jackson.annotation.JsonProperty("Base") BASE,
     /** Custom element (web components) or unknown tag */
-    @com.fasterxml.jackson.annotation.JsonProperty("Custom")
-    CUSTOM;
+    @com.fasterxml.jackson.annotation.JsonProperty("Custom") CUSTOM;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        TEXT -> "Text"
-        ELEMENT -> "Element"
-        HEADING -> "Heading"
-        PARAGRAPH -> "Paragraph"
-        DIV -> "Div"
-        BLOCKQUOTE -> "Blockquote"
-        PRE -> "Pre"
-        HR -> "Hr"
-        LIST -> "List"
-        LIST_ITEM -> "ListItem"
-        DEFINITION_LIST -> "DefinitionList"
-        DEFINITION_TERM -> "DefinitionTerm"
-        DEFINITION_DESCRIPTION -> "DefinitionDescription"
-        TABLE -> "Table"
-        TABLE_ROW -> "TableRow"
-        TABLE_CELL -> "TableCell"
-        TABLE_HEADER -> "TableHeader"
-        TABLE_BODY -> "TableBody"
-        TABLE_HEAD -> "TableHead"
-        TABLE_FOOT -> "TableFoot"
-        LINK -> "Link"
-        IMAGE -> "Image"
-        STRONG -> "Strong"
-        EM -> "Em"
-        CODE -> "Code"
-        STRIKETHROUGH -> "Strikethrough"
-        UNDERLINE -> "Underline"
-        SUBSCRIPT -> "Subscript"
-        SUPERSCRIPT -> "Superscript"
-        MARK -> "Mark"
-        SMALL -> "Small"
-        BR -> "Br"
-        SPAN -> "Span"
-        ARTICLE -> "Article"
-        SECTION -> "Section"
-        NAV -> "Nav"
-        ASIDE -> "Aside"
-        HEADER -> "Header"
-        FOOTER -> "Footer"
-        MAIN -> "Main"
-        FIGURE -> "Figure"
-        FIGCAPTION -> "Figcaption"
-        TIME -> "Time"
-        DETAILS -> "Details"
-        SUMMARY -> "Summary"
-        FORM -> "Form"
-        INPUT -> "Input"
-        SELECT -> "Select"
-        OPTION -> "Option"
-        BUTTON -> "Button"
-        TEXTAREA -> "Textarea"
-        LABEL -> "Label"
-        FIELDSET -> "Fieldset"
-        LEGEND -> "Legend"
-        AUDIO -> "Audio"
-        VIDEO -> "Video"
-        PICTURE -> "Picture"
-        SOURCE -> "Source"
-        IFRAME -> "Iframe"
-        SVG -> "Svg"
-        CANVAS -> "Canvas"
-        RUBY -> "Ruby"
-        RT -> "Rt"
-        RP -> "Rp"
-        ABBR -> "Abbr"
-        KBD -> "Kbd"
-        SAMP -> "Samp"
-        VAR -> "Var"
-        CITE -> "Cite"
-        Q -> "Q"
-        DEL -> "Del"
-        INS -> "Ins"
-        DATA -> "Data"
-        METER -> "Meter"
-        PROGRESS -> "Progress"
-        OUTPUT -> "Output"
-        TEMPLATE -> "Template"
-        SLOT -> "Slot"
-        HTML -> "Html"
-        HEAD -> "Head"
-        BODY -> "Body"
-        TITLE -> "Title"
-        META -> "Meta"
-        LINK_TAG -> "LinkTag"
-        STYLE -> "Style"
-        SCRIPT -> "Script"
-        BASE -> "Base"
-        CUSTOM -> "Custom"
-    }
+    fun toWire(): String =
+        when (this) {
+            TEXT -> "Text"
+            ELEMENT -> "Element"
+            HEADING -> "Heading"
+            PARAGRAPH -> "Paragraph"
+            DIV -> "Div"
+            BLOCKQUOTE -> "Blockquote"
+            PRE -> "Pre"
+            HR -> "Hr"
+            LIST -> "List"
+            LIST_ITEM -> "ListItem"
+            DEFINITION_LIST -> "DefinitionList"
+            DEFINITION_TERM -> "DefinitionTerm"
+            DEFINITION_DESCRIPTION -> "DefinitionDescription"
+            TABLE -> "Table"
+            TABLE_ROW -> "TableRow"
+            TABLE_CELL -> "TableCell"
+            TABLE_HEADER -> "TableHeader"
+            TABLE_BODY -> "TableBody"
+            TABLE_HEAD -> "TableHead"
+            TABLE_FOOT -> "TableFoot"
+            LINK -> "Link"
+            IMAGE -> "Image"
+            STRONG -> "Strong"
+            EM -> "Em"
+            CODE -> "Code"
+            STRIKETHROUGH -> "Strikethrough"
+            UNDERLINE -> "Underline"
+            SUBSCRIPT -> "Subscript"
+            SUPERSCRIPT -> "Superscript"
+            MARK -> "Mark"
+            SMALL -> "Small"
+            BR -> "Br"
+            SPAN -> "Span"
+            ARTICLE -> "Article"
+            SECTION -> "Section"
+            NAV -> "Nav"
+            ASIDE -> "Aside"
+            HEADER -> "Header"
+            FOOTER -> "Footer"
+            MAIN -> "Main"
+            FIGURE -> "Figure"
+            FIGCAPTION -> "Figcaption"
+            TIME -> "Time"
+            DETAILS -> "Details"
+            SUMMARY -> "Summary"
+            FORM -> "Form"
+            INPUT -> "Input"
+            SELECT -> "Select"
+            OPTION -> "Option"
+            BUTTON -> "Button"
+            TEXTAREA -> "Textarea"
+            LABEL -> "Label"
+            FIELDSET -> "Fieldset"
+            LEGEND -> "Legend"
+            AUDIO -> "Audio"
+            VIDEO -> "Video"
+            PICTURE -> "Picture"
+            SOURCE -> "Source"
+            IFRAME -> "Iframe"
+            SVG -> "Svg"
+            CANVAS -> "Canvas"
+            RUBY -> "Ruby"
+            RT -> "Rt"
+            RP -> "Rp"
+            ABBR -> "Abbr"
+            KBD -> "Kbd"
+            SAMP -> "Samp"
+            VAR -> "Var"
+            CITE -> "Cite"
+            Q -> "Q"
+            DEL -> "Del"
+            INS -> "Ins"
+            DATA -> "Data"
+            METER -> "Meter"
+            PROGRESS -> "Progress"
+            OUTPUT -> "Output"
+            TEMPLATE -> "Template"
+            SLOT -> "Slot"
+            HTML -> "Html"
+            HEAD -> "Head"
+            BODY -> "Body"
+            TITLE -> "Title"
+            META -> "Meta"
+            LINK_TAG -> "LinkTag"
+            STYLE -> "Style"
+            SCRIPT -> "Script"
+            BASE -> "Base"
+            CUSTOM -> "Custom"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): NodeType = when (value) {
-            "Text", "text" -> TEXT
-            "Element", "element" -> ELEMENT
-            "Heading", "heading" -> HEADING
-            "Paragraph", "paragraph" -> PARAGRAPH
-            "Div", "div" -> DIV
-            "Blockquote", "blockquote" -> BLOCKQUOTE
-            "Pre", "pre" -> PRE
-            "Hr", "hr" -> HR
-            "List", "list" -> LIST
-            "ListItem", "listitem" -> LIST_ITEM
-            "DefinitionList", "definitionlist" -> DEFINITION_LIST
-            "DefinitionTerm", "definitionterm" -> DEFINITION_TERM
-            "DefinitionDescription", "definitiondescription" -> DEFINITION_DESCRIPTION
-            "Table", "table" -> TABLE
-            "TableRow", "tablerow" -> TABLE_ROW
-            "TableCell", "tablecell" -> TABLE_CELL
-            "TableHeader", "tableheader" -> TABLE_HEADER
-            "TableBody", "tablebody" -> TABLE_BODY
-            "TableHead", "tablehead" -> TABLE_HEAD
-            "TableFoot", "tablefoot" -> TABLE_FOOT
-            "Link", "link" -> LINK
-            "Image", "image" -> IMAGE
-            "Strong", "strong" -> STRONG
-            "Em", "em" -> EM
-            "Code", "code" -> CODE
-            "Strikethrough", "strikethrough" -> STRIKETHROUGH
-            "Underline", "underline" -> UNDERLINE
-            "Subscript", "subscript" -> SUBSCRIPT
-            "Superscript", "superscript" -> SUPERSCRIPT
-            "Mark", "mark" -> MARK
-            "Small", "small" -> SMALL
-            "Br", "br" -> BR
-            "Span", "span" -> SPAN
-            "Article", "article" -> ARTICLE
-            "Section", "section" -> SECTION
-            "Nav", "nav" -> NAV
-            "Aside", "aside" -> ASIDE
-            "Header", "header" -> HEADER
-            "Footer", "footer" -> FOOTER
-            "Main", "main" -> MAIN
-            "Figure", "figure" -> FIGURE
-            "Figcaption", "figcaption" -> FIGCAPTION
-            "Time", "time" -> TIME
-            "Details", "details" -> DETAILS
-            "Summary", "summary" -> SUMMARY
-            "Form", "form" -> FORM
-            "Input", "input" -> INPUT
-            "Select", "select" -> SELECT
-            "Option", "option" -> OPTION
-            "Button", "button" -> BUTTON
-            "Textarea", "textarea" -> TEXTAREA
-            "Label", "label" -> LABEL
-            "Fieldset", "fieldset" -> FIELDSET
-            "Legend", "legend" -> LEGEND
-            "Audio", "audio" -> AUDIO
-            "Video", "video" -> VIDEO
-            "Picture", "picture" -> PICTURE
-            "Source", "source" -> SOURCE
-            "Iframe", "iframe" -> IFRAME
-            "Svg", "svg" -> SVG
-            "Canvas", "canvas" -> CANVAS
-            "Ruby", "ruby" -> RUBY
-            "Rt", "rt" -> RT
-            "Rp", "rp" -> RP
-            "Abbr", "abbr" -> ABBR
-            "Kbd", "kbd" -> KBD
-            "Samp", "samp" -> SAMP
-            "Var", "var" -> VAR
-            "Cite", "cite" -> CITE
-            "Q", "q" -> Q
-            "Del", "del" -> DEL
-            "Ins", "ins" -> INS
-            "Data", "data" -> DATA
-            "Meter", "meter" -> METER
-            "Progress", "progress" -> PROGRESS
-            "Output", "output" -> OUTPUT
-            "Template", "template" -> TEMPLATE
-            "Slot", "slot" -> SLOT
-            "Html", "html" -> HTML
-            "Head", "head" -> HEAD
-            "Body", "body" -> BODY
-            "Title", "title" -> TITLE
-            "Meta", "meta" -> META
-            "LinkTag", "linktag" -> LINK_TAG
-            "Style", "style" -> STYLE
-            "Script", "script" -> SCRIPT
-            "Base", "base" -> BASE
-            "Custom", "custom" -> CUSTOM
-            else -> throw IllegalArgumentException("Unknown NodeType value: $value")
-        }
+        fun fromWire(value: String): NodeType =
+            when (value) {
+                "Text",
+                "text" -> TEXT
+                "Element",
+                "element" -> ELEMENT
+                "Heading",
+                "heading" -> HEADING
+                "Paragraph",
+                "paragraph" -> PARAGRAPH
+                "Div",
+                "div" -> DIV
+                "Blockquote",
+                "blockquote" -> BLOCKQUOTE
+                "Pre",
+                "pre" -> PRE
+                "Hr",
+                "hr" -> HR
+                "List",
+                "list" -> LIST
+                "ListItem",
+                "listitem" -> LIST_ITEM
+                "DefinitionList",
+                "definitionlist" -> DEFINITION_LIST
+                "DefinitionTerm",
+                "definitionterm" -> DEFINITION_TERM
+                "DefinitionDescription",
+                "definitiondescription" -> DEFINITION_DESCRIPTION
+                "Table",
+                "table" -> TABLE
+                "TableRow",
+                "tablerow" -> TABLE_ROW
+                "TableCell",
+                "tablecell" -> TABLE_CELL
+                "TableHeader",
+                "tableheader" -> TABLE_HEADER
+                "TableBody",
+                "tablebody" -> TABLE_BODY
+                "TableHead",
+                "tablehead" -> TABLE_HEAD
+                "TableFoot",
+                "tablefoot" -> TABLE_FOOT
+                "Link",
+                "link" -> LINK
+                "Image",
+                "image" -> IMAGE
+                "Strong",
+                "strong" -> STRONG
+                "Em",
+                "em" -> EM
+                "Code",
+                "code" -> CODE
+                "Strikethrough",
+                "strikethrough" -> STRIKETHROUGH
+                "Underline",
+                "underline" -> UNDERLINE
+                "Subscript",
+                "subscript" -> SUBSCRIPT
+                "Superscript",
+                "superscript" -> SUPERSCRIPT
+                "Mark",
+                "mark" -> MARK
+                "Small",
+                "small" -> SMALL
+                "Br",
+                "br" -> BR
+                "Span",
+                "span" -> SPAN
+                "Article",
+                "article" -> ARTICLE
+                "Section",
+                "section" -> SECTION
+                "Nav",
+                "nav" -> NAV
+                "Aside",
+                "aside" -> ASIDE
+                "Header",
+                "header" -> HEADER
+                "Footer",
+                "footer" -> FOOTER
+                "Main",
+                "main" -> MAIN
+                "Figure",
+                "figure" -> FIGURE
+                "Figcaption",
+                "figcaption" -> FIGCAPTION
+                "Time",
+                "time" -> TIME
+                "Details",
+                "details" -> DETAILS
+                "Summary",
+                "summary" -> SUMMARY
+                "Form",
+                "form" -> FORM
+                "Input",
+                "input" -> INPUT
+                "Select",
+                "select" -> SELECT
+                "Option",
+                "option" -> OPTION
+                "Button",
+                "button" -> BUTTON
+                "Textarea",
+                "textarea" -> TEXTAREA
+                "Label",
+                "label" -> LABEL
+                "Fieldset",
+                "fieldset" -> FIELDSET
+                "Legend",
+                "legend" -> LEGEND
+                "Audio",
+                "audio" -> AUDIO
+                "Video",
+                "video" -> VIDEO
+                "Picture",
+                "picture" -> PICTURE
+                "Source",
+                "source" -> SOURCE
+                "Iframe",
+                "iframe" -> IFRAME
+                "Svg",
+                "svg" -> SVG
+                "Canvas",
+                "canvas" -> CANVAS
+                "Ruby",
+                "ruby" -> RUBY
+                "Rt",
+                "rt" -> RT
+                "Rp",
+                "rp" -> RP
+                "Abbr",
+                "abbr" -> ABBR
+                "Kbd",
+                "kbd" -> KBD
+                "Samp",
+                "samp" -> SAMP
+                "Var",
+                "var" -> VAR
+                "Cite",
+                "cite" -> CITE
+                "Q",
+                "q" -> Q
+                "Del",
+                "del" -> DEL
+                "Ins",
+                "ins" -> INS
+                "Data",
+                "data" -> DATA
+                "Meter",
+                "meter" -> METER
+                "Progress",
+                "progress" -> PROGRESS
+                "Output",
+                "output" -> OUTPUT
+                "Template",
+                "template" -> TEMPLATE
+                "Slot",
+                "slot" -> SLOT
+                "Html",
+                "html" -> HTML
+                "Head",
+                "head" -> HEAD
+                "Body",
+                "body" -> BODY
+                "Title",
+                "title" -> TITLE
+                "Meta",
+                "meta" -> META
+                "LinkTag",
+                "linktag" -> LINK_TAG
+                "Style",
+                "style" -> STYLE
+                "Script",
+                "script" -> SCRIPT
+                "Base",
+                "base" -> BASE
+                "Custom",
+                "custom" -> CUSTOM
+                else -> throw IllegalArgumentException("Unknown NodeType value: $value")
+            }
     }
 }

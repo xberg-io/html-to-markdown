@@ -13,14 +13,25 @@ class H2mBridge {
   /// # Arguments
   ///
   /// * `html` — the HTML string to convert.
-  /// * `options` — optional conversion options. Defaults to [`ConversionOptions::default`].
+  /// * `options` — conversion options. The parameter bound is
+  ///   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+  ///   - `convert(html, ConversionOptions::default())` — bare options.
+  ///   - `convert(html, opts)` — bare options.
+  ///   - `convert(html, Some(opts))` — explicit `Option`.
+  ///   - `convert(html, None)` — fall back to [`ConversionOptions::default`].
   ///
   /// # Example
   ///
   /// ```
-  /// use html_to_markdown_rs::convert;
+  /// use html_to_markdown_rs::{convert, ConversionOptions};
   ///
   /// let html = "<h1>Hello World</h1>";
+  ///
+  /// // Bare options — most ergonomic.
+  /// let result = convert(html, ConversionOptions::default()).unwrap();
+  /// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+  ///
+  /// // `None` falls back to defaults.
   /// let result = convert(html, None).unwrap();
   /// assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
   /// ```
@@ -29,8 +40,10 @@ class H2mBridge {
   ///
   /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
   /// throws anyhow::Error on failure
-  static Future<ConversionResult> convert(String html, {ConversionOptions? options}) async {
+  static Future<ConversionResult> convert(
+    String html, {
+    ConversionOptions? options,
+  }) async {
     return await rust_bridge.convert(html: html, options: options);
   }
-
 }
