@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **autolinks: bare paths and filenames are no longer wrapped as autolinks** (resolves #397).
+  Per GFM §6.5, autolinks require an absolute URI with a scheme — but the previous check only
+  compared the link text to the `href`, so `<a href="foobar.png">foobar.png</a>` became the
+  invalid `<foobar.png>` (which parsers read as a literal HTML tag). Added `has_uri_scheme`
+  helper that validates the RFC 3986 scheme grammar (`ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )`
+  followed by `:`). Bare paths, fragments, and filenames now render as `[text](href)`. `https://`,
+  `mailto:`, `ftp://`, `data:`, and other schemed URLs continue to autolink as before.
 - **node binding: visitor callbacks (`visitText`, `visitLink`, `visitHeading`, …) now fire**
   (resolves #395). `JsHtmlVisitorBridge` now stores a persistent `napi::bindgen_prelude::ObjectRef<false>`
   obtained via `Object::create_ref()` and materializes a fresh local `Object` handle per callback

@@ -14,7 +14,7 @@ RB_SYS_CARGO_FEATURES ?=
 RB_SYS_GLOBAL_RUSTFLAGS ?=
 RB_SYS_EXTRA_RUSTFLAGS ?=
 RB_SYS_EXTRA_CARGO_ARGS ?=
-RB_SYS_CARGO_MANIFEST_DIR ?= .
+RB_SYS_CARGO_MANIFEST_DIR ?= ./native
 
 # Set dirname for the profile, since the profiles do not directly map to target dir (i.e. dev -> debug)
 ifeq ($(RB_SYS_CARGO_PROFILE),dev)
@@ -63,7 +63,7 @@ NULLCMD = :
 
 #### Start of system configuration section. ####
 
-srcdir = .
+srcdir = ./native
 topdir = /Users/naamanhirschfeld/.rbenv/versions/3.4.8/include/ruby-3.4.0
 hdrdir = $(topdir)
 arch_hdrdir = /Users/naamanhirschfeld/.rbenv/versions/3.4.8/include/ruby-3.4.0/arm64-darwin25

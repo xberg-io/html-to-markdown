@@ -14,7 +14,7 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::block::heading::{find_single_heading_child, heading_allows_inline_images, push_heading};
 use crate::converter::dom_context::DomContext;
-use crate::converter::inline::link::append_markdown_link;
+use crate::converter::inline::link::{append_markdown_link, has_uri_scheme};
 use crate::converter::main::walk_node;
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
@@ -66,9 +66,12 @@ pub fn handle_link(
             .trim()
             .to_string();
 
+        // GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
+        // bare paths or filenames must use the full `[text](href)` form (issue #397).
         let is_autolink = options.autolinks
             && !options.default_title
             && !href.is_empty()
+            && has_uri_scheme(href.as_str())
             && (raw_text == href || (href.starts_with("mailto:") && raw_text == href[7..]));
 
         if is_autolink {

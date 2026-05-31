@@ -1,0 +1,72 @@
+[
+  {
+    "id": "conversion_autolink_filename_not_autolinked",
+    "description": "Bare filename href (no URI scheme) renders as inline link, not autolink (#397)",
+    "input": {
+      "html": "<a href=\"foobar.png\">foobar.png</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[foobar.png](foobar.png)"
+      }
+    ]
+  },
+  {
+    "id": "conversion_autolink_relative_path_not_autolinked",
+    "description": "Relative path href renders as inline link (#397)",
+    "input": {
+      "html": "<a href=\"/docs/intro.html\">/docs/intro.html</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[/docs/intro.html](/docs/intro.html)"
+      }
+    ]
+  },
+  {
+    "id": "conversion_autolink_https_url",
+    "description": "Absolute https URL with matching text renders as autolink (#397)",
+    "input": {
+      "html": "<a href=\"https://example.com\">https://example.com</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "<https://example.com>"
+      }
+    ]
+  },
+  {
+    "id": "conversion_autolink_mailto",
+    "description": "mailto: link with matching email text renders as autolink (#397)",
+    "input": {
+      "html": "<a href=\"mailto:a@b.com\">a@b.com</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "<a@b.com>"
+      }
+    ]
+  },
+  {
+    "id": "conversion_autolink_mixed_filename_and_url",
+    "description": "Mixed filename + URL: only the URL becomes an autolink (#397)",
+    "input": {
+      "html": "<a href=\"foobar.png\">foobar.png</a> <a href=\"https://www.heise.de\">https://www.heise.de</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[foobar.png](foobar.png) <https://www.heise.de>"
+      }
+    ]
+  }
+]
