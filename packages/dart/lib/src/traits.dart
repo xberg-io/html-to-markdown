@@ -275,6 +275,12 @@ abstract class HtmlVisitor {
 }
 
 
+/// Opaque JSON carrier for Rust's internal InternalDocument trait contract.
+final class InternalDocumentBridge {
+  const InternalDocumentBridge({required this.json});
+  final String json;
+}
+
 /// OCR backend type identifier — used by e2e test plugin_api stubs.
 enum OcrBackendType { tesseract, easyocr, paddleocr, rapidocr }
 

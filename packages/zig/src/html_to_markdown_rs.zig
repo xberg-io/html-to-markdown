@@ -260,6 +260,17 @@ pub const ConversionOptions = struct {
     preserve_tags: []const []const u8,
     /// Skip conversion of `<img>` elements (omit images from output).
     skip_images: bool,
+    /// URL encoding strategy for link and image destinations.
+    ///
+    /// Controls how special characters in URL destinations are escaped:
+    ///
+    /// - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it
+    ///   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
+    ///
+    /// - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986
+    ///   unreserved character or `/`, producing a destination that all Markdown parsers handle
+    ///   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
+    url_escape_style: UrlEscapeStyle,
     /// Link rendering style (inline or reference).
     link_style: LinkStyle,
     /// Target output format (Markdown, plain text, etc.).
@@ -365,6 +376,8 @@ pub const ConversionOptionsUpdate = struct {
     preserve_tags: ?[]const []const u8,
     /// Optional override for `ConversionOptions.skip_images`.
     skip_images: ?bool,
+    /// Optional override for `ConversionOptions.url_escape_style`.
+    url_escape_style: ?UrlEscapeStyle,
     /// Optional override for `ConversionOptions.link_style`.
     link_style: ?LinkStyle,
     /// Optional override for `ConversionOptions.output_format`.
@@ -746,6 +759,25 @@ pub const LinkStyle = enum {
     reference,
 };
 
+/// URL encoding strategy for link and image destinations.
+///
+/// Controls how special characters in URL destinations are handled when they
+/// require escaping to produce valid Markdown.
+///
+/// The `Angle` variant (default) wraps the destination in angle brackets:
+/// `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+/// but breaks when the URL itself contains `>`.
+///
+/// The `Percent` variant percent-encodes every character that is not an RFC 3986
+/// unreserved character or `/`, producing a destination safe for all Markdown
+/// parsers: `[text](url%20with%20spaces)`.
+pub const UrlEscapeStyle = enum {
+    /// Wrap destinations that contain spaces or newlines in angle brackets. Default.
+    angle,
+    /// Percent-encode all characters that are not RFC 3986 unreserved or `/`.
+    percent,
+};
+
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.
@@ -1077,11 +1109,12 @@ pub fn convert(html: []const u8, options: ?[]const u8) ConversionError![]u8 {
         std.heap.c_allocator, "{s}", .{v}, 0) else null;
     defer if (options_z) |z| std.heap.c_allocator.free(z);
     const options_handle = if (options_z) |z| c.htm_conversion_options_from_json(z) else null;
+    if (options_z != null and options_handle == null) return _first_error(ConversionError);
+    defer if (options_handle) |h| c.htm_conversion_options_free(h);
     const _result = c.htm_convert(html_z, options_handle);
     if (c.htm_last_error_code() != 0) {
         return _first_error(ConversionError);
     }
-    if (options_handle) |h| c.htm_conversion_options_free(h);
     return blk: {
         const _json_ptr = c.htm_conversion_result_to_json(_result.?);
         defer _free_string(_json_ptr);

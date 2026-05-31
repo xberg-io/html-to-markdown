@@ -75,6 +75,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `stripTags` | `Array<string>` | `[]` | HTML tag names whose content is stripped from the output entirely. |
 | `preserveTags` | `Array<string>` | `[]` | HTML tag names that are preserved verbatim in the output. |
 | `skipImages` | `boolean` | `false` | Skip conversion of `<img>` elements (omit images from output). |
+| `urlEscapeStyle` | `UrlEscapeStyle` | `UrlEscapeStyle.Angle` | URL encoding strategy for link and image destinations. Controls how special characters in URL destinations are escaped: - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it contains spaces or newlines. Some parsers misinterpret `>` inside such a destination. - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986 unreserved character or `/`, producing a destination that all Markdown parsers handle correctly even when the URL contains `<`, `>`, spaces, or parentheses. |
 | `linkStyle` | `LinkStyle` | `LinkStyle.Inline` | Link rendering style (inline or reference). |
 | `outputFormat` | `OutputFormat` | `OutputFormat.Markdown` | Target output format (Markdown, plain text, etc.). |
 | `includeDocumentStructure` | `boolean` | `false` | Include structured document tree in result. |
@@ -1032,6 +1033,28 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 |-------|-------------|
 | `Inline` | Inline links: `[text](url)`. Default. |
 | `Reference` | Reference-style links: `[text][1]` with `[1]: url` at end of document. |
+
+---
+
+#### UrlEscapeStyle
+
+URL encoding strategy for link and image destinations.
+
+Controls how special characters in URL destinations are handled when they
+require escaping to produce valid Markdown.
+
+The `Angle` variant (default) wraps the destination in angle brackets:
+`[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+but breaks when the URL itself contains `>`.
+
+The `Percent` variant percent-encodes every character that is not an RFC 3986
+unreserved character or `/`, producing a destination safe for all Markdown
+parsers: `[text](url%20with%20spaces)`.
+
+| Value | Description |
+|-------|-------------|
+| `Angle` | Wrap destinations that contain spaces or newlines in angle brackets. Default. |
+| `Percent` | Percent-encode all characters that are not RFC 3986 unreserved or `/`. |
 
 ---
 

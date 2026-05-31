@@ -35,6 +35,7 @@
 #' @param strip_tags HTML tag names whose content is stripped from the output entirely
 #' @param preserve_tags HTML tag names that are preserved verbatim in the output
 #' @param skip_images Skip conversion of `<img>` elements (omit images from output)
+#' @param url_escape_style URL encoding strategy for link and image destinations
 #' @param link_style Link rendering style (inline or reference)
 #' @param output_format Target output format (Markdown, plain text, etc.)
 #' @param include_document_structure Include structured document tree in result
@@ -80,6 +81,7 @@ conversion_options <- function(
   strip_tags = NULL,
   preserve_tags = NULL,
   skip_images = NULL,
+  url_escape_style = NULL,
   link_style = NULL,
   output_format = NULL,
   include_document_structure = NULL,
@@ -124,6 +126,7 @@ conversion_options <- function(
   if (!is.null(strip_tags)) opts$strip_tags <- strip_tags
   if (!is.null(preserve_tags)) opts$preserve_tags <- preserve_tags
   if (!is.null(skip_images)) opts$skip_images <- skip_images
+  if (!is.null(url_escape_style)) opts$url_escape_style <- url_escape_style
   if (!is.null(link_style)) opts$link_style <- link_style
   if (!is.null(output_format)) opts$output_format <- output_format
   if (!is.null(include_document_structure)) opts$include_document_structure <- include_document_structure

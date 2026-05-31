@@ -133,6 +133,19 @@ data class ConversionOptions(
     val preserveTags: List<String> = emptyList(),
     /** Skip conversion of `<img>` elements (omit images from output). */
     val skipImages: Boolean = false,
+    /**
+     * URL encoding strategy for link and image destinations.
+     *
+     * Controls how special characters in URL destinations are escaped:
+     *
+     * - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it
+     *   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
+     *
+     * - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986
+     *   unreserved character or `/`, producing a destination that all Markdown parsers handle
+     *   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
+     */
+    val urlEscapeStyle: UrlEscapeStyle = UrlEscapeStyle.ANGLE,
     /** Link rendering style (inline or reference). */
     val linkStyle: LinkStyle = LinkStyle.INLINE,
     /** Target output format (Markdown, plain text, etc.). */

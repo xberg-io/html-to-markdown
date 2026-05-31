@@ -164,6 +164,7 @@ mod ffi {
             strip_tags: Vec<String>,
             preserve_tags: Vec<String>,
             skip_images: bool,
+            url_escape_style: UrlEscapeStyle,
             link_style: LinkStyle,
             output_format: OutputFormat,
             include_document_structure: bool,
@@ -233,6 +234,8 @@ mod ffi {
         fn preserve_tags(&self) -> Vec<String>;
         #[swift_bridge(swift_name = "skipImages")]
         fn skip_images(&self) -> bool;
+        #[swift_bridge(swift_name = "urlEscapeStyle")]
+        fn url_escape_style(&self) -> String;
         #[swift_bridge(swift_name = "linkStyle")]
         fn link_style(&self) -> String;
         #[swift_bridge(swift_name = "outputFormat")]
@@ -290,6 +293,7 @@ mod ffi {
             strip_tags: Option<Vec<String>>,
             preserve_tags: Option<Vec<String>>,
             skip_images: Option<bool>,
+            url_escape_style: Option<UrlEscapeStyle>,
             link_style: Option<LinkStyle>,
             output_format: Option<OutputFormat>,
             include_document_structure: Option<bool>,
@@ -359,6 +363,8 @@ mod ffi {
         fn preserve_tags(&self) -> Option<Vec<String>>;
         #[swift_bridge(swift_name = "skipImages")]
         fn skip_images(&self) -> Option<bool>;
+        #[swift_bridge(swift_name = "urlEscapeStyle")]
+        fn url_escape_style(&self) -> Option<String>;
         #[swift_bridge(swift_name = "linkStyle")]
         fn link_style(&self) -> Option<String>;
         #[swift_bridge(swift_name = "outputFormat")]
@@ -567,6 +573,11 @@ mod ffi {
 
     extern "Rust" {
         type LinkStyle;
+        fn to_string(&self) -> String;
+    }
+
+    extern "Rust" {
+        type UrlEscapeStyle;
         fn to_string(&self) -> String;
     }
 
@@ -1038,6 +1049,7 @@ impl ConversionOptions {
         strip_tags: Vec<String>,
         preserve_tags: Vec<String>,
         skip_images: bool,
+        url_escape_style: UrlEscapeStyle,
         link_style: LinkStyle,
         output_format: OutputFormat,
         include_document_structure: bool,
@@ -1144,6 +1156,7 @@ impl ConversionOptions {
             }
         }
         __target.skip_images = skip_images;
+        // alef: url_escape_style (UrlEscapeStyle) is an enum; reverse From not generated — left at default
         // alef: link_style (LinkStyle) is an enum; reverse From not generated — left at default
         // alef: output_format (OutputFormat) is an enum; reverse From not generated — left at default
         __target.include_document_structure = include_document_structure;
@@ -1315,6 +1328,9 @@ impl ConversionOptions {
             .and_then(|j| ::serde_json::from_value(j).ok())
             .unwrap_or_default()
     }
+    pub fn url_escape_style(&self) -> String {
+        UrlEscapeStyle::from(self.0.url_escape_style.clone()).to_string()
+    }
     pub fn link_style(&self) -> String {
         LinkStyle::from(self.0.link_style.clone()).to_string()
     }
@@ -1404,6 +1420,7 @@ impl ConversionOptionsUpdate {
         strip_tags: Option<Vec<String>>,
         preserve_tags: Option<Vec<String>>,
         skip_images: Option<bool>,
+        url_escape_style: Option<UrlEscapeStyle>,
         link_style: Option<LinkStyle>,
         output_format: Option<OutputFormat>,
         include_document_structure: Option<bool>,
@@ -1507,6 +1524,7 @@ impl ConversionOptionsUpdate {
             }
         }
         __target.skip_images = skip_images;
+        // alef: url_escape_style (UrlEscapeStyle) is an enum; reverse From not generated — left at default
         // alef: link_style (LinkStyle) is an enum; reverse From not generated — left at default
         // alef: output_format (OutputFormat) is an enum; reverse From not generated — left at default
         __target.include_document_structure = include_document_structure;
@@ -1712,6 +1730,12 @@ impl ConversionOptionsUpdate {
                 .ok()
                 .and_then(|j| ::serde_json::from_value(j).ok())
         })
+    }
+    pub fn url_escape_style(&self) -> Option<String> {
+        self.0
+            .url_escape_style
+            .clone()
+            .map(|w| UrlEscapeStyle::from(w).to_string())
     }
     pub fn link_style(&self) -> Option<String> {
         self.0.link_style.clone().map(|w| LinkStyle::from(w).to_string())
@@ -2392,6 +2416,29 @@ impl LinkStyle {
         match self {
             Self::Inline => "Inline".to_string(),
             Self::Reference => "Reference".to_string(),
+        }
+    }
+}
+
+pub enum UrlEscapeStyle {
+    Angle,
+    Percent,
+}
+
+impl From<html_to_markdown_rs::options::UrlEscapeStyle> for UrlEscapeStyle {
+    fn from(val: html_to_markdown_rs::options::UrlEscapeStyle) -> Self {
+        match val {
+            html_to_markdown_rs::options::UrlEscapeStyle::Angle => Self::Angle,
+            html_to_markdown_rs::options::UrlEscapeStyle::Percent => Self::Percent,
+        }
+    }
+}
+
+impl UrlEscapeStyle {
+    pub fn to_string(&self) -> String {
+        match self {
+            Self::Angle => "Angle".to_string(),
+            Self::Percent => "Percent".to_string(),
         }
     }
 }

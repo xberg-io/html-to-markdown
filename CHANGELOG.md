@@ -14,12 +14,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   brackets, producing output that all Markdown parsers handle correctly even when the URL
   contains `<`, `>`, spaces, or parentheses (resolves #392).
 
+### Fixed
+
+- **node binding: visitor callbacks (`visitText`, `visitLink`, `visitHeading`, …) now fire**
+  (resolves #395). The previous `JsHtmlVisitorBridge` stored a `napi::bindgen_prelude::Object<'static>`
+  via an unsound `std::mem::transmute`; the borrowed object was already invalid by the time
+  any visitor method ran, so `obj.has_named_property(...)` silently returned `false` and the
+  bridge fell through to `VisitResult::Continue` without dispatching. The regenerated bridge
+  stores raw `napi::sys::napi_env` and `napi::sys::napi_value` pointers and reconstructs
+  `Env`/`Object` references on each callback — matching how the WASM bridge already worked.
+- **php test_app: PIE `install.sh` now installs `kreuzberg-dev/html-to-markdown`** instead of
+  the non-existent `kreuzberg-dev/html-to-markdown-rs` (resolves #98 / smoke regression). The
+  Packagist project only publishes the un-suffixed name; `alef.toml` was renamed and the regen
+  picks it up in both `install.sh` and the inline comment.
+- **r binding: `conversion_options()` helper exported in `NAMESPACE`.** alef's R emitter
+  generated the `R/options.R` helper for ergonomic ConversionOptions construction but never
+  exported it, so `htmltomarkdown::conversion_options(...)` raised `could not find function`
+  at runtime — which downstream `convert(..., options=)` callers then surfaced as the
+  extendr-api 0.9.0 `options must be a named list` validation error. Resolves #99 / smoke
+  regression. (alef commit `160d504f3`)
+- **java binding: `NativeLib.<clinit>` no longer throws `NoSuchElementException`** when an
+  optional FFI symbol is missing. The error-context handle lookups (`LAST_ERROR_CODE`,
+  `LAST_ERROR_CONTEXT`) used `Optional.orElseThrow()` mid-static-init, escalating any partial
+  symbol set into a hard `NoClassDefFoundError`; they now fall back to `null` and the rest of
+  the loader's null-checks handle the absence gracefully. Resolves #100 / smoke regression.
+  (alef commit `d296bfdeb`)
+- **c FFI test_app `Makefile` now embeds an `LC_RPATH`** so the smoke binary can find the
+  dylib at runtime on macOS without `DYLD_LIBRARY_PATH`. Adds `-Wl,-rpath,$(FFI_LIB_DIR)`
+  to the LDFLAGS path. Resolves #101 / smoke regression.
+- **csharp binding: trait-bridge catch blocks no longer emit unused `Exception ex` variables.**
+  The generated `TraitBridges.cs` had 25+ `catch (Exception ex)` blocks where `ex` was never
+  referenced; with `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` the build failed
+  with CS0168, which in turn blocked NuGet publish for 3 releases (root cause of #104). alef
+  now emits bare `catch (Exception)` when the exception variable isn't actually used.
+  (alef commit `16e81b20d`)
+- **ruby gem: `Rakefile` now uses `Rake::ExtensionTask` with inline `ext_dir`** instead of the
+  alef-0.21.0 `RbSys::ExtensionTask` + manual `Dir.chdir` pattern. rake lost the chdir context
+  when running nested `file "Cargo.lock"` task declarations, breaking `bundle exec rake compile`
+  for ALL 5 platforms (macos-x86_64/arm64, linux/aarch64, windows-x64). Reverts to the v3.5.5
+  working pattern. Resolves #102. (alef commit `c273a5413`)
+
+### CI/Publish
+
+- **`.npmrc` at workspace root: `minimum-release-age=0`** so the npm `Build Node bindings` and
+  `Build WASM package` jobs stop failing at `pnpm install` time with
+  `ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION` for transitively-recent dep pins. The v3.5.5 fix
+  only patched the test command; this covers every `pnpm install` call repo-wide. Resolves
+  #96.
+- **Go subtag publish** (`packages/go/v3.5.x`) is already wired through the
+  `kreuzberg-dev/actions` `finalize-release` job (publish.yaml:2418 passes
+  `go-module-path: packages/go/v3`); no action needed here. The reason v3.5.2–v3.5.7 didn't
+  push subtags is upstream main-release-job failures cascading. Resolves #97.
+
 ### Chore
 
-- **alef pin: 0.20.12 → 0.21.0** (local unreleased head). Regen of all bindings + e2e
-  suites against the new alef. Baseline for the upcoming cohort fixes (#395 visitor
-  bridge, #392 percent-encode URLs, PHP install.sh package name, R extendr named-list,
-  Java NativeLib loader, C FFI rpath).
+- **alef pin: 0.20.12 → 0.21.0** (local unreleased head; no alef tag). Bindings + e2e suites
+  regenerated against the freshly-rebuilt local alef binary, picking up the cohort fixes
+  above in a single regen.
 
 ## [3.5.7] - 2026-05-29
 

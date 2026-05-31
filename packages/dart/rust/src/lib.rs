@@ -332,6 +332,15 @@ pub struct ConversionOptions {
     pub preserve_tags: Vec<String>,
     /// Skip conversion of `<img>` elements (omit images from output).
     pub skip_images: bool,
+    /// URL encoding strategy for link and image destinations.
+    ///
+    /// Controls how special characters in URL destinations are escaped:
+    /// - [`UrlEscapeStyle::Angle`] (default) — wraps the destination in angle brackets when it
+    ///   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
+    /// - [`UrlEscapeStyle::Percent`] — percent-encodes every character that is not an RFC 3986
+    ///   unreserved character or `/`, producing a destination that all Markdown parsers handle
+    ///   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
+    pub url_escape_style: UrlEscapeStyle,
     /// Link rendering style (inline or reference).
     pub link_style: LinkStyle,
     /// Target output format (Markdown, plain text, etc.).
@@ -438,6 +447,8 @@ pub struct ConversionOptionsUpdate {
     pub preserve_tags: Option<Vec<String>>,
     /// Optional override for [`ConversionOptions::skip_images`].
     pub skip_images: Option<bool>,
+    /// Optional override for [`ConversionOptions::url_escape_style`].
+    pub url_escape_style: Option<UrlEscapeStyle>,
     /// Optional override for [`ConversionOptions::link_style`].
     pub link_style: Option<LinkStyle>,
     /// Optional override for [`ConversionOptions::output_format`].
@@ -873,6 +884,26 @@ pub enum LinkStyle {
     Inline,
     /// Reference-style links: `[text][1]` with `[1]: url` at end of document.
     Reference,
+}
+
+/// URL encoding strategy for link and image destinations.
+///
+/// Controls how special characters in URL destinations are handled when they
+/// require escaping to produce valid Markdown.
+///
+/// The `Angle` variant (default) wraps the destination in angle brackets:
+/// `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+/// but breaks when the URL itself contains `>`.
+///
+/// The `Percent` variant percent-encodes every character that is not an RFC 3986
+/// unreserved character or `/`, producing a destination safe for all Markdown
+/// parsers: `[text](url%20with%20spaces)`.
+#[frb(mirror(UrlEscapeStyle))]
+pub enum UrlEscapeStyle {
+    /// Wrap destinations that contain spaces or newlines in angle brackets. Default.
+    Angle,
+    /// Percent-encode all characters that are not RFC 3986 unreserved or `/`.
+    Percent,
 }
 
 /// Output format for conversion.
@@ -1371,6 +1402,7 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             strip_tags: v.strip_tags.into_iter().map(|s| s.into()).collect(),
             preserve_tags: v.preserve_tags.into_iter().map(|s| s.into()).collect(),
             skip_images: v.skip_images as _,
+            url_escape_style: UrlEscapeStyle::from(v.url_escape_style),
             link_style: LinkStyle::from(v.link_style),
             output_format: OutputFormat::from(v.output_format),
             include_document_structure: v.include_document_structure as _,
@@ -1422,6 +1454,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             strip_tags: v.strip_tags.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
             preserve_tags: v.preserve_tags.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
             skip_images: v.skip_images.map(|x| x as _),
+            url_escape_style: v.url_escape_style.map(UrlEscapeStyle::from),
             link_style: v.link_style.map(LinkStyle::from),
             output_format: v.output_format.map(OutputFormat::from),
             include_document_structure: v.include_document_structure.map(|x| x as _),
@@ -1683,6 +1716,15 @@ impl From<html_to_markdown_rs::options::LinkStyle> for LinkStyle {
     }
 }
 
+impl From<html_to_markdown_rs::options::UrlEscapeStyle> for UrlEscapeStyle {
+    fn from(v: html_to_markdown_rs::options::UrlEscapeStyle) -> Self {
+        match v {
+            html_to_markdown_rs::options::UrlEscapeStyle::Angle => UrlEscapeStyle::Angle,
+            html_to_markdown_rs::options::UrlEscapeStyle::Percent => UrlEscapeStyle::Percent,
+        }
+    }
+}
+
 impl From<html_to_markdown_rs::options::OutputFormat> for OutputFormat {
     fn from(v: html_to_markdown_rs::options::OutputFormat) -> Self {
         match v {
@@ -1923,6 +1965,7 @@ impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions
             strip_tags: v.strip_tags.into_iter().map(Into::into).collect(),
             preserve_tags: v.preserve_tags.into_iter().map(Into::into).collect(),
             skip_images: v.skip_images as _,
+            url_escape_style: v.url_escape_style.into(),
             link_style: v.link_style.into(),
             output_format: v.output_format.into(),
             include_document_structure: v.include_document_structure as _,
@@ -2022,6 +2065,15 @@ impl From<LinkStyle> for html_to_markdown_rs::options::LinkStyle {
         match v {
             LinkStyle::Inline => html_to_markdown_rs::options::LinkStyle::Inline,
             LinkStyle::Reference => html_to_markdown_rs::options::LinkStyle::Reference,
+        }
+    }
+}
+
+impl From<UrlEscapeStyle> for html_to_markdown_rs::options::UrlEscapeStyle {
+    fn from(v: UrlEscapeStyle) -> Self {
+        match v {
+            UrlEscapeStyle::Angle => html_to_markdown_rs::options::UrlEscapeStyle::Angle,
+            UrlEscapeStyle::Percent => html_to_markdown_rs::options::UrlEscapeStyle::Percent,
         }
     }
 }

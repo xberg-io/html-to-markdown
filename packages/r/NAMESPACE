@@ -3,6 +3,7 @@
 useDynLib(htmltomarkdown, .registration = TRUE)
 
 export(convert)
+export(conversion_options)
 export(DocumentMetadata)
 S3method("$", DocumentMetadata)
 S3method("[[", DocumentMetadata)

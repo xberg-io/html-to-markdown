@@ -18,7 +18,7 @@ NULL
 #' @section Errors:
 #' Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 #' @export
-convert <- function(html, options = NULL) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
+convert <- function(html, options = ConversionOptions$default()) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
 #' Document-level metadata extracted from `<head>` and top-level elements
 #'
 #' Contains all metadata typically used by search engines, social media platforms,
@@ -175,6 +175,7 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field strip_tags HTML tag names whose content is stripped from the output entirely.
 #' @field preserve_tags HTML tag names that are preserved verbatim in the output.
 #' @field skip_images Skip conversion of `<img>` elements (omit images from output).
+#' @field url_escape_style URL encoding strategy for link and image destinations.
 #' @field link_style Link rendering style (inline or reference).
 #' @field output_format Target output format (Markdown, plain text, etc.).
 #' @field include_document_structure Include structured document tree in result.
@@ -238,6 +239,7 @@ ConversionOptions$from_json <- function(json) {
 #' @field strip_tags Optional override for [`ConversionOptions::strip_tags`].
 #' @field preserve_tags Optional override for [`ConversionOptions::preserve_tags`].
 #' @field skip_images Optional override for [`ConversionOptions::skip_images`].
+#' @field url_escape_style Optional override for [`ConversionOptions::url_escape_style`].
 #' @field link_style Optional override for [`ConversionOptions::link_style`].
 #' @field output_format Optional override for [`ConversionOptions::output_format`].
 #' @field include_document_structure Optional override for [`ConversionOptions::include_document_structure`].
@@ -543,6 +545,14 @@ HighlightStyle  <- function() list() |> structure(class = "HighlightStyle")
 #' @return A LinkStyle enum value
 #' @export
 LinkStyle  <- function() list() |> structure(class = "LinkStyle")
+
+#' Create a UrlEscapeStyle enum value
+#'
+#' Returns the default UrlEscapeStyle variant.
+#'
+#' @return A UrlEscapeStyle enum value
+#' @export
+UrlEscapeStyle  <- function() list() |> structure(class = "UrlEscapeStyle")
 
 #' Create a OutputFormat enum value
 #'

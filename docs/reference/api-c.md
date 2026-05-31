@@ -75,6 +75,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `strip_tags` | `const char**` | `NULL` | HTML tag names whose content is stripped from the output entirely. |
 | `preserve_tags` | `const char**` | `NULL` | HTML tag names that are preserved verbatim in the output. |
 | `skip_images` | `bool` | `false` | Skip conversion of `<img>` elements (omit images from output). |
+| `url_escape_style` | `HtmUrlEscapeStyle` | `HTM_HTM_ANGLE` | URL encoding strategy for link and image destinations. Controls how special characters in URL destinations are escaped: - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it contains spaces or newlines. Some parsers misinterpret `>` inside such a destination. - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986 unreserved character or `/`, producing a destination that all Markdown parsers handle correctly even when the URL contains `<`, `>`, spaces, or parentheses. |
 | `link_style` | `HtmLinkStyle` | `HTM_HTM_INLINE` | Link rendering style (inline or reference). |
 | `output_format` | `HtmOutputFormat` | `HTM_HTM_MARKDOWN` | Target output format (Markdown, plain text, etc.). |
 | `include_document_structure` | `bool` | `false` | Include structured document tree in result. |
@@ -1032,6 +1033,28 @@ reference-style `[text][1]` syntax with definitions collected at the end.
 |-------|-------------|
 | `HTM_INLINE` | Inline links: `[text](url)`. Default. |
 | `HTM_REFERENCE` | Reference-style links: `[text][1]` with `[1]: url` at end of document. |
+
+---
+
+#### HtmUrlEscapeStyle
+
+URL encoding strategy for link and image destinations.
+
+Controls how special characters in URL destinations are handled when they
+require escaping to produce valid Markdown.
+
+The `Angle` variant (default) wraps the destination in angle brackets:
+`[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+but breaks when the URL itself contains `>`.
+
+The `Percent` variant percent-encodes every character that is not an RFC 3986
+unreserved character or `/`, producing a destination safe for all Markdown
+parsers: `[text](url%20with%20spaces)`.
+
+| Value | Description |
+|-------|-------------|
+| `HTM_ANGLE` | Wrap destinations that contain spaces or newlines in angle brackets. Default. |
+| `HTM_PERCENT` | Percent-encode all characters that are not RFC 3986 unreserved or `/`. |
 
 ---
 

@@ -600,6 +600,20 @@ public typealias HighlightStyle = RustBridge.HighlightStyle
 /// reference-style `[text][1]` syntax with definitions collected at the end.
 public typealias LinkStyle = RustBridge.LinkStyle
 
+/// URL encoding strategy for link and image destinations.
+///
+/// Controls how special characters in URL destinations are handled when they
+/// require escaping to produce valid Markdown.
+///
+/// The `Angle` variant (default) wraps the destination in angle brackets:
+/// `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+/// but breaks when the URL itself contains `>`.
+///
+/// The `Percent` variant percent-encodes every character that is not an RFC 3986
+/// unreserved character or `/`, producing a destination safe for all Markdown
+/// parsers: `[text](url%20with%20spaces)`.
+public typealias UrlEscapeStyle = RustBridge.UrlEscapeStyle
+
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.

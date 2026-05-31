@@ -93,6 +93,8 @@ data class ConversionOptionsUpdate(
     val preserveTags: List<String>? = null,
     /** Optional override for `ConversionOptions.skip_images`. */
     val skipImages: Boolean? = null,
+    /** Optional override for `ConversionOptions.url_escape_style`. */
+    val urlEscapeStyle: UrlEscapeStyle? = null,
     /** Optional override for `ConversionOptions.link_style`. */
     val linkStyle: LinkStyle? = null,
     /** Optional override for `ConversionOptions.output_format`. */

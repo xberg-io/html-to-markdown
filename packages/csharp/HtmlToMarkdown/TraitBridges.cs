@@ -566,7 +566,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -602,7 +602,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -639,7 +639,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -678,7 +678,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -717,7 +717,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -755,7 +755,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -793,7 +793,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -830,7 +830,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -868,7 +868,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -904,7 +904,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -941,7 +941,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -977,7 +977,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1015,7 +1015,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1052,7 +1052,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1089,7 +1089,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1126,7 +1126,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1163,7 +1163,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1200,7 +1200,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1237,7 +1237,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1274,7 +1274,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1311,7 +1311,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1348,7 +1348,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1384,7 +1384,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1420,7 +1420,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1458,7 +1458,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1494,7 +1494,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1531,7 +1531,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1568,7 +1568,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1605,7 +1605,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1643,7 +1643,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1682,7 +1682,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1719,7 +1719,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1756,7 +1756,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1793,7 +1793,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1830,7 +1830,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1866,7 +1866,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1903,7 +1903,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1939,7 +1939,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -1976,7 +1976,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
@@ -2013,7 +2013,7 @@ public sealed class HtmlVisitorBridge : IDisposable {
                 throw;
             }
             return 0;
-        } catch (Exception ex) {
+        } catch (Exception) {
             outResult = IntPtr.Zero;
             return 1;
         } finally {
