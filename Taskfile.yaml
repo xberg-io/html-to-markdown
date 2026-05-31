@@ -650,6 +650,37 @@ tasks:
     cmds:
       - task: test-apps:test
 
+  # === Benchmark harness ===
+  bench:h2m:
+    desc: "Run html-to-markdown benchmark harness over fixture corpus"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- run --output tools/benchmark-harness/results/latest.json
+
+  bench:h2m:compare:
+    desc: "Compare latest benchmark results against baseline with guardrail checks"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- compare
+
+  bench:h2m:oracle:
+    desc: "Verify Markdown snapshot oracle tests"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- oracle
+
+  bench:h2m:oracle:bless:
+    desc: "Overwrite stored Markdown snapshots with current output"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- oracle --bless
+
+  bench:h2m:survey:
+    desc: "Print fixture corpus feature-coverage survey"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- survey
+
+  bench:h2m:mdream:
+    desc: "Run benchmark with side-by-side mdream comparison (requires compare-mdream feature)"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench --features compare-mdream -- run --mdream --output tools/benchmark-harness/results/latest.json
+
   # === Demo ===
   build:demo:
     desc: "Build the GitHub Pages demo"

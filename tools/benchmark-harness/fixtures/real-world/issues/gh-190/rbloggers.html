@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-US"
+	prefix="og: https://ogp.me/ns#"  prefix="og: http://ogp.me/ns#">
+<head>
+
+
+<title>Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects | R-bloggers</title>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<meta property="article:published_time" content="2017-05-15T08:40:25+00:00" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta property="article:published_time" content="2017-05-15T02:40:25-06:00" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="post-template-default single single-post postid-150446 single-format-standard">
+<div class="mh-container">
+<div class="wrapper-corporate">
+<header class="header-wrap">
+	<a href="https://www.r-bloggers.com/" title="R-bloggers" rel="home">
+<div class="logo-wrap" role="banner">
+<img src="https://www.r-bloggers.com/wp-content/uploads/2020/07/R_02.webp" height="90" width="290" alt="R-bloggers" />
+<div class="logo logo-overlay">
+<h1 class="logo-name">R-bloggers</h1>
+<h2 class="logo-desc">R news and tutorials contributed by hundreds of R bloggers</h2>
+</div>
+</div>
+</a>
+	<nav class="main-nav clearfix">
+		<div class="menu-top-nav-container"><ul id="menu-top-nav" class="menu"><li id="menu-item-48314" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-48314"><a href="https://www.r-bloggers.com">Home</a></li>
+<li id="menu-item-92333" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-92333"><a href="https://www.r-bloggers.com/about/">About</a></li>
+<li id="menu-item-50111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-50111"><a href="https://feeds.feedburner.com/RBloggers">RSS</a></li>
+<li id="menu-item-48313" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-48313"><a href="https://www.r-bloggers.com/add-your-blog/">add your blog!</a></li>
+<li id="menu-item-111419" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-111419"><a href="https://www.r-bloggers.com/2015/12/how-to-learn-r-2/">Learn R</a></li>
+<li id="menu-item-75513" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-75513"><a href="https://www.r-users.com/">R jobs</a>
+<ul class="sub-menu">
+	<li id="menu-item-76945" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-76945"><a href="https://www.r-users.com/submit-job/">Submit a new job (it&#8217;s free)</a></li>
+	<li id="menu-item-76946" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-76946"><a href="https://www.r-users.com/">Browse latest jobs (also free)</a></li>
+</ul>
+</li>
+<li id="menu-item-48311" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-48311"><a href="https://www.r-bloggers.com/contact-us/">Contact us</a></li>
+</ul></div>	</nav>
+</header>
+<div class="mh-wrapper clearfix">
+	<div class="mh-content left"><article class="post-150446 post type-post status-publish format-standard hentry category-r-bloggers">
+	<header class="post-header">
+		<h1 class="entry-title">Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects</h1>
+		<p class="meta post-meta">Posted on <span class="updated">May 15, 2017</span>  by <span class="vcard author"><a class="fn" href="https://www.r-bloggers.com/author/bogdan-anastasiei/">Bogdan Anastasiei</a></span>  in <a href="https://www.r-bloggers.com/category/r-bloggers/" rel="category tag">R bloggers</a> | 0 Comments</p>
+	</header>
+	<div class="entry clearfix">
+				<p class="syndicated-attribution">
+
+<div style="border: 1px solid; background: none repeat scroll 0 0 #EDEDED; margin: 1px; font-size: 12px;">
+[This article was first published on  <strong><a href="http://r-posts.com/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/"> R-posts.com</a></strong>, and kindly contributed to <a href="https://www.r-bloggers.com/" rel="nofollow">R-bloggers</a>].  (You can report issue about the content on this page <a href="https://www.r-bloggers.com/contact-us/">here</a>)
+<hr>Want to share your content on R-bloggers?<a href="https://www.r-bloggers.com/add-your-blog/" rel="nofollow"> click here</a> if you have a blog, or <a href="http://r-posts.com/" rel="nofollow"> here</a> if you don't.
+</div></p>
+<aside class="mashsb-container mashsb-main mashsb-stretched"><div class="mashsb-box"><div class="mashsb-buttons"><a class="mashicon-facebook mash-large mash-center mashsb-noshadow" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.r-bloggers.com%2F2017%2F05%2Fthree-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects%2F" target="_blank" rel="nofollow"><span class="icon"></span><span class="text">Share</span></a><a class="mashicon-twitter mash-large mash-center mashsb-noshadow" href="https://twitter.com/intent/tweet?text=Three-Way%20Analysis%20of%20Variance%3A%20Simple%20Second-Order%20Interaction%20Effects%20and%20Simple%20Main%20Effects&url=https://www.r-bloggers.com/2017/05/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/&via=Rbloggers" target="_blank" rel="nofollow"><span class="icon"></span><span class="text">Tweet</span></a><div class="onoffswitch2 mash-large mashsb-noshadow" style="display:none;"></div></div>
+            </div>
+                <div style="clear:both;"></div></aside>
+            In this article we will show how to run a three-way analysis of variance when both the third-order interaction effect and the second-order interaction effects are statistically significant. This type of analysis can become pretty tedious, especially when our factors have many levels, so we will try to explain it here as clearly as possible. (If you want to watch me doing these analyses live, <a href="http://www.statistics-with-r.com/" rel="nofollow" target="_blank">get my free course on statistical analysis with R here</a>.)<br />
+ <br />
+ First of all, let’s present the fictitious data we are going to work with. Let’s suppose that a pharmaceutical company is planning to launch a new vitamin that allegedly improves the employees’ resistance to effort. The vitamin is tested on a sample of 720 employees, divided into three groups: employees who take a placebo (the control group), employees who take the vitamin in low dose and employees who take the vitamin in high dose. Half of the employees are male, and half are female. Moreover, we have both blue collar employees and white collar employees in our sample.
+
+The resistance to effort is measured on a scale whatsoever, from 1 to 30 (30 being the highest resistance). Our goal is to determine whether the effort resistance is influenced by three factors: dose of vitamin (placebo, low dose, and high dose), gender (male, female) and type of employee (blue collar, white collar). You can find the experiment data in CSV format <a href="http://statistics-with-r.com/datasets/vitamin3.csv" rel="nofollow" target="_blank">here</a>.
+
+<strong>Third-order interaction effect</strong>
+
+First of all, let’s check whether the third-order interaction effect is significant. We are going to run the analysis using the <em>aov</em> function in the <em>stats</em> package (our data frame is called <em>vitamin</em>).
+
+<pre>
+aov1 &lt;- aov(effort~dose*gender*type, data=vitamin)
+summary(aov1)
+</pre>
+
+In the formula above the interaction effect is, of course, <em>dose<em>gender</em>type</em>. The ANOVA results can be seen below (we have only kept the line presenting the third-order interaction effect).                                 <br />
+ <br />
+
+<pre>
+                                  Df Sum Sq Mean Sq F value   Pr(&gt;F)
+
+
+dose:gender:type   2    187    93.4  22.367 3.81e-10
+</pre>
+
+The interaction effect is statistically significant: F(2)=22.367, p<0.01. In other words, we do have a third-order interaction effect.
+
+In this situation, it is not advisable to report and interpret the second-order interaction effects (they could be misleading). Therefore, we are going to compute the <em>simple second-order interaction effects</em>.
+
+<strong>Simple second-order interaction effects</strong>
+
+The simple second-order interaction effects are the effects of each pair of factors at each level of the third factor. Specifically, we have to compute the following effects:
+
+<ol>
+    <li>the interaction effect of dose and type of employee, for each gender category (male and female)</li>
+    <li>the interaction effect of gender and type of employee, at each dose level (placebo, low and high)</li>
+    <li>the interaction effect of dose and gender, for each type of employee (blue collar and white collar).</li>
+</ol>
+
+The total number of second-order interaction effect is given by the sum of the factor levels. In our case we have 7 effects (3+2+2). We will not analyze of all them, because this article would become too long. We will only focus on the first set of effects, leaving the others for you as an exercise.
+
+So let’s investigate the interaction effect of dose and type of employee for each gender group. First we have to create two separate data frames, for male and female employees. We do that with the <em>filter</em> command in the <em>dplyr</em> package (though you can also use brackets or subsets).
+
+<pre>
+vitamin_male &lt;- filter(vitamin, gender==&quot;male&quot;)
+vitamin_female &lt;- filter(vitamin, gender==&quot;female&quot;)
+</pre>
+
+Now we perform a two-way analysis of variance on each data frame (the factors being dose and type, of course).
+
+
+aov1 <- aov(effort~dose*type, data=vitamin_male)
+summary(aov1)
+
+aov2 <- aov(effort~dose*type, data=vitamin_female)
+summary(aov2)
+
+
+The results of the analyses are shown below (we have only retained the lines with the interaction effects).
+
+<pre>
+                Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+
+ dose:type     2    249   124.7   28.42 3.57e-12            
+
+                    Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+
+ dose:type     2  137.2    68.6   17.31 6.74e-08
+
+</pre>
+
+<br />
+
+We can notice that both simple second-order interaction effects are significant (p<0.01). So we are dealing with a combined influence of the factors dose and type of employee in both male and female groups. In this situation, we have to examine the <em>simple main effects</em> for each factor. This is what we are going to do in the next section.
+
+<strong>Simple main effects</strong>
+
+Let’s compute the main effect for the factor dose of vitamin, which is the most important (after all, the company wants to demonstrate that the vitamin does affect the resistance to effort). You will be able to compute the other simple main effects yourself, using this as an example.
+
+Now we must create four separate data frames, for each combination of the factors gender and type of employee: male – blue collar, male – white collar, female – blue collar, female – white collar.
+
+
+vitamin_male_blue <- filter(vitamin, gender=="male", type=="blue collar")
+
+vitamin_male_white <- filter(vitamin, gender=="male", type=="white collar")
+
+vitamin_female_blue <- filter(vitamin, gender=="female", type=="blue collar")
+
+vitamin_female_white <- filter(vitamin, gender=="female", type=="white collar")
+
+
+Next we perform a one-way ANOVA for each data frame. Let’s do it for the first group, male – blue collar.
+
+
+aov1 <- aov(effort~dose, data=vitamin_male_blue)
+summary(aov1)
+
+
+<pre>
+
+                 Df Sum Sq Mean Sq F value Pr(&gt;F)   
+
+ dose          2 2943.5  1471.8   349.9 &lt;2e-16
+</pre>
+
+<br />
+ The simple main effect for the factor dose on this group is statistically significant (p<0.01). In other words, there is a significant difference between placebo, low dose and high dose levels within the male – blue collar employees category, regarding the resistance to effort. To find out how big the differences are, we use the <em>TuckeyHSD</em> function to compute the test with the same name.
+
+<pre>TukeyHSD(aov1)
+
+
+                                              diff        lwr       upr   p adj
+
+ low dose-high dose -2.528333  -3.413363 -1.643303     0
+
+ placebo-high dose  -9.558333 -10.443363 -8.673303     0
+
+ placebo-low dose   -7.030000  -7.915030 -6.144970     0
+
+</pre>
+
+<br />
+ By inspection of the table we conclude that the differences in effort resistance between the dose groups are significant (p<0.01). The highest difference, in absolute values, is that between low dose and placebo levels: 9.5 points. So the employees who took a high dose present a higher resistance to effort than those who just took a placebo.
+
+One more example: the simple main effects of the variable dose of vitamin on the female – blue collar group.
+
+
+aov1 <- aov(effort~dose, data=vitamin_female_blue)
+summary(aov1)
+
+
+                 Df Sum Sq Mean Sq F value Pr(>F)   <br />
+ dose          2  399.6  199.81   45.57 <2e-16
+
+ 
+
+<pre>TukeyHSD(aov1)
+
+
+                                            diff        lwr       upr     p adj
+
+ low dose-high dose  1.083333  0.1797508  1.986916 0.0141485
+
+ placebo-high dose  -2.476667 -3.3802492 -1.573084 0.0000000
+
+ placebo-low dose   -3.560000 -4.4635826 -2.656417 0.0000000
+</pre>
+
+ 
+
+The simple main effect is statistically significant, as it results from the first table. Furthermore, all the differences between dose levels are significant. The highest difference is the difference between low dose and placebo (3.5 points).
+
+To learn more on data analysis in R, <a href="http://www.statistics-with-r.com/" rel="nofollow" target="_blank">check the free “Statistics with R” video course here.</a>
+
+
+<div id='jp-relatedposts' class='jp-relatedposts' >
+	<h3 class="jp-relatedposts-headline"><em>Related</em></h3>
+</div><aside class="mashsb-container mashsb-main mashsb-stretched"><div class="mashsb-box"><div class="mashsb-buttons"><a class="mashicon-facebook mash-large mash-center mashsb-noshadow" href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.r-bloggers.com%2F2017%2F05%2Fthree-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects%2F" target="_blank" rel="nofollow"><span class="icon"></span><span class="text">Share</span></a><a class="mashicon-twitter mash-large mash-center mashsb-noshadow" href="https://twitter.com/intent/tweet?text=Three-Way%20Analysis%20of%20Variance%3A%20Simple%20Second-Order%20Interaction%20Effects%20and%20Simple%20Main%20Effects&url=https://www.r-bloggers.com/2017/05/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/&via=Rbloggers" target="_blank" rel="nofollow"><span class="icon"></span><span class="text">Tweet</span></a><div class="onoffswitch2 mash-large mashsb-noshadow" style="display:none;"></div></div>
+            </div>
+                <div style="clear:both;"></div></aside>
+
+<p class="syndicated-attribution"><div style="border: 1px solid; background: none repeat scroll 0 0 #EDEDED; margin: 1px; font-size: 13px;">
+<div style="text-align: center;">To <strong>leave a comment</strong> for the author, please follow the link and comment on their blog: <strong><a href="http://r-posts.com/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/"> R-posts.com</a></strong>.</div>
+<hr />
+<a href="https://www.r-bloggers.com/" rel="nofollow">R-bloggers.com</a> offers <strong><a href="https://feedburner.google.com/fb/a/mailverify?uri=RBloggers" rel="nofollow">daily e-mail updates</a></strong> about <a title="The R Project for Statistical Computing" href="https://www.r-project.org/" rel="nofollow">R</a> news and tutorials about <a title="R tutorials" href="https://www.r-bloggers.com/how-to-learn-r-2/" rel="nofollow">learning R</a> and many other topics. <a title="Data science jobs" href="https://www.r-users.com/" rel="nofollow">Click here if you're looking to post or find an R/data-science job</a>.
+
+<hr>Want to share your content on R-bloggers?<a href="https://www.r-bloggers.com/add-your-blog/" rel="nofollow"> click here</a> if you have a blog, or <a href="http://r-posts.com/" rel="nofollow"> here</a> if you don't.
+</div></p>			</div>
+	</article><nav class="post-navigation clearfix" role="navigation">
+<div class="post-nav left">
+<a href="https://www.r-bloggers.com/2017/05/r%e2%81%b6-tracking-wannacry-bitcoin-wallet-payments-with-r/" rel="prev">&larr; Previous post</a></div>
+<div class="post-nav right">
+<a href="https://www.r-bloggers.com/2017/05/visualizing-r-ladies-growth/" rel="next">Next post &rarr;</a></div>
+</nav>
+	</div>
+	<aside class="mh-sidebar sb-right">
+	<div id="custom_html-2" class="widget_text sb-widget widget_custom_html"><div class="textwidget custom-html-widget">
+<div class="top-search" style="padding-left: 0px;">
+	<form id="searchform" action="https://www.google.com/cse" target="_blank">
+		<div>
+			<input type="hidden" name="cx" value="005359090438081006639:paz69t-s8ua" />
+			<input type="hidden" name="ie" value="UTF-8" />
+			<input type="text" value="" name="q" id="q" autocomplete="on" style="font-size:16px;" placeholder="Search R-bloggers.." />
+			<input type="submit" id="searchsubmit2" name="sa" value="Go" style="font-size:16px;" />
+		</div>
+	</form>
+
+</div>
+</div></div><div id="text-6" class="sb-widget widget_text">			<div class="textwidget"><div style="min-height:26px;border:1px solid #ccc;padding:3px;text-align:left; background: none repeat scroll 0 0 #FDEADA;">
+
+<form  style="width:202px; float:left;" action="https://r-bloggers.com/phplist/?p=subscribe&id=1" method="post" target="popupwindow">
+
+<input type="text" style="width:110px" onclick="if (!window.__cfRLUnblockHandlers) return false; if (this.value == 'Your e-mail here') this.value = '';" value='Your e-mail here' name="email" data-cf-modified-ebd39e8ac491a9a765cf5d88-="" />
+<input type="hidden" value="RBloggers" name="uri"/><input type="hidden" name="loc" value="en_US"/><input type="submit" value="Subscribe" />
+
+</form>
+
+
+<div>
+<a href="https://feeds.feedburner.com/RBloggers"><img src="https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1" style="height:17px;min-width:80px;class:skip-lazy;" alt data-recalc-dims="1" data-lazy-src="https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image"><noscript><img src="https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1" style="height:17px;min-width:80px;class:skip-lazy;" alt="" data-recalc-dims="1" /></noscript></a>
+</div>
+
+</div>
+
+<br/>
+
+<div>
+
+
+<iframe allowtransparency="true" frameborder="0" scrolling="no"
+src="" data-src="//platform.twitter.com/widgets/follow_button.html?screen_name=rbloggers&data-show-count"
+  style="width:100%; height:30px;"></iframe>
+
+
+<div id="fb-root"></div>
+
+
+<div style="min-height: 154px;" class="fb-page" data-href="https://www.facebook.com/rbloggers/" data-tabs="" data-width="300" data-height="154" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/rbloggers/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/rbloggers/">R bloggers Facebook page</a></blockquote></div>
+
+
+
+
+
+
+
+
+</div></div>
+		</div><div id="wppp-3" class="sb-widget widget_wppp"><h4 class="widget-title">Most viewed posts (weekly)</h4>
+<ul class='wppp_list'>
+	<li><a href='https://www.r-bloggers.com/2018/07/pca-vs-autoencoders-for-dimensionality-reduction/' title='PCA vs Autoencoders for Dimensionality Reduction'>PCA vs Autoencoders for Dimensionality Reduction</a></li>
+	<li><a href='https://www.r-bloggers.com/2016/11/5-ways-to-subset-a-data-frame-in-r/' title='5 Ways to Subset a Data Frame in R'>5 Ways to Subset a Data Frame in R</a></li>
+	<li><a href='https://www.r-bloggers.com/2015/12/how-to-write-the-first-for-loop-in-r/' title='How to write the first for loop in R'>How to write the first for loop in R</a></li>
+	<li><a href='https://www.r-bloggers.com/2022/03/how-to-calculate-a-cumulative-average-in-r/' title='How to Calculate a Cumulative Average in R'>How to Calculate a Cumulative Average in R</a></li>
+	<li><a href='https://www.r-bloggers.com/2013/08/date-formats-in-r/' title='Date Formats in R'>Date Formats in R</a></li>
+	<li><a href='https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/' title='Complete tutorial on using &#039;apply&#039; functions in R'>Complete tutorial on using &#039;apply&#039; functions in R</a></li>
+	<li><a href='https://www.r-bloggers.com/2010/02/r-sorting-a-data-frame-by-the-contents-of-a-column/' title='R – Sorting a data frame by the contents of a column'>R – Sorting a data frame by the contents of a column</a></li>
+</ul>
+</div><div id="text-18" class="sb-widget widget_text"><h4 class="widget-title">Sponsors</h4>			<div class="textwidget"><div style="min-height: 2055px;">
+
+
+
+</div></div>
+		</div>
+		<div id="recent-posts-3" class="sb-widget widget_recent_entries">
+		<h4 class="widget-title">Recent Posts</h4>
+		<ul>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/something-to-note-when-using-the-merge-function-in-r/">Something to note when using the merge function in R</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/better-sentiment-analysis-with-sentiment-ai/">Better Sentiment Analysis with sentiment.ai</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/self-documenting-plots-in-ggplot2/">Self-documenting plots in ggplot2</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/data-challenges-for-r-users/">Data Challenges for R Users</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/simplevis-new-improved/">simplevis: new &amp; improved!</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/checking-the-inputs-of-your-r-functions/">Checking the inputs of your R functions</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/imputing-missing-values-in-r/">Imputing missing values in R</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/creating-a-dashboard-framework-with-aws-part-1/">Creating a Dashboard Framework with AWS (Part 1)</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/bensstatstalks3-5-tips-for-landing-a-data-professional-role/">BensstatsTalks#3: 5 Tips for Landing a Data Professional Role</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/live-covid-19-swiss-vaccination-analysis/">Live COVID-19 Swiss vaccination analysis</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/">Complete tutorial on using &#8216;apply&#8217; functions in R</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/getting-to-know-julia/">Getting to know Julia</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/bootstraps-bandings/">Bootstraps &amp; Bandings</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/how-to-calculate-a-cumulative-average-in-r/">How to Calculate a Cumulative Average in R</a>
+									</li>
+											<li>
+					<a href="https://www.r-bloggers.com/2022/03/some-thoughts-about-the-use-of-cloud-services-and-web-apis-in-social-science-research/">Some thoughts about the use of cloud services and web APIs in social science research</a>
+									</li>
+					</ul>
+
+		</div><div id="rss-7" class="sb-widget widget_rss"><h4 class="widget-title"><a class="rsswidget" href="https://feeds.feedburner.com/Rjobs"><img class="rss-widget-icon" style="border:0" width="14" height="14" src="https://www.r-bloggers.com/wp-includes/images/rss.png" alt="RSS" /></a> <a class="rsswidget" href="https://www.r-users.com/">Jobs for R-users</a></h4><ul><li><a class='rsswidget' href='https://www.r-users.com/jobs/junior-data-scientist-quantitative-economist/'>Junior Data Scientist / Quantitative economist</a></li><li><a class='rsswidget' href='https://www.r-users.com/jobs/senior-quantitative-analyst/'>Senior Quantitative Analyst</a></li><li><a class='rsswidget' href='https://www.r-users.com/jobs/r-programmer-4/'>R programmer</a></li><li><a class='rsswidget' href='https://www.r-users.com/jobs/data-scientist-cgiar-excellence-in-agronomy-ref-no-ddg-r4d-ds-1-cg-ea-06-20/'>Data Scientist – CGIAR Excellence in Agronomy (Ref No: DDG-R4D/DS/1/CG/EA/06/20)</a></li><li><a class='rsswidget' href='https://www.r-users.com/jobs/data-analytics-auditor-future-of-audit-lead-london-or-newcastle/'>Data Analytics Auditor, Future of Audit Lead @ London or Newcastle</a></li></ul></div><div id="rss-9" class="sb-widget widget_rss"><h4 class="widget-title"><a class="rsswidget" href="https://feeds.feedburner.com/Python-bloggers"><img class="rss-widget-icon" style="border:0" width="14" height="14" src="https://www.r-bloggers.com/wp-includes/images/rss.png" alt="RSS" /></a> <a class="rsswidget" href="https://python-bloggers.com/">python-bloggers.com (python/data-science news)</a></h4><ul><li><a class='rsswidget' href='https://python-bloggers.com/2022/03/dunn-index-for-k-means-clustering-evaluation/'>Dunn Index for K-Means Clustering Evaluation</a></li><li><a class='rsswidget' href='https://python-bloggers.com/2022/03/installing-python-and-tensorflow-with-jupyter-notebook-configurations/'>Installing Python and Tensorflow with Jupyter Notebook Configurations</a></li><li><a class='rsswidget' href='https://python-bloggers.com/2022/03/how-to-get-twitter-data-using-python/'>How to Get Twitter Data using Python</a></li><li><a class='rsswidget' href='https://python-bloggers.com/2022/02/visualizations-with-altair/'>Visualizations with Altair</a></li><li><a class='rsswidget' href='https://python-bloggers.com/2022/02/spelling-corrector-program-in-python/'>Spelling Corrector Program in Python</a></li><li><a class='rsswidget' href='https://python-bloggers.com/2022/02/spelling-checker-program-in-python/'>Spelling Checker Program in Python</a></li><li><a class='rsswidget' href='https://python-bloggers.com/2022/02/streamlit-tutorial-how-to-deploy-streamlit-apps-on-rstudio-connect/'>Streamlit Tutorial: How to Deploy Streamlit Apps on RStudio Connect</a></li></ul></div><div id="text-16" class="sb-widget widget_text">			<div class="textwidget"><strong><a href="https://www.r-bloggers.com/blogs-list/">Full list of contributing R-bloggers</a></strong></div>
+		</div><div id="archives-3" class="sb-widget widget_archive"><h4 class="widget-title">Archives</h4>		<label class="screen-reader-text" for="archives-dropdown-3">Archives</label>
+		<select id="archives-dropdown-3" name="archive-dropdown">
+
+			<option value="">Select Month</option>
+				<option value='https://www.r-bloggers.com/2022/03/'> March 2022 &nbsp;(35)</option>
+	<option value='https://www.r-bloggers.com/2022/02/'> February 2022 &nbsp;(152)</option>
+	<option value='https://www.r-bloggers.com/2022/01/'> January 2022 &nbsp;(154)</option>
+	<option value='https://www.r-bloggers.com/2021/12/'> December 2021 &nbsp;(172)</option>
+	<option value='https://www.r-bloggers.com/2021/11/'> November 2021 &nbsp;(145)</option>
+	<option value='https://www.r-bloggers.com/2021/10/'> October 2021 &nbsp;(199)</option>
+	<option value='https://www.r-bloggers.com/2021/09/'> September 2021 &nbsp;(202)</option>
+	<option value='https://www.r-bloggers.com/2021/08/'> August 2021 &nbsp;(153)</option>
+	<option value='https://www.r-bloggers.com/2021/07/'> July 2021 &nbsp;(171)</option>
+	<option value='https://www.r-bloggers.com/2021/06/'> June 2021 &nbsp;(195)</option>
+	<option value='https://www.r-bloggers.com/2021/05/'> May 2021 &nbsp;(196)</option>
+	<option value='https://www.r-bloggers.com/2021/04/'> April 2021 &nbsp;(183)</option>
+	<option value='https://www.r-bloggers.com/2021/03/'> March 2021 &nbsp;(221)</option>
+	<option value='https://www.r-bloggers.com/2021/02/'> February 2021 &nbsp;(225)</option>
+	<option value='https://www.r-bloggers.com/2021/01/'> January 2021 &nbsp;(252)</option>
+	<option value='https://www.r-bloggers.com/2020/12/'> December 2020 &nbsp;(295)</option>
+	<option value='https://www.r-bloggers.com/2020/11/'> November 2020 &nbsp;(266)</option>
+	<option value='https://www.r-bloggers.com/2020/10/'> October 2020 &nbsp;(276)</option>
+	<option value='https://www.r-bloggers.com/2020/09/'> September 2020 &nbsp;(249)</option>
+	<option value='https://www.r-bloggers.com/2020/08/'> August 2020 &nbsp;(226)</option>
+	<option value='https://www.r-bloggers.com/2020/07/'> July 2020 &nbsp;(268)</option>
+	<option value='https://www.r-bloggers.com/2020/06/'> June 2020 &nbsp;(231)</option>
+	<option value='https://www.r-bloggers.com/2020/05/'> May 2020 &nbsp;(332)</option>
+	<option value='https://www.r-bloggers.com/2020/04/'> April 2020 &nbsp;(326)</option>
+	<option value='https://www.r-bloggers.com/2020/03/'> March 2020 &nbsp;(279)</option>
+	<option value='https://www.r-bloggers.com/2020/02/'> February 2020 &nbsp;(259)</option>
+	<option value='https://www.r-bloggers.com/2020/01/'> January 2020 &nbsp;(250)</option>
+	<option value='https://www.r-bloggers.com/2019/12/'> December 2019 &nbsp;(241)</option>
+	<option value='https://www.r-bloggers.com/2019/11/'> November 2019 &nbsp;(214)</option>
+	<option value='https://www.r-bloggers.com/2019/10/'> October 2019 &nbsp;(230)</option>
+	<option value='https://www.r-bloggers.com/2019/09/'> September 2019 &nbsp;(227)</option>
+	<option value='https://www.r-bloggers.com/2019/08/'> August 2019 &nbsp;(270)</option>
+	<option value='https://www.r-bloggers.com/2019/07/'> July 2019 &nbsp;(258)</option>
+	<option value='https://www.r-bloggers.com/2019/06/'> June 2019 &nbsp;(242)</option>
+	<option value='https://www.r-bloggers.com/2019/05/'> May 2019 &nbsp;(272)</option>
+	<option value='https://www.r-bloggers.com/2019/04/'> April 2019 &nbsp;(289)</option>
+	<option value='https://www.r-bloggers.com/2019/03/'> March 2019 &nbsp;(302)</option>
+	<option value='https://www.r-bloggers.com/2019/02/'> February 2019 &nbsp;(259)</option>
+	<option value='https://www.r-bloggers.com/2019/01/'> January 2019 &nbsp;(282)</option>
+	<option value='https://www.r-bloggers.com/2018/12/'> December 2018 &nbsp;(257)</option>
+	<option value='https://www.r-bloggers.com/2018/11/'> November 2018 &nbsp;(285)</option>
+	<option value='https://www.r-bloggers.com/2018/10/'> October 2018 &nbsp;(298)</option>
+	<option value='https://www.r-bloggers.com/2018/09/'> September 2018 &nbsp;(285)</option>
+	<option value='https://www.r-bloggers.com/2018/08/'> August 2018 &nbsp;(266)</option>
+	<option value='https://www.r-bloggers.com/2018/07/'> July 2018 &nbsp;(327)</option>
+	<option value='https://www.r-bloggers.com/2018/06/'> June 2018 &nbsp;(296)</option>
+	<option value='https://www.r-bloggers.com/2018/05/'> May 2018 &nbsp;(315)</option>
+	<option value='https://www.r-bloggers.com/2018/04/'> April 2018 &nbsp;(296)</option>
+	<option value='https://www.r-bloggers.com/2018/03/'> March 2018 &nbsp;(287)</option>
+	<option value='https://www.r-bloggers.com/2018/02/'> February 2018 &nbsp;(239)</option>
+	<option value='https://www.r-bloggers.com/2018/01/'> January 2018 &nbsp;(328)</option>
+	<option value='https://www.r-bloggers.com/2017/12/'> December 2017 &nbsp;(260)</option>
+	<option value='https://www.r-bloggers.com/2017/11/'> November 2017 &nbsp;(265)</option>
+	<option value='https://www.r-bloggers.com/2017/10/'> October 2017 &nbsp;(287)</option>
+	<option value='https://www.r-bloggers.com/2017/09/'> September 2017 &nbsp;(287)</option>
+	<option value='https://www.r-bloggers.com/2017/08/'> August 2017 &nbsp;(328)</option>
+	<option value='https://www.r-bloggers.com/2017/07/'> July 2017 &nbsp;(279)</option>
+	<option value='https://www.r-bloggers.com/2017/06/'> June 2017 &nbsp;(312)</option>
+	<option value='https://www.r-bloggers.com/2017/05/'> May 2017 &nbsp;(341)</option>
+	<option value='https://www.r-bloggers.com/2017/04/'> April 2017 &nbsp;(319)</option>
+	<option value='https://www.r-bloggers.com/2017/03/'> March 2017 &nbsp;(364)</option>
+	<option value='https://www.r-bloggers.com/2017/02/'> February 2017 &nbsp;(312)</option>
+	<option value='https://www.r-bloggers.com/2017/01/'> January 2017 &nbsp;(364)</option>
+	<option value='https://www.r-bloggers.com/2016/12/'> December 2016 &nbsp;(345)</option>
+	<option value='https://www.r-bloggers.com/2016/11/'> November 2016 &nbsp;(288)</option>
+	<option value='https://www.r-bloggers.com/2016/10/'> October 2016 &nbsp;(298)</option>
+	<option value='https://www.r-bloggers.com/2016/09/'> September 2016 &nbsp;(249)</option>
+	<option value='https://www.r-bloggers.com/2016/08/'> August 2016 &nbsp;(280)</option>
+	<option value='https://www.r-bloggers.com/2016/07/'> July 2016 &nbsp;(322)</option>
+	<option value='https://www.r-bloggers.com/2016/06/'> June 2016 &nbsp;(259)</option>
+	<option value='https://www.r-bloggers.com/2016/05/'> May 2016 &nbsp;(288)</option>
+	<option value='https://www.r-bloggers.com/2016/04/'> April 2016 &nbsp;(258)</option>
+	<option value='https://www.r-bloggers.com/2016/03/'> March 2016 &nbsp;(295)</option>
+	<option value='https://www.r-bloggers.com/2016/02/'> February 2016 &nbsp;(261)</option>
+	<option value='https://www.r-bloggers.com/2016/01/'> January 2016 &nbsp;(334)</option>
+	<option value='https://www.r-bloggers.com/2015/12/'> December 2015 &nbsp;(300)</option>
+	<option value='https://www.r-bloggers.com/2015/11/'> November 2015 &nbsp;(234)</option>
+	<option value='https://www.r-bloggers.com/2015/10/'> October 2015 &nbsp;(255)</option>
+	<option value='https://www.r-bloggers.com/2015/09/'> September 2015 &nbsp;(232)</option>
+	<option value='https://www.r-bloggers.com/2015/08/'> August 2015 &nbsp;(261)</option>
+	<option value='https://www.r-bloggers.com/2015/07/'> July 2015 &nbsp;(240)</option>
+	<option value='https://www.r-bloggers.com/2015/06/'> June 2015 &nbsp;(205)</option>
+	<option value='https://www.r-bloggers.com/2015/05/'> May 2015 &nbsp;(228)</option>
+	<option value='https://www.r-bloggers.com/2015/04/'> April 2015 &nbsp;(203)</option>
+	<option value='https://www.r-bloggers.com/2015/03/'> March 2015 &nbsp;(256)</option>
+	<option value='https://www.r-bloggers.com/2015/02/'> February 2015 &nbsp;(207)</option>
+	<option value='https://www.r-bloggers.com/2015/01/'> January 2015 &nbsp;(237)</option>
+	<option value='https://www.r-bloggers.com/2014/12/'> December 2014 &nbsp;(230)</option>
+	<option value='https://www.r-bloggers.com/2014/11/'> November 2014 &nbsp;(219)</option>
+	<option value='https://www.r-bloggers.com/2014/10/'> October 2014 &nbsp;(212)</option>
+	<option value='https://www.r-bloggers.com/2014/09/'> September 2014 &nbsp;(253)</option>
+	<option value='https://www.r-bloggers.com/2014/08/'> August 2014 &nbsp;(214)</option>
+	<option value='https://www.r-bloggers.com/2014/07/'> July 2014 &nbsp;(226)</option>
+	<option value='https://www.r-bloggers.com/2014/06/'> June 2014 &nbsp;(234)</option>
+	<option value='https://www.r-bloggers.com/2014/05/'> May 2014 &nbsp;(238)</option>
+	<option value='https://www.r-bloggers.com/2014/04/'> April 2014 &nbsp;(256)</option>
+	<option value='https://www.r-bloggers.com/2014/03/'> March 2014 &nbsp;(286)</option>
+	<option value='https://www.r-bloggers.com/2014/02/'> February 2014 &nbsp;(266)</option>
+	<option value='https://www.r-bloggers.com/2014/01/'> January 2014 &nbsp;(260)</option>
+	<option value='https://www.r-bloggers.com/2013/12/'> December 2013 &nbsp;(261)</option>
+	<option value='https://www.r-bloggers.com/2013/11/'> November 2013 &nbsp;(237)</option>
+	<option value='https://www.r-bloggers.com/2013/10/'> October 2013 &nbsp;(233)</option>
+	<option value='https://www.r-bloggers.com/2013/09/'> September 2013 &nbsp;(214)</option>
+	<option value='https://www.r-bloggers.com/2013/08/'> August 2013 &nbsp;(223)</option>
+	<option value='https://www.r-bloggers.com/2013/07/'> July 2013 &nbsp;(254)</option>
+	<option value='https://www.r-bloggers.com/2013/06/'> June 2013 &nbsp;(271)</option>
+	<option value='https://www.r-bloggers.com/2013/05/'> May 2013 &nbsp;(260)</option>
+	<option value='https://www.r-bloggers.com/2013/04/'> April 2013 &nbsp;(278)</option>
+	<option value='https://www.r-bloggers.com/2013/03/'> March 2013 &nbsp;(277)</option>
+	<option value='https://www.r-bloggers.com/2013/02/'> February 2013 &nbsp;(293)</option>
+	<option value='https://www.r-bloggers.com/2013/01/'> January 2013 &nbsp;(340)</option>
+	<option value='https://www.r-bloggers.com/2012/12/'> December 2012 &nbsp;(306)</option>
+	<option value='https://www.r-bloggers.com/2012/11/'> November 2012 &nbsp;(274)</option>
+	<option value='https://www.r-bloggers.com/2012/10/'> October 2012 &nbsp;(304)</option>
+	<option value='https://www.r-bloggers.com/2012/09/'> September 2012 &nbsp;(268)</option>
+	<option value='https://www.r-bloggers.com/2012/08/'> August 2012 &nbsp;(262)</option>
+	<option value='https://www.r-bloggers.com/2012/07/'> July 2012 &nbsp;(247)</option>
+	<option value='https://www.r-bloggers.com/2012/06/'> June 2012 &nbsp;(297)</option>
+	<option value='https://www.r-bloggers.com/2012/05/'> May 2012 &nbsp;(283)</option>
+	<option value='https://www.r-bloggers.com/2012/04/'> April 2012 &nbsp;(295)</option>
+	<option value='https://www.r-bloggers.com/2012/03/'> March 2012 &nbsp;(304)</option>
+	<option value='https://www.r-bloggers.com/2012/02/'> February 2012 &nbsp;(264)</option>
+	<option value='https://www.r-bloggers.com/2012/01/'> January 2012 &nbsp;(278)</option>
+	<option value='https://www.r-bloggers.com/2011/12/'> December 2011 &nbsp;(251)</option>
+	<option value='https://www.r-bloggers.com/2011/11/'> November 2011 &nbsp;(261)</option>
+	<option value='https://www.r-bloggers.com/2011/10/'> October 2011 &nbsp;(280)</option>
+	<option value='https://www.r-bloggers.com/2011/09/'> September 2011 &nbsp;(187)</option>
+	<option value='https://www.r-bloggers.com/2011/08/'> August 2011 &nbsp;(258)</option>
+	<option value='https://www.r-bloggers.com/2011/07/'> July 2011 &nbsp;(219)</option>
+	<option value='https://www.r-bloggers.com/2011/06/'> June 2011 &nbsp;(224)</option>
+	<option value='https://www.r-bloggers.com/2011/05/'> May 2011 &nbsp;(239)</option>
+	<option value='https://www.r-bloggers.com/2011/04/'> April 2011 &nbsp;(267)</option>
+	<option value='https://www.r-bloggers.com/2011/03/'> March 2011 &nbsp;(249)</option>
+	<option value='https://www.r-bloggers.com/2011/02/'> February 2011 &nbsp;(203)</option>
+	<option value='https://www.r-bloggers.com/2011/01/'> January 2011 &nbsp;(209)</option>
+	<option value='https://www.r-bloggers.com/2010/12/'> December 2010 &nbsp;(188)</option>
+	<option value='https://www.r-bloggers.com/2010/11/'> November 2010 &nbsp;(172)</option>
+	<option value='https://www.r-bloggers.com/2010/10/'> October 2010 &nbsp;(219)</option>
+	<option value='https://www.r-bloggers.com/2010/09/'> September 2010 &nbsp;(185)</option>
+	<option value='https://www.r-bloggers.com/2010/08/'> August 2010 &nbsp;(203)</option>
+	<option value='https://www.r-bloggers.com/2010/07/'> July 2010 &nbsp;(175)</option>
+	<option value='https://www.r-bloggers.com/2010/06/'> June 2010 &nbsp;(167)</option>
+	<option value='https://www.r-bloggers.com/2010/05/'> May 2010 &nbsp;(164)</option>
+	<option value='https://www.r-bloggers.com/2010/04/'> April 2010 &nbsp;(152)</option>
+	<option value='https://www.r-bloggers.com/2010/03/'> March 2010 &nbsp;(165)</option>
+	<option value='https://www.r-bloggers.com/2010/02/'> February 2010 &nbsp;(135)</option>
+	<option value='https://www.r-bloggers.com/2010/01/'> January 2010 &nbsp;(121)</option>
+	<option value='https://www.r-bloggers.com/2009/12/'> December 2009 &nbsp;(126)</option>
+	<option value='https://www.r-bloggers.com/2009/11/'> November 2009 &nbsp;(66)</option>
+	<option value='https://www.r-bloggers.com/2009/10/'> October 2009 &nbsp;(87)</option>
+	<option value='https://www.r-bloggers.com/2009/09/'> September 2009 &nbsp;(65)</option>
+	<option value='https://www.r-bloggers.com/2009/08/'> August 2009 &nbsp;(56)</option>
+	<option value='https://www.r-bloggers.com/2009/07/'> July 2009 &nbsp;(64)</option>
+	<option value='https://www.r-bloggers.com/2009/06/'> June 2009 &nbsp;(54)</option>
+	<option value='https://www.r-bloggers.com/2009/05/'> May 2009 &nbsp;(35)</option>
+	<option value='https://www.r-bloggers.com/2009/04/'> April 2009 &nbsp;(38)</option>
+	<option value='https://www.r-bloggers.com/2009/03/'> March 2009 &nbsp;(40)</option>
+	<option value='https://www.r-bloggers.com/2009/02/'> February 2009 &nbsp;(33)</option>
+	<option value='https://www.r-bloggers.com/2009/01/'> January 2009 &nbsp;(42)</option>
+	<option value='https://www.r-bloggers.com/2008/12/'> December 2008 &nbsp;(16)</option>
+	<option value='https://www.r-bloggers.com/2008/11/'> November 2008 &nbsp;(14)</option>
+	<option value='https://www.r-bloggers.com/2008/10/'> October 2008 &nbsp;(10)</option>
+	<option value='https://www.r-bloggers.com/2008/09/'> September 2008 &nbsp;(8)</option>
+	<option value='https://www.r-bloggers.com/2008/08/'> August 2008 &nbsp;(11)</option>
+	<option value='https://www.r-bloggers.com/2008/07/'> July 2008 &nbsp;(7)</option>
+	<option value='https://www.r-bloggers.com/2008/06/'> June 2008 &nbsp;(8)</option>
+	<option value='https://www.r-bloggers.com/2008/05/'> May 2008 &nbsp;(8)</option>
+	<option value='https://www.r-bloggers.com/2008/04/'> April 2008 &nbsp;(4)</option>
+	<option value='https://www.r-bloggers.com/2008/03/'> March 2008 &nbsp;(5)</option>
+	<option value='https://www.r-bloggers.com/2008/02/'> February 2008 &nbsp;(6)</option>
+	<option value='https://www.r-bloggers.com/2008/01/'> January 2008 &nbsp;(10)</option>
+	<option value='https://www.r-bloggers.com/2007/12/'> December 2007 &nbsp;(3)</option>
+	<option value='https://www.r-bloggers.com/2007/11/'> November 2007 &nbsp;(5)</option>
+	<option value='https://www.r-bloggers.com/2007/10/'> October 2007 &nbsp;(9)</option>
+	<option value='https://www.r-bloggers.com/2007/09/'> September 2007 &nbsp;(7)</option>
+	<option value='https://www.r-bloggers.com/2007/08/'> August 2007 &nbsp;(21)</option>
+	<option value='https://www.r-bloggers.com/2007/07/'> July 2007 &nbsp;(9)</option>
+	<option value='https://www.r-bloggers.com/2007/06/'> June 2007 &nbsp;(3)</option>
+	<option value='https://www.r-bloggers.com/2007/05/'> May 2007 &nbsp;(3)</option>
+	<option value='https://www.r-bloggers.com/2007/04/'> April 2007 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2007/03/'> March 2007 &nbsp;(5)</option>
+	<option value='https://www.r-bloggers.com/2007/02/'> February 2007 &nbsp;(4)</option>
+	<option value='https://www.r-bloggers.com/2006/11/'> November 2006 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2006/10/'> October 2006 &nbsp;(2)</option>
+	<option value='https://www.r-bloggers.com/2006/08/'> August 2006 &nbsp;(3)</option>
+	<option value='https://www.r-bloggers.com/2006/07/'> July 2006 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2006/06/'> June 2006 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2006/05/'> May 2006 &nbsp;(3)</option>
+	<option value='https://www.r-bloggers.com/2006/04/'> April 2006 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2006/03/'> March 2006 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2006/02/'> February 2006 &nbsp;(5)</option>
+	<option value='https://www.r-bloggers.com/2006/01/'> January 2006 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2005/10/'> October 2005 &nbsp;(1)</option>
+	<option value='https://www.r-bloggers.com/2005/09/'> September 2005 &nbsp;(3)</option>
+	<option value='https://www.r-bloggers.com/2005/05/'> May 2005 &nbsp;(1)</option>
+
+		</select>
+
+
+			</div><div id="linkcat-3349" class="sb-widget widget_links"><h4 class="widget-title">Other sites</h4>
+	<ul class='xoxo blogroll'>
+<li><a href="https://www.r-users.com/">Jobs for R-users</a></li>
+<li><a href="http://www.proc-x.com/" title="SAS news gathered from bloggers">SAS blogs</a></li>
+
+	</ul>
+</div>
+</aside></div>
+</div>
+<div class="copyright-wrap">
+	<p class="copyright">Copyright &copy; 2022 | <a href="https://www.mhthemes.com/" rel="nofollow">MH Corporate basic by MH Themes</a></p>
+</div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="snp-root">
+        <input type="hidden" id="snp_popup" value="" />
+        <input type="hidden" id="snp_popup_id" value="" />
+        <input type="hidden" id="snp_popup_theme" value="" />
+        <input type="hidden" id="snp_exithref" value="" />
+        <input type="hidden" id="snp_exittarget" value="" />
+        	<div id="snppopup-welcome" class="snp-pop-109583 snppopup"><input type="hidden" class="snp_open" value="scroll" /><input type="hidden" class="snp_show_on_exit" value="2" /><input type="hidden" class="snp_exit_js_alert_text" value="" /><input type="hidden" class="snp_exit_scroll_down" value="10" /><input type="hidden" class="snp_exit_scroll_up" value="10" /><input type="hidden" class="snp_open_scroll" value="45" /><input type="hidden" class="snp_close_scroll" value="10" /><input type="hidden" class="snp_optin_redirect_url" value="" /><input type="hidden" class="snp_show_cb_button" value="yes" /><input type="hidden" class="snp_popup_id" value="109583" /><input type="hidden" class="snp_popup_theme" value="theme6" /><input type="hidden" class="snp_overlay" value="disabled" /><input type="hidden" class="snp_cookie_conversion" value="30" /><input type="hidden" class="snp_cookie_close" value="180" /><div class="snp-fb snp-theme6">
+    <div class="snp-subscribe-inner">
+	<h1 class="snp-header"><i>Never miss an update! </i>
+<br/>
+<strong>Subscribe to R-bloggers</strong> to receive <br/>e-mails with the latest R posts.<br/>
+
+<small>(You will not see this message again.)</small></h1>	<div class="snp-form">
+	    <form action="https://r-bloggers.com/phplist/?p=subscribe&id=1&email=" method="post" class="snp-subscribeform snp_subscribeform" target="_blank">
+				<fieldset>
+		    <div class="snp-field">
+			<input type="text" name="email" id="snp_email" placeholder="Your E-mail..." class="snp-field snp-field-email" />
+		    </div>
+		    <button type="submit" class="snp-submit">Submit</button>
+		</fieldset>
+	    </form>
+	</div>
+	<a href="#" class="snp_nothanks snp-close">Click here to close (This popup will not appear again)</a>    </div>
+    </div>
+
+</div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+	</body>
+</html>

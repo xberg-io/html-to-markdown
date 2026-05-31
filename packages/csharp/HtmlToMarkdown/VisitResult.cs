@@ -29,11 +29,11 @@ public abstract record VisitResult
     public sealed record Error(string Message) : VisitResult;
 
     internal string ToFfiJson() => this switch {
-        VisitResult.Continue => "\"Continue\"",
-        VisitResult.Skip => "\"Skip\"",
-        VisitResult.PreserveHtml => "\"PreserveHtml\"",
-        VisitResult.Custom c => "{\"Custom\":" + System.Text.Json.JsonSerializer.Serialize(c.Markdown) + "}",
-        VisitResult.Error e => "{\"Error\":" + System.Text.Json.JsonSerializer.Serialize(e.Message) + "}",
-        _ => "\"Continue\""
+        VisitResult.Continue => "\"continue\"",
+        VisitResult.Skip => "\"skip\"",
+        VisitResult.PreserveHtml => "\"preserve_html\"",
+        VisitResult.Custom c => "{\"custom\":" + System.Text.Json.JsonSerializer.Serialize(c.Markdown) + "}",
+        VisitResult.Error e => "{\"error\":" + System.Text.Json.JsonSerializer.Serialize(e.Message) + "}",
+        _ => "\"continue\""
     };
 }

@@ -1,0 +1,40 @@
+[https://www.googletagmanager.com/ns.html?id=GTM-T3G2QJD](https://www.googletagmanager.com/ns.html?id=GTM-T3G2QJD)
+
+# 저성과자 관리, 어떻게 해야 할까?
+
+[아티클](/blog/category/article/)
+
+2025. 2. 27
+
+[https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fflex.team%2Fblog%2F2025%2F02%2F27%2Flow-performance-care%2F](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fflex.team%2Fblog%2F2025%2F02%2F27%2Flow-performance-care%2F)[https://www.linkedin.com/sharing/share-offsite/?url=https://flex.team/blog/2025/02/27/low-performance-care/](https://www.linkedin.com/sharing/share-offsite/?url=https://flex.team/blog/2025/02/27/low-performance-care/)[https://twitter.com/intent/tweet?text=%EC%A0%80%EC%84%B1%EA%B3%BC%EC%9E%90%20%EA%B4%80%EB%A6%AC%2C%20%EC%96%B4%EB%96%BB%EA%B2%8C%20%ED%95%B4%EC%95%BC%20%ED%95%A0%EA%B9%8C%3F&url=https%3A%2F%2Fflex.team%2Fblog%2F2025%2F02%2F27%2Flow-performance-care%2F](https://twitter.com/intent/tweet?text=%EC%A0%80%EC%84%B1%EA%B3%BC%EC%9E%90%20%EA%B4%80%EB%A6%AC%2C%20%EC%96%B4%EB%96%BB%EA%B2%8C%20%ED%95%B4%EC%95%BC%20%ED%95%A0%EA%B9%8C%3F&url=https%3A%2F%2Fflex.team%2Fblog%2F2025%2F02%2F27%2Flow-performance-care%2F)
+
+일반적으로 **저성과자(Poor·Low Performer)**는 조직이 설정한 성과
+ 목표를 지속적으로 달성하지 못하거나, 성과와 역량이 타 직원에 비해 현저히
+ 떨어지는 사람을 의미합니다. 하지만 성과는 상대적인 개념이죠. 예를 들어, **상대평가**가 적용되는 조직에서 핵심 인력만 모여 있는 핵심
+ 조직에도 가장 낮은 등급을 받는 직원이 발생하게 됩니다. 그렇다면 이 직원 역시
+ 저성과자로 볼 수 있을까요?
+
+바로 이처럼 상대평가가 적용되는 경우, 성과가 좋은 팀 내에서도 하위 등급이
+ 발생하기 마련입니다. 그러나 이것이 곧바로 **‘저성과자=해고 대상’**으로 직결되지는 않습니다. 업적·역량 평가가
+ 조직과 직원의 역할과 특성을 충분히 반영했기 보다는 회사의 **일방적 기준**일 수 있으며, **법적으로도 모호한 부분**이 많기 때문이죠.
+
+💡 기업이 보는 구성원 유형 세 가지
+
+일반적으로 기업은 3단계로 구성원을 분류하여 인사 관리를 하는 경우가
+ 많습니다.
+**1. 핵심 인력(A등급)**
+
+- 향후 임원급으로
+
+  성장 가능성이 있는 상위 10% 수준
+
+- 회사가 적극적으로 투자·육성하는
+
+  대상
+**2. 유지 인력(B등급)**
+
+- 조직 운영을 ‘유지’시키는
+
+  중간층, 대다수를 차지
+
+- 크게 문제될 것 없이 평균적 성과를 내지만, 핵

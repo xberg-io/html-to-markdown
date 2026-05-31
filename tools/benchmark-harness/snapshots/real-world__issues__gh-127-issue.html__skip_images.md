@@ -1,0 +1,503 @@
+---
+title: MW643 - كريب نص كلوش | Aya
+---
+
+
+[التخطي إلى المحتوى](https://www.aya.app/products/mw643-%D9%83%D8%B1%D9%8A%D8%A8-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4#main)
+
+ اطلبي من تطبيق آيـا واستمتعي بـ 50% كاش باك على طلبك الاول. [تحميل الان](https://mawsim.go.link?adj_t=1ka8521o "تحميل تطبيق آيا للعبايات")
+
+×
+
+## 50% كاش باك
+
+بحد أقصى 100 تطبق الشروط والاحكام:
+
+- تنتهي صلاحية الكاش باك خلال فترة 60 يوم.
+- يتم الحصول الحصول علي الكاش باك بعد 14 يوم من تاريخ التوصيل
+- يكون الكاش باك عبارة عن رصيد يتم اضافتة علي محفظتك بتطبيق Aya ويتم استخدامه بدون اي
+ حد ادني للانفاق
+
+تكبير
+
+الانتقال إلى العنصر 1
+
+الانتقال إلى العنصر 2
+
+الانتقال إلى العنصر 3
+
+الانتقال إلى العنصر 4
+
+الانتقال إلى العنصر 5
+
+الانتقال إلى العنصر 6
+
+ 50% كاش باك على طلبك الأول
+
+[تول](https://www.aya.app/collections/%D8%AA%D9%88%D9%84)
+
+## MW643 - كريب نص كلوش
+
+السعر بعد الخصم159.00 SAR$42.39USD السعر قبل الخصم350.00 SAR~~$93.32USD~~
+
+شامل الضريبة. [يتم حساب رسوم الضرائب](https://www.aya.app/policies/shipping-policy) عند إتمام الطلب
+
+ 50% كاش باك على طلبك الأول
+
+ادفع على 4 دفعات بدون فوائد بقيمة 139.75
+
+---
+
+**المقاس**
+
+50
+
+52
+
+54
+
+56
+
+58
+
+60
+
+- 50 / Black - 138.26 SR
+52 / Black - 138.26 SR
+54 / Black - 138.26 SR
+56 / Black - 138.26 SR
+58 / Black - 138.26 SR
+60 / Black - 138.26 SR
+
+متغير
+
+[جدول القياسات ▼](javascript:void(0);)
+
+CM
+
+INCHES
+
+الشحن
+
+اطلب الآن للحصول على توصيل سريع لتصلك في 1-3 أيام إلى miami
+
+تفاصيل المنتج
+
+القماش: كريب خفيف واقف
+
+القصة: نص كلوش
+
+مدة التنفيذ: 4-8 ايام عمل
+
+المرفقات: طرحة
+
+سياسة الاستبدال والاسترجاع
+
+الإرجاع والاستبدال متاح حاليًا داخل السعودية فقط – وقريبًا في
+ باقي دول الخليج!
+
+[سياسة الاستبدال والاسترجاع](https://www.aya.app/policies/refund-policy)
+
+تعليمات الغسيل والعناية
+
+غسيل عادي
+
+### كملي ستايلك
+
+تمت الإضافة إلى سلة التسوق!
+
+[MWD04 - فستان عباية اسود 50.00 SAR$13.33USD](https://www.aya.app/products/mwd04-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF)
+
+[MWD08 - طقم من قطعتين باللون الابيض 70.00 SAR$18.66USD](https://www.aya.app/products/mwd08-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6)
+
+[MWD09 - طقم من قطعتين باللون الاسود 70.00 SAR$18.66USD](https://www.aya.app/products/mwd09-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF)
+
+[MWD06 - فستان عباية مطاطي باللون الاسود 70.00 SAR$18.66USD](https://www.aya.app/products/mwd06-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF)
+
+[MWD01 - فستان عباية كحلى 50.00 SAR$13.33USD](https://www.aya.app/products/mwd01-%D9%81%D8%B3%D8%AA%D8%A7%D9%86)
+
+[MWD07 - فستان عباية مطاطي باللون الابيض 70.00 SAR$18.66USD](https://www.aya.app/products/mwd07-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6)
+
+[MWD03 - فستان عباية بني 50.00 SAR$13.33USD](https://www.aya.app/products/mwd03-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%86%D9%8A)
+
+[MWD05 - فستان عباية رمادي 50.00 SAR$13.33USD](https://www.aya.app/products/mwd05-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B1%D9%85%D8%A7%D8%AF%D9%8A)
+
+[MWD02 - فستان عباية عنابي 50.00 SAR$13.33USD](https://www.aya.app/products/mwd02-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%86%D8%A8%D9%8A%D8%AA%D9%8A)
+
+[MWD11 - فستان عبايه اسود منقط بأبيض 90.02 SAR$24.00USD](https://www.aya.app/products/mwd11-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%A8%D9%8A%D8%B6)
+
+[MWD10 - فستان عبايه ابيض منقط بأسود 90.02 SAR$24.00USD](https://www.aya.app/products/mwd10-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%A8%D9%8A%D8%B6-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%B3%D9%88%D8%AF)
+
+[MWD04 - فستان عباية اسود 50.00 SAR$13.33USD](https://www.aya.app/products/mwd04-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF)
+
+[MWD08 - طقم من قطعتين باللون الابيض 70.00 SAR$18.66USD](https://www.aya.app/products/mwd08-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6)
+
+[MWD09 - طقم من قطعتين باللون الاسود 70.00 SAR$18.66USD](https://www.aya.app/products/mwd09-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF)
+
+[MWD06 - فستان عباية مطاطي باللون الاسود 70.00 SAR$18.66USD](https://www.aya.app/products/mwd06-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF)
+
+[MWD01 - فستان عباية كحلى 50.00 SAR$13.33USD](https://www.aya.app/products/mwd01-%D9%81%D8%B3%D8%AA%D8%A7%D9%86)
+
+[MWD07 - فستان عباية مطاطي باللون الابيض 70.00 SAR$18.66USD](https://www.aya.app/products/mwd07-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6)
+
+[MWD03 - فستان عباية بني 50.00 SAR$13.33USD](https://www.aya.app/products/mwd03-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%86%D9%8A)
+
+[MWD05 - فستان عباية رمادي 50.00 SAR$13.33USD](https://www.aya.app/products/mwd05-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B1%D9%85%D8%A7%D8%AF%D9%8A)
+
+[MWD02 - فستان عباية عنابي 50.00 SAR$13.33USD](https://www.aya.app/products/mwd02-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%86%D8%A8%D9%8A%D8%AA%D9%8A)
+
+[MWD11 - فستان عبايه اسود منقط بأبيض 90.02 SAR$24.00USD](https://www.aya.app/products/mwd11-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%A8%D9%8A%D8%B6)
+
+[MWD10 - فستان عبايه ابيض منقط بأسود 90.02 SAR$24.00USD](https://www.aya.app/products/mwd10-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%A8%D9%8A%D8%B6-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%B3%D9%88%D8%AF)
+
+‹
+
+›
+
+قد يعجبك أيضًا
+
+منتجات مشابهة
+
+السابق
+
+[MW841 - كريب واقف نص كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw841-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1147 - كريب واقف بليزر مبطن 249.00 SAR $66.39USD](https://www.aya.app/products/mw1147-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D9%85%D8%A8%D8%B7%D9%86)
+
+[MW959 - كريب واقف و جاكار نص كلوش بليزر 159.00 SAR $42.39USD](https://www.aya.app/products/mw959-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%88-%D8%AC%D8%A7%D9%83%D8%A7%D8%B1-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1)
+
+[MW966 - كريب مع مخمل ربع كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw966-%D9%83%D8%B1%D9%8A%D8%A8-%D9%85%D8%B9-%D9%85%D8%AE%D9%85%D9%84-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1161 - انترنت تطريز خفيف نص كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw1161-%D8%A7%D9%86%D8%AA%D8%B1%D9%86%D8%AA-%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%AE%D9%81%D9%8A%D9%81-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1024 - مخمل مع كتان نص كلوش مع ياقة 149.01 SAR $39.73USD](https://www.aya.app/products/mw1024-%D9%85%D8%AE%D9%85%D9%84-%D9%85%D8%B9-%D9%83%D8%AA%D8%A7%D9%86-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-%D9%85%D8%B9-%D9%8A%D8%A7%D9%82%D8%A9)
+
+[MW1160- حرير ياباني بليزر خفيف 350.00 SAR $93.32USD](https://www.aya.app/products/mw1160-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%AE%D9%81%D9%8A%D9%81)
+
+[MW983 - شامواه شتوي نص كلوش 189.00 SAR $50.39USD](https://www.aya.app/products/mw983-%D8%B4%D8%A7%D9%85%D9%88%D8%A7%D9%87-%D8%B4%D8%AA%D9%88%D9%8A-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW849 - كريب واقف ربع كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw849-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW645 - كريب خفيف واقف مع جاكار نص كلوش 270.00 SAR $71.99USD](https://www.aya.app/products/mw645-%D9%83%D8%B1%D9%8A%D8%A8-%D8%AE%D9%81%D9%8A%D9%81-%D9%88%D8%A7%D9%82%D9%81-%D9%85%D8%B9-%D8%AC%D8%A7%D9%83%D8%A7%D8%B1-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1138 - حرير شموه بليزر مبطن 249.00 SAR $66.39USD](https://www.aya.app/products/mw1138-%D8%AD%D8%B1%D9%8A%D8%B1-%D8%B4%D9%85%D9%88%D9%87-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D9%85%D8%A8%D8%B7%D9%86)
+
+[MW1152 -حرير ياباني بليزر 218.99 SAR $58.39USD](https://www.aya.app/products/mw1152-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1)
+
+[MW1231 -نص كلوش كريب ياباني 239.00 SAR $63.73USD](https://www.aya.app/products/mw1231-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-%D9%83%D8%B1%D9%8A%D8%A8-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A)
+
+[MW1134 - حرير شموه بليزر مبطن 249.00 SAR $66.39USD](https://www.aya.app/products/mw1134-%D8%AD%D8%B1%D9%8A%D8%B1-%D8%B4%D9%85%D9%88%D9%87-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D9%85%D8%A8%D8%B7%D9%86)
+
+[MW1136 - حرير شموه بليزر مبطن 249.00 SAR $66.39USD](https://www.aya.app/products/mw1136-%D8%AD%D8%B1%D9%8A%D8%B1-%D8%B4%D9%85%D9%88%D9%87-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D9%85%D8%A8%D8%B7%D9%86)
+
+[MW960 - كريب واقف نص كلوش 270.00 SAR $71.99USD](https://www.aya.app/products/mw960-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1217 -كريب واقف نص كلوش 270.00 SAR $71.99USD](https://www.aya.app/products/mw1217-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1215 -كريب واقف نص كلوش 169.00 SAR $45.06USD](https://www.aya.app/products/mw1215-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1320 - بليزر أسود بتطريز جانبي فاخر 229.00 SAR $61.06USD](https://www.aya.app/products/mw1320-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A3%D8%B3%D9%88%D8%AF-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%AC%D8%A7%D9%86%D8%A8%D9%8A-%D9%81%D8%A7%D8%AE%D8%B1)
+
+[MW1139 - حرير شموه بليزر مبطن 249.00 SAR $66.39USD](https://www.aya.app/products/mw1139-%D8%AD%D8%B1%D9%8A%D8%B1-%D8%B4%D9%85%D9%88%D9%87-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D9%85%D8%A8%D8%B7%D9%86)
+
+[MW1025 - مخمل مع كتان نص كلوش مع ياقة 149.01 SAR $39.73USD](https://www.aya.app/products/mw1025-%D9%85%D8%AE%D9%85%D9%84-%D9%85%D8%B9-%D9%83%D8%AA%D8%A7%D9%86-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-%D9%85%D8%B9-%D9%8A%D8%A7%D9%82%D8%A9)
+
+[MW1251 - كريب واقف مع دانتيل نص كلوش 239.00 SAR $63.73USD](https://www.aya.app/products/mw1251-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%85%D8%B9-%D8%AF%D8%A7%D9%86%D8%AA%D9%8A%D9%84-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MWT1248 - كريب واقف مع دانتيل نص كلوش سوداء 199.00 SAR $53.06USD](https://www.aya.app/products/mwt1248-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%85%D8%B9-%D8%AF%D8%A7%D9%86%D8%AA%D9%8A%D9%84-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1)
+
+[MW1315 - كريب بليزر 209.00 SAR $55.73USD](https://www.aya.app/products/mw1315-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1)
+
+[MW1022 - حرير ياباني مع قيطان نص كلوش 189.00 SAR $50.39USD](https://www.aya.app/products/mw1022-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A-%D9%85%D8%B9-%D9%82%D9%8A%D8%B7%D8%A7%D9%86-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1216 -كريب واقف مع جاكار نص كلوش 169.00 SAR $45.06USD](https://www.aya.app/products/mw1216-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D9%85%D8%B9-%D8%AC%D8%A7%D9%83%D8%A7%D8%B1-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1274 - عباية سوداء فاحمة مع تطريز خطوط في الأمام و الكم 139.00 SAR $37.06USD](https://www.aya.app/products/mw1274-%D8%A7%D9%86%D8%AA%D8%B1%D9%86%D8%AA-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[TEST-NGI 115.00 SAR $30.66USD](https://www.aya.app/products/test-mw645-%D9%83%D8%B1%D9%8A%D8%A8-%D8%AE%D9%81%D9%8A%D9%81-%D9%88%D8%A7%D9%82%D9%81-%D9%85%D8%B9-%D8%AC%D8%A7%D9%83%D8%A7%D8%B1-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-copy)
+
+التالي
+
+السابق
+
+[MW961 - حرير مغسول نص كلوش 270.00 SAR $71.99USD](https://www.aya.app/products/mw961-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1025 - مخمل مع كتان نص كلوش مع ياقة 149.01 SAR $39.73USD](https://www.aya.app/products/mw1025-%D9%85%D8%AE%D9%85%D9%84-%D9%85%D8%B9-%D9%83%D8%AA%D8%A7%D9%86-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4-%D9%85%D8%B9-%D9%8A%D8%A7%D9%82%D8%A9)
+
+[MW1022 - حرير ياباني مع قيطان نص كلوش 189.00 SAR $50.39USD](https://www.aya.app/products/mw1022-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A-%D9%85%D8%B9-%D9%82%D9%8A%D8%B7%D8%A7%D9%86-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW841 - كريب واقف نص كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw841-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW978 - كريب مع مخمل ربع كلوش 169.00 SAR $45.06USD](https://www.aya.app/products/mw978-%D9%83%D8%B1%D9%8A%D8%A8-%D9%85%D8%B9-%D9%85%D8%AE%D9%85%D9%84-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1684 - عباية سوداء لدوام بقماش كوبرا 290.00 SAR $77.32USD](https://www.aya.app/products/mw1684-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%84%D8%AF%D9%88%D8%A7%D9%85-%D8%A8%D9%82%D9%85%D8%A7%D8%B4-%D9%83%D9%88%D8%A8%D8%B1%D8%A7)
+
+[MWT511 - عباية بليزر أسود مقلم 290.70 SAR $77.51USD](https://www.aya.app/products/mwt511-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A3%D8%B3%D9%88%D8%AF-%D9%85%D9%82%D9%84%D9%85)
+
+[MW1171 - حرير مع كسرات من الخلف 218.99 SAR $58.39USD](https://www.aya.app/products/mw1171-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%85%D8%B9-%D9%83%D8%B3%D8%B1%D8%A7%D8%AA-%D9%85%D9%86-%D8%A7%D9%84%D8%AE%D9%84%D9%81)
+
+[MW644 - انترنت مع تفته نص كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw644-%D8%A7%D9%86%D8%AA%D8%B1%D9%86%D8%AA-%D9%85%D8%B9-%D8%AA%D9%81%D8%AA%D9%87-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW1147 - كريب واقف بليزر مبطن 249.00 SAR $66.39USD](https://www.aya.app/products/mw1147-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%A7%D9%82%D9%81-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D9%85%D8%A8%D8%B7%D9%86)
+
+[MW1154 -كتان تايلاندي بليزر 309.00 SAR $82.39USD](https://www.aya.app/products/mw1154-%D9%83%D8%AA%D8%A7%D9%86-%D8%AA%D8%A7%D9%8A%D9%84%D8%A7%D9%86%D8%AF%D9%8A-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1)
+
+[MW662 - اوكراني ناعم ربع كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw662-%D8%A7%D9%88%D9%83%D8%B1%D8%A7%D9%86%D9%8A-%D9%86%D8%A7%D8%B9%D9%85-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW966 - كريب مع مخمل ربع كلوش 159.00 SAR $42.39USD](https://www.aya.app/products/mw966-%D9%83%D8%B1%D9%8A%D8%A8-%D9%85%D8%B9-%D9%85%D8%AE%D9%85%D9%84-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+[MWT512 - عباية بليزر أسود 290.70 SAR $77.51USD](https://www.aya.app/products/mwt512-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A3%D8%B3%D9%88%D8%AF)
+
+[MW666 - لنن نص كلوش 189.00 SAR $50.39USD](https://www.aya.app/products/mw666-%D9%84%D9%86%D9%86-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4)
+
+[MW976 - حرير ياباني ربع كلوش 350.00 SAR $93.32USD](https://www.aya.app/products/mw976-%D8%AD%D8%B1%D9%8A%D8%B1-%D9%8A%D8%A7%D8%A8%D8%A7%D9%86%D9%8A-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4)
+
+التالي
+
+### المزيد من العبايات
+
+[](https://www.aya.app/products/mwd04-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF) حدِّد الخيارات
+
+[MWD04 - فستان عباية اسود](https://www.aya.app/products/mwd04-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF) السعر بعد الخصم50.00 SR$13.33USD
+
+[](https://www.aya.app/products/mw1537-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9-%D9%85%D9%84%D9%88%D9%86%D8%A9) حدِّد الخيارات
+
+[MW1537 - عباية صيفية ملونة](https://www.aya.app/products/mw1537-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9-%D9%85%D9%84%D9%88%D9%86%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd09-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF) حدِّد الخيارات
+
+[MWD09 - طقم من قطعتين باللون الاسود](https://www.aya.app/products/mwd09-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF) السعر بعد الخصم70.00 SR$18.66USD
+
+[](https://www.aya.app/products/mw1604-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D9%88%D8%B1%D9%88%D8%AF-%D8%B9%D9%84%D9%89-%D8%A7%D9%84%D8%AC%D9%88%D8%A7%D9%86%D8%A8-black-abaya-with-floral-side-embroidery) حدِّد الخيارات
+
+[MW1604 - عباية سوداء بتطريز ورود على الجوانب | Black Abaya with Floral Side Embroidery](https://www.aya.app/products/mw1604-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D9%88%D8%B1%D9%88%D8%AF-%D8%B9%D9%84%D9%89-%D8%A7%D9%84%D8%AC%D9%88%D8%A7%D9%86%D8%A8-black-abaya-with-floral-side-embroidery) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd08-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6) حدِّد الخيارات
+
+[MWD08 - طقم من قطعتين باللون الابيض](https://www.aya.app/products/mwd08-%D8%B7%D9%82%D9%85-%D9%85%D9%86-%D9%82%D8%B7%D8%B9%D8%AA%D9%8A%D9%86-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6) السعر بعد الخصم70.00 SR$18.66USD
+
+[](https://www.aya.app/products/mw1384-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D9%84%D9%8A%D9%86%D9%86-%D8%A8%D9%8A%D8%B6%D8%A7%D8%A1-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D9%8A%D8%A8%D9%8A-%D8%A8%D9%86%D9%83-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4) حدِّد الخيارات
+
+[MW1384 - عبايه لينن بيضاء بتطريز بيبي بنك ربع كلوش](https://www.aya.app/products/mw1384-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D9%84%D9%8A%D9%86%D9%86-%D8%A8%D9%8A%D8%B6%D8%A7%D8%A1-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D9%8A%D8%A8%D9%8A-%D8%A8%D9%86%D9%83-%D8%B1%D8%A8%D8%B9-%D9%83%D9%84%D9%88%D8%B4) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1341-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A7%D8%B3%D9%88%D8%AF) حدِّد الخيارات
+
+[MW1341 - عباية بليزر بتطريز اسود](https://www.aya.app/products/mw1341-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A7%D8%B3%D9%88%D8%AF) السعر بعد الخصم300.00 SR$79.99USD
+
+[](https://www.aya.app/products/mw1592-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A8%D8%B8%D9%87%D8%B1-%D9%85%D8%AE%D8%B7%D8%B7-black-crepe-abaya-with-striped-back) حدِّد الخيارات
+
+[MW1592 - عباية سوداء كريب بظهر مخطط | Black Crepe Abaya with Striped Back](https://www.aya.app/products/mw1592-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A8%D8%B8%D9%87%D8%B1-%D9%85%D8%AE%D8%B7%D8%B7-black-crepe-abaya-with-striped-back) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mw1561-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B4%D9%8A%D9%81%D9%88%D9%86-%D9%85%D9%88%D8%B1%D8%AF-chiffon-flowered-abaya) حدِّد الخيارات
+
+[MW1561 - عباية شيفون مورد | Chiffon flowered abaya](https://www.aya.app/products/mw1561-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B4%D9%8A%D9%81%D9%88%D9%86-%D9%85%D9%88%D8%B1%D8%AF-chiffon-flowered-abaya) السعر بعد الخصم310.01 SR$82.66USD
+
+[](https://www.aya.app/products/mw1545-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%88%D9%84%D9%83%D8%A7-%D8%AF%D9%88%D8%AA-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4) حدِّد الخيارات
+
+[MW1545 - عباية بولكا دوت نص كلوش](https://www.aya.app/products/mw1545-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%88%D9%84%D9%83%D8%A7-%D8%AF%D9%88%D8%AA-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1552-magestic-garden-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D9%88%D8%B1%D8%AF%D9%8A%D8%A9) حدِّد الخيارات
+
+[MW1552 - Magestic Garden | عباية مطبوعة](https://www.aya.app/products/mw1552-magestic-garden-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D9%88%D8%B1%D8%AF%D9%8A%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd03-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%86%D9%8A) حدِّد الخيارات
+
+[MWD03 - فستان عباية بني](https://www.aya.app/products/mwd03-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%86%D9%8A) السعر بعد الخصم50.00 SR$13.33USD
+
+[](https://www.aya.app/products/mw1605-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AE%D8%B7%D9%88%D8%B7-%D8%A8%D9%86%D9%81%D8%B3%D8%AC%D9%8A%D8%A9-%D9%88%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D9%86%D9%81%D8%B3%D8%AC%D9%8A-black-abaya-with-purple-stripes-and-embroidery) حدِّد الخيارات
+
+[MW1605 - عباية سوداء بخطوط بنفسجية وتطريز بنفسجي | Black Abaya with Purple Stripes and Embroidery](https://www.aya.app/products/mw1605-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AE%D8%B7%D9%88%D8%B7-%D8%A8%D9%86%D9%81%D8%B3%D8%AC%D9%8A%D8%A9-%D9%88%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D9%86%D9%81%D8%B3%D8%AC%D9%8A-black-abaya-with-purple-stripes-and-embroidery) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mwd06-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF) حدِّد الخيارات
+
+[MWD06 - فستان عباية مطاطي باللون الاسود](https://www.aya.app/products/mwd06-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%B3%D9%88%D8%AF) السعر بعد الخصم70.00 SR$18.66USD
+
+[](https://www.aya.app/products/mwd05-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B1%D9%85%D8%A7%D8%AF%D9%8A) حدِّد الخيارات
+
+[MWD05 - فستان عباية رمادي](https://www.aya.app/products/mwd05-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B1%D9%85%D8%A7%D8%AF%D9%8A) السعر بعد الخصم50.00 SR$13.33USD
+
+[](https://www.aya.app/products/mw1556-back-charm-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%85%D8%B7%D8%B1%D8%B2%D8%A9-%D9%85%D9%86-%D8%A7%D9%84%D8%AC%D9%87%D8%AA%D9%8A%D9%86-%D8%A8%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84-%D9%81%D8%A7%D8%AE%D8%B1%D8%A9) حدِّد الخيارات
+
+[MW1556 - Back Charm | عباية سوداء مطرزة من الجهتين بتفاصيل فاخرة](https://www.aya.app/products/mw1556-back-charm-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%85%D8%B7%D8%B1%D8%B2%D8%A9-%D9%85%D9%86-%D8%A7%D9%84%D8%AC%D9%87%D8%AA%D9%8A%D9%86-%D8%A8%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84-%D9%81%D8%A7%D8%AE%D8%B1%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd01-%D9%81%D8%B3%D8%AA%D8%A7%D9%86) حدِّد الخيارات
+
+[MWD01 - فستان عباية كحلى](https://www.aya.app/products/mwd01-%D9%81%D8%B3%D8%AA%D8%A7%D9%86) السعر بعد الخصم50.00 SR$13.33USD
+
+[](https://www.aya.app/products/mwd07-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6) حدِّد الخيارات
+
+[MWD07 - فستان عباية مطاطي باللون الابيض](https://www.aya.app/products/mwd07-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A7%D8%B7%D9%8A-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6) السعر بعد الخصم70.00 SR$18.66USD
+
+[](https://www.aya.app/products/mw1162-%D9%85%D8%AE%D9%85%D9%84-%D9%85%D9%83%D8%B3%D8%B1-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4) حدِّد الخيارات
+
+[MW1162 - مخمل مكسر نص كلوش](https://www.aya.app/products/mw1162-%D9%85%D8%AE%D9%85%D9%84-%D9%85%D9%83%D8%B3%D8%B1-%D9%86%D8%B5-%D9%83%D9%84%D9%88%D8%B4) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1577-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A8%D9%82%D8%B5%D8%A9-%D8%A3%D9%86%D9%8A%D9%82%D8%A9-elegant-cut-crepe-abaya) حدِّد الخيارات
+
+[MW1577 - عباية كريب بقصة أنيقة | Elegant Cut Crepe Abaya](https://www.aya.app/products/mw1577-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A8%D9%82%D8%B5%D8%A9-%D8%A3%D9%86%D9%8A%D9%82%D8%A9-elegant-cut-crepe-abaya) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1606-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AE%D8%B7%D9%88%D8%B7-%D9%88%D8%B1%D8%AF%D9%8A%D8%A9-%D9%88%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D9%88%D8%B1%D8%AF%D9%8A-black-abaya-with-pink-stripes-and-embroidery) حدِّد الخيارات
+
+[MW1606 - عباية سوداء بخطوط وردية وتطريز وردي | Black Abaya with Pink Stripes and Embroidery](https://www.aya.app/products/mw1606-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AE%D8%B7%D9%88%D8%B7-%D9%88%D8%B1%D8%AF%D9%8A%D8%A9-%D9%88%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D9%88%D8%B1%D8%AF%D9%8A-black-abaya-with-pink-stripes-and-embroidery) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mw1611-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%86%D9%86-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D8%B9-%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D8%A7%D9%84%D8%A3%D9%83%D9%85%D8%A7%D9%85) حدِّد الخيارات
+
+[MW1611 - عباية لنن اسود مع تطريز بالأكمام](https://www.aya.app/products/mw1611-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%86%D9%86-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D8%B9-%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D8%A7%D9%84%D8%A3%D9%83%D9%85%D8%A7%D9%85) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw7971-%D9%84%D9%86%D9%86-%D9%86%D8%B5-%D8%A8%D8%B4%D8%AA) حدِّد الخيارات
+
+[MW7971 - لنن نص بشت](https://www.aya.app/products/mw7971-%D9%84%D9%86%D9%86-%D9%86%D8%B5-%D8%A8%D8%B4%D8%AA) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw7931-%D9%84%D9%86%D9%86-%D9%86%D8%B5-%D8%A8%D8%B4%D8%AA) حدِّد الخيارات
+
+[MW7931 - لنن نص بشت](https://www.aya.app/products/mw7931-%D9%84%D9%86%D9%86-%D9%86%D8%B5-%D8%A8%D8%B4%D8%AA) السعر بعد الخصم199.00 SR$53.06USD السعر قبل الخصم280.00 SR~~$74.66USD~~
+
+[](https://www.aya.app/products/mw1551-navy-garden-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) حدِّد الخيارات
+
+[MW1551 - Navy Garden | عباية مطبوعة صيفية](https://www.aya.app/products/mw1551-navy-garden-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd02-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%86%D8%A8%D9%8A%D8%AA%D9%8A) حدِّد الخيارات
+
+[MWD02 - فستان عباية عنابي](https://www.aya.app/products/mwd02-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%86%D8%A8%D9%8A%D8%AA%D9%8A) السعر بعد الخصم50.00 SR$13.33USD
+
+[](https://www.aya.app/products/mw1586-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9-%D8%B4%D9%8A%D9%81%D9%88%D9%86-%D8%A8%D8%A7%D8%B1%D8%AF-sunflower-gold) حدِّد الخيارات
+
+[MW1586 - عباية صيفية شيفون بارد | Sunflower Gold](https://www.aya.app/products/mw1586-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9-%D8%B4%D9%8A%D9%81%D9%88%D9%86-%D8%A8%D8%A7%D8%B1%D8%AF-sunflower-gold) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1636-magestic-pink-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D9%88%D8%B1%D8%AF%D9%8A%D8%A9) حدِّد الخيارات
+
+[MW1636 - Magestic Pink | عباية مطبوعة وردية](https://www.aya.app/products/mw1636-magestic-pink-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D9%88%D8%B1%D8%AF%D9%8A%D8%A9) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mw1534-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D9%86%D9%82%D8%A7%D8%B7-%D8%A8%D9%8A%D8%B6%D8%A7%D8%A1-%D9%86%D8%A7%D8%B9%D9%85%D8%A9-%D8%A8%D8%B7%D8%A7%D8%A8%D8%B9-%D8%A3%D9%86%D8%AB%D9%88%D9%8A-%D8%B1%D8%A7%D9%82%D9%8D) حدِّد الخيارات
+
+[MW1534 - عباية سوداء بنقاط بيضاء ناعمة بطابع أنثوي راقٍ](https://www.aya.app/products/mw1534-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D9%86%D9%82%D8%A7%D8%B7-%D8%A8%D9%8A%D8%B6%D8%A7%D8%A1-%D9%86%D8%A7%D8%B9%D9%85%D8%A9-%D8%A8%D8%B7%D8%A7%D8%A8%D8%B9-%D8%A3%D9%86%D8%AB%D9%88%D9%8A-%D8%B1%D8%A7%D9%82%D9%8D) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1640-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%88%D8%B1%D8%AF) حدِّد الخيارات
+
+[MW1640 - عباية اسود مورد](https://www.aya.app/products/mw1640-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%88%D8%B1%D8%AF) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mw1591-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D8%B1%D8%AA%D9%82%D8%A7%D9%84%D9%8A-black-abaya-with-orange-embroidery) حدِّد الخيارات
+
+[MW1591 -عباية سوداء بتطريز برتقالي | Black Abaya with Orange Embroidery](https://www.aya.app/products/mw1591-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D8%A8%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D8%A8%D8%B1%D8%AA%D9%82%D8%A7%D9%84%D9%8A-black-abaya-with-orange-embroidery) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1520-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A7%D8%B3%D9%88%D8%AF-%D9%88%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D9%88%D8%B1%D8%AF%D9%8A) حدِّد الخيارات
+
+[MW1520 - عباية كريب اسود وتطريز وردي](https://www.aya.app/products/mw1520-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%83%D8%B1%D9%8A%D8%A8-%D8%A7%D8%B3%D9%88%D8%AF-%D9%88%D8%AA%D8%B7%D8%B1%D9%8A%D8%B2-%D9%88%D8%B1%D8%AF%D9%8A) السعر بعد الخصم180.00 SR$47.99USD السعر قبل الخصم300.00 SR~~$79.99USD~~
+
+[](https://www.aya.app/products/mw1522-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D8%B9-%D8%AA%D8%AF%D8%AE%D9%8A%D9%84-%D8%A8%D9%8A%D8%A8%D9%8A-%D8%A8%D9%8A%D9%86%D9%83-%D9%85%D9%86-%D9%88%D8%B1%D8%A7-%D8%A8%D8%A7%D9%84%D8%B7%D9%88%D9%84) حدِّد الخيارات
+
+[MW1522 - Whisper of Pink | عباية سوداء بلمسة وردية](https://www.aya.app/products/mw1522-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D8%B9-%D8%AA%D8%AF%D8%AE%D9%8A%D9%84-%D8%A8%D9%8A%D8%A8%D9%8A-%D8%A8%D9%8A%D9%86%D9%83-%D9%85%D9%86-%D9%88%D8%B1%D8%A7-%D8%A8%D8%A7%D9%84%D8%B7%D9%88%D9%84) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1639-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D9%82%D9%84%D9%85-%D8%A7%D8%AE%D8%B6%D8%B1-%D8%A8%D9%88%D8%B1%D8%AF%D8%A7%D8%AA) حدِّد الخيارات
+
+[MW1639 - عباية مقلم اخضر بوردات](https://www.aya.app/products/mw1639-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D9%82%D9%84%D9%85-%D8%A7%D8%AE%D8%B6%D8%B1-%D8%A8%D9%88%D8%B1%D8%AF%D8%A7%D8%AA) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mw1601-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A3%D8%B3%D9%88%D8%AF-%D8%A7%D9%84%D9%81%D8%A7%D8%AD%D9%85-charcoal-black-blazer-style-abaya) حدِّد الخيارات
+
+[MW1601 - عباية بليزر باللون الأسود الفاحم | Charcoal Black Blazer-Style Abaya](https://www.aya.app/products/mw1601-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A8%D8%A7%D9%84%D9%84%D9%88%D9%86-%D8%A7%D9%84%D8%A3%D8%B3%D9%88%D8%AF-%D8%A7%D9%84%D9%81%D8%A7%D8%AD%D9%85-charcoal-black-blazer-style-abaya) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1614-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D8%AD%D8%B1%D9%8A%D8%B1-%D8%AC%D8%A7%D9%83%D8%A7%D8%B1-pink-jacquard) حدِّد الخيارات
+
+[MW1614 - عباية مطبوعة حرير جاكار - Pink Jacquard](https://www.aya.app/products/mw1614-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D8%AD%D8%B1%D9%8A%D8%B1-%D8%AC%D8%A7%D9%83%D8%A7%D8%B1-pink-jacquard) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1539-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B2%D9%87%D9%88%D8%B1-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9-copy) حدِّد الخيارات
+
+[MW1540 - عباية صيفية شيفون بارد](https://www.aya.app/products/mw1539-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B2%D9%87%D9%88%D8%B1-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9-copy) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1539-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B2%D9%87%D9%88%D8%B1-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) حدِّد الخيارات
+
+[MW1539 - عباية زهور صيفية](https://www.aya.app/products/mw1539-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B2%D9%87%D9%88%D8%B1-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd11-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%A8%D9%8A%D8%B6) حدِّد الخيارات
+
+[MWD11 - فستان عبايه اسود منقط بأبيض](https://www.aya.app/products/mwd11-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%A8%D9%8A%D8%B6) السعر بعد الخصم90.02 SR$24.00USD
+
+[](https://www.aya.app/products/mw1418-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D9%87-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D8%A8%D9%88%D8%B1%D8%AF-copy) حدِّد الخيارات
+
+[MW1419 -عباية صيفية مطبوعة باللون الازرق](https://www.aya.app/products/mw1418-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B5%D9%8A%D9%81%D9%8A%D9%87-%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A9-%D8%A8%D9%88%D8%B1%D8%AF-copy) السعر بعد الخصم350.00 SR$93.32USD
+
+[](https://www.aya.app/products/mw1578-black-linen-elegance-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%8A%D9%86%D9%86-%D9%87%D9%86%D8%AF%D9%8A-%D9%85%D8%B7%D8%B1%D8%B2%D8%A9-%D9%8A%D8%AF%D9%88%D9%8A%D9%8B%D8%A7) حدِّد الخيارات
+
+[MW1578 - Black Linen Elegance | عباية لينن هندي مطرزة يدويًا](https://www.aya.app/products/mw1578-black-linen-elegance-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%8A%D9%86%D9%86-%D9%87%D9%86%D8%AF%D9%8A-%D9%85%D8%B7%D8%B1%D8%B2%D8%A9-%D9%8A%D8%AF%D9%88%D9%8A%D9%8B%D8%A7) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1219-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%AF%D8%A7%D9%86%D8%AA%D9%8A%D9%84-%D9%85%D9%86-%D8%A7%D9%84%D8%AE%D9%84%D9%81) حدِّد الخيارات
+
+[MW1219 - كريب ودانتيل من الخلف](https://www.aya.app/products/mw1219-%D9%83%D8%B1%D9%8A%D8%A8-%D9%88%D8%AF%D8%A7%D9%86%D8%AA%D9%8A%D9%84-%D9%85%D9%86-%D8%A7%D9%84%D8%AE%D9%84%D9%81) السعر بعد الخصمالسعر من 104.35 SAR$27.82USD السعر قبل الخصم209.00 SR~~$55.73USD~~
+
+[](https://www.aya.app/products/mw1446-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%AA%D8%B1%D8%A8%D9%84-%D9%83%D9%84%D9%88%D8%B4-%D9%85%D8%B2%D9%8A%D9%86%D8%A9-%D8%A8%D8%A7%D9%84%D8%AF%D8%A7%D9%86%D8%AA%D9%8A%D9%84-%D8%A7%D9%84%D8%B0%D9%87%D8%A8%D9%8A-copy) حدِّد الخيارات
+
+[MW1445 -عباية من الشيفون المطرز بالاسود](https://www.aya.app/products/mw1446-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%AA%D8%B1%D8%A8%D9%84-%D9%83%D9%84%D9%88%D8%B4-%D9%85%D8%B2%D9%8A%D9%86%D8%A9-%D8%A8%D8%A7%D9%84%D8%AF%D8%A7%D9%86%D8%AA%D9%8A%D9%84-%D8%A7%D9%84%D8%B0%D9%87%D8%A8%D9%8A-copy) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1500-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%86%D9%86-%D8%A8%D9%8A%D8%AC-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) حدِّد الخيارات
+
+[MW1500 - عباية لنن موف | Soft Lavender](https://www.aya.app/products/mw1500-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%86%D9%86-%D8%A8%D9%8A%D8%AC-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1542-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%86%D9%86-%D8%A8%D9%8A%D8%A8%D9%8A-%D8%A8%D9%86%D9%83-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) حدِّد الخيارات
+
+[MW1542 - عباية لنن بيبي بنك صيفية](https://www.aya.app/products/mw1542-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D9%84%D9%86%D9%86-%D8%A8%D9%8A%D8%A8%D9%8A-%D8%A8%D9%86%D9%83-%D8%B5%D9%8A%D9%81%D9%8A%D8%A9) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mwd10-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%A8%D9%8A%D8%B6-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%B3%D9%88%D8%AF) حدِّد الخيارات
+
+[MWD10 - فستان عبايه ابيض منقط بأسود](https://www.aya.app/products/mwd10-%D9%81%D8%B3%D8%AA%D8%A7%D9%86-%D8%B9%D8%A8%D8%A7%D9%8A%D9%87-%D8%A7%D8%A8%D9%8A%D8%B6-%D9%85%D9%86%D9%82%D8%B7-%D8%A8%D8%A3%D8%B3%D9%88%D8%AF) السعر بعد الخصم90.02 SR$24.00USD
+
+[](https://www.aya.app/products/mw1622-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B4%D9%8A%D9%81%D9%88%D9%86-%D8%B7%D8%A8%D8%A7%D8%B9%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%84%D9%88%D9%86-color-splash) حدِّد الخيارات
+
+[MW1622 -عباية شيفون طباعة اسود ملون -Color Splash](https://www.aya.app/products/mw1622-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B4%D9%8A%D9%81%D9%88%D9%86-%D8%B7%D8%A8%D8%A7%D8%B9%D8%A9-%D8%A7%D8%B3%D9%88%D8%AF-%D9%85%D9%84%D9%88%D9%86-color-splash) السعر بعد الخصم270.00 SR$71.99USD
+
+[](https://www.aya.app/products/mw1347-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%8A%D8%A7%D9%82%D8%A9-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A8%D8%B7%D8%A8%D9%82%D8%A7%D8%AA-%D8%A8%D9%8A%D9%84%D9%8A%D8%B3%D9%8A%D8%A9-%D9%85%D8%B7%D8%B1%D8%B2%D8%A9-%D8%A8%D9%84%D9%88%D9%86-%D8%B9%D8%A7%D8%AC%D9%8A-copy-1) حدِّد الخيارات
+
+[MW1361 - عباية مطبوعة بلون الرمادي والأزرق](https://www.aya.app/products/mw1347-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%8A%D8%A7%D9%82%D8%A9-%D8%A8%D9%84%D9%8A%D8%B2%D8%B1-%D8%A8%D8%B7%D8%A8%D9%82%D8%A7%D8%AA-%D8%A8%D9%8A%D9%84%D9%8A%D8%B3%D9%8A%D8%A9-%D9%85%D8%B7%D8%B1%D8%B2%D8%A9-%D8%A8%D9%84%D9%88%D9%86-%D8%B9%D8%A7%D8%AC%D9%8A-copy-1) السعر بعد الخصم249.00 SR$66.39USD السعر قبل الخصم390.00 SR~~$103.99USD~~
+
+[](https://www.aya.app/products/mw1686-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%82%D9%85%D8%A7%D8%B4-%D8%AF%D9%8A%D8%AC%D8%AA%D8%A7%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84) حدِّد الخيارات
+
+[MW1686 - عباية بقماش ديجتال بالكامل](https://www.aya.app/products/mw1686-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%A8%D9%82%D9%85%D8%A7%D8%B4-%D8%AF%D9%8A%D8%AC%D8%AA%D8%A7%D9%84-%D8%A8%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84) السعر بعد الخصم290.00 SR$77.32USD
+
+[](https://www.aya.app/products/mw1582-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%83%D8%B1%D9%8A%D8%A8-black-crepe-abaya) حدِّد الخيارات
+
+[MW1582 - عباية سوداء كريب | Black Crepe Abaya](https://www.aya.app/products/mw1582-%D8%B9%D8%A8%D8%A7%D9%8A%D8%A9-%D8%B3%D9%88%D8%AF%D8%A7%D8%A1-%D9%83%D8%B1%D9%8A%D8%A8-black-crepe-abaya) السعر بعد الخصم290.00 SR$77.32USD
+
+عرض المزيد من المنتجات
+
+**تسوقي وانتي مطمّنة**
+
+موثوقين في معروف وتحت مظلة وزارة التجارة السعودية
+
+
+
+**من قلبنا لقلب الخليج**
+
+طلبك بيوصلك بكل دول الخليج خلال وقت قياسي
+
+**مكان التريندات**
+
+تلقين عندنا اخر تريندات العبايات اول بأول
+
+ **ترجيع خلال ٧ أيام**
+
+7 ايام، لو ما عجبتك رجعيها بدون سبب
+
+[حسب الشروط والأحكام](https://www.aya.app/pages/refund-policy "سياسة الاستبدال والاسترجاع")
+
+**سهلناها عليك**
+
+نجمع لك كل براندات العبايات في مكان واحد
+
+{{amount}} SR
+
+- Autodetect currency
+- Bahraini Dinar (BHD)
+- Kuwaiti Dinar (KWD)
+- Qatari Riyal (QAR)
+- Saudi Riyal (SAR)
+- United Arab Emirates Dirham (AED)
+
+
+- Auto
+- AED
+- BHD
+- KWD
+- QAR
+- SAR
+
+
+جدول المقاسات

@@ -1,0 +1,1038 @@
+# [자동차 설계하기..](https://kimbrain.tistory.com/ "자동차 설계하기..")
+
+**..** [Cover Letter](https://kimbrain.tistory.com/43?category=578236)
+
+공부#Robotics#자율주행/(ROS2) 기초
+
+## (ROS2 기초)6. 코드 스타일, ROS2에서 파이썬으로 기초 코딩하기
+
+BrainKimDu 2023. 5. 9. 02:26
+
+**참고도서 1. ROS 2로 시작하는 로봇 프로그래밍. 표윤석 . 루비페이퍼 .
+ 2021** **참고도서 2.** **ROS2 혼자공부하는 로봇SW 직접 만들고 코딩하자** **. 민형기 . 잇플 . 2022****참고자료 1. PinkWink(민형기)님의 ROS2 강의자료****참고자료 2. ROS2 humble documeation**
+ROS2를 복습하는 김에 제대로
+ 다시 한 번 정리하고 넘어가고 싶어서 이 시리즈를 작성합니다.
+이 글은
+ Turtlebot3 패키지를 제대로 이해하고, 다양한 센서를 부착하면서 활용하는 것을
+ 목표로 합니다.
+또한 글이 끝날 때 ROS와 관련된 문제를 하나 만들어서 직접
+ 풀어보도록 합니다.
+이번 시간에는 ROS에서 코드 스타일과 Python으오 코딩하는
+ 기초를 다룹니다.
+
+---
+
+
+## ROS 프로그래밍 규칙
+
+이 부분은 표윤석님의 책에서 대부분의 내용을 발췌하여 작성됩니다.
+<https://cafe.naver.com/openrt/24436>
+
+[023 ROS 프로그래밍 규칙 (코드 스타일) Created Date: 2020.10.23 Modified Date: 2020.10.26 revision 11 * 로봇 운영체제 ROS 강좌 목차: https://cafe... cafe.naver.com](https://cafe.naver.com/openrt/24436)
+
+
+**기본 이름 규칙**
+snake_case, CamelCased, ALL_CAPITALS와
+ 같이 3종류의 네이밍을 기본으로 사용합니다.
+파일 이름 및 변수명, 함수명에는
+ 모두 소문자로 하며 snake_case을 사용합니다. 가독성을 해치는
+ 축약어는 사용하지 않으며 확장자명은 모두 소문자로 표기합니다. 타입이나 클래스는
+ CamelCased 이름 규칙을 사용하고 상수는 ALL_CAPITALS 이름 규칙을 사용합니다. 단
+ 인터페이스 파일명은 CamelCased 규칙을 따릅니다. 다만 앞서 살펴보았던 특정 목적에
+ 따라 만들어지는 파일(패키지를 만들면 자동으로 만들어주는 파일)은 예외적으로
+ 대소문자 규칙을 따르지 않고, 고유의 이름을 사용합니다.
+이게 무슨 말인지,
+ 위의 말을 ChatGPT에 넣고 한 번 코드를
+ 짜달라고 부탁을 해보겠습니다. ROS2의 코드 스타일에 대한 말입니다. 파일 이름 및 변수명, 함수명에는 모두
+ 소문자로 하며 snake_case을 사용한다. 가독성을 해치는 축약어는 사용하지
+ 않으며 확장자명은 모두 소문자로 표기한다. 타입이나 클래스는 CamelCased 이름
+ 규칙을 사용하고 상수는 ALL_CAPITALS 이름 규칙을 사용한다. 단 인터페이스
+ 파일명은 CamelCased 규칙을 따른다. 다만 앞서 살펴보았던 특정 목적에 따라
+ 만들어지는 파일(패키지를 만들면 자동으로 만들어주는 파일)은 예외적으로
+ 대소문자 규칙을 따르지 않고, 고유의 이름을 사용합니다. 위에서 설명하는
+ snake_case, CamelCased, ALL_CAPITALS란 무엇인지 설명해주시고, 위에서 설명한
+ 예시가 모두 포함되는 예시코드를 C++과 python으로 작성해주세요 snake_case: 단어들을 모두 소문자로 쓰고, 각 단어 사이에는 언더스코어(_)를
+ 사용하여 단어를 구분하는 명명 규칙입니다. 예를 들어, "ros2_node"와 같은 변수나
+ 함수 이름을 snake_case로 작성합니다. CamelCased: 단어의 첫 글자는 모두 대문자로 쓰고, 나머지 글자는 소문자로 쓰며,
+ 단어들 사이에 공백 대신 대문자를 사용하여 단어를 구분하는 명명 규칙입니다.
+ 예를 들어, "Ros2Node"와 같은 클래스 이름을 CamelCased로 작성합니다. ALL_CAPITALS: 모든 글자를 대문자로 쓰는 명명 규칙입니다. 예를 들어,
+ "MAX_ITERATIONS"와 같은 상수 이름을 ALL_CAPITALS로 작성합니다. 아래는 C++와 Python에서 ROS2 코드 스타일을 따르는 예시 코드입니다. C++ 예시:
+
+```text
+#include "rclcpp/rclcpp.hpp"
+
+// Snake_case를 사용한 변수 이름
+int my_variable = 0;
+
+class MyNode : public rclcpp::Node
+{
+public:
+  MyNode() : Node("my_node")
+  {
+    // CamelCased를 사용한 함수 이름
+    timer_ = create_wall_timer(std::chrono::seconds(1), &MyNode::myCallback, this);
+  }
+
+private:
+  // CamelCased를 사용한 멤버 변수 이름
+  rclcpp::TimerBase::SharedPtr timer_;
+
+  // CamelCased를 사용한 함수 이름
+  void myCallback()
+  {
+    // ALL_CAPITALS를 사용한 상수 이름
+    const int MAX_ITERATIONS = 10;
+    for (int i = 0; i < MAX_ITERATIONS; i++) {
+      RCLCPP_INFO(get_logger(), "Iteration %d", i);
+    }
+  }
+};
+
+int main(int argc, char **argv)
+{
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<MyNode>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
+}
+```
+
+```text
+import rclpy
+
+# snake_case를 사용한 변수 이름
+my_variable = 0
+
+class MyNode(rclpy.node.Node):
+    def __init__(self):
+        super().__init__('my_node')
+
+        # CamelCased를 사용한 함수 이름
+        self.timer = self.create_timer(1.0, self.my_callback)
+
+    # CamelCased를 사용한 함수 이름
+    def my_callback(self):
+        # ALL_CAPITALS를 사용한 상수 이름
+        MAX_ITERATIONS = 10
+        for i in range(MAX_ITERATIONS):
+            self.get_logger().info('Iteration %d' % i)
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = MyNode()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+
+
+**C++ 의 ROS 스타일**
+C++의 코드 스타일은 Google
+ C++ Style Guide를 사용하고 있으며, ROS의 특성에 따라 일부를 수정해서
+ 사용한다.
+
+1. 기본규칙 : C++ 14 Standard를 준수한다.
+2. 라인 길이 :
+
+   최대 100문자
+
+3. 이름 규칙
+
+- CamelCased, snake_case, ALL_CAPITALS만을
+
+  사용한다.
+CamelCased : 타입, 클래스, 구조체, 열거형
+snake_case : 파일,
+
+ 패키지, 인터페이스, 네임스페이스, 변수, 함수, 메소드
+ALL_CAPITALS :
+ 상수, 메크로
+
+- 소스 파일은 cpp 확장자를 사용한다.
+- 헤더파일은 hpp
+
+  확장자를 사용한다.
+
+- 전역변수를 반드시 사용해야할 경우 접두어 g_ 를
+
+  붙인다.
+
+- 클래스 맴버 변수는 마지막줄에 밑줄 _을 붙인다.
+
+4. 공백문자
+
+   대 탭
+
+- 기본 들여쓰기는 공백 문자 2개를 사용한다 (탭을 사용하지 않는다.)
+-
+
+ Class 의 접근지정자는 들여쓰기 하지 않는다.
+5. 괄호
+
+- if, else,
+
+  do, while, for 구문에 괄호를 사용한다.
+
+- 괄호를 사용하는 올바른 방법은
+
+  다음을 참고한다.
+먼저 C++에서의 코딩 방법이다.
+
+```text
+int main(int argc, char **argv)
+{
+  if (condition){
+      return 0;
+    } else {
+      return 1;
+    }
+}
+
+if (this && that || both){
+
+}
+
+// 긴 조건문인 경우
+if (
+  this && that || both && this && that || both %% this && that || both
+)
+{
+
+}
+
+// 짧은 함수 호출문
+call_func(foo, bar);
+
+// 긴 함수 호출문
+call_func(
+  foo, bar, foo, bar, foo, bar, foo, bar, foo, bar, foo, bar, foo, bar,
+  foo, bar, foo, bar, foo, bar, foo, bar, foo, bar, foo, bar, foo, bar);
+
+
+// 매우 긴 함수 인수를 사용해야하는 경우, 가독성을 위해 개행
+call_func(
+  bang,
+  fooooooooooooooooooooooooooooooooo,
+  bar, bat);
+
+ReturnType LongClassName::ReallyReallyReallyReallyLongFunctionName(
+  Type par_name1,  //2 스페이스 들여쓰기
+  Type par_name1,
+  Type par_name1,)
+{
+  DoSomething();
+}
+
+MyClass::MyClass(int var)
+: some_var_(var), // 첫 구문은 들여쓰기를 사용하지 않고, 이후부터는 스페이스 들여쓰기
+  some_other_var_(var+1)
+{
+  Dosomething();
+}
+```
+
+6. 주석
+
+- 문서 주석은 /** */를 사용한다.
+- 구현 주석은 //을
+
+  사용한다.
+
+7. 린터(Linters)
+
+- C++ 코드 스타일의 자동 오류 검출을 위하여
+
+  ament_cppint, ament_uncrustify를 사용하고 정적 코드 분석이 필요한 경우
+  ament_cppcheck를 사용한다.
+
+8. 기타
+
+- Boost 라이브러리의 사용은 가능한
+
+  피하고 어쩔 수 없을 경우에만 사용한다.
+
+- 포인터 구문은 char * c 처럼
+
+  사용하며 char* c나 char *c를 허용하지 않는다.
+
+- 중첩 템플릿은
+
+  set<list<string>> 처럼 사용한다.
+
+**Python Style**
+Python 코드 스타일은 Python Enhancement Proposals의 PEP 8을 준수한다.
+1.
+ 기본 규칙
+
+- 파이썬 3(파이썬 3.5이상)을 사용한다,
+
+2. 라인 길이
+
+-
+
+ 최대 100문자
+3. 이름 규칙(Naming)
+
+- CamelCased, snake_case,
+
+  ALL_CAPITALS만을 사용한다.
+CamelCased : 타입, 클래스
+snake_case :
+
+ 파일, 패키지, 인터페이스, 모듈, 변수, 함수, 메소드
+ALL_CAPITALS : 상수
+
+4.
+
+  공백 문자 대 탭
+
+- 기본 들여쓰기는 공백 문자 4개를 사용한다 (탭 사용금지)
+-
+
+ Hanging indent(문자 중간에 들여쓰기를 사용하는 형식)의 사용 방법은 다음 예제를
+ 보자.
+
+- 괄호 및 공백 사용은 다음 예제를 참고하자.
+
+```text
+foo = function(var_one, var_two, var_three, var_four)
+
+def long_long_long_long_function_name(
+        var_one;
+        var_two,
+        var_three,
+        var_four):
+
+    print(var_one)
+```
+
+다음의 방식만 허용되며 이 외는 허용하지 않는다.
+5. 괄호
+
+- 괄호는
+
+  계산식 및 배열 인덱스로 사용하며, 자료형에 따라 적절한 괄호를 사용한다.
+
+6.
+
+  주석
+
+- 문서 주석은 """을 사용하며 Docstring Conventions을 기술한 PEP 257을
+
+  준수한다.
+
+- 구현 주석은 #을 사용한다.
+
+7. 린터(Linters)
+
+- 파이썬
+
+  코드 스타일의 자동 오류 검출을 위해 ament_flake8을 사용하자.
+
+8. 기타
+
+-
+
+ 모든 문자는 큰 따옴표(")가 아닌 작은 따옴표(')를 사용하여 표현한다.
+
+
+## ROS 프로그래밍 기초 (파이썬)
+
+이전시간에 우리는 파이썬 패키지와 C++ 패키지를 만들었습니다. 그 패키지에서
+ 이어서 진행을 합니다. 우선 첫시간에 설정했던 VScode가 있어야 합니다.
+
+이렇게 하면 VScode가 열리게 됩니다. 코딩을 하면서 주의할 점이라면 ROS와 VScode가
+ 조금 어디선가 어긋나는 부분이 있기 때문에 VScode 는 오류라고 뱉는 경우가 있지만
+ 정상적으로 돌아가는 경우가 있습니다. ROS에서부터는 짜증나더라도 일단 colcon
+ build에서 문제가 생기지 않는다면 무시해도 좋습니다.
+
+다음의 모습에서 ros_study_py 폴더 안에 파이썬 파일을 하나 만듭시다. my_node.py
+ 라는 파일을 하나 만듭니다. 그리고 다음과 같이 작성합니다.
+
+```text
+def main():
+    print("Hello World")
+
+if __name__ == 'main__':
+    main()
+```
+
+그리고 항상 기억해야 할 것이 저장입니다. 저장을 안하고 빌드를 하면, 이전의
+ 상태로 다시 빌드하는 것과 같습니다. 자 이제 빌드를 진행해봅시다.
+ROS환경을
+ 불러오고 colcon build한 후에
+
+다시 메타 패키지 환경을 불러와야합니다. 이 파일은 ./install/setup.bash에
+ 있습니다. 주의하실 점이라면 Ros환경과 메타 패키지 환경이 둘 다 불러와 있어야
+ 됩니다.
+
+```text
+source ./install/setup.bash
+```
+
+그러나 방금 작성한 파일이 터미널에서 보이지 않습니다. 이유가 뭘까요?
+
+setup.py에서 entry_points를 지정해주어야 터미널상에서 접근이 가능합니다. 다음과
+ 같이 작성합니다.
+
+```text
+'my_node = ros_study_py.my_node:main'
+```
+
+그리고 다시 빌드를 하고 실행해봅니다.
+
+```text
+ros2 run ros_study_py my_node
+```
+
+다음의 명령어를 실행합니다.
+
+정말 간단한 원리입니다. 그냥 Ros로 my_node.py 파일을 실행한 것입니다. 이 파일이
+ 어디 있는지 찾지를 못해서 실행이 안되었던 것이 였습니다. setup.py에서
+ entry_points를 잡아주니 파일을 찾게 되었고 (실행가능하게 ) Ros상에서 실행이
+ 가능하게 되었습니다.
+근데, 내가 ROS를 다룰 줄 안다 이야기할 수 있다면
+ 최소한 topic 을 직접 발행하고, 구독하는 정도의 코드는 짤 줄 알아야합니다. 그러나
+ 지금당장 코드를 짜기에는 난이도가 있습니다. 그러니 먼저 예시코드를
+ Documentation에서 가져오도록 하겠습니다.<https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html>
+
+[Writing a simple publisher and subscriber (Python) — ROS 2 Documentation: Foxy documentation Navigate into ros2_ws/src/py_pubsub/py_pubsub. Recall that this directory is a Python package with the same name as the ROS 2 package it’s nested in. Now there will be a new file named publisher_member_function.py adjacent to __init__.py. Open the file u docs.ros.org](https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html)
+
+파일을 하나 작성합니다. ros_study_py 폴더 안에 다음을 작성합니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+
+
+class MinimalPublisher(Node):
+
+    def __init__(self):
+        super().__init__('minimal_publisher')
+        self.publisher_ = self.create_publisher(String, 'topic', 10)
+        timer_period = 0.5  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+
+    def timer_callback(self):
+        msg = String()
+        msg.data = 'Hello World: %d' % self.i
+        self.publisher_.publish(msg)
+        self.get_logger().info('Publishing: "%s"' % msg.data)
+        self.i += 1
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    minimal_publisher = MinimalPublisher()
+
+    rclpy.spin(minimal_publisher)
+
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    minimal_publisher.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+처음부터 구조가 보이지는 않을 것입니다. 일단 ROS의 동작 시스템을 한 번 설명을
+ 해보자면
+Topic 을 발행하는 친구는 보통 타이머를 묶어서 몇 주기로 topic 을
+ publish할지 결정하게 됩니다. 타이머를 사용하는게 아니라면 센서에서 신호가
+ 들어오는 순간 publishing을 하기도 합니다. 지금의 상황에서는 몇초마다 숫자를
+ 늘려가면서 publishing하는 예제임으로 타이머를 달아서 작동을 하게 합니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+```
+
+rclpy는 ros의 python모듈입니다. 보통 rclpy도 import 하고 node도 사용하므로
+ node도 import 합니다. 여기서 몇초마다 숫자를 늘려가면서 string 형태로
+ publishing하기 때문에 ros의 기본 메시지 타입인 String에 넣어서 topic으로
+ 발행하려고 합니다.
+
+```text
+class MinimalPublisher(Node):
+
+    def __init__(self):
+        super().__init__('minimal_publisher')
+        self.publisher_ = self.create_publisher(String, 'topic', 10)
+        timer_period = 0.5  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+```
+
+보통 노드는 Class형태로 선언하며, Node의 구현은 Node 클래스를 상속함으로써
+ 구현됩니다.
+super().**inti** 뒤에 들어가는 'minimal_publisher'는
+ Node의 이름을 나타냅니다.
+여기서 중요한게 self.publisher_ 는
+ 변수이름이라 그냥 이름을 publisher라고 하였을 뿐 별 이유는 없지만 그 뒤에가
+ publisher하는 변수로 만들어 줍니다. self.create_publisher(String(메시지타입),
+ 'topic'(토픽의 이름), 10)
+timer_period는 0.5초 마다로 만들어서 self.timer =
+ self.create_timer(timer_period, self.timer_callback) 0.5초마다
+ self.timer_callback이라는 함수를 실행하게 합니다.
+self.i는 메시지에 넣어
+ 발행할 숫자겠죠?
+
+```text
+노드 클래스 내부에 있는
+	def timer_callback(self):
+       msg = String()
+       msg.data = 'Hello World: %d' % self.i
+       self.publisher_.publish(msg)
+       self.get_logger().info('Publishing: "%s"' % msg.data)
+       self.i += 1
+```
+
+def timer_callback은 메시지 형식을 msg라는 변수에 저장하고, data에다가 string을
+ 넣고, topic을 발행합니다. 그리고 이를 log에 남깁니다.
+여기서 잠깐.. 왜
+ call_back이라는 함수를 쓸까요? call_back은 어떤 이벤트가 발생했을때 실행하는
+ 함수입니다. 여기서는 timer가 0.5초마다 call_back함수를 호출합니다.
+콜백
+ 함수 구현에는 member function, lambda, local function 방법이 있으며, 이 예제는
+ member function 방법을 사용했다. 이에 대한 개념은 파이썬을 배울 때 배우는데,
+ 나중에 추가하도록 하겠다.
+
+
+```text
+def main(args=None):
+    rclpy.init(args=args)
+
+    minimal_publisher = MinimalPublisher()
+
+    rclpy.spin(minimal_publisher)
+
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    minimal_publisher.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+마지막으로 실행을 담당하는 부분으로 대부분 형식이 거의 정해져 있다고 볼 수
+ 있습니다. rclpy.init은 초기화를 하고 위에서 작성한 노드를 클래스를 node변수로
+ 생성한 다음에 rclpy.spin으로 생성한 노드를 spin시켜 지정된 콜백 함수가 실행될 수
+ 있도록 합니다. 그리고 종료되는 상황에서는 node를 소멸시키기 위해 shutdown을
+ 사용합니다.
+
+저는 이름을 my_publisher.py로 만들었습니다. 그러면 우선 이를 setup.py에 등록을
+ 하고 다음의 문제를 생각해봅시다.
+
+```text
+'my_publisher = ros_study_py.my_publisher:main'
+```
+
+빌드해보고 잘되는지 실행을 해봅시다.
+
+정상적으로 빌드가 완료되었습니다.
+
+정상적으로 출력을 합니다. 그러나 우리는 위의 코드에서 이 부분을 package.xml에
+ 명시해주는 것이 좋습니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+```
+
+```text
+<depend>reclpy</depend>
+<depend>std_msgs</depend>
+```
+
+다시 빌드를 진행합니다. 그러면 정상적으로 작동합니다.
+
+이제 이를
+ 받아주는 친구를 작성하도록 합시다. 도큐먼트에서 배포하는 subscribe의 코드입니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+
+
+class MinimalSubscriber(Node):
+
+    def __init__(self):
+        super().__init__('minimal_subscriber')
+        self.subscription = self.create_subscription(
+            String,
+            'topic',
+            self.listener_callback,
+            10)
+        self.subscription  # prevent unused variable warning
+
+    def listener_callback(self, msg):
+        self.get_logger().info('I heard: "%s"' % msg.data)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    minimal_subscriber = MinimalSubscriber()
+
+    rclpy.spin(minimal_subscriber)
+
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    minimal_subscriber.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+subscribe도 비슷합니다. 하나씩 코드를 살펴보도록 하겠습니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+```
+
+아무래도 publisher와 동일한 메시지 타입을 가져야 구독을 할 수 있겠죠.
+
+```text
+class MinimalSubscriber(Node):
+
+    def __init__(self):
+        super().__init__('minimal_subscriber')
+        self.subscription = self.create_subscription(
+            String,
+            'topic',
+            self.listener_callback,
+            10)
+        self.subscription  # prevent unused variable warning
+
+    def listener_callback(self, msg):
+        self.get_logger().info('I heard: "%s"' % msg.data)
+```
+
+간단합니다. 구독을 하는 노드를 만들고, 구독을 위한 변수를 선언합니다.
+ self.create_subscription과 함께 메시지타입, 토픽이름, 그리고 토픽을 받게되면
+ 실행할 call_back함수를 선언합니다.
+그리고 call_back함수에서는 토픽을 받으면
+ 이를 log로 남기게 됩니다.
+
+```text
+def main(args=None):
+    rclpy.init(args=args)
+
+    minimal_subscriber = MinimalSubscriber()
+
+    rclpy.spin(minimal_subscriber)
+
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    minimal_subscriber.destroy_node()
+    rclpy.shutdown()
+```
+
+위에서 설명한 것과 동일합니다. rclpy를 초기화하고, node를 실행합니다. 그래서
+ 위의 코드를 my_subscriber.py로 만들고 setup.py를 수정하면 다음과 같습니다.
+
+이제 빌드하고 두 파일을 ros run으로 실행시킵니다.
+
+```text
+ros2 run ros_study_py my_publisher
+```
+
+```text
+ros2 run ros_study_py my_subscriber
+```
+
+
+그러나 아무리 실행해도 둘이 통신이 되질 않을 것입니다. 그 이유는
+ 간단합니다.
+humble 환경도 불러야하고, ros_domain도 맞추어야하고,
+ ros_study 메타 패키지 환경도 불러와야합니다. 그러니
+gedit ~/.bashrc로
+ 다음을 입력합니다.
+
+```text
+alias ros_study="humble; source ~/ros_study/install/local_setup.bash; echo \"ros_study workspace is activated.\""
+```
+
+그러면 다음에는 환경을 불러올때 ros_study만 입력하면됩니다.
+
+그러면 정상적으로 통신이 가능해집니다.
+
+
+
+
+
+**문제 : publisher를 하는 중에 통신 상태가 원할하지 못해 예기치 못한 문제가
+ 발생할 것이라 예상된다. 이 경우를 대비해 publish하는 데이터는 버퍼에 10개까지
+ 저장하고자 한다. 이 경우 QoS 설정을 통해서 이를 보여라.**
+
+
+
+QoS는 이론 설명을 제외했으나, Quality of Service의 약자로 데이터를 주고받을 때 약속에 대한 내용입니다.
+ 실제 로봇을 다룰 때 정말 중요한 내용 중 하나입니다.
+
+두 파일 모두 이렇게 수정하시면 됩니다. 수정된 부분만 적으면
+ 다음과 같습니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+from rclpy.qos import QoSProfile
+
+
+class my_publisher(Node):
+
+    def __init__(self):
+        super().__init__('minimal_publisher')
+        qos_profile = QoSProfile(depth=10)
+        self.publisher_ = self.create_publisher(String, 'topic', qos_profile)
+        timer_period = 0.5  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+```
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+from rclpy.qos import QoSProfile
+
+class my_subscriber(Node):
+
+    def __init__(self):
+        super().__init__('minimal_subscriber')
+        qos_profile = QoSProfile(depth=10)
+        self.subscription = self.create_subscription(
+            String,
+            'topic',
+            self.listener_callback,
+            qos_profile)
+        self.subscription  # prevent unused variable warning
+
+    def listener_callback(self, msg):
+        self.get_logger().info('I heard: "%s"' % msg.data)
+```
+
+이제 실행하면 QoS가 적용됩니다.
+
+
+
+
+
+
+
+
+**생각해볼 문제**
+**turtlesim을 한 번 움직여 봅시다. 거북이가 간단하게 오른쪽으로 1초간
+ 이동했다가 왼쪽으로 1초간 이동하는 topic을 발행해봅시다.**
+
+
+
+
+우선 타이머가 필요할
+ 것입니다. 1초마다 거북이의 이동을 바꿔야하니까요.
+
+이전시간에
+ Turtlesim을 움직이는 topic은 cmd_vel이라고 알고 있었습니다. 그러나 이렇게 문제를
+ 풀면 ros 엔지니어라고 하기 좀 민망합니다.
+우선 터틀심을 실행합니다.
+
+```text
+humble
+ros2 run turtlesim turtlesim_node
+```
+
+이 상태에서 어떻게 해야 topic을 볼 수 있을까요. humble로 환경을 불러오고 다음을
+ 입력합니다.
+
+```text
+humble
+ros2 topic list
+```
+
+그러면 왠지 의심스러운게 cmd_vel입니다.
+
+이렇게 확인하면 당연히 안보입니다. 거북이가 움직이고 있지 않으니까요.
+
+```text
+ros2 topic info /turtle1/cmd_vel
+```
+
+
+
+Twist 토픽을 발행하고 있군요. 근데 이 토픽은 어떻게 생긴걸까요?
+
+```text
+ros2 interface show geometry_msgs/msg/Twist
+```
+
+뭔가 이동을 담당하는 토픽으로 보입니다. 그러면 이 토픽을 발행하면 될 것
+ 같습니다. 새로운 파일로 my_turtlesim.py라는 파일을 만듭니다.
+publisher파일에서
+ 조금 때올건 때옵시다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from rclpy.qos import QoSProfile
+
+
+class my_publisher(Node):
+
+    def __init__(self):
+        super().__init__('')
+        qos_profile = QoSProfile(depth=10)
+        self.publisher_ = self.create_publisher(, '', qos_profile)
+        timer_period =  
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+
+    def timer_callback(self):
+        msg =
+        msg
+        self.publisher_.publish()
+        self.get_logger().info()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    minimal_publisher = my_publisher()
+
+    rclpy.spin(minimal_publisher)
+
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    minimal_publisher.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+이 상황에서 시작을 합시다. 메시지 타입이 아까 뭐였죠?
+
+```text
+geometry_msgs/msg/Twist
+```
+
+이 메시지 타입이니 다음처럼 적어줍니다.
+
+```text
+import rclpy
+from rclpy.node import Node
+
+from rclpy.qos import QoSProfile
+from geometry_msgs.msg import Twist
+```
+
+그 다음에 노드 부분을 수정합니다. 토픽의 이름은
+
+```text
+/turtle1/cmd_vel
+```
+
+그럼 다음처럼 수정이 되겠죠?
+
+```text
+class my_publisher(Node):
+
+    def __init__(self):
+        super().__init__('move_turtlesim')
+        qos_profile = QoSProfile(depth=10)
+        self.publisher_ = self.create_publisher(Twist, '/turtle1/cmd_vel', qos_profile)
+        timer_period =  1
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+```
+
+
+그리고 메시지의 포멧에 맞게 코딩을 할때는 이렇게 해야합니다.
+
+```text
+def timer_callback(self):
+        msg = Twist()
+        msg.linear.x = 2.0
+        self.publisher_.publish(msg)
+        self.get_logger().info('move ->')
+```
+
+이렇게 코딩을 하면 됩니다. 만약에 ROS 확장이 잘 다운로드 되어있다면 다음과 같이
+ 표시됩니다.
+
+이제 검증을 해봅시다. 이상태로 저장하고, setup.py에 등록을 합시다.
+
+이제 빌드하고 실행해봅시다.
+
+잘움직입니다. 이제 부터는 코딩싸움입니다. 간단하게 if문으로 끝낼 수 있는
+ 코딩이죠..
+
+```text
+def timer_callback(self):
+        msg = Twist()
+        if self.i == 0:
+            self.i = 1
+            msg.linear.x = 2.0
+            self.publisher_.publish(msg)
+            self.get_logger().info('move->')
+
+        elif self.i == 1:
+            self.i = 0
+            msg.linear.x = -2.0
+            self.publisher_.publish(msg)
+            self.get_logger().info('move<-')
+```
+
+다음처럼 수정하고 실행시키면 됩니다.
+
+다음처럼 왔다갔다 움직이게 됩니다.
+
+
+위 문제로
+ 깨달았으면 하는 점은 ROS 코딩에서 뼈대가 있다는 점이라는 것 같습니다.
+
+
+
+다음시간에는
+ 지금까지의 과정을 C++로 한 번 만들어보도록 하겠습니다. 그리고 Turtlebot을
+ 활용하는 문제도 제작해보도록 하죠.
+
+공유하기
+
+게시글 관리
+
+**자동차 설계하기..**
+
+[저작자표시 비영리 변경금지 (새창열림)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ko)
+
+### '[공부#Robotics#자율주행](/category/%EA%B3%B5%EB%B6%80%23Robotics%23%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89) > [(ROS2) 기초](/category/%EA%B3%B5%EB%B6%80%23Robotics%23%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89/%28ROS2%29%20%EA%B8%B0%EC%B4%88)' 카테고리의 다른 글
+
+| [(ROS2 기초)8. 토픽, 서비스, 액션 인터페이스 작성하기](/540) (0)                 | 2023.05.12 |
+| -------------------------------------------------------------- | ---------- |
+| [(ROS2 기초)7. ROS2에서 C++으로 기초 코딩하기](/539) (1)                   | 2023.05.11 |
+| [(ROS2 기초)5. ROS에서 코딩하기 전 알아야할 내용](/537) (0)                   | 2023.05.08 |
+| [(ROS2 기초)4. ROS에서 사용하는 도구](/536) (1)                          | 2023.05.08 |
+| [(ROS2 기초)3. ROS의 Turtlesim으로 ROS의 인터페이스와 파라미터 이해하기](/535) (0) | 2023.05.06 |
+
+#### '공부#Robotics#자율주행/(ROS2) 기초'의 다른글
+
+- [이전글**(ROS2 기초)5. ROS에서 코딩하기 전 알아야할 내용**](/537)
+- 현재글**(ROS2 기초)6. 코드 스타일, ROS2에서 파이썬으로 기초 코딩하기**
+- [다음글**(ROS2 기초)7. ROS2에서 C++으로 기초 코딩하기**](/539)
+
+#### 관련글
+
+- [**(ROS2 기초)8. 토픽, 서비스, 액션 인터페이스 작성하기** 2023.05.12](/540?category=639383)
+- [**(ROS2 기초)7. ROS2에서 C++으로 기초 코딩하기** 2023.05.11](/539?category=639383)
+- [**(ROS2 기초)5. ROS에서 코딩하기 전 알아야할 내용** 2023.05.08](/537?category=639383)
+- [**(ROS2 기초)4. ROS에서 사용하는 도구** 2023.05.08](/536?category=639383)
+
+[댓글 2](#rp)
+
+-
+
+ 로봇, 자율주행, C++, 딥러닝 하다가.. 자동차의 시스템과 기능안전 설계 엔지니어로
+ 일을 하고 있습니다.
+
+#### Tag
+
+#### 최근글과 인기글
+
+- [최근글](#)
+- [인기글](#)
+
+
+- [**FOSS for All Conference 2025 참석 후기** 2025.11.11 20:09](/652)
+- [**대한민국 미래모빌리티 엑스포 2025를 다녀왔습니다.** 2025.10.26 19:51](/651)
+- [**자동차 전장 개발자 신입 취업 준비법** 2025.10.08 05:08](/650)
+
+
+- [**(ROS2 기초)5. ROS에서 코딩하기 전 알아야할 내용** 2023.05.08 23:19](/537)
+- [**PinkLab에서 6개월의 인턴을 진행하면서** 2023.10.13 23:02](/621)
+- [**(CARLA) 1. PythonAPI를 이용해서 CARLA 사용하기** 2023.04.30 04:17](/515)
+
+#### 최근댓글
+
+- [**들렸다 갑니다~** 문자life](/646#comment15263572)
+- [**안녕하세요 혹시 글 중간에 "복선도" 그림은 어떤 프로그램으로 그린 건가요? 손그림이 섞여⋯** cuffyluv](/346#comment15237654)
+- [**왔다 갑니다.** 인포info](/646#comment15207597)
+
+#### 공지사항
+
+#### 페이스북 트위터 플러그인
+
+- [Facebook](#)
+- [Twitter](#)
+
+> [](<>)
+
+— <>
+
+[](<>)
+
+#### Archives
+
+- [2025/11](/archive/202511)
+- [2025/10](/archive/202510)
+- [2025/09](/archive/202509)
+
+#### Calendar
+
+*[«](/archive/202512 "1개월 앞의 달력을 보여줍니다.") [2026/01](/archive/202601 "현재 달의 달력을 보여줍니다.") [»](/archive/202602 "1개월 뒤의 달력을 보여줍니다.")*
+
+| 일  | 월  | 화  | 수  | 목  | 금  | 토  |
+| --- | --- | --- | --- | --- | --- | --- |
+|    |    |    |    | 1  | 2  | 3  |
+| 4  | 5  | 6  | 7  | 8  | 9  | 10 |
+| 11 | 12 | 13 | 14 | 15 | 16 | 17 |
+| 18 | 19 | 20 | 21 | 22 | 23 | 24 |
+| 25 | 26 | 27 | 28 | 29 | 30 | 31 |
+
+#### 방문자수Total
+
+142,653
+
+- Today : 20
+- Yesterday : 226
+
+블로그 내 검색
+
+Copyright © Kakao Corp. All rights reserved.
+
+관련사이트
+
+### 티스토리툴바
+
+**자동차 설계하기..***구독하기*
