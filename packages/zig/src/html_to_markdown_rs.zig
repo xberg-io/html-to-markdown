@@ -1268,6 +1268,9 @@ pub const IHtmlVisitor = extern struct {
     visit_figcaption: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called after processing a figure `</figure>`.
     visit_figure_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
+    /// Called by the Rust runtime to release strings returned by callbacks.
+    free_string: ?*const fn (ptr: [*c]u8) callconv(.c) void = null,
+
     /// Called by the Rust runtime when the bridge is dropped.
     /// Use this to release any Zig-side state held via `user_data`.
     free_user_data: ?*const fn (user_data: ?*anyopaque) callconv(.c) void = null,
@@ -1737,6 +1740,11 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
             }
         }.thunk,
 
+        .free_string = struct {
+            fn thunk(ptr: [*c]u8) callconv(.c) void {
+                _ = ptr;
+            }
+        }.thunk,
         .free_user_data = struct {
             fn thunk(user_data: ?*anyopaque) callconv(.c) void {
                 _ = user_data;

@@ -1308,6 +1308,10 @@ typedef struct HTMHtmHtmlVisitorVTable {
                               char **out_result,
                               char **out_error);
   /**
+   * Optional string destructor: called for strings returned by vtable callbacks.
+   */
+  void (*free_string)(char*);
+  /**
    * Optional destructor: called once with `user_data` when the bridge is dropped.
    */
   void (*free_user_data)(void*);

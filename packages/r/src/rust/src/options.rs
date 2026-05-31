@@ -2,17 +2,157 @@
 
 use extendr_api::prelude::*;
 
-/// Decode an R ExternalPtr or NULL into ConversionOptions.
+/// Helper: extract and convert a value from an R list by name.
+fn list_get(list: &List, key: &str) -> Option<Robj> {
+    let names = list.names().ok()?;
+    names
+        .iter()
+        .zip(list.iter())
+        .find(|(name, _)| name == key)
+        .map(|(_, val)| val)
+}
+
+/// Decode a url escape style enum from its string representation.
+fn decode_url_escape_style(val: Robj) -> std::result::Result<crate::UrlEscapeStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("url_escape_style: {e}"))?;
+    match s.as_str() {
+        "Angle" => Ok(crate::UrlEscapeStyle::Angle),
+        "Percent" => Ok(crate::UrlEscapeStyle::Percent),
+        _ => Err(format!("url_escape_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a output format enum from its string representation.
+fn decode_output_format(val: Robj) -> std::result::Result<crate::OutputFormat, String> {
+    let s = String::try_from(&val).map_err(|e| format!("output_format: {e}"))?;
+    match s.as_str() {
+        "Markdown" => Ok(crate::OutputFormat::Markdown),
+        "Djot" => Ok(crate::OutputFormat::Djot),
+        "Plain" => Ok(crate::OutputFormat::Plain),
+        _ => Err(format!("output_format: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a newline style enum from its string representation.
+fn decode_newline_style(val: Robj) -> std::result::Result<crate::NewlineStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("newline_style: {e}"))?;
+    match s.as_str() {
+        "Spaces" => Ok(crate::NewlineStyle::Spaces),
+        "Backslash" => Ok(crate::NewlineStyle::Backslash),
+        _ => Err(format!("newline_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a link style enum from its string representation.
+fn decode_link_style(val: Robj) -> std::result::Result<crate::LinkStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("link_style: {e}"))?;
+    match s.as_str() {
+        "Inline" => Ok(crate::LinkStyle::Inline),
+        "Reference" => Ok(crate::LinkStyle::Reference),
+        _ => Err(format!("link_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a code block style enum from its string representation.
+fn decode_code_block_style(val: Robj) -> std::result::Result<crate::CodeBlockStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("code_block_style: {e}"))?;
+    match s.as_str() {
+        "Indented" => Ok(crate::CodeBlockStyle::Indented),
+        "Backticks" => Ok(crate::CodeBlockStyle::Backticks),
+        "Tildes" => Ok(crate::CodeBlockStyle::Tildes),
+        _ => Err(format!("code_block_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a highlight style enum from its string representation.
+fn decode_highlight_style(val: Robj) -> std::result::Result<crate::HighlightStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("highlight_style: {e}"))?;
+    match s.as_str() {
+        "DoubleEqual" => Ok(crate::HighlightStyle::DoubleEqual),
+        "Html" => Ok(crate::HighlightStyle::Html),
+        "Bold" => Ok(crate::HighlightStyle::Bold),
+        "None" => Ok(crate::HighlightStyle::None),
+        _ => Err(format!("highlight_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a heading style enum from its string representation.
+fn decode_heading_style(val: Robj) -> std::result::Result<crate::HeadingStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("heading_style: {e}"))?;
+    match s.as_str() {
+        "Atx" => Ok(crate::HeadingStyle::Atx),
+        "Underlined" => Ok(crate::HeadingStyle::Underlined),
+        "AtxClosed" => Ok(crate::HeadingStyle::AtxClosed),
+        _ => Err(format!("heading_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a preprocessing preset enum from its string representation.
+fn decode_preprocessing_preset(val: Robj) -> std::result::Result<crate::PreprocessingPreset, String> {
+    let s = String::try_from(&val).map_err(|e| format!("preprocessing_preset: {e}"))?;
+    match s.as_str() {
+        "Minimal" => Ok(crate::PreprocessingPreset::Minimal),
+        "Standard" => Ok(crate::PreprocessingPreset::Standard),
+        "Aggressive" => Ok(crate::PreprocessingPreset::Aggressive),
+        _ => Err(format!("preprocessing_preset: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a whitespace mode enum from its string representation.
+fn decode_whitespace_mode(val: Robj) -> std::result::Result<crate::WhitespaceMode, String> {
+    let s = String::try_from(&val).map_err(|e| format!("whitespace_mode: {e}"))?;
+    match s.as_str() {
+        "Normalized" => Ok(crate::WhitespaceMode::Normalized),
+        "Strict" => Ok(crate::WhitespaceMode::Strict),
+        _ => Err(format!("whitespace_mode: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a list indent type enum from its string representation.
+fn decode_list_indent_type(val: Robj) -> std::result::Result<crate::ListIndentType, String> {
+    let s = String::try_from(&val).map_err(|e| format!("list_indent_type: {e}"))?;
+    match s.as_str() {
+        "Spaces" => Ok(crate::ListIndentType::Spaces),
+        "Tabs" => Ok(crate::ListIndentType::Tabs),
+        _ => Err(format!("list_indent_type: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode preprocessing options from an R list.
+fn decode_preprocessing_options(val: Robj) -> std::result::Result<crate::PreprocessingOptions, String> {
+    if val.is_null() {
+        return Ok(crate::PreprocessingOptions::default());
+    }
+    let list = List::try_from(&val).map_err(|e| format!("preprocessing: {e}"))?;
+    let mut opts = crate::PreprocessingOptions::default();
+
+    if let Some(v) = list_get(&list, "enabled") {
+        opts.enabled = bool::try_from(&v).map_err(|e| format!("preprocessing.enabled: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "preset") {
+        opts.preset = decode_preprocessing_preset(v)?;
+    }
+    if let Some(v) = list_get(&list, "remove_navigation") {
+        opts.remove_navigation = bool::try_from(&v).map_err(|e| format!("preprocessing.remove_navigation: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "remove_forms") {
+        opts.remove_forms = bool::try_from(&v).map_err(|e| format!("preprocessing.remove_forms: {e}"))?;
+    }
+
+    Ok(opts)
+}
+
+/// Decode an R ExternalPtr, NULL, or named list into ConversionOptions.
 ///
 /// Accepts:
 /// - ExternalPtr<ConversionOptions> (from $default() or builder methods) — unwraps and converts
 /// - NULL — returns default ConversionOptions
+/// - Named list with field names matching struct fields — decodes field by field
 ///
-/// This function is a placeholder that handles the core ExternalPtr case. Full list-based
-/// field parsing can be added by the project if needed for advanced use cases.
+/// Fields are optional: omitted fields retain their defaults. Unknown fields are ignored.
 pub fn decode_options(options: Robj) -> std::result::Result<crate::ConversionOptions, String> {
     if options.is_null() {
-        return Ok(crate::ConversionOptions::default().into());
+        return Ok(crate::ConversionOptions::default());
     }
 
     // Accept the wrapper struct returned by `ConversionOptions$default()` / builder methods,
@@ -23,6 +163,150 @@ pub fn decode_options(options: Robj) -> std::result::Result<crate::ConversionOpt
         return Ok((*ext).clone().into());
     }
 
-    // If unwrapping as ExternalPtr failed, the input is not a valid options object
-    Err("options must be NULL, or an ExternalPtr from ConversionOptions$default()".to_string())
+    // Try to decode as a named list
+    let list =
+        List::try_from(&options).map_err(|e| format!("options must be NULL, ExternalPtr, or named list: {e}"))?;
+    let mut opts = crate::ConversionOptions::default();
+
+    if let Some(v) = list_get(&list, "heading_style") {
+        opts.heading_style = decode_heading_style(v)?;
+    }
+    if let Some(v) = list_get(&list, "list_indent_type") {
+        opts.list_indent_type = decode_list_indent_type(v)?;
+    }
+    if let Some(v) = list_get(&list, "list_indent_width") {
+        opts.list_indent_width = usize::try_from(&v).map_err(|e| format!("list_indent_width: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "bullets") {
+        opts.bullets = String::try_from(&v).map_err(|e| format!("bullets: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "strong_em_symbol") {
+        let s = String::try_from(&v).map_err(|e| format!("strong_em_symbol: {e}"))?;
+        if s.len() != 1 {
+            return Err("strong_em_symbol: must be a single character string".to_string());
+        }
+        opts.strong_em_symbol = s.chars().next().unwrap();
+    }
+    if let Some(v) = list_get(&list, "escape_asterisks") {
+        opts.escape_asterisks = bool::try_from(&v).map_err(|e| format!("escape_asterisks: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "escape_underscores") {
+        opts.escape_underscores = bool::try_from(&v).map_err(|e| format!("escape_underscores: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "escape_misc") {
+        opts.escape_misc = bool::try_from(&v).map_err(|e| format!("escape_misc: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "escape_ascii") {
+        opts.escape_ascii = bool::try_from(&v).map_err(|e| format!("escape_ascii: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "code_language") {
+        opts.code_language = String::try_from(&v).map_err(|e| format!("code_language: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "autolinks") {
+        opts.autolinks = bool::try_from(&v).map_err(|e| format!("autolinks: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "default_title") {
+        opts.default_title = bool::try_from(&v).map_err(|e| format!("default_title: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "br_in_tables") {
+        opts.br_in_tables = bool::try_from(&v).map_err(|e| format!("br_in_tables: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "compact_tables") {
+        opts.compact_tables = bool::try_from(&v).map_err(|e| format!("compact_tables: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "highlight_style") {
+        opts.highlight_style = decode_highlight_style(v)?;
+    }
+    if let Some(v) = list_get(&list, "extract_metadata") {
+        opts.extract_metadata = bool::try_from(&v).map_err(|e| format!("extract_metadata: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "whitespace_mode") {
+        opts.whitespace_mode = decode_whitespace_mode(v)?;
+    }
+    if let Some(v) = list_get(&list, "strip_newlines") {
+        opts.strip_newlines = bool::try_from(&v).map_err(|e| format!("strip_newlines: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "wrap") {
+        opts.wrap = bool::try_from(&v).map_err(|e| format!("wrap: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "wrap_width") {
+        opts.wrap_width = usize::try_from(&v).map_err(|e| format!("wrap_width: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "convert_as_inline") {
+        opts.convert_as_inline = bool::try_from(&v).map_err(|e| format!("convert_as_inline: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "sub_symbol") {
+        opts.sub_symbol = String::try_from(&v).map_err(|e| format!("sub_symbol: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "sup_symbol") {
+        opts.sup_symbol = String::try_from(&v).map_err(|e| format!("sup_symbol: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "newline_style") {
+        opts.newline_style = decode_newline_style(v)?;
+    }
+    if let Some(v) = list_get(&list, "code_block_style") {
+        opts.code_block_style = decode_code_block_style(v)?;
+    }
+    if let Some(v) = list_get(&list, "keep_inline_images_in") {
+        let strings = Strings::try_from(&v).map_err(|e| format!("keep_inline_images_in: {e}"))?;
+        let vec: Vec<String> = strings.iter().map(|s| s.to_string()).collect();
+        opts.keep_inline_images_in = vec;
+    }
+    if let Some(v) = list_get(&list, "preprocessing") {
+        opts.preprocessing = decode_preprocessing_options(v)?;
+    }
+    if let Some(v) = list_get(&list, "encoding") {
+        opts.encoding = String::try_from(&v).map_err(|e| format!("encoding: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "debug") {
+        opts.debug = bool::try_from(&v).map_err(|e| format!("debug: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "strip_tags") {
+        let strings = Strings::try_from(&v).map_err(|e| format!("strip_tags: {e}"))?;
+        let vec: Vec<String> = strings.iter().map(|s| s.to_string()).collect();
+        opts.strip_tags = vec;
+    }
+    if let Some(v) = list_get(&list, "preserve_tags") {
+        let strings = Strings::try_from(&v).map_err(|e| format!("preserve_tags: {e}"))?;
+        let vec: Vec<String> = strings.iter().map(|s| s.to_string()).collect();
+        opts.preserve_tags = vec;
+    }
+    if let Some(v) = list_get(&list, "skip_images") {
+        opts.skip_images = bool::try_from(&v).map_err(|e| format!("skip_images: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "url_escape_style") {
+        opts.url_escape_style = decode_url_escape_style(v)?;
+    }
+    if let Some(v) = list_get(&list, "link_style") {
+        opts.link_style = decode_link_style(v)?;
+    }
+    if let Some(v) = list_get(&list, "output_format") {
+        opts.output_format = decode_output_format(v)?;
+    }
+    if let Some(v) = list_get(&list, "include_document_structure") {
+        opts.include_document_structure = bool::try_from(&v).map_err(|e| format!("include_document_structure: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "extract_images") {
+        opts.extract_images = bool::try_from(&v).map_err(|e| format!("extract_images: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "max_image_size") {
+        opts.max_image_size = u64::try_from(&v).map_err(|e| format!("max_image_size: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "capture_svg") {
+        opts.capture_svg = bool::try_from(&v).map_err(|e| format!("capture_svg: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "infer_dimensions") {
+        opts.infer_dimensions = bool::try_from(&v).map_err(|e| format!("infer_dimensions: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "max_depth") {
+        opts.max_depth = usize::try_from(&v).map_err(|e| format!("max_depth: {e}"))?;
+    }
+    if let Some(v) = list_get(&list, "exclude_selectors") {
+        let strings = Strings::try_from(&v).map_err(|e| format!("exclude_selectors: {e}"))?;
+        let vec: Vec<String> = strings.iter().map(|s| s.to_string()).collect();
+        opts.exclude_selectors = vec;
+    }
+    // Note: visitor field is skipped — R has no visitor concept, so it remains at default None
+
+    Ok(opts)
 }

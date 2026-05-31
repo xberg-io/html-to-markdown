@@ -49,9 +49,9 @@ enum class PreprocessingPreset {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): PreprocessingPreset = when (value) {
-            "Minimal" -> MINIMAL
-            "Standard" -> STANDARD
-            "Aggressive" -> AGGRESSIVE
+            "Minimal", "minimal" -> MINIMAL
+            "Standard", "standard" -> STANDARD
+            "Aggressive", "aggressive" -> AGGRESSIVE
             else -> throw IllegalArgumentException("Unknown PreprocessingPreset value: $value")
         }
     }

@@ -49,9 +49,9 @@ enum class HeadingStyle {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): HeadingStyle = when (value) {
-            "Underlined" -> UNDERLINED
-            "Atx" -> ATX
-            "AtxClosed" -> ATX_CLOSED
+            "Underlined", "underlined" -> UNDERLINED
+            "Atx", "atx" -> ATX
+            "AtxClosed", "atxclosed" -> ATX_CLOSED
             else -> throw IllegalArgumentException("Unknown HeadingStyle value: $value")
         }
     }

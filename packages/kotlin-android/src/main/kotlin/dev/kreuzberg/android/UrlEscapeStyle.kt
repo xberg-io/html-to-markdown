@@ -54,8 +54,8 @@ enum class UrlEscapeStyle {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): UrlEscapeStyle = when (value) {
-            "Angle" -> ANGLE
-            "Percent" -> PERCENT
+            "Angle", "angle" -> ANGLE
+            "Percent", "percent" -> PERCENT
             else -> throw IllegalArgumentException("Unknown UrlEscapeStyle value: $value")
         }
     }

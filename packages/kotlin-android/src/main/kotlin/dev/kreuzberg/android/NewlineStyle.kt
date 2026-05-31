@@ -45,8 +45,8 @@ enum class NewlineStyle {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): NewlineStyle = when (value) {
-            "Spaces" -> SPACES
-            "Backslash" -> BACKSLASH
+            "Spaces", "spaces" -> SPACES
+            "Backslash", "backslash" -> BACKSLASH
             else -> throw IllegalArgumentException("Unknown NewlineStyle value: $value")
         }
     }

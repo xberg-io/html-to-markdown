@@ -45,8 +45,8 @@ enum class ListIndentType {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): ListIndentType = when (value) {
-            "Spaces" -> SPACES
-            "Tabs" -> TABS
+            "Spaces", "spaces" -> SPACES
+            "Tabs", "tabs" -> TABS
             else -> throw IllegalArgumentException("Unknown ListIndentType value: $value")
         }
     }

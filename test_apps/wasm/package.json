@@ -7,7 +7,7 @@
     "test": "NODE_OPTIONS=--max-old-space-size=4096 vitest run"
   },
   "devDependencies": {
-    "@kreuzberg/html-to-markdown-wasm": "3.5.7",
+    "@kreuzberg/html-to-markdown-wasm": "^3.5.7",
     "rollup": "^4.53.3",
     "vitest": "^4.1.5"
   }

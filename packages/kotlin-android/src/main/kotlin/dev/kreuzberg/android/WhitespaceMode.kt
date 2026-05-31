@@ -47,8 +47,8 @@ enum class WhitespaceMode {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): WhitespaceMode = when (value) {
-            "Normalized" -> NORMALIZED
-            "Strict" -> STRICT
+            "Normalized", "normalized" -> NORMALIZED
+            "Strict", "strict" -> STRICT
             else -> throw IllegalArgumentException("Unknown WhitespaceMode value: $value")
         }
     }

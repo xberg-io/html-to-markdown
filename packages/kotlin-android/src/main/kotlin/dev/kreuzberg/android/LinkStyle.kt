@@ -46,8 +46,8 @@ enum class LinkStyle {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): LinkStyle = when (value) {
-            "Inline" -> INLINE
-            "Reference" -> REFERENCE
+            "Inline", "inline" -> INLINE
+            "Reference", "reference" -> REFERENCE
             else -> throw IllegalArgumentException("Unknown LinkStyle value: $value")
         }
     }

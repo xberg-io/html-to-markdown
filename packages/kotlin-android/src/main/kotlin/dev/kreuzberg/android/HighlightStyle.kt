@@ -53,10 +53,10 @@ enum class HighlightStyle {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): HighlightStyle = when (value) {
-            "DoubleEqual" -> DOUBLE_EQUAL
-            "Html" -> HTML
-            "Bold" -> BOLD
-            "None" -> NONE
+            "DoubleEqual", "doubleequal" -> DOUBLE_EQUAL
+            "Html", "html" -> HTML
+            "Bold", "bold" -> BOLD
+            "None", "none" -> NONE
             else -> throw IllegalArgumentException("Unknown HighlightStyle value: $value")
         }
     }

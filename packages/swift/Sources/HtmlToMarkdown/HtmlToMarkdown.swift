@@ -1153,7 +1153,7 @@ private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8]
 
 public func convert(_ html: String, _ configJson: String) throws -> ConversionResult {
     let config = try conversionOptionsFromJson(configJson)
-    return try convert(html: html, config: config)
+    return try convert(html: html, options: config)
 }
 
 // MARK: - From-JSON Helpers

@@ -55,6 +55,9 @@ dist-web/
 !packages/ruby/lib/**/*.rb
 packages/ruby/lib/bin/
 packages/ruby/lib/**/*.bundle
+packages/ruby/ext/**/*.bundle
+packages/ruby/ext/**/mkmf.log
+packages/ruby/ext/**/Makefile
 packages/ruby/tmp/
 packages/ruby/vendor/html-to-markdown-rs/
 packages/ruby/vendor/Cargo.toml

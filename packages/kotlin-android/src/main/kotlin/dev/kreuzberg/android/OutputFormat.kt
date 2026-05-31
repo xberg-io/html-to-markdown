@@ -49,9 +49,9 @@ enum class OutputFormat {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): OutputFormat = when (value) {
-            "Markdown" -> MARKDOWN
-            "Djot" -> DJOT
-            "Plain" -> PLAIN
+            "Markdown", "markdown" -> MARKDOWN
+            "Djot", "djot" -> DJOT
+            "Plain", "plain" -> PLAIN
             else -> throw IllegalArgumentException("Unknown OutputFormat value: $value")
         }
     }

@@ -389,94 +389,94 @@ enum class NodeType {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): NodeType = when (value) {
-            "Text" -> TEXT
-            "Element" -> ELEMENT
-            "Heading" -> HEADING
-            "Paragraph" -> PARAGRAPH
-            "Div" -> DIV
-            "Blockquote" -> BLOCKQUOTE
-            "Pre" -> PRE
-            "Hr" -> HR
-            "List" -> LIST
-            "ListItem" -> LIST_ITEM
-            "DefinitionList" -> DEFINITION_LIST
-            "DefinitionTerm" -> DEFINITION_TERM
-            "DefinitionDescription" -> DEFINITION_DESCRIPTION
-            "Table" -> TABLE
-            "TableRow" -> TABLE_ROW
-            "TableCell" -> TABLE_CELL
-            "TableHeader" -> TABLE_HEADER
-            "TableBody" -> TABLE_BODY
-            "TableHead" -> TABLE_HEAD
-            "TableFoot" -> TABLE_FOOT
-            "Link" -> LINK
-            "Image" -> IMAGE
-            "Strong" -> STRONG
-            "Em" -> EM
-            "Code" -> CODE
-            "Strikethrough" -> STRIKETHROUGH
-            "Underline" -> UNDERLINE
-            "Subscript" -> SUBSCRIPT
-            "Superscript" -> SUPERSCRIPT
-            "Mark" -> MARK
-            "Small" -> SMALL
-            "Br" -> BR
-            "Span" -> SPAN
-            "Article" -> ARTICLE
-            "Section" -> SECTION
-            "Nav" -> NAV
-            "Aside" -> ASIDE
-            "Header" -> HEADER
-            "Footer" -> FOOTER
-            "Main" -> MAIN
-            "Figure" -> FIGURE
-            "Figcaption" -> FIGCAPTION
-            "Time" -> TIME
-            "Details" -> DETAILS
-            "Summary" -> SUMMARY
-            "Form" -> FORM
-            "Input" -> INPUT
-            "Select" -> SELECT
-            "Option" -> OPTION
-            "Button" -> BUTTON
-            "Textarea" -> TEXTAREA
-            "Label" -> LABEL
-            "Fieldset" -> FIELDSET
-            "Legend" -> LEGEND
-            "Audio" -> AUDIO
-            "Video" -> VIDEO
-            "Picture" -> PICTURE
-            "Source" -> SOURCE
-            "Iframe" -> IFRAME
-            "Svg" -> SVG
-            "Canvas" -> CANVAS
-            "Ruby" -> RUBY
-            "Rt" -> RT
-            "Rp" -> RP
-            "Abbr" -> ABBR
-            "Kbd" -> KBD
-            "Samp" -> SAMP
-            "Var" -> VAR
-            "Cite" -> CITE
-            "Q" -> Q
-            "Del" -> DEL
-            "Ins" -> INS
-            "Data" -> DATA
-            "Meter" -> METER
-            "Progress" -> PROGRESS
-            "Output" -> OUTPUT
-            "Template" -> TEMPLATE
-            "Slot" -> SLOT
-            "Html" -> HTML
-            "Head" -> HEAD
-            "Body" -> BODY
-            "Title" -> TITLE
-            "Meta" -> META
-            "LinkTag" -> LINK_TAG
-            "Style" -> STYLE
-            "Script" -> SCRIPT
-            "Base" -> BASE
-            "Custom" -> CUSTOM
+            "Text", "text" -> TEXT
+            "Element", "element" -> ELEMENT
+            "Heading", "heading" -> HEADING
+            "Paragraph", "paragraph" -> PARAGRAPH
+            "Div", "div" -> DIV
+            "Blockquote", "blockquote" -> BLOCKQUOTE
+            "Pre", "pre" -> PRE
+            "Hr", "hr" -> HR
+            "List", "list" -> LIST
+            "ListItem", "listitem" -> LIST_ITEM
+            "DefinitionList", "definitionlist" -> DEFINITION_LIST
+            "DefinitionTerm", "definitionterm" -> DEFINITION_TERM
+            "DefinitionDescription", "definitiondescription" -> DEFINITION_DESCRIPTION
+            "Table", "table" -> TABLE
+            "TableRow", "tablerow" -> TABLE_ROW
+            "TableCell", "tablecell" -> TABLE_CELL
+            "TableHeader", "tableheader" -> TABLE_HEADER
+            "TableBody", "tablebody" -> TABLE_BODY
+            "TableHead", "tablehead" -> TABLE_HEAD
+            "TableFoot", "tablefoot" -> TABLE_FOOT
+            "Link", "link" -> LINK
+            "Image", "image" -> IMAGE
+            "Strong", "strong" -> STRONG
+            "Em", "em" -> EM
+            "Code", "code" -> CODE
+            "Strikethrough", "strikethrough" -> STRIKETHROUGH
+            "Underline", "underline" -> UNDERLINE
+            "Subscript", "subscript" -> SUBSCRIPT
+            "Superscript", "superscript" -> SUPERSCRIPT
+            "Mark", "mark" -> MARK
+            "Small", "small" -> SMALL
+            "Br", "br" -> BR
+            "Span", "span" -> SPAN
+            "Article", "article" -> ARTICLE
+            "Section", "section" -> SECTION
+            "Nav", "nav" -> NAV
+            "Aside", "aside" -> ASIDE
+            "Header", "header" -> HEADER
+            "Footer", "footer" -> FOOTER
+            "Main", "main" -> MAIN
+            "Figure", "figure" -> FIGURE
+            "Figcaption", "figcaption" -> FIGCAPTION
+            "Time", "time" -> TIME
+            "Details", "details" -> DETAILS
+            "Summary", "summary" -> SUMMARY
+            "Form", "form" -> FORM
+            "Input", "input" -> INPUT
+            "Select", "select" -> SELECT
+            "Option", "option" -> OPTION
+            "Button", "button" -> BUTTON
+            "Textarea", "textarea" -> TEXTAREA
+            "Label", "label" -> LABEL
+            "Fieldset", "fieldset" -> FIELDSET
+            "Legend", "legend" -> LEGEND
+            "Audio", "audio" -> AUDIO
+            "Video", "video" -> VIDEO
+            "Picture", "picture" -> PICTURE
+            "Source", "source" -> SOURCE
+            "Iframe", "iframe" -> IFRAME
+            "Svg", "svg" -> SVG
+            "Canvas", "canvas" -> CANVAS
+            "Ruby", "ruby" -> RUBY
+            "Rt", "rt" -> RT
+            "Rp", "rp" -> RP
+            "Abbr", "abbr" -> ABBR
+            "Kbd", "kbd" -> KBD
+            "Samp", "samp" -> SAMP
+            "Var", "var" -> VAR
+            "Cite", "cite" -> CITE
+            "Q", "q" -> Q
+            "Del", "del" -> DEL
+            "Ins", "ins" -> INS
+            "Data", "data" -> DATA
+            "Meter", "meter" -> METER
+            "Progress", "progress" -> PROGRESS
+            "Output", "output" -> OUTPUT
+            "Template", "template" -> TEMPLATE
+            "Slot", "slot" -> SLOT
+            "Html", "html" -> HTML
+            "Head", "head" -> HEAD
+            "Body", "body" -> BODY
+            "Title", "title" -> TITLE
+            "Meta", "meta" -> META
+            "LinkTag", "linktag" -> LINK_TAG
+            "Style", "style" -> STYLE
+            "Script", "script" -> SCRIPT
+            "Base", "base" -> BASE
+            "Custom", "custom" -> CUSTOM
             else -> throw IllegalArgumentException("Unknown NodeType value: $value")
         }
     }

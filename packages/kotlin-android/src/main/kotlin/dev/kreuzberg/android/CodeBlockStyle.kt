@@ -49,9 +49,9 @@ enum class CodeBlockStyle {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
         fun fromWire(value: String): CodeBlockStyle = when (value) {
-            "Indented" -> INDENTED
-            "Backticks" -> BACKTICKS
-            "Tildes" -> TILDES
+            "Indented", "indented" -> INDENTED
+            "Backticks", "backticks" -> BACKTICKS
+            "Tildes", "tildes" -> TILDES
             else -> throw IllegalArgumentException("Unknown CodeBlockStyle value: $value")
         }
     }

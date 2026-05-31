@@ -22,7 +22,6 @@ export {
 export type {
   AnnotationKind,
   ConversionOptions,
-  ConversionOptionsUpdate,
   ConversionResult,
   DocumentMetadata,
   DocumentNode,
@@ -35,7 +34,6 @@ export type {
   NodeContent,
   NodeContext,
   PreprocessingOptions,
-  PreprocessingOptionsUpdate,
   ProcessingWarning,
   StructuredData,
   TableData,
