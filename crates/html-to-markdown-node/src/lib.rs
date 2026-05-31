@@ -1498,7 +1498,6 @@ pub fn convert(
 use napi::JsValue;
 #[allow(unused_imports)]
 use napi::bindgen_prelude::{JsObjectValue, Object, ToNapiValue, Unknown};
-use std::sync::Mutex;
 
 fn nodecontext_to_js_object<'e>(
     env: &'e napi::Env,
@@ -1526,13 +1525,6 @@ fn nodecontext_to_js_object<'e>(
     }
     obj.set_named_property("attributes", attrs)?;
     Ok(obj)
-}
-
-/// Thread-safe visitor bridge result that can be shared across threads.
-#[derive(Debug, Clone)]
-struct CallResult {
-    is_error: bool,
-    message: String,
 }
 
 pub struct JsHtmlVisitorBridge {
@@ -1579,7 +1571,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1664,7 +1656,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1745,7 +1737,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1836,7 +1828,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -1955,7 +1947,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2074,7 +2066,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2192,7 +2184,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2300,7 +2292,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2391,7 +2383,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2498,7 +2490,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2585,7 +2577,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2679,7 +2671,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2761,7 +2753,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2859,7 +2851,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -2949,7 +2941,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3050,7 +3042,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3139,7 +3131,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3228,7 +3220,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3317,7 +3309,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3406,7 +3398,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3495,7 +3487,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3580,7 +3572,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3665,7 +3657,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3742,7 +3734,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3824,7 +3816,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -3924,7 +3916,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4005,7 +3997,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4094,7 +4086,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4183,7 +4175,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4273,7 +4265,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4390,7 +4382,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4514,7 +4506,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4603,7 +4595,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4699,7 +4691,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4795,7 +4787,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4891,7 +4883,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -4977,7 +4969,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -5062,7 +5054,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -5143,7 +5135,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<
@@ -5232,7 +5224,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for JsHtmlVisitorBridge {
         // SAFETY: env and obj are raw NAPI pointers stored at initialization time.
         // We reconstruct the Env and Object from these pointers to call the JS function.
         let __env = unsafe { napi::Env::from_raw(self.env) };
-        let obj = unsafe { napi::bindgen_prelude::Object::from_raw_unchecked(__env.raw(), self.obj) };
+        let obj = napi::bindgen_prelude::Object::from_raw(__env.raw(), self.obj);
 
         // Try to get the JS function from the object
         let func: napi::bindgen_prelude::Function<

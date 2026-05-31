@@ -57,7 +57,7 @@
     },
     {
       "name": "h2m",
-      "version": "3.5.0",
+      "version": "3.5.7",
       "dependencies": [
         "flutter_rust_bridge",
         "freezed_annotation",

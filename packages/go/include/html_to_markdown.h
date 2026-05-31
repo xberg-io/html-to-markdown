@@ -367,6 +367,21 @@ typedef struct HTMTextAnnotation HTMTextAnnotation;
  */
 typedef struct HTMTextDirection HTMTextDirection;
 /**
+ * URL encoding strategy for link and image destinations.
+ *
+ * Controls how special characters in URL destinations are handled when they
+ * require escaping to produce valid Markdown.
+ *
+ * The `Angle` variant (default) wraps the destination in angle brackets:
+ * `text (<url with spaces>)`. This is the CommonMark-specified escape hatch
+ * but breaks when the URL itself contains `>`.
+ *
+ * The `Percent` variant percent-encodes every character that is not an RFC 3986
+ * unreserved character or `/`, producing a destination safe for all Markdown
+ * parsers: `text (url%20with%20spaces)`.
+ */
+typedef struct HTMUrlEscapeStyle HTMUrlEscapeStyle;
+/**
  * Result of a visitor callback.
  *
  * Allows visitors to control the conversion flow by either proceeding
@@ -1999,6 +2014,13 @@ char *htm_conversion_options_preserve_tags(const HTMConversionOptions *ptr);
 int32_t htm_conversion_options_skip_images(const HTMConversionOptions *ptr);
 
 /**
+ * Get the `url_escape_style` field from a `ConversionOptions`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMUrlEscapeStyle *htm_conversion_options_url_escape_style(const HTMConversionOptions *ptr);
+
+/**
  * Get the `link_style` field from a `ConversionOptions`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -2312,6 +2334,13 @@ char *htm_conversion_options_update_preserve_tags(const HTMConversionOptionsUpda
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_update_skip_images(const HTMConversionOptionsUpdate *ptr);
+
+/**
+ * Get the `url_escape_style` field from a `ConversionOptionsUpdate`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMUrlEscapeStyle *htm_conversion_options_update_url_escape_style(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `link_style` field from a `ConversionOptionsUpdate`.
@@ -3130,6 +3159,21 @@ int32_t htm_link_style_from_i32(int32_t value);
 int32_t htm_link_style_from_str(const char *name);
 
 /**
+ * Convert an integer to a `UrlEscapeStyle` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t htm_url_escape_style_from_i32(int32_t value);
+
+/**
+ * Convert a `UrlEscapeStyle` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t htm_url_escape_style_from_str(const char *name);
+
+/**
  * Convert an integer to a `OutputFormat` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -3374,6 +3418,13 @@ void htm_highlight_style_free(HTMHighlightStyle *ptr);
  * Pointer must have been returned by this library, or be null.
  */
 void htm_link_style_free(HTMLinkStyle *ptr);
+
+/**
+ * Free a heap-allocated `UrlEscapeStyle` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_url_escape_style_free(HTMUrlEscapeStyle *ptr);
 
 /**
  * Free a heap-allocated `OutputFormat` returned by a pointer-returning FFI function.

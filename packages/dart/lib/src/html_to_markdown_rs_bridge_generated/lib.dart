@@ -9,7 +9,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ConversionError`, `HtmlVisitorDartImpl`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
@@ -416,6 +416,16 @@ class ConversionOptions {
   /// Skip conversion of `<img>` elements (omit images from output).
   final bool skipImages;
 
+  /// URL encoding strategy for link and image destinations.
+  ///
+  /// Controls how special characters in URL destinations are escaped:
+  /// - [`UrlEscapeStyle::Angle`] (default) — wraps the destination in angle brackets when it
+  ///   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
+  /// - [`UrlEscapeStyle::Percent`] — percent-encodes every character that is not an RFC 3986
+  ///   unreserved character or `/`, producing a destination that all Markdown parsers handle
+  ///   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
+  final UrlEscapeStyle urlEscapeStyle;
+
   /// Link rendering style (inline or reference).
   final LinkStyle linkStyle;
 
@@ -493,6 +503,7 @@ class ConversionOptions {
     required this.stripTags,
     required this.preserveTags,
     required this.skipImages,
+    required this.urlEscapeStyle,
     required this.linkStyle,
     required this.outputFormat,
     required this.includeDocumentStructure,
@@ -539,6 +550,7 @@ class ConversionOptions {
       stripTags.hashCode ^
       preserveTags.hashCode ^
       skipImages.hashCode ^
+      urlEscapeStyle.hashCode ^
       linkStyle.hashCode ^
       outputFormat.hashCode ^
       includeDocumentStructure.hashCode ^
@@ -587,6 +599,7 @@ class ConversionOptions {
           stripTags == other.stripTags &&
           preserveTags == other.preserveTags &&
           skipImages == other.skipImages &&
+          urlEscapeStyle == other.urlEscapeStyle &&
           linkStyle == other.linkStyle &&
           outputFormat == other.outputFormat &&
           includeDocumentStructure == other.includeDocumentStructure &&
@@ -700,6 +713,9 @@ class ConversionOptionsUpdate {
   /// Optional override for [`ConversionOptions::skip_images`].
   final bool? skipImages;
 
+  /// Optional override for [`ConversionOptions::url_escape_style`].
+  final UrlEscapeStyle? urlEscapeStyle;
+
   /// Optional override for [`ConversionOptions::link_style`].
   final LinkStyle? linkStyle;
 
@@ -763,6 +779,7 @@ class ConversionOptionsUpdate {
     this.stripTags,
     this.preserveTags,
     this.skipImages,
+    this.urlEscapeStyle,
     this.linkStyle,
     this.outputFormat,
     this.includeDocumentStructure,
@@ -809,6 +826,7 @@ class ConversionOptionsUpdate {
       stripTags.hashCode ^
       preserveTags.hashCode ^
       skipImages.hashCode ^
+      urlEscapeStyle.hashCode ^
       linkStyle.hashCode ^
       outputFormat.hashCode ^
       includeDocumentStructure.hashCode ^
@@ -857,6 +875,7 @@ class ConversionOptionsUpdate {
           stripTags == other.stripTags &&
           preserveTags == other.preserveTags &&
           skipImages == other.skipImages &&
+          urlEscapeStyle == other.urlEscapeStyle &&
           linkStyle == other.linkStyle &&
           outputFormat == other.outputFormat &&
           includeDocumentStructure == other.includeDocumentStructure &&
@@ -2310,6 +2329,26 @@ enum TextDirection {
 
   /// Automatic directionality detection
   auto,
+}
+
+/// URL encoding strategy for link and image destinations.
+///
+/// Controls how special characters in URL destinations are handled when they
+/// require escaping to produce valid Markdown.
+///
+/// The `Angle` variant (default) wraps the destination in angle brackets:
+/// `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+/// but breaks when the URL itself contains `>`.
+///
+/// The `Percent` variant percent-encodes every character that is not an RFC 3986
+/// unreserved character or `/`, producing a destination safe for all Markdown
+/// parsers: `[text](url%20with%20spaces)`.
+enum UrlEscapeStyle {
+  /// Wrap destinations that contain spaces or newlines in angle brackets. Default.
+  angle,
+
+  /// Percent-encode all characters that are not RFC 3986 unreserved or `/`.
+  percent,
 }
 
 @freezed

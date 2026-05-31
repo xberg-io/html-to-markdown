@@ -189,6 +189,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TextDirection dco_decode_box_autoadd_text_direction(dynamic raw);
 
   @protected
+  UrlEscapeStyle dco_decode_box_autoadd_url_escape_style(dynamic raw);
+
+  @protected
   WhitespaceMode dco_decode_box_autoadd_whitespace_mode(dynamic raw);
 
   @protected
@@ -366,6 +369,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw);
 
   @protected
+  UrlEscapeStyle? dco_decode_opt_box_autoadd_url_escape_style(dynamic raw);
+
+  @protected
   WhitespaceMode? dco_decode_opt_box_autoadd_whitespace_mode(dynamic raw);
 
   @protected
@@ -417,6 +423,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void dco_decode_unit(dynamic raw);
+
+  @protected
+  UrlEscapeStyle dco_decode_url_escape_style(dynamic raw);
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
@@ -533,6 +542,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TextDirection sse_decode_box_autoadd_text_direction(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  UrlEscapeStyle sse_decode_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   );
 
@@ -758,6 +772,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  UrlEscapeStyle? sse_decode_opt_box_autoadd_url_escape_style(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   WhitespaceMode? sse_decode_opt_box_autoadd_whitespace_mode(
     SseDeserializer deserializer,
   );
@@ -819,6 +838,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_decode_unit(SseDeserializer deserializer);
+
+  @protected
+  UrlEscapeStyle sse_decode_url_escape_style(SseDeserializer deserializer);
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
@@ -1063,6 +1085,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_text_direction(
     TextDirection self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_url_escape_style(
+    UrlEscapeStyle self,
     SseSerializer serializer,
   );
 
@@ -1350,6 +1378,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_url_escape_style(
+    UrlEscapeStyle? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_whitespace_mode(
     WhitespaceMode? self,
     SseSerializer serializer,
@@ -1429,6 +1463,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_url_escape_style(
+    UrlEscapeStyle self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
