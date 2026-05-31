@@ -130,6 +130,8 @@ test_apps/c/test_*
 !test_apps/c/test_*.c
 test_apps/c/*.o
 test_apps/c/*.dSYM/
+# Download cache (populated by download_ffi.sh at smoke time).
+test_apps/c/ffi/
 
 # Vendor / package managers
 **/vendor/
