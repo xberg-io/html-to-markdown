@@ -559,12 +559,24 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.node]
 module = "@kreuzberg/html-to-markdown"
 function = "convert"
 options_type = "ConversionOptions"
 enum_module = "html_to_markdown._html_to_markdown"
+
+[crates.e2e.call.overrides.node.enum_fields]
+headingStyle = "HeadingStyle"
+codeBlockStyle = "CodeBlockStyle"
+listIndentType = "ListIndentType"
+newlineStyle = "NewlineStyle"
+whitespaceMode = "WhitespaceMode"
+highlightStyle = "HighlightStyle"
+linkStyle = "LinkStyle"
+outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
@@ -590,6 +602,7 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.java.nested_types]
 preprocessing = "PreprocessingOptions"
@@ -608,6 +621,7 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.csharp.nested_types]
 preprocessing = "PreprocessingOptions"
@@ -628,6 +642,7 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.ruby]
 module = "html_to_markdown"
@@ -642,6 +657,7 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.elixir]
 module = "HtmlToMarkdown"
@@ -658,6 +674,7 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.r]
 module = "html_to_markdown"
@@ -678,6 +695,7 @@ whitespaceMode = "WasmWhitespaceMode"
 highlightStyle = "WasmHighlightStyle"
 linkStyle = "WasmLinkStyle"
 outputFormat = "WasmOutputFormat"
+urlEscapeStyle = "WasmUrlEscapeStyle"
 preset = "WasmPreprocessingPreset"
 
 [crates.e2e.call.overrides.wasm.nested_types]
@@ -703,6 +721,7 @@ whitespaceMode = "WhitespaceMode"
 highlightStyle = "HighlightStyle"
 linkStyle = "LinkStyle"
 outputFormat = "OutputFormat"
+urlEscapeStyle = "UrlEscapeStyle"
 
 [crates.e2e.call.overrides.swift]
 module = "HtmlToMarkdown"
