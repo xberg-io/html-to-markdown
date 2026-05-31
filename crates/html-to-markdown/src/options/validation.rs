@@ -206,6 +206,42 @@ impl LinkStyle {
     }
 }
 
+/// URL encoding strategy for link and image destinations.
+///
+/// Controls how special characters in URL destinations are handled when they
+/// require escaping to produce valid Markdown.
+///
+/// The `Angle` variant (default) wraps the destination in angle brackets:
+/// `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+/// but breaks when the URL itself contains `>`.
+///
+/// The `Percent` variant percent-encodes every character that is not an RFC 3986
+/// unreserved character or `/`, producing a destination safe for all Markdown
+/// parsers: `[text](url%20with%20spaces)`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum UrlEscapeStyle {
+    /// Wrap destinations that contain spaces or newlines in angle brackets. Default.
+    #[default]
+    Angle,
+    /// Percent-encode all characters that are not RFC 3986 unreserved or `/`.
+    Percent,
+}
+
+impl UrlEscapeStyle {
+    /// Parse a URL escape style from a string.
+    ///
+    /// Accepts "percent" or defaults to Angle.
+    /// Input is normalized (lowercased, alphanumeric only).
+    #[must_use]
+    #[cfg_attr(alef, alef(skip))]
+    pub fn parse(value: &str) -> Self {
+        match normalize_token(value).as_str() {
+            "percent" => Self::Percent,
+            _ => Self::Angle,
+        }
+    }
+}
+
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.
@@ -251,7 +287,7 @@ pub(crate) fn normalize_token(value: &str) -> String {
 mod serde_impls {
     use super::{
         CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
-        WhitespaceMode,
+        UrlEscapeStyle, WhitespaceMode,
     };
     use serde::{Deserialize, Serialize, Serializer};
 
@@ -276,6 +312,7 @@ mod serde_impls {
     impl_deserialize_from_parse!(CodeBlockStyle, CodeBlockStyle::parse);
     impl_deserialize_from_parse!(HighlightStyle, HighlightStyle::parse);
     impl_deserialize_from_parse!(LinkStyle, LinkStyle::parse);
+    impl_deserialize_from_parse!(UrlEscapeStyle, UrlEscapeStyle::parse);
     impl_deserialize_from_parse!(OutputFormat, OutputFormat::parse);
 
     // Serialize implementations that convert enum variants to their string representations
@@ -369,6 +406,19 @@ mod serde_impls {
             let s = match self {
                 Self::Inline => "inline",
                 Self::Reference => "reference",
+            };
+            serializer.serialize_str(s)
+        }
+    }
+
+    impl Serialize for UrlEscapeStyle {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            let s = match self {
+                Self::Angle => "angle",
+                Self::Percent => "percent",
             };
             serializer.serialize_str(s)
         }

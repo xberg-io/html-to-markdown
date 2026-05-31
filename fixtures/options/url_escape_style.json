@@ -1,0 +1,75 @@
+[
+  {
+    "id": "options_url_escape_style_angle_default",
+    "description": "Default angle style wraps URLs containing spaces in angle brackets",
+    "input": {
+      "html": "<a href=\"/file (1).pdf\">file</a>",
+      "options": {
+        "url_escape_style": "angle"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "</file (1).pdf>"
+      }
+    ]
+  },
+  {
+    "id": "options_url_escape_style_percent_link",
+    "description": "Percent style encodes spaces and parens in link URLs",
+    "input": {
+      "html": "<a href=\"/file (1).pdf\">file</a>",
+      "options": {
+        "url_escape_style": "percent"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "/file%20%281%29.pdf"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "</"
+      }
+    ]
+  },
+  {
+    "id": "options_url_escape_style_percent_angle_brackets_in_url",
+    "description": "Percent style encodes angle brackets in link URLs from issue 392",
+    "input": {
+      "html": "<a href=\"/file (1) <draft>.pdf\">file</a>",
+      "options": {
+        "url_escape_style": "percent"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "/file%20%281%29%20%3Cdraft%3E.pdf"
+      }
+    ]
+  },
+  {
+    "id": "options_url_escape_style_percent_image",
+    "description": "Percent style encodes special characters in image src URLs",
+    "input": {
+      "html": "<img src=\"/img (1) <draft>.png\" alt=\"alt\">",
+      "options": {
+        "url_escape_style": "percent"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "/img%20%281%29%20%3Cdraft%3E.png"
+      }
+    ]
+  }
+]

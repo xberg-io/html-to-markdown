@@ -51,6 +51,7 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
             .clone()
             .unwrap_or(defaults.keep_inline_images_in),
         link_style: cli.link_style.map_or(defaults.link_style, Into::into),
+        url_escape_style: defaults.url_escape_style,
         skip_images: cli.skip_images,
         preprocessing,
         encoding: cli.encoding.clone(),

@@ -153,6 +153,7 @@ pub fn handle_img(
                 title.as_deref(),
                 should_use_alt_text,
                 options.link_style,
+                options.url_escape_style,
                 ctx.reference_collector.as_ref(),
             )),
             VisitResult::Custom(custom) => Some(custom),
@@ -172,6 +173,7 @@ pub fn handle_img(
             title.as_deref(),
             should_use_alt_text,
             options.link_style,
+            options.url_escape_style,
             ctx.reference_collector.as_ref(),
         ))
     };
@@ -183,6 +185,7 @@ pub fn handle_img(
         title.as_deref(),
         should_use_alt_text,
         options.link_style,
+        options.url_escape_style,
         ctx.reference_collector.as_ref(),
     ));
 
@@ -226,12 +229,17 @@ pub fn handle_img(
 ///
 /// If `use_alt_only` is true, returns just the alt text.
 /// Otherwise returns the full `![alt](src "title")` syntax.
+///
+/// The `url_escape_style` controls how the `src` URL is escaped:
+/// - [`UrlEscapeStyle::Angle`] (default) — wraps `src` in angle brackets when it contains spaces.
+/// - [`UrlEscapeStyle::Percent`] — percent-encodes every non-unreserved character.
 fn format_image_markdown(
     src: &str,
     alt: &str,
     title: Option<&str>,
     use_alt_only: bool,
     link_style: crate::options::validation::LinkStyle,
+    url_escape_style: crate::options::validation::UrlEscapeStyle,
     reference_collector: Option<&crate::converter::reference_collector::ReferenceCollectorHandle>,
 ) -> String {
     if use_alt_only {
@@ -256,6 +264,9 @@ fn format_image_markdown(
 
     if src.is_empty() {
         buf.push_str("<>");
+    } else if url_escape_style == crate::options::validation::UrlEscapeStyle::Percent {
+        let encoded = crate::converter::inline::link::percent_encode_url(src);
+        buf.push_str(&encoded);
     } else if src.contains(' ') || src.contains('\n') {
         buf.push('<');
         buf.push_str(src);
@@ -279,4 +290,66 @@ fn format_image_markdown(
     }
     buf.push(')');
     buf
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::options::validation::{LinkStyle, UrlEscapeStyle};
+
+    #[test]
+    fn format_image_markdown_angle_wraps_space() {
+        let result = format_image_markdown(
+            "/img (1).png",
+            "alt",
+            None,
+            false,
+            LinkStyle::Inline,
+            UrlEscapeStyle::Angle,
+            None,
+        );
+        assert_eq!(result, "![alt](</img (1).png>)");
+    }
+
+    #[test]
+    fn format_image_markdown_percent_encodes_space_and_parens() {
+        let result = format_image_markdown(
+            "/img (1).png",
+            "alt",
+            None,
+            false,
+            LinkStyle::Inline,
+            UrlEscapeStyle::Percent,
+            None,
+        );
+        assert_eq!(result, "![alt](/img%20%281%29.png)");
+    }
+
+    #[test]
+    fn format_image_markdown_percent_encodes_angle_brackets() {
+        let result = format_image_markdown(
+            "/img (1) <draft>.png",
+            "alt",
+            None,
+            false,
+            LinkStyle::Inline,
+            UrlEscapeStyle::Percent,
+            None,
+        );
+        assert_eq!(result, "![alt](/img%20%281%29%20%3Cdraft%3E.png)");
+    }
+
+    #[test]
+    fn format_image_markdown_angle_plain_url_unchanged() {
+        let result = format_image_markdown(
+            "https://example.com/img.png",
+            "photo",
+            None,
+            false,
+            LinkStyle::Inline,
+            UrlEscapeStyle::Angle,
+            None,
+        );
+        assert_eq!(result, "![photo](https://example.com/img.png)");
+    }
 }

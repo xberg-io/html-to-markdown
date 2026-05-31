@@ -4,7 +4,8 @@
 
 use crate::options::preprocessing::PreprocessingOptions;
 use crate::options::validation::{
-    CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat, WhitespaceMode,
+    CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
+    UrlEscapeStyle, WhitespaceMode,
 };
 
 /// Main conversion options for HTML to Markdown conversion.
@@ -123,6 +124,15 @@ pub struct ConversionOptions {
     pub preserve_tags: Vec<String>,
     /// Skip conversion of `<img>` elements (omit images from output).
     pub skip_images: bool,
+    /// URL encoding strategy for link and image destinations.
+    ///
+    /// Controls how special characters in URL destinations are escaped:
+    /// - [`UrlEscapeStyle::Angle`] (default) — wraps the destination in angle brackets when it
+    ///   contains spaces or newlines. Some parsers misinterpret `>` inside such a destination.
+    /// - [`UrlEscapeStyle::Percent`] — percent-encodes every character that is not an RFC 3986
+    ///   unreserved character or `/`, producing a destination that all Markdown parsers handle
+    ///   correctly even when the URL contains `<`, `>`, spaces, or parentheses.
+    pub url_escape_style: UrlEscapeStyle,
     /// Link rendering style (inline or reference).
     pub link_style: LinkStyle,
     /// Target output format (Markdown, plain text, etc.).
@@ -198,6 +208,7 @@ impl Default for ConversionOptions {
             strip_tags: Vec::new(),
             preserve_tags: Vec::new(),
             skip_images: false,
+            url_escape_style: UrlEscapeStyle::default(),
             link_style: LinkStyle::default(),
             output_format: OutputFormat::default(),
             include_document_structure: false,
@@ -316,6 +327,7 @@ impl ConversionOptionsBuilder {
     // Element handling
     builder_setter!(convert_as_inline, bool);
     builder_setter!(skip_images, bool);
+    builder_setter!(url_escape_style, UrlEscapeStyle);
 
     /// Set the list of HTML tag names whose content is stripped from output.
     #[must_use]
@@ -459,6 +471,8 @@ pub struct ConversionOptionsUpdate {
     pub preserve_tags: Option<Vec<String>>,
     /// Optional override for [`ConversionOptions::skip_images`].
     pub skip_images: Option<bool>,
+    /// Optional override for [`ConversionOptions::url_escape_style`].
+    pub url_escape_style: Option<UrlEscapeStyle>,
     /// Optional override for [`ConversionOptions::link_style`].
     pub link_style: Option<LinkStyle>,
     /// Optional override for [`ConversionOptions::output_format`].
@@ -525,6 +539,7 @@ impl ConversionOptions {
         apply!(strip_tags);
         apply!(preserve_tags);
         apply!(skip_images);
+        apply!(url_escape_style);
         apply!(link_style);
         apply!(output_format);
         apply!(include_document_structure);

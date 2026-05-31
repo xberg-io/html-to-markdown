@@ -344,13 +344,46 @@ pub fn handle(
     }
 }
 
+/// Percent-encode a URL destination.
+///
+/// Encodes every character that is not an RFC 3986 unreserved character (`A-Z`, `a-z`, `0-9`,
+/// `-`, `_`, `.`, `~`) or a forward slash (`/`). This produces a destination that all
+/// Markdown parsers handle correctly even when the original URL contains `<`, `>`, spaces,
+/// or parentheses.
+#[must_use]
+pub fn percent_encode_url(url: &str) -> String {
+    let mut encoded = String::with_capacity(url.len() * 2);
+    for byte in url.bytes() {
+        match byte {
+            // RFC 3986 unreserved characters plus slash
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' | b'/' => {
+                encoded.push(byte as char);
+            }
+            other => {
+                encoded.push('%');
+                let hi = char::from_digit(u32::from(other >> 4), 16)
+                    .unwrap_or('0')
+                    .to_ascii_uppercase();
+                let lo = char::from_digit(u32::from(other & 0x0f), 16)
+                    .unwrap_or('0')
+                    .to_ascii_uppercase();
+                encoded.push(hi);
+                encoded.push(lo);
+            }
+        }
+    }
+    encoded
+}
+
 /// Format and append a Markdown link to the output string.
 ///
 /// Generates the link syntax: `[label](href "title")`
 /// Handles special cases:
 /// - Empty href renders as `[label]()`
-/// - Hrefs with spaces/newlines get wrapped in angle brackets: `[label](<URL with spaces>)`
-/// - Unbalanced parentheses in href get escaped: `[label](url\(example\))`
+/// - With `UrlEscapeStyle::Angle` (default): hrefs with spaces/newlines get wrapped in angle
+///   brackets: `[label](<URL with spaces>)`
+/// - With `UrlEscapeStyle::Percent`: every non-unreserved character is percent-encoded
+/// - Unbalanced parentheses in href get escaped when using `Angle` style
 /// - Titles are wrapped in quotes and quotes inside are escaped
 /// - When `default_title` option is true and raw_text equals href, adds href as title
 ///
@@ -388,6 +421,9 @@ pub fn append_markdown_link(
 
     if href.is_empty() {
         output.push_str("<>");
+    } else if options.url_escape_style == crate::options::validation::UrlEscapeStyle::Percent {
+        let encoded = percent_encode_url(href);
+        output.push_str(&encoded);
     } else if href.contains(' ') || href.contains('\n') {
         output.push('<');
         output.push_str(href);
@@ -425,4 +461,102 @@ pub fn append_markdown_link(
     }
 
     output.push(')');
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::options::validation::UrlEscapeStyle;
+
+    fn opts_with_style(style: UrlEscapeStyle) -> ConversionOptions {
+        ConversionOptions::builder().url_escape_style(style).build()
+    }
+
+    // ── percent_encode_url ───────────────────────────────────────────────────
+
+    #[test]
+    fn percent_encode_url_leaves_unreserved_chars_unchanged() {
+        // Note: ':' and '/' are outside the strict unreserved set, but '/' is explicitly allowed
+        let result = percent_encode_url("/path-to_file.html~");
+        assert_eq!(result, "/path-to_file.html~");
+    }
+
+    #[test]
+    fn percent_encode_url_encodes_spaces() {
+        assert_eq!(percent_encode_url("/file (1).pdf"), "/file%20%281%29.pdf");
+    }
+
+    #[test]
+    fn percent_encode_url_encodes_angle_brackets() {
+        assert_eq!(percent_encode_url("/file <draft>.pdf"), "/file%20%3Cdraft%3E.pdf");
+    }
+
+    #[test]
+    fn percent_encode_url_full_issue_example() {
+        // Reproduces the exact example from GitHub issue #392
+        assert_eq!(
+            percent_encode_url("/file (1) <draft>.pdf"),
+            "/file%20%281%29%20%3Cdraft%3E.pdf"
+        );
+    }
+
+    // ── append_markdown_link with Angle style (default) ──────────────────────
+
+    #[test]
+    fn append_markdown_link_angle_plain_url_unchanged() {
+        let mut out = String::new();
+        let options = opts_with_style(UrlEscapeStyle::Angle);
+        append_markdown_link(&mut out, "text", "/file.pdf", None, "text", &options, None);
+        assert_eq!(out, "[text](/file.pdf)");
+    }
+
+    #[test]
+    fn append_markdown_link_angle_wraps_space_in_angle_brackets() {
+        let mut out = String::new();
+        let options = opts_with_style(UrlEscapeStyle::Angle);
+        append_markdown_link(&mut out, "file", "/file (1).pdf", None, "file", &options, None);
+        assert_eq!(out, "[file](</file (1).pdf>)");
+    }
+
+    // ── append_markdown_link with Percent style ───────────────────────────────
+
+    #[test]
+    fn append_markdown_link_percent_encodes_spaces() {
+        let mut out = String::new();
+        let options = opts_with_style(UrlEscapeStyle::Percent);
+        append_markdown_link(&mut out, "file", "/file (1).pdf", None, "file", &options, None);
+        assert_eq!(out, "[file](/file%20%281%29.pdf)");
+    }
+
+    #[test]
+    fn append_markdown_link_percent_encodes_angle_brackets() {
+        let mut out = String::new();
+        let options = opts_with_style(UrlEscapeStyle::Percent);
+        append_markdown_link(&mut out, "file", "/file <draft>.pdf", None, "file", &options, None);
+        assert_eq!(out, "[file](/file%20%3Cdraft%3E.pdf)");
+    }
+
+    #[test]
+    fn append_markdown_link_percent_full_issue_example() {
+        let mut out = String::new();
+        let options = opts_with_style(UrlEscapeStyle::Percent);
+        append_markdown_link(&mut out, "file", "/file (1) <draft>.pdf", None, "file", &options, None);
+        assert_eq!(out, "[file](/file%20%281%29%20%3Cdraft%3E.pdf)");
+    }
+
+    #[test]
+    fn append_markdown_link_percent_preserves_title() {
+        let mut out = String::new();
+        let options = opts_with_style(UrlEscapeStyle::Percent);
+        append_markdown_link(
+            &mut out,
+            "link",
+            "/path with spaces",
+            Some("My Title"),
+            "link",
+            &options,
+            None,
+        );
+        assert_eq!(out, "[link](/path%20with%20spaces \"My Title\")");
+    }
 }

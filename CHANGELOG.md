@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`url_escape_style` option** (`UrlEscapeStyle::Angle` | `UrlEscapeStyle::Percent`). When set
+  to `Percent`, link and image destinations are percent-encoded instead of wrapped in angle
+  brackets, producing output that all Markdown parsers handle correctly even when the URL
+  contains `<`, `>`, spaces, or parentheses (resolves #392).
+
 ### Chore
 
 - **alef pin: 0.20.12 → 0.21.0** (local unreleased head). Regen of all bindings + e2e

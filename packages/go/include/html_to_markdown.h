@@ -1302,15 +1302,15 @@ typedef struct HTMHtmHtmlVisitorVTable {
  * Return the last error code (0 means no error).
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
+ * This function does not allocate and returns no owned pointer.
  */
 int32_t htm_last_error_code(void);
 
 /**
- * Return the last error message. The pointer is valid until the next FFI call on this thread.
+ * Return the last error message. The pointer is borrowed and valid until the next FFI call on this thread.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
+ * The returned pointer is borrowed from thread-local storage and must NOT be freed.
  */
 const char *htm_last_error_context(void);
 
