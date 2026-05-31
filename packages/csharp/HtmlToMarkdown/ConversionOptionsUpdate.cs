@@ -24,13 +24,13 @@ public sealed record ConversionOptionsUpdate
     /// Optional override for `ConversionOptions.heading_style`.
     /// </summary>
     [JsonPropertyName("heading_style")]
-    public JsonElement? HeadingStyle { get; init; } = null;
+    public HeadingStyle? HeadingStyle { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.list_indent_type`.
     /// </summary>
     [JsonPropertyName("list_indent_type")]
-    public JsonElement? ListIndentType { get; init; } = null;
+    public ListIndentType? ListIndentType { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.list_indent_width`.
@@ -108,7 +108,7 @@ public sealed record ConversionOptionsUpdate
     /// Optional override for `ConversionOptions.highlight_style`.
     /// </summary>
     [JsonPropertyName("highlight_style")]
-    public JsonElement? HighlightStyle { get; init; } = null;
+    public HighlightStyle? HighlightStyle { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.extract_metadata`.
@@ -120,7 +120,7 @@ public sealed record ConversionOptionsUpdate
     /// Optional override for `ConversionOptions.whitespace_mode`.
     /// </summary>
     [JsonPropertyName("whitespace_mode")]
-    public JsonElement? WhitespaceMode { get; init; } = null;
+    public WhitespaceMode? WhitespaceMode { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.strip_newlines`.
@@ -162,13 +162,13 @@ public sealed record ConversionOptionsUpdate
     /// Optional override for `ConversionOptions.newline_style`.
     /// </summary>
     [JsonPropertyName("newline_style")]
-    public JsonElement? NewlineStyle { get; init; } = null;
+    public NewlineStyle? NewlineStyle { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.code_block_style`.
     /// </summary>
     [JsonPropertyName("code_block_style")]
-    public JsonElement? CodeBlockStyle { get; init; } = null;
+    public CodeBlockStyle? CodeBlockStyle { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.keep_inline_images_in`.
@@ -216,19 +216,19 @@ public sealed record ConversionOptionsUpdate
     /// Optional override for `ConversionOptions.url_escape_style`.
     /// </summary>
     [JsonPropertyName("url_escape_style")]
-    public JsonElement? UrlEscapeStyle { get; init; } = null;
+    public UrlEscapeStyle? UrlEscapeStyle { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.link_style`.
     /// </summary>
     [JsonPropertyName("link_style")]
-    public JsonElement? LinkStyle { get; init; } = null;
+    public LinkStyle? LinkStyle { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.output_format`.
     /// </summary>
     [JsonPropertyName("output_format")]
-    public JsonElement? OutputFormat { get; init; } = null;
+    public OutputFormat? OutputFormat { get; init; } = null;
 
     /// <summary>
     /// Optional override for `ConversionOptions.include_document_structure`.

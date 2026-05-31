@@ -23,13 +23,13 @@ public sealed record ConversionOptions
     /// Heading style to use in Markdown output (ATX `#` or Setext underline).
     /// </summary>
     [JsonPropertyName("heading_style")]
-    public JsonElement? HeadingStyle { get; init; } = null;
+    public HeadingStyle? HeadingStyle { get; init; } = null;
 
     /// <summary>
     /// How to indent nested list items (spaces or tab).
     /// </summary>
     [JsonPropertyName("list_indent_type")]
-    public JsonElement? ListIndentType { get; init; } = null;
+    public ListIndentType? ListIndentType { get; init; } = null;
 
     /// <summary>
     /// Number of spaces (or tabs) to use for each level of list indentation.
@@ -113,7 +113,7 @@ public sealed record ConversionOptions
     /// Style used for `&lt;mark&gt;` / highlighted text (e.g. `==text==`).
     /// </summary>
     [JsonPropertyName("highlight_style")]
-    public JsonElement? HighlightStyle { get; init; } = null;
+    public HighlightStyle? HighlightStyle { get; init; } = null;
 
     /// <summary>
     /// Populate `result.metadata` with `&lt;head&gt;` / `&lt;meta&gt;` extraction
@@ -137,7 +137,7 @@ public sealed record ConversionOptions
     /// content outside `&lt;pre&gt;` tags). For most documents `Normalized` produces cleaner output.
     /// </summary>
     [JsonPropertyName("whitespace_mode")]
-    public JsonElement? WhitespaceMode { get; init; } = null;
+    public WhitespaceMode? WhitespaceMode { get; init; } = null;
 
     /// <summary>
     /// Strip all newlines from the output, producing a single-line result.
@@ -183,13 +183,13 @@ public sealed record ConversionOptions
     /// How to encode hard line breaks (`&lt;br&gt;`) in Markdown.
     /// </summary>
     [JsonPropertyName("newline_style")]
-    public JsonElement? NewlineStyle { get; init; } = null;
+    public NewlineStyle NewlineStyle { get; init; } = NewlineStyle.Spaces;
 
     /// <summary>
     /// Style used for fenced code blocks (backticks or tilde).
     /// </summary>
     [JsonPropertyName("code_block_style")]
-    public JsonElement? CodeBlockStyle { get; init; } = null;
+    public CodeBlockStyle? CodeBlockStyle { get; init; } = null;
 
     /// <summary>
     /// HTML tag names whose `&lt;img&gt;` children are kept inline instead of block.
@@ -252,19 +252,19 @@ public sealed record ConversionOptions
     ///   correctly even when the URL contains `&lt;`, `&gt;`, spaces, or parentheses.
     /// </summary>
     [JsonPropertyName("url_escape_style")]
-    public JsonElement? UrlEscapeStyle { get; init; } = null;
+    public UrlEscapeStyle? UrlEscapeStyle { get; init; } = null;
 
     /// <summary>
     /// Link rendering style (inline or reference).
     /// </summary>
     [JsonPropertyName("link_style")]
-    public JsonElement? LinkStyle { get; init; } = null;
+    public LinkStyle? LinkStyle { get; init; } = null;
 
     /// <summary>
     /// Target output format (Markdown, plain text, etc.).
     /// </summary>
     [JsonPropertyName("output_format")]
-    public JsonElement? OutputFormat { get; init; } = null;
+    public OutputFormat? OutputFormat { get; init; } = null;
 
     /// <summary>
     /// Include structured document tree in result.

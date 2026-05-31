@@ -27,7 +27,7 @@ public sealed record PreprocessingOptions
     /// Preprocessing preset level (Minimal, Standard, Aggressive)
     /// </summary>
     [JsonPropertyName("preset")]
-    public JsonElement? Preset { get; init; } = null;
+    public PreprocessingPreset? Preset { get; init; } = null;
 
     /// <summary>
     /// Remove navigation elements (nav, breadcrumbs, menus, sidebars)

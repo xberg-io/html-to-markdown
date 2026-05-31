@@ -31,7 +31,7 @@ public sealed record PreprocessingOptionsUpdate
     /// Optional preprocessing preset level override (Minimal, Standard, Aggressive)
     /// </summary>
     [JsonPropertyName("preset")]
-    public JsonElement? Preset { get; init; } = null;
+    public PreprocessingPreset? Preset { get; init; } = null;
 
     /// <summary>
     /// Optional navigation element removal override (nav, breadcrumbs, menus, sidebars)
