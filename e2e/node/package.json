@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@kreuzberg/html-to-markdown": "workspace:*",
+    "@types/node": "^22.10.2",
     "vitest": "^4.1.5"
   }
 }

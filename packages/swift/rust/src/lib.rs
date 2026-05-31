@@ -672,14 +672,12 @@ mod ffi {
     }
 
     extern "Rust" {
-
         #[swift_bridge(swift_name = "conversionOptionsFromJson")]
         fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String>;
         #[swift_bridge(swift_name = "nodeContextFromJson")]
         fn node_context_from_json(json: String) -> Result<NodeContext, String>;
     }
     extern "Rust" {
-
         #[swift_bridge(swift_name = "documentMetadataFromJson")]
         fn document_metadata_from_json(json: String) -> Result<DocumentMetadata, String>;
         #[swift_bridge(swift_name = "headerMetadataFromJson")]
@@ -716,7 +714,6 @@ mod ffi {
         fn processing_warning_from_json(json: String) -> Result<ProcessingWarning, String>;
     }
     extern "Rust" {
-
         #[swift_bridge(swift_name = "textDirectionFromJson")]
         fn text_direction_from_json(json: String) -> Result<TextDirection, String>;
         #[swift_bridge(swift_name = "linkTypeFromJson")]

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Chore
+
+- **alef pin: 0.20.12 → 0.21.0** (local unreleased head). Regen of all bindings + e2e
+  suites against the new alef. Baseline for the upcoming cohort fixes (#395 visitor
+  bridge, #392 percent-encode URLs, PHP install.sh package name, R extendr named-list,
+  Java NativeLib loader, C FFI rpath).
+
 ## [3.5.7] - 2026-05-29
 
 ### Fixed

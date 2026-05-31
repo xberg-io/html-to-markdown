@@ -273,3 +273,13 @@ abstract class HtmlVisitor {
   /// Called after processing a figure `</figure>`.
   Future<VisitResult> visitFigureEnd(NodeContext ctx, String output);
 }
+
+
+/// OCR backend type identifier — used by e2e test plugin_api stubs.
+enum OcrBackendType { tesseract, easyocr, paddleocr, rapidocr }
+
+/// Processing stage for post-processors — used by e2e test plugin_api stubs.
+enum ProcessingStage { preProcessing, processing, postProcessing }
+
+/// Synchronous extractor trait stub — used by e2e test plugin_api stubs.
+abstract class SyncExtractor {}

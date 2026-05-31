@@ -18,7 +18,7 @@ NULL
 #' @section Errors:
 #' Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 #' @export
-convert <- function(html, options) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
+convert <- function(html, options = NULL) .Call("wrap__convert", html, options, PACKAGE = "htmltomarkdown")
 #' Document-level metadata extracted from `<head>` and top-level elements
 #'
 #' Contains all metadata typically used by search engines, social media platforms,
@@ -42,8 +42,11 @@ DocumentMetadata$from_json <- function(json) {
 #' @export
 `$.DocumentMetadata` <- function(self, name) {
   func <- DocumentMetadata[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.DocumentMetadata` <- `$.DocumentMetadata`
@@ -58,12 +61,15 @@ DocumentMetadata$from_json <- function(json) {
 #' @field html_offset Byte offset in original HTML document
 #' @export
 HeaderMetadata <- new.env(parent = emptyenv())
-HeaderMetadata$is_valid <- function() .Call("wrap__HeaderMetadata__is_valid", self, PACKAGE = "htmltomarkdown")
+HeaderMetadata$is_valid <- function(self) .Call("wrap__HeaderMetadata__is_valid", self, PACKAGE = "htmltomarkdown")
 #' @export
 `$.HeaderMetadata` <- function(self, name) {
   func <- HeaderMetadata[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.HeaderMetadata` <- `$.HeaderMetadata`
@@ -83,8 +89,11 @@ LinkMetadata <- new.env(parent = emptyenv())
 #' @export
 `$.LinkMetadata` <- function(self, name) {
   func <- LinkMetadata[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.LinkMetadata` <- `$.LinkMetadata`
@@ -103,8 +112,11 @@ ImageMetadata <- new.env(parent = emptyenv())
 #' @export
 `$.ImageMetadata` <- function(self, name) {
   func <- ImageMetadata[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.ImageMetadata` <- `$.ImageMetadata`
@@ -120,8 +132,11 @@ StructuredData <- new.env(parent = emptyenv())
 #' @export
 `$.StructuredData` <- function(self, name) {
   func <- StructuredData[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.StructuredData` <- `$.StructuredData`
@@ -179,8 +194,11 @@ ConversionOptions$from_json <- function(json) {
 #' @export
 `$.ConversionOptions` <- function(self, name) {
   func <- ConversionOptions[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.ConversionOptions` <- `$.ConversionOptions`
@@ -235,8 +253,11 @@ ConversionOptionsUpdate <- new.env(parent = emptyenv())
 #' @export
 `$.ConversionOptionsUpdate` <- function(self, name) {
   func <- ConversionOptionsUpdate[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.ConversionOptionsUpdate` <- `$.ConversionOptionsUpdate`
@@ -254,8 +275,11 @@ PreprocessingOptions$from_json <- function(json) {
 #' @export
 `$.PreprocessingOptions` <- function(self, name) {
   func <- PreprocessingOptions[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.PreprocessingOptions` <- `$.PreprocessingOptions`
@@ -273,8 +297,11 @@ PreprocessingOptionsUpdate <- new.env(parent = emptyenv())
 #' @export
 `$.PreprocessingOptionsUpdate` <- function(self, name) {
   func <- PreprocessingOptionsUpdate[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.PreprocessingOptionsUpdate` <- `$.PreprocessingOptionsUpdate`
@@ -300,8 +327,11 @@ TextAnnotation <- new.env(parent = emptyenv())
 #' @export
 `$.TextAnnotation` <- function(self, name) {
   func <- TextAnnotation[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.TextAnnotation` <- `$.TextAnnotation`
@@ -317,8 +347,11 @@ GridCell <- new.env(parent = emptyenv())
 #' @export
 `$.GridCell` <- function(self, name) {
   func <- GridCell[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.GridCell` <- `$.GridCell`
@@ -330,8 +363,11 @@ TableData <- new.env(parent = emptyenv())
 #' @export
 `$.TableData` <- function(self, name) {
   func <- TableData[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.TableData` <- `$.TableData`
@@ -357,8 +393,11 @@ ProcessingWarning <- new.env(parent = emptyenv())
 #' @export
 `$.ProcessingWarning` <- function(self, name) {
   func <- ProcessingWarning[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.ProcessingWarning` <- `$.ProcessingWarning`
@@ -378,8 +417,11 @@ NodeContext <- new.env(parent = emptyenv())
 #' @export
 `$.NodeContext` <- function(self, name) {
   func <- NodeContext[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.NodeContext` <- `$.NodeContext`
@@ -398,8 +440,11 @@ VisitResult <- new.env(parent = emptyenv())
 #' @export
 `$.VisitResult` <- function(self, name) {
   func <- VisitResult[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.VisitResult` <- `$.VisitResult`
@@ -533,8 +578,11 @@ NodeContent$from_json <- function(json) .Call("wrap__NodeContent__from_json", js
 #' @export
 `$.NodeContent` <- function(self, name) {
   func <- NodeContent[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.NodeContent` <- `$.NodeContent`
@@ -548,8 +596,11 @@ AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_jso
 #' @export
 `$.AnnotationKind` <- function(self, name) {
   func <- AnnotationKind[[name]]
-  environment(func) <- environment()
-  func
+  if (identical(names(formals(func))[1], "self")) {
+    function(...) func(self, ...)
+  } else {
+    func
+  }
 }
 #' @export
 `[[.AnnotationKind` <- `$.AnnotationKind`

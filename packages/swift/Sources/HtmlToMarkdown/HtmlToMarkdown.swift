@@ -1106,6 +1106,42 @@ public enum ConversionError: Swift.Error {
     case other(message: String, field0: String)
 }
 
+// MARK: - JSON-String Convenience Overloads
+// These overloads accept JSON-encoded config parameters and decode them automatically.
+// Enables e2e tests to pass JSON strings directly without typed config construction.
+
+/// Resolves a string argument as either a file path or literal UTF-8 content.
+/// Searches: current working directory, ALEF_TEST_DOCUMENTS_DIR env var,
+/// and ancestor `test_documents/` or `fixtures/` directories (up to 16 levels).
+/// If no file is found, treats the string as UTF-8 content and returns its bytes.
+private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8] {
+    let fm = FileManager.default
+    var roots: [String] = [fm.currentDirectoryPath]
+    if let envRoot = ProcessInfo.processInfo.environment["ALEF_TEST_DOCUMENTS_DIR"] {
+        roots.append(envRoot)
+    }
+    var walker = URL(fileURLWithPath: fm.currentDirectoryPath)
+    for _ in 0..<16 {
+        roots.append(walker.appendingPathComponent("test_documents").path)
+        roots.append(walker.appendingPathComponent("fixtures").path)
+        let parent = walker.deletingLastPathComponent()
+        if parent.path == walker.path { break }
+        walker = parent
+    }
+    let candidates = [pathOrContent] + roots.map { ($0 as NSString).appendingPathComponent(pathOrContent) }
+    for path in candidates {
+        if fm.fileExists(atPath: path), let data = try? Data(contentsOf: URL(fileURLWithPath: path)) {
+            return [UInt8](data)
+        }
+    }
+    return [UInt8](pathOrContent.utf8)
+}
+
+public func convert(_ html: String, _ configJson: String) throws -> ConversionResult {
+    let config = try conversionOptionsFromJson(configJson)
+    return try convert(html: html, config: config)
+}
+
 // MARK: - From-JSON Helpers
 // Public helpers that decode JSON into first-class Swift types.
 // First-class struct types (Codable) use JSONDecoder directly.

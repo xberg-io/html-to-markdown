@@ -21,7 +21,7 @@ repository = "https://github.com/kreuzberg-dev/html-to-markdown"
 ignored = ["ahash", "serde_json", "tokio", "async-trait"]
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "staticlib", "rlib"]
 
 [features]
 default = []

@@ -5,17 +5,18 @@ version = "3.5.7"
 edition = "2024"
 license = "MIT"
 
-# `ahash`, `async-trait`, `serde`, `serde_json`, and `tokio` are all
+# `ahash`, `async-trait`, `libc`, `serde`, `serde_json`, and `tokio` are all
 # conditionally referenced by alef-emitted code: `ahash` only when the
 # umbrella crate exposes `AHashMap<Cow<str>, _>` parameters (the conditional
 # `__*_ahash` shim rebuilds), `async-trait` and `tokio` only when the API
-# surface includes async streaming adapters and runtime spawn, `serde` and
+# surface includes async streaming adapters and runtime spawn, `libc` only
+# when service API C callback functions are emitted, `serde` and
 # `serde_json` only when JSON DTO conversions are emitted. They are listed
 # unconditionally in `[dependencies]` so the manifest is stable across
 # regens, and ignored here so cargo-machete does not flag downstream crates
 # whose API surface does not trigger those paths as unused.
 [package.metadata.cargo-machete]
-ignored = ["ahash", "async-trait", "serde", "serde_json", "tokio"]
+ignored = ["ahash", "async-trait", "libc", "serde", "serde_json", "tokio"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
@@ -31,6 +32,7 @@ bench = false
 ahash = "0.8"
 async-trait = "0.1"
 html_to_markdown_rs = { version = "3.5.7", path = "../../../crates/html-to-markdown", features = ["full"], package = "html-to-markdown-rs" }
+libc = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 swift-bridge = "0.1.59"

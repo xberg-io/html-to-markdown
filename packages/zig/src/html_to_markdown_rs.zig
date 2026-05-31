@@ -26,7 +26,7 @@ pub fn _last_error() ?[]const u8 {
 /// will replace this once the IR exposes per-variant numeric codes.
 inline fn _first_error(comptime E: type) E {
     const fields = @typeInfo(E).error_set orelse return @as(E, error.Unknown);
-    if (fields.len == 0) unreachable;
+    if (fields.len == 0) return @as(E, error.Unknown);
     return @field(E, fields[0].name);
 }
 
@@ -1102,17 +1102,17 @@ pub const IHtmlVisitor = extern struct {
     /// # Arguments
     /// - `ctx`: Node context (will have `node_type: NodeType::Text`)
     /// - `text`: The raw text content (HTML entities already decoded)
-    visit_text: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_text: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called before entering any element.
     ///
     /// This is the first callback invoked for every HTML element, allowing
     /// visitors to implement generic element handling before tag-specific logic.
-    visit_element_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_element_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called after exiting any element.
     ///
     /// Receives the default markdown output that would be generated.
     /// Visitors can inspect or replace this output.
-    visit_element_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_element_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit anchor links `<a href="...">`.
     ///
     /// # Arguments
@@ -1120,7 +1120,7 @@ pub const IHtmlVisitor = extern struct {
     /// - `href`: The link URL (from `href` attribute)
     /// - `text`: The link text content (already converted to markdown)
     /// - `title`: Optional title attribute
-    visit_link: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_link: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit images `<img src="...">`.
     ///
     /// # Arguments
@@ -1128,7 +1128,7 @@ pub const IHtmlVisitor = extern struct {
     /// - `src`: The image source URL
     /// - `alt`: The alt text
     /// - `title`: Optional title attribute
-    visit_image: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_image: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit heading elements `<h1>` through `<h6>`.
     ///
     /// # Arguments
@@ -1136,20 +1136,20 @@ pub const IHtmlVisitor = extern struct {
     /// - `level`: Heading level (1-6)
     /// - `text`: The heading text content
     /// - `id`: Optional id attribute (for anchor links)
-    visit_heading: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_heading: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit code blocks `<pre><code>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `lang`: Optional language specifier (from class attribute)
     /// - `code`: The code content
-    visit_code_block: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_code_block: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit inline code `<code>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `code`: The code content
-    visit_code_inline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_code_inline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit list items `<li>`.
     ///
     /// # Arguments
@@ -1157,84 +1157,84 @@ pub const IHtmlVisitor = extern struct {
     /// - `ordered`: Whether this is an ordered list item
     /// - `marker`: The list marker (e.g., "-", "1.", "a)")
     /// - `text`: The list item content (already converted)
-    visit_list_item: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_list_item: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called before processing a list `<ul>` or `<ol>`.
-    visit_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32) callconv(.c) [*c]const u8 = null,
+    visit_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called after processing a list `</ul>` or `</ol>`.
-    visit_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called before processing a table `<table>`.
-    visit_table_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_table_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit table rows `<tr>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `cells`: Cell contents (already converted to markdown)
     /// - `is_header`: Whether this row is in `<thead>`
-    visit_table_row: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32) callconv(.c) [*c]const u8 = null,
+    visit_table_row: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called after processing a table `</table>`.
-    visit_table_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_table_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit blockquote elements `<blockquote>`.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `content`: The blockquote content (already converted)
     /// - `depth`: Nesting depth (for nested blockquotes)
-    visit_blockquote: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize) callconv(.c) [*c]const u8 = null,
+    visit_blockquote: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit strong/bold elements `<strong>`, `<b>`.
-    visit_strong: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_strong: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit emphasis/italic elements `<em>`, `<i>`.
-    visit_emphasis: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_emphasis: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
-    visit_strikethrough: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_strikethrough: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit underline elements `<u>`, `<ins>`.
-    visit_underline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_underline: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit subscript elements `<sub>`.
-    visit_subscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_subscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit superscript elements `<sup>`.
-    visit_superscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_superscript: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit mark/highlight elements `<mark>`.
-    visit_mark: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_mark: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit line break elements `<br>`.
-    visit_line_break: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_line_break: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit horizontal rule elements `<hr>`.
-    visit_horizontal_rule: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_horizontal_rule: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit custom elements (web components) or unknown tags.
     ///
     /// # Arguments
     /// - `ctx`: Node context
     /// - `tag_name`: The custom element's tag name
     /// - `html`: The raw HTML of this element
-    visit_custom_element: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_custom_element: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit definition list `<dl>`.
-    visit_definition_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_definition_list_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit definition term `<dt>`.
-    visit_definition_term: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_definition_term: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit definition description `<dd>`.
-    visit_definition_description: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_definition_description: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called after processing a definition list `</dl>`.
-    visit_definition_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_definition_list_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit form elements `<form>`.
-    visit_form: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_form: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit input elements `<input>`.
-    visit_input: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_input: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit button elements `<button>`.
-    visit_button: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_button: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit audio elements `<audio>`.
-    visit_audio: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_audio: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit video elements `<video>`.
-    visit_video: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_video: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit iframe elements `<iframe>`.
-    visit_iframe: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_iframe: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit details elements `<details>`.
-    visit_details: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _open: i32) callconv(.c) [*c]const u8 = null,
+    visit_details: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _open: i32, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit summary elements `<summary>`.
-    visit_summary: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_summary: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit figure elements `<figure>`.
-    visit_figure_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_figure_start: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Visit figcaption elements `<figcaption>`.
-    visit_figcaption: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_figcaption: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called after processing a figure `</figure>`.
-    visit_figure_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 = null,
+    visit_figure_end: ?*const fn (user_data: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 = null,
     /// Called by the Rust runtime when the bridge is dropped.
     /// Use this to release any Zig-side state held via `user_data`.
     free_user_data: ?*const fn (user_data: ?*anyopaque) callconv(.c) void = null,
@@ -1265,282 +1265,442 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
     _ = instance; // instance is passed as user_data by the caller
     return IHtmlVisitor{
         .visit_text = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_text(_ctx, _text);
+                const value = self.visit_text(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_element_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_element_start(_ctx);
+                const value = self.visit_element_start(_ctx);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_element_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_element_end(_ctx, _output);
+                const value = self.visit_element_end(_ctx, _output);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_link = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _href: [*c]const u8, _text: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_link(_ctx, _href, _text, _title);
+                const value = self.visit_link(_ctx, _href, _text, _title);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_image = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, _alt: [*c]const u8, _title: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_image(_ctx, _src, _alt, _title);
+                const value = self.visit_image(_ctx, _src, _alt, _title);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_heading = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _level: u32, _text: [*c]const u8, _id: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_heading(_ctx, _level, _text, _id);
+                const value = self.visit_heading(_ctx, _level, _text, _id);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_code_block = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _lang: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_code_block(_ctx, _lang, _code);
+                const value = self.visit_code_block(_ctx, _lang, _code);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_code_inline = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _code: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_code_inline(_ctx, _code);
+                const value = self.visit_code_inline(_ctx, _code);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_list_item = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _marker: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_list_item(_ctx, _ordered, _marker, _text);
+                const value = self.visit_list_item(_ctx, _ordered, _marker, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_list_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_list_start(_ctx, _ordered);
+                const value = self.visit_list_start(_ctx, _ordered);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_list_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _ordered: i32, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_list_end(_ctx, _ordered, _output);
+                const value = self.visit_list_end(_ctx, _ordered, _output);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_table_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_table_start(_ctx);
+                const value = self.visit_table_start(_ctx);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_table_row = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _cells: [*c]const u8, _is_header: i32, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_table_row(_ctx, _cells, _is_header);
+                const value = self.visit_table_row(_ctx, _cells, _is_header);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_table_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_table_end(_ctx, _output);
+                const value = self.visit_table_end(_ctx, _output);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_blockquote = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _content: [*c]const u8, _depth: usize, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_blockquote(_ctx, _content, _depth);
+                const value = self.visit_blockquote(_ctx, _content, _depth);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_strong = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_strong(_ctx, _text);
+                const value = self.visit_strong(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_emphasis = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_emphasis(_ctx, _text);
+                const value = self.visit_emphasis(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_strikethrough = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_strikethrough(_ctx, _text);
+                const value = self.visit_strikethrough(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_underline = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_underline(_ctx, _text);
+                const value = self.visit_underline(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_subscript = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_subscript(_ctx, _text);
+                const value = self.visit_subscript(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_superscript = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_superscript(_ctx, _text);
+                const value = self.visit_superscript(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_mark = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_mark(_ctx, _text);
+                const value = self.visit_mark(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_line_break = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_line_break(_ctx);
+                const value = self.visit_line_break(_ctx);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_horizontal_rule = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_horizontal_rule(_ctx);
+                const value = self.visit_horizontal_rule(_ctx);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_custom_element = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _tag_name: [*c]const u8, _html: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_custom_element(_ctx, _tag_name, _html);
+                const value = self.visit_custom_element(_ctx, _tag_name, _html);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_definition_list_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_definition_list_start(_ctx);
+                const value = self.visit_definition_list_start(_ctx);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_definition_term = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_definition_term(_ctx, _text);
+                const value = self.visit_definition_term(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_definition_description = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_definition_description(_ctx, _text);
+                const value = self.visit_definition_description(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_definition_list_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_definition_list_end(_ctx, _output);
+                const value = self.visit_definition_list_end(_ctx, _output);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_form = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _action: [*c]const u8, _method: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_form(_ctx, _action, _method);
+                const value = self.visit_form(_ctx, _action, _method);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_input = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _input_type: [*c]const u8, _name: [*c]const u8, _value: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_input(_ctx, _input_type, _name, _value);
+                const value = self.visit_input(_ctx, _input_type, _name, _value);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_button = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_button(_ctx, _text);
+                const value = self.visit_button(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_audio = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_audio(_ctx, _src);
+                const value = self.visit_audio(_ctx, _src);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_video = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_video(_ctx, _src);
+                const value = self.visit_video(_ctx, _src);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_iframe = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _src: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_iframe(_ctx, _src);
+                const value = self.visit_iframe(_ctx, _src);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_details = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _open: i32) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _open: i32, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_details(_ctx, _open);
+                const value = self.visit_details(_ctx, _open);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_summary = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_summary(_ctx, _text);
+                const value = self.visit_summary(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_figure_start = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_figure_start(_ctx);
+                const value = self.visit_figure_start(_ctx);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_figcaption = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _text: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_figcaption(_ctx, _text);
+                const value = self.visit_figcaption(_ctx, _text);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 
         .visit_figure_end = struct {
-            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8) callconv(.c) [*c]const u8 {
+            fn thunk(ud: ?*anyopaque, _ctx: [*c]const u8, _output: [*c]const u8, out_result: ?*?[*c]u8) callconv(.c) i32 {
                 const self: *T = @ptrCast(@alignCast(ud));
-                return self.visit_figure_end(_ctx, _output);
+                const value = self.visit_figure_end(_ctx, _output);
+                if (out_result) |ptr| {
+                    ptr.* = @constCast(value);
+                }
+                return 0;
             }
         }.thunk,
 

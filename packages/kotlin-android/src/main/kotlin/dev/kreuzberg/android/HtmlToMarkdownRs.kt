@@ -22,14 +22,67 @@
 
 package dev.kreuzberg.android
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object HtmlToMarkdownRs {
+    /// Jackson module that marshals ByteArray as a JSON array of unsigned bytes,
+    /// matching how Rust serde encodes Vec<u8> on the wire.
+    /// Jackson's default writes ByteArray as a Base64 string, which Rust serde rejects
+    /// with "invalid type: string, expected a sequence".
+    private val byteArrayModule = com.fasterxml.jackson.databind.module.SimpleModule().apply {
+        addSerializer(
+            ByteArray::class.java,
+            object : com.fasterxml.jackson.databind.ser.std.StdSerializer<ByteArray>(ByteArray::class.java) {
+                override fun serialize(
+                    value: ByteArray,
+                    gen: com.fasterxml.jackson.core.JsonGenerator,
+                    provider: com.fasterxml.jackson.databind.SerializerProvider,
+                ) {
+                    gen.writeStartArray()
+                    for (b in value) gen.writeNumber(b.toInt() and 0xff)
+                    gen.writeEndArray()
+                }
+            },
+        )
+        addDeserializer(
+            ByteArray::class.java,
+            object : com.fasterxml.jackson.databind.deser.std.StdDeserializer<ByteArray>(ByteArray::class.java) {
+                override fun deserialize(
+                    parser: com.fasterxml.jackson.core.JsonParser,
+                    ctx: com.fasterxml.jackson.databind.DeserializationContext,
+                ): ByteArray {
+                    val node = parser.codec.readTree<com.fasterxml.jackson.databind.JsonNode>(parser)
+                    return when {
+                        node.isArray -> ByteArray(node.size()) { i -> node.get(i).asInt().toByte() }
+                        node.isTextual -> java.util.Base64.getDecoder().decode(node.asText())
+                        else -> ByteArray(0)
+                    }
+                }
+            },
+        )
+    }
+
     private val mapper = jacksonObjectMapper()
+        .registerModule(com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
+        .registerModule(byteArrayModule)
+        .registerModule(
+            com.fasterxml.jackson.module.kotlin.KotlinModule.Builder()
+                .configure(com.fasterxml.jackson.module.kotlin.KotlinFeature.NullIsSameAsDefault, true)
+                .configure(com.fasterxml.jackson.module.kotlin.KotlinFeature.NullToEmptyCollection, true)
+                .configure(com.fasterxml.jackson.module.kotlin.KotlinFeature.NullToEmptyMap, true)
+                .build(),
+        )
         .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+        .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY)
+        .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     /**
      * Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,

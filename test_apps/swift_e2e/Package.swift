@@ -7,13 +7,11 @@ let package = Package(
         .macOS(.v13),
         .iOS(.v16),
     ],
-    dependencies: [
-        .binaryTarget(name: "HtmlToMarkdown", url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.5.7/HtmlToMarkdown-rs.artifactbundle.zip", checksum: "__ALEF_SWIFT_CHECKSUM__"),
-    ],
     targets: [
+                .binaryTarget(name: "HtmlToMarkdown", url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.5.7/HtmlToMarkdown-rs.artifactbundle.zip", checksum: "__ALEF_SWIFT_CHECKSUM__"),
         .testTarget(
             name: "HtmlToMarkdownE2ETests",
-            dependencies: [.binaryTarget(name: "HtmlToMarkdown")]
+            dependencies: [.target(name: "HtmlToMarkdown")]
         ),
     ]
 )
