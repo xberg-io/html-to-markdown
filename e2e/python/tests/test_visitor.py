@@ -30,6 +30,7 @@ def _alef_e2e_item_texts(item: object) -> tuple[str, ...]:
 
 def test_visitor_audio_custom() -> None:
     """Visitor replaces audio element with custom output."""
+
     class _TestVisitor:
         def visit_audio(self, ctx, src):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "[AUDIO: podcast.mp3]"}
@@ -45,6 +46,7 @@ def test_visitor_audio_custom() -> None:
 
 def test_visitor_audio_skip() -> None:
     """Visitor removes audio elements from output."""
+
     class _TestVisitor:
         def visit_audio(self, ctx, src):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -56,14 +58,15 @@ def test_visitor_audio_skip() -> None:
     assert "Background music:" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Enjoy!" in result.content  # noqa: S101
-    assert result.content is None or not ("music.ogg" in result.content)  # noqa: S101
+    assert result.content is None or "music.ogg" not in result.content  # noqa: S101
 
 
 def test_visitor_button_custom() -> None:
     """Visitor replaces button with bracketed text."""
+
     class _TestVisitor:
         def visit_button(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'[BTN:{text}]'}
+            return {"custom": f"[BTN:{text}]"}
 
     html = '<p>Confirm action: <button type="submit">Click me</button> or <button type="reset">Cancel</button></p>'
 
@@ -78,6 +81,7 @@ def test_visitor_button_custom() -> None:
 
 def test_visitor_button_skip() -> None:
     """Visitor removes all buttons from output."""
+
     class _TestVisitor:
         def visit_button(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -87,13 +91,14 @@ def test_visitor_button_skip() -> None:
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "Actions available:" in result.content  # noqa: S101
-    assert result.content is None or not ("Save" in result.content)  # noqa: S101
-    assert result.content is None or not ("Delete" in result.content)  # noqa: S101
-    assert result.content is None or not ("Export" in result.content)  # noqa: S101
+    assert result.content is None or "Save" not in result.content  # noqa: S101
+    assert result.content is None or "Delete" not in result.content  # noqa: S101
+    assert result.content is None or "Export" not in result.content  # noqa: S101
 
 
 def test_visitor_continue_default() -> None:
     """Visitor continue action preserves default conversion."""
+
     class _TestVisitor:
         def visit_strong(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "continue"
@@ -107,6 +112,7 @@ def test_visitor_continue_default() -> None:
 
 def test_visitor_custom_blockquote() -> None:
     """Visitor replaces blockquote with custom format."""
+
     class _TestVisitor:
         def visit_blockquote(self, ctx, content, depth):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": f'QUOTE: "{content}"'}
@@ -122,64 +128,69 @@ def test_visitor_custom_blockquote() -> None:
 
 def test_visitor_custom_emphasis() -> None:
     """Visitor replaces emphasis with custom output."""
+
     class _TestVisitor:
         def visit_emphasis(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'>>>{text}<<<'}
+            return {"custom": f">>>{text}<<<"}
 
     html = "<p>This is <em>important</em> text.</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert ">>>important<<<" in result.content  # noqa: S101
-    assert result.content is None or not ("*important*" in result.content)  # noqa: S101
+    assert result.content is None or "*important*" not in result.content  # noqa: S101
 
 
 def test_visitor_custom_heading() -> None:
     """Visitor replaces heading with custom format."""
+
     class _TestVisitor:
         def visit_heading(self, ctx, level, text, id):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'--- {text} ---'}
+            return {"custom": f"--- {text} ---"}
 
     html = "<h2>Section Title</h2><p>Content below heading.</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "--- Section Title ---" in result.content  # noqa: S101
-    assert result.content is None or not ("## Section Title" in result.content)  # noqa: S101
+    assert result.content is None or "## Section Title" not in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Content below heading." in result.content  # noqa: S101
 
 
 def test_visitor_custom_image() -> None:
     """Visitor replaces image with custom output using template."""
+
     class _TestVisitor:
         def visit_image(self, ctx, src, alt, title):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'[Image: {alt}]'}
+            return {"custom": f"[Image: {alt}]"}
 
     html = '<img src="banner.png" alt="Banner">'
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "[Image: Banner]" in result.content  # noqa: S101
-    assert result.content is None or not ("banner.png" in result.content)  # noqa: S101
+    assert result.content is None or "banner.png" not in result.content  # noqa: S101
 
 
 def test_visitor_custom_link_format() -> None:
     """Visitor reformats links using template interpolation."""
+
     class _TestVisitor:
         def visit_link(self, ctx, href, text, title):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'{text} ({href})'}
+            return {"custom": f"{text} ({href})"}
 
     html = '<p>Visit <a href="https://example.com">Example</a> for more info.</p>'
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "Example (https://example.com)" in result.content  # noqa: S101
-    assert result.content is None or not ("[Example]" in result.content)  # noqa: S101
+    assert result.content is None or "[Example]" not in result.content  # noqa: S101
 
 
 def test_visitor_custom_link_static() -> None:
     """Visitor replaces link with static custom output."""
+
     class _TestVisitor:
         def visit_link(self, ctx, href, text, title):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "[REDACTED LINK]"}
@@ -189,11 +200,12 @@ def test_visitor_custom_link_static() -> None:
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "[REDACTED LINK]" in result.content  # noqa: S101
-    assert result.content is None or not ("example.com" in result.content)  # noqa: S101
+    assert result.content is None or "example.com" not in result.content  # noqa: S101
 
 
 def test_visitor_custom_output() -> None:
     """Visitor custom action replaces element output."""
+
     class _TestVisitor:
         def visit_heading(self, ctx, level, text, id):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "## REPLACED HEADING"}
@@ -203,14 +215,15 @@ def test_visitor_custom_output() -> None:
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "## REPLACED HEADING" in result.content  # noqa: S101
-    assert result.content is None or not ("# Original Heading" in result.content)  # noqa: S101
+    assert result.content is None or "# Original Heading" not in result.content  # noqa: S101
 
 
 def test_visitor_definition_list_custom() -> None:
     """Visitor customizes definition list items."""
+
     class _TestVisitor:
         def visit_definition_term(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'**{text}**'}
+            return {"custom": f"**{text}**"}
 
     html = "<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl>"
 
@@ -225,11 +238,13 @@ def test_visitor_definition_list_custom() -> None:
 
 def test_visitor_definition_list_custom_format() -> None:
     """Visitor formats definition lists with custom templates."""
+
     class _TestVisitor:
         def visit_definition_description(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'> {text}'}
+            return {"custom": f"> {text}"}
+
         def visit_definition_term(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'### {text}'}
+            return {"custom": f"### {text}"}
 
     html = "<dl><dt>Python</dt><dd>A high-level programming language</dd><dt>JavaScript</dt><dd>A scripting language for web browsers</dd></dl>"
 
@@ -246,9 +261,11 @@ def test_visitor_definition_list_custom_format() -> None:
 
 def test_visitor_definition_list_skip() -> None:
     """Visitor skips definition list items from output."""
+
     class _TestVisitor:
         def visit_definition_description(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
+
         def visit_definition_term(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
 
@@ -259,15 +276,16 @@ def test_visitor_definition_list_skip() -> None:
     assert "Glossary:" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "End of glossary" in result.content  # noqa: S101
-    assert result.content is None or not ("Term A" in result.content)  # noqa: S101
-    assert result.content is None or not ("Definition" in result.content)  # noqa: S101
+    assert result.content is None or "Term A" not in result.content  # noqa: S101
+    assert result.content is None or "Definition" not in result.content  # noqa: S101
 
 
 def test_visitor_details_summary_custom() -> None:
     """Visitor customizes details/summary disclosure elements."""
+
     class _TestVisitor:
         def visit_summary(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'[EXPANDABLE] {text}'}
+            return {"custom": f"[EXPANDABLE] {text}"}
 
     html = "<details><summary>Click to expand</summary><p>This content is initially hidden.</p><p>But can be revealed by the user.</p></details>"
 
@@ -280,6 +298,7 @@ def test_visitor_details_summary_custom() -> None:
 
 def test_visitor_details_summary_skip() -> None:
     """Visitor removes details/summary elements entirely."""
+
     class _TestVisitor:
         def visit_details(self, ctx, is_open):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -291,15 +310,16 @@ def test_visitor_details_summary_skip() -> None:
     assert "Main content here." in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "More main content." in result.content  # noqa: S101
-    assert result.content is None or not ("Hidden section" in result.content)  # noqa: S101
-    assert result.content is None or not ("Secret details" in result.content)  # noqa: S101
+    assert result.content is None or "Hidden section" not in result.content  # noqa: S101
+    assert result.content is None or "Secret details" not in result.content  # noqa: S101
 
 
 def test_visitor_figure_custom() -> None:
     """Visitor customizes figure and figcaption elements."""
+
     class _TestVisitor:
         def visit_figcaption(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'*{text}*'}
+            return {"custom": f"*{text}*"}
 
     html = '<article><h1>Article Title</h1><p>Introduction paragraph.</p><figure><img src="diagram.png" alt="System architecture diagram"><figcaption>Figure 1: System Architecture</figcaption></figure><p>Explanation of the figure.</p></article>'
 
@@ -314,9 +334,11 @@ def test_visitor_figure_custom() -> None:
 
 def test_visitor_figure_custom_wrap() -> None:
     """Visitor wraps figure content with custom formatting."""
+
     class _TestVisitor:
         def visit_figure_end(self, ctx, output, *args):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'{output}\n[/FIGURE]\n'}
+            return {"custom": f"{output}\n[/FIGURE]\n"}
+
         def visit_figure_start(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "\n[FIGURE]\n"}
 
@@ -333,6 +355,7 @@ def test_visitor_figure_custom_wrap() -> None:
 
 def test_visitor_figure_skip() -> None:
     """Visitor removes figure elements with their captions."""
+
     class _TestVisitor:
         def visit_figure_start(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -344,12 +367,13 @@ def test_visitor_figure_skip() -> None:
     assert "See the chart below:" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "As shown in the chart above." in result.content  # noqa: S101
-    assert result.content is None or not ("Revenue Trends" in result.content)  # noqa: S101
-    assert result.content is None or not ("chart.svg" in result.content)  # noqa: S101
+    assert result.content is None or "Revenue Trends" not in result.content  # noqa: S101
+    assert result.content is None or "chart.svg" not in result.content  # noqa: S101
 
 
 def test_visitor_form_custom() -> None:
     """Visitor replaces form with custom output."""
+
     class _TestVisitor:
         def visit_form(self, ctx, action_url, method):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "[FORM PLACEHOLDER]"}
@@ -359,12 +383,13 @@ def test_visitor_form_custom() -> None:
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "[FORM PLACEHOLDER]" in result.content  # noqa: S101
-    assert result.content is None or not ("submit" in result.content)  # noqa: S101
-    assert result.content is None or not ("input" in result.content)  # noqa: S101
+    assert result.content is None or "submit" not in result.content  # noqa: S101
+    assert result.content is None or "input" not in result.content  # noqa: S101
 
 
 def test_visitor_form_skip() -> None:
     """Visitor skips form elements entirely."""
+
     class _TestVisitor:
         def visit_form(self, ctx, action_url, method):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -376,25 +401,27 @@ def test_visitor_form_skip() -> None:
     assert "Before form" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "After form" in result.content  # noqa: S101
-    assert result.content is None or not ("email" in result.content)  # noqa: S101
+    assert result.content is None or "email" not in result.content  # noqa: S101
 
 
 def test_visitor_heading_bare_string_preserves_case() -> None:
     """Visitor returns rendered heading template as bare string; mixed-case is preserved (regression guard for issue #350)."""
+
     class _TestVisitor:
         def visit_heading(self, ctx, level, text, id):  # noqa: A002, ANN001, ANN202, ARG002
-            return f'## {text} ##'
+            return f"## {text} ##"
 
     html = "<h2>Important Section Title</h2><p>Body.</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "## Important Section Title ##" in result.content  # noqa: S101
-    assert result.content is None or not ("important section title" in result.content)  # noqa: S101
+    assert result.content is None or "important section title" not in result.content  # noqa: S101
 
 
 def test_visitor_horizontal_rule_custom() -> None:
     """Visitor replaces horizontal rule with custom output."""
+
     class _TestVisitor:
         def visit_horizontal_rule(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "\n[DIVIDER]\n"}
@@ -408,11 +435,12 @@ def test_visitor_horizontal_rule_custom() -> None:
     assert "Section A" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Section B" in result.content  # noqa: S101
-    assert result.content is None or not ("---" in result.content)  # noqa: S101
+    assert result.content is None or "---" not in result.content  # noqa: S101
 
 
 def test_visitor_horizontal_rule_skip() -> None:
     """Visitor removes all horizontal rules."""
+
     class _TestVisitor:
         def visit_horizontal_rule(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -426,11 +454,12 @@ def test_visitor_horizontal_rule_skip() -> None:
     assert "Part 2" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Part 3" in result.content  # noqa: S101
-    assert result.content is None or not ("---" in result.content)  # noqa: S101
+    assert result.content is None or "---" not in result.content  # noqa: S101
 
 
 def test_visitor_iframe_custom() -> None:
     """Visitor replaces embedded iframe with custom text."""
+
     class _TestVisitor:
         def visit_iframe(self, ctx, src):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": "[EMBEDDED: https://maps.example.com/embed]"}
@@ -448,6 +477,7 @@ def test_visitor_iframe_custom() -> None:
 
 def test_visitor_iframe_skip() -> None:
     """Visitor removes embedded iframes."""
+
     class _TestVisitor:
         def visit_iframe(self, ctx, src):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -459,29 +489,31 @@ def test_visitor_iframe_skip() -> None:
     assert "Reviews" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "See reviews from our partners." in result.content  # noqa: S101
-    assert result.content is None or not ("widget.example.com" in result.content)  # noqa: S101
+    assert result.content is None or "widget.example.com" not in result.content  # noqa: S101
 
 
 def test_visitor_image_bare_string_preserves_case() -> None:
     """Visitor returns bare-string image replacement; mixed-case alt/src preserved (regression guard for issue #350)."""
+
     class _TestVisitor:
         def visit_image(self, ctx, src, alt, title):  # noqa: A002, ANN001, ANN202, ARG002
-            return f'[image: {alt} -> {src}]'
+            return f"[image: {alt} -> {src}]"
 
     html = '<img src="PhotoOne.JPG" alt="Sunset Over Bay">'
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "[image: Sunset Over Bay -> PhotoOne.JPG]" in result.content  # noqa: S101
-    assert result.content is None or not ("sunset over bay" in result.content)  # noqa: S101
-    assert result.content is None or not ("photoone.jpg" in result.content)  # noqa: S101
+    assert result.content is None or "sunset over bay" not in result.content  # noqa: S101
+    assert result.content is None or "photoone.jpg" not in result.content  # noqa: S101
 
 
 def test_visitor_input_custom() -> None:
     """Visitor replaces input with labeled output."""
+
     class _TestVisitor:
         def visit_input(self, ctx, input_type, name, value):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'[INPUT:{input_type}]'}
+            return {"custom": f"[INPUT:{input_type}]"}
 
     html = '<form><label>Username: <input type="text" name="username" value=""></label><label>Password: <input type="password" name="password"></label></form>'
 
@@ -494,6 +526,7 @@ def test_visitor_input_custom() -> None:
 
 def test_visitor_input_skip() -> None:
     """Visitor skips all input elements."""
+
     class _TestVisitor:
         def visit_input(self, ctx, input_type, name, value):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -505,11 +538,12 @@ def test_visitor_input_skip() -> None:
     assert "Sign up:" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Continue" in result.content  # noqa: S101
-    assert result.content is None or not ("email" in result.content)  # noqa: S101
+    assert result.content is None or "email" not in result.content  # noqa: S101
 
 
 def test_visitor_line_break_custom() -> None:
     """Visitor replaces line break with custom output."""
+
     class _TestVisitor:
         def visit_line_break(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return {"custom": " | "}
@@ -519,11 +553,12 @@ def test_visitor_line_break_custom() -> None:
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "First line | Second line | Third line" in result.content  # noqa: S101
-    assert result.content is None or not ("\n\n" in result.content)  # noqa: S101
+    assert result.content is None or "\n\n" not in result.content  # noqa: S101
 
 
 def test_visitor_line_break_skip() -> None:
     """Visitor removes all line breaks."""
+
     class _TestVisitor:
         def visit_line_break(self, ctx, *args):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -537,24 +572,26 @@ def test_visitor_line_break_skip() -> None:
 
 def test_visitor_link_bare_string_preserves_case() -> None:
     """Visitor returns rendered template as a bare string (not a dict) and original mixed-case content is preserved end-to-end (regression guard for issue #350)."""
+
     class _TestVisitor:
         def visit_link(self, ctx, href, text, title):  # noqa: A002, ANN001, ANN202, ARG002
-            return f'[{text}](https://new-cdn.com/file.pdf)'
+            return f"[{text}](https://new-cdn.com/file.pdf)"
 
     html = '<a href="https://old-cdn.com/file.pdf">Download</a>'
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "[Download](https://new-cdn.com/file.pdf)" in result.content  # noqa: S101
-    assert result.content is None or not ("[download]" in result.content)  # noqa: S101
-    assert result.content is None or not ("old-cdn.com" in result.content)  # noqa: S101
+    assert result.content is None or "[download]" not in result.content  # noqa: S101
+    assert result.content is None or "old-cdn.com" not in result.content  # noqa: S101
 
 
 def test_visitor_mark_custom() -> None:
     """Visitor replaces highlight/mark with custom template."""
+
     class _TestVisitor:
         def visit_mark(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'=={text}=='}
+            return {"custom": f"=={text}=="}
 
     html = "<p>This is a <mark>highlighted passage</mark> in the text.</p>"
 
@@ -567,6 +604,7 @@ def test_visitor_mark_custom() -> None:
 
 def test_visitor_mark_skip() -> None:
     """Visitor skips mark elements entirely."""
+
     class _TestVisitor:
         def visit_mark(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -574,7 +612,7 @@ def test_visitor_mark_skip() -> None:
     html = "<p>Key insight: <mark>always validate input</mark> for security.</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
-    assert result.content is None or not ("always validate input" in result.content)  # noqa: S101
+    assert result.content is None or "always validate input" not in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Key insight:" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
@@ -583,6 +621,7 @@ def test_visitor_mark_skip() -> None:
 
 def test_visitor_preserve_html() -> None:
     """Visitor preserve_html action includes raw HTML in output."""
+
     class _TestVisitor:
         def visit_custom_element(self, ctx, tag_name, html):  # noqa: A002, ANN001, ANN202, ARG002
             return "preserve_html"
@@ -596,6 +635,7 @@ def test_visitor_preserve_html() -> None:
 
 def test_visitor_skip_code_blocks() -> None:
     """Visitor skips code blocks from output."""
+
     class _TestVisitor:
         def visit_code_block(self, ctx, lang, code):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -607,11 +647,12 @@ def test_visitor_skip_code_blocks() -> None:
     assert "Intro text" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Outro text" in result.content  # noqa: S101
-    assert result.content is None or not ("let x = 42" in result.content)  # noqa: S101
+    assert result.content is None or "let x = 42" not in result.content  # noqa: S101
 
 
 def test_visitor_skip_heading() -> None:
     """Visitor skip action omits all headings from output."""
+
     class _TestVisitor:
         def visit_heading(self, ctx, level, text, id):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -619,13 +660,14 @@ def test_visitor_skip_heading() -> None:
     html = "<h1>Title</h1><p>Body text remains.</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
-    assert result.content is None or not ("Title" in result.content)  # noqa: S101
+    assert result.content is None or "Title" not in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Body text remains." in result.content  # noqa: S101
 
 
 def test_visitor_skip_images() -> None:
     """Visitor skips all images from output."""
+
     class _TestVisitor:
         def visit_image(self, ctx, src, alt, title):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -637,12 +679,13 @@ def test_visitor_skip_images() -> None:
     assert "Before image" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "After image" in result.content  # noqa: S101
-    assert result.content is None or not ("photo.jpg" in result.content)  # noqa: S101
-    assert result.content is None or not ("A photo" in result.content)  # noqa: S101
+    assert result.content is None or "photo.jpg" not in result.content  # noqa: S101
+    assert result.content is None or "A photo" not in result.content  # noqa: S101
 
 
 def test_visitor_skip_links() -> None:
     """Visitor skips all links entirely."""
+
     class _TestVisitor:
         def visit_link(self, ctx, href, text, title):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -650,12 +693,13 @@ def test_visitor_skip_links() -> None:
     html = '<p>Before <a href="https://example.com">link text</a> after</p>'
 
     result = convert(html, None, visitor=_TestVisitor())
-    assert result.content is None or not ("link text" in result.content)  # noqa: S101
-    assert result.content is None or not ("example.com" in result.content)  # noqa: S101
+    assert result.content is None or "link text" not in result.content  # noqa: S101
+    assert result.content is None or "example.com" not in result.content  # noqa: S101
 
 
 def test_visitor_skip_strong() -> None:
     """Visitor skips bold/strong elements."""
+
     class _TestVisitor:
         def visit_strong(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -663,16 +707,17 @@ def test_visitor_skip_strong() -> None:
     html = "<p>Normal <strong>bold text</strong> normal</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
-    assert result.content is None or not ("bold text" in result.content)  # noqa: S101
+    assert result.content is None or "bold text" not in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "Normal" in result.content  # noqa: S101
 
 
 def test_visitor_subscript_custom() -> None:
     """Visitor replaces subscript with custom template."""
+
     class _TestVisitor:
         def visit_subscript(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'~{text}~'}
+            return {"custom": f"~{text}~"}
 
     html = "<p>H<sub>2</sub>O is water.</p>"
 
@@ -685,6 +730,7 @@ def test_visitor_subscript_custom() -> None:
 
 def test_visitor_subscript_skip() -> None:
     """Visitor skips subscript elements entirely."""
+
     class _TestVisitor:
         def visit_subscript(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -698,9 +744,10 @@ def test_visitor_subscript_skip() -> None:
 
 def test_visitor_superscript_custom() -> None:
     """Visitor replaces superscript with custom template."""
+
     class _TestVisitor:
         def visit_superscript(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'^{text}^'}
+            return {"custom": f"^{text}^"}
 
     html = "<p>Einstein's E=mc<sup>2</sup> revolutionized physics.</p>"
 
@@ -713,6 +760,7 @@ def test_visitor_superscript_custom() -> None:
 
 def test_visitor_superscript_skip() -> None:
     """Visitor skips superscript from output."""
+
     class _TestVisitor:
         def visit_superscript(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -726,20 +774,22 @@ def test_visitor_superscript_skip() -> None:
 
 def test_visitor_underline_custom() -> None:
     """Visitor replaces underline with custom markup."""
+
     class _TestVisitor:
         def visit_underline(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'_{text}_'}
+            return {"custom": f"_{text}_"}
 
     html = "<p>This is <u>very important</u> text.</p>"
 
     result = convert(html, None, visitor=_TestVisitor())
     assert result.content is not None  # noqa: S101
     assert "_very important_" in result.content  # noqa: S101
-    assert result.content is None or not ("**" in result.content)  # noqa: S101
+    assert result.content is None or "**" not in result.content  # noqa: S101
 
 
 def test_visitor_underline_skip() -> None:
     """Visitor skips underline elements from output."""
+
     class _TestVisitor:
         def visit_underline(self, ctx, text):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -751,14 +801,15 @@ def test_visitor_underline_skip() -> None:
     assert "Normal text with" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "and more text." in result.content  # noqa: S101
-    assert result.content is None or not ("underlined part" in result.content)  # noqa: S101
+    assert result.content is None or "underlined part" not in result.content  # noqa: S101
 
 
 def test_visitor_video_custom() -> None:
     """Visitor replaces video with custom link."""
+
     class _TestVisitor:
         def visit_video(self, ctx, src):  # noqa: A002, ANN001, ANN202, ARG002
-            return {"custom": f'[VIDEO: {src}]'}
+            return {"custom": f"[VIDEO: {src}]"}
 
     html = '<p>Watch our tutorial:</p><video src="tutorial.mp4" width="320" height="240" controls></video><p>Great content!</p>'
 
@@ -773,6 +824,7 @@ def test_visitor_video_custom() -> None:
 
 def test_visitor_video_skip() -> None:
     """Visitor removes video elements entirely."""
+
     class _TestVisitor:
         def visit_video(self, ctx, src):  # noqa: A002, ANN001, ANN202, ARG002
             return "skip"
@@ -784,4 +836,4 @@ def test_visitor_video_skip() -> None:
     assert "Demo" in result.content  # noqa: S101
     assert result.content is not None  # noqa: S101
     assert "See the demo above." in result.content  # noqa: S101
-    assert result.content is None or not ("demo.webm" in result.content)  # noqa: S101
+    assert result.content is None or "demo.webm" not in result.content  # noqa: S101

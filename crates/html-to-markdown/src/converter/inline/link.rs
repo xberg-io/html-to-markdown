@@ -94,10 +94,13 @@ pub fn handle(
             return;
         }
 
-        // Check if this should be rendered as an autolink
+        // Check if this should be rendered as an autolink.
+        // GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
+        // bare paths or filenames must use the full `[text](href)` form.
         let is_autolink = options.autolinks
             && !options.default_title
             && !href.is_empty()
+            && has_uri_scheme(href.as_str())
             && (raw_text == href || (href.starts_with("mailto:") && raw_text == href[7..]));
 
         if is_autolink {
@@ -344,6 +347,28 @@ pub fn handle(
     }
 }
 
+/// Check whether `href` begins with a syntactically valid RFC 3986 URI scheme.
+///
+/// A scheme matches `ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )` followed by `:`.
+/// Bare paths and filenames (e.g. `foobar.png`) fail this check and must be rendered
+/// as `[text](href)` rather than as autolinks per GFM §6.5.
+#[must_use]
+pub fn has_uri_scheme(href: &str) -> bool {
+    let mut bytes = href.bytes();
+    match bytes.next() {
+        Some(b) if b.is_ascii_alphabetic() => {}
+        _ => return false,
+    }
+    for b in bytes {
+        match b {
+            b':' => return true,
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'+' | b'-' | b'.' => {}
+            _ => return false,
+        }
+    }
+    false
+}
+
 /// Percent-encode a URL destination.
 ///
 /// Encodes every character that is not an RFC 3986 unreserved character (`A-Z`, `a-z`, `0-9`,
@@ -470,6 +495,49 @@ mod tests {
 
     fn opts_with_style(style: UrlEscapeStyle) -> ConversionOptions {
         ConversionOptions::builder().url_escape_style(style).build()
+    }
+
+    // ── has_uri_scheme ───────────────────────────────────────────────────────
+
+    #[test]
+    fn has_uri_scheme_accepts_http() {
+        assert!(has_uri_scheme("http://example.com"));
+        assert!(has_uri_scheme("https://example.com/path"));
+    }
+
+    #[test]
+    fn has_uri_scheme_accepts_mailto() {
+        assert!(has_uri_scheme("mailto:a@b.com"));
+    }
+
+    #[test]
+    fn has_uri_scheme_accepts_uncommon_schemes() {
+        assert!(has_uri_scheme("ftp://host"));
+        assert!(has_uri_scheme("ssh://host"));
+        assert!(has_uri_scheme("data:text/plain,foo"));
+        assert!(has_uri_scheme("file:///etc/hosts"));
+    }
+
+    #[test]
+    fn has_uri_scheme_rejects_bare_paths() {
+        assert!(!has_uri_scheme("foobar.png"));
+        assert!(!has_uri_scheme("/relative/path"));
+        assert!(!has_uri_scheme("../up.html"));
+        assert!(!has_uri_scheme("#fragment"));
+    }
+
+    #[test]
+    fn has_uri_scheme_rejects_leading_digit_or_punct() {
+        assert!(!has_uri_scheme("9scheme:foo"));
+        assert!(!has_uri_scheme(":no-scheme"));
+        assert!(!has_uri_scheme(""));
+    }
+
+    #[test]
+    fn issue_397_filename_with_extension_is_not_autolinked() {
+        // <a href="foobar.png">foobar.png</a> must NOT become <foobar.png> — there's no scheme.
+        // The autolink check `is_autolink` is wired with `has_uri_scheme`; verify the helper.
+        assert!(!has_uri_scheme("foobar.png"));
     }
 
     // ── percent_encode_url ───────────────────────────────────────────────────
