@@ -11,7 +11,7 @@ GEMSPEC = Gem::Specification.load(File.expand_path("html_to_markdown.gemspec", G
 Rake::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
   ext.lib_dir = "lib"
   ext.ext_dir = "ext/html_to_markdown_rb/native"
-  ext.source_pattern = "*.{}"
+  ext.source_pattern = "**/*.{rs,toml}"
   ext.platform = "ruby"
 end
 
