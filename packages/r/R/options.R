@@ -45,6 +45,7 @@
 #' @param infer_dimensions Infer image dimensions from data
 #' @param max_depth Maximum DOM traversal depth. `None` means unlimited
 #' @param exclude_selectors CSS selectors for elements to exclude entirely (element + all content)
+#' @param tier_strategy Which conversion tier to use
 #' @param visitor (feature-gated) Optional visitor for custom traversal logic
 #' @return A named list suitable for the `options` argument of [convert()].
 #' @export
@@ -91,6 +92,7 @@ conversion_options <- function(
   infer_dimensions = NULL,
   max_depth = NULL,
   exclude_selectors = NULL,
+  tier_strategy = NULL,
   visitor = NULL
 ) {
   opts <- list()
@@ -136,6 +138,7 @@ conversion_options <- function(
   if (!is.null(infer_dimensions)) opts$infer_dimensions <- infer_dimensions
   if (!is.null(max_depth)) opts$max_depth <- as.integer(max_depth)
   if (!is.null(exclude_selectors)) opts$exclude_selectors <- exclude_selectors
+  if (!is.null(tier_strategy)) opts$tier_strategy <- tier_strategy
   if (!is.null(visitor)) opts$visitor <- visitor
   opts
 }

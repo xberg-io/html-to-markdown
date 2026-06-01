@@ -12,6 +12,7 @@ export {
 	PreprocessingPreset,
 	StructuredDataType,
 	TextDirection,
+	TierStrategy,
 	UrlEscapeStyle,
 	VisitorHandle,
 	WarningKind,

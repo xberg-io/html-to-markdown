@@ -218,7 +218,7 @@ return link(_that.url,_that.title);case _:
 
 class AnnotationKind_Bold extends AnnotationKind {
   const AnnotationKind_Bold(): super._();
-  
+
 
 
 
@@ -250,7 +250,7 @@ String toString() {
 
 class AnnotationKind_Italic extends AnnotationKind {
   const AnnotationKind_Italic(): super._();
-  
+
 
 
 
@@ -282,7 +282,7 @@ String toString() {
 
 class AnnotationKind_Underline extends AnnotationKind {
   const AnnotationKind_Underline(): super._();
-  
+
 
 
 
@@ -314,7 +314,7 @@ String toString() {
 
 class AnnotationKind_Strikethrough extends AnnotationKind {
   const AnnotationKind_Strikethrough(): super._();
-  
+
 
 
 
@@ -346,7 +346,7 @@ String toString() {
 
 class AnnotationKind_Code extends AnnotationKind {
   const AnnotationKind_Code(): super._();
-  
+
 
 
 
@@ -378,7 +378,7 @@ String toString() {
 
 class AnnotationKind_Subscript extends AnnotationKind {
   const AnnotationKind_Subscript(): super._();
-  
+
 
 
 
@@ -410,7 +410,7 @@ String toString() {
 
 class AnnotationKind_Superscript extends AnnotationKind {
   const AnnotationKind_Superscript(): super._();
-  
+
 
 
 
@@ -442,7 +442,7 @@ String toString() {
 
 class AnnotationKind_Highlight extends AnnotationKind {
   const AnnotationKind_Highlight(): super._();
-  
+
 
 
 
@@ -474,7 +474,7 @@ String toString() {
 
 class AnnotationKind_Link extends AnnotationKind {
   const AnnotationKind_Link({required this.url, required this.title}): super._();
-  
+
 
 /// The URL from the `href` attribute, copied verbatim from the source HTML.
 ///
@@ -540,6 +540,689 @@ class _$AnnotationKind_LinkCopyWithImpl<$Res>
   return _then(AnnotationKind_Link(
 url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+mixin _$ConversionError {
+
+ String get field0;
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionErrorCopyWith<ConversionError> get copyWith => _$ConversionErrorCopyWithImpl<ConversionError>(this as ConversionError, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionErrorCopyWith<$Res>  {
+  factory $ConversionErrorCopyWith(ConversionError value, $Res Function(ConversionError) _then) = _$ConversionErrorCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionErrorCopyWithImpl<$Res>
+    implements $ConversionErrorCopyWith<$Res> {
+  _$ConversionErrorCopyWithImpl(this._self, this._then);
+
+  final ConversionError _self;
+  final $Res Function(ConversionError) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? field0 = null,}) {
+  return _then(_self.copyWith(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ConversionError].
+extension ConversionErrorPatterns on ConversionError {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ConversionError_ParseError value)?  parseError,TResult Function( ConversionError_SanitizationError value)?  sanitizationError,TResult Function( ConversionError_ConfigError value)?  configError,TResult Function( ConversionError_IoError value)?  ioError,TResult Function( ConversionError_Panic value)?  panic,TResult Function( ConversionError_InvalidInput value)?  invalidInput,TResult Function( ConversionError_Other value)?  other,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case ConversionError_ParseError() when parseError != null:
+return parseError(_that);case ConversionError_SanitizationError() when sanitizationError != null:
+return sanitizationError(_that);case ConversionError_ConfigError() when configError != null:
+return configError(_that);case ConversionError_IoError() when ioError != null:
+return ioError(_that);case ConversionError_Panic() when panic != null:
+return panic(_that);case ConversionError_InvalidInput() when invalidInput != null:
+return invalidInput(_that);case ConversionError_Other() when other != null:
+return other(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ConversionError_ParseError value)  parseError,required TResult Function( ConversionError_SanitizationError value)  sanitizationError,required TResult Function( ConversionError_ConfigError value)  configError,required TResult Function( ConversionError_IoError value)  ioError,required TResult Function( ConversionError_Panic value)  panic,required TResult Function( ConversionError_InvalidInput value)  invalidInput,required TResult Function( ConversionError_Other value)  other,}){
+final _that = this;
+switch (_that) {
+case ConversionError_ParseError():
+return parseError(_that);case ConversionError_SanitizationError():
+return sanitizationError(_that);case ConversionError_ConfigError():
+return configError(_that);case ConversionError_IoError():
+return ioError(_that);case ConversionError_Panic():
+return panic(_that);case ConversionError_InvalidInput():
+return invalidInput(_that);case ConversionError_Other():
+return other(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ConversionError_ParseError value)?  parseError,TResult? Function( ConversionError_SanitizationError value)?  sanitizationError,TResult? Function( ConversionError_ConfigError value)?  configError,TResult? Function( ConversionError_IoError value)?  ioError,TResult? Function( ConversionError_Panic value)?  panic,TResult? Function( ConversionError_InvalidInput value)?  invalidInput,TResult? Function( ConversionError_Other value)?  other,}){
+final _that = this;
+switch (_that) {
+case ConversionError_ParseError() when parseError != null:
+return parseError(_that);case ConversionError_SanitizationError() when sanitizationError != null:
+return sanitizationError(_that);case ConversionError_ConfigError() when configError != null:
+return configError(_that);case ConversionError_IoError() when ioError != null:
+return ioError(_that);case ConversionError_Panic() when panic != null:
+return panic(_that);case ConversionError_InvalidInput() when invalidInput != null:
+return invalidInput(_that);case ConversionError_Other() when other != null:
+return other(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String field0)?  parseError,TResult Function( String field0)?  sanitizationError,TResult Function( String field0)?  configError,TResult Function( String field0)?  ioError,TResult Function( String field0)?  panic,TResult Function( String field0)?  invalidInput,TResult Function( String field0)?  other,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case ConversionError_ParseError() when parseError != null:
+return parseError(_that.field0);case ConversionError_SanitizationError() when sanitizationError != null:
+return sanitizationError(_that.field0);case ConversionError_ConfigError() when configError != null:
+return configError(_that.field0);case ConversionError_IoError() when ioError != null:
+return ioError(_that.field0);case ConversionError_Panic() when panic != null:
+return panic(_that.field0);case ConversionError_InvalidInput() when invalidInput != null:
+return invalidInput(_that.field0);case ConversionError_Other() when other != null:
+return other(_that.field0);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String field0)  parseError,required TResult Function( String field0)  sanitizationError,required TResult Function( String field0)  configError,required TResult Function( String field0)  ioError,required TResult Function( String field0)  panic,required TResult Function( String field0)  invalidInput,required TResult Function( String field0)  other,}) {final _that = this;
+switch (_that) {
+case ConversionError_ParseError():
+return parseError(_that.field0);case ConversionError_SanitizationError():
+return sanitizationError(_that.field0);case ConversionError_ConfigError():
+return configError(_that.field0);case ConversionError_IoError():
+return ioError(_that.field0);case ConversionError_Panic():
+return panic(_that.field0);case ConversionError_InvalidInput():
+return invalidInput(_that.field0);case ConversionError_Other():
+return other(_that.field0);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String field0)?  parseError,TResult? Function( String field0)?  sanitizationError,TResult? Function( String field0)?  configError,TResult? Function( String field0)?  ioError,TResult? Function( String field0)?  panic,TResult? Function( String field0)?  invalidInput,TResult? Function( String field0)?  other,}) {final _that = this;
+switch (_that) {
+case ConversionError_ParseError() when parseError != null:
+return parseError(_that.field0);case ConversionError_SanitizationError() when sanitizationError != null:
+return sanitizationError(_that.field0);case ConversionError_ConfigError() when configError != null:
+return configError(_that.field0);case ConversionError_IoError() when ioError != null:
+return ioError(_that.field0);case ConversionError_Panic() when panic != null:
+return panic(_that.field0);case ConversionError_InvalidInput() when invalidInput != null:
+return invalidInput(_that.field0);case ConversionError_Other() when other != null:
+return other(_that.field0);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class ConversionError_ParseError extends ConversionError {
+  const ConversionError_ParseError({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_ParseErrorCopyWith<ConversionError_ParseError> get copyWith => _$ConversionError_ParseErrorCopyWithImpl<ConversionError_ParseError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_ParseError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.parseError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_ParseErrorCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_ParseErrorCopyWith(ConversionError_ParseError value, $Res Function(ConversionError_ParseError) _then) = _$ConversionError_ParseErrorCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_ParseErrorCopyWithImpl<$Res>
+    implements $ConversionError_ParseErrorCopyWith<$Res> {
+  _$ConversionError_ParseErrorCopyWithImpl(this._self, this._then);
+
+  final ConversionError_ParseError _self;
+  final $Res Function(ConversionError_ParseError) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_ParseError(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ConversionError_SanitizationError extends ConversionError {
+  const ConversionError_SanitizationError({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_SanitizationErrorCopyWith<ConversionError_SanitizationError> get copyWith => _$ConversionError_SanitizationErrorCopyWithImpl<ConversionError_SanitizationError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_SanitizationError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.sanitizationError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_SanitizationErrorCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_SanitizationErrorCopyWith(ConversionError_SanitizationError value, $Res Function(ConversionError_SanitizationError) _then) = _$ConversionError_SanitizationErrorCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_SanitizationErrorCopyWithImpl<$Res>
+    implements $ConversionError_SanitizationErrorCopyWith<$Res> {
+  _$ConversionError_SanitizationErrorCopyWithImpl(this._self, this._then);
+
+  final ConversionError_SanitizationError _self;
+  final $Res Function(ConversionError_SanitizationError) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_SanitizationError(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ConversionError_ConfigError extends ConversionError {
+  const ConversionError_ConfigError({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_ConfigErrorCopyWith<ConversionError_ConfigError> get copyWith => _$ConversionError_ConfigErrorCopyWithImpl<ConversionError_ConfigError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_ConfigError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.configError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_ConfigErrorCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_ConfigErrorCopyWith(ConversionError_ConfigError value, $Res Function(ConversionError_ConfigError) _then) = _$ConversionError_ConfigErrorCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_ConfigErrorCopyWithImpl<$Res>
+    implements $ConversionError_ConfigErrorCopyWith<$Res> {
+  _$ConversionError_ConfigErrorCopyWithImpl(this._self, this._then);
+
+  final ConversionError_ConfigError _self;
+  final $Res Function(ConversionError_ConfigError) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_ConfigError(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ConversionError_IoError extends ConversionError {
+  const ConversionError_IoError({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_IoErrorCopyWith<ConversionError_IoError> get copyWith => _$ConversionError_IoErrorCopyWithImpl<ConversionError_IoError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_IoError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.ioError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_IoErrorCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_IoErrorCopyWith(ConversionError_IoError value, $Res Function(ConversionError_IoError) _then) = _$ConversionError_IoErrorCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_IoErrorCopyWithImpl<$Res>
+    implements $ConversionError_IoErrorCopyWith<$Res> {
+  _$ConversionError_IoErrorCopyWithImpl(this._self, this._then);
+
+  final ConversionError_IoError _self;
+  final $Res Function(ConversionError_IoError) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_IoError(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ConversionError_Panic extends ConversionError {
+  const ConversionError_Panic({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_PanicCopyWith<ConversionError_Panic> get copyWith => _$ConversionError_PanicCopyWithImpl<ConversionError_Panic>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_Panic&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.panic(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_PanicCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_PanicCopyWith(ConversionError_Panic value, $Res Function(ConversionError_Panic) _then) = _$ConversionError_PanicCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_PanicCopyWithImpl<$Res>
+    implements $ConversionError_PanicCopyWith<$Res> {
+  _$ConversionError_PanicCopyWithImpl(this._self, this._then);
+
+  final ConversionError_Panic _self;
+  final $Res Function(ConversionError_Panic) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_Panic(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ConversionError_InvalidInput extends ConversionError {
+  const ConversionError_InvalidInput({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_InvalidInputCopyWith<ConversionError_InvalidInput> get copyWith => _$ConversionError_InvalidInputCopyWithImpl<ConversionError_InvalidInput>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_InvalidInput&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.invalidInput(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_InvalidInputCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_InvalidInputCopyWith(ConversionError_InvalidInput value, $Res Function(ConversionError_InvalidInput) _then) = _$ConversionError_InvalidInputCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_InvalidInputCopyWithImpl<$Res>
+    implements $ConversionError_InvalidInputCopyWith<$Res> {
+  _$ConversionError_InvalidInputCopyWithImpl(this._self, this._then);
+
+  final ConversionError_InvalidInput _self;
+  final $Res Function(ConversionError_InvalidInput) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_InvalidInput(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class ConversionError_Other extends ConversionError {
+  const ConversionError_Other({required this.field0}): super._();
+
+
+@override final  String field0;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ConversionError_OtherCopyWith<ConversionError_Other> get copyWith => _$ConversionError_OtherCopyWithImpl<ConversionError_Other>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConversionError_Other&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'ConversionError.other(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ConversionError_OtherCopyWith<$Res> implements $ConversionErrorCopyWith<$Res> {
+  factory $ConversionError_OtherCopyWith(ConversionError_Other value, $Res Function(ConversionError_Other) _then) = _$ConversionError_OtherCopyWithImpl;
+@override @useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$ConversionError_OtherCopyWithImpl<$Res>
+    implements $ConversionError_OtherCopyWith<$Res> {
+  _$ConversionError_OtherCopyWithImpl(this._self, this._then);
+
+  final ConversionError_Other _self;
+  final $Res Function(ConversionError_Other) _then;
+
+/// Create a copy of ConversionError
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(ConversionError_Other(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -778,7 +1461,7 @@ return group(_that.label,_that.headingLevel,_that.headingText);case _:
 
 class NodeContent_Heading extends NodeContent {
   const NodeContent_Heading({required this.level, required this.text}): super._();
-  
+
 
 /// Heading level (1-6).
  final  PlatformInt64 level;
@@ -848,7 +1531,7 @@ as String,
 
 class NodeContent_Paragraph extends NodeContent {
   const NodeContent_Paragraph({required this.text}): super._();
-  
+
 
 /// The paragraph text content.
  final  String text;
@@ -915,7 +1598,7 @@ as String,
 
 class NodeContent_List extends NodeContent {
   const NodeContent_List({required this.ordered}): super._();
-  
+
 
 /// Whether this is an ordered list.
  final  bool ordered;
@@ -982,7 +1665,7 @@ as bool,
 
 class NodeContent_ListItem extends NodeContent {
   const NodeContent_ListItem({required this.text}): super._();
-  
+
 
 /// The list item text content.
  final  String text;
@@ -1049,7 +1732,7 @@ as String,
 
 class NodeContent_Table extends NodeContent {
   const NodeContent_Table({required this.grid}): super._();
-  
+
 
 /// The table grid structure.
  final  TableGrid grid;
@@ -1116,7 +1799,7 @@ as TableGrid,
 
 class NodeContent_Image extends NodeContent {
   const NodeContent_Image({required this.description, required this.src, required this.imageIndex}): super._();
-  
+
 
 /// Alt text or caption.
  final  String description;
@@ -1189,7 +1872,7 @@ as PlatformInt64,
 
 class NodeContent_Code extends NodeContent {
   const NodeContent_Code({required this.text, required this.language}): super._();
-  
+
 
 /// The code text content.
  final  String text;
@@ -1259,7 +1942,7 @@ as String,
 
 class NodeContent_Quote extends NodeContent {
   const NodeContent_Quote(): super._();
-  
+
 
 
 
@@ -1291,7 +1974,7 @@ String toString() {
 
 class NodeContent_DefinitionList extends NodeContent {
   const NodeContent_DefinitionList(): super._();
-  
+
 
 
 
@@ -1323,7 +2006,7 @@ String toString() {
 
 class NodeContent_DefinitionItem extends NodeContent {
   const NodeContent_DefinitionItem({required this.term, required this.definition}): super._();
-  
+
 
 /// The term being defined.
  final  String term;
@@ -1393,7 +2076,7 @@ as String,
 
 class NodeContent_RawBlock extends NodeContent {
   const NodeContent_RawBlock({required this.format, required this.content}): super._();
-  
+
 
 /// The format of the raw content (e.g. "html", "css", "javascript").
  final  String format;
@@ -1463,7 +2146,7 @@ as String,
 
 class NodeContent_MetadataBlock extends NodeContent {
   const NodeContent_MetadataBlock({required final  List<List<String>> entries}): _entries = entries,super._();
-  
+
 
 /// Key-value metadata pairs.
  final  List<List<String>> _entries;
@@ -1537,7 +2220,7 @@ as List<List<String>>,
 
 class NodeContent_Group extends NodeContent {
   const NodeContent_Group({required this.label, required this.headingLevel, required this.headingText}): super._();
-  
+
 
 /// Optional section label.
  final  String label;
@@ -1788,7 +2471,7 @@ return error(_that.field0);case _:
 
 class VisitResult_Continue extends VisitResult {
   const VisitResult_Continue(): super._();
-  
+
 
 
 
@@ -1820,7 +2503,7 @@ String toString() {
 
 class VisitResult_Custom extends VisitResult {
   const VisitResult_Custom({required this.field0}): super._();
-  
+
 
  final  String field0;
 
@@ -1886,7 +2569,7 @@ as String,
 
 class VisitResult_Skip extends VisitResult {
   const VisitResult_Skip(): super._();
-  
+
 
 
 
@@ -1918,7 +2601,7 @@ String toString() {
 
 class VisitResult_PreserveHtml extends VisitResult {
   const VisitResult_PreserveHtml(): super._();
-  
+
 
 
 
@@ -1950,7 +2633,7 @@ String toString() {
 
 class VisitResult_Error extends VisitResult {
   const VisitResult_Error({required this.field0}): super._();
-  
+
 
  final  String field0;
 

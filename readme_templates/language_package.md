@@ -57,6 +57,8 @@
 
 {% include 'partials/_quick_start.md' %}
 
+{% include 'partials/_architecture.md' %}
+
 ## API Reference
 
 {% include 'partials/_api_reference.md' %}

@@ -179,4 +179,12 @@ data class ConversionOptions(
      * "[role='complementary']".into()]`
      */
     val excludeSelectors: List<String> = emptyList(),
+    /**
+     * Which conversion tier to use.
+     *
+     * - `TierStrategy.Auto` (default) — automatically choose the best path.
+     * - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path.
+     * - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only).
+     */
+    val tierStrategy: TierStrategy = TierStrategy.AUTO,
 )

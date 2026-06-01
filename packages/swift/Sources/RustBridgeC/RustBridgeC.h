@@ -461,6 +461,18 @@ void* __swift_bridge__$Vec_StructuredDataType$get_mut(void* vec_ptr, uintptr_t i
 uintptr_t __swift_bridge__$Vec_StructuredDataType$len(void* vec_ptr);
 void* __swift_bridge__$Vec_StructuredDataType$as_ptr(void* vec_ptr);
 
+typedef struct TierStrategy TierStrategy;
+void __swift_bridge__$TierStrategy$_free(void* self);
+
+void* __swift_bridge__$Vec_TierStrategy$new(void);
+void __swift_bridge__$Vec_TierStrategy$drop(void* vec_ptr);
+void __swift_bridge__$Vec_TierStrategy$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_TierStrategy$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_TierStrategy$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_TierStrategy$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_TierStrategy$len(void* vec_ptr);
+void* __swift_bridge__$Vec_TierStrategy$as_ptr(void* vec_ptr);
+
 typedef struct PreprocessingPreset PreprocessingPreset;
 void __swift_bridge__$PreprocessingPreset$_free(void* self);
 
@@ -679,7 +691,7 @@ void* __swift_bridge__$HtmlMetadata$headers(void* self);
 void* __swift_bridge__$HtmlMetadata$links(void* self);
 void* __swift_bridge__$HtmlMetadata$images(void* self);
 void* __swift_bridge__$HtmlMetadata$structured_data(void* self);
-void* __swift_bridge__$ConversionOptions$new(void* heading_style, void* list_indent_type, uintptr_t list_indent_width, void* bullets, void* strong_em_symbol, bool escape_asterisks, bool escape_underscores, bool escape_misc, bool escape_ascii, void* code_language, bool autolinks, bool default_title, bool br_in_tables, bool compact_tables, void* highlight_style, bool extract_metadata, void* whitespace_mode, bool strip_newlines, bool wrap, uintptr_t wrap_width, bool convert_as_inline, void* sub_symbol, void* sup_symbol, void* newline_style, void* code_block_style, void* keep_inline_images_in, void* preprocessing, void* encoding, bool debug, void* strip_tags, void* preserve_tags, bool skip_images, void* url_escape_style, void* link_style, void* output_format, bool include_document_structure, bool extract_images, uint64_t max_image_size, bool capture_svg, bool infer_dimensions, struct __private__OptionUsize max_depth, void* exclude_selectors, void* visitor);
+void* __swift_bridge__$ConversionOptions$new(void* heading_style, void* list_indent_type, uintptr_t list_indent_width, void* bullets, void* strong_em_symbol, bool escape_asterisks, bool escape_underscores, bool escape_misc, bool escape_ascii, void* code_language, bool autolinks, bool default_title, bool br_in_tables, bool compact_tables, void* highlight_style, bool extract_metadata, void* whitespace_mode, bool strip_newlines, bool wrap, uintptr_t wrap_width, bool convert_as_inline, void* sub_symbol, void* sup_symbol, void* newline_style, void* code_block_style, void* keep_inline_images_in, void* preprocessing, void* encoding, bool debug, void* strip_tags, void* preserve_tags, bool skip_images, void* url_escape_style, void* link_style, void* output_format, bool include_document_structure, bool extract_images, uint64_t max_image_size, bool capture_svg, bool infer_dimensions, struct __private__OptionUsize max_depth, void* exclude_selectors, void* tier_strategy, void* visitor);
 void* __swift_bridge__$ConversionOptions$heading_style(void* self);
 void* __swift_bridge__$ConversionOptions$list_indent_type(void* self);
 uintptr_t __swift_bridge__$ConversionOptions$list_indent_width(void* self);
@@ -722,8 +734,9 @@ bool __swift_bridge__$ConversionOptions$capture_svg(void* self);
 bool __swift_bridge__$ConversionOptions$infer_dimensions(void* self);
 struct __private__OptionUsize __swift_bridge__$ConversionOptions$max_depth(void* self);
 void* __swift_bridge__$ConversionOptions$exclude_selectors(void* self);
+void* __swift_bridge__$ConversionOptions$tier_strategy(void* self);
 void* __swift_bridge__$ConversionOptions$visitor(void* self);
-void* __swift_bridge__$ConversionOptionsUpdate$new(void* heading_style, void* list_indent_type, struct __private__OptionUsize list_indent_width, void* bullets, void* strong_em_symbol, struct __private__OptionBool escape_asterisks, struct __private__OptionBool escape_underscores, struct __private__OptionBool escape_misc, struct __private__OptionBool escape_ascii, void* code_language, struct __private__OptionBool autolinks, struct __private__OptionBool default_title, struct __private__OptionBool br_in_tables, struct __private__OptionBool compact_tables, void* highlight_style, struct __private__OptionBool extract_metadata, void* whitespace_mode, struct __private__OptionBool strip_newlines, struct __private__OptionBool wrap, struct __private__OptionUsize wrap_width, struct __private__OptionBool convert_as_inline, void* sub_symbol, void* sup_symbol, void* newline_style, void* code_block_style, void* keep_inline_images_in, void* preprocessing, void* encoding, struct __private__OptionBool debug, void* strip_tags, void* preserve_tags, struct __private__OptionBool skip_images, void* url_escape_style, void* link_style, void* output_format, struct __private__OptionBool include_document_structure, struct __private__OptionBool extract_images, struct __private__OptionU64 max_image_size, struct __private__OptionBool capture_svg, struct __private__OptionBool infer_dimensions, void* max_depth, void* exclude_selectors, void* visitor);
+void* __swift_bridge__$ConversionOptionsUpdate$new(void* heading_style, void* list_indent_type, struct __private__OptionUsize list_indent_width, void* bullets, void* strong_em_symbol, struct __private__OptionBool escape_asterisks, struct __private__OptionBool escape_underscores, struct __private__OptionBool escape_misc, struct __private__OptionBool escape_ascii, void* code_language, struct __private__OptionBool autolinks, struct __private__OptionBool default_title, struct __private__OptionBool br_in_tables, struct __private__OptionBool compact_tables, void* highlight_style, struct __private__OptionBool extract_metadata, void* whitespace_mode, struct __private__OptionBool strip_newlines, struct __private__OptionBool wrap, struct __private__OptionUsize wrap_width, struct __private__OptionBool convert_as_inline, void* sub_symbol, void* sup_symbol, void* newline_style, void* code_block_style, void* keep_inline_images_in, void* preprocessing, void* encoding, struct __private__OptionBool debug, void* strip_tags, void* preserve_tags, struct __private__OptionBool skip_images, void* url_escape_style, void* link_style, void* output_format, struct __private__OptionBool include_document_structure, struct __private__OptionBool extract_images, struct __private__OptionU64 max_image_size, struct __private__OptionBool capture_svg, struct __private__OptionBool infer_dimensions, void* max_depth, void* exclude_selectors, void* tier_strategy, void* visitor);
 void* __swift_bridge__$ConversionOptionsUpdate$heading_style(void* self);
 void* __swift_bridge__$ConversionOptionsUpdate$list_indent_type(void* self);
 struct __private__OptionUsize __swift_bridge__$ConversionOptionsUpdate$list_indent_width(void* self);
@@ -766,6 +779,7 @@ struct __private__OptionBool __swift_bridge__$ConversionOptionsUpdate$capture_sv
 struct __private__OptionBool __swift_bridge__$ConversionOptionsUpdate$infer_dimensions(void* self);
 void* __swift_bridge__$ConversionOptionsUpdate$max_depth(void* self);
 void* __swift_bridge__$ConversionOptionsUpdate$exclude_selectors(void* self);
+void* __swift_bridge__$ConversionOptionsUpdate$tier_strategy(void* self);
 void* __swift_bridge__$ConversionOptionsUpdate$visitor(void* self);
 void* __swift_bridge__$PreprocessingOptions$new(bool enabled, void* preset, bool remove_navigation, bool remove_forms);
 bool __swift_bridge__$PreprocessingOptions$enabled(void* self);
@@ -819,6 +833,7 @@ void* __swift_bridge__$TextDirection$to_string(void* self);
 void* __swift_bridge__$LinkType$to_string(void* self);
 void* __swift_bridge__$ImageType$to_string(void* self);
 void* __swift_bridge__$StructuredDataType$to_string(void* self);
+void* __swift_bridge__$TierStrategy$to_string(void* self);
 void* __swift_bridge__$PreprocessingPreset$to_string(void* self);
 void* __swift_bridge__$HeadingStyle$to_string(void* self);
 void* __swift_bridge__$ListIndentType$to_string(void* self);
@@ -860,6 +875,7 @@ struct __private__ResultPtrAndPtr __swift_bridge__$text_direction_from_json(void
 struct __private__ResultPtrAndPtr __swift_bridge__$link_type_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$image_type_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$structured_data_type_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$tier_strategy_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$node_content_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$annotation_kind_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$warning_kind_from_json(void* json);

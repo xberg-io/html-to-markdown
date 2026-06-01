@@ -8,8 +8,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `ConversionError`, `HtmlVisitorDartImpl`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
 /// and warnings.
@@ -281,6 +281,39 @@ enum CodeBlockStyle {
   tildes,
 }
 
+@freezed
+sealed class ConversionError with _$ConversionError {
+  const ConversionError._();
+
+  /// HTML parsing error
+  const factory ConversionError.parseError({required String field0}) =
+      ConversionError_ParseError;
+
+  /// HTML sanitization error
+  const factory ConversionError.sanitizationError({required String field0}) =
+      ConversionError_SanitizationError;
+
+  /// Invalid configuration
+  const factory ConversionError.configError({required String field0}) =
+      ConversionError_ConfigError;
+
+  /// I/O error
+  const factory ConversionError.ioError({required String field0}) =
+      ConversionError_IoError;
+
+  /// Panic caught during conversion to prevent unwinding across FFI boundaries
+  const factory ConversionError.panic({required String field0}) =
+      ConversionError_Panic;
+
+  /// Invalid input data
+  const factory ConversionError.invalidInput({required String field0}) =
+      ConversionError_InvalidInput;
+
+  /// Generic conversion error
+  const factory ConversionError.other({required String field0}) =
+      ConversionError_Other;
+}
+
 /// Main conversion options for HTML to Markdown conversion.
 ///
 /// Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
@@ -470,6 +503,13 @@ class ConversionOptions {
   /// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
   final List<String> excludeSelectors;
 
+  /// Which conversion tier to use.
+  ///
+  /// - [`TierStrategy::Auto`] (default) — automatically choose the best path.
+  /// - [`TierStrategy::Tier2`] — always use the Tier-2 DOM-walk path.
+  /// - `TierStrategy::Tier1` — always attempt Tier-1 (testkit only).
+  final TierStrategy tierStrategy;
+
   /// Optional visitor for custom traversal logic.
   ///
   /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -520,6 +560,7 @@ class ConversionOptions {
     required this.inferDimensions,
     this.maxDepth,
     required this.excludeSelectors,
+    required this.tierStrategy,
     this.visitor,
   });
 
@@ -567,6 +608,7 @@ class ConversionOptions {
       inferDimensions.hashCode ^
       maxDepth.hashCode ^
       excludeSelectors.hashCode ^
+      tierStrategy.hashCode ^
       visitor.hashCode;
 
   @override
@@ -616,6 +658,7 @@ class ConversionOptions {
           inferDimensions == other.inferDimensions &&
           maxDepth == other.maxDepth &&
           excludeSelectors == other.excludeSelectors &&
+          tierStrategy == other.tierStrategy &&
           visitor == other.visitor;
 }
 
@@ -750,6 +793,9 @@ class ConversionOptionsUpdate {
   /// Optional override for [`ConversionOptions::exclude_selectors`].
   final List<String>? excludeSelectors;
 
+  /// Optional override for [`ConversionOptions::tier_strategy`].
+  final TierStrategy? tierStrategy;
+
   /// Optional override for [`ConversionOptions::visitor`].
   final VisitorHandle? visitor;
 
@@ -796,6 +842,7 @@ class ConversionOptionsUpdate {
     this.inferDimensions,
     this.maxDepth,
     this.excludeSelectors,
+    this.tierStrategy,
     this.visitor,
   });
 
@@ -843,6 +890,7 @@ class ConversionOptionsUpdate {
       inferDimensions.hashCode ^
       maxDepth.hashCode ^
       excludeSelectors.hashCode ^
+      tierStrategy.hashCode ^
       visitor.hashCode;
 
   @override
@@ -892,6 +940,7 @@ class ConversionOptionsUpdate {
           inferDimensions == other.inferDimensions &&
           maxDepth == other.maxDepth &&
           excludeSelectors == other.excludeSelectors &&
+          tierStrategy == other.tierStrategy &&
           visitor == other.visitor;
 }
 
@@ -2336,6 +2385,23 @@ enum TextDirection {
 
   /// Automatic directionality detection
   auto,
+}
+
+/// Controls which conversion tier is used.
+enum TierStrategy {
+  /// Automatically pick the best tier for the input (default).
+  ///
+  /// Runs the classifier against the prescan report and uses Tier-1 when
+  /// eligible; falls back to Tier-2 on bail or when the classifier routes
+  /// to Tier-2.
+  auto,
+
+  /// Always use the Tier-2 (`tl::parse` + walk) path, skipping Tier-1.
+  tier2,
+
+  /// Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
+  /// Testkit-only; not stable API.
+  tier1,
 }
 
 /// URL encoding strategy for link and image destinations.

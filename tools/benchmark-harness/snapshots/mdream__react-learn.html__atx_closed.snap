@@ -44,13 +44,13 @@ React apps are made out of *components*. A component is a piece of the UI (user 
 React components are JavaScript functions that return markup:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  return (  
+  return (
 
-    <button>I'm a button</button>  
+    <button>I'm a button</button>
 
-  );  
+  );
 
 }
 ```
@@ -58,19 +58,19 @@ function MyButton() {
 Now that you’ve declared `MyButton`, you can nest it into another component:
 
 ```
-export default function MyApp() {  
+export default function MyApp() {
 
-  return (  
+  return (
 
-    <div>  
+    <div>
 
-      <h1>Welcome to my app</h1>  
+      <h1>Welcome to my app</h1>
 
-      <MyButton />  
+      <MyButton />
 
-    </div>  
+    </div>
 
-  );  
+  );
 
 }
 ```
@@ -119,19 +119,19 @@ The markup syntax you’ve seen above is called *JSX*. It is optional, but most 
 JSX is stricter than HTML. You have to close tags like `<br />`. Your component also can’t return multiple JSX tags. You have to wrap them into a shared parent, like a `<div>...</div>` or an empty `<>...</>` wrapper:
 
 ```
-function AboutPage() {  
+function AboutPage() {
 
-  return (  
+  return (
 
-    <>  
+    <>
 
-      <h1>About</h1>  
+      <h1>About</h1>
 
-      <p>Hello there.<br />How do you do?</p>  
+      <p>Hello there.<br />How do you do?</p>
 
-    </>  
+    </>
 
-  );  
+  );
 
 }
 ```
@@ -149,11 +149,11 @@ In React, you specify a CSS class with `className`. It works the same way as the
 Then you write the CSS rules for it in a separate CSS file:
 
 ```
-/* In your CSS */  
+/* In your CSS */
 
-.avatar {  
+.avatar {
 
-  border-radius: 50%;  
+  border-radius: 50%;
 
 }
 ```
@@ -165,13 +165,13 @@ React does not prescribe how you add CSS files. In the simplest case, you’ll a
 JSX lets you put markup into JavaScript. Curly braces let you “escape back” into JavaScript so that you can embed some variable from your code and display it to the user. For example, this will display `user.name`:
 
 ```
-return (  
+return (
 
-  <h1>  
+  <h1>
 
-    {user.name}  
+    {user.name}
 
-  </h1>  
+  </h1>
 
 );
 ```
@@ -179,15 +179,15 @@ return (
 You can also “escape into JavaScript” from JSX attributes, but you have to use curly braces *instead of* quotes. For example, `className="avatar"` passes the `"avatar"` string as the CSS class, but `src={user.imageUrl}` reads the JavaScript `user.imageUrl` variable value, and then passes that value as the `src` attribute:
 
 ```
-return (  
+return (
 
-  <img  
+  <img
 
-    className="avatar"  
+    className="avatar"
 
-    src={user.imageUrl}  
+    src={user.imageUrl}
 
-  />  
+  />
 
 );
 ```
@@ -238,25 +238,25 @@ In the above example, `style={{}}` is not a special syntax, but a regular `{}` o
 In React, there is no special syntax for writing conditions. Instead, you’ll use the same techniques as you use when writing regular JavaScript code. For example, you can use an [`if`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else) statement to conditionally include JSX:
 
 ```
-let content;  
+let content;
 
-if (isLoggedIn) {  
+if (isLoggedIn) {
 
-  content = <AdminPanel />;  
+  content = <AdminPanel />;
 
-} else {  
+} else {
 
-  content = <LoginForm />;  
+  content = <LoginForm />;
 
-}  
+}
 
-return (  
+return (
 
-  <div>  
+  <div>
 
-    {content}  
+    {content}
 
-  </div>  
+  </div>
 
 );
 ```
@@ -264,17 +264,17 @@ return (
 If you prefer more compact code, you can use the [conditional `?` operator.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator) Unlike `if`, it works inside JSX:
 
 ```
-<div>  
+<div>
 
-  {isLoggedIn ? (  
+  {isLoggedIn ? (
 
-    <AdminPanel />  
+    <AdminPanel />
 
-  ) : (  
+  ) : (
 
-    <LoginForm />  
+    <LoginForm />
 
-  )}  
+  )}
 
 </div>
 ```
@@ -282,9 +282,9 @@ If you prefer more compact code, you can use the [conditional `?` operator.](htt
 When you don’t need the `else` branch, you can also use a shorter [logical `&&` syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation):
 
 ```
-<div>  
+<div>
 
-  {isLoggedIn && <AdminPanel />}  
+  {isLoggedIn && <AdminPanel />}
 
 </div>
 ```
@@ -298,13 +298,13 @@ You will rely on JavaScript features like [`for` loop](https://developer.mozilla
 For example, let’s say you have an array of products:
 
 ```
-const products = [  
+const products = [
 
-  { title: 'Cabbage', id: 1 },  
+  { title: 'Cabbage', id: 1 },
 
-  { title: 'Garlic', id: 2 },  
+  { title: 'Garlic', id: 2 },
 
-  { title: 'Apple', id: 3 },  
+  { title: 'Apple', id: 3 },
 
 ];
 ```
@@ -312,19 +312,19 @@ const products = [
 Inside your component, use the `map()` function to transform an array of products into an array of `<li>` items:
 
 ```
-const listItems = products.map(product =>  
+const listItems = products.map(product =>
 
-  <li key={product.id}>  
+  <li key={product.id}>
 
-    {product.title}  
+    {product.title}
 
-  </li>  
+  </li>
 
-);  
+);
 
-return (  
+return (
 
-  <ul>{listItems}</ul>  
+  <ul>{listItems}</ul>
 
 );
 ```
@@ -373,23 +373,23 @@ export default function ShoppingList() {
 You can respond to events by declaring *event handler* functions inside your components:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  function handleClick() {  
+  function handleClick() {
 
-    alert('You clicked me!');  
+    alert('You clicked me!');
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <button onClick={handleClick}>  
+    <button onClick={handleClick}>
 
-      Click me  
+      Click me
 
-    </button>  
+    </button>
 
-  );  
+  );
 
 }
 ```
@@ -409,9 +409,9 @@ import { useState } from 'react';
 Now you can declare a *state variable* inside your component:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
   // ...
 ```
@@ -421,25 +421,25 @@ You’ll get two things from `useState`: the current state (`count`), and the fu
 The first time the button is displayed, `count` will be `0` because you passed `0` to `useState()`. When you want to change state, call `setCount()` and pass the new value to it. Clicking this button will increment the counter:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
-  function handleClick() {  
+  function handleClick() {
 
-    setCount(count + 1);  
+    setCount(count + 1);
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <button onClick={handleClick}>  
+    <button onClick={handleClick}>
 
-      Clicked {count} times  
+      Clicked {count} times
 
-    </button>  
+    </button>
 
-  );  
+  );
 
 }
 ```
@@ -531,35 +531,35 @@ Now when you click either button, the `count` in `MyApp` will change, which will
 First, *move the state up* from `MyButton` into `MyApp`:
 
 ```
-export default function MyApp() {  
+export default function MyApp() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
-  function handleClick() {  
+  function handleClick() {
 
-    setCount(count + 1);  
+    setCount(count + 1);
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <div>  
+    <div>
 
-      <h1>Counters that update separately</h1>  
+      <h1>Counters that update separately</h1>
 
-      <MyButton />  
+      <MyButton />
 
-      <MyButton />  
+      <MyButton />
 
-    </div>  
+    </div>
 
-  );  
+  );
 
-}  
+}
 
-function MyButton() {  
+function MyButton() {
 
-  // ... we're moving code from here ...  
+  // ... we're moving code from here ...
 
 }
 ```
@@ -567,29 +567,29 @@ function MyButton() {
 Then, *pass the state down* from `MyApp` to each `MyButton`, together with the shared click handler. You can pass information to `MyButton` using the JSX curly braces, just like you previously did with built-in tags like `<img>`:
 
 ```
-export default function MyApp() {  
+export default function MyApp() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
-  function handleClick() {  
+  function handleClick() {
 
-    setCount(count + 1);  
+    setCount(count + 1);
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <div>  
+    <div>
 
-      <h1>Counters that update together</h1>  
+      <h1>Counters that update together</h1>
 
-      <MyButton count={count} onClick={handleClick} />  
+      <MyButton count={count} onClick={handleClick} />
 
-      <MyButton count={count} onClick={handleClick} />  
+      <MyButton count={count} onClick={handleClick} />
 
-    </div>  
+    </div>
 
-  );  
+  );
 
 }
 ```
@@ -599,17 +599,17 @@ The information you pass down like this is called *props*. Now the `MyApp` compo
 Finally, change `MyButton` to *read* the props you have passed from its parent component:
 
 ```
-function MyButton({ count, onClick }) {  
+function MyButton({ count, onClick }) {
 
-  return (  
+  return (
 
-    <button onClick={onClick}>  
+    <button onClick={onClick}>
 
-      Clicked {count} times  
+      Clicked {count} times
 
-    </button>  
+    </button>
 
-  );  
+  );
 
 }
 ```

@@ -299,6 +299,12 @@ pub const ConversionOptions = struct {
     ///
     /// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
     exclude_selectors: []const []const u8,
+    /// Which conversion tier to use.
+    ///
+    /// - `TierStrategy.Auto` (default) — automatically choose the best path.
+    /// - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path.
+    /// - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only).
+    tier_strategy: TierStrategy,
     /// Optional visitor for custom traversal logic.
     ///
     /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -396,6 +402,8 @@ pub const ConversionOptionsUpdate = struct {
     max_depth: ?u64,
     /// Optional override for `ConversionOptions.exclude_selectors`.
     exclude_selectors: ?[]const []const u8,
+    /// Optional override for `ConversionOptions.tier_strategy`.
+    tier_strategy: ?TierStrategy,
     /// Optional override for `ConversionOptions.visitor`.
     visitor: ?VisitorHandle,
 };
@@ -666,6 +674,21 @@ pub const StructuredDataType = enum {
     microdata,
     /// RDF in Attributes (RDFa) markup
     rdfa,
+};
+
+/// Controls which conversion tier is used.
+pub const TierStrategy = enum {
+    /// Automatically pick the best tier for the input (default).
+    ///
+    /// Runs the classifier against the prescan report and uses Tier-1 when
+    /// eligible; falls back to Tier-2 on bail or when the classifier routes
+    /// to Tier-2.
+    auto,
+    /// Always use the Tier-2 (`tl.parse` + walk) path, skipping Tier-1.
+    tier2,
+    /// Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
+    /// Testkit-only; not stable API.
+    tier1,
 };
 
 /// HTML preprocessing aggressiveness level.

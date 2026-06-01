@@ -21,19 +21,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.6.0-rc.1", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.6.0-rc.1", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images"] }
 napi = { version = "3", features = ["async"] }
 napi-derive = "3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
-[features]
-# Mirrors the `testkit` feature of `html-to-markdown-rs` so generated cfg guards compile cleanly.
-testkit = ["html-to-markdown-rs/testkit"]
-
-[dev-dependencies]
-# Enable testkit in the core crate when running tests, so TierStrategy::Tier1 variant exists.
-html-to-markdown-rs = { version = "3.6.0-rc.1", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
 
 [build-dependencies]
 napi-build = "2"

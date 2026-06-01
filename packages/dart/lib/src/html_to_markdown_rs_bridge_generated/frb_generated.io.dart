@@ -189,6 +189,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TextDirection dco_decode_box_autoadd_text_direction(dynamic raw);
 
   @protected
+  TierStrategy dco_decode_box_autoadd_tier_strategy(dynamic raw);
+
+  @protected
   UrlEscapeStyle dco_decode_box_autoadd_url_escape_style(dynamic raw);
 
   @protected
@@ -196,6 +199,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CodeBlockStyle dco_decode_code_block_style(dynamic raw);
+
+  @protected
+  ConversionError dco_decode_conversion_error(dynamic raw);
 
   @protected
   ConversionOptions dco_decode_conversion_options(dynamic raw);
@@ -369,6 +375,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TextDirection? dco_decode_opt_box_autoadd_text_direction(dynamic raw);
 
   @protected
+  TierStrategy? dco_decode_opt_box_autoadd_tier_strategy(dynamic raw);
+
+  @protected
   UrlEscapeStyle? dco_decode_opt_box_autoadd_url_escape_style(dynamic raw);
 
   @protected
@@ -417,6 +426,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TextDirection dco_decode_text_direction(dynamic raw);
+
+  @protected
+  TierStrategy dco_decode_tier_strategy(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -546,6 +558,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  TierStrategy sse_decode_box_autoadd_tier_strategy(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   UrlEscapeStyle sse_decode_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   );
@@ -557,6 +574,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CodeBlockStyle sse_decode_code_block_style(SseDeserializer deserializer);
+
+  @protected
+  ConversionError sse_decode_conversion_error(SseDeserializer deserializer);
 
   @protected
   ConversionOptions sse_decode_conversion_options(SseDeserializer deserializer);
@@ -772,6 +792,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  TierStrategy? sse_decode_opt_box_autoadd_tier_strategy(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   UrlEscapeStyle? sse_decode_opt_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   );
@@ -832,6 +857,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TextDirection sse_decode_text_direction(SseDeserializer deserializer);
+
+  @protected
+  TierStrategy sse_decode_tier_strategy(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -1089,6 +1117,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_tier_strategy(
+    TierStrategy self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_url_escape_style(
     UrlEscapeStyle self,
     SseSerializer serializer,
@@ -1103,6 +1137,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_code_block_style(
     CodeBlockStyle self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_conversion_error(
+    ConversionError self,
     SseSerializer serializer,
   );
 
@@ -1378,6 +1418,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_tier_strategy(
+    TierStrategy? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_url_escape_style(
     UrlEscapeStyle? self,
     SseSerializer serializer,
@@ -1457,6 +1503,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_text_direction(TextDirection self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_tier_strategy(TierStrategy self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

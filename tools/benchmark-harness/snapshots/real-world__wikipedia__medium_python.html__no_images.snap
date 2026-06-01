@@ -48,7 +48,7 @@ title: Python (programming language) - Wikipedia
 - [Esperanto](https://eo.wikipedia.org/wiki/Python_(programlingvo) "Python (programlingvo) – Esperanto")
 - [Euskara](https://eu.wikipedia.org/wiki/Python_(informatika) "Python (informatika) – Basque")
 - [فارسی](https://fa.wikipedia.org/wiki/%D9%BE%D8%A7%DB%8C%D8%AA%D9%88%D9%86_(%D8%B2%D8%A8%D8%A7%D9%86_%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D9%86%D9%88%DB%8C%D8%B3%DB%8C) "پایتون (زبان برنامه‌نویسی) – Persian")
-- [Français](https://fr.wikipedia.org/wiki/Python_(langage) "Python (langage) – French")
+- [Français](https://fr.wikipedia.org/wiki/Python_(langage) "Python (language) – French")
 - [Galego](https://gl.wikipedia.org/wiki/Python "Python – Galician")
 - [گیلکی](https://glk.wikipedia.org/wiki/%D9%BE%D8%A7%D9%8A%D8%AA%D8%A4%D9%86_(%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D9%86%D9%8A%D9%88%D9%8A%D8%B3%D9%8A_%D8%B2%D9%88%D8%A7%D9%86) "پايتؤن (برنامه‌نيويسي زوان) – Gilaki")
 - [ગુજરાતી](https://gu.wikipedia.org/wiki/%E0%AA%AA%E0%AA%BE%E0%AA%AF%E0%AA%A5%E0%AB%8B%E0%AA%A8(%E0%AA%AA%E0%AB%8D%E0%AA%B0%E0%AB%8B%E0%AA%97%E0%AB%8D%E0%AA%B0%E0%AA%BE%E0%AA%AE%E0%AA%BF%E0%AA%82%E0%AA%97_%E0%AA%AD%E0%AA%BE%E0%AA%B7%E0%AA%BE) "પાયથોન(પ્રોગ્રામિંગ ભાષા) – Gujarati")
@@ -104,7 +104,7 @@ title: Python (programming language) - Wikipedia
 - [Русский](https://ru.wikipedia.org/wiki/Python "Python – Russian")
 - [Саха тыла](https://sah.wikipedia.org/wiki/Python "Python – Yakut")
 - [ᱥᱟᱱᱛᱟᱲᱤ](https://sat.wikipedia.org/wiki/%E1%B1%AF%E1%B1%9F%E1%B1%AD%E1%B1%9B%E1%B1%B7%E1%B1%9A%E1%B1%B1_(%E1%B1%AF%E1%B1%A8%E1%B1%B3%E1%B1%9C%E1%B1%BD%E1%B1%A8%E1%B1%9F%E1%B1%A2%E1%B1%A4%E1%B1%9D_%E1%B1%AF%E1%B1%9F%E1%B1%B9%E1%B1%A8%E1%B1%A5%E1%B1%A4) "ᱯᱟᱭᱛᱷᱚᱱ (ᱯᱨᱳᱜᱽᱨᱟᱢᱤᱝ ᱯᱟᱹᱨᱥᱤ) – Santali")
-- [Scots](https://sco.wikipedia.org/wiki/Python_(programmin_leid) "Python (programmin leid) – Scots")
+- [Scots](https://sco.wikipedia.org/wiki/Python_(programmin_leid) "Python (programming leid) – Scots")
 - [Shqip](https://sq.wikipedia.org/wiki/Python "Python – Albanian")
 - [සිංහල](https://si.wikipedia.org/wiki/%E0%B6%B4%E0%B6%BA%E0%B7%92%E0%B6%AD%E0%B6%B1%E0%B7%8A "පයිතන් – Sinhala")
 - [Simple English](https://simple.wikipedia.org/wiki/Python_(programming_language) "Python (programming language) – Simple English")
@@ -1052,7 +1052,7 @@ Python's development practices have also been emulated by other languages. For
  tools[[5]](#cite_note-type_hint-PEP-5)
 2. **[↑](#cite_ref-12)**   - **Tier 1**: 64-bit [Linux](/wiki/Linux "Linux"), [macOS](/wiki/MacOS "MacOS"); 64- and 32-bit [Windows](/wiki/Windows "Windows") 10+[[6]](#cite_note-7)
   - **Tier 2**: E.g. 32-bit [WebAssembly](/wiki/WebAssembly "WebAssembly") (WASI)
-  - **Tier 3**: 64-bit [Android](/wiki/Android_(operating_system) "Android (operating system)"),[[7]](#cite_note-8) [iOS](/wiki/IOS "IOS"), [FreeBSD](/wiki/FreeBSD "FreeBSD"), and (32-bit) [Raspberry Pi OS](/wiki/Raspberry_Pi_OS "Raspberry Pi OS")  
+  - **Tier 3**: 64-bit [Android](/wiki/Android_(operating_system) "Android (operating system)"),[[7]](#cite_note-8) [iOS](/wiki/IOS "IOS"), [FreeBSD](/wiki/FreeBSD "FreeBSD"), and (32-bit) [Raspberry Pi OS](/wiki/Raspberry_Pi_OS "Raspberry Pi OS")
 Unofficial (or has been known to work): Other [Unix-like](/wiki/Unix-like "Unix-like")/[BSD](/wiki/BSD "BSD") variants) and a few other platforms[[8]](#cite_note-9)[[9]](#cite_note-10)[[10]](#cite_note-11)
 3. **[↑](#cite_ref-87)** `del` in Python does not behave the same way `delete` in languages such as [C++](/wiki/C%2B%2B "C++") does, where such a word is
  used to call the [destructor](/wiki/Destructor_(computer_programming) "Destructor (computer programming)") and deallocate heap memory.

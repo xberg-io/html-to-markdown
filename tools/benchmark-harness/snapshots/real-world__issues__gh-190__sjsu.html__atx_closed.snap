@@ -31,13 +31,13 @@ list processing procedures. Pipelines are built using procedural composition.
 For example, assume the following LISP procedures are defined[<![if !supportFootnotes]>[1]<![endif]>](#_ftn1 ""). In each
 case the nums parameter represents a list of integers:
 
-// = list got by removing even numbers from nums  
+// = list got by removing even numbers from nums
 (define (filterEvens nums) ... )
 
-// = list got by squaring each n in nums  
+// = list got by squaring each n in nums
 (define (mapSquare nums) ... )
 
-// = sum of all n in nums  
+// = sum of all n in nums
 (define (sum nums) ... )
 
 We can use these procedures to build a pipeline that sums
@@ -47,7 +47,7 @@ the squares of odd integers:
 
 Here's the corresponding LISP definition:
 
-// = sum of squares of odd n in nums  
+// = sum of squares of odd n in nums
 (define (sumOddSquares nums)  뿯½뿯½ (sum (mapSquare (filterEvens nums))))
 
 Pipelines have also been used to implement compilers. Each
@@ -105,18 +105,18 @@ class Filter extends **Thread** { ... }
 An active filter has a control loop function. Here's a
 simplified version that assumes the filter is a transformer:
 
-void controlLoop()  
+void controlLoop()
 {  뿯½뿯½ while(true)  뿯½뿯½ {  뿯½뿯½뿯½뿯½뿯½ Message val = inPipe.read();  뿯½뿯½뿯½뿯½뿯½ val = transform(val); // do something
-to val  뿯½뿯½뿯½뿯½뿯½ outPipe.write(val);  뿯½뿯½ }  
+to val  뿯½뿯½뿯½뿯½뿯½ outPipe.write(val);  뿯½뿯½ }
 }
 
 When activated, a **passive
 filter** reads a single message from its input pipe, processes it, then
 writes the result to its output pipe:
 
-void activate()  
+void activate()
 {  뿯½뿯½ Message val = inPipe.read();  뿯½뿯½ val = transform(val); // do something
-to val  뿯½뿯½ outPipe.write(val);  
+to val  뿯½뿯½ outPipe.write(val);
 }
 
 There are two types of passive filters. A **data-driven filter** is activated when
@@ -169,7 +169,7 @@ filters are subscribers. In the data-driven model filters subscribe to their
 input pipes. In the demand-driven model filters subscribe to their output
 pipes.
 
-<![if !supportFootnotes]>  
+<![if !supportFootnotes]>
 
 ---
 <![endif]>

@@ -63,7 +63,7 @@ fn force_tier1(html: &str) -> String {
 /// entities to numeric form before Tier-1 sees them.
 #[test]
 fn bails_on_unknown_named_entity_eacute() {
-    let html = "<p>caf&eacute;</p>";
+    let html = "<p>calf&eacute;</p>";
     let result = tier1_raw(html);
     let err = result.unwrap_err();
     assert!(
@@ -121,7 +121,7 @@ fn does_not_bail_on_amp_and_lt() {
 /// succeeds and the é character appears in the result.
 #[test]
 fn convert_auto_falls_back_on_unknown_entity_and_succeeds() {
-    let html = "<p>caf&eacute;</p>";
+    let html = "<p>calf&eacute;</p>";
     let opts = ConversionOptions {
         tier_strategy: TierStrategy::Auto,
         extract_metadata: false,
@@ -140,7 +140,7 @@ fn convert_auto_falls_back_on_unknown_entity_and_succeeds() {
 /// with `&eacute;`.  The bail causes the dispatcher to fall back to Tier-2.
 #[test]
 fn force_tier1_matches_tier2_for_unknown_entity() {
-    let html = "<p>caf&eacute;</p>";
+    let html = "<p>calf&eacute;</p>";
     assert_eq!(
         force_tier1(html),
         tier2(html),
@@ -154,7 +154,7 @@ fn force_tier1_matches_tier2_for_unknown_entity() {
 /// back to Tier-2, which produces the correct output.
 #[test]
 fn prescan_does_not_rewrite_named_entity_so_tier1_still_bails() {
-    let html = "<p>caf&eacute;</p>";
+    let html = "<p>calf&eacute;</p>";
     // The prescan does not rewrite named entities to numeric form.
     // Tier-1 therefore bails with UnknownEntity even after prescanning.
     let result = tier1_run(html);

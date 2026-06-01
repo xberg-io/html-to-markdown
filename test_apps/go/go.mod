@@ -1,4 +1,4 @@
-module e2e_go
+module github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/e2e
 
 go 1.26
 

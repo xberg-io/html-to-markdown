@@ -19,7 +19,7 @@ This feature is well established and works across many devices and browser versi
 - [See full compatibility](#browser_compatibility)
 - [Report feedback](https://survey.alchemer.com/s3/7634825/MDN-baseline-feedback?page=%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray&level=high)
 
-  
+
 
 The **`Array`** object, as with arrays in other programming languages, enables [storing a collection of multiple items under a single variable name](/en-US/docs/Learn_web_development/Core/Scripting/Arrays), and has members for [performing common array operations](#examples).
 
@@ -1141,5 +1141,5 @@ Developers
 - [Legal](https://www.mozilla.org/about/legal/terms/mozilla)
 - [Community Participation Guidelines](https://www.mozilla.org/about/governance/policies/participation/)
 
-Visit [Mozilla Corporation’s](https://www.mozilla.org/) not-for-profit parent, the [Mozilla Foundation](https://foundation.mozilla.org/).  
+Visit [Mozilla Corporation’s](https://www.mozilla.org/) not-for-profit parent, the [Mozilla Foundation](https://foundation.mozilla.org/).
 Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under [a Creative Commons license](/docs/MDN/Writing_guidelines/Attrib_copyright_license).

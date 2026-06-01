@@ -863,6 +863,29 @@ const _: fn() = || {
             let _: String = title;
         }
     }
+    match None::<crate::ConversionError>.unwrap() {
+        crate::ConversionError::ParseError { field0 } => {
+            let _: String = field0;
+        }
+        crate::ConversionError::SanitizationError { field0 } => {
+            let _: String = field0;
+        }
+        crate::ConversionError::ConfigError { field0 } => {
+            let _: String = field0;
+        }
+        crate::ConversionError::IoError { field0 } => {
+            let _: String = field0;
+        }
+        crate::ConversionError::Panic { field0 } => {
+            let _: String = field0;
+        }
+        crate::ConversionError::InvalidInput { field0 } => {
+            let _: String = field0;
+        }
+        crate::ConversionError::Other { field0 } => {
+            let _: String = field0;
+        }
+    }
     {
         let ConversionOptions = None::<crate::ConversionOptions>.unwrap();
         let _: crate::HeadingStyle = ConversionOptions.heading_style;
@@ -907,6 +930,7 @@ const _: fn() = || {
         let _: bool = ConversionOptions.infer_dimensions;
         let _: Option<i64> = ConversionOptions.max_depth;
         let _: Vec<String> = ConversionOptions.exclude_selectors;
+        let _: crate::TierStrategy = ConversionOptions.tier_strategy;
         let _: Option<VisitorHandle> = ConversionOptions.visitor;
     }
     {
@@ -953,6 +977,7 @@ const _: fn() = || {
         let _: Option<bool> = ConversionOptionsUpdate.infer_dimensions;
         let _: Option<i64> = ConversionOptionsUpdate.max_depth;
         let _: Option<Vec<String>> = ConversionOptionsUpdate.exclude_selectors;
+        let _: Option<crate::TierStrategy> = ConversionOptionsUpdate.tier_strategy;
         let _: Option<VisitorHandle> = ConversionOptionsUpdate.visitor;
     }
     {
@@ -1795,6 +1820,46 @@ impl SseDecode for crate::CodeBlockStyle {
     }
 }
 
+impl SseDecode for crate::ConversionError {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::ParseError { field0: var_field0 };
+            }
+            1 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::SanitizationError { field0: var_field0 };
+            }
+            2 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::ConfigError { field0: var_field0 };
+            }
+            3 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::IoError { field0: var_field0 };
+            }
+            4 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::Panic { field0: var_field0 };
+            }
+            5 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::InvalidInput { field0: var_field0 };
+            }
+            6 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::ConversionError::Other { field0: var_field0 };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseDecode for crate::ConversionOptions {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1840,6 +1905,7 @@ impl SseDecode for crate::ConversionOptions {
         let mut var_inferDimensions = <bool>::sse_decode(deserializer);
         let mut var_maxDepth = <Option<i64>>::sse_decode(deserializer);
         let mut var_excludeSelectors = <Vec<String>>::sse_decode(deserializer);
+        let mut var_tierStrategy = <crate::TierStrategy>::sse_decode(deserializer);
         let mut var_visitor = <Option<VisitorHandle>>::sse_decode(deserializer);
         return crate::ConversionOptions {
             heading_style: var_headingStyle,
@@ -1884,6 +1950,7 @@ impl SseDecode for crate::ConversionOptions {
             infer_dimensions: var_inferDimensions,
             max_depth: var_maxDepth,
             exclude_selectors: var_excludeSelectors,
+            tier_strategy: var_tierStrategy,
             visitor: var_visitor,
         };
     }
@@ -1934,6 +2001,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
         let mut var_inferDimensions = <Option<bool>>::sse_decode(deserializer);
         let mut var_maxDepth = <Option<i64>>::sse_decode(deserializer);
         let mut var_excludeSelectors = <Option<Vec<String>>>::sse_decode(deserializer);
+        let mut var_tierStrategy = <Option<crate::TierStrategy>>::sse_decode(deserializer);
         let mut var_visitor = <Option<VisitorHandle>>::sse_decode(deserializer);
         return crate::ConversionOptionsUpdate {
             heading_style: var_headingStyle,
@@ -1978,6 +2046,7 @@ impl SseDecode for crate::ConversionOptionsUpdate {
             infer_dimensions: var_inferDimensions,
             max_depth: var_maxDepth,
             exclude_selectors: var_excludeSelectors,
+            tier_strategy: var_tierStrategy,
             visitor: var_visitor,
         };
     }
@@ -2840,6 +2909,17 @@ impl SseDecode for Option<crate::TextDirection> {
     }
 }
 
+impl SseDecode for Option<crate::TierStrategy> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::TierStrategy>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::UrlEscapeStyle> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3043,6 +3123,19 @@ impl SseDecode for crate::TextDirection {
     }
 }
 
+impl SseDecode for crate::TierStrategy {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::TierStrategy::Auto,
+            1 => crate::TierStrategy::Tier2,
+            2 => crate::TierStrategy::Tier1,
+            _ => unreachable!("Invalid variant for TierStrategy: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for u8 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3242,6 +3335,43 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::CodeBlockStyle>> for cr
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionError> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::ConversionError::ParseError { field0 } => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::ConversionError::SanitizationError { field0 } => {
+                [1.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::ConversionError::ConfigError { field0 } => {
+                [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::ConversionError::IoError { field0 } => {
+                [3.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::ConversionError::Panic { field0 } => {
+                [4.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::ConversionError::InvalidInput { field0 } => {
+                [5.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::ConversionError::Other { field0 } => {
+                [6.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::ConversionError> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::ConversionError>> for crate::ConversionError {
+    fn into_into_dart(self) -> FrbWrapper<crate::ConversionError> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptions> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3287,6 +3417,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptions> {
             self.0.infer_dimensions.into_into_dart().into_dart(),
             self.0.max_depth.into_into_dart().into_dart(),
             self.0.exclude_selectors.into_into_dart().into_dart(),
+            self.0.tier_strategy.into_into_dart().into_dart(),
             self.0.visitor.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -3344,6 +3475,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ConversionOptionsUpdate
             self.0.infer_dimensions.into_into_dart().into_dart(),
             self.0.max_depth.into_into_dart().into_dart(),
             self.0.exclude_selectors.into_into_dart().into_dart(),
+            self.0.tier_strategy.into_into_dart().into_dart(),
             self.0.visitor.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -4039,6 +4171,23 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::TextDirection>> for cra
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::TierStrategy> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::TierStrategy::Auto => 0.into_dart(),
+            crate::TierStrategy::Tier2 => 1.into_dart(),
+            crate::TierStrategy::Tier1 => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::TierStrategy> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::TierStrategy>> for crate::TierStrategy {
+    fn into_into_dart(self) -> FrbWrapper<crate::TierStrategy> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::UrlEscapeStyle> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self.0 {
@@ -4223,6 +4372,45 @@ impl SseEncode for crate::CodeBlockStyle {
     }
 }
 
+impl SseEncode for crate::ConversionError {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::ConversionError::ParseError { field0 } => {
+                <i32>::sse_encode(0, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::ConversionError::SanitizationError { field0 } => {
+                <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::ConversionError::ConfigError { field0 } => {
+                <i32>::sse_encode(2, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::ConversionError::IoError { field0 } => {
+                <i32>::sse_encode(3, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::ConversionError::Panic { field0 } => {
+                <i32>::sse_encode(4, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::ConversionError::InvalidInput { field0 } => {
+                <i32>::sse_encode(5, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::ConversionError::Other { field0 } => {
+                <i32>::sse_encode(6, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseEncode for crate::ConversionOptions {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4268,6 +4456,7 @@ impl SseEncode for crate::ConversionOptions {
         <bool>::sse_encode(self.infer_dimensions, serializer);
         <Option<i64>>::sse_encode(self.max_depth, serializer);
         <Vec<String>>::sse_encode(self.exclude_selectors, serializer);
+        <crate::TierStrategy>::sse_encode(self.tier_strategy, serializer);
         <Option<VisitorHandle>>::sse_encode(self.visitor, serializer);
     }
 }
@@ -4317,6 +4506,7 @@ impl SseEncode for crate::ConversionOptionsUpdate {
         <Option<bool>>::sse_encode(self.infer_dimensions, serializer);
         <Option<i64>>::sse_encode(self.max_depth, serializer);
         <Option<Vec<String>>>::sse_encode(self.exclude_selectors, serializer);
+        <Option<crate::TierStrategy>>::sse_encode(self.tier_strategy, serializer);
         <Option<VisitorHandle>>::sse_encode(self.visitor, serializer);
     }
 }
@@ -5072,6 +5262,16 @@ impl SseEncode for Option<crate::TextDirection> {
     }
 }
 
+impl SseEncode for Option<crate::TierStrategy> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::TierStrategy>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::UrlEscapeStyle> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5242,6 +5442,23 @@ impl SseEncode for crate::TextDirection {
                 crate::TextDirection::LeftToRight => 0,
                 crate::TextDirection::RightToLeft => 1,
                 crate::TextDirection::Auto => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::TierStrategy {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::TierStrategy::Auto => 0,
+                crate::TierStrategy::Tier2 => 1,
+                crate::TierStrategy::Tier1 => 2,
                 _ => {
                     unimplemented!("");
                 }

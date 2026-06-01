@@ -369,6 +369,12 @@ pub struct ConversionOptions {
     ///
     /// Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]`
     pub exclude_selectors: Vec<String>,
+    /// Which conversion tier to use.
+    ///
+    /// - [`TierStrategy::Auto`] (default) — automatically choose the best path.
+    /// - [`TierStrategy::Tier2`] — always use the Tier-2 DOM-walk path.
+    /// - `TierStrategy::Tier1` — always attempt Tier-1 (testkit only).
+    pub tier_strategy: TierStrategy,
     /// Optional visitor for custom traversal logic.
     ///
     /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -467,6 +473,8 @@ pub struct ConversionOptionsUpdate {
     pub max_depth: Option<i64>,
     /// Optional override for [`ConversionOptions::exclude_selectors`].
     pub exclude_selectors: Option<Vec<String>>,
+    /// Optional override for [`ConversionOptions::tier_strategy`].
+    pub tier_strategy: Option<TierStrategy>,
     /// Optional override for [`ConversionOptions::visitor`].
     pub visitor: Option<VisitorHandle>,
 }
@@ -730,7 +738,7 @@ pub struct NodeContext {
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
-#[frb(mirror(TextDirection))]
+#[frb(mirror(TextDirection), unignore)]
 pub enum TextDirection {
     /// Left-to-right text flow (default for Latin scripts)
     LeftToRight,
@@ -743,7 +751,7 @@ pub enum TextDirection {
 /// Link classification based on href value and document context.
 ///
 /// Used to categorize links during extraction for filtering and analysis.
-#[frb(mirror(LinkType))]
+#[frb(mirror(LinkType), unignore)]
 pub enum LinkType {
     /// Anchor link within same document (href starts with #)
     Anchor,
@@ -762,7 +770,7 @@ pub enum LinkType {
 /// Image source classification for proper handling and processing.
 ///
 /// Determines whether an image is embedded (data URI), inline SVG, external, or relative.
-#[frb(mirror(ImageType))]
+#[frb(mirror(ImageType), unignore)]
 pub enum ImageType {
     /// Data URI embedded image (base64 or other encoding)
     DataUri,
@@ -777,7 +785,7 @@ pub enum ImageType {
 /// Structured data format type.
 ///
 /// Identifies the schema/format used for structured data markup.
-#[frb(mirror(StructuredDataType))]
+#[frb(mirror(StructuredDataType), unignore)]
 pub enum StructuredDataType {
     /// JSON-LD (JSON for Linking Data) script blocks
     JsonLd,
@@ -787,10 +795,26 @@ pub enum StructuredDataType {
     RDFa,
 }
 
+/// Controls which conversion tier is used.
+#[frb(mirror(TierStrategy), unignore)]
+pub enum TierStrategy {
+    /// Automatically pick the best tier for the input (default).
+    ///
+    /// Runs the classifier against the prescan report and uses Tier-1 when
+    /// eligible; falls back to Tier-2 on bail or when the classifier routes
+    /// to Tier-2.
+    Auto,
+    /// Always use the Tier-2 (`tl::parse` + walk) path, skipping Tier-1.
+    Tier2,
+    /// Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
+    /// Testkit-only; not stable API.
+    Tier1,
+}
+
 /// HTML preprocessing aggressiveness level.
 ///
 /// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
-#[frb(mirror(PreprocessingPreset))]
+#[frb(mirror(PreprocessingPreset), unignore)]
 pub enum PreprocessingPreset {
     /// Minimal cleanup. Remove only essential noise (scripts, styles).
     Minimal,
@@ -803,7 +827,7 @@ pub enum PreprocessingPreset {
 /// Heading style options for Markdown output.
 ///
 /// Controls how headings (h1-h6) are rendered in the output Markdown.
-#[frb(mirror(HeadingStyle))]
+#[frb(mirror(HeadingStyle), unignore)]
 pub enum HeadingStyle {
     /// Underlined style (=== for h1, --- for h2).
     Underlined,
@@ -816,7 +840,7 @@ pub enum HeadingStyle {
 /// List indentation character type.
 ///
 /// Controls whether list items are indented with spaces or tabs.
-#[frb(mirror(ListIndentType))]
+#[frb(mirror(ListIndentType), unignore)]
 pub enum ListIndentType {
     /// Use spaces for indentation. Default. Width controlled by `list_indent_width`.
     Spaces,
@@ -827,7 +851,7 @@ pub enum ListIndentType {
 /// Whitespace handling strategy during conversion.
 ///
 /// Determines how sequences of whitespace characters (spaces, tabs, newlines) are processed.
-#[frb(mirror(WhitespaceMode))]
+#[frb(mirror(WhitespaceMode), unignore)]
 pub enum WhitespaceMode {
     /// Collapse multiple whitespace characters to single spaces. Default. Matches browser behavior.
     Normalized,
@@ -838,7 +862,7 @@ pub enum WhitespaceMode {
 /// Line break syntax in Markdown output.
 ///
 /// Controls how soft line breaks (from `<br>` or line breaks in source) are rendered.
-#[frb(mirror(NewlineStyle))]
+#[frb(mirror(NewlineStyle), unignore)]
 pub enum NewlineStyle {
     /// Two trailing spaces at end of line. Default. Standard Markdown syntax.
     Spaces,
@@ -849,7 +873,7 @@ pub enum NewlineStyle {
 /// Code block fence style in Markdown output.
 ///
 /// Determines how code blocks (`<pre><code>`) are rendered in Markdown.
-#[frb(mirror(CodeBlockStyle))]
+#[frb(mirror(CodeBlockStyle), unignore)]
 pub enum CodeBlockStyle {
     /// Indented code blocks (4 spaces). `CommonMark` standard.
     Indented,
@@ -862,7 +886,7 @@ pub enum CodeBlockStyle {
 /// Highlight rendering style for `<mark>` elements.
 ///
 /// Controls how highlighted text is rendered in Markdown output.
-#[frb(mirror(HighlightStyle))]
+#[frb(mirror(HighlightStyle), unignore)]
 pub enum HighlightStyle {
     /// Double equals syntax (==text==). Default. Pandoc-compatible.
     DoubleEqual,
@@ -878,7 +902,7 @@ pub enum HighlightStyle {
 ///
 /// Controls whether links and images use inline `[text](url)` syntax or
 /// reference-style `[text][1]` syntax with definitions collected at the end.
-#[frb(mirror(LinkStyle))]
+#[frb(mirror(LinkStyle), unignore)]
 pub enum LinkStyle {
     /// Inline links: `[text](url)`. Default.
     Inline,
@@ -898,7 +922,7 @@ pub enum LinkStyle {
 /// The `Percent` variant percent-encodes every character that is not an RFC 3986
 /// unreserved character or `/`, producing a destination safe for all Markdown
 /// parsers: `[text](url%20with%20spaces)`.
-#[frb(mirror(UrlEscapeStyle))]
+#[frb(mirror(UrlEscapeStyle), unignore)]
 pub enum UrlEscapeStyle {
     /// Wrap destinations that contain spaces or newlines in angle brackets. Default.
     Angle,
@@ -909,7 +933,7 @@ pub enum UrlEscapeStyle {
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.
-#[frb(mirror(OutputFormat))]
+#[frb(mirror(OutputFormat), unignore)]
 pub enum OutputFormat {
     /// Standard Markdown (CommonMark compatible). Default.
     Markdown,
@@ -922,7 +946,7 @@ pub enum OutputFormat {
 /// The semantic content type of a document node.
 ///
 /// Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
-#[frb(mirror(NodeContent))]
+#[frb(mirror(NodeContent), unignore)]
 pub enum NodeContent {
     /// A heading element (h1-h6).
     Heading {
@@ -1004,7 +1028,7 @@ pub enum NodeContent {
 /// The type of an inline text annotation.
 ///
 /// Uses internally tagged representation (`"annotation_type": "bold"`) for JSON serialization.
-#[frb(mirror(AnnotationKind))]
+#[frb(mirror(AnnotationKind), unignore)]
 pub enum AnnotationKind {
     /// Bold / strong emphasis.
     Bold,
@@ -1040,7 +1064,7 @@ pub enum AnnotationKind {
 }
 
 /// Categories of processing warnings.
-#[frb(mirror(WarningKind))]
+#[frb(mirror(WarningKind), unignore)]
 pub enum WarningKind {
     /// An image could not be extracted (e.g. invalid data URI, unsupported format).
     ImageExtractionFailed,
@@ -1060,7 +1084,7 @@ pub enum WarningKind {
 ///
 /// This enum categorizes all HTML elements that the converter recognizes,
 /// providing a coarse-grained classification for visitor dispatch.
-#[frb(mirror(NodeType))]
+#[frb(mirror(NodeType), unignore)]
 pub enum NodeType {
     /// Text node (most frequent - 100+ per document)
     Text,
@@ -1245,7 +1269,7 @@ pub enum NodeType {
 /// Allows visitors to control the conversion flow by either proceeding
 /// with default behavior, providing custom output, skipping elements,
 /// preserving HTML, or signaling errors.
-#[frb(mirror(VisitResult))]
+#[frb(mirror(VisitResult), unignore)]
 pub enum VisitResult {
     /// Continue with default conversion behavior
     Continue,
@@ -1269,7 +1293,7 @@ pub enum VisitResult {
 }
 
 /// Errors that can occur during HTML to Markdown conversion.
-#[frb(mirror(ConversionError))]
+#[frb(mirror(ConversionError), unignore)]
 pub enum ConversionError {
     /// HTML parsing error
     ParseError { field0: String },
@@ -1412,6 +1436,7 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions
             infer_dimensions: v.infer_dimensions as _,
             max_depth: v.max_depth.map(|x| x as _),
             exclude_selectors: v.exclude_selectors.into_iter().map(|s| s.into()).collect(),
+            tier_strategy: TierStrategy::from(v.tier_strategy),
             visitor: v.visitor.map(VisitorHandle::from),
         }
     }
@@ -1466,6 +1491,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for ConversionO
             exclude_selectors: v
                 .exclude_selectors
                 .map(|vec| vec.into_iter().map(|s| s.into()).collect()),
+            tier_strategy: v.tier_strategy.map(TierStrategy::from),
             visitor: v.visitor.map(VisitorHandle::from),
         }
     }
@@ -1635,6 +1661,16 @@ impl From<html_to_markdown_rs::metadata::StructuredDataType> for StructuredDataT
             html_to_markdown_rs::metadata::StructuredDataType::JsonLd => StructuredDataType::JsonLd,
             html_to_markdown_rs::metadata::StructuredDataType::Microdata => StructuredDataType::Microdata,
             html_to_markdown_rs::metadata::StructuredDataType::RDFa => StructuredDataType::RDFa,
+        }
+    }
+}
+
+impl From<html_to_markdown_rs::options::TierStrategy> for TierStrategy {
+    fn from(v: html_to_markdown_rs::options::TierStrategy) -> Self {
+        match v {
+            html_to_markdown_rs::options::TierStrategy::Auto => TierStrategy::Auto,
+            html_to_markdown_rs::options::TierStrategy::Tier2 => TierStrategy::Tier2,
+            html_to_markdown_rs::options::TierStrategy::Tier1 => TierStrategy::Tier1,
         }
     }
 }
@@ -1975,6 +2011,7 @@ impl From<ConversionOptions> for html_to_markdown_rs::options::ConversionOptions
             infer_dimensions: v.infer_dimensions as _,
             max_depth: v.max_depth.map(|x| x as _),
             exclude_selectors: v.exclude_selectors.into_iter().map(Into::into).collect(),
+            tier_strategy: v.tier_strategy.into(),
             visitor: v.visitor.map(Into::into),
             ..Default::default()
         }
@@ -1988,6 +2025,16 @@ impl From<PreprocessingOptions> for html_to_markdown_rs::options::PreprocessingO
             preset: v.preset.into(),
             remove_navigation: v.remove_navigation as _,
             remove_forms: v.remove_forms as _,
+        }
+    }
+}
+
+impl From<TierStrategy> for html_to_markdown_rs::options::TierStrategy {
+    fn from(v: TierStrategy) -> Self {
+        match v {
+            TierStrategy::Auto => html_to_markdown_rs::options::TierStrategy::Auto,
+            TierStrategy::Tier2 => html_to_markdown_rs::options::TierStrategy::Tier2,
+            TierStrategy::Tier1 => html_to_markdown_rs::options::TierStrategy::Tier1,
         }
     }
 }

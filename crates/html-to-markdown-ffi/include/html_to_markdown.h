@@ -367,6 +367,10 @@ typedef struct HTMTextAnnotation HTMTextAnnotation;
  */
 typedef struct HTMTextDirection HTMTextDirection;
 /**
+ * Controls which conversion tier is used.
+ */
+typedef struct HTMTierStrategy HTMTierStrategy;
+/**
  * URL encoding strategy for link and image destinations.
  *
  * Controls how special characters in URL destinations are handled when they
@@ -2088,6 +2092,13 @@ uintptr_t htm_conversion_options_max_depth(const HTMConversionOptions *ptr);
 char *htm_conversion_options_exclude_selectors(const HTMConversionOptions *ptr);
 
 /**
+ * Get the `tier_strategy` field from a `ConversionOptions`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMTierStrategy *htm_conversion_options_tier_strategy(const HTMConversionOptions *ptr);
+
+/**
  * Get the `visitor` field from a `ConversionOptions`.
  * # Safety
  * Pointer must be a valid handle returned by this library.
@@ -2408,6 +2419,13 @@ uintptr_t htm_conversion_options_update_max_depth(const HTMConversionOptionsUpda
  * Pointer must be a valid handle returned by this library.
  */
 char *htm_conversion_options_update_exclude_selectors(const HTMConversionOptionsUpdate *ptr);
+
+/**
+ * Get the `tier_strategy` field from a `ConversionOptionsUpdate`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMTierStrategy *htm_conversion_options_update_tier_strategy(const HTMConversionOptionsUpdate *ptr);
 
 /**
  * Get the `visitor` field from a `ConversionOptionsUpdate`.
@@ -3043,6 +3061,21 @@ int32_t htm_structured_data_type_from_i32(int32_t value);
 int32_t htm_structured_data_type_from_str(const char *name);
 
 /**
+ * Convert an integer to a `TierStrategy` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t htm_tier_strategy_from_i32(int32_t value);
+
+/**
+ * Convert a `TierStrategy` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t htm_tier_strategy_from_str(const char *name);
+
+/**
  * Convert an integer to a `PreprocessingPreset` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -3366,6 +3399,31 @@ char *htm_structured_data_type_to_json(const HTMStructuredDataType *ptr);
  * The returned string must be freed with `htm_free_string`.
  */
 char *htm_structured_data_type_to_string(const HTMStructuredDataType *ptr);
+
+/**
+ * Free a heap-allocated `TierStrategy` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void htm_tier_strategy_free(HTMTierStrategy *ptr);
+
+/**
+ * Serialize a heap-allocated `TierStrategy` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_tier_strategy_to_json(const HTMTierStrategy *ptr);
+
+/**
+ * Render a heap-allocated `TierStrategy` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_tier_strategy_to_string(const HTMTierStrategy *ptr);
 
 /**
  * Free a heap-allocated `PreprocessingPreset` returned by a pointer-returning FFI function.

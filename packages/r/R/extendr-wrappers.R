@@ -185,6 +185,7 @@ StructuredData <- new.env(parent = emptyenv())
 #' @field infer_dimensions Infer image dimensions from data.
 #' @field max_depth Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are
 #' @field exclude_selectors CSS selectors for elements to exclude entirely (element + all content).
+#' @field tier_strategy Which conversion tier to use.
 #' @field visitor Optional visitor for custom traversal logic.
 #' @export
 ConversionOptions <- new.env(parent = emptyenv())
@@ -249,6 +250,7 @@ ConversionOptions$from_json <- function(json) {
 #' @field infer_dimensions Optional override for [`ConversionOptions::infer_dimensions`].
 #' @field max_depth Optional override for [`ConversionOptions::max_depth`].
 #' @field exclude_selectors Optional override for [`ConversionOptions::exclude_selectors`].
+#' @field tier_strategy Optional override for [`ConversionOptions::tier_strategy`].
 #' @field visitor Optional override for [`ConversionOptions::visitor`].
 #' @export
 ConversionOptionsUpdate <- new.env(parent = emptyenv())
@@ -481,6 +483,14 @@ ImageType  <- function() list() |> structure(class = "ImageType")
 #' @return A StructuredDataType enum value
 #' @export
 StructuredDataType  <- function() list() |> structure(class = "StructuredDataType")
+
+#' Create a TierStrategy enum value
+#'
+#' Returns the default TierStrategy variant.
+#'
+#' @return A TierStrategy enum value
+#' @export
+TierStrategy  <- function() list() |> structure(class = "TierStrategy")
 
 #' Create a PreprocessingPreset enum value
 #'

@@ -174,6 +174,7 @@ mod ffi {
             infer_dimensions: bool,
             max_depth: Option<usize>,
             exclude_selectors: Vec<String>,
+            tier_strategy: TierStrategy,
             visitor: Option<VisitorHandle>,
         ) -> ConversionOptions;
         #[swift_bridge(swift_name = "headingStyle")]
@@ -254,6 +255,8 @@ mod ffi {
         fn max_depth(&self) -> Option<usize>;
         #[swift_bridge(swift_name = "excludeSelectors")]
         fn exclude_selectors(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "tierStrategy")]
+        fn tier_strategy(&self) -> String;
         fn visitor(&self) -> Option<VisitorHandle>;
     }
 
@@ -303,6 +306,7 @@ mod ffi {
             infer_dimensions: Option<bool>,
             max_depth: String,
             exclude_selectors: Option<Vec<String>>,
+            tier_strategy: Option<TierStrategy>,
             visitor: Option<VisitorHandle>,
         ) -> ConversionOptionsUpdate;
         #[swift_bridge(swift_name = "headingStyle")]
@@ -383,6 +387,8 @@ mod ffi {
         fn max_depth(&self) -> String;
         #[swift_bridge(swift_name = "excludeSelectors")]
         fn exclude_selectors(&self) -> Option<Vec<String>>;
+        #[swift_bridge(swift_name = "tierStrategy")]
+        fn tier_strategy(&self) -> Option<String>;
         fn visitor(&self) -> Option<VisitorHandle>;
     }
 
@@ -533,6 +539,11 @@ mod ffi {
 
     extern "Rust" {
         type StructuredDataType;
+        fn to_string(&self) -> String;
+    }
+
+    extern "Rust" {
+        type TierStrategy;
         fn to_string(&self) -> String;
     }
 
@@ -733,6 +744,8 @@ mod ffi {
         fn image_type_from_json(json: String) -> Result<ImageType, String>;
         #[swift_bridge(swift_name = "structuredDataTypeFromJson")]
         fn structured_data_type_from_json(json: String) -> Result<StructuredDataType, String>;
+        #[swift_bridge(swift_name = "tierStrategyFromJson")]
+        fn tier_strategy_from_json(json: String) -> Result<TierStrategy, String>;
         #[swift_bridge(swift_name = "nodeContentFromJson")]
         fn node_content_from_json(json: String) -> Result<NodeContent, String>;
         #[swift_bridge(swift_name = "annotationKindFromJson")]
@@ -1059,6 +1072,7 @@ impl ConversionOptions {
         infer_dimensions: bool,
         max_depth: Option<usize>,
         exclude_selectors: Vec<String>,
+        tier_strategy: TierStrategy,
         visitor: Option<VisitorHandle>,
     ) -> ConversionOptions {
         let mut __target: html_to_markdown_rs::options::ConversionOptions = ::std::default::Default::default();
@@ -1170,6 +1184,7 @@ impl ConversionOptions {
                 __target.exclude_selectors = t;
             }
         }
+        // alef: tier_strategy (TierStrategy) is an enum; reverse From not generated — left at default
         if let Some(w) = visitor {
             __target.visitor = Some(w.0);
         }
@@ -1380,6 +1395,9 @@ impl ConversionOptions {
             .and_then(|j| ::serde_json::from_value(j).ok())
             .unwrap_or_default()
     }
+    pub fn tier_strategy(&self) -> String {
+        TierStrategy::from(self.0.tier_strategy.clone()).to_string()
+    }
     pub fn visitor(&self) -> Option<VisitorHandle> {
         self.0.visitor.clone().map(VisitorHandle)
     }
@@ -1430,6 +1448,7 @@ impl ConversionOptionsUpdate {
         infer_dimensions: Option<bool>,
         max_depth: String,
         exclude_selectors: Option<Vec<String>>,
+        tier_strategy: Option<TierStrategy>,
         visitor: Option<VisitorHandle>,
     ) -> ConversionOptionsUpdate {
         let mut __target: html_to_markdown_rs::options::ConversionOptionsUpdate = ::std::default::Default::default();
@@ -1542,6 +1561,7 @@ impl ConversionOptionsUpdate {
                 __target.exclude_selectors = t;
             }
         }
+        // alef: tier_strategy (TierStrategy) is an enum; reverse From not generated — left at default
         if let Some(w) = visitor {
             __target.visitor = Some(w.0);
         }
@@ -1787,6 +1807,9 @@ impl ConversionOptionsUpdate {
                 .ok()
                 .and_then(|j| ::serde_json::from_value(j).ok())
         })
+    }
+    pub fn tier_strategy(&self) -> Option<String> {
+        self.0.tier_strategy.clone().map(|w| TierStrategy::from(w).to_string())
     }
     pub fn visitor(&self) -> Option<VisitorHandle> {
         self.0.visitor.clone().map(VisitorHandle)
@@ -2217,6 +2240,32 @@ impl StructuredDataType {
             Self::JsonLd => "json_ld".to_string(),
             Self::Microdata => "microdata".to_string(),
             Self::RDFa => "rdfa".to_string(),
+        }
+    }
+}
+
+pub enum TierStrategy {
+    Auto,
+    Tier2,
+    Tier1,
+}
+
+impl From<html_to_markdown_rs::options::TierStrategy> for TierStrategy {
+    fn from(val: html_to_markdown_rs::options::TierStrategy) -> Self {
+        match val {
+            html_to_markdown_rs::options::TierStrategy::Auto => Self::Auto,
+            html_to_markdown_rs::options::TierStrategy::Tier2 => Self::Tier2,
+            html_to_markdown_rs::options::TierStrategy::Tier1 => Self::Tier1,
+        }
+    }
+}
+
+impl TierStrategy {
+    pub fn to_string(&self) -> String {
+        match self {
+            Self::Auto => "Auto".to_string(),
+            Self::Tier2 => "Tier2".to_string(),
+            Self::Tier1 => "Tier1".to_string(),
         }
     }
 }
@@ -3598,6 +3647,11 @@ pub fn image_type_from_json(json: String) -> Result<ImageType, String> {
 pub fn structured_data_type_from_json(json: String) -> Result<StructuredDataType, String> {
     serde_json::from_str::<html_to_markdown_rs::metadata::StructuredDataType>(&json)
         .map(StructuredDataType::from)
+        .map_err(|e| e.to_string())
+}
+pub fn tier_strategy_from_json(json: String) -> Result<TierStrategy, String> {
+    serde_json::from_str::<html_to_markdown_rs::options::TierStrategy>(&json)
+        .map(TierStrategy::from)
         .map_err(|e| e.to_string())
 }
 pub fn node_content_from_json(json: String) -> Result<NodeContent, String> {

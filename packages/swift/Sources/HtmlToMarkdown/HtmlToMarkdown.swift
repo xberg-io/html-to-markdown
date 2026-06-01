@@ -559,6 +559,28 @@ extension StructuredDataType {
     }
 }
 
+/// Controls which conversion tier is used.
+public enum TierStrategy: String, Codable, Sendable, Hashable {
+    /// Automatically pick the best tier for the input (default).
+    ///
+    /// Runs the classifier against the prescan report and uses Tier-1 when
+    /// eligible; falls back to Tier-2 on bail or when the classifier routes
+    /// to Tier-2.
+    case auto = "Auto"
+    /// Always use the Tier-2 (`tl::parse` + walk) path, skipping Tier-1.
+    case tier2 = "Tier2"
+    /// Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
+    /// Testkit-only; not stable API.
+    case tier1 = "Tier1"
+}
+extension TierStrategy {
+    func intoRust() throws -> RustBridge.TierStrategy {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "null"
+        return try RustBridge.tierStrategyFromJson(json)
+    }
+}
+
 /// HTML preprocessing aggressiveness level.
 ///
 /// Controls the extent of cleanup performed before conversion. Higher levels remove more elements.
@@ -1264,6 +1286,11 @@ public func structuredDataTypeFromJson(_ json: String) throws -> StructuredDataT
     return try JSONDecoder().decode(StructuredDataType.self, from: data)
 }
 
+public func tierStrategyFromJson(_ json: String) throws -> TierStrategy {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(TierStrategy.self, from: data)
+}
+
 public func nodeContentFromJson(_ json: String) throws -> NodeContent {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(NodeContent.self, from: data)
@@ -1623,10 +1650,42 @@ public func convert(html: String, options: ConversionOptions?) throws -> Convers
 }
 
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.DocumentMetadata: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.HeaderMetadata: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.LinkMetadata: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ImageMetadata: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.StructuredData: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.HtmlMetadata: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.ConversionOptions: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ConversionOptionsUpdate: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.PreprocessingOptions: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.PreprocessingOptionsUpdate: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.DocumentStructure: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.DocumentNode: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.TextAnnotation: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.ConversionResult: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.TableGrid: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.GridCell: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.TableData: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ProcessingWarning: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.VisitorHandle: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.NodeContext: @unchecked Sendable {}

@@ -92,6 +92,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `infer_dimensions` | `Boolean` | `true` | Infer image dimensions from data. |
 | `max_depth` | `Integer?` | `nil` | Maximum DOM traversal depth. `nil` means unlimited. When set, subtrees beyond this depth are silently truncated. |
 | `exclude_selectors` | `Array<String>` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
+| `tier_strategy` | `TierStrategy` | `:auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle?` | `nil` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ### Methods
@@ -930,6 +931,18 @@ Identifies the schema/format used for structured data markup.
 | `json_ld` | JSON-LD (JSON for Linking Data) script blocks |
 | `microdata` | HTML5 Microdata attributes (itemscope, itemtype, itemprop) |
 | `rdfa` | RDF in Attributes (RDFa) markup |
+
+---
+
+#### TierStrategy
+
+Controls which conversion tier is used.
+
+| Value | Description |
+|-------|-------------|
+| `auto` | Automatically pick the best tier for the input (default). Runs the classifier against the prescan report and uses Tier-1 when eligible; falls back to Tier-2 on bail or when the classifier routes to Tier-2. |
+| `tier2` | Always use the Tier-2 (`tl.parse` + walk) path, skipping Tier-1. |
+| `tier1` | Force the Tier-1 byte scanner; if it bails, fall back to Tier-2. Testkit-only; not stable API. |
 
 ---
 

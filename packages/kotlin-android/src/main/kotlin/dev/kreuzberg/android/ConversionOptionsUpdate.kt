@@ -114,4 +114,6 @@ data class ConversionOptionsUpdate(
     val maxDepth: Long?? = null,
     /** Optional override for `ConversionOptions.exclude_selectors`. */
     val excludeSelectors: List<String>? = null,
+    /** Optional override for `ConversionOptions.tier_strategy`. */
+    val tierStrategy: TierStrategy? = null,
 )

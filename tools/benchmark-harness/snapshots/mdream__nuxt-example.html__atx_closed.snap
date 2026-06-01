@@ -23,5 +23,3 @@ MDream is built with performance in mind. It uses a custom HTML parser optimized
 ## Table Support ##
 
 Full support for HTML tables with proper alignment detection, colspan handling, and header formatting. MDream converts complex table structures into clean Markdown tables that preserve the original layout and content structure as closely as possible.
-
-  

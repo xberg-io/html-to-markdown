@@ -2180,6 +2180,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TierStrategy dco_decode_box_autoadd_tier_strategy(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_tier_strategy(raw);
+  }
+
+  @protected
   UrlEscapeStyle dco_decode_box_autoadd_url_escape_style(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_url_escape_style(raw);
@@ -2198,11 +2204,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ConversionError dco_decode_conversion_error(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return ConversionError_ParseError(field0: dco_decode_String(raw[1]));
+      case 1:
+        return ConversionError_SanitizationError(
+          field0: dco_decode_String(raw[1]),
+        );
+      case 2:
+        return ConversionError_ConfigError(field0: dco_decode_String(raw[1]));
+      case 3:
+        return ConversionError_IoError(field0: dco_decode_String(raw[1]));
+      case 4:
+        return ConversionError_Panic(field0: dco_decode_String(raw[1]));
+      case 5:
+        return ConversionError_InvalidInput(field0: dco_decode_String(raw[1]));
+      case 6:
+        return ConversionError_Other(field0: dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
   ConversionOptions dco_decode_conversion_options(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 43)
-      throw Exception('unexpected arr length: expect 43 but see ${arr.length}');
+    if (arr.length != 44)
+      throw Exception('unexpected arr length: expect 44 but see ${arr.length}');
     return ConversionOptions(
       headingStyle: dco_decode_heading_style(arr[0]),
       listIndentType: dco_decode_list_indent_type(arr[1]),
@@ -2246,9 +2277,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       inferDimensions: dco_decode_bool(arr[39]),
       maxDepth: dco_decode_opt_box_autoadd_i_64(arr[40]),
       excludeSelectors: dco_decode_list_String(arr[41]),
+      tierStrategy: dco_decode_tier_strategy(arr[42]),
       visitor:
           dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            arr[42],
+            arr[43],
           ),
     );
   }
@@ -2257,8 +2289,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ConversionOptionsUpdate dco_decode_conversion_options_update(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 43)
-      throw Exception('unexpected arr length: expect 43 but see ${arr.length}');
+    if (arr.length != 44)
+      throw Exception('unexpected arr length: expect 44 but see ${arr.length}');
     return ConversionOptionsUpdate(
       headingStyle: dco_decode_opt_box_autoadd_heading_style(arr[0]),
       listIndentType: dco_decode_opt_box_autoadd_list_indent_type(arr[1]),
@@ -2304,9 +2336,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       inferDimensions: dco_decode_opt_box_autoadd_bool(arr[39]),
       maxDepth: dco_decode_opt_box_autoadd_i_64(arr[40]),
       excludeSelectors: dco_decode_opt_list_String(arr[41]),
+      tierStrategy: dco_decode_opt_box_autoadd_tier_strategy(arr[42]),
       visitor:
           dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            arr[42],
+            arr[43],
           ),
     );
   }
@@ -2801,6 +2834,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TierStrategy? dco_decode_opt_box_autoadd_tier_strategy(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_tier_strategy(raw);
+  }
+
+  @protected
   UrlEscapeStyle? dco_decode_opt_box_autoadd_url_escape_style(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_url_escape_style(raw);
@@ -2949,6 +2988,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TextDirection dco_decode_text_direction(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return TextDirection.values[raw as int];
+  }
+
+  @protected
+  TierStrategy dco_decode_tier_strategy(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TierStrategy.values[raw as int];
   }
 
   @protected
@@ -3222,6 +3267,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TierStrategy sse_decode_box_autoadd_tier_strategy(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_tier_strategy(deserializer));
+  }
+
+  @protected
   UrlEscapeStyle sse_decode_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   ) {
@@ -3242,6 +3295,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return CodeBlockStyle.values[inner];
+  }
+
+  @protected
+  ConversionError sse_decode_conversion_error(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_ParseError(field0: var_field0);
+      case 1:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_SanitizationError(field0: var_field0);
+      case 2:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_ConfigError(field0: var_field0);
+      case 3:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_IoError(field0: var_field0);
+      case 4:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_Panic(field0: var_field0);
+      case 5:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_InvalidInput(field0: var_field0);
+      case 6:
+        var var_field0 = sse_decode_String(deserializer);
+        return ConversionError_Other(field0: var_field0);
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -3291,6 +3376,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_inferDimensions = sse_decode_bool(deserializer);
     var var_maxDepth = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_excludeSelectors = sse_decode_list_String(deserializer);
+    var var_tierStrategy = sse_decode_tier_strategy(deserializer);
     var var_visitor =
         sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           deserializer,
@@ -3338,6 +3424,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       inferDimensions: var_inferDimensions,
       maxDepth: var_maxDepth,
       excludeSelectors: var_excludeSelectors,
+      tierStrategy: var_tierStrategy,
       visitor: var_visitor,
     );
   }
@@ -3408,6 +3495,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_inferDimensions = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_maxDepth = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_excludeSelectors = sse_decode_opt_list_String(deserializer);
+    var var_tierStrategy = sse_decode_opt_box_autoadd_tier_strategy(
+      deserializer,
+    );
     var var_visitor =
         sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
           deserializer,
@@ -3455,6 +3545,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       inferDimensions: var_inferDimensions,
       maxDepth: var_maxDepth,
       excludeSelectors: var_excludeSelectors,
+      tierStrategy: var_tierStrategy,
       visitor: var_visitor,
     );
   }
@@ -4189,6 +4280,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TierStrategy? sse_decode_opt_box_autoadd_tier_strategy(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_tier_strategy(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   UrlEscapeStyle? sse_decode_opt_box_autoadd_url_escape_style(
     SseDeserializer deserializer,
   ) {
@@ -4363,6 +4467,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return TextDirection.values[inner];
+  }
+
+  @protected
+  TierStrategy sse_decode_tier_strategy(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return TierStrategy.values[inner];
   }
 
   @protected
@@ -4887,6 +4998,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_tier_strategy(
+    TierStrategy self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_tier_strategy(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_url_escape_style(
     UrlEscapeStyle self,
     SseSerializer serializer,
@@ -4911,6 +5031,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_conversion_error(
+    ConversionError self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case ConversionError_ParseError(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_String(field0, serializer);
+      case ConversionError_SanitizationError(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(field0, serializer);
+      case ConversionError_ConfigError(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_String(field0, serializer);
+      case ConversionError_IoError(field0: final field0):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(field0, serializer);
+      case ConversionError_Panic(field0: final field0):
+        sse_encode_i_32(4, serializer);
+        sse_encode_String(field0, serializer);
+      case ConversionError_InvalidInput(field0: final field0):
+        sse_encode_i_32(5, serializer);
+        sse_encode_String(field0, serializer);
+      case ConversionError_Other(field0: final field0):
+        sse_encode_i_32(6, serializer);
+        sse_encode_String(field0, serializer);
+    }
   }
 
   @protected
@@ -4961,6 +5112,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.inferDimensions, serializer);
     sse_encode_opt_box_autoadd_i_64(self.maxDepth, serializer);
     sse_encode_list_String(self.excludeSelectors, serializer);
+    sse_encode_tier_strategy(self.tierStrategy, serializer);
     sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
       self.visitor,
       serializer,
@@ -5027,6 +5179,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_bool(self.inferDimensions, serializer);
     sse_encode_opt_box_autoadd_i_64(self.maxDepth, serializer);
     sse_encode_opt_list_String(self.excludeSelectors, serializer);
+    sse_encode_opt_box_autoadd_tier_strategy(self.tierStrategy, serializer);
     sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
       self.visitor,
       serializer,
@@ -5671,6 +5824,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_tier_strategy(
+    TierStrategy? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_tier_strategy(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_url_escape_style(
     UrlEscapeStyle? self,
     SseSerializer serializer,
@@ -5829,6 +5995,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_text_direction(TextDirection self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_tier_strategy(TierStrategy self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
   }
