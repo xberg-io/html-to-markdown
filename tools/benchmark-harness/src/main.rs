@@ -17,7 +17,6 @@ use html_to_markdown_bench::{
     schema::{BenchRecord, Guardrails, RunResults, SCHEMA_VERSION},
     survey,
 };
-#[cfg(feature = "testkit")]
 use html_to_markdown_rs::TierStrategy;
 use html_to_markdown_rs::options::ConversionOptions;
 
