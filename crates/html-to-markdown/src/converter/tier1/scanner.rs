@@ -1503,20 +1503,16 @@ fn trim_trailing_inline_whitespace(state: &mut Tier1State) {
 /// Collapse runs of 3+ consecutive newlines down to 2, matching Tier-2's
 /// `collapse_excess_blank_lines` post-processing step.
 fn collapse_excess_blank_lines(output: &mut String) {
-    let mut cleaned = String::with_capacity(output.len());
     let mut consecutive = 0usize;
-    for ch in output.chars() {
-        if ch == '\n' {
+    output.retain(|c| {
+        if c == '\n' {
             consecutive += 1;
-            if consecutive <= 2 {
-                cleaned.push(ch);
-            }
+            consecutive <= 2
         } else {
             consecutive = 0;
-            cleaned.push(ch);
+            true
         }
-    }
-    *output = cleaned;
+    });
 }
 
 // ── HTML entity decoding ──────────────────────────────────────────────────────
