@@ -69,8 +69,13 @@ struct RunArgs {
 
     /// Force Tier-1 conversion path, bypassing the classifier (requires `testkit` feature).
     /// Falls back to Tier-2 on bail. Useful for bench isolation; `auto` is the production path.
-    #[arg(long)]
+    #[arg(long, conflicts_with = "force_tier2")]
     force_tier1: bool,
+
+    /// Force Tier-2 conversion path, skipping Tier-1 entirely. Useful for bench isolation;
+    /// `auto` is the production path.
+    #[arg(long)]
+    force_tier2: bool,
 }
 
 fn cmd_run(args: RunArgs) -> Result<()> {
@@ -104,6 +109,11 @@ fn cmd_run(args: RunArgs) -> Result<()> {
                     "--force-tier1 requires building with the testkit feature: cargo run --features testkit -- run --force-tier1"
                 );
             }
+        } else if args.force_tier2 {
+            Some(ConversionOptions {
+                tier_strategy: TierStrategy::Tier2,
+                ..ConversionOptions::default()
+            })
         } else {
             None
         };
