@@ -8,8 +8,8 @@
 use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::router::{TierChoice, classify};
 use html_to_markdown_rs::options::{
-    CodeBlockStyle, ConversionOptions, HeadingStyle, HighlightStyle, ListIndentType, NewlineStyle,
-    WhitespaceMode,
+    CodeBlockStyle, ConversionOptions, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle,
+    OutputFormat, UrlEscapeStyle, WhitespaceMode,
 };
 
 // ── Helper ──────────────────────────────────────────────────────────────────
@@ -19,13 +19,17 @@ use html_to_markdown_rs::options::{
 /// only the option under test can cause a Tier-2 route.
 ///
 /// This baseline must have:
-/// - `extract_metadata: false` and `hocr_spatial_tables: false` (structural gates)
+/// - `extract_metadata: false` (structural gate)
 /// - `highlight_style: HighlightStyle::None` — the default `DoubleEqual` triggers
 ///   the highlight gate because Tier-1 emits `<mark>` content as plain text
+/// - `code_block_style: CodeBlockStyle::Indented` — Tier-1 always emits 4-space
+///   indented pre blocks regardless of the option; `Backticks` (the default) would
+///   fire the code_block_style gate
 fn base_opts() -> ConversionOptions {
     ConversionOptions {
         extract_metadata: false,
         highlight_style: HighlightStyle::None,
+        code_block_style: CodeBlockStyle::Indented,
         ..ConversionOptions::default()
     }
 }
@@ -325,6 +329,169 @@ fn gate_highlight_style_html_forces_tier2() {
 fn gate_highlight_style_bold_forces_tier2() {
     let opts = ConversionOptions {
         highlight_style: HighlightStyle::Bold,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+// ── output_format ─────────────────────────────────────────────────────────────
+
+#[test]
+fn gate_output_format_markdown_allows_tier1() {
+    let opts = ConversionOptions {
+        output_format: OutputFormat::Markdown,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_output_format_djot_forces_tier2() {
+    let opts = ConversionOptions {
+        output_format: OutputFormat::Djot,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+#[test]
+fn gate_output_format_plain_forces_tier2() {
+    let opts = ConversionOptions {
+        output_format: OutputFormat::Plain,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+// ── escape flags ──────────────────────────────────────────────────────────────
+
+#[test]
+fn gate_escape_asterisks_false_allows_tier1() {
+    let opts = ConversionOptions {
+        escape_asterisks: false,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_escape_asterisks_true_forces_tier2() {
+    let opts = ConversionOptions {
+        escape_asterisks: true,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+#[test]
+fn gate_escape_underscores_false_allows_tier1() {
+    let opts = ConversionOptions {
+        escape_underscores: false,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_escape_underscores_true_forces_tier2() {
+    let opts = ConversionOptions {
+        escape_underscores: true,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+#[test]
+fn gate_escape_misc_false_allows_tier1() {
+    let opts = ConversionOptions {
+        escape_misc: false,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_escape_misc_true_forces_tier2() {
+    let opts = ConversionOptions {
+        escape_misc: true,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+#[test]
+fn gate_escape_ascii_false_allows_tier1() {
+    let opts = ConversionOptions {
+        escape_ascii: false,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_escape_ascii_true_forces_tier2() {
+    let opts = ConversionOptions {
+        escape_ascii: true,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+// ── link_style ────────────────────────────────────────────────────────────────
+
+#[test]
+fn gate_link_style_inline_allows_tier1() {
+    let opts = ConversionOptions {
+        link_style: LinkStyle::Inline,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_link_style_reference_forces_tier2() {
+    let opts = ConversionOptions {
+        link_style: LinkStyle::Reference,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+// ── url_escape_style ──────────────────────────────────────────────────────────
+
+#[test]
+fn gate_url_escape_style_angle_allows_tier1() {
+    let opts = ConversionOptions {
+        url_escape_style: UrlEscapeStyle::Angle,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_url_escape_style_percent_forces_tier2() {
+    let opts = ConversionOptions {
+        url_escape_style: UrlEscapeStyle::Percent,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier2);
+}
+
+// ── compact_tables ────────────────────────────────────────────────────────────
+
+#[test]
+fn gate_compact_tables_false_allows_tier1() {
+    let opts = ConversionOptions {
+        compact_tables: false,
+        ..base_opts()
+    };
+    assert_eq!(route(&opts), TierChoice::Tier1);
+}
+
+#[test]
+fn gate_compact_tables_true_forces_tier2() {
+    let opts = ConversionOptions {
+        compact_tables: true,
         ..base_opts()
     };
     assert_eq!(route(&opts), TierChoice::Tier2);

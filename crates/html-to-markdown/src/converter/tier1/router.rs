@@ -46,31 +46,37 @@ pub enum TierChoice {
 /// differ from Tier-2's, breaking the byte-equality contract.  The following
 /// table documents each style option and the gate added here:
 ///
-/// | Option               | Tier-1 hardcoded value      | Gate added?         |
-/// |----------------------|-----------------------------|---------------------|
-/// | `heading_style`      | `HeadingStyle::Atx`         | Yes — non-Atx       |
-/// | `code_block_style`   | `CodeBlockStyle::Indented`  | Yes — non-Indented  |
-/// | `strong_em_symbol`   | `'*'` (asterisk)            | Yes — `'_'`         |
-/// | `bullets`            | `"-"` (first char `'-'`)    | Yes — other chars   |
-/// | `list_indent_width`  | `2` spaces                  | Yes — `!= 2`        |
-/// | `list_indent_type`   | `ListIndentType::Spaces`    | Yes — Tabs          |
-/// | `escape_asterisks`   | `false` (no escaping)       | No — default matches|
-/// | `escape_underscores` | `false` (no escaping)       | No — default matches|
-/// | `escape_misc`        | `false` (no escaping)       | No — default matches|
-/// | `escape_ascii`       | `false` (no escaping)       | No — default matches|
-/// | `whitespace_mode`    | `WhitespaceMode::Normalized`| Yes — Strict        |
-/// | `newline_style`      | `NewlineStyle::Spaces`      | Yes — Backslash     |
-/// | `code_language`      | irrelevant (Indented style) | No — gated via `code_block_style` |
-/// | `autolinks`          | not implemented in Tier-1   | No — Tier-1 never transforms bare URLs regardless of flag |
-/// | `default_title`      | `false` (not honored)       | Yes — `true`        |
-/// | `sub_symbol`         | `""` (transparent pass-through) | Yes — non-empty |
-/// | `sup_symbol`         | `""` (transparent pass-through) | Yes — non-empty |
-/// | `highlight_style`    | transparent (`<mark>` → plain text) | Yes — non-None |
-/// | `br_in_tables`       | bails on `<br>` in cells    | No — covered by bail|
-/// | `hocr_spatial_tables`| Tier-2 only (structural gate) | Already gated above |
+/// | Option               | Tier-1 hardcoded value                  | Gate added?                              |
+/// |----------------------|-----------------------------------------|------------------------------------------|
+/// | `output_format`      | `OutputFormat::Markdown`                | Yes — non-Markdown                       |
+/// | `heading_style`      | `HeadingStyle::Atx`                     | Yes — non-Atx                            |
+/// | `code_block_style`   | `CodeBlockStyle::Indented`              | Yes — non-Indented                       |
+/// | `strong_em_symbol`   | `'*'` (asterisk)                        | Yes — any other char                     |
+/// | `bullets`            | `"-"` (first char `'-'`)                | Yes — other first char                   |
+/// | `list_indent_width`  | `2` spaces                              | Yes — `!= 2`                             |
+/// | `list_indent_type`   | `ListIndentType::Spaces`                | Yes — Tabs                               |
+/// | `escape_asterisks`   | `false` (no escaping)                   | Yes — `true`                             |
+/// | `escape_underscores` | `false` (no escaping)                   | Yes — `true`                             |
+/// | `escape_misc`        | `false` (no escaping)                   | Yes — `true`                             |
+/// | `escape_ascii`       | `false` (no escaping)                   | Yes — `true`                             |
+/// | `whitespace_mode`    | `WhitespaceMode::Normalized`            | Yes — Strict                             |
+/// | `newline_style`      | `NewlineStyle::Spaces`                  | Yes — Backslash                          |
+/// | `code_language`      | irrelevant (Indented style)             | No — gated via `code_block_style`        |
+/// | `autolinks`          | not implemented in Tier-1               | No — Tier-1 never transforms bare URLs   |
+/// | `default_title`      | `false` (not honored)                   | Yes — `true`                             |
+/// | `sub_symbol`         | `""` (transparent pass-through)         | Yes — non-empty                          |
+/// | `sup_symbol`         | `""` (transparent pass-through)         | Yes — non-empty                          |
+/// | `highlight_style`    | transparent (`<mark>` → plain text)     | Yes — non-None                           |
+/// | `link_style`         | `LinkStyle::Inline`                     | Yes — Reference                          |
+/// | `url_escape_style`   | `UrlEscapeStyle::Angle` (raw href)      | Yes — Percent                            |
+/// | `compact_tables`     | `false` (padded cells: `\| cell \|`)    | Yes — `true`                             |
+/// | `br_in_tables`       | bails on `<br>` in cells                | No — covered by scanner bail             |
+/// | `hocr_spatial_tables`| Tier-2 only (structural gate)           | Already gated above                      |
 pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> TierChoice {
-    use crate::options::{CodeBlockStyle, HeadingStyle, HighlightStyle, ListIndentType, NewlineStyle,
-                         PreprocessingPreset, WhitespaceMode};
+    use crate::options::{
+        CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
+        PreprocessingPreset, UrlEscapeStyle, WhitespaceMode,
+    };
 
     if report.had_custom_elements
         || report.had_cdata
@@ -83,6 +89,8 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> TierChoi
         || !options.preserve_tags.is_empty()
         || options.debug
         // ── Style-option gates ────────────────────────────────────────────────
+        // output_format: Tier-1 only produces Markdown; other formats are Tier-2 only.
+        || options.output_format != OutputFormat::Markdown
         // heading_style: Tier-1 hardcodes ATX; non-ATX headings differ.
         || options.heading_style != HeadingStyle::Atx
         // code_block_style: Tier-1 always emits 4-space indented blocks.
@@ -95,6 +103,12 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> TierChoi
         || options.list_indent_width != 2
         // list_indent_type: Tier-1 hardcodes spaces for list indentation.
         || options.list_indent_type != ListIndentType::Spaces
+        // escape_*: Tier-1 does not perform any text escaping. If the caller
+        // requests escaping, Tier-2 must handle it.
+        || options.escape_asterisks
+        || options.escape_underscores
+        || options.escape_misc
+        || options.escape_ascii
         // whitespace_mode: Tier-1 always normalizes whitespace (collapses runs).
         || options.whitespace_mode != WhitespaceMode::Normalized
         // newline_style: Tier-1 emits `  \n` for `<br>` (two-space style).
@@ -108,6 +122,16 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> TierChoi
         // highlight_style: Tier-1 passes <mark> content through as plain text.
         // This is byte-identical to Tier-2 only when style is None (no wrapping).
         || options.highlight_style != HighlightStyle::None
+        // link_style: Tier-1 always emits inline `[text](href)` links; reference
+        // style (with a link-reference block at end of document) is Tier-2 only.
+        || options.link_style != LinkStyle::Inline
+        // url_escape_style: Tier-1 emits hrefs verbatim (no angle-bracket wrapping
+        // or percent-encoding). This matches Tier-2's Angle behaviour for URLs that
+        // contain no spaces, but diverges for Percent (which percent-encodes).
+        || options.url_escape_style != UrlEscapeStyle::Angle
+        // compact_tables: Tier-1 always emits padded `| cell |` GFM tables.
+        // compact_tables=true would produce `|cell|`, which Tier-1 never does.
+        || options.compact_tables
     {
         return TierChoice::Tier2;
     }
