@@ -21,7 +21,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 futures-util = "0.3"
-html-to-markdown-rs = { version = "3.6.0", path = "../html-to-markdown", features = ["serde", "metadata", "inline-images"] }
+html-to-markdown-rs = { version = "3.6.0-rc.1", path = "../html-to-markdown", features = ["serde", "metadata", "inline-images"] }
 jni = "0.22"
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync"] }

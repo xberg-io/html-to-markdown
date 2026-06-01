@@ -143,10 +143,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     internal readonly IHtmlVisitor _impl;
     private readonly GCHandle _implHandle;
-    private readonly GCHandle _delegatesHandle;
     internal IntPtr _vtable;
     private bool _disposed;
-    private readonly object[] _delegates;
+    // Keep all delegates alive for the lifetime of the bridge.
+    // Delegates must not be GC'd because Rust holds function pointers obtained via
+    // GetFunctionPointerForDelegate; those pointers become invalid if the delegate is collected.
+    private readonly List<object> _delegateRoots;
     internal readonly IntPtr _bridgeId;
     private int _callbackRefCount = 0;
 
@@ -286,14 +288,12 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
     public HtmlVisitorBridge(IHtmlVisitor impl) {
         _impl = impl ?? throw new ArgumentNullException(nameof(impl));
-        // Reference types cannot be Pinned (GCHandle throws "Object contains references").
-        // Normal handles keep the object alive across GC without moving it; that is
-        // sufficient because we hand Rust function pointers obtained via
-        // GetFunctionPointerForDelegate, which remain valid as long as the delegate
-        // (and its target) is alive — the managed address of the array does not matter.
+        // Keep impl alive via normal GCHandle (sufficient for callback rooting).
+        // The impl instance itself is not pinned, just kept in the GC root set.
         _implHandle = GCHandle.Alloc(impl, GCHandleType.Normal);
-        _delegates = new object[42];
-        _delegatesHandle = GCHandle.Alloc(_delegates, GCHandleType.Normal);
+        // Delegate list roots all delegates by reference to prevent GC.
+        // This avoids trying to pin an object array containing references, which .NET 10 forbids.
+        _delegateRoots = new List<object>(42);
         _vtable = IntPtr.Zero;
         _disposed = false;
         // Allocate unique bridge ID for registry lookup during callbacks
@@ -309,212 +309,212 @@ public sealed class HtmlVisitorBridge : IDisposable {
 
         // Slot 0: visit_text_fn
         var visitTextFn = new VisitTextFn(VisitTextFnCallback);
-        _delegates[0] = visitTextFn;
+        _delegateRoots.Add(visitTextFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 0, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTextFn));
 
         // Slot 1: visit_element_start_fn
         var visitElementStartFn = new VisitElementStartFn(VisitElementStartFnCallback);
-        _delegates[1] = visitElementStartFn;
+        _delegateRoots.Add(visitElementStartFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 8, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
 
         // Slot 2: visit_element_end_fn
         var visitElementEndFn = new VisitElementEndFn(VisitElementEndFnCallback);
-        _delegates[2] = visitElementEndFn;
+        _delegateRoots.Add(visitElementEndFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 16, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
 
         // Slot 3: visit_link_fn
         var visitLinkFn = new VisitLinkFn(VisitLinkFnCallback);
-        _delegates[3] = visitLinkFn;
+        _delegateRoots.Add(visitLinkFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 24, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitLinkFn));
 
         // Slot 4: visit_image_fn
         var visitImageFn = new VisitImageFn(VisitImageFnCallback);
-        _delegates[4] = visitImageFn;
+        _delegateRoots.Add(visitImageFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 32, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitImageFn));
 
         // Slot 5: visit_heading_fn
         var visitHeadingFn = new VisitHeadingFn(VisitHeadingFnCallback);
-        _delegates[5] = visitHeadingFn;
+        _delegateRoots.Add(visitHeadingFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 40, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitHeadingFn));
 
         // Slot 6: visit_code_block_fn
         var visitCodeBlockFn = new VisitCodeBlockFn(VisitCodeBlockFnCallback);
-        _delegates[6] = visitCodeBlockFn;
+        _delegateRoots.Add(visitCodeBlockFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 48, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCodeBlockFn));
 
         // Slot 7: visit_code_inline_fn
         var visitCodeInlineFn = new VisitCodeInlineFn(VisitCodeInlineFnCallback);
-        _delegates[7] = visitCodeInlineFn;
+        _delegateRoots.Add(visitCodeInlineFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 56, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCodeInlineFn));
 
         // Slot 8: visit_list_item_fn
         var visitListItemFn = new VisitListItemFn(VisitListItemFnCallback);
-        _delegates[8] = visitListItemFn;
+        _delegateRoots.Add(visitListItemFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 64, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListItemFn));
 
         // Slot 9: visit_list_start_fn
         var visitListStartFn = new VisitListStartFn(VisitListStartFnCallback);
-        _delegates[9] = visitListStartFn;
+        _delegateRoots.Add(visitListStartFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 72, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListStartFn));
 
         // Slot 10: visit_list_end_fn
         var visitListEndFn = new VisitListEndFn(VisitListEndFnCallback);
-        _delegates[10] = visitListEndFn;
+        _delegateRoots.Add(visitListEndFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 80, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListEndFn));
 
         // Slot 11: visit_table_start_fn
         var visitTableStartFn = new VisitTableStartFn(VisitTableStartFnCallback);
-        _delegates[11] = visitTableStartFn;
+        _delegateRoots.Add(visitTableStartFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 88, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableStartFn));
 
         // Slot 12: visit_table_row_fn
         var visitTableRowFn = new VisitTableRowFn(VisitTableRowFnCallback);
-        _delegates[12] = visitTableRowFn;
+        _delegateRoots.Add(visitTableRowFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 96, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableRowFn));
 
         // Slot 13: visit_table_end_fn
         var visitTableEndFn = new VisitTableEndFn(VisitTableEndFnCallback);
-        _delegates[13] = visitTableEndFn;
+        _delegateRoots.Add(visitTableEndFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 104, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableEndFn));
 
         // Slot 14: visit_blockquote_fn
         var visitBlockquoteFn = new VisitBlockquoteFn(VisitBlockquoteFnCallback);
-        _delegates[14] = visitBlockquoteFn;
+        _delegateRoots.Add(visitBlockquoteFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 112, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitBlockquoteFn));
 
         // Slot 15: visit_strong_fn
         var visitStrongFn = new VisitStrongFn(VisitStrongFnCallback);
-        _delegates[15] = visitStrongFn;
+        _delegateRoots.Add(visitStrongFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 120, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitStrongFn));
 
         // Slot 16: visit_emphasis_fn
         var visitEmphasisFn = new VisitEmphasisFn(VisitEmphasisFnCallback);
-        _delegates[16] = visitEmphasisFn;
+        _delegateRoots.Add(visitEmphasisFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 128, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitEmphasisFn));
 
         // Slot 17: visit_strikethrough_fn
         var visitStrikethroughFn = new VisitStrikethroughFn(VisitStrikethroughFnCallback);
-        _delegates[17] = visitStrikethroughFn;
+        _delegateRoots.Add(visitStrikethroughFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 136, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitStrikethroughFn));
 
         // Slot 18: visit_underline_fn
         var visitUnderlineFn = new VisitUnderlineFn(VisitUnderlineFnCallback);
-        _delegates[18] = visitUnderlineFn;
+        _delegateRoots.Add(visitUnderlineFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 144, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitUnderlineFn));
 
         // Slot 19: visit_subscript_fn
         var visitSubscriptFn = new VisitSubscriptFn(VisitSubscriptFnCallback);
-        _delegates[19] = visitSubscriptFn;
+        _delegateRoots.Add(visitSubscriptFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 152, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSubscriptFn));
 
         // Slot 20: visit_superscript_fn
         var visitSuperscriptFn = new VisitSuperscriptFn(VisitSuperscriptFnCallback);
-        _delegates[20] = visitSuperscriptFn;
+        _delegateRoots.Add(visitSuperscriptFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 160, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSuperscriptFn));
 
         // Slot 21: visit_mark_fn
         var visitMarkFn = new VisitMarkFn(VisitMarkFnCallback);
-        _delegates[21] = visitMarkFn;
+        _delegateRoots.Add(visitMarkFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 168, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitMarkFn));
 
         // Slot 22: visit_line_break_fn
         var visitLineBreakFn = new VisitLineBreakFn(VisitLineBreakFnCallback);
-        _delegates[22] = visitLineBreakFn;
+        _delegateRoots.Add(visitLineBreakFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 176, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitLineBreakFn));
 
         // Slot 23: visit_horizontal_rule_fn
         var visitHorizontalRuleFn = new VisitHorizontalRuleFn(VisitHorizontalRuleFnCallback);
-        _delegates[23] = visitHorizontalRuleFn;
+        _delegateRoots.Add(visitHorizontalRuleFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 184, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitHorizontalRuleFn));
 
         // Slot 24: visit_custom_element_fn
         var visitCustomElementFn = new VisitCustomElementFn(VisitCustomElementFnCallback);
-        _delegates[24] = visitCustomElementFn;
+        _delegateRoots.Add(visitCustomElementFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 192, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCustomElementFn));
 
         // Slot 25: visit_definition_list_start_fn
         var visitDefinitionListStartFn = new VisitDefinitionListStartFn(VisitDefinitionListStartFnCallback);
-        _delegates[25] = visitDefinitionListStartFn;
+        _delegateRoots.Add(visitDefinitionListStartFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 200, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionListStartFn));
 
         // Slot 26: visit_definition_term_fn
         var visitDefinitionTermFn = new VisitDefinitionTermFn(VisitDefinitionTermFnCallback);
-        _delegates[26] = visitDefinitionTermFn;
+        _delegateRoots.Add(visitDefinitionTermFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 208, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionTermFn));
 
         // Slot 27: visit_definition_description_fn
         var visitDefinitionDescriptionFn = new VisitDefinitionDescriptionFn(VisitDefinitionDescriptionFnCallback);
-        _delegates[27] = visitDefinitionDescriptionFn;
+        _delegateRoots.Add(visitDefinitionDescriptionFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 216, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionDescriptionFn));
 
         // Slot 28: visit_definition_list_end_fn
         var visitDefinitionListEndFn = new VisitDefinitionListEndFn(VisitDefinitionListEndFnCallback);
-        _delegates[28] = visitDefinitionListEndFn;
+        _delegateRoots.Add(visitDefinitionListEndFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 224, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionListEndFn));
 
         // Slot 29: visit_form_fn
         var visitFormFn = new VisitFormFn(VisitFormFnCallback);
-        _delegates[29] = visitFormFn;
+        _delegateRoots.Add(visitFormFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 232, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFormFn));
 
         // Slot 30: visit_input_fn
         var visitInputFn = new VisitInputFn(VisitInputFnCallback);
-        _delegates[30] = visitInputFn;
+        _delegateRoots.Add(visitInputFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 240, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitInputFn));
 
         // Slot 31: visit_button_fn
         var visitButtonFn = new VisitButtonFn(VisitButtonFnCallback);
-        _delegates[31] = visitButtonFn;
+        _delegateRoots.Add(visitButtonFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 248, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitButtonFn));
 
         // Slot 32: visit_audio_fn
         var visitAudioFn = new VisitAudioFn(VisitAudioFnCallback);
-        _delegates[32] = visitAudioFn;
+        _delegateRoots.Add(visitAudioFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 256, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitAudioFn));
 
         // Slot 33: visit_video_fn
         var visitVideoFn = new VisitVideoFn(VisitVideoFnCallback);
-        _delegates[33] = visitVideoFn;
+        _delegateRoots.Add(visitVideoFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 264, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitVideoFn));
 
         // Slot 34: visit_iframe_fn
         var visitIframeFn = new VisitIframeFn(VisitIframeFnCallback);
-        _delegates[34] = visitIframeFn;
+        _delegateRoots.Add(visitIframeFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 272, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitIframeFn));
 
         // Slot 35: visit_details_fn
         var visitDetailsFn = new VisitDetailsFn(VisitDetailsFnCallback);
-        _delegates[35] = visitDetailsFn;
+        _delegateRoots.Add(visitDetailsFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 280, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDetailsFn));
 
         // Slot 36: visit_summary_fn
         var visitSummaryFn = new VisitSummaryFn(VisitSummaryFnCallback);
-        _delegates[36] = visitSummaryFn;
+        _delegateRoots.Add(visitSummaryFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 288, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSummaryFn));
 
         // Slot 37: visit_figure_start_fn
         var visitFigureStartFn = new VisitFigureStartFn(VisitFigureStartFnCallback);
-        _delegates[37] = visitFigureStartFn;
+        _delegateRoots.Add(visitFigureStartFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 296, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigureStartFn));
 
         // Slot 38: visit_figcaption_fn
         var visitFigcaptionFn = new VisitFigcaptionFn(VisitFigcaptionFnCallback);
-        _delegates[38] = visitFigcaptionFn;
+        _delegateRoots.Add(visitFigcaptionFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 304, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigcaptionFn));
 
         // Slot 39: visit_figure_end_fn
         var visitFigureEndFn = new VisitFigureEndFn(VisitFigureEndFnCallback);
-        _delegates[39] = visitFigureEndFn;
+        _delegateRoots.Add(visitFigureEndFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 312, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigureEndFn));
 
         // Slot 40: free_string
         var freeStringFn = new FreeStringFn(FreeStringCallback);
-        _delegates[40] = freeStringFn;
+        _delegateRoots.Add(freeStringFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 320, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(freeStringFn));
 
         // Slot 41: free_user_data
         var freeFn = new FreeUserDataFn(FreeUserDataCallback);
-        _delegates[41] = freeFn;
+        _delegateRoots.Add(freeFn);
         global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 328, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(freeFn));
 
     }
@@ -2063,9 +2063,8 @@ public sealed class HtmlVisitorBridge : IDisposable {
             _implHandle.Free();
         }
 
-        if (_delegatesHandle.IsAllocated) {
-            _delegatesHandle.Free();
-        }
+        // _delegateRoots is kept as a managed list; GC handles it automatically.
+        // No need to free individual delegates or the list.
     }
 
     /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>

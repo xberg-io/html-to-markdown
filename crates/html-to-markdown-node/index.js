@@ -79,12 +79,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-android-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -102,12 +102,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-android-arm-eabi/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -133,12 +133,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-win32-x64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -156,12 +156,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-win32-x64-msvc/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -180,12 +180,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-win32-ia32-msvc/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -203,12 +203,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-win32-arm64-msvc/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -229,12 +229,12 @@ function requireNative() {
 			const bindingPackageVersion =
 				require("@kreuzberg/html-to-markdown-node-darwin-universal/package.json").version;
 			if (
-				bindingPackageVersion !== "3.6.0" &&
+				bindingPackageVersion !== "3.6.0-rc.1" &&
 				process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 				process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 			) {
 				throw new Error(
-					`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+					`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 				);
 			}
 			return binding;
@@ -252,12 +252,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-darwin-x64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -275,12 +275,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-darwin-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -302,12 +302,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-freebsd-x64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -325,12 +325,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-freebsd-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -353,12 +353,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-x64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -376,12 +376,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-x64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -401,12 +401,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-arm64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -424,12 +424,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-arm64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -449,12 +449,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-arm-musleabihf/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -472,12 +472,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-arm-gnueabihf/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -497,12 +497,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-loong64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -520,12 +520,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-loong64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -545,12 +545,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-riscv64-musl/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -568,12 +568,12 @@ function requireNative() {
 					const bindingPackageVersion =
 						require("@kreuzberg/html-to-markdown-node-linux-riscv64-gnu/package.json").version;
 					if (
-						bindingPackageVersion !== "3.6.0" &&
+						bindingPackageVersion !== "3.6.0-rc.1" &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 						process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 					) {
 						throw new Error(
-							`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+							`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 						);
 					}
 					return binding;
@@ -592,12 +592,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-linux-ppc64-gnu/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -615,12 +615,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-linux-s390x-gnu/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -642,12 +642,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-openharmony-arm64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -665,12 +665,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-openharmony-x64/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
@@ -688,12 +688,12 @@ function requireNative() {
 				const bindingPackageVersion =
 					require("@kreuzberg/html-to-markdown-node-openharmony-arm/package.json").version;
 				if (
-					bindingPackageVersion !== "3.6.0" &&
+					bindingPackageVersion !== "3.6.0-rc.1" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
 				) {
 					throw new Error(
-						`Native binding package version mismatch, expected 3.6.0 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
+						`Native binding package version mismatch, expected 3.6.0-rc.1 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
 					);
 				}
 				return binding;
