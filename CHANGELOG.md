@@ -45,16 +45,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Per-group regression guardrails (`baselines/baseline.json`, `guardrails.json`).
   Wired under `task bench:*` namespace.
 
+- **Bench regression gate in CI** — every PR that touches the Rust core or bench harness now
+  runs `task bench:oracle && task bench:run && task bench:compare` on `ubuntu-24.04-arm`,
+  failing on any fixture that exceeds its per-group threshold in
+  `tools/benchmark-harness/guardrails.json` (5% clean_large, 8% clean_medium, 10% other groups,
+  30% adversarial). Baselines are blessed deliberately by humans, not automatically by CI.
+
 ### Performance
 
 - **Tier-1 byte scanner activated in production** (`tier_strategy = Auto`). The classifier
   decides per-input whether Tier-1's single-pass byte scanner runs; on bail, the dispatcher
-  falls back to Tier-2 transparently. Measured wins (vs prior Tier-2-only baseline):
-  spec_rules group median **7.47×**, adversarial **2.08×**, clean_small **1.70×**.
-  Reference fixtures: `synthetic/optional_li.html` 7.47×, `synthetic/unclosed_p.html` 4.27×,
-  `real-world/issues/gh-121-hacker-news.html` 2.62× (55 KB), `gh-190/firsteigen.html` 2.46×,
-  `real-world/wikipedia/large_rust.html` 1.72× (1.04 MB), `mdream/wikipedia-small.html`
-  1.05× (162 KB).
+  falls back to Tier-2 transparently. Measured throughput on the harness corpus (29 fixtures,
+  6.4 MB total; Apple Silicon, `cargo build --release`):
+
+  | Fixture                                  |   Size | ms (best) | Throughput |
+  |------------------------------------------|-------:|----------:|-----------:|
+  | `real-world/wikipedia/medium_python.html` | 1.24 MB | 62.58 ms  | 19.0 MB/s  |
+  | `real-world/wikipedia/large_rust.html`   | 1.07 MB | 37.17 ms  | 27.3 MB/s  |
+  | `mdream/github-markdown-complete.html`   | 430 KB | 10.57 ms  | 38.7 MB/s  |
+  | `mdream/react-learn.html`                | 265 KB | 12.11 ms  | 20.9 MB/s  |
+  | `mdream/wikipedia-small.html`            | 166 KB |  5.63 ms  | 28.1 MB/s  |
+  | `real-world/issues/gh-121-hacker-news.html` |  57 KB |  1.08 ms  | 50.3 MB/s  |
+  | `mdream/nuxt-example.html`               | 3.6 KB |  0.029 ms | 116.1 MB/s |
+
+  Per-group regression thresholds (5–30%) are enforced on every PR via `task bench:compare` (see Added section).
 
 - **memchr-driven text scan**: `decode_and_collapse_into` and `decode_entities_into` use
   `memchr::memchr3` / `memchr::memchr` to skip ahead to the next special byte (`<`, `&`,

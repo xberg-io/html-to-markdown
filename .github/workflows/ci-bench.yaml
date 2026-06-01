@@ -1,0 +1,74 @@
+name: CI Bench
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "crates/html-to-markdown/**"
+      - "tools/benchmark-harness/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".task/workflows/benchmark.yml"
+      - ".github/workflows/ci-bench.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/html-to-markdown/**"
+      - "tools/benchmark-harness/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".task/workflows/benchmark.yml"
+      - ".github/workflows/ci-bench.yaml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-bench-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+  BUILD_PROFILE: "ci"
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    name: "Bench"
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1 # v1
+        with:
+          cache-key-prefix: bench-ubuntu-arm
+
+      - name: Install Task
+        uses: kreuzberg-dev/actions/install-task@v1 # v1
+
+      - name: Run Oracle Check
+        run: task bench:oracle
+        shell: bash
+
+      - name: Run Benchmarks
+        run: task bench:run
+        shell: bash
+
+      - name: Compare Results
+        run: task bench:compare
+        shell: bash
+
+      - name: Upload Bench Results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-results-${{ github.sha }}
+          path: tools/benchmark-harness/results/latest.json
+          retention-days: 14

@@ -78,19 +78,59 @@
   </a>
 </div>
 
-High-performance HTML to Markdown conversion powered by Rust. Ships as native bindings for **Rust, Python, TypeScript/Node.js, Ruby, PHP, Go, Java, C#, Elixir, R, C (FFI), and WebAssembly** with identical rendering across all runtimes.
+Fast, robust HTML → Markdown for 16 languages. A tiered converter that picks the safest fastest path per input without losing content.
 
 **[Documentation](https://docs.html-to-markdown.kreuzberg.dev)** | **[API Reference](https://docs.rs/html-to-markdown-rs/)**
 
 ## Highlights
 
-- **Rust-native throughput** with html5ever parsing
-- **12 language bindings** with consistent output across all runtimes
-- **Structured result** — `convert()` returns `ConversionResult` with `content`, `metadata`, `tables`, `images`, and `warnings`
-- **Metadata extraction** — title, headers, links, images, structured data (JSON-LD, Microdata, RDFa)
-- **Visitor pattern** — custom callbacks for content filtering, URL rewriting, domain-specific dialects
-- **Table extraction** — extract structured table data (cells, headers, rendered markdown) during conversion
-- **Secure by default** — built-in HTML sanitization via ammonia
+- **16 languages, one Rust core.** Rust, Python, Node.js, WASM, Java, Go, C#, PHP, Ruby, Elixir, R, Dart, Kotlin (Android), Swift, Zig, C ABI.
+- **Tiered dispatch.** Byte scanner for clean HTML → DOM walker for complex inputs → `html5ever` repair for malformed HTML. Byte-equal output across tiers.
+- **Real-HTML robust.** Unclosed tags, CDATA, custom elements, malformed entities, nested tables, mixed encodings — handled without losing content.
+- **GFM tables, Djot output, metadata extraction, visitor API, inline images, configurable preprocessing presets.**
+- **CommonMark-compatible Markdown** with GFM-style tables. `output_format = "djot"` switches to Djot.
+- **116-snapshot oracle + per-group regression gates in CI.** Performance and correctness both enforced.
+
+## Architecture
+
+The converter routes each input through one of three tiers based on a fast prescan of the byte stream:
+
+1. **Tier-1 — Single-pass byte scanner.** Walks `html.as_bytes()` once and emits Markdown directly. Handles 110+ HTML tags including paragraphs, headings, lists, GFM tables, links, images, inline emphasis, blockquotes, indented code blocks. Bails (returns a structured error) on any construct it cannot prove byte-equivalent to Tier-2 — custom elements, CDATA, malformed entities, nested tables, mixed table sections, multi-line table cells, etc.
+
+2. **Tier-2 — `tl::parse` DOM walker.** Picks up Tier-1's bails and inputs the classifier rejected up front (non-default style options, non-Markdown output, etc.). Handles the full HTML5 spec via a tolerant DOM walk.
+
+3. **Tier-3 — `html5ever` standards-conformant parser.** Engaged when Tier-2 detects HTML requiring full HTML5 repair (custom elements, structural recovery, weird namespace transitions).
+
+The dispatcher is invisible to the caller. The same `convert()` call works regardless of which tier handled the input; the output is byte-identical across tiers (enforced by a 116-snapshot oracle).
+
+## Performance
+
+Best-of-3 measurements on the harness corpus (Apple Silicon, `cargo build --release`):
+
+| Fixture | Size | ms (best of 3) | Throughput |
+|---|---:|---:|---:|
+| `wikipedia/medium_python.html` | 1.24 MB | 62.58 ms | 19.0 MB/s |
+| `wikipedia/large_rust.html` | 1.07 MB | 37.17 ms | 27.3 MB/s |
+| `wikipedia/small_html.html` | 973 KB | 29.32 ms | 31.6 MB/s |
+| `wikipedia/tables_countries.html` | 756 KB | 18.95 ms | 38.1 MB/s |
+| `mdream/github-markdown-complete.html` | 430 KB | 10.57 ms | 38.7 MB/s |
+| `mdream/react-learn.html` | 265 KB | 12.11 ms | 20.9 MB/s |
+| `mdream/wikipedia-small.html` | 166 KB | 5.63 ms | 28.1 MB/s |
+| `issues/gh-121-hacker-news.html` | 57 KB | 1.08 ms | 50.3 MB/s |
+| `mdream/nuxt-example.html` | 3.6 KB | 0.029 ms | 116.1 MB/s |
+
+Corpus: 29 fixtures totalling 6.4 MB across `clean_small`, `clean_medium`, `clean_large`, `spec_rules`, `adversarial`, and `fallthrough_*` groups. Per-group regression thresholds (5–30%) are enforced on every PR via `task bench:compare`. Run `task bench:run` to reproduce on your hardware.
+
+## Capabilities
+
+- **HTML element coverage**: 110+ tags handled natively in Tier-1; full HTML5 coverage via Tier-2/Tier-3 fallback.
+- **GFM-style tables** with padded cells, alignment, and pipe escaping.
+- **Djot output**: set `ConversionOptions { output_format: OutputFormat::Djot, .. }` to emit Djot instead of Markdown.
+- **Metadata extraction**: parse `<head>` into structured `HtmlMetadata` (open-graph, twitter, JSON-LD, microdata, RDFa, header hierarchy).
+- **Inline images**: opt-in via `inline-images` feature; mirrors data URIs and remote image references.
+- **Visitor API**: feature-gated traversal that lets callers transform the converted Markdown AST (`visitor` feature).
+- **Configurable preprocessing**: standard, strict, lenient presets — or build your own.
+- **Tiered fallback**: Tier-3 (`html5ever`) handles inputs the other tiers cannot, so the converter never silently corrupts malformed HTML.
 
 ## Quick Start
 
@@ -113,7 +153,7 @@ cargo install html-to-markdown-cli
 brew install kreuzberg-dev/tap/html-to-markdown
 ```
 
-See the package READMEs for all languages including PHP, Go, Java, C#, Elixir, R, and WASM.
+See the package READMEs for the full list: PHP, Go, Java, C#, Elixir, R, Dart, Kotlin (Android), Swift, Zig, WASM, and a C ABI for everything else.
 
 ### Usage
 
