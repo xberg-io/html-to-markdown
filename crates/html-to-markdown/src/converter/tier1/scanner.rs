@@ -38,7 +38,7 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
             b'<' => {
                 // Flush pending text before we process this tag.
                 if text_start < pos {
-                    flush_text(&mut state, &html[text_start..pos]);
+                    flush_text(&mut state, &html[text_start..pos], text_start)?;
                 }
 
                 let next = bytes.get(pos + 1).copied().unwrap_or(0);
@@ -189,7 +189,7 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
                     1
                 };
                 let (link_href, link_title) = if matches!(spec.kind, TagKind::Link) {
-                    extract_link_attrs(&attrs)
+                    extract_link_attrs(&attrs)?
                 } else {
                     (None, None)
                 };
@@ -229,7 +229,7 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
 
     // Flush any trailing text after the last tag.
     if text_start < pos {
-        flush_text(&mut state, &html[text_start..pos]);
+        flush_text(&mut state, &html[text_start..pos], text_start)?;
     }
 
     // M4: Implicitly close any optional-close elements still open at EOF.
@@ -510,15 +510,15 @@ fn emit_void(
             let alt = find_attr(attrs, b"alt").unwrap_or_default();
             let title = find_attr(attrs, b"title");
 
-            let src = decode_attr(src);
-            let alt = decode_attr(alt);
+            let src = decode_attr(src)?;
+            let alt = decode_attr(alt)?;
 
             let keep_as_markdown = should_keep_image_as_markdown(html, &state.stack, options);
 
             let dest = state.cell_or_output_mut();
             if keep_as_markdown {
                 if let Some(title_bytes) = title {
-                    let title_str = decode_attr(title_bytes);
+                    let title_str = decode_attr(title_bytes)?;
                     dest.push_str(&format!("![{alt}]({src} \"{title_str}\")"));
                 } else {
                     dest.push_str(&format!("![{alt}]({src})"));
@@ -1013,9 +1013,15 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
 
 /// Flush a raw HTML text segment into the output (or current cell buffer),
 /// decoding entities and collapsing whitespace (unless inside `<pre>`).
-fn flush_text(state: &mut Tier1State, raw: &str) {
+///
+/// `base_offset` is the byte offset of `raw` within the original HTML input;
+/// it is forwarded to the entity decoder so that `BailReason::UnknownEntity`
+/// carries an accurate position.
+///
+/// Returns `Err(BailReason::UnknownEntity)` if an unrecognised entity is found.
+fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(), BailReason> {
     if raw.is_empty() {
-        return;
+        return Ok(());
     }
 
     // Inside a table but outside a cell: discard text (whitespace between
@@ -1023,7 +1029,7 @@ fn flush_text(state: &mut Tier1State, raw: &str) {
     // Tier-2 processes only tag children explicitly, ignoring text nodes at
     // this level.
     if !state.table_stack.is_empty() && !state.in_table_cell() {
-        return;
+        return Ok(());
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
@@ -1032,11 +1038,11 @@ fn flush_text(state: &mut Tier1State, raw: &str) {
     if in_pre {
         if has_entities {
             let dest = state.cell_or_output_mut();
-            decode_entities_into(dest, raw);
+            decode_entities_into(dest, raw, base_offset)?;
         } else {
             state.cell_or_output_mut().push_str(raw);
         }
-        return;
+        return Ok(());
     }
 
     // Outside `<pre>`: collapse runs of space/tab into a single space, decode
@@ -1045,11 +1051,11 @@ fn flush_text(state: &mut Tier1State, raw: &str) {
     if !has_entities && !has_collapsible {
         // Hot path: plain ASCII text with single-space whitespace already.
         state.cell_or_output_mut().push_str(raw);
-        return;
+        return Ok(());
     }
 
     let dest = state.cell_or_output_mut();
-    decode_and_collapse_into(dest, raw, has_entities);
+    decode_and_collapse_into(dest, raw, has_entities, base_offset)
 }
 
 /// True if `s` contains two consecutive whitespace bytes (space or tab) that
@@ -1070,7 +1076,12 @@ fn has_double_ws(s: &str) -> bool {
 }
 
 /// Decode HTML entities directly into `out` (no intermediate allocation).
-fn decode_entities_into(out: &mut String, s: &str) {
+///
+/// `base_offset` is the byte offset of `s` within the original HTML input and
+/// is used to report the position of any unrecognised entity in the bail reason.
+///
+/// Returns `Err(BailReason::UnknownEntity)` when an entity cannot be decoded.
+fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result<(), BailReason> {
     let bytes = s.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
@@ -1095,17 +1106,34 @@ fn decode_entities_into(out: &mut String, s: &str) {
                 i = end + 1;
                 continue;
             }
+            // Entity found (`&name;`) but not in the decode table or invalid
+            // numeric reference — bail rather than silently passing it through.
+            return Err(BailReason::UnknownEntity {
+                name: entity.to_owned(),
+                offset: base_offset + amp,
+            });
         }
         out.push('&');
         i += 1;
     }
+    Ok(())
 }
 
 /// Decode entities AND collapse spaces/tabs in one pass, directly into `out`.
 ///
+/// `base_offset` is the byte offset of `s` within the original HTML input and
+/// is used to report the position of any unrecognised entity in the bail reason.
+///
 /// Bulk-copies long runs of "ordinary" bytes (not space/tab/&) with a single
 /// `push_str` to avoid the per-byte overhead of `push(char)`.
-fn decode_and_collapse_into(out: &mut String, s: &str, has_entities: bool) {
+///
+/// Returns `Err(BailReason::UnknownEntity)` when an entity cannot be decoded.
+fn decode_and_collapse_into(
+    out: &mut String,
+    s: &str,
+    has_entities: bool,
+    base_offset: usize,
+) -> Result<(), BailReason> {
     let bytes = s.as_bytes();
     let mut i = 0;
     let mut prev_was_space = false;
@@ -1132,6 +1160,12 @@ fn decode_and_collapse_into(out: &mut String, s: &str, has_entities: bool) {
                     i = end + 1;
                     continue;
                 }
+                // Entity found (`&name;`) but not in the decode table or invalid
+                // numeric reference — bail rather than silently passing it through.
+                return Err(BailReason::UnknownEntity {
+                    name: entity.to_owned(),
+                    offset: base_offset + amp,
+                });
             }
             out.push('&');
             i += 1;
@@ -1159,6 +1193,7 @@ fn decode_and_collapse_into(out: &mut String, s: &str, has_entities: bool) {
         out.push_str(&s[start..i]);
         prev_was_space = false;
     }
+    Ok(())
 }
 
 // ── Escape context management ─────────────────────────────────────────────────
@@ -1202,10 +1237,12 @@ fn find_attr<'a>(attrs: &[(&'a [u8], Option<&'a [u8]>)], key: &[u8]) -> Option<&
 }
 
 /// Extract `href` and `title` from the attribute list for a link.
-fn extract_link_attrs(attrs: &[(&[u8], Option<&[u8]>)]) -> (Option<String>, Option<String>) {
-    let href = find_attr(attrs, b"href").map(decode_attr);
-    let title = find_attr(attrs, b"title").map(decode_attr);
-    (href, title)
+fn extract_link_attrs(
+    attrs: &[(&[u8], Option<&[u8]>)],
+) -> Result<(Option<String>, Option<String>), BailReason> {
+    let href = find_attr(attrs, b"href").map(decode_attr).transpose()?;
+    let title = find_attr(attrs, b"title").map(decode_attr).transpose()?;
+    Ok((href, title))
 }
 
 /// Extract `start` attribute from `<ol>` (defaults to 1).
@@ -1217,14 +1254,19 @@ fn extract_ol_start(attrs: &[(&[u8], Option<&[u8]>)]) -> u16 {
 }
 
 /// Decode an attribute value: entity-decode and convert to a String.
-fn decode_attr(bytes: &[u8]) -> String {
+///
+/// Returns `Err(BailReason::UnknownEntity)` when the value contains an entity
+/// that Tier-1 cannot decode (Tier-2 would decode it differently).
+fn decode_attr(bytes: &[u8]) -> Result<String, BailReason> {
     let s = std::str::from_utf8(bytes).unwrap_or("");
     if !s.contains('&') {
-        return s.to_owned();
+        return Ok(s.to_owned());
     }
     let mut out = String::with_capacity(s.len());
-    decode_entities_into(&mut out, s);
-    out
+    // Attribute values do not carry a meaningful offset into the HTML source;
+    // use 0 as the base so the entity name is still reported.
+    decode_entities_into(&mut out, s, 0)?;
+    Ok(out)
 }
 
 // ── Stack helpers ─────────────────────────────────────────────────────────────

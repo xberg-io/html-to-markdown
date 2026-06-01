@@ -72,6 +72,20 @@ pub enum BailReason {
     /// Table sections appear in an unsupported order, e.g. `<tbody>` after
     /// `<tfoot>` close, or `<thead>` after any section that already closed.
     TableSectionOrder,
+
+    /// A named HTML entity (e.g. `&mdash;`, `&laquo;`) was encountered that is
+    /// not in Tier-1's 45-entry decode table, or a numeric character reference
+    /// was malformed / mapped to an invalid Unicode code point.
+    ///
+    /// Tier-1 would pass the entity through verbatim, but Tier-2 decodes it to
+    /// the correct character, so the outputs would diverge.  Bail so the
+    /// dispatcher falls back to Tier-2.
+    UnknownEntity {
+        /// The entity name between `&` and `;` (e.g. `"mdash"`, `"#x2014"`).
+        name: String,
+        /// Byte offset in the HTML input where the `&` was found.
+        offset: usize,
+    },
 }
 
 impl fmt::Display for BailReason {
@@ -111,6 +125,9 @@ impl fmt::Display for BailReason {
             }
             Self::TableSectionOrder => {
                 write!(f, "table sections in unsupported order")
+            }
+            Self::UnknownEntity { name, offset } => {
+                write!(f, "unknown HTML entity &{name}; at byte offset {offset}")
             }
         }
     }
