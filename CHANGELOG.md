@@ -63,6 +63,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   byte-by-byte conditional inner loop and closes a substantial portion of the gap to main's
   heavily-optimized Tier-2 path on Wikipedia-scale documents (e.g., +32% on `wikipedia-small`).
 
+- **Tier-1 dispatcher reuses normalized input on Tier-2 fallback.** When the Tier-1 scanner
+  bails or the classifier routes to Tier-2, the dispatcher threads the already-computed
+  `normalize_input` `Cow<str>` through to the Tier-2 path instead of recomputing it. Eliminates
+  one full-input pass on every bail-fallback or Tier-2-routed call.
+
+- **`collapse_excess_blank_lines` in-place.** Replaced the fresh-`String` rewrite with
+  `String::retain`, eliminating an output-sized allocation on every Tier-1 success whose
+  output contains `\n\n\n`. Measured wins (best-of-3, `--force-tier1`, vs prior commit):
+  `wikipedia/lists_timeline` -3.81%, `gh-121-hacker-news` -4.23%, `github-markdown-complete`
+  -2.99%, `wikipedia/medium_python` -2.94%, `mdream/wikipedia-small` -2.68%, `mdn-array`
+  -2.12%, `gh-190/firsteigen` -2.55%. No fixture regressed.
+
+- **`htmbench --force-tier2`** flag mirroring `--force-tier1`, for clean head-to-head
+  benchmarks now that the Auto router activates Tier-1 on most fixtures and so cannot be
+  used as a Tier-2 control.
+
 - **`convert()` accepts options as a bare `ConversionOptions`** in addition to
   `Option<ConversionOptions>` (resolves #398). The second parameter now bounds
   `impl Into<Option<ConversionOptions>>`, so `convert(html, opts)`,
