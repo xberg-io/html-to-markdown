@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "thresholds": {
+    "clean_small": { "max_regression_pct": 10 },
+    "clean_medium": { "max_regression_pct": 8 },
+    "clean_large": { "max_regression_pct": 5 },
+    "spec_rules": { "max_regression_pct": 10 },
+    "fallthrough_custom_elements": { "max_regression_pct": 10 },
+    "fallthrough_bare_lt": { "max_regression_pct": 10 },
+    "adversarial": { "max_regression_pct": 30 }
+  }
+}

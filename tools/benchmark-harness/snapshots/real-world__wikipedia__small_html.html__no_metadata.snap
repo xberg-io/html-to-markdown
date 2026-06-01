@@ -1,0 +1,1528 @@
+[Jump to content](#bodyContent)
+
+Main menu
+
+Main menu
+
+move to sidebar
+
+hide
+
+Navigation
+
+- [Main page](/wiki/Main_Page "Visit the main page [z]")
+- [Contents](/wiki/Wikipedia:Contents "Guides to browsing Wikipedia")
+- [Current events](/wiki/Portal:Current_events "Articles related to current events")
+- [Random article](/wiki/Special:Random "Visit a randomly selected article [x]")
+- [About Wikipedia](/wiki/Wikipedia:About "Learn about Wikipedia and how it works")
+- [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us "How to contact Wikipedia")
+
+Contribute
+
+- [Help](/wiki/Help:Contents "Guidance on how to use and edit Wikipedia")
+- [Learn to edit](/wiki/Help:Introduction "Learn how to edit Wikipedia")
+- [Community portal](/wiki/Wikipedia:Community_portal "The hub for editors")
+- [Recent changes](/wiki/Special:RecentChanges "A list of recent changes to Wikipedia [r]")
+- [Upload file](/wiki/Wikipedia:File_upload_wizard "Add images or other media for use on Wikipedia")
+- [Special pages](/wiki/Special:SpecialPages)
+
+[![](/static/images/icons/wikipedia.png)![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)![The Free Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)](/wiki/Main_Page)
+
+[Search](/wiki/Special:Search "Search Wikipedia [f]")
+
+Search
+
+Appearance
+
+- [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
+- [Create account](/w/index.php?title=Special:CreateAccount&returnto=HTML "You are encouraged to create an account and log in; however, it is not mandatory")
+- [Log in](/w/index.php?title=Special:UserLogin&returnto=HTML "You're encouraged to log in; however, it's not mandatory. [o]")
+
+Personal tools
+
+- [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
+- [Create account](/w/index.php?title=Special:CreateAccount&returnto=HTML "You are encouraged to create an account and log in; however, it is not mandatory")
+- [Log in](/w/index.php?title=Special:UserLogin&returnto=HTML "You're encouraged to log in; however, it's not mandatory. [o]")
+
+Pages for logged out editors [learn more](/wiki/Help:Introduction)
+
+- [Contributions](/wiki/Special:MyContributions "A list of edits made from this IP address [y]")
+- [Talk](/wiki/Special:MyTalk "Discussion about edits from this IP address [n]")
+
+## Contents
+
+move to sidebar
+
+hide
+
+- [(Top)](#)
+- [1History](#History)Toggle History subsection
+
+  - [1.1Development](#Development)
+  - [1.2HTML version timeline](#HTML_version_timeline)
+    - [1.2.1HTML 2](#HTML_2)
+    - [1.2.2HTML 3](#HTML_3)
+    - [1.2.3HTML 4](#HTML_4)
+    - [1.2.4HTML 5](#HTML_5)
+  - [1.3HTML draft version timeline](#HTML_draft_version_timeline)
+    - [1.3.1XHTML versions](#XHTML_versions)
+  - [1.4Transition of HTML publication to WHATWG](#Transition_of_HTML_publication_to_WHATWG)
+- [2Markup](#Markup)Toggle Markup subsection
+
+  - [2.1Elements](#Elements)
+    - [2.1.1Element examples](#Element_examples)
+      - [2.1.1.1Headings](#Headings)
+      - [2.1.1.2Line breaks](#Line_breaks)
+      - [2.1.1.3Links](#Links)
+      - [2.1.1.4Inputs](#Inputs)
+    - [2.1.2Attributes](#Attributes)
+  - [2.2Character and entity references](#Character_and_entity_references)
+  - [2.3Data types](#Data_types)
+  - [2.4Document type declaration](#Document_type_declaration)
+- [3Semantic HTML](#Semantic_HTML)
+- [4Delivery](#Delivery)Toggle Delivery subsection
+
+  - [4.1HTTP](#HTTP)
+  - [4.2HTML e-mail](#HTML_e-mail)
+  - [4.3Naming conventions](#Naming_conventions)
+  - [4.4HTML Application](#HTML_Application)
+- [5HTML4 variations](#HTML4_variations)Toggle HTML4 variations subsection
+
+  - [5.1SGML-based versus XML-based HTML](#SGML-based_versus_XML-based_HTML)
+  - [5.2Transitional versus strict](#Transitional_versus_strict)
+  - [5.3Frameset versus transitional](#Frameset_versus_transitional)
+  - [5.4Summary of specification versions](#Summary_of_specification_versions)
+- [6WHATWG HTML versus HTML5](#WHATWG_HTML_versus_HTML5)
+- [7WYSIWYG editors](#WYSIWYG_editors)
+- [8See also](#See_also)
+- [9Notes](#Notes)
+- [10References](#References)
+- [11External links](#External_links)
+
+Toggle the table of contents
+
+# HTML
+
+139 languages
+
+- [Afrikaans](https://af.wikipedia.org/wiki/HTML "HTML – Afrikaans")
+- [Alemannisch](https://als.wikipedia.org/wiki/HTML "HTML – Alemannic")
+- [Ænglisc](https://ang.wikipedia.org/wiki/Oferwrit_mearc_gereord "Oferwrit mearc gereord – Old English")
+- [العربية](https://ar.wikipedia.org/wiki/%D9%84%D8%BA%D8%A9_%D8%AA%D8%A3%D8%B4%D9%8A%D8%B1_%D8%A7%D9%84%D9%86%D8%B5_%D8%A7%D9%84%D8%AA%D8%B1%D8%A7%D8%A8%D8%B7%D9%8A "لغة تأشير النص الترابطي – Arabic")
+- [Aragonés](https://an.wikipedia.org/wiki/HTML "HTML – Aragonese")
+- [অসমীয়া](https://as.wikipedia.org/wiki/%E0%A6%8F%E0%A6%87%E0%A6%9B%E0%A6%9F%E0%A6%BF%E0%A6%8F%E0%A6%AE%E0%A6%8F%E0%A6%B2 "এইছটিএমএল – Assamese")
+- [Asturianu](https://ast.wikipedia.org/wiki/HTML "HTML – Asturian")
+- [Azərbaycanca](https://az.wikipedia.org/wiki/HTML "HTML – Azerbaijani")
+- [تۆرکجه](https://azb.wikipedia.org/wiki/%D8%A7%DA%86%E2%80%8C%D8%AA%DB%8C%E2%80%8C%D8%A7%D9%85%E2%80%8C%D8%A7%D9%84 "اچ‌تی‌ام‌ال – South Azerbaijani")
+- [Basa Bali](https://ban.wikipedia.org/wiki/HTML "HTML – Balinese")
+- [বাংলা](https://bn.wikipedia.org/wiki/%E0%A6%8F%E0%A6%87%E0%A6%9A%E0%A6%9F%E0%A6%BF%E0%A6%8F%E0%A6%AE%E0%A6%8F%E0%A6%B2 "এইচটিএমএল – Bangla")
+- [閩南語 / Bân-lâm-gí](https://zh-min-nan.wikipedia.org/wiki/HTML "HTML – Minnan")
+- [Башҡортса](https://ba.wikipedia.org/wiki/HTML "HTML – Bashkir")
+- [Беларуская](https://be.wikipedia.org/wiki/HTML "HTML – Belarusian")
+- [Беларуская (тарашкевіца)](https://be-tarask.wikipedia.org/wiki/HTML "HTML – Belarusian (Taraškievica orthography)")
+- [Български](https://bg.wikipedia.org/wiki/HTML "HTML – Bulgarian")
+- [Boarisch](https://bar.wikipedia.org/wiki/HTML "HTML – Bavarian")
+- [Bosanski](https://bs.wikipedia.org/wiki/HTML "HTML – Bosnian")
+- [Brezhoneg](https://br.wikipedia.org/wiki/HTML "HTML – Breton")
+- [Català](https://ca.wikipedia.org/wiki/Hyper_Text_Markup_Language "Hyper Text Markup Language – Catalan")
+- [Чӑвашла](https://cv.wikipedia.org/wiki/HTML "HTML – Chuvash")
+- [Čeština](https://cs.wikipedia.org/wiki/Hypertext_Markup_Language "Hypertext Markup Language – Czech")
+- [ChiTumbuka](https://tum.wikipedia.org/wiki/HTML "HTML – Tumbuka")
+- [Corsu](https://co.wikipedia.org/wiki/HTML "HTML – Corsican")
+- [Cymraeg](https://cy.wikipedia.org/wiki/HTML "HTML – Welsh")
+- [Dansk](https://da.wikipedia.org/wiki/HTML "HTML – Danish")
+- [Davvisámegiella](https://se.wikipedia.org/wiki/HTML "HTML – Northern Sami")
+- [Deutsch](https://de.wikipedia.org/wiki/Hypertext_Markup_Language "Hypertext Markup Language – German")
+- [Dolnoserbski](https://dsb.wikipedia.org/wiki/HTML "HTML – Lower Sorbian")
+- [Eesti](https://et.wikipedia.org/wiki/HTML "HTML – Estonian")
+- [Ελληνικά](https://el.wikipedia.org/wiki/HTML "HTML – Greek")
+- [Español](https://es.wikipedia.org/wiki/HTML "HTML – Spanish")
+- [Esperanto](https://eo.wikipedia.org/wiki/HTML "HTML – Esperanto")
+- [Euskara](https://eu.wikipedia.org/wiki/HTML "HTML – Basque")
+- [فارسی](https://fa.wikipedia.org/wiki/%D8%A7%DA%86%E2%80%8C%D8%AA%DB%8C%E2%80%8C%D8%A7%D9%85%E2%80%8C%D8%A7%D9%84 "اچ‌تی‌ام‌ال – Persian")
+- [Fiji Hindi](https://hif.wikipedia.org/wiki/HTML "HTML – Fiji Hindi")
+- [Føroyskt](https://fo.wikipedia.org/wiki/HTML "HTML – Faroese")
+- [Français](https://fr.wikipedia.org/wiki/Hypertext_Markup_Language "Hypertext Markup Language – French")
+- [Frysk](https://fy.wikipedia.org/wiki/HTML "HTML – Western Frisian")
+- [Furlan](https://fur.wikipedia.org/wiki/HTML "HTML – Friulian")
+- [Gaeilge](https://ga.wikipedia.org/wiki/HTML "HTML – Irish")
+- [Gàidhlig](https://gd.wikipedia.org/wiki/HTML "HTML – Scottish Gaelic")
+- [Galego](https://gl.wikipedia.org/wiki/HTML "HTML – Galician")
+- [گیلکی](https://glk.wikipedia.org/wiki/%D8%A6%DA%86.%D8%AA%D9%8A.%D8%A6%D9%85.%D8%A6%D9%84 "ئچ.تي.ئم.ئل – Gilaki")
+- [ગુજરાતી](https://gu.wikipedia.org/wiki/HTML "HTML – Gujarati")
+- [한국어](https://ko.wikipedia.org/wiki/HTML "HTML – Korean")
+- [Hawaiʻi](https://haw.wikipedia.org/wiki/HTML "HTML – Hawaiian")
+- [Հայերեն](https://hy.wikipedia.org/wiki/HTML "HTML – Armenian")
+- [हिन्दी](https://hi.wikipedia.org/wiki/%E0%A4%8F%E0%A4%9A%E0%A4%9F%E0%A5%80%E0%A4%8F%E0%A4%AE%E0%A4%8F%E0%A4%B2 "एचटीएमएल – Hindi")
+- [Hornjoserbsce](https://hsb.wikipedia.org/wiki/HTML "HTML – Upper Sorbian")
+- [Hrvatski](https://hr.wikipedia.org/wiki/HTML "HTML – Croatian")
+- [Ido](https://io.wikipedia.org/wiki/HTML "HTML – Ido")
+- [Bahasa Indonesia](https://id.wikipedia.org/wiki/HTML "HTML – Indonesian")
+- [Interlingua](https://ia.wikipedia.org/wiki/HTML "HTML – Interlingua")
+- [Íslenska](https://is.wikipedia.org/wiki/HTML "HTML – Icelandic")
+- [Italiano](https://it.wikipedia.org/wiki/HTML "HTML – Italian")
+- [עברית](https://he.wikipedia.org/wiki/HTML "HTML – Hebrew")
+- [Jawa](https://jv.wikipedia.org/wiki/Hypertext_markup_language "Hypertext markup language – Javanese")
+- [ქართული](https://ka.wikipedia.org/wiki/%E1%83%B0%E1%83%98%E1%83%9E%E1%83%94%E1%83%A0%E1%83%A2%E1%83%94%E1%83%A5%E1%83%A1%E1%83%A2%E1%83%A3%E1%83%A0%E1%83%98_%E1%83%9B%E1%83%90%E1%83%A0%E1%83%99%E1%83%98%E1%83%A0%E1%83%94%E1%83%91%E1%83%98%E1%83%A1_%E1%83%94%E1%83%9C%E1%83%90 "ჰიპერტექსტური მარკირების ენა – Georgian")
+- [Қазақша](https://kk.wikipedia.org/wiki/HTML "HTML – Kazakh")
+- [Kiswahili](https://sw.wikipedia.org/wiki/HTML "HTML – Swahili")
+- [Kurdî](https://ku.wikipedia.org/wiki/HTML "HTML – Kurdish")
+- [Кыргызча](https://ky.wikipedia.org/wiki/HTML "HTML – Kyrgyz")
+- [ລາວ](https://lo.wikipedia.org/wiki/%E0%BB%80%E0%BA%AE%E0%BA%B1%E0%BA%94%E0%BA%94%E0%BA%B5%E0%BB%80%E0%BA%AD%E0%BA%B1%E0%BA%A1%E0%BB%81%E0%BA%AD%E0%BA%A7 "ເຮັດດີເອັມແອວ – Lao")
+- [Latgaļu](https://ltg.wikipedia.org/wiki/HTML "HTML – Latgalian")
+- [Latina](https://la.wikipedia.org/wiki/HTML "HTML – Latin")
+- [Latviešu](https://lv.wikipedia.org/wiki/HTML "HTML – Latvian")
+- [Lëtzebuergesch](https://lb.wikipedia.org/wiki/Hypertext_Markup_Language "Hypertext Markup Language – Luxembourgish")
+- [Lietuvių](https://lt.wikipedia.org/wiki/HTML "HTML – Lithuanian")
+- [Ligure](https://lij.wikipedia.org/wiki/HTML "HTML – Ligurian")
+- [Lingua Franca Nova](https://lfn.wikipedia.org/wiki/HTML "HTML – Lingua Franca Nova")
+- [Lombard](https://lmo.wikipedia.org/wiki/HTML "HTML – Lombard")
+- [Magyar](https://hu.wikipedia.org/wiki/HTML "HTML – Hungarian")
+- [मैथिली](https://mai.wikipedia.org/wiki/%E0%A4%8F%E0%A4%9A%E0%A4%9F%E0%A4%BF%E0%A4%8F%E0%A4%AE%E0%A4%8F%E0%A4%B2 "एचटिएमएल – Maithili")
+- [Македонски](https://mk.wikipedia.org/wiki/HTML "HTML – Macedonian")
+- [Malagasy](https://mg.wikipedia.org/wiki/Hypertext_Markup_Language "Hypertext Markup Language – Malagasy")
+- [മലയാളം](https://ml.wikipedia.org/wiki/%E0%B4%8E%E0%B4%9A%E0%B5%8D.%E0%B4%9F%E0%B4%BF.%E0%B4%8E%E0%B4%82.%E0%B4%8E%E0%B5%BD. "എച്.ടി.എം.എൽ. – Malayalam")
+- [मराठी](https://mr.wikipedia.org/wiki/%E0%A4%8F%E0%A4%9A.%E0%A4%9F%E0%A5%80.%E0%A4%8F%E0%A4%AE.%E0%A4%8F%E0%A4%B2. "एच.टी.एम.एल. – Marathi")
+- [مصرى](https://arz.wikipedia.org/wiki/%D8%A7%D8%AA%D8%B4_%D8%AA%D9%89_%D8%A7%D9%85_%D8%A7%D9%84 "اتش تى ام ال – Egyptian Arabic")
+- [Bahasa Melayu](https://ms.wikipedia.org/wiki/HTML "HTML – Malay")
+- [Minangkabau](https://min.wikipedia.org/wiki/HTML "HTML – Minangkabau")
+- [閩東語 / Mìng-dĕ̤ng-ngṳ̄](https://cdo.wikipedia.org/wiki/HTML "HTML – Mindong")
+- [Монгол](https://mn.wikipedia.org/wiki/HTML "HTML – Mongolian")
+- [မြန်မာဘာသာ](https://my.wikipedia.org/wiki/HTML "HTML – Burmese")
+- [Nederlands](https://nl.wikipedia.org/wiki/HyperText_Markup_Language "HyperText Markup Language – Dutch")
+- [नेपाली](https://ne.wikipedia.org/wiki/%E0%A4%8F%E0%A4%9A%E0%A4%9F%E0%A4%BF%E0%A4%8F%E0%A4%AE%E0%A4%8F%E0%A4%B2 "एचटिएमएल – Nepali")
+- [नेपाल भाषा](https://new.wikipedia.org/wiki/%E0%A4%8F%E0%A4%9A_%E0%A4%9F%E0%A5%80_%E0%A4%8F%E0%A4%AE%E0%A5%8D_%E0%A4%8F%E0%A4%B2%E0%A5%8D "एच टी एम् एल् – Newari")
+- [日本語](https://ja.wikipedia.org/wiki/HyperText_Markup_Language "HyperText Markup Language – Japanese")
+- [Нохчийн](https://ce.wikipedia.org/wiki/HTML "HTML – Chechen")
+- [Nordfriisk](https://frr.wikipedia.org/wiki/HTML "HTML – Northern Frisian")
+- [Norsk bokmål](https://no.wikipedia.org/wiki/HTML "HTML – Norwegian Bokmål")
+- [Norsk nynorsk](https://nn.wikipedia.org/wiki/HTML "HTML – Norwegian Nynorsk")
+- [Олык марий](https://mhr.wikipedia.org/wiki/HTML "HTML – Eastern Mari")
+- [Oʻzbekcha / ўзбекча](https://uz.wikipedia.org/wiki/HTML "HTML – Uzbek")
+- [ਪੰਜਾਬੀ](https://pa.wikipedia.org/wiki/%E0%A8%90%E0%A8%9A.%E0%A8%9F%E0%A9%80.%E0%A8%90%E0%A8%AE.%E0%A8%90%E0%A8%B2 "ਐਚ.ਟੀ.ਐਮ.ਐਲ – Punjabi")
+- [پنجابی](https://pnb.wikipedia.org/wiki/%D8%A7%DB%8C%DA%86_%D9%B9%DB%8C_%D8%A7%DB%8C%D9%85_%D8%A7%DB%8C%D9%84 "ایچ ٹی ایم ایل – Western Punjabi")
+- [ပအိုဝ်ႏဘာႏသာႏ](https://blk.wikipedia.org/wiki/HTML "HTML – Pa'O")
+- [ភាសាខ្មែរ](https://km.wikipedia.org/wiki/HTML "HTML – Khmer")
+- [Piemontèis](https://pms.wikipedia.org/wiki/HTML "HTML – Piedmontese")
+- [Polski](https://pl.wikipedia.org/wiki/HTML "HTML – Polish")
+- [Português](https://pt.wikipedia.org/wiki/HTML "HTML – Portuguese")
+- [Qaraqalpaqsha](https://kaa.wikipedia.org/wiki/HTML "HTML – Kara-Kalpak")
+- [Română](https://ro.wikipedia.org/wiki/HTML "HTML – Romanian")
+- [Runa Simi](https://qu.wikipedia.org/wiki/HTML "HTML – Quechua")
+- [Русиньскый](https://rue.wikipedia.org/wiki/HTML "HTML – Rusyn")
+- [Русский](https://ru.wikipedia.org/wiki/HTML "HTML – Russian")
+- [Scots](https://sco.wikipedia.org/wiki/HTML "HTML – Scots")
+- [Shqip](https://sq.wikipedia.org/wiki/HTML "HTML – Albanian")
+- [සිංහල](https://si.wikipedia.org/wiki/HTML "HTML – Sinhala")
+- [Simple English](https://simple.wikipedia.org/wiki/HTML "HTML – Simple English")
+- [سنڌي](https://sd.wikipedia.org/wiki/%D9%87%D8%A7%D8%A6%D9%BE%D8%B1_%D9%BD%D9%8A%DA%AA%D8%B3%D9%BD_%D9%85%D8%A7%D8%B1%DA%AA_%D8%A7%D9%BE_%D9%84%D9%8A%D9%86%DA%AF%D9%88%D9%8A%D8%AC "هائپر ٽيڪسٽ مارڪ اپ لينگويج – Sindhi")
+- [Slovenčina](https://sk.wikipedia.org/wiki/Hypertextov%C3%BD_zna%C4%8Dkov%C3%BD_jazyk "Hypertextový značkový jazyk – Slovak")
+- [Slovenščina](https://sl.wikipedia.org/wiki/HTML "HTML – Slovenian")
+- [Soomaaliga](https://so.wikipedia.org/wiki/HTML "HTML – Somali")
+- [کوردی](https://ckb.wikipedia.org/wiki/%D8%A6%DB%8E%DA%86_%D8%AA%DB%8C_%D8%A6%DB%8E%D9%85_%D8%A6%DB%8E%DA%B5 "ئێچ تی ئێم ئێڵ – Central Kurdish")
+- [Српски / srpski](https://sr.wikipedia.org/wiki/HTML "HTML – Serbian")
+- [Srpskohrvatski / српскохрватски](https://sh.wikipedia.org/wiki/HTML "HTML – Serbo-Croatian")
+- [Suomi](https://fi.wikipedia.org/wiki/HTML "HTML – Finnish")
+- [Svenska](https://sv.wikipedia.org/wiki/HTML "HTML – Swedish")
+- [Tagalog](https://tl.wikipedia.org/wiki/HTML "HTML – Tagalog")
+- [தமிழ்](https://ta.wikipedia.org/wiki/%E0%AE%AE%E0%AF%80%E0%AE%AF%E0%AF%81%E0%AE%B0%E0%AF%88%E0%AE%95%E0%AF%8D_%E0%AE%95%E0%AF%81%E0%AE%B1%E0%AE%BF%E0%AE%AF%E0%AE%BF%E0%AE%9F%E0%AF%81_%E0%AE%AE%E0%AF%8A%E0%AE%B4%E0%AE%BF "மீயுரைக் குறியிடு மொழி – Tamil")
+- [တႆး](https://shn.wikipedia.org/wiki/HTML "HTML – Shan")
+- [తెలుగు](https://te.wikipedia.org/wiki/HTML "HTML – Telugu")
+- [ไทย](https://th.wikipedia.org/wiki/%E0%B9%80%E0%B8%AD%E0%B8%8A%E0%B8%97%E0%B8%B5%E0%B9%80%E0%B8%AD%E0%B9%87%E0%B8%A1%E0%B9%81%E0%B8%AD%E0%B8%A5 "เอชทีเอ็มแอล – Thai")
+- [Тоҷикӣ](https://tg.wikipedia.org/wiki/HTML "HTML – Tajik")
+- [Türkçe](https://tr.wikipedia.org/wiki/HTML "HTML – Turkish")
+- [Türkmençe](https://tk.wikipedia.org/wiki/HTML "HTML – Turkmen")
+- [Українська](https://uk.wikipedia.org/wiki/HTML "HTML – Ukrainian")
+- [اردو](https://ur.wikipedia.org/wiki/%D8%A7%DB%8C%DA%86_%D9%B9%DB%8C_%D8%A7%DB%8C%D9%85_%D8%A7%DB%8C%D9%84 "ایچ ٹی ایم ایل – Urdu")
+- [Vèneto](https://vec.wikipedia.org/wiki/HTML "HTML – Venetian")
+- [Tiếng Việt](https://vi.wikipedia.org/wiki/HTML "HTML – Vietnamese")
+- [Winaray](https://war.wikipedia.org/wiki/HTML "HTML – Waray")
+- [Wolof](https://wo.wikipedia.org/wiki/HTML "HTML – Wolof")
+- [吴语](https://wuu.wikipedia.org/wiki/HTML "HTML – Wu")
+- [ייִדיש](https://yi.wikipedia.org/wiki/HTML "HTML – Yiddish")
+- [Yorùbá](https://yo.wikipedia.org/wiki/HTML "HTML – Yoruba")
+- [粵語](https://zh-yue.wikipedia.org/wiki/HTML "HTML – Cantonese")
+- [Žemaitėška](https://bat-smg.wikipedia.org/wiki/HTML "HTML – Samogitian")
+- [中文](https://zh.wikipedia.org/wiki/HTML "HTML – Chinese")
+
+
+[Edit links](https://www.wikidata.org/wiki/Special:EntityPage/Q8811#sitelinks-wikipedia "Edit interlanguage links")
+
+- [Article](/wiki/HTML "View the content page [c]")
+- [Talk](/wiki/Talk:HTML "Discuss improvements to the content page [t]")
+
+English
+
+- [Read](/wiki/HTML)
+- [View source](/w/index.php?title=HTML&action=edit "This page is protected.
+You can view its source [e]")
+- [View history](/w/index.php?title=HTML&action=history "Past revisions of this page [h]")
+
+Tools
+
+Tools
+
+move to sidebar
+
+hide
+
+Actions
+
+- [Read](/wiki/HTML)
+- [View source](/w/index.php?title=HTML&action=edit)
+- [View history](/w/index.php?title=HTML&action=history)
+
+General
+
+- [What links here](/wiki/Special:WhatLinksHere/HTML "List of all English Wikipedia pages containing links to this page [j]")
+- [Related changes](/wiki/Special:RecentChangesLinked/HTML "Recent changes in pages linked from this page [k]")
+- [Upload file](//en.wikipedia.org/wiki/Wikipedia:File_Upload_Wizard "Upload files [u]")
+- [Permanent link](/w/index.php?title=HTML&oldid=1314044013 "Permanent link to this revision of this page")
+- [Page information](/w/index.php?title=HTML&action=info "More information about this page")
+- [Cite this page](/w/index.php?title=Special:CiteThisPage&page=HTML&id=1314044013&wpFormIdentifier=titleform "Information on how to cite this page")
+- [Get shortened URL](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FHTML)
+- [Download QR code](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FHTML)
+
+Print/export
+
+- [Download as PDF](/w/index.php?title=Special:DownloadAsPdf&page=HTML&action=show-download-screen "Download this page as a PDF file")
+- [Printable version](/w/index.php?title=HTML&printable=yes "Printable version of this page [p]")
+
+In other projects
+
+- [Wikimedia Commons](https://commons.wikimedia.org/wiki/HTML)
+- [MediaWiki](https://www.mediawiki.org/wiki/HTML)
+- [Wikibooks](https://en.wikibooks.org/wiki/HyperText_Markup_Language)
+- [Wikiversity](https://en.wikiversity.org/wiki/HTML)
+- [Wikidata item](https://www.wikidata.org/wiki/Special:EntityPage/Q8811 "Structured data on this page hosted by Wikidata [g]")
+
+Appearance
+
+move to sidebar
+
+hide
+
+[![Page semi-protected](//upload.wikimedia.org/wikipedia/en/thumb/1/1b/Semi-protection-shackle.svg/20px-Semi-protection-shackle.svg.png)](/wiki/Wikipedia:Protection_policy#semi "This article is semi-protected due to vandalism")
+
+From Wikipedia, the free encyclopedia
+
+Markup language for documents
+
+".htm" and ".html" redirect here. For other uses, see [HTM](/wiki/HTM_(disambiguation) "HTM (disambiguation)").
+
+| HTML | |
+| --- | --- |
+| [![](//upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/250px-HTML5_logo_and_wordmark.svg.png)](/wiki/File:HTML5_logo_and_wordmark.svg)<br>  Official logo of [HTML5](/wiki/HTML5 "HTML5")[[1]](#cite_note-1) | |
+| [Filename extension](/wiki/Filename_extension "Filename extension") | `.html``.htm` |
+| [Internet media type](/wiki/Media_type "Media type") | text/html |
+| [Type code](/wiki/Resource_fork#Types "Resource fork") | TEXT |
+| [Uniform Type Identifier (UTI)](/wiki/Uniform_Type_Identifier "Uniform Type Identifier") | public.html |
+| Developed by | [WHATWG](/wiki/WHATWG "WHATWG")[World Wide Web Consortium](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium")  (W3C; formerly) |
+| Initial release | 1993; 32 years ago (1993) |
+| [Latest release](/wiki/Software_release_life_cycle "Software release life cycle") | [Living Standard](https://html.spec.whatwg.org/multipage/) |
+| Type of format | [Document file format](/wiki/Document_file_format "Document file format") |
+| [Container for](/wiki/Container_format "Container format") | [HTML elements](/wiki/HTML_elements "HTML elements") |
+| Contained by | [Web browser](/wiki/Web_browser "Web browser") |
+| Extended from | [SGML](/wiki/Standard_Generalized_Markup_Language "Standard Generalized Markup Language") |
+| Extended to | [XHTML](/wiki/XHTML "XHTML") |
+| [Open format](/wiki/Open_file_format "Open file format")? | Yes |
+| Website | [html.spec.whatwg.org](https://html.spec.whatwg.org/) |
+
+| HTML |
+| --- |
+| [![](//upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/60px-HTML5_logo_and_wordmark.svg.png)](/wiki/File:HTML5_logo_and_wordmark.svg) |
+| HTML and variants |
+| [Dynamic HTML](/wiki/Dynamic_HTML "Dynamic HTML")[HTML5](/wiki/HTML5 "HTML5")[XHTML](/wiki/XHTML "XHTML")<br>  [Basic](/wiki/XHTML_Basic "XHTML Basic")  [Mobile Profile](/wiki/XHTML_Mobile_Profile "XHTML Mobile Profile") |
+| HTML elements and attributes |
+| [HTML element](/wiki/HTML_element "HTML element")<br>  [article](/wiki/Article_element "Article element")  [audio](/wiki/HTML_audio "HTML audio")  [blink](/wiki/Blink_element "Blink element")  [canvas](/wiki/Canvas_element "Canvas element")  [div and span](/wiki/Div_and_span "Div and span")  [marquee](/wiki/Marquee_element "Marquee element")  [meta](/wiki/Meta_element "Meta element")  [video](/wiki/HTML_video "HTML video") [HTML attribute](/wiki/HTML_attribute "HTML attribute")<br>  [alt attribute](/wiki/Alt_attribute "Alt attribute") [HTML frame](/wiki/Frame_(World_Wide_Web) "Frame (World Wide Web)") |
+| Editing |
+| [HTML editor](/wiki/HTML_editor "HTML editor")[Text editor](/wiki/Text_editor "Text editor") |
+| Character encodings and language |
+| [Character encodings](/wiki/Character_encodings_in_HTML "Character encodings in HTML")[Character entity references (amed characters)](/wiki/List_of_XML_and_HTML_character_entity_references "List of XML and HTML character entity references")[Unicode](/wiki/Unicode_and_HTML "Unicode and HTML")[Language code](/wiki/Language_code "Language code") |
+| Document and browser models |
+| [Document Object Model](/wiki/Document_Object_Model "Document Object Model")[Browser Object Model](/wiki/Browser_Object_Model "Browser Object Model")[Style sheets](/wiki/Style_sheet_(web_development) "Style sheet (web development)")<br>  [CSS](/wiki/CSS "CSS") [Font family](/wiki/Font_family_(HTML) "Font family (HTML)")[Web colors](/wiki/Web_colors "Web colors") |
+| Client-side scripting and APIs |
+| [JavaScript](/wiki/JavaScript "JavaScript")<br>  [WebCL](/wiki/WebCL "WebCL")  [HTMX](/wiki/HTMX "HTMX") |
+| Graphics and Web3D technology |
+| [Web3D](/wiki/Web3D "Web3D")<br>  [WebGL](/wiki/WebGL "WebGL")  [WebGPU](/wiki/WebGPU "WebGPU")  [WebXR](/wiki/WebXR "WebXR") [W3C](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium")<br>  [Validator](/wiki/W3C_Markup_Validation_Service "W3C Markup Validation Service") [WHATWG](/wiki/WHATWG "WHATWG")[Quirks mode](/wiki/Quirks_mode "Quirks mode")[Web storage](/wiki/Web_storage "Web storage")[Rendering engine](/wiki/Browser_engine "Browser engine") |
+| Comparisons |
+| [Document markup languages](/wiki/Comparison_of_document_markup_languages "Comparison of document markup languages")[Comparison of browser engines](/wiki/Comparison_of_browser_engines "Comparison of browser engines") |
+| [v (View this template)](/wiki/Template:HTML "Template:HTML")[t (Discuss this template)](/wiki/Template_talk:HTML "Template talk:HTML")[e (Edit this template)](/wiki/Special:EditPage/Template:HTML "Special:EditPage/Template:HTML") |
+
+
+**Hypertext Markup Language** (**HTML**) is the standard [markup language](/wiki/Markup_language "Markup language")[[a]](#cite_note-3) for documents designed to be displayed in a [web browser](/wiki/Web_browser "Web browser"). It defines the
+ content and structure of [web content](/wiki/Web_content "Web content"). It is often
+ assisted by technologies such as [Cascading Style Sheets](/wiki/Cascading_Style_Sheets "Cascading Style Sheets") (CSS) and [scripting languages](/wiki/Scripting_language "Scripting language") such as [JavaScript](/wiki/JavaScript "JavaScript").
+
+[Web browsers](/wiki/Web_browser "Web browser") receive HTML
+ documents from a [web server](/wiki/Web_server "Web server") or
+ from local storage and [render](/wiki/Browser_engine "Browser engine") the documents
+ into multimedia web pages. HTML describes the structure of a [web page](/wiki/Web_page "Web page")[semantically](/wiki/Semantic_Web "Semantic Web") and
+ originally included cues for its appearance.
+
+[HTML elements](/wiki/HTML_element "HTML element") are the
+ building blocks of HTML pages. With HTML constructs, [images](/wiki/HTML_element#Images_and_objects "HTML element") and other objects such as [interactive forms](/wiki/Fieldset "Fieldset") may be embedded into the rendered page. HTML provides a means to create [structured documents](/wiki/Structured_document "Structured document") by denoting structural [semantics](/wiki/Semantics "Semantics") for text such as
+ headings, paragraphs, lists, [links](/wiki/Hyperlink "Hyperlink"), quotes, and other items.
+ HTML elements are delineated by *tags*, written using [angle brackets](/wiki/Bracket#Angle_brackets "Bracket"). Tags
+ such as `<img>` and `<input>` directly introduce content into the page. Other tags such as `<p>` and `</p>` surround and provide information about document text and may include sub-element
+ tags. [Browsers](/wiki/Web_browser "Web browser") do not
+ display the HTML tags, but use them to interpret the content of the page.
+
+HTML can embed programs written in a [scripting language](/wiki/Scripting_language "Scripting language") such as [JavaScript](/wiki/JavaScript "JavaScript"), which
+ affects the behavior and content of web pages. The inclusion of CSS defines the
+ look and layout of content. The [World Wide Web Consortium](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium") (W3C), former maintainer of the HTML and current maintainer of the CSS
+ standards, has encouraged the use of [CSS](/wiki/CSS "CSS") over explicit presentational HTML since
+ 1997.[[update]](https://en.wikipedia.org/w/index.php?title=HTML&action=edit)[[3]](#cite_note-deprecated-4) A form of HTML, known as [HTML5](/wiki/HTML5 "HTML5"), is used
+ to display video and audio, primarily using the `<canvas>` element, together with JavaScript.
+
+## History
+
+### Development
+
+[![Photograph of Tim Berners-Lee in April 2009](//upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Tim_Berners-Lee_April_2009.jpg/250px-Tim_Berners-Lee_April_2009.jpg)](/wiki/File:Tim_Berners-Lee_April_2009.jpg)
+
+*[Tim Berners-Lee](/wiki/Tim_Berners-Lee "Tim Berners-Lee") in
+ April 2009*
+
+In 1980, [physicist](/wiki/Physicist "Physicist")[Tim Berners-Lee](/wiki/Tim_Berners-Lee "Tim Berners-Lee"), a
+ contractor at [CERN](/wiki/CERN "CERN"), proposed and
+ prototyped [ENQUIRE](/wiki/ENQUIRE "ENQUIRE"), a system for
+ CERN researchers to use and share documents. In 1989, Berners-Lee wrote a memo
+ proposing an [Internet](/wiki/Internet "Internet")-based [hypertext](/wiki/Hypertext "Hypertext") system.[[4]](#cite_note-5) Berners-Lee specified HTML and wrote the browser and server software in late
+ 1990. That year, Berners-Lee and CERN [data systems](/wiki/Data_system "Data system") engineer [Robert Cailliau](/wiki/Robert_Cailliau "Robert Cailliau") collaborated on a joint request for funding, but the project was not formally
+ adopted by CERN. In his personal notes of 1990, Berners-Lee listed "some of the
+ many areas in which hypertext is used"; an [encyclopedia](/wiki/Encyclopedia "Encyclopedia") is the first
+ entry.[[5]](#cite_note-6)
+
+The first publicly available description of HTML was a document called "HTML
+ Tags",[[6]](#cite_note-7) first mentioned on the Internet by Tim Berners-Lee in late 1991.[[7]](#cite_note-tagshtml-8)[[8]](#cite_note-9) It describes 18 elements comprising the initial, relatively simple design of
+ HTML. Except for the hyperlink tag, these were strongly influenced by [CERN SGML](/wiki/CERN_SGML "CERN SGML"), an in-house [Standard Generalized Markup Language](/wiki/Standard_Generalized_Markup_Language "Standard Generalized Markup Language") (SGML)-based documentation format at CERN. Eleven of these elements still exist
+ in HTML 4.[[9]](#cite_note-10)
+
+HTML is a [markup language](/wiki/Markup_language "Markup language") that [web browsers](/wiki/Web_browser "Web browser") use to
+ interpret and [compose](/wiki/Typesetting "Typesetting") text,
+ images, and other material into visible or audible web pages. Default
+ characteristics for every item of HTML markup are defined in the browser, and
+ these characteristics can be altered or enhanced by the web page designer's
+ additional use of [CSS](/wiki/CSS "CSS"). Many of the text
+ elements are mentioned in the 1988 ISO technical report TR 9537 *Techniques for using SGML*, which describes the features of early text
+ formatting languages such as that used by the [RUNOFF command](/wiki/TYPSET_and_RUNOFF "TYPSET and RUNOFF") developed in the early 1960s for the [CTSS](/wiki/Compatible_Time-Sharing_System "Compatible Time-Sharing System") (Compatible Time-Sharing System) operating system. These formatting commands
+ were derived from the commands used by typesetters to manually format documents.
+ However, the SGML concept of generalized markup is based on elements (nested
+ annotated ranges with attributes) rather than merely print effects, with
+ separate structure and markup. HTML has been progressively moved in this
+ direction with CSS.
+
+Berners-Lee considered HTML to be an application of SGML. It was formally
+ defined as such by the [Internet Engineering Task Force](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") (IETF) with the mid-1993 publication of the first proposal for an HTML
+ specification, the "Hypertext Markup Language (HTML)" Internet Draft by
+ Berners-Lee and [Dan Connolly](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)"), which included an SGML [Document type definition](/wiki/Document_type_definition "Document type definition") to define the syntax.[[10]](#cite_note-11)[[11]](#cite_note-12) The draft expired after six months, but was notable for its acknowledgment of
+ the [NCSA Mosaic](/wiki/Mosaic_(web_browser) "Mosaic (web browser)") browser's custom tag for embedding in-line images, reflecting the IETF's
+ philosophy of basing standards on successful prototypes. Similarly, [Dave Raggett](/wiki/Dave_Raggett "Dave Raggett")'s competing
+ Internet Draft, "HTML+ (Hypertext Markup Format)", from late 1993, suggested
+ standardizing already-implemented features like tables and fill-out forms.[[12]](#cite_note-html+-13)
+
+After the HTML and HTML+ drafts expired in early 1994, the IETF created an HTML
+ Working Group. In 1995, this working group completed "HTML 2.0", the first HTML
+ specification intended to be treated as a standard against which future
+ implementations should be based.[[13]](#cite_note-14)
+
+Further development under the auspices of the IETF was stalled by competing
+ interests. Since 1996,[[update]](https://en.wikipedia.org/w/index.php?title=HTML&action=edit) the HTML specifications have been maintained, with input from commercial
+ software vendors, by the [World Wide Web Consortium](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium") (W3C).[[14]](#cite_note-raggett-15) In 2000, HTML became an international standard ([ISO](/wiki/International_Organization_for_Standardization "International Organization for Standardization")/[IEC](/wiki/International_Electrotechnical_Commission "International Electrotechnical Commission") 15445:2000). HTML 4.01 was published in late 1999, with further errata published
+ through 2001. In 2004, development began on HTML5 in the [Web Hypertext Application Technology Working Group](/wiki/Web_Hypertext_Application_Technology_Working_Group "Web Hypertext Application Technology Working Group") (WHATWG), which became a joint deliverable with the W3C in 2008, and was
+ completed and standardized on 28 October 2014.[[15]](#cite_note-16)
+
+### HTML version timeline
+
+#### HTML 2
+
+November 24, 1995
+HTML 2.0 was published as [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [1866](https://www.rfc-editor.org/rfc/rfc1866). Supplemental [RFCs](/wiki/Request_for_Comments "Request for Comments") added capabilities:
+
+- November 25, 1995: [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [1867](https://www.rfc-editor.org/rfc/rfc1867) (form-based file upload)
+- May 1996: [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [1942](https://www.rfc-editor.org/rfc/rfc1942) (tables)
+- August 1996: [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [1980](https://www.rfc-editor.org/rfc/rfc1980) (client-side image maps)
+- January 1997: [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [2070](https://www.rfc-editor.org/rfc/rfc2070) ([internationalization](/wiki/Internationalization_and_localization "Internationalization and localization"))
+
+#### HTML 3
+
+January 14, 1997
+HTML 3.2[[16]](#cite_note-17) was published as a [W3C Recommendation](/wiki/W3C_Recommendation "W3C Recommendation"). It was the first version developed and standardized exclusively by the
+ W3C, as the IETF had closed its HTML Working Group on September 12,
+ 1996.[[17]](#cite_note-18)
+
+Initially code-named "Wilbur",[[18]](#cite_note-engelfriet-19) HTML 3.2 dropped math formulas entirely, reconciled overlap among various
+ proprietary extensions and adopted most of [Netscape](/wiki/Netscape "Netscape")'s visual markup
+ tags. Netscape's [blink element](/wiki/Blink_element "Blink element") and [Microsoft](/wiki/Microsoft "Microsoft")'s [marquee element](/wiki/Marquee_element "Marquee element") were omitted due to a mutual agreement between the two companies.[[14]](#cite_note-raggett-15) A markup for mathematical formulas similar to that of HTML was
+ standardized 14 months later in [MathML](/wiki/MathML "MathML").
+
+#### HTML 4
+
+December 18, 1997
+HTML 4.0[[19]](#cite_note-20) was published as a W3C Recommendation. It offers three variations:
+
+- Strict, in which deprecated elements are forbidden
+- Transitional, in which deprecated elements are allowed
+- Frameset, in which mostly only [frame](/wiki/Framing_(World_Wide_Web) "Framing (World Wide Web)") related elements are allowed.
+
+Initially code-named "Cougar",[[18]](#cite_note-engelfriet-19) HTML 4.0 adopted many browser-specific element types and attributes, but also
+ sought to phase out Netscape's visual markup features by marking them as [deprecated](/wiki/Deprecation "Deprecation") in favor of
+ style sheets. HTML 4 is an SGML application conforming to ISO 8879 –
+ SGML.[[20]](#cite_note-21)
+
+April 24, 1998
+
+HTML 4.0[[21]](#cite_note-22) was reissued with minor edits without incrementing the version number.
+
+December 24, 1999
+HTML 4.01[[22]](#cite_note-23) was published as a W3C Recommendation. It offers the same three variations
+ as HTML 4.0 and its last errata[[23]](#cite_note-24) were published on May 12, 2001.
+
+May 2000
+ISO/IEC 15445:2000[[24]](#cite_note-iso-html-25) ("[ISO](/wiki/International_Organization_for_Standardization "International Organization for Standardization") HTML", based on HTML 4.01 Strict) was published as an ISO/IEC
+ international standard.[[25]](#cite_note-26) In the ISO, this standard is in the domain of the [ISO/IEC JTC 1/SC 34](/wiki/ISO/IEC_JTC_1/SC_34 "ISO/IEC JTC 1/SC 34") (ISO/IEC Joint Technical Committee 1, Subcommittee 34 – Document
+ description and processing languages).[[24]](#cite_note-iso-html-25)
+
+After HTML 4.01, there were no new versions of HTML for many years, as
+ the development of the parallel, XML-based language XHTML occupied the
+ W3C's HTML Working Group.
+
+#### HTML 5
+
+Main article: [HTML5](/wiki/HTML5 "HTML5")
+
+October 28, 2014
+HTML5[[26]](#cite_note-27) was published as a W3C Recommendation.[[27]](#cite_note-28)
+
+November 1, 2016
+HTML 5.1[[28]](#cite_note-29) was published as a W3C Recommendation.[[29]](#cite_note-30)[[30]](#cite_note-31)
+
+December 14, 2017
+HTML 5.2[[31]](#cite_note-32) was published as a W3C Recommendation.[[32]](#cite_note-33)[[33]](#cite_note-34)
+
+### HTML draft version timeline
+
+October 1991
+*HTML Tags*,[[7]](#cite_note-tagshtml-8) an informal CERN document listing 18 HTML tags, was first mentioned in public.
+
+June 1992
+First informal draft of the HTML DTD,[[34]](#cite_note-35) with seven subsequent revisions (July 15, August 6, August 18, November 17,
+ November 19, November 20, November 22)[[35]](#cite_note-36)[[36]](#cite_note-37)[[37]](#cite_note-html11-38)
+
+November 1992
+HTML DTD 1.1 (the first with a version number, based on RCS revisions, which
+ start with 1.1 rather than 1.0), an informal draft[[37]](#cite_note-html11-38)
+
+June 1993
+Hypertext Markup Language[[38]](#cite_note-39) was published by the [IETF](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") IIIR Working Group as an Internet Draft (a rough proposal for a standard). It
+ was replaced by a second version[[39]](#cite_note-ietfiiir-40) one month later.
+
+November 1993
+[HTML+](https://www.w3.org/MarkUp/HTMLPlus/htmlplus_1.html) was published by the IETF as an Internet Draft and was a competing proposal to
+ the Hypertext Markup Language draft. It expired in July 1994.[[40]](#cite_note-41)
+
+November 1994
+First draft (revision 00) of HTML 2.0 published by IETF itself[[41]](#cite_note-42) (called as "HTML 2.0" from revision 02[[42]](#cite_note-43)), that finally led to the publication of [RFC](/wiki/RFC_(identifier) "RFC (identifier)") [1866](https://www.rfc-editor.org/rfc/rfc1866) in November 1995.[[43]](#cite_note-rfc1866-44)
+
+April 1995 (authored March 1995)
+HTML 3.0[[44]](#cite_note-45) was proposed as a standard to the IETF, but the proposal expired five months
+ later (28 September 1995)[[45]](#cite_note-html30cover-46) without further action. It included many of the capabilities that were in
+ Raggett's HTML+ proposal, such as support for tables, text flow around
+ figures, and the display of complex mathematical formulas.[[45]](#cite_note-html30cover-46)
+
+W3C began development of its own [Arena browser](/wiki/Arena_(web_browser) "Arena (web browser)") as a [test bed](/wiki/Test_bed "Test bed") for
+ HTML 3 and Cascading Style Sheets,[[46]](#cite_note-47)[[47]](#cite_note-48)[[48]](#cite_note-49) but HTML 3.0 did not succeed for several reasons. The draft was considered
+ very large at 150 pages and the pace of browser development, as well as the
+ number of interested parties, had outstripped the resources of the IETF.[[14]](#cite_note-raggett-15) Browser vendors, including Microsoft and Netscape at the time, chose to
+ implement different subsets of HTML 3's draft features as well as to introduce
+ their own extensions to it.[[14]](#cite_note-raggett-15) (See [browser wars](/wiki/Browser_wars "Browser wars").)
+ These included extensions to control stylistic aspects of documents, contrary
+ to the "belief [of the academic engineering community] that such things as
+ text color, background texture, font size, and font face were definitely
+ outside the scope of a language when their only intent was to specify how a
+ document would be organized."[[14]](#cite_note-raggett-15) Dave Raggett, who has been a W3C Fellow for many years, has commented for
+ example: "To a certain extent, Microsoft built its business on the Web by
+ extending HTML features."[[14]](#cite_note-raggett-15)
+
+[![Official HTML5 logo](//upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/250px-HTML5_logo_and_wordmark.svg.png)](/wiki/File:HTML5_logo_and_wordmark.svg)
+
+*Logo of HTML5*
+
+January 2008
+[HTML5](/wiki/HTML5 "HTML5") was published as a [Working Draft](/wiki/World_Wide_Web_Consortium#Certification "World Wide Web Consortium") by the W3C.[[49]](#cite_note-50)
+
+Although its syntax closely resembles that of [SGML](/wiki/SGML "SGML"), [HTML5](/wiki/HTML5 "HTML5") has abandoned any attempt to be
+ an SGML application and has explicitly defined its own "html" serialization,
+ in addition to an alternative XML-based XHTML5 serialization.[[50]](#cite_note-51)
+
+2011 HTML5 – Last Call
+On 14 February 2011, the W3C extended the charter of its HTML Working Group
+ with clear milestones for HTML5. In May 2011, the working group advanced HTML5
+ to "Last Call", an invitation to communities inside and outside W3C to confirm
+ the technical soundness of the specification. The W3C developed a
+ comprehensive test suite to achieve broad interoperability for the full
+ specification by 2014, which was the target date for recommendation.[[51]](#cite_note-w3c2014-52) In January 2011, the WHATWG renamed its "HTML5" living standard to "HTML". The
+ W3C nevertheless continued its project to release HTML5.[[52]](#cite_note-53)
+
+2012 HTML5 – Candidate Recommendation
+In July 2012, WHATWG and [W3C](/wiki/W3C "W3C") decided on a
+ degree of separation. W3C will continue the HTML5 specification work, focusing
+ on a single definitive standard, which is considered a "snapshot" by WHATWG.
+ The WHATWG organization will continue its work with HTML5 as a "Living
+ Standard". The concept of a living standard is that it is never complete and
+ is always being updated and improved. New features can be added but
+ functionality will not be removed.[[53]](#cite_note-54)
+
+In December 2012, W3C designated HTML5 as a Candidate Recommendation.[[54]](#cite_note-55) The criterion for advancement to [W3C Recommendation](/wiki/W3C_recommendation#W3C_recommendation_(REC) "W3C recommendation") is "two 100% complete and fully interoperable implementations".[[55]](#cite_note-W3Crec-56)
+
+2014 HTML5 – Proposed Recommendation and Recommendation
+In September 2014, W3C moved HTML5 to Proposed Recommendation.[[56]](#cite_note-57)
+
+On 28 October 2014, HTML5 was released as a stable W3C Recommendation,[[57]](#cite_note-58) meaning the specification process is complete.[[58]](#cite_note-finalars-59)
+
+#### XHTML versions
+
+Main article: [XHTML](/wiki/XHTML "XHTML")
+
+XHTML is a separate language that began as a reformulation of HTML 4.01 using [XML](/wiki/XML "XML") 1.0. It is now referred to as *the XML syntax for HTML* and is no longer being developed as a separate
+ standard.[[59]](#cite_note-60)
+
+- XHTML 1.0 was published as a W3C Recommendation on January 26, 2000,[[60]](#cite_note-61) and was later revised and republished on August 1, 2002. It offers the same
+ three variations as HTML 4.0 and 4.01, reformulated in XML, with minor
+ restrictions.
+- XHTML 1.1[[61]](#cite_note-62) was published as a W3C Recommendation on May 31, 2001. It is based on XHTML
+ 1.0 Strict, but includes minor changes, can be customized, and is reformulated
+ using modules in the W3C recommendation "Modularization of XHTML", which was
+ published on April 10, 2001.[[62]](#cite_note-63)
+- XHTML 2.0 was a working draft. Work on it was abandoned in 2009 in favor of
+ work on [HTML5](/wiki/HTML5 "HTML5") and [XHTML5](/wiki/XHTML#XHTML5 "XHTML").[[63]](#cite_note-64)[[64]](#cite_note-65)[[65]](#cite_note-66) XHTML 2.0 was incompatible with XHTML 1.x and, therefore, would be more
+ accurately characterized as an XHTML-inspired new language than an update to
+ XHTML 1.x.
+
+
+### Transition of HTML publication to WHATWG
+
+See also: [HTML5 § W3C and WHATWG conflict](/wiki/HTML5#W3C_and_WHATWG_conflict "HTML5")
+
+On 28 May 2019, the W3C announced that WHATWG would be the sole publisher of the
+ HTML and DOM standards.[[66]](#cite_note-W3C_transfer_blog-67)[[67]](#cite_note-W3C_transfer_HTML-68)[[68]](#cite_note-W3C_transfer_memo-69)[[69]](#cite_note-W3C_transfer_ZDNet-70) The W3C and WHATWG had been publishing competing standards since 2012. While the
+ W3C standard was identical to the WHATWG in 2007 the standards have since
+ progressively diverged due to different design decisions.[[70]](#cite_note-W3C_forks-71) The WHATWG "Living Standard" had been the *de facto* web standard for some
+ time.[[71]](#cite_note-72)
+
+## Markup
+
+HTML markup consists of several key components, including those called *tags* (and their *attributes*), character-based *data types*, *character references* and *entity references*. HTML tags most
+ commonly come in pairs like `<h1>` and `</h1>`, although some represent *empty elements* and so are unpaired, for
+ example `<img>`. The first tag in such a pair is the *start tag*, and the second is the *end tag* (they are also called *opening tags* and *closing tags*).
+
+Another important component is the HTML *[document type declaration](/wiki/Document_type_declaration "Document type declaration")*, which triggers [standards mode](/wiki/Standards_mode "Standards mode") rendering.
+
+The following is an example of the classic ["Hello, World!" program](/wiki/%22Hello,_World!%22_program "&quot;Hello, World!&quot; program"):
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>This is a title</title>
+      </head>
+      <body>
+        <div>
+            <p>Hello world!</p>
+        </div>
+      </body>
+    </html>
+
+The text between `<html>` and `</html>` describes the web page, and the text between `<body>` and `</body>` is the visible page content. The markup text `<title>This is a title</title>` defines the browser page title shown on [browser tabs](/wiki/Browser_tab "Browser tab") and [window](/wiki/Window_(computing) "Window (computing)") titles
+ and the tag `<div>` defines a division of the page used for easy styling. Between `<head>` and `</head>`, a `<meta>` element can be used to define webpage metadata.
+
+The Document Type Declaration `<!DOCTYPE html>` is for HTML5. If a declaration is not included, various browsers will revert to
+ "[quirks mode](/wiki/Quirks_mode "Quirks mode")" for
+ rendering.[[72]](#cite_note-hsivonen-73)
+
+### Elements
+
+Main article: [HTML element](/wiki/HTML_element "HTML element")
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/1/10/HTML_element_content_categories.svg/250px-HTML_element_content_categories.svg.png)](/wiki/File:HTML_element_content_categories.svg)
+
+*HTML element content categories*
+
+HTML documents imply a structure of nested [HTML elements](/wiki/HTML_element "HTML element"). These are
+ indicated in the document by HTML *tags*, enclosed in angle brackets.[[73]](#cite_note-74)[*[better source needed](/wiki/Wikipedia:NOTRS "Wikipedia:NOTRS")*]
+
+In the simple, general case, the extent of an element is indicated by a pair of
+ tags: a "start tag" `<p>` and "end tag" `</p>`. The text content of the element, if any, is placed between these tags.
+
+Tags may also enclose further tag markup between the start and end, including a
+ mixture of tags and text. This indicates further (nested) elements, as children
+ of the parent element.
+
+The start tag may also include the element's *attributes* within the tag.
+ These indicate other information, such as identifiers for sections within the
+ document, identifiers used to bind style information to the presentation of the
+ document, and for some tags such as the `<img>` used to embed images, the reference to the image resource in the format like
+ this: `<img
+                      src="example.com/example.jpg">`
+
+Some elements, such as the [line break](/wiki/Line_breaking_character "Line breaking character")`<br>` do not permit *any* embedded content, either text or further tags. These
+ require only a single empty tag (akin to a start tag) and do not use an end tag.
+
+Many tags, particularly the closing end tag for the very commonly used paragraph
+ element `<p>`, are optional. An HTML browser or other agent can infer the closure for the
+ end of an element from the context and the structural rules defined by the HTML
+ standard. These rules are complex and not widely understood by most HTML
+ authors.
+
+The general form of an HTML element is therefore: `<tag
+                      attribute1="value1" attribute2="value2">''content''</tag>`. Some HTML elements are defined as *empty elements* and take the form `<tag
+                      attribute1="value1" attribute2="value2">`. Empty elements may enclose no content, for instance, the `<br>` tag or the inline `<img>` tag. The name of an HTML element is the name used in the tags. The end tag's
+ name is preceded by a slash character `/`. If a tag has no
+ content, an end tag is not allowed. If attributes are not mentioned, default
+ values are used in each case.
+
+#### Element examples
+
+See also: [HTML element](/wiki/HTML_element "HTML element")
+
+Header of the HTML document: `<head>...</head>`. The title is included in the head, for example:
+
+    <head>
+      <title>The Title</title>
+      <link rel="stylesheet" href="stylebyjimbowales.css"> <!-- Imports Stylesheets -->
+    </head>
+
+##### Headings
+
+HTML headings are defined with the `<h1>` to `<h6>` tags with H1 being the highest (or most important) level and H6 the least:
+
+    <h1>Heading level 1</h1>
+    <h2>Heading level 2</h2>
+    <h3>Heading level 3</h3>
+    <h4>Heading level 4</h4>
+    <h5>Heading level 5</h5>
+    <h6>Heading level 6</h6>
+
+The effects are:
+> Heading Level 1
+>
+> Heading Level 2
+>
+> Heading Level 3
+>
+> Heading Level 4
+>
+> Heading Level 5
+>
+> Heading Level 6
+
+CSS can substantially change the rendering.
+
+Paragraphs:
+
+    <p>Paragraph 1</p> <p>Paragraph 2</p>
+
+##### Line breaks
+
+`<br>`. The difference between `<br>` and `<p>` is that `<br>`[breaks a line](/wiki/Line_breaking_character "Line breaking character") without altering the semantic structure of the page, whereas `<p>` sections the page into [paragraphs](/wiki/Paragraph "Paragraph"). The element `<br>` is an *empty element* in that, although it may have attributes, it can take
+ no content and it must not have an end tag.
+
+    <p>This <br> is a paragraph <br> with <br> line breaks</p>
+
+##### Links
+
+This is a link in HTML. To create a link the `<a>` tag is used. The `href` attribute holds the [URL](/wiki/URL "URL") address of the link.
+
+    <a href="https://www.wikipedia.org/">A link to Wikipedia!</a>
+
+##### Inputs
+
+There are many possible ways a user can give inputs like:
+
+    <input type="text"> <!-- This is for text input -->
+    <input type="file"> <!-- This is for uploading files -->
+    <input type="checkbox"> <!-- This is for checkboxes -->
+
+**Comments:**
+
+    <!-- This is a comment -->
+
+Comments can help in the understanding of the markup and do not display in the
+ webpage.
+
+There are several types of markup elements used in HTML:
+
+Structural markup indicates the purpose of text
+For example, `<h2>Golf</h2>` establishes "Golf" as a second-level [heading](/wiki/HTML_element#Basic_text "HTML element").
+ Structural markup does not denote any specific rendering, but most web
+ browsers have default styles for element formatting. Content may be further
+ styled using [Cascading Style Sheets](/wiki/Cascading_Style_Sheets "Cascading Style Sheets") (CSS).[[74]](#cite_note-75)
+
+Presentational markup indicates the appearance of the text, regardless of its
+ purpose
+For example, `<b>bold text</b>` indicates that visual output devices should render "boldface" in bold text,
+ but gives little indication what devices that are unable to do this (such as
+ aural devices that read the text aloud) should do. In the case of both `<b>bold text</b>` and `<i>italic text</i>`, there are other elements that may have equivalent visual renderings but
+ that are more semantic in nature, such as `<strong>strong text</strong>` and `<em>emphasized text</em>` respectively. It is easier to see how an aural user agent should interpret the
+ latter two elements. However, they are not equivalent to their presentational
+ counterparts: it would be undesirable for a screen reader to emphasize the
+ name of a book, for instance, but on a screen, such a name would be
+ italicized. Most presentational markup elements have become [deprecated](/wiki/Deprecation "Deprecation") under the HTML
+ 4.0 specification in favor of using [CSS](/wiki/CSS "CSS") for styling.
+
+Hypertext markup makes parts of a document into links to other documents
+An anchor element creates a [hyperlink](/wiki/Hyperlink "Hyperlink") in the document and
+ its `href` attribute sets the link's target [URL](/wiki/URL "URL"). For example, the HTML markup `<a
+                        href="https://en.wikipedia.org/">Wikipedia</a>`, will render the word "[Wikipedia](https://en.wikipedia.org/)" as a hyperlink. To render an image as a hyperlink, an `img` element is inserted as content into the `a` element. Like `br`, `img` is an empty
+ element with attributes but no content or closing tag. `<a
+                        href="https://example.org"><img
+                        src="image.gif" alt="descriptive text"
+                        width="50" height="50"
+                        border="0"></a>`.
+
+#### Attributes
+
+Main article: [HTML attribute](/wiki/HTML_attribute "HTML attribute")
+
+Most of the attributes of an element are [name–value pairs](/wiki/Name%E2%80%93value_pair "Name–value pair"), separated by `=` and written within the start tag of an
+ element after the element's name. The value may be enclosed in single or double
+ quotes, although values consisting of certain characters can be left unquoted in
+ HTML (but not XHTML).[[75]](#cite_note-76)[[76]](#cite_note-77) Leaving attribute values unquoted is considered unsafe.[[77]](#cite_note-78) In contrast with name-value pair attributes, there are some attributes that
+ affect the element simply by their presence in the start tag of the element,[[7]](#cite_note-tagshtml-8) like the `ismap` attribute for the `img` element.[[78]](#cite_note-79)
+
+There are several common attributes that may appear in many elements :
+
+- The `id` attribute provides a document-wide unique identifier for
+ an element. This is used to identify the element so that stylesheets can alter
+ its presentational properties, and scripts may alter, animate or delete its
+ contents or presentation. Appended to the URL of the page, it provides a
+ globally unique identifier for the element, typically a sub-section of the
+ page. For example, the ID "Attributes" in `https://en.wikipedia.org/wiki/HTML#Attributes`.
+- The `class` attribute provides a way of classifying similar
+ elements. This can be used for [semantic](/wiki/Semantics "Semantics") or presentation
+ purposes. For example, an HTML document might semantically use the designation `<class="notation">` to indicate that all elements with this class value are subordinate to the
+ main text of the document. In presentation, such elements might be gathered
+ together and presented as footnotes on a page instead of appearing in the
+ place where they occur in the HTML source. Class attributes are used
+ semantically in [microformats](/wiki/Microformat "Microformat"). Multiple
+ class values may be specified; for example `<class="notation
+                        important">` puts the element into both the `notation` and the `important` classes.
+- An author may use the `style` attribute to assign presentational
+ properties to a particular element. It is considered better practice to use an
+ element's `id` or `class` attributes to select the
+ element from within a [stylesheet](/wiki/Cascading_Style_Sheets "Cascading Style Sheets"), though sometimes this can be too cumbersome for a simple, specific, or ad
+ hoc styling.
+- The `title` attribute is used to attach a subtextual explanation to
+ an element. In most [browsers](/wiki/Web_browser "Web browser") this attribute is
+ displayed as a [tooltip](/wiki/Tooltip "Tooltip").
+- The `lang` attribute identifies the natural language of the
+ element's contents, which may be different from that of the rest of the
+ document. For example, in an English-language document:
+  
+
+    <p>Oh well, <span lang="fr">c'est la vie</span>, as they say in France.</p>
+
+The abbreviation element, `abbr`, can be used to demonstrate some of
+ these attributes:
+
+    <abbr id="anId" class="jargon" style="color:purple;" title="Hypertext Markup Language">HTML</abbr>
+
+This example displays as HTML (Hypertext Markup Language); in most browsers, pointing the cursor at the abbreviation should display the
+ title text "Hypertext Markup Language."
+
+Most elements take the language-related attribute `dir` to specify
+ text direction, such as with "rtl" for right-to-left text in, for example, [Arabic](/wiki/Arabic_language "Arabic language"), [Persian](/wiki/Persian_language "Persian language") or [Hebrew](/wiki/Hebrew_language "Hebrew language").[[79]](#cite_note-80)
+
+### Character and entity references
+
+See also: [List of XML and HTML character entity references](/wiki/List_of_XML_and_HTML_character_entity_references "List of XML and HTML character entity references") and [Unicode and HTML](/wiki/Unicode_and_HTML "Unicode and HTML")
+
+As of version 4.0, HTML defines a set of 252 [character entity references](/wiki/Character_entity_reference "Character entity reference") and a set of 1,114,050 [numeric character references](/wiki/Numeric_character_reference "Numeric character reference"), both of which allow individual characters to be written via simple markup,
+ rather than literally. A literal character and its markup counterpart are
+ considered equivalent and are rendered identically.
+
+The ability to "[escape](/wiki/Escape_character "Escape character")" characters in this way allows for the characters `<` and `&` (when written as `&lt;` and `&amp;`, respectively) to be interpreted as character data,
+ rather than markup. For example, a literal `<` normally indicates
+ the start of a tag, and `&` normally indicates the start of a
+ character entity reference or numeric character reference; writing it as `&amp;` or `&#x26;` or `&#38;` allows `&` to be included in the content
+ of an element or in the value of an attribute. The double-quote character
+ (`"`), when not used to quote an attribute value, must also be
+ escaped as `&quot;` or `&#x22;` or `&#34;` when it appears within the attribute value itself.
+ Equivalently, the single-quote character (`'`), when not used to
+ quote an attribute value, must also be escaped as `&#x27;` or `&#39;` (or as `&apos;` in HTML5 or XHTML
+ documents[[80]](#cite_note-81)[[81]](#cite_note-aposhtml-82)) when it appears within the attribute value itself. If document authors
+ overlook the need to escape such characters, some browsers can be very forgiving
+ and try to use context to guess their intent. The result is still invalid
+ markup, which makes the document less accessible to other browsers and to other [user agents](/wiki/User_agent "User agent") that may try to
+ parse the document for [search and indexing](/wiki/Web_crawler "Web crawler") purposes
+ for example.
+
+Escaping also allows for characters that are not easily typed, or that are not
+ available in the document's [character encoding](/wiki/Character_encoding "Character encoding"), to be represented within the element and attribute content. For example, the
+ acute-accented `e` (`é`), a character typically found only
+ on Western European and South American keyboards, can be written in any HTML
+ document as the entity reference `&eacute;` or as the numeric
+ references `&#xE9;` or `&#233;`, using characters
+ that are available on all keyboards and are supported in all character
+ encodings. [Unicode](/wiki/Unicode "Unicode") character
+ encodings such as [UTF-8](/wiki/UTF-8 "UTF-8") are compatible
+ with all modern browsers and allow direct access to almost all the characters of
+ the world's writing systems.[[82]](#cite_note-83)
+
+*HTML escape sequence examples*
+
+| Named | Decimal | Hexadecimal | Result | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `&amp;` | `&#38;` | `&#x26;` | `&` | [Ampersand](/wiki/Ampersand "Ampersand") |  |
+| `&lt;` | `&#60;` | `&#x3C;` | `<` | [Less Than](/wiki/Less-than_sign "Less-than sign") |  |
+| `&gt;` | `&#62;` | `&#x3E;` | `>` | [Greater Than](/wiki/Greater-than_sign "Greater-than sign") |  |
+| `&quot;` | `&#34;` | `&#x22;` | `"` | [Double Quote](/wiki/Double_quote "Double quote") |  |
+| `&apos;` | `&#39;` | `&#x27;` | `'` | [Single Quote](/wiki/Single_quote "Single quote") |  |
+| `&nbsp;` | `&#160;` | `&#xA0;` |  | [Non-Breaking Space](/wiki/Non-breaking_space "Non-breaking space") |  |
+| `&copy;` | `&#169;` | `&#xA9;` | `©` | [Copyright](/wiki/Copyright_symbol "Copyright symbol") |  |
+| `&reg;` | `&#174;` | `&#xAE;` | `®` | [Registered Trademark](/wiki/Registered_trademark_symbol "Registered trademark symbol") |  |
+| `&dagger;` | `&#8224;` | `&#x2020;` | `†` | [Dagger](/wiki/Dagger_(mark) "Dagger (mark)") |  |
+| `&ddagger;` | `&#8225;` | `&#x2021;` | `‡` | [Double dagger](/wiki/Dagger_(mark) "Dagger (mark)") | Names are case-sensitive and may have synonyms. |
+| `&trade;` | `&#8482;` | `&#x2122;` | `™` | [Trademark](/wiki/Trademark_symbol "Trademark symbol") |  |
+
+
+### Data types
+
+HTML defines several [data types](/wiki/Data_type "Data type") for element content,
+ such as script data and stylesheet data, and a plethora of types for attribute
+ values, including IDs, names, [URIs](/wiki/Uniform_Resource_Identifier "Uniform Resource Identifier"), numbers, units of length, languages, media descriptors, colors, character
+ encodings, dates and times, and so on. All of these data types are
+ specializations of character data.
+
+### Document type declaration
+
+HTML documents are required to start with a [document type declaration](/wiki/Document_type_declaration "Document type declaration") (informally, a "doctype"). In browsers, the doctype helps to define the
+ rendering mode—particularly whether to use [quirks mode](/wiki/Quirks_mode "Quirks mode").
+
+The original purpose of the doctype was to enable the parsing and validation of
+ HTML documents by SGML tools based on the [document type definition](/wiki/Document_type_definition "Document type definition") (DTD). The DTD to which the DOCTYPE refers contains a machine-readable grammar
+ specifying the permitted and prohibited content for a document conforming to
+ such a DTD. Browsers, on the other hand, do not implement HTML as an application
+ of SGML and as consequence do not read the DTD.
+
+[HTML5](/wiki/HTML5 "HTML5") does not define a DTD; therefore,
+ in HTML5 the doctype declaration is simpler and shorter:[[83]](#cite_note-84)
+
+    <!DOCTYPE html>
+
+An example of an HTML 4 doctype
+
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
+
+This declaration references the DTD for the "strict" version of HTML 4.01.
+ SGML-based validators read the DTD in order to properly parse the document and
+ to perform validation. In modern browsers, a valid doctype activates standards
+ mode as opposed to [quirks mode](/wiki/Quirks_mode "Quirks mode").
+
+In addition, HTML 4.01 provides Transitional and Frameset DTDs, [as explained below](#Transitional_versus_strict). The transitional
+ type is the most inclusive, incorporating current tags as well as older or
+ "deprecated" tags, with the Strict DTD excluding deprecated tags. The frameset
+ has all tags necessary to make frames on a page along with the tags included in
+ transitional type.[[84]](#cite_note-85)
+
+## Semantic HTML
+
+Main article: [Semantic HTML](/wiki/Semantic_HTML "Semantic HTML")
+
+Semantic HTML is a way of writing HTML that emphasizes the meaning of the
+ encoded information over its presentation (look). HTML has included semantic
+ markup from its inception,[[85]](#cite_note-86) but has also included presentational markup, such as `<font>`, `<i>` and `<center>` tags. There are also the semantically neutral [div and span](/wiki/Div_and_span "Div and span") tags. Since
+ the late 1990s, when [Cascading Style Sheets](/wiki/Cascading_Style_Sheets "Cascading Style Sheets") were beginning to work in most browsers, web authors have been encouraged to
+ avoid the use of presentational HTML markup with a view to the [separation of content and presentation](/wiki/Separation_of_content_and_presentation "Separation of content and presentation").[[86]](#cite_note-87)
+
+In a 2001 discussion of the [Semantic Web](/wiki/Semantic_Web "Semantic Web"), [Tim Berners-Lee](/wiki/Tim_Berners-Lee "Tim Berners-Lee") and
+ others gave examples of ways in which intelligent software "agents" may one day
+ automatically crawl the web and find, filter, and correlate previously
+ unrelated, published facts for the benefit of human users.[[87]](#cite_note-88) Such agents are not commonplace even now, but some of the ideas of [Web 2.0](/wiki/Web_2.0 "Web 2.0"), [mashups](/wiki/Mashup_(web_application_hybrid) "Mashup (web application hybrid)") and [price comparison websites](/wiki/Price_comparison_service "Price comparison service") may be coming close[*[citation needed](/wiki/Wikipedia:Citation_needed "Wikipedia:Citation needed")*]. The main difference between these web application hybrids and Berners-Lee's
+ semantic agents lies in the fact that the current [aggregation](/wiki/Feed_aggregator "Feed aggregator") and hybridization of information is usually designed by [web developers](/wiki/Web_developer "Web developer"), who
+ already know the web locations and the [API semantics](/wiki/Application_programming_interface "Application programming interface") of the specific data they wish to mash, compare and combine.
+
+An important type of web agent that does crawl and read web pages automatically,
+ without prior knowledge of what it might find, is the [web crawler](/wiki/Web_crawler "Web crawler") or search-engine
+ spider. These software agents are dependent on the semantic clarity of web pages
+ they find as they use various techniques and [algorithms](/wiki/Algorithm "Algorithm") to read and index
+ millions of web pages a day and provide web users with [search facilities](/wiki/Web_search_engine "Web search engine") without which the World Wide Web's usefulness would be greatly reduced.
+
+In order for search engine spiders to be able to rate the significance of pieces
+ of text they find in HTML documents, and also for those creating mashups and
+ other hybrids as well as for more automated agents as they are developed, the
+ semantic structures that exist in HTML need to be widely and uniformly applied
+ to bring out the meaning of the published text.[[88]](#cite_note-Semantic_Web_Revisted-89)
+
+Presentational markup tags are [deprecated](/wiki/Deprecation "Deprecation") in current HTML
+ and [XHTML](/wiki/XHTML "XHTML") recommendations. The majority
+ of presentational features from previous versions of HTML are no longer allowed
+ as they lead to poorer accessibility, higher cost of site maintenance, and
+ larger document sizes.[[89]](#cite_note-90)
+
+Good semantic HTML also improves the [accessibility](/wiki/Accessibility "Accessibility") of web
+ documents (see also [Web Content Accessibility Guidelines](/wiki/Web_Content_Accessibility_Guidelines "Web Content Accessibility Guidelines")). For example, when a screen reader or audio browser can correctly ascertain
+ the structure of a document, it will not waste the visually impaired user's time
+ by reading out repeated or irrelevant information when it has been marked up
+ correctly.
+
+## Delivery
+
+HTML documents can be delivered by the same means as any other computer file.
+ However, they are most often delivered either by [HTTP](/wiki/Hypertext_Transfer_Protocol "Hypertext Transfer Protocol") from a [web server](/wiki/Web_server "Web server") or by [email](/wiki/Email "Email").
+
+### HTTP
+
+Main article: [Hypertext Transfer Protocol](/wiki/Hypertext_Transfer_Protocol "Hypertext Transfer Protocol")
+
+The [World Wide Web](/wiki/World_Wide_Web "World Wide Web") is
+ composed primarily of HTML documents transmitted from web servers to web
+ browsers using the [Hypertext Transfer Protocol](/wiki/Hypertext_Transfer_Protocol "Hypertext Transfer Protocol") (HTTP). However, HTTP is used to serve images, sound, and other content, in
+ addition to HTML. To allow the web browser to know how to handle each document
+ it receives, other information is transmitted along with the document. This [meta data](/wiki/Meta_data "Meta data") usually includes the [MIME type](/wiki/MIME_type "MIME type") (e.g., `text/html` or `application/xhtml+xml`) and the
+ character encoding (see [Character encodings in HTML](/wiki/Character_encodings_in_HTML "Character encodings in HTML")).
+
+In modern browsers, the MIME type that is sent with the HTML document may affect
+ how the document is initially interpreted. A document sent with the XHTML MIME
+ type is expected to be [well-formed](/wiki/Well-formed_document "Well-formed document") XML; syntax errors may cause the browser to fail to render it. The same document
+ sent with the HTML MIME type might be displayed successfully since some browsers
+ are more lenient with HTML.
+
+The W3C recommendations state that XHTML 1.0 documents that follow guidelines
+ set forth in the recommendation's Appendix C may be labeled with either MIME
+ Type.[[90]](#cite_note-91) XHTML 1.1 also states that XHTML 1.1 documents should[[91]](#cite_note-92) be labeled with either MIME type.[[92]](#cite_note-93)
+
+### HTML e-mail
+
+Main article: [HTML email](/wiki/HTML_email "HTML email")
+
+Most graphical email clients allow the use of a subset of HTML (often
+ ill-defined) to provide formatting and [semantic](/wiki/Semantic_web "Semantic web") markup not available with [plain text](/wiki/Plain_text "Plain text"). This may include
+ typographic information like colored headings, emphasized and quoted text,
+ inline images and diagrams. Many such clients include both a [GUI](/wiki/Graphical_user_interface "Graphical user interface") editor for composing HTML e-mail messages and a rendering engine for displaying
+ them. Use of HTML in e-mail is criticized by some because of compatibility
+ issues, because it can help disguise [phishing](/wiki/Phishing "Phishing") attacks, because of
+ accessibility issues for blind or visually impaired people, because it can
+ confuse [spam](/wiki/Email_spam "Email spam") filters and
+ because the message size is larger than plain text.
+
+### Naming conventions
+
+The most common [filename extension](/wiki/Filename_extension "Filename extension") for [files](/wiki/Computer_file "Computer file") containing
+ HTML is `.html`. A common abbreviation of this is `.htm`,
+ which originated because some early operating systems and file systems, such as [DOS](/wiki/DOS "DOS") and the limitations imposed by [FAT](/wiki/File_Allocation_Table "File Allocation Table") data
+ structure, limited file extensions to [three letters](/wiki/8.3_filename "8.3 filename").[[93]](#cite_note-94)
+
+### HTML Application
+
+Main article: [HTML Application](/wiki/HTML_Application "HTML Application")
+
+An HTML Application (HTA; file extension `.hta`) is a [Microsoft Windows](/wiki/Microsoft_Windows "Microsoft Windows") application that uses HTML and Dynamic HTML in a [browser](/wiki/Web_browser "Web browser") to provide the
+ application's graphical interface. A regular HTML file is confined to the
+ security model of the [web browser's security](/wiki/Browser_security "Browser security"), communicating only to web servers and manipulating only web page objects and [site cookies](/wiki/HTTP_cookie "HTTP cookie"). An HTA runs as
+ a fully trusted application and therefore has more privileges, like
+ creation/editing/removal of files and [Windows Registry](/wiki/Windows_Registry "Windows Registry") entries. Because they operate outside the browser's security model, HTAs cannot
+ be executed via HTTP, but must be downloaded (just like an [EXE](/wiki/EXE "EXE") file) and executed
+ from local file system.
+
+## HTML4 variations
+
+Since its inception, HTML and its associated protocols gained acceptance
+ relatively quickly. However, no clear standards existed in the early years of
+ the language. Though its creators originally conceived of HTML as a semantic
+ language devoid of presentation details,[[94]](#cite_note-95) practical uses pushed many presentational elements and attributes into the
+ language, driven largely by the various browser vendors. The latest standards
+ surrounding HTML reflect efforts to overcome the sometimes chaotic development
+ of the language[[95]](#cite_note-96) and to create a rational foundation for building both meaningful and
+ well-presented documents. To return HTML to its role as a semantic language, the [W3C](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium") has developed style languages such as [CSS](/wiki/Cascading_Style_Sheets "Cascading Style Sheets") and [XSL](/wiki/XSL "XSL") to shoulder the burden of
+ presentation. In conjunction, the HTML specification has slowly reined in the
+ presentational elements.
+
+There are two axes differentiating various variations of HTML as currently
+ specified: SGML-based HTML versus XML-based HTML (referred to as XHTML) on one
+ axis, and strict versus transitional (loose) versus frameset on the other axis.
+
+### SGML-based versus XML-based HTML
+
+One difference in the latest[*[when?](/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Chronological_items "Wikipedia:Manual of Style/Dates and numbers")*] HTML specifications lies in the distinction between the SGML-based specification
+ and the XML-based specification. The XML-based specification is usually called [XHTML](/wiki/XHTML "XHTML") to distinguish it clearly from the
+ more traditional definition. However, the root element name continues to be
+ "html" even in the XHTML-specified HTML. The W3C intended XHTML 1.0 to be
+ identical to HTML 4.01 except where limitations of XML over the more complex
+ SGML require workarounds. Because XHTML and HTML are closely related, they are
+ sometimes documented in parallel. In such circumstances, some authors [conflate the two names](/wiki/(X)HTML "(X)HTML") as (X)HTML or X(HTML).
+
+Like HTML 4.01, XHTML 1.0 has three sub-specifications: strict, transitional,
+ and frameset.
+
+Aside from the different opening declarations for a document, the differences
+ between an HTML 4.01 and XHTML 1.0 document—in each of the corresponding
+ DTDs—are largely syntactic. The underlying syntax of HTML allows many shortcuts
+ that XHTML does not, such as elements with optional opening or closing tags, and
+ even empty elements which must not have an end tag. By contrast, XHTML requires
+ all elements to have an opening tag and a closing tag. XHTML, however, also
+ introduces a new shortcut: an XHTML tag may be opened and closed within the same
+ tag, by including a slash before the end of the tag like this: `<br/>`. The introduction of this shorthand, which is not used in the SGML declaration
+ for HTML 4.01, may confuse earlier software unfamiliar with this new convention.
+ A fix for this is remove the slash preceding the closing angle bracket, as such: `<br>`.[[96]](#cite_note-97)
+
+To understand the subtle differences between HTML and XHTML, consider the
+ transformation of a valid and well-formed XHTML 1.0 document that adheres to
+ Appendix C (see below) into a valid HTML 4.01 document. Making this translation
+ requires the following steps:
+
+1. **The language for an element should be specified with a `lang` attribute rather than the XHTML `xml:lang` attribute.** XHTML uses XML's built-in language-defining functionality attribute.
+2. **Remove the XML namespace (`xmlns=URI`).** HTML has no
+ facilities for namespaces.
+3. **Change the document type declaration** from XHTML 1.0 to HTML 4.01. (see [DTD section](#Document_type_declaration) for further explanation).
+4. If present, **remove the XML declaration.** (Typically this is: `<?xml version="1.0" encoding="utf-8"?>`).
+5. **Ensure that the document's MIME type is set to `text/html`.** For both HTML and XHTML, this comes from the HTTP `Content-Type` header sent by the server.
+6. **Change the XML empty-element syntax to an HTML style empty element** (`<br/>` to `<br>`).
+
+
+Those are the main changes necessary to translate a document from XHTML 1.0 to
+ HTML 4.01. To translate from HTML to XHTML would also require the addition of
+ any omitted opening or closing tags. Whether coding in HTML or XHTML it may just
+ be best to always include the optional tags within an HTML document rather than
+ remembering which tags can be omitted.
+
+A well-formed XHTML document adheres to all the syntax requirements of XML. A
+ valid document adheres to the content specification for XHTML, which describes
+ the document structure.
+
+The W3C recommends several conventions to ensure an easy migration between HTML
+ and XHTML (see [HTML Compatibility Guidelines](https://www.w3.org/TR/xhtml1/#guidelines)). The following steps can be applied to XHTML 1.0 documents only:
+
+- Include both `xml:lang` and `lang` attributes on any
+ elements assigning language.
+- Use the empty-element syntax only for elements specified as empty in HTML.
+- Remove the closing slash in empty-element tags: for example `<br>` instead of `<br/>`.
+- Include explicit close tags for elements that permit content but are left
+ empty (for example, , not `<div
+                        />`).
+- Omit the XML declaration.
+
+
+By carefully following the W3C's compatibility guidelines, a user agent should
+ be able to interpret the document equally as HTML or XHTML. For documents that
+ are XHTML 1.0 and have been made compatible in this way, the W3C permits them to
+ be served either as HTML (with a `text/html`[MIME type](/wiki/MIME_type "MIME type")),
+ or as XHTML (with an `application/xhtml+xml` or `application/xml` MIME type). When delivered as XHTML, browsers
+ should use an XML parser, which adheres strictly to the XML specifications for
+ parsing the document's contents.
+
+### Transitional versus strict
+
+HTML 4 defined three different versions of the language: Strict, Transitional
+ (once called Loose), and Frameset. The Strict version is intended for new
+ documents and is considered best practice, while the Transitional and Frameset
+ versions were developed to make it easier to transition documents that conformed
+ to older HTML specifications or did not conform to any specification to a
+ version of HTML 4. The Transitional and Frameset versions allow for
+ presentational markup, which is omitted in the Strict version. Instead, [cascading style sheets](/wiki/Cascading_style_sheets "Cascading style sheets") are encouraged to improve the presentation of HTML documents. Because XHTML 1
+ only defines an XML syntax for the language defined by HTML 4, the same
+ differences apply to XHTML 1 as well.
+
+The Transitional version allows the following parts of the vocabulary, which are
+ not included in the Strict version:
+
+- **A looser content model**
+  - Inline elements and plain text are allowed directly in: `body`, `blockquote`, `form`, `noscript` and `noframes`
+- **Presentation related elements**
+  - underline (`u`) (Deprecated. can confuse a visitor with a
+ hyperlink.)
+  - strike-through (`s`)
+  - `center` (Deprecated. use CSS instead.)
+  - `font` (Deprecated. use CSS instead.)
+  - `basefont` (Deprecated. use CSS instead.)
+- **Presentation related attributes**
+  - `background` (Deprecated. use CSS instead.) and `bgcolor` (Deprecated. use CSS instead.) attributes for `body` (required element according to the W3C.) element.
+  - `align` (Deprecated. use CSS instead.) attribute on `div`, `form`, paragraph (`p`) and
+ heading (`h1`...`h6`) elements
+  - `align` (Deprecated. use CSS instead.), `noshade` (Deprecated. use CSS instead.), `size` (Deprecated. use CSS instead.) and `width` (Deprecated. use CSS instead.) attributes on `hr` element
+  - `align` (Deprecated. use CSS instead.), `border`, `vspace` and `hspace` attributes on `img` and `object` (caution: the `object` element is only supported in Internet Explorer (from
+ the major browsers)) elements
+  - `align` (Deprecated. use CSS instead.) attribute on `legend` and `caption` elements
+  - `align` (Deprecated. use CSS instead.) and `bgcolor` (Deprecated. use CSS instead.) on `table` element
+  - `nowrap` (Obsolete), `bgcolor` (Deprecated. use CSS
+ instead.), `width`, `height` on `td` and `th` elements
+  - `bgcolor` (Deprecated. use CSS instead.) attribute on `tr` element
+  - `clear` (Obsolete) attribute on `br` element
+  - `compact` attribute on `dl`, `dir` and `menu` elements
+  - `type` (Deprecated. use CSS instead.), `compact` (Deprecated. use CSS instead.) and `start` (Deprecated. use CSS instead.) attributes on `ol` and `ul` elements
+  - `type` and `value` attributes on `li` element
+  - `width` attribute on `pre` element
+- **Additional elements in Transitional specification**
+  - `menu` (Deprecated. use CSS instead.) list (no substitute,
+ though the unordered list, is recommended)
+  - `dir` (Deprecated. use CSS instead.) list (no substitute,
+ though the unordered list is recommended)
+  - `isindex` (Deprecated.) (element requires server-side support
+ and is typically added to documents server-side, `form` and `input` elements can be used as a substitute)
+  - `applet` (Deprecated. use the `object` element
+ instead.)
+- **The `language` (Obsolete) attribute on script element** (redundant with the `type` attribute).
+- **Frame related entities**
+  - `iframe`
+  - `noframes`
+  - `target` (Deprecated in the `map`, `link` and `form` elements.) attribute on `a`, client-side image-map (`map`), `link`, `form` and `base` elements
+
+
+The Frameset version includes everything in the Transitional version, as well as
+ the `frameset` element (used instead of `body`) and the `frame` element.
+
+### Frameset versus transitional
+
+In addition to the above transitional differences, the frameset specifications
+ (whether XHTML 1.0 or HTML 4.01) specify a different content model, with `frameset` replacing `body`, that contains either `frame` elements, or optionally `noframes` with a `body`.
+
+### Summary of specification versions
+
+As this list demonstrates, the loose versions of the specification are
+ maintained for legacy support. However, contrary to popular misconceptions, the
+ move to XHTML does not imply a removal of this legacy support. Rather the X in
+ XML stands for extensible and the W3C is modularizing the entire specification
+ and opens it up to independent extensions. The primary achievement in the move
+ from XHTML 1.0 to XHTML 1.1 is the modularization of the entire specification.
+ The strict version of HTML is deployed in XHTML 1.1 through a set of modular
+ extensions to the base XHTML 1.1 specification. Likewise, someone looking for
+ the loose (transitional) or frameset specifications will find similar extended
+ XHTML 1.1 support (much of it is contained in the legacy or frame modules).
+ Modularization also allows for separate features to develop on their own
+ timetable. So for example, XHTML 1.1 will allow quicker migration to emerging
+ XML standards such as [MathML](/wiki/MathML "MathML") (a
+ presentational and semantic math language based on XML) and [XForms](/wiki/XForms "XForms")—a new highly advanced web-form
+ technology to replace the existing HTML forms.
+
+In summary, the HTML 4 specification primarily reined in all the various HTML
+ implementations into a single clearly written specification based on SGML. XHTML
+ 1.0, ported this specification, as is, to the new XML-defined specification.
+ Next, XHTML 1.1 takes advantage of the extensible nature of XML and modularizes
+ the whole specification. XHTML 2.0 was intended to be the first step in adding
+ new features to the specification in a standards-body-based approach.
+
+## WHATWG HTML versus HTML5
+
+Main article: [§ Transition of HTML publication to WHATWG](#Transition_of_HTML_publication_to_WHATWG)
+
+The HTML Living Standard, which is developed by WHATWG, is the official version,
+ while W3C HTML5 is no longer separate from WHATWG.
+
+## WYSIWYG editors
+
+- [/wiki/File:Wiki_letter_w.svg](/wiki/File:Wiki_letter_w.svg) This article **is missing information** about contenteditable. Please expand the article [by making an edit request](https://en.wikipedia.org/w/index.php?title=Talk%3AHTML&preload=Template%3ASubmit+an+edit+request%2Fpreload&action=edit&section=new&editintro=Template%3AEdit+protected%2Feditintro&preloadtitle=Protected+edit+request+on+1+October+2025&preloadparams%5B%5D=edit+fully-protected&preloadparams%5B%5D=HTML)to include this information . Further
+ details may exist on the [talk page](/wiki/Talk:HTML "Talk:HTML").*(January 2021)*
+
+
+There are some [WYSIWYG](/wiki/WYSIWYG "WYSIWYG") editors (*what you see is what you get*), in which the user lays out everything as it is to appear in the HTML
+ document using a [graphical user interface](/wiki/Graphical_user_interface "Graphical user interface") (GUI), often similar to [word processors](/wiki/Word_processor "Word processor"). The
+ editor renders the document rather than showing the code, so authors do not
+ require extensive knowledge of HTML.
+
+The WYSIWYG editing model has been criticized,[[97]](#cite_note-98)[[98]](#cite_note-99) primarily because of the low quality of the generated code; there are voices[*[who?](/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Unsupported_attributions "Wikipedia:Manual of Style/Words to watch")*] advocating a change to the [WYSIWYM](/wiki/WYSIWYM "WYSIWYM") model (*what you see is what you mean*).
+
+WYSIWYG editors remain a controversial topic because of their perceived flaws
+ such as:
+
+- Relying mainly on the layout as opposed to meaning, often using markup that
+ does not convey the intended meaning but simply copies the layout.[[99]](#cite_note-100)
+- Often producing extremely verbose and redundant code that fails to make use of
+ the cascading nature of HTML and [CSS](/wiki/CSS "CSS").
+- Often producing ungrammatical markup, called [tag soup](/wiki/Tag_soup "Tag soup") or semantically
+ incorrect markup (such as `<em>` for italics).
+- As a great deal of the information in HTML documents is not in the layout, the
+ model has been criticized for its "what you see is all you get"-nature.[[100]](#cite_note-101)
+
+
+## See also
+
+- [Breadcrumb navigation](/wiki/Breadcrumb_navigation "Breadcrumb navigation")
+- [Cellpadding](/wiki/Cellpadding "Cellpadding")
+- [Comparison of HTML parsers](/wiki/Comparison_of_HTML_parsers "Comparison of HTML parsers")
+- [Dynamic web page](/wiki/Dynamic_web_page "Dynamic web page")
+- [HTML Application](/wiki/HTML_Application "HTML Application")
+- [HTML character references](/wiki/HTML_character_references "HTML character references")
+- [List of document markup languages](/wiki/List_of_document_markup_languages "List of document markup languages")
+- [List of XML and HTML character entity references](/wiki/List_of_XML_and_HTML_character_entity_references "List of XML and HTML character entity references")
+- [Microdata (HTML)](/wiki/Microdata_(HTML) "Microdata (HTML)")
+- [Microformat](/wiki/Microformat "Microformat")
+- [Polyglot markup](/wiki/Polyglot_markup "Polyglot markup")
+- [Semantic HTML](/wiki/Semantic_HTML "Semantic HTML")
+- [W3C (X)HTML Validator](/wiki/W3C_Markup_Validation_Service "W3C Markup Validation Service")
+- [Web colors](/wiki/Web_colors "Web colors")
+
+## Notes
+
+1. **[^](#cite_ref-3)**Even though HTML can be run in a browser, it is not viewed as a [programming language](/wiki/Programming_language "Programming language") in programming language discourse.[[2]](#cite_note-2)
+
+
+
+
+## References
+
+1. **[^](#cite_ref-1)***["W3C Html"](https://www.w3.org/html/).*
+2. **[^](#cite_ref-2)***[Hermans, Felienne](/wiki/Felienne_Hermans "Felienne Hermans"); Schlesinger, Ari (2024-10-17). "A Case for Feminism in Programming
+ Language Design". *Proceedings of the 2024 ACM SIGPLAN International Symposium on New
+ Ideas, New Paradigms, and Reflections on Programming and Software*. ACM. pp. 205–222. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3689492.3689809](https://doi.org/10.1145%2F3689492.3689809). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [979-8-4007-1215-9](/wiki/Special:BookSources/979-8-4007-1215-9 "Special:BookSources/979-8-4007-1215-9").*
+3. **[^](#cite_ref-deprecated_4-0)***["HTML 4.0 Specification — W3C Recommendation — Conformance: requirements and recommendations"](https://www.w3.org/TR/REC-html40-971218/conform.html#deprecated). World Wide Web Consortium. December 18, 1997. [Archived](https://web.archive.org/web/20150705040855/http://www.w3.org/TR/REC-html40-971218/conform.html) from the original on July 5, 2015. Retrieved July 6, 2015.*
+4. **[^](#cite_ref-5)**Tim Berners-Lee, "[Information Management: A Proposal](https://www.w3.org/History/1989/proposal.html)". CERN (March 1989, May 1990). W3C.
+5. **[^](#cite_ref-6)***Berners-Lee, Tim. ["Intended Uses"](https://www.w3.org/DesignIssues/Uses.html). *W3C*.*
+6. **[^](#cite_ref-7)***["Tags used in HTML"](http://info.cern.ch/hypertext/WWW/MarkUp/Tags.html). *info.cern.ch*. October 1991. Retrieved 2 March 2023.*
+7. ^ [***a***](#cite_ref-tagshtml_8-0)[***b***](#cite_ref-tagshtml_8-1)[***c***](#cite_ref-tagshtml_8-2)*["Tags used in HTML"](https://www.w3.org/History/19921103-hypertext/hypertext/WWW/MarkUp/Tags.html). World Wide Web Consortium. November 3, 1992. [Archived](https://web.archive.org/web/20100131184344/http://www.w3.org/History/19921103-hypertext/hypertext/WWW/MarkUp/Tags.html) from the original on January 31, 2010. Retrieved November 16, 2008.*
+8. **[^](#cite_ref-9)***Berners-Lee, Tim (October 29, 1991). ["Re: status. Re: X11 BROWSER for WWW"](http://lists.w3.org/Archives/Public/www-talk/1991SepOct/0003.html). World Wide Web Consortium. [Archived](https://web.archive.org/web/20070524045009/http://lists.w3.org/Archives/Public/www-talk/1991SepOct/0003.html) from the original on May 24, 2007. Retrieved April 8, 2007.*
+9. **[^](#cite_ref-10)***["Index of the HTML 4 elements"](https://www.w3.org/TR/1999/REC-html401-19991224/index/elements). World Wide Web Consortium. December 24, 1999. [Archived](https://web.archive.org/web/20070505172415/https://www.w3.org/TR/1999/REC-html401-19991224/index/elements) from the original on May 5, 2007. Retrieved April 8, 2007.*
+10. **[^](#cite_ref-11)***Berners-Lee, Tim (December 9, 1991). ["Re: SGML/HTML docs, X Browser"](http://lists.w3.org/Archives/Public/www-talk/1991NovDec/0020.html). *w3*. [Archived](https://web.archive.org/web/20071222060359/http://lists.w3.org/Archives/Public/www-talk/1991NovDec/0020.html) from the original on December 22, 2007. Retrieved June 16, 2007. "SGML is very general. HTML is a specific application of the SGML
+ basic syntax applied to hypertext documents with simple structure."*
+11. **[^](#cite_ref-12)***Berners-Lee, Tim; Connolly, Daniel (June 1993). ["Hypertext Markup Language (HTML): A Representation of Textual Information and MetaInformation for Retrieval and Interchange"](https://www.w3.org/MarkUp/draft-ietf-iiir-html-01.txt). *w3*. [Archived](https://web.archive.org/web/20170103041713/https://www.w3.org/MarkUp/draft-ietf-iiir-html-01.txt) from the original on January 3, 2017. Retrieved January 4, 2017.*
+12. **[^](#cite_ref-html+_13-0)***[Raggett, Dave](/wiki/Dave_Raggett "Dave Raggett"). ["A Review of the HTML+ Document Format"](http://www.w3.org/MarkUp/htmlplus_paper/htmlplus.html). *w3*. [Archived](https://web.archive.org/web/20000229205146/http://www.w3.org/MarkUp/htmlplus_paper/htmlplus.html) from the original on February 29, 2000. Retrieved May 22, 2020. "The hypertext markup language HTML was developed as a simple
+ non-proprietary delivery format for global hypertext. HTML+ is a set
+ of modular extensions to HTML and has been developed in response to a
+ growing understanding of the needs of information providers. These
+ extensions include text flow around floating figures, fill-out forms,
+ tables, and mathematical equations."*
+13. **[^](#cite_ref-14)***[Berners-Lee, Tim](/wiki/Tim_Berners-Lee "Tim Berners-Lee"); [Connolly, Daniel W.](/wiki/Daniel_Connolly_(computer_scientist) "Daniel Connolly (computer scientist)") (November 1995). [*Hypertext Markup Language - 2.0*](https://www.rfc-editor.org/rfc/rfc1866). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1866](https://doi.org/10.17487%2FRFC1866). [RFC](/wiki/Request_for_Comments "Request for Comments")[1866](https://datatracker.ietf.org/doc/html/rfc1866).**Historic.* Obsoleted by RFC [2854](https://www.rfc-editor.org/rfc/rfc2854). "This document thus defines an HTML 2.0 (to distinguish it from the
+ previous informal specifications). Future (generally upwardly
+ compatible) versions of HTML with new features will be released with
+ higher version numbers."
+14. ^ [***a***](#cite_ref-raggett_15-0)[***b***](#cite_ref-raggett_15-1)[***c***](#cite_ref-raggett_15-2)[***d***](#cite_ref-raggett_15-3)[***e***](#cite_ref-raggett_15-4)[***f***](#cite_ref-raggett_15-5)*Raggett, Dave (1998). [*Raggett on HTML 4*](https://web.archive.org/web/20070809234115/https://www.w3.org/People/Raggett/book4/ch02.html). Archived from [the original](https://www.w3.org/People/Raggett/book4/ch02.html) on August 9, 2007. Retrieved July 9, 2007.*
+15. **[^](#cite_ref-16)***["HTML5 – Hypertext Markup Language – 5.0"](https://www.w3.org/2014/10/html5-rec.html.en). Internet Engineering Task Force. 28 October 2014. [Archived](https://web.archive.org/web/20141028233921/https://www.w3.org/2014/10/html5-rec.html.en) from the original on October 28, 2014. Retrieved November 25, 2014. "This document recommends HTML 5.0 after completion."*
+16. **[^](#cite_ref-17)***["HTML 3.2 Reference Specification"](https://www.w3.org/TR/REC-html32). World Wide Web Consortium. January 14, 1997. Retrieved November 16, 2008.*
+17. **[^](#cite_ref-18)***["IETF HTML WG"](https://www.w3.org/MarkUp/HTML-WG/). Retrieved June 16, 2007. "Note: This working group is closed"*
+18. ^ [***a***](#cite_ref-engelfriet_19-0)[***b***](#cite_ref-engelfriet_19-1)*[Engelfriet, Arnoud](/w/index.php?title=Arnoud_Engelfriet&action=edit&redlink=1 "Arnoud Engelfriet (page does not exist)"). ["Introduction to Wilbur"](http://htmlhelp.com/reference/wilbur/intro.html). *htmlhelp.com*. Retrieved June 16, 2007.*
+19. **[^](#cite_ref-20)***["HTML 4.0 Specification"](https://www.w3.org/TR/REC-html40-971218/). World Wide Web Consortium. December 18, 1997. Retrieved November 16, 2008.*
+20. **[^](#cite_ref-21)***["HTML 4 – 4 Conformance: requirements and recommendations"](https://www.w3.org/TR/html4/conform.html#h-4.2). Retrieved December 30, 2009.*
+21. **[^](#cite_ref-22)***["HTML 4.0 Specification"](https://www.w3.org/TR/1998/REC-html40-19980424/). World Wide Web Consortium. April 24, 1998. Retrieved November 16, 2008.*
+22. **[^](#cite_ref-23)***["HTML 4.01 Specification"](https://www.w3.org/TR/html401/). World Wide Web Consortium. December 24, 1999. Retrieved November 16, 2008.*
+23. **[^](#cite_ref-24)***["HTML 4 Errata"](https://www.w3.org/MarkUp/html4-updates/errata). W3C. Retrieved March 2, 2023.*
+24. ^ [***a***](#cite_ref-iso-html_25-0)[***b***](#cite_ref-iso-html_25-1)*ISO (2000). ["ISO/IEC 15445:2000 – Information technology – Document description and processing languages – HyperText Markup Language (HTML)"](https://www.iso.org/standard/27688.html). Retrieved March 1, 2023.*
+25. **[^](#cite_ref-26)***["ISO/IEC 15445:2000(E) ISO-HTML"](https://www.scss.tcd.ie/misc/15445/15445.HTML). *www.scss.tcd.ie*. Geneva, CH: ISO/IEC. May 15, 2000. Retrieved March 1, 2023.*
+26. **[^](#cite_ref-27)***["HTML5: A vocabulary and associated APIs for HTML and XHTML"](https://www.w3.org/TR/2014/REC-html5-20141028/). World Wide Web Consortium. 28 October 2014. Retrieved 31 October 2014.*
+27. **[^](#cite_ref-28)***["Open Web Platform Milestone Achieved with HTML5 Recommendation"](https://www.w3.org/2014/10/html5-rec.html.en) (Press release). World Wide Web Consortium. 28 October 2014. Retrieved 31 October 2014.*
+28. **[^](#cite_ref-29)***["HTML 5.1"](https://www.w3.org/TR/2016/REC-html51-20161101/). World Wide Web Consortium. 1 November 2016. Retrieved 6 January 2017.*
+29. **[^](#cite_ref-30)***["HTML 5.1 is a W3C Recommendation"](https://www.w3.org/blog/news/archives/5932). World Wide Web Consortium. 1 November 2016. Retrieved 6 January 2017.*
+30. **[^](#cite_ref-31)***Philippe le Hegaret (17 November 2016). ["HTML 5.1 is the gold standard"](https://www.w3.org/blog/2016/11/html-5-1-is-the-gold-standard/). World Wide Web Consortium. Retrieved 6 January 2017.*
+31. **[^](#cite_ref-32)***["HTML 5.2"](https://www.w3.org/TR/2017/REC-html52-20171214/). World Wide Web Consortium. 14 December 2017. Retrieved 15 December 2017.*
+32. **[^](#cite_ref-33)***["HTML 5.2 is now a W3C Recommendation"](https://www.w3.org/blog/news/archives/6696). World Wide Web Consortium. 14 December 2017. Retrieved 15 December 2017.*
+33. **[^](#cite_ref-34)***Charles McCathie Nevile (14 December 2017). ["HTML 5.2 is done, HTML 5.3 is coming"](https://www.w3.org/blog/2017/12/html-5-2-is-done-html-5-3-is-coming/). World Wide Web Consortium. Retrieved 15 December 2017.*
+34. **[^](#cite_ref-35)***[Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (6 June 1992). ["MIME as a hypertext architecture"](http://lists.w3.org/Archives/Public/www-talk/1992MayJun/0020.html). CERN. Retrieved 24 October 2010.*
+35. **[^](#cite_ref-36)***[Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (15 July 1992). ["HTML DTD enclosed"](http://lists.w3.org/Archives/Public/www-talk/1992JulAug/0020.html). CERN. Retrieved 24 October 2010.*
+36. **[^](#cite_ref-37)***[Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (18 August 1992). ["document type declaration subset for Hyper Text Markup Language as defined by the World Wide Web project"](https://web.archive.org/web/20120314055308/http://lost-contact.mit.edu/afs/cern.ch/w3.org/www/Frame/fminit2.0/html.dtd). CERN. Archived from [the original](http://lost-contact.mit.edu/afs/cern.ch/w3.org/www/Frame/fminit2.0/html.dtd) on 14 March 2012. Retrieved 24 October 2010.*
+37. ^ [***a***](#cite_ref-html11_38-0)[***b***](#cite_ref-html11_38-1)*[Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (24 November 1992). ["Document Type Definition for the Hyper Text Markup Language as used by the World Wide Web application"](https://web.archive.org/web/20120118155040/http://lost-contact.mit.edu/afs/cern.ch/w3.org/www/MarkUp/Connolly/921125/archive.sh#html.dtd). CERN. Archived from [the original](http://lost-contact.mit.edu/afs/cern.ch/w3.org/www/MarkUp/Connolly/921125/archive.sh#html.dtd) on 18 January 2012. Retrieved 24 October 2010.* See section "Revision History"
+38. **[^](#cite_ref-39)***[Berners-Lee, Tim](/wiki/Tim_Berners-Lee "Tim Berners-Lee"); [Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (June 1993). ["Hyper Text Markup Language (HTML) Internet-Draft version 1.1"](http://tools.ietf.org/html/draft-ietf-iiir-html-00). IETF IIIR Working Group. Retrieved 18 September 2010.*
+39. **[^](#cite_ref-ietfiiir_40-0)***[Berners-Lee, Tim](/wiki/Tim_Berners-Lee "Tim Berners-Lee"); [Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (June 1993). ["Hypertext Markup Language (HTML) Internet-Draft version 1.2"](https://www.w3.org/MarkUp/draft-ietf-iiir-html-01.txt). IETF IIIR Working Group. Retrieved 18 September 2010.*
+40. **[^](#cite_ref-41)***Raggett, Dave (1993-11-08). ["History for draft-raggett-www-html-00"](https://datatracker.ietf.org/doc/draft-raggett-www-html/history/). *IETF Datatracker*. Retrieved 2019-11-18.*
+41. **[^](#cite_ref-42)***[Berners-Lee, Tim](/wiki/Tim_Berners-Lee "Tim Berners-Lee"); [Connolly, Daniel](/wiki/Dan_Connolly_(computer_scientist) "Dan Connolly (computer scientist)") (28 November 1994). ["HyperText Markup Language Specification – 2.0 INTERNET DRAFT"](http://tools.ietf.org/html/draft-ietf-html-spec-00). *Internet Engineering Task Force*. Retrieved 24 October 2010.*
+42. **[^](#cite_ref-43)***Connolly, Daniel W. (1995-05-16). ["Hypertext Markup Language – 2.0"](https://tools.ietf.org/html/draft-ietf-html-spec-02#section-1.1). *tools.ietf.org*. Retrieved 2019-11-18.*
+43. **[^](#cite_ref-rfc1866_44-0)***[Berners-Lee, Tim](/wiki/Tim_Berners-Lee "Tim Berners-Lee"); [Connolly, Daniel W.](/wiki/Daniel_Connolly_(computer_scientist) "Daniel Connolly (computer scientist)") (November 1995). [*Hypertext Markup Language - 2.0*](https://www.rfc-editor.org/rfc/rfc1866). Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC1866](https://doi.org/10.17487%2FRFC1866). [RFC](/wiki/Request_for_Comments "Request for Comments")[1866](https://datatracker.ietf.org/doc/html/rfc1866).**Historic.* Obsoleted by RFC [2854](https://www.rfc-editor.org/rfc/rfc2854).
+44. **[^](#cite_ref-45)***["HTML 3.0 Draft (Expired!) Materials"](https://www.w3.org/MarkUp/html3/). World Wide Web Consortium. December 21, 1995. Retrieved November 16, 2008.*
+45. ^ [***a***](#cite_ref-html30cover_46-0)[***b***](#cite_ref-html30cover_46-1)*["HyperText Markup Language Specification Version 3.0"](https://www.w3.org/MarkUp/html3/CoverPage). Retrieved June 16, 2007.*
+46. **[^](#cite_ref-47)***Raggett, Dave (28 March 1995). ["HyperText Markup Language Specification Version 3.0"](https://www.w3.org/People/Raggett/html3/html3.txt). *HTML 3.0 Internet Draft Expires in six months*. [World Wide Web Consortium](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium"). Retrieved 17 June 2010.*
+47. **[^](#cite_ref-48)***Bowers, N. (1998). ["Weblint: just another perl hack"](https://www.usenix.org/publications/library/proceedings/usenix98/freenix/bowers.pdf)(PDF). *1998 USENIX Annual Technical Conference (USENIX ATC 98)*.*
+48. **[^](#cite_ref-49)***[Lie, Håkon Wium](/wiki/H%C3%A5kon_Wium_Lie "Håkon Wium Lie"); [Bos, Bert](/wiki/Bert_Bos "Bert Bos") (April 1997). [*Cascading style sheets: designing for the Web*](https://archive.org/details/cascadingstylesh00lieh). Addison Wesley Longman. p. [263](https://archive.org/details/cascadingstylesh00lieh/page/263). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-0-201-41998-6](/wiki/Special:BookSources/978-0-201-41998-6 "Special:BookSources/978-0-201-41998-6"). Retrieved 9 June 2010.*
+49. **[^](#cite_ref-50)***["HTML5"](https://www.w3.org/TR/html5/). World Wide Web Consortium. June 10, 2008. Retrieved November 16, 2008.*
+50. **[^](#cite_ref-51)***["HTML5, one vocabulary, two serializations"](https://www.w3.org/blog/2008/01/html5-is-html-and-xml/). 15 January 2008. Retrieved February 25, 2009.*
+51. **[^](#cite_ref-w3c2014_52-0)***["W3C Confirms May 2011 for HTML5 Last Call, Targets 2014 for HTML5 Standard"](https://www.w3.org/2011/02/htmlwg-pr.html). [World Wide Web Consortium](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium"). 14 February 2011. Retrieved 18 February 2011.*
+52. **[^](#cite_ref-53)***Hickson, Ian (January 19, 2011). ["HTML Is the New HTML5"](https://web.archive.org/web/20191006023430/https://blog.whatwg.org/html-is-the-new-html5). *The WHATWG Blog*. Archived from [the original](https://blog.whatwg.org/html-is-the-new-html5) on 6 October 2019. Retrieved 21 January 2011.*
+53. **[^](#cite_ref-54)***Grannell, Craig (July 23, 2012). ["HTML5 gets the splits"](https://web.archive.org/web/20120725214739/http://www.netmagazine.com/news/html5-gets-splits-122102). Net magazine. Archived from [the original](http://www.netmagazine.com/news/html5-gets-splits-122102) on Jul 25, 2012. Retrieved 23 July 2012.*
+54. **[^](#cite_ref-55)***["HTML5"](https://www.w3.org/TR/2012/CR-html5-20121217/). W3C. 2012-12-17. Retrieved 2013-06-15.*
+55. **[^](#cite_ref-W3Crec_56-0)***["When Will HTML5 Be Finished?"](https://wiki.whatwg.org/wiki/FAQ#What.27s_this_I_hear_about_2022.3F). *FAQ*. WHAT Working Group. Retrieved 29 November 2009.*
+56. **[^](#cite_ref-57)***["Call for Review: HTML5 Proposed Recommendation Published W3C News"](https://www.w3.org/blog/news/archives/4074). W3C. 2014-09-16. Retrieved 2014-09-27.*
+57. **[^](#cite_ref-58)***["Open Web Platform Milestone Achieved with HTML5 Recommendation"](https://www.w3.org/2014/10/html5-rec.html.en). W3C. 28 October 2014. Retrieved 29 October 2014.*
+58. **[^](#cite_ref-finalars_59-0)***["HTML5 specification finalized, squabbling over specs continues"](https://arstechnica.com/information-technology/2014/10/html5-specification-finalized-squabbling-over-who-writes-the-specs-continues/). *Ars Technica*. 2014-10-29. Retrieved 2014-10-29.*
+59. **[^](#cite_ref-60)***["HTML vs XML syntax"](https://html.spec.whatwg.org/multipage/introduction.html#html-vs-xhtml). WHATWG. Retrieved 22 March 2023.*
+60. **[^](#cite_ref-61)***["XHTML 1.0: The Extensible HyperText Markup Language (Second Edition)"](https://www.w3.org/TR/xhtml1/). World Wide Web Consortium. January 26, 2000. Retrieved November 16, 2008.*
+61. **[^](#cite_ref-62)***["XHTML 1.1 – Module-based XHTML — Second Edition"](https://www.w3.org/TR/xhtml11/). World Wide Web Consortium. February 16, 2007. Retrieved November 16, 2008.*
+62. **[^](#cite_ref-63)***["Modularization of XHTML"](https://www.w3.org/TR/2001/REC-xhtml-modularization-20010410/). *W3C*. Retrieved 2017-01-04.*
+63. **[^](#cite_ref-64)***["XHTM 2.0"](https://www.w3.org/TR/xhtml2/). World Wide Web Consortium. July 26, 2006. Retrieved November 16, 2008.*
+64. **[^](#cite_ref-65)***["XHTML 2 Working Group Expected to Stop Work End of 2009, W3C to Increase Resources on HTML5"](https://www.w3.org/News/2009#item119). World Wide Web Consortium. July 17, 2009. Retrieved November 16, 2008.*
+65. **[^](#cite_ref-66)***["W3C XHTML FAQ"](https://www.w3.org/2009/06/xhtml-faq.html).*
+66. **[^](#cite_ref-W3C_transfer_blog_67-0)***Jaffe, Jeff (28 May 2019). ["W3C and WHATWG to Work Together to Advance the Open Web Platform"](https://www.w3.org/blog/2019/05/w3c-and-whatwg-to-work-together-to-advance-the-open-web-platform/). *W3C Blog*. [Archived](https://web.archive.org/web/20190529021122/https://www.w3.org/blog/2019/05/w3c-and-whatwg-to-work-together-to-advance-the-open-web-platform/) from the original on 29 May 2019. Retrieved 29 May 2019.*
+67. **[^](#cite_ref-W3C_transfer_HTML_68-0)***["W3C and the WHATWG Signed an Agreement to Collaborate on a Single Version of HTML and DOM"](https://www.w3.org/html/). *W3C*. 28 May 2019. [Archived](https://web.archive.org/web/20190529012655/https://www.w3.org/html/) from the original on 29 May 2019. Retrieved 29 May 2019.*
+68. **[^](#cite_ref-W3C_transfer_memo_69-0)***["Memorandum of Understanding Between W3C and WHATWG"](https://www.w3.org/2019/04/WHATWG-W3C-MOU.html). *W3C*. 28 May 2019. [Archived](https://web.archive.org/web/20190529012854/https://www.w3.org/2019/04/WHATWG-W3C-MOU.html) from the original on 29 May 2019. Retrieved 29 May 2019.*
+69. **[^](#cite_ref-W3C_transfer_ZDNet_70-0)***Cimpanu, Catalin (29 May 2019). ["Browser vendors Win War with W3C over HTML and DOM standards"](https://web.archive.org/web/20190529021959/https://www.zdnet.com/article/browser-vendors-win-war-with-w3c-over-html-and-dom-standards/). *ZDNet*. Archived from [the original](https://www.zdnet.com/article/browser-vendors-win-war-with-w3c-over-html-and-dom-standards/) on 29 May 2019. Retrieved 29 May 2019.*
+70. **[^](#cite_ref-W3C_forks_71-0)***["W3C – WHATWG Wiki"](https://web.archive.org/web/20190529013834/https://wiki.whatwg.org/wiki/W3C). *WHATWG Wiki*. Archived from [the original](https://wiki.whatwg.org/wiki/W3C) on 29 May 2019. Retrieved 29 May 2019.*
+71. **[^](#cite_ref-72)***Shankland, Stephen (July 9, 2009). ["An epitaph for the Web standard, XHTML 2"](https://www.cnet.com/news/an-epitaph-for-the-web-standard-xhtml-2/). *CNET*. CBS INTERACTIVE INC.*
+72. **[^](#cite_ref-hsivonen_73-0)**[Activating Browser Modes with Doctype](https://hsivonen.iki.fi/doctype/). Hsivonen.iki.fi. Retrieved on 2012-02-16.
+73. **[^](#cite_ref-74)***["HTML Elements"](https://www.w3schools.com/html/html_elements.asp). w3schools. Retrieved 16 March 2015.*
+74. **[^](#cite_ref-75)***["CSS Introduction"](https://www.w3schools.com/css/css_intro.asp). W3schools. Retrieved 16 March 2015.*
+75. **[^](#cite_ref-76)***["On SGML and HTML"](https://www.w3.org/TR/html401/intro/sgmltut.html#h-3.2.2). World Wide Web Consortium. Retrieved November 16, 2008.*
+76. **[^](#cite_ref-77)***["XHTML 1.0 – Differences with HTML 4"](https://www.w3.org/TR/xhtml1/diffs.html#h-4.4). World Wide Web Consortium. Retrieved November 16, 2008.*
+77. **[^](#cite_ref-78)***Korpela, Jukka (July 6, 1998). ["Why attribute values should always be quoted in HTML"](https://jkorpela.fi/qattr.html). Cs.tut.fi. Retrieved November 16, 2008.*
+78. **[^](#cite_ref-79)***["Objects, Images, and Applets in HTML documents"](https://www.w3.org/TR/1999/REC-html401-19991224/struct/objects.html#adef-ismap). World Wide Web Consortium. December 24, 1999. Retrieved November 16, 2008.*
+79. **[^](#cite_ref-80)***["H56: Using the dir attribute on an inline element to resolve problems with nested directional runs"](https://www.w3.org/TR/WCAG-TECHS/H56.html). *Techniques for WCAG 2.0*. W3C. Retrieved 18 September 2010.*
+80. **[^](#cite_ref-81)***["Character Entity Reference Chart"](https://dev.w3.org/html5/html-author/charref). World Wide Web Consortium. October 24, 2012.*
+81. **[^](#cite_ref-aposhtml_82-0)***["The Named Character Reference '"](https://www.w3.org/TR/xhtml1/#C_16). World Wide Web Consortium. January 26, 2000.*
+82. **[^](#cite_ref-83)***["*The Unicode Standard*: A Technical Introduction"](https://www.unicode.org/standard/principles.html). Unicode. Retrieved 2010-03-16.*
+83. **[^](#cite_ref-84)***["The HTML syntax"](https://www.w3.org/TR/html/syntax.html#doctype-syntax). *HTML Standard*. Retrieved 2013-08-19.*
+84. **[^](#cite_ref-85)***["HTML 4 Frameset Document Type Definition"](https://www.w3.org/TR/html401/sgml/framesetdtd.html). *W3C*. Retrieved 2021-12-25.*
+85. **[^](#cite_ref-86)***Berners-Lee, Tim; Fischetti, Mark (2000). [*Weaving the Web: The Original Design and Ultimate Destiny of the World Wide Web by Its Inventor*](https://archive.org/details/weavingweborigin00bern_0). San Francisco: Harper. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-0-06-251587-2](/wiki/Special:BookSources/978-0-06-251587-2 "Special:BookSources/978-0-06-251587-2").*
+86. **[^](#cite_ref-87)***Raggett, Dave (2002). ["Adding a touch of style"](https://www.w3.org/MarkUp/Guide/Style.html). W3C. Retrieved October 2, 2009.* This article notes that presentational HTML markup may be useful when
+ targeting browsers "before Netscape 4.0 and Internet Explorer 4.0". See
+ the [list of web browsers](/wiki/List_of_web_browsers "List of web browsers") to confirm that these were both released in 1997.
+87. **[^](#cite_ref-88)***Berners-Lee, Tim; Hendler, James; Lassila, Ora (May 1, 2001). ["The Semantic Web"](http://www.scientificamerican.com/article.cfm?id=the-semantic-web). *Scientific American*. Retrieved October 2, 2009.*
+88. **[^](#cite_ref-Semantic_Web_Revisted_89-0)***Nigel Shadbolt, Wendy Hall and Tim Berners-Lee (2006). ["The Semantic Web Revisited"](https://web.archive.org/web/20130320130521/http://eprints.soton.ac.uk/262614/1/Semantic_Web_Revisted.pdf)(PDF). IEEE Intelligent Systems.
+ Archived from [the original](http://eprints.ecs.soton.ac.uk/12614/1/Semantic_Web_Revisted.pdf)(PDF) on March 20, 2013. Retrieved October 2, 2009.*
+89. **[^](#cite_ref-90)***["HTML: The Living Standard"](https://html.spec.whatwg.org/dev/introduction.html#restrictions-on-content-models-and-on-attribute-values). *WHATWG*. Retrieved 27 September 2018.*
+90. **[^](#cite_ref-91)***["XHTML 1.0 The Extensible HyperText Markup Language (Second Edition)"](https://www.w3.org/TR/xhtml1/#media). World Wide Web Consortium. 2002 [2000]. Retrieved December 7, 2008. "XHTML Documents which follow the guidelines set forth in Appendix C,
+ \"HTML Compatibility Guidelines\" may be labeled with the Internet Media
+ Type \"text/html\" [RFC2854], as they are compatible with most HTML
+ browsers. Those documents, and any other document conforming to this
+ specification, may also be labeled with the Internet Media Type
+ \"application/xhtml+xml\" as defined in [RFC3236]."*
+91. **[^](#cite_ref-92)***[S. Bradner](/wiki/Scott_Bradner "Scott Bradner") (March 1997). [*Key words for use in RFCs to Indicate Requirement Levels*](https://www.rfc-editor.org/rfc/rfc2119). [IETF](/wiki/Internet_Engineering_Task_Force "Internet Engineering Task Force") Network Working Group. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.17487/RFC2119](https://doi.org/10.17487%2FRFC2119). BCP 14. [RFC](/wiki/Request_for_Comments "Request for Comments")[2119](https://datatracker.ietf.org/doc/html/rfc2119).**Best Current Practice 14.* Updated by RFC [8174](https://www.rfc-editor.org/rfc/rfc8174). "3. SHOULD This word, or the adjective \"RECOMMENDED\", mean that there
+ may exist valid reasons in particular circumstances to ignore a
+ particular item, but the full implications must be understood and
+ carefully weighed before choosing a different course."
+92. **[^](#cite_ref-93)***["XHTML 1.1 – Module-based XHTML — Second Edition"](https://www.w3.org/TR/xhtml11/conformance.html#strict). World Wide Web Consortium. 2007. Retrieved December 7, 2008. "XHTML 1.1 documents SHOULD be labeled with the Internet Media Type
+ text/html as defined in [RFC2854] or application/xhtml+xml as defined
+ in [RFC3236]."*
+93. **[^](#cite_ref-94)***["Naming Files, Paths, and Namespaces"](https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396). Microsoft. Retrieved 16 March 2015.*
+94. **[^](#cite_ref-95)**[HTML Design Constraints](https://www.w3.org/History/19921103-hypertext/hypertext/WWW/MarkUp/HTMLConstraints.html), W3C Archives
+95. **[^](#cite_ref-96)**[WWW: BTB – HTML](http://ei.cs.vt.edu/~wwwbtb/book/chap13/who.html), Pris Sears
+96. **[^](#cite_ref-97)***[*HTML Standard - The br Element*](https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-br-element), WHATWG*
+97. **[^](#cite_ref-98)**Sauer, C.: WYSIWIKI – Questioning WYSIWYG in the Internet Age. In:
+ Wikimania (2006)
+98. **[^](#cite_ref-99)**Spiesser, J., Kitchen, L.: Optimization of HTML automatically generated
+ by WYSIWYG programs. In: 13th International Conference on World Wide Web,
+ pp. 355–364. WWW '04. ACM, New York, NY (New York, NY, U.S., May 17–20,
+ 2004)
+99. **[^](#cite_ref-100)**[XHTML Reference: blockquote](http://xhtml.com/en/xhtml/reference/blockquote/)[Archived](https://web.archive.org/web/20100325160356/http://xhtml.com/en/xhtml/reference/blockquote/) 2010-03-25 at the [Wayback Machine](/wiki/Wayback_Machine "Wayback Machine"). Xhtml.com. Retrieved on 2012-02-16.
+100. **[^](#cite_ref-101)**[Doug Engelbart's INVISIBLE REVOLUTION](http://www.invisiblerevolution.net/). Invisiblerevolution.net. Retrieved on 2012-02-16.
+
+## External links
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikibooks-logo-en-noslogan.svg/40px-Wikibooks-logo-en-noslogan.svg.png)](/wiki/File:Wikibooks-logo-en-noslogan.svg)
+
+Wikibooks has more on the topic of: ***[HTML](https://en.wikibooks.org/wiki/Special:Search/HTML "wikibooks:Special:Search/HTML")***
+
+**HTML** at Wikipedia's [sister projects](/wiki/Wikipedia:Wikimedia_sister_projects "Wikipedia:Wikimedia sister projects")
+
+- [![](//upload.wikimedia.org/wikipedia/en/thumb/0/06/Wiktionary-logo-v2.svg/40px-Wiktionary-logo-v2.svg.png)](/wiki/File:Wiktionary-logo-v2.svg)[Definitions](https://en.wiktionary.org/wiki/HTML "wikt:HTML") from Wiktionary
+- [![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png)](/wiki/File:Commons-logo.svg)[Media](https://commons.wikimedia.org/wiki/category:HTML "c:category:HTML") from Commons
+- [![](//upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Wikibooks-logo.svg/40px-Wikibooks-logo.svg.png)](/wiki/File:Wikibooks-logo.svg)[Textbooks](https://en.wikibooks.org/wiki/HyperText_Markup_Language "b:HyperText Markup Language") from Wikibooks
+- [![](//upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Wikiversity_logo_2017.svg/40px-Wikiversity_logo_2017.svg.png)](/wiki/File:Wikiversity_logo_2017.svg)[Resources](https://en.wikiversity.org/wiki/HTML "v:HTML") from Wikiversity
+- [![](//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/40px-Wikidata-logo.svg.png)](/wiki/File:Wikidata-logo.svg)[Data](https://www.wikidata.org/wiki/Q8811 "d:Q8811") from Wikidata
+- ![](//upload.wikimedia.org/wikipedia/commons/thumb/7/75/Wikimedia_Community_Logo.svg/40px-Wikimedia_Community_Logo.svg.png)[Discussions](https://meta.wikimedia.org/wiki/Help:HTML_in_wikitext "m:Help:HTML in wikitext") from Meta-Wiki
+- [![](//upload.wikimedia.org/wikipedia/commons/thumb/a/a6/MediaWiki-2020-icon.svg/40px-MediaWiki-2020-icon.svg.png)](/wiki/File:MediaWiki-2020-icon.svg)[Documentation](https://www.mediawiki.org/wiki/HTML_restriction "mw:HTML restriction") from MediaWiki
+
+- [WHATWG](/wiki/WHATWG "WHATWG")'s [HTML Living Standard](https://html.spec.whatwg.org/multipage/)
+- [Dave Raggett's Introduction to HTML](https://www.w3.org/MarkUp/Guide/)
+- [Tim Berners-Lee Gives the Web a New Definition](https://web.archive.org/web/20110412130543/http://computemagazine.com/man-who-invented-world-wide-web-gives-new-definition) (archived 12 April 2011)
+- [List of all HTML elements from all major versions](https://meiert.com/en/indices/html-elements/)
+- [HTML Entities](https://www.w3schools.com/html/html_entities.asp)
+- *Sean B. Palmer. ["Early History of HTML – 1990 to 1992"](http://infomesh.net/html/history/early/). *Infomesh*. Retrieved 2022-04-13.* (Timeframe: 1980–1995)
+
+
+| [v (View this template)](/wiki/Template:Web_browsers "Template:Web browsers")[t (Discuss this template)](/wiki/Template_talk:Web_browsers "Template talk:Web browsers")[e (Edit this template)](/wiki/Special:EditPage/Template:Web_browsers "Special:EditPage/Template:Web browsers")<br>[Web browsers](/wiki/Web_browser "Web browser") | |
+| --- | --- |
+| | Features, standards & protocols | | | --- | --- | | | Features | [Bookmarks](/wiki/Bookmark_(digital) "Bookmark (digital)")[Extensions](/wiki/Browser_extension "Browser extension")[Privacy mode](/wiki/Private_browsing "Private browsing") | | --- | --- | | [Web standards](/wiki/Web_standards "Web standards") | HTML<br>  [v5](/wiki/HTML5 "HTML5") [CSS](/wiki/CSS "CSS")[DOM](/wiki/Document_Object_Model "Document Object Model")[JavaScript](/wiki/JavaScript "JavaScript")<br>  [WebAssembly](/wiki/WebAssembly "WebAssembly")  [Web storage](/wiki/Web_storage "Web storage")  [IndexedDB](/wiki/IndexedDB "IndexedDB")  [WebGL](/wiki/WebGL "WebGL")  [WebGPU](/wiki/WebGPU "WebGPU") | | Protocols | [HTTP](/wiki/HTTP "HTTP")<br>  [Encryption](/wiki/HTTPS "HTTPS")  [Cookies](/wiki/HTTP_cookie "HTTP cookie")<br>    [third-party](/wiki/Third-party_cookies "Third-party cookies") [OCSP](/wiki/Online_Certificate_Status_Protocol "Online Certificate Status Protocol")[WebRTC](/wiki/WebRTC "WebRTC")[WebSocket](/wiki/WebSocket "WebSocket") | <br> | | <br> | |
+| | Active | | | --- | --- | | | [Blink](/wiki/Blink_(browser_engine) "Blink (browser engine)")-based | | [Proprietary](/wiki/Proprietary_software "Proprietary software") | [Google Chrome](/wiki/Google_Chrome "Google Chrome")[Arc](/wiki/Arc_(web_browser) "Arc (web browser)")[Avast](/wiki/Avast_Secure_Browser "Avast Secure Browser")[Cốc Cốc](/wiki/C%E1%BB%91c_C%E1%BB%91c "Cốc Cốc")[Comet](/wiki/Perplexity_AI#Comet "Perplexity AI")[Comodo](/wiki/Comodo_Dragon "Comodo Dragon")[Ecosia](/wiki/Ecosia#Ecosia_Browser "Ecosia")[Epic](/wiki/Epic_(web_browser) "Epic (web browser)")[Huawei](/wiki/Huawei_Mobile_Services "Huawei Mobile Services")[Maxthon](/wiki/Maxthon "Maxthon")[Microsoft Edge](/wiki/Microsoft_Edge "Microsoft Edge")[Opera](/wiki/Opera_(web_browser) "Opera (web browser)")  ([Mobile](/wiki/Opera_Mobile "Opera Mobile")) [Puffin](/wiki/Puffin_Browser "Puffin Browser")[QQ](/wiki/QQ_Browser "QQ Browser")[Samsung](/wiki/Samsung_Internet "Samsung Internet")[Silk](/wiki/Amazon_Silk "Amazon Silk")[Sleipnir](/wiki/Sleipnir_(web_browser) "Sleipnir (web browser)")[SRWare](/wiki/SRWare_Iron "SRWare Iron")[UC](/wiki/UC_Browser "UC Browser")[Vivaldi](/wiki/Vivaldi_(web_browser) "Vivaldi (web browser)")[Whale](/wiki/Naver_Whale "Naver Whale")[Yandex](/wiki/Yandex_Browser "Yandex Browser") | | --- | --- | | [FOSS](/wiki/Free_and_open-source_software "Free and open-source software") | [Chromium](/wiki/Chromium_(web_browser) "Chromium (web browser)")[Brave](/wiki/Brave_(web_browser) "Brave (web browser)")[Dooble](/wiki/Dooble "Dooble")[Falkon](/wiki/Falkon "Falkon")[Otter](/wiki/Otter_Browser "Otter Browser")[Supermium](/wiki/Supermium "Supermium")[ungoogled](/wiki/Ungoogled-chromium "Ungoogled-chromium") | <br> | | --- | --- | | [Gecko](/wiki/Gecko_(software) "Gecko (software)")-based | [Firefox](/wiki/Firefox "Firefox")[Floorp](/wiki/Floorp "Floorp")[GNU IceCat](/wiki/GNU_IceCat "GNU IceCat")[LibreWolf](/wiki/LibreWolf "LibreWolf")[Midori](/wiki/Midori_(web_browser) "Midori (web browser)")[Mullvad](/wiki/Mullvad_Browser "Mullvad Browser")[SlimBrowser](/wiki/SlimBrowser "SlimBrowser")[Tor](/wiki/Tor_Browser "Tor Browser")[Zen](/wiki/Zen_Browser "Zen Browser")  Gecko  [forks](/wiki/Fork_(software_development) "Fork (software development)")<br>  [Basilisk](/wiki/Basilisk_(web_browser) "Basilisk (web browser)")  [K-Meleon](/wiki/K-Meleon "K-Meleon")  [Pale Moon](/wiki/Pale_Moon "Pale Moon")  [SeaMonkey](/wiki/SeaMonkey "SeaMonkey")  [Waterfox](/wiki/Waterfox "Waterfox") | | [WebKit](/wiki/WebKit "WebKit")-based | [Safari](/wiki/Safari_(web_browser) "Safari (web browser)")[GNOME Web](/wiki/GNOME_Web "GNOME Web")[iCab](/wiki/ICab "ICab")[Orion](/wiki/Kagi_(search_engine)#Orion_Browser "Kagi (search engine)") | | Multi-[engine](/wiki/Browser_engine "Browser engine") | [360](/wiki/360_Secure_Browser "360 Secure Browser")[DuckDuckGo](/wiki/DuckDuckGo_Private_Browser "DuckDuckGo Private Browser")[Konqueror](/wiki/Konqueror "Konqueror")[Lunascape](/wiki/Lunascape "Lunascape")[NetFront](/wiki/NetFront "NetFront")[qutebrowser](/wiki/Qutebrowser "Qutebrowser") | | Other | [Dillo](/wiki/Dillo "Dillo")[eww](/wiki/Eww_(web_browser) "Eww (web browser)")[Flow](/wiki/Flow_(web_browser) "Flow (web browser)")[Ladybird](/wiki/Ladybird_(web_browser) "Ladybird (web browser)")[Links](/wiki/Links_(web_browser) "Links (web browser)")[Lynx](/wiki/Lynx_(web_browser) "Lynx (web browser)")[NetSurf](/wiki/NetSurf "NetSurf")[Opera Mini](/wiki/Opera_Mini "Opera Mini")[w3m](/wiki/W3m "W3m") | <br> | | <br> | |
+| | Discontinued | | | --- | --- | | | [Blink](/wiki/Blink_(browser_engine) "Blink (browser engine)")-based | [Beaker](/wiki/Beaker_(web_browser) "Beaker (web browser)")[Citrio](/wiki/Citrio "Citrio")[Flock](/wiki/Flock_(web_browser) "Flock (web browser)")[Redcore](/wiki/Redcore "Redcore")[Rockmelt](/wiki/Rockmelt "Rockmelt")[SalamWeb](/wiki/SalamWeb "SalamWeb")[Sputnik](/wiki/Sputnik_(search_engine)#Browser "Sputnik (search engine)")[Torch](/wiki/Torch_(web_browser) "Torch (web browser)") | | --- | --- | | [Gecko](/wiki/Gecko_(software) "Gecko (software)")-based | [Beonex](/wiki/Beonex_Communicator "Beonex Communicator")[Camino](/wiki/Camino_(web_browser) "Camino (web browser)")[Classilla](/wiki/Classilla "Classilla")[Conkeror](/wiki/Conkeror "Conkeror")[Firefox Lite](/wiki/Firefox_Lite "Firefox Lite")[Galeon](/wiki/Galeon "Galeon")[Ghostzilla](/wiki/Ghostzilla "Ghostzilla")[IceDragon](/wiki/Comodo_IceDragon "Comodo IceDragon")[Kazehakase](/wiki/Kazehakase "Kazehakase")[Kylo](/wiki/Kylo_(web_browser) "Kylo (web browser)")[Lotus](/wiki/IBM_Lotus_Symphony "IBM Lotus Symphony")[MicroB](/wiki/MicroB "MicroB")[Minimo](/wiki/Minimo "Minimo")[Mozilla suite](/wiki/Mozilla_Application_Suite "Mozilla Application Suite")[PirateBrowser](/wiki/PirateBrowser "PirateBrowser")[Pogo](/wiki/AT%26T_Pogo "AT&amp;T Pogo")[Strata](/wiki/Kirix_Strata "Kirix Strata")[Swiftfox](/wiki/Swiftfox "Swiftfox")[Swiftweasel](/wiki/Swiftweasel "Swiftweasel")[TenFourFox](/wiki/TenFourFox "TenFourFox")[Timberwolf](/wiki/Timberwolf_(web_browser) "Timberwolf (web browser)")[xB](/wiki/XB_Browser "XB Browser") | | [MSHTML](/wiki/Trident_(software) "Trident (software)")-based | [Internet Explorer](/wiki/Internet_Explorer "Internet Explorer")[AOL](/wiki/AOL_Explorer "AOL Explorer")[Deepnet](/wiki/Deepnet_Explorer "Deepnet Explorer")[GreenBrowser](/wiki/GreenBrowser "GreenBrowser")[MediaBrowser](/wiki/MediaBrowser "MediaBrowser")[MSN Explorer](/wiki/MSN_Dial-Up_Internet_Access#MSN_Explorer "MSN Dial-Up Internet Access")[MSN Program Viewer](/wiki/MSN_Dial-Up_Internet_Access#MSN_2.0 "MSN Dial-Up Internet Access")[NeoPlanet](/wiki/NeoPlanet "NeoPlanet")[NetCaptor](/wiki/NetCaptor "NetCaptor")[SpaceTime](/wiki/SpaceTime_(software) "SpaceTime (software)")[ZAC](/wiki/ZAC_Browser "ZAC Browser") | | [WebKit](/wiki/WebKit "WebKit")-based | [Arora](/wiki/Arora_(web_browser) "Arora (web browser)")[BOLT](/wiki/Bolt_(web_browser) "Bolt (web browser)")[Dolphin](/wiki/Dolphin_Browser "Dolphin Browser")[Fluid](/wiki/Fluid_(web_browser) "Fluid (web browser)")[Google TV](/wiki/Google_TV_(smart_TV_platform) "Google TV (smart TV platform)")[Iris](/wiki/Iris_Browser "Iris Browser")[Mercury](/wiki/Mercury_Browser "Mercury Browser")[Nokia Symbian](/wiki/Nokia_Browser_for_Symbian "Nokia Browser for Symbian")[OmniWeb](/wiki/OmniWeb "OmniWeb")[Opera Coast](/wiki/Opera_Coast "Opera Coast")[Origyn](/wiki/Origyn_Web_Browser "Origyn Web Browser")[QtWeb](/wiki/QtWeb "QtWeb")[Shiira](/wiki/Shiira "Shiira")[Steel](/wiki/Steel_(web_browser) "Steel (web browser)")[surf](/wiki/Surf_(web_browser) "Surf (web browser)")[Uzbl](/wiki/Uzbl "Uzbl")[WebPositive](/wiki/WebPositive "WebPositive")[xombrero](/wiki/Xombrero "Xombrero") | | Other | [abaco](/wiki/Abaco_(web_browser) "Abaco (web browser)")[Amaya](/wiki/Amaya_(web_editor) "Amaya (web editor)")[Arachne](/wiki/Arachne_(web_browser) "Arachne (web browser)")[Arena](/wiki/Arena_(web_browser) "Arena (web browser)")[Blazer](/wiki/Blazer_(web_browser) "Blazer (web browser)")[Cake](/wiki/Cake_Browser "Cake Browser")[CM](/wiki/CM_Browser "CM Browser")[Deepfish](/wiki/Microsoft_Live_Labs_Deepfish "Microsoft Live Labs Deepfish")[Edge Legacy](/wiki/Microsoft_Edge_Legacy "Microsoft Edge Legacy")[ELinks](/wiki/ELinks "ELinks")[Gazelle](/wiki/Gazelle_(web_browser) "Gazelle (web browser)")[HotJava](/wiki/HotJava "HotJava")[IBM Home Page Reader](/wiki/IBM_Home_Page_Reader "IBM Home Page Reader")[IBM WebExplorer](/wiki/IBM_WebExplorer "IBM WebExplorer")[IBrowse](/wiki/IBrowse "IBrowse")[Internet Explorer for Mac](/wiki/Internet_Explorer_for_Mac "Internet Explorer for Mac")[KidZui](/wiki/KidZui "KidZui")[Line Mode](/wiki/Line_Mode_Browser "Line Mode Browser")[Mosaic](/wiki/Mosaic_(web_browser) "Mosaic (web browser)")[MSN TV](/wiki/MSN_TV "MSN TV")[NetPositive](/wiki/NetPositive "NetPositive")[Netscape](/wiki/Netscape_(web_browser) "Netscape (web browser)")[Skweezer](/wiki/Skweezer "Skweezer")[Skyfire](/wiki/Skyfire_(company) "Skyfire (company)")[ThunderHawk](/wiki/ThunderHawk "ThunderHawk")[Vision](/wiki/Vision_Mobile_Browser "Vision Mobile Browser")[WinWAP](/wiki/WinWAP "WinWAP")[WorldWideWeb](/wiki/WorldWideWeb "WorldWideWeb") | <br> | | <br> | |
+| [List](/wiki/List_of_web_browsers "List of web browsers")[Comparison](/wiki/Comparison_of_web_browsers "Comparison of web browsers")[Category](/wiki/Category:Web_browsers "Category:Web browsers") | |
+
+| [v (View this template)](/wiki/Template:W3C_standards "Template:W3C standards")[t (Discuss this template)](/wiki/Template_talk:W3C_standards "Template talk:W3C standards")[e (Edit this template)](/wiki/Special:EditPage/Template:W3C_standards "Special:EditPage/Template:W3C standards")<br>[World Wide Web Consortium](/wiki/World_Wide_Web_Consortium "World Wide Web Consortium")  (W3C) | |
+| --- | --- |
+| Products,   standards | | [Recommendations](/wiki/World_Wide_Web_Consortium#W3C_recommendation_(REC) "World Wide Web Consortium") | [ActivityPub](/wiki/ActivityPub "ActivityPub")[Activity Streams](/wiki/Activity_Streams_(format) "Activity Streams (format)")[ARIA](/wiki/WAI-ARIA "WAI-ARIA")[Canonical XML](/wiki/Canonical_XML "Canonical XML")[CDF](/wiki/Compound_Document_Format "Compound Document Format")[CSS](/wiki/CSS "CSS")<br>  [Animations](/wiki/CSS_animations "CSS animations")  [Flexbox](/wiki/Flexbox "Flexbox")  [Grid](/wiki/CSS_grid_layout "CSS grid layout") [DOM](/wiki/Document_Object_Model "Document Object Model")[EXI](/wiki/Efficient_XML_Interchange "Efficient XML Interchange")[EmotionML](/wiki/Emotion_Markup_Language "Emotion Markup Language")[Geolocation API](/wiki/W3C_Geolocation_API "W3C Geolocation API")HTML<br>  [HTML5](/wiki/HTML5 "HTML5") [IndexedDB](/wiki/IndexedDB "IndexedDB")[ITS](/wiki/Internationalization_Tag_Set "Internationalization Tag Set")[JSON-LD](/wiki/JSON-LD "JSON-LD")[Linked Data Notifications](/wiki/Linked_Data_Notifications "Linked Data Notifications")[MathML](/wiki/MathML "MathML")[Micropub](/wiki/Micropub_(protocol) "Micropub (protocol)")[OWL](/wiki/Web_Ontology_Language "Web Ontology Language")[PLS](/wiki/Pronunciation_Lexicon_Specification "Pronunciation Lexicon Specification")[RDF](/wiki/Resource_Description_Framework "Resource Description Framework")<br>  [Schema](/wiki/RDF_Schema "RDF Schema")  [RDFa](/wiki/RDFa "RDFa") [SISR](/wiki/Semantic_Interpretation_for_Speech_Recognition "Semantic Interpretation for Speech Recognition")[SKOS](/wiki/Simple_Knowledge_Organization_System "Simple Knowledge Organization System")[SMIL](/wiki/Synchronized_Multimedia_Integration_Language "Synchronized Multimedia Integration Language")[SOAP](/wiki/SOAP "SOAP")[SRGS](/wiki/Speech_Recognition_Grammar_Specification "Speech Recognition Grammar Specification")[SRI](/wiki/Subresource_Integrity "Subresource Integrity")[SSML](/wiki/Speech_Synthesis_Markup_Language "Speech Synthesis Markup Language")[SVG](/wiki/SVG "SVG")<br>  [Filter Effects](/wiki/SVG_filter_effects "SVG filter effects") [SCXML](/wiki/SCXML "SCXML")[SHACL](/wiki/SHACL "SHACL")[SPARQL](/wiki/SPARQL "SPARQL")[Timed text](/wiki/Timed_text "Timed text")[VoiceXML](/wiki/VoiceXML "VoiceXML")[WebAssembly](/wiki/WebAssembly "WebAssembly")[WoT](/wiki/Web_of_Things "Web of Things")<br>  [TD](/wiki/Thing_Description "Thing Description") [Web storage](/wiki/Web_storage "Web storage")[WSDL](/wiki/Web_Services_Description_Language "Web Services Description Language")[Webmention](/wiki/Webmention "Webmention")[WebSub](/wiki/WebSub "WebSub")[WebVTT](/wiki/WebVTT "WebVTT")[WOFF](/wiki/Web_Open_Font_Format "Web Open Font Format")[XHTML](/wiki/XHTML "XHTML")<br>  [+RDFa](/wiki/XHTML%2BRDFa "XHTML+RDFa") [XML](/wiki/XML "XML")<br>  [Base](/wiki/XML_Base "XML Base")  [Encryption](/wiki/XML_Encryption "XML Encryption")  [Events](/wiki/XML_Events "XML Events")  [Information Set](/wiki/XML_Information_Set "XML Information Set")  [Namespace](/wiki/XML_namespace "XML namespace")  [Schema](/wiki/XML_Schema_(W3C) "XML Schema (W3C)")  [Signature](/wiki/XML_Signature "XML Signature")  [XForms](/wiki/XForms "XForms")  [XInclude](/wiki/XInclude "XInclude")  [XLink](/wiki/XLink "XLink")  [XOP](/wiki/XML-binary_Optimized_Packaging "XML-binary Optimized Packaging")  [XPath](/wiki/XPath "XPath")<br>    [2.0](/wiki/XPath_2.0 "XPath 2.0")    [3.x](/wiki/XPath_3 "XPath 3")   [XPointer](/wiki/XPointer "XPointer")  [XProc](/wiki/XProc "XProc")  [XQuery](/wiki/XQuery "XQuery")  [XSL](/wiki/XSL "XSL")  [XSL-FO](/wiki/XSL_Formatting_Objects "XSL Formatting Objects")  [XSLT](/wiki/XSLT "XSLT")<br>    [elements](/wiki/XSLT_elements "XSLT elements") | | --- | --- | | Notes | [IndieAuth](/wiki/IndieAuth "IndieAuth")[XAdES](/wiki/XAdES "XAdES")[XBL](/wiki/XBL "XBL")[XHTML+SMIL](/wiki/XHTML%2BSMIL "XHTML+SMIL")[XUP](/wiki/Extensible_User_Interface_Protocol "Extensible User Interface Protocol") | | [Working drafts](/wiki/World_Wide_Web_Consortium#Working_draft_(WD) "World Wide Web Consortium") | [CCXML](/wiki/Call_Control_eXtensible_Markup_Language "Call Control eXtensible Markup Language")[CURIE](/wiki/CURIE "CURIE")[EME](/wiki/Encrypted_Media_Extensions "Encrypted Media Extensions")[InkML](/wiki/InkML "InkML")[MSE](/wiki/Media_Source_Extensions "Media Source Extensions")[RIF](/wiki/Rule_Interchange_Format "Rule Interchange Format")[SMIL Timesheets](/wiki/SMIL_Timesheets "SMIL Timesheets")[sXBL](/wiki/SXBL "SXBL")[WebGPU](/wiki/WebGPU "WebGPU")[WebXR](/wiki/WebXR "WebXR")[XFDL](/wiki/Extensible_Forms_Description_Language "Extensible Forms Description Language")[XFrames](/wiki/XFrames "XFrames")[XMLHttpRequest](/wiki/XMLHttpRequest "XMLHttpRequest") | | Guidelines | [Web Content Accessibility Guidelines](/wiki/Web_Content_Accessibility_Guidelines "Web Content Accessibility Guidelines") | | Initiative | [Markup Validation Service](/wiki/W3C_Markup_Validation_Service "W3C Markup Validation Service")[Web Accessibility Initiative](/wiki/Web_Accessibility_Initiative "Web Accessibility Initiative")[Web Components](/wiki/Web_Components "Web Components") | | Deprecated | [C-HTML](/wiki/C-HTML "C-HTML")[HDML](/wiki/Handheld_Device_Markup_Language "Handheld Device Markup Language")[JSSS](/wiki/JavaScript_Style_Sheets "JavaScript Style Sheets")[PGML](/wiki/Precision_Graphics_Markup_Language "Precision Graphics Markup Language")[VML](/wiki/Vector_Markup_Language "Vector Markup Language")[WebPlatform](/wiki/WebPlatform.org "WebPlatform.org") | | Obsoleted | [P3P](/wiki/P3P "P3P")[XHTML+MathML+SVG](/wiki/XHTML%2BMathML%2BSVG "XHTML+MathML+SVG") | <br> |
+| Groups,   organizations | | [WHATWG](/wiki/WHATWG "WHATWG")  Defunct:  [World Wide Web Foundation](/wiki/World_Wide_Web_Foundation "World Wide Web Foundation") | | | --- | --- | | Elected | [AB](/w/index.php?title=W3C_Advisory_Board&action=edit&redlink=1 "W3C Advisory Board (page does not exist)")[Board](/w/index.php?title=W3C_Board&action=edit&redlink=1 "W3C Board (page does not exist)")[TAG](/wiki/Technical_Architecture_Group "Technical Architecture Group") | | Working | [CSS](/wiki/CSS_Working_Group "CSS Working Group")[SVG](/wiki/SVG_Working_Group "SVG Working Group")[WebAssembly](/wiki/WebAssembly "WebAssembly")[WebAuthn](/wiki/Web_Authentication_Working_Group "Web Authentication Working Group") | | Community, business | [Web Advertising BG](/wiki/Improving_Web_Advertising_Business_Group "Improving Web Advertising Business Group")[WebAssembly](/wiki/WebAssembly "WebAssembly")  CG | | Closed | [Device Description](/wiki/W3C_Device_Description_Working_Group "W3C Device Description Working Group")  (DDWG) [HTML](/wiki/HTML_Working_Group "HTML Working Group")[Multimodal Interaction Activity](/wiki/W3C_MMI "W3C MMI")  (MMI) | <br> |
+| Software | | [CERN httpd](/wiki/CERN_httpd "CERN httpd")[Libwww](/wiki/Libwww "Libwww") | | | --- | --- | | [Browsers](/wiki/Web_browser "Web browser") | [Line Mode](/wiki/Line_Mode_Browser "Line Mode Browser")  (1990–) [Arena](/wiki/Arena_(web_browser) "Arena (web browser)")  (1993–98) [Agora](/wiki/Agora_(web_browser) "Agora (web browser)")  (1994–97) [Argo](/wiki/Argo_(web_browser) "Argo (web browser)")  (1994–97) [Amaya](/wiki/Amaya_(web_editor) "Amaya (web editor)")  (browser/editor, 1996–2012) | <br> |
+| Conferences | [International World Wide Web Conference](/wiki/The_Web_Conference "The Web Conference")  (IW3C)    [Steering Committee](/wiki/International_World_Wide_Web_Conference_Committee "International World Wide Web Conference Committee")  (IW3C2)   [First conference](/wiki/First_International_Conference_on_the_World-Wide_Web "First International Conference on the World-Wide Web")  ("WWW1", 1994) |
+
+| [v (View this template)](/wiki/Template:Document_markup_languages "Template:Document markup languages")[t (Discuss this template)](/wiki/Template_talk:Document_markup_languages "Template talk:Document markup languages")[e (Edit this template)](/wiki/Special:EditPage/Template:Document_markup_languages "Special:EditPage/Template:Document markup languages")<br>[Document markup languages](/wiki/Markup_language "Markup language") | |
+| --- | --- |
+| [Office suite](/wiki/Office_suite "Office suite") | [Compound Document Format](/wiki/Compound_Document_Format "Compound Document Format")[OOXML](/wiki/Office_Open_XML "Office Open XML")<br>  [SpreadsheetML](/wiki/SpreadsheetML "SpreadsheetML")  [PresentationML](/wiki/PresentationML "PresentationML")  [WordprocessingML](/wiki/WordprocessingML "WordprocessingML") [ODF](/wiki/OpenDocument "OpenDocument")[UOF](/wiki/Uniform_Office_Format "Uniform Office Format") |
+| Well-known | HTML[XHTML](/wiki/XHTML "XHTML")[MathML](/wiki/MathML "MathML")[RTF](/wiki/Rich_Text_Format "Rich Text Format")[TeX](/wiki/TeX "TeX")[LaTeX](/wiki/LaTeX "LaTeX")[Markdown](/wiki/Markdown "Markdown") |
+| Lesser-known | [AmigaGuide](/wiki/AmigaGuide "AmigaGuide")[AsciiDoc](/wiki/AsciiDoc "AsciiDoc")[BBCode](/wiki/BBCode "BBCode")[CML](/wiki/Chemical_Markup_Language "Chemical Markup Language")[C-HTML](/wiki/C-HTML "C-HTML")[ConTeXt](/wiki/ConTeXt "ConTeXt")[CrossMark](/wiki/CrossMark "CrossMark")[DITA](/wiki/Darwin_Information_Typing_Architecture "Darwin Information Typing Architecture")[DocBook](/wiki/DocBook "DocBook")[EAD](/wiki/Encoded_Archival_Description "Encoded Archival Description")[Enriched text](/wiki/Enriched_text "Enriched text")[FHTML](/wiki/FHTML "FHTML")[GML](/wiki/List_of_document_markup_languages#GML_Disambiguation "List of document markup languages")[GuideML](/wiki/GuideML "GuideML")[HDML](/wiki/Handheld_Device_Markup_Language "Handheld Device Markup Language")[HyTime](/wiki/HyTime "HyTime")[IPF](/wiki/Information_Presentation_Facility "Information Presentation Facility")[LilyPond](/wiki/LilyPond "LilyPond")[LinuxDoc](/wiki/LinuxDoc "LinuxDoc")Lout[MIF](/wiki/Maker_Interchange_Format "Maker Interchange Format")[MAML](/wiki/Microsoft_Assistance_Markup_Language "Microsoft Assistance Markup Language")[MEI](/wiki/Music_Encoding_Initiative "Music Encoding Initiative")[MusicXML](/wiki/MusicXML "MusicXML")[OMDoc](/wiki/OMDoc "OMDoc")[OpenMath](/wiki/OpenMath "OpenMath")[Org-mode](/wiki/Org-mode "Org-mode")[POD](/wiki/Plain_Old_Documentation "Plain Old Documentation")[ReStructuredText](/wiki/ReStructuredText "ReStructuredText")[RTML](/wiki/RTML "RTML")[RFT](/wiki/Revisable-Form_Text "Revisable-Form Text")[S1000D](/wiki/S1000D "S1000D")[Setext](/wiki/Setext "Setext")[TEI](/wiki/Text_Encoding_Initiative "Text Encoding Initiative")[Texinfo](/wiki/Texinfo "Texinfo")[troff](/wiki/Troff "Troff")[Wikitext](/wiki/Wiki#Editing "Wiki")[WML](/wiki/Wireless_Markup_Language "Wireless Markup Language")[WapTV](/wiki/WapTV "WapTV")[XAML](/wiki/Extensible_Application_Markup_Language "Extensible Application Markup Language") |
+| [List of document markup languages](/wiki/List_of_document_markup_languages "List of document markup languages") | |
+
+| [v (View this template)](/wiki/Template:ISO_standards "Template:ISO standards")[t (Discuss this template)](/wiki/Template_talk:ISO_standards "Template talk:ISO standards")[e (Edit this template)](/wiki/Special:EditPage/Template:ISO_standards "Special:EditPage/Template:ISO standards")<br>[International Organization for Standardization](/wiki/International_Organization_for_Standardization "International Organization for Standardization")  (ISO) standards | |
+| --- | --- |
+| List of  [ISO standards](/wiki/List_of_ISO_standards "List of ISO standards")  –  [ISO romanizations](/wiki/List_of_ISO_romanizations "List of ISO romanizations")  –  [IEC standards](/wiki/List_of_IEC_standards "List of IEC standards") | |
+| 1–9999 | [1](/wiki/ISO_1 "ISO 1")[2](/wiki/ISO_2 "ISO 2")[3](/wiki/Renard_series "Renard series")[4](/wiki/ISO_4 "ISO 4")[6](/wiki/Film_speed "Film speed")[7](/wiki/British_Standard_Pipe "British Standard Pipe")[9](/wiki/ISO_9 "ISO 9")[16](/wiki/A440_(pitch_standard) "A440 (pitch standard)")[17](/wiki/Renard_series "Renard series")[31](/wiki/ISO_31 "ISO 31")<br>  [-0](/wiki/ISO_31-0 "ISO 31-0")  [-1](/wiki/ISO_31-1 "ISO 31-1")  [-3](/wiki/ISO_31-3 "ISO 31-3")  [-4](/wiki/ISO_31-4 "ISO 31-4")  [-5](/wiki/ISO_31-5 "ISO 31-5")  [-6](/wiki/ISO_31-6 "ISO 31-6")  [-7](/wiki/ISO_31-7 "ISO 31-7")  [-8](/wiki/ISO_31-8 "ISO 31-8")  [-9](/wiki/ISO_31-9 "ISO 31-9")  [-10](/wiki/ISO_31-10 "ISO 31-10")  [-11](/wiki/ISO_31-11 "ISO 31-11")  [-12](/wiki/ISO_31-12 "ISO 31-12")  [-13](/wiki/ISO_31-13 "ISO 31-13") [68-1](/wiki/ISO_metric_screw_thread "ISO metric screw thread")[128](/wiki/ISO_128 "ISO 128")[216](/wiki/ISO_216 "ISO 216")[217](/wiki/ISO_217 "ISO 217")[226](/wiki/Equal-loudness_contour "Equal-loudness contour")[228](/wiki/British_Standard_Pipe "British Standard Pipe")[233](/wiki/ISO_233 "ISO 233")[259](/wiki/ISO_259 "ISO 259")[261](/wiki/ISO_metric_screw_thread "ISO metric screw thread")[262](/wiki/ISO_metric_screw_thread "ISO metric screw thread")[302](/wiki/Kappa_number "Kappa number")[306](/wiki/Vicat_softening_point "Vicat softening point")[361](/wiki/Hazard_symbol#Ionizing_radiation_symbol "Hazard symbol")[500](/wiki/Power_take-off "Power take-off")[518](/wiki/Hot_shoe "Hot shoe")[519](/wiki/Prontor-Compur "Prontor-Compur")[639](/wiki/ISO_639 "ISO 639")<br>  [-1](/wiki/ISO_639-1 "ISO 639-1")  [-2](/wiki/ISO_639-2 "ISO 639-2")  [-3](/wiki/ISO_639-3 "ISO 639-3")  [-5](/wiki/ISO_639-5 "ISO 639-5")  [-6](/wiki/ISO_639-6 "ISO 639-6") [646](/wiki/ISO/IEC_646 "ISO/IEC 646")[657](/wiki/ISO_657 "ISO 657")[668](/wiki/ISO_668 "ISO 668")[690](/wiki/ISO_690 "ISO 690")[704](/wiki/ISO_704 "ISO 704")[732](/wiki/ISO_732 "ISO 732")[764](/wiki/Antimagnetic_watch "Antimagnetic watch")[838](/wiki/Hole_punch "Hole punch")[843](/wiki/ISO_843 "ISO 843")[860](/wiki/ISO_860 "ISO 860")[898](/wiki/ISO_898 "ISO 898")[965](/wiki/ISO_965 "ISO 965")[999](/wiki/ISO_999 "ISO 999")[1000](/wiki/ISO_1000 "ISO 1000")[1004](/wiki/Magnetic_ink_character_recognition "Magnetic ink character recognition")[1007](/wiki/135_film "135 film")[1073-1](/wiki/OCR-A "OCR-A")[1073-2](/wiki/OCR-B "OCR-B")[1155](/wiki/Longitudinal_redundancy_check "Longitudinal redundancy check")[1413](/wiki/Shock-resistant_watch#ISO_1413_shock-resistant_standard "Shock-resistant watch")[1538](/wiki/ALGOL_60 "ALGOL 60")[1629](/wiki/ISO_1629 "ISO 1629")[1745](/wiki/ISO_1745 "ISO 1745")[1989](/wiki/COBOL "COBOL")[2014](/wiki/ISO_2014 "ISO 2014")[2015](/wiki/ISO_2015 "ISO 2015")[2022](/wiki/ISO/IEC_2022 "ISO/IEC 2022")[2033](/wiki/ISO_2033 "ISO 2033")[2047](/wiki/ISO_2047 "ISO 2047")[2108](/wiki/ISBN "ISBN")[2145](/wiki/ISO_2145 "ISO 2145")[2146](/wiki/ISO_2146 "ISO 2146")[2240](/wiki/Film_speed "Film speed")[2281](/wiki/Water_Resistant_mark "Water Resistant mark")[2533](/wiki/International_Standard_Atmosphere "International Standard Atmosphere")[2709](/wiki/ISO_2709 "ISO 2709")[2711](/wiki/ISO_2711 "ISO 2711")[2720](/wiki/Film_speed "Film speed")[2788](/wiki/ISO_2788 "ISO 2788")[2848](/wiki/ISO_2848 "ISO 2848")[2852](/wiki/ISO_2852 "ISO 2852")[2921](/wiki/ISO_2921 "ISO 2921")[3029](/wiki/126_film "126 film")[3103](/wiki/ISO_3103 "ISO 3103")[3166](/wiki/ISO_3166 "ISO 3166")<br>  [-1](/wiki/ISO_3166-1 "ISO 3166-1")  [-2](/wiki/ISO_3166-2 "ISO 3166-2")  [-3](/wiki/ISO_3166-3 "ISO 3166-3") [3297](/wiki/ISSN "ISSN")[3307](/wiki/ISO_3307 "ISO 3307")[3601](/wiki/O-ring "O-ring")[3602](/wiki/Kunrei-shiki "Kunrei-shiki")[3864](/wiki/ISO_3864 "ISO 3864")[3901](/wiki/International_Standard_Recording_Code "International Standard Recording Code")[3950](/wiki/FDI_World_Dental_Federation_notation "FDI World Dental Federation notation")[3977](/wiki/ISO_3977 "ISO 3977")[4031](/wiki/ISO_4031 "ISO 4031")[4157](/wiki/ISO_4157 "ISO 4157")[4165](/wiki/ISO_4165 "ISO 4165")[4217](/wiki/ISO_4217 "ISO 4217")[4909](/wiki/ISO/IEC_4909 "ISO/IEC 4909")[5218](/wiki/ISO/IEC_5218 "ISO/IEC 5218")[5426](/wiki/ISO_5426 "ISO 5426")[5427](/wiki/ISO_5427 "ISO 5427")[5428](/wiki/ISO_5428 "ISO 5428")[5725](/wiki/Accuracy_and_precision "Accuracy and precision")[5775](/wiki/ISO_5775 "ISO 5775")[5776](/wiki/ISO_5776 "ISO 5776")[5800](/wiki/Film_speed "Film speed")[5807](/wiki/Flowchart "Flowchart")[5964](/wiki/ISO_5964 "ISO 5964")[6166](/wiki/International_Securities_Identification_Number "International Securities Identification Number")[6344](/wiki/ISO_6344 "ISO 6344")[6346](/wiki/ISO_6346 "ISO 6346")[6373](/wiki/Minimal_BASIC "Minimal BASIC")[6385](/wiki/ISO_6385 "ISO 6385")[6425](/wiki/Water_Resistant_mark "Water Resistant mark")[6429](/wiki/ANSI_escape_code "ANSI escape code")[6438](/wiki/ISO_6438 "ISO 6438")[6523](/wiki/ISO/IEC_6523 "ISO/IEC 6523")[6709](/wiki/ISO_6709 "ISO 6709")[6943](/wiki/ISO_6943 "ISO 6943")[7001](/wiki/ISO_7001 "ISO 7001")[7002](/wiki/ISO_7002 "ISO 7002")[7010](/wiki/ISO_7010 "ISO 7010")[7027](/wiki/ISO_7027 "ISO 7027")[7064](/wiki/ISO/IEC_7064 "ISO/IEC 7064")[7098](/wiki/Pinyin "Pinyin")[7185](/wiki/Pascal_(programming_language) "Pascal (programming language)")[7200](/wiki/ISO_7200 "ISO 7200")[7498](/wiki/OSI_model "OSI model")<br>  [-1](/wiki/OSI_model "OSI model") [7637](/wiki/ISO_7637 "ISO 7637")[7736](/wiki/ISO_7736 "ISO 7736")[7810](/wiki/ISO/IEC_7810 "ISO/IEC 7810")[7811](/wiki/ISO/IEC_7811 "ISO/IEC 7811")[7812](/wiki/ISO/IEC_7812 "ISO/IEC 7812")[7813](/wiki/ISO/IEC_7813 "ISO/IEC 7813")[7816](/wiki/ISO/IEC_7816 "ISO/IEC 7816")[7942](/wiki/Graphical_Kernel_System "Graphical Kernel System")[8000](/wiki/ISO_8000 "ISO 8000")[8093](/wiki/On-board_diagnostics "On-board diagnostics")[8178](/wiki/ISO_8178 "ISO 8178")[8217](/wiki/Fuel_oil "Fuel oil")[8373](/wiki/ISO_8373 "ISO 8373")[8501-1](/wiki/ISO_8501-1 "ISO 8501-1")[8571](/wiki/FTAM "FTAM")[8583](/wiki/ISO_8583 "ISO 8583")[8601](/wiki/ISO_8601 "ISO 8601")[8613](/wiki/Open_Document_Architecture "Open Document Architecture")[8632](/wiki/Computer_Graphics_Metafile "Computer Graphics Metafile")[8651](/wiki/Graphical_Kernel_System "Graphical Kernel System")[8652](/wiki/ISO/IEC_8652 "ISO/IEC 8652")[8691](/wiki/ISO_8691 "ISO 8691")[8805/8806](/wiki/Graphical_Kernel_System "Graphical Kernel System")[8807](/wiki/Language_of_Temporal_Ordering_Specification "Language of Temporal Ordering Specification")[8820-5](/wiki/Automotive_fuse "Automotive fuse")[8859](/wiki/ISO/IEC_8859 "ISO/IEC 8859")<br>  [-1](/wiki/ISO/IEC_8859-1 "ISO/IEC 8859-1")  [-2](/wiki/ISO/IEC_8859-2 "ISO/IEC 8859-2")  [-3](/wiki/ISO/IEC_8859-3 "ISO/IEC 8859-3")  [-4](/wiki/ISO/IEC_8859-4 "ISO/IEC 8859-4")  [-5](/wiki/ISO/IEC_8859-5 "ISO/IEC 8859-5")  [-6](/wiki/ISO/IEC_8859-6 "ISO/IEC 8859-6")  [-7](/wiki/ISO/IEC_8859-7 "ISO/IEC 8859-7")  [-8](/wiki/ISO/IEC_8859-8 "ISO/IEC 8859-8")  [-8-I](/wiki/ISO-8859-8-I "ISO-8859-8-I")  [-9](/wiki/ISO/IEC_8859-9 "ISO/IEC 8859-9")  [-10](/wiki/ISO/IEC_8859-10 "ISO/IEC 8859-10")  [-11](/wiki/ISO/IEC_8859-11 "ISO/IEC 8859-11")  [-12](/wiki/ISO/IEC_8859-12 "ISO/IEC 8859-12")  [-13](/wiki/ISO/IEC_8859-13 "ISO/IEC 8859-13")  [-14](/wiki/ISO/IEC_8859-14 "ISO/IEC 8859-14")  [-15](/wiki/ISO/IEC_8859-15 "ISO/IEC 8859-15")  [-16](/wiki/ISO/IEC_8859-16 "ISO/IEC 8859-16") [8879](/wiki/Standard_Generalized_Markup_Language "Standard Generalized Markup Language")[9000/9001](/wiki/ISO_9000_family "ISO 9000 family")[9036](/wiki/ASMO_449 "ASMO 449")[9075](/wiki/SQL "SQL")[9126](/wiki/ISO/IEC_9126 "ISO/IEC 9126")[9141](/wiki/On-board_diagnostics "On-board diagnostics")[9227](/wiki/Salt_spray_test "Salt spray test")[9241](/wiki/ISO_9241 "ISO 9241")[9293](/wiki/File_Allocation_Table "File Allocation Table")[9314](/wiki/Fiber_Distributed_Data_Interface "Fiber Distributed Data Interface")[9362](/wiki/ISO_9362 "ISO 9362")[9407](/wiki/Shoe_size "Shoe size")[9496](/wiki/CHILL "CHILL")[9506](/wiki/Manufacturing_Message_Specification "Manufacturing Message Specification")[9529](/wiki/ISO/IEC_9529 "ISO/IEC 9529")[9564](/wiki/ISO_9564 "ISO 9564")[9592/9593](/wiki/PHIGS "PHIGS")[9594](/wiki/X.500 "X.500")[9660](/wiki/ISO_9660 "ISO 9660")[9797-1](/wiki/ISO/IEC_9797-1 "ISO/IEC 9797-1")[9897](/wiki/ISO_9897 "ISO 9897")[9899](/wiki/ANSI_C "ANSI C")[9945](/wiki/POSIX "POSIX")[9984](/wiki/Romanization_of_Georgian "Romanization of Georgian")[9985](/wiki/Romanization_of_Armenian "Romanization of Armenian")[9995](/wiki/ISO/IEC_9995 "ISO/IEC 9995") |
+| 10000–19999 | [10006](/wiki/ISO_10006 "ISO 10006")[10007](/wiki/ISO_10007 "ISO 10007")[10116](/wiki/ISO/IEC_10116 "ISO/IEC 10116")[10118-3](/wiki/Whirlpool_(hash_function) "Whirlpool (hash function)")[10160](/wiki/ISO_10160 "ISO 10160")[10161](/wiki/ISO_10161 "ISO 10161")[10165](/wiki/Guidelines_for_the_Definition_of_Managed_Objects "Guidelines for the Definition of Managed Objects")[10179](/wiki/Document_Style_Semantics_and_Specification_Language "Document Style Semantics and Specification Language")[10206](/wiki/Pascal_(programming_language)#ISO/IEC_10206:1990_Extended_Pascal "Pascal (programming language)")[10218](/wiki/ISO_10218 "ISO 10218")[10279](/wiki/Full_BASIC "Full BASIC")[10303](/wiki/ISO_10303 "ISO 10303")<br>  [-11](/wiki/EXPRESS_(data_modeling_language) "EXPRESS (data modeling language)")  [-21](/wiki/ISO_10303-21 "ISO 10303-21")  [-22](/wiki/ISO_10303-22 "ISO 10303-22")  [-28](/wiki/ISO_10303-28 "ISO 10303-28")  [-238](/wiki/STEP-NC "STEP-NC") [10383](/wiki/Market_Identifier_Code "Market Identifier Code")[10585](/wiki/ArmSCII "ArmSCII")[10589](/wiki/IS-IS "IS-IS")[10628](/wiki/ISO_10628 "ISO 10628")[10646](/wiki/Universal_Coded_Character_Set "Universal Coded Character Set")[10664](/wiki/Torx "Torx")[10746](/wiki/RM-ODP "RM-ODP")[10861](/wiki/Multibus "Multibus")[10957](/wiki/International_Standard_Music_Number "International Standard Music Number")[10962](/wiki/ISO_10962 "ISO 10962")[10967](/wiki/ISO/IEC_10967 "ISO/IEC 10967")[11073](/wiki/ISO/IEEE_11073 "ISO/IEEE 11073")[11170](/wiki/ISO_11170 "ISO 11170")[11172](/wiki/MPEG-1 "MPEG-1")[11179](/wiki/ISO/IEC_11179 "ISO/IEC 11179")[11404](/wiki/ISO/IEC_11404 "ISO/IEC 11404")[11544](/wiki/JBIG "JBIG")[11783](/wiki/ISO_11783 "ISO 11783")[11784](/wiki/ISO_11784_and_ISO_11785 "ISO 11784 and ISO 11785")[11785](/wiki/ISO_11784_and_ISO_11785 "ISO 11784 and ISO 11785")[11801](/wiki/ISO/IEC_11801 "ISO/IEC 11801")[11889](/wiki/Trusted_Platform_Module "Trusted Platform Module")[11898](/wiki/CAN_bus#CAN_lower-layer_standards "CAN bus")[11940](/wiki/ISO_11940 "ISO 11940") ([-2](/wiki/ISO_11940-2 "ISO 11940-2")) [11941](/wiki/ISO/TR_11941 "ISO/TR 11941")[11941 (TR)](/wiki/ISO/TR_11941 "ISO/TR 11941")[11992](/wiki/ISO_11992 "ISO 11992")[12006](/wiki/ISO_12006 "ISO 12006")[12052](/wiki/DICOM "DICOM")[12182](/wiki/ISO/IEC_TR_12182 "ISO/IEC TR 12182")[12207](/wiki/ISO/IEC_12207 "ISO/IEC 12207")[12234-2](/wiki/TIFF/EP "TIFF/EP")[12620](/wiki/Linguistic_categories#ISO_12620_(ISO_TC37_Data_Category_Registry,_ISOcat) "Linguistic categories")[13211](/wiki/Prolog "Prolog")<br>  [-1](/wiki/Prolog "Prolog")  [-2](/wiki/Prolog "Prolog") [13216](/wiki/Isofix "Isofix")[13250](/wiki/Topic_map "Topic map")[13399](/wiki/ISO_13399 "ISO 13399")[13406-2](/wiki/ISO_13406-2 "ISO 13406-2")[13450](/wiki/110_film "110 film")[13485](/wiki/ISO_13485 "ISO 13485")[13490](/wiki/ISO_13490 "ISO 13490")[13567](/wiki/ISO_13567 "ISO 13567")[13568](/wiki/Z_notation "Z notation")[13584](/wiki/ISO_13584 "ISO 13584")[13616](/wiki/International_Bank_Account_Number "International Bank Account Number")[13816](/wiki/ISLISP "ISLISP")[13818](/wiki/MPEG-2 "MPEG-2")[14000](/wiki/ISO_14000_family "ISO 14000 family")[14031](/wiki/ISO_14031 "ISO 14031")[14224](/wiki/ISO_14224 "ISO 14224")[14289](/wiki/PDF/UA "PDF/UA")[14396](/wiki/Horsepower "Horsepower")[14443](/wiki/ISO/IEC_14443 "ISO/IEC 14443")[14496](/wiki/MPEG-4 "MPEG-4")<br>  [-2](/wiki/MPEG-4_Part_2 "MPEG-4 Part 2")  [-3](/wiki/MPEG-4_Part_3 "MPEG-4 Part 3")  [-6](/wiki/Delivery_Multimedia_Integration_Framework "Delivery Multimedia Integration Framework")  [-10](/wiki/Advanced_Video_Coding "Advanced Video Coding")  [-11](/wiki/MPEG-4_Part_11 "MPEG-4 Part 11")  [-12](/wiki/ISO_base_media_file_format "ISO base media file format")  [-14](/wiki/MP4_file_format "MP4 file format")  [-17](/wiki/MP4_file_format "MP4 file format")  [-20](/wiki/MP4_file_format "MP4 file format") [14617](/wiki/ISO_14617 "ISO 14617")[14644](/wiki/ISO_14644 "ISO 14644")[14649](/wiki/STEP-NC "STEP-NC")[14651](/wiki/ISO/IEC_14651 "ISO/IEC 14651")[14698](/wiki/ISO_14698 "ISO 14698")[14764](/wiki/Software_maintenance "Software maintenance")[14882](/wiki/C%2B%2B "C++")[14971](/wiki/ISO_14971 "ISO 14971")[15022](/wiki/ISO_15022 "ISO 15022")[15189](/wiki/ISO_15189 "ISO 15189")[15288](/wiki/ISO/IEC_15288 "ISO/IEC 15288")[15291](/wiki/Ada_Semantic_Interface_Specification "Ada Semantic Interface Specification")[15398](/wiki/ISO_15398 "ISO 15398")[15408](/wiki/Common_Criteria "Common Criteria")[15444](/wiki/JPEG_2000 "JPEG 2000")<br>  [-3](/wiki/Motion_JPEG_2000 "Motion JPEG 2000")  [-9](/wiki/JPIP "JPIP") 15445[15438](/wiki/PDF417 "PDF417")[15504](/wiki/ISO/IEC_15504 "ISO/IEC 15504")[15511](/wiki/International_Standard_Identifier_for_Libraries_and_Related_Organizations "International Standard Identifier for Libraries and Related Organizations")[15686](/wiki/ISO_15686 "ISO 15686")[15693](/wiki/ISO/IEC_15693 "ISO/IEC 15693")[15706](/wiki/International_Standard_Audiovisual_Number "International Standard Audiovisual Number")<br>  [-2](/wiki/International_Standard_Audiovisual_Number "International Standard Audiovisual Number") [15707](/wiki/International_Standard_Musical_Work_Code "International Standard Musical Work Code")[15897](/wiki/ISO/IEC_15897 "ISO/IEC 15897")[15919](/wiki/ISO_15919 "ISO 15919")[15924](/wiki/ISO_15924 "ISO 15924")[15926](/wiki/ISO_15926 "ISO 15926")[15926 WIP](/wiki/ISO_15926_WIP "ISO 15926 WIP")[15930](/wiki/PDF/X "PDF/X")[15938](/wiki/MPEG-7 "MPEG-7")[16023](/wiki/MaxiCode "MaxiCode")[16262](/wiki/ECMAScript "ECMAScript")[16355-1](/wiki/Quality_function_deployment "Quality function deployment")[16485](/wiki/Mixed_raster_content "Mixed raster content")[16612-2](/wiki/PDF/VT "PDF/VT")[16750](/wiki/ISO_16750 "ISO 16750")[16949 (TS)](/wiki/IATF_16949 "IATF 16949")[17024](/wiki/ISO/IEC_17024 "ISO/IEC 17024")[17025](/wiki/ISO/IEC_17025 "ISO/IEC 17025")[17100](/wiki/ISO_17100 "ISO 17100")[17203](/wiki/Open_Virtualization_Format "Open Virtualization Format")[17369](/wiki/SDMX "SDMX")[17442](/wiki/Legal_Entity_Identifier "Legal Entity Identifier")[17506](/wiki/COLLADA "COLLADA")[17799](/wiki/ISO/IEC_27002 "ISO/IEC 27002")[18004](/wiki/QR_code "QR code")[18014](/wiki/ISO/IEC_18014 "ISO/IEC 18014")[18181](/wiki/JPEG_XL "JPEG XL")[18245](/wiki/ISO_18245 "ISO 18245")[18629](/wiki/Process_Specification_Language "Process Specification Language")[18760](/wiki/SoftWare_Hash_IDentifier "SoftWare Hash IDentifier")[18916](/wiki/Photographic_Activity_Test "Photographic Activity Test")[19005](/wiki/PDF/A "PDF/A")[19011](/wiki/ISO_19011 "ISO 19011")[19092](/wiki/ISO_19092 "ISO 19092")<br>  [-1](/wiki/ISO_19092-1 "ISO 19092-1")  [-2](/wiki/ISO_19092-2 "ISO 19092-2") [19114](/wiki/ISO_19114 "ISO 19114")[19115](/wiki/Geospatial_metadata#ISO_19115:_Geographic_information_–_Metadata "Geospatial metadata")[19125](/wiki/Simple_Features "Simple Features")[19136](/wiki/Geography_Markup_Language#ISO_19136 "Geography Markup Language")[19407](/wiki/Shoe_size "Shoe size")[19439](/wiki/ISO_19439 "ISO 19439")[19500](/wiki/Common_Object_Request_Broker_Architecture "Common Object Request Broker Architecture")[19501](/wiki/Unified_Modeling_Language "Unified Modeling Language")[19502](/wiki/Meta-Object_Facility "Meta-Object Facility")[19503](/wiki/XML_Metadata_Interchange "XML Metadata Interchange")[19505](/wiki/Unified_Modeling_Language "Unified Modeling Language")[19506](/wiki/Knowledge_Discovery_Metamodel "Knowledge Discovery Metamodel")[19507](/wiki/Object_Constraint_Language "Object Constraint Language")[19508](/wiki/Meta-Object_Facility "Meta-Object Facility")[19509](/wiki/XML_Metadata_Interchange "XML Metadata Interchange")[19510](/wiki/Business_Process_Model_and_Notation "Business Process Model and Notation")[19600](/wiki/ISO_19600 "ISO 19600")[19752](/wiki/ISO/IEC_19752 "ISO/IEC 19752")[19757](/wiki/RELAX_NG "RELAX NG")[19770](/wiki/ISO/IEC_19770 "ISO/IEC 19770")[19775-1](/wiki/X3D "X3D")[19794-5](/wiki/ISO/IEC_19794-5 "ISO/IEC 19794-5")[19831](/wiki/Cloud_Infrastructure_Management_Interface "Cloud Infrastructure Management Interface") |
+| 20000–29999 | [20000](/wiki/ISO/IEC_20000 "ISO/IEC 20000")[20022](/wiki/ISO_20022 "ISO 20022")[20121](/wiki/ISO_20121 "ISO 20121")[20400](/wiki/ISO_20400 "ISO 20400")[20802](/wiki/Open_Data_Protocol "Open Data Protocol")[20830](/wiki/Han_Xin_code "Han Xin code")[21000](/wiki/MPEG-21 "MPEG-21")[21001](/wiki/ISO_21001 "ISO 21001")[21047](/wiki/International_Standard_Text_Code "International Standard Text Code")[21122](/wiki/JPEG_XS "JPEG XS")[21500](/wiki/ISO_21500 "ISO 21500")[21778](/wiki/JSON "JSON")[21827](/wiki/ISO/IEC_21827 "ISO/IEC 21827")[22000](/wiki/ISO_22000 "ISO 22000")[22275](/wiki/ECMAScript "ECMAScript")[22300](/wiki/ISO_22300 "ISO 22300")[22301](/wiki/ISO_22301 "ISO 22301")[22395](/wiki/ISO_22395 "ISO 22395")[22537](/wiki/ECMAScript_for_XML "ECMAScript for XML")[23000](/wiki/MPEG-A "MPEG-A")[23003](/wiki/MPEG-D "MPEG-D")[23008](/wiki/MPEG-H "MPEG-H")[23009](/wiki/Dynamic_Adaptive_Streaming_over_HTTP "Dynamic Adaptive Streaming over HTTP")[23090-3](/wiki/Versatile_Video_Coding "Versatile Video Coding")[23092](/wiki/MPEG-G "MPEG-G")[23094-1](/wiki/Essential_Video_Coding "Essential Video Coding")[23094-2](/wiki/LCEVC "LCEVC")[23270](/wiki/C_Sharp_(programming_language) "C Sharp (programming language)")[23271](/wiki/Common_Language_Infrastructure "Common Language Infrastructure")[23360](/wiki/Linux_Standard_Base "Linux Standard Base")[23941](/wiki/Rectangular_Micro_QR_Code "Rectangular Micro QR Code")[24517](/wiki/PDF/E "PDF/E")[24613](/wiki/Lexical_Markup_Framework "Lexical Markup Framework")[24617](/wiki/ISO-TimeML "ISO-TimeML")[24707](/wiki/Common_Logic "Common Logic")[24728](/wiki/MicroPDF417 "MicroPDF417")[25178](/wiki/ISO_25178 "ISO 25178")[25964](/wiki/ISO_25964 "ISO 25964")[26000](/wiki/ISO_26000 "ISO 26000")[26262](/wiki/ISO_26262 "ISO 26262")[26300](/wiki/OpenDocument "OpenDocument")[26324](/wiki/Digital_object_identifier "Digital object identifier")[27000 series](/wiki/ISO/IEC_27000_family "ISO/IEC 27000 family")[27000](/wiki/ISO/IEC_27000 "ISO/IEC 27000")[27001](/wiki/ISO/IEC_27001 "ISO/IEC 27001")[27002](/wiki/ISO/IEC_27002 "ISO/IEC 27002")[27005](/wiki/ISO/IEC_27005 "ISO/IEC 27005")[27006](/wiki/ISO/IEC_27006 "ISO/IEC 27006")[27729](/wiki/International_Standard_Name_Identifier "International Standard Name Identifier")[28000](/wiki/ISO_28000 "ISO 28000")29110[29148](/wiki/Requirements_engineering "Requirements engineering")[29199-2](/wiki/JPEG_XR "JPEG XR")[29500](/wiki/Office_Open_XML "Office Open XML") |
+| 30000+ | [30170](/wiki/Ruby_(programming_language) "Ruby (programming language)")[31000](/wiki/ISO_31000 "ISO 31000")[32000](/wiki/PDF "PDF")[37001](/wiki/ISO_37001 "ISO 37001")[38500](/wiki/ISO/IEC_38500 "ISO/IEC 38500")[39075](/wiki/Graph_Query_Language "Graph Query Language")[40314](/wiki/MathML "MathML")[40500](/wiki/Web_Content_Accessibility_Guidelines "Web Content Accessibility Guidelines")[42010](/wiki/ISO/IEC_42010 "ISO/IEC 42010")[45001](/wiki/ISO_45001 "ISO 45001")[50001](/wiki/ISO_50001 "ISO 50001")[55000](/wiki/ISO_55000 "ISO 55000")[56000](/wiki/ISO_56000 "ISO 56000")[80000](/wiki/ISO/IEC_80000 "ISO/IEC 80000") |
+| ![](//upload.wikimedia.org/wikipedia/en/thumb/9/96/Symbol_category_class.svg/20px-Symbol_category_class.svg.png)[Category](/wiki/Category:ISO_standards "Category:ISO standards") | |
+
+| [v (View this template)](/wiki/Template:List_of_IEC_standards "Template:List of IEC standards")[t (Discuss this template)](/wiki/Template_talk:List_of_IEC_standards "Template talk:List of IEC standards")[e (Edit this template)](/wiki/Special:EditPage/Template:List_of_IEC_standards "Special:EditPage/Template:List of IEC standards")<br>[IEC standards](/wiki/List_of_IEC_standards "List of IEC standards") | |
+| --- | --- |
+| IEC | [60027](/wiki/IEC_60027 "IEC 60027")[60034](/wiki/IEC_60034 "IEC 60034")[60038](/wiki/IEC_60038 "IEC 60038")[60062](/wiki/RKM_code "RKM code")[60063](/wiki/E_series_of_preferred_numbers "E series of preferred numbers")[60068](/wiki/IEC_60068 "IEC 60068")[60112](/wiki/Comparative_Tracking_Index "Comparative Tracking Index")[60228](/wiki/IEC_60228 "IEC 60228")[60269](/wiki/IEC_60269 "IEC 60269")[60297](/wiki/19-inch_rack "19-inch rack")[60309](/wiki/IEC_60309 "IEC 60309")[60320](/wiki/IEC_60320 "IEC 60320")[60364](/wiki/IEC_60364 "IEC 60364")[60446](/wiki/IEC_60446 "IEC 60446")[60559](/wiki/IEEE_754 "IEEE 754")[60601](/wiki/IEC_60601 "IEC 60601")[60870](/wiki/IEC_60870 "IEC 60870")<br>  [60870-5](/wiki/IEC_60870-5 "IEC 60870-5")  [60870-6](/wiki/IEC_60870-6 "IEC 60870-6") [60906-1](/wiki/IEC_60906-1 "IEC 60906-1")[60908](/wiki/Compact_Disc_Digital_Audio "Compact Disc Digital Audio")[60929](/wiki/IEC_60929 "IEC 60929")[60958](/wiki/AES3 "AES3")[60980-344](/w/index.php?title=IEC_60980-344&action=edit&redlink=1 "IEC 60980-344 (page does not exist)")[61030](/wiki/IEC_61030 "IEC 61030")[61131](/wiki/IEC_61131 "IEC 61131")<br>  [61131-3](/wiki/IEC_61131-3 "IEC 61131-3")  [61131-9](/wiki/IO-Link "IO-Link") [61158](/wiki/Fieldbus "Fieldbus")[61162](/wiki/IEC_61162 "IEC 61162")[61334](/wiki/IEC_61334 "IEC 61334")[61355](/wiki/IEC_61355 "IEC 61355")[61360](/wiki/IEC_61360 "IEC 61360")[61400](/wiki/IEC_61400 "IEC 61400")[61499](/wiki/IEC_61499 "IEC 61499")[61508](/wiki/IEC_61508 "IEC 61508")[61511](/wiki/IEC_61511 "IEC 61511")[61784](/wiki/Fieldbus "Fieldbus")[61850](/wiki/IEC_61850 "IEC 61850")[61851](/wiki/IEC_61851 "IEC 61851")[61883](/wiki/IEC_61883 "IEC 61883")[61960](/wiki/Battery_nomenclature "Battery nomenclature")[61968](/wiki/IEC_61968 "IEC 61968")[61970](/wiki/IEC_61970 "IEC 61970")[62014-4](/wiki/IP-XACT "IP-XACT")[62026](/wiki/Fieldbus "Fieldbus")[62056](/wiki/IEC_62056 "IEC 62056")[62061](/wiki/IEC_62061 "IEC 62061")[62196](/wiki/IEC_62196 "IEC 62196")[62262](/wiki/EN_62262 "EN 62262")[62264](/wiki/IEC_62264 "IEC 62264")[62304](/wiki/IEC_62304 "IEC 62304")[62325](/wiki/IEC_62325 "IEC 62325")[62351](/wiki/IEC_62351 "IEC 62351")[62365](/wiki/AES47 "AES47")[62366](/wiki/IEC_62366 "IEC 62366")[62379](/wiki/IEC_62379 "IEC 62379")[62386](/wiki/Digital_Addressable_Lighting_Interface "Digital Addressable Lighting Interface")[62455](/wiki/IEC_62455 "IEC 62455")[62680](/wiki/USB "USB")[62682](/wiki/IEC_62682 "IEC 62682")[62700](/wiki/IEC_62700 "IEC 62700")[63110](/wiki/IEC_63110 "IEC 63110")[63119](/wiki/IEC_63119 "IEC 63119")[63382](/wiki/IEC_63382 "IEC 63382") |
+| ISO/IEC | [646](/wiki/ISO/IEC_646 "ISO/IEC 646")[1989](/wiki/COBOL "COBOL")[2022](/wiki/ISO/IEC_2022 "ISO/IEC 2022")[4909](/wiki/ISO/IEC_4909 "ISO/IEC 4909")[5218](/wiki/ISO/IEC_5218 "ISO/IEC 5218")[6429](/wiki/ANSI_escape_code "ANSI escape code")[6523](/wiki/ISO/IEC_6523 "ISO/IEC 6523")[7810](/wiki/ISO/IEC_7810 "ISO/IEC 7810")[7811](/wiki/ISO/IEC_7811 "ISO/IEC 7811")[7812](/wiki/ISO/IEC_7812 "ISO/IEC 7812")[7813](/wiki/ISO/IEC_7813 "ISO/IEC 7813")[7816](/wiki/ISO/IEC_7816 "ISO/IEC 7816")[7942](/wiki/Graphical_Kernel_System "Graphical Kernel System")[8613](/wiki/Open_Document_Architecture "Open Document Architecture")[8632](/wiki/Computer_Graphics_Metafile "Computer Graphics Metafile")[8652](/wiki/ISO/IEC_8652 "ISO/IEC 8652")[8859](/wiki/ISO/IEC_8859 "ISO/IEC 8859")[9126](/wiki/ISO/IEC_9126 "ISO/IEC 9126")[9293](/wiki/File_Allocation_Table "File Allocation Table")[9496](/wiki/CHILL "CHILL")[9529](/wiki/ISO/IEC_9529 "ISO/IEC 9529")[9592](/wiki/PHIGS "PHIGS")[9593](/wiki/PHIGS "PHIGS")[9899](/wiki/ANSI_C "ANSI C")[9945](/wiki/POSIX "POSIX")[9995](/wiki/ISO/IEC_9995 "ISO/IEC 9995")[10021](/wiki/ISO/IEC_10021 "ISO/IEC 10021")[10116](/wiki/ISO/IEC_10116 "ISO/IEC 10116")[10165](/wiki/Guidelines_for_the_Definition_of_Managed_Objects "Guidelines for the Definition of Managed Objects")[10179](/wiki/Document_Style_Semantics_and_Specification_Language "Document Style Semantics and Specification Language")[10279](/wiki/Full_BASIC "Full BASIC")[10646](/wiki/Universal_Coded_Character_Set "Universal Coded Character Set")[10967](/wiki/ISO/IEC_10967 "ISO/IEC 10967")[11172](/wiki/MPEG-1 "MPEG-1")[11179](/wiki/ISO/IEC_11179 "ISO/IEC 11179")[11404](/wiki/ISO/IEC_11404 "ISO/IEC 11404")[11544](/wiki/JBIG "JBIG")[11801](/wiki/ISO/IEC_11801 "ISO/IEC 11801")[12207](/wiki/ISO/IEC_12207 "ISO/IEC 12207")[13250](/wiki/Topic_map "Topic map")[13346](/wiki/Universal_Disk_Format "Universal Disk Format")[13522-5](/wiki/MHEG-5 "MHEG-5")[13568](/wiki/Z_notation "Z notation")[13816](/wiki/ISLISP "ISLISP")[13818](/wiki/MPEG-2 "MPEG-2")[14443](/wiki/ISO/IEC_14443 "ISO/IEC 14443")[14496](/wiki/MPEG-4 "MPEG-4")[14651](/wiki/ISO/IEC_14651 "ISO/IEC 14651")[14882](/wiki/C%2B%2B "C++")[15288](/wiki/ISO/IEC_15288 "ISO/IEC 15288")[15291](/wiki/Ada_Semantic_Interface_Specification "Ada Semantic Interface Specification")[15408](/wiki/Common_Criteria "Common Criteria")[15444](/wiki/JPEG_2000 "JPEG 2000")15445[15504](/wiki/ISO/IEC_15504 "ISO/IEC 15504")[15511](/wiki/International_Standard_Identifier_for_Libraries_and_Related_Organizations "International Standard Identifier for Libraries and Related Organizations")[15693](/wiki/ISO/IEC_15693 "ISO/IEC 15693")[15897](/wiki/ISO/IEC_15897 "ISO/IEC 15897")[15938](/wiki/MPEG-7 "MPEG-7")[16262](/wiki/ECMAScript "ECMAScript")[16485](/wiki/Mixed_raster_content "Mixed raster content")[17024](/wiki/ISO/IEC_17024 "ISO/IEC 17024")[17025](/wiki/ISO/IEC_17025 "ISO/IEC 17025")[18004](/wiki/QR_code "QR code")[18014](/wiki/ISO/IEC_18014 "ISO/IEC 18014")[18181](/wiki/JPEG_XL "JPEG XL")[19752](/wiki/ISO/IEC_19752 "ISO/IEC 19752")[19757](/wiki/RELAX_NG "RELAX NG")[19770](/wiki/ISO/IEC_19770 "ISO/IEC 19770")[19788](/wiki/ISO/IEC_19788 "ISO/IEC 19788")[20000](/wiki/ISO/IEC_20000 "ISO/IEC 20000")[20802](/wiki/Open_Data_Protocol "Open Data Protocol")[21000](/wiki/MPEG-21 "MPEG-21")[21827](/wiki/ISO/IEC_21827 "ISO/IEC 21827")[22275](/wiki/ECMAScript "ECMAScript")[22537](/wiki/ECMAScript_for_XML "ECMAScript for XML")[23000](/wiki/MPEG-A "MPEG-A")[23003](/wiki/MPEG-D "MPEG-D")[23008](/wiki/MPEG-H "MPEG-H")[23270](/wiki/C_Sharp_(programming_language) "C Sharp (programming language)")[23360](/wiki/Linux_Standard_Base "Linux Standard Base")[24707](/wiki/Common_Logic "Common Logic")[24727](/wiki/ISO/IEC_24727 "ISO/IEC 24727")[24744](/wiki/ISO/IEC_24744 "ISO/IEC 24744")[24752](/wiki/Universal_Remote_Console "Universal Remote Console")[26300](/wiki/OpenDocument "OpenDocument")[27000](/wiki/ISO/IEC_27000 "ISO/IEC 27000")[27000 family](/wiki/ISO/IEC_27000_family "ISO/IEC 27000 family")[27002](/wiki/ISO/IEC_27002 "ISO/IEC 27002")[27040](/wiki/ISO/IEC_27040 "ISO/IEC 27040")29110[29119](/wiki/ISO/IEC_29119 "ISO/IEC 29119")[33001](/wiki/ISO/IEC_33001 "ISO/IEC 33001")[38500](/wiki/ISO/IEC_38500 "ISO/IEC 38500")[39075](/wiki/Graph_Query_Language "Graph Query Language")[42010](/wiki/ISO/IEC_42010 "ISO/IEC 42010")[80000](/wiki/ISO/IEC_80000 "ISO/IEC 80000")[81346](/wiki/IEC_81346 "IEC 81346") |
+| Related | [International Electrotechnical Commission](/wiki/International_Electrotechnical_Commission "International Electrotechnical Commission") |
+
+| [Authority control databases](/wiki/Help:Authority_control "Help:Authority control")[![Edit this at Wikidata](//upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/20px-OOjs_UI_icon_edit-ltr-progressive.svg.png)](https://www.wikidata.org/wiki/Q8811#identifiers "Edit this at Wikidata") | |
+| --- | --- |
+| International | [GND](https://d-nb.info/gnd/4373477-7) |
+| National | [United States](https://id.loc.gov/authorities/sh95002791)[France](https://catalogue.bnf.fr/ark:/12148/cb12493600c)[BnF data](https://data.bnf.fr/ark:/12148/cb12493600c)[Czech Republic](https://aleph.nkp.cz/F/?func=find-c&local_base=aut&ccl_term=ica=ph117008&CON_LNG=ENG)[Spain](https://datos.bne.es/resource/XX539726)[Israel](https://www.nli.org.il/en/authorities/987007541929605171) |
+| Other | [ELMCIP](https://elmcip.net/node/8854)[Yale LUX](https://lux.collections.yale.edu/view/concept/7112a1f6-e5ef-467d-a704-8b1c5de1e30c) |
+
+[Portal](/wiki/Wikipedia:Contents/Portals "Wikipedia:Contents/Portals"):
+
+- [![icon](//upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Octicons-terminal.svg/20px-Octicons-terminal.svg.png)](/wiki/File:Octicons-terminal.svg) [Computer programming](/wiki/Portal:Computer_programming "Portal:Computer programming")
+
+![](https://en.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1&amp;usesul3=1)
+
+Retrieved from "<https://en.wikipedia.org/w/index.php?title=HTML&oldid=1314044013>"
+
+[Categories](/wiki/Help:Category "Help:Category"):
+
+- [HTML](/wiki/Category:HTML "Category:HTML")
+- [Computer-related introductions in 1990](/wiki/Category:Computer-related_introductions_in_1990 "Category:Computer-related introductions in 1990")
+- [Markup languages](/wiki/Category:Markup_languages "Category:Markup languages")
+- [Open formats](/wiki/Category:Open_formats "Category:Open formats")
+- [Technical communication](/wiki/Category:Technical_communication "Category:Technical communication")
+- [World Wide Web Consortium standards](/wiki/Category:World_Wide_Web_Consortium_standards "Category:World Wide Web Consortium standards")
+- [SGML](/wiki/Category:SGML "Category:SGML")
+
+Hidden categories:
+
+- [Webarchive template wayback links](/wiki/Category:Webarchive_template_wayback_links "Category:Webarchive template wayback links")
+- [Articles with short description](/wiki/Category:Articles_with_short_description "Category:Articles with short description")
+- [Short description is different from Wikidata](/wiki/Category:Short_description_is_different_from_Wikidata "Category:Short description is different from Wikidata")
+- [Wikipedia pages semi-protected against vandalism](/wiki/Category:Wikipedia_pages_semi-protected_against_vandalism "Category:Wikipedia pages semi-protected against vandalism")
+- [Articles containing potentially dated statements from 1997](/wiki/Category:Articles_containing_potentially_dated_statements_from_1997 "Category:Articles containing potentially dated statements from 1997")
+- [All articles containing potentially dated statements](/wiki/Category:All_articles_containing_potentially_dated_statements "Category:All articles containing potentially dated statements")
+- [Articles containing potentially dated statements from 1996](/wiki/Category:Articles_containing_potentially_dated_statements_from_1996 "Category:Articles containing potentially dated statements from 1996")
+- [All articles lacking reliable references](/wiki/Category:All_articles_lacking_reliable_references "Category:All articles lacking reliable references")
+- [Articles lacking reliable references from February 2019](/wiki/Category:Articles_lacking_reliable_references_from_February_2019 "Category:Articles lacking reliable references from February 2019")
+- [All articles with unsourced statements](/wiki/Category:All_articles_with_unsourced_statements "Category:All articles with unsourced statements")
+- [Articles with unsourced statements from February 2025](/wiki/Category:Articles_with_unsourced_statements_from_February_2025 "Category:Articles with unsourced statements from February 2025")
+- [All articles with vague or ambiguous time](/wiki/Category:All_articles_with_vague_or_ambiguous_time "Category:All articles with vague or ambiguous time")
+- [Vague or ambiguous time from March 2022](/wiki/Category:Vague_or_ambiguous_time_from_March_2022 "Category:Vague or ambiguous time from March 2022")
+- [Articles to be expanded from January 2021](/wiki/Category:Articles_to_be_expanded_from_January_2021 "Category:Articles to be expanded from January 2021")
+- [All articles with specifically marked weasel-worded phrases](/wiki/Category:All_articles_with_specifically_marked_weasel-worded_phrases "Category:All articles with specifically marked weasel-worded phrases")
+- [Articles with specifically marked weasel-worded phrases from June 2020](/wiki/Category:Articles_with_specifically_marked_weasel-worded_phrases_from_June_2020 "Category:Articles with specifically marked weasel-worded phrases from June 2020")
+- [Pages using Sister project links with wikidata namespace mismatch](/wiki/Category:Pages_using_Sister_project_links_with_wikidata_namespace_mismatch "Category:Pages using Sister project links with wikidata namespace mismatch")
+- [Pages using Sister project links with hidden wikidata](/wiki/Category:Pages_using_Sister_project_links_with_hidden_wikidata "Category:Pages using Sister project links with hidden wikidata")
+- [Articles with example code](/wiki/Category:Articles_with_example_code "Category:Articles with example code")
+
+- This page was last edited on 29 September 2025, at 12:13 (UTC).
+- Text is available under the [Creative Commons Attribution-ShareAlike 4.0 License](/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License "Wikipedia:Text of the Creative Commons Attribution-ShareAlike 4.0 International License"); additional terms may apply. By using this site, you agree to the [Terms of Use](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use "foundation:Special:MyLanguage/Policy:Terms of Use") and [Privacy Policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy "foundation:Special:MyLanguage/Policy:Privacy policy"). Wikipedia® is a registered trademark of the [Wikimedia Foundation, Inc.](https://wikimediafoundation.org/), a non-profit organization.
+
+
+- [Privacy policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)
+- [About Wikipedia](/wiki/Wikipedia:About)
+- [Disclaimers](/wiki/Wikipedia:General_disclaimer)
+- [Contact Wikipedia](//en.wikipedia.org/wiki/Wikipedia:Contact_us)
+- [Code of Conduct](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct)
+- [Developers](https://developer.wikimedia.org)
+- [Statistics](https://stats.wikimedia.org/#/en.wikipedia.org)
+- [Cookie statement](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement)
+- [Mobile view](//en.m.wikipedia.org/w/index.php?title=HTML&mobileaction=toggle_view_mobile)
+
+
+- [![Wikimedia Foundation](/static/images/footer/wikimedia.svg)](https://www.wikimedia.org/)
+- [![Powered by MediaWiki](/w/resources/assets/mediawiki_compact.svg)](https://www.mediawiki.org/)
+
+Search
+
+Search
+
+Toggle the table of contents
+
+HTML
+
+[#](#)[#](#)[#](#)[#](#)[#](#)[#](#)[#](#)[#](#)
+
+139 languages
+
+[Add topic](#)

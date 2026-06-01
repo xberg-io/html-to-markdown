@@ -1,0 +1,240 @@
+{
+  "schema": 1,
+  "sha": "4cc3fb3c8",
+  "host": "unknown",
+  "created_at": "2026-06-01T04:56:49.705995000Z",
+  "runs": [
+    {
+      "fixture": "mdream/nuxt-example.html",
+      "group": "clean_small",
+      "bytes": 3577,
+      "ms_best": 0.021558467741935483,
+      "mb_per_s": 158.23448450139693,
+      "output_bytes": 1917
+    },
+    {
+      "fixture": "mdream/vuejs-docs.html",
+      "group": "clean_medium",
+      "bytes": 112232,
+      "ms_best": 2.6480526315789477,
+      "mb_per_s": 40.41942920714762,
+      "output_bytes": 50362
+    },
+    {
+      "fixture": "mdream/wikipedia-small.html",
+      "group": "clean_medium",
+      "bytes": 166054,
+      "ms_best": 4.205384615384615,
+      "mb_per_s": 37.65682557480894,
+      "output_bytes": 44412
+    },
+    {
+      "fixture": "mdream/mdn-array.html",
+      "group": "clean_medium",
+      "bytes": 231446,
+      "ms_best": 5.232399999999999,
+      "mb_per_s": 42.18410401249159,
+      "output_bytes": 82571
+    },
+    {
+      "fixture": "mdream/react-learn.html",
+      "group": "clean_medium",
+      "bytes": 265127,
+      "ms_best": 5.2744,
+      "mb_per_s": 47.9381181718944,
+      "output_bytes": 67109
+    },
+    {
+      "fixture": "mdream/github-markdown-complete.html",
+      "group": "clean_medium",
+      "bytes": 429661,
+      "ms_best": 5.2693,
+      "mb_per_s": 77.76301604794294,
+      "output_bytes": 74772
+    },
+    {
+      "fixture": "real-world/wikipedia/small_html.html",
+      "group": "clean_large",
+      "bytes": 972853,
+      "ms_best": 21.49366666666667,
+      "mb_per_s": 43.165502383900815,
+      "output_bytes": 176153
+    },
+    {
+      "fixture": "real-world/wikipedia/lists_timeline.html",
+      "group": "clean_large",
+      "bytes": 251962,
+      "ms_best": 4.104923076923077,
+      "mb_per_s": 58.53695272907897,
+      "output_bytes": 24499
+    },
+    {
+      "fixture": "real-world/wikipedia/tables_countries.html",
+      "group": "clean_large",
+      "bytes": 756394,
+      "ms_best": 15.0875,
+      "mb_per_s": 47.811335932645505,
+      "output_bytes": 115149
+    },
+    {
+      "fixture": "real-world/wikipedia/medium_python.html",
+      "group": "clean_large",
+      "bytes": 1244134,
+      "ms_best": 26.858,
+      "mb_per_s": 44.17673102866086,
+      "output_bytes": 246098
+    },
+    {
+      "fixture": "real-world/wikipedia/large_rust.html",
+      "group": "clean_large",
+      "bytes": 1065167,
+      "ms_best": 43.355,
+      "mb_per_s": 23.430340458620602,
+      "output_bytes": 187540
+    },
+    {
+      "fixture": "real-world/issues/gh-190/mitrade.html",
+      "group": "clean_small",
+      "bytes": 2346,
+      "ms_best": 0.07107692307692308,
+      "mb_per_s": 31.477445131772523,
+      "output_bytes": 458
+    },
+    {
+      "fixture": "real-world/issues/gh-190/flex2025.html",
+      "group": "clean_small",
+      "bytes": 6304,
+      "ms_best": 0.10894849785407726,
+      "mb_per_s": 55.18169602188792,
+      "output_bytes": 201
+    },
+    {
+      "fixture": "real-world/issues/gh-190/insight.html",
+      "group": "clean_medium",
+      "bytes": 12340,
+      "ms_best": 0.23554418604651164,
+      "mb_per_s": 49.962350003108526,
+      "output_bytes": 828
+    },
+    {
+      "fixture": "real-world/issues/gh-190/plusblog.html",
+      "group": "clean_medium",
+      "bytes": 29182,
+      "ms_best": 0.7028548387096775,
+      "mb_per_s": 39.59583454310222,
+      "output_bytes": 6990
+    },
+    {
+      "fixture": "real-world/issues/gh-190/rbloggers.html",
+      "group": "fallthrough_bare_lt",
+      "bytes": 47306,
+      "ms_best": 0.0,
+      "mb_per_s": 0.0,
+      "output_bytes": 0
+    },
+    {
+      "fixture": "real-world/issues/gh-190/ozonekorea.html",
+      "group": "clean_medium",
+      "bytes": 67037,
+      "ms_best": 1.2933684210526317,
+      "mb_per_s": 49.43020419262593,
+      "output_bytes": 30608
+    },
+    {
+      "fixture": "real-world/issues/gh-190/firsteigen.html",
+      "group": "clean_medium",
+      "bytes": 69635,
+      "ms_best": 2.6003809523809522,
+      "mb_per_s": 25.53822391374769,
+      "output_bytes": 23405
+    },
+    {
+      "fixture": "real-world/issues/gh-190/sjsu.html",
+      "group": "clean_medium",
+      "bytes": 134697,
+      "ms_best": 0.5129285714285714,
+      "mb_per_s": 250.43851435142977,
+      "output_bytes": 134697
+    },
+    {
+      "fixture": "real-world/issues/gh-190/kimbrain.html",
+      "group": "clean_medium",
+      "bytes": 163213,
+      "ms_best": 0.0,
+      "mb_per_s": 0.0,
+      "output_bytes": 0
+    },
+    {
+      "fixture": "real-world/issues/gh-121-hacker-news.html",
+      "group": "clean_medium",
+      "bytes": 56676,
+      "ms_best": 2.0283214285714286,
+      "mb_per_s": 26.64786990625495,
+      "output_bytes": 11912
+    },
+    {
+      "fixture": "real-world/issues/gh-127-issue.html",
+      "group": "fallthrough_custom_elements",
+      "bytes": 650928,
+      "ms_best": 11.9515,
+      "mb_per_s": 51.941037980980425,
+      "output_bytes": 599231
+    },
+    {
+      "fixture": "synthetic/optional_li.html",
+      "group": "spec_rules",
+      "bytes": 25,
+      "ms_best": 0.0022486000000000003,
+      "mb_per_s": 10.602978702373141,
+      "output_bytes": 16
+    },
+    {
+      "fixture": "synthetic/table_no_tbody.html",
+      "group": "spec_rules",
+      "bytes": 46,
+      "ms_best": 0.002649059481443823,
+      "mb_per_s": 16.560224057625717,
+      "output_bytes": 17
+    },
+    {
+      "fixture": "synthetic/bare_fragment.html",
+      "group": "adversarial",
+      "bytes": 19,
+      "ms_best": 0.0006446367768161159,
+      "mb_per_s": 28.10856076380431,
+      "output_bytes": 12
+    },
+    {
+      "fixture": "synthetic/unescaped_lt.html",
+      "group": "adversarial",
+      "bytes": 27,
+      "ms_best": 0.0009111002222494444,
+      "mb_per_s": 28.261662014960013,
+      "output_bytes": 20
+    },
+    {
+      "fixture": "synthetic/unclosed_p.html",
+      "group": "adversarial",
+      "bytes": 21,
+      "ms_best": 0.0013968313292167696,
+      "mb_per_s": 14.337565478117437,
+      "output_bytes": 16
+    },
+    {
+      "fixture": "synthetic/unclosed_at_eof.html",
+      "group": "adversarial",
+      "bytes": 18,
+      "ms_best": 0.0009682764969887606,
+      "mb_per_s": 17.72854938511614,
+      "output_bytes": 16
+    },
+    {
+      "fixture": "synthetic/cdata_in_svg.html",
+      "group": "adversarial",
+      "bytes": 47,
+      "ms_best": 0.0014627107457850844,
+      "mb_per_s": 30.643579395484615,
+      "output_bytes": 125
+    }
+  ]
+}

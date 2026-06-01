@@ -66,6 +66,7 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
         infer_dimensions: true,
         max_depth: cli.max_depth,
         exclude_selectors: Vec::new(),
+        tier_strategy: defaults.tier_strategy,
         visitor: None,
     }
 }

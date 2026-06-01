@@ -1,0 +1,1710 @@
+[Jump to content](#bodyContent)
+
+Main menu
+
+Main menu
+
+move to sidebar
+
+hide
+
+Navigation
+
+- [Main page](/wiki/Main_Page "Visit the main page [z]")
+- [Contents](/wiki/Wikipedia:Contents "Guides to browsing Wikipedia")
+- [Current events](/wiki/Portal:Current_events "Articles related to current events")
+- [Random article](/wiki/Special:Random "Visit a randomly selected article [x]")
+- [About Wikipedia](/wiki/Wikipedia:About "Learn about Wikipedia and how it works")
+- [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us "How to contact Wikipedia")
+
+Contribute
+
+- [Help](/wiki/Help:Contents "Guidance on how to use and edit Wikipedia")
+- [Learn to edit](/wiki/Help:Introduction "Learn how to edit Wikipedia")
+- [Community portal](/wiki/Wikipedia:Community_portal "The hub for editors")
+- [Recent changes](/wiki/Special:RecentChanges "A list of recent changes to Wikipedia [r]")
+- [Upload file](/wiki/Wikipedia:File_upload_wizard "Add images or other media for use on Wikipedia")
+- [Special pages](/wiki/Special:SpecialPages)
+
+[![](/static/images/icons/wikipedia.png)![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)![The Free Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)](/wiki/Main_Page)
+
+[Search](/wiki/Special:Search "Search Wikipedia [f]")
+
+Search
+
+Appearance
+
+- [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
+- [Create account](/w/index.php?title=Special:CreateAccount&returnto=Rust+%28programming+language%29 "You are encouraged to create an account and log in; however, it is not mandatory")
+- [Log in](/w/index.php?title=Special:UserLogin&returnto=Rust+%28programming+language%29 "You're encouraged to log in; however, it's not mandatory. [o]")
+
+Personal tools
+
+- [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
+- [Create account](/w/index.php?title=Special:CreateAccount&returnto=Rust+%28programming+language%29 "You are encouraged to create an account and log in; however, it is not mandatory")
+- [Log in](/w/index.php?title=Special:UserLogin&returnto=Rust+%28programming+language%29 "You're encouraged to log in; however, it's not mandatory. [o]")
+
+Pages for logged out editors [learn more](/wiki/Help:Introduction)
+
+- [Contributions](/wiki/Special:MyContributions "A list of edits made from this IP address [y]")
+- [Talk](/wiki/Special:MyTalk "Discussion about edits from this IP address [n]")
+
+## Contents
+
+move to sidebar
+
+hide
+
+- [(Top)](#)
+- [1Etymology](#Etymology)
+- [2History](#History)Toggle History subsection
+
+  - [2.12006–2009: Early years](#2006–2009:_Early_years)
+  - [2.22009–2012: Mozilla sponsorship](#2009–2012:_Mozilla_sponsorship)
+  - [2.32012–2015: Evolution](#2012–2015:_Evolution)
+  - [2.42015–2020: Servo and early adoption](#2015–2020:_Servo_and_early_adoption)
+  - [2.52020–present: Mozilla layoffs and Rust Foundation](#2020–present:_Mozilla_layoffs_and_Rust_Foundation)
+- [3Syntax and features](#Syntax_and_features)Toggle Syntax and features subsection
+
+  - [3.1Hello World program](#Hello_World_program)
+  - [3.2Variables](#Variables)
+  - [3.3Block expressions and control flow](#Block_expressions_and_control_flow)
+    - [3.3.1if expressions](#if_expressions)
+    - [3.3.2while loops](#while_loops)
+    - [3.3.3for loops and iterators](#for_loops_and_iterators)
+    - [3.3.4loop and break statements](#loop_and_break_statements)
+  - [3.4Pattern matching](#Pattern_matching)
+  - [3.5Types](#Types)
+    - [3.5.1Primitive types](#Primitive_types)
+    - [3.5.2Compound types](#Compound_types)
+  - [3.6Ownership and references](#Ownership_and_references)
+    - [3.6.1Lifetimes](#Lifetimes)
+  - [3.7User-defined types](#User-defined_types)
+    - [3.7.1Standard library](#Standard_library)
+  - [3.8Pointers](#Pointers)
+  - [3.9Type conversion](#Type_conversion)
+  - [3.10Polymorphism](#Polymorphism)
+    - [3.10.1Trait objects](#Trait_objects)
+  - [3.11Memory safety](#Memory_safety)
+  - [3.12Memory management](#Memory_management)
+  - [3.13Unsafe](#Unsafe)
+  - [3.14Macros](#Macros)
+    - [3.14.1Declarative macros](#Declarative_macros)
+    - [3.14.2Procedural macros](#Procedural_macros)
+  - [3.15Interface with C and C++](#Interface_with_C_and_C++)
+- [4Ecosystem](#Ecosystem)Toggle Ecosystem subsection
+
+  - [4.1Compiler](#Compiler)
+  - [4.2Cargo](#Cargo)
+  - [4.3Rustfmt](#Rustfmt)
+  - [4.4Clippy](#Clippy)
+  - [4.5Versioning system](#Versioning_system)
+  - [4.6IDE support](#IDE_support)
+- [5Performance](#Performance)
+- [6Adoption](#Adoption)
+- [7In academic research](#In_academic_research)
+- [8Community](#Community)Toggle Community subsection
+
+  - [8.1Rust Foundation](#Rust_Foundation)
+  - [8.2Governance teams](#Governance_teams)
+- [9See also](#See_also)
+- [10Notes](#Notes)
+- [11References](#References)Toggle References subsection
+
+  - [11.1Book sources](#Book_sources)
+  - [11.2Others](#Others)
+- [12External links](#External_links)
+
+Toggle the table of contents
+
+# Rust (programming language)
+
+51 languages
+
+- [Afrikaans](https://af.wikipedia.org/wiki/Rust_(programmeertaal) "Rust (programmeertaal) – Afrikaans")
+- [العربية](https://ar.wikipedia.org/wiki/%D8%B1%D8%B3%D8%AA_(%D9%84%D8%BA%D8%A9_%D8%A8%D8%B1%D9%85%D8%AC%D8%A9) "رست (لغة برمجة) – Arabic")
+- [Azərbaycanca](https://az.wikipedia.org/wiki/Rust_(proqramla%C5%9Fd%C4%B1rma_dili) "Rust (proqramlaşdırma dili) – Azerbaijani")
+- [বাংলা](https://bn.wikipedia.org/wiki/%E0%A6%B0%E0%A6%BE%E0%A6%B8%E0%A7%8D%E0%A6%9F_(%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A7%8B%E0%A6%97%E0%A7%8D%E0%A6%B0%E0%A6%BE%E0%A6%AE%E0%A6%BF%E0%A6%82_%E0%A6%AD%E0%A6%BE%E0%A6%B7%E0%A6%BE) "রাস্ট (প্রোগ্রামিং ভাষা) – Bangla")
+- [閩南語 / Bân-lâm-gí](https://zh-min-nan.wikipedia.org/wiki/Rust_(pian-t%C3%AAng_g%C3%BA-gi%C3%A2n) "Rust (pian-têng gú-giân) – Minnan")
+- [Беларуская](https://be.wikipedia.org/wiki/Rust "Rust – Belarusian")
+- [Català](https://ca.wikipedia.org/wiki/Rust_(llenguatge_de_programaci%C3%B3) "Rust (llenguatge de programació) – Catalan")
+- [Čeština](https://cs.wikipedia.org/wiki/Rust_(programovac%C3%AD_jazyk) "Rust (programovací jazyk) – Czech")
+- [Dansk](https://da.wikipedia.org/wiki/Rust_(programmeringssprog) "Rust (programmeringssprog) – Danish")
+- [Deutsch](https://de.wikipedia.org/wiki/Rust_(Programmiersprache) "Rust (Programmiersprache) – German")
+- [Eesti](https://et.wikipedia.org/wiki/Rust "Rust – Estonian")
+- [Español](https://es.wikipedia.org/wiki/Rust_(lenguaje_de_programaci%C3%B3n) "Rust (lenguaje de programación) – Spanish")
+- [Esperanto](https://eo.wikipedia.org/wiki/Rust_(programlingvo) "Rust (programlingvo) – Esperanto")
+- [Euskara](https://eu.wikipedia.org/wiki/Rust_(programazio-lengoaia) "Rust (programazio-lengoaia) – Basque")
+- [فارسی](https://fa.wikipedia.org/wiki/%D8%B1%D8%A7%D8%B3%D8%AA_(%D8%B2%D8%A8%D8%A7%D9%86_%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D9%86%D9%88%DB%8C%D8%B3%DB%8C) "راست (زبان برنامه‌نویسی) – Persian")
+- [Français](https://fr.wikipedia.org/wiki/Rust_(langage) "Rust (langage) – French")
+- [Galego](https://gl.wikipedia.org/wiki/Rust_(linguaxe_de_programaci%C3%B3n) "Rust (linguaxe de programación) – Galician")
+- [한국어](https://ko.wikipedia.org/wiki/%EB%9F%AC%EC%8A%A4%ED%8A%B8_(%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D_%EC%96%B8%EC%96%B4) "러스트 (프로그래밍 언어) – Korean")
+- [Hrvatski](https://hr.wikipedia.org/wiki/Rust_(programski_jezik) "Rust (programski jezik) – Croatian")
+- [Bahasa Indonesia](https://id.wikipedia.org/wiki/Rust_(bahasa_pemrograman) "Rust (bahasa pemrograman) – Indonesian")
+- [Íslenska](https://is.wikipedia.org/wiki/Rust_(forritunarm%C3%A1l) "Rust (forritunarmál) – Icelandic")
+- [Italiano](https://it.wikipedia.org/wiki/Rust_(linguaggio_di_programmazione) "Rust (linguaggio di programmazione) – Italian")
+- [עברית](https://he.wikipedia.org/wiki/%D7%A8%D7%90%D7%A1%D7%98_(%D7%A9%D7%A4%D7%AA_%D7%AA%D7%9B%D7%A0%D7%95%D7%AA) "ראסט (שפת תכנות) – Hebrew")
+- [Kiswahili](https://sw.wikipedia.org/wiki/Rust_(lugha_ya_kompyuta) "Rust (lugha ya kompyuta) – Swahili")
+- [Latviešu](https://lv.wikipedia.org/wiki/Rust "Rust – Latvian")
+- [Lombard](https://lmo.wikipedia.org/wiki/Rust_(lenguagg_de_programazzion) "Rust (lenguagg de programazzion) – Lombard")
+- [Magyar](https://hu.wikipedia.org/wiki/Rust_(programoz%C3%A1si_nyelv) "Rust (programozási nyelv) – Hungarian")
+- [മലയാളം](https://ml.wikipedia.org/wiki/%E0%B4%B1%E0%B4%B8%E0%B5%8D%E0%B4%B1%E0%B5%8D%E0%B4%B1%E0%B5%8D_(%E0%B4%AA%E0%B5%8D%E0%B4%B0%E0%B5%8B%E0%B4%97%E0%B5%8D%E0%B4%B0%E0%B4%BE%E0%B4%AE%E0%B4%BF%E0%B4%82%E0%B4%97%E0%B5%8D_%E0%B4%AD%E0%B4%BE%E0%B4%B7) "റസ്റ്റ് (പ്രോഗ്രാമിംഗ് ഭാഷ) – Malayalam")
+- [Bahasa Melayu](https://ms.wikipedia.org/wiki/Rust_(bahasa_pengaturcaraan) "Rust (bahasa pengaturcaraan) – Malay")
+- [Nederlands](https://nl.wikipedia.org/wiki/Rust_(programmeertaal) "Rust (programmeertaal) – Dutch")
+- [日本語](https://ja.wikipedia.org/wiki/Rust_(%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E8%A8%80%E8%AA%9E) "Rust (プログラミング言語) – Japanese")
+- [Norsk bokmål](https://no.wikipedia.org/wiki/Rust_(programmeringsspr%C3%A5k) "Rust (programmeringsspråk) – Norwegian Bokmål")
+- [Polski](https://pl.wikipedia.org/wiki/Rust_(j%C4%99zyk_programowania) "Rust (język programowania) – Polish")
+- [Português](https://pt.wikipedia.org/wiki/Rust_(linguagem_de_programa%C3%A7%C3%A3o) "Rust (linguagem de programação) – Portuguese")
+- [Română](https://ro.wikipedia.org/wiki/Rust_(limbaj_de_programare) "Rust (limbaj de programare) – Romanian")
+- [Runa Simi](https://qu.wikipedia.org/wiki/Rust "Rust – Quechua")
+- [Русский](https://ru.wikipedia.org/wiki/Rust_(%D1%8F%D0%B7%D1%8B%D0%BA_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F) "Rust (язык программирования) – Russian")
+- [Shqip](https://sq.wikipedia.org/wiki/Rust_(gjuh%C3%AB_programimi) "Rust (gjuhë programimi) – Albanian")
+- [Simple English](https://simple.wikipedia.org/wiki/Rust_(programming_language) "Rust (programming language) – Simple English")
+- [Slovenčina](https://sk.wikipedia.org/wiki/Rust_(programovac%C3%AD_jazyk) "Rust (programovací jazyk) – Slovak")
+- [Српски / srpski](https://sr.wikipedia.org/wiki/Rust_(%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D1%81%D0%BA%D0%B8_%D1%98%D0%B5%D0%B7%D0%B8%D0%BA) "Rust (програмски језик) – Serbian")
+- [Suomi](https://fi.wikipedia.org/wiki/Rust_(ohjelmointikieli) "Rust (ohjelmointikieli) – Finnish")
+- [Svenska](https://sv.wikipedia.org/wiki/Rust_(programspr%C3%A5k) "Rust (programspråk) – Swedish")
+- [తెలుగు](https://te.wikipedia.org/wiki/%E0%B0%B0%E0%B0%B8%E0%B1%8D%E0%B0%9F%E0%B1%8D_(%E0%B0%AA%E0%B1%8D%E0%B0%B0%E0%B1%8B%E0%B0%97%E0%B1%8D%E0%B0%B0%E0%B0%BE%E0%B0%AE%E0%B0%BF%E0%B0%82%E0%B0%97%E0%B1%8D_%E0%B0%AD%E0%B0%BE%E0%B0%B7) "రస్ట్ (ప్రోగ్రామింగ్ భాష) – Telugu")
+- [ไทย](https://th.wikipedia.org/wiki/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%A3%E0%B8%B1%E0%B8%AA%E0%B8%95%E0%B9%8C "ภาษารัสต์ – Thai")
+- [Türkçe](https://tr.wikipedia.org/wiki/Rust_(programlama_dili) "Rust (programlama dili) – Turkish")
+- [Українська](https://uk.wikipedia.org/wiki/Rust_(%D0%BC%D0%BE%D0%B2%D0%B0_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F) "Rust (мова програмування) – Ukrainian")
+- [Tiếng Việt](https://vi.wikipedia.org/wiki/Rust_(ng%C3%B4n_ng%E1%BB%AF_l%E1%BA%ADp_tr%C3%ACnh) "Rust (ngôn ngữ lập trình) – Vietnamese")
+- [粵語](https://zh-yue.wikipedia.org/wiki/Rust "Rust – Cantonese")
+- [中文](https://zh.wikipedia.org/wiki/Rust_(%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80) "Rust (编程语言) – Chinese")
+- [Kadazandusun](https://dtp.wikipedia.org/wiki/Rust_(boros_tokud) "Rust (boros tokud) – Central Dusun")
+
+
+[Edit links](https://www.wikidata.org/wiki/Special:EntityPage/Q575650#sitelinks-wikipedia "Edit interlanguage links")
+
+- [Article](/wiki/Rust_(programming_language) "View the content page [c]")
+- [Talk](/wiki/Talk:Rust_(programming_language) "Discuss improvements to the content page [t]")
+
+English
+
+- [Read](/wiki/Rust_(programming_language))
+- [Edit](/w/index.php?title=Rust_(programming_language)&action=edit "Edit this page [e]")
+- [View history](/w/index.php?title=Rust_(programming_language)&action=history "Past revisions of this page [h]")
+
+Tools
+
+Tools
+
+move to sidebar
+
+hide
+
+Actions
+
+- [Read](/wiki/Rust_(programming_language))
+- [Edit](/w/index.php?title=Rust_(programming_language)&action=edit "Edit this page [e]")
+- [View history](/w/index.php?title=Rust_(programming_language)&action=history)
+
+General
+
+- [What links here](/wiki/Special:WhatLinksHere/Rust_(programming_language) "List of all English Wikipedia pages containing links to this page [j]")
+- [Related changes](/wiki/Special:RecentChangesLinked/Rust_(programming_language) "Recent changes in pages linked from this page [k]")
+- [Upload file](//en.wikipedia.org/wiki/Wikipedia:File_Upload_Wizard "Upload files [u]")
+- [Permanent link](/w/index.php?title=Rust_(programming_language)&oldid=1314392250 "Permanent link to this revision of this page")
+- [Page information](/w/index.php?title=Rust_(programming_language)&action=info "More information about this page")
+- [Cite this page](/w/index.php?title=Special:CiteThisPage&page=Rust_%28programming_language%29&id=1314392250&wpFormIdentifier=titleform "Information on how to cite this page")
+- [Get shortened URL](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FRust_%28programming_language%29)
+- [Download QR code](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FRust_%28programming_language%29)
+
+Print/export
+
+- [Download as PDF](/w/index.php?title=Special:DownloadAsPdf&page=Rust_%28programming_language%29&action=show-download-screen "Download this page as a PDF file")
+- [Printable version](/w/index.php?title=Rust_(programming_language)&printable=yes "Printable version of this page [p]")
+
+In other projects
+
+- [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Rust_(programming_language))
+- [Wikiversity](https://en.wikiversity.org/wiki/Rust)
+- [Wikidata item](https://www.wikidata.org/wiki/Special:EntityPage/Q575650 "Structured data on this page hosted by Wikidata [g]")
+
+Appearance
+
+move to sidebar
+
+hide
+
+[![This is a good article. Click here for more information.](//upload.wikimedia.org/wikipedia/en/thumb/9/94/Symbol_support_vote.svg/20px-Symbol_support_vote.svg.png)](/wiki/Wikipedia:Good_articles* "This is a good article. Click here for more information.")
+
+From Wikipedia, the free encyclopedia
+
+General-purpose programming language
+
+| Rust | |
+| --- | --- |
+| [![Rust logo; a capital letter R set into a sprocket](//upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Rust_programming_language_black_logo.svg/150px-Rust_programming_language_black_logo.svg.png)](/wiki/File:Rust_programming_language_black_logo.svg) | |
+| [Paradigms](/wiki/Programming_paradigm "Programming paradigm") | [Concurrent](/wiki/Concurrent_computing "Concurrent computing")[functional](/wiki/Functional_programming "Functional programming")[generic](/wiki/Generic_programming "Generic programming")[imperative](/wiki/Imperative_programming "Imperative programming")[structured](/wiki/Structured_programming "Structured programming") |
+| [Developer](/wiki/Software_developer "Software developer") | The Rust Team |
+| First appeared | January 19, 2012; 13 years ago (2012-01-19) |
+|  | |
+| [Stable release](/wiki/Software_release_life_cycle "Software release life cycle") | 1.90.0[[1]](#cite_note-wikidata-625dfa02256b12affe5cdb18bbe05fea7b2cb7a3-v20-1) [![Edit this on Wikidata](//upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/20px-OOjs_UI_icon_edit-ltr-progressive.svg.png)](https://www.wikidata.org/wiki/Q575650?uselang=en#P348 "Edit this on Wikidata")  / September 18, 2025; 13 days ago (September 18, 2025) |
+|  | |
+| [Typing discipline](/wiki/Type_system "Type system") | [Affine](/wiki/Affine_type_system "Affine type system")[inferred](/wiki/Type_inference "Type inference")[nominal](/wiki/Nominal_type_system "Nominal type system")[static](/wiki/Static_typing "Static typing")[strong](/wiki/Strong_and_weak_typing "Strong and weak typing") |
+| Implementation language | [OCaml](/wiki/OCaml "OCaml") (2006–2011)   Rust  (2012–present) |
+| [Platform](/wiki/Computing_platform "Computing platform") | [Cross-platform](/wiki/Cross-platform_software "Cross-platform software")[[note 1]](#cite_note-3) |
+| [OS](/wiki/Operating_system "Operating system") | [Cross-platform](/wiki/Cross-platform_software "Cross-platform software")[[note 2]](#cite_note-4) |
+| [License](/wiki/Software_license "Software license") | [MIT](/wiki/MIT_License "MIT License"),  [Apache 2.0](/wiki/Apache_License "Apache License")[[note 3]](#cite_note-7) |
+| [Filename extensions](/wiki/Filename_extension "Filename extension") | `.rs`, `.rlib` |
+| Website | [rust-lang.org](https://www.rust-lang.org/) |
+| Influenced by | |
+| [Alef](/wiki/Alef_(programming_language) "Alef (programming language)")[BETA](/wiki/BETA_(programming_language) "BETA (programming language)")[CLU](/wiki/CLU_(programming_language) "CLU (programming language)")[C#](/wiki/C_Sharp_(programming_language) "C Sharp (programming language)")[C++](/wiki/C%2B%2B "C++")[Cyclone](/wiki/Cyclone_(programming_language) "Cyclone (programming language)")[Elm](/wiki/Elm_(programming_language) "Elm (programming language)")[Erlang](/wiki/Erlang_(programming_language) "Erlang (programming language)")[Haskell](/wiki/Haskell "Haskell")[Hermes](/wiki/Hermes_(programming_language) "Hermes (programming language)")[Limbo](/wiki/Limbo_(programming_language) "Limbo (programming language)")[Mesa](/wiki/Mesa_(programming_language) "Mesa (programming language)")[Napier](/wiki/Napier88 "Napier88")[Newsqueak](/wiki/Newsqueak "Newsqueak")[NIL](/wiki/Typestate_analysis "Typestate analysis")[[note 4]](#cite_note-10)[OCaml](/wiki/OCaml "OCaml")[Ruby](/wiki/Ruby_(programming_language) "Ruby (programming language)")[Sather](/wiki/Sather "Sather")[Scheme](/wiki/Scheme_(programming_language) "Scheme (programming language)")[Standard ML](/wiki/Standard_ML "Standard ML")[Swift](/wiki/Swift_(programming_language) "Swift (programming language)")[[7]](#cite_note-11)[[8]](#cite_note-influences-12) | |
+| Influenced | |
+| [Idris](/wiki/Idris_(programming_language) "Idris (programming language)")[[9]](#cite_note-13)[Project Verona](/wiki/Project_Verona "Project Verona")[[10]](#cite_note-Project_Verona-14)[SPARK](/wiki/SPARK_(programming_language) "SPARK (programming language)")[[11]](#cite_note-Jaloyan-15)[Swift](/wiki/Swift_(programming_language) "Swift (programming language)")[[12]](#cite_note-Lattner-16)[V](/wiki/V_(programming_language) "V (programming language)")[[13]](#cite_note-17)[Zig](/wiki/Zig_(programming_language) "Zig (programming language)")[[14]](#cite_note-18) | |
+
+
+**Rust** is a [general-purpose](/wiki/General-purpose_programming_language "General-purpose programming language")[programming language](/wiki/Programming_language "Programming language"). It is noted for its emphasis on [performance](/wiki/Computer_performance "Computer performance"), [type safety](/wiki/Type_safety "Type safety"), [concurrency](/wiki/Concurrency_(computer_science) "Concurrency (computer science)"), and [memory safety](/wiki/Memory_safety "Memory safety").
+
+Rust supports multiple [programming paradigms](/wiki/Programming_paradigm "Programming paradigm"). It was influenced by ideas from [functional programming](/wiki/Functional_programming "Functional programming"), including [immutability](/wiki/Immutable_object "Immutable object"), [higher-order functions](/wiki/Higher-order_function "Higher-order function"), [algebraic data types](/wiki/Algebraic_data_type "Algebraic data type"), and [pattern matching](/wiki/Pattern_matching "Pattern matching").
+ It also supports [object-oriented programming](/wiki/Object-oriented_programming "Object-oriented programming") via structs, [enums](/wiki/Union_type "Union type"), traits,
+ and methods. Rust is noted for enforcing memory safety (i.e., that all [references](/wiki/Reference_(computer_science) "Reference (computer science)") point to valid memory) without a conventional [garbage collector](/wiki/Garbage_collection_(computer_science) "Garbage collection (computer science)"); instead, memory safety errors and [data races](/wiki/Data_race "Data race") are prevented by the "borrow checker", which tracks the [object lifetime](/wiki/Object_lifetime "Object lifetime") of
+ references [at compile time](/wiki/Compiler "Compiler").
+
+Software developer Graydon Hoare created Rust in 2006 while working at [Mozilla](/wiki/Mozilla "Mozilla") Research, which officially
+ sponsored the project in 2009. The first stable release, Rust 1.0, was published
+ in May 2015. Following a layoff of Mozilla employees in August 2020, four other
+ companies joined Mozilla in sponsoring Rust through the creation of the [Rust Foundation](#Rust_Foundation) in February 2021.
+
+Rust has been adopted by many software projects, especially [web services](/wiki/Web_service "Web service") and [system software](/wiki/System_software "System software"), and
+ is the first language other than [C](/wiki/C_(programming_language) "C (programming language)") and [assembly](/wiki/Assembly_language "Assembly language") to
+ be supported in the development of the [Linux kernel](/wiki/Linux_kernel "Linux kernel"). It has been
+ studied academically and has a growing community of developers.
+
+## Etymology
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=1 "Edit section: Etymology")]
+
+Rust was named for the [group of fungi](/wiki/Rust_(fungus) "Rust (fungus)") that are
+ "over-engineered for survival".[[15]](#cite_note-MITTechReview-19) The Rust logo was developed in 2011 based on a bicycle [chainring](/wiki/Crankset#Chainring "Crankset").[[16]](#cite_note-20)
+
+## History
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=2 "Edit section: History")]
+
+### 2006–2009: Early years
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=3 "Edit section: 2006–2009: Early years")]
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/d/dd/MozillaCaliforniaHeadquarters.JPG/250px-MozillaCaliforniaHeadquarters.JPG)](/wiki/File:MozillaCaliforniaHeadquarters.JPG)
+
+*Mozilla Foundation headquarters, 650 Castro Street in [Mountain View, California](/wiki/Mountain_View,_California "Mountain View, California"), June 2009*
+
+Rust began as a personal project by [Mozilla](/wiki/Mozilla "Mozilla") employee Graydon Hoare in
+ 2006.[[15]](#cite_note-MITTechReview-19) Hoare started the project due to his frustration with a broken elevator in his
+ apartment building.[[15]](#cite_note-MITTechReview-19) During the time period between 2006 and 2009, Rust was not publicized to others
+ at Mozilla and was written in Hoare's free time;[[17]](#cite_note-Klabnik2016ACMHistory-21): 7:50  Hoare began speaking about the language around 2009 after a small group at
+ Mozilla became interested in the project.[[18]](#cite_note-Hoare2010-22) Hoare emphasized prioritizing good ideas from old languages over new
+ development, citing languages including [CLU](/wiki/CLU_(programming_language) "CLU (programming language)") (1974), [BETA](/wiki/BETA_(programming_language) "BETA (programming language)") (1975), [Mesa](/wiki/Mesa_(programming_language) "Mesa (programming language)") (1977), NIL (1983),[[note 5]](#cite_note-23)[Erlang](/wiki/Erlang_(programming_language) "Erlang (programming language)") (1987), [Newsqueak](/wiki/Newsqueak "Newsqueak") (1988), [Napier](/wiki/Napier88 "Napier88") (1988), [Hermes](/wiki/Hermes_(programming_language) "Hermes (programming language)") (1990), [Sather](/wiki/Sather "Sather") (1990), [Alef](/wiki/Alef_(programming_language) "Alef (programming language)") (1992), and [Limbo](/wiki/Limbo_(programming_language) "Limbo (programming language)") (1996) as influences, stating "many older languages [are] better than new ones",
+ and describing the language as "technology from the past come to save the future
+ from itself."[[17]](#cite_note-Klabnik2016ACMHistory-21): 8:17 [[18]](#cite_note-Hoare2010-22) Early Rust developer Manish Goregaokar similarly described Rust as being based
+ on "mostly decades-old research."[[15]](#cite_note-MITTechReview-19)
+
+During the early years, the Rust [compiler](/wiki/Compiler "Compiler") was written in about
+ 38,000 lines of [OCaml](/wiki/OCaml "OCaml").[[17]](#cite_note-Klabnik2016ACMHistory-21): 15:34 [[19]](#cite_note-OCamlCompiler-24) Early Rust contained features such as explicit [object-oriented programming](/wiki/Object-oriented_programming "Object-oriented programming") via an `obj` keyword (later removed),[[17]](#cite_note-Klabnik2016ACMHistory-21): 10:08  and a [typestates](/wiki/Typestate_analysis "Typestate analysis") system that would allow variables of a type to be tracked along with state
+ changes (such as going from uninitialized to initialized, also removed).[[17]](#cite_note-Klabnik2016ACMHistory-21): 13:12
+
+### 2009–2012: Mozilla sponsorship
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=4 "Edit section: 2009–2012: Mozilla sponsorship")]
+
+Mozilla officially sponsored the Rust project in 2009.[[15]](#cite_note-MITTechReview-19)[Brendan Eich](/wiki/Brendan_Eich "Brendan Eich") and other
+ executives, intrigued by the possibility of using Rust for a safe [web browser](/wiki/Web_browser "Web browser")[engine](/wiki/Browser_engine "Browser engine"), placed
+ engineers on the project including Patrick Walton, Niko Matsakis, Felix Klock,
+ and Manish Goregaokar.[[15]](#cite_note-MITTechReview-19) A conference room taken by the project developers was dubbed "the nerd cave,"
+ with a sign placed outside the door.[[15]](#cite_note-MITTechReview-19)
+
+During this time period, work had shifted from the initial OCaml compiler to a [self-hosting compiler](/wiki/Self-hosting_(compilers) "Self-hosting (compilers)"), *i.e.*, written in Rust, based on [LLVM](/wiki/LLVM "LLVM").[[20]](#cite_note-Rust0.1-25)[[note 6]](#cite_note-27) The Rust ownership system was also in place by 2010.[[15]](#cite_note-MITTechReview-19)
+
+The first public release, Rust 0.1, was released on January 20, 2012[[22]](#cite_note-Rust0.1a-28) for Windows, Linux, and MacOS.[[23]](#cite_note-ExtremeTechRust0.1-29) The early 2010s saw increasing involvement from open source volunteers outside
+ of Mozilla and outside of the United States. At Mozilla, executives would
+ eventually employ over a dozen engineers to work on Rust full time over the next
+ decade.[[15]](#cite_note-MITTechReview-19)
+
+### 2012–2015: Evolution
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=5 "Edit section: 2012–2015: Evolution")]
+
+The years from 2012 to 2015 were marked by substantial changes to the Rust [type system](/wiki/Type_system "Type system"), including the
+ removal of the typestate system and [garbage collector](/wiki/Garbage_collection_(computer_science) "Garbage collection (computer science)").[[17]](#cite_note-Klabnik2016ACMHistory-21): 18:36 [[15]](#cite_note-MITTechReview-19) Memory management through the ownership system was gradually consolidated and
+ expanded to prevent memory-related bugs. By 2013, the garbage collector feature
+ was rarely used, and was removed by the team in favor of the ownership
+ system.[[15]](#cite_note-MITTechReview-19) Other changes during this time included the removal of [pure functions](/wiki/Pure_function "Pure function"), which
+ were declared by an explicit `pure` annotation, in March 2013.[[24]](#cite_note-30) Specialized syntax support for [channels](/wiki/Channel_(programming) "Channel (programming)") and various pointer types were removed to simplify the language.[[17]](#cite_note-Klabnik2016ACMHistory-21): 22:32
+
+According to Rust developer Steve Klabnik, Rust was influenced during this
+ period by developers coming from [C++](/wiki/C%2B%2B "C++") (e.g., low-level performance of
+ features), [scripting languages](/wiki/Scripting_language "Scripting language") (e.g., Cargo and package management), and [functional programming](/wiki/Functional_programming "Functional programming") (e.g., type systems development).[[17]](#cite_note-Klabnik2016ACMHistory-21): 30:50
+
+Graydon Hoare stepped down from Rust in 2013.[[15]](#cite_note-MITTechReview-19) After Hoare's departure, it evolved organically under a federated governance
+ structure, with a "core team" of initially six people,[[17]](#cite_note-Klabnik2016ACMHistory-21): 21:45  around 30-40 developers total across various other teams,[[17]](#cite_note-Klabnik2016ACMHistory-21): 22:22  and a Request for Comments (RFC) process for new language features added in
+ March 2014.[[17]](#cite_note-Klabnik2016ACMHistory-21): 33:47  The core team would grow to nine people by 2016[[17]](#cite_note-Klabnik2016ACMHistory-21): 21:45  with over 1600 proposed RFCs.[[17]](#cite_note-Klabnik2016ACMHistory-21): 34:08
+
+According to Andrew Binstock writing for *[Dr. Dobb's Journal](/wiki/Dr._Dobb%27s_Journal "Dr. Dobb's Journal")* in January 2014, while Rust was "widely viewed as a remarkably elegant
+ language", adoption slowed because it radically changed from version to
+ version.[[25]](#cite_note-31) Rust development at this time was focused on finalizing the language features
+ and moving towards 1.0 so it could begin promising [backward compatibility](/wiki/Backward_compatibility "Backward compatibility").[[17]](#cite_note-Klabnik2016ACMHistory-21): 41:26
+
+Six years after Mozilla sponsored its development, the first [stable release](/wiki/Stable_release "Stable release"), Rust 1.0, was published on May 15, 2015.[[15]](#cite_note-MITTechReview-19) A year after the release, the Rust compiler had accumulated over 1,400
+ contributors and there were over 5,000 third-party libraries published on the
+ Rust package management website Crates.io.[[17]](#cite_note-Klabnik2016ACMHistory-21): 43:15
+
+### 2015–2020: Servo and early adoption
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=6 "Edit section: 2015–2020: Servo and early adoption")]
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/3/39/Home_page_servo_v0.01.png/250px-Home_page_servo_v0.01.png)](/wiki/File:Home_page_servo_v0.01.png)
+
+*Early homepage of Mozilla's [Servo browser engine](/wiki/Servo_(software) "Servo (software)")*
+
+The development of the [Servo browser engine](/wiki/Servo_(software) "Servo (software)") continued in parallel with Rust, jointly funded by Mozilla and [Samsung](/wiki/Samsung "Samsung").[[26]](#cite_note-32) The teams behind the two projects worked in close collaboration; new features in
+ Rust were tested out by the Servo team, and new features in Servo were used to
+ give feedback back to the Rust team.[[17]](#cite_note-Klabnik2016ACMHistory-21): 5:41  The first version of Servo was released in 2016.[[15]](#cite_note-MITTechReview-19) The [Firefox](/wiki/Firefox "Firefox") web browser shipped with
+ Rust code as of 2016 (version 45),[[17]](#cite_note-Klabnik2016ACMHistory-21): 53:30 [[27]](#cite_note-33) but components of Servo did not appear in Firefox until September 2017 (version
+ 57) as part of the [Gecko](/wiki/Gecko_(software) "Gecko (software)") and [Quantum](/wiki/Gecko_(software)#Quantum "Gecko (software)") projects.[[28]](#cite_note-34)
+
+Improvements were made to the Rust toolchain ecosystem during the years
+ following 1.0 including [Rustfmt](#Rustfmt), [integrated development environment](/wiki/Integrated_development_environment "Integrated development environment") integration,[[17]](#cite_note-Klabnik2016ACMHistory-21): 44:56  and a regular compiler testing and release cycle.[[17]](#cite_note-Klabnik2016ACMHistory-21): 46:48  Rust also gained a community [code of conduct](/wiki/Code_of_conduct "Code of conduct") and
+ an [IRC](/wiki/IRC "IRC") chat for community discussion.[[17]](#cite_note-Klabnik2016ACMHistory-21): 50:36
+
+The earliest known adoption outside of Mozilla was by individual projects at
+ Samsung, [Facebook](/wiki/Facebook "Facebook") (now [Meta Platforms](/wiki/Meta_Platforms "Meta Platforms")), [Dropbox](/wiki/Dropbox "Dropbox"), and Tilde, Inc. (the
+ company behind [ember.js](/wiki/Ember.js "Ember.js")).[[17]](#cite_note-Klabnik2016ACMHistory-21): 55:44 [[15]](#cite_note-MITTechReview-19)[Amazon Web Services](/wiki/Amazon_Web_Services "Amazon Web Services") followed in 2020.[[15]](#cite_note-MITTechReview-19) Engineers acknowledged the risks of adopting a new technology; they cited
+ performance, lack of a garbage collector, safety, and pleasantness of working in
+ the language as reasons for the adoption. Amazon developers cited a finding by
+ Portuguese researchers that Rust code used [less energy](/wiki/Energy_efficiency_in_computing "Energy efficiency in computing") compared to similar code written in [Java](/wiki/Java_(programming_language) "Java (programming language)") and [C++](/wiki/C%2B%2B "C++") (behind only [C](/wiki/C_(programming_language) "C (programming language)")).[[15]](#cite_note-MITTechReview-19)[[29]](#cite_note-2017PortugalEnergyStudy-35)[[note 7]](#cite_note-36)
+
+### 2020–present: Mozilla layoffs and Rust Foundation
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=7 "Edit section: 2020–present: Mozilla layoffs and Rust Foundation")]
+
+In August 2020, Mozilla laid off 250 of its 1,000 employees worldwide, as part
+ of a corporate restructuring caused by the [COVID-19 pandemic](/wiki/COVID-19_pandemic "COVID-19 pandemic").[[30]](#cite_note-37)[[31]](#cite_note-38) The team behind Servo was disbanded. The event raised concerns about the future
+ of Rust.[[32]](#cite_note-39) In the following week, the Rust Core Team acknowledged the severe impact of the
+ layoffs and announced that plans for a Rust foundation were underway. The first
+ goal of the foundation would be to take ownership of all [trademarks](/wiki/Trademark "Trademark") and [domain names](/wiki/Domain_name "Domain name") and to take
+ financial responsibility for their costs.[[33]](#cite_note-40)
+
+On February 8, 2021, the formation of the [Rust Foundation](#Rust_Foundation) was announced by five founding
+ companies: [Amazon Web Services](/wiki/Amazon_Web_Services "Amazon Web Services"), [Google](/wiki/Google "Google"), [Huawei](/wiki/Huawei "Huawei"), [Microsoft](/wiki/Microsoft "Microsoft"), and [Mozilla](/wiki/Mozilla "Mozilla").[[34]](#cite_note-41)[[35]](#cite_note-42) The foundation, led by Shane Miller for its first two years, offered $20,000
+ grants and other support for programmers working on major Rust features.[[15]](#cite_note-MITTechReview-19) In a [blog](/wiki/Blog "Blog") post published on April 6, 2021,
+ Google announced support for Rust within the [Android Open Source Project](/wiki/Android_Open_Source_Project "Android Open Source Project") as an alternative to C/C++.[[36]](#cite_note-43)
+
+On November 22, 2021, the Moderation Team, which was responsible for enforcing
+ the community code of conduct, announced their resignation "in protest of the
+ Core Team placing themselves unaccountable to anyone but themselves".[[37]](#cite_note-moderation-44) In May 2022, the Rust Core Team, other lead programmers, and members of the Rust
+ Foundation board implemented governance reforms in response to the incident.[[38]](#cite_note-45)
+
+The Rust Foundation posted a draft for a new trademark policy on April 6, 2023,
+ which resulted in widespread negative reactions from Rust users and
+ contributors.[[39]](#cite_note-ApologizesTrademarkPolicy-46) The trademark policy included rules for how the Rust logo and name could be
+ used.[[39]](#cite_note-ApologizesTrademarkPolicy-46)
+
+On February 26, 2024, the U.S. [White House](/wiki/White_House "White House")[Office of the National Cyber Director](/wiki/Office_of_the_National_Cyber_Director "Office of the National Cyber Director") released a 19-page press report urging software development to move away from C
+ and C++ to memory-safe languages like C#, Go, Java, Ruby, Swift, and Rust.[[40]](#cite_note-WhiteHouse1-47)[[41]](#cite_note-WhiteHouse2-48)[[42]](#cite_note-WhiteHouseFullReport-49) News coverage of Rust increased in light of the report.[[43]](#cite_note-WhiteHouse3-50)[[44]](#cite_note-WhiteHouse4-51)
+
+## Syntax and features
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=8 "Edit section: Syntax and features")]
+
+Main article: [Rust syntax](/wiki/Rust_syntax "Rust syntax")
+
+Rust's [syntax](/wiki/Syntax_(programming_languages) "Syntax (programming languages)") is similar to that of [C](/wiki/C_(programming_language) "C (programming language)") and C++,[[45]](#cite_note-52)[[46]](#cite_note-:4-53) although many of its features were influenced by [functional programming](/wiki/Functional_programming "Functional programming") languages such as [OCaml](/wiki/OCaml "OCaml").[[47]](#cite_note-FOOTNOTEKlabnikNichols2019263-54) Hoare has described Rust as targeted at frustrated C++ developers and emphasized
+ features such as safety, control of [memory layout](/wiki/Memory_layout "Memory layout"), and [concurrency](/wiki/Concurrency_(computer_science) "Concurrency (computer science)").[[18]](#cite_note-Hoare2010-22) Safety in Rust includes the guarantees of memory safety, type safety, and lack
+ of data races.
+
+### Hello World program
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=9 "Edit section: Hello World program")]
+
+Below is a ["Hello, World!" program](/wiki/%22Hello,_World!%22_program "&quot;Hello, World!&quot; program") in Rust. The `fn` keyword denotes a [function](/wiki/Function_(computer_programming) "Function (computer programming)"), and the `println!`[macro](/wiki/Macro_(computer_science) "Macro (computer science)") (see [§ Macros](#Macros)) prints the message to [standard output](/wiki/Standard_output "Standard output").[[48]](#cite_note-FOOTNOTEKlabnikNichols20195–6-55)[Statements](/wiki/Statement_(computer_science) "Statement (computer science)") in Rust are separated by [semicolons](/wiki/Semicolon#Programming "Semicolon").
+
+    fn main() {
+        println!("Hello, World!");
+    }
+
+### Variables
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=10 "Edit section: Variables")]
+
+[Variables](/wiki/Variable_(computer_science) "Variable (computer science)") in Rust are defined through the `let` keyword.[[49]](#cite_note-FOOTNOTEKlabnikNichols202332-56) The example below assigns a value to the variable with name `foo` of type `i32` and outputs its value.
+
+    fn main() {
+        let foo = 10;
+        println!("The value of foo is {foo}");
+    }
+
+Variables are [immutable](/wiki/Immutable_object "Immutable object") by
+ default, but adding the `mut` keyword allows the variable to be mutated.[[50]](#cite_note-FOOTNOTEKlabnikNichols202332–33-57) The following example uses `//`, which denotes the start of a [comment](/wiki/Comment_(computer_programming) "Comment (computer programming)").[[51]](#cite_note-FOOTNOTEKlabnikNichols202349–50-58)
+
+    fn main() {
+        // This code would not compile without adding "mut".
+        let mut foo = 10;
+        println!("The value of foo is {foo}");
+        foo = 20;
+        println!("The value of foo is {foo}");
+    }
+
+Multiple `let` expressions can define multiple variables with the same name, known as [variable shadowing](/wiki/Variable_shadowing "Variable shadowing"). Variable shadowing allows transforming variables without having to name the
+ variables differently.[[52]](#cite_note-FOOTNOTEKlabnikNichols202334–36-59) The example below declares a new variable with the same name that is double the
+ original value:
+
+    fn main() {
+        let foo = 10;
+        // This will output "The value of foo is 10"
+        println!("The value of foo is {foo}");
+        let foo = foo * 2;
+        // This will output "The value of foo is 20"
+        println!("The value of foo is {foo}");
+    }
+
+Variable shadowing is also possible for values of different types. For example,
+ going from a string to its length:
+
+    fn main() {
+        let letters = "abc";
+        let letters = letters.len();
+    }
+
+### Block expressions and control flow
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=11 "Edit section: Block expressions and control flow")]
+
+A *block expression* is delimited by [curly brackets](/wiki/Bracket#Curly_brackets "Bracket"). When
+ the last expression inside a block does not end with a semicolon, the block
+ evaluates to the value of that trailing expression:[[53]](#cite_note-FOOTNOTEKlabnikNichols20236,_47,_53-60)
+
+    fn main() {
+        let x = {
+            println!("this is inside the block");
+            1 + 2
+        };
+        println!("1 + 2 = {x}");
+    }
+
+Trailing expressions of function bodies are used as the return value:[[54]](#cite_note-FOOTNOTEKlabnikNichols202347–48-61)
+
+    fn add_two(x: i32) -> i32 {
+        x + 2
+    }
+
+#### `if` expressions
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=12 "Edit section: if expressions")]
+
+An `if`[conditional expression](/wiki/Conditional_expression "Conditional expression") executes code based on whether the given value is `true`. `else` can be used for when the value evaluates to `false`, and `else if` can be used for combining multiple expressions.[[55]](#cite_note-FOOTNOTEKlabnikNichols202350–53-62)
+
+    fn main() {
+        let x = 10;
+        if x > 5 {
+            println!("value is greater than five");
+        }
+
+        if x % 7 == 0 {
+            println!("value is divisible by 7");
+        } else if x % 5 == 0 {
+            println!("value is divisible by 5");
+        } else {
+            println!("value is not divisible by 7 or 5");
+        }
+    }
+
+`if` and `else` blocks can evaluate to a value, which can then be assigned to a variable:[[55]](#cite_note-FOOTNOTEKlabnikNichols202350–53-62)
+
+    fn main() {
+        let x = 10;
+        let new_x = if x % 2 == 0 { x / 2 } else { 3 * x + 1 };
+        println!("{new_x}");
+    }
+
+#### `while` loops
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=13 "Edit section: while loops")]
+
+`[while](/wiki/While_loop "While loop")` can be used
+ to repeat a block of code while a condition is met.[[56]](#cite_note-FOOTNOTEKlabnikNichols202356-63)
+
+    fn main() {
+        // Iterate over all integers from 4 to 10
+        let mut value = 4;
+        while value <= 10 {
+             println!("value = {value}");
+             value += 1;
+        }
+    }
+
+#### `for` loops and iterators
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=14 "Edit section: for loops and iterators")]
+
+[For loops](/wiki/For_loop "For loop") in Rust loop over
+ elements of a collection.[[57]](#cite_note-FOOTNOTEKlabnikNichols202357–58-64)`for` expressions work over any [iterator](/wiki/Iterator "Iterator") type.
+
+    fn main() {
+        // Using `for` with range syntax for the same functionality as above
+        // The syntax 4..=10 means the range from 4 to 10, up to and including 10.
+        for value in 4..=10 {
+            println!("value = {value}");
+        }
+    }
+
+In the above code, `4..=10` is a value of type `Range` which implements the `Iterator` trait. The code within the curly braces is applied to each element returned by
+ the iterator.
+
+Iterators can be combined with functions over iterators like `map`, `filter`, and `sum`. For example, the following adds up all numbers between 1 and 100 that are
+ multiples of 3:
+
+    (1..=100).filter(|&x: i8| -> bool { x % 3 == 0 }).sum()
+
+#### `loop` and `break` statements
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=15 "Edit section: loop and break statements")]
+
+More generally, the `loop` keyword allows repeating a portion of code until a `break` occurs. `break` may optionally exit the loop with a value. In the case of nested loops, labels
+ denoted by `'label_name` can be used to break an outer loop rather than the innermost loop.[[58]](#cite_note-FOOTNOTEKlabnikNichols202354–56-65)
+
+    fn main() {
+        let value = 456;
+        let mut x = 1;
+        let y = loop {
+            x *= 10;
+            if x > value {
+                break x / 10;
+            }
+        };
+        println!("largest power of ten that is smaller than or equal to value: {y}");
+
+        let mut up = 1;
+        'outer: loop {
+            let mut down = 120;
+            loop {
+                if up > 100 {
+                    break 'outer;
+                }
+
+                if down < 4 {
+                    break;
+                }
+
+                down /= 2;
+                up += 1;
+                println!("up: {up}, down: {down}");
+            }
+            up *= 2;
+        }
+    }
+
+### Pattern matching
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=16 "Edit section: Pattern matching")]
+
+The `match` and `if let` expressions can be used for [pattern matching](/wiki/Pattern_matching "Pattern matching").
+ For example, `match` can be used to double an optional integer value if present, and return zero
+ otherwise:[[59]](#cite_note-FOOTNOTEKlabnikNichols2019104–109-66)
+
+    fn double(x: Option<u64>) -> u64 {
+        match x {
+            Some(y) => y * 2,
+            None => 0,
+        }
+    }
+
+Equivalently, this can be written with `if let` and `else`:
+
+    fn double(x: Option<u64>) -> u64 {
+        if let Some(y) = x {
+            y * 2
+        } else {
+            0
+        }
+    }
+
+### Types
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=17 "Edit section: Types")]
+
+Rust is [strongly typed](/wiki/Strongly_typed "Strongly typed") and [statically typed](/wiki/Statically_typed "Statically typed"), meaning that the types of all variables must be known at compilation time.
+ Assigning a value of a particular type to a differently typed variable causes a [compilation error](/wiki/Compilation_error "Compilation error"). [Type inference](/wiki/Type_inference "Type inference") is
+ used to determine the type of variables if unspecified.[[60]](#cite_note-FOOTNOTEKlabnikNichols201924-67)
+
+The type `()`, called the "unit type" in Rust, is a concrete type
+ that has exactly one value. It occupies no memory (as it represents the absence
+ of value). All functions that do not have an indicated return type implicitly
+ return `()`. It is similar to `void` in other C-style languages, however `void` denotes the absence of a type and cannot have any value.
+
+The default integer type is `i32`, and the default [floating point](/wiki/Floating_point "Floating point") type is `f64`. If the type of a [literal](/wiki/Literal_(computer_programming) "Literal (computer programming)") number is not explicitly provided, it is either inferred from the context or the
+ default type is used.[[61]](#cite_note-FOOTNOTEKlabnikNichols201936–38-68)
+
+#### Primitive types
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=18 "Edit section: Primitive types")]
+
+[Integer types](/wiki/Integer_type "Integer type") in Rust are named based on the [signedness](/wiki/Signedness "Signedness") and the number of
+ bits the type takes. For example, `i32` is a signed integer that takes 32 bits of storage, whereas `u8` is unsigned and only takes 8 bits of storage. `isize` and `usize` take storage depending on the [memory address bus width](/wiki/Bus_(computing)#Address_bus "Bus (computing)") of the compilation target. For example, when building for [32-bit targets](/wiki/32-bit_computing "32-bit computing"),
+ both types will take up 32 bits of space.[[62]](#cite_note-69)[[63]](#cite_note-70)
+
+By default, integer literals are in base-10, but different [radices](/wiki/Radix "Radix") are supported with prefixes, for
+ example, `0b11` for [binary numbers](/wiki/Binary_number "Binary number"), `0o567` for [octals](/wiki/Octal "Octal"), and `0xDB` for [hexadecimals](/wiki/Hexadecimal "Hexadecimal"). By
+ default, integer literals default to `i32` as its type. Suffixes such as `4u32` can be used to explicitly set the type of a literal.[[64]](#cite_note-FOOTNOTEKlabnikNichols202336–38-71) Byte literals such as `b'X'` are available to represent the [ASCII](/wiki/ASCII "ASCII") value (as a `u8`) of a specific character.[[65]](#cite_note-FOOTNOTEKlabnikNichols2023502-72)
+
+The [Boolean type](/wiki/Boolean_type "Boolean type") is referred to as `bool` which can take a value of either `true` or `false`. A `char` takes up 32 bits of space and represents a Unicode scalar value:[[66]](#cite_note-73) a [Unicode codepoint](/wiki/Unicode_codepoint "Unicode codepoint") that is not a [surrogate](/wiki/Universal_Character_Set_characters#Surrogates "Universal Character Set characters").[[67]](#cite_note-74)[IEEE 754](/wiki/IEEE_754 "IEEE 754") floating point numbers
+ are supported with `f32` for [single precision floats](/wiki/Single_precision_float "Single precision float") and `f64` for [double precision floats](/wiki/Double_precision_float "Double precision float").[[68]](#cite_note-FOOTNOTEKlabnikNichols201938–40-75)
+
+#### Compound types
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=19 "Edit section: Compound types")]
+
+Compound types can contain multiple values. Tuples are fixed-size lists that can
+ contain values whose types can be different. Arrays are fixed-size lists whose
+ values are of the same type. Expressions of the tuple and array types can be
+ written through listing the values, and can be accessed with `.index` or `[index]`:[[69]](#cite_note-FOOTNOTEKlabnikNichols202340–42-76)
+
+    let tuple: (u32, bool) = (3, true);
+    let array: [i8; 5] = [1, 2, 3, 4, 5];
+    let value = tuple.1; // true
+    let value = array[2]; // 3
+
+Arrays can also be constructed through copying a single value a number of
+ times:[[70]](#cite_note-FOOTNOTEKlabnikNichols202342-77)
+
+    let array2: [char; 10] = [' '; 10];
+
+### Ownership and references
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=20 "Edit section: Ownership and references")]
+
+Rust's ownership system consists of rules that ensure memory safety without
+ using a garbage collector. At compile time, each value must be attached to a
+ variable called the *owner* of that value, and every value must have
+ exactly one owner.[[71]](#cite_note-FOOTNOTEKlabnikNichols201959–61-78) Values are moved between different owners through assignment or passing a value
+ as a function parameter. Values can also be *borrowed,* meaning they are
+ temporarily passed to a different function before being returned to the
+ owner.[[72]](#cite_note-FOOTNOTEKlabnikNichols201963–68-79) With these rules, Rust can prevent the creation and use of [dangling pointers](/wiki/Dangling_pointers "Dangling pointers"):[[72]](#cite_note-FOOTNOTEKlabnikNichols201963–68-79)[[73]](#cite_note-FOOTNOTEKlabnikNichols201974–75-80)
+
+    fn print_string(s: String) {
+        println!("{}", s);
+    }
+
+    fn main() {
+        let s = String::from("Hello, World");
+        print_string(s); // s consumed by print_string
+        // s has been moved, so cannot be used any more
+        // another print_string(s); would result in a compile error
+    }
+
+The function `print_string` takes ownership over the `String` value passed in; Alternatively, `&` can be used to indicate a [reference](/wiki/Reference_(computer_science) "Reference (computer science)") type (in `&String`) and to create a reference (in `&s`):[[74]](#cite_note-FOOTNOTEKlabnikNichols202371–72-81)
+
+    fn print_string(s: &String) {
+        println!("{}", s);
+    }
+
+    fn main() {
+        let s = String::from("Hello, World");
+        print_string(&s); // s borrowed by print_string
+        print_string(&s); // s has not been consumed; we can call the function many times
+    }
+
+Because of these ownership rules, Rust types are known as *[linear](/wiki/Linear_types "Linear types")* or *affine* types, meaning each value can be used exactly once. This
+ enforces a form of [software fault isolation](/wiki/Software_fault_isolation "Software fault isolation") as the owner of a value is solely responsible for its correctness and
+ deallocation.[[75]](#cite_note-BeyondSafety-82)
+
+When a value goes out of scope, it is *dropped* by running its [destructor](/wiki/Destructor_(computer_programming) "Destructor (computer programming)"). The destructor may be programmatically defined through implementing the `Drop`[trait](#Traits). This helps manage resources such as file handles,
+ network sockets, and [locks](/wiki/Lock_(computer_science) "Lock (computer science)"), since when objects are dropped, the resources associated with them are closed
+ or released automatically.[[76]](#cite_note-FOOTNOTEKlabnikNichols2023327–30-83)
+
+#### Lifetimes
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=21 "Edit section: Lifetimes")]
+
+[Object lifetime](/wiki/Object_lifetime "Object lifetime") refers to the period of time during which a reference is valid; that is, the
+ time between the object creation and destruction.[[77]](#cite_note-84) These *lifetimes* are implicitly associated with all Rust reference types.
+ While often inferred, they can also be indicated explicitly with named lifetime
+ parameters (often denoted `'a`, `'b`, and so on).[[78]](#cite_note-85)
+
+Lifetimes in Rust can be thought of as [lexically scoped](/wiki/Scope_(computer_science) "Scope (computer science)"), meaning that the duration of an object lifetime is inferred from the set of
+ locations in the source code (i.e., function, line, and column numbers) for
+ which a variable is valid.[[79]](#cite_note-FOOTNOTEKlabnikNichols2019194-86) For example, a reference to a local variable has a lifetime corresponding to the
+ block it is defined in:[[79]](#cite_note-FOOTNOTEKlabnikNichols2019194-86)
+
+    fn main() {
+        let x = 5;                // ------------------+- Lifetime 'a
+                                  //                   |
+        let r = &x;               // -+-- Lifetime 'b  |
+                                  //  |                |
+        println!("r: {}", r);     //  |                |
+                                  //  |                |
+                                  // -+                |
+    }                             // ------------------+
+
+The borrow checker in the Rust compiler then enforces that references are only
+ used in the locations of the source code where the associated lifetime is
+ valid.[[80]](#cite_note-FOOTNOTEKlabnikNichols201975,_134-87)[[81]](#cite_note-88) In the example above, storing a reference to variable `x` in `r` is valid, as variable `x` has a longer lifetime (`'a`) than variable `r` (`'b`). However, when `x` has a shorter lifetime, the borrow checker would reject the program:
+
+    fn main() {
+        let r;                    // ------------------+- Lifetime 'a
+                                  //                   |
+        {                         //                   |
+            let x = 5;            // -+-- Lifetime 'b  |
+            r = &x; // ERROR: x does  |                |
+        }           // not live long -|                |
+                    // enough                          |
+        println!("r: {}", r);     //                   |
+    }                             // ------------------+
+
+Since the lifetime of the referenced variable (`'b`) is shorter than the lifetime of the variable holding the reference (`'a`), the borrow checker errors, preventing `x` from being used from outside its scope.[[82]](#cite_note-FOOTNOTEKlabnikNichols2019194–195-89)
+
+Lifetimes can be indicated using explicit *lifetime parameters* on function
+ arguments. For example, the following code specifies that the reference returned
+ by the function has the same lifetime as `original` (and *not* necessarily the same lifetime as `prefix`):[[83]](#cite_note-FOOTNOTEKlabnikNichols2023208–12-90)
+
+    fn remove_prefix<'a>(mut original: &'a str, prefix: &str) -> &'a str {
+        if original.starts_with(prefix) {
+            original = original[prefix.len()..];
+        }
+        original
+    }
+
+In the compiler, ownership and lifetimes work together to prevent memory safety
+ issues such as dangling pointers.[[84]](#cite_note-FOOTNOTEKlabnikNichols2023[httpsdocrust-langorgbookch04-02-references-and-borrowinghtml_4.2._References_and_Borrowing]-91)[[85]](#cite_note-Pearce-92)
+
+### User-defined types
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=22 "Edit section: User-defined types")]
+
+User-defined types are created with the `struct` or `enum` keywords. The `struct` keyword is used to denote a [record type](/wiki/Record_(computer_science) "Record (computer science)") that groups multiple related values.[[86]](#cite_note-FOOTNOTEKlabnikNichols201983-93)`enum`s can take on different variants at runtime, with its capabilities similar to [algebraic data types](/wiki/Algebraic_data_types "Algebraic data types") found in functional programming languages.[[87]](#cite_note-FOOTNOTEKlabnikNichols201997-94) Both records and enum variants can contain [fields](/wiki/Field_(computer_science) "Field (computer science)") with different types.[[88]](#cite_note-FOOTNOTEKlabnikNichols201998–101-95) Alternative names, or aliases, for the same type can be defined with the `type` keyword.[[89]](#cite_note-FOOTNOTEKlabnikNichols2019438–440-96)
+
+The `impl` keyword can define methods for a user-defined type. Data and functions are
+ defined separately. Implementations fulfill a role similar to that of [classes](/wiki/Class_(computer_programming) "Class (computer programming)") within other languages.[[90]](#cite_note-FOOTNOTEKlabnikNichols201993-97)
+
+#### Standard library
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=23 "Edit section: Standard library")]
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/a/af/Rust_standard_libraries.svg/250px-Rust_standard_libraries.svg.png)](/wiki/File:Rust_standard_libraries.svg)
+
+*A diagram of the dependencies between the standard library modules of Rust.*
+
+The Rust [standard library](/wiki/Standard_library "Standard library") defines and implements many widely used custom data types, including core data
+ structures such as `Vec`, `Option`, and `HashMap`, as well as [smart pointer](/wiki/Smart_pointer "Smart pointer") types.
+ Rust also provides a way to exclude most of the standard library using the
+ attribute `#![no_std]`, for applications such as embedded devices. Internally, the standard library
+ is divided into three parts, `core`, `alloc`, and `std`, where `std` and `alloc` are excluded by `#![no_std]`.[[91]](#cite_note-FOOTNOTEGjengset2021213–215-98)
+
+Rust uses the [option type](/wiki/Option_type "Option type")`Option<T>` to define optional values, which can be matched
+ using `if let` or `match` to access the inner value:[[92]](#cite_note-FOOTNOTEKlabnikNichols2023108–110,_113–114,_116–117-99)
+
+    fn main() {
+        let name1: Option<&str> = None;
+        // In this case, nothing will be printed out
+        if let Some(name) = name1 {
+            println!("{name}");
+        }
+
+        let name2: Option<&str> = Some("Matthew");
+        // In this case, the word "Matthew" will be printed out
+        if let Some(name) = name2 {
+            println!("{name}");
+        }
+    }
+
+Similarly, Rust's [result type](/wiki/Result_type "Result type")`Result<T, E>` holds either a successfully computed value (the `Ok` variant) or an error (the `Err` variant)[[93]](#cite_note-Rust_error_handling-100). Like `Option`, the use of `Result` means that the inner
+ value cannot be used directly; programmers must use a `match` expression, syntactic sugar such as `?` (the “try”
+ operator), or an explicit `unwrap` assertion to access it. Both `Option` and `Result` are used throughout the standard
+ library and are a fundamental part of Rust's explicit approach to handling
+ errors and missing data.
+
+### Pointers
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=24 "Edit section: Pointers")]
+
+The `&` and `&mut` reference types are guaranteed to not be null and point to valid memory.[[94]](#cite_note-FOOTNOTEGjengset2021155-156-101) The raw pointer types `*const` and `*mut` opt out of the safety guarantees, thus they may be null or invalid; however, it
+ is impossible to dereference them unless the code is explicitly declared unsafe
+ through the use of an `unsafe` block.[[95]](#cite_note-FOOTNOTEKlabnikNichols2023421–423-102) Unlike dereferencing, the creation of raw pointers is allowed inside safe Rust
+ code.[[96]](#cite_note-FOOTNOTEKlabnikNichols2019418–427-103)
+
+### Type conversion
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=25 "Edit section: Type conversion")]
+
+This section is an excerpt from [Type conversion § Rust](/wiki/Type_conversion#Rust "Type conversion").[[edit](https://en.wikipedia.org/w/index.php?title=Type_conversion&action=edit)]
+
+Rust provides no implicit type conversion (coercion) between most primitive
+ types. But, explicit type conversion (casting) can be performed using the `as` keyword.[[97]](#cite_note-104)
+
+    let x: i32 = 1000;
+    println!("1000 as a u16 is: {}", x as u16);
+
+[//upload.wikimedia.org/wikipedia/commons/transcoded/5/5c/Rust_101.webm/Rust_101.webm.480p.vp9.webm](//upload.wikimedia.org/wikipedia/commons/transcoded/5/5c/Rust_101.webm/Rust_101.webm.480p.vp9.webm)
+
+*A presentation on Rust by Emily Dunham from [Mozilla](/wiki/Mozilla "Mozilla")'s Rust team ([linux.conf.au](/wiki/Linux.conf.au "Linux.conf.au") conference, Hobart, 2017)*
+
+### Polymorphism
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=26 "Edit section: Polymorphism")]
+
+Rust supports [bounded parametric polymorphism](/wiki/Bounded_parametric_polymorphism "Bounded parametric polymorphism") through [traits](/wiki/Trait_(computer_programming) "Trait (computer programming)") and [generic functions](/wiki/Generic_function "Generic function").[[98]](#cite_note-FOOTNOTEKlabnikNichols2023378-105) Common behavior between types may be declared using traits and `impl`s:[[99]](#cite_note-FOOTNOTEKlabnikNichols2023192–198-106)
+
+    trait Zero: Sized {
+        fn zero() -> Self;
+        fn is_zero(&self) -> bool
+        where
+            Self: PartialEq,
+        {
+            self == &Zero::zero()
+        }
+    }
+
+    impl Zero for u32 {
+        fn zero() -> u32 { 0 }
+    }
+
+    impl Zero for f32 {
+        fn zero() -> Self { 0.0 }
+    }
+
+The example above also includes a method `is_zero` which provides a default implementation that is not required when implementing
+ the trait.[[99]](#cite_note-FOOTNOTEKlabnikNichols2023192–198-106)
+
+A function can then be made generic by adding type parameters inside angle
+ brackets (`<Num>`), which only allow types that implement the trait:
+
+    // zero is a generic function with one type parameter, Num
+    fn zero<Num: Zero>() -> Num {
+        Num::zero()
+    }
+
+    fn main() {
+        let a: u32 = zero();
+        let b: f32 = zero();
+        assert!(a.is_zero() && b.is_zero());
+    }
+
+In the examples above, `Num: Zero` as well as `where Self: PartialEq` are trait bounds that constrain the type to only allow types that implement `Zero` or `PartialEq`.[[99]](#cite_note-FOOTNOTEKlabnikNichols2023192–198-106) Within a trait or impl, `Self` refers to the type that the code is implementing.[[100]](#cite_note-FOOTNOTEKlabnikNichols202398-107)
+
+Generics can be used in functions to allow implementing a behavior for different
+ types without repeating the same code. Generic functions can be written in
+ relation to other generics, without knowing the actual type.[[101]](#cite_note-FOOTNOTEKlabnikNichols2019171–172,_205-108)
+
+#### Trait objects
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=27 "Edit section: Trait objects")]
+
+Generic functions use [static dispatch](/wiki/Static_dispatch "Static dispatch"),
+ meaning that the type of all parameters that end up being used for the function
+ must be known at compile time. Generic functions generate separate copies of the
+ code for each combination of generic parameters used in a process called [monomorphization](/wiki/Monomorphization "Monomorphization").[[102]](#cite_note-FOOTNOTEKlabnikNichols2023191–192-109) Because monomorphization duplicates the code for each type used, it is as
+ performant as writing functions using concrete types,[[102]](#cite_note-FOOTNOTEKlabnikNichols2023191–192-109) but compile time and size of the output binary could be increased.[[103]](#cite_note-FOOTNOTEGjengset202125-110)
+
+However, Rust also uses a feature known as *trait objects* to accomplish [dynamic dispatch](/wiki/Dynamic_dispatch "Dynamic dispatch"),
+ a type of polymorphism where the implementation of a polymorphic operation is
+ chosen at [runtime](/wiki/Runtime_(program_lifecycle_phase) "Runtime (program lifecycle phase)"). This allows for behavior similar to [duck typing](/wiki/Duck_typing "Duck typing"), where all data
+ types that implement a given trait can be treated as functionally
+ equivalent.[[104]](#cite_note-FOOTNOTEKlabnikNichols2023[httpsdocrust-langorgbookch18-02-trait-objectshtml_18.2._Using_Trait_Objects_That_Allow_for_Values_of_Different_Types]-111) Trait objects are declared using the syntax `dyn Tr` where `Tr` is a trait. Trait objects are dynamically sized, therefore they
+ must be put behind a pointer, such as `Box`.[[105]](#cite_note-FOOTNOTEKlabnikNichols2019441–442-112) The following example creates a list of objects where each object can be printed
+ out using the `Display` trait:
+
+    use std::fmt::Display;
+
+    let v: Vec<Box<dyn Display>> = vec![
+        Box::new(3),
+        Box::new(5.0),
+        Box::new("hi"),
+    ];
+
+    for x in v {
+        println!("{x}");
+    }
+
+If an element in the list does not implement the `Display` trait, it
+ will cause a compile-time error.[[106]](#cite_note-FOOTNOTEKlabnikNichols2019379–380-113)
+
+### Memory safety
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=28 "Edit section: Memory safety")]
+
+Rust is designed to be [memory safe](/wiki/Memory_safe "Memory safe"). It does not permit null pointers, [dangling pointers](/wiki/Dangling_pointer "Dangling pointer"),
+ or [data races](/wiki/Data_race "Data race").[[107]](#cite_note-cnet-114)[[108]](#cite_note-lwn-115)[[109]](#cite_note-The_Rustonomicon-116)[[110]](#cite_note-Sensors-117) Data values can be initialized only through a fixed set of forms, all of which
+ require their inputs to be already initialized.[[111]](#cite_note-lang-faq-118)
+
+### Memory management
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=29 "Edit section: Memory management")]
+
+Rust does not use [garbage collection](/wiki/Garbage_collection_(computer_science) "Garbage collection (computer science)"). Memory and other resources are instead managed through the "resource
+ acquisition is initialization" convention,[[112]](#cite_note-119) with optional [reference counting](/wiki/Reference_counting "Reference counting"). Rust provides deterministic management of resources, with very low [overhead](/wiki/Overhead_(computing) "Overhead (computing)").[[113]](#cite_note-120) Values are [allocated on the stack](/wiki/Stack-based_memory_allocation "Stack-based memory allocation") by default, and all [dynamic allocations](/wiki/Dynamic_allocation "Dynamic allocation") must be explicit.[[114]](#cite_note-121)
+
+The built-in reference types using the `&` symbol do not involve
+ run-time reference counting. The safety and validity of the underlying pointers
+ is verified at compile time, preventing [dangling pointers](/wiki/Dangling_pointers "Dangling pointers") and other forms of [undefined behavior](/wiki/Undefined_behavior "Undefined behavior").[[115]](#cite_note-FOOTNOTEKlabnikNichols201970–75-122) Rust's type system separates shared, [immutable](/wiki/Immutable_object "Immutable object") references of the form `&T` from unique, mutable references of
+ the form `&mut T`. A mutable reference can be coerced to an
+ immutable reference, but not vice versa.[[116]](#cite_note-FOOTNOTEKlabnikNichols2019323-123)
+
+### Unsafe
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=30 "Edit section: Unsafe")]
+
+Rust's memory safety checks may be circumvented through the use of `unsafe` blocks. This allows programmers to dereference arbitrary raw pointers, call
+ external code, or perform other low-level functionality not allowed by safe
+ Rust.[[117]](#cite_note-FOOTNOTEKlabnikNichols2023420–429-124) Some low-level functionality enabled in this way includes [volatile memory access](/wiki/Volatile_(computer_programming) "Volatile (computer programming)"), architecture-specific intrinsics, [type punning](/wiki/Type_punning "Type punning"), and inline
+ assembly.[[118]](#cite_note-FOOTNOTEMcNamara2021139,_376–379,_395-125)
+
+Unsafe code is sometimes needed to implement complex data structures.[[119]](#cite_note-UnsafeRustUse-126) A frequently cited example is that it is difficult or impossible to implement [doubly linked lists](/wiki/Doubly_linked_list "Doubly linked list") in safe Rust.[[120]](#cite_note-127)[[121]](#cite_note-128)[[122]](#cite_note-129)[[123]](#cite_note-130)
+
+Programmers using unsafe Rust are considered responsible for upholding Rust's
+ memory and type safety requirements, for example, that no two mutable references
+ exist pointing to the same location.[[124]](#cite_note-IsRustSafely-131) If programmers write code which violates these requirements, this results in [undefined behavior](/wiki/Undefined_behavior "Undefined behavior").[[124]](#cite_note-IsRustSafely-131) The Rust documentation includes a list of behavior considered undefined,
+ including accessing dangling or misaligned pointers, or breaking the aliasing
+ rules for references.[[125]](#cite_note-132)
+
+### Macros
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=31 "Edit section: Macros")]
+
+Macros allow generation and transformation of Rust code to reduce repetition.
+ Macros come in two forms, with *declarative macros* defined through `macro_rules!`, and *procedural macros*, which are defined in
+ separate crates.[[126]](#cite_note-FOOTNOTEKlabnikNichols2023449–455-133)[[127]](#cite_note-FOOTNOTEGjengset2021101–102-134)
+
+#### Declarative macros
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=32 "Edit section: Declarative macros")]
+
+A declarative macro (also called a "macro by example") is a macro, defined using
+ the `macro_rules!` keyword, that uses pattern matching to determine
+ its expansion.[[128]](#cite_note-Rust_Ref._–_Macros_By_Example-135)[[129]](#cite_note-FOOTNOTEKlabnikNichols2019446–448-136) Below is an example that sums over all its arguments:
+
+    macro_rules! sum {
+        ( $initial:expr $(, $expr:expr )* $(,)? ) => {
+            $initial $(+ $expr)*
+        }
+    }
+
+    fn main() {
+        let x = sum!(1, 2, 3);
+        println!("{x}"); // prints 6
+    }
+
+#### Procedural macros
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=33 "Edit section: Procedural macros")]
+
+Procedural macros are Rust functions that run and modify the compiler's input [token](/wiki/Token_(parser) "Token (parser)") stream, before any other components are compiled. They are generally more
+ flexible than declarative macros, but are more difficult to maintain due to
+ their complexity.[[130]](#cite_note-rust-procedural-macros-137)[[131]](#cite_note-FOOTNOTEKlabnikNichols2019449–455-138)
+
+Procedural macros come in three flavors:
+
+- Function-like macros `custom!(...)`
+- Derive macros `#[derive(CustomDerive)]`
+- Attribute macros `#[custom_attribute]`
+
+
+### Interface with C and C++
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=34 "Edit section: Interface with C and C++")]
+
+Rust supports the creation of [foreign function interfaces](/wiki/Foreign_function_interface "Foreign function interface") (FFI) through the `extern` keyword. A function that uses the C [calling convention](/wiki/Calling_convention "Calling convention") can be written using `extern "C" fn`. Symbols can be exported from Rust to other languages through the `#[no_mangle]` attribute, and symbols can be imported into Rust through `extern` blocks:[[note 8]](#cite_note-140)[[133]](#cite_note-FOOTNOTEGjengset2021193–209-141)
+
+    #[no_mangle]
+    pub extern "C" fn exported_from_rust(x: i32) -> i32 { x + 1 }
+    unsafe extern "C" {
+        fn imported_into_rust(x: i32) -> i32;
+    }
+
+The `#[repr(C)]` attribute enables deterministic memory layouts for `struct`s and `enum`s for use across FFI boundaries.[[133]](#cite_note-FOOTNOTEGjengset2021193–209-141) External libraries such as `bindgen` and `cxx` can generate Rust bindings for C/C++.[[133]](#cite_note-FOOTNOTEGjengset2021193–209-141)[[134]](#cite_note-142)
+
+## Ecosystem
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=35 "Edit section: Ecosystem")]
+
+[//upload.wikimedia.org/wikipedia/commons/transcoded/5/52/Cargo_compiling.webm/Cargo_compiling.webm.480p.vp9.webm](//upload.wikimedia.org/wikipedia/commons/transcoded/5/52/Cargo_compiling.webm/Cargo_compiling.webm.480p.vp9.webm)
+
+*Compiling a Rust program with Cargo*
+
+The Rust ecosystem includes its compiler, its [standard library](#Standard_library), and additional components for
+ software development. Component installation is typically managed by `rustup`, a Rust [toolchain](/wiki/Toolchain "Toolchain") installer
+ developed by the Rust project.[[135]](#cite_note-FOOTNOTEBlandyOrendorffTindall20216–8-143)
+
+### Compiler
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=36 "Edit section: Compiler")]
+
+The Rust compiler, `rustc`, compiles Rust code into [binaries](/wiki/Executable "Executable"). First, the compiler
+ parses the source code into an [AST](/wiki/Abstract_syntax_tree "Abstract syntax tree"). Next,
+ this AST is lowered to [IR](/wiki/Intermediate_representation "Intermediate representation"). The compiler backend is then invoked as a subcomponent to apply [optimizations](/wiki/Optimizing_compiler "Optimizing compiler") and translate the resulting IR into [object code](/wiki/Object_code "Object code"). Finally, a [linker](/wiki/Linker_(computing) "Linker (computing)") is used
+ to combine the object(s) into a single executable image.[[136]](#cite_note-144)
+
+rustc uses [LLVM](/wiki/LLVM "LLVM") as its compiler backend by
+ default, but it also supports using alternative backends such as [GCC](/wiki/GNU_Compiler_Collection "GNU Compiler Collection") and [Cranelift](/wiki/Cranelift "Cranelift").[[137]](#cite_note-145) The intention of those alternative backends is to increase platform coverage of
+ Rust or to improve compilation times.[[138]](#cite_note-146)[[139]](#cite_note-147)
+
+### Cargo
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=37 "Edit section: Cargo")]
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/8/88/Crates.io_website.png/250px-Crates.io_website.png)](/wiki/File:Crates.io_website.png)
+
+*Screenshot of crates.io in June 2022*
+
+Cargo is Rust's [build system](/wiki/Build_system_(software_development) "Build system (software development)") and [package manager](/wiki/Package_manager "Package manager").
+ It downloads, compiles, distributes, and uploads packages—called *crates*—that are maintained in an official registry. It also acts as a
+ front-end for Clippy and other Rust components.[[140]](#cite_note-Nature-148)
+
+By default, Cargo sources its dependencies from the user-contributed registry *crates.io*, but [Git](/wiki/Git "Git") repositories,
+ crates in the local filesystem, and other external sources can also be specified
+ as dependencies.[[141]](#cite_note-149)
+
+### Rustfmt
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=38 "Edit section: Rustfmt")]
+
+Rustfmt is a [code formatter](/wiki/Code_formatter "Code formatter") for Rust. It formats whitespace and [indentation](/wiki/Indentation_style "Indentation style") to
+ produce code in accordance with a common [style](/wiki/Programming_style "Programming style"), unless
+ otherwise specified. It can be invoked as a standalone program, or from a Rust
+ project through Cargo.[[142]](#cite_note-FOOTNOTEKlabnikNichols2019511–512-150)
+
+### Clippy
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=39 "Edit section: Clippy")]
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Cargo_clippy_hello_world_example.png/250px-Cargo_clippy_hello_world_example.png)](/wiki/File:Cargo_clippy_hello_world_example.png)
+
+*Example output of Clippy on a hello world Rust program*
+
+Clippy is Rust's built-in [linting](/wiki/Linting "Linting") tool to
+ improve the correctness, performance, and readability of Rust code. As of
+ 2024[[update]](https://en.wikipedia.org/w/index.php?title=Rust_(programming_language)&action=edit), it has more than 700 rules.[[143]](#cite_note-151)[[144]](#cite_note-152)
+
+### Versioning system
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=40 "Edit section: Versioning system")]
+
+Following Rust 1.0, new features are developed in *nightly* versions which
+ are released daily. During each six-week release cycle, changes to nightly
+ versions are released to beta, while changes from the previous beta version are
+ released to a new stable version.[[145]](#cite_note-Rust_Book_G-153)
+
+Every two or three years, a new "edition" is produced. Editions are released to
+ allow making limited [breaking changes](/wiki/Breaking_changes "Breaking changes"), such as promoting `await` to a keyword to support [async/await](/wiki/Async/await "Async/await") features. Crates
+ targeting different editions can interoperate with each other, so a crate can
+ upgrade to a new edition even if its callers or its dependencies still target
+ older editions. Migration to a new edition can be assisted with automated
+ tooling.[[146]](#cite_note-FOOTNOTEBlandyOrendorffTindall2021176–177-154)
+
+### IDE support
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=41 "Edit section: IDE support")]
+
+*rust-analyzer* is a set of [utilities](/wiki/Utility_software "Utility software") that
+ provides [integrated development environments](/wiki/Integrated_development_environment "Integrated development environment") (IDEs) and [text editors](/wiki/Text_editor "Text editor") with
+ information about a Rust project through the [Language Server Protocol](/wiki/Language_Server_Protocol "Language Server Protocol"). This enables features including [autocomplete](/wiki/Autocomplete "Autocomplete"), and [compilation error](/wiki/Compilation_error "Compilation error") display, while editing code.[[147]](#cite_note-FOOTNOTEKlabnikNichols2023623-155)
+
+## Performance
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=42 "Edit section: Performance")]
+
+Since it performs no garbage collection, Rust is often faster than other
+ memory-safe languages.[[148]](#cite_note-156)[[75]](#cite_note-BeyondSafety-82)[[149]](#cite_note-157) Most of Rust's memory safety guarantees impose no runtime overhead,[[150]](#cite_note-FOOTNOTEMcNamara202111-158) with the exception of [array indexing](/wiki/Array_(data_structure) "Array (data structure)") which is checked at runtime by default.[[151]](#cite_note-SaferAtAnySpeed-159) The performance impact of array indexing bounds checks varies, but can be
+ significant in some cases.[[151]](#cite_note-SaferAtAnySpeed-159)
+
+Many of Rust's features are so-called *zero-cost abstractions*, meaning
+ they are optimized away at compile time and incur no runtime penalty.[[152]](#cite_note-FOOTNOTEMcNamara202119,_27-160) The ownership and borrowing system permits [zero-copy](/wiki/Zero-copy "Zero-copy") implementations for
+ some performance-sensitive tasks, such as [parsing](/wiki/Parsing "Parsing").[[153]](#cite_note-161)[Static dispatch](/wiki/Static_dispatch "Static dispatch") is
+ used by default to eliminate [method calls](/wiki/Method_call "Method call"), except for methods called on dynamic trait objects.[[154]](#cite_note-FOOTNOTEMcNamara202120-162) The compiler also uses [inline expansion](/wiki/Inline_expansion "Inline expansion") to eliminate [function calls](/wiki/Function_call "Function call") and statically-dispatched method invocations.[[155]](#cite_note-163)
+
+Since Rust uses [LLVM](/wiki/LLVM "LLVM"), all performance
+ improvements in LLVM apply to Rust also.[[156]](#cite_note-how-fast-is-rust-164) Unlike C and C++, Rust allows the compiler to reorder struct and enum elements
+ unless a `#[repr(C)]` representation attribute is applied.[[157]](#cite_note-165) This allows the compiler to optimize for memory footprint, alignment, and
+ padding, which can be used to produce more efficient code in some cases.[[158]](#cite_note-FOOTNOTEGjengset202122-166)
+
+## Adoption
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=43 "Edit section: Adoption")]
+
+See also: [Category:Rust (programming language) software](/wiki/Category:Rust_(programming_language)_software "Category:Rust (programming language) software")
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Firefox_logo%2C_2019.svg/250px-Firefox_logo%2C_2019.svg.png)](/wiki/File:Firefox_logo,_2019.svg)
+
+*[Firefox](/wiki/Firefox "Firefox") has components written in
+ Rust as part of the underlying [Gecko](/wiki/Gecko_(software) "Gecko (software)") browser
+ engine.*
+
+Rust is used in software across different domains. Components from the Servo
+ browser engine (funded by [Mozilla](/wiki/Mozilla "Mozilla") and [Samsung](/wiki/Samsung "Samsung")) were incorporated in the [Gecko](/wiki/Gecko_(software) "Gecko (software)") browser
+ engine underlying [Firefox](/wiki/Firefox "Firefox").[[159]](#cite_note-167) In January 2023, Google ([Alphabet](/wiki/Alphabet_Inc. "Alphabet Inc.")) announced support for using third party Rust libraries in [Chromium](/wiki/Chromium_(web_browser) "Chromium (web browser)").[[160]](#cite_note-168)[[161]](#cite_note-169)
+
+Rust is used in several [backend](/wiki/Frontend_and_backend "Frontend and backend") software projects of large [web services](/wiki/Web_service "Web service"). [OpenDNS](/wiki/OpenDNS "OpenDNS"), a [DNS](/wiki/Domain_Name_System "Domain Name System") resolution
+ service owned by [Cisco](/wiki/Cisco "Cisco"), uses Rust
+ internally.[[162]](#cite_note-170)[[163]](#cite_note-171)[Amazon Web Services](/wiki/Amazon_Web_Services "Amazon Web Services") uses Rust in "performance-sensitive components" of its several services. In
+ 2019, AWS [open-sourced](/wiki/Open_sourced "Open sourced")[Firecracker](/wiki/Firecracker_(software) "Firecracker (software)"), a virtualization solution primarily written in Rust.[[164]](#cite_note-172)[Microsoft Azure](/wiki/Microsoft_Azure "Microsoft Azure") IoT
+ Edge, a platform used to run Azure services on [IoT](/wiki/Internet_of_things "Internet of things") devices,
+ has components implemented in Rust.[[165]](#cite_note-173) Microsoft also uses Rust to run containerized modules with [WebAssembly](/wiki/WebAssembly "WebAssembly") and [Kubernetes](/wiki/Kubernetes "Kubernetes").[[166]](#cite_note-174)[Cloudflare](/wiki/Cloudflare "Cloudflare"), a company
+ providing [content delivery network](/wiki/Content_delivery_network "Content delivery network") services, used Rust to build a new [web proxy](/wiki/Web_proxy "Web proxy") named Pingora for increased performance and efficiency.[[167]](#cite_note-175) The [npm package manager](/wiki/Npm "Npm") used Rust for its
+ production authentication service in 2019.[[168]](#cite_note-176)[[169]](#cite_note-177)[[170]](#cite_note-178)
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Rust_for_Linux_logo.svg/150px-Rust_for_Linux_logo.svg.png)](/wiki/File:Rust_for_Linux_logo.svg)
+
+*The [Rust for Linux](/wiki/Rust_for_Linux "Rust for Linux") project has been supported in the [Linux kernel](/wiki/Linux_kernel "Linux kernel") since 2022.*
+
+In operating systems, the [Rust for Linux](/wiki/Rust_for_Linux "Rust for Linux") project, launched in 2020, merged initial support into the [Linux kernel](/wiki/Linux_kernel "Linux kernel") version 6.1
+ in late 2022.[[171]](#cite_note-UsenixRustForLinux-179)[[172]](#cite_note-180)[[173]](#cite_note-181) The project is active with a team of 6–7 developers, and has added more Rust
+ code with kernel releases from 2022 to 2024,[[174]](#cite_note-182) aiming to demonstrate the [minimum viability](/wiki/Minimum_viable_product "Minimum viable product") of the project and resolve key compatibility blockers.[[171]](#cite_note-UsenixRustForLinux-179)[[175]](#cite_note-183) The first drivers written in Rust were merged into the kernel for version
+ 6.8.[[171]](#cite_note-UsenixRustForLinux-179) The [Android](/wiki/Android_(operating_system) "Android (operating system)") developers used Rust in 2021 to rewrite existing components.[[176]](#cite_note-184)[[177]](#cite_note-185)[Microsoft](/wiki/Microsoft "Microsoft") has rewritten parts of [Windows](/wiki/Windows "Windows") in
+ Rust.[[178]](#cite_note-186) The r9 project aims to re-implement [Plan 9 from Bell Labs](/wiki/Plan_9_from_Bell_Labs "Plan 9 from Bell Labs") in Rust.[[179]](#cite_note-187) Rust has been used in the development of new operating systems such as [Redox](/wiki/Redox_(operating_system) "Redox (operating system)"), a "Unix-like" operating system and [microkernel](/wiki/Microkernel "Microkernel"),[[180]](#cite_note-188) Theseus, an experimental operating system with modular state management,[[181]](#cite_note-189)[[182]](#cite_note-190) and most of [Fuchsia](/wiki/Fuchsia_(operating_system) "Fuchsia (operating system)").[[183]](#cite_note-rustmag-1-191) Rust is also used for command-line tools and operating system components,
+ including [stratisd](/wiki/Stratis_(configuration_daemon) "Stratis (configuration daemon)"), a [file system](/wiki/File_system "File system") manager[[184]](#cite_note-192)[[185]](#cite_note-193) and COSMIC, a [desktop environment](/wiki/Desktop_environment "Desktop environment") by [System76](/wiki/System76 "System76").[[186]](#cite_note-194)
+
+In web development, [Deno](/wiki/Deno_(software) "Deno (software)"), a secure
+ runtime for [JavaScript](/wiki/JavaScript "JavaScript") and [TypeScript](/wiki/TypeScript "TypeScript"), is built on top of [V8](/wiki/V8_(JavaScript_engine) "V8 (JavaScript engine)") using Rust and Tokio.[[187]](#cite_note-195) Other notable adoptions in this space include [Ruffle](/wiki/Ruffle_(software) "Ruffle (software)"), an
+ open-source [SWF](/wiki/SWF "SWF") emulator,[[188]](#cite_note-196) and [Polkadot](/wiki/Polkadot_(cryptocurrency) "Polkadot (cryptocurrency)"), an open source [blockchain](/wiki/Blockchain "Blockchain") and [cryptocurrency](/wiki/Cryptocurrency "Cryptocurrency") platform.[[189]](#cite_note-197)
+
+[Discord](/wiki/Discord "Discord"), an [instant messaging](/wiki/Instant_messaging "Instant messaging") software company, rewrote parts of its system in Rust for increased performance
+ in 2020. In the same year, Dropbox announced that its [file synchronization](/wiki/File_synchronization "File synchronization") had been rewritten in Rust. [Facebook](/wiki/Facebook "Facebook") ([Meta](/wiki/Meta_Platforms "Meta Platforms")) used Rust to redesign its system that manages source code for internal
+ projects.[[15]](#cite_note-MITTechReview-19)
+
+In the 2025 [Stack Overflow](/wiki/Stack_Overflow "Stack Overflow") Developer Survey, 14.8% of respondents had recently done extensive development
+ in Rust.[[190]](#cite_note-SO-2025-survey-198) The survey named Rust the "most admired programming language" annually from 2016
+ to 2025 (inclusive), as measured by the number of existing developers interested
+ in continuing to work in the language.[[191]](#cite_note-199)[[note 9]](#cite_note-200) In 2025, 29.2% of developers not currently working in Rust expressed an interest
+ in doing so.[[190]](#cite_note-SO-2025-survey-198)
+
+[DARPA](/wiki/DARPA "DARPA") has a project TRACTOR (Translating
+ All C to Rust) automatically translating C to Rust using techniques such as
+ static analysis, dynamic analysis, and large language models.[[192]](#cite_note-201)
+
+## In academic research
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=44 "Edit section: In academic research")]
+
+Rust's safety and performance have been investigated in [programming language theory](/wiki/Programming_language_theory "Programming language theory") research.[[193]](#cite_note-202)[[119]](#cite_note-UnsafeRustUse-126)[[194]](#cite_note-203)
+
+Rust's applicability to writing research software has been examined in other
+ fields. A journal article published to *[Proceedings of the International Astronomical Union](/wiki/Proceedings_of_the_International_Astronomical_Union "Proceedings of the International Astronomical Union")* used Rust to simulate multi-planet systems.[[195]](#cite_note-ResearchSoftware1-204) An article published in *[Nature](/wiki/Nature_(journal) "Nature (journal)")* shared stories of bioinformaticians using Rust.[[140]](#cite_note-Nature-148) Both articles found that Rust has advantages for its performance and safety, and
+ cited the [learning curve](/wiki/Learning_curve "Learning curve") as
+ being a primary drawback to its adoption.
+
+## Community
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=45 "Edit section: Community")]
+
+[![A bright orange crab icon](//upload.wikimedia.org/wikipedia/commons/thumb/2/20/Rustacean-orig-noshadow.svg/250px-Rustacean-orig-noshadow.svg.png)](/wiki/File:Rustacean-orig-noshadow.svg)
+
+*Some Rust users refer to themselves as Rustaceans (similar to the word [crustacean](/wiki/Crustacean "Crustacean")) and have adopted
+ an orange crab, Ferris, as their unofficial mascot.[[196]](#cite_note-FOOTNOTEKlabnikNichols20194-205)[[197]](#cite_note-206)*
+
+According to the *[MIT Technology Review](/wiki/MIT_Technology_Review "MIT Technology Review")*, the Rust community has been seen as "unusually friendly" to newcomers and
+ particularly attracted people from the [queer community](/wiki/Queer_community "Queer community"), partly due to its [code of conduct](/wiki/Code_of_conduct "Code of conduct") which outlined a set of expectations for Rust community members to follow.[[15]](#cite_note-MITTechReview-19) Inclusiveness of the community has been cited as an important factor for some
+ Rust developers.[[140]](#cite_note-Nature-148) Demographic data on the community has been collected and published by the Rust
+ official blog.[[198]](#cite_note-StateOfRustSurvey2024-207)
+
+According to [GitHub](/wiki/GitHub "GitHub")'s *State of the Octoverse* project, the Rust community grew by 50.5% in 2022,
+ making it one of the fastest growing communities,[[199]](#cite_note-208) though not one of the 10 largest communities as of 2024.[[200]](#cite_note-209)
+
+### Rust Foundation
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=46 "Edit section: Rust Foundation")]
+
+*Rust Foundation*
+
+| [![](//upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Rust_Foundation_logo.png/250px-Rust_Foundation_logo.png)](/wiki/File:Rust_Foundation_logo.png) | |
+| --- | --- |
+| Formation | February 8, 2021; 4 years ago (2021-02-08) |
+| Founders | [Amazon Web Services](/wiki/Amazon_Web_Services "Amazon Web Services")[Google](/wiki/Google "Google")[Huawei](/wiki/Huawei "Huawei")[Microsoft](/wiki/Microsoft "Microsoft")[Mozilla Foundation](/wiki/Mozilla_Foundation "Mozilla Foundation") |
+| Type | [Nonprofit organization](/wiki/Nonprofit_organization "Nonprofit organization") |
+| Location | [United States](/wiki/United_States "United States") |
+| [Chairperson](/wiki/Chairperson "Chairperson") | Shane Miller |
+| [Executive Director](/wiki/Executive_Director "Executive Director") | Rebecca Rumbul |
+| Website | [foundation.rust-lang.org](http://foundation.rust-lang.org) |
+
+
+The **Rust Foundation** is a [non-profit](/wiki/Nonprofit_organization "Nonprofit organization")[membership organization](/wiki/Membership_organization "Membership organization") incorporated in [United States](/wiki/United_States "United States"), with the
+ primary purposes of backing the technical project as a [legal entity](/wiki/Legal_entity "Legal entity") and helping to manage the trademark and infrastructure assets.[[201]](#cite_note-210)[[46]](#cite_note-:4-53)
+
+It was established on February 8, 2021, with five founding corporate members
+ (Amazon Web Services, Huawei, Google, Microsoft, and Mozilla).[[202]](#cite_note-211) The foundation's board is chaired by Shane Miller.[[203]](#cite_note-212) Starting in late 2021, its Executive Director and CEO is Rebecca Rumbul.[[204]](#cite_note-213) Prior to this, Ashley Williams was interim executive director.[[46]](#cite_note-:4-53)
+
+### Governance teams
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=47 "Edit section: Governance teams")]
+
+The Rust project is composed of *teams* that are responsible for different
+ subareas of the development. The compiler team develops, manages, and optimizes
+ compiler internals; and the language team designs new language features and
+ helps implement them. The Rust project website lists 6 top-level teams as of
+ July 2024[[update]](https://en.wikipedia.org/w/index.php?title=Rust_(programming_language)&action=edit).[[205]](#cite_note-214) Representatives among teams form the Leadership council, which oversees the Rust
+ project as a whole.[[206]](#cite_note-215)
+
+## See also
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=48 "Edit section: See also")]
+
+[![](//upload.wikimedia.org/wikipedia/commons/thumb/d/df/Wikibooks-logo-en-noslogan.svg/40px-Wikibooks-logo-en-noslogan.svg.png)](/wiki/File:Wikibooks-logo-en-noslogan.svg)
+
+Wikibooks has a book on the topic of: ***[Rust for the Novice Programmer](https://en.wikibooks.org/wiki/Rust_for_the_Novice_Programmer "wikibooks:Rust for the Novice Programmer")***
+
+- [Comparison of programming languages](/wiki/Comparison_of_programming_languages "Comparison of programming languages")
+- [History of programming languages](/wiki/History_of_programming_languages "History of programming languages")
+- [List of programming languages](/wiki/List_of_programming_languages "List of programming languages")
+- [List of programming languages by type](/wiki/List_of_programming_languages_by_type "List of programming languages by type")
+- [List of Rust software and tools](/wiki/List_of_Rust_software_and_tools "List of Rust software and tools")
+
+
+## Notes
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=49 "Edit section: Notes")]
+
+1. **[^](#cite_ref-3)**Including build tools, host tools, and standard library support for [x86-64](/wiki/X86-64 "X86-64"), [ARM](/wiki/ARM_architecture_family "ARM architecture family"), [MIPS](/wiki/MIPS_architecture "MIPS architecture"), [RISC-V](/wiki/RISC-V "RISC-V"), [WebAssembly](/wiki/WebAssembly "WebAssembly"), [i686](/wiki/P6_(microarchitecture) "P6 (microarchitecture)"), [AArch64](/wiki/AArch64 "AArch64"), [PowerPC](/wiki/PowerPC "PowerPC"), and [s390x](/wiki/Linux_on_IBM_Z "Linux on IBM Z").[[2]](#cite_note-CrossPlatform-2)
+2. **[^](#cite_ref-4)**Including [Windows](/wiki/Windows "Windows"), [Linux](/wiki/Linux "Linux"), [macOS](/wiki/MacOS "MacOS"), [FreeBSD](/wiki/FreeBSD "FreeBSD"), [NetBSD](/wiki/NetBSD "NetBSD"), and [Illumos](/wiki/Illumos "Illumos"). Host build tools on [Android](/wiki/Android_(operating_system) "Android (operating system)"), [iOS](/wiki/IOS "IOS"), [Haiku](/wiki/Haiku_(operating_system) "Haiku (operating system)"), [Redox](/wiki/Redox_(operating_system) "Redox (operating system)"), and [Fuchsia](/wiki/Fuchsia_(operating_system) "Fuchsia (operating system)") are not officially shipped; these operating systems are supported as
+ targets.[[2]](#cite_note-CrossPlatform-2)
+3. **[^](#cite_ref-7)**Third-party dependencies, e.g., [LLVM](/wiki/LLVM "LLVM") or [MSVC](/wiki/MSVC "MSVC"), are
+ subject to their own licenses.[[3]](#cite_note-5)[[4]](#cite_note-licenses-6)
+4. **[^](#cite_ref-10)**NIL is cited as an influence for Rust in multiple sources; this likely
+ refers to Network Implementation Language developed by Robert Strom and
+ others at [IBM](/wiki/IBM "IBM"), which pioneered [typestate analysis](/wiki/Typestate_analysis "Typestate analysis"),[[5]](#cite_note-Strom1983-8)[[6]](#cite_note-9) not to be confused with [New Implementation of LISP](/wiki/NIL_(programming_language) "NIL (programming language)").
+5. **[^](#cite_ref-23)**See previous footnote on the referent of NIL.
+6. **[^](#cite_ref-27)**The list of Rust compiler versions (referred to as a bootstrapping
+ chain) has history going back to 2012.[[21]](#cite_note-Nelson2022RustConf-26)
+7. **[^](#cite_ref-36)**Energy compared to C was 3% more for Rust and 34% more for C++; time
+ was 4% more and 56% more, respectively.
+8. **[^](#cite_ref-140)**wrapping `no_mangle` with `unsafe` as well as prefacing the `extern "C"` block with `unsafe` are required in the 2024 edition or later.[[132]](#cite_note-139)
+9. **[^](#cite_ref-200)**That is, among respondents who have done "extensive development work
+ [with Rust] in over the past year" (14.8%), Rust had the largest
+ percentage who also expressed interest to "work in [Rust] over the next
+ year" (72.4%).[[190]](#cite_note-SO-2025-survey-198)
+
+## References
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=50 "Edit section: References")]
+
+### Book sources
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=51 "Edit section: Book sources")]
+
+- *Gjengset, Jon (2021). *Rust for Rustaceans* (1st ed.). No
+ Starch Press. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [9781718501850](/wiki/Special:BookSources/9781718501850 "Special:BookSources/9781718501850"). [OCLC](/wiki/OCLC_(identifier) "OCLC (identifier)") [1277511986](https://search.worldcat.org/oclc/1277511986).*
+- *Klabnik, Steve; Nichols, Carol (2019-08-12). [*The Rust Programming Language (Covers Rust 2018)*](https://books.google.com/books?id=0Vv6DwAAQBAJ). No Starch Press. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-7185-0044-0](/wiki/Special:BookSources/978-1-7185-0044-0 "Special:BookSources/978-1-7185-0044-0").*
+- *Blandy, Jim; Orendorff, Jason; Tindall, Leonora F. S. (2021). *Programming Rust: Fast, Safe Systems Development* (2nd ed.).
+ O'Reilly Media. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4920-5254-8](/wiki/Special:BookSources/978-1-4920-5254-8 "Special:BookSources/978-1-4920-5254-8"). [OCLC](/wiki/OCLC_(identifier) "OCLC (identifier)") [1289839504](https://search.worldcat.org/oclc/1289839504).*
+- *McNamara, Tim (2021). *Rust in Action*. Manning Publications. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-6172-9455-6](/wiki/Special:BookSources/978-1-6172-9455-6 "Special:BookSources/978-1-6172-9455-6"). [OCLC](/wiki/OCLC_(identifier) "OCLC (identifier)") [1153044639](https://search.worldcat.org/oclc/1153044639).*
+- *Klabnik, Steve; Nichols, Carol (2023). *The Rust programming language* (2nd ed.). No Starch Press. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-7185-0310-6](/wiki/Special:BookSources/978-1-7185-0310-6 "Special:BookSources/978-1-7185-0310-6"). [OCLC](/wiki/OCLC_(identifier) "OCLC (identifier)") [1363816350](https://search.worldcat.org/oclc/1363816350).*
+
+### Others
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=52 "Edit section: Others")]
+
+1. **[^](#cite_ref-wikidata-625dfa02256b12affe5cdb18bbe05fea7b2cb7a3-v20_1-0)***["Announcing Rust 1.90.0"](https://blog.rust-lang.org/2025/09/18/Rust-1.90.0/). 2025-09-18. Retrieved 2025-09-18.*
+2. ^ [***a***](#cite_ref-CrossPlatform_2-0)[***b***](#cite_ref-CrossPlatform_2-1)*["Platform Support"](https://doc.rust-lang.org/rustc/platform-support.html). *The rustc book*. [Archived](https://web.archive.org/web/20220630164523/https://doc.rust-lang.org/rustc/platform-support.html) from the original on 2022-06-30. Retrieved 2022-06-27.*
+3. **[^](#cite_ref-5)***["Copyright"](https://github.com/rust-lang/rust/blob/master/COPYRIGHT). *[GitHub](/wiki/GitHub "GitHub")*. The Rust Programming Language. 2022-10-19. [Archived](https://web.archive.org/web/20230722190056/http://github.com/rust-lang/rust/blob/master/COPYRIGHT) from the original on 2023-07-22. Retrieved 2022-10-19.*
+4. **[^](#cite_ref-licenses_6-0)***["Licenses"](https://www.rust-lang.org/policies/licenses). *The Rust Programming Language*. [Archived](https://web.archive.org/web/20250223193908/https://www.rust-lang.org/policies/licenses) from the original on 2025-02-23. Retrieved 2025-03-07.*
+5. **[^](#cite_ref-Strom1983_8-0)***Strom, Robert E. (1983). "Mechanisms for compile-time enforcement of
+ security". *Proceedings of the 10th ACM SIGACT-SIGPLAN symposium on Principles
+ of programming languages - POPL '83*. pp. 276–284. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/567067.567093](https://doi.org/10.1145%2F567067.567093). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [0897910907](/wiki/Special:BookSources/0897910907 "Special:BookSources/0897910907"). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [6630704](https://api.semanticscholar.org/CorpusID:6630704).*
+6. **[^](#cite_ref-9)***Strom, Robert E.; Yemini, Shaula (1986). ["Typestate: A programming language concept for enhancing software reliability"](https://www.cs.cmu.edu/~aldrich/papers/classic/tse12-typestate.pdf)(PDF). *IEEE Transactions on Software Engineering*. **12**. IEEE: 157–171. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1109/tse.1986.6312929](https://doi.org/10.1109%2Ftse.1986.6312929). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [15575346](https://api.semanticscholar.org/CorpusID:15575346).*
+7. **[^](#cite_ref-11)***["Uniqueness Types"](https://blog.rust-lang.org/2016/08/10/Shape-of-errors-to-come.html). *Rust Blog*. [Archived](https://web.archive.org/web/20160915133745/https://blog.rust-lang.org/2016/08/10/Shape-of-errors-to-come.html) from the original on 2016-09-15. Retrieved 2016-10-08. "Those of you familiar with the Elm style may recognize that the
+ updated --explain messages draw heavy
+ inspiration from the Elm approach."*
+8. **[^](#cite_ref-influences_12-0)***["Influences"](https://doc.rust-lang.org/reference/influences.html). *The Rust Reference*. [Archived](https://web.archive.org/web/20231126231034/https://doc.rust-lang.org/reference/influences.html) from the original on 2023-11-26. Retrieved 2023-12-31.*
+9. **[^](#cite_ref-13)***["Uniqueness Types"](http://docs.idris-lang.org/en/latest/reference/uniqueness-types.html). *Idris 1.3.3 documentation*. [Archived](https://web.archive.org/web/20181121072557/http://docs.idris-lang.org/en/latest/reference/uniqueness-types.html) from the original on 2018-11-21. Retrieved 2022-07-14. "They are inspired by ... ownership types and borrowed pointers in
+ the Rust programming language."*
+10. **[^](#cite_ref-Project_Verona_14-0)***Tung, Liam. ["Microsoft opens up Rust-inspired Project Verona programming language on GitHub"](https://www.zdnet.com/article/microsoft-opens-up-rust-inspired-project-verona-programming-language-on-github/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20200117143852/https://www.zdnet.com/article/microsoft-opens-up-rust-inspired-project-verona-programming-language-on-github/) from the original on 2020-01-17. Retrieved 2020-01-17.*
+11. **[^](#cite_ref-Jaloyan_15-0)***Jaloyan, Georges-Axel (2017-10-19). "Safe Pointers in SPARK 2014". [arXiv](/wiki/ArXiv_(identifier) "ArXiv (identifier)"):[1710.07047](https://arxiv.org/abs/1710.07047) [[cs.PL](https://arxiv.org/archive/cs.PL)].*
+12. **[^](#cite_ref-Lattner_16-0)***Lattner, Chris. ["Chris Lattner's Homepage"](http://nondot.org/sabre/). *Nondot*. [Archived](https://web.archive.org/web/20181225175312/http://nondot.org/sabre/) from the original on 2018-12-25. Retrieved 2019-05-14.*
+13. **[^](#cite_ref-17)***["V documentation (Introduction)"](https://github.com/vlang/v/blob/master/doc/docs.md#introduction). *[GitHub](/wiki/GitHub "GitHub")*. The V Programming Language. Retrieved 2023-11-04.*
+14. **[^](#cite_ref-18)***Yegulalp, Serdar (2016-08-29). ["New challenger joins Rust to topple C language"](https://www.infoworld.com/article/3113083/new-challenger-joins-rust-to-upend-c-language.html). *[InfoWorld](/wiki/InfoWorld "InfoWorld")*. [Archived](https://web.archive.org/web/20211125104022/https://www.infoworld.com/article/3113083/new-challenger-joins-rust-to-upend-c-language.html) from the original on 2021-11-25. Retrieved 2022-10-19.*
+15. ^ [***a***](#cite_ref-MITTechReview_19-0)[***b***](#cite_ref-MITTechReview_19-1)[***c***](#cite_ref-MITTechReview_19-2)[***d***](#cite_ref-MITTechReview_19-3)[***e***](#cite_ref-MITTechReview_19-4)[***f***](#cite_ref-MITTechReview_19-5)[***g***](#cite_ref-MITTechReview_19-6)[***h***](#cite_ref-MITTechReview_19-7)[***i***](#cite_ref-MITTechReview_19-8)[***j***](#cite_ref-MITTechReview_19-9)[***k***](#cite_ref-MITTechReview_19-10)[***l***](#cite_ref-MITTechReview_19-11)[***m***](#cite_ref-MITTechReview_19-12)[***n***](#cite_ref-MITTechReview_19-13)[***o***](#cite_ref-MITTechReview_19-14)[***p***](#cite_ref-MITTechReview_19-15)[***q***](#cite_ref-MITTechReview_19-16)[***r***](#cite_ref-MITTechReview_19-17)[***s***](#cite_ref-MITTechReview_19-18)[***t***](#cite_ref-MITTechReview_19-19)*Thompson, Clive (2023-02-14). ["How Rust went from a side project to the world's most-loved programming language"](https://www.technologyreview.com/2023/02/14/1067869/rust-worlds-fastest-growing-programming-language/). *MIT Technology Review*. [Archived](https://web.archive.org/web/20240919102849/https://www.technologyreview.com/2023/02/14/1067869/rust-worlds-fastest-growing-programming-language/) from the original on 2024-09-19. Retrieved 2023-02-23.*
+16. **[^](#cite_ref-20)***["Rust logo"](https://bugzilla.mozilla.org/show_bug.cgi?id=680521). *[Bugzilla](/wiki/Bugzilla "Bugzilla")*. [Archived](https://web.archive.org/web/20240202045212/https://bugzilla.mozilla.org/show_bug.cgi?id=680521) from the original on 2024-02-02. Retrieved 2024-02-02.*
+17. ^ [***a***](#cite_ref-Klabnik2016ACMHistory_21-0)[***b***](#cite_ref-Klabnik2016ACMHistory_21-1)[***c***](#cite_ref-Klabnik2016ACMHistory_21-2)[***d***](#cite_ref-Klabnik2016ACMHistory_21-3)[***e***](#cite_ref-Klabnik2016ACMHistory_21-4)[***f***](#cite_ref-Klabnik2016ACMHistory_21-5)[***g***](#cite_ref-Klabnik2016ACMHistory_21-6)[***h***](#cite_ref-Klabnik2016ACMHistory_21-7)[***i***](#cite_ref-Klabnik2016ACMHistory_21-8)[***j***](#cite_ref-Klabnik2016ACMHistory_21-9)[***k***](#cite_ref-Klabnik2016ACMHistory_21-10)[***l***](#cite_ref-Klabnik2016ACMHistory_21-11)[***m***](#cite_ref-Klabnik2016ACMHistory_21-12)[***n***](#cite_ref-Klabnik2016ACMHistory_21-13)[***o***](#cite_ref-Klabnik2016ACMHistory_21-14)[***p***](#cite_ref-Klabnik2016ACMHistory_21-15)[***q***](#cite_ref-Klabnik2016ACMHistory_21-16)[***r***](#cite_ref-Klabnik2016ACMHistory_21-17)[***s***](#cite_ref-Klabnik2016ACMHistory_21-18)[***t***](#cite_ref-Klabnik2016ACMHistory_21-19)[***u***](#cite_ref-Klabnik2016ACMHistory_21-20)*Klabnik, Steve (2016-06-02). ["The History of Rust"](https://dl.acm.org/doi/10.1145/2959689.2960081). *Applicative 2016*. New York, NY, USA: Association for
+ Computing Machinery. p. 80. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/2959689.2960081](https://doi.org/10.1145%2F2959689.2960081). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4503-4464-7](/wiki/Special:BookSources/978-1-4503-4464-7 "Special:BookSources/978-1-4503-4464-7").*
+18. ^ [***a***](#cite_ref-Hoare2010_22-0)[***b***](#cite_ref-Hoare2010_22-1)[***c***](#cite_ref-Hoare2010_22-2)*Hoare, Graydon (July 2010). [*Project Servo: Technology from the past come to save the future from itself*](https://archive.today/20211226213836/http://venge.net/graydon/talks/intro-talk-2.pdf)(PDF). Mozilla Annual Summit. Archived
+ from [the original](http://venge.net/graydon/talks/intro-talk-2.pdf)(PDF) on 2021-12-26. Retrieved 2024-10-29.*
+19. **[^](#cite_ref-OCamlCompiler_24-0)***Hoare, Graydon (November 2016). ["Rust Prehistory (Archive of the original Rust OCaml compiler source code)"](https://github.com/graydon/rust-prehistory/tree/master). *[GitHub](/wiki/GitHub "GitHub")*. Retrieved 2024-10-29.*
+20. **[^](#cite_ref-Rust0.1_25-0)***["0.1 first supported public release Milestone · rust-lang/rust"](https://github.com/rust-lang/rust/milestone/3?closed=1). *[GitHub](/wiki/GitHub "GitHub")*. Retrieved 2024-10-29.*
+21. **[^](#cite_ref-Nelson2022RustConf_26-0)***Nelson, Jynn (2022-08-05). [*RustConf 2022 - Bootstrapping: The once and future compiler*](https://www.youtube.com/watch?v=oUIjG-y4zaA). Portland, Oregon: Rust Team. Retrieved 2024-10-29 – via YouTube.*
+22. **[^](#cite_ref-Rust0.1a_28-0)***Anderson, Brian (2012-01-24). ["[rust-dev] The Rust compiler 0.1 is unleashed"](https://web.archive.org/web/20120124160628/https://mail.mozilla.org/pipermail/rust-dev/2012-January/001256.html). *rust-dev* (Mailing list). Archived from [the original](https://mail.mozilla.org/pipermail/rust-dev/2012-January/001256.html) on 2012-01-24. Retrieved 2025-01-07.*
+23. **[^](#cite_ref-ExtremeTechRust0.1_29-0)***Anthony, Sebastian (2012-01-24). ["Mozilla releases Rust 0.1, the language that will eventually usurp Firefox's C++"](https://www.extremetech.com/internet/115207-mozilla-releases-rust-0-1-the-language-that-will-eventually-usurp-firefoxs-c). *ExtremeTech*. Retrieved 2025-01-07.*
+24. **[^](#cite_ref-30)***["Purity by pcwalton · Pull Request #5412 · rust-lang/rust"](https://github.com/rust-lang/rust/pull/5412). *[GitHub](/wiki/GitHub "GitHub")*. Retrieved 2024-10-29.*
+25. **[^](#cite_ref-31)***Binstock, Andrew (2014-01-07). ["The Rise And Fall of Languages in 2013"](https://web.archive.org/web/20160807075745/http://www.drdobbs.com/jvm/the-rise-and-fall-of-languages-in-2013/240165192). *[Dr. Dobb's Journal](/wiki/Dr._Dobb%27s_Journal "Dr. Dobb's Journal")*. Archived from [the original](https://www.drdobbs.com/jvm/the-rise-and-fall-of-languages-in-2013/240165192) on 2016-08-07. Retrieved 2022-11-20.*
+26. **[^](#cite_ref-32)***Lardinois, Frederic (2015-04-03). ["Mozilla And Samsung Team Up To Develop Servo, Mozilla's Next-Gen Browser Engine For Multicore Processors"](https://techcrunch.com/2013/04/03/mozilla-and-samsung-collaborate-on-servo-mozillas-next-gen-browser-engine-for-tomorrows-multicore-processors/). *[TechCrunch](/wiki/TechCrunch "TechCrunch")*. [Archived](https://web.archive.org/web/20160910211537/https://techcrunch.com/2013/04/03/mozilla-and-samsung-collaborate-on-servo-mozillas-next-gen-browser-engine-for-tomorrows-multicore-processors/) from the original on 2016-09-10. Retrieved 2017-06-25.*
+27. **[^](#cite_ref-33)***["Firefox 45.0, See All New Features, Updates and Fixes"](https://www.mozilla.org/en-US/firefox/45.0/releasenotes/). *Mozilla*. [Archived](https://web.archive.org/web/20160317215950/https://www.mozilla.org/en-US/firefox/45.0/releasenotes/) from the original on 2016-03-17. Retrieved 2024-10-31.*
+28. **[^](#cite_ref-34)***Lardinois, Frederic (2017-09-29). ["It's time to give Firefox another chance"](https://techcrunch.com/2017/09/29/its-time-to-give-firefox-another-chance/). *[TechCrunch](/wiki/TechCrunch "TechCrunch")*. [Archived](https://web.archive.org/web/20230815025149/https://techcrunch.com/2017/09/29/its-time-to-give-firefox-another-chance/) from the original on 2023-08-15. Retrieved 2023-08-15.*
+29. **[^](#cite_ref-2017PortugalEnergyStudy_35-0)***Pereira, Rui; Couto, Marco; Ribeiro, Francisco; Rua, Rui; Cunha,
+ Jácome; Fernandes, João Paulo; Saraiva, João (2017-10-23). ["Energy efficiency across programming languages: How do energy, time, and memory relate?"](https://dl.acm.org/doi/10.1145/3136014.3136031). [*Proceedings of the 10th ACM SIGPLAN International Conference on Software Language Engineering*](http://repositorio.inesctec.pt/handle/123456789/5492). SLE 2017. New York, NY, USA: Association for Computing Machinery.
+ pp. 256–267. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3136014.3136031](https://doi.org/10.1145%2F3136014.3136031). [hdl](/wiki/Hdl_(identifier) "Hdl (identifier)"):[1822/65359](https://hdl.handle.net/1822%2F65359). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4503-5525-4](/wiki/Special:BookSources/978-1-4503-5525-4 "Special:BookSources/978-1-4503-5525-4").*
+30. **[^](#cite_ref-37)***Cimpanu, Catalin (2020-08-11). ["Mozilla lays off 250 employees while it refocuses on commercial products"](https://www.zdnet.com/article/mozilla-lays-off-250-employees-while-it-refocuses-on-commercial-products/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20220318025804/https://www.zdnet.com/article/mozilla-lays-off-250-employees-while-it-refocuses-on-commercial-products/) from the original on 2022-03-18. Retrieved 2020-12-02.*
+31. **[^](#cite_ref-38)***Cooper, Daniel (2020-08-11). ["Mozilla lays off 250 employees due to the pandemic"](https://www.engadget.com/mozilla-firefox-250-employees-layoffs-151324924.html). *[Engadget](/wiki/Engadget "Engadget")*. [Archived](https://web.archive.org/web/20201213020220/https://www.engadget.com/mozilla-firefox-250-employees-layoffs-151324924.html) from the original on 2020-12-13. Retrieved 2020-12-02.*
+32. **[^](#cite_ref-39)***Tung, Liam (2020-08-21). ["Programming language Rust: Mozilla job cuts have hit us badly but here's how we'll survive"](https://www.zdnet.com/article/programming-language-rust-mozilla-job-cuts-have-hit-us-badly-but-heres-how-well-survive/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20220421083509/https://www.zdnet.com/article/programming-language-rust-mozilla-job-cuts-have-hit-us-badly-but-heres-how-well-survive/) from the original on 2022-04-21. Retrieved 2022-04-21.*
+33. **[^](#cite_ref-40)***["Laying the foundation for Rust's future"](https://blog.rust-lang.org/2020/08/18/laying-the-foundation-for-rusts-future.html). *Rust Blog*. 2020-08-18. [Archived](https://web.archive.org/web/20201202022933/https://blog.rust-lang.org/2020/08/18/laying-the-foundation-for-rusts-future.html) from the original on 2020-12-02. Retrieved 2020-12-02.*
+34. **[^](#cite_ref-41)***["Hello World!"](https://foundation.rust-lang.org/news/2021-02-08-hello-world/). *Rust Foundation*. 2020-02-08. [Archived](https://web.archive.org/web/20220419124635/https://foundation.rust-lang.org/news/2021-02-08-hello-world/) from the original on 2022-04-19. Retrieved 2022-06-04.*
+35. **[^](#cite_ref-42)***["Mozilla Welcomes the Rust Foundation"](https://blog.mozilla.org/blog/2021/02/08/mozilla-welcomes-the-rust-foundation). *Mozilla Blog*. 2021-02-09. [Archived](https://web.archive.org/web/20210208212031/https://blog.mozilla.org/blog/2021/02/08/mozilla-welcomes-the-rust-foundation/) from the original on 2021-02-08. Retrieved 2021-02-09.*
+36. **[^](#cite_ref-43)***Amadeo, Ron (2021-04-07). ["Google is now writing low-level Android code in Rust"](https://arstechnica.com/gadgets/2021/04/google-is-now-writing-low-level-android-code-in-rust/). *Ars Technica*. [Archived](https://web.archive.org/web/20210408001446/https://arstechnica.com/gadgets/2021/04/google-is-now-writing-low-level-android-code-in-rust/) from the original on 2021-04-08. Retrieved 2021-04-08.*
+37. **[^](#cite_ref-moderation_44-0)***Anderson, Tim (2021-11-23). ["Entire Rust moderation team resigns"](https://www.theregister.com/2021/11/23/rust_moderation_team_quits/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20220714093245/https://www.theregister.com/2021/11/23/rust_moderation_team_quits/) from the original on 2022-07-14. Retrieved 2022-08-04.*
+38. **[^](#cite_ref-45)***Levick, Ryan; Bos, Mara. ["Governance Update"](https://blog.rust-lang.org/inside-rust/2022/05/19/governance-update.html). *Inside Rust Blog*. [Archived](https://web.archive.org/web/20221027030926/https://blog.rust-lang.org/inside-rust/2022/05/19/governance-update.html) from the original on 2022-10-27. Retrieved 2022-10-27.*
+39. ^ [***a***](#cite_ref-ApologizesTrademarkPolicy_46-0)[***b***](#cite_ref-ApologizesTrademarkPolicy_46-1)*Claburn, Thomas (2023-04-17). ["Rust Foundation apologizes for trademark policy confusion"](https://www.theregister.com/2023/04/17/rust_foundation_apologizes_trademark_policy/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20230507053637/https://www.theregister.com/2023/04/17/rust_foundation_apologizes_trademark_policy/) from the original on 2023-05-07. Retrieved 2023-05-07.*
+40. **[^](#cite_ref-WhiteHouse1_47-0)***Gross, Grant (2024-02-27). ["White House urges developers to dump C and C++"](https://www.infoworld.com/article/2336216/white-house-urges-developers-to-dump-c-and-c.html). *[InfoWorld](/wiki/InfoWorld "InfoWorld")*. Retrieved 2025-01-26.*
+41. **[^](#cite_ref-WhiteHouse2_48-0)***Warminsky, Joe (2024-02-27). ["After decades of memory-related software bugs, White House calls on industry to act"](https://therecord.media/memory-related-software-bugs-white-house-code-report-oncd). *The Record*. Retrieved 2025-01-26.*
+42. **[^](#cite_ref-WhiteHouseFullReport_49-0)***["Press Release: Future Software Should Be Memory Safe"](https://web.archive.org/web/20250118013136/https://www.whitehouse.gov/oncd/briefing-room/2024/02/26/press-release-technical-report/). [The White House](/wiki/White_House "White House").
+ 2024-02-26. Archived from [the original](https://www.whitehouse.gov/oncd/briefing-room/2024/02/26/press-release-technical-report/) on 2025-01-18. Retrieved 2025-01-26.*
+43. **[^](#cite_ref-WhiteHouse3_50-0)***Jack, Bobby (2024-02-29). ["The White House Wants Memory-Safe Programming, but What Is That?"](https://www.makeuseof.com/memory-safe-programming-white-house-wants/). *MakeUseOf*. Retrieved 2025-01-26.*
+44. **[^](#cite_ref-WhiteHouse4_51-0)***Donovan, Ryan (2024-12-30). ["In Rust we trust? White House Office urges memory safety"](https://stackoverflow.blog/2024/12/30/in-rust-we-trust-white-house-office-urges-memory-safety/). *[The Stack Overflow Blog](/wiki/Stack_Overflow "Stack Overflow")*. Retrieved 2025-01-26.*
+45. **[^](#cite_ref-52)***Proven, Liam (2019-11-27). ["Rebecca Rumbul named new CEO of The Rust Foundation"](https://www.theregister.com/2021/11/19/rust_foundation_ceo/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20220714110957/https://www.theregister.com/2021/11/19/rust_foundation_ceo/) from the original on 2022-07-14. Retrieved 2022-07-14. "Both are curly bracket languages, with C-like syntax that makes
+ them unintimidating for C programmers."*
+46. ^ [***a***](#cite_ref-:4_53-0)[***b***](#cite_ref-:4_53-1)[***c***](#cite_ref-:4_53-2)*Vigliarolo, Brandon (2021-02-10). ["The Rust programming language now has its own independent foundation"](https://web.archive.org/web/20230320172900/https://www.techrepublic.com/article/the-rust-programming-language-now-has-its-own-independent-foundation/). *[TechRepublic](/wiki/TechRepublic "TechRepublic")*. Archived from [the original](https://www.techrepublic.com/article/the-rust-programming-language-now-has-its-own-independent-foundation/) on 2023-03-20. Retrieved 2022-07-14.*
+47. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019263_54-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ p. 263.
+48. **[^](#cite_ref-FOOTNOTEKlabnikNichols20195–6_55-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 5–6.
+49. **[^](#cite_ref-FOOTNOTEKlabnikNichols202332_56-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 32.
+50. **[^](#cite_ref-FOOTNOTEKlabnikNichols202332–33_57-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 32–33.
+51. **[^](#cite_ref-FOOTNOTEKlabnikNichols202349–50_58-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 49–50.
+52. **[^](#cite_ref-FOOTNOTEKlabnikNichols202334–36_59-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 34–36.
+53. **[^](#cite_ref-FOOTNOTEKlabnikNichols20236,_47,_53_60-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 6, 47, 53.
+54. **[^](#cite_ref-FOOTNOTEKlabnikNichols202347–48_61-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 47–48.
+55. ^ [***a***](#cite_ref-FOOTNOTEKlabnikNichols202350–53_62-0)[***b***](#cite_ref-FOOTNOTEKlabnikNichols202350–53_62-1)[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 50–53.
+56. **[^](#cite_ref-FOOTNOTEKlabnikNichols202356_63-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 56.
+57. **[^](#cite_ref-FOOTNOTEKlabnikNichols202357–58_64-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 57–58.
+58. **[^](#cite_ref-FOOTNOTEKlabnikNichols202354–56_65-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 54–56.
+59. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019104–109_66-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 104–109.
+60. **[^](#cite_ref-FOOTNOTEKlabnikNichols201924_67-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 24.
+61. **[^](#cite_ref-FOOTNOTEKlabnikNichols201936–38_68-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 36–38.
+62. **[^](#cite_ref-69)***["isize"](https://doc.rust-lang.org/stable/std/primitive.isize.html). *doc.rust-lang.org*. Retrieved 2025-09-28.*
+63. **[^](#cite_ref-70)***["usize"](https://doc.rust-lang.org/stable/std/primitive.usize.html). *doc.rust-lang.org*. Retrieved 2025-09-28.*
+64. **[^](#cite_ref-FOOTNOTEKlabnikNichols202336–38_71-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 36–38.
+65. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023502_72-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 502.
+66. **[^](#cite_ref-73)***["Primitive Type char"](https://doc.rust-lang.org/std/primitive.char.html). *The Rust Standard Library documentation*. Retrieved 2025-09-07.*
+67. **[^](#cite_ref-74)***["Glossary of Unicode Terms"](https://www.unicode.org/glossary/). *[Unicode Consortium](/wiki/Unicode_Consortium "Unicode Consortium")*. [Archived](https://web.archive.org/web/20180924092749/http://www.unicode.org/glossary/) from the original on 2018-09-24. Retrieved 2024-07-30.*
+68. **[^](#cite_ref-FOOTNOTEKlabnikNichols201938–40_75-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 38–40.
+69. **[^](#cite_ref-FOOTNOTEKlabnikNichols202340–42_76-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 40–42.
+70. **[^](#cite_ref-FOOTNOTEKlabnikNichols202342_77-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 42.
+71. **[^](#cite_ref-FOOTNOTEKlabnikNichols201959–61_78-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 59–61.
+72. ^ [***a***](#cite_ref-FOOTNOTEKlabnikNichols201963–68_79-0)[***b***](#cite_ref-FOOTNOTEKlabnikNichols201963–68_79-1)[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 63–68.
+73. **[^](#cite_ref-FOOTNOTEKlabnikNichols201974–75_80-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 74–75.
+74. **[^](#cite_ref-FOOTNOTEKlabnikNichols202371–72_81-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 71–72.
+75. ^ [***a***](#cite_ref-BeyondSafety_82-0)[***b***](#cite_ref-BeyondSafety_82-1)*Balasubramanian, Abhiram; Baranowski, Marek S.; Burtsev, Anton;
+ Panda, Aurojit; Rakamarić, Zvonimir; Ryzhyk, Leonid (2017-05-07). ["System Programming in Rust"](https://doi.org/10.1145/3102980.3103006). *Proceedings of the 16th Workshop on Hot Topics in Operating
+ Systems*. HotOS '17. New York, NY, US: Association for Computing Machinery.
+ pp. 156–161. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3102980.3103006](https://doi.org/10.1145%2F3102980.3103006). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4503-5068-6](/wiki/Special:BookSources/978-1-4503-5068-6 "Special:BookSources/978-1-4503-5068-6"). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [24100599](https://api.semanticscholar.org/CorpusID:24100599). [Archived](https://web.archive.org/web/20220611034046/https://dl.acm.org/doi/10.1145/3102980.3103006) from the original on 2022-06-11. Retrieved 2022-06-01.*
+76. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023327–30_83-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 327–30.
+77. **[^](#cite_ref-84)***["Lifetimes"](https://doc.rust-lang.org/rust-by-example/scope/lifetime.html). *Rust by Example*. [Archived](https://web.archive.org/web/20241116192422/https://doc.rust-lang.org/rust-by-example/scope/lifetime.html) from the original on 2024-11-16. Retrieved 2024-10-29.*
+78. **[^](#cite_ref-85)***["Explicit annotation"](https://doc.rust-lang.org/rust-by-example/scope/lifetime/explicit.html). *Rust by Example*. Retrieved 2024-10-29.*
+79. ^ [***a***](#cite_ref-FOOTNOTEKlabnikNichols2019194_86-0)[***b***](#cite_ref-FOOTNOTEKlabnikNichols2019194_86-1)[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ p. 194.
+80. **[^](#cite_ref-FOOTNOTEKlabnikNichols201975,_134_87-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 75, 134.
+81. **[^](#cite_ref-88)***Shamrell-Harrington, Nell (2022-04-15). ["The Rust Borrow Checker – a Deep Dive"](https://www.infoq.com/presentations/rust-borrow-checker/). *InfoQ*. [Archived](https://web.archive.org/web/20220625140128/https://www.infoq.com/presentations/rust-borrow-checker/) from the original on 2022-06-25. Retrieved 2022-06-25.*
+82. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019194–195_89-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 194–195.
+83. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023208–12_90-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 208–12.
+84. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023[httpsdocrust-langorgbookch04-02-references-and-borrowinghtml_4.2._References_and_Borrowing]_91-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023), [4.2. References and Borrowing](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html).
+85. **[^](#cite_ref-Pearce_92-0)***Pearce, David (2021-04-17). ["A Lightweight Formalism for Reference Lifetimes and Borrowing in Rust"](https://dl.acm.org/doi/10.1145/3443420). *ACM Transactions on Programming Languages and Systems*. **43**: 1–73. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3443420](https://doi.org/10.1145%2F3443420). [Archived](https://web.archive.org/web/20240415053627/https://dl.acm.org/doi/10.1145/3443420) from the original on 2024-04-15. Retrieved 2024-12-11.*
+86. **[^](#cite_ref-FOOTNOTEKlabnikNichols201983_93-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ p. 83.
+87. **[^](#cite_ref-FOOTNOTEKlabnikNichols201997_94-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ p. 97.
+88. **[^](#cite_ref-FOOTNOTEKlabnikNichols201998–101_95-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 98–101.
+89. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019438–440_96-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 438–440.
+90. **[^](#cite_ref-FOOTNOTEKlabnikNichols201993_97-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 93.
+91. **[^](#cite_ref-FOOTNOTEGjengset2021213–215_98-0)**[Gjengset 2021](#CITEREFGjengset2021),
+ pp. 213–215.
+92. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023108–110,_113–114,_116–117_99-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 108–110, 113–114, 116–117.
+93. **[^](#cite_ref-Rust_error_handling_100-0)***["Rust error handling is perfect actually"](https://bitfieldconsulting.com/posts/rust-errors-option-result). *Bitfield Consulting*. [Archived](https://web.archive.org/web/20250807061432/https://bitfieldconsulting.com/posts/rust-errors-option-result) from the original on 2025-08-07. Retrieved 2025-09-15.*
+94. **[^](#cite_ref-FOOTNOTEGjengset2021155-156_101-0)**[Gjengset 2021](#CITEREFGjengset2021),
+ p. 155-156.
+95. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023421–423_102-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 421–423.
+96. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019418–427_103-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 418–427.
+97. **[^](#cite_ref-104)***["Casting"](https://doc.rust-lang.org/rust-by-example/types/cast.html). *Rust by Example*. Retrieved 2025-04-01.*
+98. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023378_105-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 378.
+99. ^ [***a***](#cite_ref-FOOTNOTEKlabnikNichols2023192–198_106-0)[***b***](#cite_ref-FOOTNOTEKlabnikNichols2023192–198_106-1)[***c***](#cite_ref-FOOTNOTEKlabnikNichols2023192–198_106-2)[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 192–198.
+100. **[^](#cite_ref-FOOTNOTEKlabnikNichols202398_107-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 98.
+101. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019171–172,_205_108-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 171–172, 205.
+102. ^ [***a***](#cite_ref-FOOTNOTEKlabnikNichols2023191–192_109-0)[***b***](#cite_ref-FOOTNOTEKlabnikNichols2023191–192_109-1)[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 191–192.
+103. **[^](#cite_ref-FOOTNOTEGjengset202125_110-0)**[Gjengset 2021](#CITEREFGjengset2021), p. 25.
+104. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023[httpsdocrust-langorgbookch18-02-trait-objectshtml_18.2._Using_Trait_Objects_That_Allow_for_Values_of_Different_Types]_111-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023), [18.2. Using Trait Objects That Allow for Values of Different Types](https://doc.rust-lang.org/book/ch18-02-trait-objects.html).
+105. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019441–442_112-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 441–442.
+106. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019379–380_113-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 379–380.
+107. **[^](#cite_ref-cnet_114-0)***Rosenblatt, Seth (2013-04-03). ["Samsung joins Mozilla's quest for Rust"](http://reviews.cnet.com/8301-3514_7-57577639/samsung-joins-mozillas-quest-for-rust/). [CNET](/wiki/CNET "CNET"). [Archived](https://web.archive.org/web/20130404142333/http://reviews.cnet.com/8301-3514_7-57577639/samsung-joins-mozillas-quest-for-rust/) from the original on 2013-04-04. Retrieved 2013-04-05.*
+108. **[^](#cite_ref-lwn_115-0)***Brown, Neil (2013-04-17). ["A taste of Rust"](https://lwn.net/Articles/547145/). *[LWN.net](/wiki/LWN.net "LWN.net")*. [Archived](https://web.archive.org/web/20130426010754/http://lwn.net/Articles/547145/) from the original on 2013-04-26. Retrieved 2013-04-25.*
+109. **[^](#cite_ref-The_Rustonomicon_116-0)***["Races"](https://doc.rust-lang.org/nomicon/races.html). *The Rustonomicon*. [Archived](https://web.archive.org/web/20170710194643/https://doc.rust-lang.org/nomicon/races.html) from the original on 2017-07-10. Retrieved 2017-07-03.*
+110. **[^](#cite_ref-Sensors_117-0)***Vandervelden, Thibaut; De Smet, Ruben; Deac, Diana; Steenhaut, Kris;
+ Braeken, An (2024-09-07). ["Overview of Embedded Rust Operating Systems and Frameworks"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11398098). *Sensors*. **24** (17): 5818. [Bibcode](/wiki/Bibcode_(identifier) "Bibcode (identifier)"):[2024Senso..24.5818V](https://ui.adsabs.harvard.edu/abs/2024Senso..24.5818V). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.3390/s24175818](https://doi.org/10.3390%2Fs24175818). [PMC](/wiki/PMC_(identifier) "PMC (identifier)") [11398098](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11398098). [PMID](/wiki/PMID_(identifier) "PMID (identifier)") [39275729](https://pubmed.ncbi.nlm.nih.gov/39275729).*
+111. **[^](#cite_ref-lang-faq_118-0)***["The Rust Language FAQ"](https://web.archive.org/web/20150420104147/http://static.rust-lang.org/doc/master/complement-lang-faq.html). The Rust Programming Language. 2015. Archived from [the original](http://static.rust-lang.org/doc/master/complement-lang-faq.html) on 2015-04-20. Retrieved 2017-04-24.*
+112. **[^](#cite_ref-119)***["RAII"](https://doc.rust-lang.org/rust-by-example/scope/raii.html). *Rust by Example*. [Archived](https://web.archive.org/web/20190421131142/https://doc.rust-lang.org/rust-by-example/scope/raii.html) from the original on 2019-04-21. Retrieved 2020-11-22.*
+113. **[^](#cite_ref-120)***["Abstraction without overhead: traits in Rust"](https://blog.rust-lang.org/2015/05/11/traits.html). *Rust Blog*. [Archived](https://web.archive.org/web/20210923101530/https://blog.rust-lang.org/2015/05/11/traits.html) from the original on 2021-09-23. Retrieved 2021-10-19.*
+114. **[^](#cite_ref-121)***["Box, stack and heap"](https://doc.rust-lang.org/stable/rust-by-example/std/box.html). *Rust by Example*. [Archived](https://web.archive.org/web/20220531114141/https://doc.rust-lang.org/stable/rust-by-example/std/box.html) from the original on 2022-05-31. Retrieved 2022-06-13.*
+115. **[^](#cite_ref-FOOTNOTEKlabnikNichols201970–75_122-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 70–75.
+116. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019323_123-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ p. 323.
+117. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023420–429_124-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 420–429.
+118. **[^](#cite_ref-FOOTNOTEMcNamara2021139,_376–379,_395_125-0)**[McNamara 2021](#CITEREFMcNamara2021), p. 139, 376–379,
+ 395.
+119. ^ [***a***](#cite_ref-UnsafeRustUse_126-0)[***b***](#cite_ref-UnsafeRustUse_126-1)*Astrauskas, Vytautas; Matheja, Christoph; Poli, Federico; Müller,
+ Peter; Summers, Alexander J. (2020-11-13). ["How do programmers use unsafe rust?"](https://dl.acm.org/doi/10.1145/3428204). *Proceedings of the ACM on Programming Languages*. **4**: 1–27. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3428204](https://doi.org/10.1145%2F3428204). [hdl](/wiki/Hdl_(identifier) "Hdl (identifier)"):[20.500.11850/465785](https://hdl.handle.net/20.500.11850%2F465785). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2475-1421](https://search.worldcat.org/issn/2475-1421).*
+120. **[^](#cite_ref-127)***Lattuada, Andrea; Hance, Travis; Cho, Chanhee; Brun, Matthias;
+ Subasinghe, Isitha; Zhou, Yi; Howell, Jon; Parno, Bryan; Hawblitzel,
+ Chris (2023-04-06). ["Verus: Verifying Rust Programs using Linear Ghost Types"](https://dl.acm.org/doi/10.1145/3586037). *Proceedings of the ACM on Programming Languages*. **7**:
+ 85:286–85:315. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3586037](https://doi.org/10.1145%2F3586037). [hdl](/wiki/Hdl_(identifier) "Hdl (identifier)"):[20.500.11850/610518](https://hdl.handle.net/20.500.11850%2F610518).*
+121. **[^](#cite_ref-128)***Milano, Mae; Turcotti, Julia; Myers, Andrew C. (2022-06-09). "A
+ flexible type system for fearless concurrency". *Proceedings of the 43rd ACM SIGPLAN International Conference on
+ Programming Language Design and Implementation*. New York, NY, USA: Association for Computing Machinery.
+ pp. 458–473. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3519939.3523443](https://doi.org/10.1145%2F3519939.3523443). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4503-9265-5](/wiki/Special:BookSources/978-1-4503-9265-5 "Special:BookSources/978-1-4503-9265-5").*
+122. **[^](#cite_ref-129)***["Introduction - Learning Rust With Entirely Too Many Linked Lists"](https://rust-unofficial.github.io/too-many-lists/). *rust-unofficial.github.io*. Retrieved 2025-08-06.*
+123. **[^](#cite_ref-130)***Noble, James; Mackay, Julian; Wrigstad, Tobias (2023-10-16). ["Rusty Links in Local Chains✱"](https://doi.org/10.1145/3611096.3611097). *Proceedings of the 24th ACM International Workshop on Formal
+ Techniques for Java-like Programs*. New York, NY, USA: Association for Computing Machinery.
+ pp. 1–3. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3611096.3611097](https://doi.org/10.1145%2F3611096.3611097). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [979-8-4007-0784-1](/wiki/Special:BookSources/979-8-4007-0784-1 "Special:BookSources/979-8-4007-0784-1").*
+124. ^ [***a***](#cite_ref-IsRustSafely_131-0)[***b***](#cite_ref-IsRustSafely_131-1)*Evans, Ana Nora; Campbell, Bradford; Soffa, Mary Lou (2020-10-01). ["Is rust used safely by software developers?"](https://doi.org/10.1145/3377811.3380413). *Proceedings of the ACM/IEEE 42nd International Conference on
+ Software Engineering*. New York, NY, USA: Association for Computing Machinery.
+ pp. 246–257. [arXiv](/wiki/ArXiv_(identifier) "ArXiv (identifier)"):[2007.00752](https://arxiv.org/abs/2007.00752). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3377811.3380413](https://doi.org/10.1145%2F3377811.3380413). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4503-7121-6](/wiki/Special:BookSources/978-1-4503-7121-6 "Special:BookSources/978-1-4503-7121-6").*
+125. **[^](#cite_ref-132)***["Behavior considered undefined"](https://doc.rust-lang.org/reference/behavior-considered-undefined.html). *The Rust Reference*. Retrieved 2025-08-06.*
+126. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023449–455_133-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ pp. 449–455.
+127. **[^](#cite_ref-FOOTNOTEGjengset2021101–102_134-0)**[Gjengset 2021](#CITEREFGjengset2021),
+ pp. 101–102.
+128. **[^](#cite_ref-Rust_Ref._–_Macros_By_Example_135-0)***["Macros By Example"](https://doc.rust-lang.org/reference/macros-by-example.html). *The Rust Reference*. [Archived](https://web.archive.org/web/20230421052332/https://doc.rust-lang.org/reference/macros-by-example.html) from the original on 2023-04-21. Retrieved 2023-04-21.*
+129. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019446–448_136-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 446–448.
+130. **[^](#cite_ref-rust-procedural-macros_137-0)***["Procedural Macros"](https://doc.rust-lang.org/reference/procedural-macros.html). *The Rust Programming Language Reference*. [Archived](https://web.archive.org/web/20201107233444/https://doc.rust-lang.org/reference/procedural-macros.html) from the original on 2020-11-07. Retrieved 2021-03-23.*
+131. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019449–455_138-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 449–455.
+132. **[^](#cite_ref-139)***Baumgartner, Stefan (2025-05-23). ["Programming language: Rust 2024 is the most comprehensive edition to date"](https://www.heise.de/en/background/Programming-language-Rust-2024-is-the-most-comprehensive-edition-to-date-10393917.html). *[heise online](/wiki/Heise_online "Heise online")*. Retrieved 2025-06-28.*
+133. ^ [***a***](#cite_ref-FOOTNOTEGjengset2021193–209_141-0)[***b***](#cite_ref-FOOTNOTEGjengset2021193–209_141-1)[***c***](#cite_ref-FOOTNOTEGjengset2021193–209_141-2)[Gjengset 2021](#CITEREFGjengset2021),
+ pp. 193–209.
+134. **[^](#cite_ref-142)***["Safe Interoperability between Rust and C++ with CXX"](https://www.infoq.com/news/2020/12/cpp-rust-interop-cxx/). *InfoQ*. 2020-12-06. [Archived](https://web.archive.org/web/20210122142035/https://www.infoq.com/news/2020/12/cpp-rust-interop-cxx/) from the original on 2021-01-22. Retrieved 2021-01-03.*
+135. **[^](#cite_ref-FOOTNOTEBlandyOrendorffTindall20216–8_143-0)**[Blandy, Orendorff & Tindall 2021](#CITEREFBlandyOrendorffTindall2021), pp. 6–8.
+136. **[^](#cite_ref-144)***["Overview of the compiler"](https://rustc-dev-guide.rust-lang.org/overview.html). *Rust Compiler Development Guide*. Rust project contributors. [Archived](https://web.archive.org/web/20230531035222/https://rustc-dev-guide.rust-lang.org/overview.html) from the original on 2023-05-31. Retrieved 2024-11-07.*
+137. **[^](#cite_ref-145)***["Code Generation"](https://rustc-dev-guide.rust-lang.org/backend/codegen.html). *Rust Compiler Development Guide*. Rust project
+ contributors. Retrieved 2024-03-03.*
+138. **[^](#cite_ref-146)***["rust-lang/rustc_codegen_gcc"](https://github.com/rust-lang/rustc_codegen_gcc#Motivation). *[GitHub](/wiki/GitHub "GitHub")*. The Rust Programming Language. 2024-03-02. Retrieved 2024-03-03.*
+139. **[^](#cite_ref-147)***["rust-lang/rustc_codegen_cranelift"](https://github.com/rust-lang/rustc_codegen_cranelift). *[GitHub](/wiki/GitHub "GitHub")*. The Rust Programming Language. 2024-03-02. Retrieved 2024-03-03.*
+140. ^ [***a***](#cite_ref-Nature_148-0)[***b***](#cite_ref-Nature_148-1)[***c***](#cite_ref-Nature_148-2)*Perkel, Jeffrey M. (2020-12-01). ["Why scientists are turning to Rust"](https://www.nature.com/articles/d41586-020-03382-2). *[Nature](/wiki/Nature_(journal) "Nature (journal)")*. **588** (7836): 185–186. [Bibcode](/wiki/Bibcode_(identifier) "Bibcode (identifier)"):[2020Natur.588..185P](https://ui.adsabs.harvard.edu/abs/2020Natur.588..185P). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1038/d41586-020-03382-2](https://doi.org/10.1038%2Fd41586-020-03382-2). [PMID](/wiki/PMID_(identifier) "PMID (identifier)") [33262490](https://pubmed.ncbi.nlm.nih.gov/33262490). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [227251258](https://api.semanticscholar.org/CorpusID:227251258). [Archived](https://web.archive.org/web/20220506040523/https://www.nature.com/articles/d41586-020-03382-2) from the original on 2022-05-06. Retrieved 2022-05-15.*
+141. **[^](#cite_ref-149)***Simone, Sergio De (2019-04-18). ["Rust 1.34 Introduces Alternative Registries for Non-Public Crates"](https://www.infoq.com/news/2019/04/rust-1.34-additional-registries). *InfoQ*. [Archived](https://web.archive.org/web/20220714164454/https://www.infoq.com/news/2019/04/rust-1.34-additional-registries) from the original on 2022-07-14. Retrieved 2022-07-14.*
+142. **[^](#cite_ref-FOOTNOTEKlabnikNichols2019511–512_150-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ pp. 511–512.
+143. **[^](#cite_ref-151)***["Clippy"](https://github.com/rust-lang/rust-clippy). *[GitHub](/wiki/GitHub "GitHub")*. The Rust Programming Language. 2023-11-30. [Archived](https://web.archive.org/web/20210523042004/https://github.com/rust-lang/rust-clippy) from the original on 2021-05-23. Retrieved 2023-11-30.*
+144. **[^](#cite_ref-152)***["Clippy Lints"](https://rust-lang.github.io/rust-clippy/master/index.html). *The Rust Programming Language*. Retrieved 2023-11-30.*
+145. **[^](#cite_ref-Rust_Book_G_153-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ Appendix G – How Rust is Made and "Nightly Rust"
+146. **[^](#cite_ref-FOOTNOTEBlandyOrendorffTindall2021176–177_154-0)**[Blandy, Orendorff & Tindall 2021](#CITEREFBlandyOrendorffTindall2021), pp. 176–177.
+147. **[^](#cite_ref-FOOTNOTEKlabnikNichols2023623_155-0)**[Klabnik & Nichols 2023](#CITEREFKlabnikNichols2023),
+ p. 623.
+148. **[^](#cite_ref-156)***Anderson, Tim (2021-11-30). ["Can Rust save the planet? Why, and why not"](https://www.theregister.com/2021/11/30/aws_reinvent_rust/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20220711001629/https://www.theregister.com/2021/11/30/aws_reinvent_rust/) from the original on 2022-07-11. Retrieved 2022-07-11.*
+149. **[^](#cite_ref-157)***Yegulalp, Serdar (2021-10-06). ["What is the Rust language? Safe, fast, and easy software development"](https://www.infoworld.com/article/3218074/what-is-rust-safe-fast-and-easy-software-development.html). *[InfoWorld](/wiki/InfoWorld "InfoWorld")*. [Archived](https://web.archive.org/web/20220624101013/https://www.infoworld.com/article/3218074/what-is-rust-safe-fast-and-easy-software-development.html) from the original on 2022-06-24. Retrieved 2022-06-25.*
+150. **[^](#cite_ref-FOOTNOTEMcNamara202111_158-0)**[McNamara 2021](#CITEREFMcNamara2021), p. 11.
+151. ^ [***a***](#cite_ref-SaferAtAnySpeed_159-0)[***b***](#cite_ref-SaferAtAnySpeed_159-1)*Popescu, Natalie; Xu, Ziyang; Apostolakis, Sotiris; August, David I.;
+ Levy, Amit (2021-10-15). ["Safer at any speed: automatic context-aware safety enhancement for Rust"](https://doi.org/10.1145%2F3485480). *Proceedings of the ACM on Programming Languages*. **5** (OOPSLA). Section 2. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3485480](https://doi.org/10.1145%2F3485480). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [238212612](https://api.semanticscholar.org/CorpusID:238212612). p. 5: "We observe a large variance in the overheads of checked indexing:
+ 23.6% of benchmarks do report significant performance hits from
+ checked indexing, but 64.5% report little-to-no impact and,
+ surprisingly, 11.8% report improved performance ... Ultimately,
+ while unchecked indexing can improve performance, most of the time
+ it does not."*
+152. **[^](#cite_ref-FOOTNOTEMcNamara202119,_27_160-0)**[McNamara 2021](#CITEREFMcNamara2021), p. 19, 27.
+153. **[^](#cite_ref-161)***Couprie, Geoffroy (2015). "Nom, A Byte oriented, streaming, Zero
+ copy, Parser Combinators Library in Rust". *2015 IEEE Security and Privacy Workshops*. pp. 142–148. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1109/SPW.2015.31](https://doi.org/10.1109%2FSPW.2015.31). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4799-9933-0](/wiki/Special:BookSources/978-1-4799-9933-0 "Special:BookSources/978-1-4799-9933-0"). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [16608844](https://api.semanticscholar.org/CorpusID:16608844).*
+154. **[^](#cite_ref-FOOTNOTEMcNamara202120_162-0)**[McNamara 2021](#CITEREFMcNamara2021), p. 20.
+155. **[^](#cite_ref-163)***["Code generation"](https://doc.rust-lang.org/reference/attributes/codegen.html). *The Rust Reference*. [Archived](https://web.archive.org/web/20221009202615/https://doc.rust-lang.org/reference/attributes/codegen.html) from the original on 2022-10-09. Retrieved 2022-10-09.*
+156. **[^](#cite_ref-how-fast-is-rust_164-0)***["How Fast Is Rust?"](https://doc.rust-lang.org/1.0.0/complement-lang-faq.html#how-fast-is-rust?). *The Rust Programming Language FAQ*. [Archived](https://web.archive.org/web/20201028102013/https://doc.rust-lang.org/1.0.0/complement-lang-faq.html#how-fast-is-rust?) from the original on 2020-10-28. Retrieved 2019-04-11.*
+157. **[^](#cite_ref-165)***Farshin, Alireza; Barbette, Tom; Roozbeh, Amir; Maguire, Gerald Q.
+ Jr; Kostić, Dejan (2021). "PacketMill: Toward per-Core 100-GBPS
+ networking". [*Proceedings of the 26th ACM International Conference on Architectural Support for Programming Languages and Operating Systems*](https://dlnext.acm.org/doi/abs/10.1145/3445814.3446724). pp. 1–17. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3445814.3446724](https://doi.org/10.1145%2F3445814.3446724). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [9781450383172](/wiki/Special:BookSources/9781450383172 "Special:BookSources/9781450383172"). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [231949599](https://api.semanticscholar.org/CorpusID:231949599). [Archived](https://web.archive.org/web/20220712060927/https://dlnext.acm.org/doi/abs/10.1145/3445814.3446724) from the original on 2022-07-12. Retrieved 2022-07-12. "... While some compilers (e.g., Rust) support structure reordering
+ [82], C & C++ compilers are forbidden to reorder data structures
+ (e.g., struct or class) [74] ..."*
+158. **[^](#cite_ref-FOOTNOTEGjengset202122_166-0)**[Gjengset 2021](#CITEREFGjengset2021), p. 22.
+159. **[^](#cite_ref-167)***Keizer, Gregg (2016-10-31). ["Mozilla plans to rejuvenate Firefox in 2017"](https://www.computerworld.com/article/3137050/mozilla-plans-to-rejuvenate-firefox-in-2017.html). *[Computerworld](/wiki/Computerworld "Computerworld")*. [Archived](https://web.archive.org/web/20230513020437/https://www.computerworld.com/article/3137050/mozilla-plans-to-rejuvenate-firefox-in-2017.html) from the original on 2023-05-13. Retrieved 2023-05-13.*
+160. **[^](#cite_ref-168)***Claburn, Thomas (2023-01-12). ["Google polishes Chromium code with a layer of Rust"](https://www.theregister.com/2023/01/12/google_chromium_rust/). *[The Register](/wiki/The_Register "The Register")*. Retrieved 2024-07-17.*
+161. **[^](#cite_ref-169)***Jansens, Dana (2023-01-12). ["Supporting the Use of Rust in the Chromium Project"](https://security.googleblog.com/2023/01/supporting-use-of-rust-in-chromium.html). *Google Online Security Blog*. [Archived](https://web.archive.org/web/20230113004438/https://security.googleblog.com/2023/01/supporting-use-of-rust-in-chromium.html) from the original on 2023-01-13. Retrieved 2023-11-12.*
+162. **[^](#cite_ref-170)***Shankland, Stephen (2016-07-12). ["Firefox will get overhaul in bid to get you interested again"](https://www.cnet.com/tech/services-and-software/firefox-mozilla-gets-overhaul-in-a-bid-to-get-you-interested-again/). [CNET](/wiki/CNET "CNET"). [Archived](https://web.archive.org/web/20220714172029/https://www.cnet.com/tech/services-and-software/firefox-mozilla-gets-overhaul-in-a-bid-to-get-you-interested-again/) from the original on 2022-07-14. Retrieved 2022-07-14.*
+163. **[^](#cite_ref-171)***Security Research Team (2013-10-04). ["ZeroMQ: Helping us Block Malicious Domains in Real Time"](https://web.archive.org/web/20230513161542/https://umbrella.cisco.com/blog/zeromq-helping-us-block-malicious-domains). *Cisco Umbrella*. Archived from [the original](https://umbrella.cisco.com/blog/zeromq-helping-us-block-malicious-domains) on 2023-05-13. Retrieved 2023-05-13.*
+164. **[^](#cite_ref-172)***Cimpanu, Catalin (2019-10-15). ["AWS to sponsor Rust project"](https://www.zdnet.com/article/aws-to-sponsor-rust-project/). *[ZDNET](/wiki/ZDNET "ZDNET")*. Retrieved 2024-07-17.*
+165. **[^](#cite_ref-173)***Nichols, Shaun (2018-06-27). ["Microsoft's next trick? Kicking things out of the cloud to Azure IoT Edge"](https://www.theregister.co.uk/2018/06/27/microsofts_next_cloud_trick_kicking_things_out_of_the_cloud_to_azure_iot_edge/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20190927092433/https://www.theregister.co.uk/2018/06/27/microsofts_next_cloud_trick_kicking_things_out_of_the_cloud_to_azure_iot_edge/) from the original on 2019-09-27. Retrieved 2019-09-27.*
+166. **[^](#cite_ref-174)***Tung, Liam (2020-04-30). ["Microsoft: Why we used programming language Rust over Go for WebAssembly on Kubernetes app"](https://www.zdnet.com/article/microsoft-why-we-used-programming-language-rust-over-go-for-webassembly-on-kubernetes-app/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20220421043549/https://www.zdnet.com/article/microsoft-why-we-used-programming-language-rust-over-go-for-webassembly-on-kubernetes-app/) from the original on 2022-04-21. Retrieved 2022-04-21.*
+167. **[^](#cite_ref-175)***Claburn, Thomas (2022-09-20). ["In Rust We Trust: Microsoft Azure CTO shuns C and C++"](https://www.theregister.com/2022/09/20/rust_microsoft_c/). *[The Register](/wiki/The_Register "The Register")*. Retrieved 2024-07-07.*
+168. **[^](#cite_ref-176)***Simone, Sergio De (2019-03-10). ["NPM Adopted Rust to Remove Performance Bottlenecks"](https://www.infoq.com/news/2019/03/rust-npm-performance/). *InfoQ*. [Archived](https://web.archive.org/web/20231119135434/https://www.infoq.com/news/2019/03/rust-npm-performance/) from the original on 2023-11-19. Retrieved 2023-11-20.*
+169. **[^](#cite_ref-177)***Lyu, Shing (2020). ["Welcome to the World of Rust"](https://doi.org/10.1007/978-1-4842-5599-5_1). In Lyu, Shing (ed.). *Practical Rust Projects: Building Game, Physical Computing, and
+ Machine Learning Applications*. Berkeley, CA: Apress. pp. 1–8. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1007/978-1-4842-5599-5_1](https://doi.org/10.1007%2F978-1-4842-5599-5_1). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4842-5599-5](/wiki/Special:BookSources/978-1-4842-5599-5 "Special:BookSources/978-1-4842-5599-5"). Retrieved 2023-11-29.*
+170. **[^](#cite_ref-178)***Lyu, Shing (2021). ["Rust in the Web World"](https://doi.org/10.1007/978-1-4842-6589-5_1). In Lyu, Shing (ed.). *Practical Rust Web Projects: Building Cloud and Web-Based
+ Applications*. Berkeley, CA: Apress. pp. 1–7. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1007/978-1-4842-6589-5_1](https://doi.org/10.1007%2F978-1-4842-6589-5_1). [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-4842-6589-5](/wiki/Special:BookSources/978-1-4842-6589-5 "Special:BookSources/978-1-4842-6589-5"). Retrieved 2023-11-29.*
+171. ^ [***a***](#cite_ref-UsenixRustForLinux_179-0)[***b***](#cite_ref-UsenixRustForLinux_179-1)[***c***](#cite_ref-UsenixRustForLinux_179-2)*Li, Hongyu; Guo, Liwei; Yang, Yexuan; Wang, Shangguang; Xu, Mengwei
+ (2024-06-30). ["An Empirical Study of Rust-for-Linux: The Success, Dissatisfaction, and Compromise"](https://www.usenix.org/publications/loginonline/empirical-study-rust-linux-success-dissatisfaction-and-compromise). *[USENIX](/wiki/USENIX "USENIX")*. Retrieved 2024-11-28.*
+172. **[^](#cite_ref-180)***Corbet, Jonathan (2022-10-13). ["A first look at Rust in the 6.1 kernel"](https://lwn.net/Articles/910762/). *[LWN.net](/wiki/LWN.net "LWN.net")*. [Archived](https://web.archive.org/web/20231117141103/https://lwn.net/Articles/910762/) from the original on 2023-11-17. Retrieved 2023-11-11.*
+173. **[^](#cite_ref-181)***Vaughan-Nichols, Steven (2021-12-07). ["Rust takes a major step forward as Linux's second official language"](https://www.zdnet.com/article/rust-takes-a-major-step-forward-as-linuxs-second-official-language/). *[ZDNET](/wiki/ZDNET "ZDNET")*. Retrieved 2024-11-27.*
+174. **[^](#cite_ref-182)***Corbet, Jonathan (2022-11-17). ["Rust in the 6.2 kernel"](https://lwn.net/Articles/914458/). *[LWN.net](/wiki/LWN.net "LWN.net")*. Retrieved 2024-11-28.*
+175. **[^](#cite_ref-183)***Corbet, Jonathan (2024-09-24). ["Committing to Rust in the kernel"](https://lwn.net/Articles/991062/). *[LWN.net](/wiki/LWN.net "LWN.net")*. Retrieved 2024-11-28.*
+176. **[^](#cite_ref-184)***Amadeo, Ron (2021-04-07). ["Google is now writing low-level Android code in Rust"](https://arstechnica.com/gadgets/2021/04/google-is-now-writing-low-level-android-code-in-rust/). *Ars Technica*. [Archived](https://web.archive.org/web/20210408001446/https://arstechnica.com/gadgets/2021/04/google-is-now-writing-low-level-android-code-in-rust/) from the original on 2021-04-08. Retrieved 2022-04-21.*
+177. **[^](#cite_ref-185)***Darkcrizt (2021-04-02). ["Google Develops New Bluetooth Stack for Android, Written in Rust"](https://web.archive.org/web/20210825165930/https://blog.desdelinux.net/en/google-develops-a-new-bluetooth-stack-for-android-written-in-rust/). *Desde Linux*. Archived from [the original](https://blog.desdelinux.net/en/google-develops-a-new-bluetooth-stack-for-android-written-in-rust/) on 2021-08-25. Retrieved 2024-08-31.*
+178. **[^](#cite_ref-186)***Claburn, Thomas (2023-04-27). ["Microsoft is rewriting core Windows libraries in Rust"](https://www.theregister.com/2023/04/27/microsoft_windows_rust/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20230513082735/https://www.theregister.com/2023/04/27/microsoft_windows_rust/) from the original on 2023-05-13. Retrieved 2023-05-13.*
+179. **[^](#cite_ref-187)***Proven, Liam (2023-12-01). ["Small but mighty, 9Front's 'Humanbiologics' is here for the truly curious"](https://www.theregister.com/2023/12/01/9front_humanbiologics/). *[The Register](/wiki/The_Register "The Register")*. Retrieved 2024-03-07.*
+180. **[^](#cite_ref-188)***Yegulalp, Serdar (2016-03-21). ["Rust's Redox OS could show Linux a few new tricks"](https://web.archive.org/web/20160321192838/http://www.infoworld.com/article/3046100/open-source-tools/rusts-redox-os-could-show-linux-a-few-new-tricks.html). *[InfoWorld](/wiki/InfoWorld "InfoWorld")*. Archived from [the original](http://www.infoworld.com/article/3046100/open-source-tools/rusts-redox-os-could-show-linux-a-few-new-tricks.html) on 2016-03-21. Retrieved 2016-03-21.*
+181. **[^](#cite_ref-189)***Anderson, Tim (2021-01-14). ["Another Rust-y OS: Theseus joins Redox in pursuit of safer, more resilient systems"](https://www.theregister.com/2021/01/14/rust_os_theseus/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20220714112619/https://www.theregister.com/2021/01/14/rust_os_theseus/) from the original on 2022-07-14. Retrieved 2022-07-14.*
+182. **[^](#cite_ref-190)***Boos, Kevin; Liyanage, Namitha; Ijaz, Ramla; Zhong, Lin (2020). [*Theseus: an Experiment in Operating System Structure and State Management*](https://www.usenix.org/conference/osdi20/presentation/boos). pp. 1–19. [ISBN](/wiki/ISBN_(identifier) "ISBN (identifier)") [978-1-939133-19-9](/wiki/Special:BookSources/978-1-939133-19-9 "Special:BookSources/978-1-939133-19-9"). [Archived](https://web.archive.org/web/20230513164135/https://www.usenix.org/conference/osdi20/presentation/boos) from the original on 2023-05-13. Retrieved 2023-05-13.*
+183. **[^](#cite_ref-rustmag-1_191-0)***Zhang, HanDong (2023-01-31). ["2022 Review | The adoption of Rust in Business"](https://rustmagazine.org/issue-1/2022-review-the-adoption-of-rust-in-business/). *Rust Magazine*. Retrieved 2023-02-07.*
+184. **[^](#cite_ref-192)***Sei, Mark (2018-10-10). ["Fedora 29 new features: Startis now officially in Fedora"](https://www.marksei.com/fedora-29-new-features-startis/). *Marksei, Weekly sysadmin pills*. [Archived](https://web.archive.org/web/20190413075055/https://www.marksei.com/fedora-29-new-features-startis/) from the original on 2019-04-13. Retrieved 2019-05-13.*
+185. **[^](#cite_ref-193)***Proven, Liam (2022-07-12). ["Oracle Linux 9 released, with some interesting additions"](https://www.theregister.com/2022/07/12/oracle_linux_9/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20220714073400/https://www.theregister.com/2022/07/12/oracle_linux_9/) from the original on 2022-07-14. Retrieved 2022-07-14.*
+186. **[^](#cite_ref-194)***Proven, Liam (2023-02-02). ["System76 teases features coming in homegrown Rust-based desktop COSMIC"](https://www.theregister.com/2023/02/02/system76_cosmic_xfce_updates/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20240717145511/https://www.theregister.com/2023/02/02/system76_cosmic_xfce_updates/) from the original on 2024-07-17. Retrieved 2024-07-17.*
+187. **[^](#cite_ref-195)***Hu, Vivian (2020-06-12). ["Deno Is Ready for Production"](https://www.infoq.com/news/2020/06/deno-1-ready-production/). *InfoQ*. [Archived](https://web.archive.org/web/20200701105007/https://www.infoq.com/news/2020/06/deno-1-ready-production/) from the original on 2020-07-01. Retrieved 2022-07-14.*
+188. **[^](#cite_ref-196)***Abrams, Lawrence (2021-02-06). ["This Flash Player emulator lets you securely play your old games"](https://www.bleepingcomputer.com/news/software/this-flash-player-emulator-lets-you-securely-play-your-old-games/). *[Bleeping Computer](/wiki/Bleeping_Computer "Bleeping Computer")*. [Archived](https://web.archive.org/web/20211225124131/https://www.bleepingcomputer.com/news/software/this-flash-player-emulator-lets-you-securely-play-your-old-games/) from the original on 2021-12-25. Retrieved 2021-12-25.*
+189. **[^](#cite_ref-197)***Kharif, Olga (2020-10-17). ["Ethereum Blockchain Killer Goes By Unassuming Name of Polkadot"](https://www.bloomberg.com/news/articles/2020-10-17/ethereum-blockchain-killer-goes-by-unassuming-name-of-polkadot). *[Bloomberg News](/wiki/Bloomberg_News "Bloomberg News")*. [Bloomberg L.P.](/wiki/Bloomberg_L.P. "Bloomberg L.P.")[Archived](https://web.archive.org/web/20201017192915/https://www.bloomberg.com/news/articles/2020-10-17/ethereum-blockchain-killer-goes-by-unassuming-name-of-polkadot) from the original on 2020-10-17. Retrieved 2021-07-14.*
+190. ^ [***a***](#cite_ref-SO-2025-survey_198-0)[***b***](#cite_ref-SO-2025-survey_198-1)[***c***](#cite_ref-SO-2025-survey_198-2)*["2025 Stack Overflow Developer Survey – Technology"](https://survey.stackoverflow.co/2025/technology). *[Stack Overflow](/wiki/Stack_Overflow "Stack Overflow")*. Retrieved 2025-08-09.*
+191. **[^](#cite_ref-199)***Claburn, Thomas (2022-06-23). ["Linus Torvalds says Rust is coming to the Linux kernel"](https://www.theregister.com/2022/06/23/linus_torvalds_rust_linux_kernel/). *[The Register](/wiki/The_Register "The Register")*. [Archived](https://web.archive.org/web/20220728221531/https://www.theregister.com/2022/06/23/linus_torvalds_rust_linux_kernel/) from the original on 2022-07-28. Retrieved 2022-07-15.*
+192. **[^](#cite_ref-201)***Wallach, Dan. ["TRACTOR: Translating All C to Rust"](https://www.darpa.mil/research/programs/translating-all-c-to-rust). [DARPA](/wiki/DARPA "DARPA"). Retrieved 2025-08-03.*
+193. **[^](#cite_ref-202)***Jung, Ralf; Jourdan, Jacques-Henri; Krebbers, Robbert; Dreyer, Derek
+ (2017-12-27). ["RustBelt: securing the foundations of the Rust programming language"](https://dl.acm.org/doi/10.1145/3158154). *Proceedings of the ACM on Programming Languages*. **2** (POPL): 1–34. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3158154](https://doi.org/10.1145%2F3158154). [hdl](/wiki/Hdl_(identifier) "Hdl (identifier)"):[21.11116/0000-0003-34C6-3](https://hdl.handle.net/21.11116%2F0000-0003-34C6-3). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2475-1421](https://search.worldcat.org/issn/2475-1421).*
+194. **[^](#cite_ref-203)***Popescu, Natalie; Xu, Ziyang; Apostolakis, Sotiris; August, David I.;
+ Levy, Amit (2021-10-20). ["Safer at any speed: automatic context-aware safety enhancement for Rust"](https://doi.org/10.1145%2F3485480). *Proceedings of the ACM on Programming Languages*. **5** (OOPSLA): 1–23. [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1145/3485480](https://doi.org/10.1145%2F3485480). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [2475-1421](https://search.worldcat.org/issn/2475-1421).*
+195. **[^](#cite_ref-ResearchSoftware1_204-0)***Blanco-Cuaresma, Sergi; Bolmont, Emeline (2017-05-30). ["What can the programming language Rust do for astrophysics?"](https://www.cambridge.org/core/journals/proceedings-of-the-international-astronomical-union/article/what-can-the-programming-language-rust-do-for-astrophysics/B51B6DF72B7641F2352C05A502F3D881). *[Proceedings of the International Astronomical Union](/wiki/Proceedings_of_the_International_Astronomical_Union "Proceedings of the International Astronomical Union")*. **12** (S325): 341–344. [arXiv](/wiki/ArXiv_(identifier) "ArXiv (identifier)"):[1702.02951](https://arxiv.org/abs/1702.02951). [Bibcode](/wiki/Bibcode_(identifier) "Bibcode (identifier)"):[2017IAUS..325..341B](https://ui.adsabs.harvard.edu/abs/2017IAUS..325..341B). [doi](/wiki/Doi_(identifier) "Doi (identifier)"):[10.1017/S1743921316013168](https://doi.org/10.1017%2FS1743921316013168). [ISSN](/wiki/ISSN_(identifier) "ISSN (identifier)") [1743-9213](https://search.worldcat.org/issn/1743-9213). [S2CID](/wiki/S2CID_(identifier) "S2CID (identifier)") [7857871](https://api.semanticscholar.org/CorpusID:7857871). [Archived](https://web.archive.org/web/20220625140128/https://www.cambridge.org/core/journals/proceedings-of-the-international-astronomical-union/article/what-can-the-programming-language-rust-do-for-astrophysics/B51B6DF72B7641F2352C05A502F3D881) from the original on 2022-06-25. Retrieved 2022-06-25.*
+196. **[^](#cite_ref-FOOTNOTEKlabnikNichols20194_205-0)**[Klabnik & Nichols 2019](#CITEREFKlabnikNichols2019),
+ p. 4.
+197. **[^](#cite_ref-206)***["Getting Started"](https://www.rust-lang.org/learn/get-started#ferris). *The Rust Programming Language*. [Archived](https://web.archive.org/web/20201101145703/https://www.rust-lang.org/learn/get-started#ferris) from the original on 2020-11-01. Retrieved 2020-10-11.*
+198. **[^](#cite_ref-StateOfRustSurvey2024_207-0)***The Rust Survey Team (2025-02-13). ["2024 State of Rust Survey Results"](https://blog.rust-lang.org/2025/02/13/2024-State-Of-Rust-Survey-results.html). *The Rust Programming Language*. Retrieved 2025-09-07.*
+199. **[^](#cite_ref-208)***["The top programming languages"](https://octoverse.github.com/2022/top-programming-languages). *The State of the Octoverse*. 2022. Retrieved 2025-06-25.*
+200. **[^](#cite_ref-209)***["Octoverse: AI leads Python to top language as the number of global developers surges"](https://github.blog/news-insights/octoverse/octoverse-2024/). *The GitHub Blog*. 2024-10-29. Retrieved 2025-06-25.*
+201. **[^](#cite_ref-210)***Tung, Liam (2021-02-08). ["The Rust programming language just took a huge step forwards"](https://www.zdnet.com/article/the-rust-programming-language-just-took-a-huge-step-forwards/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20220714105527/https://www.zdnet.com/article/the-rust-programming-language-just-took-a-huge-step-forwards/) from the original on 2022-07-14. Retrieved 2022-07-14.*
+202. **[^](#cite_ref-211)***Krill, Paul (2021-02-09). ["Rust language moves to independent foundation"](https://www.infoworld.com/article/3606774/rust-language-moves-to-independent-foundation.html). *[InfoWorld](/wiki/InfoWorld "InfoWorld")*. [Archived](https://web.archive.org/web/20210410161528/https://www.infoworld.com/article/3606774/rust-language-moves-to-independent-foundation.html) from the original on 2021-04-10. Retrieved 2021-04-10.*
+203. **[^](#cite_ref-212)***Vaughan-Nichols, Steven J. (2021-04-09). ["AWS's Shane Miller to head the newly created Rust Foundation"](https://www.zdnet.com/article/awss-shane-miller-to-head-the-newly-created-rust-foundation/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20210410031305/https://www.zdnet.com/article/awss-shane-miller-to-head-the-newly-created-rust-foundation/) from the original on 2021-04-10. Retrieved 2021-04-10.*
+204. **[^](#cite_ref-213)***Vaughan-Nichols, Steven J. (2021-11-17). ["Rust Foundation appoints Rebecca Rumbul as executive director"](https://www.zdnet.com/article/rust-foundation-appoints-rebecca-rumbul-as-executive-director/). *[ZDNET](/wiki/ZDNET "ZDNET")*. [Archived](https://web.archive.org/web/20211118062346/https://www.zdnet.com/article/rust-foundation-appoints-rebecca-rumbul-as-executive-director/) from the original on 2021-11-18. Retrieved 2021-11-18.*
+205. **[^](#cite_ref-214)***["Governance"](https://www.rust-lang.org/governance). *The Rust Programming Language*. [Archived](https://web.archive.org/web/20220510225505/https://www.rust-lang.org/governance) from the original on 2022-05-10. Retrieved 2024-07-18.*
+206. **[^](#cite_ref-215)***["Introducing the Rust Leadership Council"](https://blog.rust-lang.org/2023/06/20/introducing-leadership-council.html). *Rust Blog*. 2023-06-20. Retrieved 2024-01-12.*
+
+## External links
+
+[[edit](/w/index.php?title=Rust_(programming_language)&action=edit&section=53 "Edit section: External links")]
+
+**Rust** at Wikipedia's [sister projects](/wiki/Wikipedia:Wikimedia_sister_projects "Wikipedia:Wikimedia sister projects")
+
+- [![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png)](/wiki/File:Commons-logo.svg)[Media](https://commons.wikimedia.org/wiki/Category:Rust_(programming_language) "c:Category:Rust (programming language)") from Commons
+- [![](//upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Wikiversity_logo_2017.svg/40px-Wikiversity_logo_2017.svg.png)](/wiki/File:Wikiversity_logo_2017.svg)[Resources](https://en.wikiversity.org/wiki/Rust "v:Rust") from Wikiversity
+- [![](//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/40px-Wikidata-logo.svg.png)](/wiki/File:Wikidata-logo.svg)[Data](https://www.wikidata.org/wiki/Q575650 "d:Q575650") from Wikidata
+
+- [Official website](https://www.rust-lang.org/)[![Edit this at Wikidata](//upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/20px-OOjs_UI_icon_edit-ltr-progressive.svg.png)](https://www.wikidata.org/wiki/Q575650#P856 "Edit this at Wikidata")
+- [Source code](https://github.com/rust-lang/rust) on [GitHub](/wiki/GitHub "GitHub")
+- [Documentation](https://doc.rust-lang.org/stable/)
+
+
+| [v (View this template)](/wiki/Template:Programming_languages "Template:Programming languages")[t (Discuss this template)](/wiki/Template_talk:Programming_languages "Template talk:Programming languages")[e (Edit this template)](/wiki/Special:EditPage/Template:Programming_languages "Special:EditPage/Template:Programming languages")<br>[Programming languages](/wiki/Programming_language "Programming language") | |
+| --- | --- |
+| [Comparison](/wiki/Comparison_of_programming_languages "Comparison of programming languages")[Timeline](/wiki/Timeline_of_programming_languages "Timeline of programming languages")[History](/wiki/History_of_programming_languages "History of programming languages") | |
+| [Ada](/wiki/Ada_(programming_language) "Ada (programming language)")[ALGOL](/wiki/ALGOL "ALGOL")<br>  [Simula](/wiki/Simula "Simula") [APL](/wiki/APL_(programming_language) "APL (programming language)")[Assembly](/wiki/Assembly_language "Assembly language")[BASIC](/wiki/BASIC "BASIC")<br>  [Visual Basic](/wiki/Visual_Basic "Visual Basic")<br>    [classic](/wiki/Visual_Basic_(classic) "Visual Basic (classic)")    [.NET](/wiki/Visual_Basic_(.NET) "Visual Basic (.NET)") [C](/wiki/C_(programming_language) "C (programming language)")[C++](/wiki/C%2B%2B "C++")[C#](/wiki/C_Sharp_(programming_language) "C Sharp (programming language)")[COBOL](/wiki/COBOL "COBOL")[Erlang](/wiki/Erlang_(programming_language) "Erlang (programming language)")<br>  [Elixir](/wiki/Elixir_(programming_language) "Elixir (programming language)") [Forth](/wiki/Forth_(programming_language) "Forth (programming language)")[Fortran](/wiki/Fortran "Fortran")[Go](/wiki/Go_(programming_language) "Go (programming language)")[Haskell](/wiki/Haskell "Haskell")[Java](/wiki/Java_(programming_language) "Java (programming language)")[JavaScript](/wiki/JavaScript "JavaScript")[Julia](/wiki/Julia_(programming_language) "Julia (programming language)")[Kotlin](/wiki/Kotlin_(programming_language) "Kotlin (programming language)")[Lisp](/wiki/Lisp_(programming_language) "Lisp (programming language)")[Lua](/wiki/Lua "Lua")[MATLAB](/wiki/MATLAB "MATLAB")[ML](/wiki/ML_(programming_language) "ML (programming language)")<br>  [Caml](/wiki/Caml "Caml")<br>    [OCaml](/wiki/OCaml "OCaml") [Pascal](/wiki/Pascal_(programming_language) "Pascal (programming language)")<br>  [Object Pascal](/wiki/Object_Pascal "Object Pascal") [Perl](/wiki/Perl "Perl")<br>  [Raku](/wiki/Raku_(programming_language) "Raku (programming language)") [PHP](/wiki/PHP "PHP")[Prolog](/wiki/Prolog "Prolog")[Python](/wiki/Python_(programming_language) "Python (programming language)")[R](/wiki/R_(programming_language) "R (programming language)")[Ruby](/wiki/Ruby_(programming_language) "Ruby (programming language)")Rust[SAS](/wiki/SAS_language "SAS language")[SQL](/wiki/SQL "SQL")[Scratch](/wiki/Scratch_(programming_language) "Scratch (programming language)")[Shell](/wiki/Shell_script "Shell script")[Smalltalk](/wiki/Smalltalk "Smalltalk")[Swift](/wiki/Swift_(programming_language) "Swift (programming language)")*[more...](/wiki/List_of_programming_languages "List of programming languages")* | |
+| ![](//upload.wikimedia.org/wikipedia/en/thumb/d/db/Symbol_list_class.svg/20px-Symbol_list_class.svg.png)**Lists:**[Alphabetical](/wiki/List_of_programming_languages "List of programming languages")[Categorical](/wiki/List_of_programming_languages_by_type "List of programming languages by type")[Generational](/wiki/Generational_list_of_programming_languages "Generational list of programming languages")[Non-English-based](/wiki/Non-English-based_programming_languages "Non-English-based programming languages")![](//upload.wikimedia.org/wikipedia/en/thumb/9/96/Symbol_category_class.svg/20px-Symbol_category_class.svg.png)[Category](/wiki/Category:Programming_languages "Category:Programming languages") | |
+
+| [v (View this template)](/wiki/Template:Mozilla "Template:Mozilla")[t (Discuss this template)](/wiki/Template_talk:Mozilla "Template talk:Mozilla")[e (Edit this template)](/wiki/Special:EditPage/Template:Mozilla "Special:EditPage/Template:Mozilla")<br>[Mozilla](/wiki/Mozilla "Mozilla") | |
+| --- | --- |
+| | Projects | | | --- | --- | | | Mozilla   Labs | [Bugzilla](/wiki/Bugzilla "Bugzilla")[ChatZilla](/wiki/ChatZilla "ChatZilla")*[Jetpack](/wiki/Jetpack_(Firefox_project) "Jetpack (Firefox project)")**[Lightning](/wiki/Lightning_(software) "Lightning (software)")**[Persona](/wiki/Mozilla_Persona "Mozilla Persona")**[Prism](/wiki/Mozilla_Prism "Mozilla Prism")**[Raindrop](/wiki/Mozilla_Raindrop "Mozilla Raindrop")**[Skywriter](/wiki/Mozilla_Skywriter "Mozilla Skywriter")**[Sunbird](/wiki/Mozilla_Sunbird "Mozilla Sunbird")*[PDF.js](/wiki/PDF.js "PDF.js")*[Ubiquity](/wiki/Ubiquity_(Firefox) "Ubiquity (Firefox)")* | | --- | --- | | Mozilla   Research | [Open Media](/wiki/Alliance_for_Open_Media "Alliance for Open Media")Rust[Shumway](/wiki/Shumway_(software) "Shumway (software)")[WebAssembly](/wiki/WebAssembly "WebAssembly")[WebXR](/wiki/WebXR "WebXR")*[asm.js](/wiki/Asm.js "Asm.js")**[Daala](/wiki/Daala "Daala")**[Firefox OS](/wiki/Firefox_OS "Firefox OS")**[OpenFlint](/wiki/OpenFlint "OpenFlint")* | | Mozilla   Foundation | [Mozilla Location Service](/wiki/Mozilla_Location_Service "Mozilla Location Service")[SeaMonkey](/wiki/SeaMonkey "SeaMonkey")[Mozilla Monitor](/wiki/Mozilla_Monitor "Mozilla Monitor")[Thunderbird](/wiki/Mozilla_Thunderbird "Mozilla Thunderbird")[Mozilla VPN](/wiki/Mozilla_VPN "Mozilla VPN")[List of products](/wiki/List_of_Mozilla_products "List of Mozilla products")  | Firefox | [Firefox Browser](/wiki/Firefox "Firefox")<br>  [Early version history](/wiki/Firefox_early_version_history "Firefox early version history")  *[2](/wiki/Firefox_2 "Firefox 2")*  *[3](/wiki/Firefox_3.0 "Firefox 3.0")*  *[3.5](/wiki/Firefox_3.5 "Firefox 3.5")*  *[3.6](/wiki/Firefox_3.6 "Firefox 3.6")*  *[4](/wiki/Firefox_4 "Firefox 4")*  [Version history](/wiki/Firefox_version_history "Firefox version history")  [for Android](/wiki/Firefox_for_Android "Firefox for Android")  [Focus](/wiki/Firefox_Focus "Firefox Focus") [Sync](/wiki/Firefox_Sync "Firefox Sync")[Pocket](/wiki/Pocket_(service) "Pocket (service)") | | --- | --- | | Origins | *[Mozilla Application Suite](/wiki/Mozilla_Application_Suite "Mozilla Application Suite")**[Netscape Navigator](/wiki/Netscape_Navigator "Netscape Navigator")**[Netscape Communicator](/wiki/Netscape_Communicator "Netscape Communicator")**[Netscape Communications](/wiki/Netscape "Netscape")**[Beonex Communicator](/wiki/Beonex_Communicator "Beonex Communicator")* | | Frameworks | [Add-on](/wiki/Add-on_(Mozilla) "Add-on (Mozilla)")[Gecko](/wiki/Gecko_(software) "Gecko (software)")[Necko](/wiki/Mozilla_application_framework "Mozilla application framework")[NPAPI](/wiki/NPAPI "NPAPI") | | Components | [Composer](/wiki/Mozilla_Composer "Mozilla Composer")[NSPR](/wiki/Netscape_Portable_Runtime "Netscape Portable Runtime")[NSS](/wiki/Network_Security_Services "Network Security Services")[Rhino](/wiki/Rhino_(JavaScript_engine) "Rhino (JavaScript engine)")[SpiderMonkey](/wiki/SpiderMonkey "SpiderMonkey")*[Tamarin](/wiki/Tamarin_(software) "Tamarin (software)")*Features | | Typefaces | [Fira](/wiki/Fira_(typeface) "Fira (typeface)")[Zilla Slab](/wiki/Zilla_Slab "Zilla Slab") | | Discontinued | *[Calendar Project](/wiki/Mozilla_Calendar_Project "Mozilla Calendar Project")**[Camino](/wiki/Camino_(web_browser) "Camino (web browser)")**[Firefox Lockwise](/wiki/Firefox_Lockwise "Firefox Lockwise")**[Firefox Send](/wiki/Firefox_Send "Firefox Send")**[Minimo](/wiki/Minimo "Minimo")*[XUL](/wiki/XUL "XUL")<br>  [XBL](/wiki/XBL "XBL")  [XPCOM](/wiki/XPCOM "XPCOM")  [XPInstall](/wiki/XPInstall "XPInstall")  [XULRunner](/wiki/XULRunner "XULRunner") | <br> | | Forks | [Basilisk](/wiki/Basilisk_(web_browser) "Basilisk (web browser)")*[Classilla](/wiki/Classilla "Classilla")**[Flock](/wiki/Flock_(web_browser) "Flock (web browser)")*[Floorp](/wiki/Floorp "Floorp")[Goanna](/wiki/Goanna_(software) "Goanna (software)")[IceCat](/wiki/GNU_IceCat "GNU IceCat")[LibreWolf](/wiki/LibreWolf "LibreWolf")*[Miro](/wiki/Miro_(video_software) "Miro (video software)")**[Netscape 9](/wiki/Netscape_Navigator_9 "Netscape Navigator 9")*[Pale Moon](/wiki/Pale_Moon "Pale Moon")[Portable Edition](/wiki/Firefox_Portable "Firefox Portable")*[Swiftfox](/wiki/Swiftfox "Swiftfox")**[Swiftweasel](/wiki/Swiftweasel "Swiftweasel")*[Waterfox](/wiki/Waterfox "Waterfox")*[xB Browser](/wiki/XB_Browser "XB Browser")*[Zen Browser](/wiki/Zen_Browser "Zen Browser") | | Discontinued projects are in *italics*. Some  projects abandoned by Mozilla that are still  maintained by third parties are in underline. | | <br> | | <br> | |
+| | Organization | | | --- | --- | | | Foundation | [Mozilla Foundation](/wiki/Mozilla_Foundation "Mozilla Foundation")[Mozilla Corporation](/wiki/Mozilla_Corporation "Mozilla Corporation")[Mozilla Messaging](/wiki/Mozilla_Messaging "Mozilla Messaging") | | --- | --- | | Official affiliates | [Mozilla China](/wiki/Mozilla_China "Mozilla China")[Mozilla Europe](/wiki/Mozilla_Europe "Mozilla Europe")  (defunct) [Mozilla Japan](/wiki/Mozilla_Japan "Mozilla Japan") | | People | [Mitchell Baker](/wiki/Mitchell_Baker "Mitchell Baker")[David Baron](/wiki/David_Baron_(computer_scientist) "David Baron (computer scientist)")[Tantek Çelik](/wiki/Tantek_%C3%87elik "Tantek Çelik")[Laura Chambers](/wiki/Laura_Chambers "Laura Chambers")[Brendan Eich](/wiki/Brendan_Eich "Brendan Eich")[John Hammink](/wiki/John_Hammink "John Hammink")[Johnny Stenbäck](/wiki/Johnny_Stenb%C3%A4ck "Johnny Stenbäck")[Doug Turner](/wiki/Doug_Turner_(Mozilla) "Doug Turner (Mozilla)") | <br> | | <br> | |
+| | Community | | | --- | --- | | [mozdev.org](/wiki/Mozdev.org "Mozdev.org")[MDN Web Docs](/wiki/MDN_Web_Docs "MDN Web Docs")[MozillaZine](/wiki/MozillaZine "MozillaZine") | | <br> | |
+| | Other topics | | | --- | --- | | [Mozilla Manifesto](/wiki/Mozilla_Manifesto "Mozilla Manifesto")*[The Book of Mozilla](/wiki/The_Book_of_Mozilla "The Book of Mozilla")**[Code Rush](/wiki/Code_Rush "Code Rush")*[Mozilla Public License](/wiki/Mozilla_Public_License "Mozilla Public License")[Mascot](/wiki/Mozilla_(mascot) "Mozilla (mascot)")[Debian–Mozilla trademark dispute](/wiki/Debian%E2%80%93Mozilla_trademark_dispute "Debian–Mozilla trademark dispute")[Common Voice](/wiki/Common_Voice "Common Voice")*[Mozilla Corp. v. FCC](/wiki/Mozilla_Corp._v._FCC "Mozilla Corp. v. FCC")*  (2019) | | <br> | |
+
+| [Authority control databases](/wiki/Help:Authority_control "Help:Authority control")[![Edit this at Wikidata](//upload.wikimedia.org/wikipedia/en/thumb/8/8a/OOjs_UI_icon_edit-ltr-progressive.svg/20px-OOjs_UI_icon_edit-ltr-progressive.svg.png)](https://www.wikidata.org/wiki/Q575650#identifiers "Edit this at Wikidata") | |
+| --- | --- |
+| International | [GND](https://d-nb.info/gnd/1078438080)[FAST](https://id.worldcat.org/fast/2002371) |
+| National | [United States](https://id.loc.gov/authorities/sh2018000672)[France](https://catalogue.bnf.fr/ark:/12148/cb17808721b)[BnF data](https://data.bnf.fr/ark:/12148/cb17808721b)[Czech Republic](https://aleph.nkp.cz/F/?func=find-c&local_base=aut&ccl_term=ica=ph1269448&CON_LNG=ENG)[Spain](https://datos.bne.es/resource/XX6456854)[Israel](https://www.nli.org.il/en/authorities/987012402011505171) |
+| Other | [Yale LUX](https://lux.collections.yale.edu/view/concept/9bb5bffe-7522-4b18-9057-6d989ea6c162) |
+
+[Portal](/wiki/Wikipedia:Contents/Portals "Wikipedia:Contents/Portals"):
+
+- [![icon](//upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Octicons-terminal.svg/20px-Octicons-terminal.svg.png)](/wiki/File:Octicons-terminal.svg) [Computer programming](/wiki/Portal:Computer_programming "Portal:Computer programming")
+
+![](https://en.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1&amp;usesul3=1)
+
+Retrieved from "<https://en.wikipedia.org/w/index.php?title=Rust_(programming_language)&oldid=1314392250>"
+
+[Categories](/wiki/Help:Category "Help:Category"):
+
+- [Rust (programming language)](/wiki/Category:Rust_(programming_language) "Category:Rust (programming language)")
+- [Compiled programming languages](/wiki/Category:Compiled_programming_languages "Category:Compiled programming languages")
+- [Concurrent programming languages](/wiki/Category:Concurrent_programming_languages "Category:Concurrent programming languages")
+- [Free and open source compilers](/wiki/Category:Free_and_open_source_compilers "Category:Free and open source compilers")
+- [Free software projects](/wiki/Category:Free_software_projects "Category:Free software projects")
+- [Functional languages](/wiki/Category:Functional_languages "Category:Functional languages")
+- [High-level programming languages](/wiki/Category:High-level_programming_languages "Category:High-level programming languages")
+- [Mozilla](/wiki/Category:Mozilla "Category:Mozilla")
+- [Multi-paradigm programming languages](/wiki/Category:Multi-paradigm_programming_languages "Category:Multi-paradigm programming languages")
+- [Pattern matching programming languages](/wiki/Category:Pattern_matching_programming_languages "Category:Pattern matching programming languages")
+- [Procedural programming languages](/wiki/Category:Procedural_programming_languages "Category:Procedural programming languages")
+- [Programming languages created in 2015](/wiki/Category:Programming_languages_created_in_2015 "Category:Programming languages created in 2015")
+- [Software using the Apache license](/wiki/Category:Software_using_the_Apache_license "Category:Software using the Apache license")
+- [Software using the MIT license](/wiki/Category:Software_using_the_MIT_license "Category:Software using the MIT license")
+- [Statically typed programming languages](/wiki/Category:Statically_typed_programming_languages "Category:Statically typed programming languages")
+- [Systems programming languages](/wiki/Category:Systems_programming_languages "Category:Systems programming languages")
+
+Hidden categories:
+
+- [Articles with short description](/wiki/Category:Articles_with_short_description "Category:Articles with short description")
+- [Short description is different from Wikidata](/wiki/Category:Short_description_is_different_from_Wikidata "Category:Short description is different from Wikidata")
+- [Good articles](/wiki/Category:Good_articles "Category:Good articles")
+- [Use American English from July 2022](/wiki/Category:Use_American_English_from_July_2022 "Category:Use American English from July 2022")
+- [All Wikipedia articles written in American English](/wiki/Category:All_Wikipedia_articles_written_in_American_English "Category:All Wikipedia articles written in American English")
+- [Use mdy dates from July 2022](/wiki/Category:Use_mdy_dates_from_July_2022 "Category:Use mdy dates from July 2022")
+- [Articles with example C++ code](/wiki/Category:Articles_with_example_C%2B%2B_code "Category:Articles with example C++ code")
+- [Articles with excerpts](/wiki/Category:Articles_with_excerpts "Category:Articles with excerpts")
+- [Articles containing potentially dated statements from 2024](/wiki/Category:Articles_containing_potentially_dated_statements_from_2024 "Category:Articles containing potentially dated statements from 2024")
+- [All articles containing potentially dated statements](/wiki/Category:All_articles_containing_potentially_dated_statements "Category:All articles containing potentially dated statements")
+- [Articles containing potentially dated statements from July 2024](/wiki/Category:Articles_containing_potentially_dated_statements_from_July_2024 "Category:Articles containing potentially dated statements from July 2024")
+- [Pages using Sister project links with hidden wikidata](/wiki/Category:Pages_using_Sister_project_links_with_hidden_wikidata "Category:Pages using Sister project links with hidden wikidata")
+- [Articles with example Rust code](/wiki/Category:Articles_with_example_Rust_code "Category:Articles with example Rust code")
+
+- This page was last edited on 1 October 2025, at 04:26 (UTC).
+- Text is available under the [Creative Commons Attribution-ShareAlike 4.0 License](/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License "Wikipedia:Text of the Creative Commons Attribution-ShareAlike 4.0 International License"); additional terms may apply. By using this site, you agree to the [Terms of Use](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use "foundation:Special:MyLanguage/Policy:Terms of Use") and [Privacy Policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy "foundation:Special:MyLanguage/Policy:Privacy policy"). Wikipedia® is a registered trademark of the [Wikimedia Foundation, Inc.](https://wikimediafoundation.org/), a non-profit organization.
+
+
+- [Privacy policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)
+- [About Wikipedia](/wiki/Wikipedia:About)
+- [Disclaimers](/wiki/Wikipedia:General_disclaimer)
+- [Contact Wikipedia](//en.wikipedia.org/wiki/Wikipedia:Contact_us)
+- [Code of Conduct](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct)
+- [Developers](https://developer.wikimedia.org)
+- [Statistics](https://stats.wikimedia.org/#/en.wikipedia.org)
+- [Cookie statement](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement)
+- [Mobile view](//en.m.wikipedia.org/w/index.php?title=Rust_(programming_language)&mobileaction=toggle_view_mobile)
+
+
+- [![Wikimedia Foundation](/static/images/footer/wikimedia.svg)](https://www.wikimedia.org/)
+- [![Powered by MediaWiki](/w/resources/assets/mediawiki_compact.svg)](https://www.mediawiki.org/)
+
+Search
+
+Search
+
+Toggle the table of contents
+
+Rust (programming language)
+
+[#](#)[#](#)[#](#)[#](#)[#](#)[#](#)[#](#)[#](#)
+
+51 languages
+
+[Add topic](#)

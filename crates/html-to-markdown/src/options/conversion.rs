@@ -8,6 +8,26 @@ use crate::options::validation::{
     UrlEscapeStyle, WhitespaceMode,
 };
 
+/// Controls which conversion tier is used.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[cfg_attr(
+    any(feature = "serde", feature = "metadata"),
+    derive(serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(any(feature = "serde", feature = "metadata"), serde(rename_all = "snake_case"))]
+pub enum TierStrategy {
+    /// Automatically pick the best tier for the input (default).
+    #[default]
+    Auto,
+    /// Always use the Tier-2 (`tl::parse` + walk) path.
+    Tier2Only,
+    /// Always attempt Tier-1, falling back to Tier-2 on bail.
+    ///
+    /// Only available in test or when the `testkit` feature is enabled.
+    #[cfg(any(test, feature = "testkit"))]
+    ForceTier1,
+}
+
 /// Main conversion options for HTML to Markdown conversion.
 ///
 /// Use [`ConversionOptions::builder()`] to construct, or [`Default::default()`] for defaults.
@@ -163,6 +183,14 @@ pub struct ConversionOptions {
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default))]
     pub exclude_selectors: Vec<String>,
 
+    /// Which conversion tier to use.
+    ///
+    /// - [`TierStrategy::Auto`] (default) — automatically choose the best path.
+    /// - [`TierStrategy::Tier2Only`] — always use the Tier-2 DOM-walk path.
+    /// - [`TierStrategy::ForceTier1`] — always attempt Tier-1 (test/testkit only).
+    #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default))]
+    pub tier_strategy: TierStrategy,
+
     /// Optional visitor for custom traversal logic.
     ///
     /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -218,6 +246,7 @@ impl Default for ConversionOptions {
             infer_dimensions: true,
             max_depth: None,
             exclude_selectors: Vec::new(),
+            tier_strategy: TierStrategy::Auto,
             #[cfg(feature = "visitor")]
             visitor: None,
         }
@@ -385,6 +414,9 @@ impl ConversionOptionsBuilder {
     // Debug
     builder_setter!(debug, bool);
 
+    // Tier strategy
+    builder_setter!(tier_strategy, TierStrategy);
+
     /// Build the final [`ConversionOptions`].
     #[must_use]
     pub fn build(self) -> ConversionOptions {
@@ -491,6 +523,8 @@ pub struct ConversionOptionsUpdate {
     pub max_depth: Option<Option<usize>>,
     /// Optional override for [`ConversionOptions::exclude_selectors`].
     pub exclude_selectors: Option<Vec<String>>,
+    /// Optional override for [`ConversionOptions::tier_strategy`].
+    pub tier_strategy: Option<TierStrategy>,
     /// Optional override for [`ConversionOptions::visitor`].
     #[cfg(feature = "visitor")]
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(skip))]
@@ -549,6 +583,7 @@ impl ConversionOptions {
         apply!(infer_dimensions);
         apply!(max_depth);
         apply!(exclude_selectors);
+        apply!(tier_strategy);
         #[cfg(feature = "visitor")]
         if let Some(visitor) = update.visitor {
             self.visitor = Some(visitor);

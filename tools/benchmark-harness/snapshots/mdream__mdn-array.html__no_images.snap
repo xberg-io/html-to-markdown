@@ -1,0 +1,1456 @@
+---
+canonical: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+link-alternate: "https://developer.mozilla.org/en-US/blog/rss.xml"
+meta-description: The Array object, as with arrays in other programming languages, enables storing a collection of multiple items under a single variable name, and has members for performing common array operations.
+meta-og:description: The Array object, as with arrays in other programming languages, enables storing a collection of multiple items under a single variable name, and has members for performing common array operations.
+meta-og:image: "https://developer.mozilla.org/mdn-social-image.46ac2375.png"
+meta-og:image:alt: The MDN logo
+meta-og:image:height: 1024
+meta-og:image:type: image/png
+meta-og:image:width: 1024
+meta-og:locale: en_US
+meta-og:site_name: MDN Web Docs
+meta-og:title: Array - JavaScript | MDN
+meta-og:url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+meta-twitter:card: summary
+meta-twitter:creator: MozDevNet
+meta-viewport: width=device-width, initial-scale=1.0
+title: Array - JavaScript | MDN
+---
+
+- [Skip to main content](#content)
+- [Skip to search](#search)
+
+
+[![MDN](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ibG9nb19faW1hZ2UiIGhlaWdodD0iMjQiIHJvbGU9ImltZyIgdmlld0JveD0iMCAwIDgzIDI0IiB3aWR0aD0iODMiPgogICAgICAgICAgPHRpdGxlPk1ETjwvdGl0bGU+CiAgICAgICAgICA8cGF0aCBjbGFzcz0ibG9nb19fbGV0dGVyIiBkPSJNOS40IDAgMi44MSAyMS4xN0guMTJMNi42OSAwSDkuNFptMi4zOCAwdjIxLjE3SDkuNFYwaDIuNFptOS4yNyAwLTYuNTYgMjEuMTdIMTEuOEwxOC4zNiAwaDIuNjlabTIuMzkgMHYyMS4xN2gtMi40VjBoMi40WiIgLz4KICAgICAgICAgIDxwYXRoIGNsYXNzPSJsb2dvX190ZXh0IiBkPSJNNDUuNTUgMTYuODNoLTMuOTN2LTEuMjdoLjg3di0zLjYzYzAtLjg1LS4xNi0xLjQ…](/en-US/)
+
+HTML
+
+[HTML: Markup language](/en-US/docs/Web/HTML)
+
+HTML reference
+- [Elements](/en-US/docs/Web/HTML/Reference/Elements)
+- [Global attributes](/en-US/docs/Web/HTML/Reference/Global_attributes)
+- [Attributes](/en-US/docs/Web/HTML/Reference/Attributes)
+- [See all…](/en-US/docs/Web/HTML/Reference "See all HTML references")
+
+HTML guides
+- [Responsive images](/en-US/docs/Web/HTML/Guides/Responsive_images)
+- [HTML cheatsheet](/en-US/docs/Web/HTML/Guides/Cheatsheet)
+- [Date & time formats](/en-US/docs/Web/HTML/Guides/Date_and_time_formats)
+- [See all…](/en-US/docs/Web/HTML/Guides "See all HTML guides")
+
+Markup languages
+- [SVG](/en-US/docs/Web/SVG)
+- [MathML](/en-US/docs/Web/MathML)
+- [XML](/en-US/docs/Web/XML)
+
+CSS
+
+[CSS: Styling language](/en-US/docs/Web/CSS)
+
+CSS reference
+- [Properties](/en-US/docs/Web/CSS/Reference/Properties)
+- [Selectors](/en-US/docs/Web/CSS/Reference/Selectors)
+- [At-rules](/en-US/docs/Web/CSS/Reference/At-rules)
+- [Values](/en-US/docs/Web/CSS/Reference/Values)
+- [See all…](/en-US/docs/Web/CSS/Reference "See all CSS references")
+
+CSS guides
+- [Box model](/en-US/docs/Web/CSS/Guides/Box_model/Introduction)
+- [Animations](/en-US/docs/Web/CSS/Guides/Animations/Using)
+- [Flexbox](/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Basic_concepts)
+- [Colors](/en-US/docs/Web/CSS/Guides/Colors/Applying_color)
+- [See all…](/en-US/docs/Web/CSS/Guides "See all CSS guides")
+
+Layout cookbook
+- [Column layouts](/en-US/docs/Web/CSS/How_to/Layout_cookbook/Column_layouts)
+- [Centering an element](/en-US/docs/Web/CSS/How_to/Layout_cookbook/Center_an_element)
+- [Card component](/en-US/docs/Web/CSS/How_to/Layout_cookbook/Card)
+- [See all…](/en-US/docs/Web/CSS/How_to/Layout_cookbook)
+
+JavaScriptJS
+
+[JavaScript: Scripting language](/en-US/docs/Web/JavaScript)
+
+JS reference
+- [Standard built-in objects](/en-US/docs/Web/JavaScript/Reference/Global_Objects)
+- [Expressions & operators](/en-US/docs/Web/JavaScript/Reference/Operators)
+- [Statements & declarations](/en-US/docs/Web/JavaScript/Reference/Statements)
+- [Functions](/en-US/docs/Web/JavaScript/Reference/Functions)
+- [See all…](/en-US/docs/Web/JavaScript/Reference "See all JavaScript references")
+
+JS guides
+- [Control flow & error handing](/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling)
+- [Loops and iteration](/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration)
+- [Working with objects](/en-US/docs/Web/JavaScript/Guide/Working_with_objects)
+- [Using classes](/en-US/docs/Web/JavaScript/Guide/Using_classes)
+- [See all…](/en-US/docs/Web/JavaScript/Guide "See all JavaScript guides")
+
+Web APIs
+
+[Web APIs: Programming interfaces](/en-US/docs/Web/API)
+
+Web API reference
+- [File system API](/en-US/docs/Web/API/File_System_API)
+- [Fetch API](/en-US/docs/Web/API/Fetch_API)
+- [Geolocation API](/en-US/docs/Web/API/Geolocation_API)
+- [HTML DOM API](/en-US/docs/Web/API/HTML_DOM_API)
+- [Push API](/en-US/docs/Web/API/Push_API)
+- [Service worker API](/en-US/docs/Web/API/Service_Worker_API)
+- [See all…](/en-US/docs/Web/API "See all Web API guides")
+
+Web API guides
+- [Using the Web animation API](/en-US/docs/Web/API/Web_Animations_API/Using_the_Web_Animations_API)
+- [Using the Fetch API](/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+- [Working with the History API](/en-US/docs/Web/API/History_API/Working_with_the_History_API)
+- [Using the Web speech API](/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API)
+- [Using web workers](/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
+
+All
+
+[All web technology](/en-US/docs/Web)
+
+Technologies
+- [Accessibility](/en-US/docs/Web/Accessibility)
+- [HTTP](/en-US/docs/Web/HTTP)
+- [URI](/en-US/docs/Web/URI)
+- [Web extensions](/en-US/docs/Mozilla/Add-ons/WebExtensions)
+- [WebAssembly](/en-US/docs/WebAssembly)
+- [WebDriver](/en-US/docs/Web/WebDriver)
+- [See all…](/en-US/docs/Web "See all web technology references")
+
+Topics
+- [Media](/en-US/docs/Web/Media)
+- [Performance](/en-US/docs/Web/Performance)
+- [Privacy](/en-US/docs/Web/Privacy)
+- [Security](/en-US/docs/Web/Security)
+- [Progressive web apps](/en-US/docs/Web/Progressive_web_apps)
+
+Learn
+
+[Learn web development](/en-US/docs/Learn_web_development)
+
+Frontend developer course
+- [Getting started modules](/en-US/docs/Learn_web_development/Getting_started)
+- [Core modules](/en-US/docs/Learn_web_development/Core)
+- [MDN Curriculum](/en-US/curriculum/)
+
+Learn HTML
+- [Structuring content with HTML module](/en-US/docs/Learn_web_development/Core/Structuring_content)
+
+Learn CSS
+- [CSS styling basics module](/en-US/docs/Learn_web_development/Core/Styling_basics)
+- [CSS layout module](/en-US/docs/Learn_web_development/Core/CSS_layout)
+
+Learn JavaScript
+- [Dynamic scripting with JavaScript module](/en-US/docs/Learn_web_development/Core/Scripting)
+
+Tools
+
+Discover our tools
+
+- [Playground](/en-US/play)
+- [HTTP Observatory](/en-US/observatory)
+
+
+- [Border-image generator](/en-US/docs/Web/CSS/Guides/Backgrounds_and_borders/Border-image_generator)
+- [Border-radius generator](/en-US/docs/Web/CSS/Guides/Backgrounds_and_borders/Border-radius_generator)
+- [Box-shadow generator](/en-US/docs/Web/CSS/Guides/Backgrounds_and_borders/Box-shadow_generator)
+- [Color format converter](/en-US/docs/Web/CSS/Guides/Colors/Color_format_converter)
+- [Color mixer](/en-US/docs/Web/CSS/Guides/Colors/Color_mixer)
+- [Shape generator](/en-US/docs/Web/CSS/Guides/Shapes/Shape_generator)
+
+About
+
+Get to know MDN better
+
+- [About MDN](/en-US/about)
+- [Advertise with us](/en-US/advertising)
+
+
+- [Community](/en-US/community)
+- [MDN on GitHub](https://github.com/mdn)
+
+[Blog](/en-US/blog/)
+
+1. [Web](/en-US/docs/Web)
+2. [JavaScript](/en-US/docs/Web/JavaScript)
+3. [Reference](/en-US/docs/Web/JavaScript/Reference)
+4. [Standard built-in objects](/en-US/docs/Web/JavaScript/Reference/Global_Objects)
+5. [Array](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+
+# Array
+
+**Baseline Widely available  ***
+
+This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+* Some parts of this feature may have varying levels of support.
+
+- [Learn more](/en-US/docs/Glossary/Baseline/Compatibility)
+- [See full compatibility](#browser_compatibility)
+- [Report feedback](https://survey.alchemer.com/s3/7634825/MDN-baseline-feedback?page=%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray&level=high)
+
+
+
+The **`Array`** object, as with arrays in other programming languages, enables [storing a collection of multiple items under a single variable name](/en-US/docs/Learn_web_development/Core/Scripting/Arrays), and has members for [performing common array operations](#examples).
+
+## In this article
+
+- [Description](#description)
+- [Constructor](#constructor)
+- [Static properties](#static_properties)
+- [Static methods](#static_methods)
+- [Instance properties](#instance_properties)
+- [Instance methods](#instance_methods)
+- [Examples](#examples)
+- [Specifications](#specifications)
+- [Browser compatibility](#browser_compatibility)
+- [See also](#see_also)
+
+## [Description](#description)
+
+In JavaScript, arrays aren't [primitives](/en-US/docs/Glossary/Primitive) but are instead `Array` objects with the following core characteristics:
+
+- **JavaScript arrays are resizable** and **can contain a mix of different [data types](/en-US/docs/Web/JavaScript/Guide/Data_structures)**. (When those characteristics are undesirable, use [typed arrays](/en-US/docs/Web/JavaScript/Guide/Typed_arrays) instead.)
+- **JavaScript arrays are not associative arrays** and so, array elements cannot be accessed using arbitrary strings as indexes, but must be accessed using nonnegative integers (or their respective string form) as indexes.
+- **JavaScript arrays are [zero-indexed](https://en.wikipedia.org/wiki/Zero-based_numbering)**: the first element of an array is at index `0`, the second is at index `1`, and so on — and the last element is at the value of the array's [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property minus `1`.
+- **JavaScript [array-copy operations](#copy_an_array) create [shallow copies](/en-US/docs/Glossary/Shallow_copy)**. (All standard built-in copy operations with *any* JavaScript objects create shallow copies, rather than [deep copies](/en-US/docs/Glossary/Deep_copy)).
+
+### [Array indices](#array_indices)
+
+`Array` objects cannot use arbitrary strings as element indexes (as in an [associative array](https://en.wikipedia.org/wiki/Associative_array)) but must use nonnegative integers (or their respective string form). Setting or accessing via non-integers will not set or retrieve an element from the array list itself, but will set or access a variable associated with that array's [object property collection](/en-US/docs/Web/JavaScript/Guide/Data_structures#properties). The array's object properties and list of array elements are separate, and the array's [traversal and mutation operations](/en-US/docs/Web/JavaScript/Guide/Indexed_collections#array_methods) cannot be applied to these named properties.
+
+Array elements are object properties in the same way that `toString` is a property (to be specific, however, `toString()` is a method). Nevertheless, trying to access an element of an array as follows throws a syntax error because the property name is not valid:
+
+js
+
+```
+arr.0; // a syntax error
+```
+
+JavaScript syntax requires properties beginning with a digit to be accessed using [bracket notation](/en-US/docs/Web/JavaScript/Guide/Working_with_objects#objects_and_properties) instead of [dot notation](/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors). It's also possible to quote the array indices (e.g., `years['2']` instead of `years[2]`), although usually not necessary.
+
+The `2` in `years[2]` is coerced into a string by the JavaScript engine through an implicit `toString` conversion. As a result, `'2'` and `'02'` would refer to two different slots on the `years` object, and the following example could be `true`:
+
+js
+
+```
+console.log(years["2"] !== years["02"]);
+```
+
+Only `years['2']` is an actual array index. `years['02']` is an arbitrary string property that will not be visited in array iteration.
+
+### [Relationship between length and numerical properties](#relationship_between_length_and_numerical_properties)
+
+A JavaScript array's [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property and numerical properties are connected.
+
+Several of the built-in array methods (e.g., [`join()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join), [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice), [`indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf), etc.) take into account the value of an array's [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property when they're called.
+
+Other methods (e.g., [`push()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push), [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice), etc.) also result in updates to an array's [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property.
+
+js
+
+```
+const fruits = [];
+fruits.push("banana", "apple", "peach");
+console.log(fruits.length); // 3
+```
+
+When setting a property on a JavaScript array when the property is a valid array index and that index is outside the current bounds of the array, the engine will update the array's [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property accordingly:
+
+js
+
+```
+fruits[5] = "mango";
+console.log(fruits[5]); // 'mango'
+console.log(Object.keys(fruits)); // ['0', '1', '2', '5']
+console.log(fruits.length); // 6
+```
+
+Increasing the [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) extends the array by adding empty slots without creating any new elements — not even `undefined`.
+
+js
+
+```
+fruits.length = 10;
+console.log(fruits); // ['banana', 'apple', 'peach', empty x 2, 'mango', empty x 4]
+console.log(Object.keys(fruits)); // ['0', '1', '2', '5']
+console.log(fruits.length); // 10
+console.log(fruits[8]); // undefined
+```
+
+Decreasing the [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property does, however, delete elements.
+
+js
+
+```
+fruits.length = 2;
+console.log(Object.keys(fruits)); // ['0', '1']
+console.log(fruits.length); // 2
+```
+
+This is explained further on the [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) page.
+
+### [Array methods and empty slots](#array_methods_and_empty_slots)
+
+Array methods have different behaviors when encountering empty slots in [sparse arrays](/en-US/docs/Web/JavaScript/Guide/Indexed_collections#sparse_arrays). In general, older methods (e.g., `forEach`) treat empty slots differently from indices that contain `undefined`.
+
+Methods that have special treatment for empty slots include the following: [`concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat), [`copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin), [`every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every), [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), [`flat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat), [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap), [`forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach), [`indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf), [`lastIndexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf), [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), [`reduce()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce), [`reduceRight()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight), [`reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse), [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice), [`some()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some), [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort), and [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice). Iteration methods such as `forEach` don't visit empty slots at all. Other methods, such as `concat`, `copyWithin`, etc., preserve empty slots when doing the copying, so in the end the array is still sparse.
+
+js
+
+```
+const colors = ["red", "yellow", "blue"];
+colors[5] = "purple";
+colors.forEach((item, index) => {
+  console.log(`${index}: ${item}`);
+});
+// Output:
+// 0: red
+// 1: yellow
+// 2: blue
+// 5: purple
+
+colors.reverse(); // ['purple', empty × 2, 'blue', 'yellow', 'red']
+```
+
+Newer methods (e.g., `keys`) do not treat empty slots specially and treat them as if they contain `undefined`. Methods that conflate empty slots with `undefined` elements include the following: [`entries()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries), [`fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill), [`find()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find), [`findIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex), [`findLast()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast), [`findLastIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex), [`includes()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes), [`join()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join), [`keys()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys), [`toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toLocaleString), [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed), [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted), [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced), [`values()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values), and [`with()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with).
+
+js
+
+```
+const colors = ["red", "yellow", "blue"];
+colors[5] = "purple";
+const iterator = colors.keys();
+for (const key of iterator) {
+  console.log(`${key}: ${colors[key]}`);
+}
+// Output
+// 0: red
+// 1: yellow
+// 2: blue
+// 3: undefined
+// 4: undefined
+// 5: purple
+
+const newColors = colors.toReversed(); // ['purple', undefined, undefined, 'blue', 'yellow', 'red']
+```
+
+### [Copying methods and mutating methods](#copying_methods_and_mutating_methods)
+
+Some methods do not mutate the existing array that the method was called on, but instead return a new array. They do so by first constructing a new array and then populating it with elements. The copy always happens [*shallowly*](/en-US/docs/Glossary/Shallow_copy) — the method never copies anything beyond the initially created array. Elements of the original array(s) are copied into the new array as follows:
+
+- Objects: the object reference is copied into the new array. Both the original and new array refer to the same object. That is, if a referenced object is modified, the changes are visible to both the new and original arrays.
+- Primitive types such as strings, numbers and booleans (not [`String`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [`Number`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number), and [`Boolean`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) objects): their values are copied into the new array.
+
+
+Other methods mutate the array that the method was called on, in which case their return value differs depending on the method: sometimes a reference to the same array, sometimes the length of the new array.
+
+The following methods create new arrays by accessing [`this.constructor[Symbol.species]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.species) to determine the constructor to use: [`concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat), [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), [`flat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat), [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap), [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice), and [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) (to construct the array of removed elements that's returned).
+
+The following methods always create new arrays with the `Array` base constructor: [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed), [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted), [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced), and [`with()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with).
+
+The following table lists the methods that mutate the original array, and the corresponding non-mutating alternative:
+
+| Mutating method | Non-mutating alternative |
+| --- | --- |
+| [`copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin) | No one-method alternative |
+| [`fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill) | No one-method alternative |
+| [`pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop) | [`slice(0, -1)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) |
+| [`push(v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push) | [`concat([v1, v2])`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat) |
+| [`reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse) | [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed) |
+| [`shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift) | [`slice(1)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) |
+| [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) | [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted) |
+| [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) | [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced) |
+| [`unshift(v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift) | [`toSpliced(0, 0, v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced) |
+
+An easy way to change a mutating method into a non-mutating alternative is to use the [spread syntax](/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) or [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) to create a copy first:
+
+js
+
+```
+arr.copyWithin(0, 1, 2); // mutates arr
+const arr2 = arr.slice().copyWithin(0, 1, 2); // does not mutate arr
+const arr3 = [...arr].copyWithin(0, 1, 2); // does not mutate arr
+```
+
+### [Iterative methods](#iterative_methods)
+
+Many array methods take a callback function as an argument. The callback function is called sequentially and at most once for each element in the array, and the return value of the callback function is used to determine the return value of the method. They all share the same signature:
+
+js
+
+```
+method(callbackFn, thisArg)
+```
+
+Where `callbackFn` takes three arguments:
+
+[`element`](#element)
+The current element being processed in the array.
+
+[`index`](#index)
+The index of the current element being processed in the array.
+
+[`array`](#array)
+The array that the method was called upon.
+
+What `callbackFn` is expected to return depends on the array method that was called.
+
+The `thisArg` argument (defaults to `undefined`) will be used as the `this` value when calling `callbackFn`. The `this` value ultimately observable by `callbackFn` is determined according to [the usual rules](/en-US/docs/Web/JavaScript/Reference/Operators/this): if `callbackFn` is [non-strict](/en-US/docs/Web/JavaScript/Reference/Strict_mode#no_this_substitution), primitive `this` values are wrapped into objects, and `undefined`/`null` is substituted with [`globalThis`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis). The `thisArg` argument is irrelevant for any `callbackFn` defined with an [arrow function](/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), as arrow functions don't have their own `this` [binding](/en-US/docs/Glossary/Binding).
+
+The `array` argument passed to `callbackFn` is most useful if you want to read another index during iteration, because you may not always have an existing variable that refers to the current array. You should generally not mutate the array during iteration (see [mutating initial array in iterative methods](#mutating_initial_array_in_iterative_methods)), but you can also use this argument to do so. The `array` argument is *not* the array that is being built, in the case of methods like `map()`, `filter()`, and `flatMap()` — there is no way to access the array being built from the callback function.
+
+All iterative methods are [copying](#copying_methods_and_mutating_methods) and [generic](#generic_array_methods), although they behave differently with [empty slots](#array_methods_and_empty_slots).
+
+The following methods are iterative: [`every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every), [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), [`find()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find), [`findIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex), [`findLast()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast), [`findLastIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex), [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap), [`forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach), [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), and [`some()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some).
+
+In particular, [`every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every), [`find()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find), [`findIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex), [`findLast()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast), [`findLastIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex), and [`some()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some) do not always invoke `callbackFn` on every element — they stop iteration as soon as the return value is determined.
+
+The [`reduce()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce) and [`reduceRight()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight) methods also take a callback function and run it at most once for each element in the array, but they have slightly different signatures from typical iterative methods (for example, they don't accept `thisArg`).
+
+The [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) method also takes a callback function, but it is not an iterative method. It mutates the array in-place, doesn't accept `thisArg`, and may invoke the callback multiple times on an index.
+
+Iterative methods iterate the array like the following (with a lot of technical details omitted):
+
+js
+
+```
+function method(callbackFn, thisArg) {
+  const length = this.length;
+  for (let i = 0; i < length; i++) {
+    if (i in this) {
+      const result = callbackFn.call(thisArg, this[i], i, this);
+      // Do something with result; maybe return early
+    }
+  }
+}
+```
+
+Note the following:
+
+1. Not all methods do the `i in this` test. The `find`, `findIndex`, `findLast`, and `findLastIndex` methods do not, but other methods do.
+2. The `length` is memorized before the loop starts. This affects how insertions and deletions during iteration are handled (see [mutating initial array in iterative methods](#mutating_initial_array_in_iterative_methods)).
+3. The method doesn't memorize the array contents, so if any index is modified during iteration, the new value might be observed.
+4. The code above iterates the array in ascending order of index. Some methods iterate in descending order of index (`for (let i = length - 1; i >= 0; i--)`): `reduceRight()`, `findLast()`, and `findLastIndex()`.
+5. `reduce` and `reduceRight` have slightly different signatures and do not always start at the first/last element.
+
+### [Generic array methods](#generic_array_methods)
+
+Array methods are always generic — they don't access any internal data of the array object. They only access the array elements through the `length` property and the indexed elements. This means that they can be called on array-like objects as well.
+
+js
+
+```
+const arrayLike = {
+  0: "a",
+  1: "b",
+  length: 2,
+};
+console.log(Array.prototype.join.call(arrayLike, "+")); // 'a+b'
+```
+
+#### Normalization of the length property
+
+The `length` property is [converted to an integer](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number#integer_conversion) and then clamped to the range between 0 and 253 - 1. `NaN` becomes `0`, so even when `length` is not present or is `undefined`, it behaves as if it has value `0`.
+
+The language avoids setting `length` to an [unsafe integer](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER). All built-in methods will throw a [`TypeError`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError) if `length` will be set to a number greater than 253 - 1. However, because the [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length) property of arrays throws an error if it's set to greater than 232 - 1, the safe integer threshold is usually not reached unless the method is called on a non-array object.
+
+js
+
+```
+Array.prototype.flat.call({}); // []
+```
+
+Some array methods set the `length` property of the array object. They always set the value after normalization, so `length` always ends as an integer.
+
+js
+
+```
+const a = { length: 0.7 };
+Array.prototype.push.call(a);
+console.log(a.length); // 0
+```
+
+#### Array-like objects
+
+The term [*array-like object*](/en-US/docs/Web/JavaScript/Guide/Indexed_collections#working_with_array-like_objects) refers to any object that doesn't throw during the `length` conversion process described above. In practice, such object is expected to actually have a `length` property and to have indexed elements in the range `0` to `length - 1`. (If it doesn't have all indices, it will be functionally equivalent to a [sparse array](#array_methods_and_empty_slots).) Any integer index less than zero or greater than `length - 1` is ignored when an array method operates on an array-like object.
+
+Many DOM objects are array-like — for example, [`NodeList`](/en-US/docs/Web/API/NodeList) and [`HTMLCollection`](/en-US/docs/Web/API/HTMLCollection). The [`arguments`](/en-US/docs/Web/JavaScript/Reference/Functions/arguments) object is also array-like. You can call array methods on them even if they don't have these methods themselves.
+
+js
+
+```
+function f() {
+  console.log(Array.prototype.join.call(arguments, "+"));
+}
+
+f("a", "b"); // 'a+b'
+```
+
+## [Constructor](#constructor)
+
+[`Array()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Array)
+Creates a new `Array` object.
+
+## [Static properties](#static_properties)
+
+[`Array[Symbol.species]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.species)
+Returns the `Array` constructor.
+
+## [Static methods](#static_methods)
+
+[`Array.from()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
+Creates a new `Array` instance from an iterable or array-like object.
+
+[`Array.fromAsync()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fromAsync)
+Creates a new `Array` instance from an async iterable, iterable, or array-like object.
+
+[`Array.isArray()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray)
+Returns `true` if the argument is an array, or `false` otherwise.
+
+[`Array.of()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/of)
+Creates a new `Array` instance with a variable number of arguments, regardless of number or type of the arguments.
+
+## [Instance properties](#instance_properties)
+
+These properties are defined on `Array.prototype` and shared by all `Array` instances.
+
+[`Array.prototype.constructor`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/constructor)
+The constructor function that created the instance object. For `Array` instances, the initial value is the [`Array`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Array) constructor.
+
+[`Array.prototype[Symbol.unscopables]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.unscopables)
+Contains property names that were not included in the ECMAScript standard prior to the ES2015 version and that are ignored for [`with`](/en-US/docs/Web/JavaScript/Reference/Statements/with) statement-binding purposes.
+
+These properties are own properties of each `Array` instance.
+
+[`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length)
+Reflects the number of elements in an array.
+
+## [Instance methods](#instance_methods)
+
+[`Array.prototype.at()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/at)
+Returns the array item at the given index. Accepts negative integers, which count back from the last item.
+
+[`Array.prototype.concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)
+Returns a new array that is the calling array joined with other array(s) and/or value(s).
+
+[`Array.prototype.copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin)
+Copies a sequence of array elements within an array.
+
+[`Array.prototype.entries()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries)
+Returns a new [*array iterator*](/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators) object that contains the key/value pairs for each index in an array.
+
+[`Array.prototype.every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+Returns `false` if it finds an element in the array that does not satisfy the provided testing function. Otherwise, it returns `true`.
+
+[`Array.prototype.fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)
+Fills all the elements of an array from a start index to an end index with a static value.
+
+[`Array.prototype.filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+Returns a new array containing all elements of the calling array for which the provided filtering function returns `true`.
+
+[`Array.prototype.find()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+Returns the value of the first element in the array that satisfies the provided testing function, or `undefined` if no appropriate element is found.
+
+[`Array.prototype.findIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
+Returns the index of the first element in the array that satisfies the provided testing function, or `-1` if no appropriate element was found.
+
+[`Array.prototype.findLast()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast)
+Returns the value of the last element in the array that satisfies the provided testing function, or `undefined` if no appropriate element is found.
+
+[`Array.prototype.findLastIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex)
+Returns the index of the last element in the array that satisfies the provided testing function, or `-1` if no appropriate element was found.
+
+[`Array.prototype.flat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat)
+Returns a new array with all sub-array elements concatenated into it recursively up to the specified depth.
+
+[`Array.prototype.flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap)
+Returns a new array formed by applying a given callback function to each element of the calling array, and then flattening the result by one level.
+
+[`Array.prototype.forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
+Calls a function for each element in the calling array.
+
+[`Array.prototype.includes()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
+Determines whether the calling array contains a value, returning `true` or `false` as appropriate.
+
+[`Array.prototype.indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
+Returns the first (least) index at which a given element can be found in the calling array.
+
+[`Array.prototype.join()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)
+Joins all elements of an array into a string.
+
+[`Array.prototype.keys()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys)
+Returns a new [*array iterator*](/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators) that contains the keys for each index in the calling array.
+
+[`Array.prototype.lastIndexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf)
+Returns the last (greatest) index at which a given element can be found in the calling array, or `-1` if none is found.
+
+[`Array.prototype.map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+Returns a new array containing the results of invoking a function on every element in the calling array.
+
+[`Array.prototype.pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)
+Removes the last element from an array and returns that element.
+
+[`Array.prototype.push()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push)
+Adds one or more elements to the end of an array, and returns the new `length` of the array.
+
+[`Array.prototype.reduce()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)
+Executes a user-supplied "reducer" callback function on each element of the array (from left to right), to reduce it to a single value.
+
+[`Array.prototype.reduceRight()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)
+Executes a user-supplied "reducer" callback function on each element of the array (from right to left), to reduce it to a single value.
+
+[`Array.prototype.reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)
+Reverses the order of the elements of an array *in place*. (First becomes the last, last becomes first.)
+
+[`Array.prototype.shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)
+Removes the first element from an array and returns that element.
+
+[`Array.prototype.slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
+Extracts a section of the calling array and returns a new array.
+
+[`Array.prototype.some()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
+Returns `true` if it finds an element in the array that satisfies the provided testing function. Otherwise, it returns `false`.
+
+[`Array.prototype.sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+Sorts the elements of an array in place and returns the array.
+
+[`Array.prototype.splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
+Adds and/or removes elements from an array.
+
+[`Array.prototype.toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toLocaleString)
+Returns a localized string representing the calling array and its elements. Overrides the [`Object.prototype.toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toLocaleString) method.
+
+[`Array.prototype.toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed)
+Returns a new array with the elements in reversed order, without modifying the original array.
+
+[`Array.prototype.toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted)
+Returns a new array with the elements sorted in ascending order, without modifying the original array.
+
+[`Array.prototype.toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced)
+Returns a new array with some elements removed and/or replaced at a given index, without modifying the original array.
+
+[`Array.prototype.toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toString)
+Returns a string representing the calling array and its elements. Overrides the [`Object.prototype.toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString) method.
+
+[`Array.prototype.unshift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift)
+Adds one or more elements to the front of an array, and returns the new `length` of the array.
+
+[`Array.prototype.values()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values)
+Returns a new [*array iterator*](/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators) object that contains the values for each index in the array.
+
+[`Array.prototype.with()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with)
+Returns a new array with the element at the given index replaced with the given value, without modifying the original array.
+
+[`Array.prototype[Symbol.iterator]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.iterator)
+An alias for the [`values()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values) method by default.
+
+## [Examples](#examples)
+
+This section provides some examples of common array operations in JavaScript.
+
+**Note:** If you're not yet familiar with array basics, consider first reading [JavaScript First Steps: Arrays](/en-US/docs/Learn_web_development/Core/Scripting/Arrays), which [explains what arrays are](/en-US/docs/Learn_web_development/Core/Scripting/Arrays#what_is_an_array), and includes other examples of common array operations.
+
+### [Create an array](#create_an_array)
+
+This example shows three ways to create new array: first using [array literal notation](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Array#array_literal_notation), then using the [`Array()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Array) constructor, and finally using [`String.prototype.split()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split) to build the array from a string.
+
+js
+
+```
+// 'fruits' array created using array literal notation.
+const fruits = ["Apple", "Banana"];
+console.log(fruits.length);
+// 2
+
+// 'fruits2' array created using the Array() constructor.
+const fruits2 = new Array("Apple", "Banana");
+console.log(fruits2.length);
+// 2
+
+// 'fruits3' array created using String.prototype.split().
+const fruits3 = "Apple, Banana".split(", ");
+console.log(fruits3.length);
+// 2
+```
+
+### [Create a string from an array](#create_a_string_from_an_array)
+
+This example uses the [`join()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join) method to create a string from the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Banana"];
+const fruitsString = fruits.join(", ");
+console.log(fruitsString);
+// "Apple, Banana"
+```
+
+### [Access an array item by its index](#access_an_array_item_by_its_index)
+
+This example shows how to access items in the `fruits` array by specifying the index number of their position in the array.
+
+js
+
+```
+const fruits = ["Apple", "Banana"];
+
+// The index of an array's first element is always 0.
+fruits[0]; // Apple
+
+// The index of an array's second element is always 1.
+fruits[1]; // Banana
+
+// The index of an array's last element is always one
+// less than the length of the array.
+fruits[fruits.length - 1]; // Banana
+
+// Using an index number larger than the array's length
+// returns 'undefined'.
+fruits[99]; // undefined
+```
+
+### [Find the index of an item in an array](#find_the_index_of_an_item_in_an_array)
+
+This example uses the [`indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf) method to find the position (index) of the string `"Banana"` in the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Banana"];
+console.log(fruits.indexOf("Banana"));
+// 1
+```
+
+### [Check if an array contains a certain item](#check_if_an_array_contains_a_certain_item)
+
+This example shows two ways to check if the `fruits` array contains `"Banana"` and `"Cherry"`: first with the [`includes()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes) method, and then with the [`indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf) method to test for an index value that's not `-1`.
+
+js
+
+```
+const fruits = ["Apple", "Banana"];
+
+fruits.includes("Banana"); // true
+fruits.includes("Cherry"); // false
+
+// If indexOf() doesn't return -1, the array contains the given item.
+fruits.indexOf("Banana") !== -1; // true
+fruits.indexOf("Cherry") !== -1; // false
+```
+
+### [Append an item to an array](#append_an_item_to_an_array)
+
+This example uses the [`push()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push) method to append a new string to the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Banana"];
+const newLength = fruits.push("Orange");
+console.log(fruits);
+// ["Apple", "Banana", "Orange"]
+console.log(newLength);
+// 3
+```
+
+### [Remove the last item from an array](#remove_the_last_item_from_an_array)
+
+This example uses the [`pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop) method to remove the last item from the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Banana", "Orange"];
+const removedItem = fruits.pop();
+console.log(fruits);
+// ["Apple", "Banana"]
+console.log(removedItem);
+// Orange
+```
+
+**Note:**`pop()` can only be used to remove the last item from an array. To remove multiple items from the end of an array, see the next example.
+
+### [Remove multiple items from the end of an array](#remove_multiple_items_from_the_end_of_an_array)
+
+This example uses the [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) method to remove the last 3 items from the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Banana", "Strawberry", "Mango", "Cherry"];
+const start = -3;
+const removedItems = fruits.splice(start);
+console.log(fruits);
+// ["Apple", "Banana"]
+console.log(removedItems);
+// ["Strawberry", "Mango", "Cherry"]
+```
+
+### [Truncate an array down to just its first N items](#truncate_an_array_down_to_just_its_first_n_items)
+
+This example uses the [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) method to truncate the `fruits` array down to just its first 2 items.
+
+js
+
+```
+const fruits = ["Apple", "Banana", "Strawberry", "Mango", "Cherry"];
+const start = 2;
+const removedItems = fruits.splice(start);
+console.log(fruits);
+// ["Apple", "Banana"]
+console.log(removedItems);
+// ["Strawberry", "Mango", "Cherry"]
+```
+
+### [Remove the first item from an array](#remove_the_first_item_from_an_array)
+
+This example uses the [`shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift) method to remove the first item from the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Banana"];
+const removedItem = fruits.shift();
+console.log(fruits);
+// ["Banana"]
+console.log(removedItem);
+// Apple
+```
+
+**Note:**`shift()` can only be used to remove the first item from an array. To remove multiple items from the beginning of an array, see the next example.
+
+### [Remove multiple items from the beginning of an array](#remove_multiple_items_from_the_beginning_of_an_array)
+
+This example uses the [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) method to remove the first 3 items from the `fruits` array.
+
+js
+
+```
+const fruits = ["Apple", "Strawberry", "Cherry", "Banana", "Mango"];
+const start = 0;
+const deleteCount = 3;
+const removedItems = fruits.splice(start, deleteCount);
+console.log(fruits);
+// ["Banana", "Mango"]
+console.log(removedItems);
+// ["Apple", "Strawberry", "Cherry"]
+```
+
+### [Add a new first item to an array](#add_a_new_first_item_to_an_array)
+
+This example uses the [`unshift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift) method to add, at index `0`, a new item to the `fruits` array — making it the new first item in the array.
+
+js
+
+```
+const fruits = ["Banana", "Mango"];
+const newLength = fruits.unshift("Strawberry");
+console.log(fruits);
+// ["Strawberry", "Banana", "Mango"]
+console.log(newLength);
+// 3
+```
+
+### [Remove a single item by index](#remove_a_single_item_by_index)
+
+This example uses the [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) method to remove the string `"Banana"` from the `fruits` array — by specifying the index position of `"Banana"`.
+
+js
+
+```
+const fruits = ["Strawberry", "Banana", "Mango"];
+const start = fruits.indexOf("Banana");
+const deleteCount = 1;
+const removedItems = fruits.splice(start, deleteCount);
+console.log(fruits);
+// ["Strawberry", "Mango"]
+console.log(removedItems);
+// ["Banana"]
+```
+
+### [Remove multiple items by index](#remove_multiple_items_by_index)
+
+This example uses the [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) method to remove the strings `"Banana"` and `"Strawberry"` from the `fruits` array — by specifying the index position of `"Banana"`, along with a count of the number of total items to remove.
+
+js
+
+```
+const fruits = ["Apple", "Banana", "Strawberry", "Mango"];
+const start = 1;
+const deleteCount = 2;
+const removedItems = fruits.splice(start, deleteCount);
+console.log(fruits);
+// ["Apple", "Mango"]
+console.log(removedItems);
+// ["Banana", "Strawberry"]
+```
+
+### [Replace multiple items in an array](#replace_multiple_items_in_an_array)
+
+This example uses the [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) method to replace the last 2 items in the `fruits` array with new items.
+
+js
+
+```
+const fruits = ["Apple", "Banana", "Strawberry"];
+const start = -2;
+const deleteCount = 2;
+const removedItems = fruits.splice(start, deleteCount, "Mango", "Cherry");
+console.log(fruits);
+// ["Apple", "Mango", "Cherry"]
+console.log(removedItems);
+// ["Banana", "Strawberry"]
+```
+
+### [Iterate over an array](#iterate_over_an_array)
+
+This example uses a [`for...of`](/en-US/docs/Web/JavaScript/Reference/Statements/for...of) loop to iterate over the `fruits` array, logging each item to the console.
+
+js
+
+```
+const fruits = ["Apple", "Mango", "Cherry"];
+for (const fruit of fruits) {
+  console.log(fruit);
+}
+// Apple
+// Mango
+// Cherry
+```
+
+But `for...of` is just one of many ways to iterate over any array; for more ways, see [Loops and iteration](/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration), and see the documentation for the [`every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every), [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap), [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), [`reduce()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce), and [`reduceRight()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight) methods — and see the next example, which uses the [`forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) method.
+
+### [Call a function on each element in an array](#call_a_function_on_each_element_in_an_array)
+
+This example uses the [`forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) method to call a function on each element in the `fruits` array; the function causes each item to be logged to the console, along with the item's index number.
+
+js
+
+```
+const fruits = ["Apple", "Mango", "Cherry"];
+fruits.forEach((item, index, array) => {
+  console.log(item, index);
+});
+// Apple 0
+// Mango 1
+// Cherry 2
+```
+
+### [Merge multiple arrays together](#merge_multiple_arrays_together)
+
+This example uses the [`concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat) method to merge the `fruits` array with a `moreFruits` array, to produce a new `combinedFruits` array. Notice that `fruits` and `moreFruits` remain unchanged.
+
+js
+
+```
+const fruits = ["Apple", "Banana", "Strawberry"];
+const moreFruits = ["Mango", "Cherry"];
+const combinedFruits = fruits.concat(moreFruits);
+console.log(combinedFruits);
+// ["Apple", "Banana", "Strawberry", "Mango", "Cherry"]
+
+// The 'fruits' array remains unchanged.
+console.log(fruits);
+// ["Apple", "Banana", "Strawberry"]
+
+// The 'moreFruits' array also remains unchanged.
+console.log(moreFruits);
+// ["Mango", "Cherry"]
+```
+
+### [Copy an array](#copy_an_array)
+
+This example shows three ways to create a new array from the existing `fruits` array: first by using [spread syntax](/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax), then by using the [`from()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from) method, and then by using the [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) method.
+
+js
+
+```
+const fruits = ["Strawberry", "Mango"];
+
+// Create a copy using spread syntax.
+const fruitsCopy = [...fruits];
+// ["Strawberry", "Mango"]
+
+// Create a copy using the from() method.
+const fruitsCopy2 = Array.from(fruits);
+// ["Strawberry", "Mango"]
+
+// Create a copy using the slice() method.
+const fruitsCopy3 = fruits.slice();
+// ["Strawberry", "Mango"]
+```
+
+All built-in array-copy operations ([spread syntax](/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax), [`Array.from()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from), [`Array.prototype.slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice), and [`Array.prototype.concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)) create [shallow copies](/en-US/docs/Glossary/Shallow_copy). If you instead want a [deep copy](/en-US/docs/Glossary/Deep_copy) of an array, you can use [`JSON.stringify()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) to convert the array to a JSON string, and then [`JSON.parse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) to convert the string back into a new array that's completely independent from the original array.
+
+js
+
+```
+const fruitsDeepCopy = JSON.parse(JSON.stringify(fruits));
+```
+
+You can also create deep copies using the [`structuredClone()`](/en-US/docs/Web/API/Window/structuredClone "structuredClone()") method, which has the advantage of allowing [transferable objects](/en-US/docs/Web/API/Web_Workers_API/Transferable_objects) in the source to be *transferred* to the new copy, rather than just cloned.
+
+Finally, it's important to understand that assigning an existing array to a new variable doesn't create a copy of either the array or its elements. Instead the new variable is just a reference, or alias, to the original array; that is, the original array's name and the new variable name are just two names for the exact same object (and so will always evaluate as [strictly equivalent](/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness#strict_equality_using)). Therefore, if you make any changes at all either to the value of the original array or to the value of the new variable, the other will change, too:
+
+js
+
+```
+const fruits = ["Strawberry", "Mango"];
+const fruitsAlias = fruits;
+// 'fruits' and 'fruitsAlias' are the same object, strictly equivalent.
+fruits === fruitsAlias; // true
+// Any changes to the 'fruits' array change 'fruitsAlias' too.
+fruits.unshift("Apple", "Banana");
+console.log(fruits);
+// ['Apple', 'Banana', 'Strawberry', 'Mango']
+console.log(fruitsAlias);
+// ['Apple', 'Banana', 'Strawberry', 'Mango']
+```
+
+### [Creating a two-dimensional array](#creating_a_two-dimensional_array)
+
+The following creates a chessboard as a two-dimensional array of strings. The first move is made by copying the `'p'` in `board[6][4]` to `board[4][4]`. The old position at `[6][4]` is made blank.
+
+js
+
+```
+const board = [
+  ["R", "N", "B", "Q", "K", "B", "N", "R"],
+  ["P", "P", "P", "P", "P", "P", "P", "P"],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  ["p", "p", "p", "p", "p", "p", "p", "p"],
+  ["r", "n", "b", "q", "k", "b", "n", "r"],
+];
+
+console.log(`${board.join("\n")}\n\n`);
+
+// Move King's Pawn forward 2
+board[4][4] = board[6][4];
+board[6][4] = " ";
+console.log(board.join("\n"));
+```
+
+Here is the output:
+
+```
+R,N,B,Q,K,B,N,R
+P,P,P,P,P,P,P,P
+ , , , , , , ,
+ , , , , , , ,
+ , , , , , , ,
+ , , , , , , ,
+p,p,p,p,p,p,p,p
+r,n,b,q,k,b,n,r
+
+R,N,B,Q,K,B,N,R
+P,P,P,P,P,P,P,P
+ , , , , , , ,
+ , , , , , , ,
+ , , , ,p, , ,
+ , , , , , , ,
+p,p,p,p, ,p,p,p
+r,n,b,q,k,b,n,r
+```
+
+### [Using an array to tabulate a set of values](#using_an_array_to_tabulate_a_set_of_values)
+
+js
+
+```
+const values = [];
+for (let x = 0; x < 10; x++) {
+  values.push([2 ** x, 2 * x ** 2]);
+}
+console.table(values);
+```
+
+Results in
+
+```
+// The first column is the index
+0  1    0
+1  2    2
+2  4    8
+3  8    18
+4  16   32
+5  32   50
+6  64   72
+7  128  98
+8  256  128
+9  512  162
+```
+
+### [Creating an array using the result of a match](#creating_an_array_using_the_result_of_a_match)
+
+The result of a match between a [`RegExp`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) and a string can create a JavaScript array that has properties and elements which provide information about the match. Such an array is returned by [`RegExp.prototype.exec()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec) and [`String.prototype.match()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match).
+
+For example:
+
+js
+
+```
+// Match one d followed by one or more b's followed by one d
+// Remember matched b's and the following d
+// Ignore case
+
+const myRe = /d(b+)(d)/i;
+const execResult = myRe.exec("cdbBdbsbz");
+
+console.log(execResult.input); // 'cdbBdbsbz'
+console.log(execResult.index); // 1
+console.log(execResult); // [ "dbBd", "bB", "d" ]
+```
+
+For more information about the result of a match, see the [`RegExp.prototype.exec()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec) and [`String.prototype.match()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match) pages.
+
+### [Mutating initial array in iterative methods](#mutating_initial_array_in_iterative_methods)
+
+[Iterative methods](#iterative_methods) do not mutate the array on which it is called, but the function provided as `callbackFn` can. The key principle to remember is that only indexes between 0 and `arrayLength - 1` are visited, where `arrayLength` is the length of the array at the time the array method was first called, but the element passed to the callback is the value at the time the index is visited. Therefore:
+
+- `callbackFn` will not visit any elements added beyond the array's initial length when the call to the iterative method began.
+- Changes to already-visited indexes do not cause `callbackFn` to be invoked on them again.
+- If an existing, yet-unvisited element of the array is changed by `callbackFn`, its value passed to the `callbackFn` will be the value at the time that element gets visited. Removed elements are not visited.
+
+
+**Warning:** Concurrent modifications of the kind described above frequently lead to hard-to-understand code and are generally to be avoided (except in special cases).
+
+The following examples use the `forEach` method as an example, but other methods that visit indexes in ascending order work in the same way. We will first define a helper function:
+
+js
+
+```
+function testSideEffect(effect) {
+  const arr = ["e1", "e2", "e3", "e4"];
+  arr.forEach((elem, index, arr) => {
+    console.log(`array: [${arr.join(", ")}], index: ${index}, elem: ${elem}`);
+    effect(arr, index);
+  });
+  console.log(`Final array: [${arr.join(", ")}]`);
+}
+```
+
+Modification to indexes not visited yet will be visible once the index is reached:
+
+js
+
+```
+testSideEffect((arr, index) => {
+  if (index + 1 < arr.length) arr[index + 1] += "*";
+});
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e1, e2*, e3, e4], index: 1, elem: e2*
+// array: [e1, e2*, e3*, e4], index: 2, elem: e3*
+// array: [e1, e2*, e3*, e4*], index: 3, elem: e4*
+// Final array: [e1, e2*, e3*, e4*]
+```
+
+Modification to already visited indexes does not change iteration behavior, although the array will be different afterwards:
+
+js
+
+```
+testSideEffect((arr, index) => {
+  if (index > 0) arr[index - 1] += "*";
+});
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e1, e2, e3, e4], index: 1, elem: e2
+// array: [e1*, e2, e3, e4], index: 2, elem: e3
+// array: [e1*, e2*, e3, e4], index: 3, elem: e4
+// Final array: [e1*, e2*, e3*, e4]
+```
+
+Inserting *n* elements at unvisited indexes that are less than the initial array length will make them be visited. The last *n* elements in the original array that now have index greater than the initial array length will not be visited:
+
+js
+
+```
+testSideEffect((arr, index) => {
+  if (index === 1) arr.splice(2, 0, "new");
+});
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e1, e2, e3, e4], index: 1, elem: e2
+// array: [e1, e2, new, e3, e4], index: 2, elem: new
+// array: [e1, e2, new, e3, e4], index: 3, elem: e3
+// Final array: [e1, e2, new, e3, e4]
+// e4 is not visited because it now has index 4
+```
+
+Inserting *n* elements with index greater than the initial array length will not make them be visited:
+
+js
+
+```
+testSideEffect((arr) => arr.push("new"));
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e1, e2, e3, e4, new], index: 1, elem: e2
+// array: [e1, e2, e3, e4, new, new], index: 2, elem: e3
+// array: [e1, e2, e3, e4, new, new, new], index: 3, elem: e4
+// Final array: [e1, e2, e3, e4, new, new, new, new]
+```
+
+Inserting *n* elements at already visited indexes will not make them be visited, but it shifts remaining elements back by *n*, so the current index and the *n - 1* elements before it are visited again:
+
+js
+
+```
+testSideEffect((arr, index) => arr.splice(index, 0, "new"));
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [new, e1, e2, e3, e4], index: 1, elem: e1
+// array: [new, new, e1, e2, e3, e4], index: 2, elem: e1
+// array: [new, new, new, e1, e2, e3, e4], index: 3, elem: e1
+// Final array: [new, new, new, new, e1, e2, e3, e4]
+// e1 keeps getting visited because it keeps getting shifted back
+```
+
+Deleting *n* elements at unvisited indexes will make them not be visited anymore. Because the array has shrunk, the last *n* iterations will visit out-of-bounds indexes. If the method ignores non-existent indexes (see [array methods and empty slots](#array_methods_and_empty_slots)), the last *n* iterations will be skipped; otherwise, they will receive `undefined`:
+
+js
+
+```
+testSideEffect((arr, index) => {
+  if (index === 1) arr.splice(2, 1);
+});
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e1, e2, e3, e4], index: 1, elem: e2
+// array: [e1, e2, e4], index: 2, elem: e4
+// Final array: [e1, e2, e4]
+// Does not visit index 3 because it's out-of-bounds
+
+// Compare this with find(), which treats nonexistent indexes as undefined:
+const arr2 = ["e1", "e2", "e3", "e4"];
+arr2.find((elem, index, arr) => {
+  console.log(`array: [${arr.join(", ")}], index: ${index}, elem: ${elem}`);
+  if (index === 1) arr.splice(2, 1);
+  return false;
+});
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e1, e2, e3, e4], index: 1, elem: e2
+// array: [e1, e2, e4], index: 2, elem: e4
+// array: [e1, e2, e4], index: 3, elem: undefined
+```
+
+Deleting *n* elements at already visited indexes does not change the fact that they were visited before they get deleted. Because the array has shrunk, the next *n* elements after the current index are skipped. If the method ignores non-existent indexes, the last *n* iterations will be skipped; otherwise, they will receive `undefined`:
+
+js
+
+```
+testSideEffect((arr, index) => arr.splice(index, 1));
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// Does not visit e2 because e2 now has index 0, which has already been visited
+// array: [e2, e3, e4], index: 1, elem: e3
+// Does not visit e4 because e4 now has index 1, which has already been visited
+// Final array: [e2, e4]
+// Index 2 is out-of-bounds, so it's not visited
+
+// Compare this with find(), which treats nonexistent indexes as undefined:
+const arr2 = ["e1", "e2", "e3", "e4"];
+arr2.find((elem, index, arr) => {
+  console.log(`array: [${arr.join(", ")}], index: ${index}, elem: ${elem}`);
+  arr.splice(index, 1);
+  return false;
+});
+// array: [e1, e2, e3, e4], index: 0, elem: e1
+// array: [e2, e3, e4], index: 1, elem: e3
+// array: [e2, e4], index: 2, elem: undefined
+// array: [e2, e4], index: 3, elem: undefined
+```
+
+For methods that iterate in descending order of index, insertion causes elements to be skipped, and deletion causes elements to be visited multiple times. Adjust the code above yourself to see the effects.
+
+## [Specifications](#specifications)
+
+| Specification |
+| --- |
+| [ECMAScript® 2026 Language Specification # sec-array-objects](https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array-objects) |
+
+## [Browser compatibility](#browser_compatibility)
+
+## [See also](#see_also)
+
+- [Indexed collections](/en-US/docs/Web/JavaScript/Guide/Indexed_collections) guide
+- [`TypedArray`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
+- [`ArrayBuffer`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
+
+![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiBoZWlnaHQ9IjE2MiIgdmlld0JveD0iMCAwIDE2MiAxNjIiIHdpZHRoPSIxNjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PG1hc2sgZmlsbD0iI2ZmZiIgaWQ9ImIiPjxwYXRoIGQ9Ik05Ny4yMDMgNDcuMDRjOC4xMTMtNy44ODYgMTguMDA0LTEzLjg3MSAyOC45MDYtMTcuNDkyYTc4IDc4IDAgMCAxIDMzLjk2OS0zLjM5YzExLjQ0MyAxLjM5IDIyLjQwMSA1LjI5NSAzMi4wMjQgMTEuNDExczE3LjY1NiAxNC4yOCAyMy40NzYgMjMuODZjNS44MTkgOS41NzkgOS4yNjkgMjAuMzE4IDEwLjA4MyAzMS4zODVhNjkuODUgNjkuODUgMCAwIDEtNS4zODcgMzIuNDRjLTQuMzU4IDEwLjI3Mi0xMS4xMTUgMTkuNDQzLTE5Ljc0NyAyNi44MDEtOC42MzIgNy4zNTktMTguOTA4IDEyLjcwOS0zMC4wMzQgMTUuNjM3bC02LjE3LTIxLjY5OGM3LjY2Ni0yLjAxNyAxNC43NDYtNS43MDMgMjAuNjk0LTEwLjc3MyA1Ljk0OC01LjA3MSAxMC42MDMtMTEuMzg5IDEzLjYwNi0xOC40NjdhNDguMTQgNDguMTQgMCAwIDAgMy43MTItMjIuMzUyYy0uNTYxLTcuNjI1LTIuOTM4LTE1LjAyNS02Ljk0OC0yMS42MjVzLTkuNTQ0LTEyLjIyNi0xNi4xNzUtMTYuNDQtMTQuMTgxLTYuOTA0LTIyLjA2NS03Ljg2M2E1My43NSA1My43NSAwIDAgMC0yMy40MDUgMi4zMzZjLTcuNTEzIDIuNDk1LTE0LjMyNyA2LjYyLTE5LjkxOCAxMi4wNTN6IiAvPjwvbWFzaz48cGF0aCBkPSJNOTcuMjAzIDQ3LjA0YzguMTEzLTcuODg2IDE4LjAwNC0xMy44NzEgMjguOTA2LTE3LjQ5MmE3OCA3OCAwIDAgMSAzMy45NjktMy4zOWMxMS40NDMgMS4zOSAyMi40MDEgNS4yOTUgMzIuMDI0IDExLjQxMXMxNy42NTYgMTQuMjggMjMuNDc2IDIzLjg2YzUuODE5IDkuNTc5IDkuMjY5IDIwLjMxOCAxMC4wODMgMzEuMzg1YTY5Ljg1IDY5Ljg1IDAgMCAxLTUuMzg3IDMyLjQ0Yy00LjM1OCAxMC4yNzItMTEuMTE1IDE5LjQ0My0xOS43NDcgMjYuODAxLTguNjMyIDcuMzU5LTE4LjkwOCAxMi43MDktMzAuMDM0IDE1LjYzN2wtNi4xNy0yMS42OThjNy42NjYtMi4wMTcgMTQuNzQ2LTUuNzAzIDIwLjY5NC0xMC43NzMgNS45NDgtNS4wNzEgMTAuNjAzLTExLjM4OSAxMy42MDYtMTguNDY3YTQ4LjE0IDQ4LjE0IDAgMCAwIDMuNzEyLTIyLjM1MmMtLjU2MS03LjYyNS0yLjkzOC0xNS4wMjUtNi45NDgtMjEuNjI1cy05LjU0NC0xMi4yMjYtMTYuMTc1LTE2LjQ0LTE0LjE4MS02LjkwNC0yMi4wNjUtNy44NjNhNTMuNzUgNTMuNzUgMCAwIDAtMjMuNDA1IDIuMzM2Yy03LjUxMyAyLjQ5NS0xNC4zMjcgNi42Mi0xOS45MTggMTIuMDUzeiIgbWFzaz0idXJsKCNiKSIgc3Ryb2tlPSJ1cmwoI2EpIiBzdHJva2UtZGFzaGFycmF5PSI2LCA2IiBzdHJva2Utd2lkdGg9IjIiIHN0eWxlPSJzdHJva2U6dXJsKCNhKSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTYzLjk5MiAtMjUuNTg3KSIgLz48ZWxsaXBzZSBjeD0iOC4wNjYiIGN5PSIxMTEuNTk3IiBmaWxsPSJjdXJyZW50Q29sb3IiIHJ4PSI1My42NzciIHJ5PSI1My42OTkiIHRyYW5zZm9ybT0ibWF0cml4KC43MTcwNyAtLjY5NyAuNzI0MyAuNjg5NSAwIDApIiAvPjxnIGNsaXAtcGF0aD0idXJsKCNjKSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTYzLjk5MiAtMjUuNTg3KSI+PHBhdGggZD0ibTE0NC4yNTYgMTM3LjM3OSAzMi45MDYgMTIuNDM0YTQuNDEgNC40MSAwIDAgMSAyLjU1OSA1LjY2N2wtOS4zMjYgMjQuNjc5YTQuNDEgNC40MSAwIDAgMS01LjY2NyAyLjU1OWwtOC4yMjYtMy4xMDgtMi4zMzIgNi4xN2MtLjQ2NiAxLjIzMy0uMzc1IDEuODgzLTEuNjA5IDEuNDE3bC0yLjI1My0uNTI3Yy0uNDExLS4xNTUtLjk1LS41OTQtMS4yMDYtMS4xNjFsLTQuNzM0LTEwLjQ4NC0xMi41NDUtNC43NDFhNC40MSA0LjQxIDAgMCAxLTIuNTU5LTUuNjY3bDkuMzI1LTI0LjY3OWE0LjQxIDQuNDEgMCAwIDEgNS42NjctMi41NTltOS45NjEgMjkuNjE3IDguMjI3IDMuMTA4IDMuMjY0LTguNjM4LS40OTgtNi43NjgtNC4xMTMtMS41NTUuNTQ4IDcuMjU4LTQuMzE5LTEuNjMyem0tMTIuMzM5LTQuNjYzIDguMjI2IDMuMTA4IDMuMjY0LTguNjM3LS40OTgtNi43NjktNC4xMTMtMS41NTQuNTQ4IDcuMjU3LTQuMzE5LTEuNjMyeiIgZmlsbD0iIzlhYmZmNSIgLz48L2c+PGcgY2xpcC1wYXRoPSJ1cmwoI2QpIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNjMuOTkyIC0yNS41ODcpIj48cGF0aCBkPSJNMTM1LjM1IDYwLjEzNiA4Ni42NyA0MS42NTRjLTMuMzQ2LTEuMjctNy4xMjQuNDI4LTguMzk0IDMuNzc1TDY0LjQxNCA4MS45MzhjLTEuMjcgMy4zNDcuNDI4IDcuMTI1IDMuNzc0IDguMzk1bDEyLjE3IDQuNjItMy40NjUgOS4xMjhjLS42OTMgMS44MjYtMS40MzIgMi40NTcuMzk0IDMuMTVsMy4wMTQgMS42MjVjLjYwOS4yMzEgMS42MzcuMjc0IDIuNDc3LS4xMDRsMTUuNTMtNi45ODMgMTguNTYgNy4wNDdjMy4zNDYgMS4yNyA3LjEyNC0uNDI4IDguMzk1LTMuNzc1bDEzLjg2Mi0zNi41MWMxLjI3LTMuMzQ2LS40MjgtNy4xMjQtMy43NzUtOC4zOTVNOTUuMjYxIDgzLjIwN2wtMTIuMTctNC42MiA0Ljg1Mi0xMi43NzkgNy4xOS03LjAxNyA2LjA4NSAyLjMxLTcuNzI1IDcuNTEgNi4zODkgMi40MjZ6bTE4LjI1NSA2LjkzLTEyLjE3LTQuNjIgNC44NTItMTIuNzc4IDcuMTg5LTcuMDE3IDYuMDg1IDIuMzEtNy43MjUgNy41MSA2LjM5IDIuNDI2eiIgZmlsbD0iIzgxYjBmMyIgLz48L2c+PGRlZnM+PGNsaXBwYXRoIGlkPSJjIj48cGF0aCBkPSJtMTk4LjYzOCAxNDYuNTg2LTY1LjA1Ni0yNC41ODMtMjQuNTgzIDY1LjA1NyA2NS4wNTYgMjQuNTgyeiIgZmlsbD0iI2ZmZiIgLz48L2NsaXBwYXRoPjxjbGlwcGF0aCBpZD0iZCI+PHBhdGggZD0ibTY2LjQzOCAxNC4wNTUgOTYuMjQyIDM2LjU0LTM2LjU0IDk2LjI0My05Ni4yNDMtMzYuNTR6IiBmaWxsPSIjZmZmIiAvPjwvY2xpcHBhdGg+PGxpbmVhcmdyYWRpZW50IGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBpZD0iYSIgeDE9Ijk3LjIwMyIgeDI9IjE5OS45OTUiIHkxPSI0Ny4wNCIgeTI9IjE1Mi43OTMiPjxzdG9wIHN0b3AtY29sb3I9IiMwODZERkMiIC8+PHN0b3Agb2Zmc2V0PSIuMjQ2IiBzdG9wLWNvbG9yPSIjMkM4MUZBIiAvPjxzdG9wIG9mZnNldD0iLjUxNiIgc3RvcC1jb2xvcj0iIzU0OTdGOCIgLz48c3RvcCBvZmZzZXQ9Ii44MjEiIHN0b3AtY29sb3I9IiM4MEIwRjYiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOUFCRkY1IiAvPjwvbGluZWFyZ3JhZGllbnQ+PC9kZWZzPjwvc3ZnPg==)
+
+## Help improve MDN
+
+[Learn how to contribute](/en-US/docs/MDN/Community/Getting_started)
+
+This page was last modified on Feb 24, 2026 by [MDN contributors](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contributors.txt).
+
+
+
+[View this page on GitHub](https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/global_objects/array/index.md?plain=1 "Folder: en-us/web/javascript/reference/global_objects/array (Opens in a new tab)") • [Report a problem with this content](https://github.com/mdn/content/issues/new?template=page-report.yml&mdn-url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray&metadata=%3C%21--+Do+not+make+changes+below+this+line+--%3E%0A%3Cdetails%3E%0A%3Csummary%3EPage+report+details%3C%2Fsummary%3E%0A%0A*+Folder%3A+%60en-us%2Fweb%2Fjavascript%2Freference%2Fglobal_objects%2Farray%60%0A*+MDN+URL%3A+https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray%0A*+GitHub+URL%3A+https%3A%2F%2Fgithub.com%2Fmdn%2Fcontent%2Fblob%2Fmain%2Ffiles%2Fen-us%2Fweb%2Fjavascript%2Freference%2Fglobal_objects%2Farray%2Findex.md%0A*+Last+commit%3A+https%3A%2F%2Fgithub.com%2Fmdn%2Fcontent%2Fcommit%2Fdd88a6eb2176fa31f5b744d8964efecf3f1f425b%0A*+Document+last+modified%3A+2026-02-24T22%3A43%3A48.000Z%0A%0A%3C%2Fdetails%3E "This will take you to GitHub to file a new issue.")
+
+1. [Standard built-in objects](/en-US/docs/Web/JavaScript/Reference/Global_Objects)
+2. *[`Array`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)*
+3.
+
+**Constructor**
+
+  1. [`Array()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Array)
+
+4.
+
+**Static methods**
+
+  1. [`from()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
+  2. [`fromAsync()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fromAsync)
+  3. [`isArray()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray)
+  4. [`of()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/of)
+
+5.
+
+**Static properties**
+
+  1. [`[Symbol.species]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.species)
+
+6.
+
+**Instance methods**
+
+  1. [`at()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/at)
+  2. [`concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)
+  3. [`copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin)
+  4. [`entries()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries)
+  5. [`every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+  6. [`fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)
+  7. [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+  8. [`find()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+  9. [`findIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
+  10. [`findLast()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast)
+  11. [`findLastIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex)
+  12. [`flat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat)
+  13. [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap)
+  14. [`forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
+  15. [`includes()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
+  16. [`indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
+  17. [`join()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)
+  18. [`keys()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys)
+  19. [`lastIndexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf)
+  20. [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+  21. [`pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)
+  22. [`push()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push)
+  23. [`reduce()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)
+  24. [`reduceRight()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)
+  25. [`reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)
+  26. [`shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)
+  27. [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
+  28. [`some()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
+  29. [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+  30. [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
+  31. [`toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toLocaleString)
+  32. [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed)
+  33. [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted)
+  34. [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced)
+  35. [`toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toString)
+  36. [`unshift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift)
+  37. [`values()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values)
+  38. [`with()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with)
+  39. [`[Symbol.iterator]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.iterator)
+
+7.
+
+**Instance properties**
+
+  1. [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length)
+  2. [`[Symbol.unscopables]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.unscopables)
+
+8. Inheritance
+9. [`Object/Function`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
+10.
+
+**Static methods**
+
+  1. [`apply()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply)
+  2. [`bind()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
+  3. [`call()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call)
+  4. [`toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/toString)
+  5. [`[Symbol.hasInstance]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Symbol.hasInstance)
+
+11.
+
+**Static properties**
+
+  1. [`displayName`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/displayName)Non-standard (Non-standard. Check cross-browser support before using.)
+  2. [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length)
+  3. [`name`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name)
+  4. [`prototype`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/prototype)
+  5. [`arguments`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/arguments)Non-standard (Non-standard. Check cross-browser support before using.)Deprecated (Deprecated. Not for use in new websites.)
+  6. [`caller`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/caller)Non-standard (Non-standard. Check cross-browser support before using.)Deprecated (Deprecated. Not for use in new websites.)
+
+12.
+
+**Instance methods**
+
+  1. [`__defineGetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineGetter__)Deprecated (Deprecated. Not for use in new websites.)
+  2. [`__defineSetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineSetter__)Deprecated (Deprecated. Not for use in new websites.)
+  3. [`__lookupGetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__lookupGetter__)Deprecated (Deprecated. Not for use in new websites.)
+  4. [`__lookupSetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__lookupSetter__)Deprecated (Deprecated. Not for use in new websites.)
+  5. [`hasOwnProperty()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty)
+  6. [`isPrototypeOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/isPrototypeOf)
+  7. [`propertyIsEnumerable()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/propertyIsEnumerable)
+  8. [`toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toLocaleString)
+  9. [`toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString)
+  10. [`valueOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf)
+
+13.
+
+**Instance properties**
+
+  1. [`__proto__`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/proto)Deprecated (Deprecated. Not for use in new websites.)
+  2. [`constructor`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/constructor)
+
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgODMgMjQiIHdpZHRoPSI4MyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS40IDAgMi44MSAyMS4xN0guMTJMNi42OSAwem0yLjM4IDB2MjEuMTdIOS40VjBoMi40Wm05LjI3IDAtNi41NiAyMS4xN0gxMS44TDE4LjM2IDB6bTIuMzkgMHYyMS4xN2gtMi40VjB6bTIyLjExIDE2LjgzaC0zLjkzdi0xLjI3aC44N3YtMy42M2MwLS44NS0uMTYtMS40NS0uNDgtMS44MmExLjY1IDEuNjUgMCAwIDAtMS4zLS41MmMtLjc0IDAtMS4zLjI1LTEuNjYuNzhhMyAzIDAgMCAwLS41OCAxLjU4djMuNTloMS4zOHYxLjI2aC0zLjkzdi0xLjI2aC44N3YtM…](/)
+
+Your blueprint for a better internet.
+
+- [](https://github.com/mdn/)
+- [](https://bsky.app/profile/developer.mozilla.org)
+- [](https://x.com/mozdevnet)
+- [](https://mastodon.social/@mdn)
+- [](/en-US/blog/rss.xml)
+
+
+MDN
+- [About](/en-US/about)
+- [Blog](/en-US/blog/)
+- [Mozilla careers](https://www.mozilla.org/en-US/careers/listings/)
+- [Advertise with us](/en-US/advertising)
+- [MDN Plus](/en-US/plus)
+- [Product help](https://support.mozilla.org/products/mdn-plus)
+
+Contribute
+- [MDN Community](/en-US/community)
+- [Community resources](/en-US/docs/MDN/Community)
+- [Writing guidelines](/en-US/docs/MDN/Writing_guidelines)
+- [MDN Discord](/discord)
+- [MDN on GitHub](https://github.com/mdn)
+
+Developers
+- [Web technologies](/en-US/docs/Web)
+- [Learn web development](/en-US/docs/Learn_web_development)
+- [Guides](/en-US/docs/MDN/Guides)
+- [Tutorials](/en-US/docs/MDN/Tutorials)
+- [Glossary](/en-US/docs/Glossary)
+- [Hacks blog](https://hacks.mozilla.org/)
+
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMjU2IDYwIiB3aWR0aD0iMTI4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMy4zMiAyMi4xIDUuMSAyNC4zaDIuMWw1LjEtMjQuM0gzOS4zdjM3LjM0aC03LjI2VjI4LjQ2aC0yLjFsLTYuOTYgMzAuOThoLTcuMDJMOS4wMiAyOC40NmgtMi4xdjMxSC0uMzVWMjIuMWgxMy42NlptNDUuMTIgOC43NGM4LjczIDAgMTMuOCA1LjE1IDEzLjggMTQuNTdTNjcuMTQgNjAgNTguNDQgNjBjLTguNzMgMC0xMy44LTUuMTctMTMuOC0xNC41OSAwLTkuNDMgNS4wNy0xNC41NyAxMy44LTE0LjU3bTAgMjMuMzRjNC4xIDAgNi4xNi0yLjEgNi4xNi02L…](https://www.mozilla.org/)
+
+- [Website Privacy Notice](https://www.mozilla.org/privacy/websites/)
+- [Telemetry Settings](https://www.mozilla.org/en-US/privacy/websites/data-preferences/)
+- [Legal](https://www.mozilla.org/about/legal/terms/mozilla)
+- [Community Participation Guidelines](https://www.mozilla.org/about/governance/policies/participation/)
+
+
+Visit [Mozilla Corporation’s](https://www.mozilla.org/) not-for-profit parent, the [Mozilla Foundation](https://foundation.mozilla.org/).  
+Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under [a Creative Commons license](/docs/MDN/Writing_guidelines/Attrib_copyright_license).

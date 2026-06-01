@@ -55,6 +55,31 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
 
     let options = options.into().unwrap_or_default();
 
+    // Tier-1 dispatcher: attempt the single-pass byte scanner when forced via
+    // the testkit `ForceTier1` strategy.  `Auto` and `Tier2Only` both skip this
+    // block and fall through to the Tier-2 path below.
+    #[cfg(any(test, feature = "testkit"))]
+    if options.tier_strategy == crate::options::TierStrategy::ForceTier1 {
+        let (cleaned, report) = crate::converter::prescan::run(html);
+        match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+            Ok(markdown) => {
+                return Ok(crate::types::ConversionResult {
+                    content: Some(markdown),
+                    document: None,
+                    tables: Vec::new(),
+                    warnings: Vec::new(),
+                    #[cfg(feature = "metadata")]
+                    metadata: crate::metadata::HtmlMetadata::default(),
+                    #[cfg(feature = "inline-images")]
+                    images: Vec::new(),
+                });
+            }
+            Err(_bail) => {
+                // Fall through to Tier-2.
+            }
+        }
+    }
+
     #[cfg(feature = "visitor")]
     let visitor = options.visitor.clone();
 

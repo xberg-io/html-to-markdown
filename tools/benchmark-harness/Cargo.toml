@@ -1,0 +1,60 @@
+[package]
+name = "html-to-markdown-bench"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Benchmark harness and golden oracle for html-to-markdown-rs"
+publish = false
+
+[lib]
+name = "html_to_markdown_bench"
+path = "src/lib.rs"
+
+[[bin]]
+name = "htmbench"
+path = "src/main.rs"
+
+[features]
+default = []
+# Enable testkit for --force-tier1 benchmarking.
+testkit = ["html-to-markdown-rs/testkit"]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4.5", features = ["derive"] }
+html-to-markdown-rs = { path = "../../crates/html-to-markdown", features = ["testkit"] }
+humantime = "2"
+pretty_assertions = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "1.1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+walkdir = "2"
+
+[dev-dependencies]
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+unused_must_use = "deny"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+multiple_crate_versions = { level = "allow", priority = 1 }
+cargo_common_metadata = { level = "allow", priority = 1 }
+must_use_candidate = { level = "allow", priority = 1 }
+cast_possible_truncation = { level = "allow", priority = 1 }
+cast_sign_loss = { level = "allow", priority = 1 }
+cast_precision_loss = { level = "allow", priority = 1 }
+needless_pass_by_value = { level = "allow", priority = 1 }
+redundant_closure_for_method_calls = { level = "allow", priority = 1 }
+doc_markdown = { level = "allow", priority = 1 }
+format_push_string = { level = "allow", priority = 1 }
+uninlined_format_args = { level = "allow", priority = 1 }
+struct_field_names = { level = "allow", priority = 1 }

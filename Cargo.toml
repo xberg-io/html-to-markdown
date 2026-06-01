@@ -11,6 +11,7 @@ members = [
     "crates/html-to-markdown-wasm",
     "packages/dart/rust",
     "packages/swift/rust",
+    "tools/benchmark-harness",
 ]
 exclude = [
     "e2e/rust",

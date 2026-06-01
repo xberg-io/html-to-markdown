@@ -1,0 +1,34 @@
+version: "3"
+
+tasks:
+  run:
+    desc: "Run the benchmark harness over the fixture corpus"
+    cmds:
+      - mkdir -p tools/benchmark-harness/results
+      - cargo run --release -p html-to-markdown-bench -- run --output tools/benchmark-harness/results/latest.json
+
+  compare:
+    desc: "Compare latest benchmark results against the baseline"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- compare --results tools/benchmark-harness/results/latest.json
+
+  oracle:
+    desc: "Verify oracle snapshots match current output"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- oracle
+
+  oracle:bless:
+    desc: "Regenerate oracle snapshots from current output"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- oracle --bless
+
+  survey:
+    desc: "Print fixture corpus feature-coverage survey"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- survey
+
+  mdream:
+    desc: "Run benchmark with mdream side-by-side (requires compare-mdream feature and /tmp/mdream)"
+    cmds:
+      - mkdir -p tools/benchmark-harness/results
+      - cargo run --release -p html-to-markdown-bench --features html-to-markdown-bench/compare-mdream -- run --mdream --output tools/benchmark-harness/results/latest-mdream.json

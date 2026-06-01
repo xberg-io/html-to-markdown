@@ -1,0 +1,138 @@
+# Fixture group assignments for the benchmark harness.
+#
+# Groups:
+#   clean_small              < 10 KB, well-formed HTML
+#   clean_medium             10–200 KB, well-formed HTML
+#   clean_large              200 KB–2 MB, well-formed HTML
+#   spec_rules               Optional close-tag / implied-tbody exercises
+#   fallthrough_custom_elements  Fixtures containing significant custom elements (tag-with-hyphen)
+#   fallthrough_bare_lt      Fixtures with unescaped bare < in text content
+#   adversarial              Synthetic failure-mode fixtures
+
+# ---- mdream corpus ----
+
+[[fixtures]]
+path = "mdream/nuxt-example.html"
+group = "clean_small"
+
+[[fixtures]]
+path = "mdream/vuejs-docs.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "mdream/wikipedia-small.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "mdream/mdn-array.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "mdream/react-learn.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "mdream/github-markdown-complete.html"
+group = "clean_medium"
+
+# ---- real-world / wikipedia ----
+
+[[fixtures]]
+path = "real-world/wikipedia/small_html.html"
+group = "clean_large"
+
+[[fixtures]]
+path = "real-world/wikipedia/lists_timeline.html"
+group = "clean_large"
+
+[[fixtures]]
+path = "real-world/wikipedia/tables_countries.html"
+group = "clean_large"
+
+[[fixtures]]
+path = "real-world/wikipedia/medium_python.html"
+group = "clean_large"
+
+[[fixtures]]
+path = "real-world/wikipedia/large_rust.html"
+group = "clean_large"
+
+# ---- real-world / gh-190 ----
+
+[[fixtures]]
+path = "real-world/issues/gh-190/mitrade.html"
+group = "clean_small"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/flex2025.html"
+group = "clean_small"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/insight.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/plusblog.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/rbloggers.html"
+group = "fallthrough_bare_lt"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/ozonekorea.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/firsteigen.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/sjsu.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "real-world/issues/gh-190/kimbrain.html"
+group = "clean_medium"
+
+# ---- real-world / other issues ----
+
+[[fixtures]]
+path = "real-world/issues/gh-121-hacker-news.html"
+group = "clean_medium"
+
+[[fixtures]]
+path = "real-world/issues/gh-127-issue.html"
+group = "fallthrough_custom_elements"
+
+# ---- synthetic / spec_rules ----
+
+[[fixtures]]
+path = "synthetic/optional_li.html"
+group = "spec_rules"
+
+[[fixtures]]
+path = "synthetic/table_no_tbody.html"
+group = "spec_rules"
+
+# ---- synthetic / adversarial ----
+
+[[fixtures]]
+path = "synthetic/bare_fragment.html"
+group = "adversarial"
+
+[[fixtures]]
+path = "synthetic/unescaped_lt.html"
+group = "adversarial"
+
+[[fixtures]]
+path = "synthetic/unclosed_p.html"
+group = "adversarial"
+
+[[fixtures]]
+path = "synthetic/unclosed_at_eof.html"
+group = "adversarial"
+
+[[fixtures]]
+path = "synthetic/cdata_in_svg.html"
+group = "adversarial"

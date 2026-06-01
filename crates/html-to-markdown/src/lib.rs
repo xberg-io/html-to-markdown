@@ -60,6 +60,23 @@ mod convert_api;
 #[allow(dead_code)]
 pub(crate) mod converter;
 mod exports;
+
+// Re-export internal test/benchmark modules when the testkit feature is active.
+// This lets integration tests and the bench harness access prescan and tier1
+// without making them part of the stable public API.
+//
+// We use a pub mod alias so tests can use both the short path (`crate::prescan`)
+// and the original path (`crate::converter::prescan`) via the re-export below.
+#[cfg(any(test, feature = "testkit"))]
+#[allow(unused_imports)]
+pub mod testkit {
+    pub use crate::converter::prescan;
+    pub use crate::converter::tier1;
+}
+#[cfg(any(test, feature = "testkit"))]
+pub use converter::prescan;
+#[cfg(any(test, feature = "testkit"))]
+pub use converter::tier1;
 #[cfg(feature = "inline-images")]
 mod inline_images;
 pub(crate) mod prelude;
