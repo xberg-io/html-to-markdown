@@ -733,10 +733,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         // Void-only kinds that never have open frames:
         TagKind::LineBreak | TagKind::Image => {}
         // Explicitly no-op: all remaining known kinds not listed above.
-        TagKind::DefinitionTerm
-        | TagKind::DefinitionDescription
-        | TagKind::RawText(_)
-        | TagKind::Ignored => {}
+        TagKind::DefinitionTerm | TagKind::DefinitionDescription | TagKind::RawText(_) | TagKind::Ignored => {}
     }
 
     Ok(())

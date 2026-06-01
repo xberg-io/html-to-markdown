@@ -118,5 +118,4 @@ mod tests {
         let p = tags::lookup(b"p").unwrap();
         assert!(!should_close_for_new_tag(div, p));
     }
-
 }

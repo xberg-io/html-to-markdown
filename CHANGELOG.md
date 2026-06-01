@@ -18,12 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   test (`tests/tier1_byte_equality_test.rs`). Tier-3 (`html5ever` repair) remains the
   fallback for truly malformed HTML.
 
-- **`ConversionOptions::tier_strategy`** (`TierStrategy::Auto` | `Tier2Only` | `ForceTier1`)
-  for runtime tier selection. `Auto` (default) lets the dispatcher pick; `Tier2Only` forces
-  the existing path. `ForceTier1` is testkit-only (`#[cfg(any(test, feature = "testkit"))]`)
-  for debugging and benchmarking. Exposed to Node (`tierStrategy: "auto" | "tier2_only"`)
-  and Wasm (`WasmTierStrategy` enum). CLI and Python pick up the field via the standard
-  options-mapping flow.
+- **`ConversionOptions::tier_strategy`** (`TierStrategy::Auto` | `Tier2` | `Tier1`)
+  for runtime tier selection. `Auto` (default) lets the classifier decide based on the
+  prescan signals and options shape; `Tier2` forces the existing DOM-walk path; `Tier1` is
+  testkit-only (`#[cfg(any(test, feature = "testkit"))]`) for debugging and benchmarking.
+  Exposed to Node (`tierStrategy: "auto" | "tier2"`) and Wasm (`WasmTierStrategy` enum).
+  CLI and Python pick up the field via the standard options-mapping flow.
 
 - **Tier-1 router style-option gate.** The classifier forces Tier-2 when any of these
   deviate from Tier-1's hardcoded value: `heading_style`, `code_block_style`,
@@ -43,8 +43,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Benchmark harness** (`tools/benchmark-harness/`, binary `htmbench`) with
   `run` / `compare` / `oracle` / `oracle:bless` / `survey` / `mdream` subcommands.
   Per-group regression guardrails (`baselines/baseline.json`, `guardrails.json`).
-  Wired under `task bench:*` namespace. Profile artifacts under
-  `tools/benchmark-harness/profiles/`.
+  Wired under `task bench:*` namespace. Profile artifacts and the head-to-head Tier-1
+  vs Tier-2 comparison under `tools/benchmark-harness/profiles/`.
+
+### Performance
+
+- **Tier-1 byte scanner activated in production** (`tier_strategy = Auto`). The classifier
+  decides per-input whether Tier-1's single-pass byte scanner runs; on bail, the dispatcher
+  falls back to Tier-2 transparently. Measured wins (vs prior Tier-2-only baseline):
+  spec_rules group median **7.47×**, adversarial **2.08×**, clean_small **1.70×**.
+  Reference fixtures: `synthetic/optional_li.html` 7.47×, `synthetic/unclosed_p.html` 4.27×,
+  `real-world/issues/gh-121-hacker-news.html` 2.62× (55 KB), `gh-190/firsteigen.html` 2.46×,
+  `real-world/wikipedia/large_rust.html` 1.72× (1.04 MB), `mdream/wikipedia-small.html`
+  1.05× (162 KB).
+
+- **memchr-driven text scan**: `decode_and_collapse_into` and `decode_entities_into` use
+  `memchr::memchr3` / `memchr::memchr` to skip ahead to the next special byte (`<`, `&`,
+  whitespace boundary) and bulk-copy plain text runs in a single `push_str`. Replaces a
+  byte-by-byte conditional inner loop and closes a substantial portion of the gap to main's
+  heavily-optimized Tier-2 path on Wikipedia-scale documents (e.g., +32% on `wikipedia-small`).
 
 - **`convert()` accepts options as a bare `ConversionOptions`** in addition to
   `Option<ConversionOptions>` (resolves #398). The second parameter now bounds

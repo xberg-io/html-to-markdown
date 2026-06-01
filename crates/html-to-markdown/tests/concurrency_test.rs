@@ -50,8 +50,8 @@ fn load_fixtures() -> Vec<(String, String)> {
     let mut result = Vec::new();
     for name in FIXTURE_NAMES {
         let path = dir.join(name);
-        let html = std::fs::read_to_string(&path)
-            .unwrap_or_else(|e| panic!("failed to read fixture {}: {e}", path.display()));
+        let html =
+            std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("failed to read fixture {}: {e}", path.display()));
         let reference = convert(&html, Some(default_opts()))
             .unwrap_or_else(|e| panic!("serial convert failed for {name}: {e}"))
             .content
