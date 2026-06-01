@@ -43,8 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Benchmark harness** (`tools/benchmark-harness/`, binary `htmbench`) with
   `run` / `compare` / `oracle` / `oracle:bless` / `survey` / `mdream` subcommands.
   Per-group regression guardrails (`baselines/baseline.json`, `guardrails.json`).
-  Wired under `task bench:*` namespace. Profile artifacts and the head-to-head Tier-1
-  vs Tier-2 comparison under `tools/benchmark-harness/profiles/`.
+  Wired under `task bench:*` namespace.
 
 ### Performance
 
