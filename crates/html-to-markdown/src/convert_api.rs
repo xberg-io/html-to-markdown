@@ -60,7 +60,8 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
     // block and fall through to the Tier-2 path below.
     #[cfg(any(test, feature = "testkit"))]
     if options.tier_strategy == crate::options::TierStrategy::ForceTier1 {
-        let (cleaned, report) = crate::converter::prescan::run(html);
+        let normalized = normalize_input(html)?;
+        let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
         match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
             Ok(markdown) => {
                 return Ok(crate::types::ConversionResult {

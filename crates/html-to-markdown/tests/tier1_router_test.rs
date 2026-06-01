@@ -7,7 +7,7 @@
 use html_to_markdown_rs::convert;
 use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::router::{TierChoice, classify};
-use html_to_markdown_rs::options::{ConversionOptions, PreprocessingOptions, PreprocessingPreset, TierStrategy};
+use html_to_markdown_rs::options::{CodeBlockStyle, ConversionOptions, HighlightStyle, PreprocessingOptions, PreprocessingPreset, TierStrategy};
 
 // ── Helper ──────────────────────────────────────────────────────────────────
 
@@ -17,11 +17,13 @@ fn route(html: &str, options: &ConversionOptions) -> TierChoice {
     classify(&report, options)
 }
 
-/// `ConversionOptions` with extract_metadata and hocr_spatial_tables turned
-/// off so the classifier can ever return Tier1.
+/// `ConversionOptions` with all structural and style gates set to Tier-1-
+/// compatible values so the classifier can return Tier1.
 fn minimal_options() -> ConversionOptions {
     ConversionOptions {
         extract_metadata: false,
+        code_block_style: CodeBlockStyle::Indented,
+        highlight_style: HighlightStyle::None,
         ..ConversionOptions::default()
     }
 }
@@ -148,6 +150,8 @@ fn tier_strategy_tier2_only_overrides_classifier() {
     // Even the cleanest HTML with all classifier flags off: Tier2Only wins.
     let opts = ConversionOptions {
         extract_metadata: false,
+        code_block_style: CodeBlockStyle::Indented,
+        highlight_style: HighlightStyle::None,
         tier_strategy: TierStrategy::Tier2Only,
         ..ConversionOptions::default()
     };

@@ -104,6 +104,23 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
                 // Bail on unsupported tag kinds for M3c
                 bail_unsupported(spec, pos)?;
 
+                // Bail on <pre> when code_block_style is not Indented.
+                // Tier-1 only implements 4-space indented code blocks; other styles
+                // (Backticks, Tildes) require Tier-2's fenced-block logic.
+                if matches!(spec.kind, TagKind::Pre)
+                    && options.code_block_style != crate::options::CodeBlockStyle::Indented
+                {
+                    return Err(BailReason::Classifier);
+                }
+
+                // Bail on nested lists: Tier-2 cycles bullet characters by depth
+                // (-, *, +) but Tier-1 always uses "-". Nesting requires Tier-2.
+                if matches!(spec.kind, TagKind::List(ListKind::Unordered | ListKind::Ordered))
+                    && state.list_depth > 0
+                {
+                    return Err(BailReason::Classifier);
+                }
+
                 // Find end of tag (handles quoted attribute values)
                 let close = parse::find_tag_close(bytes, name_end).ok_or(BailReason::LiteralLt { offset: pos })?;
 
@@ -230,6 +247,12 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
         return Err(BailReason::EofWithOpenBlock {
             open_count: state.stack.len(),
         });
+    }
+
+    // Collapse runs of 3+ consecutive newlines to exactly 2, matching Tier-2's
+    // `collapse_excess_blank_lines` post-processing step.
+    if state.output.contains("\n\n\n") {
+        collapse_excess_blank_lines(&mut state.output);
     }
 
     // Normalise trailing newlines to match Tier-2's final-output contract:
@@ -642,13 +665,30 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
             //
             // Implementation: heading is on the stack, content_start is stored
             // in the frame.  We insert the `# ` prefix at `content_start`.
-            let prefix = heading_prefix(n);
             trim_trailing_inline_whitespace(state);
-            state.output.insert_str(frame.content_start, &prefix);
-            // Tier-2 leaves a blank line ("\n\n") after a heading. A following
-            // paragraph's "\n\n" guard then finds it already and appends
-            // nothing, yielding the expected single blank line.
-            state.ensure_blank_line();
+            let content = &state.output[frame.content_start..];
+            if content.trim().is_empty() {
+                // Empty heading: Tier-2 emits nothing. Roll back to before
+                // the heading's block separator was added.
+                state.output.truncate(frame.content_start);
+                // Also trim any blank-line separator that ensure_blank_line
+                // added before the heading opened (frame.content_start is
+                // after emit_open, which may have pushed "\n\n").
+                let trimmed_len = state.output.trim_end_matches('\n').len();
+                if trimmed_len > 0 {
+                    state.output.truncate(trimmed_len);
+                    state.output.push('\n');
+                } else {
+                    state.output.clear();
+                }
+            } else {
+                let prefix = heading_prefix(n);
+                state.output.insert_str(frame.content_start, &prefix);
+                // Tier-2 leaves a blank line ("\n\n") after a heading. A
+                // following paragraph's "\n\n" guard then finds it already
+                // and appends nothing, yielding the expected single blank line.
+                state.ensure_blank_line();
+            }
         }
 
         TagKind::Blockquote => {
@@ -658,6 +698,12 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
             let content = state.output[frame.content_start..].to_owned();
             let prefixed = prefix_blockquote_lines(&content);
             state.output.truncate(frame.content_start);
+            // Mirror Tier-2 blockquote.rs: when the output ends with "\n\n"
+            // before the blockquote, remove one "\n" (heading-then-blockquote
+            // produces only a single newline separator, not a blank line).
+            if state.output.ends_with("\n\n") {
+                state.output.pop();
+            }
             state.output.push_str(&prefixed);
         }
 
@@ -806,9 +852,12 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
                 if cell_text.contains('\n') {
                     return Err(BailReason::TableBlockChildInCell);
                 }
-                // Pipes in cell text are NOT escaped: Tier-2 passes them through
-                // verbatim.  Bailing on multi-line content (above) prevents the
-                // only other newline-splitting scenario.
+                // Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
+                // which changes the cell width computation; Tier-1 does not
+                // implement pipe escaping.
+                if cell_text.contains('|') {
+                    return Err(BailReason::TableBlockChildInCell);
+                }
                 ts.current_row.push(cell_text);
                 ts.current_cell.clear();
             }
@@ -1341,42 +1390,58 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
     }
 
     // Pre-table separator: mirrors Tier-2's `convert_table` logic exactly.
-    // Tier-2 does:
-    //   if !output.ends_with("\n\n") {
-    //       if output.is_empty() || !output.ends_with('\n') {
-    //           output.push_str("\n\n");
-    //       } else {
-    //           output.push('\n');
-    //       }
-    //   }
-    // Note: unlike most blocks, Tier-2 adds \n\n even when output is empty.
-    if !state.output.ends_with("\n\n") {
-        if state.output.is_empty() || !state.output.ends_with('\n') {
-            state.output.push_str("\n\n");
-        } else {
+    // Tier-2 (block/table/mod.rs): `if !output.is_empty() && !output.ends_with("\n\n")`
+    // — only adds separator when there is existing output (no leading blank lines).
+    if !state.output.is_empty() && !state.output.ends_with("\n\n") {
+        if state.output.ends_with('\n') {
             state.output.push('\n');
+        } else {
+            state.output.push_str("\n\n");
+        }
+    }
+
+    // Pre-compute max column widths across ALL rows (mirrors Tier-2's pre-pass).
+    // Tier-2: separator dashes = max(col_content_char_count_across_all_rows, 3).
+    let col_count = ts.rows.iter().map(|r| r.len()).max().unwrap_or(0);
+    let mut col_widths: Vec<usize> = vec![0; col_count];
+    for row in &ts.rows {
+        for (i, cell) in row.iter().enumerate() {
+            let w = cell.chars().count();
+            if w > col_widths[i] {
+                col_widths[i] = w;
+            }
         }
     }
 
     for (row_index, row) in ts.rows.iter().enumerate() {
-        // Row: `|` then each cell as ` text |`
+        // Row: `|` then each cell as ` text |` (padded to col_width like Tier-2).
         state.output.push('|');
-        for cell in row {
+        for (i, cell) in row.iter().enumerate() {
             state.output.push(' ');
             state.output.push_str(cell);
+            // Pad to column width (mirrors Tier-2 cell.rs padding logic).
+            let cell_len = cell.chars().count();
+            let col_w = col_widths.get(i).copied().unwrap_or(0);
+            for _ in cell_len..col_w {
+                state.output.push(' ');
+            }
             state.output.push_str(" |");
         }
         state.output.push('\n');
 
         // After row 0 (the header row), emit the separator row.
+        // Tier-2: col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES)
+        // where MIN_SEPARATOR_DASHES = 3.
         if row_index == 0 {
-            let col_count = row.len().max(1);
             state.output.push_str("| ");
-            for i in 0..col_count {
+            for i in 0..col_count.max(1) {
                 if i > 0 {
                     state.output.push_str(" | ");
                 }
-                state.output.push_str("---");
+                let dash_count = col_widths.get(i).copied().unwrap_or(0).max(3);
+                for _ in 0..dash_count {
+                    state.output.push('-');
+                }
             }
             state.output.push_str(" |\n");
         }
@@ -1389,6 +1454,25 @@ fn trim_trailing_inline_whitespace(state: &mut Tier1State) {
     while state.output.ends_with(' ') || state.output.ends_with('\t') {
         state.output.pop();
     }
+}
+
+/// Collapse runs of 3+ consecutive newlines down to 2, matching Tier-2's
+/// `collapse_excess_blank_lines` post-processing step.
+fn collapse_excess_blank_lines(output: &mut String) {
+    let mut cleaned = String::with_capacity(output.len());
+    let mut consecutive = 0usize;
+    for ch in output.chars() {
+        if ch == '\n' {
+            consecutive += 1;
+            if consecutive <= 2 {
+                cleaned.push(ch);
+            }
+        } else {
+            consecutive = 0;
+            cleaned.push(ch);
+        }
+    }
+    *output = cleaned;
 }
 
 // ── HTML entity decoding ──────────────────────────────────────────────────────
