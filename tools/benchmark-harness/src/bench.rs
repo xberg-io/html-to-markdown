@@ -101,4 +101,3 @@ pub fn run_one(html: &str, opts: Option<ConversionOptions>) -> (f64, usize) {
 
     (best_us / 1_000.0, output_bytes)
 }
-

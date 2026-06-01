@@ -39,11 +39,10 @@ pub fn skip_ws(bytes: &[u8], mut pos: usize) -> usize {
     pos
 }
 
-/// Find the closing `>` of a tag starting at `start` (the position after the
-/// tag name and attributes).  Returns `(close_bracket_idx, is_self_closing)`
-/// where `is_self_closing` is true if the tag ended with `/>`.
+/// Find the closing `>` of a tag starting at `start` (the position after the tag name and attributes).
 ///
-/// Returns `None` if no `>` was found before the end of input.
+/// Returns `(close_bracket_idx, is_self_closing)` where `is_self_closing` is true if the tag ended
+/// with `/>`.  Returns `None` if no `>` was found before the end of input.
 pub fn find_tag_close(bytes: &[u8], start: usize) -> Option<(usize, bool)> {
     let mut pos = start;
     let len = bytes.len();
@@ -114,24 +113,21 @@ pub fn scan_attribute(bytes: &[u8], pos: usize) -> Option<(Range<usize>, Option<
     }
 
     // Value: quoted or unquoted
-    let (value_range, new_pos) = match bytes[after_eq] {
-        q @ (b'"' | b'\'') => {
-            let val_start = after_eq + 1;
-            let mut val_end = val_start;
-            while val_end < bytes.len() && bytes[val_end] != q {
-                val_end += 1;
-            }
-            (val_start..val_end, val_end + 1)
+    let (value_range, new_pos) = if let q @ (b'"' | b'\'') = bytes[after_eq] {
+        let val_start = after_eq + 1;
+        let mut val_end = val_start;
+        while val_end < bytes.len() && bytes[val_end] != q {
+            val_end += 1;
         }
-        _ => {
-            // Unquoted value: ends at whitespace or `>`
-            let val_start = after_eq;
-            let mut val_end = val_start;
-            while val_end < bytes.len() && !matches!(bytes[val_end], b' ' | b'\t' | b'\n' | b'\r' | b'>' | b'/') {
-                val_end += 1;
-            }
-            (val_start..val_end, val_end)
+        (val_start..val_end, val_end + 1)
+    } else {
+        // Unquoted value: ends at whitespace or `>`
+        let val_start = after_eq;
+        let mut val_end = val_start;
+        while val_end < bytes.len() && !matches!(bytes[val_end], b' ' | b'\t' | b'\n' | b'\r' | b'>' | b'/') {
+            val_end += 1;
         }
+        (val_start..val_end, val_end)
     };
 
     Some((key_start..key_end, Some(value_range), new_pos))

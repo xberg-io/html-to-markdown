@@ -1,3 +1,4 @@
+//! Integration tests for the prescan module.
 use html_to_markdown_rs::prescan::{self, PrescanReport};
 
 fn report(html: &str) -> PrescanReport {
@@ -21,8 +22,7 @@ fn detects_head_range() {
     let head_contents = &buf[range];
     assert!(
         head_contents.contains("<title>x</title>"),
-        "head contents should include title; got: {:?}",
-        head_contents
+        "head contents should include title; got: {head_contents:?}"
     );
 }
 
@@ -275,8 +275,7 @@ fn doctype_removed() {
     let out = cleaned("<!DOCTYPE html><html><body>hi</body></html>");
     assert!(
         !out.to_lowercase().contains("doctype"),
-        "DOCTYPE should be stripped; got: {:?}",
-        out
+        "DOCTYPE should be stripped; got: {out:?}"
     );
 }
 

@@ -5,12 +5,12 @@
 //! default value still allows `TierChoice::Tier1` (with all structural
 //! blockers turned off).
 
-use html_to_markdown_rs::prescan;
-use html_to_markdown_rs::tier1::router::{TierChoice, classify};
 use html_to_markdown_rs::options::{
     CodeBlockStyle, ConversionOptions, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle,
     OutputFormat, UrlEscapeStyle, WhitespaceMode,
 };
+use html_to_markdown_rs::prescan;
+use html_to_markdown_rs::tier1::router::{TierChoice, classify};
 
 // ── Helper ──────────────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ use html_to_markdown_rs::options::{
 ///   the highlight gate because Tier-1 emits `<mark>` content as plain text
 /// - `code_block_style: CodeBlockStyle::Indented` — Tier-1 always emits 4-space
 ///   indented pre blocks regardless of the option; `Backticks` (the default) would
-///   fire the code_block_style gate
+///   fire the `code_block_style` gate
 fn base_opts() -> ConversionOptions {
     ConversionOptions {
         extract_metadata: false,

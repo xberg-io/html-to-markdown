@@ -23,8 +23,8 @@ pub enum TierStrategy {
     Tier2Only,
     /// Always attempt Tier-1, falling back to Tier-2 on bail.
     ///
-    /// Only available in test or when the `testkit` feature is enabled.
-    #[cfg(any(test, feature = "testkit"))]
+    /// Primarily for testing; in production code use `Auto` instead.
+    #[doc(hidden)]
     ForceTier1,
 }
 

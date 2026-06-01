@@ -92,7 +92,7 @@ fn test_3x3_with_header() {
     </table>";
     assert_matches_tier2(html);
     let out = tier1(html);
-    assert!(out.contains("A"), "header missing: {out:?}");
+    assert!(out.contains('A'), "header missing: {out:?}");
     assert!(out.contains("| 1 |"), "row 1 missing: {out:?}");
     assert!(out.contains("| 4 |"), "row 2 missing: {out:?}");
 }
@@ -106,7 +106,7 @@ fn test_implicit_tbody() {
     </table>";
     assert_matches_tier2(html);
     let out = tier1(html);
-    assert!(out.contains("X"), "header missing: {out:?}");
+    assert!(out.contains('X'), "header missing: {out:?}");
     assert!(out.contains("foo"), "data missing: {out:?}");
 }
 

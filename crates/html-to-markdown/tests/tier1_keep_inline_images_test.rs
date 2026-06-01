@@ -25,10 +25,13 @@ use html_to_markdown_rs::{ConversionOptions, convert};
 #[cfg(feature = "inline-images")]
 fn auto(html: &str, keep: &[&str]) -> String {
     let opts = ConversionOptions {
-        keep_inline_images_in: keep.iter().map(|s| s.to_string()).collect(),
+        keep_inline_images_in: keep.iter().map(ToString::to_string).collect(),
         ..ConversionOptions::default()
     };
-    convert(html, Some(opts)).expect("conversion must succeed").content.unwrap_or_default()
+    convert(html, Some(opts))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default()
 }
 
 // ── 1. Default (keep_inline_images_in empty) — image preserved ────────────────
@@ -110,19 +113,25 @@ mod tier_parity {
     fn t1(html: &str, keep: &[&str]) -> String {
         let opts = ConversionOptions {
             tier_strategy: TierStrategy::ForceTier1,
-            keep_inline_images_in: keep.iter().map(|s| s.to_string()).collect(),
+            keep_inline_images_in: keep.iter().map(ToString::to_string).collect(),
             ..ConversionOptions::default()
         };
-        convert(html, Some(opts)).expect("tier-1 conversion must succeed").content.unwrap_or_default()
+        convert(html, Some(opts))
+            .expect("tier-1 conversion must succeed")
+            .content
+            .unwrap_or_default()
     }
 
     fn t2(html: &str, keep: &[&str]) -> String {
         let opts = ConversionOptions {
             tier_strategy: TierStrategy::Tier2Only,
-            keep_inline_images_in: keep.iter().map(|s| s.to_string()).collect(),
+            keep_inline_images_in: keep.iter().map(ToString::to_string).collect(),
             ..ConversionOptions::default()
         };
-        convert(html, Some(opts)).expect("tier-2 conversion must succeed").content.unwrap_or_default()
+        convert(html, Some(opts))
+            .expect("tier-2 conversion must succeed")
+            .content
+            .unwrap_or_default()
     }
 
     // 6a. Default (empty keep list) — paragraph image

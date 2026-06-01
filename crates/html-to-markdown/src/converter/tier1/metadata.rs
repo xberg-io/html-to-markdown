@@ -246,7 +246,7 @@ fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> String {
 
 /// ASCII-lowercase a `Cow<str>` tag name without allocation when already lower.
 fn normalize_tag_name(raw: Cow<'_, str>) -> Cow<'_, str> {
-    if raw.as_bytes().iter().any(|b| b.is_ascii_uppercase()) {
+    if raw.as_bytes().iter().any(u8::is_ascii_uppercase) {
         let mut owned = raw.into_owned();
         owned.make_ascii_lowercase();
         Cow::Owned(owned)

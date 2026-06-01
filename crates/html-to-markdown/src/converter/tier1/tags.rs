@@ -1,6 +1,6 @@
-//! Compile-time table mapping tag-name bytes → semantic spec consulted by the
-//! Tier-1 byte scanner (M3c).  All lookups go through `lookup(tag_name_bytes)`;
-//! callers are expected to lowercase their input first.
+//! Compile-time table mapping tag-name bytes → semantic spec consulted by the Tier-1 byte scanner (M3c).
+//!
+//! All lookups go through `lookup(tag_name_bytes)`; callers are expected to lowercase their input first.
 
 use phf::phf_map;
 
@@ -11,18 +11,25 @@ use phf::phf_map;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TagKind {
     // Block-level structural
+    /// Generic block container (`<div>`, `<section>`, etc.).
     Block,
+    /// Paragraph (`<p>`).
     Paragraph,
     /// Heading level 1–6.
     Heading(u8),
+    /// Block quotation (`<blockquote>`).
     Blockquote,
+    /// Horizontal rule (`<hr>`).
     Hr,
     /// Code-block container.
     Pre,
 
     // Inline formatting
+    /// Generic inline container (`<span>`, etc.).
     Inline,
+    /// Bold/strong emphasis (`<strong>`, `<b>`).
     Strong,
+    /// Italic/emphasis (`<em>`, `<i>`).
     Emphasis,
     /// Inline `code`.
     Code,
@@ -34,24 +41,36 @@ pub enum TagKind {
     Image,
 
     // List structures
+    /// Ordered or unordered list container.
     List(ListKind),
+    /// List item (`<li>`).
     ListItem,
+    /// Definition term (`<dt>`).
     DefinitionTerm,
+    /// Definition description (`<dd>`).
     DefinitionDescription,
 
     // Tables
+    /// Table root (`<table>`).
     Table,
+    /// Table header section (`<thead>`).
     TableHead,
+    /// Table body section (`<tbody>`).
     TableBody,
+    /// Table footer section (`<tfoot>`).
     TableFoot,
+    /// Table row (`<tr>`).
     TableRow,
     /// Table cell; `is_header` distinguishes `<th>` from `<td>`.
     TableCell {
+        /// True for `<th>` header cells, false for `<td>` data cells.
         is_header: bool,
     },
+    /// Table caption (`<caption>`).
     TableCaption,
 
     // Raw-text containers (scanner must skip their contents)
+    /// Raw-text container whose content the scanner skips until the matching close tag.
     RawText(RawKind),
 
     // Special / ignored
@@ -62,22 +81,34 @@ pub enum TagKind {
 /// List flavour for `TagKind::List`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ListKind {
+    /// Bullet list (`<ul>`).
     Unordered,
+    /// Numbered list (`<ol>`).
     Ordered,
+    /// Definition list (`<dl>`).
     Definition,
 }
 
 /// Raw-text sub-type for `TagKind::RawText`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RawKind {
+    /// `<script>` element.
     Script,
+    /// `<style>` element.
     Style,
+    /// `<textarea>` element.
     Textarea,
+    /// `<title>` element.
     Title,
+    /// `<xmp>` element (obsolete preformatted text).
     Xmp,
+    /// `<iframe>` element.
     Iframe,
+    /// `<noscript>` element.
     Noscript,
+    /// `<noembed>` element.
     NoEmbed,
+    /// `<noframes>` element.
     NoFrames,
 }
 

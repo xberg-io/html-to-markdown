@@ -9,6 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Tiered HTML-to-Markdown conversion architecture.** Clean HTML inputs now have an opt-in
+  fast path through a Tier-1 single-pass byte scanner (`converter/tier1/`); on anything the
+  scanner cannot prove byte-equivalent to the existing Tier-2 DOM walker, it returns a
+  structured bail and the dispatcher falls back to Tier-2 (`tl::parse` + `walk_node`)
+  transparently. Output is always byte-equal to what Tier-2 would have produced for the
+  same input — verified by 116 oracle snapshots and a per-fixture byte-equality integration
+  test (`tests/tier1_byte_equality_test.rs`). Tier-3 (`html5ever` repair) remains the
+  fallback for truly malformed HTML.
+
+- **`ConversionOptions::tier_strategy`** (`TierStrategy::Auto` | `Tier2Only` | `ForceTier1`)
+  for runtime tier selection. `Auto` (default) lets the dispatcher pick; `Tier2Only` forces
+  the existing path. `ForceTier1` is testkit-only (`#[cfg(any(test, feature = "testkit"))]`)
+  for debugging and benchmarking. Exposed to Node (`tierStrategy: "auto" | "tier2_only"`)
+  and Wasm (`WasmTierStrategy` enum). CLI and Python pick up the field via the standard
+  options-mapping flow.
+
+- **Tier-1 router style-option gate.** The classifier forces Tier-2 when any of these
+  deviate from Tier-1's hardcoded value: `heading_style`, `code_block_style`,
+  `strong_em_symbol`, `bullets`, `list_indent_*`, `whitespace_mode`, `newline_style`,
+  `escape_*` flags, `output_format`, `link_style`, `url_escape_style`, `compact_tables`,
+  `default_title`, `sub_symbol`, `sup_symbol`, `highlight_style`. 47 integration tests
+  enforce the gate.
+
+- **Tier-1 conservative bail set.** Tier-1 returns `Err(BailReason::*)` rather than emit
+  potentially-wrong output on: custom elements, CDATA, unescaped `<`, inline SVG, HTML
+  5 optional-close edge cases, `<table>` with rowspan/colspan/block-children-in-cells/
+  caption/mixed-section-order, nested lists (Tier-2 cycles bullets by depth), `<pre>`
+  with non-Indented `code_block_style`, named HTML entities outside the 45-entry
+  zero-alloc table, table cells containing `|`, and `<br>` inside table cells. Tests
+  cover every variant.
+
+- **Benchmark harness** (`tools/benchmark-harness/`, binary `htmbench`) with
+  `run` / `compare` / `oracle` / `oracle:bless` / `survey` / `mdream` subcommands.
+  Per-group regression guardrails (`baselines/baseline.json`, `guardrails.json`).
+  Wired under `task bench:*` namespace. Profile artifacts under
+  `tools/benchmark-harness/profiles/`.
+
 - **`convert()` accepts options as a bare `ConversionOptions`** in addition to
   `Option<ConversionOptions>` (resolves #398). The second parameter now bounds
   `impl Into<Option<ConversionOptions>>`, so `convert(html, opts)`,
@@ -23,6 +60,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contains `<`, `>`, spaces, or parentheses (resolves #392).
 
 ### Fixed
+
+- **Non-deterministic SVG attribute serialization** in `converter/media/svg.rs`:
+  `serialize_element` iterated `tag.attributes()` over astral-tl's internal `HashMap`,
+  which has non-deterministic iteration order. SVG `data:` URIs therefore differed across
+  runs. Fixed by sorting attributes by name before emission, restoring determinism.
 
 - **spurious blank lines after frontmatter and lists (MD012)** (resolves #399). Block-level
   emission now collapses runs of three or more consecutive newlines into exactly two, so

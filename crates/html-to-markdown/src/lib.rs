@@ -69,6 +69,7 @@ mod exports;
 // and the original path (`crate::converter::prescan`) via the re-export below.
 #[cfg(any(test, feature = "testkit"))]
 #[allow(unused_imports)]
+/// Re-exports of internal modules for integration tests and the bench harness.
 pub mod testkit {
     pub use crate::converter::prescan;
     pub use crate::converter::tier1;

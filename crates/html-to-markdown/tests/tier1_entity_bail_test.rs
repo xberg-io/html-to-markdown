@@ -45,7 +45,7 @@ fn tier2(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-/// `convert()` with ForceTier1 — bails silently and falls back to Tier-2.
+/// `convert()` with `ForceTier1` — bails silently and falls back to Tier-2.
 fn force_tier1(html: &str) -> String {
     let opts = ConversionOptions {
         tier_strategy: TierStrategy::ForceTier1,

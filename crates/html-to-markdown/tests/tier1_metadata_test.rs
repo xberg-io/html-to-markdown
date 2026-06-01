@@ -29,7 +29,10 @@ fn t1(html: &str) -> String {
         extract_metadata: true,
         ..ConversionOptions::default()
     };
-    convert(html, Some(opts)).expect("tier-1 conversion must succeed").content.unwrap_or_default()
+    convert(html, Some(opts))
+        .expect("tier-1 conversion must succeed")
+        .content
+        .unwrap_or_default()
 }
 
 /// Convert with `Tier2Only` + `extract_metadata: true` (same other defaults).
@@ -39,7 +42,10 @@ fn t2(html: &str) -> String {
         extract_metadata: true,
         ..ConversionOptions::default()
     };
-    convert(html, Some(opts)).expect("tier-2 conversion must succeed").content.unwrap_or_default()
+    convert(html, Some(opts))
+        .expect("tier-2 conversion must succeed")
+        .content
+        .unwrap_or_default()
 }
 
 // ── 1. Title extraction ───────────────────────────────────────────────────────

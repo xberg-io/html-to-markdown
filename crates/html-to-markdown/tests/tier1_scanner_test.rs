@@ -39,8 +39,7 @@ fn assert_matches_tier2(html: &str) {
     let t2 = tier2(html);
     assert_eq!(
         t1, t2,
-        "tier1 diverged from tier2 for input {:?}\ntier1: {:?}\ntier2: {:?}",
-        html, t1, t2
+        "tier1 diverged from tier2 for input {html:?}\ntier1: {t1:?}\ntier2: {t2:?}"
     );
 }
 

@@ -115,9 +115,7 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
 
                 // Bail on nested lists: Tier-2 cycles bullet characters by depth
                 // (-, *, +) but Tier-1 always uses "-". Nesting requires Tier-2.
-                if matches!(spec.kind, TagKind::List(ListKind::Unordered | ListKind::Ordered))
-                    && state.list_depth > 0
-                {
+                if matches!(spec.kind, TagKind::List(ListKind::Unordered | ListKind::Ordered)) && state.list_depth > 0 {
                     return Err(BailReason::Classifier);
                 }
 
@@ -136,10 +134,9 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
                 // common case; only collect for the kinds whose emit paths
                 // actually consult attributes.
                 let attrs: Vec<(&[u8], Option<&[u8]>)> = match spec.kind {
-                    TagKind::Link
-                    | TagKind::Image
-                    | TagKind::List(ListKind::Ordered)
-                    | TagKind::TableCell { .. } => parse::collect_attrs(bytes, name_end, attrs_end),
+                    TagKind::Link | TagKind::Image | TagKind::List(ListKind::Ordered) | TagKind::TableCell { .. } => {
+                        parse::collect_attrs(bytes, name_end, attrs_end)
+                    }
                     _ => Vec::new(),
                 };
 
@@ -287,19 +284,21 @@ fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReason> {
         TagKind::DefinitionTerm
         | TagKind::DefinitionDescription
         | TagKind::List(ListKind::Definition)
-        | TagKind::RawText(RawKind::Textarea)
-        | TagKind::RawText(RawKind::Title)
-        | TagKind::RawText(RawKind::Xmp)
-        | TagKind::RawText(RawKind::Iframe)
-        | TagKind::RawText(RawKind::Noscript)
-        | TagKind::RawText(RawKind::NoEmbed)
-        | TagKind::RawText(RawKind::NoFrames) => Err(BailReason::Classifier),
+        | TagKind::RawText(
+            RawKind::Textarea
+            | RawKind::Title
+            | RawKind::Xmp
+            | RawKind::Iframe
+            | RawKind::Noscript
+            | RawKind::NoEmbed
+            | RawKind::NoFrames,
+        ) => Err(BailReason::Classifier),
 
         // script/style are `Ignored` with `is_rawtext=true`; handled as void-like
         // by the prescan (stripped). We bail here as a safety net — if they
         // appear in the scanner they weren't stripped by the prescan, which
         // means they have content we can't skip.
-        TagKind::RawText(RawKind::Script) | TagKind::RawText(RawKind::Style) => Err(BailReason::Classifier),
+        TagKind::RawText(RawKind::Script | RawKind::Style) => Err(BailReason::Classifier),
 
         // head / meta / link are Ignored — we can silently skip them when void,
         // but if they have children (weird HTML) we bail.
@@ -363,19 +362,18 @@ fn emit_open(
             // Emit the list item marker.
             let parent_kind = find_parent_list_kind(&state.stack);
             let indent = list_item_indent(state.list_depth.saturating_sub(1));
-            match parent_kind {
-                Some(ListKind::Ordered) => {
-                    // Increment counter on parent ordered list frame
-                    let counter = increment_ol_counter(&mut state.stack);
-                    let start = find_ol_start(&state.stack);
-                    let index = start.saturating_sub(1) + counter;
-                    state.output.push_str(&indent);
-                    state.output.push_str(&format!("{index}. "));
-                }
-                _ => {
-                    state.output.push_str(&indent);
-                    state.output.push_str("- ");
-                }
+            if parent_kind == Some(ListKind::Ordered) {
+                // Increment counter on parent ordered list frame
+                let counter = increment_ol_counter(&mut state.stack);
+                let start = find_ol_start(&state.stack);
+                let index = start.saturating_sub(1) + counter;
+                state.output.push_str(&indent);
+                // measured: write! is slower on this workload (Stage 5c)
+                #[allow(clippy::format_push_string)]
+                state.output.push_str(&format!("{index}. "));
+            } else {
+                state.output.push_str(&indent);
+                state.output.push_str("- ");
             }
         }
 
@@ -403,12 +401,13 @@ fn emit_open(
         }
 
         // ── Table handling ──────────────────────────────────────────────────────
-
         TagKind::Table => {
             // The nested-table check was already done in the main scanner loop
             // (before this emit_open call) to ensure TableNestedTable takes
             // priority over TableBlockChildInCell.
-            state.table_stack.push(crate::converter::tier1::state::TableState::default());
+            state
+                .table_stack
+                .push(crate::converter::tier1::state::TableState::default());
         }
 
         TagKind::TableCaption => {
@@ -519,8 +518,12 @@ fn emit_void(
             if keep_as_markdown {
                 if let Some(title_bytes) = title {
                     let title_str = decode_attr(title_bytes)?;
+                    // measured: write! is slower on this workload (Stage 5c)
+                    #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("![{alt}]({src} \"{title_str}\")"));
                 } else {
+                    // measured: write! is slower on this workload (Stage 5c)
+                    #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("![{alt}]({src})"));
                 }
             } else {
@@ -736,8 +739,12 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
             let dest = state.cell_or_output_mut();
             if let Some(href) = &frame.link_href {
                 if let Some(title) = &frame.link_title {
+                    // measured: write! is slower on this workload (Stage 5c)
+                    #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("]({href} \"{title}\")"));
                 } else {
+                    // measured: write! is slower on this workload (Stage 5c)
+                    #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("]({href})"));
                 }
             } else {
@@ -768,7 +775,6 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         }
 
         // ── Table handling ──────────────────────────────────────────────────────
-
         TagKind::Table => {
             // Pop the table state and (if safe) emit the GFM table to main output.
             if let Some(ts) = state.table_stack.pop() {
@@ -798,8 +804,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
                     let link_heavy = row_count <= 2 && ts.link_count >= 3;
 
                     // Blank table → Tier-2 emits nothing (not a bail case).
-                    let is_blank = ts.rows.is_empty()
-                        || ts.rows.iter().all(|r| r.iter().all(|c| c.trim().is_empty()));
+                    let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|c| c.trim().is_empty()));
 
                     if inconsistent_cols || link_heavy || is_blank {
                         // Tier-2 would not emit a GFM table here.
@@ -886,7 +891,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
 /// literal top frame) and skips the tag-name lookup (we use the frame's spec
 /// directly).
 fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
-    let frame = state.stack.pop().ok_or(BailReason::DepthMismatch {
+    let frame = state.stack.pop().ok_or_else(|| BailReason::DepthMismatch {
         tag: String::from("(implicit)"),
         expected: 1,
         actual: 0,
@@ -948,8 +953,12 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
             let dest = state.cell_or_output_mut();
             if let Some(href) = &frame.link_href {
                 if let Some(title) = &frame.link_title {
+                    // measured: write! is slower on this workload (Stage 5c)
+                    #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("]({href} \"{title}\")"));
                 } else {
+                    // measured: write! is slower on this workload (Stage 5c)
+                    #[allow(clippy::format_push_string)]
                     dest.push_str(&format!("]({href})"));
                 }
             } else {
@@ -972,7 +981,6 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
         }
 
         // ── Table implicit closes ──────────────────────────────────────────────
-
         TagKind::TableCell { .. } => {
             // Implicitly close a <td>/<th> — same logic as the explicit close.
             if let Some(ts) = state.table_stack.last_mut() {
@@ -1061,6 +1069,7 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
 /// True if `s` contains two consecutive whitespace bytes (space or tab) that
 /// would collapse.
 #[inline]
+#[allow(clippy::many_single_char_names)] // byte-scanner loop — single-char names are conventional here
 fn has_double_ws(s: &str) -> bool {
     let b = s.as_bytes();
     let mut i = 1;
@@ -1237,9 +1246,7 @@ fn find_attr<'a>(attrs: &[(&'a [u8], Option<&'a [u8]>)], key: &[u8]) -> Option<&
 }
 
 /// Extract `href` and `title` from the attribute list for a link.
-fn extract_link_attrs(
-    attrs: &[(&[u8], Option<&[u8]>)],
-) -> Result<(Option<String>, Option<String>), BailReason> {
+fn extract_link_attrs(attrs: &[(&[u8], Option<&[u8]>)]) -> Result<(Option<String>, Option<String>), BailReason> {
     let href = find_attr(attrs, b"href").map(decode_attr).transpose()?;
     let title = find_attr(attrs, b"title").map(decode_attr).transpose()?;
     Ok((href, title))
@@ -1319,7 +1326,7 @@ fn find_parent_list_kind(stack: &[OpenTag]) -> Option<ListKind> {
 /// Returns the new counter value (1-based).
 fn increment_ol_counter(stack: &mut [OpenTag]) -> u16 {
     for frame in stack.iter_mut().rev() {
-        if let TagKind::List(ListKind::Ordered) = frame.spec.kind {
+        if frame.spec.kind == TagKind::List(ListKind::Ordered) {
             frame.list_index = frame.list_index.saturating_add(1);
             return frame.list_index;
         }
@@ -1330,7 +1337,7 @@ fn increment_ol_counter(stack: &mut [OpenTag]) -> u16 {
 /// Get the `ol_start` value from the nearest `List(Ordered)` frame.
 fn find_ol_start(stack: &[OpenTag]) -> u16 {
     for frame in stack.iter().rev() {
-        if let TagKind::List(ListKind::Ordered) = frame.spec.kind {
+        if frame.spec.kind == TagKind::List(ListKind::Ordered) {
             return frame.ol_start;
         }
     }
@@ -1444,7 +1451,7 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
 
     // Pre-compute max column widths across ALL rows (mirrors Tier-2's pre-pass).
     // Tier-2: separator dashes = max(col_content_char_count_across_all_rows, 3).
-    let col_count = ts.rows.iter().map(|r| r.len()).max().unwrap_or(0);
+    let col_count = ts.rows.iter().map(Vec::len).max().unwrap_or(0);
     let mut col_widths: Vec<usize> = vec![0; col_count];
     for row in &ts.rows {
         for (i, cell) in row.iter().enumerate() {

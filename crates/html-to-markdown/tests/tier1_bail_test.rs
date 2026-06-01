@@ -56,7 +56,7 @@ fn auto(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-/// `convert()` with ForceTier1 — bails silently and falls back to Tier-2.
+/// `convert()` with `ForceTier1` — bails silently and falls back to Tier-2.
 fn force_tier1(html: &str) -> String {
     let opts = ConversionOptions {
         tier_strategy: TierStrategy::ForceTier1,
@@ -105,7 +105,7 @@ fn scanner_bails_on_cdata_direct() {
     // Call tier1::run without prescanning so `<![CDATA[` survives to the scanner.
     let html = "<p><![CDATA[data]]></p>";
     let err = tier1_raw(html).unwrap_err();
-    assert!(matches!(err, BailReason::Cdata { .. }), "expected Cdata, got {:?}", err);
+    assert!(matches!(err, BailReason::Cdata { .. }), "expected Cdata, got {err:?}");
 }
 
 #[test]
@@ -121,8 +121,7 @@ fn bails_on_cdata_or_classifier_via_prescan() {
             err,
             BailReason::Cdata { .. } | BailReason::Classifier | BailReason::UnknownCustomElement { .. }
         ),
-        "expected a bail reason, got {:?}",
-        err
+        "expected a bail reason, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -135,8 +134,7 @@ fn bails_on_custom_element() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::UnknownCustomElement { .. }),
-        "expected UnknownCustomElement, got {:?}",
-        err
+        "expected UnknownCustomElement, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -147,8 +145,7 @@ fn bails_on_custom_element_contains_name() {
     if let Err(BailReason::UnknownCustomElement { name, .. }) = tier1_run(html) {
         assert!(
             name.contains('-') || name.eq_ignore_ascii_case("data-widget"),
-            "expected name to reflect the element, got {:?}",
-            name
+            "expected name to reflect the element, got {name:?}"
         );
     } else {
         panic!("expected UnknownCustomElement");
@@ -162,7 +159,7 @@ fn bails_on_custom_element_fallback_matches_tier2() {
         "<ui-card><p>hi</p></ui-card>",
         "<foo-bar baz=\"1\">text</foo-bar>",
     ] {
-        assert_eq!(force_tier1(html), tier2(html), "fallback mismatch for {:?}", html);
+        assert_eq!(force_tier1(html), tier2(html), "fallback mismatch for {html:?}");
     }
 }
 
@@ -174,8 +171,7 @@ fn bails_on_eof_with_open_block() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::EofWithOpenBlock { .. }),
-        "expected EofWithOpenBlock, got {:?}",
-        err
+        "expected EofWithOpenBlock, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -185,7 +181,7 @@ fn eof_open_count_reflects_stack_depth() {
     // Two unclosed block elements: <p> and <strong>
     let html = "<p>hello <strong>world";
     if let Err(BailReason::EofWithOpenBlock { open_count }) = tier1_run(html) {
-        assert_eq!(open_count, 2, "expected 2 unclosed elements, got {}", open_count);
+        assert_eq!(open_count, 2, "expected 2 unclosed elements, got {open_count}");
     } else {
         panic!("expected EofWithOpenBlock");
     }
@@ -197,8 +193,7 @@ fn bails_on_eof_single_unclosed() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::EofWithOpenBlock { open_count: 1 }),
-        "expected EofWithOpenBlock{{open_count:1}}, got {:?}",
-        err
+        "expected EofWithOpenBlock{{open_count:1}}, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -210,8 +205,7 @@ fn bails_on_eof_nested_open() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::EofWithOpenBlock { .. }),
-        "expected EofWithOpenBlock, got {:?}",
-        err
+        "expected EofWithOpenBlock, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -225,8 +219,7 @@ fn bails_on_depth_mismatch_close_without_open() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::DepthMismatch { .. }),
-        "expected DepthMismatch, got {:?}",
-        err
+        "expected DepthMismatch, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -238,8 +231,7 @@ fn bails_on_depth_mismatch_wrong_close() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::DepthMismatch { .. }),
-        "expected DepthMismatch, got {:?}",
-        err
+        "expected DepthMismatch, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -248,7 +240,7 @@ fn bails_on_depth_mismatch_wrong_close() {
 fn depth_mismatch_contains_tag_name() {
     let html = "<p>text</div>";
     if let Err(BailReason::DepthMismatch { tag, .. }) = tier1_run(html) {
-        assert_eq!(tag, "div", "expected tag name 'div', got {:?}", tag);
+        assert_eq!(tag, "div", "expected tag name 'div', got {tag:?}");
     } else {
         panic!("expected DepthMismatch");
     }
@@ -262,7 +254,7 @@ fn table_now_handled_by_tier1() {
     // Tier-1 output must be byte-identical to Tier-2.
     let html = "<table><tr><td>a</td></tr></table>";
     let result = tier1_run(html);
-    assert!(result.is_ok(), "expected success, got {:?}", result);
+    assert!(result.is_ok(), "expected success, got {result:?}");
     assert_eq!(force_tier1(html), tier2(html));
 }
 
@@ -272,8 +264,7 @@ fn bails_on_definition_list() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::Classifier),
-        "expected Classifier, got {:?}",
-        err
+        "expected Classifier, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -286,8 +277,7 @@ fn bails_on_script() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::Classifier),
-        "expected Classifier, got {:?}",
-        err
+        "expected Classifier, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -298,8 +288,7 @@ fn bails_on_textarea() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::Classifier),
-        "expected Classifier, got {:?}",
-        err
+        "expected Classifier, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
@@ -346,7 +335,7 @@ fn bail_reason_display_is_non_empty() {
     ];
     for reason in &reasons {
         let s = reason.to_string();
-        assert!(!s.is_empty(), "Display for {:?} produced empty string", reason);
+        assert!(!s.is_empty(), "Display for {reason:?} produced empty string");
     }
 }
 
@@ -358,13 +347,13 @@ fn bail_reason_display_contains_contextual_info() {
         actual: 0,
     };
     let s = r.to_string();
-    assert!(s.contains("section"), "Display should contain tag name: {}", s);
+    assert!(s.contains("section"), "Display should contain tag name: {s}");
 
     let r2 = BailReason::LiteralLt { offset: 99 };
     let s2 = r2.to_string();
-    assert!(s2.contains("99"), "Display should contain offset: {}", s2);
+    assert!(s2.contains("99"), "Display should contain offset: {s2}");
 
     let r3 = BailReason::EofWithOpenBlock { open_count: 5 };
     let s3 = r3.to_string();
-    assert!(s3.contains("5"), "Display should contain open_count: {}", s3);
+    assert!(s3.contains('5'), "Display should contain open_count: {s3}");
 }

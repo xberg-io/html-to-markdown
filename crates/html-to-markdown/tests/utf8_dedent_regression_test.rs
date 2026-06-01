@@ -34,7 +34,10 @@ fn test_mixed_tab_nbsp_indent() {
     let result = convert(html, None);
     assert!(result.is_ok(), "panicked on mixed tab+NBSP indent: {:?}", result.err());
     let md = result.unwrap().content.unwrap_or_default();
-    assert!(md.contains("ascii_line"), "expected 'ascii_line' in output, got: {md:?}");
+    assert!(
+        md.contains("ascii_line"),
+        "expected 'ascii_line' in output, got: {md:?}"
+    );
     assert!(md.contains("nbsp_line"), "expected 'nbsp_line' in output, got: {md:?}");
 }
 
@@ -57,7 +60,7 @@ fn test_blank_lines_interleaved_with_multibyte_indent() {
 ///
 /// `é` (U+00E9) and `ñ` (U+00F1) are both 2-byte in UTF-8.  Using them as
 /// leading whitespace is unusual but they are valid UTF-8 and `char::is_whitespace`
-/// returns false for them, so min_indent stays 0 — the key is that the
+/// returns false for them, so `min_indent` stays 0 — the key is that the
 /// converter must not panic regardless.
 #[test]
 fn test_latin1_supplement_chars_at_line_start() {
@@ -65,7 +68,11 @@ fn test_latin1_supplement_chars_at_line_start() {
     // the conversion must succeed without panic.
     let html = "<pre>éline\nñline</pre>";
     let result = convert(html, None);
-    assert!(result.is_ok(), "panicked on Latin-1 chars at line start: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "panicked on Latin-1 chars at line start: {:?}",
+        result.err()
+    );
     let md = result.unwrap().content.unwrap_or_default();
     assert!(md.contains("éline"), "expected 'éline' in output, got: {md:?}");
     assert!(md.contains("ñline"), "expected 'ñline' in output, got: {md:?}");

@@ -3359,6 +3359,8 @@ impl From<html_to_markdown_rs::options::TierStrategy> for WasmTierStrategy {
         match val {
             html_to_markdown_rs::options::TierStrategy::Auto => Self::Auto,
             html_to_markdown_rs::options::TierStrategy::Tier2Only => Self::Tier2Only,
+            #[cfg(any(test, feature = "testkit"))]
+            html_to_markdown_rs::options::TierStrategy::ForceTier1 => Self::Auto,
         }
     }
 }

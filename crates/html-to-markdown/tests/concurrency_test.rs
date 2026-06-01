@@ -51,9 +51,9 @@ fn load_fixtures() -> Vec<(String, String)> {
     for name in FIXTURE_NAMES {
         let path = dir.join(name);
         let html = std::fs::read_to_string(&path)
-            .unwrap_or_else(|e| panic!("failed to read fixture {}: {}", path.display(), e));
+            .unwrap_or_else(|e| panic!("failed to read fixture {}: {e}", path.display()));
         let reference = convert(&html, Some(default_opts()))
-            .unwrap_or_else(|e| panic!("serial convert failed for {}: {}", name, e))
+            .unwrap_or_else(|e| panic!("serial convert failed for {name}: {e}"))
             .content
             .unwrap_or_default();
         result.push((html, reference));
@@ -76,20 +76,20 @@ fn all_threads_produce_output_equal_to_serial_reference() {
                     .content
                     .unwrap_or_default();
                 assert_eq!(
-                    output, *reference,
-                    "thread {i} output differed from serial reference (fixture index {})",
-                    i % fixtures.len()
+                    output,
+                    *reference,
+                    "thread {i} output differed from serial reference (fixture index {fi})",
+                    fi = i % fixtures.len()
                 );
             })
         })
         .collect();
 
-    // Collect all join handles; panic if any thread panicked.
-    for (i, handle) in handles.into_iter().enumerate() {
+    // Join all handles; panic if any thread panicked.
+    for handle in handles {
         handle.join().unwrap_or_else(|e| {
             std::panic::resume_unwind(e);
         });
-        let _ = i;
     }
 }
 

@@ -17,9 +17,14 @@ pub mod spec_rules;
 pub mod state;
 pub mod tags;
 
+// These re-exports are used by testkit/bench consumers; they look unused in
+// normal builds where `tier1` itself is not re-exported from the crate root.
+#[allow(unused_imports)]
 pub use tags::{ListKind, OptionalCloseRule, RawKind, TagKind, TagSpec, lookup};
 
+#[allow(unused_imports)]
 pub use bail::BailReason;
+#[allow(unused_imports)]
 pub use router::TierChoice;
 
 use crate::converter::prescan::PrescanReport;

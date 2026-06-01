@@ -60,8 +60,7 @@ fn should_bail_on_table_rowspan_greater_than_one() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableRowspanColspan),
-        "expected TableRowspanColspan, got {:?}",
-        err
+        "expected TableRowspanColspan, got {err:?}"
     );
     // Tier-1 fallback via convert still produces a sensible result.
     let result = force_tier1(html);
@@ -75,8 +74,7 @@ fn should_bail_on_table_colspan_greater_than_one() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableRowspanColspan),
-        "expected TableRowspanColspan, got {:?}",
-        err
+        "expected TableRowspanColspan, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -89,7 +87,7 @@ fn should_not_bail_when_rowspan_and_colspan_are_one() {
 <tbody><tr><td>1</td><td>2</td></tr></tbody>
 </table>"#;
     let result = tier1_run(html);
-    assert!(result.is_ok(), "rowspan=1/colspan=1 must not bail; got {:?}", result);
+    assert!(result.is_ok(), "rowspan=1/colspan=1 must not bail; got {result:?}");
 }
 
 // ── TableBlockChildInCell ─────────────────────────────────────────────────────
@@ -100,8 +98,7 @@ fn should_bail_when_paragraph_is_child_of_table_cell() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableBlockChildInCell),
-        "expected TableBlockChildInCell, got {:?}",
-        err
+        "expected TableBlockChildInCell, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -112,8 +109,7 @@ fn should_bail_when_div_is_child_of_table_cell() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableBlockChildInCell),
-        "expected TableBlockChildInCell, got {:?}",
-        err
+        "expected TableBlockChildInCell, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -126,8 +122,7 @@ fn should_bail_when_br_is_child_of_table_cell() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableBlockChildInCell),
-        "expected TableBlockChildInCell for <br> in cell, got {:?}",
-        err
+        "expected TableBlockChildInCell for <br> in cell, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -140,8 +135,7 @@ fn should_bail_on_nested_table_inside_cell() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableNestedTable),
-        "expected TableNestedTable, got {:?}",
-        err
+        "expected TableNestedTable, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -154,8 +148,7 @@ fn should_bail_on_table_caption_element() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableCaption),
-        "expected TableCaption, got {:?}",
-        err
+        "expected TableCaption, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -169,8 +162,7 @@ fn should_bail_when_thead_appears_after_tbody_close() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableSectionOrder),
-        "expected TableSectionOrder, got {:?}",
-        err
+        "expected TableSectionOrder, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -182,8 +174,7 @@ fn should_bail_when_tbody_appears_after_tfoot() {
     let err = tier1_run(html).unwrap_err();
     assert!(
         matches!(err, BailReason::TableSectionOrder),
-        "expected TableSectionOrder for tbody-after-tfoot, got {:?}",
-        err
+        "expected TableSectionOrder for tbody-after-tfoot, got {err:?}"
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
@@ -209,6 +200,6 @@ fn table_bail_reason_display_strings_are_non_empty() {
     ];
     for reason in &reasons {
         let s = reason.to_string();
-        assert!(!s.is_empty(), "Display for {:?} produced empty string", reason);
+        assert!(!s.is_empty(), "Display for {reason:?} produced empty string");
     }
 }

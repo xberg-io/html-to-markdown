@@ -5,9 +5,11 @@
 //! Tier-2 fallback path.
 
 use html_to_markdown_rs::convert;
+use html_to_markdown_rs::options::{
+    CodeBlockStyle, ConversionOptions, HighlightStyle, PreprocessingOptions, PreprocessingPreset, TierStrategy,
+};
 use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::router::{TierChoice, classify};
-use html_to_markdown_rs::options::{CodeBlockStyle, ConversionOptions, HighlightStyle, PreprocessingOptions, PreprocessingPreset, TierStrategy};
 
 // ── Helper ──────────────────────────────────────────────────────────────────
 
@@ -176,7 +178,7 @@ fn convert_with_default_options_still_works() {
     let result = convert("<p>hello</p>", None);
     assert!(result.is_ok(), "convert() returned Err: {:?}", result.err());
     let md = result.unwrap().content.unwrap_or_default();
-    assert!(md.contains("hello"), "expected 'hello' in output, got: {:?}", md);
+    assert!(md.contains("hello"), "expected 'hello' in output, got: {md:?}");
 }
 
 // ── 13. debug flag forces Tier-2 ────────────────────────────────────────────
@@ -213,7 +215,10 @@ fn tier1_bail_falls_back_to_tier2() {
         tier_strategy: TierStrategy::Tier2Only,
         ..ConversionOptions::default()
     };
-    let tier2_output = convert(html, Some(tier2_opts)).expect("tier-2 must succeed").content.unwrap_or_default();
+    let tier2_output = convert(html, Some(tier2_opts))
+        .expect("tier-2 must succeed")
+        .content
+        .unwrap_or_default();
 
     // ForceTier1 with default options: classifier normally blocks Tier-1 due to
     // extract_metadata=true, but ForceTier1 overrides it. The M2 stub always
@@ -222,7 +227,10 @@ fn tier1_bail_falls_back_to_tier2() {
         tier_strategy: TierStrategy::ForceTier1,
         ..ConversionOptions::default()
     };
-    let fallback_output = convert(html, Some(force_opts)).expect("fallback must succeed").content.unwrap_or_default();
+    let fallback_output = convert(html, Some(force_opts))
+        .expect("fallback must succeed")
+        .content
+        .unwrap_or_default();
     assert_eq!(
         fallback_output, tier2_output,
         "Tier-1 bail fallback output must match Tier-2 output"

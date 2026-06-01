@@ -46,10 +46,15 @@ bitflags::bitflags! {
     /// Ambient escape contexts.  Set when we enter a tag that changes escape rules.
     #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
     pub struct EscapeCtx: u8 {
+        /// Inside a `<code>` span.
         const CODE       = 1 << 1;
+        /// Inside a `<pre>` block.
         const PRE        = 1 << 2;
+        /// Inside an `<a>` link.
         const LINK       = 1 << 3;
+        /// Inside a `<blockquote>`.
         const BLOCKQUOTE = 1 << 4;
+        /// Inside a heading element.
         const HEADING    = 1 << 5;
     }
 }
@@ -57,6 +62,7 @@ bitflags::bitflags! {
 /// One frame on the open-tag stack.
 #[derive(Debug, Clone)]
 pub struct OpenTag {
+    /// Static tag specification for this element.
     pub spec: &'static TagSpec,
     /// Where this tag's content begins in the input buffer (byte index).
     pub content_start: usize,
@@ -75,10 +81,15 @@ pub struct OpenTag {
     pub name_range: std::ops::Range<usize>,
 }
 
+/// Mutable state threaded through the entire Tier-1 scan pass.
 pub struct Tier1State {
+    /// Open-tag stack; one frame per currently-open element.
     pub stack: Vec<OpenTag>,
+    /// Current escape-context bitmask.
     pub escape_ctx: EscapeCtx,
+    /// Accumulated Markdown output.
     pub output: String,
+    /// Current list nesting depth (0 = top level).
     pub list_depth: u16,
     /// Tracks the output length before the most recent block-open separator was appended,
     /// so we can detect whether any content was actually emitted inside a block.
@@ -89,6 +100,7 @@ pub struct Tier1State {
 }
 
 impl Tier1State {
+    /// Create a new `Tier1State` pre-allocating output capacity based on `input_len`.
     pub fn new(input_len: usize) -> Self {
         Self {
             stack: Vec::with_capacity(16),

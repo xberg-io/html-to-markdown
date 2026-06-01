@@ -42,17 +42,14 @@ fn tier2_output(html: &str) -> String {
 
 /// The core invariant: if Tier-1 succeeds, its output must equal Tier-2.
 fn assert_tier1_matches_tier2_or_bails(html: &str) {
-    match tier1_direct(html) {
-        Ok(t1_out) => {
-            let t2_out = tier2_output(html);
-            assert_eq!(
-                t1_out, t2_out,
-                "Tier-1 produced different output than Tier-2 for input:\n{html}\n\nTier-1:\n{t1_out}\n\nTier-2:\n{t2_out}"
-            );
-        }
-        Err(_) => {
-            // Bail is always acceptable — no assertion needed.
-        }
+    if let Ok(t1_out) = tier1_direct(html) {
+        let t2_out = tier2_output(html);
+        assert_eq!(
+            t1_out, t2_out,
+            "Tier-1 produced different output than Tier-2 for input:\n{html}\n\nTier-1:\n{t1_out}\n\nTier-2:\n{t2_out}"
+        );
+    } else {
+        // Bail is always acceptable — no assertion needed.
     }
 }
 

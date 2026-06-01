@@ -20,10 +20,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 // ── Fixture paths (mirrors groups.toml) ──────────────────────────────────────
 
-const FIXTURES_ROOT: &str = concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/../../tools/benchmark-harness/fixtures"
-);
+const FIXTURES_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../tools/benchmark-harness/fixtures");
 
 /// All fixture relative paths from groups.toml.
 const FIXTURE_PATHS: &[&str] = &[
@@ -113,31 +110,22 @@ fn tier1_byte_equality_against_all_fixtures() {
     for rel_path in FIXTURE_PATHS {
         total += 1;
         let full_path = fixtures_root.join(rel_path);
-        let html = match fs::read_to_string(&full_path) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("SKIP {rel_path}: cannot read ({e})");
-                skipped += 1;
-                continue;
-            }
+        let Ok(html) = fs::read_to_string(&full_path) else {
+            eprintln!("SKIP {rel_path}: cannot read");
+            skipped += 1;
+            continue;
         };
 
-        let t2 = match tier2_output(&html) {
-            Some(s) => s,
-            None => {
-                eprintln!("SKIP {rel_path}: Tier-2 panicked or failed");
-                skipped += 1;
-                continue;
-            }
+        let Some(t2) = tier2_output(&html) else {
+            eprintln!("SKIP {rel_path}: Tier-2 panicked or failed");
+            skipped += 1;
+            continue;
         };
 
-        let t1 = match force_tier1_output(&html) {
-            Some(s) => s,
-            None => {
-                eprintln!("SKIP {rel_path}: ForceTier1 panicked");
-                skipped += 1;
-                continue;
-            }
+        let Some(t1) = force_tier1_output(&html) else {
+            eprintln!("SKIP {rel_path}: ForceTier1 panicked");
+            skipped += 1;
+            continue;
         };
 
         if t1 != t2 {
@@ -157,10 +145,10 @@ fn tier1_byte_equality_against_all_fixtures() {
         failures.len()
     );
 
+    let nfail = failures.len();
     assert!(
         failures.is_empty(),
-        "{} fixture(s) diverged from Tier-2:\n{}",
-        failures.len(),
+        "{nfail} fixture(s) diverged from Tier-2:\n{}",
         failures.join("\n\n")
     );
 }
@@ -183,28 +171,19 @@ fn tier1_bail_survey() {
 
     for rel_path in FIXTURE_PATHS {
         let full_path = fixtures_root.join(rel_path);
-        let html = match fs::read_to_string(&full_path) {
-            Ok(s) => s,
-            Err(_) => {
-                skipped += 1;
-                continue;
-            }
+        let Ok(html) = fs::read_to_string(&full_path) else {
+            skipped += 1;
+            continue;
         };
 
-        let t2 = match tier2_output(&html) {
-            Some(s) => s,
-            None => {
-                skipped += 1;
-                continue;
-            }
+        let Some(t2) = tier2_output(&html) else {
+            skipped += 1;
+            continue;
         };
 
-        let t1 = match force_tier1_output(&html) {
-            Some(s) => s,
-            None => {
-                skipped += 1;
-                continue;
-            }
+        let Some(t1) = force_tier1_output(&html) else {
+            skipped += 1;
+            continue;
         };
 
         // When t1 == t2, Tier-1 either handled it correctly or bailed to Tier-2.
@@ -219,9 +198,7 @@ fn tier1_bail_survey() {
         }
     }
 
-    eprintln!(
-        "\ntier1_bail_survey: equal={handled} diverged={bailed} skipped={skipped}"
-    );
+    eprintln!("\ntier1_bail_survey: equal={handled} diverged={bailed} skipped={skipped}");
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -234,9 +211,5 @@ fn first_diff(expected: &str, actual: &str) -> String {
             return format!("line {}: expected {:?} actual {:?}", i + 1, e, a);
         }
     }
-    format!(
-        "line count differs: expected {} actual {}",
-        exp.len(),
-        act.len()
-    )
+    format!("line count differs: expected {} actual {}", exp.len(), act.len())
 }

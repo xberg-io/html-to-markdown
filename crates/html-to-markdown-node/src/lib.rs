@@ -6041,12 +6041,12 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for JsConversionOptio
             infer_dimensions: Some(val.infer_dimensions),
             max_depth: val.max_depth.map(|v| v as i64),
             exclude_selectors: Some(val.exclude_selectors.into_iter().collect()),
-            tier_strategy: Some(
-                match val.tier_strategy {
-                    html_to_markdown_rs::options::TierStrategy::Auto => "auto".to_string(),
-                    html_to_markdown_rs::options::TierStrategy::Tier2Only => "tier2_only".to_string(),
-                }
-            ),
+            tier_strategy: Some(match val.tier_strategy {
+                html_to_markdown_rs::options::TierStrategy::Auto => "auto".to_string(),
+                html_to_markdown_rs::options::TierStrategy::Tier2Only => "tier2_only".to_string(),
+                #[cfg(any(test, feature = "testkit"))]
+                html_to_markdown_rs::options::TierStrategy::ForceTier1 => "auto".to_string(),
+            }),
             visitor: Default::default(),
         }
     }
