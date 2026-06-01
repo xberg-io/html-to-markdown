@@ -714,6 +714,7 @@ pub struct WasmConversionOptions {
     infer_dimensions: bool,
     max_depth: Option<usize>,
     exclude_selectors: Vec<String>,
+    tier_strategy: WasmTierStrategy,
     visitor: Option<WasmVisitorHandle>,
 }
 
@@ -765,6 +766,7 @@ impl WasmConversionOptions {
         inferDimensions: Option<bool>,
         excludeSelectors: Option<Vec<String>>,
         maxDepth: Option<usize>,
+        tierStrategy: Option<WasmTierStrategy>,
     ) -> WasmConversionOptions {
         WasmConversionOptions {
             heading_style: headingStyle.unwrap_or_default(),
@@ -809,6 +811,7 @@ impl WasmConversionOptions {
             infer_dimensions: inferDimensions.unwrap_or(true),
             max_depth: maxDepth,
             exclude_selectors: excludeSelectors.unwrap_or_default(),
+            tier_strategy: tierStrategy.unwrap_or_default(),
             visitor: Default::default(),
         }
     }
@@ -1233,6 +1236,16 @@ impl WasmConversionOptions {
         self.exclude_selectors = value;
     }
 
+    #[wasm_bindgen(getter, js_name = "tierStrategy")]
+    pub fn tier_strategy(&self) -> String {
+        self.tier_strategy.to_api_str().to_owned()
+    }
+
+    #[wasm_bindgen(setter, js_name = "tierStrategy")]
+    pub fn set_tier_strategy(&mut self, value: WasmTierStrategy) {
+        self.tier_strategy = value;
+    }
+
     #[wasm_bindgen(getter)]
     pub fn visitor(&self) -> Option<WasmVisitorHandle> {
         self.visitor.clone()
@@ -1299,6 +1312,7 @@ pub struct WasmConversionOptionsUpdate {
     infer_dimensions: Option<bool>,
     max_depth: Option<usize>,
     exclude_selectors: Option<Vec<String>>,
+    tier_strategy: Option<WasmTierStrategy>,
     visitor: Option<WasmVisitorHandle>,
 }
 
@@ -1350,6 +1364,7 @@ impl WasmConversionOptionsUpdate {
         inferDimensions: Option<bool>,
         maxDepth: Option<usize>,
         excludeSelectors: Option<Vec<String>>,
+        tierStrategy: Option<WasmTierStrategy>,
     ) -> WasmConversionOptionsUpdate {
         WasmConversionOptionsUpdate {
             heading_style: headingStyle,
@@ -1394,6 +1409,7 @@ impl WasmConversionOptionsUpdate {
             infer_dimensions: inferDimensions,
             max_depth: maxDepth,
             exclude_selectors: excludeSelectors,
+            tier_strategy: tierStrategy,
             visitor: Default::default(),
         }
     }
@@ -1822,6 +1838,16 @@ impl WasmConversionOptionsUpdate {
     #[wasm_bindgen(setter, js_name = "excludeSelectors")]
     pub fn set_exclude_selectors(&mut self, value: Option<Vec<String>>) {
         self.exclude_selectors = value;
+    }
+
+    #[wasm_bindgen(getter, js_name = "tierStrategy")]
+    pub fn tier_strategy(&self) -> Option<String> {
+        self.tier_strategy.map(|v| v.to_api_str().to_owned())
+    }
+
+    #[wasm_bindgen(setter, js_name = "tierStrategy")]
+    pub fn set_tier_strategy(&mut self, value: Option<WasmTierStrategy>) {
+        self.tier_strategy = value;
     }
 
     #[wasm_bindgen(getter)]
@@ -3277,6 +3303,62 @@ impl WasmOutputFormat {
             "Djot" => Some(Self::Djot),
             "Plain" => Some(Self::Plain),
             _ => None,
+        }
+    }
+}
+
+/// Controls which conversion tier is used.
+///
+/// `Auto` (default) lets the engine pick the best path. `Tier2Only` forces the
+/// Tier-2 DOM-walk path. `ForceTier1` is intentionally not exposed here (testkit only).
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum WasmTierStrategy {
+    Auto = 0,
+    Tier2Only = 1,
+}
+
+#[allow(clippy::derivable_impls)]
+impl Default for WasmTierStrategy {
+    fn default() -> Self {
+        Self::Auto
+    }
+}
+
+impl WasmTierStrategy {
+    /// Returns the serde wire string for this variant.
+    pub fn to_api_str(self) -> &'static str {
+        match self {
+            Self::Auto => "auto",
+            Self::Tier2Only => "tier2_only",
+        }
+    }
+
+    /// Parses a serde wire string and returns the corresponding variant, or None if unrecognized.
+    pub fn from_api_str(s: &str) -> Option<Self> {
+        match s {
+            "auto" => Some(Self::Auto),
+            "tier2_only" => Some(Self::Tier2Only),
+            _ => None,
+        }
+    }
+}
+
+impl From<WasmTierStrategy> for html_to_markdown_rs::options::TierStrategy {
+    fn from(val: WasmTierStrategy) -> Self {
+        match val {
+            WasmTierStrategy::Auto => Self::Auto,
+            WasmTierStrategy::Tier2Only => Self::Tier2Only,
+        }
+    }
+}
+
+impl From<html_to_markdown_rs::options::TierStrategy> for WasmTierStrategy {
+    fn from(val: html_to_markdown_rs::options::TierStrategy) -> Self {
+        match val {
+            html_to_markdown_rs::options::TierStrategy::Auto => Self::Auto,
+            html_to_markdown_rs::options::TierStrategy::Tier2Only => Self::Tier2Only,
         }
     }
 }
@@ -6534,6 +6616,7 @@ impl From<WasmConversionOptions> for html_to_markdown_rs::options::ConversionOpt
             infer_dimensions: val.infer_dimensions,
             max_depth: val.max_depth,
             exclude_selectors: val.exclude_selectors.into_iter().collect(),
+            tier_strategy: val.tier_strategy.into(),
             visitor: val.visitor.map(|v| (*v.inner).clone()),
             ..Default::default()
         }
@@ -6586,6 +6669,7 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for WasmConversionOpt
             infer_dimensions: val.infer_dimensions,
             max_depth: val.max_depth,
             exclude_selectors: val.exclude_selectors.into_iter().collect(),
+            tier_strategy: val.tier_strategy.into(),
             visitor: val.visitor.map(|v| WasmVisitorHandle {
                 inner: std::sync::Arc::new(v),
             }),
@@ -6639,6 +6723,7 @@ impl From<html_to_markdown_rs::options::ConversionOptionsUpdate> for WasmConvers
             infer_dimensions: val.infer_dimensions,
             max_depth: val.max_depth.flatten(),
             exclude_selectors: val.exclude_selectors.map(|v| v.into_iter().collect()),
+            tier_strategy: val.tier_strategy.map(Into::into),
             visitor: val.visitor.map(|v| WasmVisitorHandle {
                 inner: std::sync::Arc::new(v),
             }),

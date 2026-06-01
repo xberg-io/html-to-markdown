@@ -532,6 +532,14 @@ pub struct JsConversionOptions {
     #[napi(js_name = "excludeSelectors")]
     #[serde(rename = "excludeSelectors")]
     pub exclude_selectors: Option<Vec<String>>,
+    /// Which conversion tier to use.
+    ///
+    /// Accepted values: `"auto"` (default) or `"tier2_only"`.
+    /// `"auto"` lets the engine pick the best path; `"tier2_only"` forces the
+    /// Tier-2 DOM-walk path. `"force_tier1"` is intentionally not exposed here.
+    #[napi(js_name = "tierStrategy")]
+    #[serde(rename = "tierStrategy")]
+    pub tier_strategy: Option<String>,
     /// Optional visitor for custom traversal logic.
     ///
     /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -1473,13 +1481,14 @@ pub fn convert(
         })
     });
     let options_core: Option<html_to_markdown_rs::ConversionOptions> = options
-        .map(|o| {
-            let mut result: html_to_markdown_rs::ConversionOptions = o.into();
+        .map(|o| -> napi::Result<html_to_markdown_rs::ConversionOptions> {
+            let mut result: html_to_markdown_rs::ConversionOptions = o.try_into()?;
             if visitor_handle.is_some() {
                 result.visitor = visitor_handle.clone();
             }
-            result
+            Ok(result)
         })
+        .transpose()?
         .or_else(|| {
             if visitor_handle.is_some() {
                 Some(html_to_markdown_rs::ConversionOptions {
@@ -5838,8 +5847,10 @@ impl From<html_to_markdown_rs::metadata::HtmlMetadata> for JsHtmlMetadata {
 #[allow(clippy::needless_update)]
 #[allow(clippy::field_reassign_with_default, clippy::let_and_return)]
 #[allow(clippy::redundant_closure, clippy::useless_conversion)]
-impl From<JsConversionOptions> for html_to_markdown_rs::options::ConversionOptions {
-    fn from(val: JsConversionOptions) -> Self {
+impl TryFrom<JsConversionOptions> for html_to_markdown_rs::options::ConversionOptions {
+    type Error = napi::Error;
+
+    fn try_from(val: JsConversionOptions) -> napi::Result<Self> {
         let mut __result = html_to_markdown_rs::options::ConversionOptions::default();
         if let Some(__v) = val.heading_style {
             __result.heading_style = __v.into();
@@ -5965,8 +5976,22 @@ impl From<JsConversionOptions> for html_to_markdown_rs::options::ConversionOptio
         if let Some(__v) = val.exclude_selectors {
             __result.exclude_selectors = __v.into_iter().collect();
         }
+        match val.tier_strategy.as_deref() {
+            None | Some("auto") => {
+                __result.tier_strategy = html_to_markdown_rs::options::TierStrategy::Auto;
+            }
+            Some("tier2_only") => {
+                __result.tier_strategy = html_to_markdown_rs::options::TierStrategy::Tier2Only;
+            }
+            Some(other) => {
+                return Err(napi::Error::new(
+                    napi::Status::InvalidArg,
+                    format!("tier_strategy must be 'auto' or 'tier2_only', got: {other}"),
+                ));
+            }
+        }
         __result.visitor = Default::default();
-        __result
+        Ok(__result)
     }
 }
 
@@ -6016,6 +6041,12 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for JsConversionOptio
             infer_dimensions: Some(val.infer_dimensions),
             max_depth: val.max_depth.map(|v| v as i64),
             exclude_selectors: Some(val.exclude_selectors.into_iter().collect()),
+            tier_strategy: Some(
+                match val.tier_strategy {
+                    html_to_markdown_rs::options::TierStrategy::Auto => "auto".to_string(),
+                    html_to_markdown_rs::options::TierStrategy::Tier2Only => "tier2_only".to_string(),
+                }
+            ),
             visitor: Default::default(),
         }
     }
