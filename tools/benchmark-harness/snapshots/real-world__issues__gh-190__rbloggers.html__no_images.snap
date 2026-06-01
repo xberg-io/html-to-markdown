@@ -1,28 +1,15 @@
 ---
-meta-article-published_time: "2017-05-15T02:40:25-06:00"
-title: "Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects | R-bloggers"
+meta-article:published_time: 2017-05-15T02:40:25-06:00
+title: Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects | R-bloggers
 ---
 
 [R-bloggersR-bloggersR news and tutorials contributed by hundreds of R bloggers](https://www.r-bloggers.com/ "R-bloggers")
-
-- [Home](https://www.r-bloggers.com)
-- [About](https://www.r-bloggers.com/about/)
-- [RSS](https://feeds.feedburner.com/RBloggers)
-- [add your blog!](https://www.r-bloggers.com/add-your-blog/)
-- [Learn R](https://www.r-bloggers.com/2015/12/how-to-learn-r-2/)
-- [R jobs](https://www.r-users.com/)
-  - [Submit a new job (it’s free)](https://www.r-users.com/submit-job/)
-  - [Browse latest jobs (also free)](https://www.r-users.com/)
-- [Contact us](https://www.r-bloggers.com/contact-us/)
-
-
 
 # Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects
 
 Posted on May 15, 2017 by [Bogdan Anastasiei](https://www.r-bloggers.com/author/bogdan-anastasiei/) in [R bloggers](https://www.r-bloggers.com/category/r-bloggers/) | 0 Comments
 
 [This article was first published on **[R-posts.com](http://r-posts.com/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/)**, and kindly contributed to [R-bloggers](https://www.r-bloggers.com/)]. (You can report issue about the content on this page [here](https://www.r-bloggers.com/contact-us/))
-
 ---
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
@@ -40,14 +27,15 @@ The resistance to effort is measured on a scale whatsoever, from 1 to 30 (30 bei
 aov1 <- aov(effort~dose*gender*type, data=vitamin)
 summary(aov1)
 ```
+
 In the formula above the interaction effect is, of course, *dose*gender*type*. The ANOVA results can be seen below (we have only kept the line presenting the third-order interaction effect).  
 
 ```
                                   Df Sum Sq Mean Sq F value   Pr(>F)
 
-
 dose:gender:type   2    187    93.4  22.367 3.81e-10
 ```
+
 The interaction effect is statistically significant: F(2)=22.367, p<0.01. In other words, we do have a third-order interaction effect.
 
 In this situation, it is not advisable to report and interpret the second-order interaction effects (they could be misleading). Therefore, we are going to compute the *simple second-order interaction effects*.
@@ -65,15 +53,14 @@ So let’s investigate the interaction effect of dose and type of employee for e
 vitamin_male <- filter(vitamin, gender=="male")
 vitamin_female <- filter(vitamin, gender=="female")
 ```
-Now we perform a two-way analysis of variance on each data frame (the factors being dose and type, of course).
 
+Now we perform a two-way analysis of variance on each data frame (the factors being dose and type, of course).
 
 aov1 <- aov(effort~dose*type, data=vitamin_male)
 summary(aov1)
 
 aov2 <- aov(effort~dose*type, data=vitamin_female)
 summary(aov2)
-
 
 The results of the analyses are shown below (we have only retained the lines with the interaction effects).
 
@@ -93,7 +80,6 @@ We can notice that both simple second-order interaction effects are significant 
 
 Now we must create four separate data frames, for each combination of the factors gender and type of employee: male – blue collar, male – white collar, female – blue collar, female – white collar.
 
-
 vitamin_male_blue <- filter(vitamin, gender=="male", type=="blue collar")
 
 vitamin_male_white <- filter(vitamin, gender=="male", type=="white collar")
@@ -102,9 +88,7 @@ vitamin_female_blue <- filter(vitamin, gender=="female", type=="blue collar")
 
 vitamin_female_white <- filter(vitamin, gender=="female", type=="white collar")
 
-
 Next we perform a one-way ANOVA for each data frame. Let’s do it for the first group, male – blue collar.
-
 
 aov1 <- aov(effort~dose, data=vitamin_male_blue)
 summary(aov1)
@@ -120,7 +104,6 @@ The simple main effect for the factor dose on this group is statistically signif
 ```
 TukeyHSD(aov1)
 
-
                                               diff        lwr       upr   p adj
 
  low dose-high dose -2.528333  -3.413363 -1.643303     0
@@ -134,17 +117,14 @@ By inspection of the table we conclude that the differences in effort resistance
 
 One more example: the simple main effects of the variable dose of vitamin on the female – blue collar group.
 
-
 aov1 <- aov(effort~dose, data=vitamin_female_blue)
 summary(aov1)
-
 
  Df Sum Sq Mean Sq F value Pr(>F)  
 dose 2 399.6 199.81 45.57 <2e-16
 
 ```
 TukeyHSD(aov1)
-
 
                                             diff        lwr       upr     p adj
 
@@ -154,6 +134,7 @@ TukeyHSD(aov1)
 
  placebo-low dose   -3.560000 -4.4635826 -2.656417 0.0000000
 ```
+
 The simple main effect is statistically significant, as it results from the first table. Furthermore, all the differences between dose levels are significant. The highest difference is the difference between low dose and placebo (3.5 points).
 
 To learn more on data analysis in R, [check the free “Statistics with R” video course here.](http://www.statistics-with-r.com/)
@@ -170,13 +151,7 @@ To **leave a comment** for the author, please follow the link and comment on the
 ---
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
-[← Previous post](https://www.r-bloggers.com/2017/05/r%e2%81%b6-tracking-wannacry-bitcoin-wallet-payments-with-r/)
-
-[Next post →](https://www.r-bloggers.com/2017/05/visualizing-r-ladies-growth/)
-
-
-
-[![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&amp;ssl=1)![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)](https://feeds.feedburner.com/RBloggers)
+[![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)](https://feeds.feedburner.com/RBloggers)
 
 > [R bloggers Facebook page](https://www.facebook.com/rbloggers/)
 
@@ -189,12 +164,10 @@ Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com
 - [How to write the first for loop in R](https://www.r-bloggers.com/2015/12/how-to-write-the-first-for-loop-in-r/ "How to write the first for loop in R")
 - [How to Calculate a Cumulative Average in R](https://www.r-bloggers.com/2022/03/how-to-calculate-a-cumulative-average-in-r/ "How to Calculate a Cumulative Average in R")
 - [Date Formats in R](https://www.r-bloggers.com/2013/08/date-formats-in-r/ "Date Formats in R")
-- [Complete tutorial on using 'apply' functions in R](https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/ "Complete tutorial on using 'apply' functions in R")
+- [Complete tutorial on using 'apply' functions in R](https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/ "Complete tutorial on using &#039;apply&#039; functions in R")
 - [R – Sorting a data frame by the contents of a column](https://www.r-bloggers.com/2010/02/r-sorting-a-data-frame-by-the-contents-of-a-column/ "R – Sorting a data frame by the contents of a column")
 
 #### Sponsors
-
-
 
 #### Recent Posts
 
@@ -231,8 +204,6 @@ Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com
 - [Spelling Corrector Program in Python](https://python-bloggers.com/2022/02/spelling-corrector-program-in-python/)
 - [Spelling Checker Program in Python](https://python-bloggers.com/2022/02/spelling-checker-program-in-python/)
 - [Streamlit Tutorial: How to Deploy Streamlit Apps on RStudio Connect](https://python-bloggers.com/2022/02/streamlit-tutorial-how-to-deploy-streamlit-apps-on-rstudio-connect/)
-
-
 
 **[Full list of contributing R-bloggers](https://www.r-bloggers.com/blogs-list/)**
 
@@ -445,9 +416,5 @@ May 2005 (1)
 Copyright © 2022 | [MH Corporate basic by MH Themes](https://www.mhthemes.com/)
 
 # *Never miss an update!*  **Subscribe to R-bloggers** to receive  e-mails with the latest R posts.  (You will not see this message again.)
-
-
-
-Submit
 
 [Click here to close (This popup will not appear again)](#)

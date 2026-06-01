@@ -1,28 +1,15 @@
 ---
-meta-article-published_time: "2017-05-15T02:40:25-06:00"
-title: "Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects | R-bloggers"
+meta-article:published_time: 2017-05-15T02:40:25-06:00
+title: Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects | R-bloggers
 ---
 
 [R-bloggersR-bloggersR news and tutorials contributed by hundreds of R bloggers](https://www.r-bloggers.com/ "R-bloggers")
-
-- [Home](https://www.r-bloggers.com)
-- [About](https://www.r-bloggers.com/about/)
-- [RSS](https://feeds.feedburner.com/RBloggers)
-- [add your blog!](https://www.r-bloggers.com/add-your-blog/)
-- [Learn R](https://www.r-bloggers.com/2015/12/how-to-learn-r-2/)
-- [R jobs](https://www.r-users.com/)
-  - [Submit a new job (it’s free)](https://www.r-users.com/submit-job/)
-  - [Browse latest jobs (also free)](https://www.r-users.com/)
-- [Contact us](https://www.r-bloggers.com/contact-us/)
-
-
 
 # Three-Way Analysis of Variance: Simple Second-Order Interaction Effects and Simple Main Effects
 
 Posted on May 15, 2017 by [Bogdan Anastasiei](https://www.r-bloggers.com/author/bogdan-anastasiei/) in [R bloggers](https://www.r-bloggers.com/category/r-bloggers/) | 0 Comments
 
 [This article was first published on **[R-posts.com](http://r-posts.com/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/)**, and kindly contributed to [R-bloggers](https://www.r-bloggers.com/)]. (You can report issue about the content on this page [here](https://www.r-bloggers.com/contact-us/))
-
 ---
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
@@ -36,15 +23,18 @@ The resistance to effort is measured on a scale whatsoever, from 1 to 30 (30 bei
 
 **Third-order interaction effect** First of all, let’s check whether the third-order interaction effect is significant. We are going to run the analysis using the *aov* function in the *stats* package (our data frame is called *vitamin*).
 
-    aov1 <- aov(effort~dose*gender*type, data=vitamin)
-    summary(aov1)
+```
+aov1 <- aov(effort~dose*gender*type, data=vitamin)
+summary(aov1)
+```
 
 In the formula above the interaction effect is, of course, *dose*gender*type*. The ANOVA results can be seen below (we have only kept the line presenting the third-order interaction effect).  
 
-                                      Df Sum Sq Mean Sq F value   Pr(>F)
+```
+                                  Df Sum Sq Mean Sq F value   Pr(>F)
 
-
-    dose:gender:type   2    187    93.4  22.367 3.81e-10
+dose:gender:type   2    187    93.4  22.367 3.81e-10
+```
 
 The interaction effect is statistically significant: F(2)=22.367, p<0.01. In other words, we do have a third-order interaction effect.
 
@@ -59,11 +49,12 @@ The total number of second-order interaction effect is given by the sum of the f
 
 So let’s investigate the interaction effect of dose and type of employee for each gender group. First we have to create two separate data frames, for male and female employees. We do that with the *filter* command in the *dplyr* package (though you can also use brackets or subsets).
 
-    vitamin_male <- filter(vitamin, gender=="male")
-    vitamin_female <- filter(vitamin, gender=="female")
+```
+vitamin_male <- filter(vitamin, gender=="male")
+vitamin_female <- filter(vitamin, gender=="female")
+```
 
 Now we perform a two-way analysis of variance on each data frame (the factors being dose and type, of course).
-
 
 aov1 <- aov(effort~dose*type, data=vitamin_male)
 summary(aov1)
@@ -71,24 +62,23 @@ summary(aov1)
 aov2 <- aov(effort~dose*type, data=vitamin_female)
 summary(aov2)
 
-
 The results of the analyses are shown below (we have only retained the lines with the interaction effects).
 
-                   Df Sum Sq Mean Sq F value   Pr(>F)   
+```
+               Df Sum Sq Mean Sq F value   Pr(>F)   
 
-    dose:type     2    249   124.7   28.42 3.57e-12            
+dose:type     2    249   124.7   28.42 3.57e-12            
 
-                       Df Sum Sq Mean Sq F value   Pr(>F)   
+                   Df Sum Sq Mean Sq F value   Pr(>F)   
 
-    dose:type     2  137.2    68.6   17.31 6.74e-08
-
+dose:type     2  137.2    68.6   17.31 6.74e-08
+```
 
 We can notice that both simple second-order interaction effects are significant (p<0.01). So we are dealing with a combined influence of the factors dose and type of employee in both male and female groups. In this situation, we have to examine the *simple main effects* for each factor. This is what we are going to do in the next section.
 
 **Simple main effects** Let’s compute the main effect for the factor dose of vitamin, which is the most important (after all, the company wants to demonstrate that the vitamin does affect the resistance to effort). You will be able to compute the other simple main effects yourself, using this as an example.
 
 Now we must create four separate data frames, for each combination of the factors gender and type of employee: male – blue collar, male – white collar, female – blue collar, female – white collar.
-
 
 vitamin_male_blue <- filter(vitamin, gender=="male", type=="blue collar")
 
@@ -98,54 +88,52 @@ vitamin_female_blue <- filter(vitamin, gender=="female", type=="blue collar")
 
 vitamin_female_white <- filter(vitamin, gender=="female", type=="white collar")
 
-
 Next we perform a one-way ANOVA for each data frame. Let’s do it for the first group, male – blue collar.
-
 
 aov1 <- aov(effort~dose, data=vitamin_male_blue)
 summary(aov1)
 
-                    Df Sum Sq Mean Sq F value Pr(>F)   
+```
+                Df Sum Sq Mean Sq F value Pr(>F)   
 
-    dose          2 2943.5  1471.8   349.9 <2e-16
-
+dose          2 2943.5  1471.8   349.9 <2e-16
+```
 
 The simple main effect for the factor dose on this group is statistically significant (p<0.01). In other words, there is a significant difference between placebo, low dose and high dose levels within the male – blue collar employees category, regarding the resistance to effort. To find out how big the differences are, we use the *TuckeyHSD* function to compute the test with the same name.
 
-    TukeyHSD(aov1)
+```
+TukeyHSD(aov1)
 
+                                              diff        lwr       upr   p adj
 
-                                                  diff        lwr       upr   p adj
+ low dose-high dose -2.528333  -3.413363 -1.643303     0
 
-     low dose-high dose -2.528333  -3.413363 -1.643303     0
+ placebo-high dose  -9.558333 -10.443363 -8.673303     0
 
-     placebo-high dose  -9.558333 -10.443363 -8.673303     0
-
-     placebo-low dose   -7.030000  -7.915030 -6.144970     0
-
+ placebo-low dose   -7.030000  -7.915030 -6.144970     0
+```
 
 By inspection of the table we conclude that the differences in effort resistance between the dose groups are significant (p<0.01). The highest difference, in absolute values, is that between low dose and placebo levels: 9.5 points. So the employees who took a high dose present a higher resistance to effort than those who just took a placebo.
 
 One more example: the simple main effects of the variable dose of vitamin on the female – blue collar group.
 
-
 aov1 <- aov(effort~dose, data=vitamin_female_blue)
 summary(aov1)
-
 
  Df Sum Sq Mean Sq F value Pr(>F)  
 dose 2 399.6 199.81 45.57 <2e-16
 
-    TukeyHSD(aov1)
+```
+TukeyHSD(aov1)
 
+                                            diff        lwr       upr     p adj
 
-                                                diff        lwr       upr     p adj
+ low dose-high dose  1.083333  0.1797508  1.986916 0.0141485
 
-     low dose-high dose  1.083333  0.1797508  1.986916 0.0141485
+ placebo-high dose  -2.476667 -3.3802492 -1.573084 0.0000000
 
-     placebo-high dose  -2.476667 -3.3802492 -1.573084 0.0000000
-
-     placebo-low dose   -3.560000 -4.4635826 -2.656417 0.0000000
+ placebo-low dose   -3.560000 -4.4635826 -2.656417 0.0000000
+```
 
 The simple main effect is statistically significant, as it results from the first table. Furthermore, all the differences between dose levels are significant. The highest difference is the difference between low dose and placebo (3.5 points).
 
@@ -163,13 +151,7 @@ To **leave a comment** for the author, please follow the link and comment on the
 ---
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
-[← Previous post](https://www.r-bloggers.com/2017/05/r%e2%81%b6-tracking-wannacry-bitcoin-wallet-payments-with-r/)
-
-[Next post →](https://www.r-bloggers.com/2017/05/visualizing-r-ladies-growth/)
-
-
-
-[![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&amp;ssl=1)![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)](https://feeds.feedburner.com/RBloggers)
+[![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)](https://feeds.feedburner.com/RBloggers)
 
 > [R bloggers Facebook page](https://www.facebook.com/rbloggers/)
 
@@ -182,12 +164,10 @@ Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com
 - [How to write the first for loop in R](https://www.r-bloggers.com/2015/12/how-to-write-the-first-for-loop-in-r/ "How to write the first for loop in R")
 - [How to Calculate a Cumulative Average in R](https://www.r-bloggers.com/2022/03/how-to-calculate-a-cumulative-average-in-r/ "How to Calculate a Cumulative Average in R")
 - [Date Formats in R](https://www.r-bloggers.com/2013/08/date-formats-in-r/ "Date Formats in R")
-- [Complete tutorial on using 'apply' functions in R](https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/ "Complete tutorial on using 'apply' functions in R")
+- [Complete tutorial on using 'apply' functions in R](https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/ "Complete tutorial on using &#039;apply&#039; functions in R")
 - [R – Sorting a data frame by the contents of a column](https://www.r-bloggers.com/2010/02/r-sorting-a-data-frame-by-the-contents-of-a-column/ "R – Sorting a data frame by the contents of a column")
 
 #### Sponsors
-
-
 
 #### Recent Posts
 
@@ -224,8 +204,6 @@ Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com
 - [Spelling Corrector Program in Python](https://python-bloggers.com/2022/02/spelling-corrector-program-in-python/)
 - [Spelling Checker Program in Python](https://python-bloggers.com/2022/02/spelling-checker-program-in-python/)
 - [Streamlit Tutorial: How to Deploy Streamlit Apps on RStudio Connect](https://python-bloggers.com/2022/02/streamlit-tutorial-how-to-deploy-streamlit-apps-on-rstudio-connect/)
-
-
 
 **[Full list of contributing R-bloggers](https://www.r-bloggers.com/blogs-list/)**
 
@@ -438,9 +416,5 @@ May 2005 (1)
 Copyright © 2022 | [MH Corporate basic by MH Themes](https://www.mhthemes.com/)
 
 # *Never miss an update!*  **Subscribe to R-bloggers** to receive  e-mails with the latest R posts.  (You will not see this message again.)
-
-
-
-Submit
 
 [Click here to close (This popup will not appear again)](#)

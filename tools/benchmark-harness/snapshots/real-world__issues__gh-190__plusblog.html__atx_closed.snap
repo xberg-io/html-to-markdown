@@ -1,6 +1,6 @@
 ---
-meta-article-published_time: "2010-01-28T16:55:48+09:00"
-title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
+meta-article:published_time: 2010-01-28T16:55:48+09:00
+title: 1.1 데이터란 무엇인가? :: 파프리 블로그
 ---
 
 # [파프리 블로그](https://plusblog.co.kr/) #
@@ -15,7 +15,7 @@ title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
 
 - [좋은 저녁이에요. 귀하의 글을 읽는 것이 즐거웠습니다. 좋았고 흥미로웠습⋯](/29#comment31699194 " leecheawon〃09.26")
 - [1](/1#comment23502009 " @@de4Bk〃2023")
-- [1](/1#comment23502008 " 1�����%2527%2522〃2023")
+- [1](/1#comment23502008 " 1����%2527%2522〃2023")
 - [1](/1#comment23502006 " 1'&quot;〃2023")
 - [1](/1#comment23502003 " Eokw52We')) OR 657=(SELECT 657 FROM PG_SLEEP(15))--〃2023")
 
@@ -60,24 +60,24 @@ title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
 
 [computer](/tag/computer), [Computer science](/tag/Computer%20science), [data](/tag/data), [Database](/tag/Database), [데이터](/tag/%EB%8D%B0%EC%9D%B4%ED%84%B0), [데이터 베이스](/tag/%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EB%B2%A0%EC%9D%B4%EC%8A%A4), [컴퓨터 공학](/tag/%EC%BB%B4%ED%93%A8%ED%84%B0%20%EA%B3%B5%ED%95%99)
 
-
 컴퓨터를 접하는 우리는 항상 데이터를 다루고 있습니다. 하지만 데이터란
  무엇일까요? 세상에서 가장 어려운 질문이 정의를 물어보는 것이 아닌가합니다.
  막연히 데이터라는 말을 사용하고 있지만 정작 데이터의 정확한 정의는 알고 있지
  않습니다. ( 물론 컴퓨터 공학 전공이신 분들은 명쾌한 정의를 다 알고 계실 겁니다.
  )  
 
-- [Information Superhighway](http://www.flickr.com/photos/7762644@N04/2533281806 "Information Superhighway") Information Superhighway by [nickwheeleroz](http://www.flickr.com/photos/7762644@N04)[저작자 표시비영리동일조건 변경허락](http://creativecommons.org/licenses/by-nc-sa/2.0/kr/)
-
-
+- [Information Superhighway](http://www.flickr.com/photos/7762644@N04/2533281806 "Information Superhighway") Information Superhighway by [nickwheeleroz](http://www.flickr.com/photos/7762644@N04) [저작자 표시비영리동일조건 변경허락](http://creativecommons.org/licenses/by-nc-sa/2.0/kr/)
 
 데이터는
+
 > The term data means groups of information that represent the qualitative or
-> quantitative attributes of a variable or set of variables.라고 [위키피디아](http://en.wikipedia.org/wiki/Data "[http://en.wikipedia.org/wiki/Data]로 이동합니다.")는 정의합니다. 한글로 쉽게 풀어 쓰면, 데이터는 사실을 나타내는 수치라고 할 수
+> quantitative attributes of a variable or set of variables.
+
+라고 [위키피디아](http://en.wikipedia.org/wiki/Data "[http://en.wikipedia.org/wiki/Data]로 이동합니다.")는 정의합니다. 한글로 쉽게 풀어 쓰면, 데이터는 사실을 나타내는 수치라고 할 수
  있습니다. 예를 들면, 오늘의 날씨 정보에서 오늘 아침 기온, 습도, 날씨 등등 각각의
  수치들은 데이터가 됩니다.  
 
-- [Actual is not normal (a tribute to Edward Tufte)](http://www.flickr.com/photos/12836528@N00/2121472112 "Actual is not normal (a tribute to Edward Tufte)") Actual is not normal (a tribute to Edward Tufte) by [kevindooley](http://www.flickr.com/photos/12836528@N00)[저작자 표시](http://creativecommons.org/licenses/by/2.0/kr/)
+- [Actual is not normal (a tribute to Edward Tufte)](http://www.flickr.com/photos/12836528@N00/2121472112 "Actual is not normal (a tribute to Edward Tufte)") Actual is not normal (a tribute to Edward Tufte) by [kevindooley](http://www.flickr.com/photos/12836528@N00) [저작자 표시](http://creativecommons.org/licenses/by/2.0/kr/)
   
 하지만 데이터 자체로는 큰 의미가 없습니다. 컴퓨터 공학에서는 데이터를 가공( 처리 : Processing )하여 정보를
  만듭니다. 예를 들면 날씨를 나타내는 데이터들 ( 기온, 습도, 풍속, 위성사진 등 )은 기상대나
@@ -85,7 +85,7 @@ title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
  이제 이 데이터들을 처리하여 정보를 만듭니다. 기상대에서 측정 된 각각의
  데이터들을 바탕으로 내일의 날씨를 예보하게 되죠.  
 
-- [Extinct Poster](http://www.flickr.com/photos/9729909@N07/3581969837 "Extinct Poster") Extinct Poster by [Network Osaka](http://www.flickr.com/photos/9729909@N07)[저작자 표시비영리변경 금지](http://creativecommons.org/licenses/by-nc-nd/2.0/kr/)
+- [Extinct Poster](http://www.flickr.com/photos/9729909@N07/3581969837 "Extinct Poster") Extinct Poster by [Network Osaka](http://www.flickr.com/photos/9729909@N07) [저작자 표시비영리변경 금지](http://creativecommons.org/licenses/by-nc-nd/2.0/kr/)
 
 데이터를 처리하여 나온 결과를 "정보"라고 하는데, 정보란 간략하게
  정의하자면 "사용자의 의사결정에 도움이 될 만한 잘 정리 된 데이터들." 이라고 할 수 있습니다. 현실 세계에서 보자면 구름 사진( 데이터 )이 지구과학
@@ -95,10 +95,8 @@ title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
 컴퓨터는 이런 데이터를 입력 받아서 정보로 만들어 주는 역할을 하는
  기계라고 할 수 있습니다.  
 
-
 -- 요약 --  데이터는 그냥 사실을 나타내는 수치일 뿐이고, 정보는 사용자의 의사결정에
  도움을 주는 가공 된 데이터들의 집합이다.  
-
 
 공유하기
 
@@ -106,23 +104,14 @@ title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
 
 **파프리 블로그**
 
-NAME
-
-PASSWORD
-
-HOMEPAGE
-
-SECRET
-
 1.
 
 #### [+ Recent posts](/category) ####
 
-- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png)화왕산 가는길, 화왕산 버스로 가는 방법](/977)
-- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png)비슬산 등산 코스, 비슬산 산행, 병풍바위 ~ 정상 ~⋯](/976)
-- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png)비슬산 등산코스, 비슬산 산행( 유가사 입구 - 병풍바⋯](/975)
-- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png)비슬산 가는길, 비슬산 버스로 찾아 가는 방법](/974)
-
+- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png) 화왕산 가는길, 화왕산 버스로 가는 방법](/977)
+- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png) 비슬산 등산 코스, 비슬산 산행, 병풍바위 ~ 정상 ~⋯](/976)
+- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png) 비슬산 등산코스, 비슬산 산행( 유가사 입구 - 병풍바⋯](/975)
+- [![post image](https://tistory1.daumcdn.net/tistory/100974/skin/images/blank.png) 비슬산 가는길, 비슬산 버스로 찾아 가는 방법](/974)
 
 Powered by [Tistory](http://www.tistory.com/), Designed by [wallel](http://wallel.com/)
 

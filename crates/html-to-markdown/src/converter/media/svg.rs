@@ -92,6 +92,9 @@ pub fn handle_inline_svg(
 }
 
 /// Serialize an element to HTML string (for SVG and Math elements).
+///
+/// Attributes are sorted by name to guarantee deterministic output across
+/// process invocations (the underlying parser stores them in a `HashMap`).
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn serialize_element(node_handle: &NodeHandle, parser: &Parser) -> String {
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
@@ -100,7 +103,9 @@ pub fn serialize_element(node_handle: &NodeHandle, parser: &Parser) -> String {
         html.push('<');
         html.push_str(&tag_name);
 
-        for (key, value_opt) in tag.attributes().iter() {
+        let mut attrs: Vec<_> = tag.attributes().iter().collect();
+        attrs.sort_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
+        for (key, value_opt) in attrs {
             html.push(' ');
             html.push_str(&key);
             if let Some(value) = value_opt {

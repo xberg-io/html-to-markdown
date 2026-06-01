@@ -1,9 +1,8 @@
 ---
-canonical: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
-link-alternate: "https://developer.mozilla.org/en-US/blog/rss.xml"
+canonical: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
 meta-description: The Array object, as with arrays in other programming languages, enables storing a collection of multiple items under a single variable name, and has members for performing common array operations.
 meta-og:description: The Array object, as with arrays in other programming languages, enables storing a collection of multiple items under a single variable name, and has members for performing common array operations.
-meta-og:image: "https://developer.mozilla.org/mdn-social-image.46ac2375.png"
+meta-og:image: https://developer.mozilla.org/mdn-social-image.46ac2375.png
 meta-og:image:alt: The MDN logo
 meta-og:image:height: 1024
 meta-og:image:type: image/png
@@ -11,7 +10,7 @@ meta-og:image:width: 1024
 meta-og:locale: en_US
 meta-og:site_name: MDN Web Docs
 meta-og:title: Array - JavaScript | MDN
-meta-og:url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
+meta-og:url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
 meta-twitter:card: summary
 meta-twitter:creator: MozDevNet
 meta-viewport: width=device-width, initial-scale=1.0
@@ -20,159 +19,6 @@ title: Array - JavaScript | MDN
 
 - [Skip to main content](#content)
 - [Skip to search](#search)
-
-
-[![MDN](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ibG9nb19faW1hZ2UiIGhlaWdodD0iMjQiIHJvbGU9ImltZyIgdmlld0JveD0iMCAwIDgzIDI0IiB3aWR0aD0iODMiPgogICAgICAgICAgPHRpdGxlPk1ETjwvdGl0bGU+CiAgICAgICAgICA8cGF0aCBjbGFzcz0ibG9nb19fbGV0dGVyIiBkPSJNOS40IDAgMi44MSAyMS4xN0guMTJMNi42OSAwSDkuNFptMi4zOCAwdjIxLjE3SDkuNFYwaDIuNFptOS4yNyAwLTYuNTYgMjEuMTdIMTEuOEwxOC4zNiAwaDIuNjlabTIuMzkgMHYyMS4xN2gtMi40VjBoMi40WiIgLz4KICAgICAgICAgIDxwYXRoIGNsYXNzPSJsb2dvX190ZXh0IiBkPSJNNDUuNTUgMTYuODNoLTMuOTN2LTEuMjdoLjg3di0zLjYzYzAtLjg1LS4xNi0xLjQ…](/en-US/)
-
-HTML
-
-[HTML: Markup language](/en-US/docs/Web/HTML)
-
-HTML reference
-- [Elements](/en-US/docs/Web/HTML/Reference/Elements)
-- [Global attributes](/en-US/docs/Web/HTML/Reference/Global_attributes)
-- [Attributes](/en-US/docs/Web/HTML/Reference/Attributes)
-- [See all…](/en-US/docs/Web/HTML/Reference "See all HTML references")
-
-HTML guides
-- [Responsive images](/en-US/docs/Web/HTML/Guides/Responsive_images)
-- [HTML cheatsheet](/en-US/docs/Web/HTML/Guides/Cheatsheet)
-- [Date & time formats](/en-US/docs/Web/HTML/Guides/Date_and_time_formats)
-- [See all…](/en-US/docs/Web/HTML/Guides "See all HTML guides")
-
-Markup languages
-- [SVG](/en-US/docs/Web/SVG)
-- [MathML](/en-US/docs/Web/MathML)
-- [XML](/en-US/docs/Web/XML)
-
-CSS
-
-[CSS: Styling language](/en-US/docs/Web/CSS)
-
-CSS reference
-- [Properties](/en-US/docs/Web/CSS/Reference/Properties)
-- [Selectors](/en-US/docs/Web/CSS/Reference/Selectors)
-- [At-rules](/en-US/docs/Web/CSS/Reference/At-rules)
-- [Values](/en-US/docs/Web/CSS/Reference/Values)
-- [See all…](/en-US/docs/Web/CSS/Reference "See all CSS references")
-
-CSS guides
-- [Box model](/en-US/docs/Web/CSS/Guides/Box_model/Introduction)
-- [Animations](/en-US/docs/Web/CSS/Guides/Animations/Using)
-- [Flexbox](/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Basic_concepts)
-- [Colors](/en-US/docs/Web/CSS/Guides/Colors/Applying_color)
-- [See all…](/en-US/docs/Web/CSS/Guides "See all CSS guides")
-
-Layout cookbook
-- [Column layouts](/en-US/docs/Web/CSS/How_to/Layout_cookbook/Column_layouts)
-- [Centering an element](/en-US/docs/Web/CSS/How_to/Layout_cookbook/Center_an_element)
-- [Card component](/en-US/docs/Web/CSS/How_to/Layout_cookbook/Card)
-- [See all…](/en-US/docs/Web/CSS/How_to/Layout_cookbook)
-
-JavaScriptJS
-
-[JavaScript: Scripting language](/en-US/docs/Web/JavaScript)
-
-JS reference
-- [Standard built-in objects](/en-US/docs/Web/JavaScript/Reference/Global_Objects)
-- [Expressions & operators](/en-US/docs/Web/JavaScript/Reference/Operators)
-- [Statements & declarations](/en-US/docs/Web/JavaScript/Reference/Statements)
-- [Functions](/en-US/docs/Web/JavaScript/Reference/Functions)
-- [See all…](/en-US/docs/Web/JavaScript/Reference "See all JavaScript references")
-
-JS guides
-- [Control flow & error handing](/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling)
-- [Loops and iteration](/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration)
-- [Working with objects](/en-US/docs/Web/JavaScript/Guide/Working_with_objects)
-- [Using classes](/en-US/docs/Web/JavaScript/Guide/Using_classes)
-- [See all…](/en-US/docs/Web/JavaScript/Guide "See all JavaScript guides")
-
-Web APIs
-
-[Web APIs: Programming interfaces](/en-US/docs/Web/API)
-
-Web API reference
-- [File system API](/en-US/docs/Web/API/File_System_API)
-- [Fetch API](/en-US/docs/Web/API/Fetch_API)
-- [Geolocation API](/en-US/docs/Web/API/Geolocation_API)
-- [HTML DOM API](/en-US/docs/Web/API/HTML_DOM_API)
-- [Push API](/en-US/docs/Web/API/Push_API)
-- [Service worker API](/en-US/docs/Web/API/Service_Worker_API)
-- [See all…](/en-US/docs/Web/API "See all Web API guides")
-
-Web API guides
-- [Using the Web animation API](/en-US/docs/Web/API/Web_Animations_API/Using_the_Web_Animations_API)
-- [Using the Fetch API](/en-US/docs/Web/API/Fetch_API/Using_Fetch)
-- [Working with the History API](/en-US/docs/Web/API/History_API/Working_with_the_History_API)
-- [Using the Web speech API](/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API)
-- [Using web workers](/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
-
-All
-
-[All web technology](/en-US/docs/Web)
-
-Technologies
-- [Accessibility](/en-US/docs/Web/Accessibility)
-- [HTTP](/en-US/docs/Web/HTTP)
-- [URI](/en-US/docs/Web/URI)
-- [Web extensions](/en-US/docs/Mozilla/Add-ons/WebExtensions)
-- [WebAssembly](/en-US/docs/WebAssembly)
-- [WebDriver](/en-US/docs/Web/WebDriver)
-- [See all…](/en-US/docs/Web "See all web technology references")
-
-Topics
-- [Media](/en-US/docs/Web/Media)
-- [Performance](/en-US/docs/Web/Performance)
-- [Privacy](/en-US/docs/Web/Privacy)
-- [Security](/en-US/docs/Web/Security)
-- [Progressive web apps](/en-US/docs/Web/Progressive_web_apps)
-
-Learn
-
-[Learn web development](/en-US/docs/Learn_web_development)
-
-Frontend developer course
-- [Getting started modules](/en-US/docs/Learn_web_development/Getting_started)
-- [Core modules](/en-US/docs/Learn_web_development/Core)
-- [MDN Curriculum](/en-US/curriculum/)
-
-Learn HTML
-- [Structuring content with HTML module](/en-US/docs/Learn_web_development/Core/Structuring_content)
-
-Learn CSS
-- [CSS styling basics module](/en-US/docs/Learn_web_development/Core/Styling_basics)
-- [CSS layout module](/en-US/docs/Learn_web_development/Core/CSS_layout)
-
-Learn JavaScript
-- [Dynamic scripting with JavaScript module](/en-US/docs/Learn_web_development/Core/Scripting)
-
-Tools
-
-Discover our tools
-
-- [Playground](/en-US/play)
-- [HTTP Observatory](/en-US/observatory)
-
-
-- [Border-image generator](/en-US/docs/Web/CSS/Guides/Backgrounds_and_borders/Border-image_generator)
-- [Border-radius generator](/en-US/docs/Web/CSS/Guides/Backgrounds_and_borders/Border-radius_generator)
-- [Box-shadow generator](/en-US/docs/Web/CSS/Guides/Backgrounds_and_borders/Box-shadow_generator)
-- [Color format converter](/en-US/docs/Web/CSS/Guides/Colors/Color_format_converter)
-- [Color mixer](/en-US/docs/Web/CSS/Guides/Colors/Color_mixer)
-- [Shape generator](/en-US/docs/Web/CSS/Guides/Shapes/Shape_generator)
-
-About
-
-Get to know MDN better
-
-- [About MDN](/en-US/about)
-- [Advertise with us](/en-US/advertising)
-
-
-- [Community](/en-US/community)
-- [MDN on GitHub](https://github.com/mdn)
-
-[Blog](/en-US/blog/)
 
 1. [Web](/en-US/docs/Web)
 2. [JavaScript](/en-US/docs/Web/JavaScript)
@@ -192,22 +38,9 @@ This feature is well established and works across many devices and browser versi
 - [See full compatibility](#browser_compatibility)
 - [Report feedback](https://survey.alchemer.com/s3/7634825/MDN-baseline-feedback?page=%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray&level=high)
 
-
+  
 
 The **`Array`** object, as with arrays in other programming languages, enables [storing a collection of multiple items under a single variable name](/en-US/docs/Learn_web_development/Core/Scripting/Arrays), and has members for [performing common array operations](#examples).
-
-## In this article
-
-- [Description](#description)
-- [Constructor](#constructor)
-- [Static properties](#static_properties)
-- [Static methods](#static_methods)
-- [Instance properties](#instance_properties)
-- [Instance methods](#instance_methods)
-- [Examples](#examples)
-- [Specifications](#specifications)
-- [Browser compatibility](#browser_compatibility)
-- [See also](#see_also)
 
 ## [Description](#description)
 
@@ -345,7 +178,6 @@ Some methods do not mutate the existing array that the method was called on, but
 - Objects: the object reference is copied into the new array. Both the original and new array refer to the same object. That is, if a referenced object is modified, the changes are visible to both the new and original arrays.
 - Primitive types such as strings, numbers and booleans (not [`String`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [`Number`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number), and [`Boolean`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) objects): their values are copied into the new array.
 
-
 Other methods mutate the array that the method was called on, in which case their return value differs depending on the method: sometimes a reference to the same array, sometimes the length of the new array.
 
 The following methods create new arrays by accessing [`this.constructor[Symbol.species]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.species) to determine the constructor to use: [`concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat), [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter), [`flat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat), [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap), [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice), and [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) (to construct the array of removed elements that's returned).
@@ -354,16 +186,16 @@ The following methods always create new arrays with the `Array` base constructor
 
 The following table lists the methods that mutate the original array, and the corresponding non-mutating alternative:
 
-| Mutating method | Non-mutating alternative |
-| --- | --- |
-| [`copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin) | No one-method alternative |
-| [`fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill) | No one-method alternative |
-| [`pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop) | [`slice(0, -1)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) |
-| [`push(v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push) | [`concat([v1, v2])`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat) |
-| [`reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse) | [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed) |
-| [`shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift) | [`slice(1)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) |
-| [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) | [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted) |
-| [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) | [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced) |
+| Mutating method                                                                        | Non-mutating alternative                                                                         |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [`copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin) | No one-method alternative                                                                        |
+| [`fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)             | No one-method alternative                                                                        |
+| [`pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)               | [`slice(0, -1)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)                |
+| [`push(v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push)       | [`concat([v1, v2])`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)           |
+| [`reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)       | [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed)           |
+| [`shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)           | [`slice(1)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)                    |
+| [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)             | [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted)               |
+| [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)         | [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced)             |
 | [`unshift(v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift) | [`toSpliced(0, 0, v1, v2)`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced) |
 
 An easy way to change a mutating method into a non-mutating alternative is to use the [spread syntax](/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) or [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) to create a copy first:
@@ -773,7 +605,7 @@ console.log(removedItem);
 // Orange
 ```
 
-**Note:**`pop()` can only be used to remove the last item from an array. To remove multiple items from the end of an array, see the next example.
+**Note:** `pop()` can only be used to remove the last item from an array. To remove multiple items from the end of an array, see the next example.
 
 ### [Remove multiple items from the end of an array](#remove_multiple_items_from_the_end_of_an_array)
 
@@ -822,7 +654,7 @@ console.log(removedItem);
 // Apple
 ```
 
-**Note:**`shift()` can only be used to remove the first item from an array. To remove multiple items from the beginning of an array, see the next example.
+**Note:** `shift()` can only be used to remove the first item from an array. To remove multiple items from the beginning of an array, see the next example.
 
 ### [Remove multiple items from the beginning of an array](#remove_multiple_items_from_the_beginning_of_an_array)
 
@@ -1119,7 +951,6 @@ For more information about the result of a match, see the [`RegExp.prototype.exe
 - Changes to already-visited indexes do not cause `callbackFn` to be invoked on them again.
 - If an existing, yet-unvisited element of the array is changed by `callbackFn`, its value passed to the `callbackFn` will be the value at the time that element gets visited. Removed elements are not visited.
 
-
 **Warning:** Concurrent modifications of the kind described above frequently lead to hard-to-understand code and are generally to be avoided (except in special cases).
 
 The following examples use the `forEach` method as an example, but other methods that visit indexes in ascending order work in the same way. We will first define a helper function:
@@ -1267,8 +1098,8 @@ For methods that iterate in descending order of index, insertion causes elements
 
 ## [Specifications](#specifications)
 
-| Specification |
-| --- |
+| Specification                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------- |
 | [ECMAScript® 2026 Language Specification # sec-array-objects](https://tc39.es/ecma262/multipage/indexed-collections.html#sec-array-objects) |
 
 ## [Browser compatibility](#browser_compatibility)
@@ -1287,130 +1118,9 @@ For methods that iterate in descending order of index, insertion causes elements
 
 This page was last modified on Feb 24, 2026 by [MDN contributors](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/contributors.txt).
 
-
-
 [View this page on GitHub](https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/global_objects/array/index.md?plain=1 "Folder: en-us/web/javascript/reference/global_objects/array (Opens in a new tab)") • [Report a problem with this content](https://github.com/mdn/content/issues/new?template=page-report.yml&mdn-url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray&metadata=%3C%21--+Do+not+make+changes+below+this+line+--%3E%0A%3Cdetails%3E%0A%3Csummary%3EPage+report+details%3C%2Fsummary%3E%0A%0A*+Folder%3A+%60en-us%2Fweb%2Fjavascript%2Freference%2Fglobal_objects%2Farray%60%0A*+MDN+URL%3A+https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray%0A*+GitHub+URL%3A+https%3A%2F%2Fgithub.com%2Fmdn%2Fcontent%2Fblob%2Fmain%2Ffiles%2Fen-us%2Fweb%2Fjavascript%2Freference%2Fglobal_objects%2Farray%2Findex.md%0A*+Last+commit%3A+https%3A%2F%2Fgithub.com%2Fmdn%2Fcontent%2Fcommit%2Fdd88a6eb2176fa31f5b744d8964efecf3f1f425b%0A*+Document+last+modified%3A+2026-02-24T22%3A43%3A48.000Z%0A%0A%3C%2Fdetails%3E "This will take you to GitHub to file a new issue.")
 
-1. [Standard built-in objects](/en-US/docs/Web/JavaScript/Reference/Global_Objects)
-2. *[`Array`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)*
-3.
-
-**Constructor**
-
-  1. [`Array()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Array)
-
-4.
-
-**Static methods**
-
-  1. [`from()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
-  2. [`fromAsync()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fromAsync)
-  3. [`isArray()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray)
-  4. [`of()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/of)
-
-5.
-
-**Static properties**
-
-  1. [`[Symbol.species]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.species)
-
-6.
-
-**Instance methods**
-
-  1. [`at()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/at)
-  2. [`concat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)
-  3. [`copyWithin()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin)
-  4. [`entries()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries)
-  5. [`every()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
-  6. [`fill()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)
-  7. [`filter()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
-  8. [`find()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
-  9. [`findIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
-  10. [`findLast()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast)
-  11. [`findLastIndex()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex)
-  12. [`flat()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat)
-  13. [`flatMap()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap)
-  14. [`forEach()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
-  15. [`includes()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
-  16. [`indexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
-  17. [`join()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)
-  18. [`keys()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys)
-  19. [`lastIndexOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf)
-  20. [`map()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
-  21. [`pop()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/pop)
-  22. [`push()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push)
-  23. [`reduce()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)
-  24. [`reduceRight()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)
-  25. [`reverse()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)
-  26. [`shift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/shift)
-  27. [`slice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
-  28. [`some()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
-  29. [`sort()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-  30. [`splice()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
-  31. [`toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toLocaleString)
-  32. [`toReversed()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toReversed)
-  33. [`toSorted()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted)
-  34. [`toSpliced()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSpliced)
-  35. [`toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toString)
-  36. [`unshift()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift)
-  37. [`values()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values)
-  38. [`with()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with)
-  39. [`[Symbol.iterator]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.iterator)
-
-7.
-
-**Instance properties**
-
-  1. [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length)
-  2. [`[Symbol.unscopables]`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.unscopables)
-
-8. Inheritance
-9. [`Object/Function`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
-10.
-
-**Static methods**
-
-  1. [`apply()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply)
-  2. [`bind()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
-  3. [`call()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call)
-  4. [`toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/toString)
-  5. [`[Symbol.hasInstance]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Symbol.hasInstance)
-
-11.
-
-**Static properties**
-
-  1. [`displayName`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/displayName)Non-standard (Non-standard. Check cross-browser support before using.)
-  2. [`length`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length)
-  3. [`name`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name)
-  4. [`prototype`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/prototype)
-  5. [`arguments`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/arguments)Non-standard (Non-standard. Check cross-browser support before using.)Deprecated (Deprecated. Not for use in new websites.)
-  6. [`caller`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/caller)Non-standard (Non-standard. Check cross-browser support before using.)Deprecated (Deprecated. Not for use in new websites.)
-
-12.
-
-**Instance methods**
-
-  1. [`__defineGetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineGetter__)Deprecated (Deprecated. Not for use in new websites.)
-  2. [`__defineSetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineSetter__)Deprecated (Deprecated. Not for use in new websites.)
-  3. [`__lookupGetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__lookupGetter__)Deprecated (Deprecated. Not for use in new websites.)
-  4. [`__lookupSetter__()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__lookupSetter__)Deprecated (Deprecated. Not for use in new websites.)
-  5. [`hasOwnProperty()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwnProperty)
-  6. [`isPrototypeOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/isPrototypeOf)
-  7. [`propertyIsEnumerable()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/propertyIsEnumerable)
-  8. [`toLocaleString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toLocaleString)
-  9. [`toString()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString)
-  10. [`valueOf()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/valueOf)
-
-13.
-
-**Instance properties**
-
-  1. [`__proto__`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/proto)Deprecated (Deprecated. Not for use in new websites.)
-  2. [`constructor`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/constructor)
-
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgODMgMjQiIHdpZHRoPSI4MyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS40IDAgMi44MSAyMS4xN0guMTJMNi42OSAwem0yLjM4IDB2MjEuMTdIOS40VjBoMi40Wm05LjI3IDAtNi41NiAyMS4xN0gxMS44TDE4LjM2IDB6bTIuMzkgMHYyMS4xN2gtMi40VjB6bTIyLjExIDE2LjgzaC0zLjkzdi0xLjI3aC44N3YtMy42M2MwLS44NS0uMTYtMS40NS0uNDgtMS44MmExLjY1IDEuNjUgMCAwIDAtMS4zLS41MmMtLjc0IDAtMS4zLjI1LTEuNjYuNzhhMyAzIDAgMCAwLS41OCAxLjU4djMuNTloMS4zOHYxLjI2aC0zLjkzdi0xLjI2aC44N3YtM…](/)
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgODMgMjQiIHdpZHRoPSI4MyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNOS40IDAgMi44MSAyMS4xN0guMTJMNi42OSAwem0yLjM4IDB2MjEuMTdIOS40VjBoMi40Wm05LjI3IDAtNi41NiAyMS4xN0gxMS44TDE4LjM2IDB6bTIuMzkgMHYyMS4xN2gtMi40VjB6bTIyLjExIDE2LjgzaC0zLjkzdi0xLjI3aC44N3YtMy42M2MwLS44NS0uMTYtMS40NS0uNDgtMS44MmExLjY1IDEuNjUgMCAwIDAtMS4zLS41MmMtLjc0IDAtMS4zLjI1LTEuNjYuNzhhMyAzIDAgMCAwLS41OCAxLjU4djMuNTloMS4zOHYxLjI2aC0zLjkzdi0xLjI2aC44N3YtMy42YzAtLjg4LS4xNi0xLjQ4LS40OC0xLjgzYTEuNyAxLjcgMCAwIDAtMS4yOS0uNTIgMS45MyAxLjkzIDAgMCAwLTEuNjUuNzUgMi44NSAyLjg1IDAgMCAwLS41OCAxLjZ2My42MmgxLjU5djEuMjdoLTQuNjR2LTEuMjdoMS4zN1Y5Ljc1aC0xLjRWOC40NmgzLjA4djEuNDdjLjI4LS40OC42Mi0uODcgMS4wOC0xLjJhMyAzIDAgMCAxIDEuNjgtLjQ1Yy42NyAwIDEuMjIuMTYgMS43My40OC41LjMyLjg1LjggMS4wMyAxLjQ3LjI1LS41Ny42Mi0xLjAzIDEuMTMtMS40LjUtLjM3IDEuMS0uNTUgMS44MS0uNTUuOCAwIDEuNS4yNSAyLjA1Ljc1LjU1LjUxLjg1IDEuMy44NSAyLjM1djQuMThoMS40em05Ljc3IDBINTIuM3YtMS42NmMtLjI3LjUxLS42Ni45NS0xLjEzIDEuMjktLjU2LjQtMS4yMy41OS0xLjkuNTUtMS4xMSAwLTItLjM3LTIuNjctMS4xMmE0LjQgNC40IDAgMCAxLTEtMy4wNmMwLTEuMTUuMy0yLjIuOTMtMy4xNS42LS45NCAxLjU4LTEuNDMgMi45NC0xLjQzczIuMjUuNSAyLjgzIDEuNVY1LjIyaC0yVjMuOTNoMy42M3YxMS42M2gxLjM4djEuMjdabS0zLjA2LTMuODZ2LTEuMDJhMi4yOCAyLjI4IDAgMCAwLS43My0xLjY3IDIuNCAyLjQgMCAwIDAtMS42Ni0uNjUgMi4xOCAyLjE4IDAgMCAwLTEuODguOSAzLjYzIDMuNjMgMCAwIDAtLjY1IDIuMmMwIC45NS4yMyAxLjY4LjcgMi4xOS40NS41IDEuMDMuNzYgMS43Ljc2LjczIDAgMS4zMy0uMyAxLjc5LS44OC40OC0uNi43MS0xLjIxLjczLTEuODNtMTQuMTQgMy44NmgtNC40M3YtMS4yN2gxLjM3di0zLjYzYzAtLjg1LS4xNi0xLjQ1LS41LTEuODJhMS42OCAxLjY4IDAgMCAwLTEuMzEtLjUyYy0uNzEgMC0xLjI5LjIzLTEuNy42OWEyLjUyIDIuNTIgMCAwIDAtLjY3IDEuNnYzLjY2aDEuMzh2MS4yNkg1Ni4xdi0xLjI2aDEuMzh2LTUuOGgtMS40MlY4LjQ3aDMuMTJWOS45Yy42LTEuMDYgMS41Ny0xLjYgMi45Mi0xLjYuODMgMCAxLjU0LjI2IDIuMTIuNzcuNTcuNS44NSAxLjI4Ljg1IDIuMzR2NC4xOWgxLjM4djEuMjRoLS4wNVptMS4zMSA1LjE1SDgzVjI0SDY3LjcxeiIgLz48L3N2Zz4=)](/)
 
 Your blueprint for a better internet.
 
@@ -1419,7 +1129,6 @@ Your blueprint for a better internet.
 - [](https://x.com/mozdevnet)
 - [](https://mastodon.social/@mdn)
 - [](/en-US/blog/rss.xml)
-
 
 MDN
 - [About](/en-US/about)
@@ -1444,13 +1153,12 @@ Developers
 - [Glossary](/en-US/docs/Glossary)
 - [Hacks blog](https://hacks.mozilla.org/)
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMjU2IDYwIiB3aWR0aD0iMTI4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMy4zMiAyMi4xIDUuMSAyNC4zaDIuMWw1LjEtMjQuM0gzOS4zdjM3LjM0aC03LjI2VjI4LjQ2aC0yLjFsLTYuOTYgMzAuOThoLTcuMDJMOS4wMiAyOC40NmgtMi4xdjMxSC0uMzVWMjIuMWgxMy42NlptNDUuMTIgOC43NGM4LjczIDAgMTMuOCA1LjE1IDEzLjggMTQuNTdTNjcuMTQgNjAgNTguNDQgNjBjLTguNzMgMC0xMy44LTUuMTctMTMuOC0xNC41OSAwLTkuNDMgNS4wNy0xNC41NyAxMy44LTE0LjU3bTAgMjMuMzRjNC4xIDAgNi4xNi0yLjEgNi4xNi02L…](https://www.mozilla.org/)
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMjU2IDYwIiB3aWR0aD0iMTI4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0xMy4zMiAyMi4xIDUuMSAyNC4zaDIuMWw1LjEtMjQuM0gzOS4zdjM3LjM0aC03LjI2VjI4LjQ2aC0yLjFsLTYuOTYgMzAuOThoLTcuMDJMOS4wMiAyOC40NmgtMi4xdjMxSC0uMzVWMjIuMWgxMy42NlptNDUuMTIgOC43NGM4LjczIDAgMTMuOCA1LjE1IDEzLjggMTQuNTdTNjcuMTQgNjAgNTguNDQgNjBjLTguNzMgMC0xMy44LTUuMTctMTMuOC0xNC41OSAwLTkuNDMgNS4wNy0xNC41NyAxMy44LTE0LjU3bTAgMjMuMzRjNC4xIDAgNi4xNi0yLjEgNi4xNi02Ljczdi00LjEyYzAtNC42Mi0yLjA2LTYuNzMtNi4xNi02Ljczcy02LjE1IDIuMS02LjE1IDYuNzN2NC4xMmMwIDQuNjMgMi4wNSA2LjczIDYuMTUgNi43M20xNy42OC0uMTQgMTQuODItMTcuMjZINzYuMzJ2LTUuNDFoMjMuMzF2NS40TDg0Ljg0IDU0LjA1aDE1LjAzdjUuNEg3Ni4xM3YtNS40MVptMjguMDctMjIuNjdoMTAuN3YyOC4wN2gtNy4yNVYzNi43N2gtMy40OHYtNS40em0zLjQ0LTkuMjdoNy4yNnY1LjRoLTcuMjV2LTUuNFptMTIuNjIgMGgxMC43MnYzNy4zNGgtNy4yNFYyNy41aC0zLjQ4em0xNi4wOCAwaDEwLjd2MzcuMzRoLTcuMjVWMjcuNWgtMy40OHYtNS40em0yNy44IDguNzRjNC4yNCAwIDcuMDggMi4wNSA3Ljg3IDUuNjNoMi4xdi01LjFoOC44OHY1LjRoLTMuNDd2MTcuMjhoMy40N3Y1LjRoLTQuMjVjLTMgMC00LjYzLTEuNjMtNC42My00LjYydi0uNDhIMTcyYy0uNzggMy41OC0zLjYzIDUuNjMtNy44OCA1LjYzLTYuNjggMC0xMS40LTUuNTktMTEuNC0xNC41OCAwLTkgNC43Mi0xNC41NSAxMS40LTE0LjU1bTIuMiAyMy4zNGM0LjEgMCA1LjkzLTIuMSA1LjkzLTYuNzN2LTQuMTJjMC00LjYyLTEuODItNi43My01Ljk0LTYuNzMtMy45OSAwLTUuOTIgMi4xLTUuOTIgNi43M3Y0LjEzYzAgNC42MiAxLjkyIDYuNzIgNS45MyA2LjcybTQ2LjI4IDUuMjdoLTcuMjZWMGg3LjI2em02LjMtMjguNDFoMzAuOHYtMi4xbC0yMC40LTcuMzJ2LTUuODhsMjAuNC03LjMzdi0yLjFoLTI0LjI3VjBoMzAuNzl2MTJsLTE2LjYyIDUuNjN2Mi4xMWwxNi42MSA1LjY0djEySDIxOC45em0wLTI0LjczaDYuNXY2LjUyaC02LjV6IiAvPjwvc3ZnPg==)](https://www.mozilla.org/)
 
 - [Website Privacy Notice](https://www.mozilla.org/privacy/websites/)
 - [Telemetry Settings](https://www.mozilla.org/en-US/privacy/websites/data-preferences/)
 - [Legal](https://www.mozilla.org/about/legal/terms/mozilla)
 - [Community Participation Guidelines](https://www.mozilla.org/about/governance/policies/participation/)
-
 
 Visit [Mozilla Corporation’s](https://www.mozilla.org/) not-for-profit parent, the [Mozilla Foundation](https://foundation.mozilla.org/).  
 Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under [a Creative Commons license](/docs/MDN/Writing_guidelines/Attrib_copyright_license).

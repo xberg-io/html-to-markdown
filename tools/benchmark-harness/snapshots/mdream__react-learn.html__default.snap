@@ -1,126 +1,24 @@
 ---
-canonical: "https://react.dev/learn"
-link-alternate: "https://ko.react.dev/learn"
+canonical: https://react.dev/learn
 meta-algolia-search-order: 3
-meta-fb-app_id: 623268441017527
+meta-fb:app_id: 623268441017527
 meta-google-site-verification: sIlAGs48RulR4DdP95YSWNKZIEtCqQmRjzn-Zq-CcD0
-meta-msapplication-tilecolor: "#2b5797"
-meta-og-description: The library for web and native user interfaces
-meta-og-image: "https://react.dev/images/og-learn.png"
-meta-og-title: Quick Start – React
-meta-og-type: website
-meta-og-url: "https://react.dev/learn"
-meta-theme-color: "#23272f"
+meta-msapplication-TileColor: #2b5797
+meta-og:description: The library for web and native user interfaces
+meta-og:image: https://react.dev/images/og-learn.png
+meta-og:title: Quick Start – React
+meta-og:type: website
+meta-og:url: https://react.dev/learn
+meta-theme-color: #23272f
 meta-twitter:card: summary_large_image
 meta-twitter:creator: @reactjs
 meta-twitter:description: The library for web and native user interfaces
-meta-twitter:image: "https://react.dev/images/og-learn.png"
+meta-twitter:image: https://react.dev/images/og-learn.png
 meta-twitter:site: @reactjs
 meta-twitter:title: Quick Start – React
 meta-viewport: width=device-width, initial-scale=1
 title: Quick Start – React
 ---
-
-![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiBoZWlnaHQ9IjEuMzNlbSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIyIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxLjMzZW0iPjxsaW5lIHgxPSIzIiB4Mj0iMjEiIHkxPSIxMiIgeTI9IjEyIiAvPjxsaW5lIHgxPSIzIiB4Mj0iMjEiIHkxPSI2IiB5Mj0iNiIgLz48bGluZSB4MT0iMyIgeDI9IjIxIiB5MT0iMTgiIHkyPSIxOCIgLz48L3N2Zz4=)
-
-[![logo by @sawaratsuki1004](/_next/image?url=%2Fimages%2Fuwu.png&amp;w=128&amp;q=75 "logo by @sawaratsuki1004")](/)
-
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0idGV4dC1zbSBtZS0wIHctMTAgaC0xMCB0ZXh0LWJyYW5kIGRhcms6dGV4dC1icmFuZC1kYXJrIGZsZXggb3JpZ2luLWNlbnRlciB0cmFuc2l0aW9uLWFsbCBlYXNlLWluLW91dCIgZmlsbD0ibm9uZSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSItMTAuNSAtOS40NSAyMSAxOC45IiB3aWR0aD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIwIiBjeT0iMCIgZmlsbD0iY3VycmVudENvbG9yIiByPSIyIiAvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjEiPjxlbGxpcHNlIHJ4PSIxMCIgcnk9IjQuNSIgLz48ZWxsa…](/)
-
-[v19.2](/versions)
-
-![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iYWxpZ24tbWlkZGxlIG1lLTMgdGV4dC1ncmF5LTMwIHNocmluay0wIGdyb3VwLWJldHRlcmhvdmVyOmhvdmVyOnRleHQtZ3JheS03MCIgaGVpZ2h0PSIxZW0iIHZpZXdCb3g9IjAgMCAyMCAyMCIgd2lkdGg9IjFlbSI+PHBhdGggZD0iTTE0LjM4NiAxNC4zODZsNC4wODc3IDQuMDg3Ny00LjA4NzctNC4wODc3Yy0yLjk0MTggMi45NDE5LTcuNzExNSAyLjk0MTktMTAuNjUzMyAwLTIuOTQxOS0yLjk0MTgtMi45NDE5LTcuNzExNSAwLTEwLjY1MzMgMi45NDE4LTIuOTQxOSA3LjcxMTUtMi45NDE5IDEwLjY1MzMgMCAyLjk0MTkgMi45NDE4IDIuOTQxOSA3LjcxMTUgMCAxMC42NTMzeiIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiIC8+PC9zdmc+)Search`⌘``Ctrl``K`
-
-[Learn](/learn)
-
-[Reference](/reference/react)
-
-[Community](/community)
-
-[Blog](/blog)
-
-![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0idy01IGgtNSBhbGlnbi1taWRkbGUiIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIxZW0iPjxwYXRoIGQ9Ik0xNC4zODYgMTQuMzg2bDQuMDg3NyA0LjA4NzctNC4wODc3LTQuMDg3N2MtMi45NDE4IDIuOTQxOS03LjcxMTUgMi45NDE5LTEwLjY1MzMgMC0yLjk0MTktMi45NDE4LTIuOTQxOS03LjcxMTUgMC0xMC42NTMzIDIuOTQxOC0yLjk0MTkgNy43MTE1LTIuOTQxOSAxMC42NTMzIDAgMi45NDE5IDIuOTQxOCAyLjk0MTkgNy43MTE1IDAgMTAuNjUzM3oiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIyIiAvPjwvc3ZnPg==)
-
-![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI4IiB2aWV3Qm94PSIwIDAgMzIgMzIiIHdpZHRoPSIyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDAgLTIwMCkiPjxwYXRoIGQ9Ik0xMDIsMjEgQzEwMiwxOC4xMDE3MTQxIDEwMy4zMDcxNzksMTUuNDE5ODI5NSAxMDUuNTE3MzUsMTMuNjI0NjYyNCBDMTA2LjAwMTkzOSwxMy4yMzEwNjQ3IDEwNS44MjE2MTEsMTIuNDUyMjkzNiAxMDUuMjEzMzQsMTIuMzExNzUxOCBDMTA0LjMyMjAwNiwxMi4xMDU4MDc4IDEwMy40MTQ3NTgsMTIgMTAyLjUsMTIgQzk1Ljg3MjI4NjQsMTIgOTAuNSwxNy4zNzIyODY0IDkwLjUsMjQgQzkwLjUsMzAuNjI3NzEzNiA5NS44NzIyODY0LDM2IDEwMi41LDM2IEMxMDYuMDkwODY4LDM2IDEwOS40MjM5MDIsMzQuNDEwOTA5MyAxMTEuNjkwMjc0LDMxLjcxMjg5OTUgQzExMi4wOTE4MzcsMzEuMjM0ODU3MiAxMTEuNzY3NjUzLDMwLjUwNDEyMTEgMTExLjE0Mzc1OSwzMC40ODEwMTM5IEMxMDYuMDQ3NDc5LDMwLjI5MjI2MjggMTAyLDI2LjEwOTczNDkgMTAyLDIxIFogTTEwMi41LDM0LjUgQzk2LjcwMDcxMzYsMzQuNSA5MiwyOS43OTkyODY0IDkyLDI0IEM5MiwxOC4yMDA3MTM2IDk2LjcwMDcxMzYsMTMuNSAxMDIuNSwxMy41IEMxMDIuODA3Mzg2LDEzLjUgMTAzLjExMzkyNSwxMy41MTM2NzkzIDEwMy40MTkyNDksMTMuNTQwNzc4NSBDMTAxLjU2NjA0NywxNS41NDQ2Mzc4IDEwMC41LDE4LjE4NTE2MiAxMDAuNSwyMSBDMTAwLjUsMjYuMzE5ODUyNiAxMDQuMjg3NTQ5LDMwLjc3MTQzMjIgMTA5LjMzOTgxNCwzMS43NzU2NjM4IEwxMDkuNTE2NTY1LDMxLjgwOTI5MjcgQzEwNy42MTUyNzYsMzMuNTIwOTQ1MiAxMDUuMTM4MDgxLDM0LjUgMTAyLjUsMzQuNSBaIiBmaWxsPSJjdXJyZW50Q29sb3IiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMC41IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTQuNSAxOTIpIiAvPjxwb2x5Z29uIHBvaW50cz0iNDQ0IDIyOCA0NjggMjI4IDQ2OCAyMDQgNDQ0IDIwNCIgLz48L2c+PC9zdmc+)
-
-![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMzIgMzIiIHdpZHRoPSIzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDIgLTIwMCkiPjxnIGZpbGw9ImN1cnJlbnRDb2xvciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzU2IDE0NCkiPjxwYXRoIGQ9Ik0xMDguNSAyNEMxMDguNSAyNy41OTAyMTM2IDEwNS41OTAyMTQgMzAuNSAxMDIgMzAuNSA5OC40MDk3ODY0IDMwLjUgOTUuNSAyNy41OTAyMTM2IDk1LjUgMjQgOTUuNSAyMC40MDk3ODY0IDk4LjQwOTc4NjQgMTcuNSAxMDIgMTcuNSAxMDUuNTkwMjE0IDE3LjUgMTA4LjUgMjAuNDA5Nzg2NCAxMDguNSAyNHpNMTA3IDI0QzEwNyAyMS4yMzgyMTM2IDEwNC43NjE3ODYgMTkgMTAyIDE5IDk5LjIzODIxMzYgMTkgOTcgMjEuMjM4MjEzNiA5NyAyNCA5NyAyNi43NjE3ODY0IDk5LjIzODIxMzYgMjkgMTAyIDI5IDEwNC43NjE3ODYgMjkgMTA3IDI2Ljc2MTc4NjQgMTA3IDI0ek0xMDEgMTIuNzVMMTAxIDE0Ljc1QzEwMSAxNS4xNjQyMTM2IDEwMS4zMzU3ODYgMTUuNSAxMDEuNzUgMTUuNSAxMDIuMTY0MjE0IDE1LjUgMTAyLjUgMTUuMTY0MjEzNiAxMDIuNSAxNC43NUwxMDIuNSAxMi43NUMxMDIuNSAxMi4zMzU3ODY0IDEwMi4xNjQyMTQgMTIgMTAxLjc1IDEyIDEwMS4zMzU3ODYgMTIgMTAxIDEyLjMzNTc4NjQgMTAxIDEyLjc1ek05NS43MjU1MTY1IDE0LjYzMjM2MTZMOTYuNzQ4NTE2NSAxNi40MDM4NjE2Qzk2Ljk1NTY1NzMgMTYuNzYyNTYxNCA5Ny40MTQzNjE4IDE2Ljg4NTQyNDMgOTcuNzczMDYxNiAxNi42NzgyODM1IDk4LjEzMTc2MTQgMTYuNDcxMTQyNyA5OC4yNTQ2MjQzIDE2LjAxMjQzODIgOTguMDQ3NDgzNSAxNS42NTM3Mzg0TDk3LjAyNDQ4MzUgMTMuODgyMjM4NEM5Ni44MTczNDI3IDEzLjUyMzUzODYgOTYuMzU4NjM4MiAxMy40MDA2NzU3IDk1Ljk5OTkzODQgMTMuNjA3ODE2NSA5NS42NDEyMzg2IDEzLjgxNDk1NzMgOTUuNTE4Mzc1NyAxNC4yNzM2NjE4IDk1LjcyNTUxNjUgMTQuNjMyMzYxNnpNOTEuODgyMjM4NCAxOS4wMjQ0ODM1TDkzLjY1MzczODQgMjAuMDQ3NDgzNUM5NC4wMTI0MzgyIDIwLjI1NDYyNDMgOTQuNDcxMTQyNyAyMC4xMzE3NjE0IDk0LjY3ODI4MzUgMTkuNzczMDYxNiA5NC44ODU0MjQzIDE5LjQxNDM2MTggOTQuNzYyNTYxNCAxOC45NTU2NTczIDk0LjQwMzg2MTYgMTguNzQ4NTE2NUw5Mi42MzIzNjE2IDE3LjcyNTUxNjVDOTIuMjczNjYxOCAxNy41MTgzNzU3IDkxLjgxNDk1NzMgMTcuNjQxMjM4NiA5MS42MDc4MTY1IDE3Ljk5OTkzODQgOTEuNDAwNjc1NyAxOC4zNTg2MzgyIDkxLjUyMzUzODYgMTguODE3MzQyNyA5MS44ODIyMzg0IDE5LjAyNDQ4MzV6TTkwLjc1IDI1TDkyLjc1IDI1QzkzLjE2NDIxMzYgMjUgOTMuNSAyNC42NjQyMTM2IDkzLjUgMjQuMjUgOTMuNSAyMy44MzU3ODY0IDkzLjE2NDIxMzYgMjMuNSA5Mi43NSAyMy41TDkwLjc1IDIzLjVDOTAuMzM1Nzg2NCAyMy41IDkwIDIzLjgzNTc4NjQgOTAgMjQuMjUgOTAgMjQuNjY0MjEzNiA5MC4zMzU3ODY0IDI1IDkwLjc1IDI1ek05Mi42MzIzNjE2IDMwLjI3NDQ4MzVMOTQuNDAzODYxNiAyOS4yNTE0ODM1Qzk0Ljc2MjU2MTQgMjkuMDQ0MzQyNyA5NC44ODU0MjQzIDI4LjU4NTYzODIgOTQuNjc4MjgzNSAyOC4yMjY5Mzg0IDk0LjQ3MTE0MjcgMjcuODY4MjM4NiA5NC4wMTI0MzgyIDI3Ljc0NTM3NTcgOTMuNjUzNzM4NCAyNy45NTI1MTY1TDkxLjg4MjIzODQgMjguOTc1NTE2NUM5MS41MjM1Mzg2IDI5LjE4MjY1NzMgOTEuNDAwNjc1NyAyOS42NDEzNjE4IDkxLjYwNzgxNjUgMzAuMDAwMDYxNiA5MS44MTQ5NTczIDMwLjM1ODc2MTQgOTIuMjczNjYxOCAzMC40ODE2MjQzIDkyLjYzMjM2MTYgMzAuMjc0NDgzNXpNOTcuMDI0NDgzNSAzNC4xMTc3NjE2TDk4LjA0NzQ4MzUgMzIuMzQ2MjYxNkM5OC4yNTQ2MjQzIDMxLjk4NzU2MTggOTguMTMxNzYxNCAzMS41Mjg4NTczIDk3Ljc3MzA2MTYgMzEuMzIxNzE2NSA5Ny40MTQzNjE4IDMxLjExNDU3NTcgOTYuOTU1NjU3MyAzMS4yMzc0Mzg2IDk2Ljc0ODUxNjUgMzEuNTk2MTM4NEw5NS43MjU1MTY1IDMzLjM2NzYzODRDOTUuNTE4Mzc1NyAzMy43MjYzMzgyIDk1LjY0MTIzODYgMzQuMTg1MDQyNyA5NS45OTk5Mzg0IDM0LjM5MjE4MzUgOTYuMzU4NjM4MiAzNC41OTkzMjQzIDk2LjgxNzM0MjcgMzQuNDc2NDYxNCA5Ny4wMjQ0ODM1IDM0LjExNzc2MTZ6TTEwMyAzNS4yNUwxMDMgMzMuMjVDMTAzIDMyLjgzNTc4NjQgMTAyLjY2NDIxNCAzMi41IDEwMi4yNSAzMi41IDEwMS44MzU3ODYgMzIuNSAxMDEuNSAzMi44MzU3ODY0IDEwMS41IDMzLjI1TDEwMS41IDM1LjI1QzEwMS41IDM1LjY2NDIxMzYgMTAxLjgzNTc4NiAzNiAxMDIuMjUgMzYgMTAyLjY2NDIxNCAzNiAxMDMgMzUuNjY0MjEzNiAxMDMgMzUuMjV6TTEwOC4yNzQ0ODMgMzMuMzY3NjM4NEwxMDcuMjUxNDgzIDMxLjU5NjEzODRDMTA3LjA0NDM0MyAzMS4yMzc0Mzg2IDEwNi41ODU2MzggMzEuMTE0NTc1NyAxMDYuMjI2OTM4IDMxLjMyMTcxNjUgMTA1Ljg2ODIzOSAzMS41Mjg4NTczIDEwNS43NDUzNzYgMzEuOTg3NTYxOCAxMDUuOTUyNTE3IDMyLjM0NjI2MTZMMTA2Ljk3NTUxNyAzNC4xMTc3NjE2QzEwNy4xODI2NTcgMzQuNDc2NDYxNCAxMDcuNjQxMzYyIDM0LjU5OTMyNDMgMTA4LjAwMDA2MiAzNC4zOTIxODM1IDEwOC4zNTg3NjEgMzQuMTg1MDQyNyAxMDguNDgxNjI0IDMzLjcyNjMzODIgMTA4LjI3NDQ4MyAzMy4zNjc2Mzg0ek0xMTIuMTE3NzYyIDI4Ljk3NTUxNjVMMTEwLjM0NjI2MiAyNy45NTI1MTY1QzEwOS45ODc1NjIgMjcuNzQ1Mzc1NyAxMDkuNTI4ODU3IDI3Ljg2ODIzODYgMTA5LjMyMTcxNyAyOC4yMjY5Mzg0IDEwOS4xMTQ1NzYgMjguNTg1NjM4MiAxMDkuMjM3NDM5IDI5LjA0NDM0MjcgMTA5LjU5NjEzOCAyOS4yNTE0ODM1TDExMS4zNjc2MzggMzAuMjc0NDgzNUMxMTEuNzI2MzM4IDMwLjQ4MTYyNDMgMTEyLjE4NTA0MyAzMC4zNTg3NjE0IDExMi4zOTIxODMgMzAuMDAwMDYxNiAxMTIuNTk5MzI0IDI5LjY0MTM2MTggMTEyLjQ3NjQ2MSAyOS4xODI2NTczIDExMi4xMTc3NjIgMjguOTc1NTE2NXpNMTEzLjI1IDIzTDExMS4yNSAyM0MxMTAuODM1Nzg2IDIzIDExMC41IDIzLjMzNTc4NjQgMTEwLjUgMjMuNzUgMTEwLjUgMjQuMTY0MjEzNiAxMTAuODM1Nzg2IDI0LjUgMTExLjI1IDI0LjVMMTEzLjI1IDI0LjVDMTEzLjY2NDIxNCAyNC41IDExNCAyNC4xNjQyMTM2IDExNCAyMy43NSAxMTQgMjMuMzM1Nzg2NCAxMTMuNjY0MjE0IDIzIDExMy4yNSAyM3pNMTExLjM2NzYzOCAxNy43MjU1MTY1TDEwOS41OTYxMzggMTguNzQ4NTE2NUMxMDkuMjM3NDM5IDE4Ljk1NTY1NzMgMTA5LjExNDU3NiAxOS40MTQzNjE4IDEwOS4zMjE3MTcgMTkuNzczMDYxNiAxMDkuNTI4ODU3IDIwLjEzMTc2MTQgMTA5Ljk4NzU2MiAyMC4yNTQ2MjQzIDExMC4zNDYyNjIgMjAuMDQ3NDgzNUwxMTIuMTE3NzYyIDE5LjAyNDQ4MzVDMTEyLjQ3NjQ2MSAxOC44MTczNDI3IDExMi41OTkzMjQgMTguMzU4NjM4MiAxMTIuMzkyMTgzIDE3Ljk5OTkzODQgMTEyLjE4NTA0MyAxNy42NDEyMzg2IDExMS43MjYzMzggMTcuNTE4Mzc1NyAxMTEuMzY3NjM4IDE3LjcyNTUxNjV6TTEwNi45NzU1MTcgMTMuODgyMjM4NEwxMDUuOTUyNTE3IDE1LjY1MzczODRDMTA1Ljc0NTM3NiAxNi4wMTI0MzgyIDEwNS44NjgyMzkgMTYuNDcxMTQyNyAxMDYuMjI2OTM4IDE2LjY3ODI4MzUgMTA2LjU4NTYzOCAxNi44ODU0MjQzIDEwNy4wNDQzNDMgMTYuNzYyNTYxNCAxMDcuMjUxNDgzIDE2LjQwMzg2MTZMMTA4LjI3NDQ4MyAxNC42MzIzNjE2QzEwOC40ODE2MjQgMTQuMjczNjYxOCAxMDguMzU4NzYxIDEzLjgxNDk1NzMgMTA4LjAwMDA2MiAxMy42MDc4MTY1IDEwNy42NDEzNjIgMTMuNDAwNjc1NyAxMDcuMTgyNjU3IDEzLjUyMzUzODYgMTA2Ljk3NTUxNyAxMy44ODIyMzg0eiIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIwLjI1IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDQ4KSIgLz48cGF0aCBkPSJNOTguNjEyMyw2MC4xMzcyIEM5OC42MTIzLDU5LjM1NTIgOTguODc1Myw1OC42NDI3IDk5LjMzNjgsNTguMDk0MiBDOTkuNTI5Myw1Ny44NjU3IDk5LjM5MzMsNTcuNTA5MiA5OS4wOTQzLDU3LjUwMTcgQzk5LjA3OTMsNTcuNTAxMiA5OS4wNjMzLDU3LjUwMDcgOTkuMDQ4Myw1Ny41MDA3IEM5Ny4xNTc4LDU3LjQ3NDcgOTUuNTQxOCw1OS4wMzEyIDk1LjUwMDgsNjAuOTIxNyBDOTUuNDU3OCw2Mi44OTA3IDk3LjA0MDgsNjQuNTAwMiA5OC45OTk4LDY0LjUwMDIgQzk5Ljc3OTMsNjQuNTAwMiAxMDAuNDk4Myw2NC4yNDUyIDEwMS4wNzk4LDYzLjgxNDIgQzEwMS4zMTgzLDYzLjYzNzIgMTAxLjIzNTgsNjMuMjYyNyAxMDAuOTQ3OCw2My4xODk3IEM5OS41OTIzLDYyLjg0NTcgOTguNjEyMyw2MS42MDcyIDk4LjYxMjMsNjAuMTM3MiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMyAxMSkiIC8+PC9nPjxwb2x5Z29uIHBvaW50cz0iNDQ0IDIyOCA0NjggMjI4IDQ2OCAyMDQgNDQ0IDIwNCIgLz48L2c+PC9zdmc+)
-
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSIgTTEyLjg3IDE1LjA3bC0yLjU0LTIuNTEuMDMtLjAzYzEuNzQtMS45NCAyLjk4LTQuMTcgMy43MS02LjUzSDE3VjRoLTdWMkg4djJIMXYxLjk5aDExLjE3QzExLjUgNy45MiAxMC40NCA5Ljc1IDkgMTEuMzUgOC4wNyAxMC4zMiA3LjMgOS4xOSA2LjY5IDhoLTJjLjczIDEuNjMgMS43MyAzLjE3IDIuOTggNC41NmwtNS4wOSA1LjAyTDQgMTlsNS01IDMuMTEgMy4xMS43Ni0yLjA0ek0xOC41IDEwaC0yTDEyIDIyaDJsMS4xMi0zaDQuNzVMMjEgMjJoMmwtNC41LTEye…](/community/translations)
-
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJjdXJyZW50Q29sb3IiPjxwYXRoIGQ9Ik0xMiAwYy02LjYyNiAwLTEyIDUuMzczLTEyIDEyIDAgNS4zMDIgMy40MzggOS44IDguMjA3IDExLjM4Ny41OTkuMTExLjc5My0uMjYxLjc5My0uNTc3di0yLjIzNGMtMy4zMzguNzI2LTQuMDMzLTEuNDE2LTQuMDMzLTEuNDE2LS41NDYtMS4zODctMS4zMzMtMS43NTYtMS4zMzMtMS43NTYtMS4wODktLjc0NS4wODMtLjcyOS4wODMtLjcyOSAxLjIwNS4wODQgMS44MzkgMS4yMzcgMS44MzkgMS4yMzcgMS4wNyAxLjgzNCAyL…](https://github.com/facebook/react/releases)
-
-### GET STARTED
-
-- [Quick Start SVG Image](/learn "Quick Start")
-
-  - [Tutorial: Tic-Tac-Toe](/learn/tutorial-tic-tac-toe "Tutorial: Tic-Tac-Toe")
-  - [Thinking in React](/learn/thinking-in-react "Thinking in React")
-
-- [Installation SVG Image](/learn/installation "Installation")
-
-  - [Creating a React App](/learn/creating-a-react-app "Creating a React App")
-  - [Build a React App from Scratch](/learn/build-a-react-app-from-scratch "Build a React App from Scratch")
-  - [Add React to an Existing Project](/learn/add-react-to-an-existing-project "Add React to an Existing Project")
-
-- [Setup SVG Image](/learn/setup "Setup")
-
-  - [Editor Setup](/learn/editor-setup "Editor Setup")
-  - [Using TypeScript](/learn/typescript "Using TypeScript")
-  - [React Developer Tools](/learn/react-developer-tools "React Developer Tools")
-
-- [React Compiler SVG Image](/learn/react-compiler "React Compiler")
-
-  - [Introduction](/learn/react-compiler/introduction "Introduction")
-  - [Installation](/learn/react-compiler/installation "Installation")
-  - [Incremental Adoption](/learn/react-compiler/incremental-adoption "Incremental Adoption")
-  - [Debugging and Troubleshooting](/learn/react-compiler/debugging "Debugging and Troubleshooting")
-
--
-
-### LEARN REACT
-
-- [Describing the UI SVG Image](/learn/describing-the-ui "Describing the UI")
-
-  - [Your First Component](/learn/your-first-component "Your First Component")
-  - [Importing and Exporting Components](/learn/importing-and-exporting-components "Importing and Exporting Components")
-  - [Writing Markup with JSX](/learn/writing-markup-with-jsx "Writing Markup with JSX")
-  - [JavaScript in JSX with Curly Braces](/learn/javascript-in-jsx-with-curly-braces "JavaScript in JSX with Curly Braces")
-  - [Passing Props to a Component](/learn/passing-props-to-a-component "Passing Props to a Component")
-  - [Conditional Rendering](/learn/conditional-rendering "Conditional Rendering")
-  - [Rendering Lists](/learn/rendering-lists "Rendering Lists")
-  - [Keeping Components Pure](/learn/keeping-components-pure "Keeping Components Pure")
-  - [Your UI as a Tree](/learn/understanding-your-ui-as-a-tree "Your UI as a Tree")
-
-- [Adding Interactivity SVG Image](/learn/adding-interactivity "Adding Interactivity")
-
-  - [Responding to Events](/learn/responding-to-events "Responding to Events")
-  - [State: A Component's Memory](/learn/state-a-components-memory "State: A Component's Memory")
-  - [Render and Commit](/learn/render-and-commit "Render and Commit")
-  - [State as a Snapshot](/learn/state-as-a-snapshot "State as a Snapshot")
-  - [Queueing a Series of State Updates](/learn/queueing-a-series-of-state-updates "Queueing a Series of State Updates")
-  - [Updating Objects in State](/learn/updating-objects-in-state "Updating Objects in State")
-  - [Updating Arrays in State](/learn/updating-arrays-in-state "Updating Arrays in State")
-
-- [Managing State SVG Image](/learn/managing-state "Managing State")
-
-  - [Reacting to Input with State](/learn/reacting-to-input-with-state "Reacting to Input with State")
-  - [Choosing the State Structure](/learn/choosing-the-state-structure "Choosing the State Structure")
-  - [Sharing State Between Components](/learn/sharing-state-between-components "Sharing State Between Components")
-  - [Preserving and Resetting State](/learn/preserving-and-resetting-state "Preserving and Resetting State")
-  - [Extracting State Logic into a Reducer](/learn/extracting-state-logic-into-a-reducer "Extracting State Logic into a Reducer")
-  - [Passing Data Deeply with Context](/learn/passing-data-deeply-with-context "Passing Data Deeply with Context")
-  - [Scaling Up with Reducer and Context](/learn/scaling-up-with-reducer-and-context "Scaling Up with Reducer and Context")
-
-- [Escape Hatches SVG Image](/learn/escape-hatches "Escape Hatches")
-
-  - [Referencing Values with Refs](/learn/referencing-values-with-refs "Referencing Values with Refs")
-  - [Manipulating the DOM with Refs](/learn/manipulating-the-dom-with-refs "Manipulating the DOM with Refs")
-  - [Synchronizing with Effects](/learn/synchronizing-with-effects "Synchronizing with Effects")
-  - [You Might Not Need an Effect](/learn/you-might-not-need-an-effect "You Might Not Need an Effect")
-  - [Lifecycle of Reactive Effects](/learn/lifecycle-of-reactive-effects "Lifecycle of Reactive Effects")
-  - [Separating Events from Effects](/learn/separating-events-from-effects "Separating Events from Effects")
-  - [Removing Effect Dependencies](/learn/removing-effect-dependencies "Removing Effect Dependencies")
-  - [Reusing Logic with Custom Hooks](/learn/reusing-logic-with-custom-hooks "Reusing Logic with Custom Hooks")
 
 [Learn React](/learn)![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNi44NjYxMiAxMy42MTYxQzYuMzc3OTYgMTQuMTA0MyA2LjM3Nzk2IDE0Ljg5NTcgNi44NjYxMiAxNS4zODM5QzcuMzU0MjcgMTUuODcyIDguMTQ1NzIgMTUuODcyIDguNjMzODggMTUuMzgzOUwxMy4xMzM5IDEwLjg4MzlDMTMuNjIyIDEwLjM5NTcgMTMuNjIyIDkuNjA0MjggMTMuMTMzOSA5LjExNjEyTDguNjMzODggNC42MTYxMkM4LjE0NTcyIDQuMTI3OTcgNy4zNTQyNyA0LjEyNzk3IDYuODY2MTIgNC42MTYxMkM2LjM3Nzk2IDUuMTA0MjggNi4zNzc5NiA1Ljg5NTczIDYuODY2MTIgNi4zODM4OEwxMC40ODIyIDEwTDYuODY2MTIgMTMuNjE2MVoiIGZpbGw9ImN1cnJlbnRDb2xvciIgLz48L3N2Zz4=)
 
@@ -145,33 +43,37 @@ React apps are made out of *components*. A component is a piece of the UI (user 
 
 React components are JavaScript functions that return markup:
 
-    function MyButton() {  
+```
+function MyButton() {  
 
-      return (  
+  return (  
 
-        <button>I'm a button</button>  
+    <button>I'm a button</button>  
 
-      );  
+  );  
 
-    }
+}
+```
 
 Now that you’ve declared `MyButton`, you can nest it into another component:
 
-    export default function MyApp() {  
+```
+export default function MyApp() {  
 
-      return (  
+  return (  
 
-        <div>  
+    <div>  
 
-          <h1>Welcome to my app</h1>  
+      <h1>Welcome to my app</h1>  
 
-          <MyButton />  
+      <MyButton />  
 
-        </div>  
+    </div>  
 
-      );  
+  );  
 
-    }
+}
+```
 
 Notice that `<MyButton />` starts with a capital letter. That’s how you know it’s a React component. React component names must always start with a capital letter, while HTML tags must be lowercase.
 
@@ -185,24 +87,26 @@ App.js
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUiIGZpbGw9Im5vbmUiIGhlaWdodD0iMS4zM2VtIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjEuMzNlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZSB4MT0iMTgiIHgyPSI2IiB5MT0iNiIgeTI9IjE4IiAvPjxsaW5lIHgxPSI2IiB4Mj0iMTgiIHkxPSI2IiB5Mj0iMTgiIC8+PC9zdmc+)Clear
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxN…](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxNC45NEM3LjYwMzIzIDE0Ljk4NjUgNy41NjYwNCAxNS4wNDE4IDcuNTQwNjUgMTUuMTAyN0M3LjUxNTI3IDE1LjE2MzYgNy41MDIyIDE1LjIyOSA3LjUwMjIgMTUuMjk1QzcuNTAyMiAxNS4zNjEgNy41MTUyNyAxNS40MjY0IDcuNTQwNjUgMTUuNDg3M0M3LjU2NjA0IDE1LjU0ODIgNy42MDMyMyAxNS42MDM1IDcuNjUwMSAxNS42NUw4LjM1MDEgMTYuMzVDOC4zOTY1OCAxNi4zOTY5IDguNDUxODggMTYuNDM0MSA4LjUxMjgxIDE2LjQ1OTRDOC41NzM3NCAxNi40ODQ4IDguNjM5MDkgMTYuNDk3OSA4LjcwNTEgMTYuNDk3OUM4Ljc3MTEgMTYuNDk3OSA4LjgzNjQ2IDE2LjQ4NDggOC44OTczOCAxNi40NTk0QzguOTU4MzEgMTYuNDM0MSA5LjAxMzYyIDE2LjM5NjkgOS4wNjAxIDE2LjM1TDIwLjAwMDEgNS40MVY4LjVDMjAuMDAwMSA4LjYzMjYxIDIwLjA1MjggOC43NTk3OSAyMC4xNDY1IDguODUzNTVDMjAuMjQwMyA4Ljk0NzMyIDIwLjM2NzUgOSAyMC41MDAxIDlIMjEuNTAwMUMyMS42MzI3IDkgMjEuNzU5OSA4Ljk0NzMyIDIxLjg1MzcgOC44NTM1NUMyMS45NDc0IDguNzU5NzkgMjIuMDAwMSA4LjYzMjYxIDIyLjAwMDEgOC41VjMuNUMyMi4wMDAxIDMuMTAyMTggMjEuODQyMSAyLjcyMDY0IDIxLjU2MDggMi40MzkzNEMyMS4yNzk1IDIuMTU4MDQgMjAuODk3OSAyIDIwLjUwMDEgMlYyWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjxwYXRoIGQ9Ik0yMS41IDEzSDIwLjVDMjAuMzY3NCAxMyAyMC4yNDAyIDEzLjA1MjcgMjAuMTQ2NCAxMy4xNDY0QzIwLjA1MjcgMTMuMjQwMiAyMCAxMy4zNjc0IDIwIDEzLjVWMjBINFY0SDEwLjVDMTAuNjMyNiA0IDEwLjc1OTggMy45NDczMiAxMC44NTM2IDMuODUzNTVDMTAuOTQ3MyAzLjc1OTc5IDExIDMuNjMyNjEgMTEgMy41VjIuNUMxMSAyLjM2NzM5IDEwLjk0NzMgMi4yNDAyMSAxMC44NTM2IDIuMTQ2NDVDMTAuNzU5OCAyLjA1MjY4IDEwLjYzMjYgMiAxMC41IDJIMy41QzMuMTAyMTggMiAyLjcyMDY0IDIuMTU4MDQgMi40MzkzNCAyLjQzOTM0QzIuMTU4MDQgMi43MjA2NCAyIDMuMTAyMTggMiAzLjVWMjAuNUMyIDIwLjg5NzggMi4xNTgwNCAyMS4yNzk0IDIuNDM5MzQgMjEuNTYwN0MyLjcyMDY0IDIxLjg0MiAzLjEwMjE4IDIyIDMuNSAyMkgyMC41QzIwLjg5NzggMjIgMjEuMjc5NCAyMS44NDIgMjEuNTYwNyAyMS41NjA3QzIxLjg0MiAyMS4yNzk0IDIyIDIwLjg5NzggMjIgMjAuNVYxMy41QzIyIDEzLjM2NzQgMjEuOTQ3MyAxMy4yNDAyIDIxLjg1MzYgMTMuMTQ2NEMyMS43NTk4IDEzLjA1MjcgMjEuNjMyNiAxMyAyMS41IDEzWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjwvc3ZnPg==)Fork](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
 
-    function MyButton() {
-      return (
-        <button>
-          I'm a button
-        </button>
-      );
-    }
+```
+function MyButton() {
+  return (
+    <button>
+      I'm a button
+    </button>
+  );
+}
 
-    export default function MyApp() {
-      return (
-        <div>
-          <h1>Welcome to my app</h1>
-          <MyButton />
-        </div>
-      );
-    }
+export default function MyApp() {
+  return (
+    <div>
+      <h1>Welcome to my app</h1>
+      <MyButton />
+    </div>
+  );
+}
+```
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0icm90YXRlLTAgaW5saW5lIG1lLTEuNSB0ZXh0LXhsIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDYgLTM5OCkiPjxwYXRoIGQ9Ik05NS44ODM4ODM1LDI0MC4zNjYxMTcgQzk1LjM5NTcyODEsMjM5Ljg3Nzk2MSA5NC42MDQyNzE5LDIzOS44Nzc5NjEgOTQuMTE2MTE2NSwyNDAuMzY2MTE3IEM5My42Mjc5NjEyLDI0MC44NTQyNzIgOTMuNjI3OTYxMiwyNDEuNjQ1NzI4IDk0LjExNjExNjUsMjQyLjEzMzg4MyBMOTguNjE2MTE2NSwyNDYuNjMzODgzIEM5OS4xMDQyNzE5LDI0Ny4xMjIwMzkgOTkuODk1NzI4MSwyNDcuMTIyMDM5IDEwMC4zODM4ODMsMjQ2LjYzMzg4MyBMMTA0Ljg4Mzg4MywyNDIuMTMzODgzIEMxMDUuMzcyMDM5LDI0MS42NDU3MjggMTA1LjM3MjAzOSwyNDAuODU0MjcyIDEwNC44ODM4ODMsMjQwLjM2NjExNyBDMTA0LjM5NTcyOCwyMzkuODc3OTYxIDEwMy42MDQyNzIsMjM5Ljg3Nzk2MSAxMDMuMTE2MTE3LDI0MC4zNjYxMTcgTDk5LjUsMjQzLjk4MjIzMyBMOTUuODgzODgzNSwyNDAuMzY2MTE3IFoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTYuNSAxNjQuNSkiIC8+PHBvbHlnb24gcG9pbnRzPSI0NDYgNDE4IDQ2NiA0MTggNDY2IDM5OCA0NDYgMzk4IiAvPjwvZz48L3N2Zz4=)Show more
 
@@ -214,21 +118,23 @@ The markup syntax you’ve seen above is called *JSX*. It is optional, but most 
 
 JSX is stricter than HTML. You have to close tags like `<br />`. Your component also can’t return multiple JSX tags. You have to wrap them into a shared parent, like a `<div>...</div>` or an empty `<>...</>` wrapper:
 
-    function AboutPage() {  
+```
+function AboutPage() {  
 
-      return (  
+  return (  
 
-        <>  
+    <>  
 
-          <h1>About</h1>  
+      <h1>About</h1>  
 
-          <p>Hello there.<br />How do you do?</p>  
+      <p>Hello there.<br />How do you do?</p>  
 
-        </>  
+    </>  
 
-      );  
+  );  
 
-    }
+}
+```
 
 If you have a lot of HTML to port to JSX, you can use an [online converter.](https://transform.tools/html-to-jsx)
 
@@ -236,17 +142,21 @@ If you have a lot of HTML to port to JSX, you can use an [online converter.](htt
 
 In React, you specify a CSS class with `className`. It works the same way as the HTML [`class`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class) attribute:
 
-    <img className="avatar" />
+```
+<img className="avatar" />
+```
 
 Then you write the CSS rules for it in a separate CSS file:
 
-    /* In your CSS */  
+```
+/* In your CSS */  
 
-    .avatar {  
+.avatar {  
 
-      border-radius: 50%;  
+  border-radius: 50%;  
 
-    }
+}
+```
 
 React does not prescribe how you add CSS files. In the simplest case, you’ll add a [`<link>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link) tag to your HTML. If you use a build tool or a framework, consult its documentation to learn how to add a CSS file to your project.
 
@@ -254,29 +164,33 @@ React does not prescribe how you add CSS files. In the simplest case, you’ll a
 
 JSX lets you put markup into JavaScript. Curly braces let you “escape back” into JavaScript so that you can embed some variable from your code and display it to the user. For example, this will display `user.name`:
 
-    return (  
+```
+return (  
 
-      <h1>  
+  <h1>  
 
-        {user.name}  
+    {user.name}  
 
-      </h1>  
+  </h1>  
 
-    );
+);
+```
 
 You can also “escape into JavaScript” from JSX attributes, but you have to use curly braces *instead of* quotes. For example, `className="avatar"` passes the `"avatar"` string as the CSS class, but `src={user.imageUrl}` reads the JavaScript `user.imageUrl` variable value, and then passes that value as the `src` attribute:
 
-    return (  
+```
+return (  
 
-      <img  
+  <img  
 
-        className="avatar"  
+    className="avatar"  
 
-        src={user.imageUrl}  
+    src={user.imageUrl}  
 
-      />  
+  />  
 
-    );
+);
+```
 
 You can put more complex expressions inside the JSX curly braces too, for example, [string concatenation](https://javascript.info/operators#string-concatenation-with-binary):
 
@@ -288,30 +202,32 @@ App.js
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUiIGZpbGw9Im5vbmUiIGhlaWdodD0iMS4zM2VtIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjEuMzNlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZSB4MT0iMTgiIHgyPSI2IiB5MT0iNiIgeTI9IjE4IiAvPjxsaW5lIHgxPSI2IiB4Mj0iMTgiIHkxPSI2IiB5Mj0iMTgiIC8+PC9zdmc+)Clear
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxN…](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxNC45NEM3LjYwMzIzIDE0Ljk4NjUgNy41NjYwNCAxNS4wNDE4IDcuNTQwNjUgMTUuMTAyN0M3LjUxNTI3IDE1LjE2MzYgNy41MDIyIDE1LjIyOSA3LjUwMjIgMTUuMjk1QzcuNTAyMiAxNS4zNjEgNy41MTUyNyAxNS40MjY0IDcuNTQwNjUgMTUuNDg3M0M3LjU2NjA0IDE1LjU0ODIgNy42MDMyMyAxNS42MDM1IDcuNjUwMSAxNS42NUw4LjM1MDEgMTYuMzVDOC4zOTY1OCAxNi4zOTY5IDguNDUxODggMTYuNDM0MSA4LjUxMjgxIDE2LjQ1OTRDOC41NzM3NCAxNi40ODQ4IDguNjM5MDkgMTYuNDk3OSA4LjcwNTEgMTYuNDk3OUM4Ljc3MTEgMTYuNDk3OSA4LjgzNjQ2IDE2LjQ4NDggOC44OTczOCAxNi40NTk0QzguOTU4MzEgMTYuNDM0MSA5LjAxMzYyIDE2LjM5NjkgOS4wNjAxIDE2LjM1TDIwLjAwMDEgNS40MVY4LjVDMjAuMDAwMSA4LjYzMjYxIDIwLjA1MjggOC43NTk3OSAyMC4xNDY1IDguODUzNTVDMjAuMjQwMyA4Ljk0NzMyIDIwLjM2NzUgOSAyMC41MDAxIDlIMjEuNTAwMUMyMS42MzI3IDkgMjEuNzU5OSA4Ljk0NzMyIDIxLjg1MzcgOC44NTM1NUMyMS45NDc0IDguNzU5NzkgMjIuMDAwMSA4LjYzMjYxIDIyLjAwMDEgOC41VjMuNUMyMi4wMDAxIDMuMTAyMTggMjEuODQyMSAyLjcyMDY0IDIxLjU2MDggMi40MzkzNEMyMS4yNzk1IDIuMTU4MDQgMjAuODk3OSAyIDIwLjUwMDEgMlYyWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjxwYXRoIGQ9Ik0yMS41IDEzSDIwLjVDMjAuMzY3NCAxMyAyMC4yNDAyIDEzLjA1MjcgMjAuMTQ2NCAxMy4xNDY0QzIwLjA1MjcgMTMuMjQwMiAyMCAxMy4zNjc0IDIwIDEzLjVWMjBINFY0SDEwLjVDMTAuNjMyNiA0IDEwLjc1OTggMy45NDczMiAxMC44NTM2IDMuODUzNTVDMTAuOTQ3MyAzLjc1OTc5IDExIDMuNjMyNjEgMTEgMy41VjIuNUMxMSAyLjM2NzM5IDEwLjk0NzMgMi4yNDAyMSAxMC44NTM2IDIuMTQ2NDVDMTAuNzU5OCAyLjA1MjY4IDEwLjYzMjYgMiAxMC41IDJIMy41QzMuMTAyMTggMiAyLjcyMDY0IDIuMTU4MDQgMi40MzkzNCAyLjQzOTM0QzIuMTU4MDQgMi43MjA2NCAyIDMuMTAyMTggMiAzLjVWMjAuNUMyIDIwLjg5NzggMi4xNTgwNCAyMS4yNzk0IDIuNDM5MzQgMjEuNTYwN0MyLjcyMDY0IDIxLjg0MiAzLjEwMjE4IDIyIDMuNSAyMkgyMC41QzIwLjg5NzggMjIgMjEuMjc5NCAyMS44NDIgMjEuNTYwNyAyMS41NjA3QzIxLjg0MiAyMS4yNzk0IDIyIDIwLjg5NzggMjIgMjAuNVYxMy41QzIyIDEzLjM2NzQgMjEuOTQ3MyAxMy4yNDAyIDIxLjg1MzYgMTMuMTQ2NEMyMS43NTk4IDEzLjA1MjcgMjEuNjMyNiAxMyAyMS41IDEzWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjwvc3ZnPg==)Fork](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
 
-    const user = {
-      name: 'Hedy Lamarr',
-      imageUrl: 'https://i.imgur.com/yXOvdOSs.jpg',
-      imageSize: 90,
-    };
+```
+const user = {
+  name: 'Hedy Lamarr',
+  imageUrl: 'https://i.imgur.com/yXOvdOSs.jpg',
+  imageSize: 90,
+};
 
-    export default function Profile() {
-      return (
-        <>
-          <h1>{user.name}</h1>
-          <img
-            className="avatar"
-            src={user.imageUrl}
-            alt={'Photo of ' + user.name}
-            style={{
-              width: user.imageSize,
-              height: user.imageSize
-            }}
-          />
-        </>
-      );
-    }
+export default function Profile() {
+  return (
+    <>
+      <h1>{user.name}</h1>
+      <img
+        className="avatar"
+        src={user.imageUrl}
+        alt={'Photo of ' + user.name}
+        style={{
+          width: user.imageSize,
+          height: user.imageSize
+        }}
+      />
+    </>
+  );
+}
+```
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0icm90YXRlLTAgaW5saW5lIG1lLTEuNSB0ZXh0LXhsIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDYgLTM5OCkiPjxwYXRoIGQ9Ik05NS44ODM4ODM1LDI0MC4zNjYxMTcgQzk1LjM5NTcyODEsMjM5Ljg3Nzk2MSA5NC42MDQyNzE5LDIzOS44Nzc5NjEgOTQuMTE2MTE2NSwyNDAuMzY2MTE3IEM5My42Mjc5NjEyLDI0MC44NTQyNzIgOTMuNjI3OTYxMiwyNDEuNjQ1NzI4IDk0LjExNjExNjUsMjQyLjEzMzg4MyBMOTguNjE2MTE2NSwyNDYuNjMzODgzIEM5OS4xMDQyNzE5LDI0Ny4xMjIwMzkgOTkuODk1NzI4MSwyNDcuMTIyMDM5IDEwMC4zODM4ODMsMjQ2LjYzMzg4MyBMMTA0Ljg4Mzg4MywyNDIuMTMzODgzIEMxMDUuMzcyMDM5LDI0MS42NDU3MjggMTA1LjM3MjAzOSwyNDAuODU0MjcyIDEwNC44ODM4ODMsMjQwLjM2NjExNyBDMTA0LjM5NTcyOCwyMzkuODc3OTYxIDEwMy42MDQyNzIsMjM5Ljg3Nzk2MSAxMDMuMTE2MTE3LDI0MC4zNjYxMTcgTDk5LjUsMjQzLjk4MjIzMyBMOTUuODgzODgzNSwyNDAuMzY2MTE3IFoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTYuNSAxNjQuNSkiIC8+PHBvbHlnb24gcG9pbnRzPSI0NDYgNDE4IDQ2NiA0MTggNDY2IDM5OCA0NDYgMzk4IiAvPjwvZz48L3N2Zz4=)Show more
 
@@ -321,51 +237,57 @@ In the above example, `style={{}}` is not a special syntax, but a regular `{}` o
 
 In React, there is no special syntax for writing conditions. Instead, you’ll use the same techniques as you use when writing regular JavaScript code. For example, you can use an [`if`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else) statement to conditionally include JSX:
 
-    let content;  
+```
+let content;  
 
-    if (isLoggedIn) {  
+if (isLoggedIn) {  
 
-      content = <AdminPanel />;  
+  content = <AdminPanel />;  
 
-    } else {  
+} else {  
 
-      content = <LoginForm />;  
+  content = <LoginForm />;  
 
-    }  
+}  
 
-    return (  
+return (  
 
-      <div>  
+  <div>  
 
-        {content}  
+    {content}  
 
-      </div>  
+  </div>  
 
-    );
+);
+```
 
 If you prefer more compact code, you can use the [conditional `?` operator.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator) Unlike `if`, it works inside JSX:
 
-    <div>  
+```
+<div>  
 
-      {isLoggedIn ? (  
+  {isLoggedIn ? (  
 
-        <AdminPanel />  
+    <AdminPanel />  
 
-      ) : (  
+  ) : (  
 
-        <LoginForm />  
+    <LoginForm />  
 
-      )}  
+  )}  
 
-    </div>
+</div>
+```
 
 When you don’t need the `else` branch, you can also use a shorter [logical `&&` syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation):
 
-    <div>  
+```
+<div>  
 
-      {isLoggedIn && <AdminPanel />}  
+  {isLoggedIn && <AdminPanel />}  
 
-    </div>
+</div>
+```
 
 All of these approaches also work for conditionally specifying attributes. If you’re unfamiliar with some of this JavaScript syntax, you can start by always using `if...else`.
 
@@ -375,34 +297,37 @@ You will rely on JavaScript features like [`for` loop](https://developer.mozilla
 
 For example, let’s say you have an array of products:
 
-    const products = [  
+```
+const products = [  
 
-      { title: 'Cabbage', id: 1 },  
+  { title: 'Cabbage', id: 1 },  
 
-      { title: 'Garlic', id: 2 },  
+  { title: 'Garlic', id: 2 },  
 
-      { title: 'Apple', id: 3 },  
+  { title: 'Apple', id: 3 },  
 
-    ];
+];
+```
 
 Inside your component, use the `map()` function to transform an array of products into an array of `<li>` items:
 
-    const listItems = products.map(product =>  
+```
+const listItems = products.map(product =>  
 
-      <li key={product.id}>  
+  <li key={product.id}>  
 
-        {product.title}  
+    {product.title}  
 
-      </li>  
+  </li>  
 
-    );  
+);  
 
+return (  
 
-    return (  
+  <ul>{listItems}</ul>  
 
-      <ul>{listItems}</ul>  
-
-    );
+);
+```
 
 Notice how `<li>` has a `key` attribute. For each item in a list, you should pass a string or a number that uniquely identifies that item among its siblings. Usually, a key should be coming from your data, such as a database ID. React uses your keys to know what happened if you later insert, delete, or reorder the items.
 
@@ -414,30 +339,32 @@ App.js
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUiIGZpbGw9Im5vbmUiIGhlaWdodD0iMS4zM2VtIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjEuMzNlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZSB4MT0iMTgiIHgyPSI2IiB5MT0iNiIgeTI9IjE4IiAvPjxsaW5lIHgxPSI2IiB4Mj0iMTgiIHkxPSI2IiB5Mj0iMTgiIC8+PC9zdmc+)Clear
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxN…](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxNC45NEM3LjYwMzIzIDE0Ljk4NjUgNy41NjYwNCAxNS4wNDE4IDcuNTQwNjUgMTUuMTAyN0M3LjUxNTI3IDE1LjE2MzYgNy41MDIyIDE1LjIyOSA3LjUwMjIgMTUuMjk1QzcuNTAyMiAxNS4zNjEgNy41MTUyNyAxNS40MjY0IDcuNTQwNjUgMTUuNDg3M0M3LjU2NjA0IDE1LjU0ODIgNy42MDMyMyAxNS42MDM1IDcuNjUwMSAxNS42NUw4LjM1MDEgMTYuMzVDOC4zOTY1OCAxNi4zOTY5IDguNDUxODggMTYuNDM0MSA4LjUxMjgxIDE2LjQ1OTRDOC41NzM3NCAxNi40ODQ4IDguNjM5MDkgMTYuNDk3OSA4LjcwNTEgMTYuNDk3OUM4Ljc3MTEgMTYuNDk3OSA4LjgzNjQ2IDE2LjQ4NDggOC44OTczOCAxNi40NTk0QzguOTU4MzEgMTYuNDM0MSA5LjAxMzYyIDE2LjM5NjkgOS4wNjAxIDE2LjM1TDIwLjAwMDEgNS40MVY4LjVDMjAuMDAwMSA4LjYzMjYxIDIwLjA1MjggOC43NTk3OSAyMC4xNDY1IDguODUzNTVDMjAuMjQwMyA4Ljk0NzMyIDIwLjM2NzUgOSAyMC41MDAxIDlIMjEuNTAwMUMyMS42MzI3IDkgMjEuNzU5OSA4Ljk0NzMyIDIxLjg1MzcgOC44NTM1NUMyMS45NDc0IDguNzU5NzkgMjIuMDAwMSA4LjYzMjYxIDIyLjAwMDEgOC41VjMuNUMyMi4wMDAxIDMuMTAyMTggMjEuODQyMSAyLjcyMDY0IDIxLjU2MDggMi40MzkzNEMyMS4yNzk1IDIuMTU4MDQgMjAuODk3OSAyIDIwLjUwMDEgMlYyWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjxwYXRoIGQ9Ik0yMS41IDEzSDIwLjVDMjAuMzY3NCAxMyAyMC4yNDAyIDEzLjA1MjcgMjAuMTQ2NCAxMy4xNDY0QzIwLjA1MjcgMTMuMjQwMiAyMCAxMy4zNjc0IDIwIDEzLjVWMjBINFY0SDEwLjVDMTAuNjMyNiA0IDEwLjc1OTggMy45NDczMiAxMC44NTM2IDMuODUzNTVDMTAuOTQ3MyAzLjc1OTc5IDExIDMuNjMyNjEgMTEgMy41VjIuNUMxMSAyLjM2NzM5IDEwLjk0NzMgMi4yNDAyMSAxMC44NTM2IDIuMTQ2NDVDMTAuNzU5OCAyLjA1MjY4IDEwLjYzMjYgMiAxMC41IDJIMy41QzMuMTAyMTggMiAyLjcyMDY0IDIuMTU4MDQgMi40MzkzNCAyLjQzOTM0QzIuMTU4MDQgMi43MjA2NCAyIDMuMTAyMTggMiAzLjVWMjAuNUMyIDIwLjg5NzggMi4xNTgwNCAyMS4yNzk0IDIuNDM5MzQgMjEuNTYwN0MyLjcyMDY0IDIxLjg0MiAzLjEwMjE4IDIyIDMuNSAyMkgyMC41QzIwLjg5NzggMjIgMjEuMjc5NCAyMS44NDIgMjEuNTYwNyAyMS41NjA3QzIxLjg0MiAyMS4yNzk0IDIyIDIwLjg5NzggMjIgMjAuNVYxMy41QzIyIDEzLjM2NzQgMjEuOTQ3MyAxMy4yNDAyIDIxLjg1MzYgMTMuMTQ2NEMyMS43NTk4IDEzLjA1MjcgMjEuNjMyNiAxMyAyMS41IDEzWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjwvc3ZnPg==)Fork](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
 
-    const products = [
-      { title: 'Cabbage', isFruit: false, id: 1 },
-      { title: 'Garlic', isFruit: false, id: 2 },
-      { title: 'Apple', isFruit: true, id: 3 },
-    ];
+```
+const products = [
+  { title: 'Cabbage', isFruit: false, id: 1 },
+  { title: 'Garlic', isFruit: false, id: 2 },
+  { title: 'Apple', isFruit: true, id: 3 },
+];
 
-    export default function ShoppingList() {
-      const listItems = products.map(product =>
-        <li
-          key={product.id}
-          style={{
-            color: product.isFruit ? 'magenta' : 'darkgreen'
-          }}
-        >
-          {product.title}
-        </li>
-      );
+export default function ShoppingList() {
+  const listItems = products.map(product =>
+    <li
+      key={product.id}
+      style={{
+        color: product.isFruit ? 'magenta' : 'darkgreen'
+      }}
+    >
+      {product.title}
+    </li>
+  );
 
-      return (
-        <ul>{listItems}</ul>
-      );
-    }
+  return (
+    <ul>{listItems}</ul>
+  );
+}
+```
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0icm90YXRlLTAgaW5saW5lIG1lLTEuNSB0ZXh0LXhsIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDYgLTM5OCkiPjxwYXRoIGQ9Ik05NS44ODM4ODM1LDI0MC4zNjYxMTcgQzk1LjM5NTcyODEsMjM5Ljg3Nzk2MSA5NC42MDQyNzE5LDIzOS44Nzc5NjEgOTQuMTE2MTE2NSwyNDAuMzY2MTE3IEM5My42Mjc5NjEyLDI0MC44NTQyNzIgOTMuNjI3OTYxMiwyNDEuNjQ1NzI4IDk0LjExNjExNjUsMjQyLjEzMzg4MyBMOTguNjE2MTE2NSwyNDYuNjMzODgzIEM5OS4xMDQyNzE5LDI0Ny4xMjIwMzkgOTkuODk1NzI4MSwyNDcuMTIyMDM5IDEwMC4zODM4ODMsMjQ2LjYzMzg4MyBMMTA0Ljg4Mzg4MywyNDIuMTMzODgzIEMxMDUuMzcyMDM5LDI0MS42NDU3MjggMTA1LjM3MjAzOSwyNDAuODU0MjcyIDEwNC44ODM4ODMsMjQwLjM2NjExNyBDMTA0LjM5NTcyOCwyMzkuODc3OTYxIDEwMy42MDQyNzIsMjM5Ljg3Nzk2MSAxMDMuMTE2MTE3LDI0MC4zNjYxMTcgTDk5LjUsMjQzLjk4MjIzMyBMOTUuODgzODgzNSwyNDAuMzY2MTE3IFoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTYuNSAxNjQuNSkiIC8+PHBvbHlnb24gcG9pbnRzPSI0NDYgNDE4IDQ2NiA0MTggNDY2IDM5OCA0NDYgMzk4IiAvPjwvZz48L3N2Zz4=)Show more
 
@@ -445,26 +372,27 @@ App.js
 
 You can respond to events by declaring *event handler* functions inside your components:
 
-    function MyButton() {  
+```
+function MyButton() {  
 
-      function handleClick() {  
+  function handleClick() {  
 
-        alert('You clicked me!');  
+    alert('You clicked me!');  
 
-      }  
+  }  
 
+  return (  
 
-      return (  
+    <button onClick={handleClick}>  
 
-        <button onClick={handleClick}>  
+      Click me  
 
-          Click me  
+    </button>  
 
-        </button>  
+  );  
 
-      );  
-
-    }
+}
+```
 
 Notice how `onClick={handleClick}` has no parentheses at the end! Do not *call* the event handler function: you only need to *pass it down*. React will call your event handler when the user clicks the button.
 
@@ -474,43 +402,47 @@ Often, you’ll want your component to “remember” some information and displ
 
 First, import [`useState`](/reference/react/useState) from React:
 
-    import { useState } from 'react';
+```
+import { useState } from 'react';
+```
 
 Now you can declare a *state variable* inside your component:
 
-    function MyButton() {  
+```
+function MyButton() {  
 
-      const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);  
 
-      // ...
+  // ...
+```
 
 You’ll get two things from `useState`: the current state (`count`), and the function that lets you update it (`setCount`). You can give them any names, but the convention is to write `[something, setSomething]`.
 
 The first time the button is displayed, `count` will be `0` because you passed `0` to `useState()`. When you want to change state, call `setCount()` and pass the new value to it. Clicking this button will increment the counter:
 
-    function MyButton() {  
+```
+function MyButton() {  
 
-      const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);  
 
+  function handleClick() {  
 
-      function handleClick() {  
+    setCount(count + 1);  
 
-        setCount(count + 1);  
+  }  
 
-      }  
+  return (  
 
+    <button onClick={handleClick}>  
 
-      return (  
+      Clicked {count} times  
 
-        <button onClick={handleClick}>  
+    </button>  
 
-          Clicked {count} times  
+  );  
 
-        </button>  
-
-      );  
-
-    }
+}
+```
 
 React will call your component function again. This time, `count` will be `1`. Then it will be `2`. And so on.
 
@@ -524,33 +456,35 @@ App.js
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUiIGZpbGw9Im5vbmUiIGhlaWdodD0iMS4zM2VtIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjEuMzNlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZSB4MT0iMTgiIHgyPSI2IiB5MT0iNiIgeTI9IjE4IiAvPjxsaW5lIHgxPSI2IiB4Mj0iMTgiIHkxPSI2IiB5Mj0iMTgiIC8+PC9zdmc+)Clear
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxN…](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxNC45NEM3LjYwMzIzIDE0Ljk4NjUgNy41NjYwNCAxNS4wNDE4IDcuNTQwNjUgMTUuMTAyN0M3LjUxNTI3IDE1LjE2MzYgNy41MDIyIDE1LjIyOSA3LjUwMjIgMTUuMjk1QzcuNTAyMiAxNS4zNjEgNy41MTUyNyAxNS40MjY0IDcuNTQwNjUgMTUuNDg3M0M3LjU2NjA0IDE1LjU0ODIgNy42MDMyMyAxNS42MDM1IDcuNjUwMSAxNS42NUw4LjM1MDEgMTYuMzVDOC4zOTY1OCAxNi4zOTY5IDguNDUxODggMTYuNDM0MSA4LjUxMjgxIDE2LjQ1OTRDOC41NzM3NCAxNi40ODQ4IDguNjM5MDkgMTYuNDk3OSA4LjcwNTEgMTYuNDk3OUM4Ljc3MTEgMTYuNDk3OSA4LjgzNjQ2IDE2LjQ4NDggOC44OTczOCAxNi40NTk0QzguOTU4MzEgMTYuNDM0MSA5LjAxMzYyIDE2LjM5NjkgOS4wNjAxIDE2LjM1TDIwLjAwMDEgNS40MVY4LjVDMjAuMDAwMSA4LjYzMjYxIDIwLjA1MjggOC43NTk3OSAyMC4xNDY1IDguODUzNTVDMjAuMjQwMyA4Ljk0NzMyIDIwLjM2NzUgOSAyMC41MDAxIDlIMjEuNTAwMUMyMS42MzI3IDkgMjEuNzU5OSA4Ljk0NzMyIDIxLjg1MzcgOC44NTM1NUMyMS45NDc0IDguNzU5NzkgMjIuMDAwMSA4LjYzMjYxIDIyLjAwMDEgOC41VjMuNUMyMi4wMDAxIDMuMTAyMTggMjEuODQyMSAyLjcyMDY0IDIxLjU2MDggMi40MzkzNEMyMS4yNzk1IDIuMTU4MDQgMjAuODk3OSAyIDIwLjUwMDEgMlYyWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjxwYXRoIGQ9Ik0yMS41IDEzSDIwLjVDMjAuMzY3NCAxMyAyMC4yNDAyIDEzLjA1MjcgMjAuMTQ2NCAxMy4xNDY0QzIwLjA1MjcgMTMuMjQwMiAyMCAxMy4zNjc0IDIwIDEzLjVWMjBINFY0SDEwLjVDMTAuNjMyNiA0IDEwLjc1OTggMy45NDczMiAxMC44NTM2IDMuODUzNTVDMTAuOTQ3MyAzLjc1OTc5IDExIDMuNjMyNjEgMTEgMy41VjIuNUMxMSAyLjM2NzM5IDEwLjk0NzMgMi4yNDAyMSAxMC44NTM2IDIuMTQ2NDVDMTAuNzU5OCAyLjA1MjY4IDEwLjYzMjYgMiAxMC41IDJIMy41QzMuMTAyMTggMiAyLjcyMDY0IDIuMTU4MDQgMi40MzkzNCAyLjQzOTM0QzIuMTU4MDQgMi43MjA2NCAyIDMuMTAyMTggMiAzLjVWMjAuNUMyIDIwLjg5NzggMi4xNTgwNCAyMS4yNzk0IDIuNDM5MzQgMjEuNTYwN0MyLjcyMDY0IDIxLjg0MiAzLjEwMjE4IDIyIDMuNSAyMkgyMC41QzIwLjg5NzggMjIgMjEuMjc5NCAyMS44NDIgMjEuNTYwNyAyMS41NjA3QzIxLjg0MiAyMS4yNzk0IDIyIDIwLjg5NzggMjIgMjAuNVYxMy41QzIyIDEzLjM2NzQgMjEuOTQ3MyAxMy4yNDAyIDIxLjg1MzYgMTMuMTQ2NEMyMS43NTk4IDEzLjA1MjcgMjEuNjMyNiAxMyAyMS41IDEzWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjwvc3ZnPg==)Fork](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
 
-    import { useState } from 'react';
+```
+import { useState } from 'react';
 
-    export default function MyApp() {
-      return (
-        <div>
-          <h1>Counters that update separately</h1>
-          <MyButton />
-          <MyButton />
-        </div>
-      );
-    }
+export default function MyApp() {
+  return (
+    <div>
+      <h1>Counters that update separately</h1>
+      <MyButton />
+      <MyButton />
+    </div>
+  );
+}
 
-    function MyButton() {
-      const [count, setCount] = useState(0);
+function MyButton() {
+  const [count, setCount] = useState(0);
 
-      function handleClick() {
-        setCount(count + 1);
-      }
+  function handleClick() {
+    setCount(count + 1);
+  }
 
-      return (
-        <button onClick={handleClick}>
-          Clicked {count} times
-        </button>
-      );
-    }
+  return (
+    <button onClick={handleClick}>
+      Clicked {count} times
+    </button>
+  );
+}
+```
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0icm90YXRlLTAgaW5saW5lIG1lLTEuNSB0ZXh0LXhsIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDYgLTM5OCkiPjxwYXRoIGQ9Ik05NS44ODM4ODM1LDI0MC4zNjYxMTcgQzk1LjM5NTcyODEsMjM5Ljg3Nzk2MSA5NC42MDQyNzE5LDIzOS44Nzc5NjEgOTQuMTE2MTE2NSwyNDAuMzY2MTE3IEM5My42Mjc5NjEyLDI0MC44NTQyNzIgOTMuNjI3OTYxMiwyNDEuNjQ1NzI4IDk0LjExNjExNjUsMjQyLjEzMzg4MyBMOTguNjE2MTE2NSwyNDYuNjMzODgzIEM5OS4xMDQyNzE5LDI0Ny4xMjIwMzkgOTkuODk1NzI4MSwyNDcuMTIyMDM5IDEwMC4zODM4ODMsMjQ2LjYzMzg4MyBMMTA0Ljg4Mzg4MywyNDIuMTMzODgzIEMxMDUuMzcyMDM5LDI0MS42NDU3MjggMTA1LjM3MjAzOSwyNDAuODU0MjcyIDEwNC44ODM4ODMsMjQwLjM2NjExNyBDMTA0LjM5NTcyOCwyMzkuODc3OTYxIDEwMy42MDQyNzIsMjM5Ljg3Nzk2MSAxMDMuMTE2MTE3LDI0MC4zNjYxMTcgTDk5LjUsMjQzLjk4MjIzMyBMOTUuODgzODgzNSwyNDAuMzY2MTE3IFoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTYuNSAxNjQuNSkiIC8+PHBvbHlnb24gcG9pbnRzPSI0NDYgNDE4IDQ2NiA0MTggNDY2IDM5OCA0NDYgMzk4IiAvPjwvZz48L3N2Zz4=)Show more
 
@@ -596,88 +530,89 @@ Now when you click either button, the `count` in `MyApp` will change, which will
 
 First, *move the state up* from `MyButton` into `MyApp`:
 
-    export default function MyApp() {  
+```
+export default function MyApp() {  
 
-      const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);  
 
+  function handleClick() {  
 
-      function handleClick() {  
+    setCount(count + 1);  
 
-        setCount(count + 1);  
+  }  
 
-      }  
+  return (  
 
+    <div>  
 
-      return (  
+      <h1>Counters that update separately</h1>  
 
-        <div>  
+      <MyButton />  
 
-          <h1>Counters that update separately</h1>  
+      <MyButton />  
 
-          <MyButton />  
+    </div>  
 
-          <MyButton />  
+  );  
 
-        </div>  
+}  
 
-      );  
+function MyButton() {  
 
-    }  
+  // ... we're moving code from here ...  
 
-
-    function MyButton() {  
-
-      // ... we're moving code from here ...  
-
-    }
+}
+```
 
 Then, *pass the state down* from `MyApp` to each `MyButton`, together with the shared click handler. You can pass information to `MyButton` using the JSX curly braces, just like you previously did with built-in tags like `<img>`:
 
-    export default function MyApp() {  
+```
+export default function MyApp() {  
 
-      const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);  
 
+  function handleClick() {  
 
-      function handleClick() {  
+    setCount(count + 1);  
 
-        setCount(count + 1);  
+  }  
 
-      }  
+  return (  
 
+    <div>  
 
-      return (  
+      <h1>Counters that update together</h1>  
 
-        <div>  
+      <MyButton count={count} onClick={handleClick} />  
 
-          <h1>Counters that update together</h1>  
+      <MyButton count={count} onClick={handleClick} />  
 
-          <MyButton count={count} onClick={handleClick} />  
+    </div>  
 
-          <MyButton count={count} onClick={handleClick} />  
+  );  
 
-        </div>  
-
-      );  
-
-    }
+}
+```
 
 The information you pass down like this is called *props*. Now the `MyApp` component contains the `count` state and the `handleClick` event handler, and *passes both of them down as props* to each of the buttons.
 
 Finally, change `MyButton` to *read* the props you have passed from its parent component:
 
-    function MyButton({ count, onClick }) {  
+```
+function MyButton({ count, onClick }) {  
 
-      return (  
+  return (  
 
-        <button onClick={onClick}>  
+    <button onClick={onClick}>  
 
-          Clicked {count} times  
+      Clicked {count} times  
 
-        </button>  
+    </button>  
 
-      );  
+  );  
 
-    }
+}
+```
 
 When you click the button, the `onClick` handler fires. Each button’s `onClick` prop was set to the `handleClick` function inside `MyApp`, so the code inside of it runs. That code calls `setCount(count + 1)`, incrementing the `count` state variable. The new `count` value is passed as a prop to each button, so they all show the new value. This is called “lifting state up”. By moving state up, you’ve shared it between components.
 
@@ -689,33 +624,35 @@ App.js
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUiIGZpbGw9Im5vbmUiIGhlaWdodD0iMS4zM2VtIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2Utd2lkdGg9IjIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjEuMzNlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZSB4MT0iMTgiIHgyPSI2IiB5MT0iNiIgeTI9IjE4IiAvPjxsaW5lIHgxPSI2IiB4Mj0iMTgiIHkxPSI2IiB5Mj0iMTgiIC8+PC9zdmc+)Clear
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxN…](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaW5saW5lIG14LTEgcmVsYXRpdmUgdG9wLVsxcHhdIiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMC41MDAxIDJIMTUuNTAwMUMxNS4zNjc1IDIgMTUuMjQwMyAyLjA1MjY4IDE1LjE0NjUgMi4xNDY0NUMxNS4wNTI4IDIuMjQwMjEgMTUuMDAwMSAyLjM2NzM5IDE1LjAwMDEgMi41VjMuNUMxNS4wMDAxIDMuNjMyNjEgMTUuMDUyOCAzLjc1OTc5IDE1LjE0NjUgMy44NTM1NUMxNS4yNDAzIDMuOTQ3MzIgMTUuMzY3NSA0IDE1LjUwMDEgNEgxOC41OTAxTDcuNjUwMSAxNC45NEM3LjYwMzIzIDE0Ljk4NjUgNy41NjYwNCAxNS4wNDE4IDcuNTQwNjUgMTUuMTAyN0M3LjUxNTI3IDE1LjE2MzYgNy41MDIyIDE1LjIyOSA3LjUwMjIgMTUuMjk1QzcuNTAyMiAxNS4zNjEgNy41MTUyNyAxNS40MjY0IDcuNTQwNjUgMTUuNDg3M0M3LjU2NjA0IDE1LjU0ODIgNy42MDMyMyAxNS42MDM1IDcuNjUwMSAxNS42NUw4LjM1MDEgMTYuMzVDOC4zOTY1OCAxNi4zOTY5IDguNDUxODggMTYuNDM0MSA4LjUxMjgxIDE2LjQ1OTRDOC41NzM3NCAxNi40ODQ4IDguNjM5MDkgMTYuNDk3OSA4LjcwNTEgMTYuNDk3OUM4Ljc3MTEgMTYuNDk3OSA4LjgzNjQ2IDE2LjQ4NDggOC44OTczOCAxNi40NTk0QzguOTU4MzEgMTYuNDM0MSA5LjAxMzYyIDE2LjM5NjkgOS4wNjAxIDE2LjM1TDIwLjAwMDEgNS40MVY4LjVDMjAuMDAwMSA4LjYzMjYxIDIwLjA1MjggOC43NTk3OSAyMC4xNDY1IDguODUzNTVDMjAuMjQwMyA4Ljk0NzMyIDIwLjM2NzUgOSAyMC41MDAxIDlIMjEuNTAwMUMyMS42MzI3IDkgMjEuNzU5OSA4Ljk0NzMyIDIxLjg1MzcgOC44NTM1NUMyMS45NDc0IDguNzU5NzkgMjIuMDAwMSA4LjYzMjYxIDIyLjAwMDEgOC41VjMuNUMyMi4wMDAxIDMuMTAyMTggMjEuODQyMSAyLjcyMDY0IDIxLjU2MDggMi40MzkzNEMyMS4yNzk1IDIuMTU4MDQgMjAuODk3OSAyIDIwLjUwMDEgMlYyWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjxwYXRoIGQ9Ik0yMS41IDEzSDIwLjVDMjAuMzY3NCAxMyAyMC4yNDAyIDEzLjA1MjcgMjAuMTQ2NCAxMy4xNDY0QzIwLjA1MjcgMTMuMjQwMiAyMCAxMy4zNjc0IDIwIDEzLjVWMjBINFY0SDEwLjVDMTAuNjMyNiA0IDEwLjc1OTggMy45NDczMiAxMC44NTM2IDMuODUzNTVDMTAuOTQ3MyAzLjc1OTc5IDExIDMuNjMyNjEgMTEgMy41VjIuNUMxMSAyLjM2NzM5IDEwLjk0NzMgMi4yNDAyMSAxMC44NTM2IDIuMTQ2NDVDMTAuNzU5OCAyLjA1MjY4IDEwLjYzMjYgMiAxMC41IDJIMy41QzMuMTAyMTggMiAyLjcyMDY0IDIuMTU4MDQgMi40MzkzNCAyLjQzOTM0QzIuMTU4MDQgMi43MjA2NCAyIDMuMTAyMTggMiAzLjVWMjAuNUMyIDIwLjg5NzggMi4xNTgwNCAyMS4yNzk0IDIuNDM5MzQgMjEuNTYwN0MyLjcyMDY0IDIxLjg0MiAzLjEwMjE4IDIyIDMuNSAyMkgyMC41QzIwLjg5NzggMjIgMjEuMjc5NCAyMS44NDIgMjEuNTYwNyAyMS41NjA3QzIxLjg0MiAyMS4yNzk0IDIyIDIwLjg5NzggMjIgMjAuNVYxMy41QzIyIDEzLjM2NzQgMjEuOTQ3MyAxMy4yNDAyIDIxLjg1MzYgMTMuMTQ2NEMyMS43NTk4IDEzLjA1MjcgMjEuNjMyNiAxMyAyMS41IDEzWiIgZmlsbD0iY3VycmVudENvbG9yIiAvPjwvc3ZnPg==)Fork](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
 
-    import { useState } from 'react';
+```
+import { useState } from 'react';
 
-    export default function MyApp() {
-      const [count, setCount] = useState(0);
+export default function MyApp() {
+  const [count, setCount] = useState(0);
 
-      function handleClick() {
-        setCount(count + 1);
-      }
+  function handleClick() {
+    setCount(count + 1);
+  }
 
-      return (
-        <div>
-          <h1>Counters that update together</h1>
-          <MyButton count={count} onClick={handleClick} />
-          <MyButton count={count} onClick={handleClick} />
-        </div>
-      );
-    }
+  return (
+    <div>
+      <h1>Counters that update together</h1>
+      <MyButton count={count} onClick={handleClick} />
+      <MyButton count={count} onClick={handleClick} />
+    </div>
+  );
+}
 
-    function MyButton({ count, onClick }) {
-      return (
-        <button onClick={onClick}>
-          Clicked {count} times
-        </button>
-      );
-    }
+function MyButton({ count, onClick }) {
+  return (
+    <button onClick={onClick}>
+      Clicked {count} times
+    </button>
+  );
+}
+```
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0icm90YXRlLTAgaW5saW5lIG1lLTEuNSB0ZXh0LXhsIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC00NDYgLTM5OCkiPjxwYXRoIGQ9Ik05NS44ODM4ODM1LDI0MC4zNjYxMTcgQzk1LjM5NTcyODEsMjM5Ljg3Nzk2MSA5NC42MDQyNzE5LDIzOS44Nzc5NjEgOTQuMTE2MTE2NSwyNDAuMzY2MTE3IEM5My42Mjc5NjEyLDI0MC44NTQyNzIgOTMuNjI3OTYxMiwyNDEuNjQ1NzI4IDk0LjExNjExNjUsMjQyLjEzMzg4MyBMOTguNjE2MTE2NSwyNDYuNjMzODgzIEM5OS4xMDQyNzE5LDI0Ny4xMjIwMzkgOTkuODk1NzI4MSwyNDcuMTIyMDM5IDEwMC4zODM4ODMsMjQ2LjYzMzg4MyBMMTA0Ljg4Mzg4MywyNDIuMTMzODgzIEMxMDUuMzcyMDM5LDI0MS42NDU3MjggMTA1LjM3MjAzOSwyNDAuODU0MjcyIDEwNC44ODM4ODMsMjQwLjM2NjExNyBDMTA0LjM5NTcyOCwyMzkuODc3OTYxIDEwMy42MDQyNzIsMjM5Ljg3Nzk2MSAxMDMuMTE2MTE3LDI0MC4zNjYxMTcgTDk5LjUsMjQzLjk4MjIzMyBMOTUuODgzODgzNSwyNDAuMzY2MTE3IFoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJub256ZXJvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzNTYuNSAxNjQuNSkiIC8+PHBvbHlnb24gcG9pbnRzPSI0NDYgNDE4IDQ2NiA0MTggNDY2IDM5OCA0NDYgMzk4IiAvPjwvZz48L3N2Zz4=)Show more
 
@@ -779,19 +716,4 @@ More
 
 [Terms](https://opensource.fb.com/legal/terms/)
 
-[![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS4zM2VtIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxLjMzZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIgLz48cGF0aCBkPSJNMTIgMkM2LjQ3NyAyIDIgNi40NzcgMiAxMmMwIDQuOTkxIDMuNjU3IDkuMTI4IDguNDM4IDkuODc5VjE0Ljg5aC0yLjU0VjEyaDIuNTRWOS43OTdjMC0yLjUwNiAxLjQ5Mi0zLjg5IDMuNzc3LTMuODkgMS4wOTQgMCAyLjIzOC4xOTUgMi4yMzguMTk1djIuNDZoLTEuMjZjLTEuMjQzIDAtMS42My43NzEtMS42MyAxLjU2MlYxMmgyLjc3M2wtLjQ0M…](https://www.facebook.com/react)[![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS4zMGVtIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiIgd2lkdGg9IjEuMzBlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwaDI0djI0SDB6IiBmaWxsPSJub25lIiAvPjxwYXRoIGQ9Ik0zODkuMiA0OGg3MC42TDMwNS42IDIyNC4yIDQ4NyA0NjRIMzQ1TDIzMy43IDMxOC42IDEwNi41IDQ2NEgzNS44TDIwMC43IDI3NS41IDI2LjggNDhIMTcyLjRMMjcyLjkgMTgwLjkgMzg5LjIgNDh6TTM2NC40IDQyMS44aDM5LjFMMTUxLjEgODhoLTQyTDM2NC40IDQyMS44eiIgLz48L3N2Zz4=)](https://twitter.com/reactjs)[![SVG Image](data:image/svg+xml;base64,PHN2ZyBhcmlhLWxhYmVsPSJCbHVlc2t5IiBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS4yNWVtIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxLjI1ZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggY2xhc3M9IngxOWhxY3kiIGQ9Ik0zLjQ2OCAxLjk0OEM1LjMwMyAzLjMyNSA3LjI3NiA2LjExOCA4IDcuNjE2Yy43MjUtMS40OTggMi42OTctNC4yOSA0LjUzMi01LjY2OEMxMy44NTUuOTU1IDE2IC4xODYgMTYgMi42MzJjMCAuNDg5LS4yOCA0LjEwNS0uNDQ0IDQuNjkyLS41NzIgMi4wNC0yLjY1MyAyLjU2MS00LjUwNCAyLjI0NiAzLjIzNi41NTEgNC4wNiAyLjM3NSAyLjI4MSA0L…](https://bsky.app/profile/react.dev)[![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS41ZW0iIHZpZXdCb3g9IjAgLTIgMjQgMjQiIHdpZHRoPSIxLjVlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAgMGExMCAxMCAwIDAgMC0zLjE2IDE5LjQ5Yy41LjEuNjgtLjIyLjY4LS40OGwtLjAxLTEuN2MtMi43OC42LTMuMzctMS4zNC0zLjM3LTEuMzQtLjQ2LTEuMTYtMS4xMS0xLjQ3LTEuMTEtMS40Ny0uOS0uNjIuMDctLjYuMDctLjYgMSAuMDcgMS41MyAxLjAzIDEuNTMgMS4wMy45IDEuNTIgMi4zNCAxLjA4IDIuOTEuODMuMS0uNjUuMzUtMS4wOS42My0xLjM0LTIuMjItLjI1LTQuNTUtMS4xMS00LjU1LTQuOTQgM…](https://github.com/facebook/react)
-
-## On this page
-
-- [Overview](#)
-- [Creating and nesting components](#components)
-- [Writing markup with JSX](#writing-markup-with-jsx)
-- [Adding styles](#adding-styles)
-- [Displaying data](#displaying-data)
-- [Conditional rendering](#conditional-rendering)
-- [Rendering lists](#rendering-lists)
-- [Responding to events](#responding-to-events)
-- [Updating the screen](#updating-the-screen)
-- [Using Hooks](#using-hooks)
-- [Sharing data between components](#sharing-data-between-components)
-- [Next Steps](#next-steps)
+[![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS4zM2VtIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxLjMzZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIgLz48cGF0aCBkPSJNMTIgMkM2LjQ3NyAyIDIgNi40NzcgMiAxMmMwIDQuOTkxIDMuNjU3IDkuMTI4IDguNDM4IDkuODc5VjE0Ljg5aC0yLjU0VjEyaDIuNTRWOS43OTdjMC0yLjUwNiAxLjQ5Mi0zLjg5IDMuNzc3LTMuODkgMS4wOTQgMCAyLjIzOC4xOTUgMi4yMzguMTk1djIuNDZoLTEuMjZjLTEuMjQzIDAtMS42My43NzEtMS42MyAxLjU2MlYxMmgyLjc3M2wtLjQ0MyAyLjg5aC0yLjMzdjYuOTg5QzE4LjM0MyAyMS4xMjkgMjIgMTYuOTkgMjIgMTJjMC01LjUyMy00LjQ3Ny0xMC0xMC0xMHoiIC8+PC9zdmc+)](https://www.facebook.com/react)[![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS4zMGVtIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiIgd2lkdGg9IjEuMzBlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMCAwaDI0djI0SDB6IiBmaWxsPSJub25lIiAvPjxwYXRoIGQ9Ik0zODkuMiA0OGg3MC42TDMwNS42IDIyNC4yIDQ4NyA0NjRIMzQ1TDIzMy43IDMxOC42IDEwNi41IDQ2NEgzNS44TDIwMC43IDI3NS41IDI2LjggNDhIMTcyLjRMMjcyLjkgMTgwLjkgMzg5LjIgNDh6TTM2NC40IDQyMS44aDM5LjFMMTUxLjEgODhoLTQyTDM2NC40IDQyMS44eiIgLz48L3N2Zz4=)](https://twitter.com/reactjs)[![SVG Image](data:image/svg+xml;base64,PHN2ZyBhcmlhLWxhYmVsPSJCbHVlc2t5IiBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS4yNWVtIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHdpZHRoPSIxLjI1ZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggY2xhc3M9IngxOWhxY3kiIGQ9Ik0zLjQ2OCAxLjk0OEM1LjMwMyAzLjMyNSA3LjI3NiA2LjExOCA4IDcuNjE2Yy43MjUtMS40OTggMi42OTctNC4yOSA0LjUzMi01LjY2OEMxMy44NTUuOTU1IDE2IC4xODYgMTYgMi42MzJjMCAuNDg5LS4yOCA0LjEwNS0uNDQ0IDQuNjkyLS41NzIgMi4wNC0yLjY1MyAyLjU2MS00LjUwNCAyLjI0NiAzLjIzNi41NTEgNC4wNiAyLjM3NSAyLjI4MSA0LjItMy4zNzYgMy40NjQtNC44NTItLjg3LTUuMjMtMS45OC0uMDctLjIwNC0uMTAzLS4zLS4xMDMtLjIxOCAwLS4wODEtLjAzMy4wMTQtLjEwMi4yMTgtLjM3OSAxLjExLTEuODU1IDUuNDQ0LTUuMjMxIDEuOTgtMS43NzgtMS44MjUtLjk1NS0zLjY1IDIuMjgtNC4yLTEuODUuMzE1LTMuOTMyLS4yMDUtNC41MDMtMi4yNDZDLjI4IDYuNzM3IDAgMy4xMiAwIDIuNjMyIDAgLjE4NiAyLjE0NS45NTUgMy40NjggMS45NDhaIiAvPjwvc3ZnPg==)](https://bsky.app/profile/react.dev)[![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGhlaWdodD0iMS41ZW0iIHZpZXdCb3g9IjAgLTIgMjQgMjQiIHdpZHRoPSIxLjVlbSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAgMGExMCAxMCAwIDAgMC0zLjE2IDE5LjQ5Yy41LjEuNjgtLjIyLjY4LS40OGwtLjAxLTEuN2MtMi43OC42LTMuMzctMS4zNC0zLjM3LTEuMzQtLjQ2LTEuMTYtMS4xMS0xLjQ3LTEuMTEtMS40Ny0uOS0uNjIuMDctLjYuMDctLjYgMSAuMDcgMS41MyAxLjAzIDEuNTMgMS4wMy45IDEuNTIgMi4zNCAxLjA4IDIuOTEuODMuMS0uNjUuMzUtMS4wOS42My0xLjM0LTIuMjItLjI1LTQuNTUtMS4xMS00LjU1LTQuOTQgMC0xLjEuMzktMS45OSAxLjAzLTIuNjlhMy42IDMuNiAwIDAgMSAuMS0yLjY0cy44NC0uMjcgMi43NSAxLjAyYTkuNTggOS41OCAwIDAgMSA1IDBjMS45MS0xLjMgMi43NS0xLjAyIDIuNzUtMS4wMi41NSAxLjM3LjIgMi40LjEgMi42NC42NC43IDEuMDMgMS42IDEuMDMgMi42OSAwIDMuODQtMi4zNCA0LjY4LTQuNTcgNC45My4zNi4zMS42OC45Mi42OCAxLjg1bC0uMDEgMi43NWMwIC4yNi4xOC41OC42OS40OEExMCAxMCAwIDAgMCAxMCAwIiAvPjwvc3ZnPg==)](https://github.com/facebook/react)
