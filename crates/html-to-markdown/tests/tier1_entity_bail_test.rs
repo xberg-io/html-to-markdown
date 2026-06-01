@@ -67,7 +67,7 @@ fn bails_on_unknown_named_entity_eacute() {
     let result = tier1_raw(html);
     let err = result.unwrap_err();
     assert!(
-        matches!(err, BailReason::UnknownEntity { ref name, .. } if name == "eacute"),
+        matches!(err, BailReason::UnknownEntity { ref name, .. } if name.as_ref() == "eacute"),
         "expected UnknownEntity {{ name: \"eacute\", .. }}, got: {err}"
     );
 }
@@ -79,7 +79,7 @@ fn bails_on_unknown_named_entity_agrave() {
     let result = tier1_raw(html);
     let err = result.unwrap_err();
     assert!(
-        matches!(err, BailReason::UnknownEntity { ref name, .. } if name == "agrave"),
+        matches!(err, BailReason::UnknownEntity { ref name, .. } if name.as_ref() == "agrave"),
         "expected UnknownEntity {{ name: \"agrave\", .. }}, got: {err}"
     );
 }
@@ -91,7 +91,7 @@ fn bails_on_unknown_named_entity_ouml() {
     let result = tier1_raw(html);
     let err = result.unwrap_err();
     assert!(
-        matches!(err, BailReason::UnknownEntity { ref name, .. } if name == "ouml"),
+        matches!(err, BailReason::UnknownEntity { ref name, .. } if name.as_ref() == "ouml"),
         "expected UnknownEntity {{ name: \"ouml\", .. }}, got: {err}"
     );
 }
@@ -159,7 +159,7 @@ fn prescan_does_not_rewrite_named_entity_so_tier1_still_bails() {
     // Tier-1 therefore bails with UnknownEntity even after prescanning.
     let result = tier1_run(html);
     assert!(
-        matches!(result.unwrap_err(), BailReason::UnknownEntity { ref name, .. } if name == "eacute"),
+        matches!(result.unwrap_err(), BailReason::UnknownEntity { ref name, .. } if name.as_ref() == "eacute"),
         "Tier-1 should bail with UnknownEntity after prescanning since prescan does not rewrite named entities"
     );
 }

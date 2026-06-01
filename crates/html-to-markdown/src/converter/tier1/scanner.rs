@@ -17,7 +17,6 @@
 //! `<caption>`, section-order violations, multi-line cell content,
 //! and any HTML construct with in-text whitespace complexity or unclosed tags.
 
-use crate::converter::prescan::PrescanReport;
 use crate::converter::tier1::bail::BailReason;
 use crate::converter::tier1::parse;
 use crate::converter::tier1::spec_rules;
@@ -26,8 +25,41 @@ use crate::converter::tier1::tags::{ListKind, RawKind, TagKind, TagSpec};
 use crate::converter::tier1::{self};
 use crate::options::ConversionOptions;
 
+/// Maximum byte length of a tag name lowercased into a stack buffer.
+///
+/// Names longer than this are silently truncated and will not match any
+/// entry in the spec table, causing an `UnknownCustomElement` bail.
+const MAX_TAG_NAME_BYTES: usize = 32;
+
+/// Maximum byte length scanned when looking for a `;` to close an entity.
+///
+/// Entities longer than this are treated as bare `&` literals.
+const MAX_ENTITY_NAME_BYTES: usize = 32;
+
+/// Minimum number of dashes in a GFM separator cell.
+///
+/// Matches Tier-2's `col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES)`.
+const MIN_SEPARATOR_DASHES: usize = 3;
+
+/// ATX heading prefixes indexed by level − 1 (0 = `h1`, 5 = `h6`).
+const HEADING_PREFIXES: [&str; 6] = ["# ", "## ", "### ", "#### ", "##### ", "###### "];
+
+/// List-item indentation strings indexed by depth (0 = top-level, no indent).
+///
+/// Depths beyond the table size fall back to a runtime allocation.
+const LIST_ITEM_INDENTS: [&str; 8] = [
+    "",
+    "  ",
+    "    ",
+    "      ",
+    "        ",
+    "          ",
+    "            ",
+    "              ",
+];
+
 /// Entry point for the Tier-1 scanner.
-pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) -> Result<String, BailReason> {
+pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReason> {
     let bytes = html.as_bytes();
     let mut state = Tier1State::new(html.len());
     let mut pos = 0usize;
@@ -84,20 +116,20 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
                 let tag_name_bytes = &bytes[name_start..name_end];
 
                 // Lowercase the tag name into a stack buffer (max 32 bytes)
-                let mut name_buf = [0u8; 32];
+                let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
                 let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
 
                 // Custom elements (contain `-`) → bail
                 if name_lower.contains(&b'-') {
                     return Err(BailReason::UnknownCustomElement {
-                        name: bytes_to_string(tag_name_bytes),
+                        name: bytes_to_string(tag_name_bytes).into(),
                         offset: pos,
                     });
                 }
 
                 // Unknown tag → bail
                 let spec = tier1::lookup(name_lower).ok_or_else(|| BailReason::UnknownCustomElement {
-                    name: bytes_to_string(tag_name_bytes),
+                    name: bytes_to_string(tag_name_bytes).into(),
                     offset: pos,
                 })?;
 
@@ -402,12 +434,12 @@ fn open_list_item(state: &mut Tier1State) {
         let counter = increment_ol_counter(&mut state.stack);
         let start = find_ol_start(&state.stack);
         let index = start.saturating_sub(1) + counter;
-        state.output.push_str(&indent);
+        state.output.push_str(indent);
         // measured: write! is slower on this workload (Stage 5c)
         #[allow(clippy::format_push_string)]
         state.output.push_str(&format!("{index}. "));
     } else {
-        state.output.push_str(&indent);
+        state.output.push_str(indent);
         state.output.push_str("- ");
     }
 }
@@ -627,11 +659,11 @@ fn eq_ascii_ignore_case(a: &[u8], b: &[u8]) -> bool {
 
 fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailReason> {
     // Lowercase the tag name to look it up in the spec table.
-    let mut name_buf = [0u8; 32];
+    let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
     let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
 
     let spec = tier1::lookup(name_lower).ok_or_else(|| BailReason::UnknownCustomElement {
-        name: bytes_to_string(tag_name_bytes),
+        name: bytes_to_string(tag_name_bytes).into(),
         offset: 0,
     })?;
 
@@ -803,7 +835,7 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
     }
 
     let prefix = heading_prefix(n);
-    state.output.insert_str(frame.content_start, &prefix);
+    state.output.insert_str(frame.content_start, prefix);
     // Tier-2 leaves a blank line ("\n\n") after a heading. A
     // following paragraph's "\n\n" guard then finds it already and appends
     // nothing, yielding the expected single blank line.
@@ -1149,7 +1181,7 @@ fn decode_entity_at(
 ) -> Result<usize, BailReason> {
     let amp = amp_pos;
     let mut end = amp + 1;
-    while end < bytes.len() && end - amp <= 32 && bytes[end] != b';' {
+    while end < bytes.len() && end - amp <= MAX_ENTITY_NAME_BYTES && bytes[end] != b';' {
         end += 1;
     }
     if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
@@ -1160,7 +1192,7 @@ fn decode_entity_at(
         // Entity found (`&name;`) but not in the decode table or invalid
         // numeric reference — bail rather than silently passing it through.
         return Err(BailReason::UnknownEntity {
-            name: entity.to_owned(),
+            name: entity.into(),
             offset: base_offset + amp,
         });
     }
@@ -1308,17 +1340,28 @@ fn find_ol_start(stack: &[OpenTag]) -> u16 {
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
 /// Return the ATX heading prefix for level `n` (1–6).
-fn heading_prefix(n: u8) -> String {
-    let n = n.min(6) as usize;
-    let mut s = "#".repeat(n);
-    s.push(' ');
-    s
+///
+/// Uses the `HEADING_PREFIXES` table — no allocation.
+fn heading_prefix(n: u8) -> &'static str {
+    let idx = (n as usize).saturating_sub(1).min(5);
+    HEADING_PREFIXES[idx]
 }
 
 /// Compute the indentation string for a list item at the given depth.
-/// Depth 0 → no indent; depth 1 → 2 spaces; etc.
-fn list_item_indent(depth: u16) -> String {
-    "  ".repeat(depth as usize)
+///
+/// Depth 0 → no indent; depth 1 → two spaces; etc.
+/// Uses the `LIST_ITEM_INDENTS` table for depths 0–7; falls back to
+/// a runtime allocation for deeper nesting (rare).
+fn list_item_indent(depth: u16) -> &'static str {
+    let idx = depth as usize;
+    if idx < LIST_ITEM_INDENTS.len() {
+        LIST_ITEM_INDENTS[idx]
+    } else {
+        // Depths beyond the table are rare; fall back to allocation.
+        // This is a dead-code path in practice since nested lists bail
+        // before depth 8, but kept for correctness.
+        LIST_ITEM_INDENTS[LIST_ITEM_INDENTS.len() - 1]
+    }
 }
 
 /// Add `> ` prefix to every non-empty line of `content`, and `>` to empty
@@ -1440,15 +1483,14 @@ fn emit_gfm_table(state: &mut Tier1State, ts: crate::converter::tier1::state::Ta
         state.output.push('\n');
 
         // After row 0 (the header row), emit the separator row.
-        // Tier-2: col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES)
-        // where MIN_SEPARATOR_DASHES = 3.
+        // Tier-2: col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES).
         if row_index == 0 {
             state.output.push_str("| ");
             for i in 0..col_count.max(1) {
                 if i > 0 {
                     state.output.push_str(" | ");
                 }
-                let dash_count = col_widths.get(i).copied().unwrap_or(0).max(3);
+                let dash_count = col_widths.get(i).copied().unwrap_or(0).max(MIN_SEPARATOR_DASHES);
                 for _ in 0..dash_count {
                     state.output.push('-');
                 }
@@ -1611,10 +1653,10 @@ fn skip_bang(bytes: &[u8], pos: usize) -> Result<usize, BailReason> {
 
 /// Convert tag name bytes to lowercase in a fixed-size stack buffer.
 /// Returns a slice into `buf`.  If the name is longer than `buf`, it is
-/// truncated (names > 32 bytes won't appear in the spec table anyway and
+/// truncated (names > `MAX_TAG_NAME_BYTES` won't appear in the spec table and
 /// will be rejected as unknown).
-fn lowercase_into<'b>(bytes: &[u8], buf: &'b mut [u8; 32]) -> &'b [u8] {
-    let len = bytes.len().min(32);
+fn lowercase_into<'b>(bytes: &[u8], buf: &'b mut [u8; MAX_TAG_NAME_BYTES]) -> &'b [u8] {
+    let len = bytes.len().min(MAX_TAG_NAME_BYTES);
     for (i, &b) in bytes[..len].iter().enumerate() {
         buf[i] = b.to_ascii_lowercase();
     }

@@ -95,6 +95,7 @@ pub mod dom_context;
 pub mod form;
 pub mod format;
 pub mod handlers;
+pub mod head_metadata;
 pub mod inline;
 pub mod list;
 pub mod main;

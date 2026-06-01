@@ -1,15 +1,12 @@
-//! Tier-1 metadata extraction via re-parsing the prescan's head_range slice.
+//! Metadata extraction by re-parsing the prescan's head_range slice.
 //!
 //! The prescan walks the input once and captures the byte range of the
 //! `<head>…</head>` content (between the tags) in the **cleaned** buffer.
-//! Tier-1 invokes this module to extract metadata without duplicating the
-//! Tier-2 extraction logic: we re-parse just the head slice (small) using
-//! `tl::parse` and apply the same extraction rules.
+//! `extract_frontmatter` re-parses just the head slice (small) using
+//! `tl::parse` and applies the same extraction rules as the Tier-2 path,
+//! so both paths produce byte-identical YAML frontmatter output.
 //!
 //! Heads are typically small (< 50 KB), so the second parse is cheap.
-//!
-//! The output — YAML frontmatter prepended to the markdown body — is
-//! byte-identical to what Tier-2 produces, which is the correctness contract.
 
 use std::borrow::Cow;
 use std::collections::BTreeMap;

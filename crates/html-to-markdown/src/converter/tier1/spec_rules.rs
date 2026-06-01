@@ -51,21 +51,11 @@ pub fn should_close_for_new_tag(open: &TagSpec, new: &TagSpec) -> bool {
     }
 }
 
-/// Given the new tag and the current top of the stack, return
-/// `Some(implicit-open-tag-name-bytes)` if the scanner should synthesise an
-/// implicit open before pushing the new tag.
-///
-/// Currently only the `<tr>`-inside-`<table>` without `<tbody>` case applies.
-/// Returns `None` if no implicit open is needed.
-///
-/// Note: Tier-1 bails on tables (M3c), so this will not fire until tables are
-/// unblocked in a future milestone.
-pub fn implicit_open_before(top_of_stack: Option<&TagSpec>, new: &TagSpec) -> Option<&'static [u8]> {
-    match (top_of_stack.map(|s| s.kind), new.kind) {
-        (Some(TagKind::Table), TagKind::TableRow) => Some(b"tbody"),
-        _ => None,
-    }
-}
+// `implicit_open_before` (implicit tbody synthesis) was removed here.
+// The scanner handles the <tr>-inside-<table>-without-<tbody> case directly
+// via the table-state machinery in `open_table_row`; a separate function
+// returning a static name slice was never wired into the open-tag path and
+// added dead code with no path to exercise it.
 
 #[cfg(test)]
 mod tests {
@@ -129,23 +119,4 @@ mod tests {
         assert!(!should_close_for_new_tag(div, p));
     }
 
-    #[test]
-    fn implicit_open_tr_inside_table() {
-        let table = tags::lookup(b"table").unwrap();
-        let tr = tags::lookup(b"tr").unwrap();
-        assert_eq!(implicit_open_before(Some(table), tr), Some(b"tbody" as &[u8]));
-    }
-
-    #[test]
-    fn no_implicit_open_for_div() {
-        let div = tags::lookup(b"div").unwrap();
-        let p = tags::lookup(b"p").unwrap();
-        assert_eq!(implicit_open_before(Some(div), p), None);
-    }
-
-    #[test]
-    fn no_implicit_open_when_stack_empty() {
-        let tr = tags::lookup(b"tr").unwrap();
-        assert_eq!(implicit_open_before(None, tr), None);
-    }
 }

@@ -44,7 +44,7 @@ pub enum BailReason {
     /// An unknown custom element (tag name containing `-`) was encountered.
     UnknownCustomElement {
         /// The element name.
-        name: String,
+        name: Box<str>,
         /// Byte offset of the `<` in the input.
         offset: usize,
     },
@@ -78,7 +78,7 @@ pub enum BailReason {
     /// dispatcher falls back to Tier-2.
     UnknownEntity {
         /// The entity name between `&` and `;` (e.g. `"mdash"`, `"#x2014"`).
-        name: String,
+        name: Box<str>,
         /// Byte offset in the HTML input where the `&` was found.
         offset: usize,
     },

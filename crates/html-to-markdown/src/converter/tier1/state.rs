@@ -2,6 +2,15 @@
 
 use crate::converter::tier1::tags::TagSpec;
 
+/// Minimum output buffer capacity in bytes.
+const OUTPUT_CAPACITY_MIN: usize = 1024;
+
+/// Maximum output buffer capacity in bytes (256 KiB).
+const OUTPUT_CAPACITY_MAX: usize = 256 * 1024;
+
+/// Divisor applied to `input_len` to derive the initial output buffer capacity.
+const OUTPUT_CAPACITY_DIVISOR: usize = 3;
+
 /// Accumulated state for one `<table>` being assembled by the Tier-1 scanner.
 ///
 /// When a `<table>` opens, a fresh `TableState` is pushed onto
@@ -105,7 +114,9 @@ impl Tier1State {
         Self {
             stack: Vec::with_capacity(16),
             escape_ctx: EscapeCtx::empty(),
-            output: String::with_capacity((input_len / 3).clamp(1024, 256 * 1024)),
+            output: String::with_capacity(
+                (input_len / OUTPUT_CAPACITY_DIVISOR).clamp(OUTPUT_CAPACITY_MIN, OUTPUT_CAPACITY_MAX),
+            ),
             list_depth: 0,
             last_block_sep_pos: 0,
             table_stack: Vec::new(),
