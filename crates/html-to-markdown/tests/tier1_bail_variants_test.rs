@@ -2,8 +2,6 @@
 //! variants not exercised by `tier1_bail_test.rs`.
 //!
 //! Coverage:
-//!   - `NotImplemented`           — unreachable: the M2 stub has been fully replaced by M9;
-//!     no code path in the scanner emits this variant any more.
 //!   - `Classifier`               — covered in `tier1_bail_test.rs`
 //!   - `DepthMismatch`            — covered in `tier1_bail_test.rs`
 //!   - `EofWithOpenBlock`         — covered in `tier1_bail_test.rs`
@@ -178,14 +176,6 @@ fn should_bail_when_tbody_appears_after_tfoot() {
     );
     assert_eq!(force_tier1(html), tier2(html), "fallback output must match Tier-2");
 }
-
-// ── NotImplemented ────────────────────────────────────────────────────────────
-
-// `BailReason::NotImplemented` was the M2 stub sentinel and is no longer emitted
-// by any scanner code path in M9.  The variant still exists in the enum for
-// Display completeness (tested in `tier1_bail_test.rs::bail_reason_display_is_non_empty`),
-// but there is no HTML input that triggers it.  No positive trigger test exists
-// for this variant; the gap is intentional and documented here.
 
 // ── BailReason::TableRowspanColspan display ───────────────────────────────────
 

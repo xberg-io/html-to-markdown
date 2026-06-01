@@ -10,9 +10,6 @@ use std::fmt;
 /// Reasons the Tier-1 scanner may bail out and hand off to Tier-2.
 #[derive(Debug, Clone)]
 pub enum BailReason {
-    /// Tier-1 is not yet implemented (M2 stub — all inputs bail here).
-    NotImplemented,
-
     /// The classifier decided Tier-2 is required for this input / option set.
     Classifier,
 
@@ -90,7 +87,6 @@ pub enum BailReason {
 impl fmt::Display for BailReason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::NotImplemented => write!(f, "tier-1 not yet implemented"),
             Self::Classifier => write!(f, "classifier forced tier-2"),
             Self::DepthMismatch { tag, expected, actual } => {
                 write!(

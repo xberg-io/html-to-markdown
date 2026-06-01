@@ -119,8 +119,6 @@ pub struct TagSpec {
     pub kind: TagKind,
     /// HTML void element — no closing tag, no children.
     pub is_void: bool,
-    /// `<br/>` normalised to `<br>`, etc.
-    pub is_self_closing_xhtml: bool,
     /// True for block-level elements (HTML5 flow content that establishes a
     /// block formatting context); false for inline/text-level elements.
     pub is_block: bool,
@@ -171,7 +169,6 @@ const fn block(kind: TagKind) -> TagSpec {
     TagSpec {
         kind,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: true,
         optional_close: None,
         is_rawtext: false,
@@ -182,7 +179,6 @@ const fn block_opt(kind: TagKind, rule: OptionalCloseRule) -> TagSpec {
     TagSpec {
         kind,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: true,
         optional_close: Some(rule),
         is_rawtext: false,
@@ -193,7 +189,6 @@ const fn void_block(kind: TagKind) -> TagSpec {
     TagSpec {
         kind,
         is_void: true,
-        is_self_closing_xhtml: false,
         is_block: true,
         optional_close: None,
         is_rawtext: false,
@@ -204,7 +199,6 @@ const fn void_inline(kind: TagKind) -> TagSpec {
     TagSpec {
         kind,
         is_void: true,
-        is_self_closing_xhtml: false,
         is_block: false,
         optional_close: None,
         is_rawtext: false,
@@ -215,7 +209,6 @@ const fn inline(kind: TagKind) -> TagSpec {
     TagSpec {
         kind,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: false,
         optional_close: None,
         is_rawtext: false,
@@ -226,7 +219,6 @@ const fn rawtext_ignored() -> TagSpec {
     TagSpec {
         kind: TagKind::Ignored,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: true,
         optional_close: None,
         is_rawtext: true,
@@ -237,7 +229,6 @@ const fn rawtext_block(kind: TagKind) -> TagSpec {
     TagSpec {
         kind,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: true,
         optional_close: None,
         is_rawtext: true,
@@ -248,7 +239,6 @@ const fn ignored_block() -> TagSpec {
     TagSpec {
         kind: TagKind::Ignored,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: true,
         optional_close: None,
         is_rawtext: false,
@@ -259,7 +249,6 @@ const fn ignored_void() -> TagSpec {
     TagSpec {
         kind: TagKind::Ignored,
         is_void: true,
-        is_self_closing_xhtml: false,
         is_block: false,
         optional_close: None,
         is_rawtext: false,
@@ -317,7 +306,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"br" => TagSpec {
         kind: TagKind::LineBreak,
         is_void: true,
-        is_self_closing_xhtml: true,
         is_block: false,
         optional_close: None,
         is_rawtext: false,
@@ -398,7 +386,6 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"option"    => TagSpec {
         kind: TagKind::Inline,
         is_void: false,
-        is_self_closing_xhtml: false,
         is_block: false,
         optional_close: Some(OptionalCloseRule::CloseOption),
         is_rawtext: false,

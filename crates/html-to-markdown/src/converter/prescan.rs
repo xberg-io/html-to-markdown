@@ -17,41 +17,17 @@ pub struct PrescanReport {
     pub had_cdata: bool,
     /// Any `<` that the prescan escaped via the invalid-tag branch.
     pub had_unescaped_lt: bool,
-    /// Saw two consecutive opens of `<li>`, `<p>`, `<tr>`, `<td>`, `<dt>`, `<dd>`,
-    /// or `<option>` without an intervening matching close.
-    pub had_optional_close_rule_trigger: bool,
-    /// Saw `<table>` followed directly by `<tr>` without an intervening
-    /// `<tbody>`/`<thead>`/`<tfoot>`.
-    pub has_no_tbody_table: bool,
     /// Saw `<script>` or `<style>` in the source.
     pub has_script_or_style: bool,
     /// SVG depth ever exceeded zero.
     pub has_svg: bool,
-    /// Count of every `<…` that begins a tag (open OR close, void OR not).
-    pub total_tags: u32,
-    /// Increment on non-void non-self-closing tag open, decrement on close.
-    /// Tracks the running maximum as a saturating `u16`.
-    pub max_estimated_depth: u16,
 }
-
-// Tags whose optional-close rule fires when a matching open follows without
-// an intervening close: the last-seen open for each tag is tracked.
-const OPTIONAL_CLOSE_TAGS: &[&[u8]] = &[b"li", b"p", b"tr", b"td", b"dt", b"dd", b"option"];
-
-// Void elements — do not contribute to depth tracking.
-const VOID_TAGS: &[&[u8]] = &[
-    b"area", b"base", b"br", b"col", b"embed", b"hr", b"img", b"input", b"link", b"meta", b"param", b"source",
-    b"track", b"wbr",
-];
 
 // Tags that are stripped of their content by the prescan.
 const STRIP_CONTENT_TAGS: [&[u8]; 2] = [b"script", b"style"];
 
 const SVG_TAG: &[u8] = b"svg";
 const HEAD_TAG: &[u8] = b"head";
-const TABLE_TAG: &[u8] = b"table";
-const TR_TAG: &[u8] = b"tr";
-const TBODY_LIKE: &[&[u8]] = &[b"tbody", b"thead", b"tfoot"];
 const CDATA_START: &[u8] = b"<![CDATA[";
 const DOCTYPE: &[u8] = b"doctype";
 const EMPTY_COMMENT: &[u8] = b"<!---->";
@@ -84,18 +60,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
 
     // Head-range tracking: byte index in the *output* buffer after `<head…>` closes.
     let mut head_open_end: Option<usize> = None;
-
-    // Optional-close rule: track which of the OPTIONAL_CLOSE_TAGS was last opened.
-    // Index 0..OPTIONAL_CLOSE_TAGS.len() stores whether tag[i] has an open without a close.
-    let mut opt_close_open = [false; 7]; // one bool per OPTIONAL_CLOSE_TAGS entry
-
-    // Table no-tbody detection: two-level state machine.
-    // 0 = not inside table, 1 = inside table (looking for tbody/thead/tfoot/tr),
-    // 2 = already saw tbody (no signal needed).
-    let mut table_state: u8 = 0;
-
-    // Depth tracking for max_estimated_depth.
-    let mut current_depth: u16 = 0;
 
     while idx < len {
         if bytes[idx] != b'<' {
@@ -139,8 +103,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 }
             }
             if replaced {
-                // Self-closing tags: count as a tag, but not open+close depth contributors.
-                report.total_tags += 1;
                 continue;
             }
         }
@@ -150,11 +112,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             if let Some(open_end) = find_tag_end(bytes, idx + 1 + SVG_TAG.len()) {
                 svg_depth += 1;
                 report.has_svg = true;
-                report.total_tags += 1;
-                current_depth = current_depth.saturating_add(1);
-                if current_depth > report.max_estimated_depth {
-                    report.max_estimated_depth = current_depth;
-                }
                 idx = open_end;
                 continue;
             }
@@ -163,8 +120,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 if svg_depth > 0 {
                     svg_depth = svg_depth.saturating_sub(1);
                 }
-                report.total_tags += 1;
-                current_depth = current_depth.saturating_sub(1);
                 idx = close_end;
                 continue;
             }
@@ -178,11 +133,7 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 if matches_tag_start(bytes, idx + 1, tag) {
                     if let Some(open_end) = find_tag_end(bytes, idx + 1 + tag.len()) {
                         report.has_script_or_style = true;
-                        report.total_tags += 1;
                         let remove_end = find_closing_tag(bytes, open_end, tag).unwrap_or(len);
-                        if remove_end < len {
-                            report.total_tags += 1; // the closing tag
-                        }
                         let out = output.get_or_insert_with(|| String::with_capacity(html.len()));
                         out.push_str(&html[last..idx]);
                         out.push_str(&html[idx..open_end]);
@@ -222,11 +173,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             // ── Signal: `<head>` / `</head>` ─────────────────────────────────
             if matches_tag_start(bytes, idx + 1, HEAD_TAG) {
                 if let Some(open_end) = find_tag_end(bytes, idx + 1 + HEAD_TAG.len()) {
-                    report.total_tags += 1;
-                    current_depth = current_depth.saturating_add(1);
-                    if current_depth > report.max_estimated_depth {
-                        report.max_estimated_depth = current_depth;
-                    }
                     // Record output position after the `<head…>` close-bracket.
                     // We need to compute the offset in the *output* buffer.
                     let flushed_so_far = if let Some(ref out) = output {
@@ -240,8 +186,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                 }
             } else if matches_end_tag_start(bytes, idx + 1, HEAD_TAG) {
                 if let Some(close_end) = find_tag_end(bytes, idx + 2 + HEAD_TAG.len()) {
-                    report.total_tags += 1;
-                    current_depth = current_depth.saturating_sub(1);
                     if let Some(start) = head_open_end.take() {
                         // The `</head>` tag itself starts at the current output position.
                         let flushed_so_far = if let Some(ref out) = output {
@@ -253,36 +197,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
                     }
                     idx = close_end;
                     continue;
-                }
-            }
-
-            // ── Signal: `<table>` / `<tbody>`‥ / `<tr>` ─────────────────────
-            if matches_tag_start(bytes, idx + 1, TABLE_TAG) {
-                if let Some(open_end) = find_tag_end(bytes, idx + 1 + TABLE_TAG.len()) {
-                    report.total_tags += 1;
-                    current_depth = current_depth.saturating_add(1);
-                    if current_depth > report.max_estimated_depth {
-                        report.max_estimated_depth = current_depth;
-                    }
-                    table_state = 1; // inside table, awaiting tbody or tr
-                    idx = open_end;
-                    continue;
-                }
-            } else if table_state == 1 {
-                // Check for tbody/thead/tfoot (means table has proper sectioning)
-                let mut saw_tbody = false;
-                for &body_tag in TBODY_LIKE {
-                    if matches_tag_start(bytes, idx + 1, body_tag) {
-                        saw_tbody = true;
-                        break;
-                    }
-                }
-                if saw_tbody {
-                    table_state = 2; // has proper sectioning
-                } else if matches_tag_start(bytes, idx + 1, TR_TAG) {
-                    // `<tr>` directly inside `<table>` — no tbody
-                    report.has_no_tbody_table = true;
-                    table_state = 0; // signal fired; stop tracking this table
                 }
             }
 
@@ -333,62 +247,6 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
             idx += 1;
             last = idx;
             continue;
-        }
-
-        // ── Tag counting + depth + optional-close signals ─────────────────────
-        // We reach here for all valid `<…` that weren't handled by special cases above.
-        {
-            let is_close = idx + 1 < len && bytes[idx + 1] == b'/';
-            let name_start = if is_close { idx + 2 } else { idx + 1 };
-
-            // Find end of tag name.
-            let name_end = {
-                let mut e = name_start;
-                while e < len
-                    && (bytes[e].is_ascii_alphanumeric() || bytes[e] == b'-' || bytes[e] == b'_' || bytes[e] == b':')
-                {
-                    e += 1;
-                }
-                e
-            };
-
-            if name_start < name_end {
-                report.total_tags += 1;
-
-                let tag_name = &bytes[name_start..name_end];
-
-                // ── Optional-close rule ──────────────────────────────────────
-                if let Some(tag_idx) = OPTIONAL_CLOSE_TAGS
-                    .iter()
-                    .position(|t| tag_name.len() == t.len() && tag_name.eq_ignore_ascii_case(t))
-                {
-                    if is_close {
-                        opt_close_open[tag_idx] = false;
-                    } else {
-                        if opt_close_open[tag_idx] {
-                            // Consecutive open without close
-                            report.had_optional_close_rule_trigger = true;
-                        }
-                        opt_close_open[tag_idx] = true;
-                    }
-                }
-
-                // ── Depth tracking ────────────────────────────────────────────
-                let is_void = VOID_TAGS
-                    .iter()
-                    .any(|t| tag_name.len() == t.len() && tag_name.eq_ignore_ascii_case(t));
-
-                if !is_void {
-                    if is_close {
-                        current_depth = current_depth.saturating_sub(1);
-                    } else {
-                        current_depth = current_depth.saturating_add(1);
-                        if current_depth > report.max_estimated_depth {
-                            report.max_estimated_depth = current_depth;
-                        }
-                    }
-                }
-            }
         }
 
         idx += 1;

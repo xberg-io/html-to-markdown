@@ -196,9 +196,8 @@ fn classify_tier2_on_debug_flag() {
 
 // ── 14. Tier-1 bail falls back to Tier-2 producing correct output ────────────
 //
-// `BailReason::NotImplemented` is always returned by the M2 stub, so
-// Tier1 triggers an immediate bail, and the fallback must produce
-// the same result as a direct Tier-2 call.
+// Forces `TierStrategy::Tier1` to verify that when Tier-1 bails for any
+// reason, the fallback path produces output identical to a direct Tier-2 call.
 //
 // This test requires the `testkit` feature because `TierStrategy::Tier1`
 // is only visible when `cfg(any(test, feature = "testkit"))` is true — and
@@ -221,8 +220,8 @@ fn tier1_bail_falls_back_to_tier2() {
         .unwrap_or_default();
 
     // Tier1 with default options: classifier normally blocks Tier-1 due to
-    // extract_metadata=true, but Tier1 overrides it. The M2 stub always
-    // bails with NotImplemented, so the fallback path runs and must match tier2.
+    // extract_metadata=true, but Tier1 overrides it.  On bail the fallback
+    // path runs and must produce output matching the Tier-2 path.
     let force_opts = ConversionOptions {
         tier_strategy: TierStrategy::Tier1,
         ..ConversionOptions::default()

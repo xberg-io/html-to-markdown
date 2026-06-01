@@ -120,55 +120,6 @@ fn unescaped_lt_at_eof() {
     assert!(r.had_unescaped_lt, "<p>text< should set had_unescaped_lt");
 }
 
-// ── had_optional_close_rule_trigger ──────────────────────────────────────────
-
-#[test]
-fn optional_close_li_triggers() {
-    let r = report("<ul><li>a<li>b</ul>");
-    assert!(
-        r.had_optional_close_rule_trigger,
-        "<li>…<li> without intervening </li> should trigger optional-close rule"
-    );
-}
-
-#[test]
-fn optional_close_p_triggers() {
-    let r = report("<p>a<p>b");
-    assert!(
-        r.had_optional_close_rule_trigger,
-        "<p>…<p> without </p> should trigger optional-close rule"
-    );
-}
-
-#[test]
-fn optional_close_li_with_close_no_trigger() {
-    let r = report("<ul><li>a</li><li>b</li></ul>");
-    assert!(
-        !r.had_optional_close_rule_trigger,
-        "properly closed <li> should not trigger optional-close rule"
-    );
-}
-
-// ── has_no_tbody_table ────────────────────────────────────────────────────────
-
-#[test]
-fn no_tbody_table_flagged() {
-    let r = report("<table><tr><td>a</td></tr></table>");
-    assert!(
-        r.has_no_tbody_table,
-        "<table><tr>… without <tbody> should set has_no_tbody_table"
-    );
-}
-
-#[test]
-fn tbody_table_clean() {
-    let r = report("<table><tbody><tr><td>a</td></tr></tbody></table>");
-    assert!(
-        !r.has_no_tbody_table,
-        "<table><tbody>… should not set has_no_tbody_table"
-    );
-}
-
 // ── has_script_or_style ───────────────────────────────────────────────────────
 
 #[test]
@@ -201,51 +152,6 @@ fn svg_flag() {
 fn no_svg_clean() {
     let r = report("<div><p>text</p></div>");
     assert!(!r.has_svg);
-}
-
-// ── total_tags ────────────────────────────────────────────────────────────────
-
-#[test]
-fn total_tags_counts() {
-    let r = report("<p><a></a></p>");
-    // <p>, <a>, </a>, </p> = 4
-    assert_eq!(r.total_tags, 4, "expected 4 tags; got {}", r.total_tags);
-}
-
-#[test]
-fn total_tags_empty() {
-    let r = report("just text no tags");
-    assert_eq!(r.total_tags, 0);
-}
-
-#[test]
-fn total_tags_self_closing_counted() {
-    // <br/> is normalised to <br> but still counted as 1 tag.
-    let r = report("<br/>");
-    assert_eq!(r.total_tags, 1);
-}
-
-// ── max_estimated_depth ───────────────────────────────────────────────────────
-
-#[test]
-fn max_depth_estimate() {
-    let r = report("<div><div><div></div></div></div>");
-    assert!(
-        r.max_estimated_depth >= 3,
-        "three nested divs should yield depth >= 3; got {}",
-        r.max_estimated_depth
-    );
-}
-
-#[test]
-fn max_depth_flat() {
-    // Sibling elements: depth never exceeds 1.
-    let r = report("<p>a</p><p>b</p><p>c</p>");
-    assert_eq!(
-        r.max_estimated_depth, 1,
-        "flat siblings should have depth 1; got {}",
-        r.max_estimated_depth
-    );
 }
 
 // ── cleaning behaviour (regression guard) ────────────────────────────────────

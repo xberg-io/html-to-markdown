@@ -318,7 +318,6 @@ fn auto_routes_correctly_for_complex_input() {
 #[test]
 fn bail_reason_display_is_non_empty() {
     let reasons: Vec<BailReason> = vec![
-        BailReason::NotImplemented,
         BailReason::Classifier,
         BailReason::DepthMismatch {
             tag: "div".into(),

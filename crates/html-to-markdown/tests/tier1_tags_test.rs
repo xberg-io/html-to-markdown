@@ -365,11 +365,10 @@ fn img_is_image_and_void() {
 }
 
 #[test]
-fn br_is_line_break_and_self_closing_xhtml() {
+fn br_is_line_break_and_void() {
     let spec = lookup(b"br").expect("br in table");
     assert_eq!(spec.kind, TagKind::LineBreak);
     assert!(spec.is_void);
-    assert!(spec.is_self_closing_xhtml);
 }
 
 #[test]

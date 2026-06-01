@@ -8,6 +8,12 @@
 //! head slice captured by the prescan and prepends YAML frontmatter to the
 //! scanner's output (matching Tier-2 behaviour byte-for-byte).
 
+// All submodules are declared `pub` here.  The `tier1` module itself lives
+// inside `pub(crate) mod converter`, so the effective visibility is already
+// crate-internal; `pub(crate)` would be redundant and triggers the
+// `clippy::redundant_pub_crate` lint.  The `tier1` module is only re-exported
+// from `lib.rs` under `#[cfg(any(test, feature = "testkit"))]`, so these
+// submodules remain invisible outside the crate in normal builds.
 pub mod bail;
 pub mod metadata;
 pub mod parse;
@@ -17,14 +23,23 @@ pub mod spec_rules;
 pub mod state;
 pub mod tags;
 
-// These re-exports are used by testkit/bench consumers; they look unused in
-// normal builds where `tier1` itself is not re-exported from the crate root.
-#[allow(unused_imports)]
-pub use tags::{ListKind, OptionalCloseRule, RawKind, TagKind, TagSpec, lookup};
+// `lookup` is called by scanner.rs as `tier1::lookup(...)`.
+pub use tags::lookup;
 
-#[allow(unused_imports)]
+// `BailReason` re-export for testkit/bench consumers who pattern-match on it.
+// Not needed by production code (convert_api.rs discards the bail value), so
+// gate it to avoid widening the non-testkit API surface.
+#[cfg(any(test, feature = "testkit"))]
 pub use bail::BailReason;
-#[allow(unused_imports)]
+
+// Convenience re-exports for testkit consumers that import via
+// `html_to_markdown_rs::tier1::{ListKind, TagKind, …}` rather than the full
+// module path.
+#[cfg(any(test, feature = "testkit"))]
+pub use tags::{ListKind, OptionalCloseRule, RawKind, TagKind, TagSpec};
+
+// `RouterDecision` is compared in production code (convert_api.rs line 82)
+// via the path `tier1::RouterDecision::Tier1`, so this re-export is ungated.
 pub use router::RouterDecision;
 
 use crate::converter::prescan::PrescanReport;
@@ -41,7 +56,7 @@ use crate::options::ConversionOptions;
 ///
 /// Returns `Err(BailReason::*)` when the scanner encounters a construct it
 /// cannot handle.  The dispatcher falls back to Tier-2 transparently.
-pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Result<String, BailReason> {
+pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Result<String, bail::BailReason> {
     let body = scanner::scan(html, report, options)?;
 
     // Prepend YAML frontmatter when metadata extraction is requested.
