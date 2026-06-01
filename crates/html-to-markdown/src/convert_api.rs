@@ -63,14 +63,18 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
     // `TierStrategy::Auto` runs the prescan + classifier once.  If the
     // classifier returns `RouterDecision::Tier1`, the scanner is invoked.  On
     // success the result is returned immediately.  On bail the normalized input
-    // that was already produced is passed directly to `convert_html_impl`
-    // (Tier-2) — no re-normalisation, no second prescan.  The prescan for the
-    // Tier-2 path is performed again inside `convert_html_impl`; this wastes
-    // one prescan in the bail case but keeps the byte-equality contract intact
-    // because `convert_html_impl` owns its own preprocessing state.
+    // that was already produced is threaded to the Tier-2 pipeline via
+    // `precomputed_normalized` — no re-normalisation.
     //
     // `TierStrategy::Tier1` (testkit-only) bypasses the classifier and forces
     // the scanner unconditionally, still with Tier-2 fallback on bail.
+    //
+    // `precomputed_normalized` carries the `Cow<str>` produced by
+    // `normalize_input` when the Tier-1 path ran it.  The Tier-2 entry point
+    // below uses it directly; the `Tier2` branch leaves it `None` and computes
+    // it there.
+    let mut precomputed_normalized: Option<Cow<'_, str>> = None;
+
     match options.tier_strategy {
         crate::options::TierStrategy::Tier2 => {
             // Skip Tier-1 entirely; fall through to the Tier-2 path below.
@@ -94,13 +98,14 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
                         });
                     }
                     Err(_bail) => {
-                        // Fall through to the Tier-2 path below.
-                        // `normalized_html` is re-computed from `html` below
-                        // to keep the Tier-2 path self-contained.
+                        // Fall through to Tier-2 with the already-normalized input.
+                        precomputed_normalized = Some(normalized);
                     }
                 }
+            } else {
+                // RouterDecision::Tier2: fall through with the already-normalized input.
+                precomputed_normalized = Some(normalized);
             }
-            // RouterDecision::Tier2 or Tier-1 bail: fall through to Tier-2.
         }
         #[cfg(any(test, feature = "testkit"))]
         crate::options::TierStrategy::Tier1 => {
@@ -122,7 +127,8 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
                     });
                 }
                 Err(_bail) => {
-                    // Fall through to Tier-2.
+                    // Fall through to Tier-2 with the already-normalized input.
+                    precomputed_normalized = Some(normalized);
                 }
             }
         }
@@ -131,7 +137,10 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
     #[cfg(feature = "visitor")]
     let visitor = options.visitor.clone();
 
-    let normalized_html = normalize_input(html)?;
+    let normalized_html = match precomputed_normalized {
+        Some(n) => n,
+        None => normalize_input(html)?,
+    };
 
     // Fast path: plain text with no HTML tags — skip full parsing pipeline.
     if !options.wrap {
