@@ -25,6 +25,8 @@ use crate::converter::tier1::tags::{ListKind, RawKind, TagKind, TagSpec};
 use crate::converter::tier1::{self};
 use crate::options::ConversionOptions;
 
+use memchr::memchr3;
+
 /// Maximum byte length of a tag name lowercased into a stack buffer.
 ///
 /// Names longer than this are silently truncated and will not match any
@@ -1051,33 +1053,23 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
 
     // Outside `<pre>`: collapse runs of space/tab into a single space, decode
     // entities, write directly into the output (or cell) buffer.  Newlines preserved.
-    let has_collapsible = has_double_ws(raw);
-    if !has_entities && !has_collapsible {
-        // Hot path: plain ASCII text with single-space whitespace already.
-        state.cell_or_output_mut().push_str(raw);
-        return Ok(());
+    if !has_entities {
+        // No entities. Quick check: does this text have collapsible whitespace?
+        // Use a fast memchr2 to find the first space/tab; if not found, we can
+        // take the hot path. If found, check if it's followed by another space/tab.
+        if memchr::memchr2(b' ', b'\t', raw.as_bytes()).is_none() {
+            // No whitespace at all; safe to push as-is.
+            state.cell_or_output_mut().push_str(raw);
+            return Ok(());
+        }
+        // Has whitespace; check if it's collapsible (double) by running
+        // the collapse logic.
+        let dest = state.cell_or_output_mut();
+        return decode_and_collapse_into(dest, raw, false, base_offset);
     }
 
     let dest = state.cell_or_output_mut();
     decode_and_collapse_into(dest, raw, has_entities, base_offset)
-}
-
-/// True if `s` contains two consecutive whitespace bytes (space or tab) that
-/// would collapse.
-#[inline]
-#[allow(clippy::many_single_char_names)] // byte-scanner loop — single-char names are conventional here
-fn has_double_ws(s: &str) -> bool {
-    let b = s.as_bytes();
-    let mut i = 1;
-    while i < b.len() {
-        let a = b[i - 1];
-        let c = b[i];
-        if (a == b' ' || a == b'\t') && (c == b' ' || c == b'\t') {
-            return true;
-        }
-        i += 1;
-    }
-    false
 }
 
 /// Decode HTML entities directly into `out` (no intermediate allocation).
@@ -1085,21 +1077,26 @@ fn has_double_ws(s: &str) -> bool {
 /// `base_offset` is the byte offset of `s` within the original HTML input and
 /// is used to report the position of any unrecognised entity in the bail reason.
 ///
+/// Uses memchr to quickly find the next `&` and bulk-copies non-entity runs.
+///
 /// Returns `Err(BailReason::UnknownEntity)` when an entity cannot be decoded.
 fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result<(), BailReason> {
     let bytes = s.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
-        if bytes[i] != b'&' {
-            // Push contiguous non-`&` run in one go using UTF-8 safety from `s`.
-            let start = i;
-            while i < bytes.len() && bytes[i] != b'&' {
-                i += 1;
+        // Fast path: use memchr to find next `&`.
+        if let Some(pos) = memchr::memchr(b'&', &bytes[i..]) {
+            let amp_pos = i + pos;
+            if amp_pos > i {
+                out.push_str(&s[i..amp_pos]);
             }
-            out.push_str(&s[start..i]);
-            continue;
+            i = decode_entity_at(bytes, s, amp_pos, out, base_offset)?;
+        } else {
+            if i < bytes.len() {
+                out.push_str(&s[i..]);
+            }
+            break;
         }
-        i = decode_entity_at(bytes, s, i, out, base_offset)?;
     }
     Ok(())
 }
@@ -1109,8 +1106,8 @@ fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result
 /// `base_offset` is the byte offset of `s` within the original HTML input and
 /// is used to report the position of any unrecognised entity in the bail reason.
 ///
-/// Bulk-copies long runs of "ordinary" bytes (not space/tab/&) with a single
-/// `push_str` to avoid the per-byte overhead of `push(char)`.
+/// Uses memchr3 to quickly find the next special byte (space/tab/&), then
+/// bulk-copies the run in one `push_str` to avoid per-byte overhead.
 ///
 /// Returns `Err(BailReason::UnknownEntity)` when an entity cannot be decoded.
 fn decode_and_collapse_into(
@@ -1123,41 +1120,38 @@ fn decode_and_collapse_into(
     let mut i = 0;
     let mut prev_was_space = false;
     while i < bytes.len() {
-        let b = bytes[i];
-        if b == b' ' || b == b'\t' {
-            if !prev_was_space {
-                out.push(' ');
+        // Fast path: use memchr3 to find next special byte (space/tab/&).
+        let next_special = if has_entities {
+            memchr3(b' ', b'\t', b'&', &bytes[i..]).map(|pos| i + pos)
+        } else {
+            memchr::memchr2(b' ', b'\t', &bytes[i..]).map(|pos| i + pos)
+        };
+
+        if let Some(pos) = next_special {
+            if pos > i {
+                out.push_str(&s[i..pos]);
+                prev_was_space = false;
             }
-            prev_was_space = true;
-            i += 1;
-            continue;
-        }
-        if has_entities && b == b'&' {
-            prev_was_space = false;
-            i = decode_entity_at(bytes, s, i, out, base_offset)?;
-            continue;
-        }
-        // Bulk-copy a contiguous run of non-special bytes.
-        let start = i;
-        if has_entities {
-            while i < bytes.len() {
-                let bb = bytes[i];
-                if bb == b' ' || bb == b'\t' || bb == b'&' {
-                    break;
+            match bytes[pos] {
+                b' ' | b'\t' => {
+                    if !prev_was_space {
+                        out.push(' ');
+                    }
+                    prev_was_space = true;
+                    i = pos + 1;
                 }
-                i += 1;
+                b'&' => {
+                    prev_was_space = false;
+                    i = decode_entity_at(bytes, s, pos, out, base_offset)?;
+                }
+                _ => unreachable!(),
             }
         } else {
-            while i < bytes.len() {
-                let bb = bytes[i];
-                if bb == b' ' || bb == b'\t' {
-                    break;
-                }
-                i += 1;
+            if i < bytes.len() {
+                out.push_str(&s[i..]);
             }
+            break;
         }
-        out.push_str(&s[start..i]);
-        prev_was_space = false;
     }
     Ok(())
 }
@@ -1206,6 +1200,7 @@ fn decode_entity_at(
 ///
 /// The close path restores `state.escape_ctx` directly from `frame.prev_escape_ctx`
 /// so a symmetric `remove_open_escape_ctx` is not needed.
+#[inline]
 fn apply_open_escape_ctx(state: &mut Tier1State, spec: &TagSpec) {
     // Handle <pre> specially: it sets both PRE and CODE bits.
     if spec.kind == TagKind::Pre {
