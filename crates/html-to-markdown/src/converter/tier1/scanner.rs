@@ -191,7 +191,7 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
                     (None, None)
                 };
 
-                emit_open(&mut state, spec, &attrs, ol_start)?;
+                emit_open(&mut state, spec, &attrs)?;
 
                 // Record the content-start position AFTER emit_open so that
                 // close-side post-processing operates on the correct slice.
@@ -216,7 +216,7 @@ pub fn scan(html: &str, _report: &PrescanReport, options: &ConversionOptions) ->
 
                 // Update escape context after pushing so the frame records the
                 // pre-tag ctx correctly.
-                update_escape_ctx(&mut state, spec, true);
+                apply_open_escape_ctx(&mut state, spec);
 
                 text_start = pos;
             }
@@ -314,165 +314,178 @@ fn emit_open(
     state: &mut Tier1State,
     spec: &'static TagSpec,
     attrs: &[(&[u8], Option<&[u8]>)],
-    ol_start: u16,
 ) -> Result<(), BailReason> {
-    let _ = ol_start;
-
     match spec.kind {
-        TagKind::Paragraph => {
-            // Mirrors Tier-2: when output is non-empty and doesn't already end
-            // with "\n\n", push "\n\n" (may produce three newlines total when
-            // output ends with a single "\n", e.g. right after a table row or
-            // an `<hr>`).
-            if !state.output.is_empty() && !state.output.ends_with("\n\n") {
-                state.output.push_str("\n\n");
-            }
-        }
-
-        TagKind::Heading(_) => {
-            state.ensure_blank_line();
-        }
-
-        TagKind::Blockquote => {
-            state.ensure_blank_line();
-        }
-
-        TagKind::Pre => {
-            state.ensure_blank_line();
-        }
-
-        TagKind::List(_) => {
-            // Lists at the top level need a blank line if there's preceding content.
-            // Inside a list item (`list_depth > 0`) just a newline is enough.
-            if !state.output.is_empty() {
-                if state.list_depth == 0 {
-                    // Top-level list: ensure blank line before
-                    state.ensure_blank_line();
-                } else {
-                    // Nested list inside a list item: just newline
-                    if !state.output.ends_with('\n') {
-                        state.output.push('\n');
-                    }
-                }
-            }
-            state.list_depth = state.list_depth.saturating_add(1);
-        }
-
-        TagKind::ListItem => {
-            // Emit the list item marker.
-            let parent_kind = find_parent_list_kind(&state.stack);
-            let indent = list_item_indent(state.list_depth.saturating_sub(1));
-            if parent_kind == Some(ListKind::Ordered) {
-                // Increment counter on parent ordered list frame
-                let counter = increment_ol_counter(&mut state.stack);
-                let start = find_ol_start(&state.stack);
-                let index = start.saturating_sub(1) + counter;
-                state.output.push_str(&indent);
-                // measured: write! is slower on this workload (Stage 5c)
-                #[allow(clippy::format_push_string)]
-                state.output.push_str(&format!("{index}. "));
-            } else {
-                state.output.push_str(&indent);
-                state.output.push_str("- ");
-            }
-        }
-
+        TagKind::Paragraph => open_paragraph(state),
+        TagKind::Heading(_) => open_heading(state),
+        TagKind::Blockquote => open_blockquote(state),
+        TagKind::Pre => open_pre(state),
+        TagKind::List(_) => open_list(state),
+        TagKind::ListItem => open_list_item(state),
         TagKind::Strong => {
             state.cell_or_output_mut().push_str("**");
         }
-
         TagKind::Emphasis => {
             state.cell_or_output_mut().push('*');
         }
-
         TagKind::Code => {
             // When inside <pre>, <code> is transparent — no backtick markers.
             if !state.escape_ctx.contains(EscapeCtx::PRE) {
                 state.cell_or_output_mut().push('`');
             }
         }
-
-        TagKind::Link => {
-            // Track link count inside tables for layout-table detection.
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.link_count += 1;
-            }
-            state.cell_or_output_mut().push('[');
-        }
-
-        // ── Table handling ──────────────────────────────────────────────────────
-        TagKind::Table => {
-            // The nested-table check was already done in the main scanner loop
-            // (before this emit_open call) to ensure TableNestedTable takes
-            // priority over TableBlockChildInCell.
-            state
-                .table_stack
-                .push(crate::converter::tier1::state::TableState::default());
-        }
-
-        TagKind::TableCaption => {
-            return Err(BailReason::TableCaption);
-        }
-
-        TagKind::TableHead => {
-            if let Some(ts) = state.table_stack.last_mut() {
-                // thead after any body or foot section → section order violation.
-                if ts.seen_tbody_close || ts.seen_tfoot {
-                    return Err(BailReason::TableSectionOrder);
-                }
-                ts.in_thead = true;
-            }
-        }
-
-        TagKind::TableBody => {
-            if let Some(ts) = state.table_stack.last_mut() {
-                // tbody after tfoot open → section order violation.
-                if ts.seen_tfoot {
-                    return Err(BailReason::TableSectionOrder);
-                }
-            }
-        }
-
-        TagKind::TableFoot => {
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.seen_tfoot = true;
-            }
-        }
-
-        TagKind::TableRow => {
-            // Clear the in-progress row.
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.current_row.clear();
-            }
-        }
-
-        TagKind::TableCell { is_header } => {
-            // Check rowspan / colspan — bail if either != 1.
-            let span_val = |key: &[u8]| -> u32 {
-                find_attr(attrs, key)
-                    .and_then(|b| std::str::from_utf8(b).ok())
-                    .and_then(|s| s.trim().parse::<u32>().ok())
-                    .unwrap_or(1)
-            };
-            if span_val(b"rowspan") != 1 || span_val(b"colspan") != 1 {
-                return Err(BailReason::TableRowspanColspan);
-            }
-            // Start accumulating cell text.
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.current_cell.clear();
-                ts.in_cell = true;
-                if is_header {
-                    ts.has_th = true;
-                }
-            }
-        }
-
+        TagKind::Link => open_link(state),
+        TagKind::Table => open_table(state),
+        TagKind::TableCaption => return Err(BailReason::TableCaption),
+        TagKind::TableHead => open_table_head(state)?,
+        TagKind::TableBody => open_table_body(state)?,
+        TagKind::TableFoot => open_table_foot(state),
+        TagKind::TableRow => open_table_row(state),
+        TagKind::TableCell { is_header } => open_table_cell(state, attrs, is_header)?,
         // Block containers: just track them on the stack (no inline marker).
         TagKind::Block | TagKind::Inline => {}
-
+        // All other kinds (LineBreak, Hr, Image, etc.) are void — they never
+        // reach emit_open because the void/self-closing branch fires first.
         _ => {}
     }
 
+    Ok(())
+}
+
+// ── Per-TagKind open helpers ──────────────────────────────────────────────────
+
+fn open_paragraph(state: &mut Tier1State) {
+    // Mirrors Tier-2: when output is non-empty and doesn't already end
+    // with "\n\n", push "\n\n" (may produce three newlines total when
+    // output ends with a single "\n", e.g. right after a table row or
+    // an `<hr>`).
+    if !state.output.is_empty() && !state.output.ends_with("\n\n") {
+        state.output.push_str("\n\n");
+    }
+}
+
+fn open_heading(state: &mut Tier1State) {
+    state.ensure_blank_line();
+}
+
+fn open_blockquote(state: &mut Tier1State) {
+    state.ensure_blank_line();
+}
+
+fn open_pre(state: &mut Tier1State) {
+    state.ensure_blank_line();
+}
+
+fn open_list(state: &mut Tier1State) {
+    // Lists at the top level need a blank line if there's preceding content.
+    // Inside a list item (`list_depth > 0`) just a newline is enough.
+    if !state.output.is_empty() {
+        if state.list_depth == 0 {
+            // Top-level list: ensure blank line before
+            state.ensure_blank_line();
+        } else {
+            // Nested list inside a list item: just newline
+            if !state.output.ends_with('\n') {
+                state.output.push('\n');
+            }
+        }
+    }
+    state.list_depth = state.list_depth.saturating_add(1);
+}
+
+fn open_list_item(state: &mut Tier1State) {
+    // Emit the list item marker.
+    let parent_kind = find_parent_list_kind(&state.stack);
+    let indent = list_item_indent(state.list_depth.saturating_sub(1));
+    if parent_kind == Some(ListKind::Ordered) {
+        // Increment counter on parent ordered list frame
+        let counter = increment_ol_counter(&mut state.stack);
+        let start = find_ol_start(&state.stack);
+        let index = start.saturating_sub(1) + counter;
+        state.output.push_str(&indent);
+        // measured: write! is slower on this workload (Stage 5c)
+        #[allow(clippy::format_push_string)]
+        state.output.push_str(&format!("{index}. "));
+    } else {
+        state.output.push_str(&indent);
+        state.output.push_str("- ");
+    }
+}
+
+fn open_link(state: &mut Tier1State) {
+    // Track link count inside tables for layout-table detection.
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.link_count += 1;
+    }
+    state.cell_or_output_mut().push('[');
+}
+
+fn open_table(state: &mut Tier1State) {
+    // The nested-table check was already done in the main scanner loop
+    // (before this emit_open call) to ensure TableNestedTable takes
+    // priority over TableBlockChildInCell.
+    state
+        .table_stack
+        .push(crate::converter::tier1::state::TableState::default());
+}
+
+fn open_table_head(state: &mut Tier1State) -> Result<(), BailReason> {
+    if let Some(ts) = state.table_stack.last_mut() {
+        // thead after any body or foot section → section order violation.
+        if ts.seen_tbody_close || ts.seen_tfoot {
+            return Err(BailReason::TableSectionOrder);
+        }
+        ts.in_thead = true;
+    }
+    Ok(())
+}
+
+fn open_table_body(state: &mut Tier1State) -> Result<(), BailReason> {
+    if let Some(ts) = state.table_stack.last_mut() {
+        // tbody after tfoot open → section order violation.
+        if ts.seen_tfoot {
+            return Err(BailReason::TableSectionOrder);
+        }
+    }
+    Ok(())
+}
+
+fn open_table_foot(state: &mut Tier1State) {
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.seen_tfoot = true;
+    }
+}
+
+fn open_table_row(state: &mut Tier1State) {
+    // Clear the in-progress row.
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.current_row.clear();
+    }
+}
+
+fn open_table_cell(
+    state: &mut Tier1State,
+    attrs: &[(&[u8], Option<&[u8]>)],
+    is_header: bool,
+) -> Result<(), BailReason> {
+    // Check rowspan / colspan — bail if either != 1.
+    let span_val = |key: &[u8]| -> u32 {
+        find_attr(attrs, key)
+            .and_then(|b| std::str::from_utf8(b).ok())
+            .and_then(|s| s.trim().parse::<u32>().ok())
+            .unwrap_or(1)
+    };
+    if span_val(b"rowspan") != 1 || span_val(b"colspan") != 1 {
+        return Err(BailReason::TableRowspanColspan);
+    }
+    // Start accumulating cell text.
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.current_cell.clear();
+        ts.in_cell = true;
+        if is_header {
+            ts.has_th = true;
+        }
+    }
     Ok(())
 }
 
@@ -653,229 +666,43 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
     state.escape_ctx = frame.prev_escape_ctx;
 
     match spec.kind {
-        TagKind::Paragraph => {
-            // Tier-2 appends "\n\n" after paragraph content (always two newlines).
-            // Matching this precisely is required for byte-equal output.
-            trim_trailing_inline_whitespace(state);
-            state.output.push_str("\n\n");
-        }
-
-        TagKind::Heading(n) => {
-            // The heading text was emitted as raw text; we need to prepend the
-            // `# ` prefix.  We stored the output position before the heading
-            // opened via `content_start` convention: we need to insert `# `
-            // at the beginning of the heading content.
-            //
-            // Implementation: heading is on the stack, content_start is stored
-            // in the frame.  We insert the `# ` prefix at `content_start`.
-            trim_trailing_inline_whitespace(state);
-            let content = &state.output[frame.content_start..];
-            if content.trim().is_empty() {
-                // Empty heading: Tier-2 emits nothing. Roll back to before
-                // the heading's block separator was added.
-                state.output.truncate(frame.content_start);
-                // Also trim any blank-line separator that ensure_blank_line
-                // added before the heading opened (frame.content_start is
-                // after emit_open, which may have pushed "\n\n").
-                let trimmed_len = state.output.trim_end_matches('\n').len();
-                if trimmed_len > 0 {
-                    state.output.truncate(trimmed_len);
-                    state.output.push('\n');
-                } else {
-                    state.output.clear();
-                }
-            } else {
-                let prefix = heading_prefix(n);
-                state.output.insert_str(frame.content_start, &prefix);
-                // Tier-2 leaves a blank line ("\n\n") after a heading. A
-                // following paragraph's "\n\n" guard then finds it already
-                // and appends nothing, yielding the expected single blank line.
-                state.ensure_blank_line();
-            }
-        }
-
-        TagKind::Blockquote => {
-            // The blockquote content needs `> ` prefixed to every line.
-            // We inserted nothing on open; now we need to post-process the
-            // content from `frame.content_start` to the current output end.
-            let content = state.output[frame.content_start..].to_owned();
-            let prefixed = prefix_blockquote_lines(&content);
-            state.output.truncate(frame.content_start);
-            // Mirror Tier-2 blockquote.rs: when the output ends with "\n\n"
-            // before the blockquote, remove one "\n" (heading-then-blockquote
-            // produces only a single newline separator, not a blank line).
-            if state.output.ends_with("\n\n") {
-                state.output.pop();
-            }
-            state.output.push_str(&prefixed);
-        }
-
-        TagKind::Pre => {
-            // Indent every line by 4 spaces.
-            let raw = state.output[frame.content_start..].to_owned();
-            let indented = indent_pre_lines(&raw);
-            state.output.truncate(frame.content_start);
-            state.output.push_str(&indented);
-        }
-
+        TagKind::Paragraph => close_paragraph(state),
+        TagKind::Heading(n) => close_heading(state, &frame, n, false)?,
+        TagKind::Blockquote => close_blockquote(state, &frame),
+        TagKind::Pre => close_pre(state, &frame),
         TagKind::Strong => {
             state.cell_or_output_mut().push_str("**");
         }
-
         TagKind::Emphasis => {
             state.cell_or_output_mut().push('*');
         }
-
-        TagKind::Code => {
-            // When inside <pre>, <code> is transparent — no backtick markers.
-            if !state.escape_ctx.contains(EscapeCtx::PRE) {
-                state.cell_or_output_mut().push('`');
-            }
-        }
-
-        TagKind::Link => {
-            // Close the link: `](href "title")` or `](href)`
-            // If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
-            let dest = state.cell_or_output_mut();
-            if let Some(href) = &frame.link_href {
-                if let Some(title) = &frame.link_title {
-                    // measured: write! is slower on this workload (Stage 5c)
-                    #[allow(clippy::format_push_string)]
-                    dest.push_str(&format!("]({href} \"{title}\")"));
-                } else {
-                    // measured: write! is slower on this workload (Stage 5c)
-                    #[allow(clippy::format_push_string)]
-                    dest.push_str(&format!("]({href})"));
-                }
-            } else {
-                // No href: remove the `[` we emitted on open, keep just the text.
-                // Find and remove the opening `[` that corresponds to this link.
-                // content_start is relative to cell buffer when in a cell.
-                if let Some(bracket_pos) = dest[..frame.content_start].rfind('[') {
-                    dest.remove(bracket_pos);
-                }
-            }
-        }
-
-        TagKind::List(_) => {
-            state.list_depth = state.list_depth.saturating_sub(1);
-            // Ensure the list ends with exactly one newline before any following content.
-            if !state.output.ends_with('\n') {
-                state.output.push('\n');
-            }
-        }
-
-        TagKind::ListItem => {
-            trim_trailing_inline_whitespace(state);
-            state.ensure_newline();
-        }
-
+        TagKind::Code => close_code(state),
+        TagKind::Link => close_link(state, &frame),
+        TagKind::List(_) => close_list(state),
+        TagKind::ListItem => close_list_item(state),
         TagKind::Hr => {
             // Should not happen (hr is void), but handle gracefully.
         }
-
-        // ── Table handling ──────────────────────────────────────────────────────
-        TagKind::Table => {
-            // Pop the table state and (if safe) emit the GFM table to main output.
-            if let Some(ts) = state.table_stack.pop() {
-                // Safety checks: ensure Tier-2 would also use the GFM path.
-                //
-                // Tier-2 uses the layout (non-GFM) path when ALL of these hold:
-                //   (a) no <th> anywhere in the table, AND
-                //   (b) no <caption>, AND
-                //   (c) looks_like_layout || is_blank || (row_count<=2 && link_count>=3)
-                //
-                // Where looks_like_layout covers nested tables (already bailed),
-                // colspan/rowspan (already bailed), and inconsistent column counts.
-                //
-                // If those conditions could apply to this table, we bail rather than
-                // emit a GFM table that Tier-2 would have rendered differently.
-                if !ts.has_th {
-                    // No <th>: check if Tier-2 would take the layout path.
-                    let row_count = ts.rows.len();
-
-                    // Inconsistent column counts → layout table in Tier-2.
-                    let inconsistent_cols = {
-                        let first = ts.first_row_col_count.unwrap_or(0);
-                        ts.rows.iter().any(|r| r.len() != first)
-                    };
-
-                    // Link-heavy with few rows → layout table in Tier-2.
-                    let link_heavy = row_count <= 2 && ts.link_count >= 3;
-
-                    // Blank table → Tier-2 emits nothing (not a bail case).
-                    let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|c| c.trim().is_empty()));
-
-                    if inconsistent_cols || link_heavy || is_blank {
-                        // Tier-2 would not emit a GFM table here.
-                        // Bail so the fallback produces the correct layout output.
-                        return Err(BailReason::Classifier);
-                    }
-                }
-                emit_gfm_table(state, ts);
-            }
+        TagKind::Table => close_table(state)?,
+        TagKind::TableHead => close_table_head(state),
+        TagKind::TableBody => close_table_body(state),
+        TagKind::TableFoot => {
+            // tfoot close: no action needed beyond restoring the frame (done above).
         }
-
-        TagKind::TableHead => {
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.in_thead = false;
-            }
-        }
-
-        TagKind::TableBody | TagKind::TableFoot => {
-            // Body/foot close: mark seen_tbody_close only for tbody.
-            if matches!(spec.kind, TagKind::TableBody) {
-                if let Some(ts) = state.table_stack.last_mut() {
-                    ts.seen_tbody_close = true;
-                }
-            }
-        }
-
-        TagKind::TableRow => {
-            // Commit current_row to rows (skip empty rows).
-            if let Some(ts) = state.table_stack.last_mut() {
-                if !ts.current_row.is_empty() {
-                    let col_count = ts.current_row.len();
-                    // Track first-row column count for consistency checking.
-                    if ts.first_row_col_count.is_none() {
-                        ts.first_row_col_count = Some(col_count);
-                    }
-                    let row = std::mem::take(&mut ts.current_row);
-                    ts.rows.push(row);
-                }
-            }
-        }
-
-        TagKind::TableCell { .. } => {
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.in_cell = false;
-                // Trim the accumulated cell text (matches Tier-2 `text.trim()`).
-                let cell_text = ts.current_cell.trim().to_owned();
-                // Bail if the cell contains a newline (multi-line content).
-                // Tier-2 replaces newlines with spaces, but Tier-1 only handles
-                // single-line cells to guarantee byte-identical output.
-                if cell_text.contains('\n') {
-                    return Err(BailReason::TableBlockChildInCell);
-                }
-                // Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
-                // which changes the cell width computation; Tier-1 does not
-                // implement pipe escaping.
-                if cell_text.contains('|') {
-                    return Err(BailReason::TableBlockChildInCell);
-                }
-                ts.current_row.push(cell_text);
-                ts.current_cell.clear();
-            }
-        }
-
+        TagKind::TableRow => close_table_row(state),
+        TagKind::TableCell { .. } => close_table_cell(state, false)?,
         TagKind::TableCaption => {
             // Should have been caught at open, but handle gracefully.
         }
-
         // Generic block and inline containers: no closing marker.
         TagKind::Block | TagKind::Inline => {}
-
-        _ => {}
+        // Void-only kinds that never have open frames:
+        TagKind::LineBreak | TagKind::Image => {}
+        // Explicitly no-op: all remaining known kinds not listed above.
+        TagKind::DefinitionTerm
+        | TagKind::DefinitionDescription
+        | TagKind::RawText(_)
+        | TagKind::Ignored => {}
     }
 
     Ok(())
@@ -902,118 +729,255 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
     state.escape_ctx = frame.prev_escape_ctx;
 
     match spec.kind {
-        TagKind::Paragraph => {
-            // Tier-2 appends "\n\n" after paragraph content (always two newlines).
-            // Matching this precisely is required for byte-equal output.
-            trim_trailing_inline_whitespace(state);
-            state.output.push_str("\n\n");
-        }
-
-        TagKind::Heading(n) => {
-            let prefix = heading_prefix(n);
-            trim_trailing_inline_whitespace(state);
-            state.output.insert_str(frame.content_start, &prefix);
-            // Tier-2 leaves a blank line ("\n\n") after a heading. A following
-            // paragraph's "\n\n" guard then finds it already and appends
-            // nothing, yielding the expected single blank line.
-            state.ensure_blank_line();
-        }
-
-        TagKind::Blockquote => {
-            let content = state.output[frame.content_start..].to_owned();
-            let prefixed = prefix_blockquote_lines(&content);
-            state.output.truncate(frame.content_start);
-            state.output.push_str(&prefixed);
-        }
-
-        TagKind::Pre => {
-            let raw = state.output[frame.content_start..].to_owned();
-            let indented = indent_pre_lines(&raw);
-            state.output.truncate(frame.content_start);
-            state.output.push_str(&indented);
-        }
-
+        TagKind::Paragraph => close_paragraph(state),
+        TagKind::Heading(n) => close_heading(state, &frame, n, true)?,
+        TagKind::Blockquote => close_blockquote(state, &frame),
+        TagKind::Pre => close_pre(state, &frame),
         TagKind::Strong => {
             state.cell_or_output_mut().push_str("**");
         }
-
         TagKind::Emphasis => {
             state.cell_or_output_mut().push('*');
         }
-
-        TagKind::Code => {
-            // When inside <pre>, <code> is transparent — no backtick markers.
-            // The escape_ctx was already restored to prev_escape_ctx above.
-            if !state.escape_ctx.contains(EscapeCtx::PRE) {
-                state.cell_or_output_mut().push('`');
-            }
-        }
-
-        TagKind::Link => {
-            let dest = state.cell_or_output_mut();
-            if let Some(href) = &frame.link_href {
-                if let Some(title) = &frame.link_title {
-                    // measured: write! is slower on this workload (Stage 5c)
-                    #[allow(clippy::format_push_string)]
-                    dest.push_str(&format!("]({href} \"{title}\")"));
-                } else {
-                    // measured: write! is slower on this workload (Stage 5c)
-                    #[allow(clippy::format_push_string)]
-                    dest.push_str(&format!("]({href})"));
-                }
-            } else {
-                if let Some(bracket_pos) = dest[..frame.content_start].rfind('[') {
-                    dest.remove(bracket_pos);
-                }
-            }
-        }
-
-        TagKind::List(_) => {
-            state.list_depth = state.list_depth.saturating_sub(1);
-            if !state.output.ends_with('\n') {
-                state.output.push('\n');
-            }
-        }
-
-        TagKind::ListItem => {
-            trim_trailing_inline_whitespace(state);
-            state.ensure_newline();
-        }
-
-        // ── Table implicit closes ──────────────────────────────────────────────
-        TagKind::TableCell { .. } => {
-            // Implicitly close a <td>/<th> — same logic as the explicit close.
-            if let Some(ts) = state.table_stack.last_mut() {
-                ts.in_cell = false;
-                let cell_text = ts.current_cell.trim().to_owned();
-                if cell_text.contains('\n') {
-                    return Err(BailReason::TableBlockChildInCell);
-                }
-                ts.current_row.push(cell_text);
-                ts.current_cell.clear();
-            }
-        }
-
-        TagKind::TableRow => {
-            // Implicitly close a <tr> — commit current_row to rows.
-            if let Some(ts) = state.table_stack.last_mut() {
-                if !ts.current_row.is_empty() {
-                    let col_count = ts.current_row.len();
-                    if ts.first_row_col_count.is_none() {
-                        ts.first_row_col_count = Some(col_count);
-                    }
-                    let row = std::mem::take(&mut ts.current_row);
-                    ts.rows.push(row);
-                }
-            }
-        }
-
+        TagKind::Code => close_code(state),
+        TagKind::Link => close_link(state, &frame),
+        TagKind::List(_) => close_list(state),
+        TagKind::ListItem => close_list_item(state),
+        TagKind::TableCell { .. } => close_table_cell(state, true)?,
+        TagKind::TableRow => close_table_row(state),
         // Generic block/inline: no closing marker.
         TagKind::Block | TagKind::Inline => {}
-
-        _ => {}
+        // Void-only kinds and other no-op kinds:
+        TagKind::LineBreak
+        | TagKind::Image
+        | TagKind::Hr
+        | TagKind::Table
+        | TagKind::TableHead
+        | TagKind::TableBody
+        | TagKind::TableFoot
+        | TagKind::TableCaption
+        | TagKind::DefinitionTerm
+        | TagKind::DefinitionDescription
+        | TagKind::RawText(_)
+        | TagKind::Ignored => {}
     }
 
+    Ok(())
+}
+
+// ── Per-TagKind close helpers ─────────────────────────────────────────────────
+
+fn close_paragraph(state: &mut Tier1State) {
+    // Tier-2 appends "\n\n" after paragraph content (always two newlines).
+    // Matching this precisely is required for byte-equal output.
+    trim_trailing_inline_whitespace(state);
+    state.output.push_str("\n\n");
+}
+
+/// Close a heading element.
+///
+/// When `is_implicit` is true the empty-heading guard is skipped: implicitly
+/// closed headings have already had their content flushed through the normal
+/// path, so we just prepend the prefix unconditionally.
+fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bool) -> Result<(), BailReason> {
+    trim_trailing_inline_whitespace(state);
+
+    if !is_implicit {
+        let content = &state.output[frame.content_start..];
+        if content.trim().is_empty() {
+            // Empty heading: Tier-2 emits nothing. Roll back to before
+            // the heading's block separator was added.
+            state.output.truncate(frame.content_start);
+            // Also trim any blank-line separator that ensure_blank_line
+            // added before the heading opened (frame.content_start is
+            // after emit_open, which may have pushed "\n\n").
+            let trimmed_len = state.output.trim_end_matches('\n').len();
+            if trimmed_len > 0 {
+                state.output.truncate(trimmed_len);
+                state.output.push('\n');
+            } else {
+                state.output.clear();
+            }
+            return Ok(());
+        }
+    }
+
+    let prefix = heading_prefix(n);
+    state.output.insert_str(frame.content_start, &prefix);
+    // Tier-2 leaves a blank line ("\n\n") after a heading. A
+    // following paragraph's "\n\n" guard then finds it already and appends
+    // nothing, yielding the expected single blank line.
+    state.ensure_blank_line();
+    Ok(())
+}
+
+fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
+    // The blockquote content needs `> ` prefixed to every line.
+    // We inserted nothing on open; now we need to post-process the
+    // content from `frame.content_start` to the current output end.
+    let content = state.output[frame.content_start..].to_owned();
+    let prefixed = prefix_blockquote_lines(&content);
+    state.output.truncate(frame.content_start);
+    // Mirror Tier-2 blockquote.rs: when the output ends with "\n\n"
+    // before the blockquote, remove one "\n" (heading-then-blockquote
+    // produces only a single newline separator, not a blank line).
+    if state.output.ends_with("\n\n") {
+        state.output.pop();
+    }
+    state.output.push_str(&prefixed);
+}
+
+fn close_pre(state: &mut Tier1State, frame: &OpenTag) {
+    // Indent every line by 4 spaces.
+    let raw = state.output[frame.content_start..].to_owned();
+    let indented = indent_pre_lines(&raw);
+    state.output.truncate(frame.content_start);
+    state.output.push_str(&indented);
+}
+
+fn close_code(state: &mut Tier1State) {
+    // When inside <pre>, <code> is transparent — no backtick markers.
+    // The escape_ctx was already restored to prev_escape_ctx above.
+    if !state.escape_ctx.contains(EscapeCtx::PRE) {
+        state.cell_or_output_mut().push('`');
+    }
+}
+
+fn close_link(state: &mut Tier1State, frame: &OpenTag) {
+    // Close the link: `](href "title")` or `](href)`
+    // If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
+    let dest = state.cell_or_output_mut();
+    if let Some(href) = &frame.link_href {
+        if let Some(title) = &frame.link_title {
+            // measured: write! is slower on this workload (Stage 5c)
+            #[allow(clippy::format_push_string)]
+            dest.push_str(&format!("]({href} \"{title}\")"));
+        } else {
+            // measured: write! is slower on this workload (Stage 5c)
+            #[allow(clippy::format_push_string)]
+            dest.push_str(&format!("]({href})"));
+        }
+    } else {
+        // No href: remove the `[` we emitted on open, keep just the text.
+        // Find and remove the opening `[` that corresponds to this link.
+        // content_start is relative to cell buffer when in a cell.
+        if let Some(bracket_pos) = dest[..frame.content_start].rfind('[') {
+            dest.remove(bracket_pos);
+        }
+    }
+}
+
+fn close_list(state: &mut Tier1State) {
+    state.list_depth = state.list_depth.saturating_sub(1);
+    // Ensure the list ends with exactly one newline before any following content.
+    if !state.output.ends_with('\n') {
+        state.output.push('\n');
+    }
+}
+
+fn close_list_item(state: &mut Tier1State) {
+    trim_trailing_inline_whitespace(state);
+    state.ensure_newline();
+}
+
+fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
+    // Pop the table state and (if safe) emit the GFM table to main output.
+    let Some(ts) = state.table_stack.pop() else {
+        return Ok(());
+    };
+
+    // Safety checks: ensure Tier-2 would also use the GFM path.
+    //
+    // Tier-2 uses the layout (non-GFM) path when ALL of these hold:
+    //   (a) no <th> anywhere in the table, AND
+    //   (b) no <caption>, AND
+    //   (c) looks_like_layout || is_blank || (row_count<=2 && link_count>=3)
+    //
+    // Where looks_like_layout covers nested tables (already bailed),
+    // colspan/rowspan (already bailed), and inconsistent column counts.
+    //
+    // If those conditions could apply to this table, we bail rather than
+    // emit a GFM table that Tier-2 would have rendered differently.
+    if !ts.has_th {
+        // No <th>: check if Tier-2 would take the layout path.
+        let row_count = ts.rows.len();
+
+        // Inconsistent column counts → layout table in Tier-2.
+        let inconsistent_cols = {
+            let first = ts.first_row_col_count.unwrap_or(0);
+            ts.rows.iter().any(|r| r.len() != first)
+        };
+
+        // Link-heavy with few rows → layout table in Tier-2.
+        let link_heavy = row_count <= 2 && ts.link_count >= 3;
+
+        // Blank table → Tier-2 emits nothing (not a bail case).
+        let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|c| c.trim().is_empty()));
+
+        if inconsistent_cols || link_heavy || is_blank {
+            // Tier-2 would not emit a GFM table here.
+            // Bail so the fallback produces the correct layout output.
+            return Err(BailReason::Classifier);
+        }
+    }
+    emit_gfm_table(state, ts);
+    Ok(())
+}
+
+fn close_table_head(state: &mut Tier1State) {
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.in_thead = false;
+    }
+}
+
+fn close_table_body(state: &mut Tier1State) {
+    if let Some(ts) = state.table_stack.last_mut() {
+        ts.seen_tbody_close = true;
+    }
+}
+
+fn close_table_row(state: &mut Tier1State) {
+    // Commit current_row to rows (skip empty rows).
+    let Some(ts) = state.table_stack.last_mut() else {
+        return;
+    };
+    if ts.current_row.is_empty() {
+        return;
+    }
+    let col_count = ts.current_row.len();
+    // Track first-row column count for consistency checking.
+    if ts.first_row_col_count.is_none() {
+        ts.first_row_col_count = Some(col_count);
+    }
+    let row = std::mem::take(&mut ts.current_row);
+    ts.rows.push(row);
+}
+
+/// Close a table cell (`<td>` or `<th>`).
+///
+/// `is_implicit` skips the pipe-escape bail that only applies when the cell
+/// was explicitly closed (implicit closes happen during row/table teardown
+/// where we've already committed to the data we have).
+fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), BailReason> {
+    let Some(ts) = state.table_stack.last_mut() else {
+        return Ok(());
+    };
+    ts.in_cell = false;
+    // Trim the accumulated cell text (matches Tier-2 `text.trim()`).
+    let cell_text = ts.current_cell.trim().to_owned();
+    // Bail if the cell contains a newline (multi-line content).
+    if cell_text.contains('\n') {
+        return Err(BailReason::TableBlockChildInCell);
+    }
+    // Bail if the cell contains a pipe: Tier-2 escapes `|` → `\|`
+    // which changes the cell width computation; Tier-1 does not
+    // implement pipe escaping.  Implicit closes skip this check because
+    // they are triggered during structural teardown, not fresh cell data.
+    if !is_implicit && cell_text.contains('|') {
+        return Err(BailReason::TableBlockChildInCell);
+    }
+    ts.current_row.push(cell_text);
+    ts.current_cell.clear();
     Ok(())
 }
 
@@ -1103,27 +1067,7 @@ fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result
             out.push_str(&s[start..i]);
             continue;
         }
-        // Look for matching `;` within 32 bytes
-        let amp = i;
-        let mut end = i + 1;
-        while end < bytes.len() && end - amp <= 32 && bytes[end] != b';' {
-            end += 1;
-        }
-        if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
-            let entity = &s[amp + 1..end];
-            if decode_entity_into(out, entity) {
-                i = end + 1;
-                continue;
-            }
-            // Entity found (`&name;`) but not in the decode table or invalid
-            // numeric reference — bail rather than silently passing it through.
-            return Err(BailReason::UnknownEntity {
-                name: entity.to_owned(),
-                offset: base_offset + amp,
-            });
-        }
-        out.push('&');
-        i += 1;
+        i = decode_entity_at(bytes, s, i, out, base_offset)?;
     }
     Ok(())
 }
@@ -1158,26 +1102,7 @@ fn decode_and_collapse_into(
         }
         if has_entities && b == b'&' {
             prev_was_space = false;
-            let amp = i;
-            let mut end = i + 1;
-            while end < bytes.len() && end - amp <= 32 && bytes[end] != b';' {
-                end += 1;
-            }
-            if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
-                let entity = &s[amp + 1..end];
-                if decode_entity_into(out, entity) {
-                    i = end + 1;
-                    continue;
-                }
-                // Entity found (`&name;`) but not in the decode table or invalid
-                // numeric reference — bail rather than silently passing it through.
-                return Err(BailReason::UnknownEntity {
-                    name: entity.to_owned(),
-                    offset: base_offset + amp,
-                });
-            }
-            out.push('&');
-            i += 1;
+            i = decode_entity_at(bytes, s, i, out, base_offset)?;
             continue;
         }
         // Bulk-copy a contiguous run of non-special bytes.
@@ -1205,16 +1130,54 @@ fn decode_and_collapse_into(
     Ok(())
 }
 
+/// Scan and decode a single HTML entity starting at `amp_pos` (the `&` byte).
+///
+/// Looks for a matching `;` within 32 bytes, then dispatches to
+/// `decode_entity_into` or `decode_numeric_entity_into`.
+///
+/// Returns the position immediately after the entity (i.e. after the `;`), or
+/// after the bare `&` when no valid entity boundary is found.
+///
+/// Emits `Err(BailReason::UnknownEntity)` when an `&name;` sequence is found
+/// but the name is not in the decode table.
+fn decode_entity_at(
+    bytes: &[u8],
+    s: &str,
+    amp_pos: usize,
+    out: &mut String,
+    base_offset: usize,
+) -> Result<usize, BailReason> {
+    let amp = amp_pos;
+    let mut end = amp + 1;
+    while end < bytes.len() && end - amp <= 32 && bytes[end] != b';' {
+        end += 1;
+    }
+    if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
+        let entity = &s[amp + 1..end];
+        if decode_entity_into(out, entity) {
+            return Ok(end + 1);
+        }
+        // Entity found (`&name;`) but not in the decode table or invalid
+        // numeric reference — bail rather than silently passing it through.
+        return Err(BailReason::UnknownEntity {
+            name: entity.to_owned(),
+            offset: base_offset + amp,
+        });
+    }
+    out.push('&');
+    Ok(amp + 1)
+}
+
 // ── Escape context management ─────────────────────────────────────────────────
 
-fn update_escape_ctx(state: &mut Tier1State, spec: &TagSpec, is_open: bool) {
+/// Apply the escape-context bits for an opening tag.
+///
+/// The close path restores `state.escape_ctx` directly from `frame.prev_escape_ctx`
+/// so a symmetric `remove_open_escape_ctx` is not needed.
+fn apply_open_escape_ctx(state: &mut Tier1State, spec: &TagSpec) {
     // Handle <pre> specially: it sets both PRE and CODE bits.
     if spec.kind == TagKind::Pre {
-        if is_open {
-            state.escape_ctx |= EscapeCtx::PRE | EscapeCtx::CODE;
-        } else {
-            state.escape_ctx &= !(EscapeCtx::PRE | EscapeCtx::CODE);
-        }
+        state.escape_ctx |= EscapeCtx::PRE | EscapeCtx::CODE;
         return;
     }
 
@@ -1226,11 +1189,7 @@ fn update_escape_ctx(state: &mut Tier1State, spec: &TagSpec, is_open: bool) {
         _ => return,
     };
 
-    if is_open {
-        state.escape_ctx |= bit;
-    } else {
-        state.escape_ctx &= !bit;
-    }
+    state.escape_ctx |= bit;
 }
 
 // ── Attribute helpers ─────────────────────────────────────────────────────────
@@ -1262,10 +1221,12 @@ fn extract_ol_start(attrs: &[(&[u8], Option<&[u8]>)]) -> u16 {
 
 /// Decode an attribute value: entity-decode and convert to a String.
 ///
+/// Returns `Err(BailReason::Classifier)` when the value is not valid UTF-8
+/// (malformed bytes in attributes cannot be decoded faithfully).
 /// Returns `Err(BailReason::UnknownEntity)` when the value contains an entity
 /// that Tier-1 cannot decode (Tier-2 would decode it differently).
 fn decode_attr(bytes: &[u8]) -> Result<String, BailReason> {
-    let s = std::str::from_utf8(bytes).unwrap_or("");
+    let s = std::str::from_utf8(bytes).map_err(|_| BailReason::Classifier)?;
     if !s.contains('&') {
         return Ok(s.to_owned());
     }
