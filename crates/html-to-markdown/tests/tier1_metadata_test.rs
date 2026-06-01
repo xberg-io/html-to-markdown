@@ -1,7 +1,7 @@
 //! Integration tests for Tier-1 metadata extraction (M5).
 //!
-//! Each test verifies that Tier-1 with `ForceTier1` and `extract_metadata: true`
-//! produces output byte-identical to Tier-2 (`Tier2Only`, same options).
+//! Each test verifies that Tier-1 with `Tier1` and `extract_metadata: true`
+//! produces output byte-identical to Tier-2 (`Tier2`, same options).
 //!
 //! These tests cover YAML frontmatter produced for:
 //!   - `<title>` (including HTML entities and multi-word titles)
@@ -21,11 +21,11 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// Convert with `ForceTier1` + `extract_metadata: true`.
+/// Convert with `Tier1` + `extract_metadata: true`.
 /// `hocr_spatial_tables` must be disabled so the router can reach Tier-1.
 fn t1(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: true,
         ..ConversionOptions::default()
     };
@@ -35,10 +35,10 @@ fn t1(html: &str) -> String {
         .unwrap_or_default()
 }
 
-/// Convert with `Tier2Only` + `extract_metadata: true` (same other defaults).
+/// Convert with `Tier2` + `extract_metadata: true` (same other defaults).
 fn t2(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: true,
         ..ConversionOptions::default()
     };
@@ -176,12 +176,12 @@ fn tier1_empty_head_produces_no_frontmatter() {
 fn tier1_no_frontmatter_when_extract_metadata_false() {
     let html = "<html><head><title>Hello</title></head><body><p>body</p></body></html>";
     let opts_t1 = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
     let opts_t2 = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -217,7 +217,7 @@ fn auto_routing_with_extract_metadata_can_use_tier1() {
         ..ConversionOptions::default()
     };
     let opts_t2 = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: true,
         ..ConversionOptions::default()
     };

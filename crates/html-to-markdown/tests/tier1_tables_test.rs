@@ -7,7 +7,7 @@
 //! variant for unsupported constructs.
 //!
 //! Byte-equality cross-checks (guarded by `#[cfg(feature = "testkit")]`)
-//! use `TierStrategy::ForceTier1` vs `TierStrategy::Tier2Only` to confirm
+//! use `TierStrategy::Tier1` vs `TierStrategy::Tier2` to confirm
 //! spec compliance.
 
 #![cfg(feature = "testkit")]
@@ -21,7 +21,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 fn tier1_run(html: &str) -> Result<String, BailReason> {
     let (cleaned, report) = prescan::run(html);
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -30,7 +30,7 @@ fn tier1_run(html: &str) -> Result<String, BailReason> {
 
 fn tier1_raw(html: &str) -> Result<String, BailReason> {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -39,7 +39,7 @@ fn tier1_raw(html: &str) -> Result<String, BailReason> {
 
 fn tier1(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -48,7 +48,7 @@ fn tier1(html: &str) -> String {
 
 fn tier2(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };

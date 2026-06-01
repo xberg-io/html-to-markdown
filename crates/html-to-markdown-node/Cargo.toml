@@ -32,7 +32,7 @@ serde_json = "1"
 testkit = ["html-to-markdown-rs/testkit"]
 
 [dev-dependencies]
-# Enable testkit in the core crate when running tests, so ForceTier1 variant exists.
+# Enable testkit in the core crate when running tests, so TierStrategy::Tier1 variant exists.
 html-to-markdown-rs = { version = "3.6.0-rc.1", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
 
 [build-dependencies]

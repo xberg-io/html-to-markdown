@@ -55,28 +55,75 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
 
     let options = options.into().unwrap_or_default();
 
-    // Tier-1 dispatcher: attempt the single-pass byte scanner when forced via
-    // the testkit `ForceTier1` strategy.  `Auto` and `Tier2Only` both skip this
-    // block and fall through to the Tier-2 path below.
-    #[cfg(any(test, feature = "testkit"))]
-    if options.tier_strategy == crate::options::TierStrategy::ForceTier1 {
-        let normalized = normalize_input(html)?;
-        let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
-        match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
-            Ok(markdown) => {
-                return Ok(crate::types::ConversionResult {
-                    content: Some(markdown),
-                    document: None,
-                    tables: Vec::new(),
-                    warnings: Vec::new(),
-                    #[cfg(feature = "metadata")]
-                    metadata: crate::metadata::HtmlMetadata::default(),
-                    #[cfg(feature = "inline-images")]
-                    images: Vec::new(),
-                });
+    // Tier-1 dispatcher.
+    //
+    // `TierStrategy::Tier2` skips this block entirely and falls straight to
+    // the Tier-2 pipeline below.
+    //
+    // `TierStrategy::Auto` runs the prescan + classifier once.  If the
+    // classifier returns `RouterDecision::Tier1`, the scanner is invoked.  On
+    // success the result is returned immediately.  On bail the normalized input
+    // that was already produced is passed directly to `convert_html_impl`
+    // (Tier-2) — no re-normalisation, no second prescan.  The prescan for the
+    // Tier-2 path is performed again inside `convert_html_impl`; this wastes
+    // one prescan in the bail case but keeps the byte-equality contract intact
+    // because `convert_html_impl` owns its own preprocessing state.
+    //
+    // `TierStrategy::Tier1` (testkit-only) bypasses the classifier and forces
+    // the scanner unconditionally, still with Tier-2 fallback on bail.
+    match options.tier_strategy {
+        crate::options::TierStrategy::Tier2 => {
+            // Skip Tier-1 entirely; fall through to the Tier-2 path below.
+        }
+        crate::options::TierStrategy::Auto => {
+            let normalized = normalize_input(html)?;
+            let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
+            let decision = crate::converter::tier1::router::classify(&report, &options);
+            if decision == crate::converter::tier1::RouterDecision::Tier1 {
+                match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+                    Ok(markdown) => {
+                        return Ok(crate::types::ConversionResult {
+                            content: Some(markdown),
+                            document: None,
+                            tables: Vec::new(),
+                            warnings: Vec::new(),
+                            #[cfg(feature = "metadata")]
+                            metadata: crate::metadata::HtmlMetadata::default(),
+                            #[cfg(feature = "inline-images")]
+                            images: Vec::new(),
+                        });
+                    }
+                    Err(_bail) => {
+                        // Fall through to the Tier-2 path below.
+                        // `normalized_html` is re-computed from `html` below
+                        // to keep the Tier-2 path self-contained.
+                    }
+                }
             }
-            Err(_bail) => {
-                // Fall through to Tier-2.
+            // RouterDecision::Tier2 or Tier-1 bail: fall through to Tier-2.
+        }
+        #[cfg(any(test, feature = "testkit"))]
+        crate::options::TierStrategy::Tier1 => {
+            // Testkit path: bypass the classifier and force Tier-1, with
+            // Tier-2 fallback on bail.
+            let normalized = normalize_input(html)?;
+            let (cleaned, report) = crate::converter::prescan::run(normalized.as_ref());
+            match crate::converter::tier1::run(cleaned.as_ref(), &report, &options) {
+                Ok(markdown) => {
+                    return Ok(crate::types::ConversionResult {
+                        content: Some(markdown),
+                        document: None,
+                        tables: Vec::new(),
+                        warnings: Vec::new(),
+                        #[cfg(feature = "metadata")]
+                        metadata: crate::metadata::HtmlMetadata::default(),
+                        #[cfg(feature = "inline-images")]
+                        images: Vec::new(),
+                    });
+                }
+                Err(_bail) => {
+                    // Fall through to Tier-2.
+                }
             }
         }
     }

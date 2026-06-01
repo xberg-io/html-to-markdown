@@ -3309,14 +3309,14 @@ impl WasmOutputFormat {
 
 /// Controls which conversion tier is used.
 ///
-/// `Auto` (default) lets the engine pick the best path. `Tier2Only` forces the
-/// Tier-2 DOM-walk path. `ForceTier1` is intentionally not exposed here (testkit only).
+/// `Auto` (default) lets the engine pick the best path. `Tier2` forces the
+/// Tier-2 DOM-walk path. `Tier1` (testkit-only) is intentionally not exposed here.
 
 #[wasm_bindgen]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum WasmTierStrategy {
     Auto = 0,
-    Tier2Only = 1,
+    Tier2 = 1,
 }
 
 #[allow(clippy::derivable_impls)]
@@ -3331,7 +3331,7 @@ impl WasmTierStrategy {
     pub fn to_api_str(self) -> &'static str {
         match self {
             Self::Auto => "auto",
-            Self::Tier2Only => "tier2_only",
+            Self::Tier2 => "tier2",
         }
     }
 
@@ -3339,7 +3339,7 @@ impl WasmTierStrategy {
     pub fn from_api_str(s: &str) -> Option<Self> {
         match s {
             "auto" => Some(Self::Auto),
-            "tier2_only" => Some(Self::Tier2Only),
+            "tier2" => Some(Self::Tier2),
             _ => None,
         }
     }
@@ -3349,7 +3349,7 @@ impl From<WasmTierStrategy> for html_to_markdown_rs::options::TierStrategy {
     fn from(val: WasmTierStrategy) -> Self {
         match val {
             WasmTierStrategy::Auto => Self::Auto,
-            WasmTierStrategy::Tier2Only => Self::Tier2Only,
+            WasmTierStrategy::Tier2 => Self::Tier2,
         }
     }
 }
@@ -3358,9 +3358,9 @@ impl From<html_to_markdown_rs::options::TierStrategy> for WasmTierStrategy {
     fn from(val: html_to_markdown_rs::options::TierStrategy) -> Self {
         match val {
             html_to_markdown_rs::options::TierStrategy::Auto => Self::Auto,
-            html_to_markdown_rs::options::TierStrategy::Tier2Only => Self::Tier2Only,
-            #[cfg(any(test, feature = "testkit"))]
-            html_to_markdown_rs::options::TierStrategy::ForceTier1 => Self::Auto,
+            html_to_markdown_rs::options::TierStrategy::Tier2 => Self::Tier2,
+            // Tier1 (testkit-only) is not exposed via the WASM API; map to Auto.
+            html_to_markdown_rs::options::TierStrategy::Tier1 => Self::Auto,
         }
     }
 }

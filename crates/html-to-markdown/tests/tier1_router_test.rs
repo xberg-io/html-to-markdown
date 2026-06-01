@@ -9,12 +9,12 @@ use html_to_markdown_rs::options::{
     CodeBlockStyle, ConversionOptions, HighlightStyle, PreprocessingOptions, PreprocessingPreset, TierStrategy,
 };
 use html_to_markdown_rs::prescan;
-use html_to_markdown_rs::tier1::router::{TierChoice, classify};
+use html_to_markdown_rs::tier1::router::{RouterDecision, classify};
 
 // ── Helper ──────────────────────────────────────────────────────────────────
 
 /// Prescan `html` and classify with the given options.
-fn route(html: &str, options: &ConversionOptions) -> TierChoice {
+fn route(html: &str, options: &ConversionOptions) -> RouterDecision {
     let (_cleaned, report) = prescan::run(html);
     classify(&report, options)
 }
@@ -37,7 +37,7 @@ fn classify_routes_tier2_when_extract_metadata_true() {
     // Default options have extract_metadata: true — must always be Tier-2.
     let opts = ConversionOptions::default();
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 2. Clean HTML with metadata off → Tier-1 ───────────────────────────────
@@ -46,7 +46,7 @@ fn classify_routes_tier2_when_extract_metadata_true() {
 fn classify_routes_tier1_when_clean_and_extract_metadata_false() {
     let opts = minimal_options();
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier1);
+    assert_eq!(choice, RouterDecision::Tier1);
 }
 
 // ── 3. Custom elements force Tier-2 ─────────────────────────────────────────
@@ -55,7 +55,7 @@ fn classify_routes_tier1_when_clean_and_extract_metadata_false() {
 fn classify_tier2_on_custom_elements() {
     let opts = minimal_options();
     let choice = route("<my-widget>foo</my-widget>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 4. CDATA forces Tier-2 ──────────────────────────────────────────────────
@@ -64,7 +64,7 @@ fn classify_tier2_on_custom_elements() {
 fn classify_tier2_on_cdata() {
     let opts = minimal_options();
     let choice = route("<svg><![CDATA[data]]></svg>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 5. Unescaped `<` forces Tier-2 ──────────────────────────────────────────
@@ -74,7 +74,7 @@ fn classify_tier2_on_unescaped_lt() {
     let opts = minimal_options();
     // `<b` followed by space is valid; `< ` (space after `<`) is not a tag.
     let choice = route("<p>a < b</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 6. strip_tags forces Tier-2 ─────────────────────────────────────────────
@@ -87,7 +87,7 @@ fn classify_tier2_on_strip_tags() {
         ..ConversionOptions::default()
     };
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 7. preserve_tags forces Tier-2 ──────────────────────────────────────────
@@ -100,7 +100,7 @@ fn classify_tier2_on_preserve_tags() {
         ..ConversionOptions::default()
     };
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 8. wrap forces Tier-2 ───────────────────────────────────────────────────
@@ -113,7 +113,7 @@ fn classify_tier2_on_wrap() {
         ..ConversionOptions::default()
     };
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 9. convert_as_inline forces Tier-2 ──────────────────────────────────────
@@ -126,7 +126,7 @@ fn classify_tier2_on_convert_as_inline() {
         ..ConversionOptions::default()
     };
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 10. non-standard preprocessing preset forces Tier-2 ─────────────────────
@@ -142,33 +142,33 @@ fn classify_tier2_on_non_standard_preprocessing() {
         ..ConversionOptions::default()
     };
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
-// ── 11. TierStrategy::Tier2Only overrides classifier ────────────────────────
+// ── 11. TierStrategy::Tier2 overrides classifier ────────────────────────
 
 #[test]
-fn tier_strategy_tier2_only_overrides_classifier() {
-    // Even the cleanest HTML with all classifier flags off: Tier2Only wins.
+fn tier_strategy_tier2_overrides_classifier() {
+    // Even the cleanest HTML with all classifier flags off: Tier2 wins.
     let opts = ConversionOptions {
         extract_metadata: false,
         code_block_style: CodeBlockStyle::Indented,
         highlight_style: HighlightStyle::None,
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         ..ConversionOptions::default()
     };
     // Verify the classifier alone would say Tier1.
     let (_cleaned, report) = prescan::run("<p>hello</p>");
     assert_eq!(
         classify(&report, &opts),
-        TierChoice::Tier1,
+        RouterDecision::Tier1,
         "baseline check: classifier says Tier1"
     );
 
-    // But the dispatcher honours Tier2Only regardless.
+    // But the dispatcher honours Tier2 regardless.
     // We can't call the dispatcher directly here, but we verify the strategy
     // value is stored correctly and the variant exists.
-    assert_eq!(opts.tier_strategy, TierStrategy::Tier2Only);
+    assert_eq!(opts.tier_strategy, TierStrategy::Tier2);
 }
 
 // ── 12. convert() with default options still produces correct output ─────────
@@ -191,16 +191,16 @@ fn classify_tier2_on_debug_flag() {
         ..ConversionOptions::default()
     };
     let choice = route("<p>hello</p>", &opts);
-    assert_eq!(choice, TierChoice::Tier2);
+    assert_eq!(choice, RouterDecision::Tier2);
 }
 
 // ── 14. Tier-1 bail falls back to Tier-2 producing correct output ────────────
 //
 // `BailReason::NotImplemented` is always returned by the M2 stub, so
-// ForceTier1 triggers an immediate bail, and the fallback must produce
+// Tier1 triggers an immediate bail, and the fallback must produce
 // the same result as a direct Tier-2 call.
 //
-// This test requires the `testkit` feature because `TierStrategy::ForceTier1`
+// This test requires the `testkit` feature because `TierStrategy::Tier1`
 // is only visible when `cfg(any(test, feature = "testkit"))` is true — and
 // integration tests are separate crates where `cfg(test)` is false in the
 // library being tested.
@@ -212,7 +212,7 @@ fn tier1_bail_falls_back_to_tier2() {
 
     // Tier-2 baseline.
     let tier2_opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         ..ConversionOptions::default()
     };
     let tier2_output = convert(html, Some(tier2_opts))
@@ -220,11 +220,11 @@ fn tier1_bail_falls_back_to_tier2() {
         .content
         .unwrap_or_default();
 
-    // ForceTier1 with default options: classifier normally blocks Tier-1 due to
-    // extract_metadata=true, but ForceTier1 overrides it. The M2 stub always
+    // Tier1 with default options: classifier normally blocks Tier-1 due to
+    // extract_metadata=true, but Tier1 overrides it. The M2 stub always
     // bails with NotImplemented, so the fallback path runs and must match tier2.
     let force_opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         ..ConversionOptions::default()
     };
     let fallback_output = convert(html, Some(force_opts))

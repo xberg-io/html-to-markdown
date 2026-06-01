@@ -3,9 +3,9 @@
 use crate::converter::prescan::PrescanReport;
 use crate::options::ConversionOptions;
 
-/// The tier to use for a given input + options.
+/// The routing decision produced by [`classify`] for a given input + options.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TierChoice {
+pub enum RouterDecision {
     /// Use the Tier-1 single-pass byte scanner.
     Tier1,
     /// Use the Tier-2 `tl::parse` + walk-node path.
@@ -72,7 +72,7 @@ pub enum TierChoice {
 /// | `compact_tables`     | `false` (padded cells: `\| cell \|`)    | Yes — `true`                             |
 /// | `br_in_tables`       | bails on `<br>` in cells                | No — covered by scanner bail             |
 /// | `hocr_spatial_tables`| Tier-2 only (structural gate)           | Already gated above                      |
-pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> TierChoice {
+pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDecision {
     use crate::options::{
         CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
         PreprocessingPreset, UrlEscapeStyle, WhitespaceMode,
@@ -133,8 +133,8 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> TierChoi
         // compact_tables=true would produce `|cell|`, which Tier-1 never does.
         || options.compact_tables
     {
-        return TierChoice::Tier2;
+        return RouterDecision::Tier2;
     }
 
-    TierChoice::Tier1
+    RouterDecision::Tier1
 }

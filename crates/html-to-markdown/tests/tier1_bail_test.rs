@@ -2,8 +2,8 @@
 //!
 //! Verifies that:
 //!   (a) Each tripwire fires with the correct `BailReason` variant.
-//!   (b) `convert()` with `Auto` or `ForceTier1` transparently falls back to
-//!       Tier-2 and produces output byte-identical to the `Tier2Only` path.
+//!   (b) `convert()` with `Auto` or `Tier1` transparently falls back to
+//!       Tier-2 and produces output byte-identical to the `Tier2` path.
 
 #![cfg(feature = "testkit")]
 
@@ -18,7 +18,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 fn tier1_run(html: &str) -> Result<String, BailReason> {
     let (cleaned, report) = prescan::run(html);
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -29,7 +29,7 @@ fn tier1_run(html: &str) -> Result<String, BailReason> {
 /// scanner.  Useful for testing tripwires that would be pre-sanitized otherwise.
 fn tier1_raw(html: &str) -> Result<String, BailReason> {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -39,7 +39,7 @@ fn tier1_raw(html: &str) -> Result<String, BailReason> {
 /// `convert()` via the Tier-2-only path.
 fn tier2(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -56,10 +56,10 @@ fn auto(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-/// `convert()` with `ForceTier1` — bails silently and falls back to Tier-2.
+/// `convert()` with `Tier1` — bails silently and falls back to Tier-2.
 fn force_tier1(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -306,7 +306,7 @@ fn auto_routes_through_tier1_for_clean_paragraph() {
 
 #[test]
 fn auto_routes_correctly_for_complex_input() {
-    // M9: tables are handled by Tier-1. Auto, ForceTier1, and Tier2Only
+    // M9: tables are handled by Tier-1. Auto, Tier1, and Tier2
     // must all produce byte-identical output for a simple table.
     let html = "<table><tr><td>cell</td></tr></table>";
     assert_eq!(auto(html), tier2(html));

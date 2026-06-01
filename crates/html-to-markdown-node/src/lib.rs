@@ -534,9 +534,10 @@ pub struct JsConversionOptions {
     pub exclude_selectors: Option<Vec<String>>,
     /// Which conversion tier to use.
     ///
-    /// Accepted values: `"auto"` (default) or `"tier2_only"`.
-    /// `"auto"` lets the engine pick the best path; `"tier2_only"` forces the
-    /// Tier-2 DOM-walk path. `"force_tier1"` is intentionally not exposed here.
+    /// Accepted values: `"auto"` (default) or `"tier2"`.
+    /// `"auto"` lets the engine pick the best path; `"tier2"` forces the
+    /// Tier-2 DOM-walk path. `"tier1"` is intentionally not exposed here
+    /// (testkit-only, not stable API).
     #[napi(js_name = "tierStrategy")]
     #[serde(rename = "tierStrategy")]
     pub tier_strategy: Option<String>,
@@ -5980,13 +5981,13 @@ impl TryFrom<JsConversionOptions> for html_to_markdown_rs::options::ConversionOp
             None | Some("auto") => {
                 __result.tier_strategy = html_to_markdown_rs::options::TierStrategy::Auto;
             }
-            Some("tier2_only") => {
-                __result.tier_strategy = html_to_markdown_rs::options::TierStrategy::Tier2Only;
+            Some("tier2") => {
+                __result.tier_strategy = html_to_markdown_rs::options::TierStrategy::Tier2;
             }
             Some(other) => {
                 return Err(napi::Error::new(
                     napi::Status::InvalidArg,
-                    format!("tier_strategy must be 'auto' or 'tier2_only', got: {other}"),
+                    format!("tier_strategy must be 'auto' or 'tier2', got: {other}"),
                 ));
             }
         }
@@ -6043,9 +6044,9 @@ impl From<html_to_markdown_rs::options::ConversionOptions> for JsConversionOptio
             exclude_selectors: Some(val.exclude_selectors.into_iter().collect()),
             tier_strategy: Some(match val.tier_strategy {
                 html_to_markdown_rs::options::TierStrategy::Auto => "auto".to_string(),
-                html_to_markdown_rs::options::TierStrategy::Tier2Only => "tier2_only".to_string(),
-                #[cfg(any(test, feature = "testkit"))]
-                html_to_markdown_rs::options::TierStrategy::ForceTier1 => "auto".to_string(),
+                html_to_markdown_rs::options::TierStrategy::Tier2 => "tier2".to_string(),
+                // Tier1 (testkit-only) is not exposed via the JS API; map to "auto".
+                html_to_markdown_rs::options::TierStrategy::Tier1 => "auto".to_string(),
             }),
             visitor: Default::default(),
         }

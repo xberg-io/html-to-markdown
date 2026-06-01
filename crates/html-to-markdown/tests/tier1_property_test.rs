@@ -4,9 +4,9 @@
 //! bounded to paragraphs / headings / inline / lists / blockquotes / links /
 //! code / pre / hr), the invariant is:
 //!
-//!   `ForceTier1(html)` either:
+//!   `Tier1(html)` either:
 //!     (a) Returns `Err(_)` — bail is acceptable for any input, OR
-//!     (b) Returns `Ok(t1_out)` where `t1_out == Tier2Only(html)`.
+//!     (b) Returns `Ok(t1_out)` where `t1_out == Tier2(html)`.
 //!
 //! Tier-1 may never return `Ok(wrong_output)`.
 //!
@@ -24,7 +24,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 fn tier1_direct(html: &str) -> Result<String, BailReason> {
     let (cleaned, report) = prescan::run(html);
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -33,7 +33,7 @@ fn tier1_direct(html: &str) -> Result<String, BailReason> {
 
 fn tier2_output(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };

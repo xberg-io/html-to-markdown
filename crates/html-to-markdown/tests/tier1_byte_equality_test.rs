@@ -1,11 +1,11 @@
 //! Tier-1 byte-equality oracle against all benchmark fixtures.
 //!
 //! For each fixture the test runs conversion twice:
-//!   - `Tier2Only`   — authoritative Tier-2 output.
-//!   - `ForceTier1`  — forces the Tier-1 byte-scanner path (with Tier-2 fallback on bail).
+//!   - `Tier2`   — authoritative Tier-2 output.
+//!   - `Tier1`  — forces the Tier-1 byte-scanner path (with Tier-2 fallback on bail).
 //!
-//! When `ForceTier1` bails internally, the fallback produces Tier-2 output, so
-//! the two results are equal by definition.  When `ForceTier1` successfully
+//! When `Tier1` bails internally, the fallback produces Tier-2 output, so
+//! the two results are equal by definition.  When `Tier1` successfully
 //! produces output it MUST equal the Tier-2 output byte-for-byte; any divergence
 //! is a hard failure.
 //!
@@ -65,7 +65,7 @@ const FIXTURE_PATHS: &[&str] = &[
 
 fn tier2_output(html: &str) -> Option<String> {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -79,7 +79,7 @@ fn tier2_output(html: &str) -> Option<String> {
 
 fn force_tier1_output(html: &str) -> Option<String> {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -93,8 +93,8 @@ fn force_tier1_output(html: &str) -> Option<String> {
 
 // ── Oracle test ───────────────────────────────────────────────────────────────
 
-/// For each fixture, assert that `ForceTier1` output is byte-for-byte identical
-/// to `Tier2Only` output.
+/// For each fixture, assert that `Tier1` output is byte-for-byte identical
+/// to `Tier2` output.
 ///
 /// When Tier-1 bails the fallback produces Tier-2 output, so the bytes always
 /// match — bail is not a failure.  The only failure case is when Tier-1 produces
@@ -123,7 +123,7 @@ fn tier1_byte_equality_against_all_fixtures() {
         };
 
         let Some(t1) = force_tier1_output(&html) else {
-            eprintln!("SKIP {rel_path}: ForceTier1 panicked");
+            eprintln!("SKIP {rel_path}: Tier1 panicked");
             skipped += 1;
             continue;
         };

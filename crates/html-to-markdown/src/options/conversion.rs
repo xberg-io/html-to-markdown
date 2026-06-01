@@ -17,15 +17,18 @@ use crate::options::validation::{
 #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(rename_all = "snake_case"))]
 pub enum TierStrategy {
     /// Automatically pick the best tier for the input (default).
+    ///
+    /// Runs the classifier against the prescan report and uses Tier-1 when
+    /// eligible; falls back to Tier-2 on bail or when the classifier routes
+    /// to Tier-2.
     #[default]
     Auto,
-    /// Always use the Tier-2 (`tl::parse` + walk) path.
-    Tier2Only,
-    /// Always attempt Tier-1, falling back to Tier-2 on bail.
-    ///
-    /// Primarily for testing; in production code use `Auto` instead.
-    #[doc(hidden)]
-    ForceTier1,
+    /// Always use the Tier-2 (`tl::parse` + walk) path, skipping Tier-1.
+    Tier2,
+    /// Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
+    /// Testkit-only; not stable API.
+    #[cfg(any(test, feature = "testkit"))]
+    Tier1,
 }
 
 /// Main conversion options for HTML to Markdown conversion.
@@ -186,8 +189,8 @@ pub struct ConversionOptions {
     /// Which conversion tier to use.
     ///
     /// - [`TierStrategy::Auto`] (default) — automatically choose the best path.
-    /// - [`TierStrategy::Tier2Only`] — always use the Tier-2 DOM-walk path.
-    /// - [`TierStrategy::ForceTier1`] — always attempt Tier-1 (test/testkit only).
+    /// - [`TierStrategy::Tier2`] — always use the Tier-2 DOM-walk path.
+    /// - `TierStrategy::Tier1` — always attempt Tier-1 (testkit only).
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default))]
     pub tier_strategy: TierStrategy,
 

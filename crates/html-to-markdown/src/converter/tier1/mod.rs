@@ -25,7 +25,7 @@ pub use tags::{ListKind, OptionalCloseRule, RawKind, TagKind, TagSpec, lookup};
 #[allow(unused_imports)]
 pub use bail::BailReason;
 #[allow(unused_imports)]
-pub use router::TierChoice;
+pub use router::RouterDecision;
 
 use crate::converter::prescan::PrescanReport;
 use crate::options::ConversionOptions;

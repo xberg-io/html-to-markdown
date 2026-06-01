@@ -112,7 +112,7 @@ mod tier_parity {
 
     fn t1(html: &str, keep: &[&str]) -> String {
         let opts = ConversionOptions {
-            tier_strategy: TierStrategy::ForceTier1,
+            tier_strategy: TierStrategy::Tier1,
             keep_inline_images_in: keep.iter().map(ToString::to_string).collect(),
             ..ConversionOptions::default()
         };
@@ -124,7 +124,7 @@ mod tier_parity {
 
     fn t2(html: &str, keep: &[&str]) -> String {
         let opts = ConversionOptions {
-            tier_strategy: TierStrategy::Tier2Only,
+            tier_strategy: TierStrategy::Tier2,
             keep_inline_images_in: keep.iter().map(ToString::to_string).collect(),
             ..ConversionOptions::default()
         };

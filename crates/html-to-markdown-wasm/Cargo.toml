@@ -45,7 +45,7 @@ wasm-bindgen-futures = "0.4"
 testkit = ["html-to-markdown-rs/testkit"]
 
 [dev-dependencies]
-# Enable testkit in the core crate when running tests, so ForceTier1 variant exists.
+# Enable testkit in the core crate when running tests, so TierStrategy::Tier1 variant exists.
 html-to-markdown-rs = { path = "../html-to-markdown", default-features = false, features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

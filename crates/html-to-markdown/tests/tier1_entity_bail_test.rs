@@ -18,7 +18,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 fn tier1_run(html: &str) -> Result<String, BailReason> {
     let (cleaned, report) = prescan::run(html);
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -28,7 +28,7 @@ fn tier1_run(html: &str) -> Result<String, BailReason> {
 /// Run `tier1::run` WITHOUT prescanning so entities are not rewritten.
 fn tier1_raw(html: &str) -> Result<String, BailReason> {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -38,17 +38,17 @@ fn tier1_raw(html: &str) -> Result<String, BailReason> {
 /// `convert()` via the Tier-2-only path.
 fn tier2(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-/// `convert()` with `ForceTier1` — bails silently and falls back to Tier-2.
+/// `convert()` with `Tier1` — bails silently and falls back to Tier-2.
 fn force_tier1(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -144,7 +144,7 @@ fn force_tier1_matches_tier2_for_unknown_entity() {
     assert_eq!(
         force_tier1(html),
         tier2(html),
-        "ForceTier1 fallback must produce the same output as Tier-2"
+        "Tier1 fallback must produce the same output as Tier-2"
     );
 }
 

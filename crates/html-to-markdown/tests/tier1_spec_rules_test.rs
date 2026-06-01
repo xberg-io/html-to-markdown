@@ -15,7 +15,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 fn tier1(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -24,7 +24,7 @@ fn tier1(html: &str) -> String {
 
 fn tier2(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };

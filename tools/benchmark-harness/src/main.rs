@@ -67,7 +67,8 @@ struct RunArgs {
     #[arg(long)]
     mdream: bool,
 
-    /// Force Tier-1 conversion path (requires `testkit` feature).
+    /// Force Tier-1 conversion path, bypassing the classifier (requires `testkit` feature).
+    /// Falls back to Tier-2 on bail. Useful for bench isolation; `auto` is the production path.
     #[arg(long)]
     force_tier1: bool,
 }
@@ -92,9 +93,10 @@ fn cmd_run(args: RunArgs) -> Result<()> {
         let opts: Option<ConversionOptions> = if args.force_tier1 {
             #[cfg(feature = "testkit")]
             {
-                let mut opts = ConversionOptions::default();
-                opts.tier_strategy = TierStrategy::ForceTier1;
-                Some(opts)
+                Some(ConversionOptions {
+                    tier_strategy: TierStrategy::Tier1,
+                    ..ConversionOptions::default()
+                })
             }
             #[cfg(not(feature = "testkit"))]
             {

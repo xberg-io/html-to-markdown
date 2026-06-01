@@ -17,7 +17,7 @@ use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 fn tier1(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::ForceTier1,
+        tier_strategy: TierStrategy::Tier1,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -26,7 +26,7 @@ fn tier1(html: &str) -> String {
 
 fn tier2(html: &str) -> String {
     let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier2Only,
+        tier_strategy: TierStrategy::Tier2,
         extract_metadata: false,
         ..ConversionOptions::default()
     };
@@ -212,7 +212,7 @@ fn tier1_matches_tier2_image_in_paragraph() {
 #[test]
 fn tier1_bails_on_table_falls_back_to_tier2() {
     let html = "<table><tr><td>cell</td></tr></table>";
-    // ForceTier1 will bail and fall back; result must equal Tier-2 output.
+    // Tier1 will bail and fall back; result must equal Tier-2 output.
     assert_matches_tier2(html);
 }
 
@@ -221,7 +221,7 @@ fn tier1_bails_on_custom_element_falls_back_to_tier2() {
     let html = "<my-thing>content</my-thing>";
     // Tier-1 bails on custom elements; fallback must succeed.
     let t2 = tier2(html);
-    // tier1() calls convert with ForceTier1; bail triggers Tier-2 fallback.
+    // tier1() calls convert with Tier1; bail triggers Tier-2 fallback.
     let result = tier1(html);
     assert_eq!(result, t2, "bail fallback must equal tier-2 output");
 }
@@ -230,12 +230,12 @@ fn tier1_bails_on_custom_element_falls_back_to_tier2() {
 fn tier1_bails_on_cdata_falls_back_to_tier2() {
     // CDATA causes bail; svg wrapper is needed for the prescan to detect it
     // (prescan::run flags had_cdata; the router would normally force Tier-2,
-    // but ForceTier1 bypasses the router so the scanner sees it directly).
+    // but Tier1 bypasses the router so the scanner sees it directly).
     let html = "<svg><![CDATA[data]]></svg>";
     let result = convert(
         html,
         Some(ConversionOptions {
-            tier_strategy: TierStrategy::ForceTier1,
+            tier_strategy: TierStrategy::Tier1,
             extract_metadata: false,
             ..ConversionOptions::default()
         }),
