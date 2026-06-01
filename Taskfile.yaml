@@ -49,6 +49,8 @@ includes:
     taskfile: ./.task/languages/swift.yml
   kotlin-android:
     taskfile: ./.task/languages/kotlin_android.yml
+  bench:
+    taskfile: ./.task/workflows/benchmark.yml
   version:
     taskfile: ./.task/tools/version-sync.yml
   docs:
