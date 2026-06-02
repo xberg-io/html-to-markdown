@@ -28,37 +28,38 @@ enum class TierStrategy {
     /**
      * Automatically pick the best tier for the input (default).
      *
-     * Runs the classifier against the prescan report and uses Tier-1 when
-     * eligible; falls back to Tier-2 on bail or when the classifier routes
-     * to Tier-2.
+     * Runs the classifier against the prescan report and uses Tier-1 when eligible; falls back to
+     * Tier-2 on bail or when the classifier routes to Tier-2.
      */
-    @com.fasterxml.jackson.annotation.JsonProperty("Auto")
-    AUTO,
+    @com.fasterxml.jackson.annotation.JsonProperty("Auto") AUTO,
     /** Always use the Tier-2 (`tl.parse` + walk) path, skipping Tier-1. */
-    @com.fasterxml.jackson.annotation.JsonProperty("Tier2")
-    TIER2,
+    @com.fasterxml.jackson.annotation.JsonProperty("Tier2") TIER2,
     /**
-     * Force the Tier-1 byte scanner; if it bails, fall back to Tier-2.
-     * Testkit-only; not stable API.
+     * Force the Tier-1 byte scanner; if it bails, fall back to Tier-2. Testkit-only; not stable
+     * API.
      */
-    @com.fasterxml.jackson.annotation.JsonProperty("Tier1")
-    TIER1;
+    @com.fasterxml.jackson.annotation.JsonProperty("Tier1") TIER1;
 
     @com.fasterxml.jackson.annotation.JsonValue
-    fun toWire(): String = when (this) {
-        AUTO -> "Auto"
-        TIER2 -> "Tier2"
-        TIER1 -> "Tier1"
-    }
+    fun toWire(): String =
+        when (this) {
+            AUTO -> "Auto"
+            TIER2 -> "Tier2"
+            TIER1 -> "Tier1"
+        }
 
     companion object {
         @com.fasterxml.jackson.annotation.JsonCreator
         @JvmStatic
-        fun fromWire(value: String): TierStrategy = when (value) {
-            "Auto", "auto" -> AUTO
-            "Tier2", "tier2" -> TIER2
-            "Tier1", "tier1" -> TIER1
-            else -> throw IllegalArgumentException("Unknown TierStrategy value: $value")
-        }
+        fun fromWire(value: String): TierStrategy =
+            when (value) {
+                "Auto",
+                "auto" -> AUTO
+                "Tier2",
+                "tier2" -> TIER2
+                "Tier1",
+                "tier1" -> TIER1
+                else -> throw IllegalArgumentException("Unknown TierStrategy value: $value")
+            }
     }
 }

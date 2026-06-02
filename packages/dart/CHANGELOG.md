@@ -2,6 +2,6 @@
 
 All notable changes to this package will be documented in this file.
 
-## 3.6.0-rc.1
+## 3.6.0-rc.2
 
 - Initial release.
