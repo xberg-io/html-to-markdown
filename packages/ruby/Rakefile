@@ -2,7 +2,7 @@
 
 require "bundler"
 Bundler::GemHelper.install_tasks name: "html_to_markdown"
-require "rake/extensiontask"
+require "rb_sys/extensiontask"
 require "rspec/core/rake_task"
 
 GEM_ROOT = __dir__
@@ -16,7 +16,7 @@ CROSS_PLATFORMS = %w[
   x64-mingw-ucrt
 ].freeze
 
-Rake::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
+RbSys::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
   ext.lib_dir = "lib"
   ext.ext_dir = "ext/html_to_markdown_rb/native"
   ext.source_pattern = "*.{}"

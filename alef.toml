@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.21.2"
+alef_version = "0.21.3"
 languages = [
   "python",
   "node",
@@ -748,70 +748,70 @@ categories = ["smoke", "conversion"]
 
 [crates.e2e.registry.packages.python]
 name = "html-to-markdown"
-version = ">=3.6.0rc3"
+version = ">=3.6.0rc4"
 
 [crates.e2e.registry.packages.node]
 name = "@kreuzberg/html-to-markdown"
-version = "^3.6.0-rc.3"
+version = "^3.6.0-rc.4"
 
 [crates.e2e.registry.packages.rust]
 name = "html-to-markdown-rs"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
-version = "v3.6.0-rc.3"
+version = "v3.6.0-rc.4"
 
 [crates.e2e.registry.packages.java]
 name = "dev.kreuzberg:html-to-markdown"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.csharp]
 name = "KreuzbergDev.HtmlToMarkdown"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.php]
 name = "kreuzberg-dev/html-to-markdown-rs"
-version = ">=3.6.0-rc.3"
+version = ">=3.6.0-rc.4"
 
 [crates.e2e.registry.packages.ruby]
 name = "html-to-markdown"
-version = "~> 3.6.0.pre.rc.3"
+version = "~> 3.6.0.pre.rc.4"
 
 [crates.e2e.registry.packages.elixir]
 name = "html_to_markdown"
-version = "~> 3.6.0-rc.3"
+version = "~> 3.6.0-rc.4"
 
 [crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/html-to-markdown-wasm"
-version = "^3.6.0-rc.3"
+version = "^3.6.0-rc.4"
 
 [crates.e2e.registry.packages.r]
 name = "htmltomarkdown"
-version = "3.6.0.9003"
+version = "3.6.0.9004"
 
 [crates.e2e.registry.packages.c]
 # Matches `publish.yaml`'s `asset-prefix: html-to-markdown-rs-ffi-` for the
 # upload-release-assets step. Drift causes test_apps/c/download_ffi.sh to 404
 # on the GH release tarball.
 name = "html-to-markdown-rs-ffi"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "dev.kreuzberg:html-to-markdown-android"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.swift]
 name = "HtmlToMarkdown"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.dart]
 name = "h2m"
-version = "^3.6.0-rc.3"
+version = "^3.6.0-rc.4"
 
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 # hash populated by `zig fetch --save https://github.com/.../html-to-markdown-zig-v3.5.0.tar.gz`
 # once the v3.5.0 zig tarball lands on the release. Until then the generator
 # emits a placeholder comment in build.zig.zon directing the developer to
@@ -819,13 +819,13 @@ version = "3.6.0-rc.3"
 
 [crates.e2e.registry.packages.php_ext]
 name = "kreuzberg-dev/html-to-markdown-ext"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.registry.packages.homebrew]
 tap = "kreuzberg-dev/tap"
 cli_formula = "html-to-markdown"
 ffi_formula = "libhtml-to-markdown"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 
 [crates.e2e.packages.rust]
 path = "../../crates/html-to-markdown"

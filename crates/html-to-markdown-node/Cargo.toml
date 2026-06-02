@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-node"
-version = "3.6.0-rc.3"
+version = "3.6.0-rc.4"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -21,7 +21,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.6.0-rc.3", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.6.0-rc.4", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
 napi = { version = "3", features = ["async"] }
 napi-derive = "3"
 serde = { version = "1", features = ["derive"] }
