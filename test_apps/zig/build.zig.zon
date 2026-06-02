@@ -5,7 +5,7 @@
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .html_to_markdown = .{
-            .url = "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0-rc.5/html-to-markdown-rs-zig-v3.6.0-rc.5.tar.gz",
+            .url = "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0-rc.6/html-to-markdown-rs-zig-v3.6.0-rc.6.tar.gz",
             .hash = "TODO",
         },
     },

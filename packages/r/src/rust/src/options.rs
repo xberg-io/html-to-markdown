@@ -12,6 +12,17 @@ fn list_get(list: &List, key: &str) -> Option<Robj> {
         .map(|(_, val)| val)
 }
 
+/// Decode a preprocessing preset enum from its string representation.
+fn decode_preprocessing_preset(val: Robj) -> std::result::Result<crate::PreprocessingPreset, String> {
+    let s = String::try_from(&val).map_err(|e| format!("preprocessing_preset: {e}"))?;
+    match s.as_str() {
+        "Minimal" => Ok(crate::PreprocessingPreset::Minimal),
+        "Standard" => Ok(crate::PreprocessingPreset::Standard),
+        "Aggressive" => Ok(crate::PreprocessingPreset::Aggressive),
+        _ => Err(format!("preprocessing_preset: unknown variant '{{}}'", s)),
+    }
+}
+
 /// Decode a list indent type enum from its string representation.
 fn decode_list_indent_type(val: Robj) -> std::result::Result<crate::ListIndentType, String> {
     let s = String::try_from(&val).map_err(|e| format!("list_indent_type: {e}"))?;
@@ -19,27 +30,6 @@ fn decode_list_indent_type(val: Robj) -> std::result::Result<crate::ListIndentTy
         "Spaces" => Ok(crate::ListIndentType::Spaces),
         "Tabs" => Ok(crate::ListIndentType::Tabs),
         _ => Err(format!("list_indent_type: unknown variant '{{}}'", s)),
-    }
-}
-
-/// Decode a link style enum from its string representation.
-fn decode_link_style(val: Robj) -> std::result::Result<crate::LinkStyle, String> {
-    let s = String::try_from(&val).map_err(|e| format!("link_style: {e}"))?;
-    match s.as_str() {
-        "Inline" => Ok(crate::LinkStyle::Inline),
-        "Reference" => Ok(crate::LinkStyle::Reference),
-        _ => Err(format!("link_style: unknown variant '{{}}'", s)),
-    }
-}
-
-/// Decode a output format enum from its string representation.
-fn decode_output_format(val: Robj) -> std::result::Result<crate::OutputFormat, String> {
-    let s = String::try_from(&val).map_err(|e| format!("output_format: {e}"))?;
-    match s.as_str() {
-        "Markdown" => Ok(crate::OutputFormat::Markdown),
-        "Djot" => Ok(crate::OutputFormat::Djot),
-        "Plain" => Ok(crate::OutputFormat::Plain),
-        _ => Err(format!("output_format: unknown variant '{{}}'", s)),
     }
 }
 
@@ -63,6 +53,28 @@ fn decode_url_escape_style(val: Robj) -> std::result::Result<crate::UrlEscapeSty
     }
 }
 
+/// Decode a highlight style enum from its string representation.
+fn decode_highlight_style(val: Robj) -> std::result::Result<crate::HighlightStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("highlight_style: {e}"))?;
+    match s.as_str() {
+        "DoubleEqual" => Ok(crate::HighlightStyle::DoubleEqual),
+        "Html" => Ok(crate::HighlightStyle::Html),
+        "Bold" => Ok(crate::HighlightStyle::Bold),
+        "None" => Ok(crate::HighlightStyle::None),
+        _ => Err(format!("highlight_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a link style enum from its string representation.
+fn decode_link_style(val: Robj) -> std::result::Result<crate::LinkStyle, String> {
+    let s = String::try_from(&val).map_err(|e| format!("link_style: {e}"))?;
+    match s.as_str() {
+        "Inline" => Ok(crate::LinkStyle::Inline),
+        "Reference" => Ok(crate::LinkStyle::Reference),
+        _ => Err(format!("link_style: unknown variant '{{}}'", s)),
+    }
+}
+
 /// Decode a newline style enum from its string representation.
 fn decode_newline_style(val: Robj) -> std::result::Result<crate::NewlineStyle, String> {
     let s = String::try_from(&val).map_err(|e| format!("newline_style: {e}"))?;
@@ -70,17 +82,6 @@ fn decode_newline_style(val: Robj) -> std::result::Result<crate::NewlineStyle, S
         "Spaces" => Ok(crate::NewlineStyle::Spaces),
         "Backslash" => Ok(crate::NewlineStyle::Backslash),
         _ => Err(format!("newline_style: unknown variant '{{}}'", s)),
-    }
-}
-
-/// Decode a preprocessing preset enum from its string representation.
-fn decode_preprocessing_preset(val: Robj) -> std::result::Result<crate::PreprocessingPreset, String> {
-    let s = String::try_from(&val).map_err(|e| format!("preprocessing_preset: {e}"))?;
-    match s.as_str() {
-        "Minimal" => Ok(crate::PreprocessingPreset::Minimal),
-        "Standard" => Ok(crate::PreprocessingPreset::Standard),
-        "Aggressive" => Ok(crate::PreprocessingPreset::Aggressive),
-        _ => Err(format!("preprocessing_preset: unknown variant '{{}}'", s)),
     }
 }
 
@@ -95,18 +96,6 @@ fn decode_heading_style(val: Robj) -> std::result::Result<crate::HeadingStyle, S
     }
 }
 
-/// Decode a highlight style enum from its string representation.
-fn decode_highlight_style(val: Robj) -> std::result::Result<crate::HighlightStyle, String> {
-    let s = String::try_from(&val).map_err(|e| format!("highlight_style: {e}"))?;
-    match s.as_str() {
-        "DoubleEqual" => Ok(crate::HighlightStyle::DoubleEqual),
-        "Html" => Ok(crate::HighlightStyle::Html),
-        "Bold" => Ok(crate::HighlightStyle::Bold),
-        "None" => Ok(crate::HighlightStyle::None),
-        _ => Err(format!("highlight_style: unknown variant '{{}}'", s)),
-    }
-}
-
 /// Decode a code block style enum from its string representation.
 fn decode_code_block_style(val: Robj) -> std::result::Result<crate::CodeBlockStyle, String> {
     let s = String::try_from(&val).map_err(|e| format!("code_block_style: {e}"))?;
@@ -115,6 +104,17 @@ fn decode_code_block_style(val: Robj) -> std::result::Result<crate::CodeBlockSty
         "Backticks" => Ok(crate::CodeBlockStyle::Backticks),
         "Tildes" => Ok(crate::CodeBlockStyle::Tildes),
         _ => Err(format!("code_block_style: unknown variant '{{}}'", s)),
+    }
+}
+
+/// Decode a output format enum from its string representation.
+fn decode_output_format(val: Robj) -> std::result::Result<crate::OutputFormat, String> {
+    let s = String::try_from(&val).map_err(|e| format!("output_format: {e}"))?;
+    match s.as_str() {
+        "Markdown" => Ok(crate::OutputFormat::Markdown),
+        "Djot" => Ok(crate::OutputFormat::Djot),
+        "Plain" => Ok(crate::OutputFormat::Plain),
+        _ => Err(format!("output_format: unknown variant '{{}}'", s)),
     }
 }
 
