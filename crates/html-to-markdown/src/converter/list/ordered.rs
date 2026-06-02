@@ -13,6 +13,7 @@ use super::utils::{
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
 use tl;
@@ -73,11 +74,11 @@ pub fn handle_ol(
 
         let node_ctx = NodeContext {
             node_type: NodeType::List,
-            tag_name: "ol".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("ol"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent: index,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
 
@@ -150,11 +151,11 @@ pub fn handle_ol(
 
         let node_ctx = NodeContext {
             node_type: NodeType::List,
-            tag_name: "ol".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("ol"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent: index,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
 

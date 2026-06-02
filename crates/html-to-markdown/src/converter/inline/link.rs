@@ -14,6 +14,7 @@ use crate::converter::utility::content::collect_tag_attributes;
 use crate::converter::utility::content::{collect_link_label_text, escape_link_label, normalize_link_label};
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 #[cfg(any(feature = "metadata", feature = "visitor"))]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -245,11 +246,11 @@ pub fn handle(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Link,
-                tag_name: "a".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("a"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
 

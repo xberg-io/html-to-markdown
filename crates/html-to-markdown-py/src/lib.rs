@@ -2858,13 +2858,13 @@ fn nodecontext_to_py_dict<'py>(
 ) -> pyo3::Bound<'py, pyo3::types::PyDict> {
     let d = pyo3::types::PyDict::new(py);
     d.set_item("node_type", format!("{:?}", ctx.node_type)).unwrap_or(());
-    d.set_item("tag_name", &ctx.tag_name).unwrap_or(());
+    d.set_item("tag_name", ctx.tag_name.as_ref()).unwrap_or(());
     d.set_item("depth", ctx.depth).unwrap_or(());
     d.set_item("index_in_parent", ctx.index_in_parent).unwrap_or(());
     d.set_item("is_inline", ctx.is_inline).unwrap_or(());
     d.set_item("parent_tag", ctx.parent_tag.as_deref()).unwrap_or(());
     let attrs = pyo3::types::PyDict::new(py);
-    for (k, v) in &ctx.attributes {
+    for (k, v) in ctx.attributes.iter() {
         attrs.set_item(k, v).unwrap_or(());
     }
     d.set_item("attributes", attrs).unwrap_or(());
@@ -5119,15 +5119,20 @@ impl From<html_to_markdown_rs::ProcessingWarning> for ProcessingWarning {
 }
 
 #[allow(clippy::redundant_closure, clippy::useless_conversion)]
-impl From<html_to_markdown_rs::NodeContext> for NodeContext {
-    fn from(val: html_to_markdown_rs::NodeContext) -> Self {
+impl From<html_to_markdown_rs::NodeContext<'_>> for NodeContext {
+    fn from(val: html_to_markdown_rs::NodeContext<'_>) -> Self {
         Self {
             node_type: val.node_type.into(),
-            tag_name: val.tag_name,
-            attributes: val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            tag_name: val.tag_name.into_owned(),
+            attributes: val
+                .attributes
+                .into_owned()
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect(),
             depth: val.depth,
             index_in_parent: val.index_in_parent,
-            parent_tag: val.parent_tag,
+            parent_tag: val.parent_tag.map(std::borrow::Cow::into_owned),
             is_inline: val.is_inline,
         }
     }

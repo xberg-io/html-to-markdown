@@ -134,11 +134,11 @@ pub fn handle_img(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Image,
-            tag_name: "img".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("img"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 

@@ -2378,7 +2378,7 @@ fn nodecontext_to_php_array(
     .ok();
     arr.insert(
         "tagName",
-        ext_php_rs::types::Zval::try_from(ctx.tag_name.clone()).unwrap_or_default(),
+        ext_php_rs::types::Zval::try_from(ctx.tag_name.clone().into_owned()).unwrap_or_default(),
     )
     .ok();
     arr.insert(
@@ -2399,12 +2399,12 @@ fn nodecontext_to_php_array(
     if let Some(ref pt) = ctx.parent_tag {
         arr.insert(
             "parentTag",
-            ext_php_rs::types::Zval::try_from(pt.clone()).unwrap_or_default(),
+            ext_php_rs::types::Zval::try_from(pt.clone().into_owned()).unwrap_or_default(),
         )
         .ok();
     }
     let mut attrs = ext_php_rs::types::ZendHashTable::new();
-    for (k, v) in &ctx.attributes {
+    for (k, v) in ctx.attributes.iter() {
         attrs
             .insert(
                 k.as_str(),
@@ -4438,18 +4438,23 @@ impl From<html_to_markdown_rs::ProcessingWarning> for ProcessingWarning {
 }
 
 #[allow(clippy::redundant_closure, clippy::useless_conversion)]
-impl From<html_to_markdown_rs::NodeContext> for NodeContext {
-    fn from(val: html_to_markdown_rs::NodeContext) -> Self {
+impl From<html_to_markdown_rs::NodeContext<'_>> for NodeContext {
+    fn from(val: html_to_markdown_rs::NodeContext<'_>) -> Self {
         Self {
             node_type: serde_json::to_value(val.node_type)
                 .ok()
                 .and_then(|s| s.as_str().map(String::from))
                 .unwrap_or_default(),
-            tag_name: val.tag_name,
-            attributes: val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            tag_name: val.tag_name.into_owned(),
+            attributes: val
+                .attributes
+                .into_owned()
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect(),
             depth: val.depth as i64,
             index_in_parent: val.index_in_parent as i64,
-            parent_tag: val.parent_tag,
+            parent_tag: val.parent_tag.map(std::borrow::Cow::into_owned),
             is_inline: val.is_inline,
         }
     }
@@ -4774,7 +4779,7 @@ impl From<PreprocessingOptionsUpdate> for html_to_markdown_rs::options::Preproce
 }
 
 #[allow(clippy::useless_conversion)]
-impl From<NodeContext> for html_to_markdown_rs::NodeContext {
+impl From<NodeContext> for html_to_markdown_rs::NodeContext<'static> {
     fn from(val: NodeContext) -> Self {
         Self {
             node_type: match val.node_type.as_str() {
@@ -4870,11 +4875,13 @@ impl From<NodeContext> for html_to_markdown_rs::NodeContext {
                 "Custom" | "custom" => html_to_markdown_rs::NodeType::Custom,
                 _ => html_to_markdown_rs::NodeType::Text,
             },
-            tag_name: val.tag_name,
-            attributes: val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            tag_name: std::borrow::Cow::Owned(val.tag_name),
+            attributes: std::borrow::Cow::Owned(
+                val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            ),
             depth: val.depth as usize,
             index_in_parent: val.index_in_parent as usize,
-            parent_tag: val.parent_tag,
+            parent_tag: val.parent_tag.map(std::borrow::Cow::Owned),
             is_inline: val.is_inline,
         }
     }

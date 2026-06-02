@@ -4519,7 +4519,9 @@ pub unsafe extern "C" fn htm_visitor_handle_free(ptr: *mut html_to_markdown_rs::
 /// JSON string must be valid UTF-8 and null-terminated.
 /// Returned handle must be freed with `htm_node_context_free`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn htm_node_context_from_json(json: *const c_char) -> *mut html_to_markdown_rs::NodeContext {
+pub unsafe extern "C" fn htm_node_context_from_json(
+    json: *const c_char,
+) -> *mut html_to_markdown_rs::NodeContext<'static> {
     clear_last_error();
     if json.is_null() {
         set_last_error(1, "Null pointer passed for JSON string");
@@ -4547,7 +4549,9 @@ pub unsafe extern "C" fn htm_node_context_from_json(json: *const c_char) -> *mut
 /// `ptr` must be a valid, non-null pointer returned by a `htm` function.
 /// The returned string must be freed with `htm_free_string`.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn htm_node_context_to_json(ptr: *const html_to_markdown_rs::NodeContext) -> *mut c_char {
+pub unsafe extern "C" fn htm_node_context_to_json(
+    ptr: *const html_to_markdown_rs::NodeContext<'static>,
+) -> *mut c_char {
     clear_last_error();
     if ptr.is_null() {
         set_last_error(1, "Null pointer passed to to_json");
@@ -4574,7 +4578,7 @@ pub unsafe extern "C" fn htm_node_context_to_json(ptr: *const html_to_markdown_r
 /// # Safety
 /// Pointer must have been returned by this library, or be null.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn htm_node_context_free(ptr: *mut html_to_markdown_rs::NodeContext) {
+pub unsafe extern "C" fn htm_node_context_free(ptr: *mut html_to_markdown_rs::NodeContext<'static>) {
     if !ptr.is_null() {
         // SAFETY: ptr was allocated by Box::into_raw; caller ensures no aliases.
         unsafe {
@@ -4588,7 +4592,7 @@ pub unsafe extern "C" fn htm_node_context_free(ptr: *mut html_to_markdown_rs::No
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn htm_node_context_node_type(
-    ptr: *const html_to_markdown_rs::NodeContext,
+    ptr: *const html_to_markdown_rs::NodeContext<'static>,
 ) -> *mut html_to_markdown_rs::NodeType {
     if ptr.is_null() {
         return std::ptr::null_mut();
@@ -4603,7 +4607,7 @@ pub unsafe extern "C" fn htm_node_context_node_type(
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn htm_node_context_tag_name(
-    ptr: *const html_to_markdown_rs::NodeContext,
+    ptr: *const html_to_markdown_rs::NodeContext<'static>,
 ) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
@@ -4621,7 +4625,7 @@ pub unsafe extern "C" fn htm_node_context_tag_name(
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn htm_node_context_attributes(
-    ptr: *const html_to_markdown_rs::NodeContext,
+    ptr: *const html_to_markdown_rs::NodeContext<'static>,
 ) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
@@ -4641,7 +4645,7 @@ pub unsafe extern "C" fn htm_node_context_attributes(
 /// # Safety
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn htm_node_context_depth(ptr: *const html_to_markdown_rs::NodeContext) -> usize {
+pub unsafe extern "C" fn htm_node_context_depth(ptr: *const html_to_markdown_rs::NodeContext<'static>) -> usize {
     if ptr.is_null() {
         return 0;
     }
@@ -4654,7 +4658,9 @@ pub unsafe extern "C" fn htm_node_context_depth(ptr: *const html_to_markdown_rs:
 /// # Safety
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn htm_node_context_index_in_parent(ptr: *const html_to_markdown_rs::NodeContext) -> usize {
+pub unsafe extern "C" fn htm_node_context_index_in_parent(
+    ptr: *const html_to_markdown_rs::NodeContext<'static>,
+) -> usize {
     if ptr.is_null() {
         return 0;
     }
@@ -4668,7 +4674,7 @@ pub unsafe extern "C" fn htm_node_context_index_in_parent(ptr: *const html_to_ma
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn htm_node_context_parent_tag(
-    ptr: *const html_to_markdown_rs::NodeContext,
+    ptr: *const html_to_markdown_rs::NodeContext<'static>,
 ) -> *mut std::ffi::c_char {
     if ptr.is_null() {
         return std::ptr::null_mut();
@@ -4688,7 +4694,7 @@ pub unsafe extern "C" fn htm_node_context_parent_tag(
 /// # Safety
 /// Pointer must be a valid handle returned by this library.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn htm_node_context_is_inline(ptr: *const html_to_markdown_rs::NodeContext) -> i32 {
+pub unsafe extern "C" fn htm_node_context_is_inline(ptr: *const html_to_markdown_rs::NodeContext<'static>) -> i32 {
     if ptr.is_null() {
         return 0;
     }
@@ -6578,19 +6584,22 @@ pub unsafe extern "C" fn htm_options_set_visitor(
     impl html_to_markdown_rs::visitor::HtmlVisitor for VtableRef {
         fn visit_text(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_text(_ctx, _text) }
         }
-        fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        fn visit_element_start(
+            &mut self,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_element_start(_ctx) }
         }
         fn visit_element_end(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _output: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6598,7 +6607,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_link(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _href: &str,
             _text: &str,
             _title: Option<&str>,
@@ -6608,7 +6617,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_image(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _src: &str,
             _alt: &str,
             _title: Option<&str>,
@@ -6618,7 +6627,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_heading(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _level: u32,
             _text: &str,
             _id: Option<&str>,
@@ -6628,7 +6637,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_code_block(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _lang: Option<&str>,
             _code: &str,
         ) -> html_to_markdown_rs::VisitResult {
@@ -6637,7 +6646,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_code_inline(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _code: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6645,7 +6654,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_list_item(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _ordered: bool,
             _marker: &str,
             _text: &str,
@@ -6655,7 +6664,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_list_start(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _ordered: bool,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6663,20 +6672,23 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_list_end(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _ordered: bool,
             _output: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_list_end(_ctx, _ordered, _output) }
         }
-        fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        fn visit_table_start(
+            &mut self,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_table_start(_ctx) }
         }
         fn visit_table_row(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _cells: &[String],
             _is_header: bool,
         ) -> html_to_markdown_rs::VisitResult {
@@ -6685,7 +6697,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_table_end(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _output: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6693,7 +6705,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_blockquote(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _content: &str,
             _depth: usize,
         ) -> html_to_markdown_rs::VisitResult {
@@ -6702,7 +6714,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_strong(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6710,7 +6722,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_emphasis(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6718,7 +6730,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_strikethrough(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6726,7 +6738,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_underline(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6734,7 +6746,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_subscript(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6742,7 +6754,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_superscript(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6750,26 +6762,29 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_mark(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_mark(_ctx, _text) }
         }
-        fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        fn visit_line_break(
+            &mut self,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_line_break(_ctx) }
         }
         fn visit_horizontal_rule(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_horizontal_rule(_ctx) }
         }
         fn visit_custom_element(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _tag_name: &str,
             _html: &str,
         ) -> html_to_markdown_rs::VisitResult {
@@ -6778,14 +6793,14 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_definition_list_start(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_definition_list_start(_ctx) }
         }
         fn visit_definition_term(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6793,7 +6808,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_definition_description(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6801,7 +6816,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_definition_list_end(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _output: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6809,7 +6824,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_form(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _action: Option<&str>,
             _method: Option<&str>,
         ) -> html_to_markdown_rs::VisitResult {
@@ -6818,7 +6833,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_input(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _input_type: &str,
             _name: Option<&str>,
             _value: Option<&str>,
@@ -6828,7 +6843,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_button(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6836,7 +6851,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_audio(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _src: Option<&str>,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6844,7 +6859,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_video(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _src: Option<&str>,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6852,7 +6867,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_iframe(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _src: Option<&str>,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6860,7 +6875,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_details(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _open: bool,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6868,19 +6883,22 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_summary(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_summary(_ctx, _text) }
         }
-        fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+        fn visit_figure_start(
+            &mut self,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
             unsafe { (*self.0).visit_figure_start(_ctx) }
         }
         fn visit_figcaption(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _text: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -6888,7 +6906,7 @@ pub unsafe extern "C" fn htm_options_set_visitor(
         }
         fn visit_figure_end(
             &mut self,
-            _ctx: &html_to_markdown_rs::NodeContext,
+            _ctx: &html_to_markdown_rs::NodeContext<'_>,
             _output: &str,
         ) -> html_to_markdown_rs::VisitResult {
             // SAFETY: self.0 is a valid pointer for the duration of the conversion call.
@@ -7609,14 +7627,14 @@ unsafe fn decode_visit_result(
 /// The `NodeContext` passed to the C callback is only valid for the duration
 /// of this function call.
 unsafe fn call_with_ctx<F>(
-    ctx: &html_to_markdown_rs::visitor::NodeContext,
+    ctx: &html_to_markdown_rs::visitor::NodeContext<'_>,
     callback: F,
 ) -> html_to_markdown_rs::visitor::VisitResult
 where
     F: FnOnce(*const HtmNodeContext, *mut *mut std::ffi::c_char, *mut usize) -> i32,
 {
     // Build temporary CStrings for the string fields.
-    let tag_cstring = std::ffi::CString::new(ctx.tag_name.as_str()).unwrap_or_default();
+    let tag_cstring = std::ffi::CString::new(ctx.tag_name.as_ref()).unwrap_or_default();
     let parent_cstring: Option<std::ffi::CString> =
         ctx.parent_tag.as_deref().and_then(|s| std::ffi::CString::new(s).ok());
 
@@ -9964,7 +9982,11 @@ impl HtmHtmlVisitorBridge {
 }
 
 impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
-    fn visit_text(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
+    fn visit_text(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_text else {
             return Default::default();
         };
@@ -10002,7 +10024,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
         serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json).unwrap_or_default()
     }
 
-    fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_element_start else {
             return Default::default();
         };
@@ -10035,7 +10057,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_element_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_element_end else {
@@ -10077,7 +10099,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_link(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _href: &str,
         _text: &str,
         _title: Option<&str>,
@@ -10140,7 +10162,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_image(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: &str,
         _alt: &str,
         _title: Option<&str>,
@@ -10203,7 +10225,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_heading(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _level: u32,
         _text: &str,
         _id: Option<&str>,
@@ -10259,7 +10281,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_code_block(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _lang: Option<&str>,
         _code: &str,
     ) -> html_to_markdown_rs::VisitResult {
@@ -10313,7 +10335,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_code_inline(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _code: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_code_inline else {
@@ -10355,7 +10377,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_list_item(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _ordered: bool,
         _marker: &str,
         _text: &str,
@@ -10416,7 +10438,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_list_start(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _ordered: bool,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_list_start else {
@@ -10459,7 +10481,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_list_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _ordered: bool,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
@@ -10509,7 +10531,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
         serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json).unwrap_or_default()
     }
 
-    fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_table_start else {
             return Default::default();
         };
@@ -10542,7 +10564,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_table_row(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _cells: &[String],
         _is_header: bool,
     ) -> html_to_markdown_rs::VisitResult {
@@ -10595,7 +10617,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_table_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_table_end else {
@@ -10637,7 +10659,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_blockquote(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _content: &str,
         _depth: usize,
     ) -> html_to_markdown_rs::VisitResult {
@@ -10689,7 +10711,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_strong(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_strong else {
@@ -10731,7 +10753,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_emphasis(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_emphasis else {
@@ -10773,7 +10795,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_strikethrough(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_strikethrough else {
@@ -10815,7 +10837,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_underline(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_underline else {
@@ -10857,7 +10879,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_subscript(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_subscript else {
@@ -10899,7 +10921,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_superscript(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_superscript else {
@@ -10939,7 +10961,11 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
         serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json).unwrap_or_default()
     }
 
-    fn visit_mark(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
+    fn visit_mark(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_mark else {
             return Default::default();
         };
@@ -10977,7 +11003,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
         serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json).unwrap_or_default()
     }
 
-    fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_line_break else {
             return Default::default();
         };
@@ -11008,7 +11034,10 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
         serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json).unwrap_or_default()
     }
 
-    fn visit_horizontal_rule(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_horizontal_rule(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
+    ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_horizontal_rule else {
             return Default::default();
         };
@@ -11041,7 +11070,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_custom_element(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _tag_name: &str,
         _html: &str,
     ) -> html_to_markdown_rs::VisitResult {
@@ -11100,7 +11129,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_definition_list_start(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_definition_list_start else {
             return Default::default();
@@ -11134,7 +11163,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_definition_term(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_definition_term else {
@@ -11176,7 +11205,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_definition_description(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_definition_description else {
@@ -11218,7 +11247,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_definition_list_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_definition_list_end else {
@@ -11260,7 +11289,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_form(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _action: Option<&str>,
         _method: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
@@ -11309,7 +11338,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_input(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _input_type: &str,
         _name: Option<&str>,
         _value: Option<&str>,
@@ -11367,7 +11396,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_button(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_button else {
@@ -11409,7 +11438,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_audio(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_audio else {
@@ -11446,7 +11475,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_video(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_video else {
@@ -11483,7 +11512,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_iframe(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_iframe else {
@@ -11520,7 +11549,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_details(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _open: bool,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_details else {
@@ -11563,7 +11592,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_summary(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_summary else {
@@ -11603,7 +11632,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
         serde_json::from_str::<html_to_markdown_rs::VisitResult>(&json).unwrap_or_default()
     }
 
-    fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_figure_start else {
             return Default::default();
         };
@@ -11636,7 +11665,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_figcaption(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_figcaption else {
@@ -11678,7 +11707,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmHtmlVisitorBridge {
 
     fn visit_figure_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let Some(fp) = self.vtable.visit_figure_end else {

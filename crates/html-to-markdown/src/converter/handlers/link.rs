@@ -26,6 +26,7 @@ use crate::text;
 
 #[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node;
+use std::borrow::Cow;
 
 /// Handle an `<a>` (link) element and convert to Markdown.
 ///
@@ -216,11 +217,11 @@ pub fn handle_link(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Link,
-                tag_name: "a".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("a"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
 

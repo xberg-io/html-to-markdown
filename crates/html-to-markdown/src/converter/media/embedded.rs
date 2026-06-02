@@ -91,11 +91,11 @@ pub fn handle_audio(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::Element,
-            tag_name: "audio".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("audio"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {
@@ -203,11 +203,11 @@ pub fn handle_video(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::Element,
-            tag_name: "video".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("video"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {
@@ -336,11 +336,11 @@ pub fn handle_iframe(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::Element,
-            tag_name: "iframe".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("iframe"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {

@@ -11,6 +11,7 @@
 // Note: Context and DomContext are defined in converter.rs
 // walk_node is also defined there and must be called via the parent module
 use super::walk_node;
+use std::borrow::Cow;
 
 /// Handles the `<details>` element.
 ///
@@ -47,11 +48,11 @@ pub fn handle_details(
             let open = tag.attributes().get("open").is_some();
             let node_ctx = NodeContext {
                 node_type: NodeType::Details,
-                tag_name: "details".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("details"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
             let visit_result = {
@@ -185,11 +186,11 @@ pub fn handle_summary(
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
             let node_ctx = NodeContext {
                 node_type: NodeType::Summary,
-                tag_name: "summary".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("summary"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
             let visit_result = {

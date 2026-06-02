@@ -16,6 +16,7 @@ use crate::converter::utility::siblings::{
 };
 use crate::options::ConversionOptions;
 use crate::text;
+use crate::visitor::EMPTY_ATTRS;
 
 // Type aliases for Context to avoid circular imports
 type Context = crate::converter::Context;
@@ -210,7 +211,6 @@ pub fn process_text_node(
     #[cfg(feature = "visitor")]
     let final_text = if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
-        use std::collections::BTreeMap;
 
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
@@ -218,11 +218,11 @@ pub fn process_text_node(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed(""),
+            attributes: Cow::Borrowed(&EMPTY_ATTRS),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 

@@ -13,10 +13,10 @@ use crate::text;
 
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::{collect_tag_attributes, is_block_level_element};
+use crate::visitor::EMPTY_ATTRS;
 #[cfg(feature = "visitor")]
 use crate::visitor::{NodeContext, NodeType, VisitResult, VisitorHandle};
-#[cfg(feature = "visitor")]
-use std::collections::BTreeMap;
+use std::borrow::Cow;
 
 /// Tracks list context for proper marker emission on `<li>` elements.
 #[derive(Clone, Debug)]
@@ -155,8 +155,8 @@ fn walk_plain(
                 let text_str: &str = &decoded;
                 let node_ctx = NodeContext {
                     node_type: NodeType::Text,
-                    tag_name: String::new(),
-                    attributes: BTreeMap::new(),
+                    tag_name: Cow::Borrowed(""),
+                    attributes: Cow::Borrowed(&EMPTY_ATTRS),
                     depth: state.depth,
                     index_in_parent: 0,
                     parent_tag: None,
@@ -215,8 +215,8 @@ fn walk_plain(
                 let attributes = collect_tag_attributes(tag);
                 let node_ctx = NodeContext {
                     node_type: NodeType::Element,
-                    tag_name: tag_str.to_string(),
-                    attributes,
+                    tag_name: Cow::Borrowed(tag_str),
+                    attributes: Cow::Owned(attributes),
                     depth: state.depth,
                     index_in_parent: 0,
                     parent_tag: None,
@@ -340,8 +340,8 @@ fn walk_plain(
                 let attributes = collect_tag_attributes(tag);
                 let node_ctx = NodeContext {
                     node_type: NodeType::Element,
-                    tag_name: tag_str.to_string(),
-                    attributes,
+                    tag_name: Cow::Borrowed(tag_str),
+                    attributes: Cow::Owned(attributes),
                     depth: state.depth,
                     index_in_parent: 0,
                     parent_tag: None,

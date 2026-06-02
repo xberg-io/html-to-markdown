@@ -6,6 +6,7 @@
 //! - Plain block formatting (no Pandoc colon syntax)
 
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 use tl;
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -99,11 +100,11 @@ pub fn handle_dt(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::DefinitionTerm,
-            tag_name: "dt".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("dt"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {
@@ -184,11 +185,11 @@ pub fn handle_dd(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::DefinitionDescription,
-            tag_name: "dd".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("dd"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {

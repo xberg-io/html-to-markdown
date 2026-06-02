@@ -6947,16 +6947,16 @@ impl From<html_to_markdown_rs::ProcessingWarning> for WasmProcessingWarning {
 }
 
 #[allow(clippy::redundant_closure, clippy::useless_conversion)]
-impl From<html_to_markdown_rs::NodeContext> for WasmNodeContext {
-    fn from(val: html_to_markdown_rs::NodeContext) -> Self {
+impl From<html_to_markdown_rs::NodeContext<'_>> for WasmNodeContext {
+    fn from(val: html_to_markdown_rs::NodeContext<'_>) -> Self {
         Self {
             node_type: val.node_type.into(),
-            tag_name: val.tag_name,
-            attributes: js_sys::JSON::parse(&serde_json::to_string(&val.attributes).unwrap_or_default())
+            tag_name: val.tag_name.into_owned(),
+            attributes: js_sys::JSON::parse(&serde_json::to_string(&*val.attributes).unwrap_or_default())
                 .unwrap_or(JsValue::NULL),
             depth: val.depth,
             index_in_parent: val.index_in_parent,
-            parent_tag: val.parent_tag,
+            parent_tag: val.parent_tag.map(std::borrow::Cow::into_owned),
             is_inline: val.is_inline,
         }
     }

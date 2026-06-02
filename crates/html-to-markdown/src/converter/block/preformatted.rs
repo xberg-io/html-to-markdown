@@ -10,6 +10,7 @@
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{CodeBlockStyle, ConversionOptions, WhitespaceMode};
+use std::borrow::Cow;
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -103,11 +104,11 @@ pub fn handle_pre(
 
                         let node_ctx = NodeContext {
                             node_type: NodeType::Pre,
-                            tag_name: "pre".to_string(),
-                            attributes,
+                            tag_name: Cow::Borrowed("pre"),
+                            attributes: Cow::Owned(attributes),
                             depth,
                             index_in_parent,
-                            parent_tag,
+                            parent_tag: parent_tag.map(Cow::Owned),
                             is_inline: false,
                         };
 

@@ -233,11 +233,11 @@ pub fn convert_table_row(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::TableRow,
-                tag_name: "tr".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("tr"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent: row_index,
-                parent_tag: Some("table".to_string()),
+                parent_tag: Some(Cow::Borrowed("table")),
                 is_inline: false,
             };
 

@@ -10,6 +10,7 @@
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -98,11 +99,11 @@ pub fn handle(
 
                     let node_ctx = NodeContext {
                         node_type: NodeType::Blockquote,
-                        tag_name: "blockquote".to_string(),
-                        attributes,
+                        tag_name: Cow::Borrowed("blockquote"),
+                        attributes: Cow::Owned(attributes),
                         depth,
                         index_in_parent,
-                        parent_tag,
+                        parent_tag: parent_tag.map(Cow::Owned),
                         is_inline: false,
                     };
 

@@ -21,6 +21,7 @@ use std::collections::BTreeMap;
 
 #[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node;
+use std::borrow::Cow;
 
 /// Handle an inline `<code>` element and convert to Markdown.
 ///
@@ -86,11 +87,11 @@ pub fn handle_code(
 
                 let node_ctx = NodeContext {
                     node_type: NodeType::Code,
-                    tag_name: "code".to_string(),
-                    attributes,
+                    tag_name: Cow::Borrowed("code"),
+                    attributes: Cow::Owned(attributes),
                     depth,
                     index_in_parent,
-                    parent_tag,
+                    parent_tag: parent_tag.map(Cow::Owned),
                     is_inline: true,
                 };
 
@@ -262,11 +263,11 @@ pub fn handle_pre(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Pre,
-                tag_name: "pre".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("pre"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
 

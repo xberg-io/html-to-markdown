@@ -116,11 +116,11 @@ pub fn handle_table(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Table,
-                tag_name: "table".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("table"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
 
@@ -400,11 +400,11 @@ pub fn handle_table(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Table,
-                tag_name: "table".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("table"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
 

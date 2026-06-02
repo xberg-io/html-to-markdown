@@ -60,11 +60,11 @@ pub fn handle_form(
                 .map(|v| v.as_utf8_str().into_owned());
             let node_ctx = NodeContext {
                 node_type: NodeType::Form,
-                tag_name: "form".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("form"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
             let visit_result = {
@@ -329,11 +329,11 @@ pub fn handle_input(
                 .map(|v| v.as_utf8_str().into_owned());
             let node_ctx = NodeContext {
                 node_type: NodeType::Input,
-                tag_name: "input".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("input"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
             let visit_result = {
@@ -552,11 +552,11 @@ pub fn handle_button(
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
             let node_ctx = NodeContext {
                 node_type: NodeType::Button,
-                tag_name: "button".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("button"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
             let visit_result = {

@@ -10,6 +10,7 @@
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
+use std::borrow::Cow;
 #[cfg(feature = "visitor")]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -90,11 +91,11 @@ pub fn handle_subscript(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Subscript,
-            tag_name: tag.name().as_utf8_str().to_string(),
-            attributes,
+            tag_name: tag.name().as_utf8_str(),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 
@@ -192,11 +193,11 @@ pub fn handle_superscript(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Superscript,
-            tag_name: tag.name().as_utf8_str().to_string(),
-            attributes,
+            tag_name: tag.name().as_utf8_str(),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 

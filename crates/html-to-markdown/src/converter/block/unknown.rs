@@ -8,6 +8,7 @@
 //! - Manages trailing whitespace intelligently
 
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -65,11 +66,11 @@ pub fn handle(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::Custom,
-            tag_name: tag_name.clone(),
-            attributes,
+            tag_name: Cow::Owned(tag_name.clone()),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {

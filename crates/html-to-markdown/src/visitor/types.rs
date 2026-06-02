@@ -5,7 +5,14 @@
 //! - `NodeContext`: Metadata about the current node being visited
 //! - `VisitResult`: Control flow signals from visitor methods
 
+use std::borrow::Cow;
 use std::collections::BTreeMap;
+
+/// Shared empty attribute map used by visitor call sites that have no attributes.
+///
+/// Allows constructing a [`NodeContext`] with `attributes: Cow::Borrowed(&EMPTY_ATTRS)`
+/// instead of allocating a fresh `BTreeMap` per dispatch.
+pub static EMPTY_ATTRS: BTreeMap<String, String> = BTreeMap::new();
 
 /// Node type enumeration covering all HTML element types.
 ///
@@ -207,17 +214,22 @@ pub enum NodeType {
 ///
 /// Provides comprehensive metadata about the current node being visited,
 /// including its type, attributes, position in the DOM tree, and parent context.
+///
+/// The string fields use [`Cow<'_, str>`] so the converter can pass slices
+/// directly out of the parsed DOM without allocating. Visitor implementations
+/// that need to outlive the callback call should call [`NodeContext::into_owned`]
+/// or `.tag_name.clone().into_owned()` on the specific fields they care about.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct NodeContext {
+pub struct NodeContext<'a> {
     /// Coarse-grained node type classification
     pub node_type: NodeType,
 
     /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
-    pub tag_name: String,
+    pub tag_name: Cow<'a, str>,
 
     /// All HTML attributes as key-value pairs
-    pub attributes: BTreeMap<String, String>,
+    pub attributes: Cow<'a, BTreeMap<String, String>>,
 
     /// Depth in the DOM tree (0 = root)
     pub depth: usize,
@@ -226,10 +238,26 @@ pub struct NodeContext {
     pub index_in_parent: usize,
 
     /// Parent element's tag name (None if root)
-    pub parent_tag: Option<String>,
+    pub parent_tag: Option<Cow<'a, str>>,
 
     /// Whether this element is treated as inline vs block
     pub is_inline: bool,
+}
+
+impl NodeContext<'_> {
+    /// Promote any borrowed fields into owned storage so the context can outlive `'a`.
+    #[must_use]
+    pub fn into_owned(self) -> NodeContext<'static> {
+        NodeContext {
+            node_type: self.node_type,
+            tag_name: Cow::Owned(self.tag_name.into_owned()),
+            attributes: Cow::Owned(self.attributes.into_owned()),
+            depth: self.depth,
+            index_in_parent: self.index_in_parent,
+            parent_tag: self.parent_tag.map(|p| Cow::Owned(p.into_owned())),
+            is_inline: self.is_inline,
+        }
+    }
 }
 
 /// Result of a visitor callback.
@@ -279,13 +307,14 @@ mod tests {
 
     #[test]
     fn test_node_context_creation() {
+        let attrs = BTreeMap::new();
         let ctx = NodeContext {
             node_type: NodeType::Heading,
-            tag_name: "h1".to_string(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed("h1"),
+            attributes: Cow::Borrowed(&attrs),
             depth: 1,
             index_in_parent: 0,
-            parent_tag: Some("body".to_string()),
+            parent_tag: Some(Cow::Borrowed("body")),
             is_inline: false,
         };
 

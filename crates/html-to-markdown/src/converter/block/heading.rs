@@ -321,11 +321,11 @@ fn visitor_heading_output(
 
                 let node_ctx = NodeContext {
                     node_type: NodeType::Heading,
-                    tag_name: tag_name.to_string(),
-                    attributes,
+                    tag_name: Cow::Borrowed(tag_name),
+                    attributes: Cow::Owned(attributes),
                     depth,
                     index_in_parent,
-                    parent_tag,
+                    parent_tag: parent_tag.map(Cow::Owned),
                     is_inline: false,
                 };
 

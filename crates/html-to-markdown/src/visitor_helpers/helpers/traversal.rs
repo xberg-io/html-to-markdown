@@ -11,6 +11,8 @@ use crate::visitor::HtmlVisitor;
 use crate::visitor::VisitResult;
 
 use super::content::VisitorDispatch;
+use std::borrow::Cow;
+use crate::visitor::EMPTY_ATTRS;
 
 /// Dispatch a visitor callback and handle the result.
 ///
@@ -123,8 +125,8 @@ mod tests {
         let result = dispatch_visitor(&visitor, |v| {
             let ctx = NodeContext {
                 node_type: NodeType::Text,
-                tag_name: String::new(),
-                attributes: BTreeMap::new(),
+                tag_name: Cow::Borrowed(""),
+                attributes: Cow::Borrowed(&EMPTY_ATTRS),
                 depth: 0,
                 index_in_parent: 0,
                 parent_tag: None,
@@ -146,8 +148,8 @@ mod tests {
 
         let ctx = NodeContext {
             node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed(""),
+            attributes: Cow::Borrowed(&EMPTY_ATTRS),
             depth: 0,
             index_in_parent: 0,
             parent_tag: None,
@@ -166,8 +168,8 @@ mod tests {
 
         let ctx = NodeContext {
             node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed(""),
+            attributes: Cow::Borrowed(&EMPTY_ATTRS),
             depth: 0,
             index_in_parent: 0,
             parent_tag: None,
@@ -187,8 +189,8 @@ mod tests {
 
         let ctx = NodeContext {
             node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed(""),
+            attributes: Cow::Borrowed(&EMPTY_ATTRS),
             depth: 0,
             index_in_parent: 0,
             parent_tag: None,
@@ -209,8 +211,8 @@ mod tests {
 
         let ctx = NodeContext {
             node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed(""),
+            attributes: Cow::Borrowed(&EMPTY_ATTRS),
             depth: 0,
             index_in_parent: 0,
             parent_tag: None,
@@ -229,8 +231,8 @@ mod tests {
 
         let ctx = NodeContext {
             node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
+            tag_name: Cow::Borrowed(""),
+            attributes: Cow::Borrowed(&EMPTY_ATTRS),
             depth: 0,
             index_in_parent: 0,
             parent_tag: None,

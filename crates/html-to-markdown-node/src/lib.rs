@@ -1747,7 +1747,7 @@ fn nodecontext_to_js_object<'e>(
     };
     obj.set_named_property("parentTag", parent_tag)?;
     let mut attrs = napi::bindgen_prelude::Object::new(env)?;
-    for (k, v) in &ctx.attributes {
+    for (k, v) in ctx.attributes.iter() {
         attrs.set_named_property(k, env.create_string(v)?)?;
     }
     obj.set_named_property("attributes", attrs)?;
@@ -6491,15 +6491,20 @@ impl From<html_to_markdown_rs::ProcessingWarning> for JsProcessingWarning {
 }
 
 #[allow(clippy::redundant_closure, clippy::useless_conversion)]
-impl From<html_to_markdown_rs::NodeContext> for JsNodeContext {
-    fn from(val: html_to_markdown_rs::NodeContext) -> Self {
+impl From<html_to_markdown_rs::NodeContext<'_>> for JsNodeContext {
+    fn from(val: html_to_markdown_rs::NodeContext<'_>) -> Self {
         Self {
             node_type: val.node_type.into(),
-            tag_name: val.tag_name,
-            attributes: val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            tag_name: val.tag_name.into_owned(),
+            attributes: val
+                .attributes
+                .into_owned()
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect(),
             depth: val.depth as i64,
             index_in_parent: val.index_in_parent as i64,
-            parent_tag: val.parent_tag,
+            parent_tag: val.parent_tag.map(std::borrow::Cow::into_owned),
             is_inline: val.is_inline,
         }
     }
@@ -7327,15 +7332,17 @@ impl From<html_to_markdown_rs::VisitResult> for JsVisitResult {
 }
 
 #[allow(clippy::redundant_closure, clippy::useless_conversion)]
-impl From<JsNodeContext> for html_to_markdown_rs::NodeContext {
+impl From<JsNodeContext> for html_to_markdown_rs::NodeContext<'static> {
     fn from(val: JsNodeContext) -> Self {
         Self {
             node_type: val.node_type.into(),
-            tag_name: val.tag_name,
-            attributes: val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            tag_name: std::borrow::Cow::Owned(val.tag_name),
+            attributes: std::borrow::Cow::Owned(
+                val.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            ),
             depth: val.depth as usize,
             index_in_parent: val.index_in_parent as usize,
-            parent_tag: val.parent_tag,
+            parent_tag: val.parent_tag.map(std::borrow::Cow::Owned),
             is_inline: val.is_inline,
         }
     }

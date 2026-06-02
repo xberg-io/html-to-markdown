@@ -60,8 +60,8 @@ struct ContentFilter {
 
 impl HtmlVisitor for ContentFilter {
     /// Use `visit_element_start` to filter ANY element by tag name
-    fn visit_element_start(&mut self, ctx: &NodeContext) -> VisitResult {
-        let tag_name = ctx.tag_name.as_str();
+    fn visit_element_start(&mut self, ctx: &NodeContext<'_>) -> VisitResult {
+        let tag_name: &str = ctx.tag_name.as_ref();
 
         match tag_name {
             "div" => {

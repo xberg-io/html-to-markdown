@@ -13,6 +13,7 @@ use crate::converter::utility::content::collect_tag_attributes;
 use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::walk_node;
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 use tl;
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -261,11 +262,11 @@ pub fn handle_li(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::ListItem,
-                tag_name: "li".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("li"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent: index,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
 

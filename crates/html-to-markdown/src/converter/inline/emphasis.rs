@@ -11,6 +11,7 @@
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
+use std::borrow::Cow;
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -116,11 +117,11 @@ fn handle_strong(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Strong,
-                tag_name: tag.name().as_utf8_str().to_string(),
-                attributes,
+                tag_name: tag.name().as_utf8_str(),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
 
@@ -252,11 +253,11 @@ fn handle_emphasis(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Em,
-                tag_name: tag.name().as_utf8_str().to_string(),
-                attributes,
+                tag_name: tag.name().as_utf8_str(),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
 

@@ -13,6 +13,7 @@ use super::utils::{
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::ConversionOptions;
+use std::borrow::Cow;
 #[cfg(feature = "visitor")]
 use std::collections::BTreeMap;
 use tl;
@@ -67,11 +68,11 @@ pub fn handle_ul(
 
         let node_ctx = NodeContext {
             node_type: NodeType::List,
-            tag_name: "ul".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("ul"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent: index,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
 
@@ -144,11 +145,11 @@ pub fn handle_ul(
 
         let node_ctx = NodeContext {
             node_type: NodeType::List,
-            tag_name: "ul".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("ul"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent: index,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
 

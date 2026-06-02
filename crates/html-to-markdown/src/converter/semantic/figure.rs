@@ -7,6 +7,7 @@
 //! Figure elements group an image (or other media) with its associated caption.
 //! The Markdown output preserves this relationship through content organization.
 
+use std::borrow::Cow;
 // Note: Context and DomContext are defined in converter.rs
 // walk_node is also defined there and must be called via the parent module
 
@@ -62,11 +63,11 @@ pub fn handle_figure(
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
             let node_ctx = NodeContext {
                 node_type: NodeType::Figure,
-                tag_name: "figure".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("figure"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
             let visit_result = {
@@ -178,11 +179,11 @@ pub fn handle_figure(
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
             let node_ctx = NodeContext {
                 node_type: NodeType::Figure,
-                tag_name: "figure".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("figure"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
             // Clamp to a valid char boundary in case a pop landed mid-codepoint (#380).
@@ -271,11 +272,11 @@ pub fn handle_figcaption(
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
             let node_ctx = NodeContext {
                 node_type: NodeType::Figcaption,
-                tag_name: "figcaption".to_string(),
-                attributes,
+                tag_name: Cow::Borrowed("figcaption"),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: false,
             };
             let visit_result = {

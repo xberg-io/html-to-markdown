@@ -19,6 +19,7 @@ use std::collections::BTreeMap;
 
 #[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node_to_html;
+use std::borrow::Cow;
 
 /// Handle a `<blockquote>` element and convert to Markdown.
 ///
@@ -97,11 +98,11 @@ pub fn handle_blockquote(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Blockquote,
-            tag_name: "blockquote".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("blockquote"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
 

@@ -1607,15 +1607,15 @@ impl From<html_to_markdown_rs::ProcessingWarning> for ProcessingWarning {
     }
 }
 
-impl From<html_to_markdown_rs::NodeContext> for NodeContext {
-    fn from(v: html_to_markdown_rs::NodeContext) -> Self {
+impl From<html_to_markdown_rs::NodeContext<'_>> for NodeContext {
+    fn from(v: html_to_markdown_rs::NodeContext<'_>) -> Self {
         NodeContext {
             node_type: NodeType::from(v.node_type),
-            tag_name: v.tag_name.into(),
-            attributes: v.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+            tag_name: v.tag_name.into_owned(),
+            attributes: v.attributes.into_owned().into_iter().map(|(k, v)| (k, v)).collect(),
             depth: v.depth as _,
             index_in_parent: v.index_in_parent as _,
-            parent_tag: v.parent_tag.map(|s| s.into()),
+            parent_tag: v.parent_tag.map(std::borrow::Cow::into_owned),
             is_inline: v.is_inline as _,
         }
     }
@@ -2299,7 +2299,7 @@ pub fn create_processing_warning_from_json(json: String) -> Result<ProcessingWar
 
 #[frb]
 pub fn create_node_context_from_json(json: String) -> Result<NodeContext, String> {
-    serde_json::from_str::<html_to_markdown_rs::NodeContext>(&json)
+    serde_json::from_str::<html_to_markdown_rs::NodeContext<'static>>(&json)
         .map(NodeContext::from)
         .map_err(|e| e.to_string())
 }

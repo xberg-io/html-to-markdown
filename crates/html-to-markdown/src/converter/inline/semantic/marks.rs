@@ -8,6 +8,7 @@
 #[cfg(feature = "visitor")]
 use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
+use std::borrow::Cow;
 #[cfg(feature = "visitor")]
 use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
@@ -54,11 +55,11 @@ pub fn handle_mark(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Mark,
-            tag_name: tag.name().as_utf8_str().to_string(),
-            attributes,
+            tag_name: tag.name().as_utf8_str(),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 
@@ -196,11 +197,11 @@ pub fn handle_strikethrough(
 
             let node_ctx = NodeContext {
                 node_type: NodeType::Strikethrough,
-                tag_name: tag_name.to_string(),
-                attributes,
+                tag_name: Cow::Borrowed(tag_name),
+                attributes: Cow::Owned(attributes),
                 depth,
                 index_in_parent,
-                parent_tag,
+                parent_tag: parent_tag.map(Cow::Owned),
                 is_inline: true,
             };
 
@@ -318,11 +319,11 @@ pub fn handle_inserted(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Underline,
-            tag_name: "ins".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("ins"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 
@@ -428,11 +429,11 @@ pub fn handle_underline(
 
         let node_ctx = NodeContext {
             node_type: NodeType::Underline,
-            tag_name: "u".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("u"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: true,
         };
 

@@ -7,6 +7,7 @@ use std::collections::BTreeMap;
 
 use crate::visitor::NodeContext;
 use crate::visitor::NodeType;
+use std::borrow::Cow;
 
 /// Build a `NodeContext` from current parsing state.
 ///
@@ -66,7 +67,7 @@ pub fn build_node_context(
 ) -> NodeContext {
     NodeContext {
         node_type,
-        tag_name: tag_name.to_string(),
+        tag_name: Cow::Borrowed(tag_name),
         attributes: attributes.clone(),
         depth,
         index_in_parent,

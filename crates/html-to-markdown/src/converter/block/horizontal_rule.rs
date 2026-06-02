@@ -5,6 +5,7 @@
 
 use crate::converter::main_helpers::trim_trailing_whitespace;
 use crate::converter::utility::siblings::get_previous_sibling_tag;
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -41,11 +42,11 @@ pub fn handle(
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
         let node_ctx = NodeContext {
             node_type: NodeType::Hr,
-            tag_name: "hr".to_string(),
-            attributes,
+            tag_name: Cow::Borrowed("hr"),
+            attributes: Cow::Owned(attributes),
             depth,
             index_in_parent,
-            parent_tag,
+            parent_tag: parent_tag.map(Cow::Owned),
             is_inline: false,
         };
         let visit_result = {

@@ -2094,16 +2094,16 @@ impl ProcessingWarning {
 
 pub struct VisitorHandle(pub html_to_markdown_rs::visitor::VisitorHandle);
 
-pub struct NodeContext(pub html_to_markdown_rs::NodeContext);
+pub struct NodeContext(pub html_to_markdown_rs::NodeContext<'static>);
 impl NodeContext {
     pub fn node_type(&self) -> String {
         NodeType::from(self.0.node_type.clone()).to_string()
     }
     pub fn tag_name(&self) -> String {
-        self.0.tag_name.clone()
+        self.0.tag_name.clone().into_owned()
     }
     pub fn attributes(&self) -> String {
-        serde_json::to_string(&self.0.attributes).expect("serializable attributes")
+        serde_json::to_string(&*self.0.attributes).expect("serializable attributes")
     }
     pub fn depth(&self) -> usize {
         ::serde_json::to_value(&self.0.depth)
@@ -2118,7 +2118,7 @@ impl NodeContext {
             .unwrap_or_default()
     }
     pub fn parent_tag(&self) -> Option<String> {
-        self.0.parent_tag.clone()
+        self.0.parent_tag.as_deref().map(String::from)
     }
     pub fn is_inline(&self) -> bool {
         ::serde_json::to_value(&self.0.is_inline)
