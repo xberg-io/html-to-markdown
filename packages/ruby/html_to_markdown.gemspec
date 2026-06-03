@@ -7,6 +7,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "High-performance HTML to Markdown converter"
   spec.description   = "High-performance HTML to Markdown converter"
   spec.homepage      = "https://github.com/kreuzberg-dev/html-to-markdown"
+
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
   spec.metadata["keywords"] = %w[converter html markdown].join(",")

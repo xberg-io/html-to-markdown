@@ -14,7 +14,7 @@ defmodule E2eElixir.MixProject do
     [
       {:html_to_markdown, "~> 3.6.0-rc.8"},
       {:rustler_precompiled, "~> 0.9"},
-      {:rustler, "~> 0.38.0", runtime: false}
+      {:rustler, "~> 0.37", runtime: false}
     ]
   end
 end

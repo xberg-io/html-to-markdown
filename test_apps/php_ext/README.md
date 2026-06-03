@@ -13,4 +13,4 @@ bash run_tests.sh
 
 - PIE installs the extension successfully.
 - The extension loads successfully.
-- The configured convert function returns a string containing `Hi`.
+- The configured e2e call function, when present, returns a non-null value.

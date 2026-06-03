@@ -1,11 +1,12 @@
 Package: htmltomarkdown
 Title: High-performance HTML to Markdown converter
 Version: 3.6.0.9008
-Authors@R: person("Kreuzberg Team", email = "author@example.com", role = c("aut", "cre"))
+Authors@R: person("Kreuzberg Team", role = c("aut", "cre"))
 Description: High-performance HTML to Markdown converter
     Rust bindings generated with extendr.
 URL: https://github.com/kreuzberg-dev/html-to-markdown
 BugReports: https://github.com/kreuzberg-dev/html-to-markdown/issues
+
 License: MIT
 Depends: R (>= 4.2)
 Imports: jsonlite
