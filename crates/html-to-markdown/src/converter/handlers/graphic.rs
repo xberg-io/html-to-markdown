@@ -12,8 +12,6 @@ use std::collections::BTreeMap;
 
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::ConversionOptions;
 
 #[cfg(feature = "visitor")]
@@ -103,21 +101,19 @@ pub fn handle_graphic(
     let graphic_output = if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Image,
-            tag_name: "graphic".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Image,
+            Cow::Borrowed("graphic"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: true,
-        };
+            parent_tag.map(Cow::Borrowed),
+            true,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

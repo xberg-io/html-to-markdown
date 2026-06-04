@@ -26,8 +26,10 @@ package dev.kreuzberg.android
 /**
  * Image dimensions in pixels.
  *
- * Binding-safe replacement for `(u32, u32)` tuples, which degrade to `Vec<Vec<String>>` when
- * sanitized for cross-language binding generation. Used by both `ImageMetadata` and `InlineImage`.
+ * Binding-safe replacement for `(u32, u32)` tuples, which degrade to
+ * `Vec<Vec<String>>` when sanitized for cross-language binding generation.
+ * Used by both `ImageMetadata` and
+ * `InlineImage`.
  */
 data class ImageDimensions(
     /** Width in pixels. */

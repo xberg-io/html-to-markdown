@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1406531119;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -385251249;
 
 // Section: executor
 
@@ -676,34 +676,6 @@ fn wire__crate__create_metadata_entry_from_json_impl(
         },
     )
 }
-fn wire__crate__create_node_context_from_json_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "create_node_context_from_json",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
-            };
-            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_json = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::create_node_context_from_json(api_json)?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
 fn wire__crate__create_preprocessing_options_from_json_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1182,7 +1154,6 @@ const _: fn() = || {
         let NodeContext = None::<crate::NodeContext>.unwrap();
         let _: crate::NodeType = NodeContext.node_type;
         let _: String = NodeContext.tag_name;
-        let _: std::collections::HashMap<String, String> = NodeContext.attributes;
         let _: i64 = NodeContext.depth;
         let _: i64 = NodeContext.index_in_parent;
         let _: Option<String> = NodeContext.parent_tag;
@@ -2694,7 +2665,6 @@ impl SseDecode for crate::NodeContext {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_nodeType = <crate::NodeType>::sse_decode(deserializer);
         let mut var_tagName = <String>::sse_decode(deserializer);
-        let mut var_attributes = <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         let mut var_depth = <i64>::sse_decode(deserializer);
         let mut var_indexInParent = <i64>::sse_decode(deserializer);
         let mut var_parentTag = <Option<String>>::sse_decode(deserializer);
@@ -2702,7 +2672,6 @@ impl SseDecode for crate::NodeContext {
         return crate::NodeContext {
             node_type: var_nodeType,
             tag_name: var_tagName,
-            attributes: var_attributes,
             depth: var_depth,
             index_in_parent: var_indexInParent,
             parent_tag: var_parentTag,
@@ -3336,14 +3305,13 @@ fn pde_ffi_dispatcher_primary_impl(
         14 => wire__crate__create_image_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         15 => wire__crate__create_link_metadata_from_json_impl(port, ptr, rust_vec_len, data_len),
         16 => wire__crate__create_metadata_entry_from_json_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__create_node_context_from_json_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__create_preprocessing_options_from_json_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__create_preprocessing_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__create_processing_warning_from_json_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire__crate__create_structured_data_from_json_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__create_table_data_from_json_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__create_table_grid_from_json_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__create_text_annotation_from_json_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__create_preprocessing_options_from_json_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__create_preprocessing_options_update_from_json_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__create_processing_warning_from_json_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__create_structured_data_from_json_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__create_table_data_from_json_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire__crate__create_table_grid_from_json_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__create_text_annotation_from_json_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -3984,7 +3952,6 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::NodeContext> {
         [
             self.0.node_type.into_into_dart().into_dart(),
             self.0.tag_name.into_into_dart().into_dart(),
-            self.0.attributes.into_into_dart().into_dart(),
             self.0.depth.into_into_dart().into_dart(),
             self.0.index_in_parent.into_into_dart().into_dart(),
             self.0.parent_tag.into_into_dart().into_dart(),
@@ -5117,7 +5084,6 @@ impl SseEncode for crate::NodeContext {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::NodeType>::sse_encode(self.node_type, serializer);
         <String>::sse_encode(self.tag_name, serializer);
-        <std::collections::HashMap<String, String>>::sse_encode(self.attributes, serializer);
         <i64>::sse_encode(self.depth, serializer);
         <i64>::sse_encode(self.index_in_parent, serializer);
         <Option<String>>::sse_encode(self.parent_tag, serializer);

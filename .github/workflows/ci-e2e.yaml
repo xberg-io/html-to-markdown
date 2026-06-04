@@ -305,7 +305,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
+        uses: astral-sh/setup-uv@v8
         with:
           enable-cache: true
 
@@ -490,7 +490,7 @@ jobs:
         id: checkout
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.37.1 # 2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           extensions: ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter
@@ -507,14 +507,14 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@4.0.0 # 3
+        uses: ramsey/composer-install@4
         with:
           dependency-versions: locked
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
       - name: Install PHP package Composer dependencies
-        uses: ramsey/composer-install@4.0.0 # 3
+        uses: ramsey/composer-install@4
         with:
           dependency-versions: locked
           working-directory: packages/php
@@ -687,7 +687,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1 # v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v8.2.0
+        uses: astral-sh/setup-uv@v8
         with:
           enable-cache: true
 
@@ -905,7 +905,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@2.37.1 # 2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           extensions: ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter
@@ -920,14 +920,14 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@4.0.0 # 3
+        uses: ramsey/composer-install@4
         with:
           dependency-versions: locked
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
       - name: Install PHP package Composer dependencies
-        uses: ramsey/composer-install@4.0.0 # 3
+        uses: ramsey/composer-install@4
         with:
           dependency-versions: locked
           working-directory: packages/php

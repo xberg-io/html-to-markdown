@@ -14,13 +14,9 @@ use crate::converter::text::dedent_code_block;
 use crate::options::ConversionOptions;
 
 #[cfg(feature = "visitor")]
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
-#[cfg(feature = "visitor")]
-use std::collections::BTreeMap;
-
-#[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 
 /// Handle an inline `<code>` element and convert to Markdown.
 ///
@@ -78,21 +74,19 @@ pub fn handle_code(
             let code_output = if let Some(ref visitor_handle) = ctx.visitor {
                 use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-                let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
                 let node_id = node_handle.get_inner();
                 let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
                 let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-                let node_ctx = NodeContext {
-                    node_type: NodeType::Code,
-                    tag_name: "code".to_string(),
-                    attributes,
+                let node_ctx = NodeContext::with_lazy_attributes(
+                    NodeType::Code,
+                    Cow::Borrowed("code"),
+                    tag,
                     depth,
                     index_in_parent,
-                    parent_tag,
-                    is_inline: true,
-                };
+                    parent_tag.map(Cow::Borrowed),
+                    true,
+                );
 
                 let visit_result = {
                     let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -254,21 +248,19 @@ pub fn handle_pre(
         let code_block_output = if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Pre,
-                tag_name: "pre".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Pre,
+                Cow::Borrowed("pre"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

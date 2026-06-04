@@ -11,6 +11,8 @@
 // Note: Context and DomContext are defined in converter.rs
 // walk_node is also defined there and must be called via the parent module
 use super::walk_node;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 
 /// Handles the `<details>` element.
 ///
@@ -37,23 +39,21 @@ pub fn handle_details(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
             let open = tag.attributes().get("open").is_some();
-            let node_ctx = NodeContext {
-                node_type: NodeType::Details,
-                tag_name: "details".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Details,
+                Cow::Borrowed("details"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_details(&node_ctx, open)
@@ -176,22 +176,20 @@ pub fn handle_summary(
 
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-            let node_ctx = NodeContext {
-                node_type: NodeType::Summary,
-                tag_name: "summary".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Summary,
+                Cow::Borrowed("summary"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_summary(&node_ctx, &trimmed)

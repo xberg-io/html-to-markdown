@@ -8,6 +8,8 @@
 //! - Manages trailing whitespace intelligently
 
 use crate::options::ConversionOptions;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -53,25 +55,23 @@ pub fn handle(
 
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::converter::utility::serialization::serialize_tag_to_html;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         let tag_name = tag.name().as_utf8_str().to_string();
         let raw_html = serialize_tag_to_html(node_handle, parser);
-        let attributes = collect_tag_attributes(tag);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::Custom,
-            tag_name: tag_name.clone(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Custom,
+            Cow::Owned(tag_name.clone()),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_custom_element(&node_ctx, &tag_name, &raw_html)

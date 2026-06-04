@@ -100,9 +100,6 @@ Future<ProcessingWarning> createProcessingWarningFromJson({
   required String json,
 }) => RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
 
-Future<NodeContext> createNodeContextFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
-
 /// Construct a `VisitorHandle` from Dart callback closures.
 /// FRB synthesises a Dart-callable function type for each closure parameter,
 /// which is the whole point of taking them as `impl Fn(...) -> DartFnFuture<R>`
@@ -1785,16 +1782,27 @@ sealed class NodeContent with _$NodeContent {
 /// Context information passed to all visitor methods.
 ///
 /// Provides comprehensive metadata about the current node being visited,
-/// including its type, attributes, position in the DOM tree, and parent context.
+/// including its type, tag name, position in the DOM tree, and parent context.
+///
+/// ## Attributes
+///
+/// Access attributes via [`NodeContext::attributes`], which returns
+/// `&BTreeMap<String, String>`. When the context was built with
+/// [`NodeContext::with_lazy_attributes`] (the hot path inside the converter),
+/// the map is only materialized on the first call — if the visitor never reads
+/// attributes, the allocation is skipped.
+///
+/// ## Lifetimes
+///
+/// String fields use [`Cow<'_, str>`] so the converter can pass slices directly
+/// out of the parsed DOM without allocating. Visitor implementations that need
+/// to outlive the callback should call [`NodeContext::into_owned`].
 class NodeContext {
   /// Coarse-grained node type classification
   final NodeType nodeType;
 
   /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
   final String tagName;
-
-  /// All HTML attributes as key-value pairs
-  final Map<String, String> attributes;
 
   /// Depth in the DOM tree (0 = root)
   final PlatformInt64 depth;
@@ -1811,7 +1819,6 @@ class NodeContext {
   const NodeContext({
     required this.nodeType,
     required this.tagName,
-    required this.attributes,
     required this.depth,
     required this.indexInParent,
     this.parentTag,
@@ -1822,7 +1829,6 @@ class NodeContext {
   int get hashCode =>
       nodeType.hashCode ^
       tagName.hashCode ^
-      attributes.hashCode ^
       depth.hashCode ^
       indexInParent.hashCode ^
       parentTag.hashCode ^
@@ -1835,7 +1841,6 @@ class NodeContext {
           runtimeType == other.runtimeType &&
           nodeType == other.nodeType &&
           tagName == other.tagName &&
-          attributes == other.attributes &&
           depth == other.depth &&
           indexInParent == other.indexInParent &&
           parentTag == other.parentTag &&

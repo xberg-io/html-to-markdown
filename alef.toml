@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.22.33"
+alef_version = "0.23.3"
 languages = [
   "python",
   "node",
@@ -126,7 +126,7 @@ sources = [
 ]
 version_from = "Cargo.toml"
 workspace_root = "."
-features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"]
+features = ["metadata", "visitor", "inline-images", "testkit"]
 
 [crates.python]
 module_name = "_html_to_markdown"
@@ -219,6 +219,9 @@ features = ["full", "testkit"]
 
 [crates.wasm]
 crate_dir = "crates/html-to-markdown-wasm"
+# `serde` enables Serialize/Deserialize on NodeContent and AnnotationKind, which the
+# WASM binding requires for JSON round-trip serialization via serde-wasm-bindgen.
+features = ["serde", "metadata", "visitor", "inline-images", "testkit"]
 
 [crates.zig]
 module_name = "html_to_markdown_rs"
@@ -242,7 +245,14 @@ zig = "packages/zig/src/"
 [crates.exclude]
 types = []
 functions = []
-methods = []
+methods = [
+  "html_to_markdown::NodeContext.serialize",
+  "html_to_markdown::NodeContext.deserialize",
+  # with_borrowed_attributes cannot be exposed at FFI boundaries: it returns NodeContext<'a>
+  # borrowing from a local &BTreeMap, which cannot outlive the FFI wrapper function.
+  # Callers use with_owned_attributes instead (the FFI layer always owns its data).
+  "NodeContext.with_borrowed_attributes",
+]
 
 [crates.include]
 types = ["ConversionOptions", "ConversionResult", "HtmlVisitor", "ImageDimensions", "MetadataEntry", "NodeContext", "VisitResult"]

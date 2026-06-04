@@ -22,6 +22,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::error::{ConversionError, Result};
 use crate::visitor::{HtmlVisitor, NodeContext, NodeType, VisitResult};
+use std::borrow::Cow;
 
 /// Build a `NodeContext` from current parsing state.
 ///
@@ -70,24 +71,24 @@ use crate::visitor::{HtmlVisitor, NodeContext, NodeType, VisitResult};
 /// ```
 #[allow(dead_code)]
 #[inline]
-pub fn build_node_context(
+pub fn build_node_context<'a>(
     node_type: NodeType,
-    tag_name: &str,
-    attributes: &BTreeMap<String, String>,
+    tag_name: &'a str,
+    attributes: &'a BTreeMap<String, String>,
     depth: usize,
     index_in_parent: usize,
-    parent_tag: Option<&str>,
+    parent_tag: Option<&'a str>,
     is_inline: bool,
-) -> NodeContext {
-    NodeContext {
+) -> NodeContext<'a> {
+    NodeContext::with_borrowed_attributes(
         node_type,
-        tag_name: tag_name.to_string(),
-        attributes: attributes.clone(),
+        Cow::Borrowed(tag_name),
+        attributes,
         depth,
         index_in_parent,
-        parent_tag: parent_tag.map(String::from),
+        parent_tag.map(Cow::Borrowed),
         is_inline,
-    }
+    )
 }
 
 /// Dispatch a visitor callback and handle the result.
@@ -369,6 +370,7 @@ macro_rules! try_visitor_element_end {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::visitor::EMPTY_ATTRS;
 
     #[test]
     fn test_build_node_context() {
@@ -382,10 +384,10 @@ mod tests {
         assert_eq!(ctx.tag_name, "div");
         assert_eq!(ctx.depth, 2);
         assert_eq!(ctx.index_in_parent, 3);
-        assert_eq!(ctx.parent_tag, Some("body".to_string()));
+        assert_eq!(ctx.parent_tag.as_deref(), Some("body"));
         assert!(!ctx.is_inline);
-        assert_eq!(ctx.attributes.len(), 2);
-        assert_eq!(ctx.attributes.get("id"), Some(&"main".to_string()));
+        assert_eq!(ctx.attributes().len(), 2);
+        assert_eq!(ctx.attributes().get("id"), Some(&"main".to_string()));
     }
 
     #[test]
@@ -396,7 +398,7 @@ mod tests {
 
         assert_eq!(ctx.node_type, NodeType::Html);
         assert_eq!(ctx.parent_tag, None);
-        assert!(ctx.attributes.is_empty());
+        assert!(ctx.attributes().is_empty());
     }
 
     #[test]
@@ -404,15 +406,15 @@ mod tests {
         let visitor: Option<Arc<Mutex<dyn HtmlVisitor + Send>>> = None;
 
         let result = dispatch_visitor(&visitor, |v| {
-            let ctx = NodeContext {
-                node_type: NodeType::Text,
-                tag_name: String::new(),
-                attributes: BTreeMap::new(),
-                depth: 0,
-                index_in_parent: 0,
-                parent_tag: None,
-                is_inline: true,
-            };
+            let ctx = NodeContext::with_borrowed_attributes(
+                NodeType::Text,
+                Cow::Borrowed(""),
+                &EMPTY_ATTRS,
+                0,
+                0,
+                None,
+                true,
+            );
             v.visit_text(&ctx, "test")
         })
         .unwrap();
@@ -453,15 +455,8 @@ mod tests {
         }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx =
+            NodeContext::with_borrowed_attributes(NodeType::Text, Cow::Borrowed(""), &EMPTY_ATTRS, 0, 0, None, true);
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -473,15 +468,8 @@ mod tests {
         let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Custom }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx =
+            NodeContext::with_borrowed_attributes(NodeType::Text, Cow::Borrowed(""), &EMPTY_ATTRS, 0, 0, None, true);
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -494,15 +482,8 @@ mod tests {
         let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Skip }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx =
+            NodeContext::with_borrowed_attributes(NodeType::Text, Cow::Borrowed(""), &EMPTY_ATTRS, 0, 0, None, true);
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -516,15 +497,8 @@ mod tests {
         }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx =
+            NodeContext::with_borrowed_attributes(NodeType::Text, Cow::Borrowed(""), &EMPTY_ATTRS, 0, 0, None, true);
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -536,15 +510,8 @@ mod tests {
         let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Error }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx =
+            NodeContext::with_borrowed_attributes(NodeType::Text, Cow::Borrowed(""), &EMPTY_ATTRS, 0, 0, None, true);
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello"));
 

@@ -34,15 +34,15 @@ wheels = [
 
 [[package]]
 name = "html-to-markdown"
-version = "3.6.0"
+version = "3.6.0rc12"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d3/e5/bc0e6e6787f49dd37953406941260bb7ed2f8de0c403d450d20b08a3901f/html_to_markdown-3.6.0.tar.gz", hash = "sha256:f2eb59a614830da827e6dcac0aa253d2613735cd104429323682751ecd79b0da", size = 4394226, upload-time = "2026-05-29T14:25:09.944Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/d8/4c7b2e159db28795d79077bec19ab5de77b98df9655a07a9967eaf3545eb/html_to_markdown-3.6.0rc12.tar.gz", hash = "sha256:51655d4dd9f6a3e8aad733af1affdd40b981d6d62ee772e4b71565fc438828db", size = 4434768, upload-time = "2026-06-04T09:43:41.762Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/77/de/3ce5f55ae5163a2d53a616190a2c13d0cf3f96dad50e8c9804237f6f2baa/html_to_markdown-3.6.0-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:4641c566abff4a5faa5a49d2dc4b21b1bf73480f53f45eb9b45b1983fb0dea5d", size = 6092338, upload-time = "2026-05-29T14:25:02.282Z" },
-    { url = "https://files.pythonhosted.org/packages/0e/ca/89fd1ad259591656517a86e702e18c348b145fbc8550708bed9c4325bb58/html_to_markdown-3.6.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:0c253e440864a01519031073a534b3838393f6aea6f88957bdf3546f3ee97325", size = 5736293, upload-time = "2026-05-29T14:25:03.962Z" },
-    { url = "https://files.pythonhosted.org/packages/f0/f1/585666b4665156fe2c6183e5a5ca8c512822a1c2c9757ae6ce4b281f735c/html_to_markdown-3.6.0-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:f7c9f67c84abb1b86858743b6caed4e714dc32cc4e0ed28bd31aa17ed74eb30e", size = 5890957, upload-time = "2026-05-29T14:25:05.453Z" },
-    { url = "https://files.pythonhosted.org/packages/61/31/e6d7bb7de03570d4622790e90b6519ddac1ee7c943cc3e9eb73327dd8272/html_to_markdown-3.6.0-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:0b35cd7e8d0b7687f2c974f8fcaf962c3965248bcfcee740858a2a33833fb67b", size = 6262247, upload-time = "2026-05-29T14:25:08.546Z" },
-    { url = "https://files.pythonhosted.org/packages/ed/7e/26a0a7b74fcffe5e9f3c0a648888bb59aad1bc2efff290e99e4469502d5f/html_to_markdown-3.6.0-cp310-abi3-win_amd64.whl", hash = "sha256:a0eaa429bd3a5b5301a60fde594288c9624ab7791a2f356af4f7b5495b756094", size = 6285999, upload-time = "2026-05-29T14:25:06.984Z" },
+    { url = "https://files.pythonhosted.org/packages/90/fc/229ebf23f9937782464f74030b894377dca32ea2fb7578f832193576380b/html_to_markdown-3.6.0rc12-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:ef1126f7b5860a647a562cfaec6ef4e6a8b4a8979936f58535fc96425b6ffcba", size = 6170842, upload-time = "2026-06-04T09:43:46.628Z" },
+    { url = "https://files.pythonhosted.org/packages/27/a3/b180332fde98b9119fc9bc60e81ffa379a15a3281396bf620c278e9c280c/html_to_markdown-3.6.0rc12-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:7a7072ce136cd007ac0a8881ebbf6e29c5bf472d132257fe766cccb45ba03c44", size = 5813266, upload-time = "2026-06-04T09:43:49.52Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/bf/8cd58be1423788c254d5517861da315f9660dfd65a33fd3f966fe8ee2ce0/html_to_markdown-3.6.0rc12-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2027c7508390a93644a7739736953042bd2ad7c763787782202359a76f8f6af1", size = 5967935, upload-time = "2026-06-04T09:43:44.978Z" },
+    { url = "https://files.pythonhosted.org/packages/b9/c7/c47d28ec31bda72e8736b77e9539b67ac6e4a4d2bd931e5f6d48ed3e0afe/html_to_markdown-3.6.0rc12-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:f03a06f35e08e0e7c19aa345feaa2d46fbd3c6dc7b3e9a75fd1ad704209d04eb", size = 6341364, upload-time = "2026-06-04T09:43:48.16Z" },
+    { url = "https://files.pythonhosted.org/packages/30/a8/e5562ee60aaf70a2276f1a2a0c0c570efcbee323222751944f6c5acec750/html_to_markdown-3.6.0rc12-cp310-abi3-win_amd64.whl", hash = "sha256:e2060ac6f5366601c9d3a256b0633e15461ada23bcee3dc7212d5de24ab3703a", size = 6365664, upload-time = "2026-06-04T09:43:43.506Z" },
 ]
 
 [[package]]
@@ -58,7 +58,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "html-to-markdown", specifier = ">=3.6.0" },
+    { name = "html-to-markdown", specifier = "==3.6.0rc12" },
     { name = "pytest", specifier = ">=7.4" },
     { name = "pytest-asyncio", specifier = ">=0.23" },
     { name = "pytest-timeout", specifier = ">=2.1" },

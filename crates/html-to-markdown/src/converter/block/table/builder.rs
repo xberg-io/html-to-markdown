@@ -9,9 +9,6 @@ use super::cell::{collect_table_cells, get_colspan};
 use super::cells::{append_layout_row, collect_row_cell_widths, convert_table_row};
 use super::scanner::scan_table;
 use super::utils::{is_tag_name, normalized_tag_name};
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
-
 /// Maximum allowed table columns to prevent unbounded memory usage.
 const MAX_TABLE_COLS: usize = 1000;
 
@@ -106,23 +103,20 @@ pub fn handle_table(
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
-            use std::collections::BTreeMap;
-
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Table,
-                tag_name: "table".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Table,
+                Cow::Borrowed("table"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -390,23 +384,20 @@ pub fn handle_table(
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
-            use std::collections::BTreeMap;
-
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Table,
-                tag_name: "table".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Table,
+                Cow::Borrowed("table"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
 
             let table_content = &output[table_output_start..];
 

@@ -49,6 +49,8 @@ includes:
     taskfile: ./.task/languages/swift.yml
   kotlin-android:
     taskfile: ./.task/languages/kotlin_android.yml
+  zig:
+    taskfile: ./.task/languages/zig.yml
   bench:
     taskfile: ./.task/workflows/benchmark.yml
   version:
@@ -218,6 +220,7 @@ tasks:
       - task: dart:update
       - task: swift:update
       - task: kotlin-android:update
+      - task: zig:update
       - prek autoupdate
 
   upgrade:
@@ -238,6 +241,7 @@ tasks:
       - task: dart:upgrade
       - task: swift:upgrade
       - task: kotlin-android:upgrade
+      - task: zig:upgrade
       - prek autoupdate
 
   # === Coverage ===

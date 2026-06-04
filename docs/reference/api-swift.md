@@ -13,10 +13,10 @@ and warnings.
 
   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
 
-- `convert(html, ConversionOptions.default())` — bare options.
-- `convert(html, opts)` — bare options.
-- `convert(html, Some(opts))` — explicit `Option`.
-- `convert(html, None)` — fall back to `ConversionOptions.default`.
+  - `convert(html, ConversionOptions.default())` — bare options.
+  - `convert(html, opts)` — bare options.
+  - `convert(html, Some(opts))` — explicit `Option`.
+  - `convert(html, None)` — fall back to `ConversionOptions.default`.
 
 **Errors:**
 
@@ -767,17 +767,69 @@ across language boundaries without lossy degradation.
 Context information passed to all visitor methods.
 
 Provides comprehensive metadata about the current node being visited,
-including its type, attributes, position in the DOM tree, and parent context.
+including its type, tag name, position in the DOM tree, and parent context.
+
+#### Attributes
+
+Access attributes via `NodeContext.attributes`, which returns
+`&BTreeMap<String, String>`. When the context was built with
+`NodeContext.with_lazy_attributes` (the hot path inside the converter),
+the map is only materialized on the first call — if the visitor never reads
+attributes, the allocation is skipped.
+
+#### Lifetimes
+
+String fields use `Cow<'_, str>` so the converter can pass slices directly
+out of the parsed DOM without allocating. Visitor implementations that need
+to outlive the callback should call `NodeContext.into_owned`.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `nodeType` | `NodeType` | — | Coarse-grained node type classification |
 | `tagName` | `String` | — | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
-| `attributes` | `[String: String]` | — | All HTML attributes as key-value pairs |
 | `depth` | `UInt64` | — | Depth in the DOM tree (0 = root) |
 | `indexInParent` | `UInt64` | — | Index among siblings (0-based) |
 | `parentTag` | `String?` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `Bool` | — | Whether this element is treated as inline vs block |
+
+### Methods
+
+#### attributes()
+
+Return a reference to the attribute map.
+
+If the context was built with `NodeContext.with_lazy_attributes`, the
+map is materialized on the first call and cached for subsequent calls.
+If this method is never called, no allocation occurs for attributes.
+
+**Signature:**
+
+```swift
+public func attributes() -> [String: String]
+```
+
+#### withOwnedAttributes()
+
+Construct a `NodeContext` with an owned attribute map.
+
+Prefer `NodeContext.with_lazy_attributes` (pub(crate)) inside the
+converter to avoid the eager `collect_tag_attributes` allocation.
+
+**Signature:**
+
+```swift
+public static func withOwnedAttributes(nodeType: NodeType, tagName: String, attributes: [String: String], depth: UInt64, indexInParent: UInt64, parentTag: String? = nil, isInline: Bool) -> NodeContext
+```
+
+#### intoOwned()
+
+Promote any borrowed fields into owned storage so the context can outlive `'a`.
+
+**Signature:**
+
+```swift
+public func intoOwned() -> NodeContext
+```
 
 ---
 

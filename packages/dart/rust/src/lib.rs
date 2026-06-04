@@ -739,15 +739,27 @@ impl From<VisitorHandle> for html_to_markdown_rs::VisitorHandle {
 /// Context information passed to all visitor methods.
 ///
 /// Provides comprehensive metadata about the current node being visited,
-/// including its type, attributes, position in the DOM tree, and parent context.
+/// including its type, tag name, position in the DOM tree, and parent context.
+///
+/// ## Attributes
+///
+/// Access attributes via [`NodeContext::attributes`], which returns
+/// `&BTreeMap<String, String>`. When the context was built with
+/// [`NodeContext::with_lazy_attributes`] (the hot path inside the converter),
+/// the map is only materialized on the first call — if the visitor never reads
+/// attributes, the allocation is skipped.
+///
+/// ## Lifetimes
+///
+/// String fields use [`Cow<'_, str>`] so the converter can pass slices directly
+/// out of the parsed DOM without allocating. Visitor implementations that need
+/// to outlive the callback should call [`NodeContext::into_owned`].
 #[frb(mirror(NodeContext))]
 pub struct NodeContext {
     /// Coarse-grained node type classification
     pub node_type: NodeType,
     /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
     pub tag_name: String,
-    /// All HTML attributes as key-value pairs
-    pub attributes: std::collections::HashMap<String, String>,
     /// Depth in the DOM tree (0 = root)
     pub depth: i64,
     /// Index among siblings (0-based)
@@ -1661,12 +1673,11 @@ impl From<html_to_markdown_rs::ProcessingWarning> for ProcessingWarning {
     }
 }
 
-impl From<html_to_markdown_rs::NodeContext> for NodeContext {
-    fn from(v: html_to_markdown_rs::NodeContext) -> Self {
+impl From<html_to_markdown_rs::NodeContext<'_>> for NodeContext {
+    fn from(v: html_to_markdown_rs::NodeContext<'_>) -> Self {
         NodeContext {
             node_type: NodeType::from(v.node_type),
             tag_name: v.tag_name.into(),
-            attributes: v.attributes.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
             depth: v.depth as _,
             index_in_parent: v.index_in_parent as _,
             parent_tag: v.parent_tag.map(|s| s.into()),
@@ -2362,13 +2373,6 @@ pub fn create_processing_warning_from_json(json: String) -> Result<ProcessingWar
         .map_err(|e| e.to_string())
 }
 
-#[frb]
-pub fn create_node_context_from_json(json: String) -> Result<NodeContext, String> {
-    serde_json::from_str::<html_to_markdown_rs::NodeContext>(&json)
-        .map(NodeContext::from)
-        .map_err(|e| e.to_string())
-}
-
 /// Internal Rust-side storage for Dart-provided visitor callbacks.
 /// Not exposed via FRB (private to the bridge crate); the public factory
 /// `create_{trait_snake}(...)` wraps this in the trait's configured `type_alias`
@@ -2423,7 +2427,11 @@ impl ::std::fmt::Debug for HtmlVisitorDartImpl {
 }
 
 impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
-    fn visit_text(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
+    fn visit_text(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let _text = _text.to_string();
         let __result = ::tokio::runtime::Builder::new_current_thread()
@@ -2433,7 +2441,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
         __result.into()
     }
 
-    fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_element_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let __result = ::tokio::runtime::Builder::new_current_thread()
             .build()
@@ -2444,7 +2452,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_element_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2458,7 +2466,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_link(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _href: &str,
         _text: &str,
         _title: Option<&str>,
@@ -2476,7 +2484,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_image(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: &str,
         _alt: &str,
         _title: Option<&str>,
@@ -2494,7 +2502,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_heading(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _level: u32,
         _text: &str,
         _id: Option<&str>,
@@ -2512,7 +2520,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_code_block(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _lang: Option<&str>,
         _code: &str,
     ) -> html_to_markdown_rs::VisitResult {
@@ -2528,7 +2536,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_code_inline(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _code: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2542,7 +2550,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_list_item(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _ordered: bool,
         _marker: &str,
         _text: &str,
@@ -2559,7 +2567,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_list_start(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _ordered: bool,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2572,7 +2580,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_list_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _ordered: bool,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
@@ -2585,7 +2593,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
         __result.into()
     }
 
-    fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_table_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let __result = ::tokio::runtime::Builder::new_current_thread()
             .build()
@@ -2596,7 +2604,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_table_row(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _cells: &[String],
         _is_header: bool,
     ) -> html_to_markdown_rs::VisitResult {
@@ -2611,7 +2619,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_table_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2625,7 +2633,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_blockquote(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _content: &str,
         _depth: usize,
     ) -> html_to_markdown_rs::VisitResult {
@@ -2641,7 +2649,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_strong(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2655,7 +2663,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_emphasis(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2669,7 +2677,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_strikethrough(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2683,7 +2691,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_underline(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2697,7 +2705,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_subscript(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2711,7 +2719,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_superscript(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2723,7 +2731,11 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
         __result.into()
     }
 
-    fn visit_mark(&mut self, _ctx: &html_to_markdown_rs::NodeContext, _text: &str) -> html_to_markdown_rs::VisitResult {
+    fn visit_mark(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
+        _text: &str,
+    ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let _text = _text.to_string();
         let __result = ::tokio::runtime::Builder::new_current_thread()
@@ -2733,7 +2745,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
         __result.into()
     }
 
-    fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_line_break(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let __result = ::tokio::runtime::Builder::new_current_thread()
             .build()
@@ -2742,7 +2754,10 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
         __result.into()
     }
 
-    fn visit_horizontal_rule(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_horizontal_rule(
+        &mut self,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
+    ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let __result = ::tokio::runtime::Builder::new_current_thread()
             .build()
@@ -2753,7 +2768,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_custom_element(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _tag_name: &str,
         _html: &str,
     ) -> html_to_markdown_rs::VisitResult {
@@ -2769,7 +2784,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_definition_list_start(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let __result = ::tokio::runtime::Builder::new_current_thread()
@@ -2781,7 +2796,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_definition_term(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2795,7 +2810,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_definition_description(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2809,7 +2824,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_definition_list_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2823,7 +2838,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_form(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _action: Option<&str>,
         _method: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
@@ -2839,7 +2854,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_input(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _input_type: &str,
         _name: Option<&str>,
         _value: Option<&str>,
@@ -2857,7 +2872,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_button(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2871,7 +2886,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_audio(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2885,7 +2900,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_video(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2899,7 +2914,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_iframe(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _src: Option<&str>,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2913,7 +2928,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_details(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _open: bool,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2926,7 +2941,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_summary(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2938,7 +2953,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
         __result.into()
     }
 
-    fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext) -> html_to_markdown_rs::VisitResult {
+    fn visit_figure_start(&mut self, _ctx: &html_to_markdown_rs::NodeContext<'_>) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
         let __result = ::tokio::runtime::Builder::new_current_thread()
             .build()
@@ -2949,7 +2964,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_figcaption(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _text: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());
@@ -2963,7 +2978,7 @@ impl html_to_markdown_rs::visitor::HtmlVisitor for HtmlVisitorDartImpl {
 
     fn visit_figure_end(
         &mut self,
-        _ctx: &html_to_markdown_rs::NodeContext,
+        _ctx: &html_to_markdown_rs::NodeContext<'_>,
         _output: &str,
     ) -> html_to_markdown_rs::VisitResult {
         let _ctx = NodeContext::from(_ctx.clone());

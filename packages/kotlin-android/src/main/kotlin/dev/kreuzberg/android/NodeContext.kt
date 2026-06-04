@@ -26,16 +26,28 @@ package dev.kreuzberg.android
 /**
  * Context information passed to all visitor methods.
  *
- * Provides comprehensive metadata about the current node being visited, including its type,
- * attributes, position in the DOM tree, and parent context.
+ * Provides comprehensive metadata about the current node being visited,
+ * including its type, tag name, position in the DOM tree, and parent context.
+ *
+ * ## Attributes
+ *
+ * Access attributes via `NodeContext.attributes`, which returns
+ * `&BTreeMap<String, String>`. When the context was built with
+ * `NodeContext.with_lazy_attributes` (the hot path inside the converter),
+ * the map is only materialized on the first call — if the visitor never reads
+ * attributes, the allocation is skipped.
+ *
+ * ## Lifetimes
+ *
+ * String fields use `Cow<'_, str>` so the converter can pass slices directly
+ * out of the parsed DOM without allocating. Visitor implementations that need
+ * to outlive the callback should call `NodeContext.into_owned`.
  */
 data class NodeContext(
     /** Coarse-grained node type classification */
     val nodeType: NodeType,
     /** Raw HTML tag name (e.g., "div", "h1", "custom-element") */
     val tagName: String,
-    /** All HTML attributes as key-value pairs */
-    val attributes: Map<String, String> = emptyMap(),
     /** Depth in the DOM tree (0 = root) */
     val depth: Long,
     /** Index among siblings (0-based) */

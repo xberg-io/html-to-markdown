@@ -82,22 +82,20 @@ pub fn handle_audio(
     // Dispatch the visitor callback when a visitor is attached.
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes = collect_tag_attributes(tag);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::Element,
-            tag_name: "audio".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Element,
+            Cow::Borrowed("audio"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_audio(&node_ctx, src_opt)
@@ -194,22 +192,20 @@ pub fn handle_video(
     // Dispatch the visitor callback when a visitor is attached.
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes = collect_tag_attributes(tag);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::Element,
-            tag_name: "video".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Element,
+            Cow::Borrowed("video"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_video(&node_ctx, src_opt)
@@ -327,22 +323,20 @@ pub fn handle_iframe(
     // Dispatch the visitor callback when a visitor is attached.
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes = collect_tag_attributes(tag);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::Element,
-            tag_name: "iframe".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Element,
+            Cow::Borrowed("iframe"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_iframe(&node_ctx, src_opt)

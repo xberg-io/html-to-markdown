@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kreuzberg/html-to-markdown-wasm':
-        specifier: 3.5.4
-        version: 3.5.4
+        specifier: ^3.6.0-rc.12
+        version: 3.6.0-rc.12
       rollup:
         specifier: ^4.53.3
         version: 4.60.4
@@ -32,8 +32,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kreuzberg/html-to-markdown-wasm@3.5.4':
-    resolution: {integrity: sha512-1baSup1kyPRc/guvPzufPxN+XpcugJtGA/wbz2EzyptvG692mDbQgFG8nudwKQH79Vqx9KIjygS79AaWmy9B/A==}
+  '@kreuzberg/html-to-markdown-wasm@3.6.0-rc.12':
+    resolution: {integrity: sha512-/X7eKzKt49lMgyBft6GY7IVTuN6VB3FYiurVhlY0K7Dkik1oHKHYzDWlnSQWPe2WLl7FrXwWQNxZerrM9FK7UQ==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -615,7 +615,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kreuzberg/html-to-markdown-wasm@3.5.4': {}
+  '@kreuzberg/html-to-markdown-wasm@3.6.0-rc.12': {}
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:

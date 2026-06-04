@@ -1,0 +1,31 @@
+version: "3"
+internal: true
+
+tasks:
+  update:
+    desc: "Update Zig dependencies (re-fetch each URL pinned in build.zig.zon)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/zig
+          urls="$(grep '\.url' build.zig.zon | cut -d '=' -f 2 | cut -d '#' -f 1 | tr -d '"' | tr -d ' ')"
+          for url in $urls; do
+            echo "Updating module $url"
+            zig fetch --save "$url"
+            echo
+          done
+        ignore_error: false
+
+  upgrade:
+    desc: "Upgrade Zig dependencies (re-fetch each URL pinned in build.zig.zon; SemVer pinning is per-URL)"
+    silent: false
+    cmds:
+      - cmd: |
+          cd packages/zig
+          urls="$(grep '\.url' build.zig.zon | cut -d '=' -f 2 | cut -d '#' -f 1 | tr -d '"' | tr -d ' ')"
+          for url in $urls; do
+            echo "Updating module $url"
+            zig fetch --save "$url"
+            echo
+          done
+        ignore_error: false

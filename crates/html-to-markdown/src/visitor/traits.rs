@@ -51,7 +51,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// # Arguments
     /// - `ctx`: Node context (will have `node_type: NodeType::Text`)
     /// - `text`: The raw text content (HTML entities already decoded)
-    fn visit_text(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_text(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -67,7 +67,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     ///
     /// Receives the default markdown output that would be generated.
     /// Visitors can inspect or replace this output.
-    fn visit_element_end(&mut self, _ctx: &NodeContext, _output: &str) -> VisitResult {
+    fn visit_element_end(&mut self, _ctx: &NodeContext<'_>, _output: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -78,7 +78,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `href`: The link URL (from `href` attribute)
     /// - `text`: The link text content (already converted to markdown)
     /// - `title`: Optional title attribute
-    fn visit_link(&mut self, _ctx: &NodeContext, _href: &str, _text: &str, _title: Option<&str>) -> VisitResult {
+    fn visit_link(&mut self, _ctx: &NodeContext<'_>, _href: &str, _text: &str, _title: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -89,7 +89,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `src`: The image source URL
     /// - `alt`: The alt text
     /// - `title`: Optional title attribute
-    fn visit_image(&mut self, _ctx: &NodeContext, _src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {
+    fn visit_image(&mut self, _ctx: &NodeContext<'_>, _src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -100,7 +100,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `level`: Heading level (1-6)
     /// - `text`: The heading text content
     /// - `id`: Optional id attribute (for anchor links)
-    fn visit_heading(&mut self, _ctx: &NodeContext, _level: u32, _text: &str, _id: Option<&str>) -> VisitResult {
+    fn visit_heading(&mut self, _ctx: &NodeContext<'_>, _level: u32, _text: &str, _id: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -110,7 +110,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `ctx`: Node context
     /// - `lang`: Optional language specifier (from class attribute)
     /// - `code`: The code content
-    fn visit_code_block(&mut self, _ctx: &NodeContext, _lang: Option<&str>, _code: &str) -> VisitResult {
+    fn visit_code_block(&mut self, _ctx: &NodeContext<'_>, _lang: Option<&str>, _code: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -119,7 +119,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// # Arguments
     /// - `ctx`: Node context
     /// - `code`: The code content
-    fn visit_code_inline(&mut self, _ctx: &NodeContext, _code: &str) -> VisitResult {
+    fn visit_code_inline(&mut self, _ctx: &NodeContext<'_>, _code: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -130,17 +130,17 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `ordered`: Whether this is an ordered list item
     /// - `marker`: The list marker (e.g., "-", "1.", "a)")
     /// - `text`: The list item content (already converted)
-    fn visit_list_item(&mut self, _ctx: &NodeContext, _ordered: bool, _marker: &str, _text: &str) -> VisitResult {
+    fn visit_list_item(&mut self, _ctx: &NodeContext<'_>, _ordered: bool, _marker: &str, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Called before processing a list `<ul>` or `<ol>`.
-    fn visit_list_start(&mut self, _ctx: &NodeContext, _ordered: bool) -> VisitResult {
+    fn visit_list_start(&mut self, _ctx: &NodeContext<'_>, _ordered: bool) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Called after processing a list `</ul>` or `</ol>`.
-    fn visit_list_end(&mut self, _ctx: &NodeContext, _ordered: bool, _output: &str) -> VisitResult {
+    fn visit_list_end(&mut self, _ctx: &NodeContext<'_>, _ordered: bool, _output: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -155,12 +155,12 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `ctx`: Node context
     /// - `cells`: Cell contents (already converted to markdown)
     /// - `is_header`: Whether this row is in `<thead>`
-    fn visit_table_row(&mut self, _ctx: &NodeContext, _cells: &[String], _is_header: bool) -> VisitResult {
+    fn visit_table_row(&mut self, _ctx: &NodeContext<'_>, _cells: &[String], _is_header: bool) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Called after processing a table `</table>`.
-    fn visit_table_end(&mut self, _ctx: &NodeContext, _output: &str) -> VisitResult {
+    fn visit_table_end(&mut self, _ctx: &NodeContext<'_>, _output: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -170,42 +170,42 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `ctx`: Node context
     /// - `content`: The blockquote content (already converted)
     /// - `depth`: Nesting depth (for nested blockquotes)
-    fn visit_blockquote(&mut self, _ctx: &NodeContext, _content: &str, _depth: usize) -> VisitResult {
+    fn visit_blockquote(&mut self, _ctx: &NodeContext<'_>, _content: &str, _depth: usize) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit strong/bold elements `<strong>`, `<b>`.
-    fn visit_strong(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_strong(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit emphasis/italic elements `<em>`, `<i>`.
-    fn visit_emphasis(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_emphasis(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
-    fn visit_strikethrough(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_strikethrough(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit underline elements `<u>`, `<ins>`.
-    fn visit_underline(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_underline(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit subscript elements `<sub>`.
-    fn visit_subscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_subscript(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit superscript elements `<sup>`.
-    fn visit_superscript(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_superscript(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit mark/highlight elements `<mark>`.
-    fn visit_mark(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_mark(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -225,7 +225,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     /// - `ctx`: Node context
     /// - `tag_name`: The custom element's tag name
     /// - `html`: The raw HTML of this element
-    fn visit_custom_element(&mut self, _ctx: &NodeContext, _tag_name: &str, _html: &str) -> VisitResult {
+    fn visit_custom_element(&mut self, _ctx: &NodeContext<'_>, _tag_name: &str, _html: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -235,29 +235,29 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     }
 
     /// Visit definition term `<dt>`.
-    fn visit_definition_term(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_definition_term(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit definition description `<dd>`.
-    fn visit_definition_description(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_definition_description(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Called after processing a definition list `</dl>`.
-    fn visit_definition_list_end(&mut self, _ctx: &NodeContext, _output: &str) -> VisitResult {
+    fn visit_definition_list_end(&mut self, _ctx: &NodeContext<'_>, _output: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit form elements `<form>`.
-    fn visit_form(&mut self, _ctx: &NodeContext, _action: Option<&str>, _method: Option<&str>) -> VisitResult {
+    fn visit_form(&mut self, _ctx: &NodeContext<'_>, _action: Option<&str>, _method: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit input elements `<input>`.
     fn visit_input(
         &mut self,
-        _ctx: &NodeContext,
+        _ctx: &NodeContext<'_>,
         _input_type: &str,
         _name: Option<&str>,
         _value: Option<&str>,
@@ -266,32 +266,32 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     }
 
     /// Visit button elements `<button>`.
-    fn visit_button(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_button(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit audio elements `<audio>`.
-    fn visit_audio(&mut self, _ctx: &NodeContext, _src: Option<&str>) -> VisitResult {
+    fn visit_audio(&mut self, _ctx: &NodeContext<'_>, _src: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit video elements `<video>`.
-    fn visit_video(&mut self, _ctx: &NodeContext, _src: Option<&str>) -> VisitResult {
+    fn visit_video(&mut self, _ctx: &NodeContext<'_>, _src: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit iframe elements `<iframe>`.
-    fn visit_iframe(&mut self, _ctx: &NodeContext, _src: Option<&str>) -> VisitResult {
+    fn visit_iframe(&mut self, _ctx: &NodeContext<'_>, _src: Option<&str>) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit details elements `<details>`.
-    fn visit_details(&mut self, _ctx: &NodeContext, _open: bool) -> VisitResult {
+    fn visit_details(&mut self, _ctx: &NodeContext<'_>, _open: bool) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Visit summary elements `<summary>`.
-    fn visit_summary(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_summary(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
@@ -301,12 +301,12 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
     }
 
     /// Visit figcaption elements `<figcaption>`.
-    fn visit_figcaption(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+    fn visit_figcaption(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
         VisitResult::Continue
     }
 
     /// Called after processing a figure `</figure>`.
-    fn visit_figure_end(&mut self, _ctx: &NodeContext, _output: &str) -> VisitResult {
+    fn visit_figure_end(&mut self, _ctx: &NodeContext<'_>, _output: &str) -> VisitResult {
         VisitResult::Continue
     }
 }
@@ -314,6 +314,7 @@ pub trait HtmlVisitor: std::fmt::Debug + Send {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::borrow::Cow;
     use std::collections::BTreeMap;
 
     #[derive(Debug)]
@@ -324,16 +325,17 @@ mod tests {
     #[test]
     fn test_default_visitor_implementation() {
         let mut visitor = NoOpVisitor;
+        let attrs = BTreeMap::new();
 
-        let ctx = NodeContext {
-            node_type: super::super::types::NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            super::super::types::NodeType::Text,
+            Cow::Borrowed(""),
+            &attrs,
+            0,
+            0,
+            None,
+            true,
+        );
 
         matches!(visitor.visit_element_start(&ctx), VisitResult::Continue);
         matches!(visitor.visit_element_end(&ctx, "output"), VisitResult::Continue);
@@ -349,11 +351,11 @@ mod tests {
     struct CustomLinkVisitor;
 
     impl HtmlVisitor for CustomLinkVisitor {
-        fn visit_link(&mut self, _ctx: &NodeContext, href: &str, text: &str, _title: Option<&str>) -> VisitResult {
+        fn visit_link(&mut self, _ctx: &NodeContext<'_>, href: &str, text: &str, _title: Option<&str>) -> VisitResult {
             VisitResult::Custom(format!("{} ({})", text, href))
         }
 
-        fn visit_image(&mut self, _ctx: &NodeContext, _src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {
+        fn visit_image(&mut self, _ctx: &NodeContext<'_>, _src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {
             VisitResult::Skip
         }
     }
@@ -361,16 +363,17 @@ mod tests {
     #[test]
     fn test_custom_visitor_implementation() {
         let mut visitor = CustomLinkVisitor;
+        let attrs = BTreeMap::new();
 
-        let ctx = NodeContext {
-            node_type: super::super::types::NodeType::Link,
-            tag_name: "a".to_string(),
-            attributes: BTreeMap::new(),
-            depth: 1,
-            index_in_parent: 0,
-            parent_tag: Some("p".to_string()),
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            super::super::types::NodeType::Link,
+            Cow::Borrowed("a"),
+            &attrs,
+            1,
+            0,
+            Some(Cow::Borrowed("p")),
+            true,
+        );
 
         let result = visitor.visit_link(&ctx, "https://example.com", "Example", None);
         if let VisitResult::Custom(output) = result {

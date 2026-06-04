@@ -180,7 +180,7 @@ impl HtmlVisitor for ContextCheckingVisitor {
         assert_eq!(ctx.node_type, NodeType::Heading);
         assert_eq!(ctx.tag_name, "h1");
 
-        if ctx.attributes.contains_key("id") {
+        if ctx.attributes().contains_key("id") {
             self.saw_heading_with_id = true;
         }
 

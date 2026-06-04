@@ -11,6 +11,8 @@ use crate::visitor::HtmlVisitor;
 use crate::visitor::VisitResult;
 
 use super::content::VisitorDispatch;
+use std::borrow::Cow;
+use crate::visitor::EMPTY_ATTRS;
 
 /// Dispatch a visitor callback and handle the result.
 ///
@@ -121,15 +123,15 @@ mod tests {
         let visitor: Option<Arc<Mutex<dyn HtmlVisitor + Send>>> = None;
 
         let result = dispatch_visitor(&visitor, |v| {
-            let ctx = NodeContext {
-                node_type: NodeType::Text,
-                tag_name: String::new(),
-                attributes: BTreeMap::new(),
-                depth: 0,
-                index_in_parent: 0,
-                parent_tag: None,
-                is_inline: true,
-            };
+            let ctx = NodeContext::with_borrowed_attributes(
+                NodeType::Text,
+                Cow::Borrowed(""),
+                &EMPTY_ATTRS,
+                0,
+                0,
+                None,
+                true,
+            );
             v.visit_text(&ctx, "test")
         })
         .unwrap();
@@ -144,15 +146,15 @@ mod tests {
         }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            NodeType::Text,
+            Cow::Borrowed(""),
+            &EMPTY_ATTRS,
+            0,
+            0,
+            None,
+            true,
+        );
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -164,15 +166,15 @@ mod tests {
         let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Custom }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            NodeType::Text,
+            Cow::Borrowed(""),
+            &EMPTY_ATTRS,
+            0,
+            0,
+            None,
+            true,
+        );
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -185,15 +187,15 @@ mod tests {
         let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Skip }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            NodeType::Text,
+            Cow::Borrowed(""),
+            &EMPTY_ATTRS,
+            0,
+            0,
+            None,
+            true,
+        );
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -207,15 +209,15 @@ mod tests {
         }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            NodeType::Text,
+            Cow::Borrowed(""),
+            &EMPTY_ATTRS,
+            0,
+            0,
+            None,
+            true,
+        );
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello")).unwrap();
 
@@ -227,15 +229,15 @@ mod tests {
         let visitor: Arc<Mutex<dyn HtmlVisitor + Send>> = Arc::new(Mutex::new(TestVisitor { mode: TestMode::Error }));
         let visitor_opt = Some(visitor);
 
-        let ctx = NodeContext {
-            node_type: NodeType::Text,
-            tag_name: String::new(),
-            attributes: BTreeMap::new(),
-            depth: 0,
-            index_in_parent: 0,
-            parent_tag: None,
-            is_inline: true,
-        };
+        let ctx = NodeContext::with_borrowed_attributes(
+            NodeType::Text,
+            Cow::Borrowed(""),
+            &EMPTY_ATTRS,
+            0,
+            0,
+            None,
+            true,
+        );
 
         let result = dispatch_visitor(&visitor_opt, |v| v.visit_text(&ctx, "hello"));
 

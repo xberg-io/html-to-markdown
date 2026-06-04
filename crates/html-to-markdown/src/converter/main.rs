@@ -366,10 +366,10 @@ pub fn walk_node(
             };
 
             #[cfg(feature = "visitor")]
-            if let Some(ref visitor_handle) = ctx.visitor {
+            let visitor_element_state = if let Some(ref visitor_handle) = ctx.visitor {
                 use crate::converter::visitor_hooks::{VisitAction, handle_visitor_element_start};
 
-                let action = handle_visitor_element_start(
+                let (action, state) = handle_visitor_element_start(
                     visitor_handle,
                     tag_name.as_ref(),
                     node_handle,
@@ -382,12 +382,14 @@ pub fn walk_node(
                 );
 
                 match action {
-                    VisitAction::Continue => {}
+                    VisitAction::Continue => state,
                     VisitAction::Skip => return,
                     VisitAction::Custom => return,
                     VisitAction::Error => return,
                 }
-            }
+            } else {
+                None
+            };
 
             #[cfg(feature = "visitor")]
             let visitor_is_active = ctx.visitor.is_some();
@@ -684,20 +686,18 @@ pub fn walk_node(
             }
 
             #[cfg(feature = "visitor")]
-            if let Some(ref visitor_handle) = ctx.visitor {
+            if let (Some(visitor_handle), Some(state)) = (ctx.visitor.as_ref(), visitor_element_state.as_ref()) {
                 use crate::converter::visitor_hooks::handle_visitor_element_end;
 
                 handle_visitor_element_end(
                     visitor_handle,
                     tag_name.as_ref(),
-                    node_handle,
+                    state,
                     tag,
-                    parser,
                     output,
                     element_output_start,
                     ctx,
                     depth,
-                    dom_ctx,
                 );
             }
         }

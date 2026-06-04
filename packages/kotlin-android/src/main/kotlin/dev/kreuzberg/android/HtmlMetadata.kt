@@ -26,8 +26,8 @@ package dev.kreuzberg.android
 /**
  * Comprehensive metadata extraction result from HTML document.
  *
- * Contains all extracted metadata types in a single structure, suitable for serialization and
- * transmission across language boundaries.
+ * Contains all extracted metadata types in a single structure,
+ * suitable for serialization and transmission across language boundaries.
  */
 data class HtmlMetadata(
     /** Document-level metadata (title, description, canonical, etc.) */

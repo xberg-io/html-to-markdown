@@ -8,11 +8,11 @@
 
 use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::main_helpers::trim_trailing_whitespace;
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::walk_node;
 use crate::options::ConversionOptions;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl;
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -248,26 +248,23 @@ pub fn handle_li(
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
-            use std::collections::BTreeMap;
-
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
             let parent_tag = dom_ctx
                 .parent_of(node_handle.get_inner())
                 .and_then(|pid| dom_ctx.tag_name_for(dom_ctx.node_handle(pid).copied()?, parser))
-                .map(|s| s.to_string());
+                .map(std::borrow::Cow::into_owned);
 
             let index = dom_ctx.sibling_index(node_handle.get_inner()).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::ListItem,
-                tag_name: "li".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::ListItem,
+                Cow::Borrowed("li"),
+                tag,
                 depth,
-                index_in_parent: index,
-                parent_tag,
-                is_inline: false,
-            };
+                index,
+                parent_tag.map(Cow::Owned),
+                false,
+            );
 
             let last_line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
             let last_line = &output[last_line_start..];

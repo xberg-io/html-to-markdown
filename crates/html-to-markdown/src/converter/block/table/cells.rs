@@ -5,8 +5,6 @@
 //! - Cell layout handling with colspan/rowspan support
 //! - Layout table row conversion to list items
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::converter::utility::content::normalized_tag_name;
 use std::borrow::Cow;
 
@@ -226,20 +224,17 @@ pub fn convert_table_row(
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
-        use std::collections::BTreeMap;
 
         if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
-            let node_ctx = NodeContext {
-                node_type: NodeType::TableRow,
-                tag_name: "tr".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::TableRow,
+                Cow::Borrowed("tr"),
+                tag,
                 depth,
-                index_in_parent: row_index,
-                parent_tag: Some("table".to_string()),
-                is_inline: false,
-            };
+                row_index,
+                Some(Cow::Borrowed("table")),
+                false,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

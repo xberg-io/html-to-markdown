@@ -6,7 +6,7 @@ license = "MIT"
 description = "High-performance HTML to Markdown converter"
 readme = false
 keywords = ["converter", "html", "markdown"]
-categories = ["text-processing"]
+categories = []
 
 # `ahash` and `futures-util` are conditionally included but not directly used in PHP code.
 [package.metadata.cargo-machete]
@@ -21,7 +21,7 @@ extension-module = []
 [dependencies]
 async-trait = "0.1"
 ext-php-rs = "0.15"
-html-to-markdown-rs = { version = "3.6.0-rc.12", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.6.0-rc.12", path = "../html-to-markdown", features = ["metadata", "visitor", "inline-images", "testkit"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }

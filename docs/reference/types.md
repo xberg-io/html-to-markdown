@@ -219,20 +219,7 @@ across language boundaries without lossy degradation.
 
 ---
 
-### Document Structure
-
-#### DocumentStructure
-
-A structured document tree representing the semantic content of an HTML document.
-
-Uses a flat node array with index-based parent/child references for efficient traversal.
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `nodes` | `Vec<DocumentNode>` | — | All nodes in document reading order. |
-| `source_format` | `Option<String>` | `None` | The source format (always "html" for this library). |
-
----
+### Structured Data Types
 
 #### DocumentNode
 
@@ -280,13 +267,26 @@ A top-level extracted table with both structured data and markdown representatio
 Context information passed to all visitor methods.
 
 Provides comprehensive metadata about the current node being visited,
-including its type, attributes, position in the DOM tree, and parent context.
+including its type, tag name, position in the DOM tree, and parent context.
+
+#### Attributes
+
+Access attributes via `NodeContext.attributes`, which returns
+`&BTreeMap<String, String>`. When the context was built with
+`NodeContext.with_lazy_attributes` (the hot path inside the converter),
+the map is only materialized on the first call — if the visitor never reads
+attributes, the allocation is skipped.
+
+#### Lifetimes
+
+String fields use `Cow<'_, str>` so the converter can pass slices directly
+out of the parsed DOM without allocating. Visitor implementations that need
+to outlive the callback should call `NodeContext.into_owned`.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `node_type` | `NodeType` | — | Coarse-grained node type classification |
 | `tag_name` | `String` | — | Raw HTML tag name (e.g., "div", "h1", "custom-element") |
-| `attributes` | `HashMap<String, String>` | — | All HTML attributes as key-value pairs |
 | `depth` | `usize` | — | Depth in the DOM tree (0 = root) |
 | `index_in_parent` | `usize` | — | Index among siblings (0-based) |
 | `parent_tag` | `Option<String>` | `None` | Parent element's tag name (None if root) |
@@ -324,6 +324,19 @@ Used by both `ImageMetadata` and
 |-------|------|---------|-------------|
 | `width` | `u32` | — | Width in pixels. |
 | `height` | `u32` | — | Height in pixels. |
+
+---
+
+#### DocumentStructure
+
+A structured document tree representing the semantic content of an HTML document.
+
+Uses a flat node array with index-based parent/child references for efficient traversal.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `nodes` | `Vec<DocumentNode>` | — | All nodes in document reading order. |
+| `source_format` | `Option<String>` | `None` | The source format (always "html" for this library). |
 
 ---
 

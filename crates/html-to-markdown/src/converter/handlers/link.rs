@@ -16,8 +16,6 @@ use crate::converter::block::heading::{find_single_heading_child, heading_allows
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_markdown_link, has_uri_scheme};
 use crate::converter::main::walk_node;
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::converter::utility::content::{
     collect_link_label_text, escape_link_label, get_text_content, normalize_link_label, normalized_tag_name,
 };
@@ -26,6 +24,8 @@ use crate::text;
 
 #[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 
 /// Handle an `<a>` (link) element and convert to Markdown.
 ///
@@ -208,21 +208,19 @@ pub fn handle_link(
         let link_output = if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Link,
-                tag_name: "a".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Link,
+                Cow::Borrowed("a"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: true,
-            };
+                parent_tag.map(Cow::Borrowed),
+                true,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

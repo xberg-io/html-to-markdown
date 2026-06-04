@@ -6,6 +6,8 @@
 //! - Plain block formatting (no Pandoc colon syntax)
 
 use crate::options::ConversionOptions;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl;
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -90,22 +92,20 @@ pub fn handle_dt(
 
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes = collect_tag_attributes(tag);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::DefinitionTerm,
-            tag_name: "dt".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::DefinitionTerm,
+            Cow::Borrowed("dt"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_definition_term(&node_ctx, &trimmed)
@@ -175,22 +175,20 @@ pub fn handle_dd(
 
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes = collect_tag_attributes(tag);
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::DefinitionDescription,
-            tag_name: "dd".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::DefinitionDescription,
+            Cow::Borrowed("dd"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
             visitor.visit_definition_description(&node_ctx, &trimmed)

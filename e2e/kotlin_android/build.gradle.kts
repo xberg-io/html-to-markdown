@@ -1,8 +1,11 @@
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.zip.ZipFile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.library") version "8.13.0"
-    kotlin("android") version "2.3.21"
+    kotlin("android") version "2.2.0"
 }
 
 group = "dev.kreuzberg.android"

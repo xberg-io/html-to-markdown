@@ -23,7 +23,7 @@ let package = Package(
     // The binary includes C headers for swift-bridge interop.
     .binaryTarget(
       name: "RustBridge",
-      url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0-rc.12/HtmlToMarkdown-rs.artifactbundle.zip",
+      url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v__ALEF_SWIFT_VERSION__/HtmlToMarkdown-rs.artifactbundle.zip",
       checksum: "__ALEF_SWIFT_CHECKSUM__"
     ),
     .target(

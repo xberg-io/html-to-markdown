@@ -5,6 +5,8 @@
 
 use crate::converter::main_helpers::trim_trailing_whitespace;
 use crate::options::{ConversionOptions, NewlineStyle};
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -27,26 +29,32 @@ pub fn handle(
 ) {
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
+        use crate::visitor::EMPTY_ATTRS;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
-        use std::collections::BTreeMap;
 
-        let attributes = if let Some(tl::Node::Tag(t)) = node_handle.get(parser) {
-            collect_tag_attributes(t)
-        } else {
-            BTreeMap::new()
-        };
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-        let node_ctx = NodeContext {
-            node_type: NodeType::Br,
-            tag_name: "br".to_string(),
-            attributes,
-            depth,
-            index_in_parent,
-            parent_tag,
-            is_inline: true,
+        let node_ctx = if let Some(tl::Node::Tag(t)) = node_handle.get(parser) {
+            NodeContext::with_lazy_attributes(
+                NodeType::Br,
+                Cow::Borrowed("br"),
+                t,
+                depth,
+                index_in_parent,
+                parent_tag.map(Cow::Borrowed),
+                true,
+            )
+        } else {
+            NodeContext::with_borrowed_attributes(
+                NodeType::Br,
+                Cow::Borrowed("br"),
+                &EMPTY_ATTRS,
+                depth,
+                index_in_parent,
+                parent_tag.map(Cow::Borrowed),
+                true,
+            )
         };
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

@@ -12,11 +12,13 @@ use crate::options::ConversionOptions;
 use crate::text;
 
 #[cfg(feature = "visitor")]
-use crate::converter::utility::content::{collect_tag_attributes, is_block_level_element};
+use crate::converter::utility::content::is_block_level_element;
+#[cfg(feature = "visitor")]
+use crate::visitor::EMPTY_ATTRS;
 #[cfg(feature = "visitor")]
 use crate::visitor::{NodeContext, NodeType, VisitResult, VisitorHandle};
 #[cfg(feature = "visitor")]
-use std::collections::BTreeMap;
+use std::borrow::Cow;
 
 /// Tracks list context for proper marker emission on `<li>` elements.
 #[derive(Clone, Debug)]
@@ -153,15 +155,15 @@ fn walk_plain(
             #[cfg(feature = "visitor")]
             if let Some(visitor_handle) = state.visitor {
                 let text_str: &str = &decoded;
-                let node_ctx = NodeContext {
-                    node_type: NodeType::Text,
-                    tag_name: String::new(),
-                    attributes: BTreeMap::new(),
-                    depth: state.depth,
-                    index_in_parent: 0,
-                    parent_tag: None,
-                    is_inline: true,
-                };
+                let node_ctx = NodeContext::with_borrowed_attributes(
+                    NodeType::Text,
+                    Cow::Borrowed(""),
+                    &EMPTY_ATTRS,
+                    state.depth,
+                    0,
+                    None,
+                    true,
+                );
                 let result = visitor_handle
                     .lock()
                     .expect("visitor mutex poisoned")
@@ -212,16 +214,15 @@ fn walk_plain(
             // --- visitor: element start ---
             #[cfg(feature = "visitor")]
             if let Some(visitor_handle) = state.visitor {
-                let attributes = collect_tag_attributes(tag);
-                let node_ctx = NodeContext {
-                    node_type: NodeType::Element,
-                    tag_name: tag_str.to_string(),
-                    attributes,
-                    depth: state.depth,
-                    index_in_parent: 0,
-                    parent_tag: None,
-                    is_inline: !is_block_level_element(tag_str),
-                };
+                let node_ctx = NodeContext::with_lazy_attributes(
+                    NodeType::Element,
+                    Cow::Borrowed(tag_str),
+                    tag,
+                    state.depth,
+                    0,
+                    None,
+                    !is_block_level_element(tag_str),
+                );
                 let result = visitor_handle
                     .lock()
                     .expect("visitor mutex poisoned")
@@ -337,16 +338,15 @@ fn walk_plain(
             // --- visitor: element end ---
             #[cfg(feature = "visitor")]
             if let Some(visitor_handle) = state.visitor {
-                let attributes = collect_tag_attributes(tag);
-                let node_ctx = NodeContext {
-                    node_type: NodeType::Element,
-                    tag_name: tag_str.to_string(),
-                    attributes,
-                    depth: state.depth,
-                    index_in_parent: 0,
-                    parent_tag: None,
-                    is_inline: !is_block_level_element(tag_str),
-                };
+                let node_ctx = NodeContext::with_lazy_attributes(
+                    NodeType::Element,
+                    Cow::Borrowed(tag_str),
+                    tag,
+                    state.depth,
+                    0,
+                    None,
+                    !is_block_level_element(tag_str),
+                );
                 // Clamp safe_start in case children truncated the buffer.
                 let safe_start = element_output_start.min(buf.len());
                 let element_content = &buf[safe_start..];

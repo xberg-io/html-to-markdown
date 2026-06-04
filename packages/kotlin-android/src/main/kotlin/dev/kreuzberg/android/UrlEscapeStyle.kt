@@ -26,16 +26,16 @@ package dev.kreuzberg.android
 /**
  * URL encoding strategy for link and image destinations.
  *
- * Controls how special characters in URL destinations are handled when they require escaping to
- * produce valid Markdown.
+ * Controls how special characters in URL destinations are handled when they
+ * require escaping to produce valid Markdown.
  *
- * The `Angle` variant (default) wraps the destination in angle brackets: `[text](<url with
- * spaces>)`. This is the CommonMark-specified escape hatch but breaks when the URL itself contains
- * `>`.
+ * The `Angle` variant (default) wraps the destination in angle brackets:
+ * `[text](<url with spaces>)`. This is the CommonMark-specified escape hatch
+ * but breaks when the URL itself contains `>`.
  *
- * The `Percent` variant percent-encodes every character that is not an RFC 3986 unreserved
- * character or `/`, producing a destination safe for all Markdown parsers:
- * `[text](url%20with%20spaces)`.
+ * The `Percent` variant percent-encodes every character that is not an RFC 3986
+ * unreserved character or `/`, producing a destination safe for all Markdown
+ * parsers: `[text](url%20with%20spaces)`.
  */
 enum class UrlEscapeStyle {
     /** Wrap destinations that contain spaces or newlines in angle brackets. Default. */

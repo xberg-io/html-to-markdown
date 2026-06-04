@@ -9,11 +9,14 @@ importers:
   .:
     devDependencies:
       '@kreuzberg/html-to-markdown':
-        specifier: 3.5.4
-        version: 3.5.4
+        specifier: ^3.6.0-rc.12
+        version: 3.6.0-rc.12
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.19
       vitest:
         specifier: ^4.1.5
-        version: 4.1.7(vite@8.0.14)
+        version: 4.1.7(@types/node@22.19.19)(vite@8.0.14(@types/node@22.19.19))
 
 packages:
 
@@ -29,64 +32,64 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.5.4':
-    resolution: {integrity: sha512-ULbSeK33hmUtjtbvCZRKbC04vxfJW5ddEny3qoz0C/zFnfYCLDjuK7n8NcZoRHaAFItlgaQTb14ypdVS9hb+bQ==}
+  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.0-rc.12':
+    resolution: {integrity: sha512-nLHXFycyAaqpZvlEa0K/bGs6j5HHvBWaWXSMEvvwiTEeskxq/3dMc1FiUH4VYmH7X/Dm6cf0C5NA98jqCCiGGw==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [darwin]
 
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.5.4':
-    resolution: {integrity: sha512-59ZDlrMUUhM3zMv/N6dhdJN6fw8oYT1Px1eLe+oNgRW4mAbv74yucXdOs2GAasXo7oyv4pCQ9NE5G7o5IVdOhg==}
+  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.0-rc.12':
+    resolution: {integrity: sha512-xHhaZo18JHtHiyBhjYR+LphRAXk82/tpb0Dhl47IG00AOZ8cu+TLkIQJKVxYOYqyqScIY+LVh7KbtarKhqm5Kw==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [darwin]
 
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.5.4':
-    resolution: {integrity: sha512-21mWMqEJ8arqpAXjW2/RCW6ZNTTYYVzuOS+v5Y4nquekfLZzSj/4rsS8qVD8+M9CUvr7fIK9fLTuhRsdA+TvNg==}
+  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.0-rc.12':
+    resolution: {integrity: sha512-S0g1EWV4qHnM1J7xvqtwBdPE5t3xLfOgMErMX547h/qqB86/52DaHvKdJXiYOk8EJrFgMgUdSF9aJq+nwXl/vw==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.5.4':
-    resolution: {integrity: sha512-hDFNbOGWIHzqK9yJA7XGZAKQIVhHy2oN2c27BBZD5v1WqPBFG9n2Zr6PohWDhMusWwF06B5Kt26wbjQVFvoBSQ==}
+  '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.6.0-rc.12':
+    resolution: {integrity: sha512-txGagniIzmqmopI0YaFyOYdmIZ5mtG3guyV2QLpQQYj7lgpubDXxFSaSPuWTQvJLQMQ4AUa8EPIMdaoieaUCuw==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.5.4':
-    resolution: {integrity: sha512-XcEL8CSHeDYOuF9vKW58lR/H98kJV3CunupukHQNbTrlzidsgIH0r+c6XNFTxTZfrbVsdEYLpA3utLPxvKfSiw==}
+  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.0-rc.12':
+    resolution: {integrity: sha512-V0m3f6jpWGeYUkTYiPXi9b4UZZKY3CrxWhJeWVyDwywIqOFx3jumsS9VQvH/MB7pOrJ9GZaiCP0M2fMSYZ6/kg==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.5.4':
-    resolution: {integrity: sha512-eIIm2NYtQsqiXeW4et7FtWyuYswKnUUruBpls0UPp5ovPRqny14IaeliJ2V68xQyg1GLTQtB8imzprFbz4HAQA==}
+  '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.6.0-rc.12':
+    resolution: {integrity: sha512-Uitepg3PKrQZ48nMxhZ2Pvc+78lXeDVXIiHuIWSPLpW0VCOc9wbViE5eHOxQ6E1yNZLy35jioGAaEbtOuFGNsg==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.5.4':
-    resolution: {integrity: sha512-RMrkgMPYckMdOwrgPy+oX/W3o2eIb+6Y1MmtiFHNuH6Pdvh8Y8jj9DP2iZBUID8cIhmTGTTRPov6bKb7cKDRdA==}
+  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.0-rc.12':
+    resolution: {integrity: sha512-nFGsCRCiTjjMFLrNKAUYA/Lb+1GMdxYIuaNKRTqq/tOLRLtj/bePmY11AXtjXaXOvZGhTgtLCHi509MIjab1IQ==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [win32]
 
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.5.4':
-    resolution: {integrity: sha512-k0rfZn4vHjubpDExEF0mEkFX6MEqn2QjDHWF8TrqeDRiZI9D0tTJv9CMX9s+Df9NnCihRI9UQCY5/uj+WRd+jg==}
+  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.0-rc.12':
+    resolution: {integrity: sha512-G/b6tEJ8s4EfUHpEjYWE8taCfKy/D+BGOMfovR6cYYVjPHBOk7xSribAhNIldSgsYoWihAnWkDaUh13c2NybXA==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [win32]
 
-  '@kreuzberg/html-to-markdown-node@3.5.4':
-    resolution: {integrity: sha512-Lk6Fb8Irqrb9hotavyrxqEbhOPxTJgsQAIsD5+IrVaCdWz0rptzPIPfNmXN+OeWsQQhWNOx8R3qIlf61766cHg==}
+  '@kreuzberg/html-to-markdown-node@3.6.0-rc.12':
+    resolution: {integrity: sha512-HDZW551N/N+cVpXbIqfsYOahUaZferafJzE0PFHHxy5Ywek2gNHP9fmvzozzsgp83ReMR4swrYP9s9OlrK6NOA==}
     engines: {node: '>= 18'}
 
-  '@kreuzberg/html-to-markdown@3.5.4':
-    resolution: {integrity: sha512-hzjVriwKdS15nZVzU2yJDfDl2lBLBjAyej/w1px2BpjqEYwjU7hQJ+i5hyTJos15Mjeh2Lplm8mpG+U160tGTg==}
+  '@kreuzberg/html-to-markdown@3.6.0-rc.12':
+    resolution: {integrity: sha512-VGDtXLK6fUjfCqAhDWB1EjsEG9IStjFeAvB38LtmIQ9PfSSZEfRqIcD2z7ovvLDNb0JEfYndHFSMIOb8IWlcOw==}
     engines: {node: '>= 18'}
 
   '@napi-rs/wasm-runtime@1.1.4':
@@ -210,6 +213,9 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@types/node@22.19.19':
+    resolution: {integrity: sha512-dyh/xO2Fh5bYrfWaaqGrRQQGkNdmYw6AmaAUvYeUMNTWQtvb796ikLdmTchRmOlOiIJ1TDXfWgVx1QkUlQ6Hew==}
 
   '@vitest/expect@4.1.7':
     resolution: {integrity: sha512-1R+tw0ortHEbZDGMymm+pN7/AFQ/RkFFdtd7EN+VBpynKmLbP8A3rpEXdshBJ7+8hQ9zBJh/i1s0yKNtxAnU7w==}
@@ -414,6 +420,9 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   vite@8.0.14:
     resolution: {integrity: sha512-s4BJJ+5y1pYL6Otw51FHhVJQhPnuRinKig64g/1+EUNaJsd3gCKdD31IPFvswUgW9/60QT9oFHbZHbQK5imcxw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -523,44 +532,44 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.5.4':
+  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.5.4':
+  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.5.4':
+  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.5.4':
+  '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.5.4':
+  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.5.4':
+  '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.5.4':
+  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.5.4':
+  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.0-rc.12':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node@3.5.4':
+  '@kreuzberg/html-to-markdown-node@3.6.0-rc.12':
     optionalDependencies:
-      '@kreuzberg/html-to-markdown-node-darwin-arm64': 3.5.4
-      '@kreuzberg/html-to-markdown-node-darwin-x64': 3.5.4
-      '@kreuzberg/html-to-markdown-node-linux-arm64-gnu': 3.5.4
-      '@kreuzberg/html-to-markdown-node-linux-arm64-musl': 3.5.4
-      '@kreuzberg/html-to-markdown-node-linux-x64-gnu': 3.5.4
-      '@kreuzberg/html-to-markdown-node-linux-x64-musl': 3.5.4
-      '@kreuzberg/html-to-markdown-node-win32-arm64-msvc': 3.5.4
-      '@kreuzberg/html-to-markdown-node-win32-x64-msvc': 3.5.4
+      '@kreuzberg/html-to-markdown-node-darwin-arm64': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-darwin-x64': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-linux-arm64-gnu': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-linux-arm64-musl': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-linux-x64-gnu': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-linux-x64-musl': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-win32-arm64-msvc': 3.6.0-rc.12
+      '@kreuzberg/html-to-markdown-node-win32-x64-msvc': 3.6.0-rc.12
 
-  '@kreuzberg/html-to-markdown@3.5.4':
+  '@kreuzberg/html-to-markdown@3.6.0-rc.12':
     dependencies:
-      '@kreuzberg/html-to-markdown-node': 3.5.4
+      '@kreuzberg/html-to-markdown-node': 3.6.0-rc.12
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -638,6 +647,10 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/node@22.19.19':
+    dependencies:
+      undici-types: 6.21.0
+
   '@vitest/expect@4.1.7':
     dependencies:
       '@standard-schema/spec': 1.1.0
@@ -647,13 +660,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.7(vite@8.0.14)':
+  '@vitest/mocker@4.1.7(vite@8.0.14(@types/node@22.19.19))':
     dependencies:
       '@vitest/spy': 4.1.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.14
+      vite: 8.0.14(@types/node@22.19.19)
 
   '@vitest/pretty-format@4.1.7':
     dependencies:
@@ -814,7 +827,9 @@ snapshots:
   tslib@2.8.1:
     optional: true
 
-  vite@8.0.14:
+  undici-types@6.21.0: {}
+
+  vite@8.0.14(@types/node@22.19.19):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -822,12 +837,13 @@ snapshots:
       rolldown: 1.0.2
       tinyglobby: 0.2.16
     optionalDependencies:
+      '@types/node': 22.19.19
       fsevents: 2.3.3
 
-  vitest@4.1.7(vite@8.0.14):
+  vitest@4.1.7(@types/node@22.19.19)(vite@8.0.14(@types/node@22.19.19)):
     dependencies:
       '@vitest/expect': 4.1.7
-      '@vitest/mocker': 4.1.7(vite@8.0.14)
+      '@vitest/mocker': 4.1.7(vite@8.0.14(@types/node@22.19.19))
       '@vitest/pretty-format': 4.1.7
       '@vitest/runner': 4.1.7
       '@vitest/snapshot': 4.1.7
@@ -844,8 +860,10 @@ snapshots:
       tinyexec: 1.2.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 8.0.14
+      vite: 8.0.14(@types/node@22.19.19)
       why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 22.19.19
     transitivePeerDependencies:
       - msw
 

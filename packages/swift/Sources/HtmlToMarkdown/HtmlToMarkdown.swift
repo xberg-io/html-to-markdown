@@ -526,12 +526,6 @@ internal extension ProcessingWarning {
 /// synchronisation on the caller's side.
 public typealias VisitorHandle = RustBridge.VisitorHandle
 
-/// Context information passed to all visitor methods.
-///
-/// Provides comprehensive metadata about the current node being visited,
-/// including its type, attributes, position in the DOM tree, and parent context.
-public typealias NodeContext = RustBridge.NodeContext
-
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -1331,10 +1325,6 @@ public func processingWarningFromJson(_ json: String) throws -> ProcessingWarnin
     return try JSONDecoder().decode(ProcessingWarning.self, from: data)
 }
 
-public func nodeContextFromJson(_ json: String) throws -> NodeContext {
-    return try RustBridge.nodeContextFromJson(json)
-}
-
 public func textDirectionFromJson(_ json: String) throws -> TextDirection {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(TextDirection.self, from: data)
@@ -1665,8 +1655,8 @@ private func jsonEscapeStr(_ s: String) -> String {
 
 /// Wrap a `HtmlVisitorProtocol` conformer in an opaque `VisitorHandle` handle
 /// that can be passed to `conversionOptionsFromJsonWithVisitor(...)` on the Rust side.
-public func makeHtmlVisitorHandle(_ visitor: any HtmlVisitorProtocol) -> VisitorHandle {
-    return RustBridge.makeHtmlVisitorHandle(SwiftHtmlVisitorBox(_HtmlVisitorProtocolAdapter(visitor)))
+public func makeHtmlVisitorVisitorHandle(_ visitor: any HtmlVisitorProtocol) -> VisitorHandle {
+    return RustBridge.makeHtmlVisitorVisitorHandle(SwiftHtmlVisitorBox(_HtmlVisitorProtocolAdapter(visitor)))
 }
 
 /// Decode `ConversionOptions` JSON and attach a `VisitorHandle` visitor handle.

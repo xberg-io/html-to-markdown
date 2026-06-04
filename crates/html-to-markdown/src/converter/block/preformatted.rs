@@ -7,11 +7,9 @@
 //! - Inline code formatting with backtick management
 //! - Visitor callbacks for custom code processing
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{CodeBlockStyle, ConversionOptions, WhitespaceMode};
-#[allow(unused_imports)]
-use std::collections::BTreeMap;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -95,21 +93,19 @@ pub fn handle_pre(
 
                 if let Some(node) = node_handle.get(parser) {
                     if let tl::Node::Tag(tag) = node {
-                        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
                         let node_id = node_handle.get_inner();
                         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
                         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-                        let node_ctx = NodeContext {
-                            node_type: NodeType::Pre,
-                            tag_name: "pre".to_string(),
-                            attributes,
+                        let node_ctx = NodeContext::with_lazy_attributes(
+                            NodeType::Pre,
+                            Cow::Borrowed("pre"),
+                            tag,
                             depth,
                             index_in_parent,
-                            parent_tag,
-                            is_inline: false,
-                        };
+                            parent_tag.map(Cow::Borrowed),
+                            false,
+                        );
 
                         let visit_result = {
                             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

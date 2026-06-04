@@ -26,8 +26,9 @@ package dev.kreuzberg.android
 /**
  * A single key-value metadata entry from `<head>` meta tags.
  *
- * Binding-safe replacement for `(String, String)` tuples used in `NodeContent.MetadataBlock`. Tuple
- * pairs cannot be represented across language boundaries without lossy degradation.
+ * Binding-safe replacement for `(String, String)` tuples used in
+ * `NodeContent.MetadataBlock`. Tuple pairs cannot be represented
+ * across language boundaries without lossy degradation.
  */
 data class MetadataEntry(
     /** Metadata key (e.g. `"title"`, `"description"`, `"og:title"`). */

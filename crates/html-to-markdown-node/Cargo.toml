@@ -6,7 +6,7 @@ license = "MIT"
 description = "High-performance HTML to Markdown converter"
 readme = false
 keywords = ["converter", "html", "markdown"]
-categories = ["text-processing"]
+categories = []
 
 # `serde_json` is emitted unconditionally above so the manifest is stable
 # across regens, but for umbrella crates with no JSON-marshalled return types
@@ -21,7 +21,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-trait = "0.1"
-html-to-markdown-rs = { version = "3.6.0-rc.12", path = "../html-to-markdown", features = ["full", "metadata", "visitor", "serde", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.6.0-rc.12", path = "../html-to-markdown", features = ["metadata", "visitor", "inline-images", "testkit"] }
 napi = { version = "3", features = ["async"] }
 napi-derive = "3"
 serde = { version = "1", features = ["derive"] }

@@ -60,13 +60,13 @@ struct ContentFilter {
 
 impl HtmlVisitor for ContentFilter {
     /// Use `visit_element_start` to filter ANY element by tag name
-    fn visit_element_start(&mut self, ctx: &NodeContext) -> VisitResult {
-        let tag_name = ctx.tag_name.as_str();
+    fn visit_element_start(&mut self, ctx: &NodeContext<'_>) -> VisitResult {
+        let tag_name: &str = ctx.tag_name.as_ref();
 
         match tag_name {
             "div" => {
                 // Filter divs with unwanted classes
-                let classes = ctx.attributes.get("class").map_or("", std::string::String::as_str);
+                let classes = ctx.attributes().get("class").map_or("", std::string::String::as_str);
                 if classes.contains("ad")
                     || classes.contains("advertisement")
                     || classes.contains("tracking")
@@ -95,8 +95,8 @@ impl HtmlVisitor for ContentFilter {
     /// Still use specific methods for links and images
     fn visit_image(&mut self, ctx: &NodeContext, src: &str, _alt: &str, _title: Option<&str>) -> VisitResult {
         // Remove tracking pixels (1x1 images)
-        let width = ctx.attributes.get("width").map_or("", std::string::String::as_str);
-        let height = ctx.attributes.get("height").map_or("", std::string::String::as_str);
+        let width = ctx.attributes().get("width").map_or("", std::string::String::as_str);
+        let height = ctx.attributes().get("height").map_or("", std::string::String::as_str);
 
         if width == "1" && height == "1" {
             self.skipped_elements

@@ -10,12 +10,10 @@
 //! - Visitor callbacks for custom code processing
 //! - Whitespace normalization for kbd/samp elements
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::ConversionOptions;
 use crate::text;
-#[allow(unused_imports)]
-use std::collections::BTreeMap;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -122,21 +120,19 @@ fn handle_code(
             let code_output = if let Some(ref visitor_handle) = ctx.visitor {
                 use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-                let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
                 let node_id = node_handle.get_inner();
                 let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
                 let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-                let node_ctx = NodeContext {
-                    node_type: NodeType::Code,
-                    tag_name: tag.name().as_utf8_str().to_string(),
-                    attributes,
+                let node_ctx = NodeContext::with_lazy_attributes(
+                    NodeType::Code,
+                    tag.name().as_utf8_str(),
+                    tag,
                     depth,
                     index_in_parent,
-                    parent_tag,
-                    is_inline: true,
-                };
+                    parent_tag.map(Cow::Borrowed),
+                    true,
+                );
 
                 let visit_result = {
                     let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

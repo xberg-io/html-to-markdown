@@ -7,6 +7,8 @@
 //! Figure elements group an image (or other media) with its associated caption.
 //! The Markdown output preserves this relationship through content organization.
 
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 // Note: Context and DomContext are defined in converter.rs
 // walk_node is also defined there and must be called via the parent module
 
@@ -53,22 +55,20 @@ pub fn handle_figure(
         // Check visit_figure_start before processing children.
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-            let node_ctx = NodeContext {
-                node_type: NodeType::Figure,
-                tag_name: "figure".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Figure,
+                Cow::Borrowed("figure"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_figure_start(&node_ctx)
@@ -169,22 +169,20 @@ pub fn handle_figure(
         // Call visit_figure_end after collecting content.
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-            let node_ctx = NodeContext {
-                node_type: NodeType::Figure,
-                tag_name: "figure".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Figure,
+                Cow::Borrowed("figure"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
             // Clamp to a valid char boundary in case a pop landed mid-codepoint (#380).
             let safe_start =
                 crate::converter::utility::content::floor_char_boundary(output, figure_start.min(output.len()));
@@ -262,22 +260,20 @@ pub fn handle_figcaption(
 
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-            let node_ctx = NodeContext {
-                node_type: NodeType::Figcaption,
-                tag_name: "figcaption".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Figcaption,
+                Cow::Borrowed("figcaption"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_figcaption(&node_ctx, &text)

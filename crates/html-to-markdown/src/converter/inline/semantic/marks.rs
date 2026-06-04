@@ -5,11 +5,9 @@
 //! - Strikethrough (del, s tags) with ~~ syntax
 //! - Inserted/underlined text (ins, u tags) with == syntax
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
 #[cfg(feature = "visitor")]
-use std::collections::BTreeMap;
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
@@ -46,21 +44,20 @@ pub fn handle_mark(
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         let text_content = get_text_content(node_handle, parser, dom_ctx);
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Mark,
-            tag_name: tag.name().as_utf8_str().to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Mark,
+            tag.name().as_utf8_str(),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: true,
-        };
+            parent_tag.map(Cow::Borrowed),
+            true,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -188,21 +185,20 @@ pub fn handle_strikethrough(
             use crate::converter::get_text_content;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
             let text_content = get_text_content(node_handle, parser, dom_ctx);
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Strikethrough,
-                tag_name: tag_name.to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Strikethrough,
+                Cow::Borrowed(tag_name),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: true,
-            };
+                parent_tag.map(Cow::Borrowed),
+                true,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -310,21 +306,20 @@ pub fn handle_inserted(
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         let text_content = get_text_content(node_handle, parser, dom_ctx);
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Underline,
-            tag_name: "ins".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Underline,
+            Cow::Borrowed("ins"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: true,
-        };
+            parent_tag.map(Cow::Borrowed),
+            true,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -420,21 +415,20 @@ pub fn handle_underline(
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         let text_content = get_text_content(node_handle, parser, dom_ctx);
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Underline,
-            tag_name: "u".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Underline,
+            Cow::Borrowed("u"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: true,
-        };
+            parent_tag.map(Cow::Borrowed),
+            true,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

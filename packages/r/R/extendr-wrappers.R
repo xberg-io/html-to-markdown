@@ -449,16 +449,31 @@ ProcessingWarning <- new.env(parent = emptyenv())
 #' Context information passed to all visitor methods
 #'
 #' Provides comprehensive metadata about the current node being visited,
-#' including its type, attributes, position in the DOM tree, and parent context.
+#' including its type, tag name, position in the DOM tree, and parent context.
+#'
+#' ## Attributes
+#'
+#' Access attributes via [`NodeContext::attributes`], which returns
+#' `&BTreeMap<String, String>`. When the context was built with
+#' [`NodeContext::with_lazy_attributes`] (the hot path inside the converter),
+#' the map is only materialized on the first call — if the visitor never reads
+#' attributes, the allocation is skipped.
+#'
+#' ## Lifetimes
+#'
+#' String fields use [`Cow<'_, str>`] so the converter can pass slices directly
+#' out of the parsed DOM without allocating. Visitor implementations that need
+#' to outlive the callback should call [`NodeContext::into_owned`].
 #' @field node_type Coarse-grained node type classification
 #' @field tag_name Raw HTML tag name (e.g., "div", "h1", "custom-element")
-#' @field attributes All HTML attributes as key-value pairs
 #' @field depth Depth in the DOM tree (0 = root)
 #' @field index_in_parent Index among siblings (0-based)
 #' @field parent_tag Parent element's tag name (None if root)
 #' @field is_inline Whether this element is treated as inline vs block
 #' @export
 NodeContext <- new.env(parent = emptyenv())
+NodeContext$attributes <- function(self) .Call("wrap__NodeContext__attributes", self, PACKAGE = "htmltomarkdown")
+NodeContext$into_owned <- function(self) .Call("wrap__NodeContext__into_owned", self, PACKAGE = "htmltomarkdown")
 #' @export
 `$.NodeContext` <- function(self, name) {
   func <- NodeContext[[name]]
@@ -470,6 +485,10 @@ NodeContext <- new.env(parent = emptyenv())
 }
 #' @export
 `[[.NodeContext` <- `$.NodeContext`
+#' @export
+attributes.NodeContext <- function(x, ...) x$attributes(...)
+#' @export
+into_owned.NodeContext <- function(x, ...) x$into_owned(...)
 #' Result of a visitor callback
 #'
 #' Allows visitors to control the conversion flow by either proceeding
@@ -665,5 +684,9 @@ AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_jso
 }
 #' @export
 `[[.AnnotationKind` <- `$.AnnotationKind`
+#' @export
+attributes <- function(x, ...) UseMethod("attributes")
+#' @export
+into_owned <- function(x, ...) UseMethod("into_owned")
 #' @export
 is_valid <- function(x, ...) UseMethod("is_valid")

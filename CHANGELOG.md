@@ -51,6 +51,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `tools/benchmark-harness/guardrails.json` (5% clean_large, 8% clean_medium, 10% other groups,
   30% adversarial). Baselines are blessed deliberately by humans, not automatically by CI.
 
+### Changed
+
+- **BREAKING: `NodeContext::attributes` is no longer a public field.** Access attributes via
+  the new `attributes()` method (`fn attributes(&self) -> &BTreeMap<String, String>`).
+  Struct-literal construction of `NodeContext` is no longer possible; use the provided
+  constructors: `with_borrowed_attributes`, `with_owned_attributes` (public), or
+  `with_lazy_attributes` (pub(crate), for internal use only). Attributes are now
+  lazily materialized from the DOM on first access when constructed via the internal path,
+  eliminating the per-element `BTreeMap` allocation on the visitor hot path. Measured
+  throughput improvement with visitor enabled (100-iteration harness, Apple Silicon):
+  small_html −29%, medium_python −10%, large_rust −24%, tables_countries −24%.
+
+- **`DomContext::parent_tag_name` now returns `Option<&str>` instead of `Option<String>`.**
+  This is an internal API (`pub(crate)`); external consumers are unaffected.
+
 ### Performance
 
 - **Tier-1 byte scanner activated in production** (`tier_strategy = Auto`). The classifier

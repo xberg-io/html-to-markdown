@@ -9,6 +9,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/kreuzberg-dev/html-to-markdown"
 
   spec.license       = "MIT"
+
   spec.required_ruby_version = ">= 3.2.0"
   spec.metadata["keywords"] = %w[converter html markdown].join(",")
   spec.metadata["rubygems_mfa_required"] = "true"

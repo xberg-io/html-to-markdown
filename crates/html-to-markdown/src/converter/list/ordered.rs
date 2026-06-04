@@ -10,11 +10,9 @@ use super::utils::{
     add_list_leading_separator, add_nested_list_trailing_separator, calculate_list_nesting_depth, is_loose_list,
     process_list_children,
 };
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::ConversionOptions;
-#[allow(unused_imports)]
-use std::collections::BTreeMap;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl;
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -62,24 +60,22 @@ pub fn handle_ol(
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
         let parent_tag = dom_ctx
             .parent_of(node_handle.get_inner())
             .and_then(|pid| dom_ctx.tag_name_for(dom_ctx.node_handle(pid).copied()?, parser))
-            .map(|s| s.to_string());
+            .map(std::borrow::Cow::into_owned);
 
         let index = dom_ctx.sibling_index(node_handle.get_inner()).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::List,
-            tag_name: "ol".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::List,
+            Cow::Borrowed("ol"),
+            tag,
             depth,
-            index_in_parent: index,
-            parent_tag,
-            is_inline: false,
-        };
+            index,
+            parent_tag.map(Cow::Owned),
+            false,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -139,24 +135,22 @@ pub fn handle_ol(
     if let Some(ref visitor_handle) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
         let parent_tag = dom_ctx
             .parent_of(node_handle.get_inner())
             .and_then(|pid| dom_ctx.tag_name_for(dom_ctx.node_handle(pid).copied()?, parser))
-            .map(|s| s.to_string());
+            .map(std::borrow::Cow::into_owned);
 
         let index = dom_ctx.sibling_index(node_handle.get_inner()).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::List,
-            tag_name: "ol".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::List,
+            Cow::Borrowed("ol"),
+            tag,
             depth,
-            index_in_parent: index,
-            parent_tag,
-            is_inline: false,
-        };
+            index,
+            parent_tag.map(Cow::Owned),
+            false,
+        );
 
         let list_content = &output[list_output_start..];
 

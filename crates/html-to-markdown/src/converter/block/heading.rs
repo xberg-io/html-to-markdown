@@ -6,12 +6,8 @@
 //! - Metadata collection (headers, IDs)
 //! - Visitor callbacks for custom heading processing
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, HeadingStyle};
 use std::borrow::Cow;
-#[allow(unused_imports)]
-use std::collections::BTreeMap;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -313,21 +309,19 @@ fn visitor_heading_output(
                     .flatten()
                     .map(|v| v.as_utf8_str().to_string());
 
-                let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
                 let node_id = node_handle.get_inner();
                 let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
                 let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-                let node_ctx = NodeContext {
-                    node_type: NodeType::Heading,
-                    tag_name: tag_name.to_string(),
-                    attributes,
+                let node_ctx = NodeContext::with_lazy_attributes(
+                    NodeType::Heading,
+                    Cow::Borrowed(tag_name),
+                    tag,
                     depth,
                     index_in_parent,
-                    parent_tag,
-                    is_inline: false,
-                };
+                    parent_tag.map(Cow::Borrowed),
+                    false,
+                );
 
                 let visit_result = {
                     let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

@@ -3,11 +3,15 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-buildscript { dependencies { classpath("com.vanniktech:gradle-maven-publish-plugin:0.36.0") } }
+buildscript {
+    dependencies {
+        classpath("com.vanniktech:gradle-maven-publish-plugin:0.36.0")
+    }
+}
 
 plugins {
     id("com.android.library") version "8.13.0"
-    kotlin("android") version "2.3.21"
+    kotlin("android") version "2.2.0"
     id("com.vanniktech.maven.publish") version "0.36.0"
     id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
     id("com.github.ben-manes.versions") version "0.52.0"
@@ -27,12 +31,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    sourceSets { getByName("main") { jniLibs.srcDirs("src/main/jniLibs") } }
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs")
+        }
+    }
 }
 
 kotlin {
     jvmToolchain(21)
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 ktlint {
@@ -60,13 +70,11 @@ dependencies {
 }
 
 mavenPublishing {
-    configure(
-        AndroidSingleVariantLibrary(
-            variant = "release",
-            sourcesJar = com.vanniktech.maven.publish.SourcesJar.Sources(),
-            javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
-        )
-    )
+    configure(AndroidSingleVariantLibrary(
+        variant = "release",
+        sourcesJar = com.vanniktech.maven.publish.SourcesJar.Sources(),
+        javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
+    ))
 
     publishToMavenCentral()
     signAllPublications()
@@ -97,9 +105,7 @@ mavenPublishing {
         scm {
             url.set("https://github.com/kreuzberg-dev/html-to-markdown")
             connection.set("scm:git:git://github.com/kreuzberg-dev/html-to-markdown.git")
-            developerConnection.set(
-                "scm:git:ssh://git@github.com:kreuzberg-dev/html-to-markdown.git"
-            )
+            developerConnection.set("scm:git:ssh://git@github.com:kreuzberg-dev/html-to-markdown.git")
         }
     }
 }

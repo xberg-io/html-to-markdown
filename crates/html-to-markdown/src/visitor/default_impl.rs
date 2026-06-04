@@ -16,6 +16,7 @@ pub type VisitorHandle = Arc<Mutex<dyn super::traits::HtmlVisitor + Send>>;
 mod tests {
     use super::super::traits::HtmlVisitor;
     use super::super::types::{NodeContext, NodeType, VisitResult};
+    use std::borrow::Cow;
     use std::collections::BTreeMap;
 
     #[derive(Debug)]
@@ -25,12 +26,12 @@ mod tests {
     }
 
     impl HtmlVisitor for TrackingVisitor {
-        fn visit_element_start(&mut self, _ctx: &NodeContext) -> VisitResult {
+        fn visit_element_start(&mut self, _ctx: &NodeContext<'_>) -> VisitResult {
             self.element_count += 1;
             VisitResult::Continue
         }
 
-        fn visit_text(&mut self, _ctx: &NodeContext, _text: &str) -> VisitResult {
+        fn visit_text(&mut self, _ctx: &NodeContext<'_>, _text: &str) -> VisitResult {
             self.text_count += 1;
             VisitResult::Continue
         }
@@ -47,15 +48,16 @@ mod tests {
 
         {
             let mut v = handle.lock().expect("visitor mutex poisoned");
-            let ctx = NodeContext {
-                node_type: NodeType::Text,
-                tag_name: "p".to_string(),
-                attributes: BTreeMap::new(),
-                depth: 1,
-                index_in_parent: 0,
-                parent_tag: Some("div".to_string()),
-                is_inline: false,
-            };
+            let attrs = BTreeMap::new();
+            let ctx = NodeContext::with_borrowed_attributes(
+                NodeType::Text,
+                Cow::Borrowed("p"),
+                &attrs,
+                1,
+                0,
+                Some(Cow::Borrowed("div")),
+                false,
+            );
             v.visit_text(&ctx, "test");
         }
 

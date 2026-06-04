@@ -41,10 +41,8 @@ pub fn handle_form(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
@@ -58,15 +56,15 @@ pub fn handle_form(
                 .get("method")
                 .flatten()
                 .map(|v| v.as_utf8_str().into_owned());
-            let node_ctx = NodeContext {
-                node_type: NodeType::Form,
-                tag_name: "form".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Form,
+                Cow::Borrowed("form"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: false,
-            };
+                parent_tag.map(Cow::Borrowed),
+                false,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_form(&node_ctx, action.as_deref(), method.as_deref())
@@ -303,11 +301,9 @@ pub fn handle_input(
 ) {
     #[cfg(feature = "visitor")]
     if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::converter::utility::content::collect_tag_attributes;
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
@@ -327,15 +323,15 @@ pub fn handle_input(
                 .get("value")
                 .flatten()
                 .map(|v| v.as_utf8_str().into_owned());
-            let node_ctx = NodeContext {
-                node_type: NodeType::Input,
-                tag_name: "input".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Input,
+                Cow::Borrowed("input"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: true,
-            };
+                parent_tag.map(Cow::Borrowed),
+                true,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_input(&node_ctx, &input_type, name.as_deref(), value.as_deref())
@@ -542,23 +538,21 @@ pub fn handle_button(
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
             use crate::converter::get_text_content;
-            use crate::converter::utility::content::collect_tag_attributes;
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
             let text = get_text_content(node_handle, parser, dom_ctx);
-            let attributes = collect_tag_attributes(tag);
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-            let node_ctx = NodeContext {
-                node_type: NodeType::Button,
-                tag_name: "button".to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Button,
+                Cow::Borrowed("button"),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: true,
-            };
+                parent_tag.map(Cow::Borrowed),
+                true,
+            );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
                 visitor.visit_button(&node_ctx, &text)

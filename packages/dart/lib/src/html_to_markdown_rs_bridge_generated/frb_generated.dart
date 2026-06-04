@@ -124,7 +124,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 1406531119;
+  int get rustContentHash => -385251249;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -272,8 +272,6 @@ abstract class RustLibApi extends BaseApi {
   Future<MetadataEntry> crateCreateMetadataEntryFromJson({
     required String json,
   });
-
-  Future<NodeContext> crateCreateNodeContextFromJson({required String json});
 
   Future<PreprocessingOptions> crateCreatePreprocessingOptionsFromJson({
     required String json,
@@ -1161,37 +1159,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<NodeContext> crateCreateNodeContextFromJson({required String json}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(json, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 17,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_node_context,
-          decodeErrorData: sse_decode_String,
-        ),
-        constMeta: kCrateCreateNodeContextFromJsonConstMeta,
-        argValues: [json],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateCreateNodeContextFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_node_context_from_json",
-        argNames: ["json"],
-      );
-
-  @override
   Future<PreprocessingOptions> crateCreatePreprocessingOptionsFromJson({
     required String json,
   }) {
@@ -1203,7 +1170,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 17,
             port: port_,
           );
         },
@@ -1235,7 +1202,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 19,
+            funcId: 18,
             port: port_,
           );
         },
@@ -1268,7 +1235,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 19,
             port: port_,
           );
         },
@@ -1301,7 +1268,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 21,
+            funcId: 20,
             port: port_,
           );
         },
@@ -1332,7 +1299,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 22,
+            funcId: 21,
             port: port_,
           );
         },
@@ -1363,7 +1330,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 23,
+            funcId: 22,
             port: port_,
           );
         },
@@ -1396,7 +1363,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 24,
+            funcId: 23,
             port: port_,
           );
         },
@@ -2797,16 +2764,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NodeContext dco_decode_node_context(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return NodeContext(
       nodeType: dco_decode_node_type(arr[0]),
       tagName: dco_decode_String(arr[1]),
-      attributes: dco_decode_Map_String_String_None(arr[2]),
-      depth: dco_decode_i_64(arr[3]),
-      indexInParent: dco_decode_i_64(arr[4]),
-      parentTag: dco_decode_opt_String(arr[5]),
-      isInline: dco_decode_bool(arr[6]),
+      depth: dco_decode_i_64(arr[2]),
+      indexInParent: dco_decode_i_64(arr[3]),
+      parentTag: dco_decode_opt_String(arr[4]),
+      isInline: dco_decode_bool(arr[5]),
     );
   }
 
@@ -4164,7 +4130,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_nodeType = sse_decode_node_type(deserializer);
     var var_tagName = sse_decode_String(deserializer);
-    var var_attributes = sse_decode_Map_String_String_None(deserializer);
     var var_depth = sse_decode_i_64(deserializer);
     var var_indexInParent = sse_decode_i_64(deserializer);
     var var_parentTag = sse_decode_opt_String(deserializer);
@@ -4172,7 +4137,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return NodeContext(
       nodeType: var_nodeType,
       tagName: var_tagName,
-      attributes: var_attributes,
       depth: var_depth,
       indexInParent: var_indexInParent,
       parentTag: var_parentTag,
@@ -5745,7 +5709,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_node_type(self.nodeType, serializer);
     sse_encode_String(self.tagName, serializer);
-    sse_encode_Map_String_String_None(self.attributes, serializer);
     sse_encode_i_64(self.depth, serializer);
     sse_encode_i_64(self.indexInParent, serializer);
     sse_encode_opt_String(self.parentTag, serializer);

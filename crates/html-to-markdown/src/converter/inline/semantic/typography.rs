@@ -7,11 +7,9 @@
 //! - Abbreviation (abbr) with optional title
 //! - Span element with special OCR handling
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
 #[cfg(feature = "visitor")]
-use std::collections::BTreeMap;
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
@@ -82,21 +80,20 @@ pub fn handle_subscript(
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         let text_content = get_text_content(node_handle, parser, dom_ctx);
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Subscript,
-            tag_name: tag.name().as_utf8_str().to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Subscript,
+            tag.name().as_utf8_str(),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: true,
-        };
+            parent_tag.map(Cow::Borrowed),
+            true,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -184,21 +181,20 @@ pub fn handle_superscript(
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
         let text_content = get_text_content(node_handle, parser, dom_ctx);
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Superscript,
-            tag_name: tag.name().as_utf8_str().to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Superscript,
+            tag.name().as_utf8_str(),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: true,
-        };
+            parent_tag.map(Cow::Borrowed),
+            true,
+        );
 
         let visit_result = {
             let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

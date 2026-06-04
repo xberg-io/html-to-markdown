@@ -307,23 +307,13 @@ impl DomContext {
 
     /// Get the parent tag name for a given node ID.
     ///
-    /// Returns the tag name of the parent element if it exists and is a tag,
-    /// otherwise returns None.
-    #[cfg_attr(not(feature = "visitor"), allow(dead_code))]
-    pub(crate) fn parent_tag_name(&self, node_id: u32, parser: &tl::Parser) -> Option<String> {
+    /// Returns a borrow into the cached [`TagInfo`] for the parent element,
+    /// or `None` if there is no tag parent. The result has the same lifetime
+    /// as `&self` because `TagInfo` is stored in a `OnceCell` owned by this
+    /// context.
+    pub(crate) fn parent_tag_name<'s>(&'s self, node_id: u32, parser: &tl::Parser) -> Option<&'s str> {
         let parent_id = self.parent_of(node_id)?;
-        let parent_handle = self.node_handle(parent_id)?;
-
-        if let Some(info) = self.tag_info(parent_id, parser) {
-            return Some(info.name.clone());
-        }
-
-        if let Some(tl::Node::Tag(tag)) = parent_handle.get(parser) {
-            let name = normalized_tag_name(tag.name().as_utf8_str());
-            return Some(name.into_owned());
-        }
-
-        None
+        self.tag_info(parent_id, parser).map(|info| info.name.as_str())
     }
 
     /// Get the index of a node among its siblings.

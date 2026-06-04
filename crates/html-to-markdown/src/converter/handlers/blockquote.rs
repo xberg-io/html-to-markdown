@@ -12,13 +12,9 @@ use crate::converter::main::walk_node;
 use crate::options::ConversionOptions;
 
 #[cfg(feature = "visitor")]
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
-#[cfg(feature = "visitor")]
-use std::collections::BTreeMap;
-
-#[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node_to_html;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 
 /// Handle a `<blockquote>` element and convert to Markdown.
 ///
@@ -89,21 +85,19 @@ pub fn handle_blockquote(
     if let Some(ref visitor) = ctx.visitor {
         use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-        let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
-
         let node_id = node_handle.get_inner();
         let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
         let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-        let node_ctx = NodeContext {
-            node_type: NodeType::Blockquote,
-            tag_name: "blockquote".to_string(),
-            attributes,
+        let node_ctx = NodeContext::with_lazy_attributes(
+            NodeType::Blockquote,
+            Cow::Borrowed("blockquote"),
+            tag,
             depth,
             index_in_parent,
-            parent_tag,
-            is_inline: false,
-        };
+            parent_tag.map(Cow::Borrowed),
+            false,
+        );
 
         let mut visitor_ref = visitor.lock().expect("visitor mutex poisoned");
         match visitor_ref.visit_blockquote(&node_ctx, trimmed_content, ctx.blockquote_depth) {

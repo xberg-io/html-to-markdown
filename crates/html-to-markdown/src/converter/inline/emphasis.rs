@@ -8,11 +8,9 @@
 //! - Visitor callbacks for custom emphasis processing
 //! - Bootstrap caret detection (.caret class)
 
-#[cfg(feature = "visitor")]
-use crate::converter::utility::content::collect_tag_attributes;
 use crate::options::{ConversionOptions, OutputFormat};
-#[allow(unused_imports)]
-use std::collections::BTreeMap;
+#[cfg(feature = "visitor")]
+use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 // Type aliases for Context and DomContext to avoid circular imports
@@ -108,21 +106,20 @@ fn handle_strong(
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
             let text_content = get_text_content(node_handle, parser, dom_ctx);
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Strong,
-                tag_name: tag.name().as_utf8_str().to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Strong,
+                tag.name().as_utf8_str(),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: true,
-            };
+                parent_tag.map(Cow::Borrowed),
+                true,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
@@ -244,21 +241,20 @@ fn handle_emphasis(
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
             let text_content = get_text_content(node_handle, parser, dom_ctx);
-            let attributes: BTreeMap<String, String> = collect_tag_attributes(tag);
 
             let node_id = node_handle.get_inner();
             let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
             let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
 
-            let node_ctx = NodeContext {
-                node_type: NodeType::Em,
-                tag_name: tag.name().as_utf8_str().to_string(),
-                attributes,
+            let node_ctx = NodeContext::with_lazy_attributes(
+                NodeType::Em,
+                tag.name().as_utf8_str(),
+                tag,
                 depth,
                 index_in_parent,
-                parent_tag,
-                is_inline: true,
-            };
+                parent_tag.map(Cow::Borrowed),
+                true,
+            );
 
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");

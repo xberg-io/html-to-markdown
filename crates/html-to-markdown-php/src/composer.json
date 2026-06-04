@@ -28,7 +28,7 @@
     "extension-name": "html_to_markdown",
     "support-zts": true,
     "support-nts": true,
-    "download-url-method": ["pre-packaged-binary", "composer-default"]
+    "download-url-method": "pre-packaged-binary"
   },
   "keywords": ["converter", "html", "markdown"]
 }

@@ -7,6 +7,7 @@ use std::collections::BTreeMap;
 
 use crate::visitor::NodeContext;
 use crate::visitor::NodeType;
+use std::borrow::Cow;
 
 /// Build a `NodeContext` from current parsing state.
 ///
@@ -55,24 +56,24 @@ use crate::visitor::NodeType;
 /// ```
 #[allow(dead_code)]
 #[inline]
-pub fn build_node_context(
+pub fn build_node_context<'a>(
     node_type: NodeType,
-    tag_name: &str,
-    attributes: &BTreeMap<String, String>,
+    tag_name: &'a str,
+    attributes: &'a BTreeMap<String, String>,
     depth: usize,
     index_in_parent: usize,
-    parent_tag: Option<&str>,
+    parent_tag: Option<&'a str>,
     is_inline: bool,
-) -> NodeContext {
-    NodeContext {
+) -> NodeContext<'a> {
+    NodeContext::with_borrowed_attributes(
         node_type,
-        tag_name: tag_name.to_string(),
-        attributes: attributes.clone(),
+        Cow::Borrowed(tag_name),
+        attributes,
         depth,
         index_in_parent,
-        parent_tag: parent_tag.map(String::from),
+        parent_tag.map(Cow::Borrowed),
         is_inline,
-    }
+    )
 }
 
 #[cfg(test)]
@@ -91,10 +92,10 @@ mod tests {
         assert_eq!(ctx.tag_name, "div");
         assert_eq!(ctx.depth, 2);
         assert_eq!(ctx.index_in_parent, 3);
-        assert_eq!(ctx.parent_tag, Some("body".to_string()));
+        assert_eq!(ctx.parent_tag.as_deref(), Some("body"));
         assert!(!ctx.is_inline);
-        assert_eq!(ctx.attributes.len(), 2);
-        assert_eq!(ctx.attributes.get("id"), Some(&"main".to_string()));
+        assert_eq!(ctx.attributes().len(), 2);
+        assert_eq!(ctx.attributes().get("id"), Some(&"main".to_string()));
     }
 
     #[test]
@@ -105,6 +106,6 @@ mod tests {
 
         assert_eq!(ctx.node_type, NodeType::Html);
         assert_eq!(ctx.parent_tag, None);
-        assert!(ctx.attributes.is_empty());
+        assert!(ctx.attributes().is_empty());
     }
 }
