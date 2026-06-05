@@ -202,6 +202,7 @@ vendor/
 **/.zig-cache/
 **/.dart_tool/
 **/.build/
+test_apps/zig/zig-pkg/
 e2e/kotlin_android/build/
 test_apps/kotlin_android/build/
 packages/kotlin-android/build/

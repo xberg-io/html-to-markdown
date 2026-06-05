@@ -47,7 +47,7 @@ kotlin {
 
 dependencies {
     // Published Android AAR from Maven Central (verifies artifact resolution)
-    implementation("dev.kreuzberg:html-to-markdown-android:3.6.0-rc.13")
+    implementation("dev.kreuzberg:html-to-markdown-android:3.6.0-rc.14")
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -80,7 +80,7 @@ dependencies {
 tasks.register("verifyAarPublished") {
     description = "Verify the published Android AAR contains jniLibs and classes.jar"
     doLast {
-        val aarCoord = "dev.kreuzberg:html-to-markdown-android:3.6.0-rc.13"
+        val aarCoord = "dev.kreuzberg:html-to-markdown-android:3.6.0-rc.14"
         val (groupId, artifactId, version) = run {
             val parts = aarCoord.split(':')
             Triple(parts[0], parts[1], parts[2])
@@ -92,7 +92,7 @@ tasks.register("verifyAarPublished") {
         println("Downloading AAR from Maven Central: ${mavenUrl}")
         aarFile.parentFile.mkdirs()
 
-        val connection = java.net.URL(mavenUrl).openConnection() as java.net.HttpURLConnection
+        val connection = URL(mavenUrl).openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.connect()
 
@@ -107,7 +107,7 @@ tasks.register("verifyAarPublished") {
         }
 
         println("Verifying AAR contents...")
-        java.util.zip.ZipFile(aarFile).use { zip ->
+        ZipFile(aarFile).use { zip ->
             val entries = zip.entries().toList()
             val hasJniLibs = entries.any { it.name.startsWith("jniLibs/") }
             val hasClasses = entries.any { it.name == "classes.jar" }

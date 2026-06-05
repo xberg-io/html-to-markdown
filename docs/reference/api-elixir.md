@@ -2,7 +2,7 @@
 title: "Elixir API Reference"
 ---
 
-## Elixir API Reference <span class="version-badge">v3.6.0-rc.13</span>
+## Elixir API Reference <span class="version-badge">v3.6.0-rc.14</span>
 
 ### Functions
 

@@ -526,6 +526,72 @@ internal extension ProcessingWarning {
 /// synchronisation on the caller's side.
 public typealias VisitorHandle = RustBridge.VisitorHandle
 
+/// Context information passed to all visitor methods.
+///
+/// Provides comprehensive metadata about the current node being visited,
+/// including its type, tag name, position in the DOM tree, and parent context.
+///
+/// ## Attributes
+///
+/// Access attributes via [`NodeContext::attributes`], which returns
+/// `&BTreeMap<String, String>`. When the context was built with
+/// [`NodeContext::with_lazy_attributes`] (the hot path inside the converter),
+/// the map is only materialized on the first call — if the visitor never reads
+/// attributes, the allocation is skipped.
+///
+/// ## Lifetimes
+///
+/// String fields use [`Cow<'_, str>`] so the converter can pass slices directly
+/// out of the parsed DOM without allocating. Visitor implementations that need
+/// to outlive the callback should call [`NodeContext::into_owned`].
+public struct NodeContext: Codable, Sendable, Hashable {
+    /// Coarse-grained node type classification
+    public let nodeType: NodeType
+    /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
+    public let tagName: String
+    /// Depth in the DOM tree (0 = root)
+    public let depth: UInt
+    /// Index among siblings (0-based)
+    public let indexInParent: UInt
+    /// Parent element's tag name (None if root)
+    public let parentTag: String?
+    /// Whether this element is treated as inline vs block
+    public let isInline: Bool
+    public init(nodeType: NodeType, tagName: String, depth: UInt, indexInParent: UInt, parentTag: String? = nil, isInline: Bool) {
+        self.nodeType = nodeType
+        self.tagName = tagName
+        self.depth = depth
+        self.indexInParent = indexInParent
+        self.parentTag = parentTag
+        self.isInline = isInline
+    }
+    private enum CodingKeys: String, CodingKey {
+        case nodeType = "node_type"
+        case tagName = "tag_name"
+        case depth = "depth"
+        case indexInParent = "index_in_parent"
+        case parentTag = "parent_tag"
+        case isInline = "is_inline"
+    }
+}
+
+// MARK: - Internal FFI conversions for NodeContext
+internal extension NodeContext {
+    init(_ rb: RustBridge.NodeContextRef) throws {
+        self.nodeType = NodeType(rawValue: rb.nodeType().toString()) ?? { fatalError("Unknown NodeType: \(rb.nodeType().toString())") }()
+        self.tagName = rb.tagName().toString()
+        self.depth = rb.depth()
+        self.indexInParent = rb.indexInParent()
+        self.parentTag = rb.parentTag()?.toString()
+        self.isInline = rb.isInline()
+    }
+    func intoRust() throws -> RustBridge.NodeContext {
+        let data = try JSONEncoder().encode(self)
+        let json = String(data: data, encoding: .utf8) ?? "{}"
+        return try RustBridge.nodeContextFromJson(json)
+    }
+}
+
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -1226,9 +1292,9 @@ private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8]
     return [UInt8](pathOrContent.utf8)
 }
 
-public func convert(_ html: String, _ configJson: String) throws -> ConversionResult {
-    let config = try conversionOptionsFromJson(configJson)
-    return try convert(html: html, options: config)
+public func convert(_ html: String, _ conversionOptionsJson: String) throws -> ConversionResult {
+    let conversionOptions = try conversionOptionsFromJson(conversionOptionsJson)
+    return try convert(html: html, options: conversionOptions)
 }
 
 // MARK: - From-JSON Helpers
@@ -1323,6 +1389,11 @@ public func tableDataFromJson(_ json: String) throws -> TableData {
 public func processingWarningFromJson(_ json: String) throws -> ProcessingWarning {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(ProcessingWarning.self, from: data)
+}
+
+public func nodeContextFromJson(_ json: String) throws -> NodeContext {
+    let data = json.data(using: .utf8) ?? Data()
+    return try JSONDecoder().decode(NodeContext.self, from: data)
 }
 
 public func textDirectionFromJson(_ json: String) throws -> TextDirection {

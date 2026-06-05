@@ -881,6 +881,7 @@ void* __swift_bridge__$alef_phantom_vec_html_visitor(void);
 void* __swift_bridge__$make_html_visitor_visitor_handle(void* swift_box);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_from_json_with_visitor(void* json, void* visitor);
 struct __private__ResultPtrAndPtr __swift_bridge__$conversion_options_from_json(void* json);
+struct __private__ResultPtrAndPtr __swift_bridge__$node_context_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$document_metadata_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$header_metadata_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$link_metadata_from_json(void* json);

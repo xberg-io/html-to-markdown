@@ -21,4 +21,7 @@ object HtmlToMarkdownRsBridge {
     external fun nativeConvert(html: String, options: String): String
 
     // JNI trait-bridge external funs — implementations are Rust JNI shims.
+
+    // Destructor external funs for handle-only opaque types.
+    external fun nativeFreeVisitorHandle(handle: Long)
 }

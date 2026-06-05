@@ -708,6 +708,8 @@ mod ffi {
     extern "Rust" {
         #[swift_bridge(swift_name = "conversionOptionsFromJson")]
         fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String>;
+        #[swift_bridge(swift_name = "nodeContextFromJson")]
+        fn node_context_from_json(json: String) -> Result<NodeContext, String>;
     }
     extern "Rust" {
         #[swift_bridge(swift_name = "documentMetadataFromJson")]
@@ -768,6 +770,60 @@ mod ffi {
         fn warning_kind_from_json(json: String) -> Result<WarningKind, String>;
         #[swift_bridge(swift_name = "nodeTypeFromJson")]
         fn node_type_from_json(json: String) -> Result<NodeType, String>;
+    }
+    extern "Rust" {
+        // Phantom Vec<T> references: swift-bridge auto-generates Vectorizable conformance
+        // for every opaque type declaration. The auto-generated Swift extension references
+        // C ABI symbols __swift_bridge__$Vec_T$as_ptr and __swift_bridge__$Vec_T$len.
+        // Without this phantom block, swift-bridge-build does not emit those symbols,
+        // causing link failures when Swift tries to use Vec<T>.
+        //
+        // This function is never called; it exists only to force symbol emission.
+        fn __register_vec_accessors(
+            __document_metadata: Vec<DocumentMetadata>,
+            __header_metadata: Vec<HeaderMetadata>,
+            __link_metadata: Vec<LinkMetadata>,
+            __image_metadata: Vec<ImageMetadata>,
+            __structured_data: Vec<StructuredData>,
+            __html_metadata: Vec<HtmlMetadata>,
+            __conversion_options: Vec<ConversionOptions>,
+            __conversion_options_update: Vec<ConversionOptionsUpdate>,
+            __preprocessing_options: Vec<PreprocessingOptions>,
+            __preprocessing_options_update: Vec<PreprocessingOptionsUpdate>,
+            __image_dimensions: Vec<ImageDimensions>,
+            __document_structure: Vec<DocumentStructure>,
+            __document_node: Vec<DocumentNode>,
+            __text_annotation: Vec<TextAnnotation>,
+            __metadata_entry: Vec<MetadataEntry>,
+            __conversion_result: Vec<ConversionResult>,
+            __table_grid: Vec<TableGrid>,
+            __grid_cell: Vec<GridCell>,
+            __table_data: Vec<TableData>,
+            __processing_warning: Vec<ProcessingWarning>,
+            __visitor_handle: Vec<VisitorHandle>,
+            __node_context: Vec<NodeContext>,
+            __text_direction: Vec<TextDirection>,
+            __link_type: Vec<LinkType>,
+            __image_type: Vec<ImageType>,
+            __structured_data_type: Vec<StructuredDataType>,
+            __tier_strategy: Vec<TierStrategy>,
+            __preprocessing_preset: Vec<PreprocessingPreset>,
+            __heading_style: Vec<HeadingStyle>,
+            __list_indent_type: Vec<ListIndentType>,
+            __whitespace_mode: Vec<WhitespaceMode>,
+            __newline_style: Vec<NewlineStyle>,
+            __code_block_style: Vec<CodeBlockStyle>,
+            __highlight_style: Vec<HighlightStyle>,
+            __link_style: Vec<LinkStyle>,
+            __url_escape_style: Vec<UrlEscapeStyle>,
+            __output_format: Vec<OutputFormat>,
+            __node_content: Vec<NodeContent>,
+            __annotation_kind: Vec<AnnotationKind>,
+            __warning_kind: Vec<WarningKind>,
+            __node_type: Vec<NodeType>,
+            __visit_result: Vec<VisitResult>,
+        ) {
+        }
     }
 }
 
@@ -2136,19 +2192,28 @@ impl NodeContext {
         NodeType::from(self.0.node_type.clone()).to_string()
     }
     pub fn tag_name(&self) -> String {
-        format!("{:?}", &self.0.tag_name)
+        self.0.tag_name.to_string()
     }
     pub fn depth(&self) -> usize {
-        self.0.depth.clone()
+        ::serde_json::to_value(&self.0.depth)
+            .ok()
+            .and_then(|j| ::serde_json::from_value(j).ok())
+            .unwrap_or_default()
     }
     pub fn index_in_parent(&self) -> usize {
-        self.0.index_in_parent.clone()
+        ::serde_json::to_value(&self.0.index_in_parent)
+            .ok()
+            .and_then(|j| ::serde_json::from_value(j).ok())
+            .unwrap_or_default()
     }
     pub fn parent_tag(&self) -> Option<String> {
-        self.0.parent_tag.as_ref().map(|v| format!("{v:?}"))
+        self.0.parent_tag.as_ref().map(|v| v.to_string())
     }
     pub fn is_inline(&self) -> bool {
-        self.0.is_inline.clone()
+        ::serde_json::to_value(&self.0.is_inline)
+            .ok()
+            .and_then(|j| ::serde_json::from_value(j).ok())
+            .unwrap_or_default()
     }
 }
 
@@ -3579,6 +3644,11 @@ pub fn conversion_options_from_json_with_visitor(
 pub fn conversion_options_from_json(json: String) -> Result<ConversionOptions, String> {
     serde_json::from_str::<html_to_markdown_rs::options::ConversionOptions>(&json)
         .map(ConversionOptions)
+        .map_err(|e| e.to_string())
+}
+pub fn node_context_from_json(json: String) -> Result<NodeContext, String> {
+    serde_json::from_str::<html_to_markdown_rs::NodeContext<'static>>(&json)
+        .map(NodeContext)
         .map_err(|e| e.to_string())
 }
 pub fn document_metadata_from_json(json: String) -> Result<DocumentMetadata, String> {

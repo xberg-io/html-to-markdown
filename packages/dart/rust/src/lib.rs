@@ -2373,6 +2373,13 @@ pub fn create_processing_warning_from_json(json: String) -> Result<ProcessingWar
         .map_err(|e| e.to_string())
 }
 
+#[frb]
+pub fn create_node_context_from_json(json: String) -> Result<NodeContext, String> {
+    serde_json::from_str::<html_to_markdown_rs::NodeContext<'static>>(&json)
+        .map(NodeContext::from)
+        .map_err(|e| e.to_string())
+}
+
 /// Internal Rust-side storage for Dart-provided visitor callbacks.
 /// Not exposed via FRB (private to the bridge crate); the public factory
 /// `create_{trait_snake}(...)` wraps this in the trait's configured `type_alias`

@@ -820,6 +820,7 @@ jobs:
       - uses: kreuzberg-dev/actions/build-ruby-gem@v1
         with:
           package-dir: packages/ruby
+          dock-platform: ${{ matrix.dock_platform }}
 
       - name: Build platform gem
         # Inline: each matrix runner builds the gem for its own native platform

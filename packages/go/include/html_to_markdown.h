@@ -3037,6 +3037,22 @@ HTMWarningKind *htm_processing_warning_kind(const HTMProcessingWarning *ptr);
 void htm_visitor_handle_free(HTMVisitorHandle *ptr);
 
 /**
+ * Create a `NodeContext` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `htm_node_context_free`.
+ */
+HTMNodeContext *htm_node_context_from_json(const char *json);
+
+/**
+ * Serialize a `NodeContext` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `htm` function.
+ * The returned string must be freed with `htm_free_string`.
+ */
+char *htm_node_context_to_json(const HTMNodeContext *ptr);
+
+/**
  * Free a `NodeContext` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.

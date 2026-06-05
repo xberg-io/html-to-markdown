@@ -18,17 +18,25 @@ let package = Package(
     .library(name: "HtmlToMarkdown", targets: ["HtmlToMarkdown"])
   ],
   targets: [
+    // RustBridgeC: C headers target extracted from the artifact bundle.
+    // Swift files in RustBridge import this to access C types (RustStr, etc.)
+    // produced by swift-bridge. publicHeadersPath: "." exposes the headers.
+    .target(
+      name: "RustBridgeC",
+      path: "packages/swift/Sources/RustBridgeC",
+      publicHeadersPath: "."
+    ),
     // RustBridge: pre-built binary target containing the compiled Rust library
     // for macOS (arm64, x86_64), iOS (device, simulator), and Linux (arm64, x86_64).
-    // The binary includes C headers for swift-bridge interop.
+    // Depends on RustBridgeC so generated Swift files can use the C types.
     .binaryTarget(
       name: "RustBridge",
-      url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0-rc.13/HtmlToMarkdown-rs.artifactbundle.zip",
+      url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0-rc.14/HtmlToMarkdown-rs.artifactbundle.zip",
       checksum: "__ALEF_SWIFT_CHECKSUM__"
     ),
     .target(
       name: "HtmlToMarkdown",
-      dependencies: ["RustBridge"],
+      dependencies: ["RustBridge", "RustBridgeC"],
       path: "packages/swift/Sources/HtmlToMarkdown"
     ),
   ]

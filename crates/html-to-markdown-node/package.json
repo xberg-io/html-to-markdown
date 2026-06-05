@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-node",
-  "version": "3.6.0-rc.13",
+  "version": "3.6.0-rc.14",
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",
   "repository": {
@@ -18,14 +18,14 @@
   },
   "files": ["index.js", "index.d.ts", "*.node"],
   "optionalDependencies": {
-    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-darwin-x64": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.6.0-rc.13",
-    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.6.0-rc.13"
+    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-darwin-x64": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.6.0-rc.14",
+    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.6.0-rc.14"
   },
   "napi": {
     "packageName": "@kreuzberg/html-to-markdown-node",
@@ -42,9 +42,9 @@
     ]
   },
   "scripts": {
-    "build": "napi build --platform --release",
-    "artifacts": "napi artifacts",
-    "prepublishOnly": "napi prepublish -t npm --skip-optional-publish"
+    "build": "npx --yes @napi-rs/cli@^3.6.2 build --platform --release",
+    "artifacts": "npx --yes @napi-rs/cli@^3.6.2 artifacts",
+    "prepublishOnly": "npx --yes @napi-rs/cli@^3.6.2 prepublish -t npm --skip-optional-publish"
   },
   "engines": { "node": ">= 18" },
   "publishConfig": { "access": "public" },

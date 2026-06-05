@@ -620,6 +620,39 @@ pub const ProcessingWarning = struct {
     kind: WarningKind,
 };
 
+/// Context information passed to all visitor methods.
+///
+/// Provides comprehensive metadata about the current node being visited,
+/// including its type, tag name, position in the DOM tree, and parent context.
+///
+/// ## Attributes
+///
+/// Access attributes via `NodeContext.attributes`, which returns
+/// `&BTreeMap<String, String>`. When the context was built with
+/// `NodeContext.with_lazy_attributes` (the hot path inside the converter),
+/// the map is only materialized on the first call — if the visitor never reads
+/// attributes, the allocation is skipped.
+///
+/// ## Lifetimes
+///
+/// String fields use `Cow<'_, str>` so the converter can pass slices directly
+/// out of the parsed DOM without allocating. Visitor implementations that need
+/// to outlive the callback should call `NodeContext.into_owned`.
+pub const NodeContext = struct {
+    /// Coarse-grained node type classification
+    node_type: NodeType,
+    /// Raw HTML tag name (e.g., "div", "h1", "custom-element")
+    tag_name: []const u8,
+    /// Depth in the DOM tree (0 = root)
+    depth: u64,
+    /// Index among siblings (0-based)
+    index_in_parent: u64,
+    /// Parent element's tag name (None if root)
+    parent_tag: ?[]const u8,
+    /// Whether this element is treated as inline vs block
+    is_inline: bool,
+};
+
 /// Text directionality of document content.
 ///
 /// Corresponds to the HTML `dir` attribute and `bdi` element directionality.
@@ -1779,66 +1812,3 @@ pub fn make_html_visitor_vtable(comptime T: type, instance: *T) IHtmlVisitor {
         }.thunk,
     };
 }
-
-/// Construct a `NodeContext` with an owned attribute map.
-///
-/// Prefer `NodeContext.with_lazy_attributes` (pub(crate)) inside the
-/// converter to avoid the eager `collect_tag_attributes` allocation.
-pub fn with_owned_attributes_node_context(node_type: NodeType, tag_name: []const u8, attributes: []const u8, depth: u64, index_in_parent: u64, parent_tag: ?[]const u8, is_inline: bool) error{OutOfMemory}!NodeContext {
-    const node_type_i32: i32 = @intFromEnum(node_type);
-    const tag_name_z = try std.heap.c_allocator.dupeZ(u8, tag_name);
-    defer std.heap.c_allocator.free(tag_name_z);
-    const parent_tag_z = try std.heap.c_allocator.dupeZ(u8, parent_tag);
-    defer std.heap.c_allocator.free(parent_tag_z);
-    const _handle = c.htm_node_context_with_owned_attributes(node_type_i32, tag_name_z.ptr, attributes_z.ptr, depth, index_in_parent, parent_tag_z.ptr, is_inline);
-    if (_handle == null) return _first_error(anyerror);
-    return .{ ._handle = @as(*c.HTMNodeContext, @ptrCast(_handle.?)) };
-}
-
-/// Context information passed to all visitor methods.
-///
-/// Provides comprehensive metadata about the current node being visited,
-/// including its type, tag name, position in the DOM tree, and parent context.
-///
-/// ## Attributes
-///
-/// Access attributes via `NodeContext.attributes`, which returns
-/// `&BTreeMap<String, String>`. When the context was built with
-/// `NodeContext.with_lazy_attributes` (the hot path inside the converter),
-/// the map is only materialized on the first call — if the visitor never reads
-/// attributes, the allocation is skipped.
-///
-/// ## Lifetimes
-///
-/// String fields use `Cow<'_, str>` so the converter can pass slices directly
-/// out of the parsed DOM without allocating. Visitor implementations that need
-/// to outlive the callback should call `NodeContext.into_owned`.
-pub const NodeContext = struct {
-    _handle: *anyopaque,
-
-    /// Return a reference to the attribute map.
-    ///
-    /// If the context was built with `NodeContext.with_lazy_attributes`, the
-    /// map is materialized on the first call and cached for subsequent calls.
-    /// If this method is never called, no allocation occurs for attributes.
-    pub fn attributes(self: *NodeContext) error{OutOfMemory}![]u8 {
-        const _result = c.htm_node_context_attributes(@as(*c.HTMNodeContext, @ptrCast(self._handle)));
-        return blk: {
-            const slice = std.mem.span(_result);
-            const owned = try std.heap.c_allocator.dupe(u8, slice);
-            c.htm_free_string(_result);
-            break :blk owned;
-        };
-    }
-
-    /// Promote any borrowed fields into owned storage so the context can outlive `'a`.
-    pub fn into_owned(self: *NodeContext) NodeContext {
-        const _result = c.htm_node_context_into_owned(@as(*c.HTMNodeContext, @ptrCast(self._handle)));
-        return NodeContext{ ._handle = _result.? };
-    }
-
-    /// Release the underlying FFI handle. Safe to call once per instance.
-    pub fn free(self: *NodeContext) void {
-        c.htm_node_context_free(@as(*c.HTMNodeContext, @ptrCast(self._handle)));
-    }
-};

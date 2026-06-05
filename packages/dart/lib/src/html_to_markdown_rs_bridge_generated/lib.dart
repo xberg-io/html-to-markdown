@@ -100,6 +100,9 @@ Future<ProcessingWarning> createProcessingWarningFromJson({
   required String json,
 }) => RustLib.instance.api.crateCreateProcessingWarningFromJson(json: json);
 
+Future<NodeContext> createNodeContextFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateNodeContextFromJson(json: json);
+
 /// Construct a `VisitorHandle` from Dart callback closures.
 /// FRB synthesises a Dart-callable function type for each closure parameter,
 /// which is the whole point of taking them as `impl Fn(...) -> DartFnFuture<R>`
