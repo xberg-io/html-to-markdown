@@ -3318,11 +3318,13 @@ impl SwiftHtmlVisitorWrapper {
         Self { inner }
     }
 }
+
 impl ::std::fmt::Debug for SwiftHtmlVisitorWrapper {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         f.debug_struct("SwiftHtmlVisitorWrapper").finish_non_exhaustive()
     }
 }
+
 impl html_to_markdown_rs::visitor::HtmlVisitor for SwiftHtmlVisitorWrapper {
     fn visit_text(
         &mut self,
@@ -3816,6 +3818,7 @@ impl From<VisitorHandle> for html_to_markdown_rs::VisitorHandle {
         v.0
     }
 }
+
 impl From<html_to_markdown_rs::options::ConversionOptions> for ConversionOptions {
     fn from(v: html_to_markdown_rs::options::ConversionOptions) -> Self {
         Self(v)

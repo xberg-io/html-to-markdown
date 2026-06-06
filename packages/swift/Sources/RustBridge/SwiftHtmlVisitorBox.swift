@@ -4,7 +4,6 @@
 // shims reference SwiftHtmlVisitorBox by name and must see it in the same module.
 
 import RustBridgeC
-
 /// Delegate protocol for `SwiftHtmlVisitorBox`.
 /// Conforming types convert raw FFI params (RustString etc.) to user-friendly
 /// Swift types and return a JSON-encoded result string.

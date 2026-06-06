@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-php"
-version = "3.6.0-rc.15"
+version = "3.6.0-rc.16"
 edition = "2024"
 license = "MIT"
 description = "High-performance HTML to Markdown converter"
@@ -21,7 +21,7 @@ extension-module = []
 [dependencies]
 async-trait = "0.1"
 ext-php-rs = "0.15"
-html-to-markdown-rs = { version = "3.6.0-rc.15", path = "../html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
+html-to-markdown-rs = { version = "3.6.0-rc.16", path = "../html-to-markdown", features = ["serde", "metadata", "visitor", "inline-images", "testkit"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }

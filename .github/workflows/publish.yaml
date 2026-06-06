@@ -845,7 +845,10 @@ jobs:
             # clang cannot resolve in the mingw cross sysroot. 0.9.127's
             # container also ships 3.1.7/3.2.11/3.3.11/3.4.9; pin to those.
             gem install rb_sys -v '< 0.9.128'
-            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- bash -c "export RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 && bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
+            # Use `env VAR=val` to plant RUBY_CC_VERSION into the *command's* process
+            # environment, surviving the container's /etc/profile.d default that
+            # otherwise re-introduces Ruby 4.0.2 after `export`.
+            rb-sys-dock --platform "${{ matrix.dock_platform }}" -- env RUBY_CC_VERSION=3.4.9:3.3.11:3.2.11:3.1.7 bash -c "bundle install --jobs=4 --retry=3 && bundle exec rake compile && bundle exec rake build"
           else
             # Native build on matching architecture
             bundle exec rake compile

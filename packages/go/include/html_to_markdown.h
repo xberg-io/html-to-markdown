@@ -492,7 +492,7 @@ typedef struct HTMHtmVisitor HTMHtmVisitor;
  * Fields reflect `NodeContext` from the Rust core. All string pointers are
  * valid only for the duration of the callback invocation.
  */
-typedef struct HTMHtmContext {
+typedef struct {
   /**
    * Raw HTML tag name (e.g., "div", "h1", "custom-element")
    */
@@ -544,7 +544,7 @@ typedef struct HTMHtmContext {
  * ```
  * followed by method-specific parameters documented on each field.
  */
-typedef struct HTMHtmVisitorCallbacks {
+typedef struct {
   /**
    * Arbitrary caller context forwarded to every callback.
    */
@@ -556,7 +556,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `ctx`: Node context (will have `node_type: NodeType::Text`)
    * - `text`: The raw text content (HTML entities already decoded)
    */
-  int32_t (*visit_text)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_text)(const HTMHtmContext *ctx,
                         void *user_data,
                         const char *text,
                         char **out_custom,
@@ -567,7 +567,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * This is the first callback invoked for every HTML element, allowing
    * visitors to implement generic element handling before tag-specific logic.
    */
-  int32_t (*visit_element_start)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_element_start)(const HTMHtmContext *ctx,
                                  void *user_data,
                                  char **out_custom,
                                  uintptr_t *out_len);
@@ -577,7 +577,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * Receives the default markdown output that would be generated.
    * Visitors can inspect or replace this output.
    */
-  int32_t (*visit_element_end)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_element_end)(const HTMHtmContext *ctx,
                                void *user_data,
                                const char *output,
                                char **out_custom,
@@ -591,7 +591,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `text`: The link text content (already converted to markdown)
    * - `title`: Optional title attribute
    */
-  int32_t (*visit_link)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_link)(const HTMHtmContext *ctx,
                         void *user_data,
                         const char *href,
                         const char *text,
@@ -607,7 +607,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `alt`: The alt text
    * - `title`: Optional title attribute
    */
-  int32_t (*visit_image)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_image)(const HTMHtmContext *ctx,
                          void *user_data,
                          const char *src,
                          const char *alt,
@@ -623,7 +623,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `text`: The heading text content
    * - `id`: Optional id attribute (for anchor links)
    */
-  int32_t (*visit_heading)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_heading)(const HTMHtmContext *ctx,
                            void *user_data,
                            uint32_t level,
                            const char *text,
@@ -638,7 +638,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `lang`: Optional language specifier (from class attribute)
    * - `code`: The code content
    */
-  int32_t (*visit_code_block)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_code_block)(const HTMHtmContext *ctx,
                               void *user_data,
                               const char *lang,
                               const char *code,
@@ -651,7 +651,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `ctx`: Node context
    * - `code`: The code content
    */
-  int32_t (*visit_code_inline)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_code_inline)(const HTMHtmContext *ctx,
                                void *user_data,
                                const char *code,
                                char **out_custom,
@@ -665,7 +665,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `marker`: The list marker (e.g., "-", "1.", "a)")
    * - `text`: The list item content (already converted)
    */
-  int32_t (*visit_list_item)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_list_item)(const HTMHtmContext *ctx,
                              void *user_data,
                              int32_t ordered,
                              const char *marker,
@@ -675,7 +675,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Called before processing a list `<ul>` or `<ol>`.
    */
-  int32_t (*visit_list_start)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_list_start)(const HTMHtmContext *ctx,
                               void *user_data,
                               int32_t ordered,
                               char **out_custom,
@@ -683,7 +683,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Called after processing a list `</ul>` or `</ol>`.
    */
-  int32_t (*visit_list_end)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_list_end)(const HTMHtmContext *ctx,
                             void *user_data,
                             int32_t ordered,
                             const char *output,
@@ -692,7 +692,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Called before processing a table `<table>`.
    */
-  int32_t (*visit_table_start)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_table_start)(const HTMHtmContext *ctx,
                                void *user_data,
                                char **out_custom,
                                uintptr_t *out_len);
@@ -704,7 +704,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `cells`: Cell contents (already converted to markdown)
    * - `is_header`: Whether this row is in `<thead>`
    */
-  int32_t (*visit_table_row)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_table_row)(const HTMHtmContext *ctx,
                              void *user_data,
                              const char *const *cells,
                              uintptr_t cell_count,
@@ -714,7 +714,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Called after processing a table `</table>`.
    */
-  int32_t (*visit_table_end)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_table_end)(const HTMHtmContext *ctx,
                              void *user_data,
                              const char *output,
                              char **out_custom,
@@ -727,7 +727,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `content`: The blockquote content (already converted)
    * - `depth`: Nesting depth (for nested blockquotes)
    */
-  int32_t (*visit_blockquote)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_blockquote)(const HTMHtmContext *ctx,
                               void *user_data,
                               const char *content,
                               uintptr_t depth,
@@ -736,7 +736,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit strong/bold elements `<strong>`, `<b>`.
    */
-  int32_t (*visit_strong)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_strong)(const HTMHtmContext *ctx,
                           void *user_data,
                           const char *text,
                           char **out_custom,
@@ -744,7 +744,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit emphasis/italic elements `<em>`, `<i>`.
    */
-  int32_t (*visit_emphasis)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_emphasis)(const HTMHtmContext *ctx,
                             void *user_data,
                             const char *text,
                             char **out_custom,
@@ -752,7 +752,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
    */
-  int32_t (*visit_strikethrough)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_strikethrough)(const HTMHtmContext *ctx,
                                  void *user_data,
                                  const char *text,
                                  char **out_custom,
@@ -760,7 +760,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit underline elements `<u>`, `<ins>`.
    */
-  int32_t (*visit_underline)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_underline)(const HTMHtmContext *ctx,
                              void *user_data,
                              const char *text,
                              char **out_custom,
@@ -768,7 +768,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit subscript elements `<sub>`.
    */
-  int32_t (*visit_subscript)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_subscript)(const HTMHtmContext *ctx,
                              void *user_data,
                              const char *text,
                              char **out_custom,
@@ -776,7 +776,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit superscript elements `<sup>`.
    */
-  int32_t (*visit_superscript)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_superscript)(const HTMHtmContext *ctx,
                                void *user_data,
                                const char *text,
                                char **out_custom,
@@ -784,7 +784,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit mark/highlight elements `<mark>`.
    */
-  int32_t (*visit_mark)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_mark)(const HTMHtmContext *ctx,
                         void *user_data,
                         const char *text,
                         char **out_custom,
@@ -792,14 +792,14 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit line break elements `<br>`.
    */
-  int32_t (*visit_line_break)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_line_break)(const HTMHtmContext *ctx,
                               void *user_data,
                               char **out_custom,
                               uintptr_t *out_len);
   /**
    * Visit horizontal rule elements `<hr>`.
    */
-  int32_t (*visit_horizontal_rule)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_horizontal_rule)(const HTMHtmContext *ctx,
                                    void *user_data,
                                    char **out_custom,
                                    uintptr_t *out_len);
@@ -811,7 +811,7 @@ typedef struct HTMHtmVisitorCallbacks {
    * - `tag_name`: The custom element's tag name
    * - `html`: The raw HTML of this element
    */
-  int32_t (*visit_custom_element)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_custom_element)(const HTMHtmContext *ctx,
                                   void *user_data,
                                   const char *tag_name,
                                   const char *html,
@@ -820,14 +820,14 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit definition list `<dl>`.
    */
-  int32_t (*visit_definition_list_start)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_definition_list_start)(const HTMHtmContext *ctx,
                                          void *user_data,
                                          char **out_custom,
                                          uintptr_t *out_len);
   /**
    * Visit definition term `<dt>`.
    */
-  int32_t (*visit_definition_term)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_definition_term)(const HTMHtmContext *ctx,
                                    void *user_data,
                                    const char *text,
                                    char **out_custom,
@@ -835,7 +835,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit definition description `<dd>`.
    */
-  int32_t (*visit_definition_description)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_definition_description)(const HTMHtmContext *ctx,
                                           void *user_data,
                                           const char *text,
                                           char **out_custom,
@@ -843,7 +843,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Called after processing a definition list `</dl>`.
    */
-  int32_t (*visit_definition_list_end)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_definition_list_end)(const HTMHtmContext *ctx,
                                        void *user_data,
                                        const char *output,
                                        char **out_custom,
@@ -851,7 +851,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit form elements `<form>`.
    */
-  int32_t (*visit_form)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_form)(const HTMHtmContext *ctx,
                         void *user_data,
                         const char *action,
                         const char *method,
@@ -860,7 +860,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit input elements `<input>`.
    */
-  int32_t (*visit_input)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_input)(const HTMHtmContext *ctx,
                          void *user_data,
                          const char *input_type,
                          const char *name,
@@ -870,7 +870,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit button elements `<button>`.
    */
-  int32_t (*visit_button)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_button)(const HTMHtmContext *ctx,
                           void *user_data,
                           const char *text,
                           char **out_custom,
@@ -878,7 +878,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit audio elements `<audio>`.
    */
-  int32_t (*visit_audio)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_audio)(const HTMHtmContext *ctx,
                          void *user_data,
                          const char *src,
                          char **out_custom,
@@ -886,7 +886,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit video elements `<video>`.
    */
-  int32_t (*visit_video)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_video)(const HTMHtmContext *ctx,
                          void *user_data,
                          const char *src,
                          char **out_custom,
@@ -894,7 +894,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit iframe elements `<iframe>`.
    */
-  int32_t (*visit_iframe)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_iframe)(const HTMHtmContext *ctx,
                           void *user_data,
                           const char *src,
                           char **out_custom,
@@ -902,7 +902,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit details elements `<details>`.
    */
-  int32_t (*visit_details)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_details)(const HTMHtmContext *ctx,
                            void *user_data,
                            int32_t open,
                            char **out_custom,
@@ -910,7 +910,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit summary elements `<summary>`.
    */
-  int32_t (*visit_summary)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_summary)(const HTMHtmContext *ctx,
                            void *user_data,
                            const char *text,
                            char **out_custom,
@@ -918,14 +918,14 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Visit figure elements `<figure>`.
    */
-  int32_t (*visit_figure_start)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_figure_start)(const HTMHtmContext *ctx,
                                 void *user_data,
                                 char **out_custom,
                                 uintptr_t *out_len);
   /**
    * Visit figcaption elements `<figcaption>`.
    */
-  int32_t (*visit_figcaption)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_figcaption)(const HTMHtmContext *ctx,
                               void *user_data,
                               const char *text,
                               char **out_custom,
@@ -933,7 +933,7 @@ typedef struct HTMHtmVisitorCallbacks {
   /**
    * Called after processing a figure `</figure>`.
    */
-  int32_t (*visit_figure_end)(const struct HTMHtmContext *ctx,
+  int32_t (*visit_figure_end)(const HTMHtmContext *ctx,
                               void *user_data,
                               const char *output,
                               char **out_custom,
@@ -949,7 +949,7 @@ typedef struct HTMHtmVisitorCallbacks {
  * this vtable.  `free_user_data`, when non-null, is called once with `user_data`
  * when the bridge is dropped.
  */
-typedef struct HTMHtmHtmlVisitorVTable {
+typedef struct {
   /**
    * Visit text nodes (most frequent callback - ~100+ per document).
    *
@@ -3766,7 +3766,7 @@ HTMConversionResult *htm_convert(const char *html,
  * subsequent options-field bridge wrapper call.
  */
 void htm_options_set_visitor(HTMConversionOptions *options,
-                             struct HTMHtmHtmlVisitorBridge *visitor);
+                             HTMHtmHtmlVisitorBridge *visitor);
 
 /**
  * Create a new visitor handle from a callbacks struct.
@@ -3784,7 +3784,7 @@ void htm_options_set_visitor(HTMConversionOptions *options,
  * any thread that calls `htm_convert_with_visitor` until after
  * `htm_visitor_free` is called.
  */
-struct HTMHtmVisitor *htm_visitor_create(const struct HTMHtmVisitorCallbacks *callbacks);
+HTMHtmVisitor *htm_visitor_create(const HTMHtmVisitorCallbacks *callbacks);
 
 /**
  * Free a visitor handle previously returned by `htm_visitor_create`.
@@ -3796,7 +3796,7 @@ struct HTMHtmVisitor *htm_visitor_create(const struct HTMHtmVisitorCallbacks *ca
  * `visitor` must have been returned by `htm_visitor_create`, or be null.
  * Passing a null pointer is safe and has no effect.
  */
-void htm_visitor_free(struct HTMHtmVisitor *visitor);
+void htm_visitor_free(HTMHtmVisitor *visitor);
 
 /**
  * Create a new `HtmHtmlVisitorBridge` from a vtable and opaque user_data pointer.
@@ -3811,8 +3811,8 @@ void htm_visitor_free(struct HTMHtmVisitor *visitor);
  * remains valid for the lifetime of the returned bridge.  `user_data` must be valid
  * for any thread that calls methods on this bridge.
  */
-struct HTMHtmHtmlVisitorBridge *htm_htm_html_visitor_bridge_new(const struct HTMHtmHtmlVisitorVTable *vtable,
-                                                                const void *user_data);
+HTMHtmHtmlVisitorBridge *htm_htm_html_visitor_bridge_new(const HTMHtmHtmlVisitorVTable *vtable,
+                                                         const void *user_data);
 
 /**
  * Free a `HtmHtmlVisitorBridge` created by `htm_htm_html_visitor_bridge_new`.
@@ -3824,6 +3824,6 @@ struct HTMHtmHtmlVisitorBridge *htm_htm_html_visitor_bridge_new(const struct HTM
  * `ptr` must be either null or a non-null pointer returned by `htm_htm_html_visitor_bridge_new` that has
  * not yet been freed.
  */
-void htm_htm_html_visitor_bridge_free(struct HTMHtmHtmlVisitorBridge *ptr);
+void htm_htm_html_visitor_bridge_free(HTMHtmHtmlVisitorBridge *ptr);
 
 #endif  /* HTM_H */

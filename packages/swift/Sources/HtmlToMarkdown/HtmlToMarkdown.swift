@@ -78,6 +78,7 @@ internal extension HeaderMetadata {
         self.depth = rb.depth()
         self.htmlOffset = rb.htmlOffset()
     }
+
     func intoRust() throws -> RustBridge.HeaderMetadata {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -169,6 +170,7 @@ internal extension StructuredData {
         self.rawJson = rb.rawJson().toString()
         self.schemaType = rb.schemaType()?.toString()
     }
+
     func intoRust() throws -> RustBridge.StructuredData {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -252,6 +254,7 @@ internal extension ImageDimensions {
         self.width = rb.width()
         self.height = rb.height()
     }
+
     func intoRust() throws -> RustBridge.ImageDimensions {
         return RustBridge.ImageDimensions(self.width, self.height)
     }
@@ -300,6 +303,7 @@ internal extension TextAnnotation {
         self.end = rb.end()
         self.kind = try JSONDecoder().decode(AnnotationKind.self, from: ((rb.kind().toString()).data(using: .utf8) ?? Data("null".utf8)))
     }
+
     func intoRust() throws -> RustBridge.TextAnnotation {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -329,6 +333,7 @@ internal extension MetadataEntry {
         self.key = rb.key().toString()
         self.value = rb.value().toString()
     }
+
     func intoRust() throws -> RustBridge.MetadataEntry {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -398,6 +403,7 @@ internal extension TableGrid {
         self.cols = rb.cols()
         self.cells = try rb.cells().map { try GridCell($0) }
     }
+
     func intoRust() throws -> RustBridge.TableGrid {
         let __cells = RustVec<RustBridge.GridCell>()
         for __elem in self.cells { __cells.push(value: try __elem.intoRust()) }
@@ -447,6 +453,7 @@ internal extension GridCell {
         self.colSpan = rb.colSpan()
         self.isHeader = rb.isHeader()
     }
+
     func intoRust() throws -> RustBridge.GridCell {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -472,6 +479,7 @@ internal extension TableData {
         self.grid = try TableGrid(rb.grid())
         self.markdown = rb.markdown().toString()
     }
+
     func intoRust() throws -> RustBridge.TableData {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -511,6 +519,7 @@ internal extension ProcessingWarning {
         self.message = rb.message().toString()
         self.kind = WarningKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown WarningKind: \(rb.kind().toString())") }()
     }
+
     func intoRust() throws -> RustBridge.ProcessingWarning {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -585,6 +594,7 @@ internal extension NodeContext {
         self.parentTag = rb.parentTag()?.toString()
         self.isInline = rb.isInline()
     }
+
     func intoRust() throws -> RustBridge.NodeContext {
         let data = try JSONEncoder().encode(self)
         let json = String(data: data, encoding: .utf8) ?? "{}"
@@ -791,6 +801,7 @@ public enum NodeContent: Codable, Sendable, Hashable {
 
     private enum CodingKeys: String, CodingKey {
         case node_type
+
         case content
         case definition
         case description
@@ -806,8 +817,7 @@ public enum NodeContent: Codable, Sendable, Hashable {
         case ordered
         case src
         case term
-        case text
-    }
+        case text    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -855,27 +865,34 @@ public enum NodeContent: Codable, Sendable, Hashable {
             try container.encode("heading", forKey: .node_type)
             try container.encode(level, forKey: .level)
             try container.encode(text, forKey: .text)
+
         case .paragraph(let text):
             try container.encode("paragraph", forKey: .node_type)
             try container.encode(text, forKey: .text)
+
         case .list(let ordered):
             try container.encode("list", forKey: .node_type)
             try container.encode(ordered, forKey: .ordered)
+
         case .listItem(let text):
             try container.encode("list_item", forKey: .node_type)
             try container.encode(text, forKey: .text)
+
         case .table(let grid):
             try container.encode("table", forKey: .node_type)
             try container.encode(grid, forKey: .grid)
+
         case .image(let description, let src, let imageIndex):
             try container.encode("image", forKey: .node_type)
             try container.encodeIfPresent(description, forKey: .description)
             try container.encodeIfPresent(src, forKey: .src)
             try container.encodeIfPresent(imageIndex, forKey: .imageIndex)
+
         case .code(let text, let language):
             try container.encode("code", forKey: .node_type)
             try container.encode(text, forKey: .text)
             try container.encodeIfPresent(language, forKey: .language)
+
         case .quote:
             try container.encode("quote", forKey: .node_type)
         case .definitionList:
@@ -884,18 +901,22 @@ public enum NodeContent: Codable, Sendable, Hashable {
             try container.encode("definition_item", forKey: .node_type)
             try container.encode(term, forKey: .term)
             try container.encode(definition, forKey: .definition)
+
         case .rawBlock(let format, let content):
             try container.encode("raw_block", forKey: .node_type)
             try container.encode(format, forKey: .format)
             try container.encode(content, forKey: .content)
+
         case .metadataBlock(let entries):
             try container.encode("metadata_block", forKey: .node_type)
             try container.encode(entries, forKey: .entries)
+
         case .group(let label, let headingLevel, let headingText):
             try container.encode("group", forKey: .node_type)
             try container.encodeIfPresent(label, forKey: .label)
             try container.encodeIfPresent(headingLevel, forKey: .headingLevel)
             try container.encodeIfPresent(headingText, forKey: .headingText)
+
         }
     }
 }
@@ -932,9 +953,9 @@ public enum AnnotationKind: Codable, Sendable, Hashable {
 
     private enum CodingKeys: String, CodingKey {
         case annotation_type
+
         case title
-        case url
-    }
+        case url    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -990,6 +1011,7 @@ public enum AnnotationKind: Codable, Sendable, Hashable {
             try container.encode("link", forKey: .annotation_type)
             try container.encode(url, forKey: .url)
             try container.encodeIfPresent(title, forKey: .title)
+
         }
     }
 }
@@ -1292,9 +1314,9 @@ private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8]
     return [UInt8](pathOrContent.utf8)
 }
 
-public func convert(_ html: String, _ optionsconversionOptionsJson: String) throws -> ConversionResult {
-    let optionsconversionOptions = try conversionOptionsFromJson(optionsconversionOptionsJson)
-    return try convert(html: html, options: optionsconversionOptions)
+public func convert(_ html: String, _ optionsJson: String) throws -> ConversionResult {
+    let options = try conversionOptionsFromJson(optionsJson)
+    return try convert(html: html, options: options)
 }
 
 // MARK: - From-JSON Helpers
@@ -1778,7 +1800,6 @@ public func conversionOptionsFromJsonWithVisitor(_ json: String, _ visitor: Visi
 public func convert(html: String, options: ConversionOptions? = nil) throws -> ConversionResult {
     return try RustBridge.convert(html, options)
 }
-
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.DocumentMetadata: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.

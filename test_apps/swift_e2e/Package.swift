@@ -8,7 +8,7 @@ let package = Package(
         .iOS(.v16),
     ],
     dependencies: [
-        .package(url: "https://github.com/kreuzberg-dev/html-to-markdown", from: "3.6.0-rc.15"),
+        .package(url: "https://github.com/kreuzberg-dev/html-to-markdown", from: "3.6.0-rc.16"),
     ],
     targets: [
         .testTarget(

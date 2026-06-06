@@ -214,7 +214,7 @@ Future<VisitorHandle> createHtmlVisitor({
 
 /// Build a `ConversionOptions` from a JSON blob and attach a Dart-built
 /// `VisitorHandle` to its `visitor` field. The mirror struct uses `final`
-/// dart fields, so callers cannot patch the visitor in after JSON load —
+/// dart fields, so callers cannot patch the visitor in after JSON load --
 /// this helper does the merge on the Rust side instead.
 Future<ConversionOptions> createConversionOptionsFromJsonWithVisitor({
   required String json,
