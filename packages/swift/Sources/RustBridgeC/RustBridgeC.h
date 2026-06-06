@@ -910,6 +910,47 @@ struct __private__ResultPtrAndPtr __swift_bridge__$node_content_from_json(void* 
 struct __private__ResultPtrAndPtr __swift_bridge__$annotation_kind_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$warning_kind_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$node_type_from_json(void* json);
+void* __swift_bridge__$__alef_phantom_vec_document_metadata(void);
+void* __swift_bridge__$__alef_phantom_vec_header_metadata(void);
+void* __swift_bridge__$__alef_phantom_vec_link_metadata(void);
+void* __swift_bridge__$__alef_phantom_vec_image_metadata(void);
+void* __swift_bridge__$__alef_phantom_vec_structured_data(void);
+void* __swift_bridge__$__alef_phantom_vec_html_metadata(void);
+void* __swift_bridge__$__alef_phantom_vec_conversion_options(void);
+void* __swift_bridge__$__alef_phantom_vec_conversion_options_update(void);
+void* __swift_bridge__$__alef_phantom_vec_preprocessing_options(void);
+void* __swift_bridge__$__alef_phantom_vec_preprocessing_options_update(void);
+void* __swift_bridge__$__alef_phantom_vec_image_dimensions(void);
+void* __swift_bridge__$__alef_phantom_vec_document_structure(void);
+void* __swift_bridge__$__alef_phantom_vec_document_node(void);
+void* __swift_bridge__$__alef_phantom_vec_text_annotation(void);
+void* __swift_bridge__$__alef_phantom_vec_metadata_entry(void);
+void* __swift_bridge__$__alef_phantom_vec_conversion_result(void);
+void* __swift_bridge__$__alef_phantom_vec_table_grid(void);
+void* __swift_bridge__$__alef_phantom_vec_grid_cell(void);
+void* __swift_bridge__$__alef_phantom_vec_table_data(void);
+void* __swift_bridge__$__alef_phantom_vec_processing_warning(void);
+void* __swift_bridge__$__alef_phantom_vec_visitor_handle(void);
+void* __swift_bridge__$__alef_phantom_vec_node_context(void);
+void* __swift_bridge__$__alef_phantom_vec_text_direction(void);
+void* __swift_bridge__$__alef_phantom_vec_link_type(void);
+void* __swift_bridge__$__alef_phantom_vec_image_type(void);
+void* __swift_bridge__$__alef_phantom_vec_structured_data_type(void);
+void* __swift_bridge__$__alef_phantom_vec_tier_strategy(void);
+void* __swift_bridge__$__alef_phantom_vec_preprocessing_preset(void);
+void* __swift_bridge__$__alef_phantom_vec_heading_style(void);
+void* __swift_bridge__$__alef_phantom_vec_list_indent_type(void);
+void* __swift_bridge__$__alef_phantom_vec_whitespace_mode(void);
+void* __swift_bridge__$__alef_phantom_vec_newline_style(void);
+void* __swift_bridge__$__alef_phantom_vec_code_block_style(void);
+void* __swift_bridge__$__alef_phantom_vec_highlight_style(void);
+void* __swift_bridge__$__alef_phantom_vec_link_style(void);
+void* __swift_bridge__$__alef_phantom_vec_url_escape_style(void);
+void* __swift_bridge__$__alef_phantom_vec_output_format(void);
+void* __swift_bridge__$__alef_phantom_vec_node_content(void);
+void* __swift_bridge__$__alef_phantom_vec_annotation_kind(void);
+void* __swift_bridge__$__alef_phantom_vec_warning_kind(void);
+void* __swift_bridge__$__alef_phantom_vec_node_type(void);
 
 
 #endif /* RUST_BRIDGE_C_H */

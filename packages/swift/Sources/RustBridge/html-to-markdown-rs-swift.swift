@@ -303,6 +303,129 @@ public func warningKindFromJson<GenericIntoRustString: IntoRustString>(_ json: G
 public func nodeTypeFromJson<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString) throws -> NodeType {
     try { let val = __swift_bridge__$node_type_from_json({ let rustString = json.intoRustString(); rustString.isOwned = false; return rustString.ptr }()); if val.is_ok { return NodeType(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
+public func __alef_phantom_vec_document_metadata() -> RustVec<DocumentMetadata> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_document_metadata())
+}
+public func __alef_phantom_vec_header_metadata() -> RustVec<HeaderMetadata> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_header_metadata())
+}
+public func __alef_phantom_vec_link_metadata() -> RustVec<LinkMetadata> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_link_metadata())
+}
+public func __alef_phantom_vec_image_metadata() -> RustVec<ImageMetadata> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_image_metadata())
+}
+public func __alef_phantom_vec_structured_data() -> RustVec<StructuredData> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_structured_data())
+}
+public func __alef_phantom_vec_html_metadata() -> RustVec<HtmlMetadata> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_html_metadata())
+}
+public func __alef_phantom_vec_conversion_options() -> RustVec<ConversionOptions> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_conversion_options())
+}
+public func __alef_phantom_vec_conversion_options_update() -> RustVec<ConversionOptionsUpdate> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_conversion_options_update())
+}
+public func __alef_phantom_vec_preprocessing_options() -> RustVec<PreprocessingOptions> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_preprocessing_options())
+}
+public func __alef_phantom_vec_preprocessing_options_update() -> RustVec<PreprocessingOptionsUpdate> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_preprocessing_options_update())
+}
+public func __alef_phantom_vec_image_dimensions() -> RustVec<ImageDimensions> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_image_dimensions())
+}
+public func __alef_phantom_vec_document_structure() -> RustVec<DocumentStructure> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_document_structure())
+}
+public func __alef_phantom_vec_document_node() -> RustVec<DocumentNode> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_document_node())
+}
+public func __alef_phantom_vec_text_annotation() -> RustVec<TextAnnotation> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_text_annotation())
+}
+public func __alef_phantom_vec_metadata_entry() -> RustVec<MetadataEntry> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_metadata_entry())
+}
+public func __alef_phantom_vec_conversion_result() -> RustVec<ConversionResult> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_conversion_result())
+}
+public func __alef_phantom_vec_table_grid() -> RustVec<TableGrid> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_table_grid())
+}
+public func __alef_phantom_vec_grid_cell() -> RustVec<GridCell> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_grid_cell())
+}
+public func __alef_phantom_vec_table_data() -> RustVec<TableData> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_table_data())
+}
+public func __alef_phantom_vec_processing_warning() -> RustVec<ProcessingWarning> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_processing_warning())
+}
+public func __alef_phantom_vec_visitor_handle() -> RustVec<VisitorHandle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_visitor_handle())
+}
+public func __alef_phantom_vec_node_context() -> RustVec<NodeContext> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_node_context())
+}
+public func __alef_phantom_vec_text_direction() -> RustVec<TextDirection> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_text_direction())
+}
+public func __alef_phantom_vec_link_type() -> RustVec<LinkType> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_link_type())
+}
+public func __alef_phantom_vec_image_type() -> RustVec<ImageType> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_image_type())
+}
+public func __alef_phantom_vec_structured_data_type() -> RustVec<StructuredDataType> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_structured_data_type())
+}
+public func __alef_phantom_vec_tier_strategy() -> RustVec<TierStrategy> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_tier_strategy())
+}
+public func __alef_phantom_vec_preprocessing_preset() -> RustVec<PreprocessingPreset> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_preprocessing_preset())
+}
+public func __alef_phantom_vec_heading_style() -> RustVec<HeadingStyle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_heading_style())
+}
+public func __alef_phantom_vec_list_indent_type() -> RustVec<ListIndentType> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_list_indent_type())
+}
+public func __alef_phantom_vec_whitespace_mode() -> RustVec<WhitespaceMode> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_whitespace_mode())
+}
+public func __alef_phantom_vec_newline_style() -> RustVec<NewlineStyle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_newline_style())
+}
+public func __alef_phantom_vec_code_block_style() -> RustVec<CodeBlockStyle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_code_block_style())
+}
+public func __alef_phantom_vec_highlight_style() -> RustVec<HighlightStyle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_highlight_style())
+}
+public func __alef_phantom_vec_link_style() -> RustVec<LinkStyle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_link_style())
+}
+public func __alef_phantom_vec_url_escape_style() -> RustVec<UrlEscapeStyle> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_url_escape_style())
+}
+public func __alef_phantom_vec_output_format() -> RustVec<OutputFormat> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_output_format())
+}
+public func __alef_phantom_vec_node_content() -> RustVec<NodeContent> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_node_content())
+}
+public func __alef_phantom_vec_annotation_kind() -> RustVec<AnnotationKind> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_annotation_kind())
+}
+public func __alef_phantom_vec_warning_kind() -> RustVec<WarningKind> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_warning_kind())
+}
+public func __alef_phantom_vec_node_type() -> RustVec<NodeType> {
+    RustVec(ptr: __swift_bridge__$__alef_phantom_vec_node_type())
+}
 
 public class DocumentMetadata: DocumentMetadataRefMut {
     public var isOwned: Bool = true

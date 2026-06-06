@@ -1292,9 +1292,9 @@ private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8]
     return [UInt8](pathOrContent.utf8)
 }
 
-public func convert(_ html: String, _ conversionOptionsJson: String) throws -> ConversionResult {
-    let conversionOptions = try conversionOptionsFromJson(conversionOptionsJson)
-    return try convert(html: html, options: conversionOptions)
+public func convert(_ html: String, _ optionsconversionOptionsJson: String) throws -> ConversionResult {
+    let optionsconversionOptions = try conversionOptionsFromJson(optionsconversionOptionsJson)
+    return try convert(html: html, options: optionsconversionOptions)
 }
 
 // MARK: - From-JSON Helpers

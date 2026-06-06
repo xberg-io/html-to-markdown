@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	moduleVersion = "3.6.0-rc.14"
+	moduleVersion = "3.6.0-rc.15"
 	repoURL       = "https://github.com/kreuzberg-dev/html-to-markdown"
 	assetPrefix   = "html-to-markdown-rs"
 )

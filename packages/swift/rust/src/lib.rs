@@ -772,59 +772,262 @@ mod ffi {
         fn node_type_from_json(json: String) -> Result<NodeType, String>;
     }
     extern "Rust" {
-        // Phantom Vec<T> references: swift-bridge auto-generates Vectorizable conformance
-        // for every opaque type declaration. The auto-generated Swift extension references
-        // C ABI symbols __swift_bridge__$Vec_T$as_ptr and __swift_bridge__$Vec_T$len.
-        // Without this phantom block, swift-bridge-build does not emit those symbols,
-        // causing link failures when Swift tries to use Vec<T>.
+        // Phantom Vec<T> functions: swift-bridge-build must emit the full Vec support
+        // C ABI symbols (__swift_bridge__$Vec_T$new, drop, push, pop, get, get_mut, as_ptr, len)
+        // which the auto-generated Swift Vec<T> conformances reference.
         //
-        // This function is never called; it exists only to force symbol emission.
-        fn __register_vec_accessors(
-            __document_metadata: Vec<DocumentMetadata>,
-            __header_metadata: Vec<HeaderMetadata>,
-            __link_metadata: Vec<LinkMetadata>,
-            __image_metadata: Vec<ImageMetadata>,
-            __structured_data: Vec<StructuredData>,
-            __html_metadata: Vec<HtmlMetadata>,
-            __conversion_options: Vec<ConversionOptions>,
-            __conversion_options_update: Vec<ConversionOptionsUpdate>,
-            __preprocessing_options: Vec<PreprocessingOptions>,
-            __preprocessing_options_update: Vec<PreprocessingOptionsUpdate>,
-            __image_dimensions: Vec<ImageDimensions>,
-            __document_structure: Vec<DocumentStructure>,
-            __document_node: Vec<DocumentNode>,
-            __text_annotation: Vec<TextAnnotation>,
-            __metadata_entry: Vec<MetadataEntry>,
-            __conversion_result: Vec<ConversionResult>,
-            __table_grid: Vec<TableGrid>,
-            __grid_cell: Vec<GridCell>,
-            __table_data: Vec<TableData>,
-            __processing_warning: Vec<ProcessingWarning>,
-            __visitor_handle: Vec<VisitorHandle>,
-            __node_context: Vec<NodeContext>,
-            __text_direction: Vec<TextDirection>,
-            __link_type: Vec<LinkType>,
-            __image_type: Vec<ImageType>,
-            __structured_data_type: Vec<StructuredDataType>,
-            __tier_strategy: Vec<TierStrategy>,
-            __preprocessing_preset: Vec<PreprocessingPreset>,
-            __heading_style: Vec<HeadingStyle>,
-            __list_indent_type: Vec<ListIndentType>,
-            __whitespace_mode: Vec<WhitespaceMode>,
-            __newline_style: Vec<NewlineStyle>,
-            __code_block_style: Vec<CodeBlockStyle>,
-            __highlight_style: Vec<HighlightStyle>,
-            __link_style: Vec<LinkStyle>,
-            __url_escape_style: Vec<UrlEscapeStyle>,
-            __output_format: Vec<OutputFormat>,
-            __node_content: Vec<NodeContent>,
-            __annotation_kind: Vec<AnnotationKind>,
-            __warning_kind: Vec<WarningKind>,
-            __node_type: Vec<NodeType>,
-            __visit_result: Vec<VisitResult>,
-        ) {
-        }
+        // swift-bridge 0.1.59 only emits these when Vec<T> appears as a return type
+        // in an extern block. Without these phantom functions, Swift linker fails when
+        // trying to construct or manipulate Vec<T> of opaque types.
+        //
+        // These declarations are paired with phantom_impl functions below the bridge module.
+        fn __alef_phantom_vec_document_metadata() -> Vec<DocumentMetadata>;
+        fn __alef_phantom_vec_header_metadata() -> Vec<HeaderMetadata>;
+        fn __alef_phantom_vec_link_metadata() -> Vec<LinkMetadata>;
+        fn __alef_phantom_vec_image_metadata() -> Vec<ImageMetadata>;
+        fn __alef_phantom_vec_structured_data() -> Vec<StructuredData>;
+        fn __alef_phantom_vec_html_metadata() -> Vec<HtmlMetadata>;
+        fn __alef_phantom_vec_conversion_options() -> Vec<ConversionOptions>;
+        fn __alef_phantom_vec_conversion_options_update() -> Vec<ConversionOptionsUpdate>;
+        fn __alef_phantom_vec_preprocessing_options() -> Vec<PreprocessingOptions>;
+        fn __alef_phantom_vec_preprocessing_options_update() -> Vec<PreprocessingOptionsUpdate>;
+        fn __alef_phantom_vec_image_dimensions() -> Vec<ImageDimensions>;
+        fn __alef_phantom_vec_document_structure() -> Vec<DocumentStructure>;
+        fn __alef_phantom_vec_document_node() -> Vec<DocumentNode>;
+        fn __alef_phantom_vec_text_annotation() -> Vec<TextAnnotation>;
+        fn __alef_phantom_vec_metadata_entry() -> Vec<MetadataEntry>;
+        fn __alef_phantom_vec_conversion_result() -> Vec<ConversionResult>;
+        fn __alef_phantom_vec_table_grid() -> Vec<TableGrid>;
+        fn __alef_phantom_vec_grid_cell() -> Vec<GridCell>;
+        fn __alef_phantom_vec_table_data() -> Vec<TableData>;
+        fn __alef_phantom_vec_processing_warning() -> Vec<ProcessingWarning>;
+        fn __alef_phantom_vec_visitor_handle() -> Vec<VisitorHandle>;
+        fn __alef_phantom_vec_node_context() -> Vec<NodeContext>;
+        fn __alef_phantom_vec_text_direction() -> Vec<TextDirection>;
+        fn __alef_phantom_vec_link_type() -> Vec<LinkType>;
+        fn __alef_phantom_vec_image_type() -> Vec<ImageType>;
+        fn __alef_phantom_vec_structured_data_type() -> Vec<StructuredDataType>;
+        fn __alef_phantom_vec_tier_strategy() -> Vec<TierStrategy>;
+        fn __alef_phantom_vec_preprocessing_preset() -> Vec<PreprocessingPreset>;
+        fn __alef_phantom_vec_heading_style() -> Vec<HeadingStyle>;
+        fn __alef_phantom_vec_list_indent_type() -> Vec<ListIndentType>;
+        fn __alef_phantom_vec_whitespace_mode() -> Vec<WhitespaceMode>;
+        fn __alef_phantom_vec_newline_style() -> Vec<NewlineStyle>;
+        fn __alef_phantom_vec_code_block_style() -> Vec<CodeBlockStyle>;
+        fn __alef_phantom_vec_highlight_style() -> Vec<HighlightStyle>;
+        fn __alef_phantom_vec_link_style() -> Vec<LinkStyle>;
+        fn __alef_phantom_vec_url_escape_style() -> Vec<UrlEscapeStyle>;
+        fn __alef_phantom_vec_output_format() -> Vec<OutputFormat>;
+        fn __alef_phantom_vec_node_content() -> Vec<NodeContent>;
+        fn __alef_phantom_vec_annotation_kind() -> Vec<AnnotationKind>;
+        fn __alef_phantom_vec_warning_kind() -> Vec<WarningKind>;
+        fn __alef_phantom_vec_node_type() -> Vec<NodeType>;
     }
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_document_metadata() -> Vec<DocumentMetadata> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_header_metadata() -> Vec<HeaderMetadata> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_link_metadata() -> Vec<LinkMetadata> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_image_metadata() -> Vec<ImageMetadata> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_structured_data() -> Vec<StructuredData> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_html_metadata() -> Vec<HtmlMetadata> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_conversion_options() -> Vec<ConversionOptions> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_conversion_options_update() -> Vec<ConversionOptionsUpdate> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_preprocessing_options() -> Vec<PreprocessingOptions> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_preprocessing_options_update() -> Vec<PreprocessingOptionsUpdate> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_image_dimensions() -> Vec<ImageDimensions> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_document_structure() -> Vec<DocumentStructure> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_document_node() -> Vec<DocumentNode> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_text_annotation() -> Vec<TextAnnotation> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_metadata_entry() -> Vec<MetadataEntry> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_conversion_result() -> Vec<ConversionResult> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_table_grid() -> Vec<TableGrid> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_grid_cell() -> Vec<GridCell> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_table_data() -> Vec<TableData> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_processing_warning() -> Vec<ProcessingWarning> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_visitor_handle() -> Vec<VisitorHandle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_node_context() -> Vec<NodeContext> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_text_direction() -> Vec<TextDirection> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_link_type() -> Vec<LinkType> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_image_type() -> Vec<ImageType> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_structured_data_type() -> Vec<StructuredDataType> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_tier_strategy() -> Vec<TierStrategy> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_preprocessing_preset() -> Vec<PreprocessingPreset> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_heading_style() -> Vec<HeadingStyle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_list_indent_type() -> Vec<ListIndentType> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_whitespace_mode() -> Vec<WhitespaceMode> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_newline_style() -> Vec<NewlineStyle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_code_block_style() -> Vec<CodeBlockStyle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_highlight_style() -> Vec<HighlightStyle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_link_style() -> Vec<LinkStyle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_url_escape_style() -> Vec<UrlEscapeStyle> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_output_format() -> Vec<OutputFormat> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_node_content() -> Vec<NodeContent> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_annotation_kind() -> Vec<AnnotationKind> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_warning_kind() -> Vec<WarningKind> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_node_type() -> Vec<NodeType> {
+    Vec::new()
 }
 
 pub struct DocumentMetadata(pub html_to_markdown_rs::metadata::DocumentMetadata);
