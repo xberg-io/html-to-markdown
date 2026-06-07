@@ -83,7 +83,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.kreuzberg",
         artifactId = "html-to-markdown-android",
-        version = "3.6.0-rc.18",
+        version = "3.6.0-rc.19",
     )
 
     pom {
