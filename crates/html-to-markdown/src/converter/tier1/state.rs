@@ -98,8 +98,14 @@ pub struct Tier1State {
     pub escape_ctx: EscapeCtx,
     /// Accumulated Markdown output.
     pub output: String,
-    /// Current list nesting depth (0 = top level).
+    /// Current list nesting depth (0 = top level). Counts both `<ul>` and `<ol>`.
     pub list_depth: u16,
+    /// Current unordered-list nesting depth.
+    ///
+    /// Counts only `<ul>` opens.  Used to cycle through `options.bullets` so
+    /// that nested lists produce byte-identical output to Tier-2 (which selects
+    /// `bullets[(ul_depth - 1) % bullets.len()]` per item).
+    pub ul_depth: u16,
     /// Tracks the output length before the most recent block-open separator was appended,
     /// so we can detect whether any content was actually emitted inside a block.
     pub last_block_sep_pos: usize,
@@ -119,6 +125,7 @@ impl Tier1State {
                 (input_len / OUTPUT_CAPACITY_DIVISOR).clamp(OUTPUT_CAPACITY_MIN, OUTPUT_CAPACITY_MAX),
             ),
             list_depth: 0,
+            ul_depth: 0,
             last_block_sep_pos: 0,
             table_stack: Vec::new(),
         }

@@ -25,7 +25,7 @@ use crate::converter::tier1::tags::{ListKind, RawKind, TagKind, TagSpec};
 use crate::converter::tier1::{self};
 use crate::options::ConversionOptions;
 
-use memchr::memchr3;
+use memchr::{memchr2, memchr3};
 
 /// Maximum byte length of a tag name lowercased into a stack buffer.
 ///
@@ -147,12 +147,6 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
                     return Err(BailReason::Classifier);
                 }
 
-                // Bail on nested lists: Tier-2 cycles bullet characters by depth
-                // (-, *, +) but Tier-1 always uses "-". Nesting requires Tier-2.
-                if matches!(spec.kind, TagKind::List(ListKind::Unordered | ListKind::Ordered)) && state.list_depth > 0 {
-                    return Err(BailReason::Classifier);
-                }
-
                 // Find end of tag (handles quoted attribute values)
                 let close = parse::find_tag_close(bytes, name_end).ok_or(BailReason::LiteralLt { offset: pos })?;
 
@@ -254,7 +248,26 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
 
                 text_start = pos;
             }
-            _ => pos += 1,
+            _ => {
+                // Batch ASCII fast-path: skip forward to the next `<` or `&`
+                // (the only two bytes that require special handling) in one
+                // memchr2 call instead of advancing one byte at a time.
+                // flush_text handles entity decoding and whitespace collapsing
+                // for whatever raw slice [text_start..pos] we hand it, so it
+                // is correct to jump pos all the way to the next special byte.
+                // This is safe across every context (<pre>, table cells, etc.)
+                // because:
+                //   • `<` still triggers the tag-dispatch path above.
+                //   • `&` is preserved in the slice passed to flush_text, which
+                //     entity-decodes it correctly regardless of context.
+                //   • Raw-text elements (script/style/textarea/…) bail before
+                //     reaching this arm, so we never skip inside them.
+                match memchr2(b'<', b'&', &bytes[pos..]) {
+                    Some(offset) if offset > 0 => pos += offset,
+                    Some(_) => pos += 1,       // next byte is already special; advance past current
+                    None => pos = bytes.len(), // no more special bytes; jump to end
+                }
+            }
         }
     }
 
@@ -354,7 +367,7 @@ fn emit_open(
         TagKind::Heading(_) => open_heading(state),
         TagKind::Blockquote => open_blockquote(state),
         TagKind::Pre => open_pre(state),
-        TagKind::List(_) => open_list(state),
+        TagKind::List(kind) => open_list(state, kind),
         TagKind::ListItem => open_list_item(state),
         TagKind::Strong => {
             state.cell_or_output_mut().push_str("**");
@@ -409,7 +422,7 @@ fn open_pre(state: &mut Tier1State) {
     state.ensure_blank_line();
 }
 
-fn open_list(state: &mut Tier1State) {
+fn open_list(state: &mut Tier1State, kind: ListKind) {
     // Lists at the top level need a blank line if there's preceding content.
     // Inside a list item (`list_depth > 0`) just a newline is enough.
     if !state.output.is_empty() {
@@ -424,24 +437,34 @@ fn open_list(state: &mut Tier1State) {
         }
     }
     state.list_depth = state.list_depth.saturating_add(1);
+    if matches!(kind, ListKind::Unordered) {
+        state.ul_depth = state.ul_depth.saturating_add(1);
+    }
 }
+
+/// Cycle through the canonical default `options.bullets` value (`"-*+"`) by
+/// `<ul>` nesting depth.  The router (`router.rs::classify`) gates Tier-1 to
+/// the literal default, so this hardcoded cycle reproduces Tier-2 byte-for-byte.
+const TIER1_BULLETS: [u8; 3] = [b'-', b'*', b'+'];
 
 fn open_list_item(state: &mut Tier1State) {
     // Emit the list item marker.
     let parent_kind = find_parent_list_kind(&state.stack);
-    let indent = list_item_indent(state.list_depth.saturating_sub(1));
+    let indent_depth = state.list_depth.saturating_sub(1);
     if parent_kind == Some(ListKind::Ordered) {
         // Increment counter on parent ordered list frame
         let counter = increment_ol_counter(&mut state.stack);
         let start = find_ol_start(&state.stack);
         let index = start.saturating_sub(1) + counter;
-        state.output.push_str(indent);
+        push_list_item_indent(&mut state.output, indent_depth);
         // measured: write! is slower on this workload (Stage 5c)
         #[allow(clippy::format_push_string)]
         state.output.push_str(&format!("{index}. "));
     } else {
-        state.output.push_str(indent);
-        state.output.push_str("- ");
+        push_list_item_indent(&mut state.output, indent_depth);
+        let bullet_idx = state.ul_depth.saturating_sub(1) as usize % TIER1_BULLETS.len();
+        state.output.push(TIER1_BULLETS[bullet_idx] as char);
+        state.output.push(' ');
     }
 }
 
@@ -711,7 +734,7 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         }
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
-        TagKind::List(_) => close_list(state),
+        TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state),
         TagKind::Hr => {
             // Should not happen (hr is void), but handle gracefully.
@@ -771,7 +794,7 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
         }
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
-        TagKind::List(_) => close_list(state),
+        TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
         TagKind::TableRow => close_table_row(state),
@@ -897,8 +920,11 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     }
 }
 
-fn close_list(state: &mut Tier1State) {
+fn close_list(state: &mut Tier1State, kind: ListKind) {
     state.list_depth = state.list_depth.saturating_sub(1);
+    if matches!(kind, ListKind::Unordered) {
+        state.ul_depth = state.ul_depth.saturating_sub(1);
+    }
     // Ensure the list ends with exactly one newline before any following content.
     if !state.output.ends_with('\n') {
         state.output.push('\n');
@@ -1338,20 +1364,20 @@ fn heading_prefix(n: u8) -> &'static str {
     HEADING_PREFIXES[idx]
 }
 
-/// Compute the indentation string for a list item at the given depth.
+/// Push the list-item indentation for `depth` into `out`.
 ///
-/// Depth 0 → no indent; depth 1 → two spaces; etc.
-/// Uses the `LIST_ITEM_INDENTS` table for depths 0–7; falls back to
-/// a runtime allocation for deeper nesting (rare).
-const fn list_item_indent(depth: u16) -> &'static str {
+/// Depth 0 → no indent; each level adds two spaces (matches the router's
+/// `list_indent_width == 2` gate).  Depths 0–7 use the static `LIST_ITEM_INDENTS`
+/// table; deeper nesting (rare) falls back to a runtime loop.
+fn push_list_item_indent(out: &mut String, depth: u16) {
     let idx = depth as usize;
     if idx < LIST_ITEM_INDENTS.len() {
-        LIST_ITEM_INDENTS[idx]
+        out.push_str(LIST_ITEM_INDENTS[idx]);
     } else {
-        // Depths beyond the table are rare; fall back to allocation.
-        // This is a dead-code path in practice since nested lists bail
-        // before depth 8, but kept for correctness.
-        LIST_ITEM_INDENTS[LIST_ITEM_INDENTS.len() - 1]
+        out.reserve(idx * 2);
+        for _ in 0..idx {
+            out.push_str("  ");
+        }
     }
 }
 

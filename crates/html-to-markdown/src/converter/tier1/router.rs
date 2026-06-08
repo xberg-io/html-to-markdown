@@ -52,7 +52,7 @@ pub enum RouterDecision {
 /// | `heading_style`      | `HeadingStyle::Atx`                     | Yes — non-Atx                            |
 /// | `code_block_style`   | `CodeBlockStyle::Indented`              | Yes — non-Indented                       |
 /// | `strong_em_symbol`   | `'*'` (asterisk)                        | Yes — any other char                     |
-/// | `bullets`            | `"-"` (first char `'-'`)                | Yes — other first char                   |
+/// | `bullets`            | `"-*+"` (cycled by `ul_depth`)          | Yes — any other value                    |
 /// | `list_indent_width`  | `2` spaces                              | Yes — `!= 2`                             |
 /// | `list_indent_type`   | `ListIndentType::Spaces`                | Yes — Tabs                               |
 /// | `escape_asterisks`   | `false` (no escaping)                   | Yes — `true`                             |
@@ -98,8 +98,9 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
         || options.code_block_style != CodeBlockStyle::Indented
         // strong_em_symbol: Tier-1 hardcodes `*`/`**`.
         || options.strong_em_symbol != '*'
-        // bullets: Tier-1 hardcodes `-` as the unordered-list bullet.
-        || !options.bullets.starts_with('-')
+        // bullets: Tier-1 hardcodes the cycle `"-*+"` (the default).  Any
+        // other configured value would diverge at nested depths.
+        || options.bullets != "-*+"
         // list_indent_width: Tier-1 hardcodes 2-space indentation per depth level.
         || options.list_indent_width != 2
         // list_indent_type: Tier-1 hardcodes spaces for list indentation.
