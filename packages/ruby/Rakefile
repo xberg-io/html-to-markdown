@@ -8,6 +8,10 @@ require "rspec/core/rake_task"
 GEM_ROOT = __dir__
 GEMSPEC = Gem::Specification.load(File.expand_path("html_to_markdown.gemspec", GEM_ROOT))
 
+# Set of supported platform identifiers for native gem cross-compilation.
+# Used by `rb_sys/extensiontask` to drive the `rake compile:<platform>` tasks
+# that produce platform-specific prebuilt gems published alongside the source
+# gem on RubyGems.
 CROSS_PLATFORMS = %w[
   x86_64-linux
   aarch64-linux
