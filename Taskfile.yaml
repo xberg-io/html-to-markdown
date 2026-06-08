@@ -601,7 +601,11 @@ tasks:
     desc: "Comprehensive tests for Go package"
     dir: test_apps/go
     cmds:
-      - go mod download
+      # `go mod tidy` resolves the full transitive set into go.sum; without
+      # it `go mod download` fails when the consumed version hashes were not
+      # captured at version-bump time (alef text_replacement only edits
+      # go.mod, not go.sum).
+      - go mod tidy
       - go test -v -run Test_
 
   test-apps:test:java:
@@ -625,9 +629,10 @@ tasks:
 
   test-apps:test:r:
     desc: "Comprehensive tests for R package"
-    dir: packages/r
+    dir: test_apps/r
     cmds:
-      - Rscript -e 'devtools::test()'
+      - Rscript install.R
+      - Rscript run_tests.R
 
   test-apps:test:swift:
     desc: "Comprehensive tests for Swift package"
@@ -645,7 +650,14 @@ tasks:
   test-apps:test:zig:
     desc: "Comprehensive tests for Zig package"
     dir: test_apps/zig
+    vars:
+      H2M_VERSION:
+        sh: cd ../.. && grep -m1 '^version =' crates/html-to-markdown/Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/'
     cmds:
+      # Resolve the per-tag tarball hash from the GitHub release before build.
+      # alef emits a placeholder hash in build.zig.zon because the real value
+      # is only known after the publish-zig job uploads the tarball.
+      - zig fetch --save=html_to_markdown "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v{{.H2M_VERSION}}/html-to-markdown-rs-zig-v{{.H2M_VERSION}}.tar.gz"
       - zig build test
 
   test-apps:test:kotlin-android:
