@@ -779,12 +779,8 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         TagKind::Heading(n) => close_heading(state, &frame, n, false)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame),
-        TagKind::Strong => {
-            state.cell_or_output_mut().push_str("**");
-        }
-        TagKind::Emphasis => {
-            state.cell_or_output_mut().push('*');
-        }
+        TagKind::Strong => close_inline_marker(state, &frame, "**"),
+        TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -814,6 +810,28 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
     Ok(())
 }
 
+/// Close an inline emphasis-style element (`<strong>`, `<em>`, `<b>`, `<i>`).
+///
+/// When the element produced no visible content (the source had `<strong></strong>`
+/// or `<i>   </i>`), erase the open marker too instead of emitting an empty
+/// `**` / `*` pair.  Tier-2's DOM walker reaches the same result by emitting
+/// nothing for an empty inline node; the byte-equality oracle requires us to
+/// match that.
+fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
+    let buf = state.cell_or_output_mut();
+    let body_is_empty = buf.len() <= frame.content_start
+        || buf[frame.content_start..]
+            .bytes()
+            .all(|b| matches!(b, b' ' | b'\t' | b'\n' | b'\r'));
+    if body_is_empty {
+        // Truncate back to the position before the open marker was pushed.
+        let open_marker_start = frame.content_start.saturating_sub(marker.len());
+        buf.truncate(open_marker_start);
+    } else {
+        buf.push_str(marker);
+    }
+}
+
 // ── Implicit close-tag emission ───────────────────────────────────────────────
 
 /// Implicitly close the top-of-stack frame without a matching `</tag>` in the
@@ -839,12 +857,8 @@ fn emit_close_for_implicit(state: &mut Tier1State) -> Result<(), BailReason> {
         TagKind::Heading(n) => close_heading(state, &frame, n, true)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame),
-        TagKind::Strong => {
-            state.cell_or_output_mut().push_str("**");
-        }
-        TagKind::Emphasis => {
-            state.cell_or_output_mut().push('*');
-        }
+        TagKind::Strong => close_inline_marker(state, &frame, "**"),
+        TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
         TagKind::Link => close_link(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -1102,6 +1116,31 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
 /// carries an accurate position.
 ///
 /// Returns `Err(BailReason::UnknownEntity)` if an unrecognised entity is found.
+/// True when `s` ends with an ordered-list marker (`<digit(s)>. ` or `<digit(s)>) `).
+///
+/// Used by the inter-block whitespace strip to recognise that the scanner just
+/// emitted a list-item marker and the next text would be the item content;
+/// leading whitespace from the source HTML indentation should be dropped.
+fn ends_with_ordered_marker(s: &str) -> bool {
+    let bytes = s.as_bytes();
+    let len = bytes.len();
+    if len < 3 || bytes[len - 1] != b' ' {
+        return false;
+    }
+    let punct = bytes[len - 2];
+    if punct != b'.' && punct != b')' {
+        return false;
+    }
+    // Walk back over digits.
+    let mut i = len - 2;
+    while i > 0 && bytes[i - 1].is_ascii_digit() {
+        i -= 1;
+    }
+    // At least one digit and the start of digits is followed by a non-digit
+    // (or start of buffer).
+    i < len - 2 && (i == 0 || !bytes[i - 1].is_ascii_digit())
+}
+
 fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(), BailReason> {
     if raw.is_empty() {
         return Ok(());
@@ -1116,6 +1155,96 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
+
+    // Inter-block whitespace strip: in a block-edge context (output empty,
+    // ends with a newline, or ends with a list-item marker like "- " /
+    // "1. "), whitespace-only text between adjacent elements (the
+    // indentation in pretty-printed HTML) is not meaningful and must be
+    // discarded.  Tier-2's DOM walker gets this for free because the
+    // parser yields text nodes separately from tag nodes and the walker
+    // skips whitespace-only text at block-level boundaries.  Skipped when
+    // inside `<pre>` (verbatim) or inside a table cell (caller is
+    // accumulating cell text).
+    //
+    // We also treat "the current open frame is a link/emphasis frame whose
+    // body is still empty" as a block-edge: text appearing immediately
+    // after `<a>` → `[`, `<strong>` → `**`, etc. inherits leading
+    // whitespace from the source HTML's indentation and Tier-2 trims it
+    // when building the inline label.  This catches cases like
+    // `<a href>\n   <span>EN</span>\n</a>` where the whitespace after
+    // `<a>` would otherwise leak into the link label as `[ EN]`.
+    //
+    // Plain `<p>`/`<div>`/`<h1>` frames are NOT in this set — Tier-2 keeps
+    // the leading whitespace inside the very first paragraph of a document
+    // (it becomes the single space after `normalize_whitespace`).  Only
+    // post-content paragraphs see "\n\n" before them, which the
+    // `output.ends_with('\n')` check above already handles.
+    let at_inline_frame_start = match state.stack.last() {
+        Some(frame) => {
+            let cs = frame.content_start;
+            let kind = frame.spec.kind;
+            let buf_len = state.cell_or_output_mut().len();
+            cs >= buf_len
+                && matches!(
+                    kind,
+                    TagKind::Link | TagKind::Strong | TagKind::Emphasis | TagKind::Code
+                )
+        }
+        None => false,
+    };
+    let is_block_edge = state.output.is_empty()
+        || state.output.ends_with('\n')
+        || state.output.ends_with("- ")
+        || state.output.ends_with("* ")
+        || state.output.ends_with("+ ")
+        || ends_with_ordered_marker(&state.output)
+        || at_inline_frame_start;
+    let raw_is_whitespace = raw.bytes().all(|b| b == b' ' || b == b'\t' || b == b'\n' || b == b'\r');
+    if !in_pre && !state.in_table_cell() && is_block_edge && raw_is_whitespace {
+        return Ok(());
+    }
+    // Whitespace-only text outside any inline element (link / strong / em /
+    // code) and outside `<pre>` / table cells is structural indentation
+    // between block siblings (e.g. between `</div>` and the next `<div>`).
+    // Tier-2 emits a single ASCII space here when the surrounding context
+    // is inline, but otherwise the DOM walker treats it as a no-op.  For
+    // Tier-1's heuristic we collapse it to nothing — matches Tier-2 for
+    // the common block-between-blocks case and the inline cases are caught
+    // by the inline-frame check above.
+    if !in_pre && !state.in_table_cell() && raw_is_whitespace {
+        let inside_inline = state.stack.iter().any(|frame| {
+            matches!(
+                frame.spec.kind,
+                TagKind::Link | TagKind::Strong | TagKind::Emphasis | TagKind::Code
+            )
+        });
+        if !inside_inline {
+            return Ok(());
+        }
+    }
+    // Even when the text is not entirely whitespace, strip its LEADING
+    // whitespace when:
+    //   - we're at the start of an open inline element's body (`<a>`,
+    //     `<strong>`, etc.), OR
+    //   - the output ends with a block separator (`\n\n`) or a list-item
+    //     marker — Tier-2's text-node `skip_prefix` logic does the same.
+    //
+    // Not when output is empty (first paragraph of a document keeps its
+    // leading whitespace per Tier-2's behaviour).
+    let block_separator_after = state.output.ends_with("\n\n")
+        || state.output.ends_with("- ")
+        || state.output.ends_with("* ")
+        || state.output.ends_with("+ ")
+        || ends_with_ordered_marker(&state.output);
+    let raw = if !in_pre && !state.in_table_cell() && (at_inline_frame_start || block_separator_after) {
+        raw.trim_start_matches([' ', '\t', '\n', '\r'])
+    } else {
+        raw
+    };
+    if raw.is_empty() {
+        return Ok(());
+    }
+
     let has_entities = raw.contains('&');
 
     if in_pre {
