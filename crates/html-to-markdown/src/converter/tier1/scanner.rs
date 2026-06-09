@@ -213,11 +213,10 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
                 } else {
                     1
                 };
-                let (link_href, link_title) = if matches!(spec.kind, TagKind::Link) {
-                    extract_link_attrs(&attrs)?
-                } else {
-                    (None, None)
-                };
+                if matches!(spec.kind, TagKind::Link) {
+                    let (href, title) = extract_link_attrs(&attrs)?;
+                    state.link_stack.push((href, title));
+                }
 
                 emit_open(&mut state, spec, &attrs)?;
 
@@ -236,8 +235,6 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
                     content_start: output_content_start,
                     prev_escape_ctx: prev_ctx,
                     list_index,
-                    link_href,
-                    link_title,
                     ol_start,
                     name_range: name_start..name_end,
                 });
@@ -899,9 +896,11 @@ fn close_code(state: &mut Tier1State) {
 fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     // Close the link: `](href "title")` or `](href)`
     // If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
+    // Link state was pushed to state.link_stack at open; pop it now.
+    let (href, title) = state.link_stack.pop().unwrap_or((None, None));
     let dest = state.cell_or_output_mut();
-    if let Some(href) = &frame.link_href {
-        if let Some(title) = &frame.link_title {
+    if let Some(href) = href {
+        if let Some(title) = title {
             // measured: write! is slower on this workload (Stage 5c)
             #[allow(clippy::format_push_string)]
             dest.push_str(&format!("]({href} \"{title}\")"));

@@ -79,10 +79,6 @@ pub struct OpenTag {
     pub prev_escape_ctx: EscapeCtx,
     /// For ordered list items: the current item counter (1-based).
     pub list_index: u16,
-    /// For `<a>` tags: the href value (raw bytes from HTML, entity-decoded when emitted).
-    pub link_href: Option<String>,
-    /// For `<a>` tags: the title value (raw bytes from HTML, entity-decoded when emitted).
-    pub link_title: Option<String>,
     /// For ordered lists: the start counter value.
     pub ol_start: u16,
     /// Byte range of the tag name in the original input (original case; callers
@@ -112,6 +108,13 @@ pub struct Tier1State {
     /// Stack of in-progress table states.  Pushed on `<table>` open, popped on
     /// `</table>` close.  Depth > 1 is a nested-table bail.
     pub table_stack: Vec<TableState>,
+    /// Stack of `(href, title)` pairs for currently-open `<a>` elements.
+    ///
+    /// HTML5 forbids nested `<a>`, but the stack handles malformed input safely.
+    /// Holding link state off `OpenTag` saves two `Option<String>` slots per
+    /// every non-link tag frame (24 bytes × every tag on Wikipedia pages with
+    /// thousands of tags), and avoids per-frame `Clone` cost.
+    pub link_stack: Vec<(Option<String>, Option<String>)>,
 }
 
 impl Tier1State {
@@ -128,6 +131,7 @@ impl Tier1State {
             ul_depth: 0,
             last_block_sep_pos: 0,
             table_stack: Vec::new(),
+            link_stack: Vec::new(),
         }
     }
 
