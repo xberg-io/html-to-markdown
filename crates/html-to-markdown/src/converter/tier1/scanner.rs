@@ -4,12 +4,13 @@
 //! output buffer.  On any construct it cannot handle exactly, returns a
 //! [`BailReason`] so the dispatcher can fall back to Tier-2.
 //!
-//! # Supported subset (M9)
+//! # Supported subset (M9 + Phase E)
 //!
 //! Paragraph, Heading(1-6), Strong, Emphasis, Code (inline), Pre, Hr,
 //! `LineBreak`, Link, Image, List(Unordered), List(Ordered), `ListItem`,
-//! Blockquote, Block (div/section/article/etc.), Inline (span/etc.),
-//! Table (GFM — conservative bail set, inline-only cell content).
+//! Blockquote, Block (div/section/article/center/etc.), Inline (span/etc.),
+//! Table (GFM — conservative bail set, inline-only cell content),
+//! and custom elements (tag names containing `-`, treated as Block containers).
 //!
 //! Bails on: RawText(script/style/textarea/etc.), `DefinitionTerm`,
 //! `DefinitionDescription`, List(Definition), Ignored (head/meta/link),
@@ -42,6 +43,24 @@ const MAX_ENTITY_NAME_BYTES: usize = 32;
 ///
 /// Matches Tier-2's `col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES)`.
 const MIN_SEPARATOR_DASHES: usize = 3;
+
+/// Static `TagSpec` used for all unknown custom elements (tag names containing
+/// `-`, e.g. `<x-foo>`, `<my-component>`).
+///
+/// Tier-2 treats unknown custom elements as generic block containers and emits
+/// their inner content as plain text.  Using a `Block` spec here produces
+/// byte-identical output to Tier-2 for the common cases where custom-element
+/// content is plain text or standard HTML children.
+///
+/// The static reference `&CUSTOM_ELEMENT_BLOCK_SPEC` is used anywhere the
+/// scanner needs a `&'static TagSpec` for a custom element open/close tag.
+static CUSTOM_ELEMENT_BLOCK_SPEC: TagSpec = TagSpec {
+    kind: TagKind::Block,
+    is_void: false,
+    is_block: true,
+    optional_close: None,
+    is_rawtext: false,
+};
 
 /// ATX heading prefixes indexed by level − 1 (0 = `h1`, 5 = `h6`).
 const HEADING_PREFIXES: [&str; 6] = ["# ", "## ", "### ", "#### ", "##### ", "###### "];
@@ -133,19 +152,24 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
                 let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
 
-                // Custom elements (contain `-`) → bail
-                if name_lower.contains(&b'-') {
-                    return Err(BailReason::UnknownCustomElement {
-                        name: bytes_to_string(tag_name_bytes).into(),
-                        offset: pos,
-                    });
-                }
-
-                // Unknown tag → bail
-                let spec = tier1::lookup(name_lower).ok_or_else(|| BailReason::UnknownCustomElement {
-                    name: bytes_to_string(tag_name_bytes).into(),
-                    offset: pos,
-                })?;
+                // Resolve the tag spec.  Custom elements (names containing `-`)
+                // are not in the static TAGS table but are treated as generic
+                // block containers — Tier-2 emits their inner content as plain
+                // block text, which matches `TagKind::Block` behaviour.  All
+                // other unknown tags are still bailed immediately.
+                let spec: &'static TagSpec = if name_lower.contains(&b'-') {
+                    &CUSTOM_ELEMENT_BLOCK_SPEC
+                } else {
+                    match tier1::lookup(name_lower) {
+                        Some(s) => s,
+                        None => {
+                            return Err(BailReason::UnknownCustomElement {
+                                name: bytes_to_string(tag_name_bytes).into(),
+                                offset: pos,
+                            });
+                        }
+                    }
+                };
 
                 // Raw-text "ignored" tags (`<script>`, `<style>`): their
                 // spec is `TagKind::Ignored` with `is_rawtext = true` (see
@@ -828,10 +852,21 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
     let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
     let name_lower = lowercase_into(tag_name_bytes, &mut name_buf);
 
-    let spec = tier1::lookup(name_lower).ok_or_else(|| BailReason::UnknownCustomElement {
-        name: bytes_to_string(tag_name_bytes).into(),
-        offset: 0,
-    })?;
+    // Custom element close tags (e.g. `</x-foo>`) use the same static Block
+    // spec as their corresponding open tag.  All other unknown close tags bail.
+    let spec: &'static TagSpec = if name_lower.contains(&b'-') {
+        &CUSTOM_ELEMENT_BLOCK_SPEC
+    } else {
+        match tier1::lookup(name_lower) {
+            Some(s) => s,
+            None => {
+                return Err(BailReason::UnknownCustomElement {
+                    name: bytes_to_string(tag_name_bytes).into(),
+                    offset: 0,
+                });
+            }
+        }
+    };
 
     // M4: Before popping the matching frame, implicitly close any open optional-close
     // elements at the top of the stack that would be auto-closed by their parent's

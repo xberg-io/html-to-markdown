@@ -126,34 +126,43 @@ fn bails_on_cdata_or_classifier_via_prescan() {
     assert_eq!(force_tier1(html), tier2(html));
 }
 
-// ── Tripwire 3: UnknownCustomElement ─────────────────────────────────────────
+// ── Custom-element block passthrough (Phase E) ───────────────────────────────
+//
+// Custom elements (tag names containing `-`) are now handled natively by
+// Tier-1 as generic block containers rather than bailed immediately.
+// Tier-2 emits their inner content as plain block text; Tier-1's Block
+// dispatch produces byte-identical output.
 
 #[test]
-fn bails_on_custom_element() {
+fn custom_element_handled_natively() {
+    // Tier-1 should NOT bail — it handles <my-thing> as a Block container
+    // and emits the inner content as-is.
     let html = "<my-thing>x</my-thing>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::UnknownCustomElement { .. }),
-        "expected UnknownCustomElement, got {err:?}"
-    );
-    assert_eq!(force_tier1(html), tier2(html));
+    let result = tier1_run(html);
+    assert!(result.is_ok(), "expected success, got bail: {:?}", result.unwrap_err());
+    assert_eq!(result.unwrap(), tier2(html), "Tier-1 output must match Tier-2");
 }
 
 #[test]
-fn bails_on_custom_element_contains_name() {
-    let html = "<data-widget>content</data-widget>";
-    if let Err(BailReason::UnknownCustomElement { name, .. }) = tier1_run(html) {
-        assert!(
-            name.contains('-') || name.eq_ignore_ascii_case("data-widget"),
-            "expected name to reflect the element, got {name:?}"
-        );
-    } else {
-        panic!("expected UnknownCustomElement");
+fn custom_element_content_matches_tier2() {
+    // Verify a range of custom-element patterns all produce Tier-2-identical output.
+    for html in &[
+        "<data-widget>content</data-widget>",
+        "<x-button>click</x-button>",
+        "<ui-card><p>hi</p></ui-card>",
+        "<foo-bar baz=\"1\">text</foo-bar>",
+        "<my-thing>x</my-thing>",
+    ] {
+        let t1 = force_tier1(html);
+        let t2 = tier2(html);
+        assert_eq!(t1, t2, "output mismatch for {html:?}");
     }
 }
 
 #[test]
 fn bails_on_custom_element_fallback_matches_tier2() {
+    // This test verifies that even when Tier-1 handles custom elements natively
+    // (no bail), the output is identical to Tier-2.  Kept for regression coverage.
     for html in &[
         "<x-button>click</x-button>",
         "<ui-card><p>hi</p></ui-card>",
