@@ -279,8 +279,35 @@ pub fn normalize_whitespace(text: &str) -> String {
 /// `Cow::Borrowed` if text is already normalized, or `Cow::Owned` with normalized text
 #[must_use]
 pub fn normalize_whitespace_cow(text: &str) -> Cow<'_, str> {
+    // ASCII fast path: most real-world text is ASCII-only.  Walking bytes
+    // avoids `char` decoding and lets the loop be tight.  Any non-ASCII byte
+    // (>= 0x80) is a continuation byte for a multi-byte codepoint which
+    // could be a Unicode space; fall back to the char-aware path in that
+    // case.
+    let bytes = text.as_bytes();
     let mut prev_was_space = false;
+    for &b in bytes {
+        if b >= 0x80 {
+            return normalize_whitespace_cow_slow(text);
+        }
+        let is_space = b == b' ' || b == b'\t';
+        if is_space {
+            if prev_was_space || b != b' ' {
+                return Cow::Owned(normalize_whitespace(text));
+            }
+            prev_was_space = true;
+        } else {
+            prev_was_space = false;
+        }
+    }
+    Cow::Borrowed(text)
+}
 
+/// Char-aware fallback path used when the input contains non-ASCII bytes.
+/// Mirrors the previous behaviour exactly.
+#[cold]
+fn normalize_whitespace_cow_slow(text: &str) -> Cow<'_, str> {
+    let mut prev_was_space = false;
     for ch in text.chars() {
         let is_space = ch == ' ' || ch == '\t' || is_unicode_space(ch);
         if is_space {
@@ -292,7 +319,6 @@ pub fn normalize_whitespace_cow(text: &str) -> Cow<'_, str> {
             prev_was_space = false;
         }
     }
-
     Cow::Borrowed(text)
 }
 
