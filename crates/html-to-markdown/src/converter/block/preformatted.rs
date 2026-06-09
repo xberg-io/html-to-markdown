@@ -206,19 +206,20 @@ fn format_code_block(
                 }
             }
 
-            let indented = content
-                .lines()
-                .map(|line| {
-                    if line.is_empty() {
-                        String::new()
-                    } else {
-                        format!("    {line}")
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join("\n");
-            output.push_str(&indented);
-
+            // Stream indented lines directly into `output` instead of building
+            // an intermediate `Vec<String>` + join.  Saves N+1 allocations per
+            // `<pre>` block where N is the line count.
+            let mut first = true;
+            for line in content.lines() {
+                if !first {
+                    output.push('\n');
+                }
+                first = false;
+                if !line.is_empty() {
+                    output.push_str("    ");
+                    output.push_str(line);
+                }
+            }
             output.push_str("\n\n");
         }
         CodeBlockStyle::Backticks | CodeBlockStyle::Tildes => {
