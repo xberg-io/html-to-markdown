@@ -56,7 +56,7 @@ fn main() {
 }
 
 const FRB_GENERATED_DART: &str = "../lib/src/html_to_markdown_rs_bridge_generated/frb_generated.dart";
-const FRB_HANDLER_EXECUTOR_CALLS_MARKER: &str = "handler.executeSync";
+const FRB_HANDLER_EXECUTOR_MARKER: &str = "handler.executeSync(";
 const LOADER_MARKER: &str = "_alefResolveExternalLibrary";
 const FRB_INIT_PROLOGUE: &str = "  /// Initialize flutter_rust_bridge\n  static Future<void> init({\n    RustLibApi? api,\n    BaseHandler? handler,\n    ExternalLibrary? externalLibrary,\n    bool forceSameCodegenVersion = true,\n  }) async {\n";
 const FRB_INIT_REPLACEMENT: &str = r#"  /// Resolve the prebuilt native library from this package's own installed
@@ -188,39 +188,137 @@ fn patch_published_loader() {
     }
 }
 
-/// Rewrite the FRB-generated `handler.executeSync(...)` and
-/// `handler.executeNormal(...)` calls on callback function parameters.
+/// Rewrite FRB-emitted `handler.executeSync(SyncTask(...))` calls into
+/// `SyncTask(...).executeSync()` form, but ONLY inside service-API methods
+/// whose signature contains a callback-function parameter (`Function(`).
 ///
-/// FRB 2.x emits `handler.executeSync(SyncTask(...))` inside service-API
-/// methods that take a user-supplied `handler` callback parameter; those
-/// methods don't exist on plain function types. This rewrite strips the
-/// erroneous method calls, calling the handler directly as a function.
+/// Methods without a callback parameter invoke the inherited `BaseHandler`
+/// class field — which IS callable as `.executeSync(task)` and must be left
+/// untouched. The pre-rename build-script did an unconditional global string
+/// replace and corrupted those class-field calls; this scope-aware version
+/// only fires where the rewrite is needed.
 ///
-/// Idempotent: when the broken pattern is absent the function is a no-op.
+/// Idempotent: if no `handler.executeSync(` marker is present, exits early.
 #[allow(clippy::collapsible_if)]
 fn fix_handler_executor_calls() {
     let path = Path::new(FRB_GENERATED_DART);
     let Ok(source) = std::fs::read_to_string(path) else {
         return;
     };
-
-    if !source.contains(FRB_HANDLER_EXECUTOR_CALLS_MARKER) {
+    if !source.contains(FRB_HANDLER_EXECUTOR_MARKER) {
         return;
     }
 
-    let mut fixed = source
-        .replace("handler.executeSync(", "await handler(")
-        .replace("handler.executeNormal(", "await handler(");
-
-    // Collapse `return await` + `await handler(` → `return await handler(`.
-    fixed = fixed.replace("await await handler", "await handler");
-
-    if fixed != source {
-        if let Err(err) = std::fs::write(path, &fixed) {
-            println!(
-                "cargo:warning=failed to fix handler executor calls in {}: {err}",
-                FRB_GENERATED_DART
-            );
+    let lines: Vec<&str> = source.lines().collect();
+    let mut out = String::with_capacity(source.len());
+    let mut i = 0;
+    while i < lines.len() {
+        let line = lines[i];
+        let trimmed = line.trim_start();
+        let is_func_start = !trimmed.is_empty()
+            && !trimmed.starts_with("//")
+            && !trimmed.starts_with("class ")
+            && !trimmed.starts_with("abstract class ")
+            && !trimmed.starts_with("mixin ")
+            && !trimmed.starts_with('}')
+            && !trimmed.starts_with(')')
+            && !trimmed.starts_with(']')
+            && line.contains('(');
+        if !is_func_start {
+            out.push_str(line);
+            out.push('\n');
+            i += 1;
+            continue;
+        }
+        let start = i;
+        let mut paren: i32 = 0;
+        let mut brace: i32 = 0;
+        let mut body_started = false;
+        while i < lines.len() {
+            let l = lines[i];
+            for c in l.chars() {
+                match c {
+                    '(' => paren += 1,
+                    ')' => paren -= 1,
+                    '{' => {
+                        brace += 1;
+                        body_started = true;
+                    }
+                    '}' => brace -= 1,
+                    _ => {}
+                }
+            }
+            i += 1;
+            if body_started && brace <= 0 {
+                break;
+            }
+        }
+        let block_text = lines[start..i].join("\n");
+        let rewritten = if block_text.contains("Function(") {
+            rewrite_executor_to_task(&block_text)
+        } else {
+            block_text
+        };
+        out.push_str(&rewritten);
+        out.push('\n');
+    }
+    if !source.ends_with('\n') && out.ends_with('\n') {
+        out.pop();
+    }
+    if out != source {
+        if let Err(err) = std::fs::write(path, &out) {
+            println!("cargo:warning=failed to write handler-executor rewrite: {err}");
         }
     }
+}
+
+fn rewrite_executor_to_task(src: &str) -> String {
+    let mut out = String::with_capacity(src.len());
+    let mut cursor = 0;
+    while let Some((rel, method)) = next_executor_call(&src[cursor..]) {
+        let start = cursor + rel;
+        let open = start + "handler.".len() + method.len();
+        let Some(close) = matching_paren(src, open) else {
+            break;
+        };
+        out.push_str(&src[cursor..start]);
+        let inner = src[open + 1..close].trim();
+        let inner = inner.strip_suffix(',').map(str::trim_end).unwrap_or(inner);
+        out.push_str(inner);
+        out.push('.');
+        out.push_str(method);
+        out.push_str("()");
+        cursor = close + 1;
+    }
+    out.push_str(&src[cursor..]);
+    out
+}
+
+fn next_executor_call(src: &str) -> Option<(usize, &'static str)> {
+    let s = src.find("handler.executeSync(");
+    let n = src.find("handler.executeNormal(");
+    match (s, n) {
+        (Some(a), Some(b)) if a <= b => Some((a, "executeSync")),
+        (Some(_), Some(b)) => Some((b, "executeNormal")),
+        (Some(a), None) => Some((a, "executeSync")),
+        (None, Some(b)) => Some((b, "executeNormal")),
+        (None, None) => None,
+    }
+}
+
+fn matching_paren(src: &str, open: usize) -> Option<usize> {
+    let mut depth = 0usize;
+    for (offset, ch) in src[open..].char_indices() {
+        match ch {
+            '(' => depth += 1,
+            ')' => {
+                depth = depth.checked_sub(1)?;
+                if depth == 0 {
+                    return Some(open + offset);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
 }

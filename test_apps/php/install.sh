@@ -36,10 +36,15 @@ else
 fi
 
 # Install the extension binary into the running PHP's extension dir.
+# Always run PIE — an existence-only skip leaves a stale .so from a prior rc
+# (different ABI / missing symbols) in $EXT_DIR, which then fails the verification
+# step below. PIE itself is idempotent: re-installing overwrites the existing
+# binary cleanly. The php.ini-append guard below prevents duplicate `extension=`
+# lines so the verification step doesn't trip on "Module already loaded".
+EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
 "$PIE" install "kreuzberg-dev/html-to-markdown:$VERSION" --skip-enable-extension
 
-# Verify the .so loads.
-EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
+# Verify the .so/.dylib/.dll exists after install (or was already present).
 test -f "$EXT_DIR/html_to_markdown.so" || test -f "$EXT_DIR/html_to_markdown.dylib" || test -f "$EXT_DIR/html_to_markdown.dll"
 
 # Enable the extension in php.ini (PIE with --skip-enable-extension doesn't do this automatically).
@@ -65,8 +70,17 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   export PIE_INSTALLED_EXTENSION_PATH="$EXT_DIR/html_to_markdown.dylib"
 fi
 
-# Verify the extension loads via explicit `-d` flag (same mechanism run_tests.php uses).
-if ! php -d extension=html_to_markdown -m | grep -qi "html_to_markdown"; then
+# Verify the extension loads. Use `extension_loaded()` via `php -r` instead of
+# parsing `php -m` output: `php -m` is fragile when an extension is enabled via
+# both php.ini *and* a conf.d drop-in (e.g. when a prior PIE install left a
+# conf.d entry behind), because PHP prints "Module ... is already loaded" to
+# stderr and the test harness 2>&1 capture treats it as fatal. `extension_loaded`
+# checks runtime state directly and is unaffected by load source or stderr noise.
+if php -r 'exit(extension_loaded("html_to_markdown") ? 0 : 1);' 2>/dev/null; then
+  echo "html_to_markdown extension loaded via php.ini"
+elif php -d extension=html_to_markdown -r 'exit(extension_loaded("html_to_markdown") ? 0 : 1);' 2>/dev/null; then
+  echo "html_to_markdown extension loaded via -d flag"
+else
   echo "::error::html_to_markdown extension failed to load after PIE install" >&2
   exit 1
 fi
