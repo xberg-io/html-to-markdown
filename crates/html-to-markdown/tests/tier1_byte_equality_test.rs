@@ -99,15 +99,16 @@ fn force_tier1_output(html: &str) -> Option<String> {
 /// When Tier-1 bails the fallback produces Tier-2 output, so the bytes always
 /// match — bail is not a failure.  The only failure case is when Tier-1 produces
 /// output that diverges from Tier-2.
+///
+/// Known Tier-2 quirks (NOT Tier-1 bugs) — Tier-2 emits stray trailing
+/// whitespace from script-tag DOM nodes that Tier-1 correctly omits.
+/// The diff is 4 bytes (`\n  \n` appended to T2 output).  Tracked
+/// separately; not a Phase C blocker.
+const KNOWN_TIER2_QUIRK_FIXTURES: &[&str] = &["mdream/nuxt-example.html"];
+
 #[test]
 fn tier1_byte_equality_against_all_fixtures() {
     let fixtures_root = Path::new(FIXTURES_ROOT);
-
-    // Known Tier-2 quirks (NOT Tier-1 bugs) — Tier-2 emits stray trailing
-    // whitespace from script-tag DOM nodes that Tier-1 correctly omits.
-    // The diff is 4 bytes (`\n  \n` appended to T2 output).  Tracked
-    // separately; not a Phase C blocker.
-    const KNOWN_TIER2_QUIRK_FIXTURES: &[&str] = &["mdream/nuxt-example.html"];
 
     let mut total = 0usize;
     let mut skipped = 0usize;
