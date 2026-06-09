@@ -53,6 +53,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Publish workflow now authenticates via the `kreuzberg-dev-publisher` GitHub App** (org-level
+  `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY`) for all writes (own-repo pushes, tag updates, release-asset
+  uploads, homebrew-tap commits, Discord dedup marker). OIDC publisher jobs (PyPI/npm/hex/Maven/NuGet/crates)
+  are unaffected. `HOMEBREW_TOKEN` is no longer used.
+
 - **BREAKING: `NodeContext::attributes` is no longer a public field.** Access attributes via
   the new `attributes()` method (`fn attributes(&self) -> &BTreeMap<String, String>`).
   Struct-literal construction of `NodeContext` is no longer possible; use the provided
