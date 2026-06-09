@@ -421,4 +421,8 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"hgroup"    => block(TagKind::Block),
     b"menu"      => block(TagKind::Block),
     b"search"    => block(TagKind::Block),
+    // `<center>` is a legacy HTML element that acts as a block container.
+    // Tier-2 emits its inner content as plain block text (no centering markup
+    // in Markdown), so a generic `Block` spec matches Tier-2 byte-for-byte.
+    b"center"    => block(TagKind::Block),
 };
