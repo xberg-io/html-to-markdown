@@ -1598,6 +1598,8 @@ jobs:
     needs: [prepare, cli-binaries]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.cli-binaries.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -1619,6 +1621,8 @@ jobs:
     needs: [prepare, go-ffi-libraries]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.go-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -1640,6 +1644,8 @@ jobs:
     needs: [prepare, c-ffi-libraries]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.c-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -1661,6 +1667,8 @@ jobs:
     needs: [prepare, swift-artifactbundle]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.swift-artifactbundle.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -1682,6 +1690,8 @@ jobs:
     needs: [prepare, elixir-natives]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.elixir-natives.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -1701,6 +1711,8 @@ jobs:
     needs: [prepare, php-extension]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.php-extension.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -2626,6 +2638,8 @@ jobs:
     needs: [prepare, build-r-package]
     if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.build-r-package.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
