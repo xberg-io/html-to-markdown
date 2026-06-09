@@ -799,8 +799,14 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
         TagKind::TableCaption => {
             // Should have been caught at open, but handle gracefully.
         }
-        // Generic block and inline containers: no closing marker.
-        TagKind::Block | TagKind::Inline => {}
+        // Generic block container close: when it produced visible content,
+        // ensure a paragraph-break separator follows so the next sibling
+        // doesn't run together with this div's last byte.  Mirrors Tier-2's
+        // `div::handle` post-children block: `output.push_str("\n\n")` when
+        // `has_content` (see block/div.rs around line 124-130).
+        TagKind::Block => close_block_container(state, &frame),
+        // Inline containers (span/etc.): no separator.
+        TagKind::Inline => {}
         // Void-only kinds that never have open frames:
         TagKind::LineBreak | TagKind::Image => {}
         // Explicitly no-op: all remaining known kinds not listed above.
@@ -808,6 +814,33 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8]) -> Result<(), BailR
     }
 
     Ok(())
+}
+
+/// Append a paragraph-break separator after a generic block container close
+/// (`<div>`, `<section>`, etc.) when it produced visible content.
+///
+/// Without this Tier-1 emits adjacent block content with no separator
+/// (e.g. `[image-link](href)EN` instead of `[image-link](href)\n\nEN`),
+/// diverging from Tier-2 which always emits `\n\n` after a block-with-content
+/// close (see Tier-2 `block/div.rs`).  Skipped inside table cells and inline
+/// contexts where the surrounding code already handles spacing.
+fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
+    if state.in_table_cell() {
+        return;
+    }
+    let buf = state.cell_or_output_mut();
+    if buf.len() <= frame.content_start {
+        // Empty block — no content emitted, no separator needed.
+        return;
+    }
+    if buf.ends_with("\n\n") {
+        return;
+    }
+    if buf.ends_with('\n') {
+        buf.push('\n');
+    } else {
+        buf.push_str("\n\n");
+    }
 }
 
 /// Close an inline emphasis-style element (`<strong>`, `<em>`, `<b>`, `<i>`).
