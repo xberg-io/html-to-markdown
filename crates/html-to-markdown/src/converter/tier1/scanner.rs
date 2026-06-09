@@ -21,7 +21,7 @@ use crate::converter::tier1::bail::BailReason;
 use crate::converter::tier1::parse;
 use crate::converter::tier1::spec_rules;
 use crate::converter::tier1::state::{EscapeCtx, OpenTag, Tier1State};
-use crate::converter::tier1::tags::{ListKind, RawKind, TagKind, TagSpec};
+use crate::converter::tier1::tags::{ListKind, TagKind, TagSpec};
 use crate::converter::tier1::{self};
 use crate::options::ConversionOptions;
 
@@ -135,25 +135,18 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
                     offset: pos,
                 })?;
 
-                // Raw-text content tags (script/style/textarea/iframe/noscript/…):
-                // the prescan currently strips these.  Handle them inline here so
-                // that Tier-1 can be invoked without a separate prescan pass
-                // (Phase C).  Find the matching close tag and skip the entire
-                // block; emit nothing.  If no close tag exists, drop to EOF.
-                if matches!(
-                    spec.kind,
-                    TagKind::RawText(
-                        RawKind::Script
-                            | RawKind::Style
-                            | RawKind::Textarea
-                            | RawKind::Title
-                            | RawKind::Xmp
-                            | RawKind::Iframe
-                            | RawKind::Noscript
-                            | RawKind::NoEmbed
-                            | RawKind::NoFrames,
-                    )
-                ) {
+                // Raw-text "ignored" tags (`<script>`, `<style>`): their
+                // spec is `TagKind::Ignored` with `is_rawtext = true` (see
+                // tags.rs `rawtext_ignored`).  Prescan also strips their
+                // content (STRIP_CONTENT_TAGS); Tier-2 does the same.  Skip
+                // them inline so we don't bail to Tier-2 just because a page
+                // contains an empty `<script></script>` left over from
+                // prescan.  Other `Ignored` tags (head/meta/link) still bail
+                // — see `bail_unsupported`.  Other `RawText` kinds
+                // (textarea/title/xmp/iframe/noscript/noembed/noframes) keep
+                // their text content in Tier-2 and must continue to bail
+                // until Tier-1 learns to emit it correctly.
+                if matches!(spec.kind, TagKind::Ignored) && spec.is_rawtext {
                     let open_end = match parse::find_tag_close(bytes, name_end) {
                         Some(close) => close.0 + 1,
                         None => bytes.len(),

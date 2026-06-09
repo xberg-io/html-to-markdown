@@ -121,12 +121,16 @@ fn gate_strong_em_symbol_underscore_forces_tier2() {
 // ── bullets ──────────────────────────────────────────────────────────────────
 
 #[test]
-fn gate_bullets_dash_allows_tier1() {
+fn gate_bullets_single_dash_forces_tier2() {
+    // Tier-1 hardcodes the cycle `"-*+"` for nested-list bullets so it can
+    // match Tier-2 at every depth.  Any other bullets value — including a
+    // single `-` — would diverge at depth >= 2, so the router sends those
+    // configurations to Tier-2.  See router.rs comments on `bullets` gate.
     let opts = ConversionOptions {
         bullets: "-".to_string(),
         ..base_opts()
     };
-    assert_eq!(route(&opts), RouterDecision::Tier1);
+    assert_eq!(route(&opts), RouterDecision::Tier2);
 }
 
 #[test]

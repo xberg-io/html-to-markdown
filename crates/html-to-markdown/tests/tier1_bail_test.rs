@@ -270,20 +270,21 @@ fn bails_on_definition_list() {
 }
 
 #[test]
-fn bails_on_script() {
+fn handles_script_inline() {
+    // Phase B: scanner skips `<script>` content inline by jumping to the
+    // matching close tag.  Prescan also pre-strips script content
+    // (defence-in-depth).  Either way Tier-1 produces the same bytes as
+    // Tier-2 with no bail.
     let html = "<script>var x = 1;</script><p>ok</p>";
-    // Note: prescan strips script content; the scanner sees <script></script>.
-    // script is RawText(Script) → Classifier.
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::Classifier),
-        "expected Classifier, got {err:?}"
-    );
+    assert!(tier1_run(html).is_ok(), "Tier-1 should handle script inline (no bail)");
     assert_eq!(force_tier1(html), tier2(html));
 }
 
 #[test]
 fn bails_on_textarea() {
+    // textarea's text content is preserved by Tier-2 (the DOM walker emits
+    // its text node).  Tier-1 must therefore bail to Tier-2 rather than
+    // silent-skipping — see the Phase B narrowing in scanner.rs.
     let html = "<textarea>some text</textarea>";
     let err = tier1_run(html).unwrap_err();
     assert!(
