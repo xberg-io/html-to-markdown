@@ -12,7 +12,7 @@
 
 #![cfg(feature = "testkit")]
 
-use html_to_markdown_rs::prescan::{self, PrescanReport};
+use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::{self, BailReason};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
@@ -26,15 +26,6 @@ fn tier1_run(html: &str) -> Result<String, BailReason> {
         ..ConversionOptions::default()
     };
     tier1::run(cleaned.as_ref(), &report, &opts)
-}
-
-fn tier1_raw(html: &str) -> Result<String, BailReason> {
-    let opts = ConversionOptions {
-        tier_strategy: TierStrategy::Tier1,
-        extract_metadata: false,
-        ..ConversionOptions::default()
-    };
-    tier1::run(html, &PrescanReport::default(), &opts)
 }
 
 fn tier1(html: &str) -> String {
