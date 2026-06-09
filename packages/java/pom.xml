@@ -375,11 +375,6 @@
             <id>publish</id>
             <properties>
                 <gpg.skip>false</gpg.skip>
-                <!-- alef-emitted stream methods can exceed 200 tokens and trigger CPD/PMD
-                     duplicate-code violations; skip those checks in the publish profile so
-                     they do not block Maven Central deployment. -->
-                <cpd.skip>true</cpd.skip>
-                <pmd.skip>true</pmd.skip>
             </properties>
             <build>
                 <plugins>

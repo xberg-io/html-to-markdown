@@ -36,15 +36,10 @@ else
 fi
 
 # Install the extension binary into the running PHP's extension dir.
-# Always run PIE — an existence-only skip leaves a stale .so from a prior rc
-# (different ABI / missing symbols) in $EXT_DIR, which then fails the verification
-# step below. PIE itself is idempotent: re-installing overwrites the existing
-# binary cleanly. The php.ini-append guard below prevents duplicate `extension=`
-# lines so the verification step doesn't trip on "Module already loaded".
-EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
 "$PIE" install "kreuzberg-dev/html-to-markdown:$VERSION" --skip-enable-extension
 
-# Verify the .so/.dylib/.dll exists after install (or was already present).
+# Verify the .so loads.
+EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
 test -f "$EXT_DIR/html_to_markdown.so" || test -f "$EXT_DIR/html_to_markdown.dylib" || test -f "$EXT_DIR/html_to_markdown.dll"
 
 # Enable the extension in php.ini (PIE with --skip-enable-extension doesn't do this automatically).
@@ -70,13 +65,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   export PIE_INSTALLED_EXTENSION_PATH="$EXT_DIR/html_to_markdown.dylib"
 fi
 
-# Verify the extension loads. If php.ini already enables it (from this run or a
-# prior one), `php -m` alone reports it loaded and adding `-d extension=` would
-# raise "Module ... is already loaded". Only fall back to the explicit `-d`
-# flag when the extension is not auto-loaded by php.ini.
-if php -m 2>/dev/null | grep -qi "html_to_markdown"; then
-  echo "html_to_markdown extension loaded via php.ini"
-elif ! php -d extension=html_to_markdown -m | grep -qi "html_to_markdown"; then
+# Verify the extension loads via explicit `-d` flag (same mechanism run_tests.php uses).
+if ! php -d extension=html_to_markdown -m | grep -qi "html_to_markdown"; then
   echo "::error::html_to_markdown extension failed to load after PIE install" >&2
   exit 1
 fi
