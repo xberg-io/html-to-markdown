@@ -135,6 +135,34 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
                     offset: pos,
                 })?;
 
+                // Raw-text content tags (script/style/textarea/iframe/noscript/…):
+                // the prescan currently strips these.  Handle them inline here so
+                // that Tier-1 can be invoked without a separate prescan pass
+                // (Phase C).  Find the matching close tag and skip the entire
+                // block; emit nothing.  If no close tag exists, drop to EOF.
+                if matches!(
+                    spec.kind,
+                    TagKind::RawText(
+                        RawKind::Script
+                            | RawKind::Style
+                            | RawKind::Textarea
+                            | RawKind::Title
+                            | RawKind::Xmp
+                            | RawKind::Iframe
+                            | RawKind::Noscript
+                            | RawKind::NoEmbed
+                            | RawKind::NoFrames,
+                    )
+                ) {
+                    let open_end = match parse::find_tag_close(bytes, name_end) {
+                        Some(close) => close.0 + 1,
+                        None => bytes.len(),
+                    };
+                    pos = find_raw_text_close(bytes, open_end, name_lower).unwrap_or(bytes.len());
+                    text_start = pos;
+                    continue;
+                }
+
                 // Bail on unsupported tag kinds for M3c
                 bail_unsupported(spec, pos)?;
 
@@ -322,27 +350,62 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<String, BailReaso
 /// Table-related tags are now handled by the scanner (M9); they are no longer
 /// bailed here.  Table-specific bail reasons are emitted by the table-handling
 /// code in `emit_open` and `emit_close`.
+/// Skip the body of a raw-text element (script/style/textarea/iframe/…).
+///
+/// `open_end` is the byte index immediately after the tag's `>`.  `tag_name`
+/// is the lowercased open-tag name.  Returns the byte index after the
+/// matching `</tag>` close, or `None` if no matching close tag exists in the
+/// remainder of the input.
+///
+/// Mirrors the prescan's STRIP_CONTENT_TAGS handling: content is discarded,
+/// only the position advances.  Matches Tier-2's behaviour byte-for-byte
+/// because Tier-2 sees this content already stripped by the prescan.
+fn find_raw_text_close(bytes: &[u8], open_end: usize, tag_name: &[u8]) -> Option<usize> {
+    let len = bytes.len();
+    let mut idx = open_end;
+    while idx < len {
+        // memchr to skip ahead to the next `<`.
+        match memchr3(b'<', b'<', b'<', &bytes[idx..]) {
+            Some(off) => idx += off,
+            None => return None,
+        }
+        // Need `</tag` to start a closing tag.
+        if idx + 2 < len && bytes[idx + 1] == b'/' {
+            let after_slash = idx + 2;
+            if after_slash + tag_name.len() <= len
+                && bytes[after_slash..after_slash + tag_name.len()].eq_ignore_ascii_case(tag_name)
+            {
+                let post_name = after_slash + tag_name.len();
+                // Tag name must be followed by `>` / whitespace / `/`.
+                if matches!(bytes.get(post_name), Some(b'>' | b'/' | b' ' | b'\t' | b'\n' | b'\r')) {
+                    // Walk to the closing `>`.
+                    let mut j = post_name;
+                    while j < len && bytes[j] != b'>' {
+                        j += 1;
+                    }
+                    if j < len {
+                        return Some(j + 1);
+                    }
+                    return None;
+                }
+            }
+        }
+        idx += 1;
+    }
+    None
+}
+
 #[inline]
 const fn bail_unsupported(spec: &TagSpec, _offset: usize) -> Result<(), BailReason> {
     match spec.kind {
-        TagKind::DefinitionTerm
-        | TagKind::DefinitionDescription
-        | TagKind::List(ListKind::Definition)
-        | TagKind::RawText(
-            RawKind::Textarea
-            | RawKind::Title
-            | RawKind::Xmp
-            | RawKind::Iframe
-            | RawKind::Noscript
-            | RawKind::NoEmbed
-            | RawKind::NoFrames,
-        ) => Err(BailReason::Classifier),
+        TagKind::DefinitionTerm | TagKind::DefinitionDescription | TagKind::List(ListKind::Definition) => {
+            Err(BailReason::Classifier)
+        }
 
-        // script/style are `Ignored` with `is_rawtext=true`; handled as void-like
-        // by the prescan (stripped). We bail here as a safety net — if they
-        // appear in the scanner they weren't stripped by the prescan, which
-        // means they have content we can't skip.
-        TagKind::RawText(RawKind::Script | RawKind::Style) => Err(BailReason::Classifier),
+        // Raw-text content tags are handled inline by the main scan loop
+        // (see find_raw_text_close).  They never reach this point in practice;
+        // listed here only to make the match exhaustive over TagKind::RawText.
+        TagKind::RawText(_) => Err(BailReason::Classifier),
 
         // head / meta / link are Ignored — we can silently skip them when void,
         // but if they have children (weird HTML) we bail.
