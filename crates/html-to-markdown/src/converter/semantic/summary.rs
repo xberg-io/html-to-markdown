@@ -148,11 +148,21 @@ pub fn handle_summary(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::with_capacity(64);
 
-        // Set strong context for nested content
-        let mut summary_ctx = ctx.clone();
-        if !ctx.convert_as_inline {
-            summary_ctx.in_strong = true;
-        }
+        // Set strong context for nested content. Skip the clone entirely
+        // when the resulting Context would be byte-identical to ctx —
+        // either convert_as_inline (block path inactive) or already
+        // in_strong upstream.
+        let want_strong = !ctx.convert_as_inline;
+        let summary_ctx_owned;
+        let summary_ctx = if want_strong && !ctx.in_strong {
+            summary_ctx_owned = super::Context {
+                in_strong: true,
+                ..ctx.clone()
+            };
+            &summary_ctx_owned
+        } else {
+            ctx
+        };
 
         let children = tag.children();
         {
@@ -162,14 +172,14 @@ pub fn handle_summary(
                     parser,
                     &mut content,
                     options,
-                    &summary_ctx,
+                    summary_ctx,
                     depth + 1,
                     dom_ctx,
                 );
             }
         }
 
-        let trimmed = content.trim().to_owned();
+        let trimmed = content.trim();
         if trimmed.is_empty() {
             return;
         }
@@ -192,7 +202,7 @@ pub fn handle_summary(
             );
             let visit_result = {
                 let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
-                visitor.visit_summary(&node_ctx, &trimmed)
+                visitor.visit_summary(&node_ctx, trimmed)
             };
             match visit_result {
                 VisitResult::Continue => {}
@@ -224,14 +234,14 @@ pub fn handle_summary(
 
         if ctx.convert_as_inline {
             // Inline mode: output without formatting
-            output.push_str(&trimmed);
+            output.push_str(trimmed);
         } else {
             // Block mode: output with strong markers
             let mut symbol = String::with_capacity(2);
             symbol.push(options.strong_em_symbol);
             symbol.push(options.strong_em_symbol);
             output.push_str(&symbol);
-            output.push_str(&trimmed);
+            output.push_str(trimmed);
             output.push_str(&symbol);
             output.push_str("\n\n");
         }
