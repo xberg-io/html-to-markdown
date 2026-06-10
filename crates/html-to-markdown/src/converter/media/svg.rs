@@ -110,9 +110,17 @@ pub fn serialize_element(node_handle: &NodeHandle, parser: &Parser) -> String {
             html.push(' ');
             html.push_str(&key);
             if let Some(value) = value_opt {
-                html.push_str("=\"");
-                html.push_str(&value);
-                html.push('"');
+                // Treat empty value identically to a bare attribute.  When tl
+                // re-parses a wrapped SVG slice (Tier-1's emit_svg_from_slice)
+                // it yields `None` for `attr=""` while a single full-document
+                // parse (Tier-2) yields `Some("")`.  Both forms are
+                // HTML5-equivalent; normalise here so both tiers produce
+                // byte-identical output.
+                if !value.is_empty() {
+                    html.push_str("=\"");
+                    html.push_str(&value);
+                    html.push('"');
+                }
             }
         }
 
