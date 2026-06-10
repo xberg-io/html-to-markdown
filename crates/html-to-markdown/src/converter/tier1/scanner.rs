@@ -892,11 +892,13 @@ fn emit_open(
         // (block/div.rs:88, semantic/sectioning.rs:71) which prefix block
         // content with `\n\n` to separate from siblings.  Skipped in table
         // cells (cells stay on one logical line).
-        TagKind::Block | TagKind::Summary => {
+        TagKind::Block => {
             if !state.in_table_cell() {
                 state.ensure_blank_line();
             }
         }
+        // Summary: push accumulation buffer so children redirect into it (Phase R).
+        TagKind::Summary => open_summary(state),
         TagKind::Inline => {}
         // All other kinds (LineBreak, Hr, Image, etc.) are void — they never
         // reach emit_open because the void/self-closing branch fires first.
@@ -1359,10 +1361,9 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         // doesn't run together with this div's last byte.  Mirrors Tier-2's
         // `div::handle` post-children block: `output.push_str("\n\n")` when
         // `has_content` (see block/div.rs around line 124-130).
-        // Generic block container close: handled by close_block_container.
-        // Summary is treated as a generic block container here in Phase R prep;
-        // the actual strong-wrap behaviour is added in the Phase R commit.
-        TagKind::Block | TagKind::Summary => close_block_container(state, &frame),
+        TagKind::Block => close_block_container(state, &frame),
+        // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
+        TagKind::Summary => close_summary(state, &frame),
         // Inline containers (span/etc.): no separator.
         TagKind::Inline => {}
         // Void-only kinds that never have open frames:
@@ -1399,6 +1400,69 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
     } else {
         buf.push_str("\n\n");
     }
+}
+
+// ── Summary strong-wrap (Phase R) ────────────────────────────────────────────
+
+/// Open a `<summary>` element.
+///
+/// When inside a table cell or caption, `<summary>` is transparent — child
+/// text writes directly to the cell/caption buffer via `cell_or_output_mut`.
+/// Otherwise push a fresh accumulation buffer so all child text (including
+/// block children rendered inline by the redirect in commit R-2) collects
+/// here instead of in the main output.
+///
+/// No leading separator is emitted on open; deferred to `close_summary`
+/// once we know whether the content is non-empty.
+fn open_summary(state: &mut Tier1State) {
+    // Inside a cell or caption: transparent — no separate buffer needed.
+    if state.in_table_cell() || state.in_table_caption() {
+        return;
+    }
+    state.push_summary_buf();
+}
+
+/// Close a `<summary>` element.
+///
+/// Pops the accumulation buffer (if any), trims it, and emits
+/// `**{trimmed}**\n\n` into the parent destination (main output, an outer
+/// summary buffer, a table cell, or a caption).
+///
+/// Mirrors Tier-2's `handle_summary` (semantic/summary.rs:138–249):
+/// - collect children with `in_strong: true` (block children render inline)
+/// - trim
+/// - emit `**…**\n\n`
+fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
+    // Transparent mode (cell or caption): no buffer was pushed, nothing to do.
+    if state.in_table_cell() || state.in_table_caption() {
+        return;
+    }
+    // Pop the buffer we pushed in open_summary.
+    let buf = match state.pop_summary_buf() {
+        Some(b) => b,
+        None => return, // malformed nesting — nothing pushed
+    };
+    let trimmed = buf.trim();
+    if trimmed.is_empty() {
+        return;
+    }
+    // Acquire the parent destination (cell, outer summary buffer, or main
+    // output).  Because we already popped the buffer above, cell_or_output_mut
+    // now returns the next-outer target.
+    let dest = state.cell_or_output_mut();
+    // Ensure a blank-line separator before the summary block when there is
+    // preceding content.  Mirrors Tier-2's blockquote/details leading-separator
+    // guard: emit "\n\n" only when not already present.
+    if !dest.is_empty() && !dest.ends_with("\n\n") {
+        if dest.ends_with('\n') {
+            dest.push('\n');
+        } else {
+            dest.push_str("\n\n");
+        }
+    }
+    dest.push_str("**");
+    dest.push_str(trimmed);
+    dest.push_str("**\n\n");
 }
 
 /// Close an inline emphasis-style element (`<strong>`, `<em>`, `<b>`, `<i>`).
@@ -1459,9 +1523,10 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
         TagKind::TableRow => close_table_row(state),
-        // Generic block/inline/summary: no closing marker in implicit close.
-        // Summary's strong-wrap close is added in the Phase R commit.
-        TagKind::Block | TagKind::Summary | TagKind::Inline => {}
+        // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
+        TagKind::Summary => close_summary(state, &frame),
+        // Generic block/inline: no closing marker.
+        TagKind::Block | TagKind::Inline => {}
         // Void-only kinds and other no-op kinds:
         TagKind::LineBreak
         | TagKind::Image
