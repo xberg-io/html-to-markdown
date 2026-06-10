@@ -2315,6 +2315,69 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // `\n  \n  ` between text runs.
     let inside_inline = state.in_summary() || state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
 
+    // Phase Y: text-node chomp.  Tier-2's text_node.rs runs `chomp()` on
+    // every text node and substitutes the leading and trailing whitespace
+    // runs with simpler stand-ins:
+    //   prefix → `" "` if the run had any leading whitespace, else `""`
+    //   suffix → `"\n\n"` if trailing run contained `\n\n`,
+    //          → `" "`   if trailing run had space/tab (folding any `\n`),
+    //          → `""`    if trailing run was `\n` only.
+    // Without this, Tier-1 keeps the literal `\n  ` in text like
+    // "The number of\n  " and emits `of\n ` while Tier-2 emits `of `,
+    // and likewise the leading whitespace case `</em>\n  baz` produces
+    // `*bar*\n baz` instead of `*bar* baz`.
+    //
+    // Applied only outside inline frames (which call
+    // `decode_and_collapse_into_inline` and handle `\n` collapse already),
+    // outside `<pre>` (verbatim), and outside table cells (which run
+    // `normalize_whitespace_cow` directly).
+    let raw_owned;
+    let raw = if !inside_inline && !state.in_table_cell() {
+        let trim_chars: &[char] = &['\n', '\r', ' ', '\t'];
+        let after_lead = raw.trim_start_matches(trim_chars);
+        let leading_len = raw.len() - after_lead.len();
+        let lead_has_nl = leading_len > 0 && raw.as_bytes()[..leading_len].iter().any(|&b| b == b'\n' || b == b'\r');
+        let trimmed_len = raw.trim_end_matches(trim_chars).len();
+        let trailing_len = raw.len() - trimmed_len;
+        let trail_has_nl = trailing_len > 0 && raw.as_bytes()[trimmed_len..].iter().any(|&b| b == b'\n' || b == b'\r');
+        if lead_has_nl || trail_has_nl {
+            // Slice safely: leading_len and trimmed_len are byte offsets
+            // produced by `trim_*_matches` on the same `raw`.
+            let core_start = leading_len;
+            let core_end = trimmed_len;
+            if core_start >= core_end {
+                // Whitespace-only text node — already handled by the
+                // earlier whitespace-only branches; skip Phase Y here.
+                raw
+            } else {
+                let core = &raw[core_start..core_end];
+                let trailing = &raw[core_end..];
+                let prefix = if leading_len > 0 { " " } else { "" };
+                let suffix = if trailing.contains("\n\n") {
+                    "\n\n"
+                } else if trailing.bytes().any(|b| b == b' ' || b == b'\t') {
+                    " "
+                } else if trail_has_nl {
+                    ""
+                } else {
+                    // Pure space/tab trailing run; let the downstream
+                    // collapse handle it as before.
+                    trailing
+                };
+                raw_owned = format!("{prefix}{core}{suffix}");
+                raw_owned.as_str()
+            }
+        } else {
+            raw
+        }
+    } else {
+        raw
+    };
+    if raw.is_empty() {
+        return Ok(());
+    }
+    let has_entities = raw.contains('&');
+
     // Outside `<pre>`: collapse runs of space/tab into a single space, decode
     // entities, write directly into the output (or cell) buffer.  Newlines preserved
     // unless inside an inline frame (see above).
