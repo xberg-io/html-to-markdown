@@ -955,6 +955,9 @@ fn open_paragraph(state: &mut Tier1State) {
     // output ends with a single "\n", e.g. right after a table row or
     // an `<hr>`).
     let dest = state.cell_or_output_mut();
+    // Drop trailing horizontal whitespace from inter-tag preservation
+    // (Phase U-2) before the block separator.
+    crate::converter::tier1::state::trim_trailing_horizontal(dest);
     if !dest.is_empty() && !dest.ends_with("\n\n") {
         dest.push_str("\n\n");
     }
@@ -2225,24 +2228,13 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
             // tail check so spaces between adjacent inline elements inside
             // a summary are preserved correctly.
             let active_tail: &str = state.cell_or_output_mut();
-            let raw_is_horizontal = raw.bytes().all(|b| b == b' ' || b == b'\t');
-            // Inline-close marker tail (`**`/`*`/`` ` ``/`)`): preserve a
-            // single space across newline-bearing whitespace too — these
-            // markers can only appear after just-closed inline elements,
-            // so the surrounding context is inline-flow even if the source
-            // wrote `</strong>\n<a>`.
-            let push_space = if output_ends_with_inline_close_marker(active_tail) {
-                true
-            } else if output_ends_with_inline_text(active_tail) {
-                // Text tail: only safe when the run is horizontal-only.
-                // Otherwise a following block tag (e.g. `text\n<ul>`) leaves
-                // a stray trailing space the next separator can't trim
-                // through every emission site.
-                raw_is_horizontal
-            } else {
-                false
-            };
-            if push_space {
+            // Preserve a single space optimistically whenever the output
+            // tail is inline content (text or `**`/`*`/`` ` ``/`)`) even
+            // across newline-bearing whitespace.  Block-tag-open paths
+            // (`ensure_blank_line`, `close_block_container`, `close_button`,
+            // `open_paragraph`, `open_list`) all trim the trailing space
+            // before emitting their separator — so this is safe.
+            if output_ends_with_inline_close_marker(active_tail) || output_ends_with_inline_text(active_tail) {
                 let dest = state.cell_or_output_mut();
                 dest.push(' ');
             }
