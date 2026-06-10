@@ -2952,10 +2952,14 @@ fn indent_pre_lines(raw: &str) -> String {
 
     let mut result = String::with_capacity(raw.len() + raw.lines().count() * 4);
     for line in raw.lines() {
-        result.push_str("    ");
         if line.trim().is_empty() {
-            // Preserve empty lines without adding trailing spaces.
+            // Empty / whitespace-only line: emit as a bare `\n` (no 4-space
+            // indent prefix).  Tier-2's `block/code.rs` also skips the indent
+            // for blank lines inside indented code blocks — without this,
+            // round-tripped CommonMark `    code\n    \n    code` would
+            // render with stray trailing spaces in the blank gap.
         } else {
+            result.push_str("    ");
             // Convert char-count `min_indent` into a byte offset by walking
             // `char_indices`.  Indexing `line[min_indent..]` directly panics
             // when the leading whitespace contains multibyte characters such
