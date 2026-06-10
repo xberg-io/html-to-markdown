@@ -862,7 +862,14 @@ fn emit_open(
         TagKind::DefinitionTerm => open_dt(state),
         TagKind::DefinitionDescription => open_dd(state),
         TagKind::Strong => {
-            state.cell_or_output_mut().push_str("**");
+            // Inside a <summary> accumulation buffer, Tier-2 processes
+            // children with `in_strong: true` which suppresses nested
+            // strong markers.  Mirror that by not pushing `**` when inside
+            // a summary, so `<strong>b</strong>` inside `<summary>` emits
+            // just `b` instead of `**b**`.
+            if !state.in_summary() {
+                state.cell_or_output_mut().push_str("**");
+            }
         }
         TagKind::Emphasis => {
             state.cell_or_output_mut().push('*');
@@ -1335,6 +1342,8 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Heading(n) => close_heading(state, &frame, n, false)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame, options),
+        // Strong: suppress close marker when inside summary (see open strong guard).
+        TagKind::Strong if state.in_summary() => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
@@ -1406,19 +1415,17 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag) {
 
 /// Open a `<summary>` element.
 ///
-/// When inside a table cell or caption, `<summary>` is transparent — child
-/// text writes directly to the cell/caption buffer via `cell_or_output_mut`.
-/// Otherwise push a fresh accumulation buffer so all child text (including
-/// block children rendered inline by the redirect in commit R-2) collects
-/// here instead of in the main output.
+/// Push a fresh accumulation buffer so all child text collects here instead
+/// of in the outer destination (main output, table cell, or caption).
+/// The summary buffer has the highest priority in `cell_or_output_mut`, so
+/// even when inside a table cell the children write to this buffer rather
+/// than the cell buffer.  This matches Tier-2's `handle_summary` which
+/// always processes children into a local `content` buffer then wraps with
+/// `**…**\n\n` before writing to the outer output.
 ///
 /// No leading separator is emitted on open; deferred to `close_summary`
 /// once we know whether the content is non-empty.
 fn open_summary(state: &mut Tier1State) {
-    // Inside a cell or caption: transparent — no separate buffer needed.
-    if state.in_table_cell() || state.in_table_caption() {
-        return;
-    }
     state.push_summary_buf();
 }
 
@@ -1433,10 +1440,6 @@ fn open_summary(state: &mut Tier1State) {
 /// - trim
 /// - emit `**…**\n\n`
 fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
-    // Transparent mode (cell or caption): no buffer was pushed, nothing to do.
-    if state.in_table_cell() || state.in_table_caption() {
-        return;
-    }
     // Pop the buffer we pushed in open_summary.
     let buf = match state.pop_summary_buf() {
         Some(b) => b,
@@ -1446,14 +1449,20 @@ fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
     if trimmed.is_empty() {
         return;
     }
-    // Acquire the parent destination (cell, outer summary buffer, or main
-    // output).  Because we already popped the buffer above, cell_or_output_mut
-    // now returns the next-outer target.
+    // Acquire the parent destination.  Because we already popped the buffer
+    // above, cell_or_output_mut now returns the next-outer target — which may
+    // be the table cell buffer (when the summary was inside a <td>), an outer
+    // summary buffer, or the main output.
+    //
+    // Check whether we're emitting into a table cell BEFORE borrowing `dest`,
+    // so we can decide whether to add a leading separator without conflicting
+    // with the mutable borrow.
+    let writing_to_cell = state.in_table_cell();
     let dest = state.cell_or_output_mut();
     // Ensure a blank-line separator before the summary block when there is
-    // preceding content.  Mirrors Tier-2's blockquote/details leading-separator
-    // guard: emit "\n\n" only when not already present.
-    if !dest.is_empty() && !dest.ends_with("\n\n") {
+    // preceding content and we're NOT writing to a table cell (cells are
+    // rendered to a single line; block separators would be collapsed anyway).
+    if !writing_to_cell && !dest.is_empty() && !dest.ends_with("\n\n") {
         if dest.ends_with('\n') {
             dest.push('\n');
         } else {
@@ -1512,6 +1521,8 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::Heading(n) => close_heading(state, &frame, n, true)?,
         TagKind::Blockquote => close_blockquote(state, &frame),
         TagKind::Pre => close_pre(state, &frame, options),
+        // Strong: suppress close marker when inside summary (see open strong guard).
+        TagKind::Strong if state.in_summary() => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**"),
         TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
         TagKind::Code => close_code(state),
@@ -2095,13 +2106,23 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
         }
         None => false,
     };
-    let is_block_edge = state.output.is_empty()
-        || state.output.ends_with('\n')
-        || state.output.ends_with("- ")
-        || state.output.ends_with("* ")
-        || state.output.ends_with("+ ")
-        || ends_with_ordered_marker(&state.output)
-        || at_inline_frame_start;
+    // Determine whether the current active output position is at a "block
+    // edge" (empty or after a newline / list marker).  When inside a summary
+    // accumulation buffer, consult that buffer rather than state.output so
+    // that inter-element spaces inside the summary are preserved correctly.
+    // Snap the relevant properties to local booleans before releasing the
+    // borrow to avoid conflicts with subsequent state reads.
+    let (active_empty, active_ends_newline, active_ends_list_marker, active_ends_ordered) = {
+        let buf: &str = state.cell_or_output_mut();
+        (
+            buf.is_empty(),
+            buf.ends_with('\n'),
+            buf.ends_with("- ") || buf.ends_with("* ") || buf.ends_with("+ "),
+            ends_with_ordered_marker(buf),
+        )
+    };
+    let is_block_edge =
+        active_empty || active_ends_newline || active_ends_list_marker || active_ends_ordered || at_inline_frame_start;
     let raw_is_whitespace = raw.bytes().all(|b| b == b' ' || b == b'\t' || b == b'\n' || b == b'\r');
     if !in_pre && !state.in_table_cell() && is_block_edge && raw_is_whitespace {
         return Ok(());
@@ -2128,16 +2149,25 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // `output_ends_with_inline_close` itself (it returns false when output
     // ends with `\n` or is empty).
     if !in_pre && !state.in_table_cell() && raw_is_whitespace {
-        let inside_inline = state.stack.iter().any(|frame| {
-            matches!(
-                frame.spec.kind,
-                TagKind::Link | TagKind::Strong | TagKind::Emphasis | TagKind::Code
-            )
-        });
+        // When inside a <summary> accumulation buffer, treat the context as
+        // inline (like strong/emphasis): inter-element spaces must be
+        // preserved so `<span>a</span> <span>b</span>` collects "a b" not "ab".
+        let inside_inline = state.in_summary()
+            || state.stack.iter().any(|frame| {
+                matches!(
+                    frame.spec.kind,
+                    TagKind::Link | TagKind::Strong | TagKind::Emphasis | TagKind::Code
+                )
+            });
         if !inside_inline {
             let raw_is_horizontal = raw.bytes().all(|b| b == b' ' || b == b'\t');
-            if raw_is_horizontal && output_ends_with_inline_close(&state.output) {
-                state.output.push(' ');
+            // Use the active buffer (summary buf or main output) for the
+            // inline-close check so spaces between adjacent inline elements
+            // inside a summary are preserved correctly.
+            let active_tail: &str = state.cell_or_output_mut();
+            if raw_is_horizontal && output_ends_with_inline_close(active_tail) {
+                let dest = state.cell_or_output_mut();
+                dest.push(' ');
             }
             return Ok(());
         }
@@ -2151,11 +2181,14 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     //
     // Not when output is empty (first paragraph of a document keeps its
     // leading whitespace per Tier-2's behaviour).
-    let block_separator_after = state.output.ends_with("\n\n")
-        || state.output.ends_with("- ")
-        || state.output.ends_with("* ")
-        || state.output.ends_with("+ ")
-        || ends_with_ordered_marker(&state.output);
+    let block_separator_after = {
+        let active: &str = state.cell_or_output_mut();
+        active.ends_with("\n\n")
+            || active.ends_with("- ")
+            || active.ends_with("* ")
+            || active.ends_with("+ ")
+            || ends_with_ordered_marker(active)
+    };
     let raw = if !in_pre && !state.in_table_cell() && (at_inline_frame_start || block_separator_after) {
         raw.trim_start_matches([' ', '\t', '\n', '\r'])
     } else {

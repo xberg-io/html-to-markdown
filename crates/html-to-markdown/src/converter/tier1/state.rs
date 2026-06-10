@@ -171,19 +171,24 @@ impl Tier1State {
         }
     }
 
-    /// Return a mutable reference to the current cell buffer when inside a
-    /// table cell, the caption buffer when inside a `<caption>`, the top
-    /// summary accumulation buffer when inside a `<summary>`, or to
-    /// `self.output` otherwise.
+    /// Return a mutable reference to the current accumulation target.
     ///
     /// Priority order (highest first):
-    /// 1. Table cell — a `<summary>` inside a `<td>` writes to the cell.
-    /// 2. Table caption — a `<summary>` inside a `<caption>` writes to the caption.
-    /// 3. Summary buffer top — the innermost active `<summary>` accumulator.
-    /// 4. `self.output` — the main output buffer.
+    /// 1. Summary buffer top — when a `<summary>` accumulation buffer is active,
+    ///    all text (including text from inside table cells) accumulates here.
+    ///    This mirrors Tier-2's behaviour where `handle_summary` processes
+    ///    children into a local `content` buffer regardless of outer context.
+    /// 2. Table cell — when inside a `<td>`/`<th>`, text accumulates in the
+    ///    cell buffer (only when not already inside a summary).
+    /// 3. Table caption — when inside a `<caption>`, text accumulates in the
+    ///    caption buffer.
+    /// 4. `self.output` — the main output buffer (default).
     ///
     /// This is the single dispatch point for "where does inline text land."
     pub fn cell_or_output_mut(&mut self) -> &mut String {
+        if let Some(buf) = self.summary_buf_stack.last_mut() {
+            return buf;
+        }
         if let Some(ts) = self.table_stack.last_mut() {
             if ts.in_cell {
                 return &mut ts.current_cell;
@@ -191,9 +196,6 @@ impl Tier1State {
             if ts.in_caption {
                 return &mut ts.caption_buf;
             }
-        }
-        if let Some(buf) = self.summary_buf_stack.last_mut() {
-            return buf;
         }
         &mut self.output
     }
