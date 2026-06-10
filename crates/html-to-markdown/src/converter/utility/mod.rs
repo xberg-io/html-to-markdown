@@ -13,5 +13,6 @@ pub mod content;
 pub mod preprocessing;
 pub mod serialization;
 pub mod siblings;
+pub mod svg_attrs;
 
 // Re-export commonly used functions for convenience

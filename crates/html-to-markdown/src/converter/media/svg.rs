@@ -2,6 +2,7 @@
 
 use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::utility::content::normalized_tag_name;
+use crate::converter::utility::svg_attrs::canonical_svg_attr;
 // reason: BTreeMap is only used when the inline-images feature is active.
 #[allow(unused_imports)]
 use std::collections::BTreeMap;
@@ -108,7 +109,16 @@ pub fn serialize_element(node_handle: &NodeHandle, parser: &Parser) -> String {
         attrs.sort_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
         for (key, value_opt) in attrs {
             html.push(' ');
-            html.push_str(&key);
+            // Restore camelCase for SVG/MathML attributes whose canonical
+            // WHATWG spelling is mixed-case.  tl lowercases all attribute
+            // names when it re-parses a wrapped fragment (Tier-1 path via
+            // emit_svg_from_slice), but preserves case on a full-document
+            // parse (Tier-2 path).  Applying the lookup in both paths is
+            // safe: Tier-2 already has the correct spelling so the lookup
+            // returns None and the original key is used unchanged.
+            let key_str = key.as_ref();
+            let canonical = canonical_svg_attr(key_str);
+            html.push_str(canonical.unwrap_or(key_str));
             if let Some(value) = value_opt {
                 // Treat empty value identically to a bare attribute.  When tl
                 // re-parses a wrapped SVG slice (Tier-1's emit_svg_from_slice)
