@@ -73,6 +73,10 @@ pub enum TagKind {
     /// `<summary>` — disclosure summary; content collected into a buffer and
     /// emitted as `**…**\n\n` (strong-wrap).
     Summary,
+    /// `<button>` — clickable button. Tier-2 (`form/elements.rs:592-594`)
+    /// emits `\n\n` after the button's content in block mode but no leading
+    /// separator; mirror with close-only block-separator semantics.
+    Button,
 
     // Raw-text containers (scanner must skip their contents)
     /// Raw-text container whose content the scanner skips until the matching close tag.
@@ -397,7 +401,11 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
         is_rawtext: false,
     },
     b"optgroup"  => inline(TagKind::Inline),
-    b"button"    => inline(TagKind::Inline),
+    // <button>: Tier-2 form/elements.rs:592-594 emits `\n\n` after content in
+    // block mode but no leading separator.  TagKind::Button gives us
+    // close-only block-separator semantics — distinct from Block which also
+    // emits a leading `\n\n` on open.
+    b"button"    => block(TagKind::Button),
     b"progress"  => inline(TagKind::Inline),
     b"meter"     => inline(TagKind::Inline),
     b"output"    => inline(TagKind::Inline),

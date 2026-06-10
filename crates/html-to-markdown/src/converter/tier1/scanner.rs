@@ -906,6 +906,9 @@ fn emit_open(
         }
         // Summary: push accumulation buffer so children redirect into it (Phase R).
         TagKind::Summary => open_summary(state),
+        // Button: no leading separator (matches Tier-2 handle_button which
+        // does nothing on open).  Close-side `\n\n` is emitted by close_button.
+        TagKind::Button => {}
         TagKind::Inline => {}
         // All other kinds (LineBreak, Hr, Image, etc.) are void — they never
         // reach emit_open because the void/self-closing branch fires first.
@@ -1373,6 +1376,9 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         TagKind::Block => close_block_container(state, &frame),
         // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
         TagKind::Summary => close_summary(state, &frame),
+        // Button (Phase T): emit `\n\n` when content was produced — mirrors
+        // Tier-2 `form/elements.rs:592-594`.  No leading separator on open.
+        TagKind::Button => close_button(state, &frame),
         // Inline containers (span/etc.): no separator.
         TagKind::Inline => {}
         // Void-only kinds that never have open frames:
@@ -1474,6 +1480,29 @@ fn close_summary(state: &mut Tier1State, _frame: &OpenTag) {
     dest.push_str("**\n\n");
 }
 
+/// Close a `<button>` (Phase T).  When the button produced visible content,
+/// emit `\n\n` after.  Skipped in table cells (cells stay one logical line).
+///
+/// Mirrors Tier-2 `form/elements.rs:592-594`:
+/// ```text
+/// if !ctx.convert_as_inline && output.len() > start_len {
+///     output.push_str("\n\n");
+/// }
+/// ```
+fn close_button(state: &mut Tier1State, frame: &OpenTag) {
+    if state.in_table_cell() {
+        return;
+    }
+    let dest = state.cell_or_output_mut();
+    if dest.len() > frame.content_start && !dest.ends_with("\n\n") {
+        if dest.ends_with('\n') {
+            dest.push('\n');
+        } else {
+            dest.push_str("\n\n");
+        }
+    }
+}
+
 /// Close an inline emphasis-style element (`<strong>`, `<em>`, `<b>`, `<i>`).
 ///
 /// When the element produced no visible content (the source had `<strong></strong>`
@@ -1536,6 +1565,8 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::TableRow => close_table_row(state),
         // Summary: pop accumulation buffer, trim, emit `**…**\n\n` (Phase R).
         TagKind::Summary => close_summary(state, &frame),
+        // Button (Phase T): emit `\n\n` on EOF close just like explicit close.
+        TagKind::Button => close_button(state, &frame),
         // Generic block/inline: no closing marker.
         TagKind::Block | TagKind::Inline => {}
         // Void-only kinds and other no-op kinds:
