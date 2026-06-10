@@ -284,6 +284,20 @@ pub fn process_list_children(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
         {
+            // Build the per-list context once; only `list_counter` varies
+            // per iteration, so mutate that field in place instead of
+            // cloning ctx for every <li>.  Tier-2 hot-spot pass III.
+            let mut list_ctx = Context {
+                in_ordered_list: is_ordered,
+                list_counter: if is_ordered { counter } else { 0 },
+                in_list: true,
+                list_depth: nested_depth,
+                ul_depth: if is_ordered { ctx.ul_depth } else { ctx.ul_depth + 1 },
+                loose_list: is_loose,
+                prev_item_had_blocks: false,
+                ..ctx.clone()
+            };
+
             for child_handle in children.top().iter() {
                 if let Some(tl::Node::Raw(bytes)) = child_handle.get(parser) {
                     if bytes.as_utf8_str().trim().is_empty() {
@@ -291,16 +305,9 @@ pub fn process_list_children(
                     }
                 }
 
-                let list_ctx = Context {
-                    in_ordered_list: is_ordered,
-                    list_counter: if is_ordered { counter } else { 0 },
-                    in_list: true,
-                    list_depth: nested_depth,
-                    ul_depth: if is_ordered { ctx.ul_depth } else { ctx.ul_depth + 1 },
-                    loose_list: is_loose,
-                    prev_item_had_blocks: false,
-                    ..ctx.clone()
-                };
+                if is_ordered {
+                    list_ctx.list_counter = counter;
+                }
 
                 use crate::converter::walk_node;
                 walk_node(child_handle, parser, output, options, &list_ctx, depth, dom_ctx);
