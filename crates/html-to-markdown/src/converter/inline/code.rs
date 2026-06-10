@@ -87,18 +87,19 @@ fn handle_code(
         _ => return,
     };
 
-    let code_ctx = Context {
-        in_code: true,
-        ..ctx.clone()
-    };
-
-    // Nested code detection: if already in code, just process children
+    // Nested code detection: if already in code, just process children.
+    // The Context clone (which bumps multiple Rc<HashSet> handles) is
+    // unnecessary in this branch because ctx.in_code is already true.
     if ctx.in_code {
         let children = tag.children();
         for child_handle in children.top().iter() {
-            walk_node(child_handle, parser, output, options, &code_ctx, depth + 1, dom_ctx);
+            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
         }
     } else {
+        let code_ctx = Context {
+            in_code: true,
+            ..ctx.clone()
+        };
         let mut content = String::with_capacity(32);
         let children = tag.children();
         {
@@ -196,14 +197,18 @@ fn handle_kbd_samp(
         _ => return,
     };
 
-    let code_ctx = Context {
-        in_code: true,
-        ..ctx.clone()
-    };
-
+    // Skip the Context clone when already inside <code>.
     let mut content = String::with_capacity(32);
     let children = tag.children();
-    {
+    if ctx.in_code {
+        for child_handle in children.top().iter() {
+            walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        }
+    } else {
+        let code_ctx = Context {
+            in_code: true,
+            ..ctx.clone()
+        };
         for child_handle in children.top().iter() {
             walk_node(
                 child_handle,
