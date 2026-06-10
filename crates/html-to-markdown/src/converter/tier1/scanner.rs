@@ -125,17 +125,15 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     continue;
                 }
 
-                // `<?` — processing instruction.  Tier-2's `tl::parse` drops
-                // these entirely (a malformed `<?>` in mdn-array becomes
-                // empty in the output).  Tier-1 mirrors by skipping to the
-                // next `>` and discarding the run.  If no `>` exists, fall
-                // through to the literal-lt branch below.
-                if next == b'?'
-                    && let Some(end) = memchr::memchr(b'>', &bytes[pos + 1..])
-                {
-                    pos = pos + 1 + end + 1;
-                    text_start = pos;
-                    continue;
+                // `<?` — processing instruction.  Tier-2 handles these
+                // inconsistently depending on whether html5ever-repair
+                // ran (it rewrites bogus comments) and how tl chooses
+                // to parse the run.  Either way the byte shape
+                // downstream differs from the simple skip Tier-1 could
+                // perform, so bail and let the Tier-2 fallback produce
+                // the authoritative output.
+                if next == b'?' {
+                    return Err(BailReason::Classifier);
                 }
 
                 // `</` — closing tag
@@ -337,17 +335,11 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 }
 
                 // Bail on <pre> when code_block_style is not Indented.
-                // Tier-1 only implements 4-space indented code blocks; other styles
-                // (Backticks, Tildes) require Tier-2's fenced-block logic.
-                // Phase Q (partial): Tier-1's open_pre/close_pre now contain
-                // backtick-fence emission code, but the SVG/link handling
-                // diverges from Tier-2 on default-style fixtures that would
-                // newly route to Tier-1 (mdream/vuejs-docs.html etc.).  Until
-                // those divergences are fixed, keep the bail in place for
-                // any non-Indented style so the testkit-forced Tier-1 path
-                // still falls through to Tier-2 and oracle stays at 28/29.
+                // Phase Q.4: Tier-1 supports Indented (4-space) and
+                // Backticks (`` ``` ``-fenced) code blocks via open_pre /
+                // close_pre.  Tildes still require Tier-2's fence emitter.
                 if matches!(spec.kind, TagKind::Pre)
-                    && options.code_block_style != crate::options::CodeBlockStyle::Indented
+                    && options.code_block_style == crate::options::CodeBlockStyle::Tildes
                 {
                     return Err(BailReason::Classifier);
                 }
@@ -1808,7 +1800,11 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
                 state.output.push_str(&options.code_language);
             }
             state.output.push('\n');
-            state.output.push_str(&raw);
+            // Strip a single trailing newline from raw so the closing
+            // fence doesn't end up after a blank line.  Tier-2 emits
+            // `content\n```\n` (single newline).
+            let raw = raw.strip_suffix('\n').unwrap_or(&raw);
+            state.output.push_str(raw);
             state.output.push('\n');
             state.output.push_str("```\n");
         }

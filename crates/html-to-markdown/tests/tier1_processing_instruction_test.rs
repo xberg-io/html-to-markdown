@@ -1,9 +1,11 @@
-//! Tier-1 processing-instruction skip (Phase X).
+//! Tier-1 processing-instruction bail (Phase X reworked in Phase Q.4).
 //!
 //! `<?...?>` and `<?>` are HTML processing instructions / malformed PI
-//! markers.  Tier-2's `tl::parse` discards them entirely.  Tier-1 used
-//! to emit them as literal text (`<?>`), breaking byte-equality on
-//! mdn-array which has a stray `<?>` between `</script>` and `<section>`.
+//! markers.  Tier-2 handles them inconsistently depending on whether
+//! html5ever-repair ran (it rewrites bogus comments) and how tl chooses
+//! to parse the run.  Tier-1 cannot mirror both paths cheaply, so it
+//! bails to the Tier-2 fallback whose output is the authoritative
+//! shape.
 
 #![cfg(feature = "testkit")]
 
@@ -18,24 +20,35 @@ fn tier1(html: &str) -> String {
     convert(html, Some(opts)).unwrap().content.unwrap_or_default()
 }
 
-#[test]
-fn empty_pi_dropped() {
-    let out = tier1("<p>a<?>b</p>");
-    assert!(!out.contains("<?>"), "PI leaked: {out:?}");
-    assert!(out.contains("ab"), "neighbours collapsed: {out:?}");
+fn tier2(html: &str) -> String {
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: false,
+        ..ConversionOptions::default()
+    };
+    convert(html, Some(opts)).unwrap().content.unwrap_or_default()
+}
+
+fn assert_matches(html: &str) {
+    let t1 = tier1(html);
+    let t2 = tier2(html);
+    assert_eq!(
+        t1, t2,
+        "tier1 diverged from tier2\ninput: {html:?}\ntier1: {t1:?}\ntier2: {t2:?}"
+    );
 }
 
 #[test]
-fn xml_pi_dropped() {
-    let out = tier1(r#"<p>before<?xml version="1.0"?>after</p>"#);
-    assert!(!out.contains("<?"), "PI leaked: {out:?}");
-    assert!(out.contains("beforeafter"), "neighbours collapsed: {out:?}");
+fn empty_pi_falls_back_to_tier2() {
+    assert_matches("<p>a<?>b</p>");
 }
 
 #[test]
-fn pi_outside_paragraph() {
-    // mdn-array's actual pattern: PI between </script> and <section>.
-    let html = "<p>x</p><?> <section><p>y</p></section>";
-    let out = tier1(html);
-    assert!(!out.contains("<?>"), "PI leaked: {out:?}");
+fn xml_pi_falls_back_to_tier2() {
+    assert_matches(r#"<p>before<?xml version="1.0"?>after</p>"#);
+}
+
+#[test]
+fn pi_outside_paragraph_falls_back_to_tier2() {
+    assert_matches("<p>x</p><?> <section><p>y</p></section>");
 }

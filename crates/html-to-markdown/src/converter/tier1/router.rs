@@ -94,8 +94,9 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
         || options.output_format != OutputFormat::Markdown
         // heading_style: Tier-1 hardcodes ATX; non-ATX headings differ.
         || options.heading_style != HeadingStyle::Atx
-        // code_block_style: Tier-1 always emits 4-space indented blocks.
-        || options.code_block_style != CodeBlockStyle::Indented
+        // code_block_style: Tier-1 supports Indented and Backticks (Phase Q.4).
+        // Tildes still require Tier-2's fence emission.
+        || options.code_block_style == CodeBlockStyle::Tildes
         // strong_em_symbol: Tier-1 hardcodes `*`/`**`.
         || options.strong_em_symbol != '*'
         // bullets: Tier-1 hardcodes the cycle `"-*+"` (the default).  Any
