@@ -448,21 +448,26 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
         flush_text(&mut state, &html[text_start..pos], text_start)?;
     }
 
-    // M4: Implicitly close any optional-close elements still open at EOF.
-    // HTML5 allows omitting end tags for elements like <p>, <li>, <dt>, <dd>.
-    while let Some(top) = state.stack.last() {
-        if top.spec.optional_close.is_some() {
-            emit_close_for_implicit(&mut state)?;
-        } else {
-            break;
+    // Phase N2: implicitly close all remaining open elements at EOF.
+    // HTML5 parsers (html5ever and tl) close every open element when input
+    // ends, so Tier-2 produces output even for malformed input like
+    // `<p>hello <b>world` (no `</b>`, no `</p>`).  Mirror that here by
+    // running emit_close_for_implicit on every remaining frame, regardless
+    // of whether it has an OptionalCloseRule.
+    //
+    // Before closing, trim trailing inline whitespace (spaces, tabs, newlines)
+    // from the output buffer.  In well-formed HTML the close tag arrives
+    // before the file's trailing newline; the inline close-marker emission
+    // (e.g. `**` for `</strong>`) lands flush against the content.  At EOF
+    // any trailing newline is between the implicit close and the file end,
+    // not inside the inline body, so we trim it before pushing the close
+    // marker to match Tier-2's `world**` instead of `world\n**`.
+    while !state.stack.is_empty() {
+        let buf = &mut state.output;
+        while matches!(buf.as_bytes().last(), Some(b' ' | b'\t' | b'\n' | b'\r')) {
+            buf.pop();
         }
-    }
-
-    // Remaining unclosed block elements at EOF → bail
-    if !state.stack.is_empty() {
-        return Err(BailReason::EofWithOpenBlock {
-            open_count: state.stack.len(),
-        });
+        emit_close_for_implicit(&mut state)?;
     }
 
     // Collapse runs of 3+ consecutive newlines to exactly 2, matching Tier-2's

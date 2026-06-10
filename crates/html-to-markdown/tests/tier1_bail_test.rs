@@ -161,49 +161,38 @@ fn bails_on_custom_element_fallback_matches_tier2() {
     }
 }
 
-// ── Tripwire 4: EofWithOpenBlock ─────────────────────────────────────────────
+// ── Tripwire 4: EOF implicit-close (was: EofWithOpenBlock) ───────────────────
+//
+// Phase N2: the scanner now closes every remaining open frame at EOF instead
+// of bailing, mirroring the HTML5 parser's behaviour.  Trailing whitespace is
+// trimmed from the output buffer before each implicit close so inline markers
+// like `</strong>` land flush against the content (no `world\n**`).
 
 #[test]
-fn bails_on_eof_with_open_block() {
+fn handles_eof_with_open_block_inline() {
     let html = "<p>hello <strong>world";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::EofWithOpenBlock { .. }),
-        "expected EofWithOpenBlock, got {err:?}"
-    );
+    assert!(tier1_run(html).is_ok(), "Tier-1 should auto-close at EOF (no bail)");
     assert_eq!(force_tier1(html), tier2(html));
 }
 
 #[test]
-fn eof_open_count_reflects_stack_depth() {
-    // Two unclosed block elements: <p> and <strong>
-    let html = "<p>hello <strong>world";
-    if let Err(BailReason::EofWithOpenBlock { open_count }) = tier1_run(html) {
-        assert_eq!(open_count, 2, "expected 2 unclosed elements, got {open_count}");
-    } else {
-        panic!("expected EofWithOpenBlock");
-    }
-}
-
-#[test]
-fn bails_on_eof_single_unclosed() {
+fn handles_eof_with_single_unclosed_div() {
     let html = "<div>some text without closing tag";
-    let err = tier1_run(html).unwrap_err();
     assert!(
-        matches!(err, BailReason::EofWithOpenBlock { open_count: 1 }),
-        "expected EofWithOpenBlock{{open_count:1}}, got {err:?}"
+        tier1_run(html).is_ok(),
+        "Tier-1 should auto-close <div> at EOF (no bail)"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
 
 #[test]
-fn bails_on_eof_nested_open() {
-    // Three levels open: ul > li > strong
+fn handles_eof_nested_open_inline() {
+    // Three levels open: ul > li > strong. Phase N2: scanner closes all
+    // three at EOF instead of bailing.
     let html = "<ul><li>item <strong>bold";
-    let err = tier1_run(html).unwrap_err();
     assert!(
-        matches!(err, BailReason::EofWithOpenBlock { .. }),
-        "expected EofWithOpenBlock, got {err:?}"
+        tier1_run(html).is_ok(),
+        "Tier-1 should auto-close nested elements at EOF"
     );
     assert_eq!(force_tier1(html), tier2(html));
 }
