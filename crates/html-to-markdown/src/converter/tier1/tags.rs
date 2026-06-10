@@ -69,6 +69,11 @@ pub enum TagKind {
     /// Table caption (`<caption>`).
     TableCaption,
 
+    // Semantic containers
+    /// `<summary>` — disclosure summary; content collected into a buffer and
+    /// emitted as `**…**\n\n` (strong-wrap).
+    Summary,
+
     // Raw-text containers (scanner must skip their contents)
     /// Raw-text container whose content the scanner skips until the matching close tag.
     RawText(RawKind),
@@ -278,7 +283,7 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"nav"     => block(TagKind::Block),
     b"address" => block(TagKind::Block),
     b"details" => block(TagKind::Block),
-    b"summary" => block(TagKind::Block),
+    b"summary" => block(TagKind::Summary),
     b"dialog"  => block(TagKind::Block),
     b"figure"  => block(TagKind::Block),
     b"figcaption" => block(TagKind::Block),

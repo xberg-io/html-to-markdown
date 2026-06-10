@@ -95,6 +95,9 @@ pub struct OpenTag {
     pub name_range: std::ops::Range<usize>,
 }
 
+/// Minimum capacity for each summary accumulation buffer.
+const SUMMARY_BUF_CAPACITY: usize = 64;
+
 /// Mutable state threaded through the entire Tier-1 scan pass.
 pub struct Tier1State {
     /// Open-tag stack; one frame per currently-open element.
@@ -136,6 +139,15 @@ pub struct Tier1State {
     /// Reset to `None` after each `</pre>` so nested same-level blocks don't
     /// inherit a stale language.
     pub pre_lang: Option<String>,
+    /// Stack of `<summary>` accumulation buffers.
+    ///
+    /// Pushed when a non-cell `<summary>` opens; all child text accumulates
+    /// here instead of in `output`.  On `</summary>`, the buffer is popped,
+    /// trimmed, and emitted as `**…**\n\n` into the parent destination.
+    ///
+    /// A stack (rather than a single `Option`) handles pathological nested
+    /// `<summary>` input without panicking.
+    pub summary_buf_stack: Vec<String>,
 }
 
 impl Tier1State {
@@ -155,12 +167,20 @@ impl Tier1State {
             link_stack: Vec::new(),
             head_range: None,
             pre_lang: None,
+            summary_buf_stack: Vec::new(),
         }
     }
 
     /// Return a mutable reference to the current cell buffer when inside a
-    /// table cell, the caption buffer when inside a `<caption>`, or to
+    /// table cell, the caption buffer when inside a `<caption>`, the top
+    /// summary accumulation buffer when inside a `<summary>`, or to
     /// `self.output` otherwise.
+    ///
+    /// Priority order (highest first):
+    /// 1. Table cell — a `<summary>` inside a `<td>` writes to the cell.
+    /// 2. Table caption — a `<summary>` inside a `<caption>` writes to the caption.
+    /// 3. Summary buffer top — the innermost active `<summary>` accumulator.
+    /// 4. `self.output` — the main output buffer.
     ///
     /// This is the single dispatch point for "where does inline text land."
     pub fn cell_or_output_mut(&mut self) -> &mut String {
@@ -172,7 +192,26 @@ impl Tier1State {
                 return &mut ts.caption_buf;
             }
         }
+        if let Some(buf) = self.summary_buf_stack.last_mut() {
+            return buf;
+        }
         &mut self.output
+    }
+
+    /// True when the scanner is currently accumulating `<summary>` content.
+    #[must_use]
+    pub fn in_summary(&self) -> bool {
+        !self.summary_buf_stack.is_empty()
+    }
+
+    /// Push a fresh summary accumulation buffer onto the stack.
+    pub fn push_summary_buf(&mut self) {
+        self.summary_buf_stack.push(String::with_capacity(SUMMARY_BUF_CAPACITY));
+    }
+
+    /// Pop the top summary accumulation buffer and return it.
+    pub fn pop_summary_buf(&mut self) -> Option<String> {
+        self.summary_buf_stack.pop()
     }
 
     /// True when the scanner is currently accumulating `<caption>` content.

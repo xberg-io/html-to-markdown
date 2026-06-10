@@ -410,6 +410,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                         spec.kind,
                         TagKind::Paragraph
                             | TagKind::Block
+                            | TagKind::Summary
                             | TagKind::List(_)
                             | TagKind::ListItem
                             | TagKind::Heading(_)
@@ -891,7 +892,7 @@ fn emit_open(
         // (block/div.rs:88, semantic/sectioning.rs:71) which prefix block
         // content with `\n\n` to separate from siblings.  Skipped in table
         // cells (cells stay on one logical line).
-        TagKind::Block => {
+        TagKind::Block | TagKind::Summary => {
             if !state.in_table_cell() {
                 state.ensure_blank_line();
             }
@@ -1338,7 +1339,10 @@ fn emit_close(state: &mut Tier1State, tag_name_bytes: &[u8], options: &Conversio
         // doesn't run together with this div's last byte.  Mirrors Tier-2's
         // `div::handle` post-children block: `output.push_str("\n\n")` when
         // `has_content` (see block/div.rs around line 124-130).
-        TagKind::Block => close_block_container(state, &frame),
+        // Generic block container close: handled by close_block_container.
+        // Summary is treated as a generic block container here in Phase R prep;
+        // the actual strong-wrap behaviour is added in the Phase R commit.
+        TagKind::Block | TagKind::Summary => close_block_container(state, &frame),
         // Inline containers (span/etc.): no separator.
         TagKind::Inline => {}
         // Void-only kinds that never have open frames:
@@ -1435,8 +1439,9 @@ fn emit_close_for_implicit(state: &mut Tier1State, options: &ConversionOptions) 
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
         TagKind::TableRow => close_table_row(state),
-        // Generic block/inline: no closing marker.
-        TagKind::Block | TagKind::Inline => {}
+        // Generic block/inline/summary: no closing marker in implicit close.
+        // Summary's strong-wrap close is added in the Phase R commit.
+        TagKind::Block | TagKind::Summary | TagKind::Inline => {}
         // Void-only kinds and other no-op kinds:
         TagKind::LineBreak
         | TagKind::Image
