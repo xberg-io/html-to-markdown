@@ -1612,6 +1612,13 @@ fn close_figcaption(state: &mut Tier1State, _frame: &OpenTag) {
     }
     let writing_to_cell = state.in_table_cell();
     let dest = state.cell_or_output_mut();
+    // Phase FF-2: trim trailing horizontal whitespace introduced by
+    // Phase U-2's inter-tag-whitespace preservation, so the block
+    // separator (\n\n) doesn't sit after a stray space.  Tier-2 does
+    // not emit that space when the figcaption follows inline content.
+    while dest.ends_with(' ') || dest.ends_with('\t') {
+        dest.pop();
+    }
     if !writing_to_cell && !dest.is_empty() && !dest.ends_with("\n\n") {
         if dest.ends_with('\n') {
             dest.push('\n');
