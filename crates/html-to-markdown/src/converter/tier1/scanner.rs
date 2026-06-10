@@ -421,6 +421,8 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                             | TagKind::Block
                             | TagKind::Summary
                             | TagKind::Figcaption
+                            | TagKind::Blockquote
+                            | TagKind::Pre
                             | TagKind::List(_)
                             | TagKind::ListItem
                             | TagKind::Heading(_)
