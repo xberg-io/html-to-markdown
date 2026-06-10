@@ -37,6 +37,44 @@ pub fn tag_has_main_semantics(tag: &tl::HTMLTag) -> bool {
     false
 }
 
+/// Navigation-hint keywords matched against `class` and `id` token values.
+///
+/// Shared between [`element_has_navigation_hint`] (Tier-2 DOM path) and the
+/// Tier-1 byte-scanner's preprocessing skip logic so both paths use the same
+/// canonical keyword list.
+pub const NAV_KEYWORDS: &[&str] = &[
+    "nav",
+    "navigation",
+    "navbar",
+    "breadcrumbs",
+    "breadcrumb",
+    "toc",
+    "sidebar",
+    "sidenav",
+    "menu",
+    "menubar",
+    "mainmenu",
+    "subnav",
+    "tabs",
+    "tablist",
+    "toolbar",
+    "pager",
+    "pagination",
+    "skipnav",
+    "skip-link",
+    "skiplinks",
+    "site-nav",
+    "site-menu",
+    "site-header",
+    "site-footer",
+    "topbar",
+    "bottombar",
+    "masthead",
+    "vector-nav",
+    "vector-header",
+    "vector-footer",
+];
+
 /// Check if an element has navigation-related hints in its attributes.
 pub fn element_has_navigation_hint(tag: &tl::HTMLTag) -> bool {
     if attribute_matches_any(tag, "role", &["navigation", "menubar", "tablist", "toolbar"]) {
@@ -50,39 +88,6 @@ pub fn element_has_navigation_hint(tag: &tl::HTMLTag) -> bool {
     ) {
         return true;
     }
-
-    const NAV_KEYWORDS: &[&str] = &[
-        "nav",
-        "navigation",
-        "navbar",
-        "breadcrumbs",
-        "breadcrumb",
-        "toc",
-        "sidebar",
-        "sidenav",
-        "menu",
-        "menubar",
-        "mainmenu",
-        "subnav",
-        "tabs",
-        "tablist",
-        "toolbar",
-        "pager",
-        "pagination",
-        "skipnav",
-        "skip-link",
-        "skiplinks",
-        "site-nav",
-        "site-menu",
-        "site-header",
-        "site-footer",
-        "topbar",
-        "bottombar",
-        "masthead",
-        "vector-nav",
-        "vector-header",
-        "vector-footer",
-    ];
 
     attribute_matches_any(tag, "class", NAV_KEYWORDS) || attribute_matches_any(tag, "id", NAV_KEYWORDS)
 }

@@ -25,6 +25,7 @@ use crate::converter::tier1::spec_rules;
 use crate::converter::tier1::state::{EscapeCtx, OpenTag, Tier1State};
 use crate::converter::tier1::tags::{ListKind, TagKind, TagSpec};
 use crate::converter::tier1::{self};
+use crate::converter::utility::attributes::NAV_KEYWORDS;
 use crate::options::ConversionOptions;
 
 use memchr::{memchr2, memchr3};
@@ -289,6 +290,34 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
 
                 // Bail on unsupported tag kinds for M3c
                 bail_unsupported(spec, pos)?;
+
+                // Phase D': mirror Tier-2's preprocessing pipeline <nav> /
+                // nav-hinted <header> / <footer> / <aside> / <form> strip.
+                // When the user's preprocessing options request the strip,
+                // jump past the matching close tag without pushing any frame.
+                // Matches Tier-2's should_drop_for_preprocessing
+                // (preprocessing_helpers.rs:115).
+                if is_preprocessing_skip_candidate(name_lower) {
+                    let close = parse::find_tag_close(bytes, name_end).ok_or(BailReason::LiteralLt { offset: pos })?;
+                    let attrs_end = if close.1 { close.0.saturating_sub(1) } else { close.0 };
+                    let skip_attrs = parse::collect_attrs(bytes, name_end, attrs_end);
+                    if should_skip_preprocessing(name_lower, &skip_attrs, options) {
+                        let open_end = close.0 + 1;
+                        if close.1 {
+                            // Self-closing void — nothing to skip over.
+                            pos = open_end;
+                        } else {
+                            pos = find_balanced_close(bytes, open_end, name_lower).unwrap_or(bytes.len());
+                        }
+                        text_start = pos;
+                        continue;
+                    }
+                    // Not skipped — fall through to the regular open path.
+                    // The regular path will call find_tag_close again (cheap)
+                    // and re-collect attrs only for kinds that need them;
+                    // nav/header/footer/aside/form are Block kind so attrs
+                    // won't be re-collected.
+                }
 
                 // Bail on <pre> when code_block_style is not Indented.
                 // Tier-1 only implements 4-space indented code blocks; other styles
@@ -2222,6 +2251,143 @@ fn find_attr<'a>(attrs: &[(&'a [u8], Option<&'a [u8]>)], key: &[u8]) -> Option<&
         }
     }
     None
+}
+
+/// Returns true when `name_lower` is a tag that *may* need preprocessing-skip
+/// evaluation.  All other tags skip the more expensive `should_skip_preprocessing`
+/// check entirely.
+fn is_preprocessing_skip_candidate(name_lower: &[u8]) -> bool {
+    matches!(name_lower, b"nav" | b"header" | b"footer" | b"aside" | b"form")
+}
+
+/// Mirrors `should_drop_for_preprocessing` (preprocessing_helpers.rs:115) for
+/// the Tier-1 byte scanner.
+///
+/// Called only for tags that passed [`is_preprocessing_skip_candidate`].
+/// Uses the raw attribute byte slices collected by [`parse::collect_attrs`]
+/// instead of the Tier-2 `tl::HTMLTag` DOM node.
+fn should_skip_preprocessing(name_lower: &[u8], attrs: &[(&[u8], Option<&[u8]>)], options: &ConversionOptions) -> bool {
+    use crate::options::PreprocessingPreset;
+
+    if !options.preprocessing.enabled {
+        return false;
+    }
+
+    if options.preprocessing.preset == PreprocessingPreset::Minimal {
+        return false;
+    }
+
+    // Form removal — Standard and Aggressive when the flag is set.
+    if options.preprocessing.remove_forms && name_lower == b"form" {
+        return true;
+    }
+
+    if !options.preprocessing.remove_navigation {
+        return false;
+    }
+
+    // <nav> is unconditionally navigation.
+    if name_lower == b"nav" {
+        return true;
+    }
+
+    // <header> / <footer> / <aside> — drop only when navigation hints present.
+    // (Aggressive would drop footer/aside unconditionally, but Aggressive routes
+    // through Tier-2 via the existing router gate so Tier-1 only needs the
+    // Standard-preset behaviour: nav-hint check.)
+    if matches!(name_lower, b"header" | b"footer" | b"aside") {
+        return byte_attrs_have_navigation_hint(attrs);
+    }
+
+    false
+}
+
+/// Byte-level equivalent of `element_has_navigation_hint` for use in the
+/// Tier-1 scanner where attributes are raw `&[u8]` slices rather than a
+/// parsed `tl::HTMLTag`.
+fn byte_attrs_have_navigation_hint(attrs: &[(&[u8], Option<&[u8]>)]) -> bool {
+    // role ∈ { "navigation", "menubar", "tablist", "toolbar" }
+    if let Some(role) = find_attr(attrs, b"role") {
+        let role_lc = role.to_ascii_lowercase();
+        if matches!(role_lc.as_slice(), b"navigation" | b"menubar" | b"tablist" | b"toolbar") {
+            return true;
+        }
+    }
+
+    // aria-label contains "navigation", "menu", "contents", "table of contents", or "toc"
+    if let Some(label) = find_attr(attrs, b"aria-label") {
+        let label_lc = label.to_ascii_lowercase();
+        const ARIA_SUBSTRINGS: &[&[u8]] = &[b"navigation", b"menu", b"contents", b"table of contents", b"toc"];
+        if ARIA_SUBSTRINGS
+            .iter()
+            .any(|sub| label_lc.windows(sub.len()).any(|w| w == *sub))
+        {
+            return true;
+        }
+    }
+
+    // class / id — tokenize (split on whitespace, normalise _:./→-, lowercase)
+    // and match against NAV_KEYWORDS.
+    for attr_name in [b"class".as_slice(), b"id".as_slice()] {
+        if let Some(value) = find_attr(attrs, attr_name) {
+            if byte_value_has_nav_keyword(value) {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
+/// Tokenize a raw attribute byte value and return true when any token matches
+/// a keyword in [`NAV_KEYWORDS`].
+///
+/// Tokens are split on ASCII whitespace.  Each token is normalised by
+/// replacing `_`, `:`, `.`, `/` with `-` and lowercasing before comparison.
+fn byte_value_has_nav_keyword(value: &[u8]) -> bool {
+    // Iterate over whitespace-separated tokens without allocating a Vec.
+    let mut start = 0;
+    let len = value.len();
+    loop {
+        // Skip leading whitespace.
+        while start < len && value[start].is_ascii_whitespace() {
+            start += 1;
+        }
+        if start >= len {
+            break;
+        }
+        // Find end of token.
+        let mut end = start;
+        while end < len && !value[end].is_ascii_whitespace() {
+            end += 1;
+        }
+        let token_bytes = &value[start..end];
+        // Normalise: replace separator chars with `-`, lowercase.
+        // Use a stack buffer when small enough to avoid heap allocation.
+        let mut buf = [0u8; 64];
+        let normalised: &[u8] = if token_bytes.len() <= buf.len() {
+            let n = token_bytes.len();
+            for (i, &b) in token_bytes.iter().enumerate() {
+                buf[i] = match b {
+                    b'_' | b':' | b'.' | b'/' => b'-',
+                    _ => b.to_ascii_lowercase(),
+                };
+            }
+            &buf[..n]
+        } else {
+            // Token is longer than any NAV_KEYWORD — skip without heap alloc.
+            start = end;
+            continue;
+        };
+
+        // Compare against each NAV_KEYWORD.
+        if NAV_KEYWORDS.iter().any(|kw| kw.as_bytes() == normalised) {
+            return true;
+        }
+
+        start = end;
+    }
+    false
 }
 
 /// Extract `href` and `title` from the attribute list for a link.

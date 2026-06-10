@@ -364,3 +364,43 @@ fn bail_reason_display_contains_contextual_info() {
     let s3 = r3.to_string();
     assert!(s3.contains('5'), "Display should contain open_count: {s3}");
 }
+
+// ── Phase D': preprocessing skip (nav / nav-hinted block elements) ────────────
+
+#[test]
+fn nav_subtree_skipped() {
+    // <nav> is unconditionally dropped by default preprocessing options.
+    let html = "<nav>content</nav>";
+    assert_eq!(force_tier1(html), tier2(html));
+    assert_eq!(force_tier1(html), "");
+}
+
+#[test]
+fn header_with_nav_hint_skipped() {
+    // <header class="site-header"> matches NAV_KEYWORDS["site-header"] → dropped.
+    let html = "<header class=\"site-header\">content</header>";
+    assert_eq!(force_tier1(html), tier2(html));
+    assert_eq!(force_tier1(html), "");
+}
+
+#[test]
+fn header_without_nav_hint_kept() {
+    // Plain <header> with no nav hint must be preserved.
+    let html = "<header><h1>Title</h1></header>";
+    // Both paths produce identical output; the trailing-newline count is
+    // determined by the converter's paragraph-spacing rules — assert equality
+    // between paths, not a hardcoded string.
+    assert_eq!(force_tier1(html), tier2(html));
+    assert!(
+        !force_tier1(html).is_empty(),
+        "plain <header> content must not be dropped"
+    );
+}
+
+#[test]
+fn aside_with_role_navigation_skipped() {
+    // <aside role="navigation"> carries the explicit ARIA navigation role → dropped.
+    let html = "<aside role=\"navigation\">content</aside>";
+    assert_eq!(force_tier1(html), tier2(html));
+    assert_eq!(force_tier1(html), "");
+}
