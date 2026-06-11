@@ -385,7 +385,7 @@ Verify all distributions are published:
 
 - **Issues**: [GitHub Issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/kreuzberg-dev/html-to-markdown/discussions)
-- **Discord**: [Kreuzberg Community](https://discord.gg/pXxagNK2zN)
+- **Discord**: [Kreuzberg Community](https://discord.gg/xt9WY3GnKR)
 
 ### License
 
