@@ -2520,37 +2520,48 @@ fn flush_text(state: &mut Tier1State, raw: &str, base_offset: usize) -> Result<(
     // `<a>X</a>&nbsp;<a>Y</a>` keeps the NBSP).  Without this rule,
     // `First<NBSP>appeared` reaches the buffer verbatim where Tier-2 outputs
     // `First appeared`.
+    // Common Unicode-whitespace entity forms: named + numeric (decimal +
+    // hex).  Tier-2's `normalize_whitespace_cow` folds the decoded chars;
+    // Tier-1's flush_text runs BEFORE entity decode, so the patterns must
+    // be listed explicitly.
+    const UNICODE_WS_ENTITIES: &[&str] = &[
+        "&nbsp;", // U+00A0
+        "&#160;", "&#xa0;", "&#xA0;", "&ensp;", // U+2002
+        "&#8194;", "&#x2002;", "&emsp;", // U+2003
+        "&#8195;", "&#x2003;", "&thinsp;", // U+2009
+        "&#8201;", "&#x2009;", "&hairsp;", // U+200A
+        "&#8202;", "&#x200a;", "&#x200A;",
+    ];
     let raw_owned_nbsp;
     let raw: &str = if !in_pre && !in_code {
-        // Quick check: does the chunk have any Unicode-whitespace source
-        // (NBSP literal/entity or any non-ASCII whitespace char)?
-        let has_nbsp_entity =
-            raw.contains("&nbsp;") || raw.contains("&#160;") || raw.contains("&#xa0;") || raw.contains("&#xA0;");
+        let has_ws_entity = UNICODE_WS_ENTITIES.iter().any(|p| raw.contains(p));
         let has_unicode_ws_literal = raw.bytes().any(|b| b >= 0x80)
             && raw
                 .chars()
                 .any(|c| c.is_whitespace() && c != ' ' && c != '\t' && c != '\n' && c != '\r');
-        if has_nbsp_entity || has_unicode_ws_literal {
+        if has_ws_entity || has_unicode_ws_literal {
             // Treat the chunk as logically whitespace-only when stripping
-            // NBSP entities leaves only whitespace characters.
-            let stripped = raw
-                .replace("&nbsp;", "")
-                .replace("&#160;", "")
-                .replace("&#xa0;", "")
-                .replace("&#xA0;", "");
+            // the Unicode-ws entities leaves only whitespace characters.
+            let mut stripped = raw.to_owned();
+            for p in UNICODE_WS_ENTITIES {
+                if stripped.contains(p) {
+                    stripped = stripped.replace(p, "");
+                }
+            }
             let is_logically_whitespace = stripped.chars().all(char::is_whitespace);
             if is_logically_whitespace {
                 raw
             } else {
-                // Fold all non-ASCII Unicode whitespace and the NBSP entities
+                // Fold all non-ASCII Unicode whitespace and known entities
                 // to ASCII space, leaving ASCII whitespace untouched (those
                 // are handled by the downstream collapse).
-                let mut tmp = String::with_capacity(raw.len());
-                let after_entities = raw
-                    .replace("&nbsp;", " ")
-                    .replace("&#160;", " ")
-                    .replace("&#xa0;", " ")
-                    .replace("&#xA0;", " ");
+                let mut after_entities = raw.to_owned();
+                for p in UNICODE_WS_ENTITIES {
+                    if after_entities.contains(p) {
+                        after_entities = after_entities.replace(p, " ");
+                    }
+                }
+                let mut tmp = String::with_capacity(after_entities.len());
                 for c in after_entities.chars() {
                     if c.is_whitespace() && c != ' ' && c != '\t' && c != '\n' && c != '\r' {
                         tmp.push(' ');
