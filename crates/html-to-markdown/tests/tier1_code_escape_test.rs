@@ -3,8 +3,8 @@
 //! Tier-2's `render_code_with_escaping` (inline/code.rs:260) chooses the
 //! number of outer backticks and delimiter spaces based on the content.
 //! Tier-1 used to emit a single backtick at open and close — when the
-//! content itself contained backticks, the adjacent markers fused into
-//! `` `` `` and the inner backticks visually disappeared.
+//! content itself contained backticks, the adjacent markers fused with
+//! the content and the inner backticks visually disappeared.
 
 #![cfg(feature = "testkit")]
 
