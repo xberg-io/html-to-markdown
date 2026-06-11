@@ -69,7 +69,7 @@ RbSys::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
   # The setter was added in a later rb_sys version; guard against older gem installations
   # where the method does not exist (e.g., rb_sys 0.9.127 locked to avoid mingw bug in 0.9.128).
   if ext.respond_to?(:cross_compile_versions=)
-    ext.cross_compile_versions = %w[3.4.9 3.3.11 3.2.11 3.1.7]
+    ext.cross_compile_versions = %w[3.5.10 3.4.13 3.3.13 3.2.13 3.1.10]
   end
 end
 

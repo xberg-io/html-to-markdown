@@ -112,6 +112,13 @@ pub struct Context {
     pub(crate) structure_collector: Option<StructureCollectorHandle>,
     /// Optional reference collector for reference-style links.
     pub(crate) reference_collector: Option<ReferenceCollectorHandle>,
+    /// When `true`, all visitor-hook Mutex acquisitions are skipped.
+    ///
+    /// Set during the table column-width pre-pass, which walks every cell to
+    /// measure rendered text width but never uses visitor results.  The pre-pass
+    /// runs before the main rendering pass, so acquiring the Mutex there is pure
+    /// overhead (especially costly post-`Arc<Mutex>` migration in 7f6178f25).
+    pub(crate) skip_visitor_hooks: bool,
 }
 
 impl Context {
@@ -203,6 +210,7 @@ impl Context {
             visitor_error: Rc::new(RefCell::new(None)),
             structure_collector,
             reference_collector,
+            skip_visitor_hooks: false,
         }
     }
 }
