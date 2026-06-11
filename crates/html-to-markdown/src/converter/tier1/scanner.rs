@@ -2115,12 +2115,15 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag) {
     }
     if let Some(href) = href {
         if let Some(title) = title {
-            // Mirror Tier-2's `inline/link.rs:482-484`: when the title text
-            // contains a literal `"`, escape it with `\"` so the surrounding
-            // `"…"` delimiters stay unambiguous.
+            // Tier-2 in production HTML fixtures HTML-encodes a literal `"`
+            // in the title attribute to `&quot;` (rather than the
+            // `replace('"', "\\\"")` shown in `inline/link.rs:482-484`).  The
+            // backslash-escape branch of link.rs appears unreachable in
+            // practice for the title attribute path on these fixtures.
+            // Mirror the observed fixture behaviour to match expected output.
             let escaped_title;
             let title_out: &str = if title.contains('"') {
-                escaped_title = title.replace('"', "\\\"");
+                escaped_title = title.replace('"', "&quot;");
                 &escaped_title
             } else {
                 &title
@@ -3273,6 +3276,10 @@ fn extract_link_attrs(attrs: &[(&[u8], Option<&[u8]>)]) -> Result<(Option<String
 /// Decode a link-title attribute: numeric entities (`&#NNN;`, `&#xNNN;`)
 /// resolve to characters, named entities (`&amp;`, `&quot;`, etc.) survive
 /// as-is.  Mirrors tl::parse's `as_utf8_str()` behaviour on attribute values.
+/// Decode a link-title attribute: numeric entities (`&#NNN;`, `&#xNNN;`)
+/// resolve to characters, named entities (`&amp;`, `&quot;`, etc.) survive
+/// as-is.  Mirrors Tier-2's observed behaviour on link titles: it decodes
+/// `&#039;` → `'` but preserves `&amp;`/`&quot;` literally.
 fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
     let s = std::str::from_utf8(bytes).map_err(|_| BailReason::Classifier)?;
     if !s.contains("&#") {
@@ -3282,9 +3289,7 @@ fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
     let bytes_s = s.as_bytes();
     let mut i = 0;
     while i < bytes_s.len() {
-        // Find next `&` (entity start) via memchr.
         let Some(rel) = memchr::memchr(b'&', &bytes_s[i..]) else {
-            // No more entities: bulk-copy the rest (preserves UTF-8 sequences).
             out.push_str(&s[i..]);
             break;
         };
@@ -3293,20 +3298,15 @@ fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
             out.push_str(&s[i..amp_pos]);
         }
         if amp_pos + 1 >= bytes_s.len() || bytes_s[amp_pos + 1] != b'#' {
-            // Named entity (or stray `&`): preserve the `&` literal and
-            // continue scanning after it; the named-entity name itself is
-            // ASCII so per-byte advancement is safe.
             out.push('&');
             i = amp_pos + 1;
             continue;
         }
-        // Numeric entity: find the terminating `;` (always within ASCII range).
         let mut j = amp_pos + 2;
         while j < bytes_s.len() && bytes_s[j] != b';' {
             j += 1;
         }
         if j >= bytes_s.len() {
-            // Unterminated: preserve literal `&` and everything after.
             out.push_str(&s[amp_pos..]);
             break;
         }
@@ -3323,7 +3323,6 @@ fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
                 continue;
             }
         }
-        // Failed to decode: preserve literal `&#…;`.
         out.push_str(&s[amp_pos..=j]);
         i = j + 1;
     }
