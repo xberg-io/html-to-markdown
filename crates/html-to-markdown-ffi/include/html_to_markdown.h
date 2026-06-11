@@ -3750,7 +3750,7 @@ HTMConversionResult *htm_convert(const char *html,
 /**
  * Attach a vtable visitor bridge to a `ConversionOptions` options struct.
  *
- * The `HtmHtmlVisitorBridge` encapsulates a set of C function pointers that receive visit
+ * The `HtmVisitor` encapsulates a set of C function pointers that receive visit
  * callbacks during generated conversion. Call this setter before invoking the generated
  * options-field bridge wrapper to activate visitor callbacks. Pass `visitor = null` to clear
  * a previously attached visitor.
@@ -3762,11 +3762,11 @@ HTMConversionResult *htm_convert(const char *html,
  *
  * `options` must be a non-null pointer returned by `htm_conversion_options_new` (or
  * equivalent), valid for write access.  `visitor` must be a non-null pointer returned by
- * `htm_htm_html_visitor_bridge_new`, or null.  Both must remain valid for the duration of any
+ * `htm_visitor_create`, or null.  Both must remain valid for the duration of any
  * subsequent options-field bridge wrapper call.
  */
 void htm_options_set_visitor(HTMConversionOptions *options,
-                             struct HTMHtmHtmlVisitorBridge *visitor);
+                             struct HTMHtmVisitor *visitor);
 
 /**
  * Create a new visitor handle from a callbacks struct.

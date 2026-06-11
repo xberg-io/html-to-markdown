@@ -189,14 +189,14 @@ fn patch_published_loader() {
 }
 
 /// Rewrite FRB-emitted `handler.executeSync(SyncTask(...))` calls into
-/// `SyncTask(...).executeSync()` form, but ONLY inside service-API methods
-/// whose signature contains a callback-function parameter (`Function(`).
+/// `SyncTask(...).executeSync()` form, but ONLY inside methods whose
+/// signature contains a callback parameter literally named `handler`.
 ///
-/// Methods without a callback parameter invoke the inherited `BaseHandler`
-/// class field — which IS callable as `.executeSync(task)` and must be left
-/// untouched. The pre-rename build-script did an unconditional global string
-/// replace and corrupted those class-field calls; this scope-aware version
-/// only fires where the rewrite is needed.
+/// The check inspects the method/function signature (up to the opening brace)
+/// for both the parameter name `handler` and a callback type `Function(`.
+/// This avoids false positives: methods with other callback parameters
+/// (e.g., named `cb`) still use the inherited base-class field, which is
+/// properly callable as `.executeSync(task)` and must be left untouched.
 ///
 /// Idempotent: if no `handler.executeSync(` marker is present, exits early.
 #[allow(clippy::collapsible_if)]
@@ -254,7 +254,9 @@ fn fix_handler_executor_calls() {
             }
         }
         let block_text = lines[start..i].join("\n");
-        let rewritten = if block_text.contains("Function(") {
+        // Extract signature: text from method start up to and including the opening brace.
+        let signature_part = extract_signature(&block_text);
+        let rewritten = if signature_part.contains("handler") && signature_part.contains("Function(") {
             rewrite_executor_to_task(&block_text)
         } else {
             block_text
@@ -270,6 +272,32 @@ fn fix_handler_executor_calls() {
             println!("cargo:warning=failed to write handler-executor rewrite: {err}");
         }
     }
+}
+
+/// Extract the method/function signature (text before and including the opening brace).
+/// Tracks parentheses to handle multi-line signatures with complex parameter lists.
+fn extract_signature(src: &str) -> String {
+    let mut paren = 0;
+    let mut result = String::new();
+    for ch in src.chars() {
+        match ch {
+            '(' => {
+                paren += 1;
+                result.push(ch);
+            }
+            ')' => {
+                result.push(ch);
+                paren -= 1;
+            }
+            '{' if paren == 0 => {
+                // Only treat `{` as body-start when all parens are closed.
+                result.push(ch);
+                break;
+            }
+            _ => result.push(ch),
+        }
+    }
+    result
 }
 
 fn rewrite_executor_to_task(src: &str) -> String {
@@ -321,4 +349,75 @@ fn matching_paren(src: &str, open: usize) -> Option<usize> {
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn extract_signature_stops_at_opening_brace() {
+        let src = "void foo(int x) { return x; }";
+        let sig = extract_signature(src);
+        assert_eq!(sig, "void foo(int x) {");
+    }
+
+    #[test]
+    fn extract_signature_with_callback_param() {
+        let src = r#"int crateServiceApiAppConnect({
+    required App that,
+    required String path,
+    required FutureOr<String> Function(String) cb,
+  }) {
+    return handler.executeSync(SyncTask(...));
+  }"#;
+        let sig = extract_signature(src);
+        assert!(
+            sig.contains("Function("),
+            "signature should contain Function( for callback param"
+        );
+        assert!(sig.contains("{"), "signature should include opening brace");
+    }
+
+    #[test]
+    fn extract_signature_without_callback_param() {
+        let src = r#"void crateServiceApiAppConfig({
+    required App that,
+    required ServerConfig config,
+  }) {
+    return handler.executeSync(SyncTask(...));
+  }"#;
+        let sig = extract_signature(src);
+        assert!(
+            !sig.contains("Function("),
+            "signature should not contain Function( when no callback"
+        );
+        assert!(sig.contains("{"), "signature should include opening brace");
+    }
+
+    #[test]
+    fn extract_signature_multiline_complex_params() {
+        let src = "void method(int a, String b, List<Map<String, int>> c) { /* body */ }";
+        let sig = extract_signature(src);
+        assert!(sig.ends_with("{"), "should end with opening brace");
+        assert!(
+            sig.contains("method("),
+            "should contain method name and param list start"
+        );
+    }
+
+    #[test]
+    fn extract_signature_ignores_function_in_body() {
+        // The pattern "Function(" in a comment or nested type in the body should not affect signature extraction.
+        let src = r#"void process(String data) {
+    // This comment mentions Function(String) but it's in the body
+    return handleData();
+  }"#;
+        let sig = extract_signature(src);
+        assert!(
+            !sig.contains("Function("),
+            "signature extraction should stop before body"
+        );
+        assert_eq!(sig, "void process(String data) {");
+    }
 }
