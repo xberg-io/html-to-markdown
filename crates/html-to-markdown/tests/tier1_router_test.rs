@@ -49,13 +49,15 @@ fn classify_routes_tier1_when_clean_and_extract_metadata_false() {
     assert_eq!(choice, RouterDecision::Tier1);
 }
 
-// ── 3. Custom elements force Tier-2 ─────────────────────────────────────────
+// ── 3. Custom elements no longer gate routing (Phase FF) ────────────────────
 
 #[test]
-fn classify_tier2_on_custom_elements() {
+fn classify_tier1_on_custom_elements() {
+    // Phase FF dropped the had_custom_elements router gate; Tier-1's
+    // skip-subtree dispatch handles unknown custom elements natively.
     let opts = minimal_options();
     let choice = route("<my-widget>foo</my-widget>", &opts);
-    assert_eq!(choice, RouterDecision::Tier2);
+    assert_eq!(choice, RouterDecision::Tier1);
 }
 
 // ── 4. CDATA forces Tier-2 ──────────────────────────────────────────────────
