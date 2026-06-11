@@ -7,6 +7,7 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run tests");
     const ffi_path = b.option([]const u8, "ffi_path", "Path to directory containing libhtml_to_markdown_ffi") orelse "../../target/release";
     const ffi_include = b.option([]const u8, "ffi_include_path", "Path to directory containing FFI header") orelse "../../crates/html-to-markdown-ffi/include";
+    const ffi_path_abs = b.pathFromRoot(ffi_path);
 
     const html_to_markdown_rs_module = b.addModule("html_to_markdown_rs", .{
         .root_source_file = b.path("../../packages/zig/src/html_to_markdown_rs.zig"),
@@ -17,6 +18,7 @@ pub fn build(b: *std.Build) void {
     html_to_markdown_rs_module.addLibraryPath(.{ .cwd_relative = ffi_path });
     html_to_markdown_rs_module.addIncludePath(.{ .cwd_relative = ffi_include });
     html_to_markdown_rs_module.linkSystemLibrary("html_to_markdown_ffi", .{});
+    html_to_markdown_rs_module.addRPath(.{ .cwd_relative = ffi_path_abs });
 
     const conversion_module = b.createModule(.{
         .root_source_file = b.path("src/conversion_test.zig"),
@@ -30,6 +32,7 @@ pub fn build(b: *std.Build) void {
         .root_module = conversion_module,
         .use_llvm = true,
     });
+    conversion_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const conversion_run = b.addRunArtifact(conversion_tests);
     test_step.dependOn(&conversion_run.step);
 
@@ -45,6 +48,7 @@ pub fn build(b: *std.Build) void {
         .root_module = edge_cases_module,
         .use_llvm = true,
     });
+    edge_cases_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const edge_cases_run = b.addRunArtifact(edge_cases_tests);
     test_step.dependOn(&edge_cases_run.step);
 
@@ -60,6 +64,7 @@ pub fn build(b: *std.Build) void {
         .root_module = metadata_module,
         .use_llvm = true,
     });
+    metadata_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const metadata_run = b.addRunArtifact(metadata_tests);
     test_step.dependOn(&metadata_run.step);
 
@@ -75,6 +80,7 @@ pub fn build(b: *std.Build) void {
         .root_module = options_module,
         .use_llvm = true,
     });
+    options_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const options_run = b.addRunArtifact(options_tests);
     test_step.dependOn(&options_run.step);
 
@@ -90,6 +96,7 @@ pub fn build(b: *std.Build) void {
         .root_module = real_world_module,
         .use_llvm = true,
     });
+    real_world_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const real_world_run = b.addRunArtifact(real_world_tests);
     test_step.dependOn(&real_world_run.step);
 
@@ -105,6 +112,7 @@ pub fn build(b: *std.Build) void {
         .root_module = result_module,
         .use_llvm = true,
     });
+    result_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const result_run = b.addRunArtifact(result_tests);
     test_step.dependOn(&result_run.step);
 
@@ -120,6 +128,7 @@ pub fn build(b: *std.Build) void {
         .root_module = smoke_module,
         .use_llvm = true,
     });
+    smoke_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const smoke_run = b.addRunArtifact(smoke_tests);
     test_step.dependOn(&smoke_run.step);
 
@@ -135,6 +144,7 @@ pub fn build(b: *std.Build) void {
         .root_module = structure_module,
         .use_llvm = true,
     });
+    structure_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const structure_run = b.addRunArtifact(structure_tests);
     test_step.dependOn(&structure_run.step);
 
@@ -150,6 +160,7 @@ pub fn build(b: *std.Build) void {
         .root_module = visitor_module,
         .use_llvm = true,
     });
+    visitor_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
     const visitor_run = b.addRunArtifact(visitor_tests);
     test_step.dependOn(&visitor_run.step);
 

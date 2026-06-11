@@ -1197,16 +1197,23 @@ fn open_table_row(state: &mut Tier1State) {
 
 fn open_table_cell(
     state: &mut Tier1State,
-    _attrs: &[(&[u8], Option<&[u8]>)],
+    attrs: &[(&[u8], Option<&[u8]>)],
     is_header: bool,
 ) -> Result<(), BailReason> {
-    // rowspan/colspan are now accepted — emit the cell content as a single
-    // Markdown cell (lossy: a spanned cell appears once, not repeated).
-    // This matches mdream and most converters.  The cell text is still
-    // trimmed and pipe-escaped by close_table_cell.
+    // rowspan: accepted but not expanded (lossy — a spanned cell renders once,
+    // matching mdream).  colspan: expanded by `close_table_cell` adding
+    // `(colspan - 1)` empty cells so Tier-2's column-count expectations are
+    // met (without this, infobox-style `<th colspan="2">` rows trigger Tier-2's
+    // layout-table fallback in close_table on what should be a normal GFM table).
+    let colspan = find_attr(attrs, b"colspan")
+        .and_then(|b| std::str::from_utf8(b).ok())
+        .and_then(|s| s.parse::<u16>().ok())
+        .unwrap_or(1)
+        .max(1);
     if let Some(ts) = state.table_stack.last_mut() {
         ts.current_cell.clear();
         ts.in_cell = true;
+        ts.current_cell_colspan = colspan;
         if is_header {
             ts.has_th = true;
         }
@@ -1239,14 +1246,13 @@ fn emit_void(
 
         TagKind::LineBreak => {
             // `<br>` outside any block context emits nothing (Tier-2 behaviour).
-            // Inside a table cell: emit a single space.  Tier-2 collects all cell
-            // text via walk_node and then calls `text.replace('\n', " ")`; `<br>`
-            // emits `  \n` during walk, which becomes `   ` after replacement.
-            // A single space is close enough for oracle-level equivalence and is
-            // what mdream emits.
+            // Inside a table cell: emit three spaces — Tier-2 walks `<br>` to
+            // `"  \n"` then `cell_text.replace('\n', " ")` turns it into `"   "`
+            // (three spaces).  Matching that exactly is required for byte-equality
+            // on cell-padding-sensitive fixtures (e.g. wikipedia/tables_countries).
             // Inside a regular block (paragraph, div, etc.) emit `  \n`.
             if state.in_table_cell() {
-                state.cell_or_output_mut().push(' ');
+                state.cell_or_output_mut().push_str("   ");
             } else if state.stack.is_empty() {
                 // bare `<br>` at top level — Tier-2 emits nothing
             } else {
@@ -2286,7 +2292,14 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
         return Err(BailReason::TableBlockChildInCell);
     }
     ts.current_row.push(cell_text);
+    // Expand colspan: add (colspan - 1) empty cells so the row's column
+    // count matches Tier-2's expanded view.  See state.rs for the rationale.
+    let extra = ts.current_cell_colspan.saturating_sub(1);
+    for _ in 0..extra {
+        ts.current_row.push(String::new());
+    }
     ts.current_cell.clear();
+    ts.current_cell_colspan = 1;
     Ok(())
 }
 

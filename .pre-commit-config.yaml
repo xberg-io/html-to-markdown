@@ -15,7 +15,7 @@ repos:
   # Temporarily pinned to v2.0.0 while v2.1.x strict-hook policy is stabilised
   # (palantir-java-format / pmd / yard-coverage upstream-JAR issues + h2m
   # exclude-set churn). Re-bump and tune excludes in a follow-up.
-  rev: v2.1.6
+  rev: v2.1.10
   hooks:
     # Alef verification
     - id: alef-verify

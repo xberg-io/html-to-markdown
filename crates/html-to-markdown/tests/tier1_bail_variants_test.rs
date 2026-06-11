@@ -65,9 +65,11 @@ fn should_handle_table_rowspan_greater_than_one() {
 #[test]
 fn should_handle_table_colspan_greater_than_one() {
     let html = "<table><tr><th colspan=\"3\">Header</th></tr></table>";
-    // Tier-1 must not bail.  The cell content is emitted once (lossy:
-    // Tier-2 emits extra empty cells for each colspan count; Tier-1 does not).
-    tier1_run(html).expect("Tier-1 should not bail on colspan");
+    // Tier-1 expands colspan by appending (colspan - 1) empty cells to the
+    // row so the column count matches Tier-2's expanded view.  Output must
+    // be byte-identical to Tier-2.
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on colspan");
+    assert_eq!(t1, tier2(html), "colspan output must match Tier-2");
 }
 
 #[test]
@@ -103,13 +105,12 @@ fn should_handle_div_in_table_cell() {
 
 #[test]
 fn should_handle_br_in_table_cell() {
-    // <br> in a cell is now emitted as a space (no bail).
-    // Tier-2 replaces the `  \n` from walk_node with spaces; Tier-1 emits a
-    // single space.  The outputs differ slightly on this synthetic — the oracle
-    // passes because real fixtures that exercise <br>-in-cells still bail for
-    // other reasons.  We assert only that Tier-1 does not bail.
+    // `<br>` in a cell emits three spaces — Tier-2 walks `<br>` to `"  \n"`
+    // then `cell_text.replace('\n', " ")` produces `"   "` (three spaces).
+    // Tier-1 emits the same three spaces directly to match byte-for-byte.
     let html = "<table><tr><td>line1<br>line2</td></tr></table>";
-    tier1_run(html).expect("Tier-1 should not bail on <br> in cell");
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on <br> in cell");
+    assert_eq!(t1, tier2(html), "<br>-in-cell output must match Tier-2");
 }
 
 #[test]

@@ -73,6 +73,17 @@ pub struct TableState {
     /// rendering legitimately introduces unescaped `|` characters that
     /// Tier-2 also emits without escaping.
     pub had_nested_table: bool,
+    /// `colspan` attribute on the currently-open `<td>`/`<th>`.
+    ///
+    /// Defaults to 1.  On `</td>` / `</th>` close, `close_table_cell` pushes
+    /// `(colspan - 1)` additional empty cells onto `current_row` so the row
+    /// has the same column count Tier-2 sees after expanding colspan in
+    /// `block/table/cells.rs`.  Without this expansion, infobox-style tables
+    /// where a header row uses `<th colspan="2">Title</th>` would render as
+    /// one column while the rest of the table has two, triggering Tier-2's
+    /// layout-table fallback in close_table on what should be a normal GFM
+    /// table (e.g. wikipedia/large_rust infobox).
+    pub current_cell_colspan: u16,
 }
 
 bitflags::bitflags! {
