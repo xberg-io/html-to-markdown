@@ -311,19 +311,16 @@ fn test_list_in_cell_handled_natively() {
     assert_eq!(t1, tier2(html), "<ul>-in-cell output must match Tier-2");
 }
 
-/// Test 18: nested `<table>` → `TableNestedTable`.
+/// Test 18: nested `<table>` — Phase HH: flattened inline into the outer cell.
+/// Tier-1 no longer bails; it inlines the nested table as pipe-separated text.
 #[test]
-fn test_bail_nested_table() {
+fn test_nested_table_flattened_natively() {
     let html = "<table>\
         <tr><th>H</th></tr>\
         <tr><td><table><tr><td>inner</td></tr></table></td></tr>\
     </table>";
-    let err = tier1_run(html).unwrap_err();
-    assert!(
-        matches!(err, BailReason::TableNestedTable),
-        "expected TableNestedTable, got {err:?}"
-    );
-    assert_eq!(tier1(html), tier2(html));
+    let t1 = tier1_run(html).expect("Tier-1 should not bail on nested table (Phase HH)");
+    assert_eq!(t1, tier2(html), "nested-table output must match Tier-2");
 }
 
 /// Test 19: `<caption>` — Phase F: now handled natively; no bail.
