@@ -2323,6 +2323,9 @@ fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
         if inconsistent_cols || link_heavy || is_blank {
             // Tier-2 would not emit a GFM table here.
             // Bail so the fallback produces the correct layout output.
+            // Phase L (Tier-1 emit_layout_table) is gated by link-title
+            // entity preservation (`&quot;` decoded vs raw); deferred until
+            // the title attribute partial-decode logic lands.
             return Err(BailReason::Classifier);
         }
     }
@@ -3250,8 +3253,66 @@ fn byte_value_has_nav_keyword(value: &[u8]) -> bool {
 /// Extract `href` and `title` from the attribute list for a link.
 fn extract_link_attrs(attrs: &[(&[u8], Option<&[u8]>)]) -> Result<(Option<String>, Option<String>), BailReason> {
     let href = find_attr(attrs, b"href").map(decode_attr).transpose()?;
-    let title = find_attr(attrs, b"title").map(decode_attr).transpose()?;
+    // Mirror Tier-2's `inline/link.rs:82` which captures the title attribute
+    // via tl::parse's `as_utf8_str()` — tl decodes numeric entities
+    // (`&#039;` → `'`) but preserves named entities (`&amp;`, `&quot;`,
+    // `&lt;`).  Use a partial-decode pass for titles to match.
+    let title = find_attr(attrs, b"title").map(decode_title_attr).transpose()?;
     Ok((href, title))
+}
+
+/// Decode a link-title attribute: numeric entities (`&#NNN;`, `&#xNNN;`)
+/// resolve to characters, named entities (`&amp;`, `&quot;`, etc.) survive
+/// as-is.  Mirrors tl::parse's `as_utf8_str()` behaviour on attribute values.
+fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
+    let s = std::str::from_utf8(bytes).map_err(|_| BailReason::Classifier)?;
+    if !s.contains("&#") {
+        return Ok(s.to_owned());
+    }
+    let mut out = String::with_capacity(s.len());
+    let mut i = 0;
+    let bytes = s.as_bytes();
+    while i < bytes.len() {
+        if bytes[i] != b'&' {
+            out.push(bytes[i] as char);
+            i += 1;
+            continue;
+        }
+        if i + 1 >= bytes.len() || bytes[i + 1] != b'#' {
+            // Named entity or stray `&`: preserve.
+            out.push('&');
+            i += 1;
+            continue;
+        }
+        // Numeric entity: find the terminating `;`.
+        let entity_start = i;
+        let mut j = i + 2;
+        while j < bytes.len() && bytes[j] != b';' {
+            j += 1;
+        }
+        if j >= bytes.len() {
+            // Unterminated entity: preserve literal bytes.
+            out.push_str(&s[entity_start..]);
+            break;
+        }
+        let body = &s[i + 2..j];
+        let cp_opt = if let Some(hex) = body.strip_prefix(['x', 'X']) {
+            u32::from_str_radix(hex, 16).ok()
+        } else {
+            body.parse::<u32>().ok()
+        };
+        if let Some(cp) = cp_opt {
+            if let Some(ch) = char::from_u32(cp) {
+                out.push(ch);
+                i = j + 1;
+                continue;
+            }
+        }
+        // Failed to decode: preserve literal `&#…;`.
+        out.push_str(&s[entity_start..=j]);
+        i = j + 1;
+    }
+    Ok(out)
 }
 
 /// Extract `start` attribute from `<ol>` (defaults to 1).
