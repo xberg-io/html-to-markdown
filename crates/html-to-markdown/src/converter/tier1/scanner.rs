@@ -2321,11 +2321,10 @@ fn close_table(state: &mut Tier1State) -> Result<(), BailReason> {
         let is_blank = ts.rows.is_empty() || ts.rows.iter().all(|r| r.iter().all(|(c, _)| c.trim().is_empty()));
 
         if inconsistent_cols || link_heavy || is_blank {
-            // Tier-2 would not emit a GFM table here.
-            // Bail so the fallback produces the correct layout output.
-            // Phase L (Tier-1 emit_layout_table) is gated by link-title
-            // entity preservation (`&quot;` decoded vs raw); deferred until
-            // the title attribute partial-decode logic lands.
+            // Tier-2 would not emit a GFM table here.  Bail so the fallback
+            // produces the correct layout output.  Phase L's full layout
+            // emit deferred — needs more careful per-cell content tracking
+            // to mirror Tier-2's walker exactly.
             return Err(BailReason::Classifier);
         }
     }
@@ -3270,32 +3269,38 @@ fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
         return Ok(s.to_owned());
     }
     let mut out = String::with_capacity(s.len());
+    let bytes_s = s.as_bytes();
     let mut i = 0;
-    let bytes = s.as_bytes();
-    while i < bytes.len() {
-        if bytes[i] != b'&' {
-            out.push(bytes[i] as char);
-            i += 1;
-            continue;
+    while i < bytes_s.len() {
+        // Find next `&` (entity start) via memchr.
+        let Some(rel) = memchr::memchr(b'&', &bytes_s[i..]) else {
+            // No more entities: bulk-copy the rest (preserves UTF-8 sequences).
+            out.push_str(&s[i..]);
+            break;
+        };
+        let amp_pos = i + rel;
+        if amp_pos > i {
+            out.push_str(&s[i..amp_pos]);
         }
-        if i + 1 >= bytes.len() || bytes[i + 1] != b'#' {
-            // Named entity or stray `&`: preserve.
+        if amp_pos + 1 >= bytes_s.len() || bytes_s[amp_pos + 1] != b'#' {
+            // Named entity (or stray `&`): preserve the `&` literal and
+            // continue scanning after it; the named-entity name itself is
+            // ASCII so per-byte advancement is safe.
             out.push('&');
-            i += 1;
+            i = amp_pos + 1;
             continue;
         }
-        // Numeric entity: find the terminating `;`.
-        let entity_start = i;
-        let mut j = i + 2;
-        while j < bytes.len() && bytes[j] != b';' {
+        // Numeric entity: find the terminating `;` (always within ASCII range).
+        let mut j = amp_pos + 2;
+        while j < bytes_s.len() && bytes_s[j] != b';' {
             j += 1;
         }
-        if j >= bytes.len() {
-            // Unterminated entity: preserve literal bytes.
-            out.push_str(&s[entity_start..]);
+        if j >= bytes_s.len() {
+            // Unterminated: preserve literal `&` and everything after.
+            out.push_str(&s[amp_pos..]);
             break;
         }
-        let body = &s[i + 2..j];
+        let body = &s[amp_pos + 2..j];
         let cp_opt = if let Some(hex) = body.strip_prefix(['x', 'X']) {
             u32::from_str_radix(hex, 16).ok()
         } else {
@@ -3309,7 +3314,7 @@ fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
             }
         }
         // Failed to decode: preserve literal `&#…;`.
-        out.push_str(&s[entity_start..=j]);
+        out.push_str(&s[amp_pos..=j]);
         i = j + 1;
     }
     Ok(out)
