@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "^22 || ^24"
+  },
   "scripts": {
     "test": "vitest run"
   },
   "devDependencies": {
-    "@kreuzberg/html-to-markdown": "^3.6.0-rc.24",
+    "@kreuzberg/html-to-markdown": "^3.6.0-rc.25",
     "@types/node": "^22.10.2",
     "vitest": "^4.1.5"
   }
