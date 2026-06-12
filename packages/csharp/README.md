@@ -118,7 +118,7 @@ Basic conversion:
 using HtmlToMarkdown;
 
 var html = "<h1>Hello World</h1><p>This is a paragraph.</p>";
-var result = HtmlToMarkdownConverter.Convert(html);
+var result = HtmlToMarkdownRs.Convert(html);
 Console.WriteLine(result.Content);
 ```
 
@@ -136,7 +136,7 @@ var options = new ConversionOptions
 };
 
 var html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>";
-var result = HtmlToMarkdownConverter.Convert(html, options);
+var result = HtmlToMarkdownRs.Convert(html, options);
 Console.WriteLine(result.Content);
 ```
 

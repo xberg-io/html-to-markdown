@@ -28,15 +28,15 @@
 
 ## Installation snippets
 
-- Rust: `html-to-markdown-rs = "3.4"` in Cargo.toml (Rust ≥ 1.85).
+- Rust: `html-to-markdown-rs = "3.6"` in Cargo.toml (Rust ≥ 1.85).
 - Python: `pip install html-to-markdown` (Python ≥ 3.10).
 - TypeScript: `npm install @kreuzberg/html-to-markdown` (Node ≥ 18).
 - Go: `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` (Go ≥ 1.26).
-- Ruby: `gem 'html-to-markdown', '~> 3.4'` (Ruby ≥ 3.2).
+- Ruby: `gem 'html-to-markdown', '~> 3.6'` (Ruby ≥ 3.2).
 - PHP: `composer require kreuzberg-dev/html-to-markdown` (PHP ≥ 8.2).
-- Java: Maven artifact `dev.kreuzberg:html-to-markdown:3.4.0` (Java ≥ 25).
+- Java: Maven artifact `dev.kreuzberg:html-to-markdown:3.6.0` (Java ≥ 25).
 - C#: `dotnet add package KreuzbergDev.HtmlToMarkdown` (.NET 10).
-- Elixir: `{:html_to_markdown, "~> 3.4"}` in mix.exs (Elixir ≥ 1.14).
+- Elixir: `{:html_to_markdown, "~> 3.6"}` in mix.exs (Elixir ≥ 1.14).
 - R: `install.packages("htmltomarkdown")` (R ≥ 4.1).
 - WebAssembly: `npm install @kreuzberg/html-to-markdown-wasm`.
 - C: shared library + header from GitHub Releases; HTM_H header, `htm_*` symbols.

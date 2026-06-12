@@ -29,7 +29,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     ```toml
     [dependencies]
-    html-to-markdown-rs = "3.4"
+    html-to-markdown-rs = "3.6"
     ```
 
     Or via `cargo add`:
@@ -64,10 +64,10 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
     ```toml
     # With visitor support
-    html-to-markdown-rs = { version = "3.4", features = ["visitor"] }
+    html-to-markdown-rs = { version = "3.6", features = ["visitor"] }
 
     # Everything
-    html-to-markdown-rs = { version = "3.4", features = ["full"] }
+    html-to-markdown-rs = { version = "3.6", features = ["full"] }
     ```
 
 === "Python"
@@ -153,7 +153,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     Or add to your `Gemfile`:
 
     ```ruby
-    gem 'html-to-markdown', '~> 3.4'
+    gem 'html-to-markdown', '~> 3.6'
     ```
 
     **Verify:**
@@ -194,20 +194,20 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     <dependency>
         <groupId>dev.kreuzberg</groupId>
         <artifactId>html-to-markdown</artifactId>
-        <version>3.4.0</version>
+        <version>3.6.0</version>
     </dependency>
     ```
 
     **Gradle** — add to `build.gradle`:
 
     ```groovy
-    implementation 'dev.kreuzberg:html-to-markdown:3.4.0'
+    implementation 'dev.kreuzberg:html-to-markdown:3.6.0'
     ```
 
     Or Kotlin DSL (`build.gradle.kts`):
 
     ```kotlin
-    implementation("dev.kreuzberg:html-to-markdown:3.4.0")
+    implementation("dev.kreuzberg:html-to-markdown:3.6.0")
     ```
 
     **Verify:**

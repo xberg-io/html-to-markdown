@@ -831,7 +831,7 @@ version = "3.6.0"
 # in v0.22.1) — the generator emits a STALE comment in build.zig.zon and the
 # zig fetch flow auto-recomputes the real multihash at consume time. Update
 # after publishing the first zig tarball: `zig fetch --save <release-url>`.
-hash = "html-to-markdown-3.5.0-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
+hash = "html-to-markdown-3.6.0-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
 
 [crates.e2e.registry.packages.php_ext]
 name = "kreuzberg-dev/html-to-markdown"
@@ -1395,7 +1395,7 @@ output_path = "packages/kotlin-android/README.md"
 package_manager = ["gradle", "maven"]
 package_name = "dev.kreuzberg:html-to-markdown-android"
 install_command = """
-implementation("dev.kreuzberg:html-to-markdown-android:3.5.0")"""
+implementation("dev.kreuzberg:html-to-markdown-android:3.6.0")"""
 description = """
 High-performance HTML to Markdown converter for Android, packaged as an AAR with bundled JNI libraries for `arm64-v8a` and `x86_64`.
 Server-side Kotlin/JVM consumers should use the `dev.kreuzberg:html-to-markdown` Java package directly — Kotlin/JVM treats Java classes as native, and Panama FFM is unavailable on Android, which is why Android ships as its own artifact.
@@ -1423,7 +1423,7 @@ output_path = "packages/swift/README.md"
 package_manager = ["spm"]
 package_name = "HtmlToMarkdown"
 install_command = """
-.package(url: "https://github.com/kreuzberg-dev/html-to-markdown.git", from: "3.5.0")"""
+.package(url: "https://github.com/kreuzberg-dev/html-to-markdown.git", from: "3.6.0")"""
 description = """
 High-performance HTML to Markdown converter for Swift via `swift-bridge`. Distributed through the Swift Package Manager; targets macOS 13+ and iOS 16+.
 Ship identical Markdown across every runtime while keeping idiomatic Swift APIs and Codable-friendly result types.
@@ -1480,7 +1480,7 @@ output_path = "packages/zig/README.md"
 package_manager = ["zig"]
 package_name = "html_to_markdown"
 install_command = """
-zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.5.0/zig.tar.gz"""
+zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0/zig.tar.gz"""
 description = """
 High-performance HTML to Markdown converter for Zig, consuming the existing C FFI surface (`libhtml_to_markdown_ffi`) via `linkSystemLibrary`. Idiomatic error sets, slice-based memory management, requires Zig 0.16+.
 Distributed via GitHub Releases — pin a tag in `build.zig.zon` and `zig fetch` handles the rest.

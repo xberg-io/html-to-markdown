@@ -118,7 +118,7 @@ Classes live in the flat `HtmlToMarkdown\` namespace. `HtmlToMarkdown::convert` 
 <dependency>
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.4.0</version>
+    <version>3.6.0</version>
 </dependency>
 ```
 
