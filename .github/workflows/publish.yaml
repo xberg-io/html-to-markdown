@@ -966,12 +966,22 @@ jobs:
               echo "::group::rake build"
               bundle exec rake build
               echo "::endgroup::"
+              echo "::group::rake native gem"
+              bundle exec rake native gem
+              echo "::endgroup::"
             '
           else
-            # Native build on matching architecture
+            # Native build on matching architecture. `rake build` only emits the
+            # source gem (spec.platform = "ruby"); `rake native gem` packages the
+            # compiled extension into a platform-tagged gem
+            # (e.g. html-to-markdown-X.Y.Z-aarch64-linux.gem). Build both so
+            # `Drop source gem on non-canonical builders` below can keep only the
+            # platform gem on non-linux runners while linux ships the source gem
+            # alongside its platform variant.
             cd packages/ruby
             bundle exec rake compile
             bundle exec rake build
+            bundle exec rake native gem
           fi
 
       - name: Drop source gem on non-canonical builders
