@@ -966,22 +966,12 @@ jobs:
               echo "::group::rake build"
               bundle exec rake build
               echo "::endgroup::"
-              echo "::group::rake native gem"
-              bundle exec rake native gem
-              echo "::endgroup::"
             '
           else
-            # Native build on matching architecture. `rake build` only emits the
-            # source gem (spec.platform = "ruby"); `rake native gem` packages the
-            # compiled extension into a platform-tagged gem
-            # (e.g. html-to-markdown-X.Y.Z-aarch64-linux.gem). Build both so
-            # `Drop source gem on non-canonical builders` below can keep only the
-            # platform gem on non-linux runners while linux ships the source gem
-            # alongside its platform variant.
+            # Native build on matching architecture
             cd packages/ruby
             bundle exec rake compile
             bundle exec rake build
-            bundle exec rake native gem
           fi
 
       - name: Drop source gem on non-canonical builders
@@ -2328,6 +2318,47 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
+  # ─── Promote release out of draft (early) ─────────────────────────────
+  #
+  # homebrew-bottles runs `brew install --build-bottle` which fetches the CLI
+  # source tarball from the formula's URL block (https://github.com/.../releases/
+  # download/<tag>/cli-<triple>.tar.gz). Draft releases 404 on the public
+  # download URL, so the bottle build cannot succeed while the release is still
+  # draft. release-finalize at the end of the workflow is the canonical
+  # draft→published promoter, but it gates on homebrew-bottles itself — a
+  # deadlock. Promote the release here, once the CLI + FFI asset uploads have
+  # landed, then let release-finalize re-edit draft=false idempotently as the
+  # canonical home for Go-module tagging + prerelease flag.
+  promote-release:
+    name: Publish GitHub Release from draft
+    needs:
+      - prepare
+      - upload-cli-release
+      - upload-c-ffi-release
+      - upload-go-release
+      - upload-swift-release
+      - upload-elixir-release
+      - upload-php-pie-release
+      - upload-r-release
+    if: |
+      needs.prepare.outputs.is_tag == 'true' &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.upload-cli-release.result == 'success' &&
+      needs.upload-c-ffi-release.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: kreuzberg-dev
+      - name: Flip release out of draft
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release edit "${{ needs.prepare.outputs.tag }}" --draft=false
+
   # ─── Homebrew (formula update + bottles) ──────────────────────────────
   #
   # Topology (mirrors kreuzberg's; html-to-markdown ships TWO formulas):
@@ -2401,11 +2432,15 @@ jobs:
 
   homebrew-bottles:
     name: Build Homebrew bottle (${{ matrix.bottle_tag }})
-    needs: [prepare, publish-homebrew-formula]
+    needs: [prepare, publish-homebrew-formula, promote-release]
     # Skipped on dry-run: `brew install --build-bottle` downloads CLI/FFI source
     # tarballs from the GitHub Release, which doesn't exist on dry-run (formula
     # is rendered locally only; tap isn't pushed). Real-release runs cover this.
-    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success' }}
+    # Gates on promote-release so the release is published (not draft) by the
+    # time `brew install` hits the formula's URL block; v3.6.0 saw all 4 bottles
+    # 404 because release-finalize was the only draft→public promoter and it
+    # waited on the bottles themselves.
+    if: ${{ needs.prepare.outputs.release_homebrew == 'true' && needs.prepare.outputs.is_tag == 'true' && needs.prepare.outputs.dry_run != 'true' && needs.publish-homebrew-formula.result == 'success' && needs.promote-release.result == 'success' }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
