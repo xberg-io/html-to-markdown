@@ -5,7 +5,7 @@ All notable changes to html-to-markdown will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.6.3] - 2026-06-13
+## [3.6.2] - 2026-06-13
 
 ### Fixed
 
@@ -13,19 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **NAPI `convert`: visitor callbacks now fire when passed via `options.visitor`.** The generated `convert(html, options)` shim previously declared a third standalone `visitor` parameter and used it directly while ignoring `options.visitor`. The TypeScript surface advertises a single uniform entry point — `convert(html, { visitor: { … } })` — so visitor callbacks routed through `options` were silently dropped. Fixed in alef v0.24.16; the standalone parameter is gone and `options.visitor` is the sole source. Closes #395.
 
+- **NAPI options-field bridge: drop unused `mut` on the closure binding.** The generated `convert(html, options)` shim's `Option<JsConversionOptions>.map(|o| …)` closure moved `o` straight into `o.into()` without mutating the binding, so `mut o` triggered `warn(unused_mut)` on `crates/html-to-markdown-node/src/lib.rs`. Fixed in alef v0.24.17 by dropping `mut` from the napi-side closure binding; the wasm-side template is unchanged because it does mutate `o.visitor` before the `into()` call.
+
 - **Ruby: precompiled-gem ABI fallback to source-gem.** The `cross_compile_versions` list in the Magnus Rakefile template now targets Ruby 3.5/3.4/3.3/3.2 (dropping 3.1, adding 3.5), and the gemspec `required_ruby_version` bounds the upper edge with `>= 3.2.0, < 4.0`. On Ruby 4.0+ / 4.1.0dev, RubyGems now refuses the precompiled platform gem and falls back to the source gem, eliminating `incompatible ABI version of binary` load failures on prerelease ABIs. Closes #405, #409.
 
 - **C# / Kotlin Android: wrapper class renamed `HtmlToMarkdownRs` → `HtmlToMarkdownConverter`.** The previous `…Rs` suffix was Rust-implementation-bleed in the public binding surface. The new name is idiomatic for both ecosystems and matches the names already used in our hand-written docs. **BREAKING for downstream C# / Kotlin-Android consumers**: apply `s/HtmlToMarkdownRs/HtmlToMarkdownConverter/g` to source code that imported or invoked the wrapper. Closes #408.
 
 - **PHP PIE: macOS install resolves the extension at the archive root.** `pie install kreuzberg-dev/html-to-markdown` on macOS arm64 previously failed because the staged extension was named `html_to_markdown.so` while PIE's `UnixBuild` probes for `<extname>.<dylib_ext>` on macOS. The publish workflow now stages the extension as `html_to_markdown.dylib` on macOS targets and `.so` on Linux, restoring PIE installs on Apple Silicon and Intel Macs. Closes #334.
-
-### Added
-
-- **CITATION.cff `date-released:` auto-stamped.** `alef sync-versions --release-date YYYY-MM-DD` now stamps the release date directly into the workspace-generated `CITATION.cff`, eliminating the prior hand-edit step at release-cut time. The release date for v3.6.3 is `2026-06-13`. Closes #327.
-
-## [3.6.2] - 2026-06-13
-
-### Fixed
 
 - **Python wheel: `HtmlVisitor` trait-bridge runtime-import resolved.** alef's pyo3 trait-marker-class emitter creates `_Trait{Name}Marker` types in the DTO module (`visitor.rs`) to satisfy TypeScript/Ruby/etc. downstream trait surface generation. The PyO3 bridge uses these markers as import-path sentinels, but h2m's `ConversionOptions` visitor field only became public in v3.6.1 after its prior conditional `#[cfg(feature = "visitor")]` gate was removed. Wheels shipped without the marker import working, causing `ImportError: cannot import name '_TraitHtmlVisitorMarker'` at runtime when user code called `convert(..., visitor)`. Fixed in alef v0.21.0 (marker-import path resolved from the actual DTO module).
 
@@ -34,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **R tarball: GitHub-release install fixed.** The CRAN tarball sources from GitHub release tags when users install from `.tar.gz` source (non-CRAN edge case). The `configure` script ran `cargo` with `CARGO_HOME=...` override to redirect vendor offline access, but `cargo vendor` itself does not honor `CARGO_HOME` (only cargo build does), so the offline build failed with "could not find `html-to-markdown` in the registry". extendr 0.18.1 correctly passes `--registry crates-io --offline` through to `cargo vendor`, restoring offline builds. The configure script also fixed inbound `str_as_str` imports from extendr that the v0.18.0 landing initially broke.
 
 - **Homebrew: `brew trust` prerequisite documented.** Homebrew 6.0+ (released 2026-05) requires `brew trust kreuzberg-dev/tap` before installing from the third-party tap. Updated `docs/installation.md`, `README.md`, and `test_apps/homebrew/run_tests.sh` with the trust step and explanatory note. Smoke test now calls `brew trust "$TAP" || true` before `brew bundle install`, making CI-tested on Homebrew 6.0+ environments.
+
+### Added
+
+- **CITATION.cff `date-released:` auto-stamped.** `alef sync-versions --release-date YYYY-MM-DD` now stamps the release date directly into the workspace-generated `CITATION.cff`, eliminating the prior hand-edit step at release-cut time. The release date for v3.6.2 is `2026-06-13`. Closes #327.
 
 ## [3.6.1] - 2026-06-12
 

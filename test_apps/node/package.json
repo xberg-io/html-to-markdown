@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@kreuzberg/html-to-markdown": "^3.6.3",
+    "@kreuzberg/html-to-markdown": "^3.6.2",
     "@types/node": "^22.10.2",
     "vitest": "^4.1.5"
   }
