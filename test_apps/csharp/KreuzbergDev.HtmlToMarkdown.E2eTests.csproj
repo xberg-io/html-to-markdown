@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="KreuzbergDev.HtmlToMarkdown" Version="3.6.2" />
+    <PackageReference Include="KreuzbergDev.HtmlToMarkdown" Version="3.6.3" />
   </ItemGroup>
 
   <ItemGroup>

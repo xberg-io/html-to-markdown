@@ -5,6 +5,24 @@ All notable changes to html-to-markdown will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.3] - 2026-06-13
+
+### Fixed
+
+- **Python `.pyi`: `ConversionOptions.visitor` attribute type now resolves to `HtmlVisitor | None`.** The class-attribute annotation pass in alef's pyo3 stub emitter previously printed the opaque `VisitorHandle` concrete type for `Option<dyn HtmlVisitor>` fields, while `__init__` parameters and `convert(...)` already resolved to the `HtmlVisitor` Protocol. Field-style assignment (`options.visitor = MyVisitor()`) is now type-clean under pyright/pylance. Closes #403.
+
+- **NAPI `convert`: visitor callbacks now fire when passed via `options.visitor`.** The generated `convert(html, options)` shim previously declared a third standalone `visitor` parameter and used it directly while ignoring `options.visitor`. The TypeScript surface advertises a single uniform entry point — `convert(html, { visitor: { … } })` — so visitor callbacks routed through `options` were silently dropped. Fixed in alef v0.24.16; the standalone parameter is gone and `options.visitor` is the sole source. Closes #395.
+
+- **Ruby: precompiled-gem ABI fallback to source-gem.** The `cross_compile_versions` list in the Magnus Rakefile template now targets Ruby 3.5/3.4/3.3/3.2 (dropping 3.1, adding 3.5), and the gemspec `required_ruby_version` bounds the upper edge with `>= 3.2.0, < 4.0`. On Ruby 4.0+ / 4.1.0dev, RubyGems now refuses the precompiled platform gem and falls back to the source gem, eliminating `incompatible ABI version of binary` load failures on prerelease ABIs. Closes #405, #409.
+
+- **C# / Kotlin Android: wrapper class renamed `HtmlToMarkdownRs` → `HtmlToMarkdownConverter`.** The previous `…Rs` suffix was Rust-implementation-bleed in the public binding surface. The new name is idiomatic for both ecosystems and matches the names already used in our hand-written docs. **BREAKING for downstream C# / Kotlin-Android consumers**: apply `s/HtmlToMarkdownRs/HtmlToMarkdownConverter/g` to source code that imported or invoked the wrapper. Closes #408.
+
+- **PHP PIE: macOS install resolves the extension at the archive root.** `pie install kreuzberg-dev/html-to-markdown` on macOS arm64 previously failed because the staged extension was named `html_to_markdown.so` while PIE's `UnixBuild` probes for `<extname>.<dylib_ext>` on macOS. The publish workflow now stages the extension as `html_to_markdown.dylib` on macOS targets and `.so` on Linux, restoring PIE installs on Apple Silicon and Intel Macs. Closes #334.
+
+### Added
+
+- **CITATION.cff `date-released:` auto-stamped.** `alef sync-versions --release-date YYYY-MM-DD` now stamps the release date directly into the workspace-generated `CITATION.cff`, eliminating the prior hand-edit step at release-cut time. The release date for v3.6.3 is `2026-06-13`. Closes #327.
+
 ## [3.6.2] - 2026-06-13
 
 ### Fixed

@@ -23,31 +23,6 @@ importers:
       '@napi-rs/cli':
         specifier: ^3.7.1
         version: 3.7.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.3)
-    optionalDependencies:
-      '@kreuzberg/html-to-markdown-node-darwin-arm64':
-        specifier: 3.6.1
-        version: 3.6.1
-      '@kreuzberg/html-to-markdown-node-darwin-x64':
-        specifier: 3.6.1
-        version: 3.6.1
-      '@kreuzberg/html-to-markdown-node-linux-arm64-gnu':
-        specifier: 3.6.1
-        version: 3.6.1
-      '@kreuzberg/html-to-markdown-node-linux-arm64-musl':
-        specifier: 3.5.5
-        version: 3.5.5
-      '@kreuzberg/html-to-markdown-node-linux-x64-gnu':
-        specifier: 3.6.1
-        version: 3.6.1
-      '@kreuzberg/html-to-markdown-node-linux-x64-musl':
-        specifier: 3.5.5
-        version: 3.5.5
-      '@kreuzberg/html-to-markdown-node-win32-arm64-msvc':
-        specifier: 3.6.1
-        version: 3.6.1
-      '@kreuzberg/html-to-markdown-node-win32-x64-msvc':
-        specifier: 3.6.1
-        version: 3.6.1
 
   crates/html-to-markdown-wasm: {}
 
@@ -232,58 +207,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.1':
-    resolution: {integrity: sha512-CjCwbdrTEOYFbzFrxoxlIMVurfy0rTtWBFxjSDqQKKRV4ZPb/iKsYaJxhucNf0ulJuQpObRlBh4NZHXuc/gcIg==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.1':
-    resolution: {integrity: sha512-+FjZfRyJf1w8CNEj5Y1/NG6E9RWSIdDz1dqQ7aRcyTP8mQyNTomzPeaFjgcXRLt2bYaZyt8Q7MICCDRMGrPG6Q==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.1':
-    resolution: {integrity: sha512-01kKaP51z9T6uLW2bXN7QCM53Eg8eq4wpcd/DUhHoghQdv7DdsC8GVy+6EJn9bWzl+0AwLd/ZjMjpd5UNRdjEg==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.5.5':
-    resolution: {integrity: sha512-74h8nh8cn/AcQy/o7vruwNoO2RRhtt/WNLK3fY6S5Wx98Pe99kdEper3wm4FF+6d+XGQiC5H1948s0Hs4GqmPw==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.1':
-    resolution: {integrity: sha512-6mfGoZJfaPfyy/K2nwDhuCDUzglg6f/6lalAb2N4iml/rZl//g12gqtSmX2b9L7cdEZ/rZbGgp3e/GSIhMMclw==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.5.5':
-    resolution: {integrity: sha512-StBgGvT0RpvLRmLkxmtWxkc+ExUOeP3Ajphte8lQgl02p2KieU3vdncCZBXl8F0t5f9iwVEAKqgLRp4bmDWv4w==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.1':
-    resolution: {integrity: sha512-i/bdit8sMDRM/X7VUAh0Uux6URSfT6DYSOlB5IYPLJzjGgLFCKg7LmFkw8tRVhnoLsgeJ44FR8LaTT2n9IjmLg==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.1':
-    resolution: {integrity: sha512-g6jqvRl5texIbvD6C8Gd/Nrer8+xsbOGxvVkp7I7jfwFd5MXbGqolbqqifsR15Kw/sWLMXBS5MjQkjrv3r4uPw==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [win32]
 
   '@napi-rs/cli@3.7.1':
     resolution: {integrity: sha512-7FkcxJ70SqpsYnyjaYwLVpkP3Xoyd8YkT5g7DevuEvSY7mzpLSva8oSQNENHiQ1T0GMLnae1X46KmiNIu5OXDw==}
@@ -1481,30 +1404,6 @@ snapshots:
       '@types/node': 25.9.3
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
-
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.1':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.1':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.1':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-linux-arm64-musl@3.5.5':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.1':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-linux-x64-musl@3.5.5':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.1':
-    optional: true
-
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.1':
-    optional: true
 
   '@napi-rs/cli@3.7.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.3)':
     dependencies:

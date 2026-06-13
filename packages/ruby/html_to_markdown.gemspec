@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "html-to-markdown"
-  spec.version = "3.6.2"
+  spec.version = "3.6.3"
   spec.authors       = ["Na'aman Hirschfeld <naaman@kreuzberg.dev>"]
   spec.summary       = "High-performance HTML to Markdown converter"
   spec.description   = "High-performance HTML to Markdown converter"
@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.license       = "MIT"
 
-  spec.required_ruby_version = ">= 3.2.0"
+  spec.required_ruby_version = ">= 3.2.0, < 4.0"
   spec.metadata["keywords"] = %w[converter html markdown].join(",")
   spec.metadata["rubygems_mfa_required"] = "true"
 
