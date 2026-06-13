@@ -16,16 +16,20 @@
       "default": "./index.js"
     }
   },
-  "files": ["index.js", "index.d.ts", "*.node"],
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node"
+  ],
   "optionalDependencies": {
-    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-darwin-x64": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.6.2",
-    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.6.2"
+    "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.6.1",
+    "@kreuzberg/html-to-markdown-node-darwin-x64": "3.6.1",
+    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.6.1",
+    "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.5.5",
+    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.6.1",
+    "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.5.5",
+    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.6.1",
+    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.6.1"
   },
   "napi": {
     "packageName": "@kreuzberg/html-to-markdown-node",
@@ -46,7 +50,13 @@
     "artifacts": "npx --yes -p @napi-rs/cli@^3.6.2 napi artifacts",
     "prepublishOnly": "npx --yes -p @napi-rs/cli@^3.6.2 napi prepublish -t npm --skip-optional-publish"
   },
-  "engines": { "node": ">= 18" },
-  "publishConfig": { "access": "public" },
-  "devDependencies": { "@napi-rs/cli": "^3.6.2" }
+  "engines": {
+    "node": ">= 18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.7.1"
+  }
 }
