@@ -2268,8 +2268,13 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           GH_REPO: ${{ github.repository }}
         run: |
+          # pub.dev OIDC validation requires refType=tag on the token. When this
+          # workflow is triggered by `release: published`, github.ref_name is the
+          # release-creating branch (e.g. main), which yields refType=branch and
+          # pub.dev rejects with "publishing is only allowed from 'tag' refType".
+          # Dispatch against the actual tag instead.
           gh workflow run publish-pubdev.yaml \
-            --ref ${{ github.ref_name }} \
+            --ref ${{ needs.prepare.outputs.tag }} \
             -f run_id=${{ github.run_id }}
 
   publish-zig:
