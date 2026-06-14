@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .html_to_markdown = .{
-            .url = "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.5/html-to-markdown-rs-zig-v3.6.5.tar.gz",
-            .hash = "html-to-markdown-3.6.5-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH",
+            .url = "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.6/html-to-markdown-rs-zig-v3.6.6.tar.gz",
+            .hash = "html-to-markdown-3.6.6-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH",
         },
     },
     .paths = .{

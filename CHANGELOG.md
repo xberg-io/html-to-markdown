@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.6] - 2026-06-14
+
+### Fixed
+
+- **Bump alef to 0.25.7 — fixes `alef publish prepare` for non-workspace-member NIF crates (Ruby gem, Elixir NIF).** alef 0.25.4–0.25.6 had a bug where `cargo update --locked` and `cargo metadata --locked` would fail for binding crates that are not workspace members (like the Rustler NIF and Magnus gem). The seed lockfile lacked a `[[package]]` entry for the binding crate, causing cargo to reject it. alef 0.25.7 dropped `--locked` from the metadata validation step and set `.env_remove("CARGO_BUILD_LOCKED")` to allow cargo to resolve these crates from the registry. This fix restores Ruby (all platforms) and Elixir NIF (all platforms + Hex package) support.
+
 ## [3.6.5] - 2026-06-14
 
 ### Fixed
