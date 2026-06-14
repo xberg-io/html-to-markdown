@@ -32,8 +32,15 @@ html-to-markdown-rs = { workspace = true, features = [
 reqwest = { version = "0.13.4", default-features = false, features = [
     "blocking",
     "rustls",
+    # NOTE: do NOT enable the `brotli` feature. It pulls `async-compression`
+    # which transitively pins `brotli = 8.x`, but brotli 8.x expects
+    # `alloc-no-stdlib` 3.x; the workspace resolves alloc-no-stdlib to 2.x for
+    # other deps, and the resulting trait-bound mismatch (`StandardAlloc:
+    # alloc::Allocator<...>`) breaks `cargo build` on stable rustc 1.96.
+    # Observed on html-to-markdown v3.6.3 Publish run 27488669093 ubuntu-latest
+    # wheel job (attempt 2). gzip+deflate are sufficient for the CLI's HTTP
+    # response decompression.
     "gzip",
-    "brotli",
     "deflate",
     "charset",
 ] }
