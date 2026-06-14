@@ -33,7 +33,6 @@ coverage.lcov
 
 # Rust
 target/
-Cargo.lock
 rust-coverage.lcov
 examples/**/.cargo/config.toml
 
