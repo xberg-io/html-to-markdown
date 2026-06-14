@@ -1619,7 +1619,7 @@ jobs:
   upload-go-release:
     name: Upload Go FFI archives to GitHub Release
     needs: [prepare, go-ffi-libraries]
-    if: ${{ (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.go-ffi-libraries.result == 'success' }}
+    if: ${{ needs.prepare.outputs.release_go == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.go-ffi-libraries.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

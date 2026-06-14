@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.3] - 2026-06-14
+
 ### Changed
 
 - **alef extension API: `[crates.ffi].visitor_callbacks` is now backed by the new alef per-extension

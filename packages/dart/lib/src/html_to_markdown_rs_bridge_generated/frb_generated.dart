@@ -44,7 +44,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       for (final dir in searchDirs) {
         for (final name in libNames) {
           final libPath = dir.resolve(name).toFilePath();
-          if (File(libPath).existsSync()) {
+          if (File(libPath).existsSync() || Directory(libPath).existsSync()) {
             return ExternalLibrary.open(libPath);
           }
         }
@@ -76,7 +76,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
     // — list that first so the loader finds it before the bare dylib.
     if (Platform.isMacOS)
       return const [
-        'html_to_markdown_rs_dart.framework/html_to_markdown_rs_dart',
+        'html_to_markdown_rs_dart.framework',
         'libhtml_to_markdown_rs_dart.dylib',
       ];
     if (Platform.isWindows) return const ['html_to_markdown_rs_dart.dll'];

@@ -5,17 +5,18 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     // Default library/include search paths follow the conventional Cargo workspace
-    // layout (`<workspace>/target/{profile}` and the FFI crate's `include/` dir).
-    // Override with `-Dffi_path=...` and `-Dffi_include_path=...` if your layout differs.
-    // `alef publish` rewrites this file for the distributed tarball so consumers
-    // link the bundled `lib/` + `include/` shipped alongside the package instead.
+    // layout. `alef publish package --lang zig` rewrites this file for the
+    // distributed tarball so consumers link the bundled lib/ and include/ dirs.
+    // Override with -Dffi_path=... and -Dffi_include_path=... if your layout differs.
     const ffi_path = b.option([]const u8, "ffi_path", "Path to directory containing libhtml_to_markdown_ffi.{dylib,so,dll,a}") orelse "../../target/release";
+
     const ffi_include = b.option([]const u8, "ffi_include_path", "Path to directory containing the FFI C header") orelse "../../crates/html-to-markdown-rs-ffi/include";
 
     const module = b.addModule("html_to_markdown_rs", .{
         .root_source_file = b.path("src/html_to_markdown_rs.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
     module.addLibraryPath(.{ .cwd_relative = ffi_path });
     module.addIncludePath(.{ .cwd_relative = ffi_include });
@@ -25,6 +26,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/html_to_markdown_rs.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
     test_module.addLibraryPath(.{ .cwd_relative = ffi_path });
     test_module.addIncludePath(.{ .cwd_relative = ffi_include });
