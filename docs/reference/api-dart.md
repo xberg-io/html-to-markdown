@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 ConversionResult convert(String html, [ConversionOptions? options])
 ```
 
+**Example:**
+
+```dart
+final result = convert("value", ConversionOptions());
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ ConversionResult convert(String html, [ConversionOptions? options])
 | `options` | `ConversionOptions?` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error`.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```dart
 static ConversionOptions default()
 ```
+
+**Example:**
+
+```dart
+final result = ConversionOptions.default();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `int` | — | Document tree depth at the header element |
 | `htmlOffset` | `int` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```dart
 bool isValid()
 ```
+
+**Example:**
+
+```dart
+final result = instance.isValid();
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 VisitResult visitText(NodeContext ctx, String text)
 ```
 
-#### visitElementStart()
+**Example:**
+
+```dart
+final result = instance.visitText(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 VisitResult visitElementStart(NodeContext ctx)
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```dart
+final result = instance.visitElementStart(NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 VisitResult visitElementEnd(NodeContext ctx, String output)
 ```
 
-#### visitLink()
+**Example:**
+
+```dart
+final result = instance.visitElementEnd(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 VisitResult visitLink(NodeContext ctx, String href, String text, [String? title])
 ```
 
-#### visitImage()
+**Example:**
+
+```dart
+final result = instance.visitLink(NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `String` | Yes | The  href |
+| `text` | `String` | Yes | The  text |
+| `title` | `String?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 VisitResult visitImage(NodeContext ctx, String src, String alt, [String? title])
 ```
 
-#### visitHeading()
+**Example:**
+
+```dart
+final result = instance.visitImage(NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String` | Yes | The  src |
+| `alt` | `String` | Yes | The  alt |
+| `title` | `String?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 VisitResult visitHeading(NodeContext ctx, int level, String text, [String? id])
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```dart
+final result = instance.visitHeading(NodeContext(), 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `int` | Yes | The  level |
+| `text` | `String` | Yes | The  text |
+| `id` | `String?` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 VisitResult visitCodeBlock(NodeContext ctx, String code, [String? lang])
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```dart
+final result = instance.visitCodeBlock(NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `String?` | No | The  lang |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 VisitResult visitCodeInline(NodeContext ctx, String code)
 ```
 
-#### visitListItem()
+**Example:**
+
+```dart
+final result = instance.visitCodeInline(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 VisitResult visitListItem(NodeContext ctx, bool ordered, String marker, String text)
 ```
 
-#### visitListStart()
+**Example:**
+
+```dart
+final result = instance.visitListItem(NodeContext(), true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `marker` | `String` | Yes | The  marker |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 VisitResult visitListStart(NodeContext ctx, bool ordered)
 ```
 
-#### visitListEnd()
+**Example:**
+
+```dart
+final result = instance.visitListStart(NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 VisitResult visitListEnd(NodeContext ctx, bool ordered, String output)
 ```
 
-#### visitTableStart()
+**Example:**
+
+```dart
+final result = instance.visitListEnd(NodeContext(), true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 VisitResult visitTableStart(NodeContext ctx)
 ```
 
-#### visitTableRow()
+**Example:**
+
+```dart
+final result = instance.visitTableStart(NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 VisitResult visitTableRow(NodeContext ctx, List<String> cells, bool isHeader)
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```dart
+final result = instance.visitTableRow(NodeContext(), [], true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `List<String>` | Yes | The  cells |
+| `isHeader` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 VisitResult visitTableEnd(NodeContext ctx, String output)
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```dart
+final result = instance.visitTableEnd(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 VisitResult visitBlockquote(NodeContext ctx, String content, int depth)
 ```
 
-#### visitStrong()
+**Example:**
+
+```dart
+final result = instance.visitBlockquote(NodeContext(), "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `String` | Yes | The  content |
+| `depth` | `int` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 VisitResult visitStrong(NodeContext ctx, String text)
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```dart
+final result = instance.visitStrong(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 VisitResult visitEmphasis(NodeContext ctx, String text)
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```dart
+final result = instance.visitEmphasis(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 VisitResult visitStrikethrough(NodeContext ctx, String text)
 ```
 
-#### visitUnderline()
+**Example:**
+
+```dart
+final result = instance.visitStrikethrough(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 VisitResult visitUnderline(NodeContext ctx, String text)
 ```
 
-#### visitSubscript()
+**Example:**
+
+```dart
+final result = instance.visitUnderline(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 VisitResult visitSubscript(NodeContext ctx, String text)
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```dart
+final result = instance.visitSubscript(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 VisitResult visitSuperscript(NodeContext ctx, String text)
 ```
 
-#### visitMark()
+**Example:**
+
+```dart
+final result = instance.visitSuperscript(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 VisitResult visitMark(NodeContext ctx, String text)
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```dart
+final result = instance.visitMark(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 VisitResult visitLineBreak(NodeContext ctx)
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```dart
+final result = instance.visitLineBreak(NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 VisitResult visitHorizontalRule(NodeContext ctx)
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```dart
+final result = instance.visitHorizontalRule(NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 VisitResult visitCustomElement(NodeContext ctx, String tagName, String html)
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```dart
+final result = instance.visitCustomElement(NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `String` | Yes | The  tag name |
+| `html` | `String` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 VisitResult visitDefinitionListStart(NodeContext ctx)
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```dart
+final result = instance.visitDefinitionListStart(NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 VisitResult visitDefinitionTerm(NodeContext ctx, String text)
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```dart
+final result = instance.visitDefinitionTerm(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 VisitResult visitDefinitionDescription(NodeContext ctx, String text)
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```dart
+final result = instance.visitDefinitionDescription(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 VisitResult visitDefinitionListEnd(NodeContext ctx, String output)
 ```
 
-#### visitForm()
+**Example:**
+
+```dart
+final result = instance.visitDefinitionListEnd(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 VisitResult visitForm(NodeContext ctx, [String? action, String? method])
 ```
 
-#### visitInput()
+**Example:**
+
+```dart
+final result = instance.visitForm(NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `String?` | No | The  action |
+| `method` | `String?` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 VisitResult visitInput(NodeContext ctx, String inputType, [String? name, String? value])
 ```
 
-#### visitButton()
+**Example:**
+
+```dart
+final result = instance.visitInput(NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `String` | Yes | The  input type |
+| `name` | `String?` | No | The  name |
+| `value` | `String?` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 VisitResult visitButton(NodeContext ctx, String text)
 ```
 
-#### visitAudio()
+**Example:**
+
+```dart
+final result = instance.visitButton(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 VisitResult visitAudio(NodeContext ctx, [String? src])
 ```
 
-#### visitVideo()
+**Example:**
+
+```dart
+final result = instance.visitAudio(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 VisitResult visitVideo(NodeContext ctx, [String? src])
 ```
 
-#### visitIframe()
+**Example:**
+
+```dart
+final result = instance.visitVideo(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 VisitResult visitIframe(NodeContext ctx, [String? src])
 ```
 
-#### visitDetails()
+**Example:**
+
+```dart
+final result = instance.visitIframe(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 VisitResult visitDetails(NodeContext ctx, bool open)
 ```
 
-#### visitSummary()
+**Example:**
+
+```dart
+final result = instance.visitDetails(NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 VisitResult visitSummary(NodeContext ctx, String text)
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```dart
+final result = instance.visitSummary(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 VisitResult visitFigureStart(NodeContext ctx)
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```dart
+final result = instance.visitFigureStart(NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 VisitResult visitFigcaption(NodeContext ctx, String text)
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```dart
+final result = instance.visitFigcaption(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```dart
 VisitResult visitFigureEnd(NodeContext ctx, String output)
 ```
+
+**Example:**
+
+```dart
+final result = instance.visitFigureEnd(NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parentTag` | `String?` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 Map<String, String> attributes()
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```dart
+final result = instance.attributes();
+```
+
+**Returns:** `Map<String, String>`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 static NodeContext withOwnedAttributes(NodeType nodeType, String tagName, Map<String, String> attributes, int depth, int indexInParent, bool isInline, [String? parentTag])
 ```
 
-#### intoOwned()
+**Example:**
+
+```dart
+final result = NodeContext.withOwnedAttributes(NodeType(), "value", {}, 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `String` | Yes | The tag name |
+| `attributes` | `Map<String, String>` | Yes | The attributes |
+| `depth` | `int` | Yes | The depth |
+| `indexInParent` | `int` | Yes | The index in parent |
+| `parentTag` | `String?` | No | The parent tag |
+| `isInline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```dart
 NodeContext intoOwned()
 ```
+
+**Example:**
+
+```dart
+final result = instance.intoOwned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```dart
 static PreprocessingOptions default()
 ```
+
+**Example:**
+
+```dart
+final result = PreprocessingOptions.default();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

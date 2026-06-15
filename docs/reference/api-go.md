@@ -27,6 +27,15 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 func Convert(html string, options ConversionOptions) (ConversionResult, error)
 ```
 
+**Example:**
+
+```go
+result, err := Convert("value", ConversionOptions{})
+if err != nil {
+    return err
+}
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +44,7 @@ func Convert(html string, options ConversionOptions) (ConversionResult, error)
 | `Options` | `*ConversionOptions` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Returns `error`.
 
 ---
@@ -94,15 +104,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `TierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `Visitor` | `*VisitorHandle` | `nil` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### Default()
+###### Default()
 
 **Signature:**
 
 ```go
 func (o *ConversionOptions) Default() ConversionOptions
 ```
+
+**Example:**
+
+```go
+result := ConversionOptions.Default()
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +223,9 @@ and position in the document structure.
 | `Depth` | `int` | — | Document tree depth at the header element |
 | `HtmlOffset` | `int` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### IsValid()
+###### IsValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +238,14 @@ Validate that the header level is within valid range (1-6).
 ```go
 func (o *HeaderMetadata) IsValid() bool
 ```
+
+**Example:**
+
+```go
+result := instance.IsValid()
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +311,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### VisitText()
+##### VisitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +323,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 func (o *HtmlVisitor) VisitText(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitElementStart()
+**Example:**
+
+```go
+result := instance.VisitText(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +351,21 @@ visitors to implement generic element handling before tag-specific logic.
 func (o *HtmlVisitor) VisitElementStart(ctx NodeContext) VisitResult
 ```
 
-#### VisitElementEnd()
+**Example:**
+
+```go
+result := instance.VisitElementStart(NodeContext{})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +378,22 @@ Visitors can inspect or replace this output.
 func (o *HtmlVisitor) VisitElementEnd(ctx NodeContext, output string) VisitResult
 ```
 
-#### VisitLink()
+**Example:**
+
+```go
+result := instance.VisitElementEnd(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +403,24 @@ Visit anchor links `<a href="...">`.
 func (o *HtmlVisitor) VisitLink(ctx NodeContext, href string, text string, title string) VisitResult
 ```
 
-#### VisitImage()
+**Example:**
+
+```go
+result := instance.VisitLink(NodeContext{}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Href` | `string` | Yes | The  href |
+| `Text` | `string` | Yes | The  text |
+| `Title` | `*string` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### VisitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +430,24 @@ Visit images `<img src="...">`.
 func (o *HtmlVisitor) VisitImage(ctx NodeContext, src string, alt string, title string) VisitResult
 ```
 
-#### VisitHeading()
+**Example:**
+
+```go
+result := instance.VisitImage(NodeContext{}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `string` | Yes | The  src |
+| `Alt` | `string` | Yes | The  alt |
+| `Title` | `*string` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### VisitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +457,24 @@ Visit heading elements `<h1>` through `<h6>`.
 func (o *HtmlVisitor) VisitHeading(ctx NodeContext, level uint32, text string, id string) VisitResult
 ```
 
-#### VisitCodeBlock()
+**Example:**
+
+```go
+result := instance.VisitHeading(NodeContext{}, 42, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Level` | `uint32` | Yes | The  level |
+| `Text` | `string` | Yes | The  text |
+| `Id` | `*string` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### VisitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +484,23 @@ Visit code blocks `<pre><code>`.
 func (o *HtmlVisitor) VisitCodeBlock(ctx NodeContext, lang string, code string) VisitResult
 ```
 
-#### VisitCodeInline()
+**Example:**
+
+```go
+result := instance.VisitCodeBlock(NodeContext{}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Lang` | `*string` | No | The  lang |
+| `Code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### VisitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +510,22 @@ Visit inline code `<code>`.
 func (o *HtmlVisitor) VisitCodeInline(ctx NodeContext, code string) VisitResult
 ```
 
-#### VisitListItem()
+**Example:**
+
+```go
+result := instance.VisitCodeInline(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### VisitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +535,24 @@ Visit list items `<li>`.
 func (o *HtmlVisitor) VisitListItem(ctx NodeContext, ordered bool, marker string, text string) VisitResult
 ```
 
-#### VisitListStart()
+**Example:**
+
+```go
+result := instance.VisitListItem(NodeContext{}, true, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Ordered` | `bool` | Yes | The  ordered |
+| `Marker` | `string` | Yes | The  marker |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +562,22 @@ Called before processing a list `<ul>` or `<ol>`.
 func (o *HtmlVisitor) VisitListStart(ctx NodeContext, ordered bool) VisitResult
 ```
 
-#### VisitListEnd()
+**Example:**
+
+```go
+result := instance.VisitListStart(NodeContext{}, true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### VisitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +587,23 @@ Called after processing a list `</ul>` or `</ol>`.
 func (o *HtmlVisitor) VisitListEnd(ctx NodeContext, ordered bool, output string) VisitResult
 ```
 
-#### VisitTableStart()
+**Example:**
+
+```go
+result := instance.VisitListEnd(NodeContext{}, true, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Ordered` | `bool` | Yes | The  ordered |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +613,21 @@ Called before processing a table `<table>`.
 func (o *HtmlVisitor) VisitTableStart(ctx NodeContext) VisitResult
 ```
 
-#### VisitTableRow()
+**Example:**
+
+```go
+result := instance.VisitTableStart(NodeContext{})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +637,23 @@ Visit table rows `<tr>`.
 func (o *HtmlVisitor) VisitTableRow(ctx NodeContext, cells []string, isHeader bool) VisitResult
 ```
 
-#### VisitTableEnd()
+**Example:**
+
+```go
+result := instance.VisitTableRow(NodeContext{}, nil, true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Cells` | `[]string` | Yes | The  cells |
+| `IsHeader` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### VisitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +663,22 @@ Called after processing a table `</table>`.
 func (o *HtmlVisitor) VisitTableEnd(ctx NodeContext, output string) VisitResult
 ```
 
-#### VisitBlockquote()
+**Example:**
+
+```go
+result := instance.VisitTableEnd(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +688,23 @@ Visit blockquote elements `<blockquote>`.
 func (o *HtmlVisitor) VisitBlockquote(ctx NodeContext, content string, depth int) VisitResult
 ```
 
-#### VisitStrong()
+**Example:**
+
+```go
+result := instance.VisitBlockquote(NodeContext{}, "value", 42)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Content` | `string` | Yes | The  content |
+| `Depth` | `int` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### VisitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +714,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 func (o *HtmlVisitor) VisitStrong(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitEmphasis()
+**Example:**
+
+```go
+result := instance.VisitStrong(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +739,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 func (o *HtmlVisitor) VisitEmphasis(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitStrikethrough()
+**Example:**
+
+```go
+result := instance.VisitEmphasis(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +764,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 func (o *HtmlVisitor) VisitStrikethrough(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitUnderline()
+**Example:**
+
+```go
+result := instance.VisitStrikethrough(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +789,22 @@ Visit underline elements `<u>`, `<ins>`.
 func (o *HtmlVisitor) VisitUnderline(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitSubscript()
+**Example:**
+
+```go
+result := instance.VisitUnderline(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +814,22 @@ Visit subscript elements `<sub>`.
 func (o *HtmlVisitor) VisitSubscript(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitSuperscript()
+**Example:**
+
+```go
+result := instance.VisitSubscript(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +839,22 @@ Visit superscript elements `<sup>`.
 func (o *HtmlVisitor) VisitSuperscript(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitMark()
+**Example:**
+
+```go
+result := instance.VisitSuperscript(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +864,22 @@ Visit mark/highlight elements `<mark>`.
 func (o *HtmlVisitor) VisitMark(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitLineBreak()
+**Example:**
+
+```go
+result := instance.VisitMark(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +889,21 @@ Visit line break elements `<br>`.
 func (o *HtmlVisitor) VisitLineBreak(ctx NodeContext) VisitResult
 ```
 
-#### VisitHorizontalRule()
+**Example:**
+
+```go
+result := instance.VisitLineBreak(NodeContext{})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +913,21 @@ Visit horizontal rule elements `<hr>`.
 func (o *HtmlVisitor) VisitHorizontalRule(ctx NodeContext) VisitResult
 ```
 
-#### VisitCustomElement()
+**Example:**
+
+```go
+result := instance.VisitHorizontalRule(NodeContext{})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +937,23 @@ Visit custom elements (web components) or unknown tags.
 func (o *HtmlVisitor) VisitCustomElement(ctx NodeContext, tagName string, html string) VisitResult
 ```
 
-#### VisitDefinitionListStart()
+**Example:**
+
+```go
+result := instance.VisitCustomElement(NodeContext{}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `TagName` | `string` | Yes | The  tag name |
+| `Html` | `string` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +963,21 @@ Visit definition list `<dl>`.
 func (o *HtmlVisitor) VisitDefinitionListStart(ctx NodeContext) VisitResult
 ```
 
-#### VisitDefinitionTerm()
+**Example:**
+
+```go
+result := instance.VisitDefinitionListStart(NodeContext{})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +987,22 @@ Visit definition term `<dt>`.
 func (o *HtmlVisitor) VisitDefinitionTerm(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitDefinitionDescription()
+**Example:**
+
+```go
+result := instance.VisitDefinitionTerm(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1012,22 @@ Visit definition description `<dd>`.
 func (o *HtmlVisitor) VisitDefinitionDescription(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitDefinitionListEnd()
+**Example:**
+
+```go
+result := instance.VisitDefinitionDescription(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1037,22 @@ Called after processing a definition list `</dl>`.
 func (o *HtmlVisitor) VisitDefinitionListEnd(ctx NodeContext, output string) VisitResult
 ```
 
-#### VisitForm()
+**Example:**
+
+```go
+result := instance.VisitDefinitionListEnd(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1062,23 @@ Visit form elements `<form>`.
 func (o *HtmlVisitor) VisitForm(ctx NodeContext, action string, method string) VisitResult
 ```
 
-#### VisitInput()
+**Example:**
+
+```go
+result := instance.VisitForm(NodeContext{}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Action` | `*string` | No | The  action |
+| `Method` | `*string` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### VisitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1088,24 @@ Visit input elements `<input>`.
 func (o *HtmlVisitor) VisitInput(ctx NodeContext, inputType string, name string, value string) VisitResult
 ```
 
-#### VisitButton()
+**Example:**
+
+```go
+result := instance.VisitInput(NodeContext{}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `InputType` | `string` | Yes | The  input type |
+| `Name` | `*string` | No | The  name |
+| `Value` | `*string` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### VisitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1115,22 @@ Visit button elements `<button>`.
 func (o *HtmlVisitor) VisitButton(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitAudio()
+**Example:**
+
+```go
+result := instance.VisitButton(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1140,22 @@ Visit audio elements `<audio>`.
 func (o *HtmlVisitor) VisitAudio(ctx NodeContext, src string) VisitResult
 ```
 
-#### VisitVideo()
+**Example:**
+
+```go
+result := instance.VisitAudio(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `*string` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### VisitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1165,22 @@ Visit video elements `<video>`.
 func (o *HtmlVisitor) VisitVideo(ctx NodeContext, src string) VisitResult
 ```
 
-#### VisitIframe()
+**Example:**
+
+```go
+result := instance.VisitVideo(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `*string` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### VisitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1190,22 @@ Visit iframe elements `<iframe>`.
 func (o *HtmlVisitor) VisitIframe(ctx NodeContext, src string) VisitResult
 ```
 
-#### VisitDetails()
+**Example:**
+
+```go
+result := instance.VisitIframe(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `*string` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### VisitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1215,22 @@ Visit details elements `<details>`.
 func (o *HtmlVisitor) VisitDetails(ctx NodeContext, open bool) VisitResult
 ```
 
-#### VisitSummary()
+**Example:**
+
+```go
+result := instance.VisitDetails(NodeContext{}, true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### VisitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1240,22 @@ Visit summary elements `<summary>`.
 func (o *HtmlVisitor) VisitSummary(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitFigureStart()
+**Example:**
+
+```go
+result := instance.VisitSummary(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1265,21 @@ Visit figure elements `<figure>`.
 func (o *HtmlVisitor) VisitFigureStart(ctx NodeContext) VisitResult
 ```
 
-#### VisitFigcaption()
+**Example:**
+
+```go
+result := instance.VisitFigureStart(NodeContext{})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1289,22 @@ Visit figcaption elements `<figcaption>`.
 func (o *HtmlVisitor) VisitFigcaption(ctx NodeContext, text string) VisitResult
 ```
 
-#### VisitFigureEnd()
+**Example:**
+
+```go
+result := instance.VisitFigcaption(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1313,21 @@ Called after processing a figure `</figure>`.
 ```go
 func (o *HtmlVisitor) VisitFigureEnd(ctx NodeContext, output string) VisitResult
 ```
+
+**Example:**
+
+```go
+result := instance.VisitFigureEnd(NodeContext{}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1427,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `ParentTag` | `*string` | `nil` | Parent element's tag name (None if root) |
 | `IsInline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### Attributes()
+###### Attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1443,15 @@ If this method is never called, no allocation occurs for attributes.
 func (o *NodeContext) Attributes() map[string]string
 ```
 
-#### WithOwnedAttributes()
+**Example:**
+
+```go
+result := instance.Attributes()
+```
+
+**Returns:** `map[string]string`
+
+###### WithOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1464,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 func (o *NodeContext) WithOwnedAttributes(nodeType NodeType, tagName string, attributes map[string]string, depth int, indexInParent int, parentTag string, isInline bool) NodeContext
 ```
 
-#### IntoOwned()
+**Example:**
+
+```go
+result := NodeContext.WithOwnedAttributes(NodeType{}, "value", nil, 42, 42, "value", true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `NodeType` | `NodeType` | Yes | The node type |
+| `TagName` | `string` | Yes | The tag name |
+| `Attributes` | `map[string]string` | Yes | The attributes |
+| `Depth` | `int` | Yes | The depth |
+| `IndexInParent` | `int` | Yes | The index in parent |
+| `ParentTag` | `*string` | No | The parent tag |
+| `IsInline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### IntoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1493,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```go
 func (o *NodeContext) IntoOwned() NodeContext
 ```
+
+**Example:**
+
+```go
+result := instance.IntoOwned()
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1515,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `RemoveNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `RemoveForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### Default()
+###### Default()
 
 **Signature:**
 
 ```go
 func (o *PreprocessingOptions) Default() PreprocessingOptions
 ```
+
+**Example:**
+
+```go
+result := PreprocessingOptions.Default()
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

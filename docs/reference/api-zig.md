@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 pub fn convert(html: [:0]const u8, options: ?ConversionOptions) Error!ConversionResult
 ```
 
+**Example:**
+
+```zig
+const result = try convert("value", .{});
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ pub fn convert(html: [:0]const u8, options: ?ConversionOptions) Error!Conversion
 | `options` | `ConversionOptions?` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error`.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```zig
 pub fn default() ConversionOptions
 ```
+
+**Example:**
+
+```zig
+const result = ConversionOptions.default();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `u64` | — | Document tree depth at the header element |
 | `htmlOffset` | `u64` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```zig
 pub fn isValid(self: *const HeaderMetadata) bool
 ```
+
+**Example:**
+
+```zig
+const result = instance.isValid();
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 pub fn visitText(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitElementStart()
+**Example:**
+
+```zig
+const result = instance.visitText(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 pub fn visitElementStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```zig
+const result = instance.visitElementStart(.{});
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 pub fn visitElementEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
-#### visitLink()
+**Example:**
+
+```zig
+const result = instance.visitElementEnd(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `[:0]const u8` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 pub fn visitLink(self: *const HtmlVisitor, ctx: NodeContext, href: [:0]const u8, text: [:0]const u8, title: ?[:0]const u8) VisitResult
 ```
 
-#### visitImage()
+**Example:**
+
+```zig
+const result = instance.visitLink(.{}, "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `[:0]const u8` | Yes | The  href |
+| `text` | `[:0]const u8` | Yes | The  text |
+| `title` | `[:0]const u8?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 pub fn visitImage(self: *const HtmlVisitor, ctx: NodeContext, src: [:0]const u8, alt: [:0]const u8, title: ?[:0]const u8) VisitResult
 ```
 
-#### visitHeading()
+**Example:**
+
+```zig
+const result = instance.visitImage(.{}, "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `[:0]const u8` | Yes | The  src |
+| `alt` | `[:0]const u8` | Yes | The  alt |
+| `title` | `[:0]const u8?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 pub fn visitHeading(self: *const HtmlVisitor, ctx: NodeContext, level: u32, text: [:0]const u8, id: ?[:0]const u8) VisitResult
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```zig
+const result = instance.visitHeading(.{}, 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `u32` | Yes | The  level |
+| `text` | `[:0]const u8` | Yes | The  text |
+| `id` | `[:0]const u8?` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 pub fn visitCodeBlock(self: *const HtmlVisitor, ctx: NodeContext, lang: ?[:0]const u8, code: [:0]const u8) VisitResult
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```zig
+const result = instance.visitCodeBlock(.{}, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `[:0]const u8?` | No | The  lang |
+| `code` | `[:0]const u8` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 pub fn visitCodeInline(self: *const HtmlVisitor, ctx: NodeContext, code: [:0]const u8) VisitResult
 ```
 
-#### visitListItem()
+**Example:**
+
+```zig
+const result = instance.visitCodeInline(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `[:0]const u8` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 pub fn visitListItem(self: *const HtmlVisitor, ctx: NodeContext, ordered: bool, marker: [:0]const u8, text: [:0]const u8) VisitResult
 ```
 
-#### visitListStart()
+**Example:**
+
+```zig
+const result = instance.visitListItem(.{}, true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `marker` | `[:0]const u8` | Yes | The  marker |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 pub fn visitListStart(self: *const HtmlVisitor, ctx: NodeContext, ordered: bool) VisitResult
 ```
 
-#### visitListEnd()
+**Example:**
+
+```zig
+const result = instance.visitListStart(.{}, true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 pub fn visitListEnd(self: *const HtmlVisitor, ctx: NodeContext, ordered: bool, output: [:0]const u8) VisitResult
 ```
 
-#### visitTableStart()
+**Example:**
+
+```zig
+const result = instance.visitListEnd(.{}, true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `output` | `[:0]const u8` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 pub fn visitTableStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
-#### visitTableRow()
+**Example:**
+
+```zig
+const result = instance.visitTableStart(.{});
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 pub fn visitTableRow(self: *const HtmlVisitor, ctx: NodeContext, cells: []const [:0]const u8, is_header: bool) VisitResult
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```zig
+const result = instance.visitTableRow(.{}, &[_]u8{}, true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `[]const [:0]const u8` | Yes | The  cells |
+| `isHeader` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 pub fn visitTableEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```zig
+const result = instance.visitTableEnd(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `[:0]const u8` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 pub fn visitBlockquote(self: *const HtmlVisitor, ctx: NodeContext, content: [:0]const u8, depth: u64) VisitResult
 ```
 
-#### visitStrong()
+**Example:**
+
+```zig
+const result = instance.visitBlockquote(.{}, "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `[:0]const u8` | Yes | The  content |
+| `depth` | `u64` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 pub fn visitStrong(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```zig
+const result = instance.visitStrong(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 pub fn visitEmphasis(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```zig
+const result = instance.visitEmphasis(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 pub fn visitStrikethrough(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitUnderline()
+**Example:**
+
+```zig
+const result = instance.visitStrikethrough(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 pub fn visitUnderline(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitSubscript()
+**Example:**
+
+```zig
+const result = instance.visitUnderline(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 pub fn visitSubscript(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```zig
+const result = instance.visitSubscript(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 pub fn visitSuperscript(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitMark()
+**Example:**
+
+```zig
+const result = instance.visitSuperscript(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 pub fn visitMark(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```zig
+const result = instance.visitMark(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 pub fn visitLineBreak(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```zig
+const result = instance.visitLineBreak(.{});
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 pub fn visitHorizontalRule(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```zig
+const result = instance.visitHorizontalRule(.{});
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 pub fn visitCustomElement(self: *const HtmlVisitor, ctx: NodeContext, tag_name: [:0]const u8, html: [:0]const u8) VisitResult
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```zig
+const result = instance.visitCustomElement(.{}, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `[:0]const u8` | Yes | The  tag name |
+| `html` | `[:0]const u8` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 pub fn visitDefinitionListStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```zig
+const result = instance.visitDefinitionListStart(.{});
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 pub fn visitDefinitionTerm(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```zig
+const result = instance.visitDefinitionTerm(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 pub fn visitDefinitionDescription(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```zig
+const result = instance.visitDefinitionDescription(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 pub fn visitDefinitionListEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
 
-#### visitForm()
+**Example:**
+
+```zig
+const result = instance.visitDefinitionListEnd(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `[:0]const u8` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 pub fn visitForm(self: *const HtmlVisitor, ctx: NodeContext, action: ?[:0]const u8, method: ?[:0]const u8) VisitResult
 ```
 
-#### visitInput()
+**Example:**
+
+```zig
+const result = instance.visitForm(.{}, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `[:0]const u8?` | No | The  action |
+| `method` | `[:0]const u8?` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 pub fn visitInput(self: *const HtmlVisitor, ctx: NodeContext, input_type: [:0]const u8, name: ?[:0]const u8, value: ?[:0]const u8) VisitResult
 ```
 
-#### visitButton()
+**Example:**
+
+```zig
+const result = instance.visitInput(.{}, "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `[:0]const u8` | Yes | The  input type |
+| `name` | `[:0]const u8?` | No | The  name |
+| `value` | `[:0]const u8?` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 pub fn visitButton(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitAudio()
+**Example:**
+
+```zig
+const result = instance.visitButton(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 pub fn visitAudio(self: *const HtmlVisitor, ctx: NodeContext, src: ?[:0]const u8) VisitResult
 ```
 
-#### visitVideo()
+**Example:**
+
+```zig
+const result = instance.visitAudio(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `[:0]const u8?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 pub fn visitVideo(self: *const HtmlVisitor, ctx: NodeContext, src: ?[:0]const u8) VisitResult
 ```
 
-#### visitIframe()
+**Example:**
+
+```zig
+const result = instance.visitVideo(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `[:0]const u8?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 pub fn visitIframe(self: *const HtmlVisitor, ctx: NodeContext, src: ?[:0]const u8) VisitResult
 ```
 
-#### visitDetails()
+**Example:**
+
+```zig
+const result = instance.visitIframe(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `[:0]const u8?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 pub fn visitDetails(self: *const HtmlVisitor, ctx: NodeContext, open: bool) VisitResult
 ```
 
-#### visitSummary()
+**Example:**
+
+```zig
+const result = instance.visitDetails(.{}, true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 pub fn visitSummary(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```zig
+const result = instance.visitSummary(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 pub fn visitFigureStart(self: *const HtmlVisitor, ctx: NodeContext) VisitResult
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```zig
+const result = instance.visitFigureStart(.{});
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 pub fn visitFigcaption(self: *const HtmlVisitor, ctx: NodeContext, text: [:0]const u8) VisitResult
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```zig
+const result = instance.visitFigcaption(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `[:0]const u8` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```zig
 pub fn visitFigureEnd(self: *const HtmlVisitor, ctx: NodeContext, output: [:0]const u8) VisitResult
 ```
+
+**Example:**
+
+```zig
+const result = instance.visitFigureEnd(.{}, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `[:0]const u8` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parentTag` | `[:0]const u8?` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 pub fn attributes(self: *const NodeContext) std.StringHashMap([:0]const u8)
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```zig
+const result = instance.attributes();
+```
+
+**Returns:** `std.StringHashMap([:0]const u8)`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 pub fn withOwnedAttributes(node_type: NodeType, tag_name: [:0]const u8, attributes: std.StringHashMap([:0]const u8), depth: u64, index_in_parent: u64, parent_tag: ?[:0]const u8, is_inline: bool) NodeContext
 ```
 
-#### intoOwned()
+**Example:**
+
+```zig
+const result = NodeContext.withOwnedAttributes(.{}, "value", .{}, 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `[:0]const u8` | Yes | The tag name |
+| `attributes` | `std.StringHashMap([:0]const u8)` | Yes | The attributes |
+| `depth` | `u64` | Yes | The depth |
+| `indexInParent` | `u64` | Yes | The index in parent |
+| `parentTag` | `[:0]const u8?` | No | The parent tag |
+| `isInline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```zig
 pub fn intoOwned(self: *const NodeContext) NodeContext
 ```
+
+**Example:**
+
+```zig
+const result = instance.intoOwned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```zig
 pub fn default() PreprocessingOptions
 ```
+
+**Example:**
+
+```zig
+const result = PreprocessingOptions.default();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

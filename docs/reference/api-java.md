@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 public static ConversionResult convert(String html, ConversionOptions options) throws Error
 ```
 
+**Example:**
+
+```java
+var result = convert("value", new ConversionOptions());
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ public static ConversionResult convert(String html, ConversionOptions options) t
 | `options` | `Optional<ConversionOptions>` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `ErrorException`.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tierStrategy` | `TierStrategy` | `TierStrategy.AUTO` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `Optional<VisitorHandle>` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### defaultOptions()
+###### defaultOptions()
 
 **Signature:**
 
 ```java
 public static ConversionOptions defaultOptions()
 ```
+
+**Example:**
+
+```java
+var result = ConversionOptions.defaultOptions();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `long` | — | Document tree depth at the header element |
 | `htmlOffset` | `long` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```java
 public boolean isValid()
 ```
+
+**Example:**
+
+```java
+var result = instance.isValid();
+```
+
+**Returns:** `boolean`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 public VisitResult visitText(NodeContext ctx, String text)
 ```
 
-#### visitElementStart()
+**Example:**
+
+```java
+var result = instance.visitText(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 public VisitResult visitElementStart(NodeContext ctx)
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```java
+var result = instance.visitElementStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 public VisitResult visitElementEnd(NodeContext ctx, String output)
 ```
 
-#### visitLink()
+**Example:**
+
+```java
+var result = instance.visitElementEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 public VisitResult visitLink(NodeContext ctx, String href, String text, String title)
 ```
 
-#### visitImage()
+**Example:**
+
+```java
+var result = instance.visitLink(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `String` | Yes | The  href |
+| `text` | `String` | Yes | The  text |
+| `title` | `Optional<String>` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 public VisitResult visitImage(NodeContext ctx, String src, String alt, String title)
 ```
 
-#### visitHeading()
+**Example:**
+
+```java
+var result = instance.visitImage(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String` | Yes | The  src |
+| `alt` | `String` | Yes | The  alt |
+| `title` | `Optional<String>` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 public VisitResult visitHeading(NodeContext ctx, int level, String text, String id)
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```java
+var result = instance.visitHeading(new NodeContext(), 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `int` | Yes | The  level |
+| `text` | `String` | Yes | The  text |
+| `id` | `Optional<String>` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 public VisitResult visitCodeBlock(NodeContext ctx, String lang, String code)
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```java
+var result = instance.visitCodeBlock(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `Optional<String>` | No | The  lang |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 public VisitResult visitCodeInline(NodeContext ctx, String code)
 ```
 
-#### visitListItem()
+**Example:**
+
+```java
+var result = instance.visitCodeInline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 public VisitResult visitListItem(NodeContext ctx, boolean ordered, String marker, String text)
 ```
 
-#### visitListStart()
+**Example:**
+
+```java
+var result = instance.visitListItem(new NodeContext(), true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean` | Yes | The  ordered |
+| `marker` | `String` | Yes | The  marker |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 public VisitResult visitListStart(NodeContext ctx, boolean ordered)
 ```
 
-#### visitListEnd()
+**Example:**
+
+```java
+var result = instance.visitListStart(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 public VisitResult visitListEnd(NodeContext ctx, boolean ordered, String output)
 ```
 
-#### visitTableStart()
+**Example:**
+
+```java
+var result = instance.visitListEnd(new NodeContext(), true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean` | Yes | The  ordered |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 public VisitResult visitTableStart(NodeContext ctx)
 ```
 
-#### visitTableRow()
+**Example:**
+
+```java
+var result = instance.visitTableStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 public VisitResult visitTableRow(NodeContext ctx, List<String> cells, boolean isHeader)
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```java
+var result = instance.visitTableRow(new NodeContext(), List.of(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `List<String>` | Yes | The  cells |
+| `isHeader` | `boolean` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 public VisitResult visitTableEnd(NodeContext ctx, String output)
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```java
+var result = instance.visitTableEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 public VisitResult visitBlockquote(NodeContext ctx, String content, long depth)
 ```
 
-#### visitStrong()
+**Example:**
+
+```java
+var result = instance.visitBlockquote(new NodeContext(), "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `String` | Yes | The  content |
+| `depth` | `long` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 public VisitResult visitStrong(NodeContext ctx, String text)
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```java
+var result = instance.visitStrong(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 public VisitResult visitEmphasis(NodeContext ctx, String text)
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```java
+var result = instance.visitEmphasis(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 public VisitResult visitStrikethrough(NodeContext ctx, String text)
 ```
 
-#### visitUnderline()
+**Example:**
+
+```java
+var result = instance.visitStrikethrough(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 public VisitResult visitUnderline(NodeContext ctx, String text)
 ```
 
-#### visitSubscript()
+**Example:**
+
+```java
+var result = instance.visitUnderline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 public VisitResult visitSubscript(NodeContext ctx, String text)
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```java
+var result = instance.visitSubscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 public VisitResult visitSuperscript(NodeContext ctx, String text)
 ```
 
-#### visitMark()
+**Example:**
+
+```java
+var result = instance.visitSuperscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 public VisitResult visitMark(NodeContext ctx, String text)
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```java
+var result = instance.visitMark(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 public VisitResult visitLineBreak(NodeContext ctx)
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```java
+var result = instance.visitLineBreak(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 public VisitResult visitHorizontalRule(NodeContext ctx)
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```java
+var result = instance.visitHorizontalRule(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 public VisitResult visitCustomElement(NodeContext ctx, String tagName, String html)
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```java
+var result = instance.visitCustomElement(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `String` | Yes | The  tag name |
+| `html` | `String` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 public VisitResult visitDefinitionListStart(NodeContext ctx)
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```java
+var result = instance.visitDefinitionListStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 public VisitResult visitDefinitionTerm(NodeContext ctx, String text)
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```java
+var result = instance.visitDefinitionTerm(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 public VisitResult visitDefinitionDescription(NodeContext ctx, String text)
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```java
+var result = instance.visitDefinitionDescription(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 public VisitResult visitDefinitionListEnd(NodeContext ctx, String output)
 ```
 
-#### visitForm()
+**Example:**
+
+```java
+var result = instance.visitDefinitionListEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 public VisitResult visitForm(NodeContext ctx, String action, String method)
 ```
 
-#### visitInput()
+**Example:**
+
+```java
+var result = instance.visitForm(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `Optional<String>` | No | The  action |
+| `method` | `Optional<String>` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 public VisitResult visitInput(NodeContext ctx, String inputType, String name, String value)
 ```
 
-#### visitButton()
+**Example:**
+
+```java
+var result = instance.visitInput(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `String` | Yes | The  input type |
+| `name` | `Optional<String>` | No | The  name |
+| `value` | `Optional<String>` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 public VisitResult visitButton(NodeContext ctx, String text)
 ```
 
-#### visitAudio()
+**Example:**
+
+```java
+var result = instance.visitButton(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 public VisitResult visitAudio(NodeContext ctx, String src)
 ```
 
-#### visitVideo()
+**Example:**
+
+```java
+var result = instance.visitAudio(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `Optional<String>` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 public VisitResult visitVideo(NodeContext ctx, String src)
 ```
 
-#### visitIframe()
+**Example:**
+
+```java
+var result = instance.visitVideo(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `Optional<String>` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 public VisitResult visitIframe(NodeContext ctx, String src)
 ```
 
-#### visitDetails()
+**Example:**
+
+```java
+var result = instance.visitIframe(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `Optional<String>` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 public VisitResult visitDetails(NodeContext ctx, boolean open)
 ```
 
-#### visitSummary()
+**Example:**
+
+```java
+var result = instance.visitDetails(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `boolean` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 public VisitResult visitSummary(NodeContext ctx, String text)
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```java
+var result = instance.visitSummary(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 public VisitResult visitFigureStart(NodeContext ctx)
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```java
+var result = instance.visitFigureStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 public VisitResult visitFigcaption(NodeContext ctx, String text)
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```java
+var result = instance.visitFigcaption(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```java
 public VisitResult visitFigureEnd(NodeContext ctx, String output)
 ```
+
+**Example:**
+
+```java
+var result = instance.visitFigureEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parentTag` | `Optional<String>` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `boolean` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 public Map<String, String> attributes()
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```java
+var result = instance.attributes();
+```
+
+**Returns:** `Map<String, String>`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 public static NodeContext withOwnedAttributes(NodeType nodeType, String tagName, Map<String, String> attributes, long depth, long indexInParent, String parentTag, boolean isInline)
 ```
 
-#### intoOwned()
+**Example:**
+
+```java
+var result = NodeContext.withOwnedAttributes(new NodeType(), "value", Map.of(), 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `String` | Yes | The tag name |
+| `attributes` | `Map<String, String>` | Yes | The attributes |
+| `depth` | `long` | Yes | The depth |
+| `indexInParent` | `long` | Yes | The index in parent |
+| `parentTag` | `Optional<String>` | No | The parent tag |
+| `isInline` | `boolean` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```java
 public NodeContext intoOwned()
 ```
+
+**Example:**
+
+```java
+var result = instance.intoOwned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### defaultOptions()
+###### defaultOptions()
 
 **Signature:**
 
 ```java
 public static PreprocessingOptions defaultOptions()
 ```
+
+**Example:**
+
+```java
+var result = PreprocessingOptions.defaultOptions();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

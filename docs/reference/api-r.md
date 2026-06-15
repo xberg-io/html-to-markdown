@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 convert(html, options = NULL)
 ```
 
+**Example:**
+
+```r
+result <- convert("value", %{{}})
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ convert(html, options = NULL)
 | `options` | `ConversionOptions or NULL` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Stops with error message.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tier_strategy` | `TierStrategy` | `"auto"` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle or NULL` | `NULL` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```r
 default()
 ```
+
+**Example:**
+
+```r
+result <- ConversionOptions.default()
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `integer` | — | Document tree depth at the header element |
 | `html_offset` | `integer` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### is_valid()
+###### is_valid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```r
 is_valid()
 ```
+
+**Example:**
+
+```r
+result <- instance.is_valid()
+```
+
+**Returns:** `logical`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visit_text()
+##### visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 visit_text(ctx, text)
 ```
 
-#### visit_element_start()
+**Example:**
+
+```r
+result <- instance.visit_text(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_element_start()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 visit_element_start(ctx)
 ```
 
-#### visit_element_end()
+**Example:**
+
+```r
+result <- instance.visit_element_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_element_end()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 visit_element_end(ctx, output)
 ```
 
-#### visit_link()
+**Example:**
+
+```r
+result <- instance.visit_element_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `character` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_link()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 visit_link(ctx, href, text, title)
 ```
 
-#### visit_image()
+**Example:**
+
+```r
+result <- instance.visit_link(%{{}}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `character` | Yes | The  href |
+| `text` | `character` | Yes | The  text |
+| `title` | `character or NULL` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_image()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 visit_image(ctx, src, alt, title)
 ```
 
-#### visit_heading()
+**Example:**
+
+```r
+result <- instance.visit_image(%{{}}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `character` | Yes | The  src |
+| `alt` | `character` | Yes | The  alt |
+| `title` | `character or NULL` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 visit_heading(ctx, level, text, id)
 ```
 
-#### visit_code_block()
+**Example:**
+
+```r
+result <- instance.visit_heading(%{{}}, 42, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `integer` | Yes | The  level |
+| `text` | `character` | Yes | The  text |
+| `id` | `character or NULL` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visit_code_block()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 visit_code_block(ctx, lang, code)
 ```
 
-#### visit_code_inline()
+**Example:**
+
+```r
+result <- instance.visit_code_block(%{{}}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `character or NULL` | No | The  lang |
+| `code` | `character` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_code_inline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 visit_code_inline(ctx, code)
 ```
 
-#### visit_list_item()
+**Example:**
+
+```r
+result <- instance.visit_code_inline(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `character` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_list_item()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 visit_list_item(ctx, ordered, marker, text)
 ```
 
-#### visit_list_start()
+**Example:**
+
+```r
+result <- instance.visit_list_item(%{{}}, TRUE, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `logical` | Yes | The  ordered |
+| `marker` | `character` | Yes | The  marker |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 visit_list_start(ctx, ordered)
 ```
 
-#### visit_list_end()
+**Example:**
+
+```r
+result <- instance.visit_list_start(%{{}}, TRUE)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `logical` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 visit_list_end(ctx, ordered, output)
 ```
 
-#### visit_table_start()
+**Example:**
+
+```r
+result <- instance.visit_list_end(%{{}}, TRUE, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `logical` | Yes | The  ordered |
+| `output` | `character` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_table_start()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 visit_table_start(ctx)
 ```
 
-#### visit_table_row()
+**Example:**
+
+```r
+result <- instance.visit_table_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_table_row()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 visit_table_row(ctx, cells, is_header)
 ```
 
-#### visit_table_end()
+**Example:**
+
+```r
+result <- instance.visit_table_row(%{{}}, [], TRUE)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `list` | Yes | The  cells |
+| `is_header` | `logical` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visit_table_end()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 visit_table_end(ctx, output)
 ```
 
-#### visit_blockquote()
+**Example:**
+
+```r
+result <- instance.visit_table_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `character` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 visit_blockquote(ctx, content, depth)
 ```
 
-#### visit_strong()
+**Example:**
+
+```r
+result <- instance.visit_blockquote(%{{}}, "value", 42)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `character` | Yes | The  content |
+| `depth` | `integer` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 visit_strong(ctx, text)
 ```
 
-#### visit_emphasis()
+**Example:**
+
+```r
+result <- instance.visit_strong(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 visit_emphasis(ctx, text)
 ```
 
-#### visit_strikethrough()
+**Example:**
+
+```r
+result <- instance.visit_emphasis(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 visit_strikethrough(ctx, text)
 ```
 
-#### visit_underline()
+**Example:**
+
+```r
+result <- instance.visit_strikethrough(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 visit_underline(ctx, text)
 ```
 
-#### visit_subscript()
+**Example:**
+
+```r
+result <- instance.visit_underline(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_subscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 visit_subscript(ctx, text)
 ```
 
-#### visit_superscript()
+**Example:**
+
+```r
+result <- instance.visit_subscript(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_superscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 visit_superscript(ctx, text)
 ```
 
-#### visit_mark()
+**Example:**
+
+```r
+result <- instance.visit_superscript(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_mark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 visit_mark(ctx, text)
 ```
 
-#### visit_line_break()
+**Example:**
+
+```r
+result <- instance.visit_mark(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_line_break()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 visit_line_break(ctx)
 ```
 
-#### visit_horizontal_rule()
+**Example:**
+
+```r
+result <- instance.visit_line_break(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 visit_horizontal_rule(ctx)
 ```
 
-#### visit_custom_element()
+**Example:**
+
+```r
+result <- instance.visit_horizontal_rule(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 visit_custom_element(ctx, tag_name, html)
 ```
 
-#### visit_definition_list_start()
+**Example:**
+
+```r
+result <- instance.visit_custom_element(%{{}}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tag_name` | `character` | Yes | The  tag name |
+| `html` | `character` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_start()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 visit_definition_list_start(ctx)
 ```
 
-#### visit_definition_term()
+**Example:**
+
+```r
+result <- instance.visit_definition_list_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_term()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 visit_definition_term(ctx, text)
 ```
 
-#### visit_definition_description()
+**Example:**
+
+```r
+result <- instance.visit_definition_term(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_description()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 visit_definition_description(ctx, text)
 ```
 
-#### visit_definition_list_end()
+**Example:**
+
+```r
+result <- instance.visit_definition_description(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 visit_definition_list_end(ctx, output)
 ```
 
-#### visit_form()
+**Example:**
+
+```r
+result <- instance.visit_definition_list_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `character` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_form()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 visit_form(ctx, action, method)
 ```
 
-#### visit_input()
+**Example:**
+
+```r
+result <- instance.visit_form(%{{}}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `character or NULL` | No | The  action |
+| `method` | `character or NULL` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visit_input()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 visit_input(ctx, input_type, name, value)
 ```
 
-#### visit_button()
+**Example:**
+
+```r
+result <- instance.visit_input(%{{}}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `input_type` | `character` | Yes | The  input type |
+| `name` | `character or NULL` | No | The  name |
+| `value` | `character or NULL` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visit_button()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 visit_button(ctx, text)
 ```
 
-#### visit_audio()
+**Example:**
+
+```r
+result <- instance.visit_button(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_audio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 visit_audio(ctx, src)
 ```
 
-#### visit_video()
+**Example:**
+
+```r
+result <- instance.visit_audio(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `character or NULL` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_video()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 visit_video(ctx, src)
 ```
 
-#### visit_iframe()
+**Example:**
+
+```r
+result <- instance.visit_video(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `character or NULL` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_iframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 visit_iframe(ctx, src)
 ```
 
-#### visit_details()
+**Example:**
+
+```r
+result <- instance.visit_iframe(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `character or NULL` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_details()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 visit_details(ctx, open)
 ```
 
-#### visit_summary()
+**Example:**
+
+```r
+result <- instance.visit_details(%{{}}, TRUE)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `logical` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visit_summary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 visit_summary(ctx, text)
 ```
 
-#### visit_figure_start()
+**Example:**
+
+```r
+result <- instance.visit_summary(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_start()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 visit_figure_start(ctx)
 ```
 
-#### visit_figcaption()
+**Example:**
+
+```r
+result <- instance.visit_figure_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 visit_figcaption(ctx, text)
 ```
 
-#### visit_figure_end()
+**Example:**
+
+```r
+result <- instance.visit_figcaption(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `character` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_end()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```r
 visit_figure_end(ctx, output)
 ```
+
+**Example:**
+
+```r
+result <- instance.visit_figure_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `character` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parent_tag` | `character or NULL` | `NULL` | Parent element's tag name (None if root) |
 | `is_inline` | `logical` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 attributes()
 ```
 
-#### with_owned_attributes()
+**Example:**
+
+```r
+result <- instance.attributes()
+```
+
+**Returns:** `list`
+
+###### with_owned_attributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 with_owned_attributes(node_type, tag_name, attributes, depth, index_in_parent, parent_tag, is_inline)
 ```
 
-#### into_owned()
+**Example:**
+
+```r
+result <- NodeContext.with_owned_attributes(%{{}}, "value", [], 42, 42, "value", TRUE)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node_type` | `NodeType` | Yes | The node type |
+| `tag_name` | `character` | Yes | The tag name |
+| `attributes` | `list` | Yes | The attributes |
+| `depth` | `integer` | Yes | The depth |
+| `index_in_parent` | `integer` | Yes | The index in parent |
+| `parent_tag` | `character or NULL` | No | The parent tag |
+| `is_inline` | `logical` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### into_owned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```r
 into_owned()
 ```
+
+**Example:**
+
+```r
+result <- instance.into_owned()
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `logical` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `logical` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```r
 default()
 ```
+
+**Example:**
+
+```r
+result <- PreprocessingOptions.default()
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

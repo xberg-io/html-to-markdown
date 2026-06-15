@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 public static ConversionResult Convert(string html, ConversionOptions? options = null)
 ```
 
+**Example:**
+
+```csharp
+var result = Convert("value", new ConversionOptions());
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ public static ConversionResult Convert(string html, ConversionOptions? options =
 | `Options` | `ConversionOptions?` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error`.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `TierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `Visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### CreateDefault()
+###### CreateDefault()
 
 **Signature:**
 
 ```csharp
 public ConversionOptions CreateDefault()
 ```
+
+**Example:**
+
+```csharp
+var result = ConversionOptions.CreateDefault();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `Depth` | `nuint` | — | Document tree depth at the header element |
 | `HtmlOffset` | `nuint` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### IsValid()
+###### IsValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```csharp
 public bool IsValid()
 ```
+
+**Example:**
+
+```csharp
+var result = instance.IsValid();
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### VisitText()
+##### VisitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 public VisitResult VisitText(NodeContext ctx, string text)
 ```
 
-#### VisitElementStart()
+**Example:**
+
+```csharp
+var result = instance.VisitText(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 public VisitResult VisitElementStart(NodeContext ctx)
 ```
 
-#### VisitElementEnd()
+**Example:**
+
+```csharp
+var result = instance.VisitElementStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 public VisitResult VisitElementEnd(NodeContext ctx, string output)
 ```
 
-#### VisitLink()
+**Example:**
+
+```csharp
+var result = instance.VisitElementEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 public VisitResult VisitLink(NodeContext ctx, string href, string text, string title)
 ```
 
-#### VisitImage()
+**Example:**
+
+```csharp
+var result = instance.VisitLink(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Href` | `string` | Yes | The  href |
+| `Text` | `string` | Yes | The  text |
+| `Title` | `string?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### VisitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 public VisitResult VisitImage(NodeContext ctx, string src, string alt, string title)
 ```
 
-#### VisitHeading()
+**Example:**
+
+```csharp
+var result = instance.VisitImage(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `string` | Yes | The  src |
+| `Alt` | `string` | Yes | The  alt |
+| `Title` | `string?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### VisitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 public VisitResult VisitHeading(NodeContext ctx, uint level, string text, string id)
 ```
 
-#### VisitCodeBlock()
+**Example:**
+
+```csharp
+var result = instance.VisitHeading(new NodeContext(), 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Level` | `uint` | Yes | The  level |
+| `Text` | `string` | Yes | The  text |
+| `Id` | `string?` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### VisitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 public VisitResult VisitCodeBlock(NodeContext ctx, string lang, string code)
 ```
 
-#### VisitCodeInline()
+**Example:**
+
+```csharp
+var result = instance.VisitCodeBlock(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Lang` | `string?` | No | The  lang |
+| `Code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### VisitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 public VisitResult VisitCodeInline(NodeContext ctx, string code)
 ```
 
-#### VisitListItem()
+**Example:**
+
+```csharp
+var result = instance.VisitCodeInline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### VisitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 public VisitResult VisitListItem(NodeContext ctx, bool ordered, string marker, string text)
 ```
 
-#### VisitListStart()
+**Example:**
+
+```csharp
+var result = instance.VisitListItem(new NodeContext(), true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Ordered` | `bool` | Yes | The  ordered |
+| `Marker` | `string` | Yes | The  marker |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 public VisitResult VisitListStart(NodeContext ctx, bool ordered)
 ```
 
-#### VisitListEnd()
+**Example:**
+
+```csharp
+var result = instance.VisitListStart(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### VisitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 public VisitResult VisitListEnd(NodeContext ctx, bool ordered, string output)
 ```
 
-#### VisitTableStart()
+**Example:**
+
+```csharp
+var result = instance.VisitListEnd(new NodeContext(), true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Ordered` | `bool` | Yes | The  ordered |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 public VisitResult VisitTableStart(NodeContext ctx)
 ```
 
-#### VisitTableRow()
+**Example:**
+
+```csharp
+var result = instance.VisitTableStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 public VisitResult VisitTableRow(NodeContext ctx, List<string> cells, bool isHeader)
 ```
 
-#### VisitTableEnd()
+**Example:**
+
+```csharp
+var result = instance.VisitTableRow(new NodeContext(), new List<object>(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Cells` | `List<string>` | Yes | The  cells |
+| `IsHeader` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### VisitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 public VisitResult VisitTableEnd(NodeContext ctx, string output)
 ```
 
-#### VisitBlockquote()
+**Example:**
+
+```csharp
+var result = instance.VisitTableEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 public VisitResult VisitBlockquote(NodeContext ctx, string content, nuint depth)
 ```
 
-#### VisitStrong()
+**Example:**
+
+```csharp
+var result = instance.VisitBlockquote(new NodeContext(), "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Content` | `string` | Yes | The  content |
+| `Depth` | `nuint` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### VisitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 public VisitResult VisitStrong(NodeContext ctx, string text)
 ```
 
-#### VisitEmphasis()
+**Example:**
+
+```csharp
+var result = instance.VisitStrong(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 public VisitResult VisitEmphasis(NodeContext ctx, string text)
 ```
 
-#### VisitStrikethrough()
+**Example:**
+
+```csharp
+var result = instance.VisitEmphasis(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 public VisitResult VisitStrikethrough(NodeContext ctx, string text)
 ```
 
-#### VisitUnderline()
+**Example:**
+
+```csharp
+var result = instance.VisitStrikethrough(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 public VisitResult VisitUnderline(NodeContext ctx, string text)
 ```
 
-#### VisitSubscript()
+**Example:**
+
+```csharp
+var result = instance.VisitUnderline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 public VisitResult VisitSubscript(NodeContext ctx, string text)
 ```
 
-#### VisitSuperscript()
+**Example:**
+
+```csharp
+var result = instance.VisitSubscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 public VisitResult VisitSuperscript(NodeContext ctx, string text)
 ```
 
-#### VisitMark()
+**Example:**
+
+```csharp
+var result = instance.VisitSuperscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 public VisitResult VisitMark(NodeContext ctx, string text)
 ```
 
-#### VisitLineBreak()
+**Example:**
+
+```csharp
+var result = instance.VisitMark(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 public VisitResult VisitLineBreak(NodeContext ctx)
 ```
 
-#### VisitHorizontalRule()
+**Example:**
+
+```csharp
+var result = instance.VisitLineBreak(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 public VisitResult VisitHorizontalRule(NodeContext ctx)
 ```
 
-#### VisitCustomElement()
+**Example:**
+
+```csharp
+var result = instance.VisitHorizontalRule(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 public VisitResult VisitCustomElement(NodeContext ctx, string tagName, string html)
 ```
 
-#### VisitDefinitionListStart()
+**Example:**
+
+```csharp
+var result = instance.VisitCustomElement(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `TagName` | `string` | Yes | The  tag name |
+| `Html` | `string` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 public VisitResult VisitDefinitionListStart(NodeContext ctx)
 ```
 
-#### VisitDefinitionTerm()
+**Example:**
+
+```csharp
+var result = instance.VisitDefinitionListStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 public VisitResult VisitDefinitionTerm(NodeContext ctx, string text)
 ```
 
-#### VisitDefinitionDescription()
+**Example:**
+
+```csharp
+var result = instance.VisitDefinitionTerm(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 public VisitResult VisitDefinitionDescription(NodeContext ctx, string text)
 ```
 
-#### VisitDefinitionListEnd()
+**Example:**
+
+```csharp
+var result = instance.VisitDefinitionDescription(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 public VisitResult VisitDefinitionListEnd(NodeContext ctx, string output)
 ```
 
-#### VisitForm()
+**Example:**
+
+```csharp
+var result = instance.VisitDefinitionListEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### VisitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 public VisitResult VisitForm(NodeContext ctx, string action, string method)
 ```
 
-#### VisitInput()
+**Example:**
+
+```csharp
+var result = instance.VisitForm(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Action` | `string?` | No | The  action |
+| `Method` | `string?` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### VisitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 public VisitResult VisitInput(NodeContext ctx, string inputType, string name, string value)
 ```
 
-#### VisitButton()
+**Example:**
+
+```csharp
+var result = instance.VisitInput(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `InputType` | `string` | Yes | The  input type |
+| `Name` | `string?` | No | The  name |
+| `Value` | `string?` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### VisitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 public VisitResult VisitButton(NodeContext ctx, string text)
 ```
 
-#### VisitAudio()
+**Example:**
+
+```csharp
+var result = instance.VisitButton(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 public VisitResult VisitAudio(NodeContext ctx, string src)
 ```
 
-#### VisitVideo()
+**Example:**
+
+```csharp
+var result = instance.VisitAudio(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `string?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### VisitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 public VisitResult VisitVideo(NodeContext ctx, string src)
 ```
 
-#### VisitIframe()
+**Example:**
+
+```csharp
+var result = instance.VisitVideo(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `string?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### VisitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 public VisitResult VisitIframe(NodeContext ctx, string src)
 ```
 
-#### VisitDetails()
+**Example:**
+
+```csharp
+var result = instance.VisitIframe(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Src` | `string?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### VisitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 public VisitResult VisitDetails(NodeContext ctx, bool open)
 ```
 
-#### VisitSummary()
+**Example:**
+
+```csharp
+var result = instance.VisitDetails(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### VisitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 public VisitResult VisitSummary(NodeContext ctx, string text)
 ```
 
-#### VisitFigureStart()
+**Example:**
+
+```csharp
+var result = instance.VisitSummary(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 public VisitResult VisitFigureStart(NodeContext ctx)
 ```
 
-#### VisitFigcaption()
+**Example:**
+
+```csharp
+var result = instance.VisitFigureStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### VisitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 public VisitResult VisitFigcaption(NodeContext ctx, string text)
 ```
 
-#### VisitFigureEnd()
+**Example:**
+
+```csharp
+var result = instance.VisitFigcaption(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### VisitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```csharp
 public VisitResult VisitFigureEnd(NodeContext ctx, string output)
 ```
+
+**Example:**
+
+```csharp
+var result = instance.VisitFigureEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Ctx` | `NodeContext` | Yes | The node context |
+| `Output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `ParentTag` | `string?` | `null` | Parent element's tag name (None if root) |
 | `IsInline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### Attributes()
+###### Attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 public Dictionary<string, string> Attributes()
 ```
 
-#### WithOwnedAttributes()
+**Example:**
+
+```csharp
+var result = instance.Attributes();
+```
+
+**Returns:** `Dictionary<string, string>`
+
+###### WithOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 public NodeContext WithOwnedAttributes(NodeType nodeType, string tagName, Dictionary<string, string> attributes, nuint depth, nuint indexInParent, string parentTag, bool isInline)
 ```
 
-#### IntoOwned()
+**Example:**
+
+```csharp
+var result = NodeContext.WithOwnedAttributes(new NodeType(), "value", new Dictionary<string, object>(), 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `NodeType` | `NodeType` | Yes | The node type |
+| `TagName` | `string` | Yes | The tag name |
+| `Attributes` | `Dictionary<string, string>` | Yes | The attributes |
+| `Depth` | `nuint` | Yes | The depth |
+| `IndexInParent` | `nuint` | Yes | The index in parent |
+| `ParentTag` | `string?` | No | The parent tag |
+| `IsInline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### IntoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```csharp
 public NodeContext IntoOwned()
 ```
+
+**Example:**
+
+```csharp
+var result = instance.IntoOwned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `RemoveNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `RemoveForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### CreateDefault()
+###### CreateDefault()
 
 **Signature:**
 
 ```csharp
 public PreprocessingOptions CreateDefault()
 ```
+
+**Example:**
+
+```csharp
+var result = PreprocessingOptions.CreateDefault();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

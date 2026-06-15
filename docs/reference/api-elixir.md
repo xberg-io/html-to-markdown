@@ -28,6 +28,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 def convert(html, options)
 ```
 
+**Example:**
+
+```elixir
+{:ok, result} = convert("value", %{{}})
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -36,6 +42,7 @@ def convert(html, options)
 | `options` | `ConversionOptions \| nil` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Returns `{:error, reason}`
 
 ---
@@ -95,15 +102,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tier_strategy` | `TierStrategy` | `:auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle \| nil` | `nil` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Functions
+##### Functions
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```elixir
 def default()
 ```
+
+**Example:**
+
+```elixir
+{:ok, result} = ConversionOptions.default()
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -206,9 +221,9 @@ and position in the document structure.
 | `depth` | `integer()` | — | Document tree depth at the header element |
 | `html_offset` | `integer()` | — | Byte offset in original HTML document |
 
-### Functions
+##### Functions
 
-#### is_valid()
+###### is_valid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -221,6 +236,14 @@ Validate that the header level is within valid range (1-6).
 ```elixir
 def is_valid()
 ```
+
+**Example:**
+
+```elixir
+{:ok, result} = instance.is_valid()
+```
+
+**Returns:** `boolean()`
 
 ---
 
@@ -286,9 +309,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Functions
+#### Functions
 
-#### visit_text()
+##### visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -298,7 +321,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 def visit_text(ctx, text)
 ```
 
-#### visit_element_start()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_text(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_element_start()
 
 Called before entering any element.
 
@@ -311,7 +349,21 @@ visitors to implement generic element handling before tag-specific logic.
 def visit_element_start(ctx)
 ```
 
-#### visit_element_end()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_element_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_element_end()
 
 Called after exiting any element.
 
@@ -324,7 +376,22 @@ Visitors can inspect or replace this output.
 def visit_element_end(ctx, output)
 ```
 
-#### visit_link()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_element_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String.t()` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_link()
 
 Visit anchor links `<a href="...">`.
 
@@ -334,7 +401,24 @@ Visit anchor links `<a href="...">`.
 def visit_link(ctx, href, text, title)
 ```
 
-#### visit_image()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_link(%{{}}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `String.t()` | Yes | The  href |
+| `text` | `String.t()` | Yes | The  text |
+| `title` | `String.t() \| nil` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_image()
 
 Visit images `<img src="...">`.
 
@@ -344,7 +428,24 @@ Visit images `<img src="...">`.
 def visit_image(ctx, src, alt, title)
 ```
 
-#### visit_heading()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_image(%{{}}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String.t()` | Yes | The  src |
+| `alt` | `String.t()` | Yes | The  alt |
+| `title` | `String.t() \| nil` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -354,7 +455,24 @@ Visit heading elements `<h1>` through `<h6>`.
 def visit_heading(ctx, level, text, id)
 ```
 
-#### visit_code_block()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_heading(%{{}}, 42, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `integer()` | Yes | The  level |
+| `text` | `String.t()` | Yes | The  text |
+| `id` | `String.t() \| nil` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visit_code_block()
 
 Visit code blocks `<pre><code>`.
 
@@ -364,7 +482,23 @@ Visit code blocks `<pre><code>`.
 def visit_code_block(ctx, lang, code)
 ```
 
-#### visit_code_inline()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_code_block(%{{}}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `String.t() \| nil` | No | The  lang |
+| `code` | `String.t()` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_code_inline()
 
 Visit inline code `<code>`.
 
@@ -374,7 +508,22 @@ Visit inline code `<code>`.
 def visit_code_inline(ctx, code)
 ```
 
-#### visit_list_item()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_code_inline(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `String.t()` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_list_item()
 
 Visit list items `<li>`.
 
@@ -384,7 +533,24 @@ Visit list items `<li>`.
 def visit_list_item(ctx, ordered, marker, text)
 ```
 
-#### visit_list_start()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_list_item(%{{}}, true, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean()` | Yes | The  ordered |
+| `marker` | `String.t()` | Yes | The  marker |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -394,7 +560,22 @@ Called before processing a list `<ul>` or `<ol>`.
 def visit_list_start(ctx, ordered)
 ```
 
-#### visit_list_end()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_list_start(%{{}}, true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean()` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -404,7 +585,23 @@ Called after processing a list `</ul>` or `</ol>`.
 def visit_list_end(ctx, ordered, output)
 ```
 
-#### visit_table_start()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_list_end(%{{}}, true, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean()` | Yes | The  ordered |
+| `output` | `String.t()` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_table_start()
 
 Called before processing a table `<table>`.
 
@@ -414,7 +611,21 @@ Called before processing a table `<table>`.
 def visit_table_start(ctx)
 ```
 
-#### visit_table_row()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_table_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_table_row()
 
 Visit table rows `<tr>`.
 
@@ -424,7 +635,23 @@ Visit table rows `<tr>`.
 def visit_table_row(ctx, cells, is_header)
 ```
 
-#### visit_table_end()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_table_row(%{{}}, [], true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `list(String.t())` | Yes | The  cells |
+| `is_header` | `boolean()` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visit_table_end()
 
 Called after processing a table `</table>`.
 
@@ -434,7 +661,22 @@ Called after processing a table `</table>`.
 def visit_table_end(ctx, output)
 ```
 
-#### visit_blockquote()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_table_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String.t()` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -444,7 +686,23 @@ Visit blockquote elements `<blockquote>`.
 def visit_blockquote(ctx, content, depth)
 ```
 
-#### visit_strong()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_blockquote(%{{}}, "value", 42)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `String.t()` | Yes | The  content |
+| `depth` | `integer()` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -454,7 +712,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 def visit_strong(ctx, text)
 ```
 
-#### visit_emphasis()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_strong(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -464,7 +737,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 def visit_emphasis(ctx, text)
 ```
 
-#### visit_strikethrough()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_emphasis(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -474,7 +762,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 def visit_strikethrough(ctx, text)
 ```
 
-#### visit_underline()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_strikethrough(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -484,7 +787,22 @@ Visit underline elements `<u>`, `<ins>`.
 def visit_underline(ctx, text)
 ```
 
-#### visit_subscript()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_underline(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_subscript()
 
 Visit subscript elements `<sub>`.
 
@@ -494,7 +812,22 @@ Visit subscript elements `<sub>`.
 def visit_subscript(ctx, text)
 ```
 
-#### visit_superscript()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_subscript(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_superscript()
 
 Visit superscript elements `<sup>`.
 
@@ -504,7 +837,22 @@ Visit superscript elements `<sup>`.
 def visit_superscript(ctx, text)
 ```
 
-#### visit_mark()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_superscript(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_mark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -514,7 +862,22 @@ Visit mark/highlight elements `<mark>`.
 def visit_mark(ctx, text)
 ```
 
-#### visit_line_break()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_mark(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_line_break()
 
 Visit line break elements `<br>`.
 
@@ -524,7 +887,21 @@ Visit line break elements `<br>`.
 def visit_line_break(ctx)
 ```
 
-#### visit_horizontal_rule()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_line_break(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -534,7 +911,21 @@ Visit horizontal rule elements `<hr>`.
 def visit_horizontal_rule(ctx)
 ```
 
-#### visit_custom_element()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_horizontal_rule(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -544,7 +935,23 @@ Visit custom elements (web components) or unknown tags.
 def visit_custom_element(ctx, tag_name, html)
 ```
 
-#### visit_definition_list_start()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_custom_element(%{{}}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tag_name` | `String.t()` | Yes | The  tag name |
+| `html` | `String.t()` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_start()
 
 Visit definition list `<dl>`.
 
@@ -554,7 +961,21 @@ Visit definition list `<dl>`.
 def visit_definition_list_start(ctx)
 ```
 
-#### visit_definition_term()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_definition_list_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_term()
 
 Visit definition term `<dt>`.
 
@@ -564,7 +985,22 @@ Visit definition term `<dt>`.
 def visit_definition_term(ctx, text)
 ```
 
-#### visit_definition_description()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_definition_term(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_description()
 
 Visit definition description `<dd>`.
 
@@ -574,7 +1010,22 @@ Visit definition description `<dd>`.
 def visit_definition_description(ctx, text)
 ```
 
-#### visit_definition_list_end()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_definition_description(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
 
@@ -584,7 +1035,22 @@ Called after processing a definition list `</dl>`.
 def visit_definition_list_end(ctx, output)
 ```
 
-#### visit_form()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_definition_list_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String.t()` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_form()
 
 Visit form elements `<form>`.
 
@@ -594,7 +1060,23 @@ Visit form elements `<form>`.
 def visit_form(ctx, action, method)
 ```
 
-#### visit_input()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_form(%{{}}, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `String.t() \| nil` | No | The  action |
+| `method` | `String.t() \| nil` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visit_input()
 
 Visit input elements `<input>`.
 
@@ -604,7 +1086,24 @@ Visit input elements `<input>`.
 def visit_input(ctx, input_type, name, value)
 ```
 
-#### visit_button()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_input(%{{}}, "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `input_type` | `String.t()` | Yes | The  input type |
+| `name` | `String.t() \| nil` | No | The  name |
+| `value` | `String.t() \| nil` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visit_button()
 
 Visit button elements `<button>`.
 
@@ -614,7 +1113,22 @@ Visit button elements `<button>`.
 def visit_button(ctx, text)
 ```
 
-#### visit_audio()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_button(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_audio()
 
 Visit audio elements `<audio>`.
 
@@ -624,7 +1138,22 @@ Visit audio elements `<audio>`.
 def visit_audio(ctx, src)
 ```
 
-#### visit_video()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_audio(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String.t() \| nil` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_video()
 
 Visit video elements `<video>`.
 
@@ -634,7 +1163,22 @@ Visit video elements `<video>`.
 def visit_video(ctx, src)
 ```
 
-#### visit_iframe()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_video(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String.t() \| nil` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_iframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -644,7 +1188,22 @@ Visit iframe elements `<iframe>`.
 def visit_iframe(ctx, src)
 ```
 
-#### visit_details()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_iframe(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String.t() \| nil` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_details()
 
 Visit details elements `<details>`.
 
@@ -654,7 +1213,22 @@ Visit details elements `<details>`.
 def visit_details(ctx, open)
 ```
 
-#### visit_summary()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_details(%{{}}, true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `boolean()` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visit_summary()
 
 Visit summary elements `<summary>`.
 
@@ -664,7 +1238,22 @@ Visit summary elements `<summary>`.
 def visit_summary(ctx, text)
 ```
 
-#### visit_figure_start()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_summary(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_start()
 
 Visit figure elements `<figure>`.
 
@@ -674,7 +1263,21 @@ Visit figure elements `<figure>`.
 def visit_figure_start(ctx)
 ```
 
-#### visit_figcaption()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_figure_start(%{{}})
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -684,7 +1287,22 @@ Visit figcaption elements `<figcaption>`.
 def visit_figcaption(ctx, text)
 ```
 
-#### visit_figure_end()
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_figcaption(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String.t()` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_end()
 
 Called after processing a figure `</figure>`.
 
@@ -693,6 +1311,21 @@ Called after processing a figure `</figure>`.
 ```elixir
 def visit_figure_end(ctx, output)
 ```
+
+**Example:**
+
+```elixir
+{:ok, result} = instance.visit_figure_end(%{{}}, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String.t()` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -792,9 +1425,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parent_tag` | `String.t() \| nil` | `nil` | Parent element's tag name (None if root) |
 | `is_inline` | `boolean()` | — | Whether this element is treated as inline vs block |
 
-### Functions
+##### Functions
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -808,7 +1441,15 @@ If this method is never called, no allocation occurs for attributes.
 def attributes()
 ```
 
-#### with_owned_attributes()
+**Example:**
+
+```elixir
+{:ok, result} = instance.attributes()
+```
+
+**Returns:** `map()`
+
+###### with_owned_attributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -821,7 +1462,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 def with_owned_attributes(node_type, tag_name, attributes, depth, index_in_parent, parent_tag, is_inline)
 ```
 
-#### into_owned()
+**Example:**
+
+```elixir
+{:ok, result} = NodeContext.with_owned_attributes(%{{}}, "value", %{}, 42, 42, "value", true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node_type` | `NodeType` | Yes | The node type |
+| `tag_name` | `String.t()` | Yes | The tag name |
+| `attributes` | `map()` | Yes | The attributes |
+| `depth` | `integer()` | Yes | The depth |
+| `index_in_parent` | `integer()` | Yes | The index in parent |
+| `parent_tag` | `String.t() \| nil` | No | The parent tag |
+| `is_inline` | `boolean()` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### into_owned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -830,6 +1491,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```elixir
 def into_owned()
 ```
+
+**Example:**
+
+```elixir
+{:ok, result} = instance.into_owned()
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -844,15 +1513,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `boolean()` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `boolean()` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Functions
+##### Functions
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```elixir
 def default()
 ```
+
+**Example:**
+
+```elixir
+{:ok, result} = PreprocessingOptions.default()
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

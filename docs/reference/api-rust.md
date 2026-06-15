@@ -27,6 +27,22 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 pub fn convert(html: &str, options: Option<ConversionOptions>) -> Result<ConversionResult, Error>
 ```
 
+**Example:**
+
+```rust
+use html_to_markdown_rs::{convert, ConversionOptions};
+
+let html = "<h1>Hello World</h1>";
+
+// Bare options — most ergonomic.
+let result = convert(html, ConversionOptions::default()).unwrap();
+assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+
+// `None` falls back to defaults.
+let result = convert(html, None).unwrap();
+assert!(result.content.as_deref().unwrap_or("").contains("Hello World"));
+```rust
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +51,7 @@ pub fn convert(html: &str, options: Option<ConversionOptions>) -> Result<Convers
 | `options` | `Option<ConversionOptions>` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Returns `Err(Error)`.
 
 ---
@@ -94,15 +111,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tier_strategy` | `TierStrategy` | `TierStrategy::Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `Option<VisitorHandle>` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```rust
 pub fn default() -> ConversionOptions
 ```
+
+**Example:**
+
+```rust
+let result = ConversionOptions::default();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +230,9 @@ and position in the document structure.
 | `depth` | `usize` | — | Document tree depth at the header element |
 | `html_offset` | `usize` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### is_valid()
+###### is_valid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +245,30 @@ Validate that the header level is within valid range (1-6).
 ```rust
 pub fn is_valid(&self) -> bool
 ```
+
+**Example:**
+
+```rust
+let valid = HeaderMetadata {
+    level: 3,
+    text: "Title".to_string(),
+    id: None,
+    depth: 2,
+    html_offset: 100,
+};
+assert!(valid.is_valid());
+
+let invalid = HeaderMetadata {
+    level: 7,  // Invalid
+    text: "Title".to_string(),
+    id: None,
+    depth: 2,
+    html_offset: 100,
+};
+assert!(!invalid.is_valid());
+```rust
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +334,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+##### Methods
 
-#### visit_text()
+###### visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +346,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 pub fn visit_text(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_element_start()
+**Example:**
+
+```rust
+let result = instance.visit_text(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_element_start()
 
 Called before entering any element.
 
@@ -310,7 +374,21 @@ visitors to implement generic element handling before tag-specific logic.
 pub fn visit_element_start(&self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_element_end()
+**Example:**
+
+```rust
+let result = instance.visit_element_start(NodeContext::default());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_element_end()
 
 Called after exiting any element.
 
@@ -323,7 +401,22 @@ Visitors can inspect or replace this output.
 pub fn visit_element_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
 
-#### visit_link()
+**Example:**
+
+```rust
+let result = instance.visit_element_end(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_link()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +426,24 @@ Visit anchor links `<a href="...">`.
 pub fn visit_link(&self, ctx: NodeContext, href: &str, text: &str, title: Option<String>) -> VisitResult
 ```
 
-#### visit_image()
+**Example:**
+
+```rust
+let result = instance.visit_link(NodeContext::default(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `String` | Yes | The  href |
+| `text` | `String` | Yes | The  text |
+| `title` | `Option<String>` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_image()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +453,24 @@ Visit images `<img src="...">`.
 pub fn visit_image(&self, ctx: NodeContext, src: &str, alt: &str, title: Option<String>) -> VisitResult
 ```
 
-#### visit_heading()
+**Example:**
+
+```rust
+let result = instance.visit_image(NodeContext::default(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String` | Yes | The  src |
+| `alt` | `String` | Yes | The  alt |
+| `title` | `Option<String>` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +480,24 @@ Visit heading elements `<h1>` through `<h6>`.
 pub fn visit_heading(&self, ctx: NodeContext, level: u32, text: &str, id: Option<String>) -> VisitResult
 ```
 
-#### visit_code_block()
+**Example:**
+
+```rust
+let result = instance.visit_heading(NodeContext::default(), 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `u32` | Yes | The  level |
+| `text` | `String` | Yes | The  text |
+| `id` | `Option<String>` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visit_code_block()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +507,23 @@ Visit code blocks `<pre><code>`.
 pub fn visit_code_block(&self, ctx: NodeContext, lang: Option<String>, code: &str) -> VisitResult
 ```
 
-#### visit_code_inline()
+**Example:**
+
+```rust
+let result = instance.visit_code_block(NodeContext::default(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `Option<String>` | No | The  lang |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_code_inline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +533,22 @@ Visit inline code `<code>`.
 pub fn visit_code_inline(&self, ctx: NodeContext, code: &str) -> VisitResult
 ```
 
-#### visit_list_item()
+**Example:**
+
+```rust
+let result = instance.visit_code_inline(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_list_item()
 
 Visit list items `<li>`.
 
@@ -383,7 +558,24 @@ Visit list items `<li>`.
 pub fn visit_list_item(&self, ctx: NodeContext, ordered: bool, marker: &str, text: &str) -> VisitResult
 ```
 
-#### visit_list_start()
+**Example:**
+
+```rust
+let result = instance.visit_list_item(NodeContext::default(), true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `marker` | `String` | Yes | The  marker |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +585,22 @@ Called before processing a list `<ul>` or `<ol>`.
 pub fn visit_list_start(&self, ctx: NodeContext, ordered: bool) -> VisitResult
 ```
 
-#### visit_list_end()
+**Example:**
+
+```rust
+let result = instance.visit_list_start(NodeContext::default(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +610,23 @@ Called after processing a list `</ul>` or `</ol>`.
 pub fn visit_list_end(&self, ctx: NodeContext, ordered: bool, output: &str) -> VisitResult
 ```
 
-#### visit_table_start()
+**Example:**
+
+```rust
+let result = instance.visit_list_end(NodeContext::default(), true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_table_start()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +636,21 @@ Called before processing a table `<table>`.
 pub fn visit_table_start(&self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_table_row()
+**Example:**
+
+```rust
+let result = instance.visit_table_start(NodeContext::default());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_table_row()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +660,23 @@ Visit table rows `<tr>`.
 pub fn visit_table_row(&self, ctx: NodeContext, cells: Vec<String>, is_header: bool) -> VisitResult
 ```
 
-#### visit_table_end()
+**Example:**
+
+```rust
+let result = instance.visit_table_row(NodeContext::default(), vec![], true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `Vec<String>` | Yes | The  cells |
+| `is_header` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visit_table_end()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +686,22 @@ Called after processing a table `</table>`.
 pub fn visit_table_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
 
-#### visit_blockquote()
+**Example:**
+
+```rust
+let result = instance.visit_table_end(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +711,23 @@ Visit blockquote elements `<blockquote>`.
 pub fn visit_blockquote(&self, ctx: NodeContext, content: &str, depth: usize) -> VisitResult
 ```
 
-#### visit_strong()
+**Example:**
+
+```rust
+let result = instance.visit_blockquote(NodeContext::default(), "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `String` | Yes | The  content |
+| `depth` | `usize` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +737,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 pub fn visit_strong(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_emphasis()
+**Example:**
+
+```rust
+let result = instance.visit_strong(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +762,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 pub fn visit_emphasis(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_strikethrough()
+**Example:**
+
+```rust
+let result = instance.visit_emphasis(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +787,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 pub fn visit_strikethrough(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_underline()
+**Example:**
+
+```rust
+let result = instance.visit_strikethrough(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +812,22 @@ Visit underline elements `<u>`, `<ins>`.
 pub fn visit_underline(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_subscript()
+**Example:**
+
+```rust
+let result = instance.visit_underline(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_subscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +837,22 @@ Visit subscript elements `<sub>`.
 pub fn visit_subscript(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_superscript()
+**Example:**
+
+```rust
+let result = instance.visit_subscript(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_superscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +862,22 @@ Visit superscript elements `<sup>`.
 pub fn visit_superscript(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_mark()
+**Example:**
+
+```rust
+let result = instance.visit_superscript(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_mark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +887,22 @@ Visit mark/highlight elements `<mark>`.
 pub fn visit_mark(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_line_break()
+**Example:**
+
+```rust
+let result = instance.visit_mark(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_line_break()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +912,21 @@ Visit line break elements `<br>`.
 pub fn visit_line_break(&self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_horizontal_rule()
+**Example:**
+
+```rust
+let result = instance.visit_line_break(NodeContext::default());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +936,21 @@ Visit horizontal rule elements `<hr>`.
 pub fn visit_horizontal_rule(&self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_custom_element()
+**Example:**
+
+```rust
+let result = instance.visit_horizontal_rule(NodeContext::default());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +960,23 @@ Visit custom elements (web components) or unknown tags.
 pub fn visit_custom_element(&self, ctx: NodeContext, tag_name: &str, html: &str) -> VisitResult
 ```
 
-#### visit_definition_list_start()
+**Example:**
+
+```rust
+let result = instance.visit_custom_element(NodeContext::default(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tag_name` | `String` | Yes | The  tag name |
+| `html` | `String` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_start()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +986,21 @@ Visit definition list `<dl>`.
 pub fn visit_definition_list_start(&self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_definition_term()
+**Example:**
+
+```rust
+let result = instance.visit_definition_list_start(NodeContext::default());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_term()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +1010,22 @@ Visit definition term `<dt>`.
 pub fn visit_definition_term(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_definition_description()
+**Example:**
+
+```rust
+let result = instance.visit_definition_term(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_description()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1035,22 @@ Visit definition description `<dd>`.
 pub fn visit_definition_description(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_definition_list_end()
+**Example:**
+
+```rust
+let result = instance.visit_definition_description(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1060,22 @@ Called after processing a definition list `</dl>`.
 pub fn visit_definition_list_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
 
-#### visit_form()
+**Example:**
+
+```rust
+let result = instance.visit_definition_list_end(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_form()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1085,23 @@ Visit form elements `<form>`.
 pub fn visit_form(&self, ctx: NodeContext, action: Option<String>, method: Option<String>) -> VisitResult
 ```
 
-#### visit_input()
+**Example:**
+
+```rust
+let result = instance.visit_form(NodeContext::default(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `Option<String>` | No | The  action |
+| `method` | `Option<String>` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visit_input()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1111,24 @@ Visit input elements `<input>`.
 pub fn visit_input(&self, ctx: NodeContext, input_type: &str, name: Option<String>, value: Option<String>) -> VisitResult
 ```
 
-#### visit_button()
+**Example:**
+
+```rust
+let result = instance.visit_input(NodeContext::default(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `input_type` | `String` | Yes | The  input type |
+| `name` | `Option<String>` | No | The  name |
+| `value` | `Option<String>` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visit_button()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1138,22 @@ Visit button elements `<button>`.
 pub fn visit_button(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_audio()
+**Example:**
+
+```rust
+let result = instance.visit_button(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_audio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1163,22 @@ Visit audio elements `<audio>`.
 pub fn visit_audio(&self, ctx: NodeContext, src: Option<String>) -> VisitResult
 ```
 
-#### visit_video()
+**Example:**
+
+```rust
+let result = instance.visit_audio(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `Option<String>` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_video()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1188,22 @@ Visit video elements `<video>`.
 pub fn visit_video(&self, ctx: NodeContext, src: Option<String>) -> VisitResult
 ```
 
-#### visit_iframe()
+**Example:**
+
+```rust
+let result = instance.visit_video(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `Option<String>` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_iframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1213,22 @@ Visit iframe elements `<iframe>`.
 pub fn visit_iframe(&self, ctx: NodeContext, src: Option<String>) -> VisitResult
 ```
 
-#### visit_details()
+**Example:**
+
+```rust
+let result = instance.visit_iframe(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `Option<String>` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_details()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1238,22 @@ Visit details elements `<details>`.
 pub fn visit_details(&self, ctx: NodeContext, open: bool) -> VisitResult
 ```
 
-#### visit_summary()
+**Example:**
+
+```rust
+let result = instance.visit_details(NodeContext::default(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visit_summary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1263,22 @@ Visit summary elements `<summary>`.
 pub fn visit_summary(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_figure_start()
+**Example:**
+
+```rust
+let result = instance.visit_summary(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_start()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1288,21 @@ Visit figure elements `<figure>`.
 pub fn visit_figure_start(&self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_figcaption()
+**Example:**
+
+```rust
+let result = instance.visit_figure_start(NodeContext::default());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1312,22 @@ Visit figcaption elements `<figcaption>`.
 pub fn visit_figcaption(&self, ctx: NodeContext, text: &str) -> VisitResult
 ```
 
-#### visit_figure_end()
+**Example:**
+
+```rust
+let result = instance.visit_figcaption(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_end()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1336,21 @@ Called after processing a figure `</figure>`.
 ```rust
 pub fn visit_figure_end(&self, ctx: NodeContext, output: &str) -> VisitResult
 ```
+
+**Example:**
+
+```rust
+let result = instance.visit_figure_end(NodeContext::default(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1450,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parent_tag` | `Option<String>` | `None` | Parent element's tag name (None if root) |
 | `is_inline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1466,15 @@ If this method is never called, no allocation occurs for attributes.
 pub fn attributes(&self) -> HashMap<String, String>
 ```
 
-#### with_owned_attributes()
+**Example:**
+
+```rust
+let result = instance.attributes();
+```
+
+**Returns:** `HashMap<String, String>`
+
+###### with_owned_attributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1487,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 pub fn with_owned_attributes(node_type: NodeType, tag_name: &str, attributes: HashMap<String, String>, depth: usize, index_in_parent: usize, parent_tag: Option<String>, is_inline: bool) -> NodeContext
 ```
 
-#### into_owned()
+**Example:**
+
+```rust
+let result = NodeContext::with_owned_attributes(NodeType::default(), "value", std::collections::HashMap::new(), 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node_type` | `NodeType` | Yes | The node type |
+| `tag_name` | `String` | Yes | The tag name |
+| `attributes` | `HashMap<String, String>` | Yes | The attributes |
+| `depth` | `usize` | Yes | The depth |
+| `index_in_parent` | `usize` | Yes | The index in parent |
+| `parent_tag` | `Option<String>` | No | The parent tag |
+| `is_inline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### into_owned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1516,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```rust
 pub fn into_owned(&self) -> NodeContext
 ```
+
+**Example:**
+
+```rust
+let result = instance.into_owned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1538,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```rust
 pub fn default() -> PreprocessingOptions
 ```
+
+**Example:**
+
+```rust
+let result = PreprocessingOptions::default();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

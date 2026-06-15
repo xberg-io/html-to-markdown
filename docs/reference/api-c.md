@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 HtmConversionResult* htm_convert(const char* html, HtmConversionOptions options);
 ```
 
+**Example:**
+
+```c
+HtmConversionResult *result = htm_convert("value", NULL);
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ HtmConversionResult* htm_convert(const char* html, HtmConversionOptions options)
 | `options` | `HtmConversionOptions*` | No | The options to use |
 
 **Returns:** `HtmConversionResult`
+
 **Errors:** Returns `NULL` on error.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tier_strategy` | `HtmTierStrategy` | `HTM_HTM_AUTO` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `HtmVisitorHandle*` | `NULL` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### htm_default()
+###### htm_default()
 
 **Signature:**
 
 ```c
 HtmConversionOptions htm_default();
 ```
+
+**Example:**
+
+```c
+HtmConversionOptions *result = htm_default();
+```
+
+**Returns:** `HtmConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `uintptr_t` | — | Document tree depth at the header element |
 | `html_offset` | `uintptr_t` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### htm_is_valid()
+###### htm_is_valid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```c
 bool htm_is_valid();
 ```
+
+**Example:**
+
+```c
+bool result = htm_is_valid(instance);
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### htm_visit_text()
+##### htm_visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 HtmVisitResult htm_visit_text(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_element_start()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_text(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_element_start()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 HtmVisitResult htm_visit_element_start(HtmNodeContext ctx);
 ```
 
-#### htm_visit_element_end()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_element_start(instance, NULL);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_element_end()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 HtmVisitResult htm_visit_element_end(HtmNodeContext ctx, const char* output);
 ```
 
-#### htm_visit_link()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_element_end(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `output` | `const char*` | Yes | The  output |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_link()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 HtmVisitResult htm_visit_link(HtmNodeContext ctx, const char* href, const char* text, const char* title);
 ```
 
-#### htm_visit_image()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_link(instance, NULL, "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `href` | `const char*` | Yes | The  href |
+| `text` | `const char*` | Yes | The  text |
+| `title` | `const char**` | No | The  title |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_image()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 HtmVisitResult htm_visit_image(HtmNodeContext ctx, const char* src, const char* alt, const char* title);
 ```
 
-#### htm_visit_heading()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_image(instance, NULL, "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `src` | `const char*` | Yes | The  src |
+| `alt` | `const char*` | Yes | The  alt |
+| `title` | `const char**` | No | The  title |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 HtmVisitResult htm_visit_heading(HtmNodeContext ctx, uint32_t level, const char* text, const char* id);
 ```
 
-#### htm_visit_code_block()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_heading(instance, NULL, 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `level` | `uint32_t` | Yes | The  level |
+| `text` | `const char*` | Yes | The  text |
+| `id` | `const char**` | No | The  id |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_code_block()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 HtmVisitResult htm_visit_code_block(HtmNodeContext ctx, const char* lang, const char* code);
 ```
 
-#### htm_visit_code_inline()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_code_block(instance, NULL, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `lang` | `const char**` | No | The  lang |
+| `code` | `const char*` | Yes | The  code |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_code_inline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 HtmVisitResult htm_visit_code_inline(HtmNodeContext ctx, const char* code);
 ```
 
-#### htm_visit_list_item()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_code_inline(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `code` | `const char*` | Yes | The  code |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_list_item()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 HtmVisitResult htm_visit_list_item(HtmNodeContext ctx, bool ordered, const char* marker, const char* text);
 ```
 
-#### htm_visit_list_start()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_list_item(instance, NULL, true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `marker` | `const char*` | Yes | The  marker |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 HtmVisitResult htm_visit_list_start(HtmNodeContext ctx, bool ordered);
 ```
 
-#### htm_visit_list_end()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_list_start(instance, NULL, true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 HtmVisitResult htm_visit_list_end(HtmNodeContext ctx, bool ordered, const char* output);
 ```
 
-#### htm_visit_table_start()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_list_end(instance, NULL, true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `output` | `const char*` | Yes | The  output |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_table_start()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 HtmVisitResult htm_visit_table_start(HtmNodeContext ctx);
 ```
 
-#### htm_visit_table_row()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_table_start(instance, NULL);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_table_row()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 HtmVisitResult htm_visit_table_row(HtmNodeContext ctx, const char** cells, bool is_header);
 ```
 
-#### htm_visit_table_end()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_table_row(instance, NULL, NULL, true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `cells` | `const char**` | Yes | The  cells |
+| `is_header` | `bool` | Yes | The  is header |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_table_end()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 HtmVisitResult htm_visit_table_end(HtmNodeContext ctx, const char* output);
 ```
 
-#### htm_visit_blockquote()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_table_end(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `output` | `const char*` | Yes | The  output |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 HtmVisitResult htm_visit_blockquote(HtmNodeContext ctx, const char* content, uintptr_t depth);
 ```
 
-#### htm_visit_strong()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_blockquote(instance, NULL, "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `content` | `const char*` | Yes | The  content |
+| `depth` | `uintptr_t` | Yes | The  depth |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 HtmVisitResult htm_visit_strong(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_emphasis()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_strong(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 HtmVisitResult htm_visit_emphasis(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_strikethrough()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_emphasis(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 HtmVisitResult htm_visit_strikethrough(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_underline()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_strikethrough(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 HtmVisitResult htm_visit_underline(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_subscript()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_underline(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_subscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 HtmVisitResult htm_visit_subscript(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_superscript()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_subscript(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_superscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 HtmVisitResult htm_visit_superscript(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_mark()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_superscript(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_mark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 HtmVisitResult htm_visit_mark(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_line_break()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_mark(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_line_break()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 HtmVisitResult htm_visit_line_break(HtmNodeContext ctx);
 ```
 
-#### htm_visit_horizontal_rule()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_line_break(instance, NULL);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 HtmVisitResult htm_visit_horizontal_rule(HtmNodeContext ctx);
 ```
 
-#### htm_visit_custom_element()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_horizontal_rule(instance, NULL);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 HtmVisitResult htm_visit_custom_element(HtmNodeContext ctx, const char* tag_name, const char* html);
 ```
 
-#### htm_visit_definition_list_start()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_custom_element(instance, NULL, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `tag_name` | `const char*` | Yes | The  tag name |
+| `html` | `const char*` | Yes | The  html |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_definition_list_start()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 HtmVisitResult htm_visit_definition_list_start(HtmNodeContext ctx);
 ```
 
-#### htm_visit_definition_term()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_definition_list_start(instance, NULL);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_definition_term()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 HtmVisitResult htm_visit_definition_term(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_definition_description()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_definition_term(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_definition_description()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 HtmVisitResult htm_visit_definition_description(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_definition_list_end()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_definition_description(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 HtmVisitResult htm_visit_definition_list_end(HtmNodeContext ctx, const char* output);
 ```
 
-#### htm_visit_form()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_definition_list_end(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `output` | `const char*` | Yes | The  output |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_form()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 HtmVisitResult htm_visit_form(HtmNodeContext ctx, const char* action, const char* method);
 ```
 
-#### htm_visit_input()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_form(instance, NULL, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `action` | `const char**` | No | The  action |
+| `method` | `const char**` | No | The  method |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_input()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 HtmVisitResult htm_visit_input(HtmNodeContext ctx, const char* input_type, const char* name, const char* value);
 ```
 
-#### htm_visit_button()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_input(instance, NULL, "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `input_type` | `const char*` | Yes | The  input type |
+| `name` | `const char**` | No | The  name |
+| `value` | `const char**` | No | The  value |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_button()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 HtmVisitResult htm_visit_button(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_audio()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_button(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_audio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 HtmVisitResult htm_visit_audio(HtmNodeContext ctx, const char* src);
 ```
 
-#### htm_visit_video()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_audio(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `src` | `const char**` | No | The  src |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_video()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 HtmVisitResult htm_visit_video(HtmNodeContext ctx, const char* src);
 ```
 
-#### htm_visit_iframe()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_video(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `src` | `const char**` | No | The  src |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_iframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 HtmVisitResult htm_visit_iframe(HtmNodeContext ctx, const char* src);
 ```
 
-#### htm_visit_details()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_iframe(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `src` | `const char**` | No | The  src |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_details()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 HtmVisitResult htm_visit_details(HtmNodeContext ctx, bool open);
 ```
 
-#### htm_visit_summary()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_details(instance, NULL, true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `open` | `bool` | Yes | The  open |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_summary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 HtmVisitResult htm_visit_summary(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_figure_start()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_summary(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_figure_start()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 HtmVisitResult htm_visit_figure_start(HtmNodeContext ctx);
 ```
 
-#### htm_visit_figcaption()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_figure_start(instance, NULL);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 HtmVisitResult htm_visit_figcaption(HtmNodeContext ctx, const char* text);
 ```
 
-#### htm_visit_figure_end()
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_figcaption(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `text` | `const char*` | Yes | The  text |
+
+**Returns:** `HtmVisitResult`
+
+###### htm_visit_figure_end()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```c
 HtmVisitResult htm_visit_figure_end(HtmNodeContext ctx, const char* output);
 ```
+
+**Example:**
+
+```c
+HtmVisitResult *result = htm_visit_figure_end(instance, NULL, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `HtmNodeContext` | Yes | The node context |
+| `output` | `const char*` | Yes | The  output |
+
+**Returns:** `HtmVisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parent_tag` | `const char**` | `NULL` | Parent element's tag name (None if root) |
 | `is_inline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### htm_attributes()
+###### htm_attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 void* htm_attributes();
 ```
 
-#### htm_with_owned_attributes()
+**Example:**
+
+```c
+void* result = htm_attributes(instance);
+```
+
+**Returns:** `void*`
+
+###### htm_with_owned_attributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 HtmNodeContext htm_with_owned_attributes(HtmNodeType node_type, const char* tag_name, void* attributes, uintptr_t depth, uintptr_t index_in_parent, const char* parent_tag, bool is_inline);
 ```
 
-#### htm_into_owned()
+**Example:**
+
+```c
+HtmNodeContext *result = htm_with_owned_attributes(NULL, "value", NULL, 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node_type` | `HtmNodeType` | Yes | The node type |
+| `tag_name` | `const char*` | Yes | The tag name |
+| `attributes` | `void*` | Yes | The attributes |
+| `depth` | `uintptr_t` | Yes | The depth |
+| `index_in_parent` | `uintptr_t` | Yes | The index in parent |
+| `parent_tag` | `const char**` | No | The parent tag |
+| `is_inline` | `bool` | Yes | The is inline |
+
+**Returns:** `HtmNodeContext`
+
+###### htm_into_owned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```c
 HtmNodeContext htm_into_owned();
 ```
+
+**Example:**
+
+```c
+HtmNodeContext *result = htm_into_owned(instance);
+```
+
+**Returns:** `HtmNodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### htm_default()
+###### htm_default()
 
 **Signature:**
 
 ```c
 HtmPreprocessingOptions htm_default();
 ```
+
+**Example:**
+
+```c
+HtmPreprocessingOptions *result = htm_default();
+```
+
+**Returns:** `HtmPreprocessingOptions`
 
 ---
 

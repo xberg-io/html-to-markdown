@@ -28,6 +28,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 fun convert(html: String, options: ConversionOptions? = null): ConversionResult
 ```
 
+**Example:**
+
+```kotlin
+val result = convert("value", ConversionOptions())
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -36,6 +42,7 @@ fun convert(html: String, options: ConversionOptions? = null): ConversionResult
 | `options` | `ConversionOptions?` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error`.
 
 ---
@@ -95,9 +102,9 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
@@ -105,6 +112,14 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 @JvmStatic
 fun default(): ConversionOptions
 ```
+
+**Example:**
+
+```kotlin
+val result = ConversionOptions.default()
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -207,9 +222,9 @@ and position in the document structure.
 | `depth` | `Long` | — | Document tree depth at the header element |
 | `htmlOffset` | `Long` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -222,6 +237,14 @@ Validate that the header level is within valid range (1-6).
 ```kotlin
 fun isValid(): Boolean
 ```
+
+**Example:**
+
+```kotlin
+val result = instance.isValid()
+```
+
+**Returns:** `Boolean`
 
 ---
 
@@ -287,9 +310,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -299,7 +322,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 fun visitText(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitElementStart()
+**Example:**
+
+```kotlin
+val result = instance.visitText(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -312,7 +350,21 @@ visitors to implement generic element handling before tag-specific logic.
 fun visitElementStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```kotlin
+val result = instance.visitElementStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -325,7 +377,22 @@ Visitors can inspect or replace this output.
 fun visitElementEnd(ctx: NodeContext, output: String): VisitResult
 ```
 
-#### visitLink()
+**Example:**
+
+```kotlin
+val result = instance.visitElementEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -335,7 +402,24 @@ Visit anchor links `<a href="...">`.
 fun visitLink(ctx: NodeContext, href: String, text: String, title: String? = null): VisitResult
 ```
 
-#### visitImage()
+**Example:**
+
+```kotlin
+val result = instance.visitLink(NodeContext(), "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `String` | Yes | The  href |
+| `text` | `String` | Yes | The  text |
+| `title` | `String?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -345,7 +429,24 @@ Visit images `<img src="...">`.
 fun visitImage(ctx: NodeContext, src: String, alt: String, title: String? = null): VisitResult
 ```
 
-#### visitHeading()
+**Example:**
+
+```kotlin
+val result = instance.visitImage(NodeContext(), "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String` | Yes | The  src |
+| `alt` | `String` | Yes | The  alt |
+| `title` | `String?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -355,7 +456,24 @@ Visit heading elements `<h1>` through `<h6>`.
 fun visitHeading(ctx: NodeContext, level: Int, text: String, id: String? = null): VisitResult
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```kotlin
+val result = instance.visitHeading(NodeContext(), 42, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `Int` | Yes | The  level |
+| `text` | `String` | Yes | The  text |
+| `id` | `String?` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -365,7 +483,23 @@ Visit code blocks `<pre><code>`.
 fun visitCodeBlock(ctx: NodeContext, lang: String? = null, code: String): VisitResult
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```kotlin
+val result = instance.visitCodeBlock(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `String?` | No | The  lang |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -375,7 +509,22 @@ Visit inline code `<code>`.
 fun visitCodeInline(ctx: NodeContext, code: String): VisitResult
 ```
 
-#### visitListItem()
+**Example:**
+
+```kotlin
+val result = instance.visitCodeInline(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -385,7 +534,24 @@ Visit list items `<li>`.
 fun visitListItem(ctx: NodeContext, ordered: Boolean, marker: String, text: String): VisitResult
 ```
 
-#### visitListStart()
+**Example:**
+
+```kotlin
+val result = instance.visitListItem(NodeContext(), true, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `Boolean` | Yes | The  ordered |
+| `marker` | `String` | Yes | The  marker |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -395,7 +561,22 @@ Called before processing a list `<ul>` or `<ol>`.
 fun visitListStart(ctx: NodeContext, ordered: Boolean): VisitResult
 ```
 
-#### visitListEnd()
+**Example:**
+
+```kotlin
+val result = instance.visitListStart(NodeContext(), true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `Boolean` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -405,7 +586,23 @@ Called after processing a list `</ul>` or `</ol>`.
 fun visitListEnd(ctx: NodeContext, ordered: Boolean, output: String): VisitResult
 ```
 
-#### visitTableStart()
+**Example:**
+
+```kotlin
+val result = instance.visitListEnd(NodeContext(), true, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `Boolean` | Yes | The  ordered |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -415,7 +612,21 @@ Called before processing a table `<table>`.
 fun visitTableStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitTableRow()
+**Example:**
+
+```kotlin
+val result = instance.visitTableStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -425,7 +636,23 @@ Visit table rows `<tr>`.
 fun visitTableRow(ctx: NodeContext, cells: List<String>, isHeader: Boolean): VisitResult
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```kotlin
+val result = instance.visitTableRow(NodeContext(), [], true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `List<String>` | Yes | The  cells |
+| `isHeader` | `Boolean` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -435,7 +662,22 @@ Called after processing a table `</table>`.
 fun visitTableEnd(ctx: NodeContext, output: String): VisitResult
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```kotlin
+val result = instance.visitTableEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -445,7 +687,23 @@ Visit blockquote elements `<blockquote>`.
 fun visitBlockquote(ctx: NodeContext, content: String, depth: Long): VisitResult
 ```
 
-#### visitStrong()
+**Example:**
+
+```kotlin
+val result = instance.visitBlockquote(NodeContext(), "value", 42)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `String` | Yes | The  content |
+| `depth` | `Long` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -455,7 +713,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 fun visitStrong(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```kotlin
+val result = instance.visitStrong(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -465,7 +738,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 fun visitEmphasis(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```kotlin
+val result = instance.visitEmphasis(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -475,7 +763,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 fun visitStrikethrough(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitUnderline()
+**Example:**
+
+```kotlin
+val result = instance.visitStrikethrough(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -485,7 +788,22 @@ Visit underline elements `<u>`, `<ins>`.
 fun visitUnderline(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitSubscript()
+**Example:**
+
+```kotlin
+val result = instance.visitUnderline(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -495,7 +813,22 @@ Visit subscript elements `<sub>`.
 fun visitSubscript(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```kotlin
+val result = instance.visitSubscript(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -505,7 +838,22 @@ Visit superscript elements `<sup>`.
 fun visitSuperscript(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitMark()
+**Example:**
+
+```kotlin
+val result = instance.visitSuperscript(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -515,7 +863,22 @@ Visit mark/highlight elements `<mark>`.
 fun visitMark(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```kotlin
+val result = instance.visitMark(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -525,7 +888,21 @@ Visit line break elements `<br>`.
 fun visitLineBreak(ctx: NodeContext): VisitResult
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```kotlin
+val result = instance.visitLineBreak(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -535,7 +912,21 @@ Visit horizontal rule elements `<hr>`.
 fun visitHorizontalRule(ctx: NodeContext): VisitResult
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```kotlin
+val result = instance.visitHorizontalRule(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -545,7 +936,23 @@ Visit custom elements (web components) or unknown tags.
 fun visitCustomElement(ctx: NodeContext, tagName: String, html: String): VisitResult
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```kotlin
+val result = instance.visitCustomElement(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `String` | Yes | The  tag name |
+| `html` | `String` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -555,7 +962,21 @@ Visit definition list `<dl>`.
 fun visitDefinitionListStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```kotlin
+val result = instance.visitDefinitionListStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -565,7 +986,22 @@ Visit definition term `<dt>`.
 fun visitDefinitionTerm(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```kotlin
+val result = instance.visitDefinitionTerm(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -575,7 +1011,22 @@ Visit definition description `<dd>`.
 fun visitDefinitionDescription(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```kotlin
+val result = instance.visitDefinitionDescription(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -585,7 +1036,22 @@ Called after processing a definition list `</dl>`.
 fun visitDefinitionListEnd(ctx: NodeContext, output: String): VisitResult
 ```
 
-#### visitForm()
+**Example:**
+
+```kotlin
+val result = instance.visitDefinitionListEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -595,7 +1061,23 @@ Visit form elements `<form>`.
 fun visitForm(ctx: NodeContext, action: String? = null, method: String? = null): VisitResult
 ```
 
-#### visitInput()
+**Example:**
+
+```kotlin
+val result = instance.visitForm(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `String?` | No | The  action |
+| `method` | `String?` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -605,7 +1087,24 @@ Visit input elements `<input>`.
 fun visitInput(ctx: NodeContext, inputType: String, name: String? = null, value: String? = null): VisitResult
 ```
 
-#### visitButton()
+**Example:**
+
+```kotlin
+val result = instance.visitInput(NodeContext(), "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `String` | Yes | The  input type |
+| `name` | `String?` | No | The  name |
+| `value` | `String?` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -615,7 +1114,22 @@ Visit button elements `<button>`.
 fun visitButton(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitAudio()
+**Example:**
+
+```kotlin
+val result = instance.visitButton(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -625,7 +1139,22 @@ Visit audio elements `<audio>`.
 fun visitAudio(ctx: NodeContext, src: String? = null): VisitResult
 ```
 
-#### visitVideo()
+**Example:**
+
+```kotlin
+val result = instance.visitAudio(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -635,7 +1164,22 @@ Visit video elements `<video>`.
 fun visitVideo(ctx: NodeContext, src: String? = null): VisitResult
 ```
 
-#### visitIframe()
+**Example:**
+
+```kotlin
+val result = instance.visitVideo(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -645,7 +1189,22 @@ Visit iframe elements `<iframe>`.
 fun visitIframe(ctx: NodeContext, src: String? = null): VisitResult
 ```
 
-#### visitDetails()
+**Example:**
+
+```kotlin
+val result = instance.visitIframe(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -655,7 +1214,22 @@ Visit details elements `<details>`.
 fun visitDetails(ctx: NodeContext, open: Boolean): VisitResult
 ```
 
-#### visitSummary()
+**Example:**
+
+```kotlin
+val result = instance.visitDetails(NodeContext(), true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `Boolean` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -665,7 +1239,22 @@ Visit summary elements `<summary>`.
 fun visitSummary(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```kotlin
+val result = instance.visitSummary(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -675,7 +1264,21 @@ Visit figure elements `<figure>`.
 fun visitFigureStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```kotlin
+val result = instance.visitFigureStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -685,7 +1288,22 @@ Visit figcaption elements `<figcaption>`.
 fun visitFigcaption(ctx: NodeContext, text: String): VisitResult
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```kotlin
+val result = instance.visitFigcaption(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -694,6 +1312,21 @@ Called after processing a figure `</figure>`.
 ```kotlin
 fun visitFigureEnd(ctx: NodeContext, output: String): VisitResult
 ```
+
+**Example:**
+
+```kotlin
+val result = instance.visitFigureEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -793,9 +1426,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parentTag` | `String?` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `Boolean` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -809,7 +1442,15 @@ If this method is never called, no allocation occurs for attributes.
 fun attributes(): Map<String, String>
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```kotlin
+val result = instance.attributes()
+```
+
+**Returns:** `Map<String, String>`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -823,7 +1464,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 fun withOwnedAttributes(nodeType: NodeType, tagName: String, attributes: Map<String, String>, depth: Long, indexInParent: Long, parentTag: String? = null, isInline: Boolean): NodeContext
 ```
 
-#### intoOwned()
+**Example:**
+
+```kotlin
+val result = NodeContext.withOwnedAttributes(NodeType(), "value", emptyMap(), 42, 42, "value", true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `String` | Yes | The tag name |
+| `attributes` | `Map<String, String>` | Yes | The attributes |
+| `depth` | `Long` | Yes | The depth |
+| `indexInParent` | `Long` | Yes | The index in parent |
+| `parentTag` | `String?` | No | The parent tag |
+| `isInline` | `Boolean` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -832,6 +1493,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```kotlin
 fun intoOwned(): NodeContext
 ```
+
+**Example:**
+
+```kotlin
+val result = instance.intoOwned()
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -846,9 +1515,9 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `Boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `Boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
@@ -856,6 +1525,14 @@ HTML preprocessing options for document cleanup before conversion.
 @JvmStatic
 fun default(): PreprocessingOptions
 ```
+
+**Example:**
+
+```kotlin
+val result = PreprocessingOptions.default()
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

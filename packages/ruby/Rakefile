@@ -70,7 +70,9 @@ RbSys::ExtensionTask.new("html-to-markdown-rb", GEMSPEC) do |ext|
   # where the method does not exist (e.g., rb_sys 0.9.127 locked to avoid mingw bug in 0.9.128).
   # rb-sys-dock 0.9.x ships images for Ruby 3.2, 3.3, 3.4, and 3.5; this list must
   # match those available images. Per-ABI platform gem windows are controlled by rake-compiler-dock.
-  ext.cross_compile_versions = %w[3.5.0 3.4.9 3.3.11 3.2.11] if ext.respond_to?(:cross_compile_versions=)
+  if ext.respond_to?(:cross_compile_versions=)
+    ext.cross_compile_versions = %w[3.5.0 3.4.9 3.3.11 3.2.11]
+  end
 end
 
 RSpec::Core::RakeTask.new(:spec)

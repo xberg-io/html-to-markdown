@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 public static function convert(string $html, ?ConversionOptions $options = null): ConversionResult
 ```
 
+**Example:**
+
+```php
+$result = convert("value", new ConversionOptions());
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ public static function convert(string $html, ?ConversionOptions $options = null)
 | `options` | `?ConversionOptions` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error`.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions::builder()` to construct, or `the default constructor` fo
 | `tierStrategy` | `TierStrategy` | `TierStrategy::Auto` | Which conversion tier to use. - `TierStrategy::Auto` (default) — automatically choose the best path. - `TierStrategy::Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy::Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `?VisitorHandle` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```php
 public static function default(): ConversionOptions
 ```
+
+**Example:**
+
+```php
+$result = ConversionOptions::default();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `int` | — | Document tree depth at the header element |
 | `htmlOffset` | `int` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```php
 public function isValid(): bool
 ```
+
+**Example:**
+
+```php
+$result = $instance->isValid();
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 public function visitText(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitElementStart()
+**Example:**
+
+```php
+$result = $instance->visitText(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 public function visitElementStart(NodeContext $ctx): VisitResult
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```php
+$result = $instance->visitElementStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 public function visitElementEnd(NodeContext $ctx, string $output): VisitResult
 ```
 
-#### visitLink()
+**Example:**
+
+```php
+$result = $instance->visitElementEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 public function visitLink(NodeContext $ctx, string $href, string $text, string $title): VisitResult
 ```
 
-#### visitImage()
+**Example:**
+
+```php
+$result = $instance->visitLink(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `string` | Yes | The  href |
+| `text` | `string` | Yes | The  text |
+| `title` | `?string` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 public function visitImage(NodeContext $ctx, string $src, string $alt, string $title): VisitResult
 ```
 
-#### visitHeading()
+**Example:**
+
+```php
+$result = $instance->visitImage(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `string` | Yes | The  src |
+| `alt` | `string` | Yes | The  alt |
+| `title` | `?string` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 public function visitHeading(NodeContext $ctx, int $level, string $text, string $id): VisitResult
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```php
+$result = $instance->visitHeading(new NodeContext(), 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `int` | Yes | The  level |
+| `text` | `string` | Yes | The  text |
+| `id` | `?string` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 public function visitCodeBlock(NodeContext $ctx, string $lang, string $code): VisitResult
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```php
+$result = $instance->visitCodeBlock(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `?string` | No | The  lang |
+| `code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 public function visitCodeInline(NodeContext $ctx, string $code): VisitResult
 ```
 
-#### visitListItem()
+**Example:**
+
+```php
+$result = $instance->visitCodeInline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 public function visitListItem(NodeContext $ctx, bool $ordered, string $marker, string $text): VisitResult
 ```
 
-#### visitListStart()
+**Example:**
+
+```php
+$result = $instance->visitListItem(new NodeContext(), true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `marker` | `string` | Yes | The  marker |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 public function visitListStart(NodeContext $ctx, bool $ordered): VisitResult
 ```
 
-#### visitListEnd()
+**Example:**
+
+```php
+$result = $instance->visitListStart(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 public function visitListEnd(NodeContext $ctx, bool $ordered, string $output): VisitResult
 ```
 
-#### visitTableStart()
+**Example:**
+
+```php
+$result = $instance->visitListEnd(new NodeContext(), true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 public function visitTableStart(NodeContext $ctx): VisitResult
 ```
 
-#### visitTableRow()
+**Example:**
+
+```php
+$result = $instance->visitTableStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 public function visitTableRow(NodeContext $ctx, array<string> $cells, bool $isHeader): VisitResult
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```php
+$result = $instance->visitTableRow(new NodeContext(), [], true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `array<string>` | Yes | The  cells |
+| `isHeader` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 public function visitTableEnd(NodeContext $ctx, string $output): VisitResult
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```php
+$result = $instance->visitTableEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 public function visitBlockquote(NodeContext $ctx, string $content, int $depth): VisitResult
 ```
 
-#### visitStrong()
+**Example:**
+
+```php
+$result = $instance->visitBlockquote(new NodeContext(), "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `string` | Yes | The  content |
+| `depth` | `int` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 public function visitStrong(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```php
+$result = $instance->visitStrong(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 public function visitEmphasis(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```php
+$result = $instance->visitEmphasis(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 public function visitStrikethrough(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitUnderline()
+**Example:**
+
+```php
+$result = $instance->visitStrikethrough(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 public function visitUnderline(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitSubscript()
+**Example:**
+
+```php
+$result = $instance->visitUnderline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 public function visitSubscript(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```php
+$result = $instance->visitSubscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 public function visitSuperscript(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitMark()
+**Example:**
+
+```php
+$result = $instance->visitSuperscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 public function visitMark(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```php
+$result = $instance->visitMark(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 public function visitLineBreak(NodeContext $ctx): VisitResult
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```php
+$result = $instance->visitLineBreak(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 public function visitHorizontalRule(NodeContext $ctx): VisitResult
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```php
+$result = $instance->visitHorizontalRule(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 public function visitCustomElement(NodeContext $ctx, string $tagName, string $html): VisitResult
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```php
+$result = $instance->visitCustomElement(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `string` | Yes | The  tag name |
+| `html` | `string` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 public function visitDefinitionListStart(NodeContext $ctx): VisitResult
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```php
+$result = $instance->visitDefinitionListStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 public function visitDefinitionTerm(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```php
+$result = $instance->visitDefinitionTerm(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 public function visitDefinitionDescription(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```php
+$result = $instance->visitDefinitionDescription(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 public function visitDefinitionListEnd(NodeContext $ctx, string $output): VisitResult
 ```
 
-#### visitForm()
+**Example:**
+
+```php
+$result = $instance->visitDefinitionListEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 public function visitForm(NodeContext $ctx, string $action, string $method): VisitResult
 ```
 
-#### visitInput()
+**Example:**
+
+```php
+$result = $instance->visitForm(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `?string` | No | The  action |
+| `method` | `?string` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 public function visitInput(NodeContext $ctx, string $inputType, string $name, string $value): VisitResult
 ```
 
-#### visitButton()
+**Example:**
+
+```php
+$result = $instance->visitInput(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `string` | Yes | The  input type |
+| `name` | `?string` | No | The  name |
+| `value` | `?string` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 public function visitButton(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitAudio()
+**Example:**
+
+```php
+$result = $instance->visitButton(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 public function visitAudio(NodeContext $ctx, string $src): VisitResult
 ```
 
-#### visitVideo()
+**Example:**
+
+```php
+$result = $instance->visitAudio(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `?string` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 public function visitVideo(NodeContext $ctx, string $src): VisitResult
 ```
 
-#### visitIframe()
+**Example:**
+
+```php
+$result = $instance->visitVideo(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `?string` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 public function visitIframe(NodeContext $ctx, string $src): VisitResult
 ```
 
-#### visitDetails()
+**Example:**
+
+```php
+$result = $instance->visitIframe(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `?string` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 public function visitDetails(NodeContext $ctx, bool $open): VisitResult
 ```
 
-#### visitSummary()
+**Example:**
+
+```php
+$result = $instance->visitDetails(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 public function visitSummary(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```php
+$result = $instance->visitSummary(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 public function visitFigureStart(NodeContext $ctx): VisitResult
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```php
+$result = $instance->visitFigureStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 public function visitFigcaption(NodeContext $ctx, string $text): VisitResult
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```php
+$result = $instance->visitFigcaption(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```php
 public function visitFigureEnd(NodeContext $ctx, string $output): VisitResult
 ```
+
+**Example:**
+
+```php
+$result = $instance->visitFigureEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext::into_owned`.
 | `parentTag` | `?string` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 public function attributes(): array<string, string>
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```php
+$result = $instance->attributes();
+```
+
+**Returns:** `array<string, string>`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 public static function withOwnedAttributes(NodeType $nodeType, string $tagName, array<string, string> $attributes, int $depth, int $indexInParent, string $parentTag, bool $isInline): NodeContext
 ```
 
-#### intoOwned()
+**Example:**
+
+```php
+$result = NodeContext::withOwnedAttributes(new NodeType(), "value", [], 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `string` | Yes | The tag name |
+| `attributes` | `array<string, string>` | Yes | The attributes |
+| `depth` | `int` | Yes | The depth |
+| `indexInParent` | `int` | Yes | The index in parent |
+| `parentTag` | `?string` | No | The parent tag |
+| `isInline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```php
 public function intoOwned(): NodeContext
 ```
+
+**Example:**
+
+```php
+$result = $instance->intoOwned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```php
 public static function default(): PreprocessingOptions
 ```
+
+**Example:**
+
+```php
+$result = PreprocessingOptions::default();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

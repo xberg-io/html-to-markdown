@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 def convert(html: str, options: ConversionOptions = None) -> ConversionResult
 ```
 
+**Example:**
+
+```python
+result = convert("value", options=ConversionOptions())
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ def convert(html: str, options: ConversionOptions = None) -> ConversionResult
 | `options` | `ConversionOptions \| None` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Raises `Error`.
 
 ---
@@ -94,9 +101,9 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tier_strategy` | `TierStrategy` | `TierStrategy.AUTO` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle \| None` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
@@ -104,6 +111,14 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 @staticmethod
 def default() -> ConversionOptions
 ```
+
+**Example:**
+
+```python
+result = ConversionOptions.default()
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -206,9 +221,9 @@ and position in the document structure.
 | `depth` | `int` | — | Document tree depth at the header element |
 | `html_offset` | `int` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### is_valid()
+###### is_valid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -221,6 +236,14 @@ Validate that the header level is within valid range (1-6).
 ```python
 def is_valid(self) -> bool
 ```
+
+**Example:**
+
+```python
+result = instance.is_valid()
+```
+
+**Returns:** `bool`
 
 ---
 
@@ -286,9 +309,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visit_text()
+##### visit_text()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -298,7 +321,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 def visit_text(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_element_start()
+**Example:**
+
+```python
+result = instance.visit_text(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_element_start()
 
 Called before entering any element.
 
@@ -311,7 +349,21 @@ visitors to implement generic element handling before tag-specific logic.
 def visit_element_start(self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_element_end()
+**Example:**
+
+```python
+result = instance.visit_element_start(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_element_end()
 
 Called after exiting any element.
 
@@ -324,7 +376,22 @@ Visitors can inspect or replace this output.
 def visit_element_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
 
-#### visit_link()
+**Example:**
+
+```python
+result = instance.visit_element_end(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `str` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_link()
 
 Visit anchor links `<a href="...">`.
 
@@ -334,7 +401,24 @@ Visit anchor links `<a href="...">`.
 def visit_link(self, ctx: NodeContext, href: str, text: str, title: str) -> VisitResult
 ```
 
-#### visit_image()
+**Example:**
+
+```python
+result = instance.visit_link(NodeContext(), "value", "value", title="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `str` | Yes | The  href |
+| `text` | `str` | Yes | The  text |
+| `title` | `str \| None` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_image()
 
 Visit images `<img src="...">`.
 
@@ -344,7 +428,24 @@ Visit images `<img src="...">`.
 def visit_image(self, ctx: NodeContext, src: str, alt: str, title: str) -> VisitResult
 ```
 
-#### visit_heading()
+**Example:**
+
+```python
+result = instance.visit_image(NodeContext(), "value", "value", title="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `str` | Yes | The  src |
+| `alt` | `str` | Yes | The  alt |
+| `title` | `str \| None` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visit_heading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -354,7 +455,24 @@ Visit heading elements `<h1>` through `<h6>`.
 def visit_heading(self, ctx: NodeContext, level: int, text: str, id: str) -> VisitResult
 ```
 
-#### visit_code_block()
+**Example:**
+
+```python
+result = instance.visit_heading(NodeContext(), 42, "value", id="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `int` | Yes | The  level |
+| `text` | `str` | Yes | The  text |
+| `id` | `str \| None` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visit_code_block()
 
 Visit code blocks `<pre><code>`.
 
@@ -364,7 +482,23 @@ Visit code blocks `<pre><code>`.
 def visit_code_block(self, ctx: NodeContext, lang: str, code: str) -> VisitResult
 ```
 
-#### visit_code_inline()
+**Example:**
+
+```python
+result = instance.visit_code_block(NodeContext(), lang="value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `str \| None` | No | The  lang |
+| `code` | `str` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_code_inline()
 
 Visit inline code `<code>`.
 
@@ -374,7 +508,22 @@ Visit inline code `<code>`.
 def visit_code_inline(self, ctx: NodeContext, code: str) -> VisitResult
 ```
 
-#### visit_list_item()
+**Example:**
+
+```python
+result = instance.visit_code_inline(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `str` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visit_list_item()
 
 Visit list items `<li>`.
 
@@ -384,7 +533,24 @@ Visit list items `<li>`.
 def visit_list_item(self, ctx: NodeContext, ordered: bool, marker: str, text: str) -> VisitResult
 ```
 
-#### visit_list_start()
+**Example:**
+
+```python
+result = instance.visit_list_item(NodeContext(), True, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `marker` | `str` | Yes | The  marker |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_list_start()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -394,7 +560,22 @@ Called before processing a list `<ul>` or `<ol>`.
 def visit_list_start(self, ctx: NodeContext, ordered: bool) -> VisitResult
 ```
 
-#### visit_list_end()
+**Example:**
+
+```python
+result = instance.visit_list_start(NodeContext(), True)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visit_list_end()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -404,7 +585,23 @@ Called after processing a list `</ul>` or `</ol>`.
 def visit_list_end(self, ctx: NodeContext, ordered: bool, output: str) -> VisitResult
 ```
 
-#### visit_table_start()
+**Example:**
+
+```python
+result = instance.visit_list_end(NodeContext(), True, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `bool` | Yes | The  ordered |
+| `output` | `str` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_table_start()
 
 Called before processing a table `<table>`.
 
@@ -414,7 +611,21 @@ Called before processing a table `<table>`.
 def visit_table_start(self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_table_row()
+**Example:**
+
+```python
+result = instance.visit_table_start(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_table_row()
 
 Visit table rows `<tr>`.
 
@@ -424,7 +635,23 @@ Visit table rows `<tr>`.
 def visit_table_row(self, ctx: NodeContext, cells: list[str], is_header: bool) -> VisitResult
 ```
 
-#### visit_table_end()
+**Example:**
+
+```python
+result = instance.visit_table_row(NodeContext(), [], True)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `list[str]` | Yes | The  cells |
+| `is_header` | `bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visit_table_end()
 
 Called after processing a table `</table>`.
 
@@ -434,7 +661,22 @@ Called after processing a table `</table>`.
 def visit_table_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
 
-#### visit_blockquote()
+**Example:**
+
+```python
+result = instance.visit_table_end(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `str` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_blockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -444,7 +686,23 @@ Visit blockquote elements `<blockquote>`.
 def visit_blockquote(self, ctx: NodeContext, content: str, depth: int) -> VisitResult
 ```
 
-#### visit_strong()
+**Example:**
+
+```python
+result = instance.visit_blockquote(NodeContext(), "value", 42)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `str` | Yes | The  content |
+| `depth` | `int` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visit_strong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -454,7 +712,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 def visit_strong(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_emphasis()
+**Example:**
+
+```python
+result = instance.visit_strong(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_emphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -464,7 +737,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 def visit_emphasis(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_strikethrough()
+**Example:**
+
+```python
+result = instance.visit_emphasis(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_strikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -474,7 +762,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 def visit_strikethrough(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_underline()
+**Example:**
+
+```python
+result = instance.visit_strikethrough(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_underline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -484,7 +787,22 @@ Visit underline elements `<u>`, `<ins>`.
 def visit_underline(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_subscript()
+**Example:**
+
+```python
+result = instance.visit_underline(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_subscript()
 
 Visit subscript elements `<sub>`.
 
@@ -494,7 +812,22 @@ Visit subscript elements `<sub>`.
 def visit_subscript(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_superscript()
+**Example:**
+
+```python
+result = instance.visit_subscript(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_superscript()
 
 Visit superscript elements `<sup>`.
 
@@ -504,7 +837,22 @@ Visit superscript elements `<sup>`.
 def visit_superscript(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_mark()
+**Example:**
+
+```python
+result = instance.visit_superscript(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_mark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -514,7 +862,22 @@ Visit mark/highlight elements `<mark>`.
 def visit_mark(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_line_break()
+**Example:**
+
+```python
+result = instance.visit_mark(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_line_break()
 
 Visit line break elements `<br>`.
 
@@ -524,7 +887,21 @@ Visit line break elements `<br>`.
 def visit_line_break(self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_horizontal_rule()
+**Example:**
+
+```python
+result = instance.visit_line_break(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_horizontal_rule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -534,7 +911,21 @@ Visit horizontal rule elements `<hr>`.
 def visit_horizontal_rule(self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_custom_element()
+**Example:**
+
+```python
+result = instance.visit_horizontal_rule(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_custom_element()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -544,7 +935,23 @@ Visit custom elements (web components) or unknown tags.
 def visit_custom_element(self, ctx: NodeContext, tag_name: str, html: str) -> VisitResult
 ```
 
-#### visit_definition_list_start()
+**Example:**
+
+```python
+result = instance.visit_custom_element(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tag_name` | `str` | Yes | The  tag name |
+| `html` | `str` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_start()
 
 Visit definition list `<dl>`.
 
@@ -554,7 +961,21 @@ Visit definition list `<dl>`.
 def visit_definition_list_start(self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_definition_term()
+**Example:**
+
+```python
+result = instance.visit_definition_list_start(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_term()
 
 Visit definition term `<dt>`.
 
@@ -564,7 +985,22 @@ Visit definition term `<dt>`.
 def visit_definition_term(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_definition_description()
+**Example:**
+
+```python
+result = instance.visit_definition_term(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_description()
 
 Visit definition description `<dd>`.
 
@@ -574,7 +1010,22 @@ Visit definition description `<dd>`.
 def visit_definition_description(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_definition_list_end()
+**Example:**
+
+```python
+result = instance.visit_definition_description(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_definition_list_end()
 
 Called after processing a definition list `</dl>`.
 
@@ -584,7 +1035,22 @@ Called after processing a definition list `</dl>`.
 def visit_definition_list_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
 
-#### visit_form()
+**Example:**
+
+```python
+result = instance.visit_definition_list_end(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `str` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visit_form()
 
 Visit form elements `<form>`.
 
@@ -594,7 +1060,23 @@ Visit form elements `<form>`.
 def visit_form(self, ctx: NodeContext, action: str, method: str) -> VisitResult
 ```
 
-#### visit_input()
+**Example:**
+
+```python
+result = instance.visit_form(NodeContext(), action="value", method="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `str \| None` | No | The  action |
+| `method` | `str \| None` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visit_input()
 
 Visit input elements `<input>`.
 
@@ -604,7 +1086,24 @@ Visit input elements `<input>`.
 def visit_input(self, ctx: NodeContext, input_type: str, name: str, value: str) -> VisitResult
 ```
 
-#### visit_button()
+**Example:**
+
+```python
+result = instance.visit_input(NodeContext(), "value", name="value", value="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `input_type` | `str` | Yes | The  input type |
+| `name` | `str \| None` | No | The  name |
+| `value` | `str \| None` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visit_button()
 
 Visit button elements `<button>`.
 
@@ -614,7 +1113,22 @@ Visit button elements `<button>`.
 def visit_button(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_audio()
+**Example:**
+
+```python
+result = instance.visit_button(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_audio()
 
 Visit audio elements `<audio>`.
 
@@ -624,7 +1138,22 @@ Visit audio elements `<audio>`.
 def visit_audio(self, ctx: NodeContext, src: str) -> VisitResult
 ```
 
-#### visit_video()
+**Example:**
+
+```python
+result = instance.visit_audio(NodeContext(), src="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `str \| None` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_video()
 
 Visit video elements `<video>`.
 
@@ -634,7 +1163,22 @@ Visit video elements `<video>`.
 def visit_video(self, ctx: NodeContext, src: str) -> VisitResult
 ```
 
-#### visit_iframe()
+**Example:**
+
+```python
+result = instance.visit_video(NodeContext(), src="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `str \| None` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_iframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -644,7 +1188,22 @@ Visit iframe elements `<iframe>`.
 def visit_iframe(self, ctx: NodeContext, src: str) -> VisitResult
 ```
 
-#### visit_details()
+**Example:**
+
+```python
+result = instance.visit_iframe(NodeContext(), src="value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `str \| None` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visit_details()
 
 Visit details elements `<details>`.
 
@@ -654,7 +1213,22 @@ Visit details elements `<details>`.
 def visit_details(self, ctx: NodeContext, open: bool) -> VisitResult
 ```
 
-#### visit_summary()
+**Example:**
+
+```python
+result = instance.visit_details(NodeContext(), True)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visit_summary()
 
 Visit summary elements `<summary>`.
 
@@ -664,7 +1238,22 @@ Visit summary elements `<summary>`.
 def visit_summary(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_figure_start()
+**Example:**
+
+```python
+result = instance.visit_summary(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_start()
 
 Visit figure elements `<figure>`.
 
@@ -674,7 +1263,21 @@ Visit figure elements `<figure>`.
 def visit_figure_start(self, ctx: NodeContext) -> VisitResult
 ```
 
-#### visit_figcaption()
+**Example:**
+
+```python
+result = instance.visit_figure_start(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visit_figcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -684,7 +1287,22 @@ Visit figcaption elements `<figcaption>`.
 def visit_figcaption(self, ctx: NodeContext, text: str) -> VisitResult
 ```
 
-#### visit_figure_end()
+**Example:**
+
+```python
+result = instance.visit_figcaption(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `str` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visit_figure_end()
 
 Called after processing a figure `</figure>`.
 
@@ -693,6 +1311,21 @@ Called after processing a figure `</figure>`.
 ```python
 def visit_figure_end(self, ctx: NodeContext, output: str) -> VisitResult
 ```
+
+**Example:**
+
+```python
+result = instance.visit_figure_end(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `str` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -792,9 +1425,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parent_tag` | `str \| None` | `None` | Parent element's tag name (None if root) |
 | `is_inline` | `bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -808,7 +1441,15 @@ If this method is never called, no allocation occurs for attributes.
 def attributes(self) -> dict[str, str]
 ```
 
-#### with_owned_attributes()
+**Example:**
+
+```python
+result = instance.attributes()
+```
+
+**Returns:** `dict[str, str]`
+
+###### with_owned_attributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -822,7 +1463,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 def with_owned_attributes(node_type: NodeType, tag_name: str, attributes: dict[str, str], depth: int, index_in_parent: int, parent_tag: str, is_inline: bool) -> NodeContext
 ```
 
-#### into_owned()
+**Example:**
+
+```python
+result = NodeContext.with_owned_attributes(NodeType(), "value", {}, 42, 42, parent_tag="value", True)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node_type` | `NodeType` | Yes | The node type |
+| `tag_name` | `str` | Yes | The tag name |
+| `attributes` | `dict[str, str]` | Yes | The attributes |
+| `depth` | `int` | Yes | The depth |
+| `index_in_parent` | `int` | Yes | The index in parent |
+| `parent_tag` | `str \| None` | No | The parent tag |
+| `is_inline` | `bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### into_owned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -831,6 +1492,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```python
 def into_owned(self) -> NodeContext
 ```
+
+**Example:**
+
+```python
+result = instance.into_owned()
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -845,9 +1514,9 @@ HTML preprocessing options for document cleanup before conversion.
 | `remove_navigation` | `bool` | `True` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `remove_forms` | `bool` | `True` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
@@ -855,6 +1524,14 @@ HTML preprocessing options for document cleanup before conversion.
 @staticmethod
 def default() -> PreprocessingOptions
 ```
+
+**Example:**
+
+```python
+result = PreprocessingOptions.default()
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

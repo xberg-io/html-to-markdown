@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 function convert(html: string, options?: ConversionOptions): ConversionResult
 ```
 
+**Example:**
+
+```typescript
+const result = convert("value", new ConversionOptions());
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ function convert(html: string, options?: ConversionOptions): ConversionResult
 | `options` | `ConversionOptions \| null` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error` with a descriptive message.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle \| null` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```typescript
 static default(): ConversionOptions
 ```
+
+**Example:**
+
+```typescript
+const result = ConversionOptions.default();
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `number` | — | Document tree depth at the header element |
 | `htmlOffset` | `number` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```typescript
 isValid(): boolean
 ```
+
+**Example:**
+
+```typescript
+const result = instance.isValid();
+```
+
+**Returns:** `boolean`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 visitText(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitElementStart()
+**Example:**
+
+```typescript
+const result = instance.visitText(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 visitElementStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```typescript
+const result = instance.visitElementStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 visitElementEnd(ctx: NodeContext, output: string): VisitResult
 ```
 
-#### visitLink()
+**Example:**
+
+```typescript
+const result = instance.visitElementEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 visitLink(ctx: NodeContext, href: string, text: string, title: string): VisitResult
 ```
 
-#### visitImage()
+**Example:**
+
+```typescript
+const result = instance.visitLink(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `string` | Yes | The  href |
+| `text` | `string` | Yes | The  text |
+| `title` | `string \| null` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 visitImage(ctx: NodeContext, src: string, alt: string, title: string): VisitResult
 ```
 
-#### visitHeading()
+**Example:**
+
+```typescript
+const result = instance.visitImage(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `string` | Yes | The  src |
+| `alt` | `string` | Yes | The  alt |
+| `title` | `string \| null` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 visitHeading(ctx: NodeContext, level: number, text: string, id: string): VisitResult
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```typescript
+const result = instance.visitHeading(new NodeContext(), 42, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `number` | Yes | The  level |
+| `text` | `string` | Yes | The  text |
+| `id` | `string \| null` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 visitCodeBlock(ctx: NodeContext, lang: string, code: string): VisitResult
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```typescript
+const result = instance.visitCodeBlock(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `string \| null` | No | The  lang |
+| `code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 visitCodeInline(ctx: NodeContext, code: string): VisitResult
 ```
 
-#### visitListItem()
+**Example:**
+
+```typescript
+const result = instance.visitCodeInline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `string` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 visitListItem(ctx: NodeContext, ordered: boolean, marker: string, text: string): VisitResult
 ```
 
-#### visitListStart()
+**Example:**
+
+```typescript
+const result = instance.visitListItem(new NodeContext(), true, "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean` | Yes | The  ordered |
+| `marker` | `string` | Yes | The  marker |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 visitListStart(ctx: NodeContext, ordered: boolean): VisitResult
 ```
 
-#### visitListEnd()
+**Example:**
+
+```typescript
+const result = instance.visitListStart(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 visitListEnd(ctx: NodeContext, ordered: boolean, output: string): VisitResult
 ```
 
-#### visitTableStart()
+**Example:**
+
+```typescript
+const result = instance.visitListEnd(new NodeContext(), true, "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `boolean` | Yes | The  ordered |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 visitTableStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitTableRow()
+**Example:**
+
+```typescript
+const result = instance.visitTableStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 visitTableRow(ctx: NodeContext, cells: Array<string>, isHeader: boolean): VisitResult
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```typescript
+const result = instance.visitTableRow(new NodeContext(), [], true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `Array<string>` | Yes | The  cells |
+| `isHeader` | `boolean` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 visitTableEnd(ctx: NodeContext, output: string): VisitResult
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```typescript
+const result = instance.visitTableEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 visitBlockquote(ctx: NodeContext, content: string, depth: number): VisitResult
 ```
 
-#### visitStrong()
+**Example:**
+
+```typescript
+const result = instance.visitBlockquote(new NodeContext(), "value", 42);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `string` | Yes | The  content |
+| `depth` | `number` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 visitStrong(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```typescript
+const result = instance.visitStrong(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 visitEmphasis(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```typescript
+const result = instance.visitEmphasis(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 visitStrikethrough(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitUnderline()
+**Example:**
+
+```typescript
+const result = instance.visitStrikethrough(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 visitUnderline(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitSubscript()
+**Example:**
+
+```typescript
+const result = instance.visitUnderline(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 visitSubscript(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```typescript
+const result = instance.visitSubscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 visitSuperscript(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitMark()
+**Example:**
+
+```typescript
+const result = instance.visitSuperscript(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 visitMark(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```typescript
+const result = instance.visitMark(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 visitLineBreak(ctx: NodeContext): VisitResult
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```typescript
+const result = instance.visitLineBreak(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 visitHorizontalRule(ctx: NodeContext): VisitResult
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```typescript
+const result = instance.visitHorizontalRule(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 visitCustomElement(ctx: NodeContext, tagName: string, html: string): VisitResult
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```typescript
+const result = instance.visitCustomElement(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `string` | Yes | The  tag name |
+| `html` | `string` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 visitDefinitionListStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```typescript
+const result = instance.visitDefinitionListStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 visitDefinitionTerm(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```typescript
+const result = instance.visitDefinitionTerm(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 visitDefinitionDescription(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```typescript
+const result = instance.visitDefinitionDescription(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 visitDefinitionListEnd(ctx: NodeContext, output: string): VisitResult
 ```
 
-#### visitForm()
+**Example:**
+
+```typescript
+const result = instance.visitDefinitionListEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 visitForm(ctx: NodeContext, action: string, method: string): VisitResult
 ```
 
-#### visitInput()
+**Example:**
+
+```typescript
+const result = instance.visitForm(new NodeContext(), "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `string \| null` | No | The  action |
+| `method` | `string \| null` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 visitInput(ctx: NodeContext, inputType: string, name: string, value: string): VisitResult
 ```
 
-#### visitButton()
+**Example:**
+
+```typescript
+const result = instance.visitInput(new NodeContext(), "value", "value", "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `string` | Yes | The  input type |
+| `name` | `string \| null` | No | The  name |
+| `value` | `string \| null` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 visitButton(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitAudio()
+**Example:**
+
+```typescript
+const result = instance.visitButton(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 visitAudio(ctx: NodeContext, src: string): VisitResult
 ```
 
-#### visitVideo()
+**Example:**
+
+```typescript
+const result = instance.visitAudio(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `string \| null` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 visitVideo(ctx: NodeContext, src: string): VisitResult
 ```
 
-#### visitIframe()
+**Example:**
+
+```typescript
+const result = instance.visitVideo(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `string \| null` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 visitIframe(ctx: NodeContext, src: string): VisitResult
 ```
 
-#### visitDetails()
+**Example:**
+
+```typescript
+const result = instance.visitIframe(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `string \| null` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 visitDetails(ctx: NodeContext, open: boolean): VisitResult
 ```
 
-#### visitSummary()
+**Example:**
+
+```typescript
+const result = instance.visitDetails(new NodeContext(), true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `boolean` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 visitSummary(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```typescript
+const result = instance.visitSummary(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 visitFigureStart(ctx: NodeContext): VisitResult
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```typescript
+const result = instance.visitFigureStart(new NodeContext());
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 visitFigcaption(ctx: NodeContext, text: string): VisitResult
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```typescript
+const result = instance.visitFigcaption(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `string` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```typescript
 visitFigureEnd(ctx: NodeContext, output: string): VisitResult
 ```
+
+**Example:**
+
+```typescript
+const result = instance.visitFigureEnd(new NodeContext(), "value");
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `string` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parentTag` | `string \| null` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `boolean` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 attributes(): Record<string, string>
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```typescript
+const result = instance.attributes();
+```
+
+**Returns:** `Record<string, string>`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 static withOwnedAttributes(nodeType: NodeType, tagName: string, attributes: Record<string, string>, depth: number, indexInParent: number, parentTag: string, isInline: boolean): NodeContext
 ```
 
-#### intoOwned()
+**Example:**
+
+```typescript
+const result = NodeContext.withOwnedAttributes(new NodeType(), "value", {}, 42, 42, "value", true);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `string` | Yes | The tag name |
+| `attributes` | `Record<string, string>` | Yes | The attributes |
+| `depth` | `number` | Yes | The depth |
+| `indexInParent` | `number` | Yes | The index in parent |
+| `parentTag` | `string \| null` | No | The parent tag |
+| `isInline` | `boolean` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```typescript
 intoOwned(): NodeContext
 ```
+
+**Example:**
+
+```typescript
+const result = instance.intoOwned();
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `boolean` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `boolean` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```typescript
 static default(): PreprocessingOptions
 ```
+
+**Example:**
+
+```typescript
+const result = PreprocessingOptions.default();
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 

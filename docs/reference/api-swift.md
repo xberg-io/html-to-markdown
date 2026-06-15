@@ -27,6 +27,12 @@ Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
 public static func convert(html: String, options: ConversionOptions? = nil) throws -> ConversionResult
 ```
 
+**Example:**
+
+```swift
+let result = try convert("value", ConversionOptions())
+```
+
 **Parameters:**
 
 | Name | Type | Required | Description |
@@ -35,6 +41,7 @@ public static func convert(html: String, options: ConversionOptions? = nil) thro
 | `options` | `ConversionOptions?` | No | The options to use |
 
 **Returns:** `ConversionResult`
+
 **Errors:** Throws `Error`.
 
 ---
@@ -94,15 +101,23 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `tierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```swift
 public static func default() -> ConversionOptions
 ```
+
+**Example:**
+
+```swift
+let result = ConversionOptions.default()
+```
+
+**Returns:** `ConversionOptions`
 
 ---
 
@@ -205,9 +220,9 @@ and position in the document structure.
 | `depth` | `UInt64` | — | Document tree depth at the header element |
 | `htmlOffset` | `UInt64` | — | Byte offset in original HTML document |
 
-### Methods
+##### Methods
 
-#### isValid()
+###### isValid()
 
 Validate that the header level is within valid range (1-6).
 
@@ -220,6 +235,14 @@ Validate that the header level is within valid range (1-6).
 ```swift
 public func isValid() -> Bool
 ```
+
+**Example:**
+
+```swift
+let result = instance.isValid()
+```
+
+**Returns:** `Bool`
 
 ---
 
@@ -285,9 +308,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-### Methods
+#### Methods
 
-#### visitText()
+##### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -297,7 +320,22 @@ Visit text nodes (most frequent callback - ~100+ per document).
 public func visitText(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitElementStart()
+**Example:**
+
+```swift
+let result = instance.visitText(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitElementStart()
 
 Called before entering any element.
 
@@ -310,7 +348,21 @@ visitors to implement generic element handling before tag-specific logic.
 public func visitElementStart(ctx: NodeContext) -> VisitResult
 ```
 
-#### visitElementEnd()
+**Example:**
+
+```swift
+let result = instance.visitElementStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitElementEnd()
 
 Called after exiting any element.
 
@@ -323,7 +375,22 @@ Visitors can inspect or replace this output.
 public func visitElementEnd(ctx: NodeContext, output: String) -> VisitResult
 ```
 
-#### visitLink()
+**Example:**
+
+```swift
+let result = instance.visitElementEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitLink()
 
 Visit anchor links `<a href="...">`.
 
@@ -333,7 +400,24 @@ Visit anchor links `<a href="...">`.
 public func visitLink(ctx: NodeContext, href: String, text: String, title: String? = nil) -> VisitResult
 ```
 
-#### visitImage()
+**Example:**
+
+```swift
+let result = instance.visitLink(NodeContext(), "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `href` | `String` | Yes | The  href |
+| `text` | `String` | Yes | The  text |
+| `title` | `String?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitImage()
 
 Visit images `<img src="...">`.
 
@@ -343,7 +427,24 @@ Visit images `<img src="...">`.
 public func visitImage(ctx: NodeContext, src: String, alt: String, title: String? = nil) -> VisitResult
 ```
 
-#### visitHeading()
+**Example:**
+
+```swift
+let result = instance.visitImage(NodeContext(), "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String` | Yes | The  src |
+| `alt` | `String` | Yes | The  alt |
+| `title` | `String?` | No | The  title |
+
+**Returns:** `VisitResult`
+
+###### visitHeading()
 
 Visit heading elements `<h1>` through `<h6>`.
 
@@ -353,7 +454,24 @@ Visit heading elements `<h1>` through `<h6>`.
 public func visitHeading(ctx: NodeContext, level: UInt32, text: String, id: String? = nil) -> VisitResult
 ```
 
-#### visitCodeBlock()
+**Example:**
+
+```swift
+let result = instance.visitHeading(NodeContext(), 42, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `level` | `UInt32` | Yes | The  level |
+| `text` | `String` | Yes | The  text |
+| `id` | `String?` | No | The  id |
+
+**Returns:** `VisitResult`
+
+###### visitCodeBlock()
 
 Visit code blocks `<pre><code>`.
 
@@ -363,7 +481,23 @@ Visit code blocks `<pre><code>`.
 public func visitCodeBlock(ctx: NodeContext, lang: String? = nil, code: String) -> VisitResult
 ```
 
-#### visitCodeInline()
+**Example:**
+
+```swift
+let result = instance.visitCodeBlock(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `lang` | `String?` | No | The  lang |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitCodeInline()
 
 Visit inline code `<code>`.
 
@@ -373,7 +507,22 @@ Visit inline code `<code>`.
 public func visitCodeInline(ctx: NodeContext, code: String) -> VisitResult
 ```
 
-#### visitListItem()
+**Example:**
+
+```swift
+let result = instance.visitCodeInline(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `code` | `String` | Yes | The  code |
+
+**Returns:** `VisitResult`
+
+###### visitListItem()
 
 Visit list items `<li>`.
 
@@ -383,7 +532,24 @@ Visit list items `<li>`.
 public func visitListItem(ctx: NodeContext, ordered: Bool, marker: String, text: String) -> VisitResult
 ```
 
-#### visitListStart()
+**Example:**
+
+```swift
+let result = instance.visitListItem(NodeContext(), true, "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `Bool` | Yes | The  ordered |
+| `marker` | `String` | Yes | The  marker |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitListStart()
 
 Called before processing a list `<ul>` or `<ol>`.
 
@@ -393,7 +559,22 @@ Called before processing a list `<ul>` or `<ol>`.
 public func visitListStart(ctx: NodeContext, ordered: Bool) -> VisitResult
 ```
 
-#### visitListEnd()
+**Example:**
+
+```swift
+let result = instance.visitListStart(NodeContext(), true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `Bool` | Yes | The  ordered |
+
+**Returns:** `VisitResult`
+
+###### visitListEnd()
 
 Called after processing a list `</ul>` or `</ol>`.
 
@@ -403,7 +584,23 @@ Called after processing a list `</ul>` or `</ol>`.
 public func visitListEnd(ctx: NodeContext, ordered: Bool, output: String) -> VisitResult
 ```
 
-#### visitTableStart()
+**Example:**
+
+```swift
+let result = instance.visitListEnd(NodeContext(), true, "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `ordered` | `Bool` | Yes | The  ordered |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitTableStart()
 
 Called before processing a table `<table>`.
 
@@ -413,7 +610,21 @@ Called before processing a table `<table>`.
 public func visitTableStart(ctx: NodeContext) -> VisitResult
 ```
 
-#### visitTableRow()
+**Example:**
+
+```swift
+let result = instance.visitTableStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitTableRow()
 
 Visit table rows `<tr>`.
 
@@ -423,7 +634,23 @@ Visit table rows `<tr>`.
 public func visitTableRow(ctx: NodeContext, cells: [String], isHeader: Bool) -> VisitResult
 ```
 
-#### visitTableEnd()
+**Example:**
+
+```swift
+let result = instance.visitTableRow(NodeContext(), [], true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `cells` | `[String]` | Yes | The  cells |
+| `isHeader` | `Bool` | Yes | The  is header |
+
+**Returns:** `VisitResult`
+
+###### visitTableEnd()
 
 Called after processing a table `</table>`.
 
@@ -433,7 +660,22 @@ Called after processing a table `</table>`.
 public func visitTableEnd(ctx: NodeContext, output: String) -> VisitResult
 ```
 
-#### visitBlockquote()
+**Example:**
+
+```swift
+let result = instance.visitTableEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitBlockquote()
 
 Visit blockquote elements `<blockquote>`.
 
@@ -443,7 +685,23 @@ Visit blockquote elements `<blockquote>`.
 public func visitBlockquote(ctx: NodeContext, content: String, depth: UInt64) -> VisitResult
 ```
 
-#### visitStrong()
+**Example:**
+
+```swift
+let result = instance.visitBlockquote(NodeContext(), "value", 42)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `content` | `String` | Yes | The  content |
+| `depth` | `UInt64` | Yes | The  depth |
+
+**Returns:** `VisitResult`
+
+###### visitStrong()
 
 Visit strong/bold elements `<strong>`, `<b>`.
 
@@ -453,7 +711,22 @@ Visit strong/bold elements `<strong>`, `<b>`.
 public func visitStrong(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitEmphasis()
+**Example:**
+
+```swift
+let result = instance.visitStrong(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitEmphasis()
 
 Visit emphasis/italic elements `<em>`, `<i>`.
 
@@ -463,7 +736,22 @@ Visit emphasis/italic elements `<em>`, `<i>`.
 public func visitEmphasis(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitStrikethrough()
+**Example:**
+
+```swift
+let result = instance.visitEmphasis(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitStrikethrough()
 
 Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 
@@ -473,7 +761,22 @@ Visit strikethrough elements `<s>`, `<del>`, `<strike>`.
 public func visitStrikethrough(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitUnderline()
+**Example:**
+
+```swift
+let result = instance.visitStrikethrough(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitUnderline()
 
 Visit underline elements `<u>`, `<ins>`.
 
@@ -483,7 +786,22 @@ Visit underline elements `<u>`, `<ins>`.
 public func visitUnderline(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitSubscript()
+**Example:**
+
+```swift
+let result = instance.visitUnderline(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSubscript()
 
 Visit subscript elements `<sub>`.
 
@@ -493,7 +811,22 @@ Visit subscript elements `<sub>`.
 public func visitSubscript(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitSuperscript()
+**Example:**
+
+```swift
+let result = instance.visitSubscript(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitSuperscript()
 
 Visit superscript elements `<sup>`.
 
@@ -503,7 +836,22 @@ Visit superscript elements `<sup>`.
 public func visitSuperscript(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitMark()
+**Example:**
+
+```swift
+let result = instance.visitSuperscript(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitMark()
 
 Visit mark/highlight elements `<mark>`.
 
@@ -513,7 +861,22 @@ Visit mark/highlight elements `<mark>`.
 public func visitMark(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitLineBreak()
+**Example:**
+
+```swift
+let result = instance.visitMark(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitLineBreak()
 
 Visit line break elements `<br>`.
 
@@ -523,7 +886,21 @@ Visit line break elements `<br>`.
 public func visitLineBreak(ctx: NodeContext) -> VisitResult
 ```
 
-#### visitHorizontalRule()
+**Example:**
+
+```swift
+let result = instance.visitLineBreak(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitHorizontalRule()
 
 Visit horizontal rule elements `<hr>`.
 
@@ -533,7 +910,21 @@ Visit horizontal rule elements `<hr>`.
 public func visitHorizontalRule(ctx: NodeContext) -> VisitResult
 ```
 
-#### visitCustomElement()
+**Example:**
+
+```swift
+let result = instance.visitHorizontalRule(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitCustomElement()
 
 Visit custom elements (web components) or unknown tags.
 
@@ -543,7 +934,23 @@ Visit custom elements (web components) or unknown tags.
 public func visitCustomElement(ctx: NodeContext, tagName: String, html: String) -> VisitResult
 ```
 
-#### visitDefinitionListStart()
+**Example:**
+
+```swift
+let result = instance.visitCustomElement(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `tagName` | `String` | Yes | The  tag name |
+| `html` | `String` | Yes | The  html |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListStart()
 
 Visit definition list `<dl>`.
 
@@ -553,7 +960,21 @@ Visit definition list `<dl>`.
 public func visitDefinitionListStart(ctx: NodeContext) -> VisitResult
 ```
 
-#### visitDefinitionTerm()
+**Example:**
+
+```swift
+let result = instance.visitDefinitionListStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionTerm()
 
 Visit definition term `<dt>`.
 
@@ -563,7 +984,22 @@ Visit definition term `<dt>`.
 public func visitDefinitionTerm(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitDefinitionDescription()
+**Example:**
+
+```swift
+let result = instance.visitDefinitionTerm(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionDescription()
 
 Visit definition description `<dd>`.
 
@@ -573,7 +1009,22 @@ Visit definition description `<dd>`.
 public func visitDefinitionDescription(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitDefinitionListEnd()
+**Example:**
+
+```swift
+let result = instance.visitDefinitionDescription(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitDefinitionListEnd()
 
 Called after processing a definition list `</dl>`.
 
@@ -583,7 +1034,22 @@ Called after processing a definition list `</dl>`.
 public func visitDefinitionListEnd(ctx: NodeContext, output: String) -> VisitResult
 ```
 
-#### visitForm()
+**Example:**
+
+```swift
+let result = instance.visitDefinitionListEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
+
+###### visitForm()
 
 Visit form elements `<form>`.
 
@@ -593,7 +1059,23 @@ Visit form elements `<form>`.
 public func visitForm(ctx: NodeContext, action: String? = nil, method: String? = nil) -> VisitResult
 ```
 
-#### visitInput()
+**Example:**
+
+```swift
+let result = instance.visitForm(NodeContext(), "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `action` | `String?` | No | The  action |
+| `method` | `String?` | No | The  method |
+
+**Returns:** `VisitResult`
+
+###### visitInput()
 
 Visit input elements `<input>`.
 
@@ -603,7 +1085,24 @@ Visit input elements `<input>`.
 public func visitInput(ctx: NodeContext, inputType: String, name: String? = nil, value: String? = nil) -> VisitResult
 ```
 
-#### visitButton()
+**Example:**
+
+```swift
+let result = instance.visitInput(NodeContext(), "value", "value", "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `inputType` | `String` | Yes | The  input type |
+| `name` | `String?` | No | The  name |
+| `value` | `String?` | No | The  value |
+
+**Returns:** `VisitResult`
+
+###### visitButton()
 
 Visit button elements `<button>`.
 
@@ -613,7 +1112,22 @@ Visit button elements `<button>`.
 public func visitButton(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitAudio()
+**Example:**
+
+```swift
+let result = instance.visitButton(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitAudio()
 
 Visit audio elements `<audio>`.
 
@@ -623,7 +1137,22 @@ Visit audio elements `<audio>`.
 public func visitAudio(ctx: NodeContext, src: String? = nil) -> VisitResult
 ```
 
-#### visitVideo()
+**Example:**
+
+```swift
+let result = instance.visitAudio(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitVideo()
 
 Visit video elements `<video>`.
 
@@ -633,7 +1162,22 @@ Visit video elements `<video>`.
 public func visitVideo(ctx: NodeContext, src: String? = nil) -> VisitResult
 ```
 
-#### visitIframe()
+**Example:**
+
+```swift
+let result = instance.visitVideo(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitIframe()
 
 Visit iframe elements `<iframe>`.
 
@@ -643,7 +1187,22 @@ Visit iframe elements `<iframe>`.
 public func visitIframe(ctx: NodeContext, src: String? = nil) -> VisitResult
 ```
 
-#### visitDetails()
+**Example:**
+
+```swift
+let result = instance.visitIframe(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `src` | `String?` | No | The  src |
+
+**Returns:** `VisitResult`
+
+###### visitDetails()
 
 Visit details elements `<details>`.
 
@@ -653,7 +1212,22 @@ Visit details elements `<details>`.
 public func visitDetails(ctx: NodeContext, open: Bool) -> VisitResult
 ```
 
-#### visitSummary()
+**Example:**
+
+```swift
+let result = instance.visitDetails(NodeContext(), true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `open` | `Bool` | Yes | The  open |
+
+**Returns:** `VisitResult`
+
+###### visitSummary()
 
 Visit summary elements `<summary>`.
 
@@ -663,7 +1237,22 @@ Visit summary elements `<summary>`.
 public func visitSummary(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitFigureStart()
+**Example:**
+
+```swift
+let result = instance.visitSummary(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureStart()
 
 Visit figure elements `<figure>`.
 
@@ -673,7 +1262,21 @@ Visit figure elements `<figure>`.
 public func visitFigureStart(ctx: NodeContext) -> VisitResult
 ```
 
-#### visitFigcaption()
+**Example:**
+
+```swift
+let result = instance.visitFigureStart(NodeContext())
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+
+**Returns:** `VisitResult`
+
+###### visitFigcaption()
 
 Visit figcaption elements `<figcaption>`.
 
@@ -683,7 +1286,22 @@ Visit figcaption elements `<figcaption>`.
 public func visitFigcaption(ctx: NodeContext, text: String) -> VisitResult
 ```
 
-#### visitFigureEnd()
+**Example:**
+
+```swift
+let result = instance.visitFigcaption(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `text` | `String` | Yes | The  text |
+
+**Returns:** `VisitResult`
+
+###### visitFigureEnd()
 
 Called after processing a figure `</figure>`.
 
@@ -692,6 +1310,21 @@ Called after processing a figure `</figure>`.
 ```swift
 public func visitFigureEnd(ctx: NodeContext, output: String) -> VisitResult
 ```
+
+**Example:**
+
+```swift
+let result = instance.visitFigureEnd(NodeContext(), "value")
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `ctx` | `NodeContext` | Yes | The node context |
+| `output` | `String` | Yes | The  output |
+
+**Returns:** `VisitResult`
 
 ---
 
@@ -791,9 +1424,9 @@ to outlive the callback should call `NodeContext.into_owned`.
 | `parentTag` | `String?` | `null` | Parent element's tag name (None if root) |
 | `isInline` | `Bool` | — | Whether this element is treated as inline vs block |
 
-### Methods
+##### Methods
 
-#### attributes()
+###### attributes()
 
 Return a reference to the attribute map.
 
@@ -807,7 +1440,15 @@ If this method is never called, no allocation occurs for attributes.
 public func attributes() -> [String: String]
 ```
 
-#### withOwnedAttributes()
+**Example:**
+
+```swift
+let result = instance.attributes()
+```
+
+**Returns:** `[String: String]`
+
+###### withOwnedAttributes()
 
 Construct a `NodeContext` with an owned attribute map.
 
@@ -820,7 +1461,27 @@ converter to avoid the eager `collect_tag_attributes` allocation.
 public static func withOwnedAttributes(nodeType: NodeType, tagName: String, attributes: [String: String], depth: UInt64, indexInParent: UInt64, parentTag: String? = nil, isInline: Bool) -> NodeContext
 ```
 
-#### intoOwned()
+**Example:**
+
+```swift
+let result = NodeContext.withOwnedAttributes(NodeType(), "value", [:], 42, 42, "value", true)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `nodeType` | `NodeType` | Yes | The node type |
+| `tagName` | `String` | Yes | The tag name |
+| `attributes` | `[String: String]` | Yes | The attributes |
+| `depth` | `UInt64` | Yes | The depth |
+| `indexInParent` | `UInt64` | Yes | The index in parent |
+| `parentTag` | `String?` | No | The parent tag |
+| `isInline` | `Bool` | Yes | The is inline |
+
+**Returns:** `NodeContext`
+
+###### intoOwned()
 
 Promote any borrowed fields into owned storage so the context can outlive `'a`.
 
@@ -829,6 +1490,14 @@ Promote any borrowed fields into owned storage so the context can outlive `'a`.
 ```swift
 public func intoOwned() -> NodeContext
 ```
+
+**Example:**
+
+```swift
+let result = instance.intoOwned()
+```
+
+**Returns:** `NodeContext`
 
 ---
 
@@ -843,15 +1512,23 @@ HTML preprocessing options for document cleanup before conversion.
 | `removeNavigation` | `Bool` | `true` | Remove navigation elements (nav, breadcrumbs, menus, sidebars) |
 | `removeForms` | `Bool` | `true` | Remove form elements (forms, inputs, buttons, etc.) |
 
-### Methods
+##### Methods
 
-#### default()
+###### default()
 
 **Signature:**
 
 ```swift
 public static func default() -> PreprocessingOptions
 ```
+
+**Example:**
+
+```swift
+let result = PreprocessingOptions.default()
+```
+
+**Returns:** `PreprocessingOptions`
 
 ---
 
