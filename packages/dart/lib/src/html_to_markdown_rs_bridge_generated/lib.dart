@@ -11,15 +11,14 @@ part 'lib.freezed.dart';
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
-/// Convert HTML to Markdown, returning a `ConversionResult` with content, metadata, images,
-/// and warnings.
+/// Convert HTML to Markdown, Djot, or plain text.
 ///
-///   `impl Into<Option<ConversionOptions>>`, so any of the following call shapes are accepted:
+/// Returns a `ConversionResult` with converted content plus optional metadata,
+/// document structure, table data, inline images, and warnings depending on the
+/// enabled features and conversion options.
 ///
-///   - `convert(html, ConversionOptions.default())` — bare options.
-///   - `convert(html, opts)` — bare options.
-///   - `convert(html, Some(opts))` — explicit `Option`.
-///   - `convert(html, None)` — fall back to `ConversionOptions.default`.
+///   `ConversionOptions`, `Some(options)`, or `null`; bindings expose the same
+///   option fields through language-native constructors or optional parameters.
 ///
 /// **Errors:**
 ///
@@ -967,10 +966,7 @@ class ConversionOptionsUpdate {
 /// assert!(result.warnings.is_empty());
 /// ```
 class ConversionResult {
-  /// Converted text output (markdown, djot, or plain text).
-  ///
-  /// `None` when `output_format` is set to `OutputFormat::None`,
-  /// indicating extraction-only mode.
+  /// Converted text output in the selected format: Markdown, Djot, or plain text.
   final String? content;
 
   /// Structured document tree with semantic elements.

@@ -10,22 +10,13 @@
 #include <string.h>
 
 int main(void) {
-  HtmResult result = htm_version();
+  const char *version = htm_version();
 
-  if (result.error_code != 0) {
-    fprintf(stderr, "FAIL: htm_version returned error %d: %s\n",
-            result.error_code, result.error_message ? result.error_message : "");
-    htm_result_free(result);
-    return 1;
-  }
-
-  if (!result.content || strlen(result.content) == 0) {
+  if (!version || strlen(version) == 0) {
     fprintf(stderr, "FAIL: expected non-empty version string\n");
-    htm_result_free(result);
     return 1;
   }
 
-  printf("PASS: htm_version returned: %s\n", result.content);
-  htm_result_free(result);
+  printf("PASS: htm_version returned: %s\n", version);
   return 0;
 }
