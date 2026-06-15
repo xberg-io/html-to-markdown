@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/html-to-markdown-node-linux-arm-gnueabihf",
-  "version": "3.6.6",
+  "version": "3.6.7",
   "description": "High-performance HTML to Markdown converter - Node.js native bindings",
   "keywords": [
     "converter",

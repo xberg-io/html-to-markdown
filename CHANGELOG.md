@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.7] - 2026-06-15
+
+### Fixed
+
+- **Restore Dart binding.** v3.6.6 silently dropped Dart from `[workspace].languages` in `alef.toml` and moved `packages/dart/rust` from workspace `members` to `exclude` in the root `Cargo.toml`. The pub.dev publish of `h2m` 3.6.6 succeeded only because the Dart workflow's tag-time checkout predated the exclusion; any subsequent regeneration would have orphaned the binding. Dart is restored to both lists.
+
+- **Bump alef to 0.25.9 — fixes Elixir NIF `[patch.crates-io]` no-op error blocking the v3.6.6 publish.** alef 0.25.7's Elixir scaffold emitted an unconditional `[patch.crates-io]` block in the generated Rustler NIF `Cargo.toml` with entries shaped `alloc-no-stdlib = { version = "=2.0.4" }` — cargo rejects these as `patch for 'alloc-no-stdlib' points to the same source, but patches must point to different sources`, failing every Elixir NIF matrix cell (linux x86_64/aarch64, macos x86_64/arm64) plus the Hex publish job on v3.6.6 publish run 27510348278. alef 0.25.9 (commit `e1e86bbc1`) replaces the broken patch block with direct `[dependencies]` entries pinning `alloc-no-stdlib = "=2.0.4"`, `alloc-stdlib = "=0.2.2"`, `brotli-decompressor = "=5.0.1"` plus matching `cargo-machete` ignores. 0.25.9 also ships the Ruby Rakefile YARD-coverage fix (`55f1eccf6`).
+
 ## [3.6.6] - 2026-06-14
 
 ### Fixed
