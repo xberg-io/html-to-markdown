@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-rs-dart"
-version = "3.6.7"
+version = "3.6.8"
 edition = "2024"
 license = "MIT"
 
@@ -11,7 +11,11 @@ ignored = ["html_to_markdown_rs"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
-
+[features]
+inline-images = ["html_to_markdown_rs/inline-images"]
+metadata = ["html_to_markdown_rs/metadata"]
+testkit = ["html_to_markdown_rs/testkit"]
+visitor = ["html_to_markdown_rs/visitor"]
 [dependencies]
 async-trait = "0.1"
 flutter_rust_bridge = "=2.12.0"
@@ -21,7 +25,4 @@ tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
 [lints.rust]
 # flutter_rust_bridge uses #[cfg(frb_expand)] internally during macro expansion.
-# Variant arms gated on upstream features (e.g. #[cfg(feature = "office")]) use
-# cfg conditions that are not declared in this binding crate. Declare all of them
-# as known cfgs so rustc does not emit unexpected_cfgs warnings.
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

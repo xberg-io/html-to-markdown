@@ -494,6 +494,10 @@ typedef struct HTMHtmVisitor HTMHtmVisitor;
  */
 typedef struct HTMHtmContext {
   /**
+   * Coarse-grained node type classification
+   */
+  int32_t node_type;
+  /**
    * Raw HTML tag name (e.g., "div", "h1", "custom-element")
    */
   const char *tag_name;

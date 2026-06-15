@@ -6,7 +6,8 @@ environment:
   sdk: ">=3.11.0 <4.0.0"
 
 dependencies:
-  h2m: ^3.6.7
+  h2m: ^3.6.8
+  ffi: ^2.2.0
 
 dev_dependencies:
   test: ^1.25.0

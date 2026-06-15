@@ -3,21 +3,26 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>HtmlToMarkdown</RootNamespace>
     <PackageId>KreuzbergDev.HtmlToMarkdown</PackageId>
-    <Version>3.6.7</Version>
+    <Version>3.6.8</Version>
+    <AssemblyVersion>3.6.8.0</AssemblyVersion>
+    <FileVersion>3.6.8.0</FileVersion>
+    <InformationalVersion>3.6.8</InformationalVersion>
     <Description>High-performance HTML to Markdown converter</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/kreuzberg-dev/html-to-markdown</RepositoryUrl>
     <Authors>Na&apos;aman Hirschfeld &lt;naaman@kreuzberg.dev&gt;</Authors>
+    <Company>Kreuzberg Team</Company>
+    <Product>HtmlToMarkdown</Product>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
-    <!-- Suppress SDK auto-generated AssemblyInfo to avoid CS0579 collisions
-         with hand-checked-in Properties/AssemblyInfo.cs files in consumer repos. -->
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <!-- Enable native asset resolution for P/Invoke. Detect platform at build time. -->
-    <UseRuntimeIdentifier>true</UseRuntimeIdentifier>
-    <RuntimeIdentifier Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">osx-arm64</RuntimeIdentifier>
-    <RuntimeIdentifier Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))">linux-x64</RuntimeIdentifier>
-    <RuntimeIdentifier Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))">win-x64</RuntimeIdentifier>
+    <!-- AnyCPU managed assembly so the PE `Machine` header stays processor-neutral
+         and consumers never see `warning CS8012: ... targets a different processor`.
+         Native asset resolution at consumer build time is driven by the
+         `runtimes/<rid>/native/` payload baked into the NuGet package — not a
+         single `<RuntimeIdentifier>` on the package author's side, which would
+         force runtime-specific output and break AnyCPU packaging. -->
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RuntimeIdentifiers>win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

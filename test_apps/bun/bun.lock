@@ -5,7 +5,7 @@
     "": {
       "name": "html-to-markdown-bun-test-app",
       "dependencies": {
-        "@kreuzberg/html-to-markdown": "^3.6.1",
+        "@kreuzberg/html-to-markdown": "^3.6.7",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -13,21 +13,21 @@
     },
   },
   "packages": {
-    "@kreuzberg/html-to-markdown": ["@kreuzberg/html-to-markdown@3.6.1", "", { "dependencies": { "@kreuzberg/html-to-markdown-node": "3.6.1" } }, "sha512-ob9Lzaxdi4b3BZgOut6GuUteX5b1+/05LfnmU+qaXFHx/yzkQQVDxcL3/qeCagT6cdiTVAxNhaZ3JZIR/njE8A=="],
+    "@kreuzberg/html-to-markdown": ["@kreuzberg/html-to-markdown@3.6.7", "", { "dependencies": { "@kreuzberg/html-to-markdown-node": "3.6.7" } }, "sha512-ZThJPNaMKxKHvwa5ZtMdBybpLQcxcTQ75pNbQUZchYbP5/uO+Sccnj5hTSX+X2xc6M7IHBd9oE4IQOrx2HOHsA=="],
 
-    "@kreuzberg/html-to-markdown-node": ["@kreuzberg/html-to-markdown-node@3.6.1", "", { "optionalDependencies": { "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.6.1", "@kreuzberg/html-to-markdown-node-darwin-x64": "3.6.1", "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.6.1", "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.6.1", "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.6.1", "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.6.1", "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.6.1", "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.6.1" } }, "sha512-ZJuXbBpidvC9q9psaKr022fNPfAwGIbaOjwYZHV7zGjrNQwENYFY2t48HiSP2GborcSFnhca1TqGmXsWlIH59g=="],
+    "@kreuzberg/html-to-markdown-node": ["@kreuzberg/html-to-markdown-node@3.6.7", "", { "optionalDependencies": { "@kreuzberg/html-to-markdown-node-darwin-arm64": "3.6.7", "@kreuzberg/html-to-markdown-node-darwin-x64": "3.6.7", "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": "3.6.7", "@kreuzberg/html-to-markdown-node-linux-arm64-musl": "3.6.7", "@kreuzberg/html-to-markdown-node-linux-x64-gnu": "3.6.7", "@kreuzberg/html-to-markdown-node-linux-x64-musl": "3.6.7", "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": "3.6.7", "@kreuzberg/html-to-markdown-node-win32-x64-msvc": "3.6.7" } }, "sha512-2SyWTaRDFECD7rz2StX2wAi09TBBwu5HCyHioqgvo2VJehQsW+N9E1il7gHsvtZpkmnrEhOd0Ywa05oESNwaCg=="],
 
-    "@kreuzberg/html-to-markdown-node-darwin-arm64": ["@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.1", "", { "os": "darwin", "cpu": "arm64" }, "sha512-CjCwbdrTEOYFbzFrxoxlIMVurfy0rTtWBFxjSDqQKKRV4ZPb/iKsYaJxhucNf0ulJuQpObRlBh4NZHXuc/gcIg=="],
+    "@kreuzberg/html-to-markdown-node-darwin-arm64": ["@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-jJGLxCWO88WDYBVZ4tiotopgKka3IjnH5lwKcBXzebdMeizh3oZibwwzJSmGkeFh2XmnqBsYGSCitw6IusMssg=="],
 
-    "@kreuzberg/html-to-markdown-node-darwin-x64": ["@kreuzberg/html-to-markdown-node-darwin-x64@3.6.1", "", { "os": "darwin", "cpu": "x64" }, "sha512-+FjZfRyJf1w8CNEj5Y1/NG6E9RWSIdDz1dqQ7aRcyTP8mQyNTomzPeaFjgcXRLt2bYaZyt8Q7MICCDRMGrPG6Q=="],
+    "@kreuzberg/html-to-markdown-node-darwin-x64": ["@kreuzberg/html-to-markdown-node-darwin-x64@3.6.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-P8AXe1QBH49cPlpgV2l8D96mJEJnjKVVuiWQyo4Jv3jzE+hcUuSFQvi79JfFTe7nhnP4Z4tfUC6oF59JIYOB4Q=="],
 
-    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": ["@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.1", "", { "os": "linux", "cpu": "arm64" }, "sha512-01kKaP51z9T6uLW2bXN7QCM53Eg8eq4wpcd/DUhHoghQdv7DdsC8GVy+6EJn9bWzl+0AwLd/ZjMjpd5UNRdjEg=="],
+    "@kreuzberg/html-to-markdown-node-linux-arm64-gnu": ["@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-xWZsYoBoo1f37RYwWy84VMDrVnVbhrRldElCVxsMrsiUg+jXHmrJUnLwmkmpOMVpHa8d8VoKNGwjIt0a6Y5x5Q=="],
 
-    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": ["@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.1", "", { "os": "linux", "cpu": "x64" }, "sha512-6mfGoZJfaPfyy/K2nwDhuCDUzglg6f/6lalAb2N4iml/rZl//g12gqtSmX2b9L7cdEZ/rZbGgp3e/GSIhMMclw=="],
+    "@kreuzberg/html-to-markdown-node-linux-x64-gnu": ["@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.7", "", { "os": "linux", "cpu": "x64" }, "sha512-HpVohVjfcbIjW8SHmn6RHdBif/BWUCVYazRI8VDL8riEvvoPAeJKuY29M54YvLLe3bvabBoLzir5KtVqG5rtoA=="],
 
-    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": ["@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.1", "", { "os": "win32", "cpu": "arm64" }, "sha512-i/bdit8sMDRM/X7VUAh0Uux6URSfT6DYSOlB5IYPLJzjGgLFCKg7LmFkw8tRVhnoLsgeJ44FR8LaTT2n9IjmLg=="],
+    "@kreuzberg/html-to-markdown-node-win32-arm64-msvc": ["@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.7", "", { "os": "win32", "cpu": "arm64" }, "sha512-j7LRqppWdKc3zYvQWMqj3OhWPr6IHFzTpgPtKYXhgdIV1wzpkzxHSYHn8hH4jJtI5gwjTi8YIn5aU6VFlUYpuA=="],
 
-    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": ["@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.1", "", { "os": "win32", "cpu": "x64" }, "sha512-g6jqvRl5texIbvD6C8Gd/Nrer8+xsbOGxvVkp7I7jfwFd5MXbGqolbqqifsR15Kw/sWLMXBS5MjQkjrv3r4uPw=="],
+    "@kreuzberg/html-to-markdown-node-win32-x64-msvc": ["@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.7", "", { "os": "win32", "cpu": "x64" }, "sha512-J6FOyFzyuTj9uO3Esu+Sur2zfpNroCHd87WfuJJElw6HreiUjKdFFeZPB2gfzZR1UksfVdsGfXyMuqfKGsZTkA=="],
 
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 

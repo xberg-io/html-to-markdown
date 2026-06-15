@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.8] - 2026-06-15
+
+### Fixed
+
+- **Bump alef to 0.25.11.** Picks up the vendor `manifest_abs` canonicalize fix (resolves Elixir NIF / PHP extension / Ruby gem / Python sdist `alef publish prepare` failures from the v3.6.7 publish run), the Dart `cfg(testkit)` whitespace fix (unblocks `Validate: Rust` and `Test: Dart` on main), the rustler `.clone()` skip for reference parameters, the JNI workspace-target host fix, the extendr enum type-path resolver, the swift `From<core>` cfg-gating for variant arms, the FFI visitor enum-context i32 emission, the visitor_result bare-string `Custom` routing, the e2e csharp SDK-AssemblyInfo suppression, and prerelease set-version support.
+- **C# assembly identity now tracks `<Version>`.** Deleted the hand-committed `packages/csharp/HtmlToMarkdown/Properties/AssemblyInfo.cs` (carrying a stale `AssemblyVersion("3.4.0")`) and switched the scaffold to let the .NET SDK derive `AssemblyVersion`, `AssemblyFileVersion`, and `AssemblyInformationalVersion` from `<Version>` plus the new `<Company>` / `<Product>` MSBuild properties. The published 3.4.0 assembly identity was breaking `task test-apps:smoke:csharp` against every NuGet package since the original ship.
+
+### Changed
+
+- **CI E2E PHP/Ruby builds: re-enable `rewrite-native-deps`.** The workaround in 3.6.7 (`a8c7fe40c`) disabled `rewrite-native-deps` on PHP and Ruby `build-*` actions to dodge the alef 0.25.9 canonicalize bug. With 0.25.11's fix the action works correctly again, so the four `rewrite-native-deps: "false"` overrides are removed.
+
 ## [3.6.7] - 2026-06-15
 
 ### Fixed
