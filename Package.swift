@@ -33,8 +33,8 @@ let package = Package(
     // sibling RustBridge target below and link against this binary.
     .binaryTarget(
       name: "RustBridgeBinary",
-      url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v__ALEF_SWIFT_VERSION__/HtmlToMarkdown-rs.artifactbundle.zip",
-      checksum: "__ALEF_SWIFT_CHECKSUM__"
+      url: "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.7/HtmlToMarkdown-rs.artifactbundle.zip",
+      checksum: "a1f573952c2936317eefbed71fcac161d881640dfce401889226cdb1e0f793c1"
     ),
     // RustBridge: Swift wrapper module owning the swift-bridge generated
     // sources. Depends on RustBridgeC for C type declarations and on
