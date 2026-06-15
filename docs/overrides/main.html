@@ -83,8 +83,8 @@
 on the wrapper for theme JS. #} {% block container %}
 <div class="md-content" data-md-component="content">
   <article class="md-content__inner md-typeset">
-    {% if page and ( page.is_homepage | default(false) or (page.url | default("")) == "" or
-    (page.url | default("")) == "/" or (page.url | default("")) == "." ) %}
+    {% if page and ( page.is_homepage | default(false) or (page.url | default("")) == ""
+    or (page.url | default("")) == "/" or (page.url | default("")) == "." ) %}
     <div class="hero-banner">
       <a href="https://kreuzberg.dev/" title="Kreuzberg.dev">
         <img
@@ -96,8 +96,9 @@ on the wrapper for theme JS. #} {% block container %}
         />
       </a>
     </div>
-    {% endif %} {% if "navigation.path" in features %} {% include "partials/path.html" %} {% endif
-    %} {% include "partials/content.html" %} {% if page and page.edit_url %}
+    {% endif %}
+    {% if "navigation.path" in features %} {% include "partials/path.html" %} {% endif %} {% include
+    "partials/content.html" %} {% if page and page.edit_url %}
     <p style="margin-top: 2rem; margin-bottom: 0; font-size: 0.75rem; line-height: 1.5">
       <a
         href="{{ page.edit_url }}"
