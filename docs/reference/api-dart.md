@@ -2,7 +2,7 @@
 title: "Dart API Reference"
 ---
 
-## Dart API Reference <span class="version-badge">v3.6.10</span>
+## Dart API Reference <span class="version-badge">v3.6.11</span>
 
 ### Functions
 
@@ -14,8 +14,8 @@ Returns a `ConversionResult` with converted content plus optional metadata,
 document structure, table data, inline images, and warnings depending on the
 enabled features and conversion options.
 
-  `ConversionOptions`, `Some(options)`, or `null`; bindings expose the same
-  option fields through language-native constructors or optional parameters.
+  `Some(options)`, or `null`. Language bindings expose the same option
+  fields through native constructors or optional parameters.
 
 **Errors:**
 
@@ -82,7 +82,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `newlineStyle` | `NewlineStyle` | `NewlineStyle.Spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `codeBlockStyle` | `CodeBlockStyle` | `CodeBlockStyle.Backticks` | Style used for fenced code blocks (backticks or tilde). |
 | `keepInlineImagesIn` | `List<String>` | `[]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
+| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to the standard preprocessing options, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
 | `encoding` | `String` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `bool` | `false` | Emit debug information during conversion. |
 | `stripTags` | `List<String>` | `[]` | HTML tag names whose content is stripped from the output entirely. |
@@ -97,7 +97,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `captureSvg` | `bool` | `false` | Capture SVG elements as images. |
 | `inferDimensions` | `bool` | `true` | Infer image dimensions from data. |
 | `maxDepth` | `int?` | `null` | Maximum DOM traversal depth. `null` means unlimited. When set, subtrees beyond this depth are silently truncated. |
-| `excludeSelectors` | `List<String>` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
+| `excludeSelectors` | `List<String>` | `[]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `[".cookie-banner", "#ad-container", "[role='complementary']"]` |
 | `tierStrategy` | `TierStrategy` | `TierStrategy.Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `VisitorHandle?` | `null` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
@@ -131,10 +131,9 @@ metadata, extracted tables, images, and processing warnings.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `content` | `String?` | `null` | Converted text output in the selected format: Markdown, Djot, or plain text. |
-| `document` | `DocumentStructure?` | `null` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `null` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
+| `document` | `DocumentStructure?` | `null` | Structured document tree with semantic elements. Populated when the `include_document_structure` option is `true`. `null` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in the result's `tables` field. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `List<TableData>` | `[]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `List<String>` | `[]` | Extracted inline images from data URIs and SVGs. Populated when the `inline-images` feature is enabled and `extract_images` is `true`. Bindings may expose a simplified image representation or omit this Rust-only payload depending on backend support for binary image data. |
 | `warnings` | `List<ProcessingWarning>` | `[]` | Non-fatal processing warnings. |
 
 ---
@@ -308,9 +307,9 @@ For a typical element like `<div><p>text</p></div>`:
 - Return `Continue` quickly for elements you don't need to customize
 - Avoid heavy computation in visitor methods; consider caching if needed
 
-#### Methods
+##### Methods
 
-##### visitText()
+###### visitText()
 
 Visit text nodes (most frequent callback - ~100+ per document).
 
@@ -1333,7 +1332,7 @@ final result = instance.visitFigureEnd(NodeContext(), "value");
 Image dimensions in pixels.
 
 Binding-safe replacement for `(u32, u32)` tuples, which degrade to
-`Vec<Vec<String>>` when sanitized for cross-language binding generation.
+`List<List<String>>` when sanitized for cross-language binding generation.
 Used by both `ImageMetadata` and
 `InlineImage`.
 
@@ -1404,8 +1403,8 @@ including its type, tag name, position in the DOM tree, and parent context.
 #### Attributes
 
 Access attributes via `NodeContext.attributes`, which returns
-`&BTreeMap<String, String>`. When the context was built with
-`NodeContext.with_lazy_attributes` (the hot path inside the converter),
+`Map<String, String>`. When the context was built with
+lazy attribute extraction (the hot path inside the converter),
 the map is only materialized on the first call — if the visitor never reads
 attributes, the allocation is skipped.
 
@@ -1430,7 +1429,7 @@ to outlive the callback should call `NodeContext.into_owned`.
 
 Return a reference to the attribute map.
 
-If the context was built with `NodeContext.with_lazy_attributes`, the
+If the context was built with lazy attribute extraction, the
 map is materialized on the first call and cached for subsequent calls.
 If this method is never called, no allocation occurs for attributes.
 
@@ -1452,8 +1451,7 @@ final result = instance.attributes();
 
 Construct a `NodeContext` with an owned attribute map.
 
-Prefer `NodeContext.with_lazy_attributes` (pub(crate)) inside the
-converter to avoid the eager `collect_tag_attributes` allocation.
+Use this when the caller already has materialized attributes.
 
 **Signature:**
 
@@ -1591,7 +1589,7 @@ A structured table grid with cell-level data including spans.
 |-------|------|---------|-------------|
 | `rows` | `int` | — | Number of rows. |
 | `cols` | `int` | — | Number of columns. |
-| `cells` | `List<GridCell>` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this vec is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty vec. |
+| `cells` | `List<GridCell>` | `[]` | All cells in the table as a flat, sparse list. The list is ordered by `(row, col)` but is **not** a dense `rows × cols` matrix: cells that are covered by a spanning cell (via `row_span > 1` or `col_span > 1`) do not appear in the list. Only the top-left "origin" cell of a span is present, with its `row_span` and `col_span` fields set accordingly. To reconstruct the full visual grid, iterate over all cells and mark the rectangular region `[row .. row+row_span, col .. col+col_span]` as occupied by that cell. Any `(row, col)` position that is not the origin of any cell is covered by a span from an earlier cell. The length of this list is `≤ rows * cols`. An empty table (`rows == 0 \|\| cols == 0`) produces an empty list. |
 
 ---
 
@@ -1604,8 +1602,7 @@ a `TextAnnotation` describes inline-level markup — bold, italic, links, code s
 similar — that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
 
 Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
-follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
-text is `text[start as usize..end as usize]`.
+is half-open: `start` is inclusive and `end` is exclusive.
 
 Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
 stored in the order they are encountered during DOM traversal.
@@ -2039,7 +2036,7 @@ Errors that can occur during HTML to Markdown conversion.
 | `ParseError` | HTML parsing error |
 | `SanitizationError` | HTML sanitization error |
 | `ConfigError` | Invalid configuration |
-| `IoError` | I/O error — stores the error message string so the variant is FFI-safe. Use `ConversionError.from(io_error)` to convert from `std.io.Error`. |
+| `IoError` | I/O error — stores the error message string so the variant is FFI-safe. Use `ConversionError.from(io_error)` to convert from an operating-system I/O error. |
 | `Panic` | Internal error caught during conversion |
 | `InvalidInput` | Invalid input data |
 | `Other` | Generic conversion error |

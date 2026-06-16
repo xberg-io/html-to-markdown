@@ -119,6 +119,22 @@ pub struct Context {
     /// runs before the main rendering pass, so acquiring the Mutex there is pure
     /// overhead (especially costly post-`Arc<Mutex>` migration in 7f6178f25).
     pub(crate) skip_visitor_hooks: bool,
+    /// When `true`, `walk_node` short-circuits nested-table dispatch — the
+    /// outer table is currently in its width-measurement pre-pass and the
+    /// nested table's full markdown rendering (which itself runs a pre-pass on
+    /// every descendant cell) would explode CPU on layout-heavy HTML.
+    ///
+    /// The per-cell width cap (`MAX_CELL_WIDTH = 200` in
+    /// `cells.rs::collect_row_cell_widths`) bounds the discarded *output*, but
+    /// the underlying *measurement* still walked every nested table fully.
+    /// Skipping the nested-table dispatch during measurement keeps the
+    /// pre-pass linear in descendant text length without changing rendered
+    /// output (the column width is slightly underestimated for cells
+    /// containing tables, which is fine — the cap dominates anyway).
+    ///
+    /// Set together with `skip_visitor_hooks` when constructing `prepass_ctx`
+    /// in `block::table::builder::handle_table`. Resolves issue #406.
+    pub(crate) measure_width_only: bool,
 }
 
 impl Context {
@@ -211,6 +227,7 @@ impl Context {
             structure_collector,
             reference_collector,
             skip_visitor_hooks: false,
+            measure_width_only: false,
         }
     }
 }

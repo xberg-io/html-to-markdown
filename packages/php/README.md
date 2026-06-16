@@ -2,7 +2,7 @@
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
   <a href="https://github.com/kreuzberg-dev/alef">
-    <img src="https://img.shields.io/badge/Bindings-alef%20%D7%90-007ec6" alt="Bindings">
+    <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef">
   </a>
   <!-- Language Bindings -->
   <a href="https://crates.io/crates/html-to-markdown-rs">
@@ -167,35 +167,34 @@ The dispatcher is invisible to the caller. Output is byte-identical across tiers
 
 ### Core Function
 
-**`Converter::convert(string $html, ?ConversionOptions $options = null, ?VisitorInterface $visitor = null): array`**
+**`HtmlToMarkdown::convert(string $html, ?ConversionOptions $options = null): ConversionResult`**
 
-Converts HTML to Markdown. Returns an array `ConversionResult` with all results in a single call.
+Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```php
 <?php
-use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\HtmlToMarkdown;
 
-$result  = Converter::create()->convert($html);
-$markdown = $result['content'];    // Converted Markdown string
-$metadata = $result['metadata'];   // Metadata (when extractMetadata: true)
-$tables   = $result['tables'];     // Structured table data (when extractTables: true)
-$document = $result['document'];   // Document-level info
-$images   = $result['images'];     // Extracted images
-$warnings = $result['warnings'];   // Any conversion warnings
+$result   = HtmlToMarkdown::convert($html);
+$markdown = $result->content;    // Converted Markdown string
+$metadata = $result->metadata;   // Metadata
+$tables   = $result->tables;     // Structured table data
+$document = $result->document;   // Document-level info
+$images   = $result->images;     // Extracted images
+$warnings = $result->warnings;   // Any conversion warnings
 ```
 
 ### Options
 
 **`ConversionOptions`** – Key configuration fields:
 
-- `heading_style`: Heading format (`"underlined"` | `"atx"` | `"atx_closed"`) — default: `"underlined"`
+- `heading_style`: Heading format (`"underlined"` | `"atx"` | `"atx_closed"`) — default: `"atx"`
 - `list_indent_width`: Spaces per indent level — default: `2`
-- `bullets`: Bullet characters cycle — default: `"*+-"`
+- `bullets`: Bullet characters cycle — default: `"-*+"`
 - `wrap`: Enable text wrapping — default: `false`
 - `wrap_width`: Wrap at column — default: `80`
 - `code_language`: Default fenced code block language — default: none
-- `extract_metadata`: Enable metadata extraction into `result.metadata` — default: `false`
-- `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
+- `extract_metadata`: Enable metadata extraction into `result.metadata` — default: `true`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`
 
 ## Djot Output Format
@@ -216,20 +215,8 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 
 ### Example Usage
 
-```php
-use HtmlToMarkdown\Converter;
-use HtmlToMarkdown\ConversionOptions;
-
-$html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
-
-// Default Markdown output
-$markdown = Converter::convert($html);
-// Result: "This is **bold** and *italic* text."
-
-// Djot output
-$djot = Converter::convert($html, new ConversionOptions(outputFormat: 'djot'));
-// Result: "This is *bold* and _italic_ text."
-```
+Set `ConversionOptions.outputFormat` to `OutputFormat::Djot` and pass the options object to
+`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
@@ -237,15 +224,8 @@ Djot's extended syntax allows you to express more semantic meaning in lightweigh
 
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
-```php
-use HtmlToMarkdown\Converter;
-use HtmlToMarkdown\ConversionOptions;
-
-$html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
-
-$plain = Converter::convert($html, new ConversionOptions(outputFormat: 'plain'));
-// Result: "Title\n\nThis is bold and italic text."
-```
+Set `ConversionOptions.outputFormat` to `OutputFormat::Plain` and pass the options object to
+`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 
@@ -344,13 +324,13 @@ $markdown = $result['content'];
 
 ## Part of Kreuzberg.dev
 
-- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 90+ formats with optional OCR.
+- [Kreuzberg](https://github.com/kreuzberg-dev/kreuzberg) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
 - [Kreuzberg Cloud](https://github.com/kreuzberg-dev/kreuzberg-cloud) — managed extraction API with SDKs, dashboards, and observability.
 - [kreuzcrawl](https://github.com/kreuzberg-dev/kreuzcrawl) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- [html-to-markdown](https://github.com/kreuzberg-dev/html-to-markdown) — fast, lossless HTML→Markdown engine.
 - [liter-llm](https://github.com/kreuzberg-dev/liter-llm) — universal LLM API client with native bindings for 14 languages and 143 providers.
 - [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) — tree-sitter grammars and code-intelligence primitives.
 - [alef](https://github.com/kreuzberg-dev/alef) — the polyglot binding generator that produces every per-language binding across the 5 polyglot repos.
-- [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
 
 ## Contributing
 
@@ -378,5 +358,4 @@ If you find this library useful, consider [sponsoring the project](https://githu
 Have questions or run into issues? We're here to help:
 
 - **GitHub Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
-- **Issues:** [github.com/kreuzberg-dev/html-to-markdown/issues](https://github.com/kreuzberg-dev/html-to-markdown/issues)
 - **Discord Community:** [discord.gg/xt9WY3GnKR](https://discord.gg/xt9WY3GnKR)

@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@kreuzberg/html-to-markdown':
-        specifier: ^3.6.7
-        version: 3.6.7
+        specifier: ^3.6.10
+        version: 3.6.10
       '@types/node':
         specifier: ^22.10.2
         version: 22.19.19
@@ -32,50 +32,50 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.7':
-    resolution: {integrity: sha512-jJGLxCWO88WDYBVZ4tiotopgKka3IjnH5lwKcBXzebdMeizh3oZibwwzJSmGkeFh2XmnqBsYGSCitw6IusMssg==}
+  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.10':
+    resolution: {integrity: sha512-ryMhm2DNi0eV5c2qBIbMsZ0C9Zrg3XD6qE6+vmNCyCQUpMTJPLLCYygWhuKPZfTeTdc7L2KwfepX7UCGwmvRaA==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [darwin]
 
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.7':
-    resolution: {integrity: sha512-P8AXe1QBH49cPlpgV2l8D96mJEJnjKVVuiWQyo4Jv3jzE+hcUuSFQvi79JfFTe7nhnP4Z4tfUC6oF59JIYOB4Q==}
+  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.10':
+    resolution: {integrity: sha512-Fj00SYpIKN2CDxp+lcrPW1d0nvV4HiYjiBRRqTy9wCe0kHu+JXOG+EoE24zJ1E+mvNmUuPaktIjYrYEYRTclYQ==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [darwin]
 
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.7':
-    resolution: {integrity: sha512-xWZsYoBoo1f37RYwWy84VMDrVnVbhrRldElCVxsMrsiUg+jXHmrJUnLwmkmpOMVpHa8d8VoKNGwjIt0a6Y5x5Q==}
+  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.10':
+    resolution: {integrity: sha512-PYfncXW1GvwJfn72XxgGOt6JIqa8ejnnofMDALPuX84gnlRSwhvbbyMCU9DdFRQ3FOq1IAVTDVlOqlAFLEL6oA==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.7':
-    resolution: {integrity: sha512-HpVohVjfcbIjW8SHmn6RHdBif/BWUCVYazRI8VDL8riEvvoPAeJKuY29M54YvLLe3bvabBoLzir5KtVqG5rtoA==}
+  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.10':
+    resolution: {integrity: sha512-EKD+SSxDaZ6stPYH+b6DQHTWfJ8WFG3vRO9vyc/aqq0XHHPXxFY8tPs2XsEEHR6bBHrtJTmjD/0Sa+F68sm+Lg==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.7':
-    resolution: {integrity: sha512-j7LRqppWdKc3zYvQWMqj3OhWPr6IHFzTpgPtKYXhgdIV1wzpkzxHSYHn8hH4jJtI5gwjTi8YIn5aU6VFlUYpuA==}
+  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.10':
+    resolution: {integrity: sha512-boK3OpJCkIHbh7iEmD75pcgbwy5spbYfbX0s6+TOzGfc3qBZ6arcHTV1ujOIoOLwrQWZrKyTonLlPzPya8BWuA==}
     engines: {node: '>= 18'}
     cpu: [arm64]
     os: [win32]
 
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.7':
-    resolution: {integrity: sha512-J6FOyFzyuTj9uO3Esu+Sur2zfpNroCHd87WfuJJElw6HreiUjKdFFeZPB2gfzZR1UksfVdsGfXyMuqfKGsZTkA==}
+  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.10':
+    resolution: {integrity: sha512-P13NA8i/1KALVbNNxaPfJmR5HyW3+EirY707O2x/73fgVC7GL/WjpSiQ/bdPFaHsv28jhC3EVrMviS5nkGb9ew==}
     engines: {node: '>= 18'}
     cpu: [x64]
     os: [win32]
 
-  '@kreuzberg/html-to-markdown-node@3.6.7':
-    resolution: {integrity: sha512-2SyWTaRDFECD7rz2StX2wAi09TBBwu5HCyHioqgvo2VJehQsW+N9E1il7gHsvtZpkmnrEhOd0Ywa05oESNwaCg==}
+  '@kreuzberg/html-to-markdown-node@3.6.10':
+    resolution: {integrity: sha512-9eD1nspBG7qBv77Q1/EFZKcmZzQW3GLx8p0vA8LrKEQ1W5zxXJYK2HgNMP4clyocOCiqVoMdrZZXvGMY+Qq/dQ==}
     engines: {node: '>= 18'}
 
-  '@kreuzberg/html-to-markdown@3.6.7':
-    resolution: {integrity: sha512-ZThJPNaMKxKHvwa5ZtMdBybpLQcxcTQ75pNbQUZchYbP5/uO+Sccnj5hTSX+X2xc6M7IHBd9oE4IQOrx2HOHsA==}
+  '@kreuzberg/html-to-markdown@3.6.10':
+    resolution: {integrity: sha512-7l8JzVNew7kTbCHvseNJhM6lmjRZjE3Tlmw0GuQ71Krl3ySM4/dgy8oUTJpAIO+JzCZi2nGHDx1aJDzKi4OSDQ==}
     engines: {node: '>= 18'}
 
   '@napi-rs/wasm-runtime@1.1.4':
@@ -518,36 +518,36 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.7':
+  '@kreuzberg/html-to-markdown-node-darwin-arm64@3.6.10':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.7':
+  '@kreuzberg/html-to-markdown-node-darwin-x64@3.6.10':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.7':
+  '@kreuzberg/html-to-markdown-node-linux-arm64-gnu@3.6.10':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.7':
+  '@kreuzberg/html-to-markdown-node-linux-x64-gnu@3.6.10':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.7':
+  '@kreuzberg/html-to-markdown-node-win32-arm64-msvc@3.6.10':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.7':
+  '@kreuzberg/html-to-markdown-node-win32-x64-msvc@3.6.10':
     optional: true
 
-  '@kreuzberg/html-to-markdown-node@3.6.7':
+  '@kreuzberg/html-to-markdown-node@3.6.10':
     optionalDependencies:
-      '@kreuzberg/html-to-markdown-node-darwin-arm64': 3.6.7
-      '@kreuzberg/html-to-markdown-node-darwin-x64': 3.6.7
-      '@kreuzberg/html-to-markdown-node-linux-arm64-gnu': 3.6.7
-      '@kreuzberg/html-to-markdown-node-linux-x64-gnu': 3.6.7
-      '@kreuzberg/html-to-markdown-node-win32-arm64-msvc': 3.6.7
-      '@kreuzberg/html-to-markdown-node-win32-x64-msvc': 3.6.7
+      '@kreuzberg/html-to-markdown-node-darwin-arm64': 3.6.10
+      '@kreuzberg/html-to-markdown-node-darwin-x64': 3.6.10
+      '@kreuzberg/html-to-markdown-node-linux-arm64-gnu': 3.6.10
+      '@kreuzberg/html-to-markdown-node-linux-x64-gnu': 3.6.10
+      '@kreuzberg/html-to-markdown-node-win32-arm64-msvc': 3.6.10
+      '@kreuzberg/html-to-markdown-node-win32-x64-msvc': 3.6.10
 
-  '@kreuzberg/html-to-markdown@3.6.7':
+  '@kreuzberg/html-to-markdown@3.6.10':
     dependencies:
-      '@kreuzberg/html-to-markdown-node': 3.6.7
+      '@kreuzberg/html-to-markdown-node': 3.6.10
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:

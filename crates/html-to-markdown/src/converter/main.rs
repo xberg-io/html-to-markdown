@@ -546,15 +546,32 @@ pub fn walk_node(
                     depth,
                     dom_ctx,
                 ),
-                "table" => crate::converter::block::table::handle_table_with_context(
-                    node_handle,
-                    parser,
-                    output,
-                    options,
-                    ctx,
-                    dom_ctx,
-                    depth,
-                ),
+                "table" => {
+                    // Issue #406: during an outer table's width-measurement pre-pass,
+                    // skip the nested-table dispatch and fall back to descendant text
+                    // content.  Running the full table handler here would launch the
+                    // nested table's own measurement pre-pass on every descendant cell,
+                    // recursing combinatorially (393 nested layout tables × ~393 cells
+                    // each in the reported reproducer, unbounded at greater nesting depth).
+                    // The per-cell output cap (`MAX_CELL_WIDTH = 200`) bounded discarded
+                    // *output* but not measurement CPU.  Emitting descendant text keeps
+                    // the pre-pass linear in descendant character count, and the resulting
+                    // width still approximates the rendered cell content for separator-row
+                    // padding.
+                    if ctx.measure_width_only {
+                        output.push_str(dom_ctx.text_content(*node_handle, parser).as_str());
+                        return;
+                    }
+                    crate::converter::block::table::handle_table_with_context(
+                        node_handle,
+                        parser,
+                        output,
+                        options,
+                        ctx,
+                        dom_ctx,
+                        depth,
+                    );
+                }
 
                 // List elements routed to list dispatcher
                 "ul" | "ol" | "li" | "dl" | "dt" | "dd" => {

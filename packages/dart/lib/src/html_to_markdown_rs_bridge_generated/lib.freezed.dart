@@ -218,7 +218,7 @@ return link(_that.url,_that.title);case _:
 
 class AnnotationKind_Bold extends AnnotationKind {
   const AnnotationKind_Bold(): super._();
-
+  
 
 
 
@@ -250,7 +250,7 @@ String toString() {
 
 class AnnotationKind_Italic extends AnnotationKind {
   const AnnotationKind_Italic(): super._();
-
+  
 
 
 
@@ -282,7 +282,7 @@ String toString() {
 
 class AnnotationKind_Underline extends AnnotationKind {
   const AnnotationKind_Underline(): super._();
-
+  
 
 
 
@@ -314,7 +314,7 @@ String toString() {
 
 class AnnotationKind_Strikethrough extends AnnotationKind {
   const AnnotationKind_Strikethrough(): super._();
-
+  
 
 
 
@@ -346,7 +346,7 @@ String toString() {
 
 class AnnotationKind_Code extends AnnotationKind {
   const AnnotationKind_Code(): super._();
-
+  
 
 
 
@@ -378,7 +378,7 @@ String toString() {
 
 class AnnotationKind_Subscript extends AnnotationKind {
   const AnnotationKind_Subscript(): super._();
-
+  
 
 
 
@@ -410,7 +410,7 @@ String toString() {
 
 class AnnotationKind_Superscript extends AnnotationKind {
   const AnnotationKind_Superscript(): super._();
-
+  
 
 
 
@@ -442,7 +442,7 @@ String toString() {
 
 class AnnotationKind_Highlight extends AnnotationKind {
   const AnnotationKind_Highlight(): super._();
-
+  
 
 
 
@@ -474,7 +474,7 @@ String toString() {
 
 class AnnotationKind_Link extends AnnotationKind {
   const AnnotationKind_Link({required this.url, required this.title}): super._();
-
+  
 
 /// The URL from the `href` attribute, copied verbatim from the source HTML.
 ///
@@ -773,7 +773,7 @@ return other(_that.field0);case _:
 
 class ConversionError_ParseError extends ConversionError {
   const ConversionError_ParseError({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -839,7 +839,7 @@ as String,
 
 class ConversionError_SanitizationError extends ConversionError {
   const ConversionError_SanitizationError({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -905,7 +905,7 @@ as String,
 
 class ConversionError_ConfigError extends ConversionError {
   const ConversionError_ConfigError({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -971,7 +971,7 @@ as String,
 
 class ConversionError_IoError extends ConversionError {
   const ConversionError_IoError({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -1037,7 +1037,7 @@ as String,
 
 class ConversionError_Panic extends ConversionError {
   const ConversionError_Panic({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -1103,7 +1103,7 @@ as String,
 
 class ConversionError_InvalidInput extends ConversionError {
   const ConversionError_InvalidInput({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -1169,7 +1169,7 @@ as String,
 
 class ConversionError_Other extends ConversionError {
   const ConversionError_Other({required this.field0}): super._();
-
+  
 
 @override final  String field0;
 
@@ -1461,7 +1461,7 @@ return group(_that.label,_that.headingLevel,_that.headingText);case _:
 
 class NodeContent_Heading extends NodeContent {
   const NodeContent_Heading({required this.level, required this.text}): super._();
-
+  
 
 /// Heading level (1-6).
  final  PlatformInt64 level;
@@ -1531,7 +1531,7 @@ as String,
 
 class NodeContent_Paragraph extends NodeContent {
   const NodeContent_Paragraph({required this.text}): super._();
-
+  
 
 /// The paragraph text content.
  final  String text;
@@ -1598,7 +1598,7 @@ as String,
 
 class NodeContent_List extends NodeContent {
   const NodeContent_List({required this.ordered}): super._();
-
+  
 
 /// Whether this is an ordered list.
  final  bool ordered;
@@ -1665,7 +1665,7 @@ as bool,
 
 class NodeContent_ListItem extends NodeContent {
   const NodeContent_ListItem({required this.text}): super._();
-
+  
 
 /// The list item text content.
  final  String text;
@@ -1732,7 +1732,7 @@ as String,
 
 class NodeContent_Table extends NodeContent {
   const NodeContent_Table({required this.grid}): super._();
-
+  
 
 /// The table grid structure.
  final  TableGrid grid;
@@ -1799,7 +1799,7 @@ as TableGrid,
 
 class NodeContent_Image extends NodeContent {
   const NodeContent_Image({required this.description, required this.src, required this.imageIndex}): super._();
-
+  
 
 /// Alt text or caption.
  final  String description;
@@ -1872,7 +1872,7 @@ as PlatformInt64,
 
 class NodeContent_Code extends NodeContent {
   const NodeContent_Code({required this.text, required this.language}): super._();
-
+  
 
 /// The code text content.
  final  String text;
@@ -1942,7 +1942,7 @@ as String,
 
 class NodeContent_Quote extends NodeContent {
   const NodeContent_Quote(): super._();
-
+  
 
 
 
@@ -1974,7 +1974,7 @@ String toString() {
 
 class NodeContent_DefinitionList extends NodeContent {
   const NodeContent_DefinitionList(): super._();
-
+  
 
 
 
@@ -2006,7 +2006,7 @@ String toString() {
 
 class NodeContent_DefinitionItem extends NodeContent {
   const NodeContent_DefinitionItem({required this.term, required this.definition}): super._();
-
+  
 
 /// The term being defined.
  final  String term;
@@ -2076,7 +2076,7 @@ as String,
 
 class NodeContent_RawBlock extends NodeContent {
   const NodeContent_RawBlock({required this.format, required this.content}): super._();
-
+  
 
 /// The format of the raw content (e.g. "html", "css", "javascript").
  final  String format;
@@ -2146,7 +2146,7 @@ as String,
 
 class NodeContent_MetadataBlock extends NodeContent {
   const NodeContent_MetadataBlock({required final  List<MetadataEntry> entries}): _entries = entries,super._();
-
+  
 
 /// Key-value metadata pairs.
  final  List<MetadataEntry> _entries;
@@ -2220,7 +2220,7 @@ as List<MetadataEntry>,
 
 class NodeContent_Group extends NodeContent {
   const NodeContent_Group({required this.label, required this.headingLevel, required this.headingText}): super._();
-
+  
 
 /// Optional section label.
  final  String label;
@@ -2471,7 +2471,7 @@ return error(_that.field0);case _:
 
 class VisitResult_Continue extends VisitResult {
   const VisitResult_Continue(): super._();
-
+  
 
 
 
@@ -2503,7 +2503,7 @@ String toString() {
 
 class VisitResult_Custom extends VisitResult {
   const VisitResult_Custom({required this.field0}): super._();
-
+  
 
  final  String field0;
 
@@ -2569,7 +2569,7 @@ as String,
 
 class VisitResult_Skip extends VisitResult {
   const VisitResult_Skip(): super._();
-
+  
 
 
 
@@ -2601,7 +2601,7 @@ String toString() {
 
 class VisitResult_PreserveHtml extends VisitResult {
   const VisitResult_PreserveHtml(): super._();
-
+  
 
 
 
@@ -2633,7 +2633,7 @@ String toString() {
 
 class VisitResult_Error extends VisitResult {
   const VisitResult_Error({required this.field0}): super._();
-
+  
 
  final  String field0;
 

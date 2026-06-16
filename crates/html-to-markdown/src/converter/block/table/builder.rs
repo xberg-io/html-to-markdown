@@ -225,6 +225,7 @@ pub fn handle_table(
             // on a 1000x10 table — pure overhead that regressed in 7f6178f25.
             let prepass_ctx = super::super::super::Context {
                 skip_visitor_hooks: true,
+                measure_width_only: true,
                 ..ctx.clone()
             };
             let mut widths: Vec<usize> = Vec::new();

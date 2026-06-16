@@ -19,32 +19,36 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 {% if language == 'python' %}
 
 ```python
-from html_to_markdown import convert, ConversionOptions
+from html_to_markdown import ConversionOptions, convert
 
 html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
 # Default Markdown output
-markdown = convert(html)
+markdown_result = convert(html)
+markdown = markdown_result.content
 # Result: "This is **bold** and *italic* text."
 
 # Djot output
-djot = convert(html, ConversionOptions(output_format="djot"))
+djot_result = convert(html, ConversionOptions(output_format="djot"))
+djot = djot_result.content
 # Result: "This is *bold* and _italic_ text."
 ```
 
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
+import { convert, OutputFormat } from "@kreuzberg/html-to-markdown";
 
 const html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
 // Default Markdown output
-const markdown = convert(html);
+const markdownResult = convert(html);
+const markdown = markdownResult.content;
 // Result: "This is **bold** and *italic* text."
 
 // Djot output
-const djot = convert(html, { outputFormat: "djot" });
+const djotResult = convert(html, { outputFormat: OutputFormat.Djot });
+const djot = djotResult.content;
 // Result: "This is *bold* and _italic_ text."
 ```
 
@@ -56,43 +60,39 @@ require 'html_to_markdown'
 html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
 # Default Markdown output
-markdown = HtmlToMarkdown.convert(html)
+markdown_result = HtmlToMarkdown.convert(html)
+markdown = markdown_result[:content]
 # Result: "This is **bold** and *italic* text."
 
 # Djot output
-djot = HtmlToMarkdown.convert(html, output_format: 'djot')
+djot_result = HtmlToMarkdown.convert(html, output_format: 'djot')
+djot = djot_result[:content]
 # Result: "This is *bold* and _italic_ text."
 ```
 
 {% elif language == 'php' %}
 
-```php
-use HtmlToMarkdown\Converter;
-use HtmlToMarkdown\ConversionOptions;
-
-$html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
-
-// Default Markdown output
-$markdown = Converter::convert($html);
-// Result: "This is **bold** and *italic* text."
-
-// Djot output
-$djot = Converter::convert($html, new ConversionOptions(outputFormat: 'djot'));
-// Result: "This is *bold* and _italic_ text."
-```
+Set `ConversionOptions.outputFormat` to `OutputFormat::Djot` and pass the options object to
+`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 {% elif language == 'go' %}
 
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
+import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
 
 html := "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
 // Default Markdown output
-markdown, _ := htmltomarkdown.Convert(html)
+markdownResult, _ := htmltomarkdown.Convert(html, nil)
+markdown := *markdownResult.Content
 // Result: "This is **bold** and *italic* text."
 
-// Note: Djot output format configuration is not yet supported in Go bindings
+// Djot output
+djotResult, _ := htmltomarkdown.Convert(html, &htmltomarkdown.ConversionOptions{
+    OutputFormat: htmltomarkdown.OutputFormatDjot,
+})
+djot := *djotResult.Content
+// Result: "This is *bold* and _italic_ text."
 ```
 
 {% elif language == 'java' %}
@@ -105,12 +105,15 @@ import dev.kreuzberg.htmltomarkdown.OutputFormat;
 String html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
 // Default Markdown output
-String markdown = HtmlToMarkdown.convert(html);
+String markdown = HtmlToMarkdown.convert(html).content();
 // Result: "This is **bold** and *italic* text."
 
 // Djot output
 String djot = HtmlToMarkdown.convert(html,
-    new ConversionOptions().setOutputFormat(OutputFormat.DJOT));
+    ConversionOptions.builder()
+        .withOutputFormat(OutputFormat.Djot)
+        .build()
+).content();
 // Result: "This is *bold* and _italic_ text."
 ```
 
@@ -122,11 +125,11 @@ using HtmlToMarkdown;
 var html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
 // Default Markdown output
-var markdown = Converter.Convert(html);
+var markdown = Converter.Convert(html).Content;
 // Result: "This is **bold** and *italic* text."
 
 // Djot output
-var djot = Converter.Convert(html, new ConversionOptions { OutputFormat = "djot" });
+var djot = Converter.Convert(html, new ConversionOptions { OutputFormat = OutputFormat.Djot }).Content;
 // Result: "This is *bold* and _italic_ text."
 ```
 
@@ -136,11 +139,13 @@ var djot = Converter.Convert(html, new ConversionOptions { OutputFormat = "djot"
 html = "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
 # Default Markdown output
-{:ok, markdown} = HtmlToMarkdown.convert(html)
+{:ok, markdown_result} = HtmlToMarkdown.convert(html)
+markdown = markdown_result.content
 # Result: "This is **bold** and *italic* text."
 
 # Djot output
-{:ok, djot} = HtmlToMarkdown.convert(html, %{output_format: "djot"})
+{:ok, djot_result} = HtmlToMarkdown.convert(html, %{output_format: "Djot"})
+djot = djot_result.content
 # Result: "This is *bold* and _italic_ text."
 ```
 

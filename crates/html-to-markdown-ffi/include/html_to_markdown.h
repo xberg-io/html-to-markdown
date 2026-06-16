@@ -382,8 +382,7 @@ typedef struct HTMTableGrid HTMTableGrid;
  * similar â that spans a contiguous run of bytes inside `DocumentNode::content`'s text field.
  *
  * Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
- * follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
- * text is `text[start as usize..end as usize]`.
+ * is half-open: `start` is inclusive and `end` is exclusive.
  *
  * Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
  * stored in the order they are encountered during DOM traversal.
@@ -3119,8 +3118,7 @@ char *htm_node_context_attributes(const HTMNodeContext *this_);
 /**
  * Construct a `NodeContext` with an owned attribute map.
  *
- * Prefer `NodeContext.with_lazy_attributes` (pub(crate)) inside the
- * converter to avoid the eager `collect_tag_attributes` allocation.
+ * Use this when the caller already has materialized attributes.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */

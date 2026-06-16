@@ -18,10 +18,9 @@ metadata, extracted tables, images, and processing warnings.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `content` | `Option<String>` | `Default::default()` | Converted text output in the selected format: Markdown, Djot, or plain text. |
-| `document` | `Option<DocumentStructure>` | `Default::default()` | Structured document tree with semantic elements. Populated when `ConversionOptions.include_document_structure` is `true`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self.tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
+| `document` | `Option<DocumentStructure>` | `Default::default()` | Structured document tree with semantic elements. Populated when `ConversionOptions::include_document_structure` is `true`. `None` otherwise (the default), which avoids the overhead of building the tree. When present, the tree mirrors the converted document: headings open `Group` sections, paragraphs and list items carry inline `TextAnnotation`s, and tables reference the same `TableGrid` data exposed in `Self::tables`. Note: this field is independent of the `metadata` feature flag. Document structure collection is always available at runtime; it is gated only by the runtime option, not by a compile-time feature. |
 | `metadata` | `HtmlMetadata` | — | Extracted HTML metadata (title, OG, links, images, structured data). |
 | `tables` | `Vec<TableData>` | `vec![]` | Extracted tables with structured cell data and markdown representation. |
-| `images` | `Vec<String>` | `vec![]` | Extracted inline images from data URIs and SVGs. Populated when the `inline-images` feature is enabled and `extract_images` is `true`. Bindings may expose a simplified image representation or omit this Rust-only payload depending on backend support for binary image data. |
 | `warnings` | `Vec<ProcessingWarning>` | `vec![]` | Non-fatal processing warnings. |
 
 ---
@@ -54,7 +53,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `compact_tables` | `bool` | `false` | Emit tables without column padding (compact GFM format). When `true`, column widths are not computed and cells are emitted with no trailing spaces. Separator rows use exactly `---` per column. Produces token-efficient output suitable for RAG / LLM contexts. Default `false` (aligned padding preserved). |
 | `highlight_style` | `HighlightStyle` | `HighlightStyle::DoubleEqual` | Style used for `<mark>` / highlighted text (e.g. `==text==`). |
 | `extract_metadata` | `bool` | `true` | Populate `result.metadata` with `<head>` / `<meta>` extraction (title, description, Open Graph, Twitter Card, JSON-LD, …). Default `true`. Disabling skips the metadata pass only — table extraction into `result.tables` runs unconditionally. |
-| `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode::Normalized` | Controls how whitespace sequences are normalised in the converted output. - `WhitespaceMode.Normalized` (default) — collapses consecutive whitespace characters (spaces, tabs, newlines) to a single space, matching browser rendering behaviour. - `WhitespaceMode.Strict` — preserves all whitespace exactly as it appears in the source HTML, including runs of spaces and embedded newlines. Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted content outside `<pre>` tags). For most documents `Normalized` produces cleaner output. |
+| `whitespace_mode` | `WhitespaceMode` | `WhitespaceMode::Normalized` | Controls how whitespace sequences are normalised in the converted output. - `WhitespaceMode::Normalized` (default) — collapses consecutive whitespace characters (spaces, tabs, newlines) to a single space, matching browser rendering behaviour. - `WhitespaceMode::Strict` — preserves all whitespace exactly as it appears in the source HTML, including runs of spaces and embedded newlines. Choose `Strict` only when the source HTML uses deliberate whitespace (e.g. pre-formatted content outside `<pre>` tags). For most documents `Normalized` produces cleaner output. |
 | `strip_newlines` | `bool` | `false` | Strip all newlines from the output, producing a single-line result. |
 | `wrap` | `bool` | `false` | Wrap long lines at `wrap_width` characters. |
 | `wrap_width` | `usize` | `80` | Maximum output line width in characters when `wrap` is `true` (default `80`). Lines are broken at word boundaries so that no line exceeds this length. A value of `0` is treated as "no limit" — equivalent to leaving `wrap` disabled. Has no effect when `wrap` is `false`. |
@@ -64,13 +63,13 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `newline_style` | `NewlineStyle` | `NewlineStyle::Spaces` | How to encode hard line breaks (`<br>`) in Markdown. |
 | `code_block_style` | `CodeBlockStyle` | `CodeBlockStyle::Backticks` | Style used for fenced code blocks (backticks or tilde). |
 | `keep_inline_images_in` | `Vec<String>` | `vec![]` | HTML tag names whose `<img>` children are kept inline instead of block. |
-| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions.default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions.builder`) to opt in or out of specific passes. |
+| `preprocessing` | `PreprocessingOptions` | — | Options for the HTML pre-processing pass applied before conversion begins. Pre-processing runs before the HTML is handed to the converter and can perform operations such as unwrapping redundant wrapper elements, removing tracking pixels, and normalising vendor-specific markup. See `PreprocessingOptions` for the full set of knobs. Defaults to `PreprocessingOptions::default()`, which enables the standard cleaning passes. Set individual fields on `PreprocessingOptions` (or construct via `ConversionOptions::builder`) to opt in or out of specific passes. |
 | `encoding` | `String` | `"utf-8"` | Expected character encoding of the input HTML (default `"utf-8"`). |
 | `debug` | `bool` | `false` | Emit debug information during conversion. |
 | `strip_tags` | `Vec<String>` | `vec![]` | HTML tag names whose content is stripped from the output entirely. |
 | `preserve_tags` | `Vec<String>` | `vec![]` | HTML tag names that are preserved verbatim in the output. |
 | `skip_images` | `bool` | `false` | Skip conversion of `<img>` elements (omit images from output). |
-| `url_escape_style` | `UrlEscapeStyle` | `UrlEscapeStyle::Angle` | URL encoding strategy for link and image destinations. Controls how special characters in URL destinations are escaped: - `UrlEscapeStyle.Angle` (default) — wraps the destination in angle brackets when it contains spaces or newlines. Some parsers misinterpret `>` inside such a destination. - `UrlEscapeStyle.Percent` — percent-encodes every character that is not an RFC 3986 unreserved character or `/`, producing a destination that all Markdown parsers handle correctly even when the URL contains `<`, `>`, spaces, or parentheses. |
+| `url_escape_style` | `UrlEscapeStyle` | `UrlEscapeStyle::Angle` | URL encoding strategy for link and image destinations. Controls how special characters in URL destinations are escaped: - `UrlEscapeStyle::Angle` (default) — wraps the destination in angle brackets when it contains spaces or newlines. Some parsers misinterpret `>` inside such a destination. - `UrlEscapeStyle::Percent` — percent-encodes every character that is not an RFC 3986 unreserved character or `/`, producing a destination that all Markdown parsers handle correctly even when the URL contains `<`, `>`, spaces, or parentheses. |
 | `link_style` | `LinkStyle` | `LinkStyle::Inline` | Link rendering style (inline or reference). |
 | `output_format` | `OutputFormat` | `OutputFormat::Markdown` | Target output format (Markdown, plain text, etc.). |
 | `include_document_structure` | `bool` | `false` | Include structured document tree in result. |
@@ -80,7 +79,7 @@ Use `ConversionOptions.builder()` to construct, or `the default constructor` for
 | `infer_dimensions` | `bool` | `true` | Infer image dimensions from data. |
 | `max_depth` | `Option<usize>` | `None` | Maximum DOM traversal depth. `None` means unlimited. When set, subtrees beyond this depth are silently truncated. |
 | `exclude_selectors` | `Vec<String>` | `vec![]` | CSS selectors for elements to exclude entirely (element + all content). Unlike `strip_tags` (which removes the tag wrapper but keeps children), excluded elements and all their descendants are dropped from the output. Supports any CSS selector that `tl` supports: tag names, `.class`, `#id`, `[attribute]`, etc. Invalid selectors are silently skipped at conversion time. Example: `vec![".cookie-banner".into(), "#ad-container".into(), "[role='complementary']".into()]` |
-| `tier_strategy` | `TierStrategy` | `TierStrategy::Auto` | Which conversion tier to use. - `TierStrategy.Auto` (default) — automatically choose the best path. - `TierStrategy.Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy.Tier1` — always attempt Tier-1 (testkit only). |
+| `tier_strategy` | `TierStrategy` | `TierStrategy::Auto` | Which conversion tier to use. - `TierStrategy::Auto` (default) — automatically choose the best path. - `TierStrategy::Tier2` — always use the Tier-2 DOM-walk path. - `TierStrategy::Tier1` — always attempt Tier-1 (testkit only). |
 | `visitor` | `Option<VisitorHandle>` | `None` | Optional visitor for custom traversal logic. When set, the visitor's callbacks are invoked for matching HTML elements during conversion, allowing custom output, skipping, or HTML preservation. See `HtmlVisitor`. |
 
 ---
@@ -272,8 +271,8 @@ including its type, tag name, position in the DOM tree, and parent context.
 #### Attributes
 
 Access attributes via `NodeContext.attributes`, which returns
-`&BTreeMap<String, String>`. When the context was built with
-`NodeContext.with_lazy_attributes` (the hot path inside the converter),
+`dict[str, str]`. When the context was built with
+lazy attribute extraction (the hot path inside the converter),
 the map is only materialized on the first call — if the visitor never reads
 attributes, the allocation is skipped.
 
@@ -316,7 +315,7 @@ JSON-LD blocks are collected as raw JSON strings for flexibility.
 Image dimensions in pixels.
 
 Binding-safe replacement for `(u32, u32)` tuples, which degrade to
-`Vec<Vec<String>>` when sanitized for cross-language binding generation.
+`list[list[str]]` when sanitized for cross-language binding generation.
 Used by both `ImageMetadata` and
 `InlineImage`.
 
@@ -349,8 +348,7 @@ a `TextAnnotation` describes inline-level markup — bold, italic, links, code s
 similar — that spans a contiguous run of bytes inside `DocumentNode.content`'s text field.
 
 Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
-follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
-text is `text[start as usize..end as usize]`.
+is half-open: `start` is inclusive and `end` is exclusive.
 
 Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
 stored in the order they are encountered during DOM traversal.
@@ -776,7 +774,7 @@ Controls which conversion tier is used.
 | Variant | Description |
 |---------|-------------|
 | `Auto` | Automatically pick the best tier for the input (default). Runs the classifier against the prescan report and uses Tier-1 when eligible; falls back to Tier-2 on bail or when the classifier routes to Tier-2. |
-| `Tier2` | Always use the Tier-2 (`tl.parse` + walk) path, skipping Tier-1. |
+| `Tier2` | Always use the Tier-2 (`tl::parse` + walk) path, skipping Tier-1. |
 | `Tier1` | Force the Tier-1 byte scanner; if it bails, fall back to Tier-2. Testkit-only; not stable API. |
 
 ---

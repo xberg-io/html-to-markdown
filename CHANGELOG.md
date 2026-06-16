@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.11] - 2026-06-16
+
+### Fixed
+
+- **Table layout pre-pass: skip nested-table rendering during column-width measurement (issue #406, residual fix).** The `MAX_CELL_WIDTH = 200` cap shipped in v3.6.10 (`4013a6864`) bounded the discarded *output* but not the measurement CPU. For deeply nested layout HTML (e.g. the reporter's Outlook digest: 393 `<table>` tags, 851 KB), `cell_text_content` still recursively dispatched `handle_table_with_context` on every nested table during the outer measurement pre-pass, triggering its own pre-pass on every descendant cell — combinatorial explosion (`cells × nested_cells × ...`) unbounded at greater nesting depth. The reproducer still ran for tens of minutes on v3.6.10. The fix threads `measure_width_only: bool` through the conversion `Context`; `walk_node`'s `"table"` arm short-circuits to descendant text content when set, keeping the pre-pass linear in descendant character count. The reproducer now converts in 0.04 s. Regression test `nested_layout_tables_convert_within_wall_clock_budget` covers a synthetic 4×4 nested-cell fixture with a 10s wall-clock budget. Tier-1 vs Tier-2 separator-row dash counts now diverge on the nested-table fallback (Tier-1 still measures the rendered cell text); existing tier-divergence tests were updated to assert outer-row content equality instead of byte-equality. Resolves the residual #406 report from `hobofan` on 2026-06-16.
+
+- **(via alef 0.25.19)** Generated Swift app harness migrates fixtures JSON from triple-quote multi-line string literal to chunked-array `[...].joined()`, avoiding Swift's `multi-line string literal content must begin on a new line` error when the Jinja whitespace-trim placed content on the same line as the opening `"""`.
+
+- **(via alef 0.25.19)** Generated FFI service-API codegen clones borrowed opaque-pointer params at the call site so consuming Rust APIs that take `T` by value receive an owned value while the C caller retains the original handle for its own `_free` call.
+
+- **(via alef 0.25.19)** Generated csharp e2e csproj template branches `<RuntimeIdentifier>` on `OSArchitecture`, picking `osx-arm64` / `linux-arm64` / `win-arm64` on arm64 runners instead of hardcoded `*-x64`.
+
+- **(via alef 0.25.19)** Generated magnus binding `Cargo.toml` emits a cfg-feature forwarding `[features]` block so any `#[cfg(feature = "X")]` arms in the binding compile under `-D warnings`.
+
+### Added
+
+- **(via alef 0.25.19)** Generated language doc pages translate Rust type spellings to language-native terminology in prose (Python `list[X]` / `dict`, TypeScript `X[]` / `Record`, Go `[]X` / `map`, etc.), applied via `map_non_code_lines` so code fences stay intact.
+
 ## [3.6.10] - 2026-06-16
 
 ### Fixed

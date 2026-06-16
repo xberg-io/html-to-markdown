@@ -5,22 +5,24 @@ Set `output_format` to `"plain"` to strip all markup and return only visible tex
 {% if language == 'python' %}
 
 ```python
-from html_to_markdown import convert, ConversionOptions
+from html_to_markdown import ConversionOptions, convert
 
 html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
-plain = convert(html, ConversionOptions(output_format="plain"))
+result = convert(html, ConversionOptions(output_format="plain"))
+plain = result.content
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
 {% elif language == 'typescript' %}
 
 ```typescript
-import { convert } from "@kreuzberg/html-to-markdown";
+import { convert, OutputFormat } from "@kreuzberg/html-to-markdown";
 
 const html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
-const plain = convert(html, { outputFormat: "plain" });
+const result = convert(html, { outputFormat: OutputFormat.Plain });
+const plain = result.content;
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
@@ -31,30 +33,27 @@ require 'html_to_markdown'
 
 html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
-plain = HtmlToMarkdown.convert(html, output_format: 'plain')
+result = HtmlToMarkdown.convert(html, output_format: 'plain')
+plain = result[:content]
 # Result: "Title\n\nThis is bold and italic text."
 ```
 
 {% elif language == 'php' %}
 
-```php
-use HtmlToMarkdown\Converter;
-use HtmlToMarkdown\ConversionOptions;
-
-$html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
-
-$plain = Converter::convert($html, new ConversionOptions(outputFormat: 'plain'));
-// Result: "Title\n\nThis is bold and italic text."
-```
+Set `ConversionOptions.outputFormat` to `OutputFormat::Plain` and pass the options object to
+`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 {% elif language == 'go' %}
 
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v2/htmltomarkdown"
+import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
 
 html := "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
-plain, _ := htmltomarkdown.Convert(html, htmltomarkdown.WithOutputFormat("plain"))
+result, _ := htmltomarkdown.Convert(html, &htmltomarkdown.ConversionOptions{
+    OutputFormat: htmltomarkdown.OutputFormatPlain,
+})
+plain := *result.Content
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
@@ -68,7 +67,10 @@ import dev.kreuzberg.htmltomarkdown.OutputFormat;
 String html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
 String plain = HtmlToMarkdown.convert(html,
-    new ConversionOptions().setOutputFormat(OutputFormat.PLAIN));
+    ConversionOptions.builder()
+        .withOutputFormat(OutputFormat.Plain)
+        .build()
+).content();
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
@@ -79,7 +81,7 @@ using HtmlToMarkdown;
 
 var html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>";
 
-var plain = Converter.Convert(html, new ConversionOptions { OutputFormat = "plain" });
+var plain = Converter.Convert(html, new ConversionOptions { OutputFormat = OutputFormat.Plain }).Content;
 // Result: "Title\n\nThis is bold and italic text."
 ```
 
@@ -88,7 +90,8 @@ var plain = Converter.Convert(html, new ConversionOptions { OutputFormat = "plai
 ```elixir
 html = "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
-{:ok, plain} = HtmlToMarkdown.convert(html, %{output_format: "plain"})
+{:ok, result} = HtmlToMarkdown.convert(html, %{output_format: "Plain"})
+plain = result.content
 # Result: "Title\n\nThis is bold and italic text."
 ```
 

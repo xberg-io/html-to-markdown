@@ -1,6 +1,6 @@
 [package]
 name = "html-to-markdown-rs-dart"
-version = "3.6.10"
+version = "3.6.11"
 edition = "2024"
 license = "MIT"
 

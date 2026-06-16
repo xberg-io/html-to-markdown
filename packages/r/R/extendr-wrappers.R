@@ -14,7 +14,7 @@ NULL
 #' document structure, table data, inline images, and warnings depending on the
 #' enabled features and conversion options.
 #' @param html — the HTML string to convert.
-#' @param options — conversion options. Rust accepts either bare [`ConversionOptions`], `Some(options)`, or `None`; bindings expose the same option fields through language-native constructors or optional parameters.
+#' @param options — conversion options. Rust accepts bare [`ConversionOptions`], `Some(options)`, or `None`. Language bindings expose the same option fields through native constructors or optional parameters.
 #' @return ConversionResult object (list with class attribute).
 #'
 #' @section Errors:
@@ -339,8 +339,7 @@ ImageDimensions <- new.env(parent = emptyenv())
 #' similar — that spans a contiguous run of bytes inside `DocumentNode::content`'s text field.
 #'
 #' Byte offsets (`start`..`end`) are into the UTF-8 encoded text of the parent node. The range
-#' follows Rust slice conventions: `start` is inclusive and `end` is exclusive, so the annotated
-#' text is `text[start as usize..end as usize]`.
+#' is half-open: `start` is inclusive and `end` is exclusive.
 #'
 #' Multiple annotations on the same node can overlap (e.g. bold-italic text), and they are
 #' stored in the order they are encountered during DOM traversal.

@@ -28,7 +28,7 @@ import { convert, ConversionOptions } from "@kreuzberg/html-to-markdown";
 const result = convert(html);
 const markdown = result.content; // Converted Markdown string
 const metadata = result.metadata; // Metadata (when extractMetadata: true)
-const tables = result.tables; // Structured table data (when extractTables: true)
+const tables = result.tables; // Structured table data
 const document = result.document; // Document-level info
 const images = result.images; // Extracted images
 const warnings = result.warnings; // Any conversion warnings
@@ -45,40 +45,40 @@ require 'html_to_markdown'
 result = HtmlToMarkdown.convert(html)
 markdown = result[:content]       # Converted Markdown string
 metadata = result[:metadata]      # Metadata (when extract_metadata: true)
-tables   = result[:tables]        # Structured table data (when extract_tables: true)
+tables   = result[:tables]        # Structured table data
 document = result[:document]      # Document-level info
 images   = result[:images]        # Extracted images
 warnings = result[:warnings]      # Any conversion warnings
 ```
 
 {% elif language == 'php' %}
-**`Converter::convert(string $html, ?ConversionOptions $options = null, ?VisitorInterface $visitor = null): array`**
+**`HtmlToMarkdown::convert(string $html, ?ConversionOptions $options = null): ConversionResult`**
 
-Converts HTML to Markdown. Returns an array `ConversionResult` with all results in a single call.
+Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```php
 <?php
-use HtmlToMarkdown\Service\Converter;
+use HtmlToMarkdown\HtmlToMarkdown;
 
-$result  = Converter::create()->convert($html);
-$markdown = $result['content'];    // Converted Markdown string
-$metadata = $result['metadata'];   // Metadata (when extractMetadata: true)
-$tables   = $result['tables'];     // Structured table data (when extractTables: true)
-$document = $result['document'];   // Document-level info
-$images   = $result['images'];     // Extracted images
-$warnings = $result['warnings'];   // Any conversion warnings
+$result   = HtmlToMarkdown::convert($html);
+$markdown = $result->content;    // Converted Markdown string
+$metadata = $result->metadata;   // Metadata
+$tables   = $result->tables;     // Structured table data
+$document = $result->document;   // Document-level info
+$images   = $result->images;     // Extracted images
+$warnings = $result->warnings;   // Any conversion warnings
 ```
 
 {% elif language == 'go' %}
-**`Convert(html string, options ...ConversionOptions) (ConversionResult, error)`**
+**`Convert(html string, options *ConversionOptions) (*ConversionResult, error)`**
 
 Converts HTML to Markdown. Returns a `ConversionResult` struct with all results in a single call.
 
 ```go
-result, err := htmltomarkdown.Convert(html)
-markdown  := result.Content    // *string — converted Markdown
-metadata  := result.Metadata   // *Metadata — when ExtractMetadata: true
-tables    := result.Tables     // []TableData — when ExtractTables: true
+result, err := htmltomarkdown.Convert(html, nil)
+markdown := result.Content  // *string - converted Markdown
+metadata := result.Metadata // *HtmlMetadata
+tables   := result.Tables   // []TableData
 ```
 
 {% elif language == 'java' %}
@@ -90,8 +90,8 @@ Converts HTML to Markdown. Returns a `ConversionResult` record with all results 
 ```java
 ConversionResult result = HtmlToMarkdown.convert(html);
 String   markdown = result.content();   // Converted Markdown string
-Metadata metadata = result.metadata();  // null unless extractMetadata(true)
-List<?>  tables   = result.tables();    // empty unless extractTables(true)
+HtmlMetadata metadata = result.metadata();
+List<TableData> tables = result.tables();
 ```
 
 {% elif language == 'csharp' %}
@@ -102,8 +102,8 @@ Converts HTML to Markdown. Returns a `ConversionResult` record with all results 
 ```csharp
 var result   = {{ csharp_wrapper_class }}.Convert(html);
 var markdown = result.Content;    // Converted Markdown string
-var metadata = result.Metadata;   // null unless ExtractMetadata = true
-var tables   = result.Tables;     // empty unless ExtractTables = true
+var metadata = result.Metadata;
+var tables   = result.Tables;
 ```
 
 {% elif language == 'elixir' %}
@@ -115,7 +115,7 @@ Converts HTML to Markdown. Returns `{:ok, result}` where result is a struct with
 {:ok, result} = HtmlToMarkdown.convert(html)
 result.content    # Converted Markdown string
 result.metadata   # Metadata map (when extract_metadata: true)
-result.tables     # Table data list (when extract_tables: true)
+result.tables     # Table data list
 result.document   # Document-level info
 result.images     # Extracted images
 result.warnings   # Any conversion warnings
@@ -130,7 +130,7 @@ Converts HTML to Markdown. Returns a named list `ConversionResult` with all resu
 result   <- convert(html)
 markdown <- result$content    # Converted Markdown string
 metadata <- result$metadata   # Metadata (when extract_metadata = TRUE)
-tables   <- result$tables     # Table data (when extract_tables = TRUE)
+tables   <- result$tables     # Table data
 ```
 
 {% else %}
@@ -140,12 +140,11 @@ tables   <- result$tables     # Table data (when extract_tables = TRUE)
 
 **`ConversionOptions`** – Key configuration fields:
 
-- `heading_style`: Heading format (`"underlined"` | `"atx"` | `"atx_closed"`) — default: `"underlined"`
+- `heading_style`: Heading format (`"underlined"` | `"atx"` | `"atx_closed"`) — default: `"atx"`
 - `list_indent_width`: Spaces per indent level — default: `2`
-- `bullets`: Bullet characters cycle — default: `"*+-"`
+- `bullets`: Bullet characters cycle — default: `"-*+"`
 - `wrap`: Enable text wrapping — default: `false`
 - `wrap_width`: Wrap at column — default: `80`
 - `code_language`: Default fenced code block language — default: none
-- `extract_metadata`: Enable metadata extraction into `result.metadata` — default: `false`
-- `extract_tables`: Enable structured table extraction into `result.tables` — default: `false`
+- `extract_metadata`: Enable metadata extraction into `result.metadata` — default: `true`
 - `output_format`: Output markup format (`"markdown"` | `"djot"` | `"plain"`) — default: `"markdown"`

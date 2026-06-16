@@ -24,9 +24,9 @@ use crate::{HtmlMetadata, MetadataConfig};
 /// # Arguments
 ///
 /// * `html` — the HTML string to convert.
-/// * `options` — conversion options. Rust accepts either bare
-///   [`ConversionOptions`], `Some(options)`, or `None`; bindings expose the same
-///   option fields through language-native constructors or optional parameters.
+/// * `options` — conversion options. Rust accepts bare [`ConversionOptions`],
+///   `Some(options)`, or `None`. Language bindings expose the same option
+///   fields through native constructors or optional parameters.
 ///
 /// # Example
 ///

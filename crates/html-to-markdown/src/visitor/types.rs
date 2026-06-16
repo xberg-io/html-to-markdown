@@ -484,8 +484,7 @@ impl<'a> NodeContext<'a> {
 
     /// Construct a `NodeContext` with an owned attribute map.
     ///
-    /// Prefer [`NodeContext::with_lazy_attributes`] (pub(crate)) inside the
-    /// converter to avoid the eager `collect_tag_attributes` allocation.
+    /// Use this when the caller already has materialized attributes.
     #[must_use]
     pub const fn with_owned_attributes(
         node_type: NodeType,
