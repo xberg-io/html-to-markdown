@@ -4,8 +4,8 @@
  * To regenerate: alef generate
  * To verify freshness: alef verify --exit-code
  */
-#include <stdio.h>
 #include "test_runner.h"
+#include <stdio.h>
 
 int main(void) {
     int passed = 0;

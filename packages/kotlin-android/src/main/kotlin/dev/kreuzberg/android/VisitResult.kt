@@ -77,7 +77,10 @@ private class VisitResultDeserializer : com.fasterxml.jackson.databind.deser.std
                 "Skip" -> VisitResult.Skip
                 "PreserveHtml" -> VisitResult.PreserveHtml
                 else -> throw com.fasterxml.jackson.databind.exc.InvalidFormatException(
-                    parser, "Unknown VisitResult unit variant", node.asText(), VisitResult::class.java,
+                    parser,
+                    "Unknown VisitResult unit variant",
+                    node.asText(),
+                    VisitResult::class.java,
                 )
             }
         }
@@ -92,14 +95,20 @@ private class VisitResultDeserializer : com.fasterxml.jackson.databind.deser.std
                         "Custom" -> VisitResult.Custom(ctx.readTreeAsValue<String>(payload, String::class.java))
                         "Error" -> VisitResult.Error(ctx.readTreeAsValue<String>(payload, String::class.java))
                         else -> throw com.fasterxml.jackson.databind.exc.InvalidFormatException(
-                            parser, "Unknown VisitResult data variant", entry.key, VisitResult::class.java,
+                            parser,
+                            "Unknown VisitResult data variant",
+                            entry.key,
+                            VisitResult::class.java,
                         )
                     }
                 }
             }
         }
         throw com.fasterxml.jackson.databind.exc.InvalidFormatException(
-            parser, "Cannot deserialize VisitResult: expected string or single-field object", null, VisitResult::class.java,
+            parser,
+            "Cannot deserialize VisitResult: expected string or single-field object",
+            null,
+            VisitResult::class.java,
         )
     }
 }
@@ -112,7 +121,9 @@ private class VisitResultSerializer : com.fasterxml.jackson.databind.ser.std.Std
         provider: com.fasterxml.jackson.databind.SerializerProvider,
     ) {
         @Suppress("UNCHECKED_CAST")
-        val mapper = (gen.codec as? com.fasterxml.jackson.databind.ObjectMapper) ?: com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules()
+        val mapper =
+            (gen.codec as? com.fasterxml.jackson.databind.ObjectMapper)
+                ?: com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules()
         when (value) {
             is VisitResult.Continue -> gen.writeString("Continue")
             is VisitResult.Custom -> {

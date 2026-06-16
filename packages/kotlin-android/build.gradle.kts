@@ -103,7 +103,7 @@ tasks.register("copyHostJni", Copy::class) {
         val libName = when (hostPlatform) {
             "darwin" -> "libhtm_jni.dylib"
             "windows" -> "htm_jni.dll"
-            else -> "libhtm_jni.so"  // linux
+            else -> "libhtm_jni.so" // linux
         }
 
         from(buildDir) {
@@ -139,11 +139,13 @@ tasks.matching { it.name.startsWith("processDebug") || it.name.startsWith("proce
 }
 
 mavenPublishing {
-    configure(AndroidSingleVariantLibrary(
+    configure(
+        AndroidSingleVariantLibrary(
         variant = "release",
         sourcesJar = com.vanniktech.maven.publish.SourcesJar.Sources(),
         javadocJar = com.vanniktech.maven.publish.JavadocJar.Empty(),
-    ))
+    )
+    )
 
     publishToMavenCentral()
     signAllPublications()

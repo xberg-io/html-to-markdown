@@ -14,7 +14,9 @@ package dev.kreuzberg.android
 
 @Suppress("TooManyFunctions")
 object HtmlToMarkdownRsBridge {
-    init { System.loadLibrary("htm_jni") }
+    init {
+        System.loadLibrary("htm_jni")
+    }
 
     @Throws(HtmlToMarkdownRsBridgeException::class)
     external fun nativeConvert(html: String, options: String): String

@@ -35,10 +35,10 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 object HtmlToMarkdown {
-    /// Jackson module that marshals ByteArray as a JSON array of unsigned bytes,
-    /// matching how Rust serde encodes Vec<u8> on the wire.
-    /// Jackson's default writes ByteArray as a Base64 string, which Rust serde rejects
-    /// with "invalid type: string, expected a sequence".
+    // / Jackson module that marshals ByteArray as a JSON array of unsigned bytes,
+    // / matching how Rust serde encodes Vec<u8> on the wire.
+    // / Jackson's default writes ByteArray as a Base64 string, which Rust serde rejects
+    // / with "invalid type: string, expected a sequence".
     private val byteArrayModule = com.fasterxml.jackson.databind.module.SimpleModule().apply {
         addSerializer(
             ByteArray::class.java,

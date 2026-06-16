@@ -6,25 +6,29 @@
  */
 /* E2e tests for category: metadata */
 
-#include <assert.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "html_to_markdown.h"
 #include "test_runner.h"
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void test_metadata_author_meta(void) {
     /* Extract author from <meta name='author'> tag */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Page</title><meta name=\"author\" content=\"Jane Doe\"></head><body><p>Content</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Page</title><meta name=\"author\" content=\"Jane "
+                    "Doe\"></head><body><p>Content</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* metadata_author = htm_document_metadata_author(document_handle);
+    char *metadata_author = htm_document_metadata_author(document_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(str_trim_eq(metadata_author, "Jane Doe") == 0 && "equals assertion failed");
     htm_free_string(content);
@@ -37,17 +41,22 @@ void test_metadata_author_meta(void) {
 
 void test_metadata_canonical_url(void) {
     /* Extract canonical URL from <link rel='canonical'> tag */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Page</title><link rel=\"canonical\" href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Page</title><link rel=\"canonical\" "
+        "href=\"https://example.com/canonical-page\"></head><body><p>Content</p></body></html>",
+        options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* metadata_canonical_url = htm_document_metadata_canonical_url(document_handle);
+    char *metadata_canonical_url = htm_document_metadata_canonical_url(document_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(str_trim_eq(metadata_canonical_url, "https://example.com/canonical-page") == 0 && "equals assertion failed");
+    assert(str_trim_eq(metadata_canonical_url, "https://example.com/canonical-page") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     htm_free_string(metadata_canonical_url);
     htm_document_metadata_free(document_handle);
@@ -58,17 +67,22 @@ void test_metadata_canonical_url(void) {
 
 void test_metadata_description_meta(void) {
     /* Extract description from <meta name='description'> tag */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Page</title><meta name=\"description\" content=\"This is the page description.\"></head><body><p>Content</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Page</title><meta name=\"description\" content=\"This is "
+                    "the page description.\"></head><body><p>Content</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* metadata_description = htm_document_metadata_description(document_handle);
+    char *metadata_description = htm_document_metadata_description(document_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(str_trim_eq(metadata_description, "This is the page description.") == 0 && "equals assertion failed");
+    assert(str_trim_eq(metadata_description, "This is the page description.") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     htm_free_string(metadata_description);
     htm_document_metadata_free(document_handle);
@@ -79,12 +93,20 @@ void test_metadata_description_meta(void) {
 
 void test_metadata_dublin_core(void) {
     /* Extract Dublin Core metadata tags */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Scholarly Work</title><meta name=\"DC.title\" content=\"Principles of Knowledge Management\"><meta name=\"DC.creator\" content=\"Dr. Alice Johnson\"><meta name=\"DC.date\" content=\"2023-06-15\"><meta name=\"DC.subject\" content=\"Knowledge Management\"><meta name=\"DC.publisher\" content=\"Academic Press\"></head><body><p>This is a scholarly article.</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Scholarly Work</title><meta name=\"DC.title\" content=\"Principles of "
+        "Knowledge Management\"><meta name=\"DC.creator\" content=\"Dr. Alice Johnson\"><meta "
+        "name=\"DC.date\" content=\"2023-06-15\"><meta name=\"DC.subject\" content=\"Knowledge "
+        "Management\"><meta name=\"DC.publisher\" content=\"Academic Press\"></head><body><p>This "
+        "is a scholarly article.</p></body></html>",
+        options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "scholarly article") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "scholarly article") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -92,13 +114,19 @@ void test_metadata_dublin_core(void) {
 
 void test_metadata_extract_all_images(void) {
     /* Extract all images from a document into metadata */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Gallery</title></head><body><img src=\"https://example.com/photo1.jpg\" alt=\"Photo 1\"><img src=\"https://example.com/photo2.png\" alt=\"Photo 2\"><img src=\"/local/image.webp\" alt=\"Local image\"></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Gallery</title></head><body><img "
+                    "src=\"https://example.com/photo1.jpg\" alt=\"Photo 1\"><img "
+                    "src=\"https://example.com/photo2.png\" alt=\"Photo 2\"><img "
+                    "src=\"/local/image.webp\" alt=\"Local image\"></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_images = htm_html_metadata_images(metadata_handle);
+    char *metadata_images = htm_html_metadata_images(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -115,13 +143,20 @@ void test_metadata_extract_all_images(void) {
 
 void test_metadata_extract_all_links(void) {
     /* Extract all links from a document into metadata */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Links Page</title></head><body><p>Visit <a href=\"https://example.com\">Example</a> or <a href=\"https://docs.example.com\">Docs</a>.</p><p>Also see <a href=\"/relative/path\">relative link</a> and <a href=\"mailto:hello@example.com\">email us</a>.</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Links Page</title></head><body><p>Visit <a "
+                    "href=\"https://example.com\">Example</a> or <a "
+                    "href=\"https://docs.example.com\">Docs</a>.</p><p>Also see <a "
+                    "href=\"/relative/path\">relative link</a> and <a "
+                    "href=\"mailto:hello@example.com\">email us</a>.</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_links = htm_html_metadata_links(metadata_handle);
+    char *metadata_links = htm_html_metadata_links(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -138,13 +173,18 @@ void test_metadata_extract_all_links(void) {
 
 void test_metadata_headers_hierarchy(void) {
     /* Extract heading hierarchy from document into metadata */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Docs</title></head><body><h1>Introduction</h1><h2>Getting Started</h2><h3>Installation</h3><h3>Configuration</h3><h2>Advanced Usage</h2><h3>Custom Options</h3></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Docs</title></head><body><h1>Introduction</h1><h2>Getting "
+                    "Started</h2><h3>Installation</h3><h3>Configuration</h3><h2>Advanced "
+                    "Usage</h2><h3>Custom Options</h3></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_headings = htm_html_metadata_headers(metadata_handle);
+    char *metadata_headings = htm_html_metadata_headers(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -161,13 +201,18 @@ void test_metadata_headers_hierarchy(void) {
 
 void test_metadata_image_type_data_uri_classified(void) {
     /* A data-URI image is extracted into metadata.images when extract_metadata is true */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<p><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<p><img "
+        "src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/"
+        "5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==\" alt=\"pixel\"></p>",
+        options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_images = htm_html_metadata_images(metadata_handle);
+    char *metadata_images = htm_html_metadata_images(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -184,13 +229,15 @@ void test_metadata_image_type_data_uri_classified(void) {
 
 void test_metadata_image_type_external_classified(void) {
     /* An https image URL is extracted into metadata.images when extract_metadata is true */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<p><img src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<p><img src=\"https://example.com/photo.jpg\" alt=\"A photo\"></p>", options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_images = htm_html_metadata_images(metadata_handle);
+    char *metadata_images = htm_html_metadata_images(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -207,15 +254,19 @@ void test_metadata_image_type_external_classified(void) {
 
 void test_metadata_keywords_meta(void) {
     /* Extract keywords from <meta name='keywords'> tag */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, markdown, html, converter\"></head><body><p>Content</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Page</title><meta name=\"keywords\" content=\"rust, "
+                    "markdown, html, converter\"></head><body><p>Content</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* metadata_document_keywords = htm_document_metadata_keywords(document_handle);
+    char *metadata_document_keywords = htm_document_metadata_keywords(document_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -233,12 +284,17 @@ void test_metadata_keywords_meta(void) {
 
 void test_metadata_lang_attribute(void) {
     /* Extract language from html lang attribute */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html lang=\"es\"><head><title>Spanish Page</title></head><body><h1>Hola Mundo</h1><p>Este es un documento en español.</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html lang=\"es\"><head><title>Spanish Page</title></head><body><h1>Hola "
+                    "Mundo</h1><p>Este es un documento en español.</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Hola Mundo") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Hola Mundo") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -246,13 +302,15 @@ void test_metadata_lang_attribute(void) {
 
 void test_metadata_link_type_anchor_classified(void) {
     /* A fragment anchor link is extracted into metadata.links when extract_metadata is true */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<p>Jump to <a href=\"#section\">section</a> below.</p>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<p>Jump to <a href=\"#section\">section</a> below.</p>", options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_links = htm_html_metadata_links(metadata_handle);
+    char *metadata_links = htm_html_metadata_links(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -269,13 +327,15 @@ void test_metadata_link_type_anchor_classified(void) {
 
 void test_metadata_link_type_email_classified(void) {
     /* A mailto link is extracted into metadata.links when extract_metadata is true */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<p>Contact <a href=\"mailto:hello@example.com\">us</a> directly.</p>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<p>Contact <a href=\"mailto:hello@example.com\">us</a> directly.</p>", options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_links = htm_html_metadata_links(metadata_handle);
+    char *metadata_links = htm_html_metadata_links(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -292,13 +352,15 @@ void test_metadata_link_type_email_classified(void) {
 
 void test_metadata_link_type_external_classified(void) {
     /* An https link is extracted into metadata.links when extract_metadata is true */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<p>See <a href=\"https://example.com\">Example</a> for details.</p>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<p>See <a href=\"https://example.com\">Example</a> for details.</p>", options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    char* metadata_links = htm_html_metadata_links(metadata_handle);
+    char *metadata_links = htm_html_metadata_links(metadata_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     {
         /* count_min: count top-level JSON array elements */
@@ -315,14 +377,25 @@ void test_metadata_link_type_external_classified(void) {
 
 void test_metadata_microdata_schema_article(void) {
     /* Extract schema.org microdata for Article */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Article</title></head><body><article itemscope itemtype=\"https://schema.org/Article\"><h1 itemprop=\"headline\">Breaking News Today</h1><span itemprop=\"author\">Jane Reporter</span><span itemprop=\"datePublished\">2024-04-22</span><div itemprop=\"articleBody\"><p>The article content goes here with important information about the breaking news story.</p></div></article></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Article</title></head><body><article itemscope "
+                    "itemtype=\"https://schema.org/Article\"><h1 itemprop=\"headline\">Breaking "
+                    "News Today</h1><span itemprop=\"author\">Jane Reporter</span><span "
+                    "itemprop=\"datePublished\">2024-04-22</span><div "
+                    "itemprop=\"articleBody\"><p>The article content goes here with important "
+                    "information about the breaking news story.</p></div></article></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Breaking News Today") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Jane Reporter") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "important information") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Breaking News Today") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Jane Reporter") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "important information") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -330,14 +403,27 @@ void test_metadata_microdata_schema_article(void) {
 
 void test_metadata_microdata_schema_breadcrumb(void) {
     /* Extract schema.org breadcrumb navigation microdata */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true,\"preprocessing\":{\"remove_navigation\":false}}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Navigation</title></head><body><nav itemscope itemtype=\"https://schema.org/BreadcrumbList\"><span itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><a itemprop=\"item\" href=\"https://example.com\"><span itemprop=\"name\">Home</span></a></span><span itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><a itemprop=\"item\" href=\"https://example.com/products\"><span itemprop=\"name\">Products</span></a></span><span itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><span itemprop=\"name\">Current Page</span></span></nav></body></html>", options_handle);
+    HTMConversionOptions *options_handle = htm_conversion_options_from_json(
+        "{\"extract_metadata\":true,\"preprocessing\":{\"remove_navigation\":false}}");
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Navigation</title></head><body><nav itemscope "
+        "itemtype=\"https://schema.org/BreadcrumbList\"><span itemprop=\"itemListElement\" "
+        "itemscope itemtype=\"https://schema.org/ListItem\"><a itemprop=\"item\" "
+        "href=\"https://example.com\"><span itemprop=\"name\">Home</span></a></span><span "
+        "itemprop=\"itemListElement\" itemscope itemtype=\"https://schema.org/ListItem\"><a "
+        "itemprop=\"item\" href=\"https://example.com/products\"><span "
+        "itemprop=\"name\">Products</span></a></span><span itemprop=\"itemListElement\" itemscope "
+        "itemtype=\"https://schema.org/ListItem\"><span itemprop=\"name\">Current "
+        "Page</span></span></nav></body></html>",
+        options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "Home") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Products") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Current Page") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Products") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Current Page") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -345,12 +431,20 @@ void test_metadata_microdata_schema_breadcrumb(void) {
 
 void test_metadata_microdata_schema_organization(void) {
     /* Extract schema.org microdata for Organization */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Company</title></head><body><div itemscope itemtype=\"https://schema.org/Organization\"><span itemprop=\"name\">Acme Corp</span><span itemprop=\"foundingDate\">2020</span><span itemprop=\"url\">https://acmecorp.example.com</span><span itemprop=\"logo\">https://acmecorp.example.com/logo.png</span></div></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Company</title></head><body><div itemscope "
+        "itemtype=\"https://schema.org/Organization\"><span itemprop=\"name\">Acme "
+        "Corp</span><span itemprop=\"foundingDate\">2020</span><span "
+        "itemprop=\"url\">https://acmecorp.example.com</span><span "
+        "itemprop=\"logo\">https://acmecorp.example.com/logo.png</span></div></body></html>",
+        options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Acme Corp") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Acme Corp") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "2020") != NULL && "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
@@ -359,13 +453,21 @@ void test_metadata_microdata_schema_organization(void) {
 
 void test_metadata_microdata_schema_person(void) {
     /* Extract schema.org microdata for Person */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Contact</title></head><body><div itemscope itemtype=\"https://schema.org/Person\"><span itemprop=\"name\">John Smith</span><span itemprop=\"email\">john@example.com</span><span itemprop=\"telephone\">+1-555-0100</span></div></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Contact</title></head><body><div itemscope "
+                    "itemtype=\"https://schema.org/Person\"><span itemprop=\"name\">John "
+                    "Smith</span><span itemprop=\"email\">john@example.com</span><span "
+                    "itemprop=\"telephone\">+1-555-0100</span></div></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "John Smith") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "john@example.com") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "John Smith") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "john@example.com") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -373,13 +475,23 @@ void test_metadata_microdata_schema_person(void) {
 
 void test_metadata_microdata_schema_product(void) {
     /* Extract schema.org microdata for Product */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>Product</title></head><body><div itemscope itemtype=\"https://schema.org/Product\"><h1 itemprop=\"name\">Awesome Widget</h1><span itemprop=\"description\">The best widget on the market</span><span itemprop=\"price\">29.99</span><span itemprop=\"priceCurrency\">USD</span><img itemprop=\"image\" src=\"widget.jpg\" alt=\"Widget\"><span itemprop=\"ratingValue\">4.5</span></div></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Product</title></head><body><div itemscope "
+        "itemtype=\"https://schema.org/Product\"><h1 itemprop=\"name\">Awesome Widget</h1><span "
+        "itemprop=\"description\">The best widget on the market</span><span "
+        "itemprop=\"price\">29.99</span><span itemprop=\"priceCurrency\">USD</span><img "
+        "itemprop=\"image\" src=\"widget.jpg\" alt=\"Widget\"><span "
+        "itemprop=\"ratingValue\">4.5</span></div></body></html>",
+        options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Awesome Widget") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "best widget") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Awesome Widget") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "best widget") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "29.99") != NULL && "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
@@ -388,12 +500,17 @@ void test_metadata_microdata_schema_product(void) {
 
 void test_metadata_text_direction_ltr(void) {
     /* Extract text direction from lang attribute on html element */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html lang=\"en\" dir=\"ltr\"><head><title>LTR Document</title></head><body><p>This is left-to-right text.</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html lang=\"en\" dir=\"ltr\"><head><title>LTR "
+                    "Document</title></head><body><p>This is left-to-right text.</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "left-to-right text") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "left-to-right text") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -401,12 +518,17 @@ void test_metadata_text_direction_ltr(void) {
 
 void test_metadata_text_direction_rtl(void) {
     /* Extract right-to-left text direction */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html lang=\"ar\" dir=\"rtl\"><head><title>RTL Document</title></head><body><p>This is right-to-left text.</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html lang=\"ar\" dir=\"rtl\"><head><title>RTL "
+                    "Document</title></head><body><p>This is right-to-left text.</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "right-to-left text") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "right-to-left text") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -414,15 +536,18 @@ void test_metadata_text_direction_rtl(void) {
 
 void test_metadata_title_tag(void) {
     /* Extract title from <title> tag */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"extract_metadata\":true}");
-    HTMConversionResult* result = htm_convert("<html><head><title>My Page</title></head><body><p>Content</p></body></html>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"extract_metadata\":true}");
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>My Page</title></head><body><p>Content</p></body></html>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* metadata_title = htm_document_metadata_title(document_handle);
+    char *metadata_title = htm_document_metadata_title(document_handle);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(str_trim_eq(metadata_title, "My Page") == 0 && "equals assertion failed");
     htm_free_string(content);
@@ -435,22 +560,29 @@ void test_metadata_title_tag(void) {
 
 void test_og_basic_tags(void) {
     /* Extract og:title, og:description, and og:image from Open Graph meta tags */
-    HTMConversionResult* result = htm_convert("<html><head><title>Fallback Title</title><meta property=\"og:title\" content=\"OG Title\"><meta property=\"og:description\" content=\"OG description text.\"><meta property=\"og:image\" content=\"https://example.com/image.jpg\"></head><body><p>Content</p></body></html>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Fallback Title</title><meta property=\"og:title\" content=\"OG "
+        "Title\"><meta property=\"og:description\" content=\"OG description text.\"><meta "
+        "property=\"og:image\" "
+        "content=\"https://example.com/image.jpg\"></head><body><p>Content</p></body></html>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* open_graph_json = htm_document_metadata_open_graph(document_handle);
+    char *open_graph_json = htm_document_metadata_open_graph(document_handle);
     assert(open_graph_json != NULL);
-    char* metadata_open_graph_title = alef_json_get_string(open_graph_json, "title");
-    char* metadata_open_graph_description = alef_json_get_string(open_graph_json, "description");
-    char* metadata_open_graph_image = alef_json_get_string(open_graph_json, "image");
+    char *metadata_open_graph_title = alef_json_get_string(open_graph_json, "title");
+    char *metadata_open_graph_description = alef_json_get_string(open_graph_json, "description");
+    char *metadata_open_graph_image = alef_json_get_string(open_graph_json, "image");
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(str_trim_eq(metadata_open_graph_title, "OG Title") == 0 && "equals assertion failed");
-    assert(str_trim_eq(metadata_open_graph_description, "OG description text.") == 0 && "equals assertion failed");
-    assert(str_trim_eq(metadata_open_graph_image, "https://example.com/image.jpg") == 0 && "equals assertion failed");
+    assert(str_trim_eq(metadata_open_graph_description, "OG description text.") == 0 &&
+           "equals assertion failed");
+    assert(str_trim_eq(metadata_open_graph_image, "https://example.com/image.jpg") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     free(metadata_open_graph_title);
     free(metadata_open_graph_description);
@@ -463,24 +595,35 @@ void test_og_basic_tags(void) {
 
 void test_og_multiple_tags(void) {
     /* Extract multiple Open Graph tags including type, url, and site_name */
-    HTMConversionResult* result = htm_convert("<html><head><meta property=\"og:title\" content=\"Article Title\"><meta property=\"og:type\" content=\"article\"><meta property=\"og:url\" content=\"https://example.com/article\"><meta property=\"og:site_name\" content=\"Example Site\"><meta property=\"og:description\" content=\"An interesting article.\"><meta property=\"og:image\" content=\"https://example.com/article.jpg\"></head><body><article><p>Article content here.</p></article></body></html>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<html><head><meta property=\"og:title\" content=\"Article Title\"><meta "
+                    "property=\"og:type\" content=\"article\"><meta property=\"og:url\" "
+                    "content=\"https://example.com/article\"><meta property=\"og:site_name\" "
+                    "content=\"Example Site\"><meta property=\"og:description\" content=\"An "
+                    "interesting article.\"><meta property=\"og:image\" "
+                    "content=\"https://example.com/article.jpg\"></head><body><article><p>Article "
+                    "content here.</p></article></body></html>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* open_graph_json = htm_document_metadata_open_graph(document_handle);
+    char *open_graph_json = htm_document_metadata_open_graph(document_handle);
     assert(open_graph_json != NULL);
-    char* metadata_open_graph_title = alef_json_get_string(open_graph_json, "title");
-    char* metadata_open_graph_type = alef_json_get_string(open_graph_json, "type");
-    char* metadata_open_graph_url = alef_json_get_string(open_graph_json, "url");
-    char* metadata_open_graph_site_name = alef_json_get_string(open_graph_json, "site_name");
+    char *metadata_open_graph_title = alef_json_get_string(open_graph_json, "title");
+    char *metadata_open_graph_type = alef_json_get_string(open_graph_json, "type");
+    char *metadata_open_graph_url = alef_json_get_string(open_graph_json, "url");
+    char *metadata_open_graph_site_name = alef_json_get_string(open_graph_json, "site_name");
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(str_trim_eq(metadata_open_graph_title, "Article Title") == 0 && "equals assertion failed");
+    assert(str_trim_eq(metadata_open_graph_title, "Article Title") == 0 &&
+           "equals assertion failed");
     assert(str_trim_eq(metadata_open_graph_type, "article") == 0 && "equals assertion failed");
-    assert(str_trim_eq(metadata_open_graph_url, "https://example.com/article") == 0 && "equals assertion failed");
-    assert(str_trim_eq(metadata_open_graph_site_name, "Example Site") == 0 && "equals assertion failed");
+    assert(str_trim_eq(metadata_open_graph_url, "https://example.com/article") == 0 &&
+           "equals assertion failed");
+    assert(str_trim_eq(metadata_open_graph_site_name, "Example Site") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     free(metadata_open_graph_title);
     free(metadata_open_graph_type);
@@ -494,20 +637,37 @@ void test_og_multiple_tags(void) {
 
 void test_structured_data_json_ld(void) {
     /* JSON-LD script tag is stripped from output (security) but metadata may be extracted */
-    HTMConversionResult* result = htm_convert("<html><head><title>Article</title><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Article\",\"headline\":\"My Article\",\"author\":{\"@type\":\"Person\",\"name\":\"Jane Doe\"},\"datePublished\":\"2024-01-15\"}</script></head><body><h1>My Article</h1><p>Article body text.</p></body></html>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<html><head><title>Article</title><script "
+                    "type=\"application/ld+json\">{\"@context\":\"https://"
+                    "schema.org\",\"@type\":\"Article\",\"headline\":\"My "
+                    "Article\",\"author\":{\"@type\":\"Person\",\"name\":\"Jane "
+                    "Doe\"},\"datePublished\":\"2024-01-15\"}</script></head><body><h1>My "
+                    "Article</h1><p>Article body text.</p></body></html>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "My Article") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "My Article") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_structured_data_multiple_json_ld(void) {
     /* Multiple JSON-LD blocks are all stripped from output */
-    HTMConversionResult* result = htm_convert("<html><head><title>Shop Page</title><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Product\",\"name\":\"Widget\",\"price\":\"9.99\"}</script><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\"}]}</script></head><body><h1>Widget</h1><p>A great widget for all purposes.</p></body></html>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<html><head><title>Shop Page</title><script "
+        "type=\"application/ld+json\">{\"@context\":\"https://"
+        "schema.org\",\"@type\":\"Product\",\"name\":\"Widget\",\"price\":\"9.99\"}</"
+        "script><script "
+        "type=\"application/ld+json\">{\"@context\":\"https://"
+        "schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\","
+        "\"position\":1,\"name\":\"Home\"}]}</script></head><body><h1>Widget</h1><p>A great widget "
+        "for all purposes.</p></body></html>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "Widget") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -516,22 +676,32 @@ void test_structured_data_multiple_json_ld(void) {
 
 void test_twitter_card_tags(void) {
     /* Extract Twitter card meta tags */
-    HTMConversionResult* result = htm_convert("<html><head><meta name=\"twitter:card\" content=\"summary_large_image\"><meta name=\"twitter:site\" content=\"@examplesite\"><meta name=\"twitter:title\" content=\"Twitter Card Title\"><meta name=\"twitter:description\" content=\"Twitter card description.\"><meta name=\"twitter:image\" content=\"https://example.com/twitter-image.jpg\"></head><body><p>Content</p></body></html>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<html><head><meta name=\"twitter:card\" content=\"summary_large_image\"><meta "
+                    "name=\"twitter:site\" content=\"@examplesite\"><meta name=\"twitter:title\" "
+                    "content=\"Twitter Card Title\"><meta name=\"twitter:description\" "
+                    "content=\"Twitter card description.\"><meta name=\"twitter:image\" "
+                    "content=\"https://example.com/twitter-image.jpg\"></head><body><p>Content</"
+                    "p></body></html>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    HTMHtmlMetadata* metadata_handle = htm_conversion_result_metadata(result);
+    char *content = htm_conversion_result_content(result);
+    HTMHtmlMetadata *metadata_handle = htm_conversion_result_metadata(result);
     assert(metadata_handle != NULL);
-    HTMDocumentMetadata* document_handle = htm_html_metadata_document(metadata_handle);
+    HTMDocumentMetadata *document_handle = htm_html_metadata_document(metadata_handle);
     assert(document_handle != NULL);
-    char* twitter_card_json = htm_document_metadata_twitter_card(document_handle);
+    char *twitter_card_json = htm_document_metadata_twitter_card(document_handle);
     assert(twitter_card_json != NULL);
-    char* metadata_twitter_card = alef_json_get_string(twitter_card_json, "card");
-    char* metadata_twitter_title = alef_json_get_string(twitter_card_json, "title");
-    char* metadata_twitter_description = alef_json_get_string(twitter_card_json, "description");
+    char *metadata_twitter_card = alef_json_get_string(twitter_card_json, "card");
+    char *metadata_twitter_title = alef_json_get_string(twitter_card_json, "title");
+    char *metadata_twitter_description = alef_json_get_string(twitter_card_json, "description");
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(str_trim_eq(metadata_twitter_card, "summary_large_image") == 0 && "equals assertion failed");
-    assert(str_trim_eq(metadata_twitter_title, "Twitter Card Title") == 0 && "equals assertion failed");
-    assert(str_trim_eq(metadata_twitter_description, "Twitter card description.") == 0 && "equals assertion failed");
+    assert(str_trim_eq(metadata_twitter_card, "summary_large_image") == 0 &&
+           "equals assertion failed");
+    assert(str_trim_eq(metadata_twitter_title, "Twitter Card Title") == 0 &&
+           "equals assertion failed");
+    assert(str_trim_eq(metadata_twitter_description, "Twitter card description.") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     free(metadata_twitter_card);
     free(metadata_twitter_title);

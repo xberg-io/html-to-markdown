@@ -6,128 +6,150 @@
  */
 /* E2e tests for category: conversion */
 
-#include <assert.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "html_to_markdown.h"
 #include "test_runner.h"
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void test_blockquote_multiple_paragraphs(void) {
     /* Blockquote with multiple paragraphs has each paragraph prefixed */
-    HTMConversionResult* result = htm_convert("<blockquote><p>First paragraph.</p><p>Second paragraph.</p></blockquote>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<blockquote><p>First paragraph.</p><p>Second paragraph.</p></blockquote>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "> First paragraph.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "> Second paragraph.") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "> First paragraph.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "> Second paragraph.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_blockquote_nested(void) {
     /* Nested blockquote produces double-prefixed lines */
-    HTMConversionResult* result = htm_convert("<blockquote><p>Outer quote.</p><blockquote><p>Inner quote.</p></blockquote></blockquote>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<blockquote><p>Outer quote.</p><blockquote><p>Inner quote.</p></blockquote></blockquote>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Outer quote.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Inner quote.") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Outer quote.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Inner quote.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_blockquote_simple(void) {
     /* Simple blockquote */
-    HTMConversionResult* result = htm_convert("<blockquote><p>Quote text</p></blockquote>", NULL);
+    HTMConversionResult *result = htm_convert("<blockquote><p>Quote text</p></blockquote>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "> Quote text") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "> Quote text") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_blockquote_with_list(void) {
     /* Blockquote containing a list preserves list items inside quote */
-    HTMConversionResult* result = htm_convert("<blockquote><p>Quote intro:</p><ul><li>Point one</li><li>Point two</li></ul></blockquote>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<blockquote><p>Quote intro:</p><ul><li>Point one</li><li>Point two</li></ul></blockquote>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Quote intro:") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Point one") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Point two") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Quote intro:") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Point one") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Point two") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_bold_and_italic(void) {
     /* Nested bold and italic */
-    HTMConversionResult* result = htm_convert("<p><strong><em>both</em></strong></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><strong><em>both</em></strong></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "***both***") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "***both***") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_bold_strong(void) {
     /* Strong tag converts to bold */
-    HTMConversionResult* result = htm_convert("<p><strong>bold</strong></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><strong>bold</strong></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "**bold**") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "**bold**") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_code_block(void) {
     /* Code block with language preserves content */
-    HTMConversionResult* result = htm_convert("<pre><code class=\"language-python\">print('hello')</code></pre>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<pre><code class=\"language-python\">print('hello')</code></pre>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "print('hello')") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "print('hello')") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_code_block_no_language(void) {
     /* Code block without a language class preserves content */
-    HTMConversionResult* result = htm_convert("<pre><code>plain code here</code></pre>", NULL);
+    HTMConversionResult *result = htm_convert("<pre><code>plain code here</code></pre>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "plain code here") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "plain code here") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_code_inline_in_paragraph(void) {
     /* Inline code element nested inside a paragraph */
-    HTMConversionResult* result = htm_convert("<p>Call the <code>initialize()</code> method first.</p>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<p>Call the <code>initialize()</code> method first.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "`initialize()`") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "`initialize()`") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_code_with_backticks_in_content(void) {
     /* Inline code containing backtick characters is properly escaped */
-    HTMConversionResult* result = htm_convert("<p>Use <code>`backtick` here</code> carefully.</p>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<p>Use <code>`backtick` here</code> carefully.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "backtick") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "backtick") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_conversion_autolink_filename_not_autolinked(void) {
     /* Bare filename href (no URI scheme) renders as inline link, not autolink (#397) */
-    HTMConversionResult* result = htm_convert("<a href=\"foobar.png\">foobar.png</a>", NULL);
+    HTMConversionResult *result = htm_convert("<a href=\"foobar.png\">foobar.png</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "[foobar.png](foobar.png)") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -135,9 +157,10 @@ void test_conversion_autolink_filename_not_autolinked(void) {
 
 void test_conversion_autolink_https_url(void) {
     /* Absolute https URL with matching text renders as autolink (#397) */
-    HTMConversionResult* result = htm_convert("<a href=\"https://example.com\">https://example.com</a>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<a href=\"https://example.com\">https://example.com</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "<https://example.com>") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -145,9 +168,9 @@ void test_conversion_autolink_https_url(void) {
 
 void test_conversion_autolink_mailto(void) {
     /* mailto: link with matching email text renders as autolink (#397) */
-    HTMConversionResult* result = htm_convert("<a href=\"mailto:a@b.com\">a@b.com</a>", NULL);
+    HTMConversionResult *result = htm_convert("<a href=\"mailto:a@b.com\">a@b.com</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "<a@b.com>") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -155,60 +178,69 @@ void test_conversion_autolink_mailto(void) {
 
 void test_conversion_autolink_mixed_filename_and_url(void) {
     /* Mixed filename + URL: only the URL becomes an autolink (#397) */
-    HTMConversionResult* result = htm_convert("<a href=\"foobar.png\">foobar.png</a> <a href=\"https://www.heise.de\">https://www.heise.de</a>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<a href=\"foobar.png\">foobar.png</a> <a "
+                    "href=\"https://www.heise.de\">https://www.heise.de</a>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(str_trim_eq(content, "[foobar.png](foobar.png) <https://www.heise.de>") == 0 && "equals assertion failed");
+    char *content = htm_conversion_result_content(result);
+    assert(str_trim_eq(content, "[foobar.png](foobar.png) <https://www.heise.de>") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_conversion_autolink_relative_path_not_autolinked(void) {
     /* Relative path href renders as inline link (#397) */
-    HTMConversionResult* result = htm_convert("<a href=\"/docs/intro.html\">/docs/intro.html</a>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<a href=\"/docs/intro.html\">/docs/intro.html</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(str_trim_eq(content, "[/docs/intro.html](/docs/intro.html)") == 0 && "equals assertion failed");
+    char *content = htm_conversion_result_content(result);
+    assert(str_trim_eq(content, "[/docs/intro.html](/docs/intro.html)") == 0 &&
+           "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_emphasis_mark_highlight(void) {
     /* mark tag produces highlighted output */
-    HTMConversionResult* result = htm_convert("<p><mark>highlighted</mark></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><mark>highlighted</mark></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "highlighted") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "highlighted") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_emphasis_strikethrough_del(void) {
     /* del tag converts to GFM strikethrough */
-    HTMConversionResult* result = htm_convert("<p><del>deleted text</del></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><del>deleted text</del></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "~~deleted text~~") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "~~deleted text~~") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_emphasis_strikethrough_s(void) {
     /* s tag converts to GFM strikethrough */
-    HTMConversionResult* result = htm_convert("<p><s>strikethrough</s></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><s>strikethrough</s></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "~~strikethrough~~") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "~~strikethrough~~") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_emphasis_subscript(void) {
     /* sub tag content is preserved */
-    HTMConversionResult* result = htm_convert("<p>H<sub>2</sub>O</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>H<sub>2</sub>O</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "H") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "2") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "O") != NULL && "expected to contain substring");
@@ -218,9 +250,9 @@ void test_emphasis_subscript(void) {
 
 void test_emphasis_superscript(void) {
     /* sup tag content is preserved */
-    HTMConversionResult* result = htm_convert("<p>x<sup>2</sup></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>x<sup>2</sup></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "x") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "2") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -229,20 +261,25 @@ void test_emphasis_superscript(void) {
 
 void test_emphasis_underline_u(void) {
     /* u tag content is preserved in output */
-    HTMConversionResult* result = htm_convert("<p><u>underlined</u></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><u>underlined</u></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "underlined") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "underlined") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_form_input_elements(void) {
     /* Form input elements produce readable output without form mechanics */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"preprocessing\":{\"remove_forms\":false}}");
-    HTMConversionResult* result = htm_convert("<form><label for=\"name\">Name:</label><input type=\"text\" id=\"name\" placeholder=\"Enter name\"></form>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"preprocessing\":{\"remove_forms\":false}}");
+    HTMConversionResult *result =
+        htm_convert("<form><label for=\"name\">Name:</label><input type=\"text\" id=\"name\" "
+                    "placeholder=\"Enter name\"></form>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "Name") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -252,10 +289,15 @@ void test_form_input_elements(void) {
 
 void test_form_select_options(void) {
     /* Select element with options produces readable output */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"preprocessing\":{\"remove_forms\":false}}");
-    HTMConversionResult* result = htm_convert("<form><label>Color:</label><select><option value=\"red\">Red</option><option value=\"blue\" selected>Blue</option><option value=\"green\">Green</option></select></form>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"preprocessing\":{\"remove_forms\":false}}");
+    HTMConversionResult *result =
+        htm_convert("<form><label>Color:</label><select><option value=\"red\">Red</option><option "
+                    "value=\"blue\" selected>Blue</option><option "
+                    "value=\"green\">Green</option></select></form>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "Color") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -265,12 +307,16 @@ void test_form_select_options(void) {
 
 void test_form_textarea(void) {
     /* Textarea element produces readable output */
-    HTMConversionOptions* options_handle = htm_conversion_options_from_json("{\"preprocessing\":{\"remove_forms\":false}}");
-    HTMConversionResult* result = htm_convert("<form><label>Message:</label><textarea>Default text content</textarea></form>", options_handle);
+    HTMConversionOptions *options_handle =
+        htm_conversion_options_from_json("{\"preprocessing\":{\"remove_forms\":false}}");
+    HTMConversionResult *result =
+        htm_convert("<form><label>Message:</label><textarea>Default text content</textarea></form>",
+                    options_handle);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Message") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Message") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_options_free(options_handle);
     htm_conversion_result_free(result);
@@ -278,9 +324,9 @@ void test_form_textarea(void) {
 
 void test_heading_h1(void) {
     /* H1 heading */
-    HTMConversionResult* result = htm_convert("<h1>Heading 1</h1>", NULL);
+    HTMConversionResult *result = htm_convert("<h1>Heading 1</h1>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "# Heading 1") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -288,9 +334,9 @@ void test_heading_h1(void) {
 
 void test_heading_h2(void) {
     /* H2 heading */
-    HTMConversionResult* result = htm_convert("<h2>Heading 2</h2>", NULL);
+    HTMConversionResult *result = htm_convert("<h2>Heading 2</h2>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "## Heading 2") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -298,9 +344,9 @@ void test_heading_h2(void) {
 
 void test_heading_h3(void) {
     /* H3 heading */
-    HTMConversionResult* result = htm_convert("<h3>Heading 3</h3>", NULL);
+    HTMConversionResult *result = htm_convert("<h3>Heading 3</h3>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "### Heading 3") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -308,9 +354,9 @@ void test_heading_h3(void) {
 
 void test_heading_h4(void) {
     /* H4 heading */
-    HTMConversionResult* result = htm_convert("<h4>Heading 4</h4>", NULL);
+    HTMConversionResult *result = htm_convert("<h4>Heading 4</h4>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "#### Heading 4") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -318,9 +364,9 @@ void test_heading_h4(void) {
 
 void test_heading_h5(void) {
     /* H5 heading */
-    HTMConversionResult* result = htm_convert("<h5>Heading 5</h5>", NULL);
+    HTMConversionResult *result = htm_convert("<h5>Heading 5</h5>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "##### Heading 5") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -328,9 +374,9 @@ void test_heading_h5(void) {
 
 void test_heading_h6(void) {
     /* H6 heading */
-    HTMConversionResult* result = htm_convert("<h6>Heading 6</h6>", NULL);
+    HTMConversionResult *result = htm_convert("<h6>Heading 6</h6>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "###### Heading 6") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -338,106 +384,126 @@ void test_heading_h6(void) {
 
 void test_image_figure_figcaption(void) {
     /* Figure with figcaption preserves both image and caption */
-    HTMConversionResult* result = htm_convert("<figure><img src=\"sunset.jpg\" alt=\"A sunset\"><figcaption>Beautiful sunset over the ocean</figcaption></figure>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<figure><img src=\"sunset.jpg\" alt=\"A sunset\"><figcaption>Beautiful sunset "
+                    "over the ocean</figcaption></figure>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "![A sunset](sunset.jpg)") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Beautiful sunset over the ocean") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "![A sunset](sunset.jpg)") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Beautiful sunset over the ocean") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_image_linked(void) {
     /* Image inside an anchor produces a linked image */
-    HTMConversionResult* result = htm_convert("<a href=\"https://example.com\"><img src=\"icon.png\" alt=\"Icon\"></a>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<a href=\"https://example.com\"><img src=\"icon.png\" alt=\"Icon\"></a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "![Icon](icon.png)") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "https://example.com") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "![Icon](icon.png)") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "https://example.com") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_image_no_alt(void) {
     /* Image without alt text produces image markdown */
-    HTMConversionResult* result = htm_convert("<img src=\"banner.jpg\">", NULL);
+    HTMConversionResult *result = htm_convert("<img src=\"banner.jpg\">", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "banner.jpg") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "banner.jpg") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_image_simple(void) {
     /* Image with alt text */
-    HTMConversionResult* result = htm_convert("<img src=\"photo.jpg\" alt=\"A photo\">", NULL);
+    HTMConversionResult *result = htm_convert("<img src=\"photo.jpg\" alt=\"A photo\">", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "![A photo](photo.jpg)") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "![A photo](photo.jpg)") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_image_with_title(void) {
     /* Image with title attribute includes title in output */
-    HTMConversionResult* result = htm_convert("<img src=\"chart.png\" alt=\"Sales chart\" title=\"Q3 Sales\">", NULL);
+    HTMConversionResult *result =
+        htm_convert("<img src=\"chart.png\" alt=\"Sales chart\" title=\"Q3 Sales\">", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "![Sales chart](chart.png") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Q3 Sales") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "![Sales chart](chart.png") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Q3 Sales") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_inline_code(void) {
     /* Inline code */
-    HTMConversionResult* result = htm_convert("<p>Use <code>console.log()</code> to debug</p>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<p>Use <code>console.log()</code> to debug</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "`console.log()`") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "`console.log()`") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_italic_em(void) {
     /* Em tag converts to italic */
-    HTMConversionResult* result = htm_convert("<p><em>italic</em></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p><em>italic</em></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "*italic*") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "*italic*") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_line_break_br_tag(void) {
     /* Single br tag produces a line break in output */
-    HTMConversionResult* result = htm_convert("<p>First line.<br>Second line.</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>First line.<br>Second line.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "First line.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Second line.") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "First line.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Second line.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_line_break_hr_tag(void) {
     /* hr tag produces a horizontal separator between content */
-    HTMConversionResult* result = htm_convert("<p>Before rule.</p><hr><p>After rule.</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>Before rule.</p><hr><p>After rule.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Before rule.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "After rule.") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Before rule.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "After rule.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_line_break_multiple_br(void) {
     /* Multiple consecutive br tags in sequence */
-    HTMConversionResult* result = htm_convert("<p>Start.<br><br>End.</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>Start.<br><br>End.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "Start.") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "End.") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -446,107 +512,135 @@ void test_line_break_multiple_br(void) {
 
 void test_link_anchor_fragment(void) {
     /* Fragment-only anchor link is preserved */
-    HTMConversionResult* result = htm_convert("<a href=\"#section\">Jump to section</a>", NULL);
+    HTMConversionResult *result = htm_convert("<a href=\"#section\">Jump to section</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "[Jump to section](#section)") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "[Jump to section](#section)") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_link_empty_href(void) {
     /* Link with empty href produces output with the link text */
-    HTMConversionResult* result = htm_convert("<a href=\"\">No destination</a>", NULL);
+    HTMConversionResult *result = htm_convert("<a href=\"\">No destination</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "No destination") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "No destination") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_link_image_inside(void) {
     /* Image inside a link produces a linked image */
-    HTMConversionResult* result = htm_convert("<a href=\"https://example.com\"><img src=\"logo.png\" alt=\"Logo\"></a>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<a href=\"https://example.com\"><img src=\"logo.png\" alt=\"Logo\"></a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "![Logo](logo.png)") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "https://example.com") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "![Logo](logo.png)") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "https://example.com") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_link_mailto(void) {
     /* Mailto link is preserved with mailto: scheme */
-    HTMConversionResult* result = htm_convert("<a href=\"mailto:user@example.com\">Email us</a>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<a href=\"mailto:user@example.com\">Email us</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "mailto:user@example.com") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "mailto:user@example.com") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_link_simple(void) {
     /* Simple link */
-    HTMConversionResult* result = htm_convert("<a href=\"https://example.com\">Example</a>", NULL);
+    HTMConversionResult *result = htm_convert("<a href=\"https://example.com\">Example</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "[Example](https://example.com)") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "[Example](https://example.com)") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_link_with_bold_text(void) {
     /* Link containing bold text preserves formatting */
-    HTMConversionResult* result = htm_convert("<a href=\"https://example.com\"><strong>Bold link</strong></a>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<a href=\"https://example.com\"><strong>Bold link</strong></a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "**Bold link**") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "https://example.com") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "**Bold link**") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "https://example.com") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_link_with_title(void) {
     /* Link with title attribute */
-    HTMConversionResult* result = htm_convert("<a href=\"https://example.com\" title=\"Example Site\">Example</a>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<a href=\"https://example.com\" title=\"Example Site\">Example</a>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "[Example](https://example.com") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Example Site") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "[Example](https://example.com") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Example Site") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_list_definition_dl(void) {
     /* Definition list with dt and dd elements */
-    HTMConversionResult* result = htm_convert("<dl><dt>Term One</dt><dd>Definition of term one.</dd><dt>Term Two</dt><dd>Definition of term two.</dd></dl>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<dl><dt>Term One</dt><dd>Definition of term one.</dd><dt>Term "
+                    "Two</dt><dd>Definition of term two.</dd></dl>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "Term One") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Definition of term one.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Term Two") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Definition of term two.") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "Term One") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Definition of term one.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Term Two") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Definition of term two.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_list_item_multiple_paragraphs(void) {
     /* List item containing multiple paragraphs */
-    HTMConversionResult* result = htm_convert("<ul><li><p>First paragraph in item.</p><p>Second paragraph in item.</p></li><li>Simple item</li></ul>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<ul><li><p>First paragraph in item.</p><p>Second paragraph in "
+                    "item.</p></li><li>Simple item</li></ul>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "First paragraph in item.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Second paragraph in item.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Simple item") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "First paragraph in item.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Second paragraph in item.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Simple item") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_list_mixed_nested(void) {
     /* Mixed list: ordered list nested inside unordered list */
-    HTMConversionResult* result = htm_convert("<ul><li>Item A<ol><li>Sub 1</li><li>Sub 2</li></ol></li><li>Item B</li></ul>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<ul><li>Item A<ol><li>Sub 1</li><li>Sub 2</li></ol></li><li>Item B</li></ul>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "Item A") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Sub 1") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Sub 2") != NULL && "expected to contain substring");
@@ -557,12 +651,15 @@ void test_list_mixed_nested(void) {
 
 void test_list_nested_ordered(void) {
     /* Nested ordered list with two levels of depth */
-    HTMConversionResult* result = htm_convert("<ol><li>Step 1<ol><li>Step 1a</li><li>Step 1b</li></ol></li><li>Step 2</li></ol>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<ol><li>Step 1<ol><li>Step 1a</li><li>Step 1b</li></ol></li><li>Step 2</li></ol>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "Step 1") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Step 1a") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Step 1b") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Step 1a") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Step 1b") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "Step 2") != NULL && "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -570,67 +667,86 @@ void test_list_nested_ordered(void) {
 
 void test_list_nested_unordered(void) {
     /* Nested unordered list with two levels of depth */
-    HTMConversionResult* result = htm_convert("<ul><li>Parent A<ul><li>Child A1</li><li>Child A2</li></ul></li><li>Parent B</li></ul>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<ul><li>Parent A<ul><li>Child A1</li><li>Child A2</li></ul></li><li>Parent B</li></ul>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "Parent A") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Child A1") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Child A2") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Parent B") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "Parent A") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Child A1") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Child A2") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Parent B") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_list_task_checkboxes(void) {
     /* Task list with checked and unchecked checkboxes */
-    HTMConversionResult* result = htm_convert("<ul><li><input type=\"checkbox\" checked> Done task</li><li><input type=\"checkbox\"> Pending task</li></ul>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<ul><li><input type=\"checkbox\" checked> Done task</li><li><input "
+                    "type=\"checkbox\"> Pending task</li></ul>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Done task") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Pending task") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Done task") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Pending task") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_ordered_list(void) {
     /* Ordered list */
-    HTMConversionResult* result = htm_convert("<ol><li>First</li><li>Second</li><li>Third</li></ol>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<ol><li>First</li><li>Second</li><li>Third</li></ol>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "1. First") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "2. Second") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "3. Third") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "1. First") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "2. Second") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "3. Third") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_paragraph_multiple(void) {
     /* Multiple paragraphs are separated by a blank line */
-    HTMConversionResult* result = htm_convert("<p>First paragraph.</p><p>Second paragraph.</p>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<p>First paragraph.</p><p>Second paragraph.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "First paragraph.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Second paragraph.") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "First paragraph.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Second paragraph.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_paragraph_nested_divs(void) {
     /* Text nested inside divs is extracted correctly */
-    HTMConversionResult* result = htm_convert("<div><div><p>Nested text</p></div></div>", NULL);
+    HTMConversionResult *result = htm_convert("<div><div><p>Nested text</p></div></div>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "Nested text") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "Nested text") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_paragraph_simple(void) {
     /* Simple paragraph converts to plain text */
-    HTMConversionResult* result = htm_convert("<p>Hello World</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>Hello World</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "Hello World") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -638,34 +754,43 @@ void test_paragraph_simple(void) {
 
 void test_paragraph_with_inline_formatting(void) {
     /* Paragraph with bold, italic, and a link */
-    HTMConversionResult* result = htm_convert("<p>This has <strong>bold</strong>, <em>italic</em>, and a <a href=\"https://example.com\">link</a>.</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>This has <strong>bold</strong>, <em>italic</em>, "
+                                              "and a <a href=\"https://example.com\">link</a>.</p>",
+                                              NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "**bold**") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "*italic*") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "[link](https://example.com)") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "**bold**") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "*italic*") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "[link](https://example.com)") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_paragraph_with_line_breaks(void) {
     /* Paragraph with br tags produces line breaks in output */
-    HTMConversionResult* result = htm_convert("<p>Line one.<br>Line two.<br>Line three.</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>Line one.<br>Line two.<br>Line three.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Line one.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Line two.") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Line three.") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Line one.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Line two.") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Line three.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_semantic_abbr(void) {
     /* Abbreviation element text is preserved */
-    HTMConversionResult* result = htm_convert("<p>The <abbr title=\"World Wide Web\">WWW</abbr> is global.</p>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<p>The <abbr title=\"World Wide Web\">WWW</abbr> is global.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "WWW") != NULL && "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -673,44 +798,54 @@ void test_semantic_abbr(void) {
 
 void test_semantic_article(void) {
     /* Article element wrapping content preserves inner content */
-    HTMConversionResult* result = htm_convert("<article><h2>Article Title</h2><p>Article body.</p></article>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<article><h2>Article Title</h2><p>Article body.</p></article>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "Article Title") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Article body.") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "Article Title") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Article body.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_semantic_definition_list(void) {
     /* Definition list with term and description */
-    HTMConversionResult* result = htm_convert("<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<dl><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading "
+                    "Style Sheets</dd></dl>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "HTML") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "HyperText Markup Language") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "HyperText Markup Language") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "CSS") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Cascading Style Sheets") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Cascading Style Sheets") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_semantic_details_summary(void) {
     /* Details and summary elements produce readable output */
-    HTMConversionResult* result = htm_convert("<details><summary>Click to expand</summary><p>Hidden content here.</p></details>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<details><summary>Click to expand</summary><p>Hidden content here.</p></details>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Click to expand") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Click to expand") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_semantic_hr(void) {
     /* Horizontal rule produces a separator in output */
-    HTMConversionResult* result = htm_convert("<p>Above</p><hr><p>Below</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>Above</p><hr><p>Below</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "Above") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Below") != NULL && "expected to contain substring");
@@ -720,31 +855,36 @@ void test_semantic_hr(void) {
 
 void test_semantic_mark_highlight(void) {
     /* Mark tag produces highlighted output */
-    HTMConversionResult* result = htm_convert("<p>This is <mark>highlighted text</mark> in a sentence.</p>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<p>This is <mark>highlighted text</mark> in a sentence.</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "highlighted text") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "highlighted text") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_semantic_section_with_heading(void) {
     /* Section element with heading preserves structure */
-    HTMConversionResult* result = htm_convert("<section><h3>Section Heading</h3><p>Section content.</p></section>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<section><h3>Section Heading</h3><p>Section content.</p></section>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "Section Heading") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "Section content.") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "Section Heading") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "Section content.") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_semantic_sub_superscript(void) {
     /* Subscript and superscript elements are preserved in output */
-    HTMConversionResult* result = htm_convert("<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>H<sub>2</sub>O and E=mc<sup>2</sup></p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "H") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "2") != NULL && "expected to contain substring");
@@ -756,9 +896,12 @@ void test_semantic_sub_superscript(void) {
 
 void test_simple_table(void) {
     /* Simple table with header */
-    HTMConversionResult* result = htm_convert("<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</td><td>30</td></tr></tbody></table>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Alice</"
+                    "td><td>30</td></tr></tbody></table>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strstr(content, "Name") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Age") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Alice") != NULL && "expected to contain substring");
@@ -771,9 +914,9 @@ void test_simple_table(void) {
 
 void test_table_empty(void) {
     /* Empty table produces no output or minimal output */
-    HTMConversionResult* result = htm_convert("<table></table>", NULL);
+    HTMConversionResult *result = htm_convert("<table></table>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -781,11 +924,14 @@ void test_table_empty(void) {
 
 void test_table_no_thead(void) {
     /* Table without thead uses first row as implied header */
-    HTMConversionResult* result = htm_convert("<table><tr><td>Product</td><td>Price</td></tr><tr><td>Apple</td><td>1.00</td></tr></table>", NULL);
+    HTMConversionResult *result = htm_convert("<table><tr><td>Product</td><td>Price</td></"
+                                              "tr><tr><td>Apple</td><td>1.00</td></tr></table>",
+                                              NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Product") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Product") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "Price") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Apple") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "1.00") != NULL && "expected to contain substring");
@@ -796,11 +942,15 @@ void test_table_no_thead(void) {
 
 void test_table_pipe_chars_in_content(void) {
     /* Table cells containing pipe characters are escaped in output */
-    HTMConversionResult* result = htm_convert("<table><thead><tr><th>Expression</th><th>Result</th></tr></thead><tbody><tr><td>a | b</td><td>true</td></tr></tbody></table>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<table><thead><tr><th>Expression</th><th>Result</th></tr></"
+                    "thead><tbody><tr><td>a | b</td><td>true</td></tr></tbody></table>",
+                    NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Expression") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Expression") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "Result") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "true") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -809,9 +959,13 @@ void test_table_pipe_chars_in_content(void) {
 
 void test_table_with_alignment(void) {
     /* Table with column alignment attributes */
-    HTMConversionResult* result = htm_convert("<table><thead><tr><th align=\"left\">Left</th><th align=\"center\">Center</th><th align=\"right\">Right</th></tr></thead><tbody><tr><td>L</td><td>C</td><td>R</td></tr></tbody></table>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<table><thead><tr><th align=\"left\">Left</th><th align=\"center\">Center</th><th "
+        "align=\"right\">Right</th></tr></thead><tbody><tr><td>L</td><td>C</td><td>R</td></tr></"
+        "tbody></table>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     assert(content != NULL && strstr(content, "Left") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Center") != NULL && "expected to contain substring");
@@ -826,11 +980,15 @@ void test_table_with_alignment(void) {
 
 void test_table_with_colspan(void) {
     /* Table with colspan attribute in a header cell */
-    HTMConversionResult* result = htm_convert("<table><thead><tr><th colspan=\"2\">Full Name</th></tr></thead><tbody><tr><td>John</td><td>Doe</td></tr></tbody></table>", NULL);
+    HTMConversionResult *result = htm_convert(
+        "<table><thead><tr><th colspan=\"2\">Full "
+        "Name</th></tr></thead><tbody><tr><td>John</td><td>Doe</td></tr></tbody></table>",
+        NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
-    assert(content != NULL && strstr(content, "Full Name") != NULL && "expected to contain substring");
+    assert(content != NULL && strstr(content, "Full Name") != NULL &&
+           "expected to contain substring");
     assert(content != NULL && strstr(content, "John") != NULL && "expected to contain substring");
     assert(content != NULL && strstr(content, "Doe") != NULL && "expected to contain substring");
     htm_free_string(content);
@@ -839,12 +997,16 @@ void test_table_with_colspan(void) {
 
 void test_unordered_list(void) {
     /* Unordered list */
-    HTMConversionResult* result = htm_convert("<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>", NULL);
+    HTMConversionResult *result =
+        htm_convert("<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "- Item 1") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "- Item 2") != NULL && "expected to contain substring");
-    assert(content != NULL && strstr(content, "- Item 3") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "- Item 1") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "- Item 2") != NULL &&
+           "expected to contain substring");
+    assert(content != NULL && strstr(content, "- Item 3") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }

@@ -41,8 +41,10 @@ class H2mBridge {
   ///
   /// Returns an error if HTML parsing fails or if the input contains invalid UTF-8.
   /// throws anyhow::Error on failure
-  static Future<ConversionResult> convert(String html, {ConversionOptions? options}) async {
+  static Future<ConversionResult> convert(
+    String html, {
+    ConversionOptions? options,
+  }) async {
     return await rust_bridge.convert(html: html, options: options);
   }
-
 }

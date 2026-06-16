@@ -6,19 +6,19 @@
  */
 /* E2e tests for category: smoke */
 
-#include <assert.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "html_to_markdown.h"
 #include "test_runner.h"
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void test_smoke_empty_string(void) {
     /* Empty string produces empty output */
-    HTMConversionResult* result = htm_convert("", NULL);
+    HTMConversionResult *result = htm_convert("", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "") == 0 && "equals assertion failed");
     htm_free_string(content);
     htm_conversion_result_free(result);
@@ -26,19 +26,20 @@ void test_smoke_empty_string(void) {
 
 void test_smoke_simple_heading(void) {
     /* H1 heading converts to ATX markdown */
-    HTMConversionResult* result = htm_convert("<h1>Title</h1>", NULL);
+    HTMConversionResult *result = htm_convert("<h1>Title</h1>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
-    assert(content != NULL && strstr(content, "# Title") != NULL && "expected to contain substring");
+    char *content = htm_conversion_result_content(result);
+    assert(content != NULL && strstr(content, "# Title") != NULL &&
+           "expected to contain substring");
     htm_free_string(content);
     htm_conversion_result_free(result);
 }
 
 void test_smoke_simple_paragraph(void) {
     /* Simple paragraph converts correctly */
-    HTMConversionResult* result = htm_convert("<p>Hello World</p>", NULL);
+    HTMConversionResult *result = htm_convert("<p>Hello World</p>", NULL);
     assert(result != NULL && "expected call to succeed");
-    char* content = htm_conversion_result_content(result);
+    char *content = htm_conversion_result_content(result);
     assert(str_trim_eq(content, "Hello World") == 0 && "equals assertion failed");
     assert(content != NULL && strlen(content) > 0 && "expected non-empty value");
     htm_free_string(content);
