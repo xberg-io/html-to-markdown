@@ -46,7 +46,7 @@ Set `ConversionOptions.outputFormat` to `OutputFormat::Plain` and pass the optio
 {% elif language == 'go' %}
 
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 
 html := "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 

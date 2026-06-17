@@ -113,7 +113,7 @@ end
 Requires R 4.3+ and a Rust toolchain (cargo, rustc).
 
 ```r
-install.packages("htmltomarkdown")
+install.packages("htmltomarkdown", repos = "https://kreuzberg-dev.r-universe.dev")
 ```
 
 Or install the development version from GitHub:

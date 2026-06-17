@@ -20,7 +20,7 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
-  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
+  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
@@ -91,7 +91,7 @@ Distributed via GitHub Releases — pin a tag in `build.zig.zon` and `zig fetch`
 ## Installation
 
 ```bash
-zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.0/zig.tar.gz
+zig fetch --save https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v3.6.13/zig.tar.gz
 ```
 
 ## Performance Snapshot

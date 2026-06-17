@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -137,402 +138,197 @@ public interface IHtmlVisitor {
 }
 
 /// <summary>
-/// Manages the FFI vtable and delegates for a HtmlVisitor implementation
+/// Manages the native HtmVisitorCallbacks struct and managed delegates for an
+/// IHtmlVisitor implementation.
+///
+/// ABI (Path 1, the canonical visitor callbacks struct shared with Go and Java):
+/// the unmanaged block is `user_data` followed by one function pointer per visit
+/// method. Each callback receives `(ctx, user_data, ...params..., out_custom, out_len)`
+/// and returns an i32 visit-result code (0=Continue, 1=Custom, 2=Skip,
+/// 3=PreserveHtml, 4=Error). For Custom/Error the callback writes a heap C string
+/// into *out_custom and its byte length into *out_len; the Rust side takes ownership
+/// and frees it.
 /// </summary>
 public sealed class HtmlVisitorBridge : IDisposable {
 
     internal readonly IHtmlVisitor _impl;
     private readonly GCHandle _implHandle;
+    // Pointer to the unmanaged HtmVisitorCallbacks struct (user_data + 40 fn pointers).
     internal IntPtr _vtable;
     private bool _disposed;
-    // Keep all delegates alive for the lifetime of the bridge.
-    // Delegates must not be GC'd because Rust holds function pointers obtained via
-    // GetFunctionPointerForDelegate; those pointers become invalid if the delegate is collected.
+    // Keep all delegates alive for the lifetime of the bridge: Rust holds raw function
+    // pointers obtained via GetFunctionPointerForDelegate, which become invalid if the
+    // delegate is collected.
     private readonly List<object> _delegateRoots;
     internal readonly IntPtr _bridgeId;
     private int _callbackRefCount = 0;
 
-    // Static registry: maps bridge ID (IntPtr) to bridge instance
-    // This prevents GC while Rust holds the bridge ID as userData.
+    // Static registry: maps bridge ID (used as the FFI user_data) to bridge instance,
+    // so callbacks can recover the managed impl and the bridge stays alive while Rust
+    // holds the ID.
     internal static readonly Dictionary<IntPtr, HtmlVisitorBridge> _bridgeRegistry = new();
     internal static int _nextBridgeId = 1;
     internal static readonly object _registryLock = new();
 
-    // Vtable slot delegates (42)
+    // Number of pointer-sized slots: user_data + 40 visit-method function pointers.
+    private const int CallbackSlotCount = 41;
+
+    // Mirror of the FFI `HtmContext` repr(C) struct.
+    [StructLayout(LayoutKind.Sequential)]
+    private struct HtmContextNative {
+        public int NodeType;
+        public IntPtr TagName;
+        public UIntPtr Depth;
+        public UIntPtr IndexInParent;
+        public IntPtr ParentTag;
+        public int IsInline;
+    }
+
+    // --- Callback delegate signatures (ctx, user_data, ...params..., out_custom, out_len) ---
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitTextFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitTextFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitElementStartFn(IntPtr userData, IntPtr ctx, out IntPtr outResult);
-
+    private delegate int VisitElementStartFn(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitElementEndFn(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult);
-
+    private delegate int VisitElementEndFn(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitLinkFn(IntPtr userData, IntPtr ctx, IntPtr href, IntPtr text, IntPtr title, out IntPtr outResult);
-
+    private delegate int VisitLinkFn(IntPtr ctx, IntPtr userData, IntPtr href, IntPtr text, IntPtr title, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitImageFn(IntPtr userData, IntPtr ctx, IntPtr src, IntPtr alt, IntPtr title, out IntPtr outResult);
-
+    private delegate int VisitImageFn(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr alt, IntPtr title, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitHeadingFn(IntPtr userData, IntPtr ctx, uint level, IntPtr text, IntPtr id, out IntPtr outResult);
-
+    private delegate int VisitHeadingFn(IntPtr ctx, IntPtr userData, uint level, IntPtr text, IntPtr id, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitCodeBlockFn(IntPtr userData, IntPtr ctx, IntPtr lang, IntPtr code, out IntPtr outResult);
-
+    private delegate int VisitCodeBlockFn(IntPtr ctx, IntPtr userData, IntPtr lang, IntPtr code, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitCodeInlineFn(IntPtr userData, IntPtr ctx, IntPtr code, out IntPtr outResult);
-
+    private delegate int VisitCodeInlineFn(IntPtr ctx, IntPtr userData, IntPtr code, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitListItemFn(IntPtr userData, IntPtr ctx, int ordered, IntPtr marker, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitListItemFn(IntPtr ctx, IntPtr userData, int ordered, IntPtr marker, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitListStartFn(IntPtr userData, IntPtr ctx, int ordered, out IntPtr outResult);
-
+    private delegate int VisitListStartFn(IntPtr ctx, IntPtr userData, int ordered, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitListEndFn(IntPtr userData, IntPtr ctx, int ordered, IntPtr output, out IntPtr outResult);
-
+    private delegate int VisitListEndFn(IntPtr ctx, IntPtr userData, int ordered, IntPtr output, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitTableStartFn(IntPtr userData, IntPtr ctx, out IntPtr outResult);
-
+    private delegate int VisitTableStartFn(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitTableRowFn(IntPtr userData, IntPtr ctx, IntPtr cells, int isHeader, out IntPtr outResult);
-
+    private delegate int VisitTableRowFn(IntPtr ctx, IntPtr userData, IntPtr cells, UIntPtr cellsCount, int isHeader, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitTableEndFn(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult);
-
+    private delegate int VisitTableEndFn(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitBlockquoteFn(IntPtr userData, IntPtr ctx, IntPtr content, ulong depth, out IntPtr outResult);
-
+    private delegate int VisitBlockquoteFn(IntPtr ctx, IntPtr userData, IntPtr content, UIntPtr depth, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitStrongFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitStrongFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitEmphasisFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitEmphasisFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitStrikethroughFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitStrikethroughFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitUnderlineFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitUnderlineFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitSubscriptFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitSubscriptFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitSuperscriptFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitSuperscriptFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitMarkFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitMarkFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitLineBreakFn(IntPtr userData, IntPtr ctx, out IntPtr outResult);
-
+    private delegate int VisitLineBreakFn(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitHorizontalRuleFn(IntPtr userData, IntPtr ctx, out IntPtr outResult);
-
+    private delegate int VisitHorizontalRuleFn(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitCustomElementFn(IntPtr userData, IntPtr ctx, IntPtr tagName, IntPtr html, out IntPtr outResult);
-
+    private delegate int VisitCustomElementFn(IntPtr ctx, IntPtr userData, IntPtr tagName, IntPtr html, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitDefinitionListStartFn(IntPtr userData, IntPtr ctx, out IntPtr outResult);
-
+    private delegate int VisitDefinitionListStartFn(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitDefinitionTermFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitDefinitionTermFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitDefinitionDescriptionFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitDefinitionDescriptionFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitDefinitionListEndFn(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult);
-
+    private delegate int VisitDefinitionListEndFn(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitFormFn(IntPtr userData, IntPtr ctx, IntPtr action, IntPtr method, out IntPtr outResult);
-
+    private delegate int VisitFormFn(IntPtr ctx, IntPtr userData, IntPtr action, IntPtr method, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitInputFn(IntPtr userData, IntPtr ctx, IntPtr inputType, IntPtr name, IntPtr value, out IntPtr outResult);
-
+    private delegate int VisitInputFn(IntPtr ctx, IntPtr userData, IntPtr inputType, IntPtr name, IntPtr value, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitButtonFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitButtonFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitAudioFn(IntPtr userData, IntPtr ctx, IntPtr src, out IntPtr outResult);
-
+    private delegate int VisitAudioFn(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitVideoFn(IntPtr userData, IntPtr ctx, IntPtr src, out IntPtr outResult);
-
+    private delegate int VisitVideoFn(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitIframeFn(IntPtr userData, IntPtr ctx, IntPtr src, out IntPtr outResult);
-
+    private delegate int VisitIframeFn(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitDetailsFn(IntPtr userData, IntPtr ctx, int open, out IntPtr outResult);
-
+    private delegate int VisitDetailsFn(IntPtr ctx, IntPtr userData, int open, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitSummaryFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitSummaryFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitFigureStartFn(IntPtr userData, IntPtr ctx, out IntPtr outResult);
-
+    private delegate int VisitFigureStartFn(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitFigcaptionFn(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult);
-
+    private delegate int VisitFigcaptionFn(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int VisitFigureEndFn(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void FreeStringFn(IntPtr ptr);
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void FreeUserDataFn(IntPtr userData);
+    private delegate int VisitFigureEndFn(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen);
 
     public HtmlVisitorBridge(IHtmlVisitor impl) {
         _impl = impl ?? throw new ArgumentNullException(nameof(impl));
-        // Keep impl alive via normal GCHandle (sufficient for callback rooting).
-        // The impl instance itself is not pinned, just kept in the GC root set.
         _implHandle = GCHandle.Alloc(impl, GCHandleType.Normal);
-        // Delegate list roots all delegates by reference to prevent GC.
-        // This avoids trying to pin an object array containing references, which .NET 10 forbids.
-        _delegateRoots = new List<object>(42);
+        _delegateRoots = new List<object>(CallbackSlotCount);
         _vtable = IntPtr.Zero;
         _disposed = false;
-        // Allocate unique bridge ID for registry lookup during callbacks
         lock (_registryLock) {
             _bridgeId = new IntPtr(_nextBridgeId++);
         }
-        BuildVtable();
+        BuildCallbacks();
     }
 
-    private void BuildVtable() {
-        // Allocate unmanaged vtable struct (array of function pointers)
-        _vtable = global::System.Runtime.InteropServices.Marshal.AllocHGlobal(IntPtr.Size * 42);
-
-        // Slot 0: visit_text_fn
-        var visitTextFn = new VisitTextFn(VisitTextFnCallback);
-        _delegateRoots.Add(visitTextFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 0, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTextFn));
-
-        // Slot 1: visit_element_start_fn
-        var visitElementStartFn = new VisitElementStartFn(VisitElementStartFnCallback);
-        _delegateRoots.Add(visitElementStartFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 8, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitElementStartFn));
-
-        // Slot 2: visit_element_end_fn
-        var visitElementEndFn = new VisitElementEndFn(VisitElementEndFnCallback);
-        _delegateRoots.Add(visitElementEndFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 16, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitElementEndFn));
-
-        // Slot 3: visit_link_fn
-        var visitLinkFn = new VisitLinkFn(VisitLinkFnCallback);
-        _delegateRoots.Add(visitLinkFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 24, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitLinkFn));
-
-        // Slot 4: visit_image_fn
-        var visitImageFn = new VisitImageFn(VisitImageFnCallback);
-        _delegateRoots.Add(visitImageFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 32, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitImageFn));
-
-        // Slot 5: visit_heading_fn
-        var visitHeadingFn = new VisitHeadingFn(VisitHeadingFnCallback);
-        _delegateRoots.Add(visitHeadingFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 40, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitHeadingFn));
-
-        // Slot 6: visit_code_block_fn
-        var visitCodeBlockFn = new VisitCodeBlockFn(VisitCodeBlockFnCallback);
-        _delegateRoots.Add(visitCodeBlockFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 48, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCodeBlockFn));
-
-        // Slot 7: visit_code_inline_fn
-        var visitCodeInlineFn = new VisitCodeInlineFn(VisitCodeInlineFnCallback);
-        _delegateRoots.Add(visitCodeInlineFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 56, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCodeInlineFn));
-
-        // Slot 8: visit_list_item_fn
-        var visitListItemFn = new VisitListItemFn(VisitListItemFnCallback);
-        _delegateRoots.Add(visitListItemFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 64, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListItemFn));
-
-        // Slot 9: visit_list_start_fn
-        var visitListStartFn = new VisitListStartFn(VisitListStartFnCallback);
-        _delegateRoots.Add(visitListStartFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 72, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListStartFn));
-
-        // Slot 10: visit_list_end_fn
-        var visitListEndFn = new VisitListEndFn(VisitListEndFnCallback);
-        _delegateRoots.Add(visitListEndFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 80, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitListEndFn));
-
-        // Slot 11: visit_table_start_fn
-        var visitTableStartFn = new VisitTableStartFn(VisitTableStartFnCallback);
-        _delegateRoots.Add(visitTableStartFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 88, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableStartFn));
-
-        // Slot 12: visit_table_row_fn
-        var visitTableRowFn = new VisitTableRowFn(VisitTableRowFnCallback);
-        _delegateRoots.Add(visitTableRowFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 96, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableRowFn));
-
-        // Slot 13: visit_table_end_fn
-        var visitTableEndFn = new VisitTableEndFn(VisitTableEndFnCallback);
-        _delegateRoots.Add(visitTableEndFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 104, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitTableEndFn));
-
-        // Slot 14: visit_blockquote_fn
-        var visitBlockquoteFn = new VisitBlockquoteFn(VisitBlockquoteFnCallback);
-        _delegateRoots.Add(visitBlockquoteFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 112, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitBlockquoteFn));
-
-        // Slot 15: visit_strong_fn
-        var visitStrongFn = new VisitStrongFn(VisitStrongFnCallback);
-        _delegateRoots.Add(visitStrongFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 120, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitStrongFn));
-
-        // Slot 16: visit_emphasis_fn
-        var visitEmphasisFn = new VisitEmphasisFn(VisitEmphasisFnCallback);
-        _delegateRoots.Add(visitEmphasisFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 128, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitEmphasisFn));
-
-        // Slot 17: visit_strikethrough_fn
-        var visitStrikethroughFn = new VisitStrikethroughFn(VisitStrikethroughFnCallback);
-        _delegateRoots.Add(visitStrikethroughFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 136, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitStrikethroughFn));
-
-        // Slot 18: visit_underline_fn
-        var visitUnderlineFn = new VisitUnderlineFn(VisitUnderlineFnCallback);
-        _delegateRoots.Add(visitUnderlineFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 144, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitUnderlineFn));
-
-        // Slot 19: visit_subscript_fn
-        var visitSubscriptFn = new VisitSubscriptFn(VisitSubscriptFnCallback);
-        _delegateRoots.Add(visitSubscriptFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 152, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSubscriptFn));
-
-        // Slot 20: visit_superscript_fn
-        var visitSuperscriptFn = new VisitSuperscriptFn(VisitSuperscriptFnCallback);
-        _delegateRoots.Add(visitSuperscriptFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 160, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSuperscriptFn));
-
-        // Slot 21: visit_mark_fn
-        var visitMarkFn = new VisitMarkFn(VisitMarkFnCallback);
-        _delegateRoots.Add(visitMarkFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 168, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitMarkFn));
-
-        // Slot 22: visit_line_break_fn
-        var visitLineBreakFn = new VisitLineBreakFn(VisitLineBreakFnCallback);
-        _delegateRoots.Add(visitLineBreakFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 176, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitLineBreakFn));
-
-        // Slot 23: visit_horizontal_rule_fn
-        var visitHorizontalRuleFn = new VisitHorizontalRuleFn(VisitHorizontalRuleFnCallback);
-        _delegateRoots.Add(visitHorizontalRuleFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 184, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitHorizontalRuleFn));
-
-        // Slot 24: visit_custom_element_fn
-        var visitCustomElementFn = new VisitCustomElementFn(VisitCustomElementFnCallback);
-        _delegateRoots.Add(visitCustomElementFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 192, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitCustomElementFn));
-
-        // Slot 25: visit_definition_list_start_fn
-        var visitDefinitionListStartFn = new VisitDefinitionListStartFn(VisitDefinitionListStartFnCallback);
-        _delegateRoots.Add(visitDefinitionListStartFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 200, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionListStartFn));
-
-        // Slot 26: visit_definition_term_fn
-        var visitDefinitionTermFn = new VisitDefinitionTermFn(VisitDefinitionTermFnCallback);
-        _delegateRoots.Add(visitDefinitionTermFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 208, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionTermFn));
-
-        // Slot 27: visit_definition_description_fn
-        var visitDefinitionDescriptionFn = new VisitDefinitionDescriptionFn(VisitDefinitionDescriptionFnCallback);
-        _delegateRoots.Add(visitDefinitionDescriptionFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 216, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionDescriptionFn));
-
-        // Slot 28: visit_definition_list_end_fn
-        var visitDefinitionListEndFn = new VisitDefinitionListEndFn(VisitDefinitionListEndFnCallback);
-        _delegateRoots.Add(visitDefinitionListEndFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 224, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDefinitionListEndFn));
-
-        // Slot 29: visit_form_fn
-        var visitFormFn = new VisitFormFn(VisitFormFnCallback);
-        _delegateRoots.Add(visitFormFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 232, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFormFn));
-
-        // Slot 30: visit_input_fn
-        var visitInputFn = new VisitInputFn(VisitInputFnCallback);
-        _delegateRoots.Add(visitInputFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 240, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitInputFn));
-
-        // Slot 31: visit_button_fn
-        var visitButtonFn = new VisitButtonFn(VisitButtonFnCallback);
-        _delegateRoots.Add(visitButtonFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 248, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitButtonFn));
-
-        // Slot 32: visit_audio_fn
-        var visitAudioFn = new VisitAudioFn(VisitAudioFnCallback);
-        _delegateRoots.Add(visitAudioFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 256, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitAudioFn));
-
-        // Slot 33: visit_video_fn
-        var visitVideoFn = new VisitVideoFn(VisitVideoFnCallback);
-        _delegateRoots.Add(visitVideoFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 264, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitVideoFn));
-
-        // Slot 34: visit_iframe_fn
-        var visitIframeFn = new VisitIframeFn(VisitIframeFnCallback);
-        _delegateRoots.Add(visitIframeFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 272, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitIframeFn));
-
-        // Slot 35: visit_details_fn
-        var visitDetailsFn = new VisitDetailsFn(VisitDetailsFnCallback);
-        _delegateRoots.Add(visitDetailsFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 280, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitDetailsFn));
-
-        // Slot 36: visit_summary_fn
-        var visitSummaryFn = new VisitSummaryFn(VisitSummaryFnCallback);
-        _delegateRoots.Add(visitSummaryFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 288, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitSummaryFn));
-
-        // Slot 37: visit_figure_start_fn
-        var visitFigureStartFn = new VisitFigureStartFn(VisitFigureStartFnCallback);
-        _delegateRoots.Add(visitFigureStartFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 296, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigureStartFn));
-
-        // Slot 38: visit_figcaption_fn
-        var visitFigcaptionFn = new VisitFigcaptionFn(VisitFigcaptionFnCallback);
-        _delegateRoots.Add(visitFigcaptionFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 304, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigcaptionFn));
-
-        // Slot 39: visit_figure_end_fn
-        var visitFigureEndFn = new VisitFigureEndFn(VisitFigureEndFnCallback);
-        _delegateRoots.Add(visitFigureEndFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 312, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(visitFigureEndFn));
-
-        // Slot 40: free_string
-        var freeStringFn = new FreeStringFn(FreeStringCallback);
-        _delegateRoots.Add(freeStringFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 320, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(freeStringFn));
-
-        // Slot 41: free_user_data
-        var freeFn = new FreeUserDataFn(FreeUserDataCallback);
-        _delegateRoots.Add(freeFn);
-        global::System.Runtime.InteropServices.Marshal.WriteIntPtr(_vtable, 328, global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(freeFn));
-
+    private void WriteSlot(int slot, Delegate fn) {
+        _delegateRoots.Add(fn);
+        Marshal.WriteIntPtr(_vtable, IntPtr.Size * slot, Marshal.GetFunctionPointerForDelegate(fn));
     }
 
-    private static string ToJsonString<T>(T value) {
-        return JsonSerializer.Serialize(value, FfiJsonExtensions.FfiJsonOptions);
-    }
-
-    /// <summary>Called by Rust via FreeUserDataCallback when done with this bridge</summary>
-    internal static void FreeUserData(IntPtr bridgeId) {
-        lock (_registryLock) {
-            // Mark bridge as disposed but DON'T remove from registry yet.
-            // Callbacks in flight will still be able to look it up and execute safely.
-            // The bridge will stay alive as long as _callbackRefCount > 0.
-            if (_bridgeRegistry.TryGetValue(bridgeId, out var bridge)) {
-                bridge._disposed = true;
-            }
-        }
+    private void BuildCallbacks() {
+        _vtable = Marshal.AllocHGlobal(IntPtr.Size * CallbackSlotCount);
+        // Slot 0: user_data — the registry id callbacks use to recover this bridge.
+        Marshal.WriteIntPtr(_vtable, 0, _bridgeId);
+        // Slots 1..40: function pointers, in HtmVisitorCallbacks field order.
+        WriteSlot(1, new VisitTextFn(VisitTextCallback));
+        WriteSlot(2, new VisitElementStartFn(VisitElementStartCallback));
+        WriteSlot(3, new VisitElementEndFn(VisitElementEndCallback));
+        WriteSlot(4, new VisitLinkFn(VisitLinkCallback));
+        WriteSlot(5, new VisitImageFn(VisitImageCallback));
+        WriteSlot(6, new VisitHeadingFn(VisitHeadingCallback));
+        WriteSlot(7, new VisitCodeBlockFn(VisitCodeBlockCallback));
+        WriteSlot(8, new VisitCodeInlineFn(VisitCodeInlineCallback));
+        WriteSlot(9, new VisitListItemFn(VisitListItemCallback));
+        WriteSlot(10, new VisitListStartFn(VisitListStartCallback));
+        WriteSlot(11, new VisitListEndFn(VisitListEndCallback));
+        WriteSlot(12, new VisitTableStartFn(VisitTableStartCallback));
+        WriteSlot(13, new VisitTableRowFn(VisitTableRowCallback));
+        WriteSlot(14, new VisitTableEndFn(VisitTableEndCallback));
+        WriteSlot(15, new VisitBlockquoteFn(VisitBlockquoteCallback));
+        WriteSlot(16, new VisitStrongFn(VisitStrongCallback));
+        WriteSlot(17, new VisitEmphasisFn(VisitEmphasisCallback));
+        WriteSlot(18, new VisitStrikethroughFn(VisitStrikethroughCallback));
+        WriteSlot(19, new VisitUnderlineFn(VisitUnderlineCallback));
+        WriteSlot(20, new VisitSubscriptFn(VisitSubscriptCallback));
+        WriteSlot(21, new VisitSuperscriptFn(VisitSuperscriptCallback));
+        WriteSlot(22, new VisitMarkFn(VisitMarkCallback));
+        WriteSlot(23, new VisitLineBreakFn(VisitLineBreakCallback));
+        WriteSlot(24, new VisitHorizontalRuleFn(VisitHorizontalRuleCallback));
+        WriteSlot(25, new VisitCustomElementFn(VisitCustomElementCallback));
+        WriteSlot(26, new VisitDefinitionListStartFn(VisitDefinitionListStartCallback));
+        WriteSlot(27, new VisitDefinitionTermFn(VisitDefinitionTermCallback));
+        WriteSlot(28, new VisitDefinitionDescriptionFn(VisitDefinitionDescriptionCallback));
+        WriteSlot(29, new VisitDefinitionListEndFn(VisitDefinitionListEndCallback));
+        WriteSlot(30, new VisitFormFn(VisitFormCallback));
+        WriteSlot(31, new VisitInputFn(VisitInputCallback));
+        WriteSlot(32, new VisitButtonFn(VisitButtonCallback));
+        WriteSlot(33, new VisitAudioFn(VisitAudioCallback));
+        WriteSlot(34, new VisitVideoFn(VisitVideoCallback));
+        WriteSlot(35, new VisitIframeFn(VisitIframeCallback));
+        WriteSlot(36, new VisitDetailsFn(VisitDetailsCallback));
+        WriteSlot(37, new VisitSummaryFn(VisitSummaryCallback));
+        WriteSlot(38, new VisitFigureStartFn(VisitFigureStartCallback));
+        WriteSlot(39, new VisitFigcaptionFn(VisitFigcaptionCallback));
+        WriteSlot(40, new VisitFigureEndFn(VisitFigureEndCallback));
     }
 
     private void IncrementCallbackRef() {
@@ -546,1632 +342,205 @@ public sealed class HtmlVisitorBridge : IDisposable {
             if (_callbackRefCount > 0) {
                 _callbackRefCount--;
             }
-            // Once refcount reaches 0 and bridge is disposed, remove from registry
             if (_callbackRefCount == 0 && _disposed) {
                 _bridgeRegistry.Remove(_bridgeId);
             }
         }
     }
 
-    private int VisitTextFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
+    // --- Marshalling helpers ---
+
+    private static string Str(IntPtr p) =>
+        p == IntPtr.Zero ? string.Empty : (Marshal.PtrToStringUTF8(p) ?? string.Empty);
+
+    private static NodeContext DecodeContext(IntPtr ctx) {
+        if (ctx == IntPtr.Zero) {
+            return new NodeContext(default, string.Empty, 0, 0, null, false);
+        }
+        var native = Marshal.PtrToStructure<HtmContextNative>(ctx);
+        var parentTag = native.ParentTag == IntPtr.Zero ? null : Marshal.PtrToStringUTF8(native.ParentTag);
+        return new NodeContext(
+            (NodeType)native.NodeType,
+            Str(native.TagName),
+            (ulong)native.Depth,
+            (ulong)native.IndexInParent,
+            parentTag,
+            native.IsInline != 0);
+    }
+
+    private static List<string> DecodeStringArray(IntPtr arr, UIntPtr count) {
+        var list = new List<string>();
+        if (arr == IntPtr.Zero) {
+            return list;
+        }
+        ulong n = (ulong)count;
+        for (ulong i = 0; i < n; i++) {
+            var p = Marshal.ReadIntPtr(arr, (int)(i * (ulong)IntPtr.Size));
+            list.Add(Str(p));
+        }
+        return list;
+    }
+
+    // Encodes a VisitResult into the FFI return code + out_custom/out_len protocol.
+    // For Custom/Error, allocates a heap C string via NativeMemory (CRT malloc) so the
+    // Rust side can take ownership and free it with the system allocator — matching Go's
+    // C.CString and Java's global-arena allocation.
+    private static unsafe int EncodeResult(VisitResult result, IntPtr outCustom, IntPtr outLen) {
+        switch (result) {
+            case VisitResult.Continue:
+                return 0;
+            case VisitResult.Custom c:
+                WriteCustom(c.Value, outCustom, outLen);
+                return 1;
+            case VisitResult.Skip:
+                return 2;
+            case VisitResult.PreserveHtml:
+                return 3;
+            case VisitResult.Error e:
+                WriteCustom(e.Value, outCustom, outLen);
+                return 4;
+            default:
+                return 0;
+        }
+    }
+
+    private static unsafe void WriteCustom(string value, IntPtr outCustom, IntPtr outLen) {
+        var bytes = Encoding.UTF8.GetBytes(value ?? string.Empty);
+        byte* buf = (byte*)NativeMemory.Alloc((nuint)(bytes.Length + 1));
+        for (int i = 0; i < bytes.Length; i++) {
+            buf[i] = bytes[i];
+        }
+        buf[bytes.Length] = 0;
+        if (outCustom != IntPtr.Zero) {
+            Marshal.WriteIntPtr(outCustom, (IntPtr)buf);
+        }
+        if (outLen != IntPtr.Zero) {
+            Marshal.WriteIntPtr(outLen, (IntPtr)bytes.Length);
+        }
+    }
+
+    // Shared dispatch: recover the bridge from the registry by user_data, invoke the
+    // user's visit method, and encode the result. Any exception falls back to Continue
+    // so a faulty visitor never unwinds across the FFI boundary or corrupts output.
+    private static int Dispatch(IntPtr userData, IntPtr outCustom, IntPtr outLen, Func<IHtmlVisitor, VisitResult> invoke) {
+        HtmlVisitorBridge? bridge = null;
+        lock (_registryLock) {
+            if (_bridgeRegistry.TryGetValue(userData, out var found)) {
+                bridge = found;
+                bridge.IncrementCallbackRef();
             }
         }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
+        if (bridge == null) {
+            return 0;
         }
         try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitText(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
+            return EncodeResult(invoke(bridge._impl), outCustom, outLen);
+        } catch {
             return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
         } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
+            try { bridge.DecrementCallbackRef(); } catch { /* bridge already removed */ }
         }
     }
 
-    private int VisitElementStartFnCallback(IntPtr userData, IntPtr ctx, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitElementStart(managed_ctx);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
+    // --- Callbacks ---
 
-    private int VisitElementEndFnCallback(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
-            var methodResult = bridge._impl.VisitElementEnd(managed_ctx, managed_output);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitLinkFnCallback(IntPtr userData, IntPtr ctx, IntPtr href, IntPtr text, IntPtr title, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_href = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(href) ?? string.Empty;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var managed_title = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(title) ?? string.Empty;
-            var methodResult = bridge._impl.VisitLink(managed_ctx, managed_href, managed_text, managed_title);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitImageFnCallback(IntPtr userData, IntPtr ctx, IntPtr src, IntPtr alt, IntPtr title, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
-            var managed_alt = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(alt) ?? string.Empty;
-            var managed_title = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(title) ?? string.Empty;
-            var methodResult = bridge._impl.VisitImage(managed_ctx, managed_src, managed_alt, managed_title);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitHeadingFnCallback(IntPtr userData, IntPtr ctx, uint level, IntPtr text, IntPtr id, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var managed_id = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(id) ?? string.Empty;
-            var methodResult = bridge._impl.VisitHeading(managed_ctx, level, managed_text, managed_id);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitCodeBlockFnCallback(IntPtr userData, IntPtr ctx, IntPtr lang, IntPtr code, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_lang = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(lang) ?? string.Empty;
-            var managed_code = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(code) ?? string.Empty;
-            var methodResult = bridge._impl.VisitCodeBlock(managed_ctx, managed_lang, managed_code);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitCodeInlineFnCallback(IntPtr userData, IntPtr ctx, IntPtr code, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_code = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(code) ?? string.Empty;
-            var methodResult = bridge._impl.VisitCodeInline(managed_ctx, managed_code);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitListItemFnCallback(IntPtr userData, IntPtr ctx, int ordered, IntPtr marker, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_marker = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(marker) ?? string.Empty;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitListItem(managed_ctx, (ordered != 0), managed_marker, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitListStartFnCallback(IntPtr userData, IntPtr ctx, int ordered, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitListStart(managed_ctx, (ordered != 0));
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitListEndFnCallback(IntPtr userData, IntPtr ctx, int ordered, IntPtr output, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
-            var methodResult = bridge._impl.VisitListEnd(managed_ctx, (ordered != 0), managed_output);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitTableStartFnCallback(IntPtr userData, IntPtr ctx, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitTableStart(managed_ctx);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitTableRowFnCallback(IntPtr userData, IntPtr ctx, IntPtr cells, int isHeader, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var json_cells = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(cells) ?? "{}";
-            var managed_cells = JsonSerializer.Deserialize<List<string>>(json_cells, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitTableRow(managed_ctx, managed_cells, (isHeader != 0));
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitTableEndFnCallback(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
-            var methodResult = bridge._impl.VisitTableEnd(managed_ctx, managed_output);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitBlockquoteFnCallback(IntPtr userData, IntPtr ctx, IntPtr content, ulong depth, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_content = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(content) ?? string.Empty;
-            var methodResult = bridge._impl.VisitBlockquote(managed_ctx, managed_content, depth);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitStrongFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitStrong(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitEmphasisFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitEmphasis(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitStrikethroughFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitStrikethrough(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitUnderlineFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitUnderline(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitSubscriptFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitSubscript(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitSuperscriptFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitSuperscript(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitMarkFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitMark(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitLineBreakFnCallback(IntPtr userData, IntPtr ctx, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitLineBreak(managed_ctx);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitHorizontalRuleFnCallback(IntPtr userData, IntPtr ctx, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitHorizontalRule(managed_ctx);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitCustomElementFnCallback(IntPtr userData, IntPtr ctx, IntPtr tagName, IntPtr html, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_tagName = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(tagName) ?? string.Empty;
-            var managed_html = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(html) ?? string.Empty;
-            var methodResult = bridge._impl.VisitCustomElement(managed_ctx, managed_tagName, managed_html);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitDefinitionListStartFnCallback(IntPtr userData, IntPtr ctx, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitDefinitionListStart(managed_ctx);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitDefinitionTermFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitDefinitionTerm(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitDefinitionDescriptionFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitDefinitionDescription(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitDefinitionListEndFnCallback(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
-            var methodResult = bridge._impl.VisitDefinitionListEnd(managed_ctx, managed_output);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitFormFnCallback(IntPtr userData, IntPtr ctx, IntPtr action, IntPtr method, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_action = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(action) ?? string.Empty;
-            var managed_method = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(method) ?? string.Empty;
-            var methodResult = bridge._impl.VisitForm(managed_ctx, managed_action, managed_method);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitInputFnCallback(IntPtr userData, IntPtr ctx, IntPtr inputType, IntPtr name, IntPtr value, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_inputType = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(inputType) ?? string.Empty;
-            var managed_name = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(name) ?? string.Empty;
-            var managed_value = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(value) ?? string.Empty;
-            var methodResult = bridge._impl.VisitInput(managed_ctx, managed_inputType, managed_name, managed_value);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitButtonFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitButton(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitAudioFnCallback(IntPtr userData, IntPtr ctx, IntPtr src, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
-            var methodResult = bridge._impl.VisitAudio(managed_ctx, managed_src);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitVideoFnCallback(IntPtr userData, IntPtr ctx, IntPtr src, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
-            var methodResult = bridge._impl.VisitVideo(managed_ctx, managed_src);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitIframeFnCallback(IntPtr userData, IntPtr ctx, IntPtr src, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_src = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(src) ?? string.Empty;
-            var methodResult = bridge._impl.VisitIframe(managed_ctx, managed_src);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitDetailsFnCallback(IntPtr userData, IntPtr ctx, int open, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitDetails(managed_ctx, (open != 0));
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitSummaryFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitSummary(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitFigureStartFnCallback(IntPtr userData, IntPtr ctx, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var methodResult = bridge._impl.VisitFigureStart(managed_ctx);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitFigcaptionFnCallback(IntPtr userData, IntPtr ctx, IntPtr text, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_text = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(text) ?? string.Empty;
-            var methodResult = bridge._impl.VisitFigcaption(managed_ctx, managed_text);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private int VisitFigureEndFnCallback(IntPtr userData, IntPtr ctx, IntPtr output, out IntPtr outResult) {
-        HtmlVisitorBridge? _bridgeFromRegistry = null;
-        lock (HtmlVisitorBridge._registryLock) {
-            if (HtmlVisitorBridge._bridgeRegistry.TryGetValue(userData, out var bridgeFromRegistry)) {
-                _bridgeFromRegistry = bridgeFromRegistry;
-                // Increment callback refcount to prevent GC while callback executes
-                _bridgeFromRegistry.IncrementCallbackRef();
-            }
-        }
-        if (_bridgeFromRegistry == null) {
-            outResult = IntPtr.Zero;
-            return 1;
-        }
-        try {
-            var bridge = _bridgeFromRegistry!;
-            var json_ctx = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(ctx) ?? "{}";
-            var managed_ctx = JsonSerializer.Deserialize<NodeContext>(json_ctx, FfiJsonExtensions.FfiJsonOptions)!;
-            var managed_output = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(output) ?? string.Empty;
-            var methodResult = bridge._impl.VisitFigureEnd(managed_ctx, managed_output);
-            try {
-                string __result_str = (methodResult.ToFfiJson()) ?? string.Empty;
-                outResult = global::System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(__result_str);
-            } catch {
-                outResult = IntPtr.Zero;
-                throw;
-            }
-            return 0;
-        } catch (Exception) {
-            outResult = IntPtr.Zero;
-            return 1;
-        } finally {
-            if (_bridgeFromRegistry != null) {
-                try { _bridgeFromRegistry.DecrementCallbackRef(); } catch { /* Bridge already removed from registry */ }
-            }
-        }
-    }
-
-    private void FreeStringCallback(IntPtr ptr) {
-        if (ptr != IntPtr.Zero) {
-            global::System.Runtime.InteropServices.Marshal.FreeCoTaskMem(ptr);
-        }
-    }
-
-    private void FreeUserDataCallback(IntPtr userData) {
-        if (userData != IntPtr.Zero) {
-            HtmlVisitorBridge.FreeUserData(userData);
-        }
-    }
-
+    private int VisitTextCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitText(DecodeContext(ctx), Str(text)));
+    private int VisitElementStartCallback(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitElementStart(DecodeContext(ctx)));
+    private int VisitElementEndCallback(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitElementEnd(DecodeContext(ctx), Str(output)));
+    private int VisitLinkCallback(IntPtr ctx, IntPtr userData, IntPtr href, IntPtr text, IntPtr title, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitLink(DecodeContext(ctx), Str(href), Str(text), Str(title)));
+    private int VisitImageCallback(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr alt, IntPtr title, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitImage(DecodeContext(ctx), Str(src), Str(alt), Str(title)));
+    private int VisitHeadingCallback(IntPtr ctx, IntPtr userData, uint level, IntPtr text, IntPtr id, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitHeading(DecodeContext(ctx), level, Str(text), Str(id)));
+    private int VisitCodeBlockCallback(IntPtr ctx, IntPtr userData, IntPtr lang, IntPtr code, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitCodeBlock(DecodeContext(ctx), Str(lang), Str(code)));
+    private int VisitCodeInlineCallback(IntPtr ctx, IntPtr userData, IntPtr code, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitCodeInline(DecodeContext(ctx), Str(code)));
+    private int VisitListItemCallback(IntPtr ctx, IntPtr userData, int ordered, IntPtr marker, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitListItem(DecodeContext(ctx), ordered != 0, Str(marker), Str(text)));
+    private int VisitListStartCallback(IntPtr ctx, IntPtr userData, int ordered, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitListStart(DecodeContext(ctx), ordered != 0));
+    private int VisitListEndCallback(IntPtr ctx, IntPtr userData, int ordered, IntPtr output, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitListEnd(DecodeContext(ctx), ordered != 0, Str(output)));
+    private int VisitTableStartCallback(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitTableStart(DecodeContext(ctx)));
+    private int VisitTableRowCallback(IntPtr ctx, IntPtr userData, IntPtr cells, UIntPtr cellsCount, int isHeader, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitTableRow(DecodeContext(ctx), DecodeStringArray(cells, cellsCount), isHeader != 0));
+    private int VisitTableEndCallback(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitTableEnd(DecodeContext(ctx), Str(output)));
+    private int VisitBlockquoteCallback(IntPtr ctx, IntPtr userData, IntPtr content, UIntPtr depth, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitBlockquote(DecodeContext(ctx), Str(content), (ulong)depth));
+    private int VisitStrongCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitStrong(DecodeContext(ctx), Str(text)));
+    private int VisitEmphasisCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitEmphasis(DecodeContext(ctx), Str(text)));
+    private int VisitStrikethroughCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitStrikethrough(DecodeContext(ctx), Str(text)));
+    private int VisitUnderlineCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitUnderline(DecodeContext(ctx), Str(text)));
+    private int VisitSubscriptCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitSubscript(DecodeContext(ctx), Str(text)));
+    private int VisitSuperscriptCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitSuperscript(DecodeContext(ctx), Str(text)));
+    private int VisitMarkCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitMark(DecodeContext(ctx), Str(text)));
+    private int VisitLineBreakCallback(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitLineBreak(DecodeContext(ctx)));
+    private int VisitHorizontalRuleCallback(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitHorizontalRule(DecodeContext(ctx)));
+    private int VisitCustomElementCallback(IntPtr ctx, IntPtr userData, IntPtr tagName, IntPtr html, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitCustomElement(DecodeContext(ctx), Str(tagName), Str(html)));
+    private int VisitDefinitionListStartCallback(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitDefinitionListStart(DecodeContext(ctx)));
+    private int VisitDefinitionTermCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitDefinitionTerm(DecodeContext(ctx), Str(text)));
+    private int VisitDefinitionDescriptionCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitDefinitionDescription(DecodeContext(ctx), Str(text)));
+    private int VisitDefinitionListEndCallback(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitDefinitionListEnd(DecodeContext(ctx), Str(output)));
+    private int VisitFormCallback(IntPtr ctx, IntPtr userData, IntPtr action, IntPtr method, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitForm(DecodeContext(ctx), Str(action), Str(method)));
+    private int VisitInputCallback(IntPtr ctx, IntPtr userData, IntPtr inputType, IntPtr name, IntPtr value, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitInput(DecodeContext(ctx), Str(inputType), Str(name), Str(value)));
+    private int VisitButtonCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitButton(DecodeContext(ctx), Str(text)));
+    private int VisitAudioCallback(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitAudio(DecodeContext(ctx), Str(src)));
+    private int VisitVideoCallback(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitVideo(DecodeContext(ctx), Str(src)));
+    private int VisitIframeCallback(IntPtr ctx, IntPtr userData, IntPtr src, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitIframe(DecodeContext(ctx), Str(src)));
+    private int VisitDetailsCallback(IntPtr ctx, IntPtr userData, int open, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitDetails(DecodeContext(ctx), open != 0));
+    private int VisitSummaryCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitSummary(DecodeContext(ctx), Str(text)));
+    private int VisitFigureStartCallback(IntPtr ctx, IntPtr userData, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitFigureStart(DecodeContext(ctx)));
+    private int VisitFigcaptionCallback(IntPtr ctx, IntPtr userData, IntPtr text, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitFigcaption(DecodeContext(ctx), Str(text)));
+    private int VisitFigureEndCallback(IntPtr ctx, IntPtr userData, IntPtr output, IntPtr outCustom, IntPtr outLen) =>
+        Dispatch(userData, outCustom, outLen, v => v.VisitFigureEnd(DecodeContext(ctx), Str(output)));
 
     public void Dispose() {
         if (_disposed) return;
         _disposed = true;
 
         if (_vtable != IntPtr.Zero) {
-            global::System.Runtime.InteropServices.Marshal.FreeHGlobal(_vtable);
+            Marshal.FreeHGlobal(_vtable);
             _vtable = IntPtr.Zero;
         }
 
         if (_implHandle.IsAllocated) {
             _implHandle.Free();
         }
-
-        // _delegateRoots is kept as a managed list; GC handles it automatically.
-        // No need to free individual delegates or the list.
-    }
-
-    /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>
-    public static IntPtr Register(IHtmlVisitor impl, string name) {
-        if (impl == null)
-            throw new ArgumentNullException(nameof(impl));
-
-
-        var bridge = new HtmlVisitorBridge(impl);
-
-        try {
-            // Register bridge in the static registry using its unique ID.
-            // This keeps the bridge alive while Rust holds the ID (userData).
-            lock (_registryLock) {
-                _bridgeRegistry[bridge._bridgeId] = bridge;
-            }
-
-            var vtablePtr = bridge._vtable;
-            var userData = bridge._bridgeId;
-
-            var result = NativeMethods.RegisterHtmlVisitor(name, vtablePtr, userData, out var outError);
-            if (result != 0) {
-                lock (_registryLock) {
-                    _bridgeRegistry.Remove(bridge._bridgeId);
-                }
-                bridge.Dispose();
-                var errorMsg = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(outError) ?? "Unknown error";
-                global::System.Runtime.InteropServices.Marshal.FreeCoTaskMem(outError);
-                throw new InvalidOperationException($"Failed to register {name}: {errorMsg}");
-            }
-
-            // Return the bridge ID (userData).
-            // The FFI layer holds this ID and will call FreeUserDataCallback with it when done.
-            return userData;
-        } catch {
-            lock (_registryLock) {
-                _bridgeRegistry.Remove(bridge._bridgeId);
-            }
-            bridge.Dispose();
-            throw;
-        }
+        // _delegateRoots is managed; the GC reclaims it once the bridge is unreachable.
     }
 }
 
-/// <summary>Static helpers for registering trait implementations</summary>
-public static class HtmlVisitorRegistry {
-
-    private static readonly ConcurrentDictionary<string, HtmlVisitorBridge> _bridges =
-        new ConcurrentDictionary<string, HtmlVisitorBridge>();
-
-    /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>
-    public static IntPtr RegisterHtmlVisitor(IHtmlVisitor impl) {
-        if (impl == null)
-            throw new ArgumentNullException(nameof(impl));
-
-        var bridge = new HtmlVisitorBridge(impl);
-        var userData = bridge._bridgeId;
-        var name = "bridge_" + Guid.NewGuid().ToString();
-
-        lock (HtmlVisitorBridge._registryLock) {
-            HtmlVisitorBridge._bridgeRegistry[userData] = bridge;
-        }
-        return userData;
-    }
-
-    /// <summary>Register a HtmlVisitor implementation and return its native handle</summary>
-
-    public static IntPtr Register(IHtmlVisitor impl, string name) {
-        if (impl == null)
-            throw new ArgumentNullException(nameof(impl));
-
-
-        var bridge = new HtmlVisitorBridge(impl);
-
-        try {
-            var userData = bridge._bridgeId;
-            var vtablePtr = bridge._vtable;
-
-            // Register bridge in the static registry using its unique ID.
-            // This keeps the bridge alive while Rust holds the ID (userData).
-            lock (HtmlVisitorBridge._registryLock) {
-                HtmlVisitorBridge._bridgeRegistry[userData] = bridge;
-            }
-
-            var result = NativeMethods.RegisterHtmlVisitor(name, vtablePtr, userData, out var outError);
-            if (result != 0) {
-                lock (HtmlVisitorBridge._registryLock) {
-                    HtmlVisitorBridge._bridgeRegistry.Remove(userData);
-                }
-                bridge.Dispose();
-                var errorMsg = global::System.Runtime.InteropServices.Marshal.PtrToStringUTF8(outError) ?? "Unknown error";
-                global::System.Runtime.InteropServices.Marshal.FreeCoTaskMem(outError);
-                throw new InvalidOperationException($"Failed to register {name}: {errorMsg}");
-            }
-
-            return userData;
-        } catch {
-            lock (HtmlVisitorBridge._registryLock) {
-                HtmlVisitorBridge._bridgeRegistry.Remove(bridge._bridgeId);
-            }
-            bridge.Dispose();
-            throw;
-        }
-    }
-
-
-}
 
 /// <summary>FFI JSON serialization extension methods and options</summary>
 internal static class FfiJsonExtensions {

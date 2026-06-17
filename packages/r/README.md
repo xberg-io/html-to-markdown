@@ -20,7 +20,7 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
-  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
+  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
@@ -91,13 +91,13 @@ Ship identical Markdown across every runtime while enjoying native performance w
 ## Installation
 
 ```bash
-install.packages("htmltomarkdown")
+install.packages("htmltomarkdown", repos = "https://kreuzberg-dev.r-universe.dev")
 ```
 
 Requires R 4.3+ and a Rust toolchain (cargo, rustc).
 
 ```r
-install.packages("htmltomarkdown")
+install.packages("htmltomarkdown", repos = "https://kreuzberg-dev.r-universe.dev")
 ```
 
 Or install the development version from GitHub:

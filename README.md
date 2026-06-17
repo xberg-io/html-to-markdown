@@ -20,7 +20,7 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
-  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
+  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
@@ -142,7 +142,7 @@ cargo add html-to-markdown-rs
 pip install html-to-markdown
 
 # TypeScript / Node.js
-npm install @kreuzberg/html-to-markdown-node
+npm install @kreuzberg/html-to-markdown
 
 # Ruby
 gem install html-to-markdown
@@ -192,15 +192,15 @@ println!("{}", result.content.unwrap_or_default());
 | -------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
 | Rust                 | [html-to-markdown-rs](https://crates.io/crates/html-to-markdown-rs)                                          | `cargo add html-to-markdown-rs`                                   |
 | Python               | [html-to-markdown](https://pypi.org/project/html-to-markdown/)                                               | `pip install html-to-markdown`                                    |
-| TypeScript / Node.js | [@kreuzberg/html-to-markdown-node](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-node)           | `npm install @kreuzberg/html-to-markdown-node`                    |
+| TypeScript / Node.js | [@kreuzberg/html-to-markdown](https://www.npmjs.com/package/@kreuzberg/html-to-markdown)                     | `npm install @kreuzberg/html-to-markdown`                         |
 | WebAssembly          | [@kreuzberg/html-to-markdown-wasm](https://www.npmjs.com/package/@kreuzberg/html-to-markdown-wasm)           | `npm install @kreuzberg/html-to-markdown-wasm`                    |
 | Ruby                 | [html-to-markdown](https://rubygems.org/gems/html-to-markdown)                                               | `gem install html-to-markdown`                                    |
 | PHP                  | [kreuzberg-dev/html-to-markdown](https://packagist.org/packages/kreuzberg-dev/html-to-markdown)              | `composer require kreuzberg-dev/html-to-markdown`                 |
-| Go                   | [htmltomarkdown](https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown) | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
+| Go                   | [htmltomarkdown](https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3)                | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` |
 | Java                 | [dev.kreuzberg:html-to-markdown](https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown)       | Maven / Gradle                                                    |
 | C#                   | [KreuzbergDev.HtmlToMarkdown](https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/)                   | `dotnet add package KreuzbergDev.HtmlToMarkdown`                  |
-| Elixir               | [html_to_markdown](https://hex.pm/packages/html_to_markdown)                                                 | `mix deps.get html_to_markdown`                                   |
-| R                    | [htmltomarkdown](https://kreuzberg-dev.r-universe.dev/htmltomarkdown)                                        | `install.packages("htmltomarkdown")`                              |
+| Elixir               | [html_to_markdown](https://hex.pm/packages/html_to_markdown)                                                 | add `{:html_to_markdown, "~> 3.6"}` to `mix.exs`                  |
+| R                    | [htmltomarkdown](https://kreuzberg-dev.r-universe.dev/htmltomarkdown)                                        | `install.packages("htmltomarkdown", repos = "https://kreuzberg-dev.r-universe.dev")` |
 | C (FFI)              | [releases](https://github.com/kreuzberg-dev/html-to-markdown/releases)                                       | Pre-built `.so` / `.dll` / `.dylib`                               |
 
 ## Part of Kreuzberg.dev

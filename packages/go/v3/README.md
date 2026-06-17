@@ -20,7 +20,7 @@
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg/html-to-markdown">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/html-to-markdown?label=Java&color=007ec6" alt="Java">
   </a>
-  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown">
+  <a href="https://pkg.go.dev/github.com/kreuzberg-dev/html-to-markdown/packages/go/v3">
     <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/html-to-markdown?label=Go&color=007ec6&filter=v3*" alt="Go">
   </a>
   <a href="https://www.nuget.org/packages/KreuzbergDev.HtmlToMarkdown/">
@@ -91,7 +91,7 @@ Supports automatic downloading of prebuilt FFI libraries for Linux, macOS, and W
 ## Installation
 
 ```bash
-go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown
+go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
 ```
 
 Requires Go 1.25+. After installing the package, run `go generate` to automatically download the platform-specific FFI library:
@@ -240,7 +240,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 
 html := "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
@@ -264,7 +264,7 @@ Djot's extended syntax allows you to express more semantic meaning in lightweigh
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 
 html := "<h1>Title</h1><p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 

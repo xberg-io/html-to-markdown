@@ -78,7 +78,7 @@ Set `ConversionOptions.outputFormat` to `OutputFormat::Djot` and pass the option
 {% elif language == 'go' %}
 
 ```go
-import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3/htmltomarkdown"
+import "github.com/kreuzberg-dev/html-to-markdown/packages/go/v3"
 
 html := "<p>This is <strong>bold</strong> and <em>italic</em> text.</p>"
 
