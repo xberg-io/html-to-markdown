@@ -58,7 +58,7 @@ else
   else
     # Guard against duplicate: check if extension line already exists (uncommented).
     if ! grep -q "^extension=html_to_markdown" "$PHP_INI"; then
-      echo "extension=html_to_markdown" >>"$PHP_INI"
+      echo "extension=html_to_markdown" >> "$PHP_INI"
     fi
   fi
 fi

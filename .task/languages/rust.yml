@@ -59,14 +59,8 @@ tasks:
         desc: "Run Rust test suite"
         silent: false
         cmds:
-            # html-to-markdown-rs-dart is excluded because flutter_rust_bridge's frb_generated.rs
-            # references local mirror types (crate::VisitResult, crate::ImageType) unconditionally,
-            # while those mirrors are gated on the dart crate's own visitor/metadata features. With
-            # --no-default-features these mirrors are compiled out and the generated file fails E0433.
-            # The companion alef fix (drop source_cfg from mirror attribute templates) lands in the
-            # next alef cut; once a regen pulls it in this exclusion can be lifted.
             - cmd: |
-                  RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo test --release --no-default-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php --exclude html-to-markdown-rs-dart -j {{.NUM_CPUS}}
+                  RUST_LOG={{.RUST_LOG}} RUST_BACKTRACE={{.RUST_BACKTRACE}} cargo test --release --no-default-features --workspace --exclude html-to-markdown-py --exclude html-to-markdown-php -j {{.NUM_CPUS}}
               ignore_error: false
 
     test:ci:

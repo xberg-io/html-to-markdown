@@ -9,13 +9,7 @@ keywords = ["converter", "html", "markdown"]
 categories = []
 
 [package.metadata.cargo-machete]
-ignored = [
-    "tokio",
-    "async-trait",
-    "alloc-no-stdlib",
-    "alloc-stdlib",
-    "brotli-decompressor",
-]
+ignored = ["tokio", "async-trait", "alloc-no-stdlib", "alloc-stdlib", "brotli-decompressor"]
 
 [workspace]
 

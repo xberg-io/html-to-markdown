@@ -207,7 +207,7 @@ func __swift_bridge__SwiftHtmlVisitorBox_alef_visit_figure_end (_ this: UnsafeMu
     { let rustString = Unmanaged<SwiftHtmlVisitorBox>.fromOpaque(this).takeUnretainedValue().alef_visit_figure_end(ctx: RustString(ptr: ctx), output: RustString(ptr: output)).intoRustString(); rustString.isOwned = false; return rustString.ptr }()
 }
 
-public func makeHtmlVisitorVisitorHandle(_ swift_box: SwiftHtmlVisitorBox) -> VisitorHandle {
+public func makeHtmlVisitorHandle(_ swift_box: SwiftHtmlVisitorBox) -> VisitorHandle {
     VisitorHandle(ptr: __swift_bridge__$make_html_visitor_visitor_handle(Unmanaged.passRetained(swift_box).toOpaque()))
 }
 public func conversionOptionsFromJsonWithVisitor<GenericIntoRustString: IntoRustString>(_ json: GenericIntoRustString, _ visitor: Optional<VisitorHandle>) throws -> ConversionOptions {

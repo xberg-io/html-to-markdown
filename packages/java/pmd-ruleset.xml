@@ -17,6 +17,16 @@
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
         <exclude name="DataClass"/>
+        <!--
+            Generated Builder-pattern classes carry per-instance final fields
+            with their type-default initializer (e.g. `private final boolean
+            introspectionEnabled = true;`). PMD interprets these as constants
+            and suggests static promotion, but each Builder instance is a
+            mutable assembly point — promoting to static would shadow the
+            field across all builders and break the pattern. Suppress the
+            rule project-wide; codegen is the source of truth.
+        -->
+        <exclude name="FinalFieldCouldBeStatic"/>
     </rule>
     <rule ref="category/java/documentation.xml">
         <exclude name="CommentSize"/>
