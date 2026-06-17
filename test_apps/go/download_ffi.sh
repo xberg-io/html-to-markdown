@@ -20,24 +20,42 @@ if [ -z "${MODULE_VERSION:-}" ]; then
 fi
 
 case "$(uname -s)" in
-  Darwin)
-    case "$(uname -m)" in
-      arm64) PLATFORM_RUST="aarch64-apple-darwin"; PLATFORM="macos-arm64" ;;
-      x86_64) PLATFORM_RUST="x86_64-apple-darwin"; PLATFORM="macos-x86_64" ;;
-      *) echo "Unsupported Darwin arch: $(uname -m)" >&2; exit 1 ;;
-    esac
+Darwin)
+  case "$(uname -m)" in
+  arm64)
+    PLATFORM_RUST="aarch64-apple-darwin"
+    PLATFORM="macos-arm64"
     ;;
-  Linux)
-    case "$(uname -m)" in
-      x86_64) PLATFORM_RUST="x86_64-unknown-linux-gnu"; PLATFORM="linux-x86_64" ;;
-      aarch64) PLATFORM_RUST="aarch64-unknown-linux-gnu"; PLATFORM="linux-aarch64" ;;
-      *) echo "Unsupported Linux arch: $(uname -m)" >&2; exit 1 ;;
-    esac
+  x86_64)
+    PLATFORM_RUST="x86_64-apple-darwin"
+    PLATFORM="macos-x86_64"
     ;;
   *)
-    echo "Unsupported OS: $(uname -s)" >&2
+    echo "Unsupported Darwin arch: $(uname -m)" >&2
     exit 1
     ;;
+  esac
+  ;;
+Linux)
+  case "$(uname -m)" in
+  x86_64)
+    PLATFORM_RUST="x86_64-unknown-linux-gnu"
+    PLATFORM="linux-x86_64"
+    ;;
+  aarch64)
+    PLATFORM_RUST="aarch64-unknown-linux-gnu"
+    PLATFORM="linux-aarch64"
+    ;;
+  *)
+    echo "Unsupported Linux arch: $(uname -m)" >&2
+    exit 1
+    ;;
+  esac
+  ;;
+*)
+  echo "Unsupported OS: $(uname -s)" >&2
+  exit 1
+  ;;
 esac
 
 GOMODCACHE="$(go env GOMODCACHE)"
