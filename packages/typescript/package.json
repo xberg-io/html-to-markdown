@@ -1,6 +1,6 @@
 {
 	"name": "@kreuzberg/html-to-markdown",
-	"version": "3.6.12",
+	"version": "3.6.13",
 	"description": "High-performance HTML to Markdown converter",
 	"keywords": [
 		"converter",

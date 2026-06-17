@@ -219,7 +219,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.6.12"
+version = "3.6.13"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -250,7 +250,7 @@ dependencies = [
 
 [[package]]
 name = "html_to_markdown_nif"
-version = "3.6.12"
+version = "3.6.13"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.13] - 2026-06-17
+
+### Fixed
+
+- **style(test_apps/go): `shfmt`-normalize `download_ffi.sh` so CI Lint's `shfmt` hook stops rejecting the v3.6.12 baseline.** The hand-written cgo library stager shipped with v3.6.12 used inline case-arm bodies; CI's `shfmt -i 2 -ci -bn -s` profile splits them onto separate lines. CI Lint failed on every v3.6.12 commit until the file was normalized.
+- **(via alef 0.25.26–0.25.28)** Generated bindings pick up: PHP shared lossy and enum-tainted binding-to-core helpers now skip `binding_excluded` fields and emit `..Default::default()` so core types with custom `Default` impls (e.g. anything that pulls config from the environment) are no longer shadowed by zeroed field defaults across Python/Node/Ruby/WASM/extendr/PHP method bodies and From-impls; FFI same-name function dedup moved out of the shared extractor pass into a backend-local pass (`backends::ffi::gen_bindings::functions::cfg_dedup::dedup_same_name_functions`) so every other backend and the e2e call-export validator see the original multi-entry surface untouched (v0.25.26 had over-collapsed the shared surface and stripped `alef(skip)`-tagged siblings from every backend); FRB Dart bridge functions wrapping core functions that return primitives now emit the cross-type cast (e.g. `.map(|v| v as i64)`) instead of the redundant `.map(|v| v)` that v0.25.25–0.25.27 emitted; generated Kotlin Android files add `ReturnCount` to the `@file:Suppress` list so detekt no longer fails sealed-class deserializers with 3+ variants.
+- **(via alef 0.25.27)** Generated Swift bindings emit the factory function as `make{Trait}Handle` (matching the documented spec, the docs snippets under `docs/snippets/swift/visitor/`, and the e2e test generator) instead of `make{Trait}{TypeAlias}` (which silently doubled the trait stem to `makeHtmlVisitorVisitorHandle`); generated Swift e2e visitor closures qualify the context type with the host module (`HtmlToMarkdown.NodeContext`) so the unqualified reference is no longer ambiguous against `RustBridge.NodeContext` that the test file also imports.
+- **(via alef 0.25.27)** Generated TypeScript WASM e2e configs override `SsrfPolicy.denyPrivate = false` when the binding exposes the field, since WASM has no `std::env::var` and `SsrfPolicy::from_env()` always falls back to `deny_private = true`, which rejected the localhost mock-server requests every WASM e2e fixture targets.
+
+### Changed
+
+- **Bump alef pin to 0.25.28** (was 0.25.25), regenerating all binding outputs, e2e codegen, API reference docs, and test_apps scaffolds.
+
 ## [3.6.12] - 2026-06-17
 
 ### Fixed
