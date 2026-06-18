@@ -30,6 +30,13 @@
     </rule>
     <rule ref="category/java/documentation.xml">
         <exclude name="CommentSize"/>
+        <!--
+            CommentRequired demands hand-written Javadoc on every field/constructor.
+            These records are generated DTOs that mirror the Rust source field-for-field;
+            codegen is the source of truth, so per-field comments are neither written nor
+            meaningful here. Type-level Javadoc is still emitted and still required.
+        -->
+        <exclude name="CommentRequired"/>
     </rule>
     <rule ref="category/java/errorprone.xml">
         <exclude name="EmptyCatchBlock"/>

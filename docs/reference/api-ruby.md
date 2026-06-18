@@ -2,7 +2,7 @@
 title: "Ruby API Reference"
 ---
 
-## Ruby API Reference <span class="version-badge">v3.6.13</span>
+## Ruby API Reference <span class="version-badge">v3.6.14</span>
 
 ### Functions
 

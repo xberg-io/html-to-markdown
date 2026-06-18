@@ -851,6 +851,7 @@ void* __swift_bridge__$TableData$grid(void* self);
 void* __swift_bridge__$TableData$markdown(void* self);
 void* __swift_bridge__$ProcessingWarning$message(void* self);
 void* __swift_bridge__$ProcessingWarning$kind(void* self);
+void __swift_bridge__$visitor_handle_noop(void* client);
 void* __swift_bridge__$NodeContext$node_type(void* self);
 void* __swift_bridge__$NodeContext$tag_name(void* self);
 uintptr_t __swift_bridge__$NodeContext$depth(void* self);

@@ -1,6 +1,9 @@
 // swift-format-ignore-file
 import RustBridgeC
 
+public func visitor_handle_noop(_ client: VisitorHandleRef) {
+    __swift_bridge__$visitor_handle_noop(client.ptr)
+}
 public func convert<GenericIntoRustString: IntoRustString>(_ html: GenericIntoRustString, _ options: Optional<ConversionOptions>) throws -> ConversionResult {
     try { let val = __swift_bridge__$convert({ let rustString = html.intoRustString(); rustString.isOwned = false; return rustString.ptr }(), { if let val = options { val.isOwned = false; return val.ptr } else { return nil } }()); if val.is_ok { return ConversionResult(ptr: val.ok_or_err!) } else { throw RustString(ptr: val.ok_or_err!) } }()
 }
