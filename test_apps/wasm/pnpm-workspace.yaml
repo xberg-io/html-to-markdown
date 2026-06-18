@@ -4,4 +4,4 @@ allowBuilds:
   esbuild: true
   tree-sitter: true
 minimumReleaseAgeExclude:
-  - '@kreuzberg/html-to-markdown-wasm@3.6.14'
+  - '@kreuzberg/html-to-markdown-wasm@3.6.15'

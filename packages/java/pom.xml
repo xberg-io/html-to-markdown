@@ -6,7 +6,7 @@
 
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.6.14</version>
+    <version>3.6.15</version>
     <packaging>jar</packaging>
 
     <name>html-to-markdown</name>
@@ -434,7 +434,7 @@
                         <configuration>
                             <publishingServerId>ossrh</publishingServerId>
                             <autoPublish>true</autoPublish>
-                            <waitUntil>published</waitUntil>
+                            <waitUntil>validated</waitUntil>
                             <waitMaxTime>7200</waitMaxTime>
                         </configuration>
                     </plugin>

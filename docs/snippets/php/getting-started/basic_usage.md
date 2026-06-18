@@ -1,6 +1,6 @@
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 
-$result = HtmlToMarkdown::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
+$result = HtmlToMarkdownApi::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
 echo $result->content;
 ```

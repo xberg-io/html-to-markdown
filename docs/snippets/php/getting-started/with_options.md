@@ -1,5 +1,5 @@
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 use HtmlToMarkdown\ConversionOptions;
 
 $options = ConversionOptions::builder()
@@ -7,6 +7,6 @@ $options = ConversionOptions::builder()
     ->listIndentWidth(2)
     ->build();
 
-$result = HtmlToMarkdown::convert('<h1>Hello</h1>', $options);
+$result = HtmlToMarkdownApi::convert('<h1>Hello</h1>', $options);
 echo $result->content;
 ```

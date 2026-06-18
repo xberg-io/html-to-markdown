@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.15] - 2026-06-18
+
+### Fixed
+
+- **ci(publish): build the PHP 8.5 + macOS arm64 (Apple Silicon) PIE extension.** Removed the build-matrix exclusion that skipped `php8.5` on `macos-latest`; the homebrew tap now ships `php@8.5` for arm64 (8.5.x) and `shivammathur/setup-php` installs it, so the cell builds. Without it, `php_html_to_markdown-v*_php8.5-arm64-darwin-bsdlibc-nts.tgz` was never produced and `pie install kreuzberg-dev/html-to-markdown` failed on Apple Silicon + PHP 8.5 with "Could not find release asset" ([#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333)). (`.github/workflows/publish.yaml`)
+- **docs(php): use the native `HtmlToMarkdownApi` class in all PHP examples.** The README quick-start, API reference, and docs snippets used the `HtmlToMarkdown` userland wrapper, which is only autoloaded via Composer's PSR-4 and is absent on the PIE install path (extension-only) — so `HtmlToMarkdown::convert()` raised "Class not found" for users who installed via `pie`. Examples now call `HtmlToMarkdownApi::convert()`, the native class registered by the extension itself, which works on both the PIE and Composer install paths ([#415](https://github.com/kreuzberg-dev/html-to-markdown/issues/415)). (`readme_templates/partials/`, `docs/snippets/php/`, `docs/language-guides.md`)
+
+### Changed
+
+- **chore(deps): bump `alef.toml.alef_version` to 0.25.44 (was 0.25.40) and regenerate every binding, e2e suite, README, and API doc.** Folds in the 0.25.41–0.25.44 cross-language generator fixes. Verified locally: `alef verify` is clean, `cargo check --workspace --all-features` compiles, and `prek run --all-files` (including the alef freshness hook) passes.
+
 ## [3.6.14] - 2026-06-18
 
 ### Fixed

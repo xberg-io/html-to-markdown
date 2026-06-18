@@ -1,5 +1,5 @@
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 use HtmlToMarkdown\ConversionOptions;
 
 // Visitors are duck-typed: define any subset of visit_* methods.
@@ -16,7 +16,7 @@ $visitor = new class {
 
 $options = ConversionOptions::builder()->visitor($visitor)->build();
 
-$result = HtmlToMarkdown::convert(
+$result = HtmlToMarkdownApi::convert(
     '<a href="/page">Link</a><img src="pic.png" alt="pic">',
     $options
 );

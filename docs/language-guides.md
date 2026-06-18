@@ -99,15 +99,15 @@ composer require kreuzberg-dev/html-to-markdown
 ```
 
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 use HtmlToMarkdown\ConversionOptions;
 
 $options = ConversionOptions::builder()->headingStyle('atx')->build();
-$result = HtmlToMarkdown::convert('<h1>Title</h1>', $options);
+$result = HtmlToMarkdownApi::convert('<h1>Title</h1>', $options);
 echo $result->content;
 ```
 
-Classes live in the flat `HtmlToMarkdown\` namespace. `HtmlToMarkdown::convert` returns a `ConversionResult` object (`$result->content`, `$result->metadata`, `$result->tables`). Conversion failures throw `HtmlToMarkdown\HtmlToMarkdownException`.
+Classes live in the flat `HtmlToMarkdown\` namespace. `HtmlToMarkdownApi::convert` returns a `ConversionResult` object (`$result->content`, `$result->metadata`, `$result->tables`). Conversion failures throw `HtmlToMarkdown\HtmlToMarkdownException`.
 
 ## Java
 

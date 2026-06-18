@@ -1,5 +1,5 @@
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 
 $html = <<<HTML
 <table>
@@ -9,7 +9,7 @@ $html = <<<HTML
 </table>
 HTML;
 
-$result = HtmlToMarkdown::convert($html);
+$result = HtmlToMarkdownApi::convert($html);
 
 foreach ($result->tables as $table) {
     foreach ($table->grid->cells as $cell) {

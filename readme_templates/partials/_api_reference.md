@@ -52,15 +52,15 @@ warnings = result[:warnings]      # Any conversion warnings
 ```
 
 {% elif language == 'php' %}
-**`HtmlToMarkdown::convert(string $html, ?ConversionOptions $options = null): ConversionResult`**
+**`HtmlToMarkdownApi::convert(string $html, ?ConversionOptions $options = null): ConversionResult`**
 
 Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```php
 <?php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 
-$result   = HtmlToMarkdown::convert($html);
+$result   = HtmlToMarkdownApi::convert($html);
 $markdown = $result->content;    // Converted Markdown string
 $metadata = $result->metadata;   // Metadata
 $tables   = $result->tables;     // Structured table data

@@ -123,16 +123,16 @@ composer require kreuzberg-dev/html-to-markdown
 Basic conversion:
 
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 
-$result = HtmlToMarkdown::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
+$result = HtmlToMarkdownApi::convert('<h1>Hello</h1><p>This is <strong>fast</strong>!</p>');
 echo $result->content;
 ```
 
 With conversion options:
 
 ```php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 use HtmlToMarkdown\ConversionOptions;
 
 $options = ConversionOptions::builder()
@@ -140,7 +140,7 @@ $options = ConversionOptions::builder()
     ->listIndentWidth(2)
     ->build();
 
-$result = HtmlToMarkdown::convert('<h1>Hello</h1>', $options);
+$result = HtmlToMarkdownApi::convert('<h1>Hello</h1>', $options);
 echo $result->content;
 ```
 
@@ -167,15 +167,15 @@ The dispatcher is invisible to the caller. Output is byte-identical across tiers
 
 ### Core Function
 
-**`HtmlToMarkdown::convert(string $html, ?ConversionOptions $options = null): ConversionResult`**
+**`HtmlToMarkdownApi::convert(string $html, ?ConversionOptions $options = null): ConversionResult`**
 
 Converts HTML to Markdown. Returns a `ConversionResult` object with all results in a single call.
 
 ```php
 <?php
-use HtmlToMarkdown\HtmlToMarkdown;
+use HtmlToMarkdown\HtmlToMarkdownApi;
 
-$result   = HtmlToMarkdown::convert($html);
+$result   = HtmlToMarkdownApi::convert($html);
 $markdown = $result->content;    // Converted Markdown string
 $metadata = $result->metadata;   // Metadata
 $tables   = $result->tables;     // Structured table data
@@ -216,7 +216,7 @@ The library supports converting HTML to [Djot](https://djot.net/), a lightweight
 ### Example Usage
 
 Set `ConversionOptions.outputFormat` to `OutputFormat::Djot` and pass the options object to
-`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
+`HtmlToMarkdownApi::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 Djot's extended syntax allows you to express more semantic meaning in lightweight text, making it useful for documents that require strikethrough, insertion tracking, or mathematical notation.
 
@@ -225,7 +225,7 @@ Djot's extended syntax allows you to express more semantic meaning in lightweigh
 Set `output_format` to `"plain"` to strip all markup and return only visible text. This bypasses the Markdown conversion pipeline entirely for maximum speed.
 
 Set `ConversionOptions.outputFormat` to `OutputFormat::Plain` and pass the options object to
-`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
+`HtmlToMarkdownApi::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 Plain text mode is useful for search indexing, text extraction, and feeding content to LLMs.
 

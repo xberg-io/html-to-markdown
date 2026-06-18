@@ -41,7 +41,7 @@ plain = result[:content]
 {% elif language == 'php' %}
 
 Set `ConversionOptions.outputFormat` to `OutputFormat::Plain` and pass the options object to
-`HtmlToMarkdown::convert($html, $options)`. The PHP API reference lists the full options constructor.
+`HtmlToMarkdownApi::convert($html, $options)`. The PHP API reference lists the full options constructor.
 
 {% elif language == 'go' %}
 
