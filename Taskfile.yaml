@@ -482,7 +482,11 @@ tasks:
     desc: "Smoke test Go package from pkg.go.dev"
     dir: test_apps/go
     cmds:
-      - go mod download
+      # Refresh go.sum for the bumped binding version (alef edits go.mod only, so
+      # go.sum lacks the new hash → "missing go.sum entry"). Use the targeted
+      # `go mod download <module>` Go itself suggests: it adds the entry without
+      # rewriting go.mod's block form (download_ffi.sh parses the version from it).
+      - go mod download github.com/kreuzberg-dev/html-to-markdown/packages/go/v3
       - bash ./download_ffi.sh
       - go test -v -run Smoke
 
