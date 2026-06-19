@@ -1127,11 +1127,14 @@ jobs:
               uses: kreuzberg-dev/actions/install-task@v1 # v1
 
             - name: Install alef
-              if: matrix.os == 'ubuntu-latest'
+              if: matrix.os != 'windows-latest'
               uses: kreuzberg-dev/actions/install-alef@v1 # v1
 
-            - name: Run E2E tests (Ubuntu only)
-              if: matrix.os == 'ubuntu-latest'
+            - name: Run E2E tests (Linux + macOS)
+              # macOS coverage exercises the Java native loader on Apple Silicon so
+              # macOS-specific binding/RID regressions are caught (alef test is not
+              # supported on the Windows runner here).
+              if: matrix.os != 'windows-latest'
               run: alef test --e2e --lang java
               shell: bash
 
