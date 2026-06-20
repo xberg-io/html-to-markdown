@@ -1,0 +1,26 @@
+{
+  "name": "html-to-markdown-cli",
+  "version": "0.1.0",
+  "description": "CLI proxy for html-to-markdown \u2014 downloads and runs the native html-to-markdown binary from GitHub releases.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Na'aman Hirschfeld",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git",
+    "directory": "cli-proxy/npm"
+  },
+  "bin": {
+    "html-to-markdown": "./bin/html-to-markdown.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "bin/",
+    "install.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
