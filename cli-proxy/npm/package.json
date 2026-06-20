@@ -1,6 +1,6 @@
 {
   "name": "html-to-markdown-cli",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "CLI proxy for html-to-markdown \u2014 downloads and runs the native html-to-markdown binary from GitHub releases.",
   "type": "module",
   "license": "MIT",
@@ -12,9 +12,6 @@
   },
   "bin": {
     "html-to-markdown": "./bin/html-to-markdown.js"
-  },
-  "scripts": {
-    "postinstall": "node install.js"
   },
   "files": [
     "bin/",
