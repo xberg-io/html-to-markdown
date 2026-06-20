@@ -252,7 +252,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rb"
-version = "3.6.18"
+version = "3.6.19"
 dependencies = [
  "html-to-markdown-rs",
  "magnus",
@@ -262,7 +262,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.6.18"
+version = "3.6.19"
 dependencies = [
  "ahash",
  "astral-tl",
