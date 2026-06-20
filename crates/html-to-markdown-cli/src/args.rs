@@ -8,8 +8,31 @@ use crate::validators::{
     CliCodeBlockStyle, CliHeadingStyle, CliHighlightStyle, CliLinkStyle, CliListIndentType, CliNewlineStyle,
     CliOutputFormat, CliPreprocessingPreset, CliWhitespaceMode, validate_bullets, validate_strong_em_symbol,
 };
-use clap::{Parser, ValueEnum};
+use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
+
+/// Optional top-level subcommands.
+///
+/// When `None`, the CLI falls back to the default convert-from-file behaviour.
+#[cfg(feature = "mcp")]
+#[cfg_attr(alef, alef(skip))]
+#[derive(Subcommand)]
+pub enum Commands {
+    /// Run as an MCP (Model Context Protocol) server.
+    Mcp {
+        /// Transport mode: "stdio" (default) or "http".
+        #[arg(long, default_value = "stdio")]
+        transport: String,
+
+        /// HTTP host (only used with --transport http).
+        #[arg(long, default_value = "127.0.0.1")]
+        host: String,
+
+        /// HTTP port (only used with --transport http).
+        #[arg(long, default_value_t = 8001)]
+        port: u16,
+    },
+}
 
 /// Convert HTML to Markdown
 ///
@@ -414,6 +437,13 @@ pub struct Cli {
     #[arg(short = 'f', long = "output-format", value_name = "FORMAT")]
     #[arg(help_heading = "Output Format")]
     pub output_format: Option<CliOutputFormat>,
+
+    /// Optional subcommand (e.g., `mcp`).
+    ///
+    /// When a subcommand is given, the convert-from-file behaviour is bypassed.
+    #[cfg(feature = "mcp")]
+    #[command(subcommand)]
+    pub command: Option<Commands>,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]

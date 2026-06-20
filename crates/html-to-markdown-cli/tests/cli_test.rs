@@ -864,3 +864,42 @@ fn serve_once_bytes(
 
     (format!("http://{addr}"), handle, rx)
 }
+
+// ============================================================================
+// MCP subcommand tests
+// ============================================================================
+
+/// Regression test: the existing convert-from-stdin path still works after the
+/// subcommand change (ensures `command: Option<Commands>` does not break the
+/// default flag-based convert flow).
+#[test]
+fn test_default_convert_regression_after_subcommand_change() {
+    cli()
+        .write_stdin("<h1>Regression</h1>")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("# Regression"));
+}
+
+/// `--version` still prints the version correctly.
+#[test]
+fn test_version_still_works() {
+    cli()
+        .arg("--version")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(env!("CARGO_PKG_VERSION")));
+}
+
+/// `mcp --help` prints transport, host, and port options.
+#[cfg(feature = "mcp")]
+#[test]
+fn test_mcp_help_lists_transport_host_port() {
+    cli()
+        .args(["mcp", "--help"])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("transport"))
+        .stdout(predicates::str::contains("host"))
+        .stdout(predicates::str::contains("port"));
+}

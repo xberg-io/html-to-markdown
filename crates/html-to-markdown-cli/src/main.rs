@@ -17,6 +17,38 @@ use std::panic;
 use std::path::PathBuf;
 use utils::{DEFAULT_USER_AGENT, decode_bytes, fetch_url};
 
+/// Run the MCP server (stdio or http transport).
+///
+/// Builds a blocking Tokio runtime and drives `start_mcp_server` / `start_mcp_server_http`.
+/// Keeps `fn main()` synchronous in line with the kreuzberg pattern.
+#[cfg(feature = "mcp")]
+fn run_mcp(transport: &str, host: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
+    let rt = tokio::runtime::Runtime::new()?;
+    match transport.to_lowercase().as_str() {
+        "stdio" => {
+            rt.block_on(html_to_markdown_rs::mcp::start_mcp_server())
+                .map_err(|e| format!("Failed to start MCP server: {e}"))?;
+        }
+        "http" => {
+            #[cfg(not(feature = "mcp-http"))]
+            {
+                return Err("HTTP transport requires the 'mcp-http' feature. \
+                            Rebuild with: cargo build --features mcp-http"
+                    .into());
+            }
+            #[cfg(feature = "mcp-http")]
+            {
+                rt.block_on(html_to_markdown_rs::mcp::start_mcp_server_http(host, port))
+                    .map_err(|e| format!("Failed to start MCP HTTP server on {host}:{port}: {e}"))?;
+            }
+        }
+        other => {
+            return Err(format!("Unknown transport '{other}'. Use 'stdio' or 'http'").into());
+        }
+    }
+    Ok(())
+}
+
 fn generate_completions(shell: Shell) {
     use clap::CommandFactory;
     use clap_complete::{Shell as ClapShell, generate};
@@ -86,6 +118,12 @@ fn read_input(cli: &Cli) -> Result<String, Box<dyn std::error::Error>> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
+
+    // Dispatch MCP subcommand before any convert-from-file logic.
+    #[cfg(feature = "mcp")]
+    if let Some(args::Commands::Mcp { transport, host, port }) = &cli.command {
+        return run_mcp(transport, host, *port);
+    }
 
     if let Some(shell) = cli.generate_completion {
         generate_completions(shell);

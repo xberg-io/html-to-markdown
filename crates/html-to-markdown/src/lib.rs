@@ -142,6 +142,9 @@ pub use visitor::{NodeContext, NodeType, VisitResult, VisitorHandle};
 
 pub use convert_api::convert;
 
+#[cfg(feature = "mcp")]
+pub mod mcp;
+
 // Tests
 // ============================================================================
 

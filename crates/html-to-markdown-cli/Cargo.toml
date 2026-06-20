@@ -17,6 +17,11 @@ categories = ["command-line-utilities", "text-processing"]
 name = "html-to-markdown"
 path = "src/main.rs"
 
+[features]
+default = ["mcp", "mcp-http"]
+mcp = ["html-to-markdown-rs/mcp", "dep:tokio"]
+mcp-http = ["mcp", "html-to-markdown-rs/mcp-http"]
+
 [dependencies]
 base64.workspace = true
 clap.workspace = true
@@ -45,6 +50,7 @@ reqwest = { version = "0.13.4", default-features = false, features = [
     "charset",
 ] }
 serde_json = "1.0"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"], optional = true }
 
 [dev-dependencies]
 assert_cmd = "2.2"
