@@ -2830,3 +2830,21 @@ jobs:
                   webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
                   project-name: html-to-markdown
                   token: ${{ steps.app-token.outputs.token }}
+
+    cli-proxy:
+        name: Publish CLI proxy packages
+        # The npm trusted publisher is bound to this workflow file (publish.yaml), so the
+        # cli-proxy package must publish from here. Decoupled from the main release: this job
+        # fires only on its own `cli-proxy-v*` release tag, never on a library version release,
+        # so the main publish pipeline and the proxy release stay independent.
+        if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'cli-proxy-v') }}
+        permissions:
+            id-token: write
+            contents: read
+        uses: kreuzberg-dev/actions/.github/workflows/reusable-cli-proxy-publish.yml@v1
+        with:
+            npm-package-dir: cli-proxy/npm
+            pypi-package-dir: cli-proxy/pypi
+            publish-npm: true
+            publish-pypi: false
+            dry-run: "false"
