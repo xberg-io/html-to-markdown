@@ -1,26 +1,26 @@
 {
-  "name": "@kreuzberg/html-to-markdown-cli",
-  "version": "0.0.1",
-  "description": "CLI proxy for html-to-markdown — downloads and runs the native html-to-markdown binary from GitHub releases.",
-  "type": "module",
-  "license": "MIT",
-  "author": "Na'aman Hirschfeld",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git",
-    "directory": "cli-proxy/npm"
-  },
-  "bin": {
-    "html-to-markdown": "bin/html-to-markdown.js"
-  },
-  "files": [
-    "bin/",
-    "install.js"
-  ],
-  "engines": {
-    "node": ">=18"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+	"name": "@kreuzberg/html-to-markdown-cli",
+	"version": "0.0.1",
+	"description": "CLI proxy for html-to-markdown — downloads and runs the native html-to-markdown binary from GitHub releases.",
+	"license": "MIT",
+	"author": "Na'aman Hirschfeld",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kreuzberg-dev/html-to-markdown.git",
+		"directory": "cli-proxy/npm"
+	},
+	"bin": {
+		"html-to-markdown": "bin/html-to-markdown.js"
+	},
+	"files": [
+		"bin/",
+		"install.js"
+	],
+	"type": "module",
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=18"
+	}
 }

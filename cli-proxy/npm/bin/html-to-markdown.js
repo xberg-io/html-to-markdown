@@ -37,8 +37,8 @@ async function ensureBinary() {
 	// Call main() explicitly rather than relying on import side-effects: ESM
 	// caches modules, so the installer's top-level run is gated to direct
 	// invocation only and would not fire on import.
-	const { main } = await import("../install.js");
-	await main();
+	const { main: installMain } = await import("../install.js");
+	await installMain();
 }
 
 function printUnavailable() {

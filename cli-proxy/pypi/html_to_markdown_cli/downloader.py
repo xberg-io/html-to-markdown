@@ -19,9 +19,13 @@ import tarfile
 import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
+from typing import IO, TYPE_CHECKING, Any
 from urllib.error import URLError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+if TYPE_CHECKING:
+    from http.client import HTTPMessage
 
 REPO = "kreuzberg-dev/html-to-markdown"
 BIN_NAME = "html-to-markdown"
@@ -60,7 +64,15 @@ def _binary_name() -> str:
 class _HttpsOnlyRedirectHandler(HTTPRedirectHandler):
     """Reject any redirect whose target is not https (downgrade/SSRF guard)."""
 
-    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+    def redirect_request(
+        self,
+        req: Request,
+        fp: IO[bytes],
+        code: int,
+        msg: str,
+        headers: HTTPMessage,
+        newurl: str,
+    ) -> Request | None:
         if urlsplit(newurl).scheme.lower() != "https":
             raise URLError(f"refusing non-https redirect to: {newurl}")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
@@ -75,12 +87,13 @@ def _http_get(url: str, accept: str | None = None) -> bytes:
     headers = {"User-Agent": _USER_AGENT}
     if accept:
         headers["Accept"] = accept
-    request = Request(url, headers=headers)
+    request = Request(url, headers=headers)  # noqa: S310 (https-only enforced above)
     try:
-        with _opener.open(request, timeout=60) as response:  # noqa: S310 (https enforced)
+        with _opener.open(request, timeout=60) as response:
             if response.status != 200:
                 raise RuntimeError(f"HTTP {response.status} for {url}")
-            return response.read()
+            data: bytes = response.read()
+            return data
     except URLError as exc:
         raise RuntimeError(f"failed to fetch {url}: {exc}") from exc
 
@@ -95,7 +108,7 @@ def _asset_score(name: str) -> int:
     return score
 
 
-def _resolve_release() -> tuple[str, dict, dict | None]:
+def _resolve_release() -> tuple[str, dict[str, Any], dict[str, Any] | None]:
     """Return (tag, archive_asset, checksums_asset_or_none) for this platform."""
     triple = _target_triple()
     pinned = os.getenv(VERSION_ENV)
@@ -115,15 +128,11 @@ def _resolve_release() -> tuple[str, dict, dict | None]:
         and ((a.get("name") or "").lower().endswith(".tar.gz") or (a.get("name") or "").lower().endswith(".zip"))
     ]
     if not archives:
-        raise RuntimeError(
-            f'no release asset matching target triple "{triple}" in {REPO} release {tag}'
-        )
+        raise RuntimeError(f'no release asset matching target triple "{triple}" in {REPO} release {tag}')
     archives.sort(key=lambda a: _asset_score(a.get("name") or ""), reverse=True)
     archive = archives[0]
 
-    checksums = next(
-        (a for a in assets if "SHA256SUMS" in (a.get("name") or "").upper()), None
-    )
+    checksums = next((a for a in assets if "SHA256SUMS" in (a.get("name") or "").upper()), None)
     return tag, archive, checksums
 
 
@@ -141,9 +150,9 @@ def _expected_digest(text: str, asset_name: str) -> str | None:
     return None
 
 
-def _verify_or_warn(archive_path: Path, asset_name: str, checksums: dict | None) -> None:
+def _verify_or_warn(archive_path: Path, asset_name: str, checksums: dict[str, Any] | None) -> None:
     if not checksums:
-        print(
+        print(  # noqa: T201 (diagnostic to stderr)
             f"WARNING: no SHA256SUMS asset found for {asset_name}; "
             "installing over HTTPS without checksum verification.",
             file=sys.stderr,
@@ -153,19 +162,16 @@ def _verify_or_warn(archive_path: Path, asset_name: str, checksums: dict | None)
     expected = _expected_digest(sums_text, asset_name)
     if not expected:
         raise RuntimeError(
-            f"no checksum entry for {asset_name} in {checksums['name']} — "
-            "refusing to install unverified binary"
+            f"no checksum entry for {asset_name} in {checksums['name']} — refusing to install unverified binary"
         )
     digest = hashlib.sha256(archive_path.read_bytes()).hexdigest().lower()
     if digest != expected:
-        raise RuntimeError(
-            f"checksum mismatch for {asset_name} (expected {expected}, got {digest})"
-        )
-    print(f"Checksum verified for {asset_name}.", file=sys.stderr)
+        raise RuntimeError(f"checksum mismatch for {asset_name} (expected {expected}, got {digest})")
+    print(f"Checksum verified for {asset_name}.", file=sys.stderr)  # noqa: T201 (diagnostic to stderr)
 
 
 def _is_within(base: Path, target: Path) -> bool:
-    """True if `target`'s resolved path stays inside `base`."""
+    """Return True if `target`'s resolved path stays inside `base`."""
     base_resolved = base.resolve()
     try:
         target.resolve().relative_to(base_resolved)
@@ -207,15 +213,15 @@ def _safe_extract(archive_path: Path, asset_name: str, dest: Path) -> None:
                 zf.extract(member, dest)
     else:
         with tarfile.open(archive_path, "r:gz") as tf:
-            for member in tf.getmembers():
-                _reject_unsafe_member(member.name)
-                if not _is_within(dest, dest / member.name):
-                    raise RuntimeError(f"refusing archive entry escaping dest: {member.name}")
+            for tar_member in tf.getmembers():
+                _reject_unsafe_member(tar_member.name)
+                if not _is_within(dest, dest / tar_member.name):
+                    raise RuntimeError(f"refusing archive entry escaping dest: {tar_member.name}")
                 # Reject link members that point outside dest as well.
-                if member.islnk() or member.issym():
-                    link_target = dest / member.name
-                    if not _is_within(dest, link_target.parent / member.linkname):
-                        raise RuntimeError(f"refusing link escaping dest: {member.name}")
+                if tar_member.islnk() or tar_member.issym():
+                    link_target = dest / tar_member.name
+                    if not _is_within(dest, link_target.parent / tar_member.linkname):
+                        raise RuntimeError(f"refusing link escaping dest: {tar_member.name}")
             tf.extractall(dest)  # noqa: S202 (members validated above)
 
 
@@ -244,7 +250,7 @@ def ensure_binary() -> str:
     if binary_path.exists() and os.access(binary_path, os.X_OK):
         return str(binary_path)
 
-    print(f"Downloading {BIN_NAME} {tag} asset {archive['name']}...", file=sys.stderr)
+    print(f"Downloading {BIN_NAME} {tag} asset {archive['name']}...", file=sys.stderr)  # noqa: T201
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp = Path(tmpdir)
         archive_path = tmp / Path(archive["name"]).name
@@ -255,14 +261,12 @@ def ensure_binary() -> str:
         _safe_extract(archive_path, archive["name"], extract_dir)
         found = _find_binary(extract_dir, _binary_name())
         if not found:
-            raise RuntimeError(
-                f"binary {_binary_name()} not found after extracting {archive['name']}"
-            )
+            raise RuntimeError(f"binary {_binary_name()} not found after extracting {archive['name']}")
         shutil.move(str(found), str(binary_path))
 
     if platform.system().lower() != "windows":
         binary_path.chmod(0o755)
-    print(f"{BIN_NAME} installed.", file=sys.stderr)
+    print(f"{BIN_NAME} installed.", file=sys.stderr)  # noqa: T201 (diagnostic to stderr)
     return str(binary_path)
 
 
