@@ -7,15 +7,12 @@ class HtmlToMarkdown < Formula
   version "${version}"
   license "MIT"
 
+  # macOS is Apple Silicon only — the CLI no longer ships an x86_64-apple-darwin
+  # build (Intel mac dropped), so there is no on_intel block here.
   on_macos do
     on_arm do
       url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-aarch64-apple-darwin.tar.gz"
       sha256 "${cli_macos_arm_sha}"
-    end
-
-    on_intel do
-      url "https://github.com/kreuzberg-dev/html-to-markdown/releases/download/v#{version}/cli-x86_64-apple-darwin.tar.gz"
-      sha256 "${cli_macos_intel_sha}"
     end
   end
 

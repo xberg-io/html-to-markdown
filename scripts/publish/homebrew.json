@@ -5,7 +5,6 @@
 			"template": "scripts/publish/html-to-markdown.rb.tmpl",
 			"assets": {
 				"cli_macos_arm_sha": "cli-aarch64-apple-darwin.tar.gz",
-				"cli_macos_intel_sha": "cli-x86_64-apple-darwin.tar.gz",
 				"cli_linux_arm_sha": "cli-aarch64-unknown-linux-gnu.tar.gz",
 				"cli_linux_intel_sha": "cli-x86_64-unknown-linux-gnu.tar.gz"
 			}
