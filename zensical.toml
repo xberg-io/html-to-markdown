@@ -21,6 +21,7 @@ nav = [
     { "Visitor pattern" = "visitor.md" },
     { "Table extraction" = "tables.md" },
     { "Error handling" = "errors.md" },
+    { "AI Coding Assistants" = "agent-skills.md" },
   ] },
   { "Concepts" = [
     { "Architecture" = "concepts/architecture.md" },
