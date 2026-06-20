@@ -2,7 +2,7 @@
 title: "R API Reference"
 ---
 
-## R API Reference <span class="version-badge">v3.6.17</span>
+## R API Reference <span class="version-badge">v3.6.18</span>
 
 ### Functions
 

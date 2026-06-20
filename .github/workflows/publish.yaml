@@ -1066,13 +1066,19 @@ jobs:
                 platform:
                     - { os: ubuntu-latest, label: linux-x86_64, target: x86_64-unknown-linux-gnu }
                     - { os: ubuntu-24.04-arm, label: linux-arm64, target: aarch64-unknown-linux-gnu }
-                    # macos-14 (not macos-latest): shivammathur/setup-php only provisions PHP 5.6-8.6
-                    # on the macos-14 Apple Silicon runner. macos-latest (15/26) lacks php8.5 arm64,
-                    # which is why the php8.5 macos-arm64 PIE asset was previously missing (#333).
-                    - { os: macos-14, label: macos-arm64, target: aarch64-apple-darwin }
+                    - { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
                     - { os: macos-15-intel, label: macos-x86_64, target: x86_64-apple-darwin }
                     - { os: windows-latest, label: windows-x86_64, target: x86_64-pc-windows-msvc }
                     # windows-arm64: deferred until ext-php-rs cross-compile to aarch64-pc-windows-msvc is validated
+                exclude:
+                    # PHP 8.5 on macos-arm64: shivammathur/setup-php cannot provision PHP 8.5 on
+                    # Apple Silicon on ANY runner (macos-14/15/26) — the install leaves empty paths
+                    # and fails ("sed: : No such file or directory", "/php.ini: No such file"). The
+                    # macos-14 attempt in v3.6.17 (#333) confirmed this and dropped ALL PHP PIE
+                    # assets. PHP 8.5 ships on linux + macos-x86_64 + windows; arm64-darwin covers
+                    # 8.2-8.4. Re-enable once upstream ships a php@8.5 arm64 formula (#333).
+                    - php: "8.5"
+                      platform: { os: macos-latest, label: macos-arm64, target: aarch64-apple-darwin }
         steps:
             - uses: actions/checkout@v6
               with:

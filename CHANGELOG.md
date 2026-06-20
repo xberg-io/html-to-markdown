@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.18] - 2026-06-20
+
+### Fixed
+
+- **ci(publish): unbreak Python wheels on every platform.** The shared `build-python-wheels` action source-built libheif 1.23.0 (with `libde265`/`x265` codec headers) for *all* consumers because kreuzberg links `libheif-sys`. html-to-markdown does not use libheif, but inherited the build — which fails on the `manylinux2014` (CentOS 7 EOL) base whose yum repos no longer carry `libde265-devel`/`x265-devel` (`Error: Not tolerating missing names on install`). The action now gates the libheif build behind an opt-in `build-libheif` input (default off); h2m no longer builds it, so all Python wheels build again. (`kreuzberg-dev/actions@v1`)
+- **ci(publish): re-exclude `php8.5` + `macos-arm64`, restoring PHP publishing.** v3.6.17 tried to build the php8.5 Apple-Silicon PIE asset on the `macos-14` runner ([#333](https://github.com/kreuzberg-dev/html-to-markdown/issues/333)), but `shivammathur/setup-php` cannot provision PHP 8.5 on arm64 on *any* macOS runner (the install leaves empty paths — `sed: : No such file`, `/php.ini: No such file`). That failing cell skipped `upload-php-pie-release`, dropping **every** PHP PIE asset (a v3.6.15-class regression). Restoring the exclusion republishes the PHP extension for all supported targets (PHP 8.2–8.5 on linux/macos-x86_64/windows, plus arm64-darwin for 8.2–8.4). #333 stays open pending an upstream php@8.5 arm64 formula. (`.github/workflows/publish.yaml`)
+
+### Changed
+
+- **chore(deps): re-pin `alef.toml.alef_version` to 0.25.50 and regenerate every binding, e2e suite, README, and API doc.** Folds in the 0.25.50 cross-language visitor-codegen fixes that turn the chronically-red e2e visitor suites green: **Node** — the bridge now reads the externally-tagged `{ Custom: ... }`/`{ Error: ... }` payload key (was lowercased to `custom`/`error`, yielding `[object Object]`); **Ruby** — visitor callbacks take named params and interpolate `{placeholder}` templates; **PHP** — bare-string returns map to `Custom` for multi-payload result enums; **Elixir** — unit-variant atoms match the snake_case wire name (`:skip` no longer leaks as literal `"Skip"`); **Swift** — `visitBlockquote`'s `depth` is `UInt`, so the override satisfies the protocol. Verified locally: every language e2e suite passes and `alef verify` is clean.
+
 ## [3.6.17] - 2026-06-19
 
 ### Fixed

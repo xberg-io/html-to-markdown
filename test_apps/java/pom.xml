@@ -31,7 +31,7 @@
         <dependency>
             <groupId>dev.kreuzberg</groupId>
             <artifactId>html-to-markdown</artifactId>
-            <version>3.6.17</version>
+            <version>3.6.18</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

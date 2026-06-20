@@ -1,6 +1,6 @@
 Package: htmltomarkdown
 Title: High-performance HTML to Markdown converter
-Version: 3.6.17
+Version: 3.6.18
 Authors@R: person("Na'aman", "Hirschfeld", email = "naaman@kreuzberg.dev", role = c("aut", "cre"))
 Description: High-performance HTML to Markdown converter
     Rust bindings generated with extendr.
