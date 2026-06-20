@@ -828,6 +828,13 @@ jobs:
                   target: ${{ matrix.target }}
                   use-napi-cross: ${{ matrix.use_napi_cross }}
                   pack-target-tarball: node-bindings-${{ matrix.target }}.tar.gz
+                  # setup-node-workspace already ran `pnpm install --no-frozen-lockfile`.
+                  # Skip build-node-napi's own install: under pnpm 11.8.0 its plain
+                  # `pnpm install --filter` re-enforces CI frozen-lockfile and fails on
+                  # the napi platform optionalDependencies (pinned to the not-yet-published
+                  # release version, so they can't be in the lockfile). pnpm 11.6.0 treated
+                  # it as a no-op; 11.8.0 does not.
+                  install-deps: "false"
 
             - uses: actions/upload-artifact@v7
               with:

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **test_apps(php): install the PHP extension via PIE's `pkg:version` syntax.** Both generated PHP test_app installers (`test_apps/php/install.sh`, `test_apps/php_ext/run_tests.sh`) ran `pie install --version "$VERSION" <pkg>`, but PIE parses `--version`/`-V` as "print PIE's own version" and exits **without installing** — the pinned extension version was never fetched, so the registry-mode PHP smoke validated whatever stale build happened to be present (or nothing). Use `pie install "<pkg>:$VERSION"` so the targeted release is actually installed. (alef 0.25.54)
+- **ci(publish): unblock the npm/Node publish under pnpm 11.8.0.** The `node-bindings` job runs `setup-node-workspace` (which installs with `--no-frozen-lockfile`) and then `build-node-napi`, whose own `pnpm install --filter` re-enforces CI's default frozen-lockfile. The napi platform `optionalDependencies` are pinned to the not-yet-published release version, so they cannot be in the lockfile — pnpm 11.6.0 treated the redundant install as a no-op, but the 11.8.0 bump made it fail (`ERR_PNPM_OUTDATED_LOCKFILE`), dropping every Node build and the npm publish. Pass `install-deps: false` so the already-installed workspace is reused. (`.github/workflows/publish.yaml`)
 
 ### Changed
 
