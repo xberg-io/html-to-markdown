@@ -225,6 +225,9 @@ DerivedData/
 *.log
 test_apps/**/test_output.log
 
+# basemind code-map index cache (per-developer)
+.basemind/
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
 .ai-rulez/.generated-manifest.json
