@@ -65,6 +65,14 @@ pub fn format_conversion_result(result: &ConversionResult) -> String {
     serde_json::to_string_pretty(&serde_json::Value::Object(map)).unwrap_or_default()
 }
 
+/// Format extracted [`HtmlMetadata`](crate::metadata::HtmlMetadata) as pretty-printed JSON.
+///
+/// Used by the `extract_metadata` tool. `HtmlMetadata` derives `Serialize`, so this
+/// is a direct serialisation (no feature-gated fields to special-case).
+pub fn format_metadata(metadata: &crate::metadata::HtmlMetadata) -> String {
+    serde_json::to_string_pretty(metadata).unwrap_or_default()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -97,5 +105,16 @@ mod tests {
         let json = format_conversion_result(&result);
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert!(parsed.get("warnings").is_some());
+    }
+
+    #[test]
+    fn test_format_metadata_is_valid_json() {
+        let metadata = crate::metadata::HtmlMetadata::default();
+        let json = format_metadata(&metadata);
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("metadata must be valid JSON");
+        assert!(
+            parsed.get("document").is_some(),
+            "metadata JSON must have document field"
+        );
     }
 }

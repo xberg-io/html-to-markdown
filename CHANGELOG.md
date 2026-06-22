@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **feat(mcp): expand the MCP server to full API parity with typed, discoverable options and complete tool annotations.** The `convert_html` tool now accepts a typed `config` object covering every settable `ConversionOptions` field (heading/list/escaping/whitespace/wrapping, preprocessing, image extraction, output format, tier strategy, …) instead of an opaque untyped JSON blob, so MCP clients discover all options through the tool's generated `inputSchema`; enum options are accepted as case-insensitive strings parsed by the core parsers. A new `extract_metadata` tool returns structured `<head>`/`<meta>` metadata (title, Open Graph, Twitter Card, JSON-LD/microdata, headers, links, images) as JSON. Both tools carry the full MCP annotation set (`title`, `read_only_hint=true`, `idempotent_hint=true`, `destructive_hint=false`, `open_world_hint=false`). The typed `ConvertConfig` mirror is implemented MCP-side (no changes to the alef-tracked core option types) and guarded by a drift test that fails if a core option is added without being mirrored. The `mcp` feature now implies `metadata`. (`crates/html-to-markdown/src/mcp/`)
+
 ## [3.6.21] - 2026-06-22
 
 ### Changed

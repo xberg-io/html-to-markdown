@@ -1,10 +1,13 @@
 //! Model Context Protocol (MCP) server implementation.
 //!
-//! Provides an MCP server that exposes html-to-markdown conversion as an MCP tool.
+//! Provides an MCP server that exposes html-to-markdown conversion as MCP tools.
 //!
-//! # Features
+//! # Tools
 //!
-//! - **convert_html**: Convert HTML to Markdown (or JSON) with optional `ConversionOptions`
+//! - **convert_html**: Convert HTML to Markdown (or Djot/plain) with typed, fully
+//!   discoverable `ConvertConfig` options; `json:true` returns the full `ConversionResult`.
+//! - **extract_metadata**: Extract structured `<head>`/`<meta>` metadata (title, Open Graph,
+//!   Twitter Card, JSON-LD, headers, links, images) as JSON.
 //!
 //! # Example
 //!

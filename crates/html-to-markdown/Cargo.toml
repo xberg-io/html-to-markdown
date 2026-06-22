@@ -27,7 +27,7 @@ metadata = ["dep:serde", "dep:serde_json"]
 visitor = []
 serde = ["dep:serde", "dep:serde_json"]
 testkit = []
-mcp = ["dep:rmcp", "dep:tokio", "dep:schemars", "serde"]
+mcp = ["dep:rmcp", "dep:tokio", "dep:schemars", "serde", "metadata"]
 mcp-http = ["mcp", "dep:axum"]
 
 [dependencies]
