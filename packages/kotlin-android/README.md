@@ -85,7 +85,7 @@ Server-side Kotlin/JVM consumers should use the `dev.kreuzberg:html-to-markdown`
 ## Installation
 
 ```bash
-implementation("dev.kreuzberg:html-to-markdown-android:3.6.21")
+implementation("dev.kreuzberg:html-to-markdown-android:3.7.0")
 ```
 
 ## Performance Snapshot

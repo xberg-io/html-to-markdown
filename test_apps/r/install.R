@@ -6,7 +6,7 @@
 # arbitrary tag; defaults to the alef-pinned version from
 # [crates.e2e.registry.packages.r].version.
 args <- commandArgs(trailingOnly = TRUE)
-VERSION <- if (length(args) > 0) args[1] else "3.6.21"
+VERSION <- if (length(args) > 0) args[1] else "3.7.0"
 
 # Construct the GitHub release tarball URL.
 url <- sprintf(

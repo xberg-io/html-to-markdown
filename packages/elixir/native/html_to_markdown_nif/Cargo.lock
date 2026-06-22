@@ -244,7 +244,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.6.21"
+version = "3.7.0"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -275,7 +275,7 @@ dependencies = [
 
 [[package]]
 name = "html_to_markdown_nif"
-version = "3.6.21"
+version = "3.7.0"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",

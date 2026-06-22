@@ -31,9 +31,9 @@
         <dependency>
             <groupId>dev.kreuzberg</groupId>
             <artifactId>html-to-markdown</artifactId>
-            <version>3.6.21</version>
+            <version>3.7.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.6.21.jar</systemPath>
+            <systemPath>${project.basedir}/../../packages/java/target/html-to-markdown-3.7.0.jar</systemPath>
         </dependency>
 
         <dependency>

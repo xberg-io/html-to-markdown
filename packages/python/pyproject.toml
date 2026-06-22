@@ -4,7 +4,7 @@ requires = [ "maturin>=1,<2" ]
 
 [project]
 name = "html-to-markdown"
-version = "3.6.21"
+version = "3.7.0"
 description = "High-performance HTML to Markdown converter"
 keywords = [ "converter", "html", "markdown" ]
 license = "MIT"

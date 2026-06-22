@@ -31,7 +31,7 @@
         <dependency>
             <groupId>dev.kreuzberg</groupId>
             <artifactId>html-to-markdown</artifactId>
-            <version>3.6.21</version>
+            <version>3.7.0</version>
         </dependency>
 
         <dependency>
