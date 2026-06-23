@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.2] - 2026-06-23
+
+### Fixed
+
+- **chore(deps): bump `alef.toml.alef_version` to 0.26.6 and regenerate every binding.** Fixes the dart
+  wrapper crate failing to build under `cargo build --no-default-features`: alef 0.26.x had regressed
+  the 0.25.33 fix and re-emitted `#[cfg(feature = ...)]` on the generated `lib.rs` mirror struct /
+  opaque-wrapper declarations, their `From` conversions, and `from_json` bridge fns, while
+  `frb_generated.rs` references those types/functions unconditionally (`E0425: cannot find type
+  VisitorHandle` / `create_html_metadata_from_json`). alef 0.26.6 keeps those declarations
+  unconditional again. Verified: the regenerated dart crate compiles under `--no-default-features`,
+  default, and `--all-features`. (alef 0.26.6)
+- **ci(publish): the Homebrew Swift artifactbundle no longer forces `kreuzberg/openssl-vendored`.** The
+  shared `build-swift-artifactbundle` action hardcoded that feature for its Linux (cargo-zigbuild)
+  targets, but it only exists in the kreuzberg core swift crate — so html-to-markdown's swift bundle
+  build failed (`the package '…' does not contain this feature`), which cascaded to skip
+  `release-finalize` (and with it the `packages/go/vX.Y.Z` Go module tag). The action now takes a
+  `linux-features` input (left empty here). (shared `kreuzberg-dev/actions/build-swift-artifactbundle`)
+
 ## [3.7.1] - 2026-06-23
 
 ### Fixed

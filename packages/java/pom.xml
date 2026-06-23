@@ -6,7 +6,7 @@
 
     <groupId>dev.kreuzberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.7.1</version>
+    <version>3.7.2</version>
     <packaging>jar</packaging>
 
     <name>html-to-markdown</name>
