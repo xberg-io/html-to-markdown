@@ -91,11 +91,13 @@ Options are keyword arguments with `snake_case` symbols. `result` is a hash. Err
 
 ## PHP
 
-**Package:** `kreuzberg-dev/html-to-markdown` on Packagist
+**Package:** `kreuzberg-dev/html-to-markdown` (native `ext-php-rs` extension)
 **Requires:** PHP ≥ 8.2
 
+Install with [PIE](https://github.com/php/pie) — not `composer require`, which cannot load a native extension:
+
 ```bash
-composer require kreuzberg-dev/html-to-markdown
+pie install kreuzberg-dev/html-to-markdown
 ```
 
 ```php

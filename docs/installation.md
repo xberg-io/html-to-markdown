@@ -171,8 +171,10 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 
 === "PHP"
 
+    This is a native PHP extension (Rust `ext-php-rs`), installed with [PIE](https://github.com/php/pie) — not `composer require` (Composer cannot load a native extension):
+
     ```bash
-    composer require kreuzberg-dev/html-to-markdown
+    pie install kreuzberg-dev/html-to-markdown
     ```
 
     **Verify:**
@@ -188,7 +190,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
     // # Hello
     ```
 
-    Requires PHP 8.2+. The package ships precompiled extensions for common PHP versions. If no prebuilt extension matches, Composer will compile from source via `cargo`.
+    Requires PHP 8.2+. PIE downloads the prebuilt extension binary matching your PHP version and platform from the GitHub release (PHP 8.2–8.5 on Linux x86_64/arm64, macOS arm64, and Windows x86_64).
 
 === "Java"
 

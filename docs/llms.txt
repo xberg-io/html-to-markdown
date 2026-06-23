@@ -34,7 +34,7 @@
 - TypeScript: `npm install @kreuzberg/html-to-markdown` (Node ≥ 18).
 - Go: `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` (Go ≥ 1.26).
 - Ruby: `gem 'html-to-markdown', '~> 3.6'` (Ruby ≥ 3.2).
-- PHP: `composer require kreuzberg-dev/html-to-markdown` (PHP ≥ 8.2).
+- PHP: `pie install kreuzberg-dev/html-to-markdown` (native ext-php-rs extension; PHP ≥ 8.2).
 - Java: Maven artifact `dev.kreuzberg:html-to-markdown:3.6.8` (Java ≥ 25).
 - C#: `dotnet add package KreuzbergDev.HtmlToMarkdown` (.NET 10).
 - Elixir: `{:html_to_markdown, "~> 3.6"}` in mix.exs (Elixir ≥ 1.14).

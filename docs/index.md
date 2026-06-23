@@ -58,7 +58,7 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 | **TypeScript / Node** | `npm install @kreuzberg/html-to-markdown`                         | [Reference](reference/api-typescript.md) |
 | **Go**                | `go get github.com/kreuzberg-dev/html-to-markdown/packages/go/v3` | [Reference](reference/api-go.md)         |
 | **Ruby**              | `gem install html-to-markdown`                                    | [Reference](reference/api-ruby.md)       |
-| **PHP**               | `composer require kreuzberg-dev/html-to-markdown`                 | [Reference](reference/api-php.md)        |
+| **PHP**               | `pie install kreuzberg-dev/html-to-markdown`                      | [Reference](reference/api-php.md)        |
 | **Java**              | Maven `dev.kreuzberg:html-to-markdown`                            | [Reference](reference/api-java.md)       |
 | **C#**                | `dotnet add package KreuzbergDev.HtmlToMarkdown`                  | [Reference](reference/api-csharp.md)     |
 | **Elixir**            | `{:html_to_markdown, "~> 3.4"}`                                   | [Reference](reference/api-elixir.md)     |
