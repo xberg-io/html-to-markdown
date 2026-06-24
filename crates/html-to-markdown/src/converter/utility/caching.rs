@@ -56,12 +56,9 @@ pub fn record_node_hierarchy(
     parser: &tl::Parser,
     ctx: &mut DomContext,
 ) {
-    // Traverse with an explicit work stack rather than native recursion. `tl`
-    // does not apply HTML5 implied-end-tags, so a document with thousands of
-    // unclosed elements (e.g. `<td>` or `<div>`) nests into a linear chain
-    // thousands deep; recursing it would overflow the native stack and abort
-    // the process. Each node only writes its own slots, so visitation order is
-    // immaterial to the resulting maps.
+    // The work stack keeps hierarchy recording on the heap for DOM chains
+    // created by unclosed elements. Each node writes only its own map entries;
+    // the same parent/child maps result from any traversal order.
     let mut work = vec![(node_handle, parent)];
     while let Some((node_handle, parent)) = work.pop() {
         let id = node_handle.get_inner();

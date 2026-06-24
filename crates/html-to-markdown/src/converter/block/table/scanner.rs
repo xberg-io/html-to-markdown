@@ -71,11 +71,9 @@ fn scan_table_node(
     is_root: bool,
     scan: &mut TableScan,
 ) {
-    // Explicit work stack instead of native recursion: a table that wraps
-    // deeply nested content (thousands of levels) would otherwise overflow the
-    // native stack and abort. Visitation order does not affect the scan — every
-    // field is an order-independent accumulator (`row_counts` is later read only
-    // via `len()` and a distinct-value check).
+    // The work stack keeps table scans on the heap for deeply nested table
+    // content. Every scan field is an order-independent accumulator; `row_counts`
+    // is later read through its length and distinct value count.
     let mut work = vec![(*node_handle, is_root)];
     while let Some((node_handle, is_root)) = work.pop() {
         let Some(node) = node_handle.get(parser) else {

@@ -338,12 +338,10 @@ pub fn extract_head_metadata(
     parser: &tl::Parser,
     options: &ConversionOptions,
 ) -> BTreeMap<String, String> {
-    // Pre-order search with an explicit work stack rather than native
-    // recursion: documents with thousands of unclosed elements nest into a
-    // linear chain that deep, and recursing it to look for `<head>` would
-    // overflow the native stack and abort the process. Returns the first
-    // `<head>` that yields metadata in document order, matching the previous
-    // depth-first, first-non-empty-wins behavior.
+    // The work stack keeps the `<head>` search on the heap for malformed
+    // documents whose unclosed elements form thousand-level DOM chains. Children
+    // are pushed in reverse so matching still returns the first non-empty
+    // `<head>` in document order.
     let mut work = vec![*node_handle];
     while let Some(handle) = work.pop() {
         let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
@@ -351,7 +349,7 @@ pub fn extract_head_metadata(
         };
 
         if !tag.name().as_utf8_str().eq_ignore_ascii_case("head") {
-            // Not a head tag: queue children so they pop in document order.
+            // Queue children in reverse so they pop in document order.
             let children: Vec<_> = tag.children().top().iter().copied().collect();
             for child_handle in children.into_iter().rev() {
                 work.push(child_handle);
