@@ -132,8 +132,8 @@ fn scan_table_node(
                             }
                         }
                         scan.row_counts.push(cell_count);
-                        let children: Vec<_> = tag.children().top().iter().copied().collect();
-                        for child in children.into_iter().rev() {
+                        let mut children: Vec<_> = tag.children().top().iter().copied().collect();
+                        while let Some(child) = children.pop() {
                             work.push((child, false));
                         }
                         continue;
@@ -141,8 +141,8 @@ fn scan_table_node(
                     _ => {}
                 }
 
-                let children: Vec<_> = tag.children().top().iter().copied().collect();
-                for child in children.into_iter().rev() {
+                let mut children: Vec<_> = tag.children().top().iter().copied().collect();
+                while let Some(child) = children.pop() {
                     work.push((child, false));
                 }
             }

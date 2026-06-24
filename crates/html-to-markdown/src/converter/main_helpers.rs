@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 use crate::options::ConversionOptions;
 use crate::options::conversion::NATIVE_STACK_SAFE_DEPTH;
 
-pub(crate) fn effective_max_depth(options: &ConversionOptions) -> usize {
+pub fn effective_max_depth(options: &ConversionOptions) -> usize {
     options
         .max_depth
         .unwrap_or(NATIVE_STACK_SAFE_DEPTH)
