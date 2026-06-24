@@ -4,7 +4,7 @@ description: "html-to-markdown — Convert HTML to Markdown, Djot, or plain text
 
 # html-to-markdown
 
-Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated packages, identical output on every runtime. Part of the [kreuzberg.dev](https://kreuzberg.dev) document intelligence ecosystem.
+Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated packages, identical output on every runtime. Part of the [xberg.io](https://xberg.io) document intelligence ecosystem.
 
 <div class="hero-badges" markdown>
 
@@ -111,11 +111,11 @@ Convert HTML to Markdown, Djot, or plain text. One Rust core plus 15 generated p
 
 ## Part of Kreuzberg.dev
 
-html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Kreuzberg](https://docs.kreuzberg.dev) document intelligence stack.
+html-to-markdown ships as a standalone library and as the HTML pipeline inside the [Kreuzberg](https://docs.xberg.io) document intelligence stack.
 
 <div class="grid cards" markdown>
 
-- :material-file-document-multiple:{ .lg .middle } **[Kreuzberg](https://docs.kreuzberg.dev)**
+- :material-file-document-multiple:{ .lg .middle } **[Kreuzberg](https://docs.xberg.io)**
 
   Document intelligence core — text, tables, and metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
 
@@ -123,21 +123,21 @@ html-to-markdown ships as a standalone library and as the HTML pipeline inside t
 
   Managed SaaS API for document extraction. Same engine, no infrastructure.
 
-- :material-spider-web:{ .lg .middle } **[kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev)**
+- :material-spider-web:{ .lg .middle } **[kreuzcrawl](https://docs.kreuzcrawl.xberg.io)**
 
   Web crawler that pairs with html-to-markdown for crawl-then-convert pipelines.
 
-- :material-robot:{ .lg .middle } **[liter-llm](https://docs.liter-llm.kreuzberg.dev)**
+- :material-robot:{ .lg .middle } **[liter-llm](https://docs.liter-llm.xberg.io)**
 
   Universal LLM client — feed it the Markdown out of html-to-markdown.
 
-- :material-code-tags:{ .lg .middle } **[tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev)**
+- :material-code-tags:{ .lg .middle } **[tree-sitter-language-pack](https://docs.tree-sitter-language-pack.xberg.io)**
 
   306 Tree-sitter grammars on demand for code intelligence.
 
 - :fontawesome-brands-discord:{ .lg .middle } **[Discord](https://discord.gg/xt9WY3GnKR)**
 
-  Community chat for kreuzberg.dev users and contributors.
+  Community chat for xberg.io users and contributors.
 
 </div>
 

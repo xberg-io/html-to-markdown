@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://docs.html-to-markdown.kreuzberg.dev/sitemap.xml
+Sitemap: https://docs.html-to-markdown.xberg.io/sitemap.xml

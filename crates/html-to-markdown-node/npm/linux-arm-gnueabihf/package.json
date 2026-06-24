@@ -9,7 +9,7 @@
 		"napi",
 		"rust"
 	],
-	"homepage": "https://kreuzberg.dev",
+	"homepage": "https://xberg.io",
 	"bugs": "https://github.com/xberg-io/html-to-markdown/issues",
 	"license": "MIT",
 	"author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",

@@ -204,7 +204,7 @@ cargo install html-to-markdown-cli
 brew install xberg-io/tap/html-to-markdown
 ```
 
-See [CLI usage](https://docs.html-to-markdown.kreuzberg.dev) for full documentation.
+See [CLI usage](https://docs.html-to-markdown.xberg.io) for full documentation.
 
 </details>
 
@@ -285,7 +285,7 @@ Add the package to `opencode.json`:
 
 ## Documentation
 
-Full guides, the `convert()` API for every binding, tier architecture, the metadata and visitor APIs, and performance benchmarks live at **[docs.html-to-markdown.kreuzberg.dev](https://docs.html-to-markdown.kreuzberg.dev)**.
+Full guides, the `convert()` API for every binding, tier architecture, the metadata and visitor APIs, and performance benchmarks live at **[docs.html-to-markdown.xberg.io](https://docs.html-to-markdown.xberg.io)**.
 
 ## Part of Kreuzberg.dev
 

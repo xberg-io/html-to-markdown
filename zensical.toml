@@ -1,8 +1,8 @@
 [project]
 site_name = "html-to-markdown"
 site_description = "High-performance HTML to Markdown conversion powered by Rust"
-site_url = "https://docs.html-to-markdown.kreuzberg.dev"
-site_author = "kreuzberg.dev"
+site_url = "https://docs.html-to-markdown.xberg.io"
+site_author = "xberg.io"
 repo_name = "xberg-io/html-to-markdown"
 repo_url = "https://github.com/xberg-io/html-to-markdown"
 edit_uri = "edit/main/docs/"

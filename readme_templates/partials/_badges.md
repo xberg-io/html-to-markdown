@@ -56,7 +56,7 @@
   <a href="https://github.com/xberg-io/html-to-markdown/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-007ec6" alt="License">
   </a>
-  <a href="https://docs.html-to-markdown.kreuzberg.dev">
+  <a href="https://docs.html-to-markdown.xberg.io">
     <img src="https://img.shields.io/badge/Docs-html--to--markdown-007ec6" alt="Documentation">
   </a>
 </div>
@@ -65,7 +65,7 @@
   <a href="https://discord.gg/xt9WY3GnKR">
     <img height="22" src="https://img.shields.io/badge/Discord-Chat-007ec6?logo=discord&logoColor=white" alt="Join Discord">
   </a>
-  <a href="https://docs.html-to-markdown.kreuzberg.dev/demo/">
+  <a href="https://docs.html-to-markdown.xberg.io/demo/">
     <img height="22" src="https://img.shields.io/badge/Live%20Demo-Open-007ec6?logo=webassembly&logoColor=white" alt="Live Demo">
   </a>
 </div>

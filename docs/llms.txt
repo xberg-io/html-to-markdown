@@ -1,31 +1,31 @@
 # html-to-markdown
 
-> Convert HTML to Markdown, Djot, or plain text. Rust core (`html-to-markdown-rs`) plus 15 generated packages, identical output on every runtime. The same engine ships under the [kreuzberg.dev](https://kreuzberg.dev) document intelligence stack.
+> Convert HTML to Markdown, Djot, or plain text. Rust core (`html-to-markdown-rs`) plus 15 generated packages, identical output on every runtime. The same engine ships under the [xberg.io](https://xberg.io) document intelligence stack.
 
 ## Get Started
 
-- [Installation](https://docs.html-to-markdown.kreuzberg.dev/installation/): Install the package for your language — Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, WebAssembly, Swift, Dart, Kotlin Android, or Zig.
-- [Usage](https://docs.html-to-markdown.kreuzberg.dev/usage/): The `convert()` call and `ConversionResult` shape across bindings.
-- [CLI](https://docs.html-to-markdown.kreuzberg.dev/cli/): Command-line wrapper with every conversion option as a flag.
+- [Installation](https://docs.html-to-markdown.xberg.io/installation/): Install the package for your language — Rust, Python, TypeScript, Go, Ruby, PHP, Java, C#, Elixir, R, C, WebAssembly, Swift, Dart, Kotlin Android, or Zig.
+- [Usage](https://docs.html-to-markdown.xberg.io/usage/): The `convert()` call and `ConversionResult` shape across bindings.
+- [CLI](https://docs.html-to-markdown.xberg.io/cli/): Command-line wrapper with every conversion option as a flag.
 
 ## Guides
 
-- [Visitor pattern](https://docs.html-to-markdown.kreuzberg.dev/visitor/): Intercept the DOM walk with `HtmlVisitor` to skip, replace, or preserve any element.
-- [Table extraction](https://docs.html-to-markdown.kreuzberg.dev/tables/): Structured `result.tables` with cells, spans, and header flags alongside the rendered Markdown.
-- [Error handling](https://docs.html-to-markdown.kreuzberg.dev/errors/): The `ConversionError` variants and how each binding surfaces them.
-- [AI Coding Assistants](https://docs.html-to-markdown.kreuzberg.dev/agent-skills/): Install the html-to-markdown plugin from the xberg-io/plugins marketplace for Claude Code, Codex, Cursor, Gemini, Factory Droid, Copilot, and opencode.
+- [Visitor pattern](https://docs.html-to-markdown.xberg.io/visitor/): Intercept the DOM walk with `HtmlVisitor` to skip, replace, or preserve any element.
+- [Table extraction](https://docs.html-to-markdown.xberg.io/tables/): Structured `result.tables` with cells, spans, and header flags alongside the rendered Markdown.
+- [Error handling](https://docs.html-to-markdown.xberg.io/errors/): The `ConversionError` variants and how each binding surfaces them.
+- [AI Coding Assistants](https://docs.html-to-markdown.xberg.io/agent-skills/): Install the html-to-markdown plugin from the xberg-io/plugins marketplace for Claude Code, Codex, Cursor, Gemini, Factory Droid, Copilot, and opencode.
 
 ## Concepts
 
-- [Architecture](https://docs.html-to-markdown.kreuzberg.dev/concepts/architecture/): Workspace layout, direct vs C-FFI bindings, feature flags, thread safety.
-- [Conversion pipeline](https://docs.html-to-markdown.kreuzberg.dev/concepts/pipeline/): The five stages of `convert()` — preprocess, parse, single-pass DOM walk, post-process, extract.
-- [Plugin system](https://docs.html-to-markdown.kreuzberg.dev/concepts/plugin-system/): The `HtmlVisitor` trait with 40 callbacks and `VisitResult::{Continue, Custom, Skip, PreserveHtml, Error}`.
+- [Architecture](https://docs.html-to-markdown.xberg.io/concepts/architecture/): Workspace layout, direct vs C-FFI bindings, feature flags, thread safety.
+- [Conversion pipeline](https://docs.html-to-markdown.xberg.io/concepts/pipeline/): The five stages of `convert()` — preprocess, parse, single-pass DOM walk, post-process, extract.
+- [Plugin system](https://docs.html-to-markdown.xberg.io/concepts/plugin-system/): The `HtmlVisitor` trait with 40 callbacks and `VisitResult::{Continue, Custom, Skip, PreserveHtml, Error}`.
 
 ## Reference
 
-- [Configuration](https://docs.html-to-markdown.kreuzberg.dev/configuration/): Every `ConversionOptions` field with type and default.
-- [API reference](https://docs.html-to-markdown.kreuzberg.dev/api-reference/): Generated API pages from the Rust source.
-- [Language guides](https://docs.html-to-markdown.kreuzberg.dev/language-guides/): Per-language install notes, naming conventions, and idiom mapping.
+- [Configuration](https://docs.html-to-markdown.xberg.io/configuration/): Every `ConversionOptions` field with type and default.
+- [API reference](https://docs.html-to-markdown.xberg.io/api-reference/): Generated API pages from the Rust source.
+- [Language guides](https://docs.html-to-markdown.xberg.io/language-guides/): Per-language install notes, naming conventions, and idiom mapping.
 
 ## Installation snippets
 
@@ -48,8 +48,8 @@
 
 ## Kreuzberg Ecosystem
 
-- [Kreuzberg](https://docs.kreuzberg.dev): Document intelligence: text, tables, metadata from 91+ formats with optional OCR
+- [Kreuzberg](https://docs.xberg.io): Document intelligence: text, tables, metadata from 91+ formats with optional OCR
 - [Kreuzberg Cloud](https://docs.kreuzberg.cloud): Managed extraction API with SDKs, dashboards, and observability
-- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev): Web crawling and scraping with HTML to Markdown and headless-Chrome fallback
-- [liter-llm](https://docs.liter-llm.kreuzberg.dev): Universal LLM API client with native bindings for 14 languages and 143 providers
-- [tree-sitter-language-pack](https://docs.tree-sitter-language-pack.kreuzberg.dev): Tree-sitter grammars and code-intelligence primitives
+- [kreuzcrawl](https://docs.kreuzcrawl.xberg.io): Web crawling and scraping with HTML to Markdown and headless-Chrome fallback
+- [liter-llm](https://docs.liter-llm.xberg.io): Universal LLM API client with native bindings for 14 languages and 143 providers
+- [tree-sitter-language-pack](https://docs.tree-sitter-language-pack.xberg.io): Tree-sitter grammars and code-intelligence primitives

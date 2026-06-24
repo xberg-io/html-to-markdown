@@ -266,9 +266,9 @@ This is the core Rust library. For other languages:
 
 ## Documentation
 
-- [Full Documentation](https://docs.html-to-markdown.kreuzberg.dev)
+- [Full Documentation](https://docs.html-to-markdown.xberg.io)
 - [API Reference](https://docs.rs/html-to-markdown-rs)
-- [Documentation](https://docs.html-to-markdown.kreuzberg.dev/)
+- [Documentation](https://docs.html-to-markdown.xberg.io/)
 - [Contributing Guide](https://github.com/xberg-io/html-to-markdown/blob/main/CONTRIBUTING.md)
 
 ## Performance
