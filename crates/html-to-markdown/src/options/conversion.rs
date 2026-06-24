@@ -6,6 +6,10 @@ use crate::options::validation::{
     UrlEscapeStyle, WhitespaceMode,
 };
 
+/// Native recursion guard used when DOM traversal would otherwise be unlimited
+/// or set beyond the process stack's safe range.
+pub(crate) const NATIVE_STACK_SAFE_DEPTH: usize = 64;
+
 /// Controls which conversion tier is used.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(
@@ -168,8 +172,11 @@ pub struct ConversionOptions {
     pub capture_svg: bool,
     /// Infer image dimensions from data.
     pub infer_dimensions: bool,
-    /// Maximum DOM traversal depth. `None` means unlimited.
-    /// When set, subtrees beyond this depth are silently truncated.
+    /// Maximum DOM traversal depth.
+    ///
+    /// `None` uses the library's internal native-stack safety limit. Explicit
+    /// values above that safety limit are clamped to prevent process-aborting
+    /// stack overflows on pathologically deep DOM trees.
     pub max_depth: Option<usize>,
     /// CSS selectors for elements to exclude entirely (element + all content).
     ///

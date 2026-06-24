@@ -6,22 +6,26 @@
 
 use std::collections::HashMap;
 
+use crate::options::conversion::NATIVE_STACK_SAFE_DEPTH;
+
 use super::document::{AnnotationKind, DocumentNode, DocumentStructure, MetadataEntry, NodeContent, TextAnnotation};
 use super::tables::{GridCell, TableGrid};
+
+fn reversed_child_handles(tag: &tl::HTMLTag) -> Vec<tl::NodeHandle> {
+    let children = tag.children();
+    let mut handles: Vec<_> = children.top().iter().copied().collect();
+    handles.reverse();
+    handles
+}
 
 // ── Text extraction ───────────────────────────────────────────────────────────
 
 /// Extract plain text from a tag's descendants, decoding HTML entities.
 fn extract_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> String {
     let mut buf = String::new();
-    collect_text_from_tag(tag, parser, &mut buf);
-    buf
-}
+    let mut stack = reversed_child_handles(tag);
 
-/// Recursively accumulate text content from a tag's children.
-fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String) {
-    let children = tag.children();
-    for handle in children.top().iter() {
+    while let Some(handle) = stack.pop() {
         let Some(node) = handle.get(parser) else {
             continue;
         };
@@ -37,11 +41,15 @@ fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut Strin
                 if matches!(name.as_str(), "script" | "style" | "head") {
                     continue;
                 }
-                collect_text_from_tag(child_tag, parser, buf);
+                for child_handle in reversed_child_handles(child_tag) {
+                    stack.push(child_handle);
+                }
             }
             tl::Node::Comment(_) => {}
         }
     }
+
+    buf
 }
 
 // ── Inline annotation extraction ─────────────────────────────────────────────
@@ -51,20 +59,32 @@ fn collect_text_from_tag(tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut Strin
 /// `text` is the pre-extracted full text of the enclosing block node; annotation
 /// byte offsets are computed relative to that string.
 fn collect_annotations(tag: &tl::HTMLTag, parser: &tl::Parser, text: &str, annotations: &mut Vec<TextAnnotation>) {
-    collect_annotations_from_tag(tag, parser, text, &mut 0usize, annotations);
-}
+    enum Frame {
+        Visit(tl::NodeHandle),
+        Finish { start: usize, kind: Option<AnnotationKind> },
+    }
 
-/// Recursive helper.  `offset` tracks how many bytes of `full_text` have been consumed
-/// so far; it is mutated in place as we walk the tree.
-fn collect_annotations_from_tag(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
-    full_text: &str,
-    offset: &mut usize,
-    annotations: &mut Vec<TextAnnotation>,
-) {
-    let children = tag.children();
-    for handle in children.top().iter() {
+    let mut offset = 0usize;
+    let mut stack: Vec<_> = reversed_child_handles(tag).into_iter().map(Frame::Visit).collect();
+
+    while let Some(frame) = stack.pop() {
+        let handle = match frame {
+            Frame::Visit(handle) => handle,
+            Frame::Finish { start, kind } => {
+                let end = offset;
+                if let Some(kind) = kind {
+                    if start < end && end <= text.len() {
+                        annotations.push(TextAnnotation {
+                            start: start as u32,
+                            end: end as u32,
+                            kind,
+                        });
+                    }
+                }
+                continue;
+            }
+        };
+
         let Some(node) = handle.get(parser) else {
             continue;
         };
@@ -72,7 +92,7 @@ fn collect_annotations_from_tag(
             tl::Node::Raw(bytes) => {
                 let raw = bytes.as_utf8_str();
                 let decoded = crate::text::decode_html_entities_cow(raw.as_ref());
-                *offset += decoded.len();
+                offset += decoded.len();
             }
             tl::Node::Tag(child_tag) => {
                 let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
@@ -80,46 +100,35 @@ fn collect_annotations_from_tag(
                     continue;
                 }
 
-                let start = *offset;
-                // Recurse to advance offset over the child's text span.
-                collect_annotations_from_tag(child_tag, parser, full_text, offset, annotations);
-                let end = *offset;
-
-                // Emit annotation only for non-empty spans that fit within the text.
-                if start < end && end <= full_text.len() {
-                    let kind = match name.as_str() {
-                        "strong" | "b" => Some(AnnotationKind::Bold),
-                        "em" | "i" => Some(AnnotationKind::Italic),
-                        "u" | "ins" => Some(AnnotationKind::Underline),
-                        "s" | "del" | "strike" => Some(AnnotationKind::Strikethrough),
-                        "code" | "kbd" | "samp" => Some(AnnotationKind::Code),
-                        "sub" => Some(AnnotationKind::Subscript),
-                        "sup" => Some(AnnotationKind::Superscript),
-                        "mark" => Some(AnnotationKind::Highlight),
-                        "a" => {
-                            let url = child_tag
-                                .attributes()
-                                .get("href")
-                                .flatten()
-                                .map(|v| v.as_utf8_str().to_string())
-                                .unwrap_or_default();
-                            let title = child_tag
-                                .attributes()
-                                .get("title")
-                                .flatten()
-                                .map(|v| v.as_utf8_str().to_string());
-                            Some(AnnotationKind::Link { url, title })
-                        }
-                        _ => None,
-                    };
-
-                    if let Some(kind) = kind {
-                        annotations.push(TextAnnotation {
-                            start: start as u32,
-                            end: end as u32,
-                            kind,
-                        });
+                let kind = match name.as_str() {
+                    "strong" | "b" => Some(AnnotationKind::Bold),
+                    "em" | "i" => Some(AnnotationKind::Italic),
+                    "u" | "ins" => Some(AnnotationKind::Underline),
+                    "s" | "del" | "strike" => Some(AnnotationKind::Strikethrough),
+                    "code" | "kbd" | "samp" => Some(AnnotationKind::Code),
+                    "sub" => Some(AnnotationKind::Subscript),
+                    "sup" => Some(AnnotationKind::Superscript),
+                    "mark" => Some(AnnotationKind::Highlight),
+                    "a" => {
+                        let url = child_tag
+                            .attributes()
+                            .get("href")
+                            .flatten()
+                            .map(|v| v.as_utf8_str().to_string())
+                            .unwrap_or_default();
+                        let title = child_tag
+                            .attributes()
+                            .get("title")
+                            .flatten()
+                            .map(|v| v.as_utf8_str().to_string());
+                        Some(AnnotationKind::Link { url, title })
                     }
+                    _ => None,
+                };
+
+                stack.push(Frame::Finish { start: offset, kind });
+                for child_handle in reversed_child_handles(child_tag) {
+                    stack.push(Frame::Visit(child_handle));
                 }
             }
             tl::Node::Comment(_) => {}
@@ -131,7 +140,7 @@ fn collect_annotations_from_tag(
 
 /// Build a [`TableGrid`] from a `<table>` element.
 fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid {
-    // Gather all <tr> handles (recursing through thead/tbody/tfoot).
+    // Gather all <tr> handles from the table subtree.
     let mut row_handles: Vec<tl::NodeHandle> = Vec::new();
     collect_tr_handles(table_tag, parser, &mut row_handles);
 
@@ -200,16 +209,19 @@ fn extract_table_grid(table_tag: &tl::HTMLTag, parser: &tl::Parser) -> TableGrid
     }
 }
 
-/// Recursively collect all `<tr>` `NodeHandle`s from within a table element.
+/// Collect all `<tr>` `NodeHandle`s from within a table element.
 fn collect_tr_handles(tag: &tl::HTMLTag, parser: &tl::Parser, result: &mut Vec<tl::NodeHandle>) {
-    let children = tag.children();
-    for handle in children.top().iter() {
+    let mut stack = reversed_child_handles(tag);
+
+    while let Some(handle) = stack.pop() {
         if let Some(tl::Node::Tag(child_tag)) = handle.get(parser) {
             let name = child_tag.name().as_utf8_str().to_ascii_lowercase();
             if name == "tr" {
-                result.push(*handle);
+                result.push(handle);
             } else {
-                collect_tr_handles(child_tag, parser, result);
+                for child_handle in reversed_child_handles(child_tag) {
+                    stack.push(child_handle);
+                }
             }
         }
     }
@@ -401,7 +413,7 @@ pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
     let mut state = BuilderState::new();
 
     for handle in dom.children() {
-        walk(&mut state, handle, parser, None);
+        walk(&mut state, handle, parser, None, 0);
     }
 
     DocumentStructure {
@@ -413,7 +425,11 @@ pub fn build_document_structure(dom: &tl::VDom<'_>) -> DocumentStructure {
 /// Recursive DOM walker.
 ///
 /// `parent_idx` is the flat-list index of the nearest structural parent, if any.
-fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, parent_idx: Option<u32>) {
+fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, parent_idx: Option<u32>, depth: usize) {
+    if depth >= NATIVE_STACK_SAFE_DEPTH {
+        return;
+    }
+
     let Some(node) = handle.get(parser) else {
         return;
     };
@@ -422,12 +438,12 @@ fn walk(state: &mut BuilderState, handle: &tl::NodeHandle, parser: &tl::Parser, 
         tl::Node::Raw(_) | tl::Node::Comment(_) => {}
         tl::Node::Tag(tag) => {
             let tag_name = tag.name().as_utf8_str().to_ascii_lowercase();
-            process_tag(state, tag_name.as_str(), tag, parser, parent_idx);
+            process_tag(state, tag_name.as_str(), tag, parser, parent_idx, depth);
         }
     }
 }
 
-/// Decide how to handle a given tag, creating nodes and recursing as needed.
+/// Decide how to handle a given tag, creating nodes and visiting children as needed.
 #[allow(clippy::too_many_lines)]
 fn process_tag(
     state: &mut BuilderState,
@@ -435,6 +451,7 @@ fn process_tag(
     tag: &tl::HTMLTag,
     parser: &tl::Parser,
     parent_idx: Option<u32>,
+    depth: usize,
 ) {
     match tag_name {
         // ── Headings ──────────────────────────────────────────────────────
@@ -528,7 +545,7 @@ fn process_tag(
             // Recurse with the list node as the parent so <li>s attach to it.
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, Some(list_idx));
+                walk(state, child_handle, parser, Some(list_idx), depth + 1);
             }
         }
 
@@ -663,7 +680,7 @@ fn process_tag(
             // Recurse into blockquote children under the Quote node.
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, Some(quote_idx));
+                walk(state, child_handle, parser, Some(quote_idx), depth + 1);
             }
         }
 
@@ -770,7 +787,7 @@ fn process_tag(
             }
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, Some(group_idx));
+                walk(state, child_handle, parser, Some(group_idx), depth + 1);
             }
         }
 
@@ -779,7 +796,7 @@ fn process_tag(
         | "form" | "fieldset" => {
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, parent_idx);
+                walk(state, child_handle, parser, parent_idx, depth + 1);
             }
         }
 
@@ -787,7 +804,7 @@ fn process_tag(
         _ => {
             let children = tag.children();
             for child_handle in children.top().iter() {
-                walk(state, child_handle, parser, parent_idx);
+                walk(state, child_handle, parser, parent_idx, depth + 1);
             }
         }
     }

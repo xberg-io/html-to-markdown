@@ -7,6 +7,7 @@
 use std::collections::HashSet;
 use std::fmt::Write;
 
+use crate::converter::main_helpers::effective_max_depth;
 use crate::converter::preprocessing_helpers::should_drop_for_preprocessing;
 use crate::options::ConversionOptions;
 use crate::text;
@@ -143,6 +144,10 @@ fn walk_plain(
     list_ctx: &mut ListContext,
     state: &WalkState<'_>,
 ) {
+    if state.depth >= effective_max_depth(state.options) {
+        return;
+    }
+
     let Some(node) = node_handle.get(parser) else {
         return;
     };
@@ -388,7 +393,7 @@ fn walk_children(
 
 /// Walk a `<table>` element, extracting cells as tab-separated, rows as newline-separated.
 fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, state: &WalkState<'_>) {
-    // Collect all <tr> node handles by recursing into the table
+    // Collect all <tr> node handles from the table subtree.
     let mut row_handles = Vec::new();
     collect_descendant_handles(table_tag, parser, "tr", &mut row_handles);
 
@@ -428,7 +433,7 @@ fn walk_table(table_tag: &tl::HTMLTag, parser: &tl::Parser, buf: &mut String, st
     }
 }
 
-/// Recursively collect all descendant `NodeHandle`s matching `target_tag` (by cloning handles).
+/// Collect all descendant `NodeHandle`s matching `target_tag` (by cloning handles).
 fn collect_descendant_handles(
     tag: &tl::HTMLTag,
     parser: &tl::Parser,
@@ -436,13 +441,20 @@ fn collect_descendant_handles(
     result: &mut Vec<tl::NodeHandle>,
 ) {
     let children = tag.children();
-    let top = children.top();
-    for child in top.iter() {
-        if let Some(tl::Node::Tag(child_tag)) = child.get(parser) {
+    let mut stack: Vec<_> = children.top().iter().copied().collect();
+    stack.reverse();
+
+    while let Some(handle) = stack.pop() {
+        if let Some(tl::Node::Tag(child_tag)) = handle.get(parser) {
             if child_tag.name().as_utf8_str().eq_ignore_ascii_case(target_tag) {
-                result.push(*child);
+                result.push(handle);
             } else {
-                collect_descendant_handles(child_tag, parser, target_tag, result);
+                let child_children = child_tag.children();
+                let mut child_handles: Vec<_> = child_children.top().iter().copied().collect();
+                child_handles.reverse();
+                for child in child_handles {
+                    stack.push(child);
+                }
             }
         }
     }

@@ -53,9 +53,9 @@ pub fn scan_table(
     scan
 }
 
-/// Recursively scan table structure.
+/// Scan table structure.
 ///
-/// Internal recursive function that walks the table tree and collects metadata.
+/// Internal function that walks the table tree and collects metadata.
 ///
 /// # Arguments
 /// * `node_handle` - Current node to scan
@@ -71,7 +71,16 @@ fn scan_table_node(
     is_root: bool,
     scan: &mut TableScan,
 ) {
-    if let Some(node) = node_handle.get(parser) {
+    // Explicit work stack instead of native recursion: a table that wraps
+    // deeply nested content (thousands of levels) would otherwise overflow the
+    // native stack and abort. Visitation order does not affect the scan — every
+    // field is an order-independent accumulator (`row_counts` is later read only
+    // via `len()` and a distinct-value check).
+    let mut work = vec![(*node_handle, is_root)];
+    while let Some((node_handle, is_root)) = work.pop() {
+        let Some(node) = node_handle.get(parser) else {
+            continue;
+        };
         match node {
             tl::Node::Raw(bytes) if !scan.has_text => {
                 let raw = bytes.as_utf8_str();
@@ -123,16 +132,20 @@ fn scan_table_node(
                                     }
                                 }
                             }
-                            scan_table_node(child, parser, dom_ctx, false, scan);
                         }
                         scan.row_counts.push(cell_count);
-                        return;
+                        let children: Vec<_> = tag.children().top().iter().copied().collect();
+                        for child in children.into_iter().rev() {
+                            work.push((child, false));
+                        }
+                        continue;
                     }
                     _ => {}
                 }
 
-                for child in tag.children().top().iter() {
-                    scan_table_node(child, parser, dom_ctx, false, scan);
+                let children: Vec<_> = tag.children().top().iter().copied().collect();
+                for child in children.into_iter().rev() {
+                    work.push((child, false));
                 }
             }
             _ => {}
