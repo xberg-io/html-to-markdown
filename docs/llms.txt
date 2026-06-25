@@ -49,7 +49,7 @@
 ## Kreuzberg Ecosystem
 
 - [Kreuzberg](https://docs.xberg.io): Document intelligence: text, tables, metadata from 91+ formats with optional OCR
-- [Kreuzberg Cloud](https://docs.kreuzberg.cloud): Managed extraction API with SDKs, dashboards, and observability
+- [Xberg Enterprise](https://enterprise.xberg.io): Managed extraction API with SDKs, dashboards, and observability
 - [kreuzcrawl](https://docs.kreuzcrawl.xberg.io): Web crawling and scraping with HTML to Markdown and headless-Chrome fallback
 - [liter-llm](https://docs.liter-llm.xberg.io): Universal LLM API client with native bindings for 14 languages and 143 providers
 - [tree-sitter-language-pack](https://docs.tree-sitter-language-pack.xberg.io): Tree-sitter grammars and code-intelligence primitives

@@ -119,7 +119,7 @@ html-to-markdown ships as a standalone library and as the HTML pipeline inside t
 
   Document intelligence core — text, tables, and metadata from 91+ file formats. Uses html-to-markdown for every HTML input.
 
-- :material-cloud:{ .lg .middle } **[Kreuzberg Cloud](https://docs.kreuzberg.cloud)**
+- :material-cloud:{ .lg .middle } **[Xberg Enterprise](https://enterprise.xberg.io)**
 
   Managed SaaS API for document extraction. Same engine, no infrastructure.
 
