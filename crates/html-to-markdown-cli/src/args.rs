@@ -8,7 +8,9 @@ use crate::validators::{
     CliCodeBlockStyle, CliHeadingStyle, CliHighlightStyle, CliLinkStyle, CliListIndentType, CliNewlineStyle,
     CliOutputFormat, CliPreprocessingPreset, CliWhitespaceMode, validate_bullets, validate_strong_em_symbol,
 };
-use clap::{Parser, Subcommand, ValueEnum};
+#[cfg(feature = "mcp")]
+use clap::Subcommand;
+use clap::{Parser, ValueEnum};
 use std::path::PathBuf;
 
 /// Optional top-level subcommands.
