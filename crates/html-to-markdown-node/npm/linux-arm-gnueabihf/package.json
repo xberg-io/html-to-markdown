@@ -12,7 +12,7 @@
 	"homepage": "https://xberg.io",
 	"bugs": "https://github.com/xberg-io/html-to-markdown/issues",
 	"license": "MIT",
-	"author": "Na'aman Hirschfeld <naaman@kreuzberg.dev>",
+	"author": "Na'aman Hirschfeld <naaman@xberg.io>",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/xberg-io/html-to-markdown.git"

@@ -42,7 +42,7 @@ date-released = "2026-06-12"
 [[workspace.citation.authors]]
 family-names = "Hirschfeld"
 given-names = "Na'aman"
-email = "naaman@kreuzberg.dev"
+email = "naaman@xberg.io"
 orcid = "https://orcid.org/0009-0000-2247-5072"
 
 # test_apps version sync — use text_replacements to avoid clobbering unrelated semver strings
@@ -958,7 +958,7 @@ c = "find {dir} \\( -name '*.c' -o -name '*.h' \\) | xargs clang-format -i"
 description = "High-performance HTML to Markdown converter"
 license = "MIT"
 repository = "https://github.com/xberg-io/html-to-markdown"
-authors = ["Na'aman Hirschfeld <naaman@kreuzberg.dev>"]
+authors = ["Na'aman Hirschfeld <naaman@xberg.io>"]
 keywords = ["html", "markdown", "converter"]
 
 [crates.readme]

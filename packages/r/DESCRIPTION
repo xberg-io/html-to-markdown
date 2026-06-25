@@ -1,7 +1,7 @@
 Package: htmltomarkdown
 Title: High-performance HTML to Markdown converter
 Version: 3.7.2
-Authors@R: person("Na'aman", "Hirschfeld", email = "naaman@kreuzberg.dev", role = c("aut", "cre"))
+Authors@R: person("Na'aman", "Hirschfeld", email = "naaman@xberg.io", role = c("aut", "cre"))
 Description: High-performance HTML to Markdown converter
     Rust bindings generated with extendr.
 URL: https://github.com/xberg-io/html-to-markdown

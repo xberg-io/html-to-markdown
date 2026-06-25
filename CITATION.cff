@@ -7,7 +7,7 @@ abstract: "Fast, lossless HTML to Markdown engine."
 authors:
   - family-names: Hirschfeld
     given-names: "Na'aman"
-    email: "naaman@kreuzberg.dev"
+    email: "naaman@xberg.io"
     orcid: "https://orcid.org/0009-0000-2247-5072"
 repository-code: "https://github.com/xberg-io/html-to-markdown"
 url: "https://xberg.io"

@@ -18,7 +18,7 @@ Personal attacks, sustained disruption, and discriminatory language are not tole
 
 ## Enforcement
 
-Report issues to **<conduct@kreuzberg.dev>**. All reports are reviewed confidentially.
+Report issues to **<contact@xberg.io>**. All reports are reviewed confidentially.
 Maintainers may warn, temporarily restrict, or permanently remove contributors whose
 behaviour harms the community.
 

@@ -7,7 +7,7 @@
 Preferred channel: open a private advisory at
 <https://github.com/xberg-io/html-to-markdown/security/advisories/new>.
 
-Alternative: email **<security@kreuzberg.dev>**.
+Alternative: email **<security@xberg.io>**.
 
 Please include a description of the issue, steps to reproduce, affected versions, and your
 preferred credit (or none). We acknowledge reports within **2 business days** and aim to
