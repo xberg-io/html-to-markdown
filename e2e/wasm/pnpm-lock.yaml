@@ -8,7 +8,7 @@ importers:
 
   .:
     devDependencies:
-      '@kreuzberg/html-to-markdown-wasm':
+      '@xberg-io/html-to-markdown-wasm':
         specifier: file:../../crates/html-to-markdown-wasm
         version: file:../../crates/html-to-markdown-wasm
       rollup:
@@ -31,9 +31,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
-  '@kreuzberg/html-to-markdown-wasm@file:../../crates/html-to-markdown-wasm':
-    resolution: {directory: ../../crates/html-to-markdown-wasm, type: directory}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -327,6 +324,9 @@ packages:
   '@vitest/utils@4.1.7':
     resolution: {integrity: sha512-T532WBu791cBxJlCl6SO+J14l81DQx6uQHm1bQbmCDY7nqlEIgkza/UFnSBNaUtSf41unldDFjdOBYEQC4b5Hw==}
 
+  '@xberg-io/html-to-markdown-wasm@file:../../crates/html-to-markdown-wasm':
+    resolution: {directory: ../../crates/html-to-markdown-wasm, type: directory}
+
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
@@ -615,8 +615,6 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kreuzberg/html-to-markdown-wasm@file:../../crates/html-to-markdown-wasm': {}
-
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
@@ -810,6 +808,8 @@ snapshots:
       '@vitest/pretty-format': 4.1.7
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
+
+  '@xberg-io/html-to-markdown-wasm@file:../../crates/html-to-markdown-wasm': {}
 
   assertion-error@2.0.1: {}
 
