@@ -516,119 +516,119 @@ VisitResult <- new.env(parent = emptyenv())
 #'
 #' @return A TextDirection enum value
 #' @export
-TextDirection <- function() list() |> structure(class = "TextDirection")
+TextDirection  <- function() list() |> structure(class = "TextDirection")
 #' Create a LinkType enum value
 #'
 #' Returns the default LinkType variant.
 #'
 #' @return A LinkType enum value
 #' @export
-LinkType <- function() list() |> structure(class = "LinkType")
+LinkType  <- function() list() |> structure(class = "LinkType")
 #' Create a ImageType enum value
 #'
 #' Returns the default ImageType variant.
 #'
 #' @return A ImageType enum value
 #' @export
-ImageType <- function() list() |> structure(class = "ImageType")
+ImageType  <- function() list() |> structure(class = "ImageType")
 #' Create a StructuredDataType enum value
 #'
 #' Returns the default StructuredDataType variant.
 #'
 #' @return A StructuredDataType enum value
 #' @export
-StructuredDataType <- function() list() |> structure(class = "StructuredDataType")
+StructuredDataType  <- function() list() |> structure(class = "StructuredDataType")
 #' Create a TierStrategy enum value
 #'
 #' Returns the default TierStrategy variant.
 #'
 #' @return A TierStrategy enum value
 #' @export
-TierStrategy <- function() list() |> structure(class = "TierStrategy")
+TierStrategy  <- function() list() |> structure(class = "TierStrategy")
 #' Create a PreprocessingPreset enum value
 #'
 #' Returns the default PreprocessingPreset variant.
 #'
 #' @return A PreprocessingPreset enum value
 #' @export
-PreprocessingPreset <- function() list() |> structure(class = "PreprocessingPreset")
+PreprocessingPreset  <- function() list() |> structure(class = "PreprocessingPreset")
 #' Create a HeadingStyle enum value
 #'
 #' Returns the default HeadingStyle variant.
 #'
 #' @return A HeadingStyle enum value
 #' @export
-HeadingStyle <- function() list() |> structure(class = "HeadingStyle")
+HeadingStyle  <- function() list() |> structure(class = "HeadingStyle")
 #' Create a ListIndentType enum value
 #'
 #' Returns the default ListIndentType variant.
 #'
 #' @return A ListIndentType enum value
 #' @export
-ListIndentType <- function() list() |> structure(class = "ListIndentType")
+ListIndentType  <- function() list() |> structure(class = "ListIndentType")
 #' Create a WhitespaceMode enum value
 #'
 #' Returns the default WhitespaceMode variant.
 #'
 #' @return A WhitespaceMode enum value
 #' @export
-WhitespaceMode <- function() list() |> structure(class = "WhitespaceMode")
+WhitespaceMode  <- function() list() |> structure(class = "WhitespaceMode")
 #' Create a NewlineStyle enum value
 #'
 #' Returns the default NewlineStyle variant.
 #'
 #' @return A NewlineStyle enum value
 #' @export
-NewlineStyle <- function() list() |> structure(class = "NewlineStyle")
+NewlineStyle  <- function() list() |> structure(class = "NewlineStyle")
 #' Create a CodeBlockStyle enum value
 #'
 #' Returns the default CodeBlockStyle variant.
 #'
 #' @return A CodeBlockStyle enum value
 #' @export
-CodeBlockStyle <- function() list() |> structure(class = "CodeBlockStyle")
+CodeBlockStyle  <- function() list() |> structure(class = "CodeBlockStyle")
 #' Create a HighlightStyle enum value
 #'
 #' Returns the default HighlightStyle variant.
 #'
 #' @return A HighlightStyle enum value
 #' @export
-HighlightStyle <- function() list() |> structure(class = "HighlightStyle")
+HighlightStyle  <- function() list() |> structure(class = "HighlightStyle")
 #' Create a LinkStyle enum value
 #'
 #' Returns the default LinkStyle variant.
 #'
 #' @return A LinkStyle enum value
 #' @export
-LinkStyle <- function() list() |> structure(class = "LinkStyle")
+LinkStyle  <- function() list() |> structure(class = "LinkStyle")
 #' Create a UrlEscapeStyle enum value
 #'
 #' Returns the default UrlEscapeStyle variant.
 #'
 #' @return A UrlEscapeStyle enum value
 #' @export
-UrlEscapeStyle <- function() list() |> structure(class = "UrlEscapeStyle")
+UrlEscapeStyle  <- function() list() |> structure(class = "UrlEscapeStyle")
 #' Create a OutputFormat enum value
 #'
 #' Returns the default OutputFormat variant.
 #'
 #' @return A OutputFormat enum value
 #' @export
-OutputFormat <- function() list() |> structure(class = "OutputFormat")
+OutputFormat  <- function() list() |> structure(class = "OutputFormat")
 #' Create a WarningKind enum value
 #'
 #' Returns the default WarningKind variant.
 #'
 #' @return A WarningKind enum value
 #' @export
-WarningKind <- function() list() |> structure(class = "WarningKind")
+WarningKind  <- function() list() |> structure(class = "WarningKind")
 #' Create a NodeType enum value
 #'
 #' Returns the default NodeType variant.
 #'
 #' @return A NodeType enum value
 #' @export
-NodeType <- function() list() |> structure(class = "NodeType")
+NodeType  <- function() list() |> structure(class = "NodeType")
 #' The semantic content type of a document node
 #'
 #' Uses internally tagged representation (`"node_type": "heading"`) for JSON serialization.
@@ -636,6 +636,17 @@ NodeType <- function() list() |> structure(class = "NodeType")
 NodeContent <- new.env(parent = emptyenv())
 NodeContent$default <- function() .Call("wrap__NodeContent__default", PACKAGE = "htmltomarkdown")
 NodeContent$from_json <- function(json) .Call("wrap__NodeContent__from_json", json, PACKAGE = "htmltomarkdown")
+NodeContent$heading <- function(level, text) .Call("wrap__NodeContent___factory_heading", level, text, PACKAGE = "htmltomarkdown")
+NodeContent$paragraph <- function(text) .Call("wrap__NodeContent___factory_paragraph", text, PACKAGE = "htmltomarkdown")
+NodeContent$list <- function(ordered) .Call("wrap__NodeContent___factory_list", ordered, PACKAGE = "htmltomarkdown")
+NodeContent$list_item <- function(text) .Call("wrap__NodeContent___factory_list_item", text, PACKAGE = "htmltomarkdown")
+NodeContent$table <- function(grid) .Call("wrap__NodeContent___factory_table", grid, PACKAGE = "htmltomarkdown")
+NodeContent$image <- function(description, src, image_index) .Call("wrap__NodeContent___factory_image", description, src, image_index, PACKAGE = "htmltomarkdown")
+NodeContent$code <- function(text, language) .Call("wrap__NodeContent___factory_code", text, language, PACKAGE = "htmltomarkdown")
+NodeContent$definition_item <- function(term, definition) .Call("wrap__NodeContent___factory_definition_item", term, definition, PACKAGE = "htmltomarkdown")
+NodeContent$raw_block <- function(format, content) .Call("wrap__NodeContent___factory_raw_block", format, content, PACKAGE = "htmltomarkdown")
+NodeContent$metadata_block <- function(entries) .Call("wrap__NodeContent___factory_metadata_block", entries, PACKAGE = "htmltomarkdown")
+NodeContent$group <- function(label, heading_level, heading_text) .Call("wrap__NodeContent___factory_group", label, heading_level, heading_text, PACKAGE = "htmltomarkdown")
 #' @export
 `$.NodeContent` <- function(self, name) {
   func <- NodeContent[[name]]
@@ -654,6 +665,7 @@ NodeContent$from_json <- function(json) .Call("wrap__NodeContent__from_json", js
 AnnotationKind <- new.env(parent = emptyenv())
 AnnotationKind$default <- function() .Call("wrap__AnnotationKind__default", PACKAGE = "htmltomarkdown")
 AnnotationKind$from_json <- function(json) .Call("wrap__AnnotationKind__from_json", json, PACKAGE = "htmltomarkdown")
+AnnotationKind$link <- function(url, title) .Call("wrap__AnnotationKind___factory_link", url, title, PACKAGE = "htmltomarkdown")
 #' @export
 `$.AnnotationKind` <- function(self, name) {
   func <- AnnotationKind[[name]]

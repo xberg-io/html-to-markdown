@@ -231,7 +231,6 @@ test_apps/**/test_output.log
 
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
-.ai-rulez/.generated-manifest.json
 .codex/
 .cursor/
 .github/agents/
