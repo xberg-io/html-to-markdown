@@ -47,7 +47,7 @@ pub fn text_cache_capacity_for_input(input_len: usize) -> NonZeroUsize {
     NonZeroUsize::new(target).unwrap_or(NonZeroUsize::MIN)
 }
 
-/// Recursively record node hierarchy into DOM context.
+/// Record node hierarchy into DOM context.
 ///
 /// Builds the complete parent-child relationship map for efficient tree traversal.
 pub fn record_node_hierarchy(
@@ -56,19 +56,25 @@ pub fn record_node_hierarchy(
     parser: &tl::Parser,
     ctx: &mut DomContext,
 ) {
-    let id = node_handle.get_inner();
-    ctx.ensure_capacity(id);
-    ctx.parent_map[id as usize] = parent;
-    ctx.node_map[id as usize] = Some(node_handle);
+    // The work stack keeps hierarchy recording on the heap for DOM chains
+    // created by unclosed elements. Each node writes only its own map entries;
+    // the same parent/child maps result from any traversal order.
+    let mut work = vec![(node_handle, parent)];
+    while let Some((node_handle, parent)) = work.pop() {
+        let id = node_handle.get_inner();
+        ctx.ensure_capacity(id);
+        ctx.parent_map[id as usize] = parent;
+        ctx.node_map[id as usize] = Some(node_handle);
 
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let children: Vec<_> = tag.children().top().iter().copied().collect();
-        for (index, child) in children.iter().enumerate() {
-            let child_id = child.get_inner();
-            ctx.ensure_capacity(child_id);
-            ctx.sibling_index_map[child_id as usize] = Some(index);
-            record_node_hierarchy(*child, Some(id), parser, ctx);
+        if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+            let children: Vec<_> = tag.children().top().iter().copied().collect();
+            for (index, child) in children.iter().enumerate() {
+                let child_id = child.get_inner();
+                ctx.ensure_capacity(child_id);
+                ctx.sibling_index_map[child_id as usize] = Some(index);
+                work.push((*child, Some(id)));
+            }
+            ctx.children_map[id as usize] = Some(children);
         }
-        ctx.children_map[id as usize] = Some(children);
     }
 }

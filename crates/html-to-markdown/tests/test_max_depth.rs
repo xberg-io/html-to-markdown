@@ -11,12 +11,13 @@ fn convert_with_options(html: &str, options: ConversionOptions) -> String {
         .unwrap_or_default()
 }
 
-/// With the default `max_depth: None`, deeply nested content should be fully converted.
+/// With the default `max_depth: None`, ordinary nesting below the native stack
+/// safety limit should be fully converted.
 #[test]
-fn test_max_depth_none_converts_deeply_nested() {
-    // Build 100 levels of nesting around a leaf text node.
+fn test_max_depth_none_converts_reasonably_nested_content() {
+    // Build 32 levels of nesting around a leaf text node.
     let mut html = String::from("<p>deep</p>");
-    for _ in 0..100 {
+    for _ in 0..32 {
         html = format!("<div>{html}</div>");
     }
 

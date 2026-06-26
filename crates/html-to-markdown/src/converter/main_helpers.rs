@@ -6,6 +6,14 @@
 use std::collections::BTreeMap;
 
 use crate::options::ConversionOptions;
+use crate::options::conversion::NATIVE_STACK_SAFE_DEPTH;
+
+pub fn effective_max_depth(options: &ConversionOptions) -> usize {
+    options
+        .max_depth
+        .unwrap_or(NATIVE_STACK_SAFE_DEPTH)
+        .min(NATIVE_STACK_SAFE_DEPTH)
+}
 
 /// Compare two tag names case-insensitively.
 pub fn tag_name_eq(a: impl AsRef<str>, b: &str) -> bool {
@@ -330,11 +338,27 @@ pub fn extract_head_metadata(
     parser: &tl::Parser,
     options: &ConversionOptions,
 ) -> BTreeMap<String, String> {
-    let mut metadata = BTreeMap::new();
+    // The work stack keeps the `<head>` search on the heap for malformed
+    // documents whose unclosed elements form thousand-level DOM chains. Children
+    // are pushed in reverse so matching still returns the first non-empty
+    // `<head>` in document order.
+    let mut work = vec![*node_handle];
+    while let Some(handle) = work.pop() {
+        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+            continue;
+        };
 
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        // Check if this is a head tag
-        if tag.name().as_utf8_str().eq_ignore_ascii_case("head") {
+        if !tag.name().as_utf8_str().eq_ignore_ascii_case("head") {
+            // Queue children in reverse so they pop in document order.
+            let children: Vec<_> = tag.children().top().iter().copied().collect();
+            for child_handle in children.into_iter().rev() {
+                work.push(child_handle);
+            }
+            continue;
+        }
+
+        let mut metadata = BTreeMap::new();
+        {
             let children = tag.children();
             for child_handle in children.top().iter() {
                 if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
@@ -402,20 +426,15 @@ pub fn extract_head_metadata(
                     }
                 }
             }
-        } else {
-            // If this is not a head tag, recursively search children for head tag
-            let children = tag.children();
-            for child_handle in children.top().iter() {
-                let child_metadata = extract_head_metadata(child_handle, parser, options);
-                if !child_metadata.is_empty() {
-                    metadata.extend(child_metadata);
-                    break; // Only process first head tag found
-                }
-            }
         }
+
+        if !metadata.is_empty() {
+            return metadata;
+        }
+        // Empty head carries no metadata: keep searching for a later one.
     }
 
-    metadata
+    BTreeMap::new()
 }
 
 /// Check if text has more than one character.

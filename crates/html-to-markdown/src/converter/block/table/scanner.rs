@@ -53,9 +53,9 @@ pub fn scan_table(
     scan
 }
 
-/// Recursively scan table structure.
+/// Scan table structure.
 ///
-/// Internal recursive function that walks the table tree and collects metadata.
+/// Internal function that walks the table tree and collects metadata.
 ///
 /// # Arguments
 /// * `node_handle` - Current node to scan
@@ -71,7 +71,14 @@ fn scan_table_node(
     is_root: bool,
     scan: &mut TableScan,
 ) {
-    if let Some(node) = node_handle.get(parser) {
+    // The work stack keeps table scans on the heap for deeply nested table
+    // content. Every scan field is an order-independent accumulator; `row_counts`
+    // is later read through its length and distinct value count.
+    let mut work = vec![(*node_handle, is_root)];
+    while let Some((node_handle, is_root)) = work.pop() {
+        let Some(node) = node_handle.get(parser) else {
+            continue;
+        };
         match node {
             tl::Node::Raw(bytes) if !scan.has_text => {
                 let raw = bytes.as_utf8_str();
@@ -123,16 +130,20 @@ fn scan_table_node(
                                     }
                                 }
                             }
-                            scan_table_node(child, parser, dom_ctx, false, scan);
                         }
                         scan.row_counts.push(cell_count);
-                        return;
+                        let mut children: Vec<_> = tag.children().top().iter().copied().collect();
+                        while let Some(child) = children.pop() {
+                            work.push((child, false));
+                        }
+                        continue;
                     }
                     _ => {}
                 }
 
-                for child in tag.children().top().iter() {
-                    scan_table_node(child, parser, dom_ctx, false, scan);
+                let mut children: Vec<_> = tag.children().top().iter().copied().collect();
+                while let Some(child) = children.pop() {
+                    work.push((child, false));
                 }
             }
             _ => {}

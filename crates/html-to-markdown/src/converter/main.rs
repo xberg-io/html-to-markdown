@@ -15,8 +15,8 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
-    collapse_excess_blank_lines, extract_head_metadata, format_metadata_frontmatter, has_custom_element_tags,
-    repair_with_html5ever, trim_line_end_whitespace, trim_trailing_whitespace,
+    collapse_excess_blank_lines, effective_max_depth, extract_head_metadata, format_metadata_frontmatter,
+    has_custom_element_tags, repair_with_html5ever, trim_line_end_whitespace, trim_trailing_whitespace,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
@@ -338,10 +338,8 @@ pub fn walk_node(
 ) {
     let Some(node) = node_handle.get(parser) else { return };
 
-    if let Some(max) = options.max_depth {
-        if depth >= max {
-            return;
-        }
+    if depth >= effective_max_depth(options) {
+        return;
     }
 
     match node {

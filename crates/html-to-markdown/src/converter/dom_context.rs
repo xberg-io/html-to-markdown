@@ -286,7 +286,13 @@ impl DomContext {
 
     pub(crate) fn text_content_uncached(&self, node_handle: tl::NodeHandle, parser: &tl::Parser) -> String {
         let mut text = String::with_capacity(64);
-        if let Some(node) = node_handle.get(parser) {
+
+        let mut stack = vec![node_handle];
+        while let Some(handle) = stack.pop() {
+            let Some(node) = handle.get(parser) else {
+                continue;
+            };
+
             match node {
                 tl::Node::Raw(bytes) => {
                     let raw = bytes.as_utf8_str();
@@ -294,9 +300,17 @@ impl DomContext {
                     text.push_str(decoded.as_ref());
                 }
                 tl::Node::Tag(tag) => {
-                    let children = tag.children();
-                    for child_handle in children.top().iter() {
-                        text.push_str(&self.text_content(*child_handle, parser));
+                    if let Some(children) = self.children_of(handle.get_inner()) {
+                        for child_handle in children.iter().rev() {
+                            stack.push(*child_handle);
+                        }
+                    } else {
+                        let children = tag.children();
+                        let mut child_handles: Vec<_> = children.top().iter().copied().collect();
+                        child_handles.reverse();
+                        for child_handle in child_handles {
+                            stack.push(child_handle);
+                        }
                     }
                 }
                 tl::Node::Comment(_) => {}
