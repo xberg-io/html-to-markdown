@@ -181,6 +181,11 @@ repos:
           - id: phpstan
             files: ^packages/php/src/.*\.php$
             exclude: ^packages/php/stubs/
+            # Pin the canonical config (see alef.toml php `check`). The shared
+            # hook runs phpstan from the repo root, where config auto-discovery
+            # misses packages/php/phpstan.neon and its `scanFiles` extension
+            # stub, leaving every stub-defined type unknown.
+            args: ["analyse", "--no-progress", "--configuration=packages/php/phpstan.neon"]
           - id: phpdoc-lint
             files: ^packages/php/src/.*\.php$
 
