@@ -5194,7 +5194,7 @@ pub extern "C" fn get_module() -> *mut ::ext_php_rs::zend::ModuleEntry {
     static __EXT_PHP_RS_MODULE_ENTRY: ::ext_php_rs::zend::StaticModuleEntry =
         ::ext_php_rs::zend::StaticModuleEntry::new();
     __EXT_PHP_RS_MODULE_ENTRY.get_or_init(|| {
-        let builder = ::ext_php_rs::builders::ModuleBuilder::new("html_to_markdown", "3.8.0-rc.1")
+        let builder = ::ext_php_rs::builders::ModuleBuilder::new("html_to_markdown", "3.8.0-rc.2")
             .startup_function(__ext_php_rs_module_startup);
         let builder = builder
             .class::<DocumentMetadata>()

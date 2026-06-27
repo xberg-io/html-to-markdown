@@ -4,7 +4,7 @@
 # To verify freshness: alef verify --exit-code
 """Public API for _html_to_markdown.
 
-Version: 3.8.0-rc.1
+Version: 3.8.0-rc.2
 """
 
 from ._html_to_markdown import (
@@ -115,4 +115,4 @@ __all__ = [
     "convert",
 ]
 
-__version__ = "3.8.0-rc.1"
+__version__ = "3.8.0-rc.2"

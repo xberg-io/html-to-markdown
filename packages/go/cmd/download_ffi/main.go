@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	moduleVersion = "3.8.0-rc.1"
+	moduleVersion = "3.8.0-rc.2"
 	repoURL       = "https://github.com/xberg-io/html-to-markdown"
 	assetPrefix   = "html-to-markdown-rs"
 )

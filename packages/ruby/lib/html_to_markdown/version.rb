@@ -6,5 +6,5 @@
 
 module HtmlToMarkdown
   ## The version string for this package.
-  VERSION = "3.8.0.pre.rc.1"
+  VERSION = "3.8.0.pre.rc.2"
 end

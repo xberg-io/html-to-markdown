@@ -95,7 +95,7 @@ Uses Foreign Function & Memory API for zero-dependency, thread-safe conversion w
 <dependency>
     <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.8.0-rc.1</version>
+    <version>3.8.0-rc.2</version>
 </dependency>
 ```
 
@@ -107,14 +107,14 @@ Requires Java 25+ with Panama FFI support.
 <dependency>
     <groupId>io.xberg</groupId>
     <artifactId>html-to-markdown</artifactId>
-    <version>3.8.0-rc.1</version>
+    <version>3.8.0-rc.2</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL):**
 
 ```kotlin
-implementation("io.xberg:html-to-markdown:3.8.0-rc.1")
+implementation("io.xberg:html-to-markdown:3.8.0-rc.2")
 ```
 
 ## Performance Snapshot
