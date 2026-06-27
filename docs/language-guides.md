@@ -181,7 +181,7 @@ end
 **Requires:** R ≥ 4.2
 
 ```r
-install.packages("htmltomarkdown")
+install.packages("htmltomarkdown", repos = "https://xberg-io.r-universe.dev")
 ```
 
 ```r

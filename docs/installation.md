@@ -283,7 +283,7 @@ Install **html-to-markdown** for your language using the commands below. Each bi
 === "R"
 
     ```r
-    install.packages("htmltomarkdown")
+    install.packages("htmltomarkdown", repos = "https://xberg-io.r-universe.dev")
     ```
 
     **Verify:**
