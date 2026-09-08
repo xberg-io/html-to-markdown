@@ -151,6 +151,11 @@ pub fn handle_ul(
             false,
         );
 
+        // ~keep Empty children can trim earlier indentation, and child visitors can
+        // ~keep replace it with multibyte text. Revalidate the saved position for both
+        // ~keep the end callback and every output mutation below (issue #474).
+        let list_output_start =
+            crate::converter::utility::content::floor_char_boundary(output, list_output_start.min(output.len()));
         let list_content = &output[list_output_start..];
 
         let visit_result = {
