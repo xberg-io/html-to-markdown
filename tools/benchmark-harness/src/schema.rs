@@ -97,7 +97,7 @@ impl Provenance {
             && *rustc_host == other.rustc_host
             && *cargo_version == other.cargo_version
             && *profile == other.profile
-            && *build_flags == other.build_flags
+            && normalized_build_flags(build_flags) == normalized_build_flags(&other.build_flags)
             && *measurement_mode == other.measurement_mode
             && *tier_strategy == other.tier_strategy
             && *visitor_mode == other.visitor_mode
@@ -124,6 +124,26 @@ impl Provenance {
     pub fn host_matches(&self, other: &Self) -> bool {
         self.cpu_model == other.cpu_model && self.cpu_count == other.cpu_count
     }
+}
+
+/// Remove only adjacent repetitions of identical two-token Rust lint settings.
+/// Their repetition is idempotent; other flags and lint-setting order remain significant.
+fn normalized_build_flags(flags: &str) -> Vec<&str> {
+    let mut normalized = Vec::new();
+    let mut tokens = flags.split_whitespace().peekable();
+    while let Some(flag) = tokens.next() {
+        if matches!(flag, "-A" | "-W" | "-D" | "-F")
+            && let Some(&lint) = tokens.peek()
+        {
+            tokens.next();
+            if !normalized.ends_with(&[flag, lint]) {
+                normalized.extend([flag, lint]);
+            }
+        } else {
+            normalized.push(flag);
+        }
+    }
+    normalized
 }
 
 /// Result of a single fixture benchmark run.

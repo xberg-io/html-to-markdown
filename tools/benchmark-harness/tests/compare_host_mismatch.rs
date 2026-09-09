@@ -113,6 +113,41 @@ fn should_fail_timing_regression_on_matching_hardware_even_with_the_opt_in() {
     );
 }
 
+#[test]
+fn should_compare_timings_with_adjacent_duplicate_warning_flags() {
+    for (name, sample, expected_success) in [
+        ("duplicate-flags-within-threshold", WITHIN_ALLOWANCE_MS, true),
+        ("duplicate-flags-regression", BEYOND_ALLOWANCE_MS, false),
+    ] {
+        let case = Case::new(name);
+        let mut provenance = calibrated_host();
+        provenance.build_flags = "-D warnings -D warnings".to_owned();
+        let output = case.run(provenance, sample, &[]);
+        let stderr = stderr_of(&output);
+        assert_eq!(output.status.success(), expected_success, "{name}: {stderr}");
+        assert!(!stderr.contains("benchmark provenance mismatch"), "{name}: {stderr}");
+        if !expected_success {
+            assert!(stderr.contains("1 guardrail(s) violated"), "{name}: {stderr}");
+        }
+    }
+}
+
+#[test]
+fn should_reject_differing_or_reordered_warning_flags() {
+    let mut baseline = calibrated_host();
+    baseline.build_flags = "-D warnings -A dead_code".to_owned();
+    for flags in [
+        "-A warnings -A dead_code",
+        "-A dead_code -D warnings",
+        "-D warnings -A dead_code -D warnings",
+        "-D warnings -A dead_code -C opt-level=2",
+    ] {
+        let mut results = baseline.clone();
+        results.build_flags = flags.to_owned();
+        assert!(!results.contract_matches(&baseline), "unexpected equivalence: {flags}");
+    }
+}
+
 /// One isolated temporary workspace holding a results/baseline/guardrails triple.
 struct Case {
     dir: PathBuf,

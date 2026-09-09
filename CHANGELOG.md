@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Treat adjacent duplicate Rust warning flags as equivalent in benchmark provenance checks while preserving timing gates.
+
 ## [3.12.3] - 2026-09-09
 
 ### Fixed
