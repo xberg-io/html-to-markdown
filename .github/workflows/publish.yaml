@@ -1757,11 +1757,20 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
+
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           pattern: go-ffi-*
           path: dist/go-ffi
           merge-multiple: true
+
+      - name: Prepare Go installer archive aliases and checksums
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: python3 scripts/prepare_go_release_assets.py dist/go-ffi html-to-markdown-rs "$RELEASE_VERSION"
 
       - uses: xberg-io/actions/upload-release-assets@v1
         with:
@@ -1770,6 +1779,7 @@ jobs:
           dry-run: ${{ needs.prepare.outputs.dry_run }}
           assets: |
             **/*.tar.gz
+            **/*.tar.gz.sha256
             **/*.zip
 
   upload-c-ffi-release:
