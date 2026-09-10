@@ -89,57 +89,65 @@ pub fn extract_frontmatter(
 fn extract_metadata_from_dom(dom: &tl::VDom, parser: &tl::Parser) -> BTreeMap<String, String> {
     let mut metadata = BTreeMap::new();
 
-    let head_handle = dom
+    let Some(head_handle) = dom
         .children()
         .iter()
-        .find_map(|child_handle| find_head_node(child_handle, parser));
-
-    let head_handle = match head_handle {
-        Some(h) => h,
-        None => return metadata,
+        .find_map(|child_handle| find_head_node(child_handle, parser))
+    else {
+        return metadata;
     };
 
-    if let Some(head_node) = head_handle.get(parser) {
-        if let tl::Node::Tag(head_tag) = head_node {
-            let children = head_tag.children();
-            for child_handle in children.top().iter() {
-                if let Some(child_node) = child_handle.get(parser) {
-                    if let tl::Node::Tag(child_tag) = child_node {
-                        let raw_name = child_tag.name().as_utf8_str();
-                        let tag_name = normalize_tag_name(raw_name);
+    let Some(tl::Node::Tag(head_tag)) = head_handle.get(parser) else {
+        return metadata;
+    };
 
-                        match tag_name.as_ref() {
-                            "title" => extract_title(child_tag, parser, &mut metadata),
-                            "base" => extract_base(child_tag, &mut metadata),
-                            "meta" => extract_meta(child_tag, &mut metadata),
-                            "link" => extract_link(child_tag, &mut metadata),
-                            _ => {}
-                        }
-                    }
-                }
-            }
-        }
+    for child_handle in head_tag.children().top().iter() {
+        extract_metadata_from_child(child_handle, parser, &mut metadata);
     }
 
     metadata
 }
 
+/// Extract metadata from a single child of the `<head>` element.
+fn extract_metadata_from_child(
+    child_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    metadata: &mut BTreeMap<String, String>,
+) {
+    let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) else {
+        return;
+    };
+
+    let raw_name = child_tag.name().as_utf8_str();
+    let tag_name = normalize_tag_name(raw_name);
+
+    match tag_name.as_ref() {
+        "title" => extract_title(child_tag, parser, metadata),
+        "base" => extract_base(child_tag, metadata),
+        "meta" => extract_meta(child_tag, metadata),
+        "link" => extract_link(child_tag, metadata),
+        _ => {}
+    }
+}
+
 /// Recursively find the first `<head>` tag in the DOM.
 fn find_head_node(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> Option<tl::NodeHandle> {
-    if let Some(node) = node_handle.get(parser) {
-        if let tl::Node::Tag(tag) = node {
-            if normalize_tag_name(tag.name().as_utf8_str()) == "head" {
-                return Some(*node_handle);
-            }
-            let children = tag.children();
-            for child_handle in children.top().iter() {
-                if let Some(result) = find_head_node(child_handle, parser) {
-                    return Some(result);
-                }
-            }
-        }
+    let Some(node) = node_handle.get(parser) else {
+        return None;
+    };
+
+    let tl::Node::Tag(tag) = node else {
+        return None;
+    };
+
+    if normalize_tag_name(tag.name().as_utf8_str()) == "head" {
+        return Some(*node_handle);
     }
-    None
+
+    tag.children()
+        .top()
+        .iter()
+        .find_map(|child_handle| find_head_node(child_handle, parser))
 }
 
 fn extract_title(tag: &tl::HTMLTag, parser: &tl::Parser, metadata: &mut BTreeMap<String, String>) {

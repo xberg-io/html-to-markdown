@@ -641,7 +641,6 @@ root = "packages/elixir"
   "nesting-too-deep",
   "too-many-parameters",
 ]
-"crates/html-to-markdown/src/converter/head_metadata.rs" = ["nesting-too-deep"]
 "crates/html-to-markdown/src/converter/inline/code.rs" = [
   "function-too-long",
   "nesting-too-deep",
