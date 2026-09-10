@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Treat adjacent duplicate Rust warning flags as equivalent in benchmark provenance checks while preserving timing gates.
 - Publish every native NuGet runtime package required by the managed package's runtime graph.
+- Upload Dart native archives and checksums required by the generated package downloader.
 
 ## [3.12.3] - 2026-09-09
 

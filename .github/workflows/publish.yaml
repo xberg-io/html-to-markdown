@@ -622,6 +622,8 @@ jobs:
 
   assemble-dart-package:
     name: Assemble Dart package artifact
+    permissions:
+      contents: write
     needs: [prepare, check-pub, dart-natives]
     if: ${{ needs.prepare.outputs.release_dart == 'true' && (needs.prepare.outputs.is_tag == 'true' || needs.prepare.outputs.dry_run == 'true') && needs.dart-natives.result == 'success' && (needs.check-pub.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
@@ -635,6 +637,20 @@ jobs:
           pattern: dart-natives-*
           path: dart-natives-artifacts
           merge-multiple: true
+
+      - name: Package native download assets
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: python3 scripts/publish/dart/package_native_assets.py dart-natives-artifacts dist/dart "$VERSION"
+      - name: Upload Dart native download assets
+        uses: xberg-io/actions/upload-release-assets@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          working-directory: dist/dart
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+          assets: |
+            *.tar.gz
+            *.sha256
 
       - name: Stage prebuilt native libraries into Dart package
         shell: bash
