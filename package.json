@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@textlint-rule/textlint-rule-no-invalid-control-character": "^3.0.0",
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.5.1",
     "textlint": "^15.8.0",
     "textlint-filter-rule-comments": "^1.3.0",
     "textlint-filter-rule-node-types": "^1.1.0",
@@ -32,11 +32,11 @@
     "textlint-rule-terminology": "^5.2.16",
     "textlint-rule-write-good": "^2.0.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=18",
     "pnpm": ">=11"
   },
-  "packageManager": "pnpm@11.15.0+sha512.266f8957a30d2be6e9468e5e66bcdedd35a794175f71b067ba8504d686cce1d0c0f429b33c323c3c569ad4891e667574a49ff71d1b89a22cc66f13c65818c578"
+  "packageManager": "pnpm@12.3.4"
 }

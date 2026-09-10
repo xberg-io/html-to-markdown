@@ -18,14 +18,14 @@
   },
   "files": ["index.js", "index.d.ts", "*.node"],
   "optionalDependencies": {
-    "@xberg-io/html-to-markdown-linux-x64-gnu": "3.12.3",
-    "@xberg-io/html-to-markdown-linux-arm64-gnu": "3.12.3",
-    "@xberg-io/html-to-markdown-linux-x64-musl": "3.12.3",
-    "@xberg-io/html-to-markdown-linux-arm64-musl": "3.12.3",
-    "@xberg-io/html-to-markdown-darwin-x64": "3.12.3",
     "@xberg-io/html-to-markdown-darwin-arm64": "3.12.3",
-    "@xberg-io/html-to-markdown-win32-x64-msvc": "3.12.3",
-    "@xberg-io/html-to-markdown-win32-arm64-msvc": "3.12.3"
+    "@xberg-io/html-to-markdown-darwin-x64": "3.12.3",
+    "@xberg-io/html-to-markdown-linux-arm64-gnu": "3.12.3",
+    "@xberg-io/html-to-markdown-linux-arm64-musl": "3.12.3",
+    "@xberg-io/html-to-markdown-linux-x64-gnu": "3.12.3",
+    "@xberg-io/html-to-markdown-linux-x64-musl": "3.12.3",
+    "@xberg-io/html-to-markdown-win32-arm64-msvc": "3.12.3",
+    "@xberg-io/html-to-markdown-win32-x64-msvc": "3.12.3"
   },
   "napi": {
     "packageName": "@xberg-io/html-to-markdown",
@@ -46,7 +46,13 @@
     "artifacts": "npx --yes -p @napi-rs/cli@^3.7.3 napi artifacts",
     "prepublishOnly": "npx --yes -p @napi-rs/cli@^3.7.3 napi prepublish -t npm --skip-optional-publish"
   },
-  "engines": { "node": ">= 22" },
-  "publishConfig": { "access": "public" },
-  "devDependencies": { "@napi-rs/cli": "^3.7.3" }
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.9.1"
+  }
 }
