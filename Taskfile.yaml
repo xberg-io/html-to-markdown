@@ -656,6 +656,7 @@ tasks:
       H2M_VERSION:
         sh: cd ../.. && grep -m1 '^version = ' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/'
     cmds:
+      - (cd ../c && bash download_ffi.sh)
       - zig fetch --save=html_to_markdown "https://github.com/xberg-io/html-to-markdown/releases/download/v{{.H2M_VERSION}}/html-to-markdown-rs-zig-v{{.H2M_VERSION}}.tar.gz"
       - zig build test
 

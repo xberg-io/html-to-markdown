@@ -688,50 +688,15 @@ jobs:
           path: c-ffi-artifacts
           merge-multiple: true
 
-      - name: Stage prebuilt FFI libraries into Zig package
-        shell: bash
-        run: |
-          mkdir -p packages/zig/lib
-          # Map alef's platform names to the directories produced by c-ffi-libraries job.
-          # c-ffi-libraries matrix produces: c-ffi-{platform}/ where platform is
-          # linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64, windows-arm64.
-          declare -A platform_map=(
-            [linux-x64]="linux-x64"
-            [linux-arm64]="linux-arm64"
-            [darwin-x64]="darwin-x64"
-            [darwin-arm64]="darwin-arm64"
-            [windows-x64]="windows-x64"
-            [windows-arm64]="windows-arm64"
-          )
-
-          for alef_rid in "${!platform_map[@]}"; do
-            artifact_platform="${platform_map[$alef_rid]}"
-            src_dir="c-ffi-artifacts/${artifact_platform}"
-
-            # c-ffi-libraries produces a flat distribution directory per platform
-            # containing the FFI shared library (.so/.dylib/.dll). Find and copy.
-            if [[ -d "$src_dir" ]]; then
-              mkdir -p "packages/zig/lib/${alef_rid}"
-              # Copy all shared library artifacts (.so, .dylib, .dll) from the distribution
-              find "$src_dir" -maxdepth 2 -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) \
-                -exec cp {} "packages/zig/lib/${alef_rid}/" \;
-              echo "Staged FFI libraries for $alef_rid:"
-              ls -la "packages/zig/lib/${alef_rid}/"
-            else
-              echo "Warning: no C FFI artifact found for $alef_rid at $src_dir"
-            fi
-          done
-
-      - name: Create Zig package tarball
-        shell: bash
-        run: |
-          cd packages/zig
-          tar -czf "../../html-to-markdown-rs-zig-v${{ needs.prepare.outputs.version }}.tar.gz" .
+      - name: Stage original C FFI archives for the Zig packager
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: python3 scripts/stage_zig_native_assets.py c-ffi-artifacts zig-ffi-artifacts "$RELEASE_VERSION"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: zig-package-assembled
-          path: html-to-markdown-rs-zig-v${{ needs.prepare.outputs.version }}.tar.gz
+          path: zig-ffi-artifacts
           if-no-files-found: error
           retention-days: 7
 
@@ -2597,7 +2562,7 @@ jobs:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: zig-package-assembled
-          path: .
+          path: zig-ffi-artifacts
 
       - uses: xberg-io/actions/publish-zig@v1
         with:
@@ -2605,6 +2570,9 @@ jobs:
           tag: ${{ needs.prepare.outputs.tag }}
           # ~keep → 404 + consumer build.zig.zon placeholder hash.
           package-name: html-to-markdown-rs-zig
+          multi-platform-ffi-dir: zig-ffi-artifacts
+          module-name: html_to_markdown_rs
+          ffi-lib-name: html_to_markdown_ffi
           update-release-notes: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
           token: ${{ steps.app-token.outputs.token }}

@@ -22,7 +22,12 @@ languages = [
 # ~keep Consumer manifests contain maintained toolchain/dependency settings and JNI tasks.
 # Their release dependency pins are updated by scripts/sync_consumer_versions.py.
 [workspace.ownership]
-user_owned = ["test_apps/dart/pubspec.yaml", "test_apps/elixir/mix.exs", "test_apps/kotlin_android/build.gradle.kts"]
+user_owned = [
+  "test_apps/dart/pubspec.yaml",
+  "test_apps/elixir/mix.exs",
+  "test_apps/kotlin_android/build.gradle.kts",
+  "test_apps/zig/build.zig",
+]
 
 [workspace.docs]
 reference_output = "docs-site/src/content/docs/reference"
@@ -1488,7 +1493,7 @@ version = "^3.12.3"
 [crates.e2e.registry.packages.zig]
 name = "html_to_markdown"
 version = "3.12.3"
-hash = "html-to-markdown-3.12.3-STALE_PLACEHOLDER_TO_BE_RESOLVED_BY_ZIG_FETCH"
+hash = "html_to_markdown_rs-3.12.3-QtXyW6p0AQARDHIsBKu1XVrpRf5J7ornocJZf2alzaq5"
 
 [crates.e2e.registry.packages.php_ext]
 name = "xberg-io/html-to-markdown"
