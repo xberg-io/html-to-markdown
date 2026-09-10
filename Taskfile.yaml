@@ -554,8 +554,20 @@ tasks:
   test-apps:smoke:homebrew:
     desc: "Smoke test the Homebrew CLI + FFI formulae"
     dir: test_apps/homebrew
+    vars:
+      H2M_VERSION:
+        sh: cd ../.. && grep -m1 '^version = ' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/'
     cmds:
-      - ./run_tests.sh
+      - brew bundle install --file=Brewfile
+      - test "$("$(brew --prefix html-to-markdown)/bin/html-to-markdown" --version)" = "html-to-markdown {{.H2M_VERSION}}"
+      - |
+        ffi_prefix="$(brew --prefix libhtml-to-markdown)"
+        probe_dir="$(mktemp -d)"
+        trap 'rm -rf "$probe_dir"' EXIT
+        printf '#include <stdio.h>\n#include <html_to_markdown.h>\nint main(void) { puts(htm_version()); return 0; }\n' |
+          cc -x c -I"$ffi_prefix/include" -L"$ffi_prefix/lib" -Wl,-rpath,"$ffi_prefix/lib" \
+            -lhtml_to_markdown_ffi -o "$probe_dir/version" -
+        test "$("$probe_dir/version")" = "{{.H2M_VERSION}}"
 
   test-apps:test:
     desc: "Run comprehensive tests for all published packages"
