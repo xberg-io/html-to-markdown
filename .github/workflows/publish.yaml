@@ -98,16 +98,23 @@ jobs:
           ref: ${{ steps.source.outputs.sha }}
           path: release-source
 
-      - name: Verify immutable release source and version
+      - name: Verify release source and checksum-only metadata
         id: version
         shell: bash
         working-directory: release-source
         env:
           EXPECTED_TAG: ${{ inputs.tag }}
           EXPECTED_SHA: ${{ steps.source.outputs.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_RUN_ID: ${{ inputs.nuget_runtime_run_id }}
         run: |
           git fetch --depth=1 origin "refs/tags/${EXPECTED_TAG}:refs/tags/${EXPECTED_TAG}"
-          [[ "$(git rev-parse "${EXPECTED_TAG}^{commit}")" == "$EXPECTED_SHA" ]]
+          if [[ "$(git rev-parse "${EXPECTED_TAG}^{commit}")" != "$EXPECTED_SHA" ]]; then
+            gh run download "$RELEASE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name swift-checksum --dir dist/provenance-swift
+          fi
+          python3 "$GITHUB_WORKSPACE/scripts/ci/csharp/verify_recovery_source.py" \
+            "$EXPECTED_SHA" "$EXPECTED_TAG" dist/provenance-swift
           python3 - <<'PY'
           import os
           import tomllib
