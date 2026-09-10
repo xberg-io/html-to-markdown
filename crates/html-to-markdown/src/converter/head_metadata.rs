@@ -132,9 +132,7 @@ fn extract_metadata_from_child(
 
 /// Recursively find the first `<head>` tag in the DOM.
 fn find_head_node(node_handle: &tl::NodeHandle, parser: &tl::Parser) -> Option<tl::NodeHandle> {
-    let Some(node) = node_handle.get(parser) else {
-        return None;
-    };
+    let node = node_handle.get(parser)?;
 
     let tl::Node::Tag(tag) = node else {
         return None;
