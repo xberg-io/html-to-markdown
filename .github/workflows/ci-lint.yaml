@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - uses: xberg-io/actions/setup-python@v1
+      - uses: xberg-io/actions/setup-python-env@v1
         with:
           python-version: "3.13"
           install-command: "uv sync --no-install-project --no-install-workspace"

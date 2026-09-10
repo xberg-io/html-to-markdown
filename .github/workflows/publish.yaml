@@ -3517,7 +3517,7 @@ jobs:
           # ~keep Same correction as the gate below: PROMOTED is empty whenever promote-release
           # was skipped, which is the normal shape of a partial-target dispatch against an
           # already-published release. Read the release's actual state.
-          if [ "$(gh release view "${TAG}" --json isDraft --jq '.isDraft' 2>/dev/null || echo unknown)" = "false" ]; then
+          if [ "$(gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" --json isDraft --jq '.isDraft' 2>/dev/null || echo unknown)" = "false" ]; then
             shipped="**${TAG} shipped** — the GitHub release is published."
           else
             shipped="**${TAG} did NOT ship** — the release is not published (promote-release reported '${PROMOTED:-<skipped>}')."
@@ -3676,7 +3676,7 @@ jobs:
           # release that was in fact public with all 61 of its assets (run 33498311069, v3.12.0).
           # Ask the release what it IS, not the job what it did; the job result is kept in the
           # message because a genuine promote failure is still worth naming.
-          release_is_draft="$(gh release view "${TAG}" --json isDraft --jq '.isDraft' 2>/dev/null || echo unknown)"
+          release_is_draft="$(gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" --json isDraft --jq '.isDraft' 2>/dev/null || echo unknown)"
           if [[ "${release_is_draft}" != "false" ]]; then
             echo "::error title=Incomplete release::${TAG} is not a published release (isDraft=${release_is_draft}; promote-release reported '${RESULT_PROMOTE:-<skipped>}')."
             failed=1

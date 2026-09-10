@@ -1,0 +1,25 @@
+name: Validate published 3.12.3 release
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Verify original publication and current release state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/34390416762" > release-run.json
+          gh api --paginate --slurp \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/34390416762/jobs?filter=latest&per_page=100" > release-jobs.json
+          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v3.12.3" > release-state.json
+          python3 scripts/validate_published_release.py release-run.json release-jobs.json release-state.json
+          echo 'Release 3.12.3 publication verified; original run 34390416762 failed only in reporting.' >> "$GITHUB_STEP_SUMMARY"
