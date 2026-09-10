@@ -1,6 +1,6 @@
 # homebrew test_app
 
-Exercises the configured Homebrew formulae from tap `xberg-io/tap` at version `3.10.6`.
+Exercises the configured Homebrew formulae from tap `xberg-io/tap` at the release version configured in `Cargo.toml`.
 
 | Formula | Purpose |
 |---------|--------|
@@ -9,12 +9,14 @@ Exercises the configured Homebrew formulae from tap `xberg-io/tap` at version `3
 
 ## Running
 
+Run from the repository root:
+
 ```bash
-bash run_tests.sh
+task test-apps:smoke:homebrew
 ```
 
 ## What it tests
 
 1. `brew bundle install` succeeds (tap + formulae install without error).
-2. `$CLI_FORMULA --version` — output contains `$VERSION`.
-3. `ffi_smoke.c` compiles against the FFI formula (via `pkg-config`) and the compiled binary calls `_version()` successfully.
+2. The installed CLI reports the exact configured release version.
+3. A C probe compiles against the installed FFI formula and verifies that `htm_version()` reports the same version.
