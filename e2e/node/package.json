@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.4.0",
     "@xberg-io/html-to-markdown": "workspace:*",
     "vitest": "^5.0.0"
   }
