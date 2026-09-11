@@ -4626,13 +4626,17 @@ fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
             break;
         }
         let body = &s[amp_pos + 2..j];
-        let cp_opt = if let Some(hex) = body.strip_prefix(['x', 'X']) {
-            u32::from_str_radix(hex, 16).ok()
-        } else {
-            body.parse::<u32>().ok()
+        let (digits, radix) = match body.strip_prefix(['x', 'X']) {
+            Some(hex) => (hex, 16),
+            None => (body, 10),
         };
-        if let Some(cp) = cp_opt {
-            if let Some(ch) = char::from_u32(cp) {
+        if let Ok(cp) = crate::text::parse_character_reference_number(digits, radix) {
+            if let Some(replacement) = crate::text::numeric_character_reference_override(cp) {
+                out.push(replacement);
+                i = j + 1;
+                continue;
+            }
+            if let Some(ch) = u32::try_from(cp).ok().and_then(char::from_u32) {
                 out.push(ch);
                 i = j + 1;
                 continue;
@@ -5200,18 +5204,18 @@ fn decode_numeric_entity_into(out: &mut String, name: &str) -> bool {
     let Some(rest) = name.strip_prefix('#') else {
         return false;
     };
-    let code_point = if rest.starts_with('x') || rest.starts_with('X') {
-        match u32::from_str_radix(&rest[1..], 16) {
-            Ok(n) => n,
-            Err(_) => return false,
-        }
-    } else {
-        match rest.parse::<u32>() {
-            Ok(n) => n,
-            Err(_) => return false,
-        }
+    let (digits, radix) = match rest.strip_prefix(['x', 'X']) {
+        Some(hex) => (hex, 16),
+        None => (rest, 10),
     };
-    match char::from_u32(code_point) {
+    let Ok(code_point) = crate::text::parse_character_reference_number(digits, radix) else {
+        return false;
+    };
+    if let Some(replacement) = crate::text::numeric_character_reference_override(code_point) {
+        out.push(replacement);
+        return true;
+    }
+    match u32::try_from(code_point).ok().and_then(char::from_u32) {
         Some(ch) => {
             out.push(ch);
             true

@@ -503,7 +503,160 @@ pub fn fold_cell_line_breaks_verbatim_cow(text: &str) -> Cow<'_, str> {
 /// Text with entities decoded
 #[must_use]
 pub fn decode_html_entities(text: &str) -> String {
-    html_escape::decode_html_entities(text).into_owned()
+    let overridden = apply_numeric_character_reference_overrides(text);
+    html_escape::decode_html_entities(overridden.as_ref()).into_owned()
+}
+
+/// Parses a numeric character reference's digit run into its numeric value.
+///
+/// `digits` must be non-empty; `radix` is 10 (decimal `&#...;`) or 16 (hex `&#x...;`).
+/// Returns `Err(())` when `digits` contains a character invalid for `radix` -- a
+/// genuinely malformed reference, which callers treat as "leave the raw text alone".
+/// A digit run that is syntactically valid but too large to fit `u64` returns
+/// `Ok(u64::MAX)` rather than erroring: that value safely clears every threshold
+/// [`numeric_character_reference_override`] checks (0x10FFFF), so an
+/// arbitrarily-long digit run is handled exactly like any other clearly-out-of-range
+/// value instead of silently wrapping.
+pub fn parse_character_reference_number(digits: &str, radix: u32) -> Result<u64, ()> {
+    match u64::from_str_radix(digits, radix) {
+        Ok(number) => Ok(number),
+        Err(err) if *err.kind() == std::num::IntErrorKind::PosOverflow => Ok(u64::MAX),
+        Err(_) => Err(()),
+    }
+}
+
+/// Maps a numeric character reference's value to the code point the WHATWG "numeric
+/// character reference end state" algorithm requires, for the cases where that
+/// differs from the naive `char::from_u32(value)` interpretation used everywhere else
+/// in this crate: the null character, values outside the Unicode range, surrogates,
+/// and the 0x80-0x9F Windows-1252 replacement table. Returns `None` when the naive
+/// interpretation is already correct, which covers the overwhelming majority of
+/// values -- callers fall back to `char::from_u32` in that case.
+///
+/// <https://html.spec.whatwg.org/multipage/parsing.html#numeric-character-reference-end-state>
+#[must_use]
+pub fn numeric_character_reference_override(value: u64) -> Option<char> {
+    if value == 0 || value > 0x0010_FFFF || (0xD800..=0xDFFF).contains(&value) {
+        return Some('\u{FFFD}');
+    }
+
+    let replacement = match value {
+        0x80 => '\u{20AC}',
+        0x82 => '\u{201A}',
+        0x83 => '\u{0192}',
+        0x84 => '\u{201E}',
+        0x85 => '\u{2026}',
+        0x86 => '\u{2020}',
+        0x87 => '\u{2021}',
+        0x88 => '\u{02C6}',
+        0x89 => '\u{2030}',
+        0x8A => '\u{0160}',
+        0x8B => '\u{2039}',
+        0x8C => '\u{0152}',
+        0x8E => '\u{017D}',
+        0x91 => '\u{2018}',
+        0x92 => '\u{2019}',
+        0x93 => '\u{201C}',
+        0x94 => '\u{201D}',
+        0x95 => '\u{2022}',
+        0x96 => '\u{2013}',
+        0x97 => '\u{2014}',
+        0x98 => '\u{02DC}',
+        0x99 => '\u{2122}',
+        0x9A => '\u{0161}',
+        0x9B => '\u{203A}',
+        0x9C => '\u{0153}',
+        0x9E => '\u{017E}',
+        0x9F => '\u{0178}',
+        _ => return None,
+    };
+    Some(replacement)
+}
+
+/// Recognizes a well-formed `&#...;` / `&#x...;` numeric character reference starting
+/// at `bytes[amp]` (expected to be `&`), using exactly the syntax `html_escape`'s own
+/// decoder accepts elsewhere in this module: a digit run terminated by `;`, with no
+/// embedded `&` (which aborts the match so the caller retries from that `&` instead).
+/// Returns the offset just past the terminating `;` and the parsed value, or `None`
+/// if `bytes[amp]` does not begin such a reference.
+fn scan_numeric_character_reference(bytes: &[u8], amp: usize) -> Option<(usize, u64)> {
+    if bytes.get(amp + 1) != Some(&b'#') {
+        return None;
+    }
+
+    let mut i = amp + 2;
+    let is_hex = matches!(bytes.get(i), Some(b'x' | b'X'));
+    if is_hex {
+        i += 1;
+    }
+
+    let digits_start = i;
+    loop {
+        match bytes.get(i) {
+            Some(b';') => break,
+            Some(b'&') | None => return None,
+            Some(_) => i += 1,
+        }
+    }
+
+    let digits = &bytes[digits_start..i];
+    let is_valid_digit: fn(&u8) -> bool = if is_hex {
+        u8::is_ascii_hexdigit
+    } else {
+        u8::is_ascii_digit
+    };
+    if digits.is_empty() || !digits.iter().all(is_valid_digit) {
+        return None;
+    }
+
+    // SAFETY-ish: `digits` was just validated as ASCII hex/decimal digits above. ~keep
+    let digits_str = std::str::from_utf8(digits).unwrap_or_default();
+    let radix = if is_hex { 16 } else { 10 };
+    let value = parse_character_reference_number(digits_str, radix).ok()?;
+    Some((i + 1, value))
+}
+
+/// Rewrites the numeric character references in `text` whose value
+/// [`numeric_character_reference_override`] maps differently than `html_escape`'s own
+/// decoder would (null, out-of-range, surrogates, and the 0x80-0x9F table), leaving
+/// every other numeric reference and every named entity untouched for `html_escape`
+/// to decode as before.
+///
+/// ~keep Safe to run as an isolated pre-pass rather than folding into a single scan:
+/// ~keep every override character is outside the ASCII set that gives `&`, digits,
+/// ~keep `x`/`X`, and `;` their meaning in entity syntax, so substituting one can never
+/// ~keep create or extend a sequence for the later `html_escape` pass to (mis)decode.
+fn apply_numeric_character_reference_overrides(text: &str) -> Cow<'_, str> {
+    let bytes = text.as_bytes();
+    if !bytes.contains(&b'&') {
+        return Cow::Borrowed(text);
+    }
+
+    let mut out = String::new();
+    let mut last = 0;
+    let mut i = 0;
+    let mut changed = false;
+    while let Some(rel) = memchr::memchr(b'&', &bytes[i..]) {
+        let amp = i + rel;
+        match scan_numeric_character_reference(bytes, amp) {
+            Some((end, value)) => {
+                if let Some(replacement) = numeric_character_reference_override(value) {
+                    out.push_str(&text[last..amp]);
+                    out.push(replacement);
+                    last = end;
+                    changed = true;
+                }
+                i = end;
+            }
+            None => i = amp + 1,
+        }
+    }
+
+    if !changed {
+        return Cow::Borrowed(text);
+    }
+    out.push_str(&text[last..]);
+    Cow::Owned(out)
 }
 
 /// Decode HTML entities in text, returning borrowed or owned result as needed.
@@ -532,7 +685,10 @@ pub fn decode_html_entities_cow(text: &str) -> Cow<'_, str> {
         return Cow::Borrowed(text);
     }
 
-    html_escape::decode_html_entities(text)
+    match apply_numeric_character_reference_overrides(text) {
+        Cow::Borrowed(unchanged) => html_escape::decode_html_entities(unchanged),
+        Cow::Owned(overridden) => Cow::Owned(html_escape::decode_html_entities(&overridden).into_owned()),
+    }
 }
 
 /// Check if a character is a unicode space character.
