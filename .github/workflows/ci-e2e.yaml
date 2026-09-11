@@ -533,17 +533,12 @@ jobs:
         run: command -v cargo-zigbuild || cargo install --locked cargo-zigbuild
 
       - name: Build native module
-        shell: bash
-        working-directory: crates/html-to-markdown-node
-        run: |
-          set -euo pipefail
-          rm -rf npm
-          pnpm exec napi create-npm-dirs
-          pnpm exec napi build --platform --release --target "${{ matrix.target }}" -x \
-            --js index.js --dts index.d.ts
-          # This matrix job produces one target, while release packaging collects all targets.
-          node -e 'const fs = require("node:fs"); const pkg = JSON.parse(fs.readFileSync("package.json", "utf8")); pkg.napi.targets = [process.argv[1]]; fs.writeFileSync("package.ci.json", JSON.stringify(pkg));' "${{ matrix.target }}"
-          pnpm exec napi artifacts --package-json-path package.ci.json --output-dir . --npm-dir npm
+        uses: xberg-io/actions/build-node-napi@v1
+        with:
+          crate-dir: crates/html-to-markdown-node
+          target: ${{ matrix.target }}
+          cross-compile: "true"
+          install-deps: "false"
 
       - name: Verify the platform package holds a native module
         shell: bash

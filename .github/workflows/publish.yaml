@@ -944,8 +944,10 @@ jobs:
 
       # napi-rs cross-compiles musl targets via `napi build -x`, which shells
       # out to cargo-zigbuild — unlike the gnu targets' --use-napi-cross
-      # (docker-based @napi-rs/cross-toolchain), so it needs zig on PATH and
-      # is not something the shared build-node-napi action supports.
+      # (docker-based @napi-rs/cross-toolchain). The shared action drives it
+      # through its `cross-compile` input but deliberately does not install the
+      # toolchain, because the zig version is a per-repo pin; hence these two
+      # setup steps.
       - name: Setup Zig (musl cross-compile)
         if: matrix.use_zig_cross
         uses: xberg-io/actions/setup-zig@v1
@@ -969,28 +971,13 @@ jobs:
 
       - name: Build native module (musl, zig cross-compile)
         if: matrix.use_zig_cross
-        shell: bash
-        working-directory: crates/html-to-markdown-node
-        run: |
-          set -euo pipefail
-          rm -rf npm
-          pnpm exec napi create-npm-dirs
-          pnpm exec napi build --platform --release --target "${{ matrix.target }}" -x \
-            --js index.js --dts index.d.ts
-          pnpm exec napi artifacts --output-dir . --npm-dir npm
-
-          node_file=$(find npm -maxdepth 2 -name "*.node" -type f | head -1)
-          if [ -z "${node_file}" ]; then
-            echo "::error::No .node file found under npm/ for ${{ matrix.target }}"
-            find npm -maxdepth 2 -type f
-            exit 1
-          fi
-          echo "Verified: $(basename "$(dirname "${node_file}")") platform package contains $(basename "${node_file}")"
-
-          tar_members=(npm)
-          [ -f index.js ] && tar_members+=(index.js)
-          [ -f index.d.ts ] && tar_members+=(index.d.ts)
-          tar -czf "${GITHUB_WORKSPACE}/node-bindings-${{ matrix.target }}.tar.gz" "${tar_members[@]}"
+        uses: xberg-io/actions/build-node-napi@v1
+        with:
+          crate-dir: crates/html-to-markdown-node
+          target: ${{ matrix.target }}
+          cross-compile: "true"
+          install-deps: "false"
+          pack-target-tarball: node-bindings-${{ matrix.target }}.tar.gz
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
