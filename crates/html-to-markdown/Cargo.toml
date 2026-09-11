@@ -55,7 +55,7 @@ memchr = "2"
 once_cell.workspace = true
 phf = { version = "0.14", features = ["macros"] }
 regex.workspace = true
-rmcp = { version = "3.2.0", features = [
+rmcp = { version = "3.3.0", features = [
     "server",
     "macros",
     "transport-io",

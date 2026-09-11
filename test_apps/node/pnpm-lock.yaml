@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: ^26.5.0
+        specifier: ^26.4.0
         version: 26.5.0
       '@xberg-io/html-to-markdown':
         specifier: ^3.12.3

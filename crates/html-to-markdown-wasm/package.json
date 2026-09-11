@@ -1,6 +1,6 @@
 {
   "name": "@xberg-io/html-to-markdown-wasm",
-  "version": "3.12.3",
+  "version": "3.12.4",
   "private": false,
   "description": "High-performance HTML to Markdown converter",
   "license": "MIT",

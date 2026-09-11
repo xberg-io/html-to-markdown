@@ -1,6 +1,7 @@
 {
   "format_version": 2,
   "generated_paths": [
+    "c/conversion/adjacent_emphasis_merged.md",
     "c/conversion/blockquote_code_block_indentation_preserved.md",
     "c/conversion/blockquote_multiple_paragraphs.md",
     "c/conversion/blockquote_nested.md",
@@ -81,6 +82,7 @@
     "c/conversion/table_ragged_row_more_cells_than_header.md",
     "c/conversion/table_with_alignment.md",
     "c/conversion/table_with_colspan.md",
+    "c/conversion/tagged_space_not_duplicated.md",
     "c/conversion/unordered_list.md",
     "c/edge-cases/empty_html.md",
     "c/edge-cases/encoding_cjk_characters.md",
@@ -291,6 +293,7 @@
     "c/visitor/visitor_underline_skip.md",
     "c/visitor/visitor_video_custom.md",
     "c/visitor/visitor_video_skip.md",
+    "csharp/conversion/adjacent_emphasis_merged.md",
     "csharp/conversion/blockquote_code_block_indentation_preserved.md",
     "csharp/conversion/blockquote_multiple_paragraphs.md",
     "csharp/conversion/blockquote_nested.md",
@@ -371,6 +374,7 @@
     "csharp/conversion/table_ragged_row_more_cells_than_header.md",
     "csharp/conversion/table_with_alignment.md",
     "csharp/conversion/table_with_colspan.md",
+    "csharp/conversion/tagged_space_not_duplicated.md",
     "csharp/conversion/unordered_list.md",
     "csharp/edge-cases/empty_html.md",
     "csharp/edge-cases/encoding_cjk_characters.md",
@@ -581,6 +585,7 @@
     "csharp/visitor/visitor_underline_skip.md",
     "csharp/visitor/visitor_video_custom.md",
     "csharp/visitor/visitor_video_skip.md",
+    "dart/conversion/adjacent_emphasis_merged.md",
     "dart/conversion/blockquote_code_block_indentation_preserved.md",
     "dart/conversion/blockquote_multiple_paragraphs.md",
     "dart/conversion/blockquote_nested.md",
@@ -661,6 +666,7 @@
     "dart/conversion/table_ragged_row_more_cells_than_header.md",
     "dart/conversion/table_with_alignment.md",
     "dart/conversion/table_with_colspan.md",
+    "dart/conversion/tagged_space_not_duplicated.md",
     "dart/conversion/unordered_list.md",
     "dart/edge-cases/empty_html.md",
     "dart/edge-cases/encoding_cjk_characters.md",
@@ -871,6 +877,7 @@
     "dart/visitor/visitor_underline_skip.md",
     "dart/visitor/visitor_video_custom.md",
     "dart/visitor/visitor_video_skip.md",
+    "elixir/conversion/adjacent_emphasis_merged.md",
     "elixir/conversion/blockquote_code_block_indentation_preserved.md",
     "elixir/conversion/blockquote_multiple_paragraphs.md",
     "elixir/conversion/blockquote_nested.md",
@@ -951,6 +958,7 @@
     "elixir/conversion/table_ragged_row_more_cells_than_header.md",
     "elixir/conversion/table_with_alignment.md",
     "elixir/conversion/table_with_colspan.md",
+    "elixir/conversion/tagged_space_not_duplicated.md",
     "elixir/conversion/unordered_list.md",
     "elixir/edge-cases/empty_html.md",
     "elixir/edge-cases/encoding_cjk_characters.md",
@@ -1161,6 +1169,7 @@
     "elixir/visitor/visitor_underline_skip.md",
     "elixir/visitor/visitor_video_custom.md",
     "elixir/visitor/visitor_video_skip.md",
+    "go/conversion/adjacent_emphasis_merged.md",
     "go/conversion/blockquote_code_block_indentation_preserved.md",
     "go/conversion/blockquote_multiple_paragraphs.md",
     "go/conversion/blockquote_nested.md",
@@ -1241,6 +1250,7 @@
     "go/conversion/table_ragged_row_more_cells_than_header.md",
     "go/conversion/table_with_alignment.md",
     "go/conversion/table_with_colspan.md",
+    "go/conversion/tagged_space_not_duplicated.md",
     "go/conversion/unordered_list.md",
     "go/edge-cases/empty_html.md",
     "go/edge-cases/encoding_cjk_characters.md",
@@ -1451,6 +1461,7 @@
     "go/visitor/visitor_underline_skip.md",
     "go/visitor/visitor_video_custom.md",
     "go/visitor/visitor_video_skip.md",
+    "java/conversion/adjacent_emphasis_merged.md",
     "java/conversion/blockquote_code_block_indentation_preserved.md",
     "java/conversion/blockquote_multiple_paragraphs.md",
     "java/conversion/blockquote_nested.md",
@@ -1531,6 +1542,7 @@
     "java/conversion/table_ragged_row_more_cells_than_header.md",
     "java/conversion/table_with_alignment.md",
     "java/conversion/table_with_colspan.md",
+    "java/conversion/tagged_space_not_duplicated.md",
     "java/conversion/unordered_list.md",
     "java/edge-cases/empty_html.md",
     "java/edge-cases/encoding_cjk_characters.md",
@@ -1741,6 +1753,7 @@
     "java/visitor/visitor_underline_skip.md",
     "java/visitor/visitor_video_custom.md",
     "java/visitor/visitor_video_skip.md",
+    "kotlin-android/conversion/adjacent_emphasis_merged.md",
     "kotlin-android/conversion/blockquote_code_block_indentation_preserved.md",
     "kotlin-android/conversion/blockquote_multiple_paragraphs.md",
     "kotlin-android/conversion/blockquote_nested.md",
@@ -1821,6 +1834,7 @@
     "kotlin-android/conversion/table_ragged_row_more_cells_than_header.md",
     "kotlin-android/conversion/table_with_alignment.md",
     "kotlin-android/conversion/table_with_colspan.md",
+    "kotlin-android/conversion/tagged_space_not_duplicated.md",
     "kotlin-android/conversion/unordered_list.md",
     "kotlin-android/edge-cases/empty_html.md",
     "kotlin-android/edge-cases/encoding_cjk_characters.md",
@@ -1977,6 +1991,7 @@
     "kotlin-android/structure/structure_list.md",
     "kotlin-android/structure/structure_multiple_headings.md",
     "kotlin-android/structure/structure_sibling_h1_groups.md",
+    "php/conversion/adjacent_emphasis_merged.md",
     "php/conversion/blockquote_code_block_indentation_preserved.md",
     "php/conversion/blockquote_multiple_paragraphs.md",
     "php/conversion/blockquote_nested.md",
@@ -2057,6 +2072,7 @@
     "php/conversion/table_ragged_row_more_cells_than_header.md",
     "php/conversion/table_with_alignment.md",
     "php/conversion/table_with_colspan.md",
+    "php/conversion/tagged_space_not_duplicated.md",
     "php/conversion/unordered_list.md",
     "php/edge-cases/empty_html.md",
     "php/edge-cases/encoding_cjk_characters.md",
@@ -2267,6 +2283,7 @@
     "php/visitor/visitor_underline_skip.md",
     "php/visitor/visitor_video_custom.md",
     "php/visitor/visitor_video_skip.md",
+    "python/conversion/adjacent_emphasis_merged.md",
     "python/conversion/blockquote_code_block_indentation_preserved.md",
     "python/conversion/blockquote_multiple_paragraphs.md",
     "python/conversion/blockquote_nested.md",
@@ -2347,6 +2364,7 @@
     "python/conversion/table_ragged_row_more_cells_than_header.md",
     "python/conversion/table_with_alignment.md",
     "python/conversion/table_with_colspan.md",
+    "python/conversion/tagged_space_not_duplicated.md",
     "python/conversion/unordered_list.md",
     "python/edge-cases/empty_html.md",
     "python/edge-cases/encoding_cjk_characters.md",
@@ -2557,6 +2575,7 @@
     "python/visitor/visitor_underline_skip.md",
     "python/visitor/visitor_video_custom.md",
     "python/visitor/visitor_video_skip.md",
+    "r/conversion/adjacent_emphasis_merged.md",
     "r/conversion/blockquote_code_block_indentation_preserved.md",
     "r/conversion/blockquote_multiple_paragraphs.md",
     "r/conversion/blockquote_nested.md",
@@ -2637,6 +2656,7 @@
     "r/conversion/table_ragged_row_more_cells_than_header.md",
     "r/conversion/table_with_alignment.md",
     "r/conversion/table_with_colspan.md",
+    "r/conversion/tagged_space_not_duplicated.md",
     "r/conversion/unordered_list.md",
     "r/edge-cases/empty_html.md",
     "r/edge-cases/encoding_cjk_characters.md",
@@ -2847,6 +2867,7 @@
     "r/visitor/visitor_underline_skip.md",
     "r/visitor/visitor_video_custom.md",
     "r/visitor/visitor_video_skip.md",
+    "ruby/conversion/adjacent_emphasis_merged.md",
     "ruby/conversion/blockquote_code_block_indentation_preserved.md",
     "ruby/conversion/blockquote_multiple_paragraphs.md",
     "ruby/conversion/blockquote_nested.md",
@@ -2927,6 +2948,7 @@
     "ruby/conversion/table_ragged_row_more_cells_than_header.md",
     "ruby/conversion/table_with_alignment.md",
     "ruby/conversion/table_with_colspan.md",
+    "ruby/conversion/tagged_space_not_duplicated.md",
     "ruby/conversion/unordered_list.md",
     "ruby/edge-cases/empty_html.md",
     "ruby/edge-cases/encoding_cjk_characters.md",
@@ -3137,6 +3159,7 @@
     "ruby/visitor/visitor_underline_skip.md",
     "ruby/visitor/visitor_video_custom.md",
     "ruby/visitor/visitor_video_skip.md",
+    "rust/conversion/adjacent_emphasis_merged.md",
     "rust/conversion/blockquote_code_block_indentation_preserved.md",
     "rust/conversion/blockquote_multiple_paragraphs.md",
     "rust/conversion/blockquote_nested.md",
@@ -3217,6 +3240,7 @@
     "rust/conversion/table_ragged_row_more_cells_than_header.md",
     "rust/conversion/table_with_alignment.md",
     "rust/conversion/table_with_colspan.md",
+    "rust/conversion/tagged_space_not_duplicated.md",
     "rust/conversion/unordered_list.md",
     "rust/edge-cases/empty_html.md",
     "rust/edge-cases/encoding_cjk_characters.md",
@@ -3427,6 +3451,7 @@
     "rust/visitor/visitor_underline_skip.md",
     "rust/visitor/visitor_video_custom.md",
     "rust/visitor/visitor_video_skip.md",
+    "swift/conversion/adjacent_emphasis_merged.md",
     "swift/conversion/blockquote_code_block_indentation_preserved.md",
     "swift/conversion/blockquote_multiple_paragraphs.md",
     "swift/conversion/blockquote_nested.md",
@@ -3507,6 +3532,7 @@
     "swift/conversion/table_ragged_row_more_cells_than_header.md",
     "swift/conversion/table_with_alignment.md",
     "swift/conversion/table_with_colspan.md",
+    "swift/conversion/tagged_space_not_duplicated.md",
     "swift/conversion/unordered_list.md",
     "swift/edge-cases/empty_html.md",
     "swift/edge-cases/encoding_cjk_characters.md",
@@ -3717,6 +3743,7 @@
     "swift/visitor/visitor_underline_skip.md",
     "swift/visitor/visitor_video_custom.md",
     "swift/visitor/visitor_video_skip.md",
+    "typescript/conversion/adjacent_emphasis_merged.md",
     "typescript/conversion/blockquote_code_block_indentation_preserved.md",
     "typescript/conversion/blockquote_multiple_paragraphs.md",
     "typescript/conversion/blockquote_nested.md",
@@ -3797,6 +3824,7 @@
     "typescript/conversion/table_ragged_row_more_cells_than_header.md",
     "typescript/conversion/table_with_alignment.md",
     "typescript/conversion/table_with_colspan.md",
+    "typescript/conversion/tagged_space_not_duplicated.md",
     "typescript/conversion/unordered_list.md",
     "typescript/edge-cases/empty_html.md",
     "typescript/edge-cases/encoding_cjk_characters.md",
@@ -4007,6 +4035,7 @@
     "typescript/visitor/visitor_underline_skip.md",
     "typescript/visitor/visitor_video_custom.md",
     "typescript/visitor/visitor_video_skip.md",
+    "wasm/conversion/adjacent_emphasis_merged.md",
     "wasm/conversion/blockquote_code_block_indentation_preserved.md",
     "wasm/conversion/blockquote_multiple_paragraphs.md",
     "wasm/conversion/blockquote_nested.md",
@@ -4087,6 +4116,7 @@
     "wasm/conversion/table_ragged_row_more_cells_than_header.md",
     "wasm/conversion/table_with_alignment.md",
     "wasm/conversion/table_with_colspan.md",
+    "wasm/conversion/tagged_space_not_duplicated.md",
     "wasm/conversion/unordered_list.md",
     "wasm/edge-cases/empty_html.md",
     "wasm/edge-cases/encoding_cjk_characters.md",
@@ -4297,6 +4327,7 @@
     "wasm/visitor/visitor_underline_skip.md",
     "wasm/visitor/visitor_video_custom.md",
     "wasm/visitor/visitor_video_skip.md",
+    "zig/conversion/adjacent_emphasis_merged.md",
     "zig/conversion/blockquote_code_block_indentation_preserved.md",
     "zig/conversion/blockquote_multiple_paragraphs.md",
     "zig/conversion/blockquote_nested.md",
@@ -4377,6 +4408,7 @@
     "zig/conversion/table_ragged_row_more_cells_than_header.md",
     "zig/conversion/table_with_alignment.md",
     "zig/conversion/table_with_colspan.md",
+    "zig/conversion/tagged_space_not_duplicated.md",
     "zig/conversion/unordered_list.md",
     "zig/edge-cases/empty_html.md",
     "zig/edge-cases/encoding_cjk_characters.md",
@@ -4589,6 +4621,18 @@
     "zig/visitor/visitor_video_skip.md"
   ],
   "generated_metadata": [
+    {
+      "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "c"
+      },
+      "path": "c/conversion/adjacent_emphasis_merged.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
     {
       "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
@@ -5543,6 +5587,18 @@
         "language": "c"
       },
       "path": "c/conversion/table_with_colspan.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "c"
+      },
+      "path": "c/conversion/tagged_space_not_duplicated.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -8071,6 +8127,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/adjacent_emphasis_merged.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "csharp"
       },
@@ -9023,6 +9091,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/table_with_colspan.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/tagged_space_not_duplicated.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -11551,6 +11631,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "dart"
+      },
+      "path": "dart/conversion/adjacent_emphasis_merged.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "dart"
       },
@@ -12503,6 +12595,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/table_with_colspan.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "dart"
+      },
+      "path": "dart/conversion/tagged_space_not_duplicated.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -15031,6 +15135,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/adjacent_emphasis_merged.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "elixir"
       },
@@ -15983,6 +16099,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/table_with_colspan.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/tagged_space_not_duplicated.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -18511,6 +18639,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "go"
+      },
+      "path": "go/conversion/adjacent_emphasis_merged.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "go"
       },
@@ -19463,6 +19603,18 @@
         "language": "go"
       },
       "path": "go/conversion/table_with_colspan.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "go"
+      },
+      "path": "go/conversion/tagged_space_not_duplicated.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -21991,6 +22143,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "java"
+      },
+      "path": "java/conversion/adjacent_emphasis_merged.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "java"
       },
@@ -22943,6 +23107,18 @@
         "language": "java"
       },
       "path": "java/conversion/table_with_colspan.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "java"
+      },
+      "path": "java/conversion/tagged_space_not_duplicated.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -25471,6 +25647,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/adjacent_emphasis_merged.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "kotlin_android"
       },
@@ -26423,6 +26611,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/table_with_colspan.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/tagged_space_not_duplicated.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -28303,6 +28503,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "php"
+      },
+      "path": "php/conversion/adjacent_emphasis_merged.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "php"
       },
@@ -29255,6 +29467,18 @@
         "language": "php"
       },
       "path": "php/conversion/table_with_colspan.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "php"
+      },
+      "path": "php/conversion/tagged_space_not_duplicated.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -31783,6 +32007,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "python"
+      },
+      "path": "python/conversion/adjacent_emphasis_merged.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "python"
       },
@@ -32735,6 +32971,18 @@
         "language": "python"
       },
       "path": "python/conversion/table_with_colspan.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "python"
+      },
+      "path": "python/conversion/tagged_space_not_duplicated.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -35263,6 +35511,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "r"
+      },
+      "path": "r/conversion/adjacent_emphasis_merged.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "r"
       },
@@ -36215,6 +36475,18 @@
         "language": "r"
       },
       "path": "r/conversion/table_with_colspan.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "r"
+      },
+      "path": "r/conversion/tagged_space_not_duplicated.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -38743,6 +39015,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/adjacent_emphasis_merged.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "ruby"
       },
@@ -39695,6 +39979,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/table_with_colspan.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/tagged_space_not_duplicated.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -42223,6 +42519,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "rust"
+      },
+      "path": "rust/conversion/adjacent_emphasis_merged.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "rust"
       },
@@ -43183,6 +43491,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/table_with_colspan.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "rust"
+      },
+      "path": "rust/conversion/tagged_space_not_duplicated.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -46043,6 +46363,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "swift"
+      },
+      "path": "swift/conversion/adjacent_emphasis_merged.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "swift"
       },
@@ -46995,6 +47327,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/table_with_colspan.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "swift"
+      },
+      "path": "swift/conversion/tagged_space_not_duplicated.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -49523,6 +49867,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "node"
+      },
+      "path": "typescript/conversion/adjacent_emphasis_merged.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "node"
       },
@@ -50475,6 +50831,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/table_with_colspan.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "node"
+      },
+      "path": "typescript/conversion/tagged_space_not_duplicated.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -53003,6 +53371,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/adjacent_emphasis_merged.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "wasm"
       },
@@ -53955,6 +54335,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/table_with_colspan.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/tagged_space_not_duplicated.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -56483,6 +56875,18 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_emphasis_merged",
+        "language": "zig"
+      },
+      "path": "zig/conversion/adjacent_emphasis_merged.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "blockquote_code_block_indentation_preserved",
         "language": "zig"
       },
@@ -57435,6 +57839,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/table_with_colspan.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_not_duplicated",
+        "language": "zig"
+      },
+      "path": "zig/conversion/tagged_space_not_duplicated.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -59964,6 +60380,70 @@
   ],
   "expected": [
     {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "zig"
+    },
+    {
       "fixture_id": "blockquote_code_block_indentation_preserved",
       "language": "c"
     },
@@ -74681,6 +75161,70 @@
     },
     {
       "fixture_id": "table_with_colspan",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "c"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "go"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "java"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "node"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "php"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "python"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "r"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
       "language": "zig"
     },
     {
@@ -78310,6 +78854,70 @@
   ],
   "generated": [
     {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_emphasis_merged",
+      "language": "zig"
+    },
+    {
       "fixture_id": "blockquote_code_block_indentation_preserved",
       "language": "c"
     },
@@ -93027,6 +93635,70 @@
     },
     {
       "fixture_id": "table_with_colspan",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "c"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "go"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "java"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "node"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "php"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "python"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "r"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "tagged_space_not_duplicated",
       "language": "zig"
     },
     {

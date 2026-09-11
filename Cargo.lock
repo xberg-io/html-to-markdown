@@ -319,9 +319,9 @@ checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 
 [[package]]
 name = "bitflags"
-version = "2.13.1"
+version = "2.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da"
+checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
 
 [[package]]
 name = "block-buffer"
@@ -1038,7 +1038,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1442,7 +1442,7 @@ checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
 
 [[package]]
 name = "html-to-markdown-bench"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "anyhow",
  "astral-tl",
@@ -1461,7 +1461,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-cli"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "assert_cmd",
  "base64 0.23.1",
@@ -1483,7 +1483,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-ffi"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "ahash",
  "async-trait",
@@ -1498,7 +1498,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-node"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",
@@ -1513,7 +1513,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-php"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "async-trait",
  "ext-php-rs",
@@ -1526,7 +1526,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-py"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",
@@ -1540,7 +1540,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -1569,7 +1569,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-dart"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "async-trait",
  "flutter_rust_bridge",
@@ -1581,7 +1581,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-jni"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -1595,7 +1595,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-swift"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "ahash",
  "async-trait",
@@ -1611,7 +1611,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-wasm"
-version = "3.12.3"
+version = "3.12.4"
 dependencies = [
  "futures",
  "futures-util",
@@ -2892,7 +2892,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3055,9 +3055,9 @@ dependencies = [
 
 [[package]]
 name = "rmcp"
-version = "3.2.0"
+version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42b6914fac0be956fe704a38239c3f44a9f841d1b06a5713d2f638065593f5b5"
+checksum = "b88db56b8ae316560e9e868b6b978ea940f27cb883323fc90e07435e44158f5c"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -3087,9 +3087,9 @@ dependencies = [
 
 [[package]]
 name = "rmcp-macros"
-version = "3.2.0"
+version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdf1c49bd4d52014b94db0877410db273c2008f01628b0252a2e9460ad9b7fda"
+checksum = "873b730df6f0a9b74b13eb514e0dca4c2db0d8b68b74af98a2e9bf3f9d436585"
 dependencies = [
  "darling 0.24.1",
  "proc-macro2",
@@ -3135,7 +3135,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3192,7 +3192,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3692,7 +3692,7 @@ dependencies = [
  "getrandom 0.3.4",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4199,9 +4199,9 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "uuid"
-version = "1.26.0"
+version = "1.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5772d71c9be8a8a6ac2117d949c5b224c1b72241bb611d9a3012edcf8af7812"
+checksum = "2ef6dac1e96601b4fb3acccccff2139741fcb757cb9a36089bf5be91cfb285ce"
 dependencies = [
  "getrandom 0.4.3",
  "js-sys",
@@ -4377,7 +4377,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

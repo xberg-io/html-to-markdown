@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	github.com/stretchr/testify v1.11.1
-	github.com/xberg-io/html-to-markdown/packages/go/v3 v3.12.3
+	github.com/xberg-io/html-to-markdown/packages/go/v3 v3.12.4
 )
 
 require (

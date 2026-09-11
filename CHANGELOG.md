@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.12.4] - 2026-09-11
+
 ### Fixed
 
 - Treat adjacent duplicate Rust warning flags as equivalent in benchmark provenance checks while preserving timing gates.
@@ -15,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish Go installer archive aliases and required SHA-256 sidecars.
 - Verify the installed Homebrew CLI and FFI versions directly in the registry smoke task.
 - Stage original native archives through the shared Zig packager; the 3.12.3 source archive requires separate C FFI libraries.
+- Merge adjacent inline emphasis into a single delimiter run, so `<i>A</i><i>B</i><i>C</i>`
+  renders as `*ABC*` rather than the `*A**B**C*` CommonMark reparses as nested emphasis
+  ([#483](https://github.com/xberg-io/html-to-markdown/issues/483)).
+- Emit exactly one space for a whitespace-only inline element; `A<i> </i>B` duplicated it and,
+  inside a paragraph, `<p>A<i> </i>B</p>` dropped it entirely
+  ([#481](https://github.com/xberg-io/html-to-markdown/issues/481)).
+- Drive the musl Node cross-compile through the shared build action, whose per-leg artifact
+  staging replaces the `napi artifacts` call that `@napi-rs/cli` 3.9.1 made fail on any
+  single-target matrix leg.
 
 ## [3.12.3] - 2026-09-09
 
