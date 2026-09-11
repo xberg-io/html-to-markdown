@@ -19,6 +19,9 @@ on:
       - ".cargo/config.toml"
       - "fixtures/**"
       - ".github/workflows/ci-rust.yaml"
+      - "alef.toml"
+      - ".alef-ownership.toml"
+      - "poly.toml"
   pull_request:
     branches: [main]
     paths:
@@ -37,6 +40,9 @@ on:
       - ".cargo/config.toml"
       - "fixtures/**"
       - ".github/workflows/ci-rust.yaml"
+      - "alef.toml"
+      - ".alef-ownership.toml"
+      - "poly.toml"
   workflow_dispatch: {}
 
 concurrency:
