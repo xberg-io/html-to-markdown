@@ -32,6 +32,10 @@ struct MisnestState {
     /// True if a strict ancestor is `<li>`/`<dt>`/`<dd>` with no intervening
     /// `<ul>`/`<ol>`/`<dl>` (i.e. we are still "inside" that same list item).
     list_item_ancestor_state: bool,
+    /// True if a strict ancestor is `<td>`/`<th>` with no intervening
+    /// `<table>`/`<thead>`/`<tbody>`/`<tfoot>`/`<tr>` (i.e. we are still "inside"
+    /// that same cell's content, not a fresh row).
+    cell_ancestor_state: bool,
 }
 
 impl MisnestState {
@@ -41,6 +45,7 @@ impl MisnestState {
         blocked_by_inline_ancestor: false,
         p_ancestor_state: false,
         list_item_ancestor_state: false,
+        cell_ancestor_state: false,
     };
 }
 
@@ -64,6 +69,14 @@ impl MisnestState {
 /// `<div>`, …) are still open inside it. `tl` does not apply that rule, so an
 /// unclosed `<p>`/`<div>` inside a list item causes it to nest the next `<li>`
 /// as a child instead of treating it as a sibling.
+///
+/// Also detects a `<tr>` nested directly inside a `<td>`/`<th>` — a structural
+/// impossibility in valid HTML (a `<tr>` is only ever a child of `<table>`,
+/// `<thead>`, `<tbody>`, or `<tfoot>`). HTML5's "in cell" insertion mode closes the
+/// open cell (and its row) before starting the new row as a sibling of the one that
+/// held the cell; `tl` instead nests it literally, and the table renderer only walks
+/// a cell's own row/table ancestry, so the nested row's content is never reached and
+/// is silently dropped. Issue #486.
 ///
 /// Also detects a `<table>` with a direct child that HTML5's "in table" insertion
 /// mode would foster-parent (non-whitespace text) or restructure (any element
@@ -117,6 +130,12 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
             return true;
         }
 
+        // ~keep <tr> nested directly inside a <td>/<th>: not reachable per HTML5 tree
+        // ~keep construction, and silently dropped by the table renderer (issue #486).
+        if info.name == "tr" && state.cell_ancestor_state {
+            return true;
+        }
+
         if let Some(children) = dom_ctx.children_of(node_id) {
             // ~keep <table> with a direct child that a spec-compliant parser would
             // ~keep foster-parent or restructure (see the doc comment above).
@@ -135,6 +154,7 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
                     || (is_inline_element(&info.name) && !inline_ancestor_allows_block(&info.name)),
                 p_ancestor_state: p_ancestor_state_for(&info.name, state.p_ancestor_state),
                 list_item_ancestor_state: list_item_ancestor_state_for(&info.name, state.list_item_ancestor_state),
+                cell_ancestor_state: cell_ancestor_state_for(&info.name, state.cell_ancestor_state),
             };
             stack.extend(children.iter().map(|child| (*child, child_state)));
         }
@@ -205,6 +225,23 @@ fn list_item_ancestor_state_for(tag_name: &str, inherited: bool) -> bool {
     if matches!(tag_name, "li" | "dt" | "dd") {
         true
     } else if matches!(tag_name, "ul" | "ol" | "dl" | "table" | "body" | "html") {
+        false
+    } else {
+        inherited
+    }
+}
+
+/// Compute the `cell_ancestor_state` scan result to hand down to a node's children,
+/// given the node's own tag name and the state its own parent handed down.
+///
+/// A `<td>`/`<th>` ancestor found before crossing a `<table>`/`<thead>`/`<tbody>`/
+/// `<tfoot>`/`<tr>` boundary counts; crossing any of those boundaries resets the
+/// search, since a `<tr>` there is legitimately positioned relative to a new row or
+/// table context.
+fn cell_ancestor_state_for(tag_name: &str, inherited: bool) -> bool {
+    if matches!(tag_name, "td" | "th") {
+        true
+    } else if matches!(tag_name, "table" | "thead" | "tbody" | "tfoot" | "tr") {
         false
     } else {
         inherited
