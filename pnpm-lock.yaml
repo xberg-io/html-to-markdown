@@ -223,7 +223,7 @@ importers:
   e2e/node:
     devDependencies:
       '@types/node':
-        specifier: ^26.4.0
+        specifier: ^26.5.1
         version: 26.5.1
       '@xberg-io/html-to-markdown':
         specifier: workspace:*
