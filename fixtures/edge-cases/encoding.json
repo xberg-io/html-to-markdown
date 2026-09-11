@@ -132,5 +132,29 @@
       "stem": "encoding_named_entities",
       "title": "Named HTML entities like &mdash; and &hellip; are decoded"
     }
+  },
+  {
+    "id": "encoding_c1_replacement_table",
+    "description": "Numeric references in the C1 range use the WHATWG replacement table",
+    "input": {
+      "html": "<p>Single: &#155; Euro: &#128; Bullet: &#149; Y: &#159;</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "›",
+          "€",
+          "•",
+          "Ÿ"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "edge-cases",
+      "stem": "encoding_c1_replacement_table",
+      "title": "Numeric references in the C1 range use the WHATWG replacement table"
+    }
   }
 ]
