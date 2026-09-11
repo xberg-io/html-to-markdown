@@ -1,18 +1,9 @@
 {
   "schema": 2,
-  "campaign_id": "c87f68acde9af870d9a3a3fb169c8208e0a5654c:2026-08-20T14:13:50.962124248Z",
+  "campaign_id": "d1878017c553eeb30eb4c11eee49b7844c21c2df:2026-09-11T15:50:26.271225894Z",
   "thresholds": {
-    "adversarial": {
-      "max_regression_pct": 30.0
-    },
     "clean_medium": {
       "max_regression_pct": 8.0
-    },
-    "clean_small": {
-      "max_regression_pct": 10.0
-    },
-    "fallthrough_custom_elements": {
-      "max_regression_pct": 10.0
     },
     "fallthrough_bare_lt": {
       "max_regression_pct": 10.0
@@ -22,6 +13,15 @@
     },
     "spec_rules": {
       "max_regression_pct": 10.0
+    },
+    "clean_small": {
+      "max_regression_pct": 10.0
+    },
+    "fallthrough_custom_elements": {
+      "max_regression_pct": 10.0
+    },
+    "adversarial": {
+      "max_regression_pct": 30.0
     }
   },
   "calibration_provenance": {
@@ -41,184 +41,189 @@
     "warmup_iterations": 20,
     "calibration_target_ms": 50,
     "calibration_timeout_ms": 2000,
-    "core_features": ["inline-images", "metadata", "serde", "visitor"],
+    "core_features": [
+      "inline-images",
+      "metadata",
+      "serde",
+      "visitor"
+    ],
     "runner_image": "ubuntu24",
     "runner_class": "github-hosted"
   },
   "fixture_floors": {
-    "synthetic/optional_li.html": {
-      "sample_count": 40,
-      "median_ms": 0.004232586610739753,
-      "mad_ms": 0.000056323113145298736,
-      "floor_ms": 0.000196287574917158
-    },
-    "real-world/issues/gh-127-issue.html": {
-      "sample_count": 40,
-      "median_ms": 23.595383666666663,
-      "mad_ms": 0.126238333333335,
-      "floor_ms": 0.40500766666666976
-    },
-    "real-world/wikipedia/lists_timeline.html": {
-      "sample_count": 40,
-      "median_ms": 15.9120345,
-      "mad_ms": 0.028208375000000174,
-      "floor_ms": 0.1192814166666647
-    },
-    "real-world/issues/gh-190/mitrade.html": {
-      "sample_count": 40,
-      "median_ms": 0.06791294722711819,
-      "mad_ms": 0.00026220438593211465,
-      "floor_ms": 0.0011037756239210411
-    },
-    "mdream/mdn-array.html": {
-      "sample_count": 40,
-      "median_ms": 10.8775877,
-      "mad_ms": 0.027514799999999617,
-      "floor_ms": 0.20259659999999968
-    },
     "real-world/wikipedia/small_html.html": {
       "sample_count": 40,
-      "median_ms": 44.962926249999995,
-      "mad_ms": 0.11760049999999822,
-      "floor_ms": 0.7874745000000019
-    },
-    "mdream/react-learn.html": {
-      "sample_count": 40,
-      "median_ms": 21.0535,
-      "mad_ms": 0.052254833333332584,
-      "floor_ms": 0.24863933333332966
-    },
-    "real-world/wikipedia/tables_countries.html": {
-      "sample_count": 40,
-      "median_ms": 32.14343275,
-      "mad_ms": 0.0534642500000011,
-      "floor_ms": 0.45310750000000155
-    },
-    "real-world/wikipedia/large_rust.html": {
-      "sample_count": 40,
-      "median_ms": 49.015349,
-      "mad_ms": 0.09306400000000181,
-      "floor_ms": 0.9187220000000025
-    },
-    "synthetic/cdata_in_svg.html": {
-      "sample_count": 40,
-      "median_ms": 0.011554638448436991,
-      "mad_ms": 0.000069183291550836,
-      "floor_ms": 0.000329806941863825
-    },
-    "mdream/wikipedia-small.html": {
-      "sample_count": 40,
-      "median_ms": 9.770672166666664,
-      "mad_ms": 0.018493416666663265,
-      "floor_ms": 0.07465249999999912
-    },
-    "real-world/issues/gh-190/firsteigen.html": {
-      "sample_count": 40,
-      "median_ms": 1.7681530089285715,
-      "mad_ms": 0.004047111761083744,
-      "floor_ms": 0.012672551724137948
-    },
-    "synthetic/bare_fragment.html": {
-      "sample_count": 40,
-      "median_ms": 0.0005029461330919103,
-      "mad_ms": 2.3516730385646505e-6,
-      "floor_ms": 0.00001186693612711617
-    },
-    "real-world/wikipedia/medium_python.html": {
-      "sample_count": 40,
-      "median_ms": 90.369955,
-      "mad_ms": 0.2181890000000024,
-      "floor_ms": 1.5818299999999965
-    },
-    "real-world/issues/gh-190/rbloggers.html": {
-      "sample_count": 40,
-      "median_ms": 1.1729033139534883,
-      "mad_ms": 0.003068883720930282,
-      "floor_ms": 0.012813080011073952
-    },
-    "real-world/issues/gh-121-hacker-news.html": {
-      "sample_count": 40,
-      "median_ms": 1.5032504741532977,
-      "mad_ms": 0.006407107397504386,
-      "floor_ms": 0.015646323529411754
-    },
-    "synthetic/unescaped_lt.html": {
-      "sample_count": 40,
-      "median_ms": 0.003008436264524613,
-      "mad_ms": 0.000032562930509271934,
-      "floor_ms": 0.00011417725252798163
-    },
-    "real-world/issues/gh-190/kimbrain.html": {
-      "sample_count": 40,
-      "median_ms": 2.7777315555555555,
-      "mad_ms": 0.006534818713450408,
-      "floor_ms": 0.02916950000000007
-    },
-    "real-world/issues/gh-190/plusblog.html": {
-      "sample_count": 40,
-      "median_ms": 2.0673152000000004,
-      "mad_ms": 0.005999700000000496,
-      "floor_ms": 0.024053565
-    },
-    "synthetic/unclosed_p.html": {
-      "sample_count": 40,
-      "median_ms": 0.0034257923913784735,
-      "mad_ms": 0.00003200054572551807,
-      "floor_ms": 0.00008786901493121032
-    },
-    "real-world/issues/gh-190/insight.html": {
-      "sample_count": 40,
-      "median_ms": 0.19769187015503875,
-      "mad_ms": 0.0006788393426294809,
-      "floor_ms": 0.0027937565179382284
-    },
-    "synthetic/table_no_tbody.html": {
-      "sample_count": 40,
-      "median_ms": 0.005586295341064297,
-      "mad_ms": 0.000047370749127630726,
-      "floor_ms": 0.00021816186692927893
-    },
-    "mdream/vuejs-docs.html": {
-      "sample_count": 40,
-      "median_ms": 9.868172583333335,
-      "mad_ms": 0.03315166666666691,
-      "floor_ms": 0.10507283333333461
-    },
-    "synthetic/unclosed_at_eof.html": {
-      "sample_count": 40,
-      "median_ms": 0.0029784749602408335,
-      "mad_ms": 0.000023943921518866217,
-      "floor_ms": 0.00010427547533489951
-    },
-    "mdream/github-markdown-complete.html": {
-      "sample_count": 40,
-      "median_ms": 19.053301,
-      "mad_ms": 0.051249833333335104,
-      "floor_ms": 0.23387266666666306
-    },
-    "real-world/issues/gh-190/flex2025.html": {
-      "sample_count": 40,
-      "median_ms": 0.11949324076191482,
-      "mad_ms": 0.0003271034379711407,
-      "floor_ms": 0.0014245865896358317
-    },
-    "real-world/issues/gh-190/ozonekorea.html": {
-      "sample_count": 40,
-      "median_ms": 3.27647059375,
-      "mad_ms": 0.008813874999999971,
-      "floor_ms": 0.037837937499999974
-    },
-    "mdream/nuxt-example.html": {
-      "sample_count": 40,
-      "median_ms": 0.04857031204350652,
-      "mad_ms": 0.00014546552490635536,
-      "floor_ms": 0.0005358150495766087
+      "median_ms": 18.577082833333336,
+      "mad_ms": 0.07585700000000095,
+      "floor_ms": 2.9119056666666694
     },
     "real-world/issues/gh-190/sjsu.html": {
       "sample_count": 40,
-      "median_ms": 2.758361710526316,
-      "mad_ms": 0.0043056315789473665,
-      "floor_ms": 0.02119373684210535
+      "median_ms": 0.914826825487013,
+      "mad_ms": 0.004015583603896089,
+      "floor_ms": 0.014191142857142847
+    },
+    "synthetic/unescaped_lt.html": {
+      "sample_count": 40,
+      "median_ms": 0.0030228495167922012,
+      "mad_ms": 0.00003168462172731712,
+      "floor_ms": 0.00010545092877087183
+    },
+    "synthetic/bare_fragment.html": {
+      "sample_count": 40,
+      "median_ms": 0.0005300673941469136,
+      "mad_ms": 3.5651180128104315e-6,
+      "floor_ms": 0.000022131381191309633
+    },
+    "real-world/wikipedia/lists_timeline.html": {
+      "sample_count": 40,
+      "median_ms": 9.987357150000001,
+      "mad_ms": 0.01970176666666923,
+      "floor_ms": 0.06440516666666518
+    },
+    "real-world/issues/gh-121-hacker-news.html": {
+      "sample_count": 40,
+      "median_ms": 1.6266579349798387,
+      "mad_ms": 0.006862821068548519,
+      "floor_ms": 0.023916516129032228
+    },
+    "real-world/issues/gh-190/firsteigen.html": {
+      "sample_count": 40,
+      "median_ms": 1.898001240740741,
+      "mad_ms": 0.004214759259259071,
+      "floor_ms": 0.018407888888889
+    },
+    "synthetic/unclosed_p.html": {
+      "sample_count": 40,
+      "median_ms": 0.0037343960154436443,
+      "mad_ms": 0.00003578349109386171,
+      "floor_ms": 0.00014535158551471587
+    },
+    "real-world/wikipedia/large_rust.html": {
+      "sample_count": 40,
+      "median_ms": 19.8542305,
+      "mad_ms": 0.0743131666666681,
+      "floor_ms": 0.25659299999999874
+    },
+    "real-world/issues/gh-190/rbloggers.html": {
+      "sample_count": 40,
+      "median_ms": 1.2751623275641026,
+      "mad_ms": 0.0033973625000000007,
+      "floor_ms": 0.013098153205128416
+    },
+    "mdream/nuxt-example.html": {
+      "sample_count": 40,
+      "median_ms": 0.04760608485953853,
+      "mad_ms": 0.00015981696689439454,
+      "floor_ms": 0.0008012416188002136
+    },
+    "real-world/issues/gh-190/plusblog.html": {
+      "sample_count": 40,
+      "median_ms": 2.07901126,
+      "mad_ms": 0.00617696000000012,
+      "floor_ms": 0.016022840000000205
+    },
+    "mdream/wikipedia-small.html": {
+      "sample_count": 40,
+      "median_ms": 3.892448346153846,
+      "mad_ms": 0.009992653846153665,
+      "floor_ms": 0.025734846153846025
+    },
+    "mdream/vuejs-docs.html": {
+      "sample_count": 40,
+      "median_ms": 5.950231944444445,
+      "mad_ms": 0.015168222222221583,
+      "floor_ms": 0.051738111111111706
+    },
+    "real-world/issues/gh-190/ozonekorea.html": {
+      "sample_count": 40,
+      "median_ms": 3.126273801470588,
+      "mad_ms": 0.010249448529411564,
+      "floor_ms": 0.04692688602941164
+    },
+    "real-world/issues/gh-190/kimbrain.html": {
+      "sample_count": 40,
+      "median_ms": 2.738570236842105,
+      "mad_ms": 0.00870413157894756,
+      "floor_ms": 0.0382221578947366
+    },
+    "synthetic/cdata_in_svg.html": {
+      "sample_count": 40,
+      "median_ms": 0.012263099100016838,
+      "mad_ms": 0.00008345727611528721,
+      "floor_ms": 0.0004144346623048776
+    },
+    "real-world/issues/gh-190/flex2025.html": {
+      "sample_count": 40,
+      "median_ms": 0.12185717961165048,
+      "mad_ms": 0.0005702503534654527,
+      "floor_ms": 0.002291070490093833
+    },
+    "real-world/wikipedia/tables_countries.html": {
+      "sample_count": 40,
+      "median_ms": 12.428117499999999,
+      "mad_ms": 0.039280700000000834,
+      "floor_ms": 0.13791815000000085
+    },
+    "real-world/issues/gh-127-issue.html": {
+      "sample_count": 40,
+      "median_ms": 21.106531166666667,
+      "mad_ms": 0.07366633333333361,
+      "floor_ms": 0.22740233333333038
+    },
+    "real-world/issues/gh-190/insight.html": {
+      "sample_count": 40,
+      "median_ms": 0.18397473564531833,
+      "mad_ms": 0.0014592224507026935,
+      "floor_ms": 0.0035684047324050228
+    },
+    "synthetic/optional_li.html": {
+      "sample_count": 40,
+      "median_ms": 0.004616298836991878,
+      "mad_ms": 0.00005488353726865484,
+      "floor_ms": 0.0001992187989802094
+    },
+    "mdream/github-markdown-complete.html": {
+      "sample_count": 40,
+      "median_ms": 11.3970388,
+      "mad_ms": 0.020747700000000258,
+      "floor_ms": 0.8614232000000008
+    },
+    "real-world/issues/gh-190/mitrade.html": {
+      "sample_count": 40,
+      "median_ms": 0.07178532424774343,
+      "mad_ms": 0.00030443944543839113,
+      "floor_ms": 0.0011879030479452213
+    },
+    "mdream/mdn-array.html": {
+      "sample_count": 40,
+      "median_ms": 10.7586096,
+      "mad_ms": 0.09231000000000034,
+      "floor_ms": 0.37410419999999966
+    },
+    "synthetic/unclosed_at_eof.html": {
+      "sample_count": 40,
+      "median_ms": 0.003342348318520676,
+      "mad_ms": 0.00004732600766026618,
+      "floor_ms": 0.00018438206630086353
+    },
+    "synthetic/table_no_tbody.html": {
+      "sample_count": 40,
+      "median_ms": 0.018595697833499666,
+      "mad_ms": 0.0001333081088910667,
+      "floor_ms": 0.0005606596498447282
+    },
+    "real-world/wikipedia/medium_python.html": {
+      "sample_count": 40,
+      "median_ms": 58.6209915,
+      "mad_ms": 0.1982344999999981,
+      "floor_ms": 1.8037390000000002
+    },
+    "mdream/react-learn.html": {
+      "sample_count": 40,
+      "median_ms": 12.806801875000001,
+      "mad_ms": 0.047051749999999615,
+      "floor_ms": 0.08419675000000026
     }
   }
 }

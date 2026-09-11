@@ -52,12 +52,15 @@ tasks:
     desc: "Calibrate baseline and fixture floors from exactly 40 quiet full-corpus runs"
     requires:
       vars: [RUNS_DIR]
+    vars:
+      ACCEPT_OUTPUT_CHANGE: '{{.ACCEPT_OUTPUT_CHANGE | default ""}}'
     cmds:
       - >-
         cargo run --release -p html-to-markdown-bench -- calibrate
         --runs-dir {{.RUNS_DIR}}
         --baseline tools/benchmark-harness/baselines/baseline.json
         --guardrails tools/benchmark-harness/guardrails.json
+        {{if .ACCEPT_OUTPUT_CHANGE}}--accept-output-change{{end}}
 
   calibration:collect:
     desc: "Collect exactly 40 quiet schema-v2 full-corpus calibration captures"

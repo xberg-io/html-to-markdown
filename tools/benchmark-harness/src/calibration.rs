@@ -15,18 +15,39 @@ type Inventory = HashMap<String, (String, u64, u64)>;
 type Thresholds = HashMap<String, GroupThreshold>;
 
 /// Validate a campaign, then promote its baseline and guardrails as one rollback-safe pair.
-pub fn calibrate(runs_dir: &Path, baseline_path: &Path, guardrails_path: &Path) -> Result<()> {
+///
+/// `accept_output_change` relaxes **only** the converted-output size comparison, for the case where
+/// a deliberate conversion fix legitimately changes what the corpus renders to. Without it there is
+/// no way to re-promote after such a fix, because the inventory is checked against the very baseline
+/// being replaced. The fixture set, its groups and its input sizes are still compared exactly, so a
+/// changed or missing fixture is still rejected. ~keep
+pub fn calibrate(
+    runs_dir: &Path,
+    baseline_path: &Path,
+    guardrails_path: &Path,
+    accept_output_change: bool,
+) -> Result<()> {
     let run_paths = run_paths(runs_dir)?;
     let runs: Vec<RunResults> = run_paths
         .iter()
         .map(|path| load_schema_v2(path, "calibration result"))
         .collect::<Result<_>>()?;
     let (expected_inventory, thresholds) = load_existing_policy(baseline_path, guardrails_path)?;
-    validate_campaign(&runs, &expected_inventory)?;
+    validate_campaign(&runs, &expected_inventory, accept_output_change)?;
     let (baseline, guardrails) = build_outputs(&runs, thresholds)?;
-    let baseline_json = serde_json::to_vec_pretty(&baseline).context("serializing calibrated baseline")?;
-    let guardrails_json = serde_json::to_vec_pretty(&guardrails).context("serializing calibrated guardrails")?;
+    let baseline_json = to_json_line_terminated(&baseline).context("serializing calibrated baseline")?;
+    let guardrails_json = to_json_line_terminated(&guardrails).context("serializing calibrated guardrails")?;
     promote_pair(baseline_path, &baseline_json, guardrails_path, &guardrails_json)
+}
+
+/// Serialize pretty JSON with the trailing newline every formatter here expects.
+///
+/// `to_vec_pretty` omits it, so a promoted pair failed the repository's format check and any
+/// reformat was undone by the next promotion. ~keep
+fn to_json_line_terminated<T: serde::Serialize>(value: &T) -> serde_json::Result<Vec<u8>> {
+    let mut bytes = serde_json::to_vec_pretty(value)?;
+    bytes.push(b'\n');
+    Ok(bytes)
 }
 
 fn run_paths(runs_dir: &Path) -> Result<Vec<PathBuf>> {
@@ -119,7 +140,7 @@ fn inventory(records: impl Iterator<Item = (String, String, u64, u64)>) -> Resul
     Ok(inventory)
 }
 
-fn validate_campaign(runs: &[RunResults], expected: &Inventory) -> Result<()> {
+fn validate_campaign(runs: &[RunResults], expected: &Inventory, accept_output_change: bool) -> Result<()> {
     ensure!(
         runs.len() == CALIBRATION_RUNS,
         "calibration requires exactly 40 captures"
@@ -149,7 +170,7 @@ fn validate_campaign(runs: &[RunResults], expected: &Inventory) -> Result<()> {
             ensure!(timestamp > previous, "run {index} timestamp is not strictly monotonic");
         }
         previous_timestamp = Some(timestamp);
-        validate_inventory(run, expected, index)?;
+        validate_inventory(run, expected, index, accept_output_change)?;
     }
     Ok(())
 }
@@ -236,7 +257,7 @@ fn validate_provenance(provenance: &Provenance) -> Result<()> {
     Ok(())
 }
 
-fn validate_inventory(run: &RunResults, expected: &Inventory, index: usize) -> Result<()> {
+fn validate_inventory(run: &RunResults, expected: &Inventory, index: usize, accept_output_change: bool) -> Result<()> {
     ensure!(
         run.runs.len() == expected.len(),
         "run {index} is not a full-corpus capture"
@@ -249,9 +270,17 @@ fn validate_inventory(run: &RunResults, expected: &Inventory, index: usize) -> R
             "run {index} contains duplicate fixture {}",
             record.fixture
         );
-        let actual = (record.group.clone(), record.bytes, record.output_bytes);
+        let Some(expected_metadata) = expected.get(&record.fixture) else {
+            anyhow::bail!("run {index} fixture metadata differs for {}", record.fixture);
+        };
+        let (expected_group, expected_bytes, expected_output_bytes) = expected_metadata;
         ensure!(
-            expected.get(&record.fixture) == Some(&actual),
+            *expected_group == record.group && *expected_bytes == record.bytes,
+            "run {index} fixture metadata differs for {}",
+            record.fixture
+        );
+        ensure!(
+            accept_output_change || *expected_output_bytes == record.output_bytes,
             "run {index} fixture metadata differs for {}",
             record.fixture
         );
@@ -464,10 +493,22 @@ mod tests {
     }
 
     #[test]
+    fn should_terminate_promoted_json_with_a_newline() {
+        let runs = campaign();
+        let (baseline, guardrails) = build_outputs(&runs, default_thresholds()).unwrap();
+        for bytes in [
+            super::to_json_line_terminated(&baseline).unwrap(),
+            super::to_json_line_terminated(&guardrails).unwrap(),
+        ] {
+            assert_eq!(bytes.last(), Some(&b'\n'), "promoted JSON must end with a newline");
+        }
+    }
+
+    #[test]
     fn should_reject_campaign_with_mismatched_provenance() {
         let mut runs = campaign();
         runs[20].provenance.cpu_count = 4;
-        let error = validate_campaign(&runs, &expected_inventory()).unwrap_err();
+        let error = validate_campaign(&runs, &expected_inventory(), false).unwrap_err();
         assert_eq!(error.to_string(), "run 20 provenance differs from the first run");
     }
 
@@ -477,8 +518,40 @@ mod tests {
         for run in &mut runs {
             run.provenance.calibration_target_ms = 1;
         }
-        let error = validate_campaign(&runs, &expected_inventory()).unwrap_err();
+        let error = validate_campaign(&runs, &expected_inventory(), false).unwrap_err();
         assert_eq!(error.to_string(), "unsupported measurement settings");
+    }
+
+    #[test]
+    fn should_reject_changed_output_bytes_unless_opted_in() {
+        let runs = campaign();
+        let mut expected = expected_inventory();
+        expected.insert("fixture.html".to_owned(), ("clean_small".to_owned(), 10, 9));
+
+        let error = validate_campaign(&runs, &expected, false).unwrap_err();
+        assert_eq!(error.to_string(), "run 0 fixture metadata differs for fixture.html");
+        assert!(validate_campaign(&runs, &expected, true).is_ok());
+    }
+
+    #[test]
+    fn should_reject_changed_input_bytes_even_when_accepting_output_change() {
+        let runs = campaign();
+        let mut expected = expected_inventory();
+        expected.insert("fixture.html".to_owned(), ("clean_small".to_owned(), 11, 5));
+
+        let error = validate_campaign(&runs, &expected, true).unwrap_err();
+        assert_eq!(error.to_string(), "run 0 fixture metadata differs for fixture.html");
+    }
+
+    #[test]
+    fn should_reject_unknown_fixture_even_when_accepting_output_change() {
+        let runs = campaign();
+        let mut expected = expected_inventory();
+        expected.remove("fixture.html");
+        expected.insert("renamed.html".to_owned(), ("clean_small".to_owned(), 10, 5));
+
+        let error = validate_campaign(&runs, &expected, true).unwrap_err();
+        assert_eq!(error.to_string(), "run 0 fixture metadata differs for fixture.html");
     }
 
     #[test]

@@ -351,11 +351,26 @@ struct CalibrateArgs {
     /// Guardrails file to migrate or update.
     #[arg(long, default_value = "tools/benchmark-harness/guardrails.json")]
     guardrails: PathBuf,
+
+    /// Allow fixtures whose converted output size changed since the baseline being replaced.
+    ///
+    /// Required after a deliberate conversion fix changes what the corpus renders to: the
+    /// inventory is otherwise checked against the very baseline this command replaces, so there
+    /// would be no way to re-promote. Fixture set, groups and input sizes are still compared
+    /// exactly. Promotion still requires retained artifacts, comparable hardware, a quiet-runner
+    /// record and reviewer approval -- see the harness README.
+    #[arg(long)]
+    accept_output_change: bool,
 }
 
 #[expect(clippy::print_stdout, reason = "calibration result is CLI output")]
 fn cmd_calibrate(args: CalibrateArgs) -> Result<()> {
-    calibration::calibrate(&args.runs_dir, &args.baseline, &args.guardrails)?;
+    calibration::calibrate(
+        &args.runs_dir,
+        &args.baseline,
+        &args.guardrails,
+        args.accept_output_change,
+    )?;
     println!(
         "Calibrated {} and {} from {}.",
         args.baseline.display(),

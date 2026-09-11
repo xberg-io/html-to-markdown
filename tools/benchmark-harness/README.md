@@ -62,6 +62,22 @@ Both output files are staged and backed up before promotion; if either promotion
 Baseline promotion requires retained raw artifacts, comparable hardware, a quiet-runner record, and reviewer approval.
 Never promote a baseline or populate floors merely to make CI green.
 
+### Re-promoting after a deliberate conversion change
+
+The fixture inventory is validated against the baseline being replaced, so a conversion fix that
+legitimately changes what the corpus renders to blocks calibration on `fixture metadata differs`.
+Re-promote with the explicit opt-in:
+
+```sh
+RUNS_DIR=/path/to/campaign ACCEPT_OUTPUT_CHANGE=1 task bench:calibrate
+```
+
+That relaxes **only** the converted-output size comparison. The fixture set, its groups, and its
+input sizes are still compared exactly, so a renamed, added, removed, or edited fixture is still
+rejected. Confirm the output change is an improvement — diff the before/after markdown, do not
+infer it from the byte count — and record which fixtures moved and why. Every other promotion
+requirement above still applies; the flag is not an approval.
+
 ## Quiet-runner gate
 
 Capture calibration or A/B evidence only when the runner is pinned, on external power, thermally stable, and has no
