@@ -122,7 +122,10 @@ pub fn cell_text_content(
         ..ctx.clone()
     };
 
-    render_cell_text(node_handle, parser, options, &cell_ctx, dom_ctx, depth)
+    // ~keep Width measurement never defers a nested table out to a separate block: the
+    // ~keep result is discarded once its length is measured (capped at 200 chars anyway),
+    // ~keep and deferring here as well as in the render pass would queue it twice (issue #484).
+    render_cell_text(node_handle, parser, options, &cell_ctx, dom_ctx, depth, None)
 }
 
 /// Initial buffer capacity for a rendered cell's markdown.
@@ -134,6 +137,15 @@ const CELL_TEXT_CAPACITY: usize = 128;
 /// the per-row context can be built once instead of cloned per cell.
 ///
 /// `depth` is the cell's own recursion depth; children are walked at `depth + 1`.
+///
+/// `deferred_tables`, when `Some`, receives a nested `<table>` child's rendered markdown
+/// verbatim (trimmed, unescaped, un-flattened) instead of folding it into this cell's single
+/// line. The caller passes `Some` only when the enclosing row holds no other cell — GFM has no
+/// way to express a real nested table, but a lone cell's content can be lifted out and rendered
+/// as its own separate table after the enclosing one, which keeps the inner table usable
+/// instead of flattening it into a line of escaped pipes (issue #484). `None` (the default, and
+/// always the case for a cell sharing its row with a sibling, per issue #469) keeps the existing
+/// flatten-and-escape behavior.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn render_cell_text(
     node_handle: &tl::NodeHandle,
@@ -142,6 +154,7 @@ pub fn render_cell_text(
     cell_ctx: &super::super::super::Context,
     dom_ctx: &super::super::super::DomContext,
     depth: usize,
+    mut deferred_tables: Option<&mut Vec<String>>,
 ) -> String {
     let mut text = String::with_capacity(CELL_TEXT_CAPACITY);
 
@@ -176,6 +189,13 @@ pub fn render_cell_text(
                         depth + 1,
                         dom_ctx,
                     );
+                    if let Some(buf) = deferred_tables.as_deref_mut() {
+                        let trimmed = nested.trim();
+                        if !trimmed.is_empty() {
+                            buf.push(trimmed.to_string());
+                        }
+                        continue;
+                    }
                     if nested.contains('|') {
                         nested = crate::converter::utility::content::escape_bare_pipes_outside_code_spans(&nested);
                     }
@@ -287,6 +307,7 @@ fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> 
 /// * `dom_ctx` - DOM context for content extraction
 /// * `col_width` - Optional target width for padding (None = no padding)
 /// * `depth` - Current recursion depth (the cell's own depth; children are walked at `depth + 1`)
+/// * `deferred_tables` - See [`render_cell_text`]; forwarded unchanged.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 #[allow(clippy::too_many_arguments)]
 pub fn convert_table_cell(
@@ -299,8 +320,9 @@ pub fn convert_table_cell(
     dom_ctx: &super::super::super::DomContext,
     col_width: Option<usize>,
     depth: usize,
+    deferred_tables: Option<&mut Vec<String>>,
 ) {
-    let text = render_cell_text(node_handle, parser, options, cell_ctx, dom_ctx, depth);
+    let text = render_cell_text(node_handle, parser, options, cell_ctx, dom_ctx, depth, deferred_tables);
     emit_cell_text(node_handle, parser, output, &text, col_width);
 }
 

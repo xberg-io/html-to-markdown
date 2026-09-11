@@ -105,6 +105,7 @@ const fn bail_variant_name(reason: &BailReason) -> &'static str {
         BailReason::TableRowspanColspan => "TableRowspanColspan",
         BailReason::TableBlockChildInCell => "TableBlockChildInCell",
         BailReason::TableNestedTable => "TableNestedTable",
+        BailReason::TableNestedTableInSingleCellRow => "TableNestedTableInSingleCellRow",
         BailReason::TableCaption => "TableCaption",
         BailReason::TableSectionOrder => "TableSectionOrder",
         BailReason::DepthLimitExceeded { .. } => "DepthLimitExceeded",

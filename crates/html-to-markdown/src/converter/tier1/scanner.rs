@@ -3329,6 +3329,15 @@ fn close_table(
             return Err(BailReason::Classifier);
         }
     }
+    // ~keep Issue #484: some row in this table (checked only once the whole table is known,
+    // ~keep see `TableState::had_single_cell_nested_table_row`) closed with exactly one cell
+    // ~keep holding a nested table, and the table did not already match the more specific
+    // ~keep one-cell-*wrapper* bail above. Tier-2 defers that row's nested table to a
+    // ~keep separate GFM table after this one; this scanner has no equivalent deferred-output
+    // ~keep buffer, so it bails and lets Tier-2 (authoritative) render it.
+    if ts.had_single_cell_nested_table_row {
+        return Err(BailReason::TableNestedTableInSingleCellRow);
+    }
     // ~keep Phase HH: a nested table writes its GFM rendering into the parent
     // ~keep cell buffer; the parent's `close_table_cell` then collapses the
     // ~keep resulting newlines to spaces.  An outer table writes to the main
@@ -3410,6 +3419,14 @@ fn close_table_row(state: &mut Tier1State) {
     if ts.current_row.is_empty() {
         return;
     }
+    // ~keep Issue #484: record (rather than bail immediately) that this row's sole cell
+    // ~keep held a nested table — `close_table` has seen every row and decides whether
+    // ~keep the more specific one-cell-*wrapper* bail applies first. See
+    // ~keep `TableState::had_single_cell_nested_table_row`.
+    if ts.pending_single_cell_nested_table && ts.current_row.len() == 1 {
+        ts.had_single_cell_nested_table_row = true;
+    }
+    ts.pending_single_cell_nested_table = false;
     // ~keep Track first-row column count for consistency checking — use the
     // ~keep colspan-expanded count so Tier-2's heuristic compares the same numbers.
     let col_count: usize = ts.current_row.iter().map(|(_, c)| usize::from(*c)).sum();
@@ -3459,6 +3476,11 @@ fn close_table_cell(state: &mut Tier1State, is_implicit: bool) -> Result<(), Bai
     if !is_implicit && !allow_pipes && cell_text.contains('|') {
         return Err(BailReason::TableBlockChildInCell);
     }
+    // ~keep Track whether this row is (so far) a single cell that held a nested table —
+    // ~keep see `TableState::pending_single_cell_nested_table`. Only the row's FIRST cell
+    // ~keep can set it; any later cell proves the row has a sibling and clears it,
+    // ~keep regardless of whether that later cell itself had a nested table.
+    ts.pending_single_cell_nested_table = allow_pipes && ts.current_row.is_empty();
     // ~keep Phase L-prep: store (text, colspan) so emit_gfm_table can mirror
     // ~keep Tier-2's `for _ in 0..colspan { output.push_str(" |") }` (cell.rs:248)
     // ~keep and the layout-heuristic uses the colspan-expanded column count.

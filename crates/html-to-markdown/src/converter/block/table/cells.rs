@@ -265,7 +265,8 @@ pub fn collect_row_cell_widths(
 /// Emit one cell of a rendered row, reusing the pre-pass rendering when it is cached.
 ///
 /// `env.ctx` is used as the cell's own context (already carrying `in_table_cell = true`).
-/// `depth` is the cell's own recursion depth.
+/// `depth` is the cell's own recursion depth. `deferred_tables` is forwarded to
+/// [`convert_table_cell`]; see [`super::cell::render_cell_text`] for what it does.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn emit_row_cell(
     cell_handle: &tl::NodeHandle,
@@ -274,6 +275,7 @@ fn emit_row_cell(
     col_width: Option<usize>,
     depth: usize,
     cell_cache: &mut CellTextCache,
+    deferred_tables: Option<&mut Vec<String>>,
 ) {
     if let Some(text) = cell_cache.take(cell_handle.get_inner()) {
         emit_cell_text(cell_handle, env.parser, row_text, &text, col_width);
@@ -288,6 +290,7 @@ fn emit_row_cell(
             env.dom_ctx,
             col_width,
             depth,
+            deferred_tables,
         );
     }
 }
@@ -358,6 +361,9 @@ fn emit_rowspan_continuation(
 /// * `is_header` - Whether this is a header row
 /// * `col_widths` - Per-column max content widths for padding (empty = no padding)
 /// * `cell_cache` - Markdown already rendered for these cells by the width pre-pass
+/// * `deferred_tables` - Collects a nested table's markdown when this row's sole cell holds
+///   one; see [`super::cell::render_cell_text`]. The caller renders these separately, after the
+///   enclosing table, once every row has been processed (issue #484).
 #[allow(clippy::too_many_arguments)]
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -377,11 +383,17 @@ pub fn convert_table_row(
     is_header: bool,
     col_widths: &[usize],
     cell_cache: &mut CellTextCache,
+    deferred_tables: &mut Vec<String>,
 ) {
     let mut row_text = String::with_capacity(256);
     let mut cells = Vec::new();
 
     collect_table_cells(node_handle, parser, dom_ctx, &mut cells);
+    // ~keep A nested table may only be deferred out of a cell that shares its row with no
+    // ~keep other cell -- pulling it out of a row with a sibling would leave that sibling's
+    // ~keep column position undefined (issue #469 locks the sibling-cell shape to the
+    // ~keep existing flatten-and-escape behavior; issue #484 is the single-cell-row shape).
+    let is_single_cell_row = cells.len() == 1;
 
     #[cfg(feature = "visitor")]
     let cell_contents: Vec<String> = if ctx.visitor.is_some() {
@@ -492,7 +504,16 @@ pub fn convert_table_row(
 
             if let Some(cell_handle) = cell_iter.next() {
                 let col_width = col_widths.get(col_index).copied();
-                emit_row_cell(cell_handle, &mut row_text, row_env, col_width, depth + 1, cell_cache);
+                let deferred = is_single_cell_row.then_some(&mut *deferred_tables);
+                emit_row_cell(
+                    cell_handle,
+                    &mut row_text,
+                    row_env,
+                    col_width,
+                    depth + 1,
+                    cell_cache,
+                    deferred,
+                );
 
                 let (colspan, rowspan) = get_colspan_rowspan(cell_handle, parser);
 
@@ -509,7 +530,16 @@ pub fn convert_table_row(
     } else {
         for (cell_idx, cell_handle) in cells.iter().enumerate() {
             let col_width = col_widths.get(cell_idx).copied();
-            emit_row_cell(cell_handle, &mut row_text, row_env, col_width, depth + 1, cell_cache);
+            let deferred = is_single_cell_row.then_some(&mut *deferred_tables);
+            emit_row_cell(
+                cell_handle,
+                &mut row_text,
+                row_env,
+                col_width,
+                depth + 1,
+                cell_cache,
+                deferred,
+            );
         }
         cells.len()
     };

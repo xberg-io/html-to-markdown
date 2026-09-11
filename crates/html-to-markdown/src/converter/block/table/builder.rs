@@ -317,6 +317,10 @@ pub fn handle_table(
 
             let reuse_cell_text = !options.compact_tables && cell_text_reuse_allowed(ctx, &table_scan);
             let mut cell_cache = CellTextCache::new(reuse_cell_text);
+            // ~keep Populated by `convert_table_row` when a row's sole cell holds a nested
+            // ~keep table (issue #484): rendered separately, after this table, instead of
+            // ~keep being flattened into a line of escaped pipes.
+            let mut deferred_tables: Vec<String> = Vec::new();
 
             // ~keep Pre-pass: compute per-column max content widths for aligned padding.
             // ~keep Uses a rowspan tracker so spanned columns are skipped just as they
@@ -464,6 +468,7 @@ pub fn handle_table(
                                                     is_header_section,
                                                     &col_widths,
                                                     &mut cell_cache,
+                                                    &mut deferred_tables,
                                                 );
                                                 row_index += 1;
                                             }
@@ -489,6 +494,7 @@ pub fn handle_table(
                                     row_index == 0,
                                     &col_widths,
                                     &mut cell_cache,
+                                    &mut deferred_tables,
                                 );
                                 row_index += 1;
                             }
@@ -509,6 +515,21 @@ pub fn handle_table(
                         }
                     }
                 }
+            }
+
+            // ~keep Render each deferred nested table (issue #484) as its own separate GFM
+            // ~keep table, immediately after this one. GFM cannot express real nesting, so
+            // ~keep this is the closest usable substitute to what 3.8.3 rendered before the
+            // ~keep escaped-flatten fallback (issue #469) took over this shape too.
+            for nested in &deferred_tables {
+                if !output.ends_with('\n') {
+                    output.push('\n');
+                }
+                if !output.ends_with("\n\n") {
+                    output.push('\n');
+                }
+                output.push_str(nested);
+                output.push('\n');
             }
         }
 

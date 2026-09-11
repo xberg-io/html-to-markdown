@@ -72,6 +72,19 @@ pub enum BailReason {
     /// (i.e. `table_stack` is non-empty).
     TableNestedTable,
 
+    /// A `<tr>` whose only cell holds a nested `<table>` closed inside an outer table
+    /// that is not itself a one-cell wrapper (i.e. `TableNestedTable` did not already
+    /// cover it — the outer table has other rows and/or a `<th>` somewhere).
+    ///
+    /// Tier-2's `block/table/builder::handle_table` defers that nested table, rendering
+    /// it as its own separate GFM table immediately after the enclosing one, rather than
+    /// flattening it into a line of escaped pipes (issue #484). Reproducing "render this
+    /// row's cell now, but hold its nested table's markdown until the whole outer table
+    /// has finished" needs the same kind of end-of-table deferred buffer Tier-2 uses;
+    /// this single-pass scanner has no equivalent buffering. Bail so Tier-2
+    /// (authoritative) handles it.
+    TableNestedTableInSingleCellRow,
+
     /// A `<caption>` element was encountered inside a table.
     TableCaption,
 
@@ -259,6 +272,9 @@ impl fmt::Display for BailReason {
             }
             Self::TableNestedTable => {
                 write!(f, "nested <table> inside a table cell")
+            }
+            Self::TableNestedTableInSingleCellRow => {
+                write!(f, "nested <table> inside a data table's single-cell row")
             }
             Self::TableCaption => {
                 write!(f, "<caption> element in table")

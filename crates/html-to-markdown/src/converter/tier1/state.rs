@@ -89,6 +89,24 @@ pub struct TableState {
     /// layout-table fallback in close_table on what should be a normal GFM
     /// table (e.g. wikipedia/large_rust infobox).
     pub current_cell_colspan: u16,
+    /// True while the row currently being assembled (`current_row`) holds exactly one
+    /// finalized cell so far and that cell had a nested table flattened into it.
+    ///
+    /// Cleared as soon as a second cell closes into the same row (a sibling means Tier-2
+    /// keeps the existing flatten-and-escape rendering, issue #469). Read by
+    /// `close_table_row`, which folds a still-true value at a one-cell row's close into
+    /// `had_single_cell_nested_table_row` below.
+    pub pending_single_cell_nested_table: bool,
+    /// True once any row in this table closed with exactly one cell that held a nested
+    /// table (see `pending_single_cell_nested_table`).
+    ///
+    /// Checked by `close_table` — after its existing one-cell-*wrapper* check, which takes
+    /// priority when both apply — rather than bailing immediately in `close_table_row`,
+    /// because a row-level decision cannot yet know whether this row turns out to be the
+    /// whole table (the wrapper shape, `TableNestedTable`) or one row among several (Tier-2
+    /// defers just that row's nested table instead, issue #484): only `close_table` has
+    /// seen every row.
+    pub had_single_cell_nested_table_row: bool,
 }
 
 bitflags::bitflags! {
