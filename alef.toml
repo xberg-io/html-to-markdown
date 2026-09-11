@@ -350,6 +350,11 @@ exclude = [
   "packages/java/**/*.java",
   "test_apps/csharp/**/*.cs",
   "test_apps/java/**/*.java",
+  # htmbench-promoted calibration pair: serde_json's pretty printer always expands short
+  # arrays that poly collapses onto one line, so formatting them is undone by the next
+  # `bench:calibrate` promotion and the two fight forever. ~keep
+  "tools/benchmark-harness/baselines/baseline.json",
+  "tools/benchmark-harness/guardrails.json",
   # Vendored wasm-bindgen artifact (docs live demo); hand-written script.js /
   # style.css / index.html in the same dir stay linted. ~keep
   "docs-site/public/demo/html_to_markdown_wasm*",
