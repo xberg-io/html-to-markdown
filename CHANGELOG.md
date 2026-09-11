@@ -26,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drive the musl Node cross-compile through the shared build action, whose per-leg artifact
   staging replaces the `napi artifacts` call that `@napi-rs/cli` 3.9.1 made fail on any
   single-target matrix leg.
+- Keep the visible text of a `<tr>` nested directly inside a `<td>`, a shape malformed
+  newsletter HTML produces; the row and its content were dropped silently
+  ([#486](https://github.com/xberg-io/html-to-markdown/issues/486)).
+- Render a data table's nested single-cell table as its own table instead of flattening it
+  into a cell of escaped pipes ([#484](https://github.com/xberg-io/html-to-markdown/issues/484)).
+- Apply the WHATWG numeric character reference replacement table, so `&#155;` decodes to
+  `›` rather than a raw C1 control character; null, surrogate and out-of-range
+  references now yield U+FFFD ([#485](https://github.com/xberg-io/html-to-markdown/issues/485)).
 
 ## [3.12.3] - 2026-09-09
 

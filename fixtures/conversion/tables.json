@@ -252,5 +252,32 @@
       "stem": "table_layout_cell_paragraphs_stay_separated",
       "title": "Adjacent paragraphs in a layout-table cell stay separated"
     }
+  },
+  {
+    "id": "table_nested_in_single_cell_renders_separately",
+    "description": "A table nested in a single-cell row renders as its own table",
+    "input": {
+      "html": "<table><tr><th>Summary</th></tr><tr><td>Before<table><tr><th>Item</th><th>Amount</th></tr><tr><td>Alpha</td><td>10</td></tr></table></td></tr></table>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "| Item  | Amount |",
+          "| Alpha | 10     |"
+        ]
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "\\|"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "table_nested_in_single_cell_renders_separately",
+      "title": "A table nested in a single-cell row renders as its own table"
+    }
   }
 ]
