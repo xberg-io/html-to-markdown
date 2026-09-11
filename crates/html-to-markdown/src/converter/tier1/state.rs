@@ -126,6 +126,17 @@ pub struct OpenTag {
     /// Byte range of the tag name in the original input (original case; callers
     /// must lowercase before comparing).
     pub name_range: std::ops::Range<usize>,
+    /// Set (`Strong`/`Emphasis` frames only) when `flush_text` dropped a whitespace-only
+    /// text node at this frame's content start, i.e. before any other content was written.
+    ///
+    /// `close_inline_marker`'s body-emptiness check operates on buffer bytes alone, but by
+    /// the time it runs, `flush_text`'s own block-edge whitespace drop (issue #481) has
+    /// already erased those bytes — a genuinely empty `<em></em>` and a whitespace-only
+    /// `<em> </em>` both look identical (buffer unchanged since `content_start`) from
+    /// `close_inline_marker`'s point of view. This flag is the only surviving signal that
+    /// distinguishes them, so `close_inline_marker` can bail (`WhitespaceOnlyInlineEmphasis`)
+    /// for the latter instead of silently truncating the space away like the former.
+    pub dropped_whitespace_only_text: bool,
 }
 
 /// Minimum capacity for each summary accumulation buffer.

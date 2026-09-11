@@ -84,7 +84,28 @@ pub fn process_text_node(
             return;
         }
 
-        if ctx.in_paragraph && output.len() == ctx.block_content_start {
+        // ~keep The `block_output_ptr` address check guards against a false match on a
+        // ~keep nested inline wrapper's (em/strong/link) fresh, empty SCRATCH buffer:
+        // ~keep `walk_node` builds each such wrapper's content into its own local `String`
+        // ~keep before splicing it into the real output (see `Context::block_output_ptr`'s
+        // ~keep and `Context::at_fresh_block_start`'s doc comments for the general shape of
+        // ~keep this hazard), so that buffer's length can coincidentally equal the ANCESTOR
+        // ~keep paragraph's `block_content_start` even when real content already precedes
+        // ~keep this point in the actual document -- e.g. `<p>A<i> </i>B</p>`, where the
+        // ~keep space inside `<i>` sees its own buffer at length 0, identical to the
+        // ~keep paragraph's block_content_start of 0, and was wrongly dropped entirely
+        // ~keep rather than surviving as the one space `<i>`'s own whitespace-only handling
+        // ~keep (`chomp_inline`) expects to receive (issue #481). An `inline_depth == 0`
+        // ~keep guard was tried and reverted: it also blocked the legitimate case of a
+        // ~keep genuinely block-level, buffer-sharing paragraph sitting at non-zero
+        // ~keep `inline_depth` because a stray tag-soup `<b>`/`<a>` wraps WHOLE paragraphs
+        // ~keep (Google Docs export artifact) -- `inline_depth` conflates "wrapped by an
+        // ~keep inline ancestor" with "writing into that ancestor's detached scratch
+        // ~keep buffer", and only the latter is what this check needs to exclude.
+        if ctx.in_paragraph
+            && std::ptr::from_ref::<String>(output) as usize == ctx.block_output_ptr
+            && output.len() == ctx.block_content_start
+        {
             return;
         }
 

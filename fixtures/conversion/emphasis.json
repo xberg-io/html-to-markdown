@@ -194,5 +194,43 @@
       "stem": "emphasis_superscript",
       "title": "sup tag content is preserved"
     }
+  },
+  {
+    "id": "adjacent_emphasis_merged",
+    "description": "Adjacent emphasis elements share one delimiter run",
+    "input": {
+      "html": "<p><i>A</i><i>B</i><i>C</i></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "*ABC*\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "adjacent_emphasis_merged",
+      "title": "Adjacent emphasis elements share one delimiter run"
+    }
+  },
+  {
+    "id": "tagged_space_not_duplicated",
+    "description": "A whitespace-only inline element contributes exactly one space",
+    "input": {
+      "html": "<p>A<i> </i>B</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "A B\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "tagged_space_not_duplicated",
+      "title": "A whitespace-only inline element contributes exactly one space"
+    }
   }
 ]

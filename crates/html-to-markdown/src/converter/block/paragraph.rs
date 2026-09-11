@@ -74,6 +74,7 @@ pub fn handle(
     let p_ctx = Context {
         in_paragraph: true,
         block_content_start: output.len(),
+        block_output_ptr: std::ptr::from_ref::<String>(output) as usize,
         ..ctx.clone()
     };
 

@@ -121,7 +121,9 @@ pub use self::dom_context::DomContext;
 pub use self::main::{convert_html_impl, walk_node};
 pub use self::main_helpers::{emit_table_cell_break, strip_trailing_backslash_breaks, trim_trailing_whitespace};
 
-pub use crate::converter::utility::content::{chomp_inline, get_text_content, normalized_tag_name};
+pub use crate::converter::utility::content::{
+    chomp_inline, get_text_content, merge_adjacent_emphasis, normalized_tag_name,
+};
 // ~keep reason: serialize_node and serialize_node_to_html are only used when the visitor
 // ~keep or inline-images features are active; re-exported here so call sites don't need
 // ~keep to know the internal utility path.

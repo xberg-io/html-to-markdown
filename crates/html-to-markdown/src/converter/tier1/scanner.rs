@@ -647,6 +647,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                     list_index,
                     ol_start,
                     name_range: name_start..name_end,
+                    dropped_whitespace_only_text: false,
                 });
 
                 apply_open_escape_ctx(&mut state, spec);
@@ -1147,11 +1148,27 @@ fn emit_open(
             // ~keep Without this, `<strong><strong>x</strong></strong>` emits
             // ~keep `****x****`, which is not valid CommonMark strong emphasis.
             if !state.summary_at_top() && !state.escape_ctx.contains(EscapeCtx::STRONG) {
+                // ~keep issue #483: opening `**` right after the buffer's own matching
+                // ~keep `**` close (no intervening content) would form one longer
+                // ~keep CommonMark delimiter run on reparse, not two independent strong
+                // ~keep spans. Tier-2 merges this case (`merge_adjacent_emphasis`);
+                // ~keep Tier-1 does not replicate the merge, so it bails instead.
+                if state.cell_or_output_mut().ends_with("**") {
+                    return Err(BailReason::AdjacentInlineEmphasis);
+                }
                 state.cell_or_output_mut().push_str("**");
             }
         }
         TagKind::Emphasis => {
-            state.cell_or_output_mut().push('*');
+            // ~keep issue #483: same reasoning as the `Strong` arm above, for the lone
+            // ~keep `*` marker -- but a lone `*` must not match the second half of a `**`
+            // ~keep (that is a `<strong>` close, an unrelated tag kind), hence excluding
+            // ~keep `ends_with("**")` here.
+            let buf = state.cell_or_output_mut();
+            if buf.ends_with('*') && !buf.ends_with("**") {
+                return Err(BailReason::AdjacentInlineEmphasis);
+            }
+            buf.push('*');
         }
         TagKind::Strikethrough => {
             // ~keep Tier-2's handle_strikethrough suppresses the `~~` wrapping
@@ -2028,14 +2045,14 @@ fn emit_close(
         // ~keep open marker either (see open-side guard) — `state.escape_ctx` was
         // ~keep just restored to `frame.prev_escape_ctx` above.
         TagKind::Strong if state.summary_at_top() || state.escape_ctx.contains(EscapeCtx::STRONG) => {}
-        TagKind::Strong => close_inline_marker(state, &frame, "**"),
-        TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
+        TagKind::Strong => close_inline_marker(state, &frame, "**")?,
+        TagKind::Emphasis => close_inline_marker(state, &frame, "*")?,
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
-        TagKind::Strikethrough => close_inline_marker(state, &frame, "~~"),
+        TagKind::Strikethrough => close_inline_marker(state, &frame, "~~")?,
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
-        TagKind::Inserted => close_inline_marker(state, &frame, "=="),
+        TagKind::Inserted => close_inline_marker(state, &frame, "==")?,
         TagKind::Code => close_code(state, &frame),
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
@@ -2291,17 +2308,32 @@ fn clamp_to_char_boundary(buf: &str, at: usize) -> usize {
 /// `**` / `*` pair.  Tier-2's DOM walker reaches the same result by emitting
 /// nothing for an empty inline node; the byte-equality oracle requires us to
 /// match that.
-fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
+fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) -> Result<(), BailReason> {
     let buf = state.cell_or_output_mut();
     let content_start = clamp_to_char_boundary(buf, frame.content_start);
-    let body_is_empty = buf.len() <= content_start
-        || buf[content_start..]
+    let content_is_absent = buf.len() <= content_start;
+    let is_whitespace_only_not_empty = !content_is_absent
+        && buf[content_start..]
             .bytes()
             .all(|b| matches!(b, b' ' | b'\t' | b'\n' | b'\r'));
+    let body_is_empty = content_is_absent || is_whitespace_only_not_empty;
     if body_is_empty {
+        // ~keep issue #481: a body that is (or, per `dropped_whitespace_only_text`, WAS
+        // ~keep before `flush_text` dropped it) non-empty but entirely whitespace (e.g.
+        // ~keep `<i> </i>`) is not the same as a genuinely empty one (`<i></i>`) --
+        // ~keep Tier-2's `chomp_inline` preserves it as a single space OUTSIDE the
+        // ~keep markers, while erasing the markers here (as the genuinely-empty case
+        // ~keep correctly does) would silently drop that space. Only bail for
+        // ~keep strong/emphasis markers (`**`/`*`) -- Strikethrough (`~~`) and
+        // ~keep Inserted (`==`) share this function but are not part of issue #481.
+        let was_whitespace_only =
+            is_whitespace_only_not_empty || (content_is_absent && frame.dropped_whitespace_only_text);
+        if was_whitespace_only && matches!(marker, "**" | "*") {
+            return Err(BailReason::WhitespaceOnlyInlineEmphasis);
+        }
         let open_marker_start = clamp_to_char_boundary(buf, content_start.saturating_sub(marker.len()));
         buf.truncate(open_marker_start);
-        return;
+        return Ok(());
     }
 
     // ~keep Mirror Tier-2's `chomp_inline` (utility/content.rs:31): leading/trailing
@@ -2345,10 +2377,11 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) {
         buf.truncate(trailing_start);
         buf.push_str(marker);
         buf.push_str(&trailing);
-        return;
+        return Ok(());
     }
 
     buf.push_str(marker);
+    Ok(())
 }
 
 /// Implicitly close the top-of-stack frame without a matching `</tag>` in the
@@ -2383,14 +2416,14 @@ fn emit_close_for_implicit(
         // ~keep open marker either (see open-side guard) — `state.escape_ctx` was
         // ~keep just restored to `frame.prev_escape_ctx` above.
         TagKind::Strong if state.summary_at_top() || state.escape_ctx.contains(EscapeCtx::STRONG) => {}
-        TagKind::Strong => close_inline_marker(state, &frame, "**"),
-        TagKind::Emphasis => close_inline_marker(state, &frame, "*"),
+        TagKind::Strong => close_inline_marker(state, &frame, "**")?,
+        TagKind::Emphasis => close_inline_marker(state, &frame, "*")?,
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
-        TagKind::Strikethrough => close_inline_marker(state, &frame, "~~"),
+        TagKind::Strikethrough => close_inline_marker(state, &frame, "~~")?,
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
-        TagKind::Inserted => close_inline_marker(state, &frame, "=="),
+        TagKind::Inserted => close_inline_marker(state, &frame, "==")?,
         TagKind::Code => close_code(state, &frame),
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
@@ -3710,6 +3743,21 @@ fn flush_text(
         && !in_list_item_frame_for_ws
         && !state.escape_ctx.contains(EscapeCtx::HEADING);
     if !in_pre && (is_block_edge || document_start_drops_ws) && raw_is_whitespace {
+        // ~keep issue #481: record that a whitespace-only text node was dropped right at
+        // ~keep this Strong/Emphasis frame's own content start, BEFORE it disappears —
+        // ~keep `close_inline_marker` cannot tell a genuinely empty `<em></em>` apart from
+        // ~keep a whitespace-only `<em> </em>` from buffer bytes alone once this drop has
+        // ~keep already erased them (see `OpenTag::dropped_whitespace_only_text`'s doc
+        // ~keep comment). Harmless when more real content follows this same drop (e.g.
+        // ~keep `<em> <b>x</b></em>`): the frame's body ends up non-empty regardless, so
+        // ~keep `close_inline_marker` never consults the flag in that case.
+        if at_inline_frame_start {
+            if let Some(frame) = state.stack.last_mut() {
+                if matches!(frame.spec.kind, TagKind::Strong | TagKind::Emphasis) {
+                    frame.dropped_whitespace_only_text = true;
+                }
+            }
+        }
         // ~keep Drop block-edge whitespace anywhere — including inside table cells.
         // ~keep A cell-open `<td>`/`<th>` produces a fresh empty buffer; the
         // ~keep pretty-printer's inter-tag whitespace before the first child would

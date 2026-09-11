@@ -95,6 +95,22 @@ pub struct Context {
     /// Used to distinguish paragraph-break newlines from a previous block
     /// vs. newlines generated within the current block.
     pub(crate) block_content_start: usize,
+    /// Address of the `output` buffer `block_content_start` was measured against (set
+    /// alongside it in `block/paragraph.rs`), as `*const String as usize`.
+    ///
+    /// `block_content_start` alone cannot tell "this text node's `output` is the SAME
+    /// buffer the paragraph started measuring" from "it coincidentally has the same
+    /// length" -- an inline wrapper (`em`/`strong`/link) builds its content into a
+    /// *different, fresh local `String`* before splicing it into the real output, and that
+    /// scratch buffer's length can coincidentally equal the ANCESTOR paragraph's
+    /// `block_content_start` even when real content already precedes this point in the
+    /// actual document (issue #481: `<p>A<i> </i>B</p>` saw the space inside `<i>`'s own
+    /// empty scratch buffer misidentified as the paragraph's own leading whitespace and
+    /// dropped). A raw address comparison, unlike `ctx.inline_depth == 0`, correctly
+    /// still fires when a block-level tag-soup wrapper (e.g. a stray `<b>` wrapping whole
+    /// paragraphs, as Google Docs exports) puts a genuine, buffer-sharing paragraph body
+    /// at non-zero `inline_depth`.
+    pub(crate) block_output_ptr: usize,
     /// Shared flag: true until the first non-whitespace text content is emitted.
     ///
     /// ~keep `block_content_start` cannot answer "is this text node at the very start of a
@@ -246,6 +262,7 @@ impl Context {
             cell_allow_inline_images: false,
             in_paragraph: false,
             block_content_start: 0,
+            block_output_ptr: 0,
             at_fresh_block_start: Rc::new(Cell::new(true)),
             in_ruby: false,
             in_strong: false,

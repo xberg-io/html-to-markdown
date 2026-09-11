@@ -32,9 +32,23 @@ pub fn chomp_inline(text: &str) -> (&str, &str, &str) {
         return ("", "", "");
     }
 
-    let prefix = if text.starts_with(&[' ', '\t'][..]) { " " } else { "" };
-
     let has_trailing_linebreak = text.ends_with("  \n") || text.ends_with("\\\n");
+
+    if text.trim().is_empty() && !has_trailing_linebreak {
+        // ~keep A whitespace-only body (e.g. `<i> </i>`) is ONE space in the source, not
+        // ~keep two: the starts_with/ends_with checks below would treat the very same run
+        // ~keep as both prefix AND suffix, and every caller's "push prefix, then
+        // ~keep append_inline_suffix(suffix)" shape then emits it twice (issue #481).
+        // ~keep Represented once, as a prefix (with an empty suffix so
+        // ~keep `append_inline_suffix` is a no-op), every existing caller naturally
+        // ~keep collapses back to a single space. A hard trailing linebreak is excluded
+        // ~keep above and keeps the full logic below -- it is not interchangeable with a
+        // ~keep plain space.
+        let prefix = if text.contains([' ', '\t']) { " " } else { "" };
+        return (prefix, "", "");
+    }
+
+    let prefix = if text.starts_with(&[' ', '\t'][..]) { " " } else { "" };
 
     let suffix = if has_trailing_linebreak {
         if text.ends_with("  \n") { "  \n" } else { "\\\n" }
@@ -54,6 +68,49 @@ pub fn chomp_inline(text: &str) -> (&str, &str, &str) {
     };
 
     (prefix, suffix, trimmed)
+}
+
+/// Merge a newly-opening emphasis delimiter into the matching close marker `output` already
+/// ends with, instead of emitting a second, textually-adjacent delimiter run.
+///
+/// `CommonMark` parses `*A**B*` as `A` in emphasis followed by a literal `**B*` — NOT as two
+/// consecutive emphasis runs — because a closing delimiter run immediately followed by an
+/// opening one of the same character forms a single, longer run (issue #483). Sibling
+/// `<i>`/`<b>` elements that each independently wrap their own content in `*…*`/`**…**`
+/// therefore corrupt on reparse unless the second element's open marker is suppressed and the
+/// previous element's close marker is removed, letting the merged run share one pair of
+/// delimiters (`<i>A</i><i>B</i>` -> `*AB*`, not `*A**B*`).
+///
+/// Pops exactly `count` trailing copies of `symbol` from `output` and returns `true` only when:
+/// - `output` ends with a run of `symbol` whose length is EXACTLY `count` (not more, not
+///   fewer) -- so `***x***` (a real 3-run) is left alone rather than half-eaten, and
+/// - the character immediately preceding that run (if any) is neither `symbol` nor `\` -- so
+///   a longer run one byte further back, or a backslash-escaped literal (`\*`), is left alone.
+///
+/// Returns `false` and leaves `output` untouched otherwise, including when `count == 0` (no
+/// delimiter to merge, e.g. a `<strong>` nested inside another `<strong>`, which emits no
+/// marker of its own).
+pub fn merge_adjacent_emphasis(output: &mut String, symbol: char, count: usize) -> bool {
+    if count == 0 {
+        return false;
+    }
+
+    let mut rev = output.chars().rev();
+    for _ in 0..count {
+        match rev.next() {
+            Some(c) if c == symbol => {}
+            _ => return false,
+        }
+    }
+    if let Some(preceding) = rev.next() {
+        if preceding == symbol || preceding == '\\' {
+            return false;
+        }
+    }
+
+    let new_len = output.len() - symbol.len_utf8() * count;
+    output.truncate(new_len);
+    true
 }
 
 /// Get the text content of a node and its children.
@@ -606,5 +663,103 @@ mod tests {
     #[test]
     fn normalize_link_label_preserves_a_glyphicon_code_point_alongside_a_backslash_style_hard_break() {
         assert_eq!(normalize_link_label("\u{E001} foo\\\nbar"), "\u{E001} foo\\\nbar");
+    }
+
+    // ~keep ── chomp_inline whitespace-only dedup (issue #481) ──────────────────────────
+
+    #[test]
+    fn chomp_inline_returns_a_single_space_prefix_for_whitespace_only_content() {
+        assert_eq!(chomp_inline(" "), (" ", "", ""));
+    }
+
+    #[test]
+    fn chomp_inline_returns_a_single_space_prefix_for_a_multi_char_whitespace_only_run() {
+        assert_eq!(chomp_inline("   "), (" ", "", ""));
+        assert_eq!(chomp_inline("\t "), (" ", "", ""));
+    }
+
+    #[test]
+    fn chomp_inline_preserves_a_hard_trailing_linebreak_over_the_whitespace_only_collapse() {
+        assert_eq!(chomp_inline("  \n"), (" ", "  \n", ""));
+        assert_eq!(chomp_inline("\\\n"), ("", "\\\n", ""));
+    }
+
+    #[test]
+    fn chomp_inline_leaves_non_whitespace_content_unaffected() {
+        assert_eq!(chomp_inline(" a "), (" ", " ", "a"));
+        assert_eq!(chomp_inline("a"), ("", "", "a"));
+    }
+
+    #[test]
+    fn chomp_inline_returns_empty_for_empty_input() {
+        assert_eq!(chomp_inline(""), ("", "", ""));
+    }
+
+    // ~keep ── merge_adjacent_emphasis (issue #483) ─────────────────────────────────────
+
+    #[test]
+    fn merge_adjacent_emphasis_pops_a_lone_matching_close_marker() {
+        let mut output = String::from("*A*");
+        assert!(merge_adjacent_emphasis(&mut output, '*', 1));
+        assert_eq!(output, "*A");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_pops_a_double_matching_close_marker() {
+        let mut output = String::from("**A**");
+        assert!(merge_adjacent_emphasis(&mut output, '*', 2));
+        assert_eq!(output, "**A");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_returns_false_when_output_does_not_end_with_the_marker() {
+        let mut output = String::from("*A* ");
+        assert!(!merge_adjacent_emphasis(&mut output, '*', 1));
+        assert_eq!(output, "*A* ", "untouched on refusal");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_refuses_a_run_longer_than_count() {
+        // ~keep `***x***` must not be half-eaten: a trailing run of 3 is not "exactly 2".
+        let mut output = String::from("***x***");
+        assert!(!merge_adjacent_emphasis(&mut output, '*', 2));
+        assert_eq!(output, "***x***");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_refuses_when_the_run_is_shorter_than_count() {
+        let mut output = String::from("*A*");
+        assert!(!merge_adjacent_emphasis(&mut output, '*', 2));
+        assert_eq!(output, "*A*");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_refuses_an_escaped_literal_asterisk() {
+        // ~keep `\*` immediately before the run: the preceding character is a backslash,
+        // ~keep so this is a literal escaped asterisk, not a mergeable close marker.
+        let mut output = String::from(r"a\*");
+        assert!(!merge_adjacent_emphasis(&mut output, '*', 1));
+        assert_eq!(output, r"a\*");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_returns_false_for_zero_count() {
+        let mut output = String::from("*A*");
+        assert!(!merge_adjacent_emphasis(&mut output, '*', 0));
+        assert_eq!(output, "*A*");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_respects_the_underscore_symbol_variant() {
+        let mut output = String::from("__A__");
+        assert!(merge_adjacent_emphasis(&mut output, '_', 2));
+        assert_eq!(output, "__A");
+    }
+
+    #[test]
+    fn merge_adjacent_emphasis_returns_false_on_empty_output() {
+        let mut output = String::new();
+        assert!(!merge_adjacent_emphasis(&mut output, '*', 1));
+        assert_eq!(output, "");
     }
 }

@@ -197,6 +197,30 @@ pub enum BailReason {
     /// duplicates non-trivial logic that would then have to stay in sync
     /// forever; bail instead so Tier-2 (authoritative) decides.
     LinkAutolinkNestedMarkup,
+
+    /// A `<strong>`/`<b>` or `<em>`/`<i>` opened while the output already ends with that
+    /// same tag kind's matching close marker (`**` or a lone `*`), with no intervening
+    /// content.
+    ///
+    /// `CommonMark` parses a closing delimiter run immediately followed by an opening one
+    /// of the same character as a single, longer delimiter run, not as two independent
+    /// emphasis spans -- so `<i>A</i><i>B</i>` reparses as `A**B` inside one `*…*` pair
+    /// rather than as `A` and `B` each independently emphasized (issue #483). Tier-2 fixes
+    /// this by merging the second element's open marker into the first's close marker
+    /// (`merge_adjacent_emphasis`); Tier-1 does not replicate that merge, so it bails and
+    /// lets Tier-2 (authoritative) handle it.
+    AdjacentInlineEmphasis,
+
+    /// A `<strong>`/`<b>` or `<em>`/`<i>` closed with a body that was non-empty but
+    /// entirely whitespace (e.g. `<i> </i>`).
+    ///
+    /// Tier-2's `chomp_inline` folds such a body into a single space placed OUTSIDE the
+    /// markers (issue #481). Tier-1's `close_inline_marker` instead erases the markers
+    /// entirely for any whitespace-only body, which is only correct for a GENUINELY empty
+    /// body (no bytes at all between the markers, e.g. `<i></i>`) -- for a whitespace-only
+    /// one it silently drops the space Tier-2 preserves. Bail so Tier-2 (authoritative)
+    /// handles it.
+    WhitespaceOnlyInlineEmphasis,
 }
 
 impl fmt::Display for BailReason {
@@ -275,6 +299,8 @@ impl fmt::Display for BailReason {
                     "autolink-eligible <a> href had a nested tag inside the label before close"
                 )
             }
+            Self::AdjacentInlineEmphasis => write!(f, "adjacent strong/emphasis elements would form one delimiter run"),
+            Self::WhitespaceOnlyInlineEmphasis => write!(f, "strong/emphasis element with a whitespace-only body"),
         }
     }
 }

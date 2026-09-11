@@ -114,6 +114,8 @@ const fn bail_variant_name(reason: &BailReason) -> &'static str {
         BailReason::ListItemUnsupportedBlockChild => "ListItemUnsupportedBlockChild",
         BailReason::ImageLazyLoadSrc => "ImageLazyLoadSrc",
         BailReason::LinkAutolinkNestedMarkup => "LinkAutolinkNestedMarkup",
+        BailReason::AdjacentInlineEmphasis => "AdjacentInlineEmphasis",
+        BailReason::WhitespaceOnlyInlineEmphasis => "WhitespaceOnlyInlineEmphasis",
     }
 }
 
