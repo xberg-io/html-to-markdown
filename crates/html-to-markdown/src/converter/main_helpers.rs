@@ -686,6 +686,7 @@ pub fn is_inline_element(tag_name: &str) -> bool {
             | "var"
             | "wbr"
             | "del"
+            | "strike"
             | "ins"
             | "img"
             | "map"

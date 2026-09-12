@@ -549,8 +549,8 @@ pub fn walk_node(
                     );
                 }
 
-                "strong" | "b" | "em" | "i" | "mark" | "del" | "s" | "ins" | "u" | "small" | "sub" | "sup" | "kbd"
-                | "samp" | "var" | "dfn" | "abbr" | "ruby" | "rb" | "rt" | "rp" | "rtc" | "span" => {
+                "strong" | "b" | "em" | "i" | "mark" | "del" | "s" | "strike" | "ins" | "u" | "small" | "sub"
+                | "sup" | "kbd" | "samp" | "var" | "dfn" | "abbr" | "ruby" | "rb" | "rt" | "rp" | "rtc" | "span" => {
                     crate::converter::inline::dispatch_inline_handler(
                         &tag_name,
                         node_handle,

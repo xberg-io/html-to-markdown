@@ -120,7 +120,7 @@ pub fn dispatch_inline_handler(
             code::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        "mark" | "del" | "s" | "ins" | "u" | "small" | "sub" | "sup" | "var" | "dfn" | "abbr" | "span" => {
+        "mark" | "del" | "s" | "strike" | "ins" | "u" | "small" | "sub" | "sup" | "var" | "dfn" | "abbr" | "span" => {
             semantic::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }

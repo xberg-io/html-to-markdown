@@ -51,7 +51,7 @@ pub fn handle(
         "mark" => {
             marks::handle_mark(node_handle, parser, output, options, ctx, depth, dom_ctx);
         }
-        "del" | "s" => {
+        "del" | "s" | "strike" => {
             marks::handle_strikethrough(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
         }
         "ins" => {
