@@ -256,15 +256,9 @@ impl fmt::Display for BailReason {
                     "depth mismatch for </{tag}>: expected {expected} open(s), got {actual}"
                 )
             }
-            Self::EofWithOpenBlock { open_count } => {
-                write!(f, "EOF with {open_count} unclosed block element(s)")
-            }
-            Self::LiteralLt { offset } => {
-                write!(f, "literal '<' at byte offset {offset}")
-            }
-            Self::Cdata { offset } => {
-                write!(f, "CDATA section at byte offset {offset}")
-            }
+            Self::EofWithOpenBlock { open_count } => write!(f, "EOF with {open_count} unclosed block element(s)"),
+            Self::LiteralLt { offset } => write!(f, "literal '<' at byte offset {offset}"),
+            Self::Cdata { offset } => write!(f, "CDATA section at byte offset {offset}"),
             Self::UnknownCustomElement { name, offset } => {
                 write!(f, "unknown custom element <{name}> at byte offset {offset}")
             }
@@ -274,27 +268,13 @@ impl fmt::Display for BailReason {
                     "adjacent <script>/<style> tags with no separating whitespace at byte offset {offset}"
                 )
             }
-            Self::TableRowspanColspan => {
-                write!(f, "table cell has rowspan or colspan != 1")
-            }
-            Self::TableBlockChildInCell => {
-                write!(f, "block-level element inside table cell")
-            }
-            Self::TableNestedTable => {
-                write!(f, "nested <table> inside a table cell")
-            }
-            Self::TableNestedTableInSingleCellRow => {
-                write!(f, "nested <table> inside a data table's single-cell row")
-            }
-            Self::TableCaption => {
-                write!(f, "<caption> element in table")
-            }
-            Self::TableSectionOrder => {
-                write!(f, "table sections in unsupported order")
-            }
-            Self::UnknownEntity { name, offset } => {
-                write!(f, "unknown HTML entity &{name}; at byte offset {offset}")
-            }
+            Self::TableRowspanColspan => write!(f, "table cell has rowspan or colspan != 1"),
+            Self::TableBlockChildInCell => write!(f, "block-level element inside table cell"),
+            Self::TableNestedTable => write!(f, "nested <table> inside a table cell"),
+            Self::TableNestedTableInSingleCellRow => write!(f, "nested <table> inside a data table's single-cell row"),
+            Self::TableCaption => write!(f, "<caption> element in table"),
+            Self::TableSectionOrder => write!(f, "table sections in unsupported order"),
+            Self::UnknownEntity { name, offset } => write!(f, "unknown HTML entity &{name}; at byte offset {offset}"),
             Self::DepthLimitExceeded { depth, max_depth } => {
                 write!(
                     f,
@@ -316,9 +296,7 @@ impl fmt::Display for BailReason {
                     "block-level child of a list item in a shape this scanner cannot render correctly"
                 )
             }
-            Self::ImageLazyLoadSrc => {
-                write!(f, "<img> has a lazy-load placeholder src and a fallback src attribute")
-            }
+            Self::ImageLazyLoadSrc => write!(f, "<img> has a lazy-load placeholder src and a fallback src attribute"),
             Self::LinkAutolinkNestedMarkup => {
                 write!(
                     f,
@@ -327,9 +305,7 @@ impl fmt::Display for BailReason {
             }
             Self::AdjacentInlineEmphasis => write!(f, "adjacent strong/emphasis elements would form one delimiter run"),
             Self::WhitespaceOnlyInlineEmphasis => write!(f, "strong/emphasis element with a whitespace-only body"),
-            Self::InlineMarkerNotReproduced => {
-                write!(f, "inline element whose tier-2 markers tier-1 does not emit")
-            }
+            Self::InlineMarkerNotReproduced => write!(f, "inline element whose tier-2 markers tier-1 does not emit"),
         }
     }
 }

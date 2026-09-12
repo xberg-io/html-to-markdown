@@ -3,7 +3,7 @@
 //! This module contains helper functions for preprocessing HTML before conversion,
 //! including validation and normalization checks.
 
-use crate::converter::dom_context::DomContext;
+use crate::converter::dom_context::{DomContext, TagInfo};
 use crate::converter::main_helpers::{is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::attributes::{attribute_matches_any, element_has_navigation_hint};
 use crate::options::ConversionOptions;
@@ -47,6 +47,40 @@ impl MisnestState {
         list_item_ancestor_state: false,
         cell_ancestor_state: false,
     };
+}
+
+/// True when `info`, reached with inherited `state`, is one of the misnestings this pass repairs.
+///
+/// ~keep Each disjunct is an independent, side-effect-free shape check, so collecting them here
+/// ~keep preserves the original sequence of early returns exactly -- same order, same
+/// ~keep short-circuiting, same answer -- while keeping the walk itself under the complexity limit
+/// ~keep (issue #465).
+fn node_is_misnested(info: &TagInfo, state: MisnestState, self_inside_preformatted: bool) -> bool {
+    // An anchor nested inside another anchor, outside preformatted content.
+    (info.name == "a" && state.inside_anchor && !state.inside_preformatted)
+        // ~keep Table elements under <p>: tl misparsed an unclosed <p> in <td>.
+        || (matches!(info.name.as_str(), "td" | "tr" | "th") && state.p_ancestor_state)
+        || (info.is_block && !self_inside_preformatted && state.blocked_by_inline_ancestor)
+        // ~keep <li>/<dt>/<dd> nested under another one without an intervening list
+        // ~keep container: tl absorbed the next item because a <p>/<div> inside the
+        // ~keep previous one was left unclosed.
+        || (matches!(info.name.as_str(), "li" | "dt" | "dd") && state.list_item_ancestor_state)
+        // ~keep <tr> nested directly inside a <td>/<th>: not reachable per HTML5 tree
+        // ~keep construction, and silently dropped by the table renderer (issue #486).
+        || (info.name == "tr" && state.cell_ancestor_state)
+}
+
+/// Inherited state to hand to every child of `info`.
+fn child_misnest_state(info: &TagInfo, state: MisnestState, self_inside_preformatted: bool) -> MisnestState {
+    MisnestState {
+        inside_anchor: state.inside_anchor || info.name == "a",
+        inside_preformatted: self_inside_preformatted,
+        blocked_by_inline_ancestor: state.blocked_by_inline_ancestor
+            || (is_inline_element(&info.name) && !inline_ancestor_allows_block(&info.name)),
+        p_ancestor_state: p_ancestor_state_for(&info.name, state.p_ancestor_state),
+        list_item_ancestor_state: list_item_ancestor_state_for(&info.name, state.list_item_ancestor_state),
+        cell_ancestor_state: cell_ancestor_state_for(&info.name, state.cell_ancestor_state),
+    }
 }
 
 /// Detect malformed nesting that requires HTML5 tree repair.
@@ -109,30 +143,8 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
             continue;
         };
 
-        if info.name == "a" && state.inside_anchor && !state.inside_preformatted {
-            return true;
-        }
-
-        // ~keep Table elements under <p>: tl misparsed an unclosed <p> in <td>.
-        if matches!(info.name.as_str(), "td" | "tr" | "th") && state.p_ancestor_state {
-            return true;
-        }
-
         let self_inside_preformatted = state.inside_preformatted || matches!(info.name.as_str(), "pre" | "code");
-        if info.is_block && !self_inside_preformatted && state.blocked_by_inline_ancestor {
-            return true;
-        }
-
-        // ~keep <li>/<dt>/<dd> nested under another one without an intervening list
-        // ~keep container: tl absorbed the next item because a <p>/<div> inside the
-        // ~keep previous one was left unclosed.
-        if matches!(info.name.as_str(), "li" | "dt" | "dd") && state.list_item_ancestor_state {
-            return true;
-        }
-
-        // ~keep <tr> nested directly inside a <td>/<th>: not reachable per HTML5 tree
-        // ~keep construction, and silently dropped by the table renderer (issue #486).
-        if info.name == "tr" && state.cell_ancestor_state {
+        if node_is_misnested(info, state, self_inside_preformatted) {
             return true;
         }
 
@@ -147,15 +159,7 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
                 return true;
             }
 
-            let child_state = MisnestState {
-                inside_anchor: state.inside_anchor || info.name == "a",
-                inside_preformatted: self_inside_preformatted,
-                blocked_by_inline_ancestor: state.blocked_by_inline_ancestor
-                    || (is_inline_element(&info.name) && !inline_ancestor_allows_block(&info.name)),
-                p_ancestor_state: p_ancestor_state_for(&info.name, state.p_ancestor_state),
-                list_item_ancestor_state: list_item_ancestor_state_for(&info.name, state.list_item_ancestor_state),
-                cell_ancestor_state: cell_ancestor_state_for(&info.name, state.cell_ancestor_state),
-            };
+            let child_state = child_misnest_state(info, state, self_inside_preformatted);
             stack.extend(children.iter().map(|child| (*child, child_state)));
         }
     }
