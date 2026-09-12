@@ -1100,6 +1100,14 @@ fn emit_open(
     // ~keep re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
 
+    // ~keep Tier-2 wraps these in markers this scanner has no arm for, so emitting them as
+    // ~keep transparent inline content would silently drop the markers. See
+    // ~keep `BailReason::InlineMarkerNotReproduced`.
+    if name_lower == b"q" || (name_lower == b"mark" && options.highlight_style != crate::options::HighlightStyle::None)
+    {
+        return Err(BailReason::InlineMarkerNotReproduced);
+    }
+
     // ~keep Phase V: when a block-level tag opens inside a link, bail.  Tier-2's
     // ~keep link handler collapses block children (img alt, paragraph text) into
     // ~keep an inline link label; replicating that in Tier-1 requires content
@@ -1147,7 +1155,13 @@ fn emit_open(
             // ~keep from ancestors before forcing it true for its own children.
             // ~keep Without this, `<strong><strong>x</strong></strong>` emits
             // ~keep `****x****`, which is not valid CommonMark strong emphasis.
-            if !state.summary_at_top() && !state.escape_ctx.contains(EscapeCtx::STRONG) {
+            // ~keep Tier-2's `handle_strong` walks children with no markers under `in_code`,
+            // ~keep which covers both a `<code>` span and a `<pre>` block. Mirror via EscapeCtx.
+            if !state.summary_at_top()
+                && !state.escape_ctx.contains(EscapeCtx::STRONG)
+                && !state.escape_ctx.contains(EscapeCtx::CODE)
+                && !state.escape_ctx.contains(EscapeCtx::PRE)
+            {
                 // ~keep issue #483: opening `**` right after the buffer's own matching
                 // ~keep `**` close (no intervening content) would form one longer
                 // ~keep CommonMark delimiter run on reparse, not two independent strong
@@ -1164,6 +1178,10 @@ fn emit_open(
             // ~keep `*` marker -- but a lone `*` must not match the second half of a `**`
             // ~keep (that is a `<strong>` close, an unrelated tag kind), hence excluding
             // ~keep `ends_with("**")` here.
+            // ~keep `handle_emphasis` is likewise transparent under `in_code`.
+            if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) {
+                return Ok(());
+            }
             let buf = state.cell_or_output_mut();
             if buf.ends_with('*') && !buf.ends_with("**") {
                 return Err(BailReason::AdjacentInlineEmphasis);
@@ -1174,6 +1192,12 @@ fn emit_open(
             // ~keep Tier-2's handle_strikethrough suppresses the `~~` wrapping
             // ~keep when inside `<code>`/`<pre>` (in_code).  Mirror via EscapeCtx.
             if !state.escape_ctx.contains(EscapeCtx::CODE) && !state.escape_ctx.contains(EscapeCtx::PRE) {
+                // ~keep issue #483, `~~` form: opening right after the buffer's own matching
+                // ~keep close forms one longer run on reparse, not two spans. Tier-2 merges
+                // ~keep this (`emit_wrapped_inline`); Tier-1 does not, so it bails.
+                if state.cell_or_output_mut().ends_with("~~") {
+                    return Err(BailReason::AdjacentInlineEmphasis);
+                }
                 state.cell_or_output_mut().push_str("~~");
             }
         }
@@ -1182,6 +1206,10 @@ fn emit_open(
             // ~keep <ins>.  Mirror Strikethrough's in-code/pre suppression for
             // ~keep consistency (no `==` inside backtick spans / fenced blocks).
             if !state.escape_ctx.contains(EscapeCtx::CODE) && !state.escape_ctx.contains(EscapeCtx::PRE) {
+                // ~keep issue #483, `==` form: same reasoning as the `~~` arm above.
+                if state.cell_or_output_mut().ends_with("==") {
+                    return Err(BailReason::AdjacentInlineEmphasis);
+                }
                 state.cell_or_output_mut().push_str("==");
             }
         }
@@ -2044,8 +2072,14 @@ fn emit_close(
         // ~keep frame nested inside another `<strong>` and so never emitted an
         // ~keep open marker either (see open-side guard) — `state.escape_ctx` was
         // ~keep just restored to `frame.prev_escape_ctx` above.
-        TagKind::Strong if state.summary_at_top() || state.escape_ctx.contains(EscapeCtx::STRONG) => {}
+        TagKind::Strong
+            if state.summary_at_top()
+                || state.escape_ctx.contains(EscapeCtx::STRONG)
+                || state.escape_ctx.contains(EscapeCtx::CODE)
+                || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**")?,
+        TagKind::Emphasis
+            if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Emphasis => close_inline_marker(state, &frame, "*")?,
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
@@ -2053,7 +2087,7 @@ fn emit_close(
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Inserted => close_inline_marker(state, &frame, "==")?,
-        TagKind::Code => close_code(state, &frame),
+        TagKind::Code => close_code(state, &frame)?,
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -2324,11 +2358,12 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) ->
         // ~keep Tier-2's `chomp_inline` preserves it as a single space OUTSIDE the
         // ~keep markers, while erasing the markers here (as the genuinely-empty case
         // ~keep correctly does) would silently drop that space. Only bail for
-        // ~keep strong/emphasis markers (`**`/`*`) -- Strikethrough (`~~`) and
-        // ~keep Inserted (`==`) share this function but are not part of issue #481.
+        // ~keep every marker this function serves: Strikethrough (`~~`) and Inserted (`==`)
+        // ~keep now go through Tier-2's shared `emit_wrapped_inline`, which preserves that
+        // ~keep separator exactly as strong/emphasis do, so they are no longer exempt.
         let was_whitespace_only =
             is_whitespace_only_not_empty || (content_is_absent && frame.dropped_whitespace_only_text);
-        if was_whitespace_only && matches!(marker, "**" | "*") {
+        if was_whitespace_only && matches!(marker, "**" | "*" | "~~" | "==") {
             return Err(BailReason::WhitespaceOnlyInlineEmphasis);
         }
         let open_marker_start = clamp_to_char_boundary(buf, content_start.saturating_sub(marker.len()));
@@ -2415,8 +2450,14 @@ fn emit_close_for_implicit(
         // ~keep frame nested inside another `<strong>` and so never emitted an
         // ~keep open marker either (see open-side guard) — `state.escape_ctx` was
         // ~keep just restored to `frame.prev_escape_ctx` above.
-        TagKind::Strong if state.summary_at_top() || state.escape_ctx.contains(EscapeCtx::STRONG) => {}
+        TagKind::Strong
+            if state.summary_at_top()
+                || state.escape_ctx.contains(EscapeCtx::STRONG)
+                || state.escape_ctx.contains(EscapeCtx::CODE)
+                || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Strong => close_inline_marker(state, &frame, "**")?,
+        TagKind::Emphasis
+            if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Emphasis => close_inline_marker(state, &frame, "*")?,
         TagKind::Strikethrough
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
@@ -2424,7 +2465,7 @@ fn emit_close_for_implicit(
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
         TagKind::Inserted => close_inline_marker(state, &frame, "==")?,
-        TagKind::Code => close_code(state, &frame),
+        TagKind::Code => close_code(state, &frame)?,
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
@@ -2802,9 +2843,9 @@ fn push_list_item_continuation_lines(state: &mut Tier1State, rendered: &str) {
     }
 }
 
-fn close_code(state: &mut Tier1State, frame: &OpenTag) {
+fn close_code(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailReason> {
     if state.escape_ctx.contains(EscapeCtx::PRE) || state.escape_ctx.contains(EscapeCtx::CODE) {
-        return;
+        return Ok(());
     }
     // ~keep Phase CC: smart backtick escaping (mirrors inline/code.rs:260).
     // ~keep Open emitted nothing; content from `frame.content_start` to buf
@@ -2813,9 +2854,25 @@ fn close_code(state: &mut Tier1State, frame: &OpenTag) {
     let buf = state.cell_or_output_mut();
     let content_start = clamp_to_char_boundary(buf, frame.content_start);
     if content_start >= buf.len() {
+        // ~keep issue #481: a body that WAS non-empty but entirely whitespace before
+        // ~keep `flush_text` dropped it is not an empty one. Tier-2 keeps `<code> </code>` as
+        // ~keep a code span whose content is that space; erasing it here, as the genuinely
+        // ~keep empty `<code></code>` case correctly does, would drop both the span and the
+        // ~keep word separator it stands between.
+        if frame.dropped_whitespace_only_text {
+            return Err(BailReason::WhitespaceOnlyInlineEmphasis);
+        }
         // ~keep No content emitted between open and close — Tier-2 emits
         // ~keep nothing for empty <code></code>.
-        return;
+        return Ok(());
+    }
+
+    // ~keep issue #483, backtick form: this span's opening backtick is about to be inserted
+    // ~keep right after a preceding code span's closing one, which reparses as a single span
+    // ~keep carrying both literal backticks. Tier-2 merges the two spans
+    // ~keep (`wrapped::emit_code_span`); Tier-1 does not, so it bails.
+    if buf[..content_start].ends_with('`') {
+        return Err(BailReason::AdjacentInlineEmphasis);
     }
 
     let contains_backtick = buf[content_start..].contains('`');
@@ -2828,12 +2885,11 @@ fn close_code(state: &mut Tier1State, frame: &OpenTag) {
         let ends_with_space = last_char == Some(' ');
         let starts_with_backtick = first_char == Some('`');
         let ends_with_backtick = last_char == Some('`');
-        let all_spaces = content.chars().all(|c| c == ' ');
-
-        let needs_delimiter_spaces = all_spaces
-            || starts_with_backtick
-            || ends_with_backtick
-            || (starts_with_space && ends_with_space && contains_backtick);
+        // ~keep No all-spaces case: CommonMark strips one space from each end of a code span
+        // ~keep only when the content is NOT entirely spaces, so padding an all-spaces body
+        // ~keep changes what it contains. Mirrors `handlers::code_block::format_inline_code`.
+        let needs_delimiter_spaces =
+            starts_with_backtick || ends_with_backtick || (starts_with_space && ends_with_space && contains_backtick);
 
         let num_backticks = if contains_backtick {
             min_safe_code_span_delimiter_length(content)
@@ -2857,6 +2913,7 @@ fn close_code(state: &mut Tier1State, frame: &OpenTag) {
     for _ in 0..num_backticks {
         buf.push('`');
     }
+    Ok(())
 }
 
 /// Compute the length of the longest consecutive run of `` ` `` in `content`.
@@ -3775,7 +3832,13 @@ fn flush_text(
         // ~keep `close_inline_marker` never consults the flag in that case.
         if at_inline_frame_start {
             if let Some(frame) = state.stack.last_mut() {
-                if matches!(frame.spec.kind, TagKind::Strong | TagKind::Emphasis) {
+                // ~keep Strikethrough/Inserted/Code joined Strong/Emphasis here once Tier-2's
+                // ~keep shared `emit_wrapped_inline` started preserving the separator (and, for
+                // ~keep Code, the span) that a whitespace-only body stands for.
+                if matches!(
+                    frame.spec.kind,
+                    TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted | TagKind::Code
+                ) {
                     frame.dropped_whitespace_only_text = true;
                 }
             }

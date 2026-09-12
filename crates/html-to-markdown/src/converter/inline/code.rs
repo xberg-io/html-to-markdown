@@ -73,28 +73,32 @@ fn handle_kbd_samp(
         _ => return,
     };
 
-    let mut content = String::with_capacity(32);
     let children = tag.children();
     if ctx.in_code {
+        // ~keep A nested `<code>` renders transparently inside an outer code span
+        // ~keep (`handlers::code_block::handle_code`); `<kbd>`/`<samp>` wrapped their own
+        // ~keep backticks anyway, so the outer span grew a second, nested pair.
         for child_handle in children.top().iter() {
-            walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
         }
-    } else {
-        let code_ctx = Context {
-            in_code: true,
-            ..ctx.clone()
-        };
-        for child_handle in children.top().iter() {
-            walk_node(
-                child_handle,
-                parser,
-                &mut content,
-                options,
-                &code_ctx,
-                depth + 1,
-                dom_ctx,
-            );
-        }
+        return;
+    }
+
+    let mut content = String::with_capacity(32);
+    let code_ctx = Context {
+        in_code: true,
+        ..ctx.clone()
+    };
+    for child_handle in children.top().iter() {
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &code_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     let normalized = text::normalize_whitespace(&content);

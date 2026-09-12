@@ -331,8 +331,12 @@ static TAGS: phf::Map<&'static [u8], TagSpec> = phf_map! {
     b"kbd"    => inline(TagKind::Code),
     b"code"   => inline(TagKind::Code),
     b"samp"   => inline(TagKind::Code),
-    b"var"    => inline(TagKind::Inline),
-    b"dfn"    => inline(TagKind::Inline),
+    // ~keep Tier-2 wraps <var>/<dfn> in the same single `strong_em_symbol` pair <em>/<i> use
+    // ~keep (`typography::handle_variable`), and the router only picks Tier-1 when that symbol
+    // ~keep is the default `*`, so Emphasis reproduces them exactly. Classifying them as plain
+    // ~keep Inline silently dropped both markers.
+    b"var"    => inline(TagKind::Emphasis),
+    b"dfn"    => inline(TagKind::Emphasis),
     b"abbr"   => inline(TagKind::Inline),
     b"span"   => inline(TagKind::Inline),
     b"bdi"    => inline(TagKind::Inline),

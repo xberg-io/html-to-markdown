@@ -234,6 +234,16 @@ pub enum BailReason {
     /// one it silently drops the space Tier-2 preserves. Bail so Tier-2 (authoritative)
     /// handles it.
     WhitespaceOnlyInlineEmphasis,
+
+    /// An inline element opened whose Tier-2 markers Tier-1 does not emit at all.
+    ///
+    /// `<q>` is wrapped in `"…"` by `semantic::attributes::handle_q`, and `<mark>` in the pair
+    /// `options.highlight_style` selects. Tier-1 treats both as transparent inline elements, so
+    /// it would drop those markers outright. The router already routes any non-`None`
+    /// `highlight_style` to Tier-2, which makes the `<mark>` case unreachable under
+    /// `TierStrategy::Auto` -- it is still checked here so the Tier-1/Tier-2 byte-equality
+    /// contract holds under a forced Tier-1 run rather than resting on that gate.
+    InlineMarkerNotReproduced,
 }
 
 impl fmt::Display for BailReason {
@@ -317,6 +327,9 @@ impl fmt::Display for BailReason {
             }
             Self::AdjacentInlineEmphasis => write!(f, "adjacent strong/emphasis elements would form one delimiter run"),
             Self::WhitespaceOnlyInlineEmphasis => write!(f, "strong/emphasis element with a whitespace-only body"),
+            Self::InlineMarkerNotReproduced => {
+                write!(f, "inline element whose tier-2 markers tier-1 does not emit")
+            }
         }
     }
 }

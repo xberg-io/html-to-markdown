@@ -371,6 +371,16 @@ pub fn handle_inserted(
         _ => return,
     };
 
+    if ctx.in_code {
+        // ~keep `handle_strikethrough` already suppresses its `~~` under `in_code`; `<ins>`
+        // ~keep did not, so it emitted literal `==` INTO code content, where it is text.
+        let children = tag.children();
+        for child_handle in children.top().iter() {
+            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
+        }
+        return;
+    }
+
     let mut content = String::with_capacity(32);
     let children = tag.children();
     for child_handle in children.top().iter() {

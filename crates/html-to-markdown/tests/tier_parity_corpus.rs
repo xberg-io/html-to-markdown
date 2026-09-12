@@ -117,6 +117,7 @@ const fn bail_variant_name(reason: &BailReason) -> &'static str {
         BailReason::LinkAutolinkNestedMarkup => "LinkAutolinkNestedMarkup",
         BailReason::AdjacentInlineEmphasis => "AdjacentInlineEmphasis",
         BailReason::WhitespaceOnlyInlineEmphasis => "WhitespaceOnlyInlineEmphasis",
+        BailReason::InlineMarkerNotReproduced => "InlineMarkerNotReproduced",
     }
 }
 

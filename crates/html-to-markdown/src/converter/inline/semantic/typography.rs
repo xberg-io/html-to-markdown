@@ -273,6 +273,17 @@ pub fn handle_variable(
         _ => return,
     };
 
+    if ctx.in_code {
+        // ~keep Every other marker-emitting inline handler suppresses itself inside a code
+        // ~keep span or a fenced block; `<var>`/`<dfn>` did not, so they emitted literal `*`
+        // ~keep INTO code content, where it is text rather than emphasis.
+        let children = tag.children();
+        for child_handle in children.top().iter() {
+            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
+        }
+        return;
+    }
+
     let mut content = String::with_capacity(32);
     let children = tag.children();
     for child_handle in children.top().iter() {
@@ -315,6 +326,17 @@ pub fn handle_definition(
         tl::Node::Tag(tag) => tag,
         _ => return,
     };
+
+    if ctx.in_code {
+        // ~keep Every other marker-emitting inline handler suppresses itself inside a code
+        // ~keep span or a fenced block; `<var>`/`<dfn>` did not, so they emitted literal `*`
+        // ~keep INTO code content, where it is text rather than emphasis.
+        let children = tag.children();
+        for child_handle in children.top().iter() {
+            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
+        }
+        return;
+    }
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
