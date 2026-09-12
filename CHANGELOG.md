@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.12.4] - 2026-09-12
+
 ### Fixed
 
 - Render `<strike>` as strikethrough. The Tier-2 inline dispatch listed only `del`/`s`, so
@@ -30,10 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   converters over 26 tags. Tier-1 now reproduces `<var>`/`<dfn>`, bails on the shapes it cannot
   (`<q>`, `<mark>`, the new delimiter merges, a whitespace-only body), and suppresses
   `<strong>`/`<em>` markers inside a code span as Tier-2 does.
-
-## [3.12.4] - 2026-09-11
-
-### Fixed
 
 - Treat adjacent duplicate Rust warning flags as equivalent in benchmark provenance checks while preserving timing gates.
 - Publish every native NuGet runtime package required by the managed package's runtime graph.
