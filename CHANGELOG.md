@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Render `<strike>` as strikethrough. The Tier-2 inline dispatch listed only `del`/`s`, so
+  `<strike>` fell through to a plain child walk and lost its `~~` markers entirely.
+- Merge adjacent inline elements that share a repeated-character delimiter, extending the
+  [#483](https://github.com/xberg-io/html-to-markdown/issues/483) fix from `<em>`/`<strong>`
+  to every other family. `<del>A</del><del>B</del>` produced `~~A~~~~B~~`, which CommonMark
+  reparses as one strikethrough containing `A~~~~B`; two adjacent code spans produced
+  `` `A``B` ``, reparsed as one span carrying the literal backticks. `<ins>`, `<mark>`,
+  `<var>` and `<dfn>` had the same defect.
+- Keep the word separator a whitespace-only inline element stands for, extending the
+  [#481](https://github.com/xberg-io/html-to-markdown/issues/481) fix to `<ins>`, `<sub>`,
+  `<sup>`, `<var>`, `<dfn>`, `<abbr>` and `<q>`, each of which joined the words either side.
+- Keep `<code> </code>` as a code span whose content is a space. It was dropped outright, and
+  the delimiter-space padding that an all-spaces body used to get turned one space into three
+  (CommonMark strips one space per end only when the content is not entirely spaces).
+- Stop `<ins>`, `<kbd>`, `<samp>`, `<var>` and `<dfn>` from emitting their markers inside a
+  code span or fenced block, where `==`, a second backtick pair and `*` are literal content
+  rather than formatting. Every other inline handler already suppressed itself there.
+- Close 22 Tier-1/Tier-2 output divergences across the inline elements, found by sweeping both
+  converters over 26 tags. Tier-1 now reproduces `<var>`/`<dfn>`, bails on the shapes it cannot
+  (`<q>`, `<mark>`, the new delimiter merges, a whitespace-only body), and suppresses
+  `<strong>`/`<em>` markers inside a code span as Tier-2 does.
+
 ## [3.12.4] - 2026-09-11
 
 ### Fixed
@@ -27,7 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   staging replaces the `napi artifacts` call that `@napi-rs/cli` 3.9.1 made fail on any
   single-target matrix leg.
 - Keep the visible text of a `<tr>` nested directly inside a `<td>`, a shape malformed
-  newsletter HTML produces; the row and its content were dropped silently
+  newsletter HTML produces; the row and its content were dropped silently. The same fix
+  repairs tbody-less tables with implicitly-closed cells, where
+  `<table><tr><th>h1<th>h2<tr><td>a<td>b</table>` emitted only a one-column header and
+  dropped both the second header and the entire data row
   ([#486](https://github.com/xberg-io/html-to-markdown/issues/486)).
 - Render a data table's nested single-cell table as its own table instead of flattening it
   into a cell of escaped pipes ([#484](https://github.com/xberg-io/html-to-markdown/issues/484)).
