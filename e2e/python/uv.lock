@@ -34,13 +34,13 @@ wheels = [
 
 [[package]]
 name = "html-to-markdown"
-version = "3.10.6"
+version = "3.12.4"
 source = { directory = "../../packages/python" }
 
 [package.metadata]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pyrefly", specifier = ">=1.1.1" }]
+dev = [{ name = "pyrefly", specifier = ">=1.2" }]
 
 [[package]]
 name = "html-to-markdown-e2e"

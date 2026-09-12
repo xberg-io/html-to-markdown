@@ -991,11 +991,11 @@ extension ConversionResultRef {
         HtmlMetadata(ptr: __swift_bridge__$ConversionResult$metadata(ptr))
     }
 
-    public func tables() -> RustVec<TableData> {
+    public func tables() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$ConversionResult$tables(ptr))
     }
 
-    public func warnings() -> RustVec<ProcessingWarning> {
+    public func warnings() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$ConversionResult$warnings(ptr))
     }
 }
@@ -1211,7 +1211,7 @@ extension DocumentNodeRef {
         RustVec(ptr: __swift_bridge__$DocumentNode$children(ptr))
     }
 
-    public func annotations() -> RustVec<TextAnnotation> {
+    public func annotations() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$DocumentNode$annotations(ptr))
     }
 
@@ -1295,7 +1295,7 @@ public class DocumentStructureRef {
     }
 }
 extension DocumentStructureRef {
-    public func nodes() -> RustVec<DocumentNode> {
+    public func nodes() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$DocumentStructure$nodes(ptr))
     }
 
@@ -1584,19 +1584,19 @@ extension HtmlMetadataRef {
         DocumentMetadata(ptr: __swift_bridge__$HtmlMetadata$document(ptr))
     }
 
-    public func headers() -> RustVec<HeaderMetadata> {
+    public func headers() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$HtmlMetadata$headers(ptr))
     }
 
-    public func links() -> RustVec<LinkMetadata> {
+    public func links() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$HtmlMetadata$links(ptr))
     }
 
-    public func images() -> RustVec<ImageMetadata> {
+    public func images() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$HtmlMetadata$images(ptr))
     }
 
-    public func structuredData() -> RustVec<StructuredData> {
+    public func structuredData() -> RustVec<RustString> {
         RustVec(ptr: __swift_bridge__$HtmlMetadata$structured_data(ptr))
     }
 }
