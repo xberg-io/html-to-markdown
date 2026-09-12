@@ -20,15 +20,15 @@ let html = """
 """
 
 let result = try convert(html: html, options: options)
-let markdown = result.content()?.toString() ?? ""
+let markdown = result.content ?? ""
 
-let metadata = result.metadata()
-let document = metadata.document()
-print("title:", document.title()?.toString() ?? "")
-print("description:", document.description()?.toString() ?? "")
-print("author:", document.author()?.toString() ?? "")
-print("headers:", metadata.headers().count)
-print("links:", metadata.links().count)
-print("images:", metadata.images().count)
+let metadata = result.metadata
+let document = metadata.document
+print("title:", document.title ?? "")
+print("description:", document.description ?? "")
+print("author:", document.author ?? "")
+print("headers:", metadata.headers.count)
+print("links:", metadata.links.count)
+print("images:", metadata.images.count)
 print(markdown)
 ```

@@ -15,12 +15,11 @@ let html = """
 
 let result = try convert(html: html, options: options)
 
-for table in result.tables() {
-    print("Markdown:", table.markdown().toString())
-    let grid = table.grid()
-    print("Grid: \(grid.rows()) rows x \(grid.cols()) cols")
-    for cellJson in grid.cells() {
-        let cell = try gridCellFromJson(cellJson.as_str().toString())
+for table in result.tables {
+    print("Markdown:", table.markdown)
+    let grid = table.grid
+    print("Grid: \(grid.rows) rows x \(grid.cols) cols")
+    for cell in grid.cells {
         let kind = cell.isHeader ? "Header" : "Cell"
         print("  \(kind) (r\(cell.row),c\(cell.col)): \(cell.content)")
     }

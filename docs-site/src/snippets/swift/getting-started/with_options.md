@@ -7,6 +7,6 @@ let options = try conversionOptionsFromJson(
 
 let html = "<h1>Hello</h1><p>This is <strong>formatted</strong> content.</p>"
 let result = try convert(html: html, options: options)
-let markdown = result.content()?.toString() ?? ""
+let markdown = result.content ?? ""
 print(markdown)
 ```

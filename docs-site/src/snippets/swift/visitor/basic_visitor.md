@@ -18,6 +18,6 @@ let options = try conversionOptionsFromJsonWithVisitor("{}", visitorHandle)
 
 let html = "<h1>Title</h1><p>See <a href=\"https://example.com\">example</a>.</p>"
 let result = try convert(html: html, options: options)
-let markdown = result.content()?.toString() ?? ""
+let markdown = result.content ?? ""
 print(markdown)
 ```
