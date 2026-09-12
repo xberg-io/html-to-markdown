@@ -11,8 +11,50 @@ tasks:
   sync:
     desc: "Synchronize version across all package manifests"
     cmds:
+      # ~keep The pin check runs FIRST, before anything writes. CI installs the
+      # ~keep `alef_version` from alef.toml, not whatever is on this machine, so regenerating
+      # ~keep with a different local alef commits output the pinned version cannot reproduce
+      # ~keep -- and every freshness gate then reads the tree as stale forever, with no diff
+      # ~keep to explain why. A binary built from a dirty tree is rejected for the same
+      # ~keep reason: its output is not attributable to any released version.
+      - cmd: |
+          set -euo pipefail
+          pinned=$(sed -n 's/^alef_version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' alef.toml | head -1)
+          [ -n "$pinned" ] || { echo "ERROR: alef.toml has no alef_version pin." >&2; exit 1; }
+          identity=$({{.ALEF}} --version)
+          running=$(printf '%s\n' "$identity" | head -1 | awk '{print $2}')
+          if [ "$pinned" != "$running" ]; then
+            echo "ERROR: alef.toml pins $pinned but the alef on PATH is $running." >&2
+            echo "       Install the pinned version, or bump alef_version to the version that" >&2
+            echo "       will actually generate this tree. CI installs the pin." >&2
+            exit 1
+          fi
+          if printf '%s\n' "$identity" | grep -q 'tree:.*DIRTY'; then
+            echo "ERROR: the alef on PATH was built from a dirty working tree, so its output" >&2
+            echo "       is not reproducible from any released version." >&2
+            exit 1
+          fi
       - "{{.ALEF}} sync-versions"
       - python3 scripts/sync_consumer_versions.py
+      # ~keep `alef sync-versions` writes the version INTO manifests; a lockfile is not a
+      # ~keep manifest, so nothing above touches one. In the 3.12.4 release that cost four
+      # ~keep separate CI failures, each surfacing in a different workflow, discovered one
+      # ~keep push at a time: the root pnpm lockfile still carried the previous version for
+      # ~keep `crates/html-to-markdown-node`'s eight platform `optionalDependencies` (they
+      # ~keep resolve as `link:npm/<target>`, so no unpublished package is fetched), and
+      # ~keep `uv.lock` for the editable `html-to-markdown` package. Use the PINNED pnpm from
+      # ~keep `package.json`'s `packageManager`: a different major rewrites the lockfile
+      # ~keep format. `test_apps/*` lockfiles legitimately lag until publish and are NOT
+      # ~keep refreshed here -- `alef validate versions` reports those as BLOCKED by design.
+      - cmd: |
+          set -euo pipefail
+          pin=$(python3 -c 'import json; print(json.load(open("package.json"))["packageManager"])')
+          case "$pin" in
+            pnpm@*) ;;
+            *) echo "ERROR: package.json packageManager is $pin, expected a pnpm@ pin." >&2; exit 1 ;;
+          esac
+          npx --yes "$pin" install --lockfile-only
+      - uv lock
       # ~keep `alef sync-versions` rewrites MANIFESTS ONLY. Everything generated from the
       # version -- README install snippets, test-app installers, e2e download scripts, stubs,
       # scaffolding -- is produced by separate subcommands, so a bump that stops at
