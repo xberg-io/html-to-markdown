@@ -191,5 +191,62 @@
       "stem": "semantic_hr",
       "title": "Horizontal rule produces a separator in output"
     }
+  },
+  {
+    "id": "adjacent_inserted_merged",
+    "description": "Adjacent inserted elements share one delimiter run",
+    "input": {
+      "html": "<p><ins>A</ins><ins>B</ins></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "==AB==\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "adjacent_inserted_merged",
+      "title": "Adjacent inserted elements share one delimiter run"
+    }
+  },
+  {
+    "id": "tagged_space_in_subscript_kept",
+    "description": "A whitespace-only subscript keeps the word separator",
+    "input": {
+      "html": "<p>A<sub> </sub>B</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "A B\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "tagged_space_in_subscript_kept",
+      "title": "A whitespace-only subscript keeps the word separator"
+    }
+  },
+  {
+    "id": "adjacent_variable_merged",
+    "description": "Adjacent variable elements share one delimiter run",
+    "input": {
+      "html": "<p><var>A</var><var>B</var></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "*AB*\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "adjacent_variable_merged",
+      "title": "Adjacent variable elements share one delimiter run"
+    }
   }
 ]

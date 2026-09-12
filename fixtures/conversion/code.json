@@ -115,5 +115,62 @@
       "stem": "code_inline_in_paragraph",
       "title": "Inline code element nested inside a paragraph"
     }
+  },
+  {
+    "id": "adjacent_code_spans_merged",
+    "description": "Adjacent code spans merge instead of colliding backticks",
+    "input": {
+      "html": "<p><code>A</code><code>B</code></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "`AB`\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "adjacent_code_spans_merged",
+      "title": "Adjacent code spans merge instead of colliding backticks"
+    }
+  },
+  {
+    "id": "whitespace_only_code_span_kept",
+    "description": "A code span whose content is a single space survives",
+    "input": {
+      "html": "<p>A<code> </code>B</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "A` `B\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "whitespace_only_code_span_kept",
+      "title": "A code span whose content is a single space survives"
+    }
+  },
+  {
+    "id": "code_span_suppresses_nested_inline_markers",
+    "description": "Inline markers inside a code span stay literal content",
+    "input": {
+      "html": "<p><code>a<em>b</em><ins>c</ins></code></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "`abc`\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "code_span_suppresses_nested_inline_markers",
+      "title": "Inline markers inside a code span stay literal content"
+    }
   }
 ]

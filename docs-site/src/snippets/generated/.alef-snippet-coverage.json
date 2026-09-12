@@ -1,7 +1,11 @@
 {
   "format_version": 2,
   "generated_paths": [
+    "c/conversion/adjacent_code_spans_merged.md",
     "c/conversion/adjacent_emphasis_merged.md",
+    "c/conversion/adjacent_inserted_merged.md",
+    "c/conversion/adjacent_strikethrough_merged.md",
+    "c/conversion/adjacent_variable_merged.md",
     "c/conversion/blockquote_code_block_indentation_preserved.md",
     "c/conversion/blockquote_multiple_paragraphs.md",
     "c/conversion/blockquote_nested.md",
@@ -14,6 +18,7 @@
     "c/conversion/code_block.md",
     "c/conversion/code_block_no_language.md",
     "c/conversion/code_inline_in_paragraph.md",
+    "c/conversion/code_span_suppresses_nested_inline_markers.md",
     "c/conversion/code_with_backticks_in_content.md",
     "c/conversion/conversion_autolink_filename_not_autolinked.md",
     "c/conversion/conversion_autolink_https_url.md",
@@ -73,6 +78,7 @@
     "c/conversion/semantic_section_with_heading.md",
     "c/conversion/semantic_sub_superscript.md",
     "c/conversion/simple_table.md",
+    "c/conversion/strike_renders_as_strikethrough.md",
     "c/conversion/table_empty.md",
     "c/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "c/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -83,8 +89,11 @@
     "c/conversion/table_ragged_row_more_cells_than_header.md",
     "c/conversion/table_with_alignment.md",
     "c/conversion/table_with_colspan.md",
+    "c/conversion/tagged_space_in_strikethrough_kept.md",
+    "c/conversion/tagged_space_in_subscript_kept.md",
     "c/conversion/tagged_space_not_duplicated.md",
     "c/conversion/unordered_list.md",
+    "c/conversion/whitespace_only_code_span_kept.md",
     "c/edge-cases/empty_html.md",
     "c/edge-cases/encoding_c1_replacement_table.md",
     "c/edge-cases/encoding_cjk_characters.md",
@@ -296,7 +305,11 @@
     "c/visitor/visitor_underline_skip.md",
     "c/visitor/visitor_video_custom.md",
     "c/visitor/visitor_video_skip.md",
+    "csharp/conversion/adjacent_code_spans_merged.md",
     "csharp/conversion/adjacent_emphasis_merged.md",
+    "csharp/conversion/adjacent_inserted_merged.md",
+    "csharp/conversion/adjacent_strikethrough_merged.md",
+    "csharp/conversion/adjacent_variable_merged.md",
     "csharp/conversion/blockquote_code_block_indentation_preserved.md",
     "csharp/conversion/blockquote_multiple_paragraphs.md",
     "csharp/conversion/blockquote_nested.md",
@@ -309,6 +322,7 @@
     "csharp/conversion/code_block.md",
     "csharp/conversion/code_block_no_language.md",
     "csharp/conversion/code_inline_in_paragraph.md",
+    "csharp/conversion/code_span_suppresses_nested_inline_markers.md",
     "csharp/conversion/code_with_backticks_in_content.md",
     "csharp/conversion/conversion_autolink_filename_not_autolinked.md",
     "csharp/conversion/conversion_autolink_https_url.md",
@@ -368,6 +382,7 @@
     "csharp/conversion/semantic_section_with_heading.md",
     "csharp/conversion/semantic_sub_superscript.md",
     "csharp/conversion/simple_table.md",
+    "csharp/conversion/strike_renders_as_strikethrough.md",
     "csharp/conversion/table_empty.md",
     "csharp/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "csharp/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -378,8 +393,11 @@
     "csharp/conversion/table_ragged_row_more_cells_than_header.md",
     "csharp/conversion/table_with_alignment.md",
     "csharp/conversion/table_with_colspan.md",
+    "csharp/conversion/tagged_space_in_strikethrough_kept.md",
+    "csharp/conversion/tagged_space_in_subscript_kept.md",
     "csharp/conversion/tagged_space_not_duplicated.md",
     "csharp/conversion/unordered_list.md",
+    "csharp/conversion/whitespace_only_code_span_kept.md",
     "csharp/edge-cases/empty_html.md",
     "csharp/edge-cases/encoding_c1_replacement_table.md",
     "csharp/edge-cases/encoding_cjk_characters.md",
@@ -591,7 +609,11 @@
     "csharp/visitor/visitor_underline_skip.md",
     "csharp/visitor/visitor_video_custom.md",
     "csharp/visitor/visitor_video_skip.md",
+    "dart/conversion/adjacent_code_spans_merged.md",
     "dart/conversion/adjacent_emphasis_merged.md",
+    "dart/conversion/adjacent_inserted_merged.md",
+    "dart/conversion/adjacent_strikethrough_merged.md",
+    "dart/conversion/adjacent_variable_merged.md",
     "dart/conversion/blockquote_code_block_indentation_preserved.md",
     "dart/conversion/blockquote_multiple_paragraphs.md",
     "dart/conversion/blockquote_nested.md",
@@ -604,6 +626,7 @@
     "dart/conversion/code_block.md",
     "dart/conversion/code_block_no_language.md",
     "dart/conversion/code_inline_in_paragraph.md",
+    "dart/conversion/code_span_suppresses_nested_inline_markers.md",
     "dart/conversion/code_with_backticks_in_content.md",
     "dart/conversion/conversion_autolink_filename_not_autolinked.md",
     "dart/conversion/conversion_autolink_https_url.md",
@@ -663,6 +686,7 @@
     "dart/conversion/semantic_section_with_heading.md",
     "dart/conversion/semantic_sub_superscript.md",
     "dart/conversion/simple_table.md",
+    "dart/conversion/strike_renders_as_strikethrough.md",
     "dart/conversion/table_empty.md",
     "dart/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "dart/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -673,8 +697,11 @@
     "dart/conversion/table_ragged_row_more_cells_than_header.md",
     "dart/conversion/table_with_alignment.md",
     "dart/conversion/table_with_colspan.md",
+    "dart/conversion/tagged_space_in_strikethrough_kept.md",
+    "dart/conversion/tagged_space_in_subscript_kept.md",
     "dart/conversion/tagged_space_not_duplicated.md",
     "dart/conversion/unordered_list.md",
+    "dart/conversion/whitespace_only_code_span_kept.md",
     "dart/edge-cases/empty_html.md",
     "dart/edge-cases/encoding_c1_replacement_table.md",
     "dart/edge-cases/encoding_cjk_characters.md",
@@ -886,7 +913,11 @@
     "dart/visitor/visitor_underline_skip.md",
     "dart/visitor/visitor_video_custom.md",
     "dart/visitor/visitor_video_skip.md",
+    "elixir/conversion/adjacent_code_spans_merged.md",
     "elixir/conversion/adjacent_emphasis_merged.md",
+    "elixir/conversion/adjacent_inserted_merged.md",
+    "elixir/conversion/adjacent_strikethrough_merged.md",
+    "elixir/conversion/adjacent_variable_merged.md",
     "elixir/conversion/blockquote_code_block_indentation_preserved.md",
     "elixir/conversion/blockquote_multiple_paragraphs.md",
     "elixir/conversion/blockquote_nested.md",
@@ -899,6 +930,7 @@
     "elixir/conversion/code_block.md",
     "elixir/conversion/code_block_no_language.md",
     "elixir/conversion/code_inline_in_paragraph.md",
+    "elixir/conversion/code_span_suppresses_nested_inline_markers.md",
     "elixir/conversion/code_with_backticks_in_content.md",
     "elixir/conversion/conversion_autolink_filename_not_autolinked.md",
     "elixir/conversion/conversion_autolink_https_url.md",
@@ -958,6 +990,7 @@
     "elixir/conversion/semantic_section_with_heading.md",
     "elixir/conversion/semantic_sub_superscript.md",
     "elixir/conversion/simple_table.md",
+    "elixir/conversion/strike_renders_as_strikethrough.md",
     "elixir/conversion/table_empty.md",
     "elixir/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "elixir/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -968,8 +1001,11 @@
     "elixir/conversion/table_ragged_row_more_cells_than_header.md",
     "elixir/conversion/table_with_alignment.md",
     "elixir/conversion/table_with_colspan.md",
+    "elixir/conversion/tagged_space_in_strikethrough_kept.md",
+    "elixir/conversion/tagged_space_in_subscript_kept.md",
     "elixir/conversion/tagged_space_not_duplicated.md",
     "elixir/conversion/unordered_list.md",
+    "elixir/conversion/whitespace_only_code_span_kept.md",
     "elixir/edge-cases/empty_html.md",
     "elixir/edge-cases/encoding_c1_replacement_table.md",
     "elixir/edge-cases/encoding_cjk_characters.md",
@@ -1181,7 +1217,11 @@
     "elixir/visitor/visitor_underline_skip.md",
     "elixir/visitor/visitor_video_custom.md",
     "elixir/visitor/visitor_video_skip.md",
+    "go/conversion/adjacent_code_spans_merged.md",
     "go/conversion/adjacent_emphasis_merged.md",
+    "go/conversion/adjacent_inserted_merged.md",
+    "go/conversion/adjacent_strikethrough_merged.md",
+    "go/conversion/adjacent_variable_merged.md",
     "go/conversion/blockquote_code_block_indentation_preserved.md",
     "go/conversion/blockquote_multiple_paragraphs.md",
     "go/conversion/blockquote_nested.md",
@@ -1194,6 +1234,7 @@
     "go/conversion/code_block.md",
     "go/conversion/code_block_no_language.md",
     "go/conversion/code_inline_in_paragraph.md",
+    "go/conversion/code_span_suppresses_nested_inline_markers.md",
     "go/conversion/code_with_backticks_in_content.md",
     "go/conversion/conversion_autolink_filename_not_autolinked.md",
     "go/conversion/conversion_autolink_https_url.md",
@@ -1253,6 +1294,7 @@
     "go/conversion/semantic_section_with_heading.md",
     "go/conversion/semantic_sub_superscript.md",
     "go/conversion/simple_table.md",
+    "go/conversion/strike_renders_as_strikethrough.md",
     "go/conversion/table_empty.md",
     "go/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "go/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -1263,8 +1305,11 @@
     "go/conversion/table_ragged_row_more_cells_than_header.md",
     "go/conversion/table_with_alignment.md",
     "go/conversion/table_with_colspan.md",
+    "go/conversion/tagged_space_in_strikethrough_kept.md",
+    "go/conversion/tagged_space_in_subscript_kept.md",
     "go/conversion/tagged_space_not_duplicated.md",
     "go/conversion/unordered_list.md",
+    "go/conversion/whitespace_only_code_span_kept.md",
     "go/edge-cases/empty_html.md",
     "go/edge-cases/encoding_c1_replacement_table.md",
     "go/edge-cases/encoding_cjk_characters.md",
@@ -1476,7 +1521,11 @@
     "go/visitor/visitor_underline_skip.md",
     "go/visitor/visitor_video_custom.md",
     "go/visitor/visitor_video_skip.md",
+    "java/conversion/adjacent_code_spans_merged.md",
     "java/conversion/adjacent_emphasis_merged.md",
+    "java/conversion/adjacent_inserted_merged.md",
+    "java/conversion/adjacent_strikethrough_merged.md",
+    "java/conversion/adjacent_variable_merged.md",
     "java/conversion/blockquote_code_block_indentation_preserved.md",
     "java/conversion/blockquote_multiple_paragraphs.md",
     "java/conversion/blockquote_nested.md",
@@ -1489,6 +1538,7 @@
     "java/conversion/code_block.md",
     "java/conversion/code_block_no_language.md",
     "java/conversion/code_inline_in_paragraph.md",
+    "java/conversion/code_span_suppresses_nested_inline_markers.md",
     "java/conversion/code_with_backticks_in_content.md",
     "java/conversion/conversion_autolink_filename_not_autolinked.md",
     "java/conversion/conversion_autolink_https_url.md",
@@ -1548,6 +1598,7 @@
     "java/conversion/semantic_section_with_heading.md",
     "java/conversion/semantic_sub_superscript.md",
     "java/conversion/simple_table.md",
+    "java/conversion/strike_renders_as_strikethrough.md",
     "java/conversion/table_empty.md",
     "java/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "java/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -1558,8 +1609,11 @@
     "java/conversion/table_ragged_row_more_cells_than_header.md",
     "java/conversion/table_with_alignment.md",
     "java/conversion/table_with_colspan.md",
+    "java/conversion/tagged_space_in_strikethrough_kept.md",
+    "java/conversion/tagged_space_in_subscript_kept.md",
     "java/conversion/tagged_space_not_duplicated.md",
     "java/conversion/unordered_list.md",
+    "java/conversion/whitespace_only_code_span_kept.md",
     "java/edge-cases/empty_html.md",
     "java/edge-cases/encoding_c1_replacement_table.md",
     "java/edge-cases/encoding_cjk_characters.md",
@@ -1771,7 +1825,11 @@
     "java/visitor/visitor_underline_skip.md",
     "java/visitor/visitor_video_custom.md",
     "java/visitor/visitor_video_skip.md",
+    "kotlin-android/conversion/adjacent_code_spans_merged.md",
     "kotlin-android/conversion/adjacent_emphasis_merged.md",
+    "kotlin-android/conversion/adjacent_inserted_merged.md",
+    "kotlin-android/conversion/adjacent_strikethrough_merged.md",
+    "kotlin-android/conversion/adjacent_variable_merged.md",
     "kotlin-android/conversion/blockquote_code_block_indentation_preserved.md",
     "kotlin-android/conversion/blockquote_multiple_paragraphs.md",
     "kotlin-android/conversion/blockquote_nested.md",
@@ -1784,6 +1842,7 @@
     "kotlin-android/conversion/code_block.md",
     "kotlin-android/conversion/code_block_no_language.md",
     "kotlin-android/conversion/code_inline_in_paragraph.md",
+    "kotlin-android/conversion/code_span_suppresses_nested_inline_markers.md",
     "kotlin-android/conversion/code_with_backticks_in_content.md",
     "kotlin-android/conversion/conversion_autolink_filename_not_autolinked.md",
     "kotlin-android/conversion/conversion_autolink_https_url.md",
@@ -1843,6 +1902,7 @@
     "kotlin-android/conversion/semantic_section_with_heading.md",
     "kotlin-android/conversion/semantic_sub_superscript.md",
     "kotlin-android/conversion/simple_table.md",
+    "kotlin-android/conversion/strike_renders_as_strikethrough.md",
     "kotlin-android/conversion/table_empty.md",
     "kotlin-android/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "kotlin-android/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -1853,8 +1913,11 @@
     "kotlin-android/conversion/table_ragged_row_more_cells_than_header.md",
     "kotlin-android/conversion/table_with_alignment.md",
     "kotlin-android/conversion/table_with_colspan.md",
+    "kotlin-android/conversion/tagged_space_in_strikethrough_kept.md",
+    "kotlin-android/conversion/tagged_space_in_subscript_kept.md",
     "kotlin-android/conversion/tagged_space_not_duplicated.md",
     "kotlin-android/conversion/unordered_list.md",
+    "kotlin-android/conversion/whitespace_only_code_span_kept.md",
     "kotlin-android/edge-cases/empty_html.md",
     "kotlin-android/edge-cases/encoding_c1_replacement_table.md",
     "kotlin-android/edge-cases/encoding_cjk_characters.md",
@@ -2012,7 +2075,11 @@
     "kotlin-android/structure/structure_list.md",
     "kotlin-android/structure/structure_multiple_headings.md",
     "kotlin-android/structure/structure_sibling_h1_groups.md",
+    "php/conversion/adjacent_code_spans_merged.md",
     "php/conversion/adjacent_emphasis_merged.md",
+    "php/conversion/adjacent_inserted_merged.md",
+    "php/conversion/adjacent_strikethrough_merged.md",
+    "php/conversion/adjacent_variable_merged.md",
     "php/conversion/blockquote_code_block_indentation_preserved.md",
     "php/conversion/blockquote_multiple_paragraphs.md",
     "php/conversion/blockquote_nested.md",
@@ -2025,6 +2092,7 @@
     "php/conversion/code_block.md",
     "php/conversion/code_block_no_language.md",
     "php/conversion/code_inline_in_paragraph.md",
+    "php/conversion/code_span_suppresses_nested_inline_markers.md",
     "php/conversion/code_with_backticks_in_content.md",
     "php/conversion/conversion_autolink_filename_not_autolinked.md",
     "php/conversion/conversion_autolink_https_url.md",
@@ -2084,6 +2152,7 @@
     "php/conversion/semantic_section_with_heading.md",
     "php/conversion/semantic_sub_superscript.md",
     "php/conversion/simple_table.md",
+    "php/conversion/strike_renders_as_strikethrough.md",
     "php/conversion/table_empty.md",
     "php/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "php/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -2094,8 +2163,11 @@
     "php/conversion/table_ragged_row_more_cells_than_header.md",
     "php/conversion/table_with_alignment.md",
     "php/conversion/table_with_colspan.md",
+    "php/conversion/tagged_space_in_strikethrough_kept.md",
+    "php/conversion/tagged_space_in_subscript_kept.md",
     "php/conversion/tagged_space_not_duplicated.md",
     "php/conversion/unordered_list.md",
+    "php/conversion/whitespace_only_code_span_kept.md",
     "php/edge-cases/empty_html.md",
     "php/edge-cases/encoding_c1_replacement_table.md",
     "php/edge-cases/encoding_cjk_characters.md",
@@ -2307,7 +2379,11 @@
     "php/visitor/visitor_underline_skip.md",
     "php/visitor/visitor_video_custom.md",
     "php/visitor/visitor_video_skip.md",
+    "python/conversion/adjacent_code_spans_merged.md",
     "python/conversion/adjacent_emphasis_merged.md",
+    "python/conversion/adjacent_inserted_merged.md",
+    "python/conversion/adjacent_strikethrough_merged.md",
+    "python/conversion/adjacent_variable_merged.md",
     "python/conversion/blockquote_code_block_indentation_preserved.md",
     "python/conversion/blockquote_multiple_paragraphs.md",
     "python/conversion/blockquote_nested.md",
@@ -2320,6 +2396,7 @@
     "python/conversion/code_block.md",
     "python/conversion/code_block_no_language.md",
     "python/conversion/code_inline_in_paragraph.md",
+    "python/conversion/code_span_suppresses_nested_inline_markers.md",
     "python/conversion/code_with_backticks_in_content.md",
     "python/conversion/conversion_autolink_filename_not_autolinked.md",
     "python/conversion/conversion_autolink_https_url.md",
@@ -2379,6 +2456,7 @@
     "python/conversion/semantic_section_with_heading.md",
     "python/conversion/semantic_sub_superscript.md",
     "python/conversion/simple_table.md",
+    "python/conversion/strike_renders_as_strikethrough.md",
     "python/conversion/table_empty.md",
     "python/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "python/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -2389,8 +2467,11 @@
     "python/conversion/table_ragged_row_more_cells_than_header.md",
     "python/conversion/table_with_alignment.md",
     "python/conversion/table_with_colspan.md",
+    "python/conversion/tagged_space_in_strikethrough_kept.md",
+    "python/conversion/tagged_space_in_subscript_kept.md",
     "python/conversion/tagged_space_not_duplicated.md",
     "python/conversion/unordered_list.md",
+    "python/conversion/whitespace_only_code_span_kept.md",
     "python/edge-cases/empty_html.md",
     "python/edge-cases/encoding_c1_replacement_table.md",
     "python/edge-cases/encoding_cjk_characters.md",
@@ -2602,7 +2683,11 @@
     "python/visitor/visitor_underline_skip.md",
     "python/visitor/visitor_video_custom.md",
     "python/visitor/visitor_video_skip.md",
+    "r/conversion/adjacent_code_spans_merged.md",
     "r/conversion/adjacent_emphasis_merged.md",
+    "r/conversion/adjacent_inserted_merged.md",
+    "r/conversion/adjacent_strikethrough_merged.md",
+    "r/conversion/adjacent_variable_merged.md",
     "r/conversion/blockquote_code_block_indentation_preserved.md",
     "r/conversion/blockquote_multiple_paragraphs.md",
     "r/conversion/blockquote_nested.md",
@@ -2615,6 +2700,7 @@
     "r/conversion/code_block.md",
     "r/conversion/code_block_no_language.md",
     "r/conversion/code_inline_in_paragraph.md",
+    "r/conversion/code_span_suppresses_nested_inline_markers.md",
     "r/conversion/code_with_backticks_in_content.md",
     "r/conversion/conversion_autolink_filename_not_autolinked.md",
     "r/conversion/conversion_autolink_https_url.md",
@@ -2674,6 +2760,7 @@
     "r/conversion/semantic_section_with_heading.md",
     "r/conversion/semantic_sub_superscript.md",
     "r/conversion/simple_table.md",
+    "r/conversion/strike_renders_as_strikethrough.md",
     "r/conversion/table_empty.md",
     "r/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "r/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -2684,8 +2771,11 @@
     "r/conversion/table_ragged_row_more_cells_than_header.md",
     "r/conversion/table_with_alignment.md",
     "r/conversion/table_with_colspan.md",
+    "r/conversion/tagged_space_in_strikethrough_kept.md",
+    "r/conversion/tagged_space_in_subscript_kept.md",
     "r/conversion/tagged_space_not_duplicated.md",
     "r/conversion/unordered_list.md",
+    "r/conversion/whitespace_only_code_span_kept.md",
     "r/edge-cases/empty_html.md",
     "r/edge-cases/encoding_c1_replacement_table.md",
     "r/edge-cases/encoding_cjk_characters.md",
@@ -2897,7 +2987,11 @@
     "r/visitor/visitor_underline_skip.md",
     "r/visitor/visitor_video_custom.md",
     "r/visitor/visitor_video_skip.md",
+    "ruby/conversion/adjacent_code_spans_merged.md",
     "ruby/conversion/adjacent_emphasis_merged.md",
+    "ruby/conversion/adjacent_inserted_merged.md",
+    "ruby/conversion/adjacent_strikethrough_merged.md",
+    "ruby/conversion/adjacent_variable_merged.md",
     "ruby/conversion/blockquote_code_block_indentation_preserved.md",
     "ruby/conversion/blockquote_multiple_paragraphs.md",
     "ruby/conversion/blockquote_nested.md",
@@ -2910,6 +3004,7 @@
     "ruby/conversion/code_block.md",
     "ruby/conversion/code_block_no_language.md",
     "ruby/conversion/code_inline_in_paragraph.md",
+    "ruby/conversion/code_span_suppresses_nested_inline_markers.md",
     "ruby/conversion/code_with_backticks_in_content.md",
     "ruby/conversion/conversion_autolink_filename_not_autolinked.md",
     "ruby/conversion/conversion_autolink_https_url.md",
@@ -2969,6 +3064,7 @@
     "ruby/conversion/semantic_section_with_heading.md",
     "ruby/conversion/semantic_sub_superscript.md",
     "ruby/conversion/simple_table.md",
+    "ruby/conversion/strike_renders_as_strikethrough.md",
     "ruby/conversion/table_empty.md",
     "ruby/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "ruby/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -2979,8 +3075,11 @@
     "ruby/conversion/table_ragged_row_more_cells_than_header.md",
     "ruby/conversion/table_with_alignment.md",
     "ruby/conversion/table_with_colspan.md",
+    "ruby/conversion/tagged_space_in_strikethrough_kept.md",
+    "ruby/conversion/tagged_space_in_subscript_kept.md",
     "ruby/conversion/tagged_space_not_duplicated.md",
     "ruby/conversion/unordered_list.md",
+    "ruby/conversion/whitespace_only_code_span_kept.md",
     "ruby/edge-cases/empty_html.md",
     "ruby/edge-cases/encoding_c1_replacement_table.md",
     "ruby/edge-cases/encoding_cjk_characters.md",
@@ -3192,7 +3291,11 @@
     "ruby/visitor/visitor_underline_skip.md",
     "ruby/visitor/visitor_video_custom.md",
     "ruby/visitor/visitor_video_skip.md",
+    "rust/conversion/adjacent_code_spans_merged.md",
     "rust/conversion/adjacent_emphasis_merged.md",
+    "rust/conversion/adjacent_inserted_merged.md",
+    "rust/conversion/adjacent_strikethrough_merged.md",
+    "rust/conversion/adjacent_variable_merged.md",
     "rust/conversion/blockquote_code_block_indentation_preserved.md",
     "rust/conversion/blockquote_multiple_paragraphs.md",
     "rust/conversion/blockquote_nested.md",
@@ -3205,6 +3308,7 @@
     "rust/conversion/code_block.md",
     "rust/conversion/code_block_no_language.md",
     "rust/conversion/code_inline_in_paragraph.md",
+    "rust/conversion/code_span_suppresses_nested_inline_markers.md",
     "rust/conversion/code_with_backticks_in_content.md",
     "rust/conversion/conversion_autolink_filename_not_autolinked.md",
     "rust/conversion/conversion_autolink_https_url.md",
@@ -3264,6 +3368,7 @@
     "rust/conversion/semantic_section_with_heading.md",
     "rust/conversion/semantic_sub_superscript.md",
     "rust/conversion/simple_table.md",
+    "rust/conversion/strike_renders_as_strikethrough.md",
     "rust/conversion/table_empty.md",
     "rust/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "rust/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -3274,8 +3379,11 @@
     "rust/conversion/table_ragged_row_more_cells_than_header.md",
     "rust/conversion/table_with_alignment.md",
     "rust/conversion/table_with_colspan.md",
+    "rust/conversion/tagged_space_in_strikethrough_kept.md",
+    "rust/conversion/tagged_space_in_subscript_kept.md",
     "rust/conversion/tagged_space_not_duplicated.md",
     "rust/conversion/unordered_list.md",
+    "rust/conversion/whitespace_only_code_span_kept.md",
     "rust/edge-cases/empty_html.md",
     "rust/edge-cases/encoding_c1_replacement_table.md",
     "rust/edge-cases/encoding_cjk_characters.md",
@@ -3487,7 +3595,11 @@
     "rust/visitor/visitor_underline_skip.md",
     "rust/visitor/visitor_video_custom.md",
     "rust/visitor/visitor_video_skip.md",
+    "swift/conversion/adjacent_code_spans_merged.md",
     "swift/conversion/adjacent_emphasis_merged.md",
+    "swift/conversion/adjacent_inserted_merged.md",
+    "swift/conversion/adjacent_strikethrough_merged.md",
+    "swift/conversion/adjacent_variable_merged.md",
     "swift/conversion/blockquote_code_block_indentation_preserved.md",
     "swift/conversion/blockquote_multiple_paragraphs.md",
     "swift/conversion/blockquote_nested.md",
@@ -3500,6 +3612,7 @@
     "swift/conversion/code_block.md",
     "swift/conversion/code_block_no_language.md",
     "swift/conversion/code_inline_in_paragraph.md",
+    "swift/conversion/code_span_suppresses_nested_inline_markers.md",
     "swift/conversion/code_with_backticks_in_content.md",
     "swift/conversion/conversion_autolink_filename_not_autolinked.md",
     "swift/conversion/conversion_autolink_https_url.md",
@@ -3559,6 +3672,7 @@
     "swift/conversion/semantic_section_with_heading.md",
     "swift/conversion/semantic_sub_superscript.md",
     "swift/conversion/simple_table.md",
+    "swift/conversion/strike_renders_as_strikethrough.md",
     "swift/conversion/table_empty.md",
     "swift/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "swift/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -3569,8 +3683,11 @@
     "swift/conversion/table_ragged_row_more_cells_than_header.md",
     "swift/conversion/table_with_alignment.md",
     "swift/conversion/table_with_colspan.md",
+    "swift/conversion/tagged_space_in_strikethrough_kept.md",
+    "swift/conversion/tagged_space_in_subscript_kept.md",
     "swift/conversion/tagged_space_not_duplicated.md",
     "swift/conversion/unordered_list.md",
+    "swift/conversion/whitespace_only_code_span_kept.md",
     "swift/edge-cases/empty_html.md",
     "swift/edge-cases/encoding_c1_replacement_table.md",
     "swift/edge-cases/encoding_cjk_characters.md",
@@ -3782,7 +3899,11 @@
     "swift/visitor/visitor_underline_skip.md",
     "swift/visitor/visitor_video_custom.md",
     "swift/visitor/visitor_video_skip.md",
+    "typescript/conversion/adjacent_code_spans_merged.md",
     "typescript/conversion/adjacent_emphasis_merged.md",
+    "typescript/conversion/adjacent_inserted_merged.md",
+    "typescript/conversion/adjacent_strikethrough_merged.md",
+    "typescript/conversion/adjacent_variable_merged.md",
     "typescript/conversion/blockquote_code_block_indentation_preserved.md",
     "typescript/conversion/blockquote_multiple_paragraphs.md",
     "typescript/conversion/blockquote_nested.md",
@@ -3795,6 +3916,7 @@
     "typescript/conversion/code_block.md",
     "typescript/conversion/code_block_no_language.md",
     "typescript/conversion/code_inline_in_paragraph.md",
+    "typescript/conversion/code_span_suppresses_nested_inline_markers.md",
     "typescript/conversion/code_with_backticks_in_content.md",
     "typescript/conversion/conversion_autolink_filename_not_autolinked.md",
     "typescript/conversion/conversion_autolink_https_url.md",
@@ -3854,6 +3976,7 @@
     "typescript/conversion/semantic_section_with_heading.md",
     "typescript/conversion/semantic_sub_superscript.md",
     "typescript/conversion/simple_table.md",
+    "typescript/conversion/strike_renders_as_strikethrough.md",
     "typescript/conversion/table_empty.md",
     "typescript/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "typescript/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -3864,8 +3987,11 @@
     "typescript/conversion/table_ragged_row_more_cells_than_header.md",
     "typescript/conversion/table_with_alignment.md",
     "typescript/conversion/table_with_colspan.md",
+    "typescript/conversion/tagged_space_in_strikethrough_kept.md",
+    "typescript/conversion/tagged_space_in_subscript_kept.md",
     "typescript/conversion/tagged_space_not_duplicated.md",
     "typescript/conversion/unordered_list.md",
+    "typescript/conversion/whitespace_only_code_span_kept.md",
     "typescript/edge-cases/empty_html.md",
     "typescript/edge-cases/encoding_c1_replacement_table.md",
     "typescript/edge-cases/encoding_cjk_characters.md",
@@ -4077,7 +4203,11 @@
     "typescript/visitor/visitor_underline_skip.md",
     "typescript/visitor/visitor_video_custom.md",
     "typescript/visitor/visitor_video_skip.md",
+    "wasm/conversion/adjacent_code_spans_merged.md",
     "wasm/conversion/adjacent_emphasis_merged.md",
+    "wasm/conversion/adjacent_inserted_merged.md",
+    "wasm/conversion/adjacent_strikethrough_merged.md",
+    "wasm/conversion/adjacent_variable_merged.md",
     "wasm/conversion/blockquote_code_block_indentation_preserved.md",
     "wasm/conversion/blockquote_multiple_paragraphs.md",
     "wasm/conversion/blockquote_nested.md",
@@ -4090,6 +4220,7 @@
     "wasm/conversion/code_block.md",
     "wasm/conversion/code_block_no_language.md",
     "wasm/conversion/code_inline_in_paragraph.md",
+    "wasm/conversion/code_span_suppresses_nested_inline_markers.md",
     "wasm/conversion/code_with_backticks_in_content.md",
     "wasm/conversion/conversion_autolink_filename_not_autolinked.md",
     "wasm/conversion/conversion_autolink_https_url.md",
@@ -4149,6 +4280,7 @@
     "wasm/conversion/semantic_section_with_heading.md",
     "wasm/conversion/semantic_sub_superscript.md",
     "wasm/conversion/simple_table.md",
+    "wasm/conversion/strike_renders_as_strikethrough.md",
     "wasm/conversion/table_empty.md",
     "wasm/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "wasm/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -4159,8 +4291,11 @@
     "wasm/conversion/table_ragged_row_more_cells_than_header.md",
     "wasm/conversion/table_with_alignment.md",
     "wasm/conversion/table_with_colspan.md",
+    "wasm/conversion/tagged_space_in_strikethrough_kept.md",
+    "wasm/conversion/tagged_space_in_subscript_kept.md",
     "wasm/conversion/tagged_space_not_duplicated.md",
     "wasm/conversion/unordered_list.md",
+    "wasm/conversion/whitespace_only_code_span_kept.md",
     "wasm/edge-cases/empty_html.md",
     "wasm/edge-cases/encoding_c1_replacement_table.md",
     "wasm/edge-cases/encoding_cjk_characters.md",
@@ -4372,7 +4507,11 @@
     "wasm/visitor/visitor_underline_skip.md",
     "wasm/visitor/visitor_video_custom.md",
     "wasm/visitor/visitor_video_skip.md",
+    "zig/conversion/adjacent_code_spans_merged.md",
     "zig/conversion/adjacent_emphasis_merged.md",
+    "zig/conversion/adjacent_inserted_merged.md",
+    "zig/conversion/adjacent_strikethrough_merged.md",
+    "zig/conversion/adjacent_variable_merged.md",
     "zig/conversion/blockquote_code_block_indentation_preserved.md",
     "zig/conversion/blockquote_multiple_paragraphs.md",
     "zig/conversion/blockquote_nested.md",
@@ -4385,6 +4524,7 @@
     "zig/conversion/code_block.md",
     "zig/conversion/code_block_no_language.md",
     "zig/conversion/code_inline_in_paragraph.md",
+    "zig/conversion/code_span_suppresses_nested_inline_markers.md",
     "zig/conversion/code_with_backticks_in_content.md",
     "zig/conversion/conversion_autolink_filename_not_autolinked.md",
     "zig/conversion/conversion_autolink_https_url.md",
@@ -4444,6 +4584,7 @@
     "zig/conversion/semantic_section_with_heading.md",
     "zig/conversion/semantic_sub_superscript.md",
     "zig/conversion/simple_table.md",
+    "zig/conversion/strike_renders_as_strikethrough.md",
     "zig/conversion/table_empty.md",
     "zig/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "zig/conversion/table_nested_chain_not_misclassified_as_layout.md",
@@ -4454,8 +4595,11 @@
     "zig/conversion/table_ragged_row_more_cells_than_header.md",
     "zig/conversion/table_with_alignment.md",
     "zig/conversion/table_with_colspan.md",
+    "zig/conversion/tagged_space_in_strikethrough_kept.md",
+    "zig/conversion/tagged_space_in_subscript_kept.md",
     "zig/conversion/tagged_space_not_duplicated.md",
     "zig/conversion/unordered_list.md",
+    "zig/conversion/whitespace_only_code_span_kept.md",
     "zig/edge-cases/empty_html.md",
     "zig/edge-cases/encoding_c1_replacement_table.md",
     "zig/edge-cases/encoding_cjk_characters.md",
@@ -4671,10 +4815,58 @@
   "generated_metadata": [
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "c"
+      },
+      "path": "c/conversion/adjacent_code_spans_merged.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "c"
       },
       "path": "c/conversion/adjacent_emphasis_merged.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "c"
+      },
+      "path": "c/conversion/adjacent_inserted_merged.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "c"
+      },
+      "path": "c/conversion/adjacent_strikethrough_merged.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "c"
+      },
+      "path": "c/conversion/adjacent_variable_merged.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -4819,6 +5011,18 @@
         "language": "c"
       },
       "path": "c/conversion/code_inline_in_paragraph.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "c"
+      },
+      "path": "c/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -5535,6 +5739,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "c"
+      },
+      "path": "c/conversion/strike_renders_as_strikethrough.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "c"
       },
@@ -5655,6 +5871,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "c"
+      },
+      "path": "c/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "c"
+      },
+      "path": "c/conversion/tagged_space_in_subscript_kept.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "c"
       },
@@ -5671,6 +5911,18 @@
         "language": "c"
       },
       "path": "c/conversion/unordered_list.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "c"
+      },
+      "path": "c/conversion/whitespace_only_code_span_kept.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -8211,10 +8463,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/adjacent_code_spans_merged.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "csharp"
       },
       "path": "csharp/conversion/adjacent_emphasis_merged.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/adjacent_inserted_merged.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/adjacent_strikethrough_merged.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/adjacent_variable_merged.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -8359,6 +8659,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/code_inline_in_paragraph.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -9075,6 +9387,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/strike_renders_as_strikethrough.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "csharp"
       },
@@ -9195,6 +9519,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/tagged_space_in_subscript_kept.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "csharp"
       },
@@ -9211,6 +9559,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/unordered_list.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/whitespace_only_code_span_kept.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -11751,10 +12111,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "dart"
+      },
+      "path": "dart/conversion/adjacent_code_spans_merged.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "dart"
       },
       "path": "dart/conversion/adjacent_emphasis_merged.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "dart"
+      },
+      "path": "dart/conversion/adjacent_inserted_merged.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "dart"
+      },
+      "path": "dart/conversion/adjacent_strikethrough_merged.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "dart"
+      },
+      "path": "dart/conversion/adjacent_variable_merged.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -11899,6 +12307,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/code_inline_in_paragraph.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "dart"
+      },
+      "path": "dart/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -12615,6 +13035,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "dart"
+      },
+      "path": "dart/conversion/strike_renders_as_strikethrough.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "dart"
       },
@@ -12735,6 +13167,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "dart"
+      },
+      "path": "dart/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "dart"
+      },
+      "path": "dart/conversion/tagged_space_in_subscript_kept.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "dart"
       },
@@ -12751,6 +13207,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/unordered_list.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "dart"
+      },
+      "path": "dart/conversion/whitespace_only_code_span_kept.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -15291,10 +15759,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/adjacent_code_spans_merged.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "elixir"
       },
       "path": "elixir/conversion/adjacent_emphasis_merged.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/adjacent_inserted_merged.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/adjacent_strikethrough_merged.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/adjacent_variable_merged.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -15439,6 +15955,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/code_inline_in_paragraph.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -16155,6 +16683,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/strike_renders_as_strikethrough.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "elixir"
       },
@@ -16275,6 +16815,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/tagged_space_in_subscript_kept.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "elixir"
       },
@@ -16291,6 +16855,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/unordered_list.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/whitespace_only_code_span_kept.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -18831,10 +19407,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "go"
+      },
+      "path": "go/conversion/adjacent_code_spans_merged.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "go"
       },
       "path": "go/conversion/adjacent_emphasis_merged.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "go"
+      },
+      "path": "go/conversion/adjacent_inserted_merged.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "go"
+      },
+      "path": "go/conversion/adjacent_strikethrough_merged.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "go"
+      },
+      "path": "go/conversion/adjacent_variable_merged.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -18979,6 +19603,18 @@
         "language": "go"
       },
       "path": "go/conversion/code_inline_in_paragraph.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "go"
+      },
+      "path": "go/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -19695,6 +20331,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "go"
+      },
+      "path": "go/conversion/strike_renders_as_strikethrough.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "go"
       },
@@ -19815,6 +20463,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "go"
+      },
+      "path": "go/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "go"
+      },
+      "path": "go/conversion/tagged_space_in_subscript_kept.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "go"
       },
@@ -19831,6 +20503,18 @@
         "language": "go"
       },
       "path": "go/conversion/unordered_list.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "go"
+      },
+      "path": "go/conversion/whitespace_only_code_span_kept.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -22371,10 +23055,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "java"
+      },
+      "path": "java/conversion/adjacent_code_spans_merged.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "java"
       },
       "path": "java/conversion/adjacent_emphasis_merged.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "java"
+      },
+      "path": "java/conversion/adjacent_inserted_merged.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "java"
+      },
+      "path": "java/conversion/adjacent_strikethrough_merged.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "java"
+      },
+      "path": "java/conversion/adjacent_variable_merged.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -22519,6 +23251,18 @@
         "language": "java"
       },
       "path": "java/conversion/code_inline_in_paragraph.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "java"
+      },
+      "path": "java/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -23235,6 +23979,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "java"
+      },
+      "path": "java/conversion/strike_renders_as_strikethrough.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "java"
       },
@@ -23355,6 +24111,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "java"
+      },
+      "path": "java/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "java"
+      },
+      "path": "java/conversion/tagged_space_in_subscript_kept.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "java"
       },
@@ -23371,6 +24151,18 @@
         "language": "java"
       },
       "path": "java/conversion/unordered_list.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "java"
+      },
+      "path": "java/conversion/whitespace_only_code_span_kept.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -25911,10 +26703,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/adjacent_code_spans_merged.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/adjacent_emphasis_merged.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/adjacent_inserted_merged.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/adjacent_strikethrough_merged.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/adjacent_variable_merged.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -26059,6 +26899,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/code_inline_in_paragraph.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -26775,6 +27627,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/strike_renders_as_strikethrough.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "kotlin_android"
       },
@@ -26895,6 +27759,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/tagged_space_in_subscript_kept.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "kotlin_android"
       },
@@ -26911,6 +27799,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/unordered_list.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/whitespace_only_code_span_kept.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -28803,10 +29703,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "php"
+      },
+      "path": "php/conversion/adjacent_code_spans_merged.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "php"
       },
       "path": "php/conversion/adjacent_emphasis_merged.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "php"
+      },
+      "path": "php/conversion/adjacent_inserted_merged.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "php"
+      },
+      "path": "php/conversion/adjacent_strikethrough_merged.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "php"
+      },
+      "path": "php/conversion/adjacent_variable_merged.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -28951,6 +29899,18 @@
         "language": "php"
       },
       "path": "php/conversion/code_inline_in_paragraph.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "php"
+      },
+      "path": "php/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -29667,6 +30627,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "php"
+      },
+      "path": "php/conversion/strike_renders_as_strikethrough.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "php"
       },
@@ -29787,6 +30759,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "php"
+      },
+      "path": "php/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "php"
+      },
+      "path": "php/conversion/tagged_space_in_subscript_kept.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "php"
       },
@@ -29803,6 +30799,18 @@
         "language": "php"
       },
       "path": "php/conversion/unordered_list.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "php"
+      },
+      "path": "php/conversion/whitespace_only_code_span_kept.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -32343,10 +33351,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "python"
+      },
+      "path": "python/conversion/adjacent_code_spans_merged.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "python"
       },
       "path": "python/conversion/adjacent_emphasis_merged.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "python"
+      },
+      "path": "python/conversion/adjacent_inserted_merged.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "python"
+      },
+      "path": "python/conversion/adjacent_strikethrough_merged.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "python"
+      },
+      "path": "python/conversion/adjacent_variable_merged.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -32491,6 +33547,18 @@
         "language": "python"
       },
       "path": "python/conversion/code_inline_in_paragraph.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "python"
+      },
+      "path": "python/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -33207,6 +34275,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "python"
+      },
+      "path": "python/conversion/strike_renders_as_strikethrough.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "python"
       },
@@ -33327,6 +34407,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "python"
+      },
+      "path": "python/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "python"
+      },
+      "path": "python/conversion/tagged_space_in_subscript_kept.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "python"
       },
@@ -33343,6 +34447,18 @@
         "language": "python"
       },
       "path": "python/conversion/unordered_list.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "python"
+      },
+      "path": "python/conversion/whitespace_only_code_span_kept.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -35883,10 +36999,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "r"
+      },
+      "path": "r/conversion/adjacent_code_spans_merged.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "r"
       },
       "path": "r/conversion/adjacent_emphasis_merged.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "r"
+      },
+      "path": "r/conversion/adjacent_inserted_merged.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "r"
+      },
+      "path": "r/conversion/adjacent_strikethrough_merged.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "r"
+      },
+      "path": "r/conversion/adjacent_variable_merged.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -36031,6 +37195,18 @@
         "language": "r"
       },
       "path": "r/conversion/code_inline_in_paragraph.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "r"
+      },
+      "path": "r/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -36747,6 +37923,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "r"
+      },
+      "path": "r/conversion/strike_renders_as_strikethrough.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "r"
       },
@@ -36867,6 +38055,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "r"
+      },
+      "path": "r/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "r"
+      },
+      "path": "r/conversion/tagged_space_in_subscript_kept.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "r"
       },
@@ -36883,6 +38095,18 @@
         "language": "r"
       },
       "path": "r/conversion/unordered_list.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "r"
+      },
+      "path": "r/conversion/whitespace_only_code_span_kept.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -39423,10 +40647,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/adjacent_code_spans_merged.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "ruby"
       },
       "path": "ruby/conversion/adjacent_emphasis_merged.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/adjacent_inserted_merged.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/adjacent_strikethrough_merged.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/adjacent_variable_merged.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -39571,6 +40843,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/code_inline_in_paragraph.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -40287,6 +41571,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/strike_renders_as_strikethrough.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "ruby"
       },
@@ -40407,6 +41703,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/tagged_space_in_subscript_kept.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "ruby"
       },
@@ -40423,6 +41743,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/unordered_list.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/whitespace_only_code_span_kept.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -42963,10 +44295,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "rust"
+      },
+      "path": "rust/conversion/adjacent_code_spans_merged.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "rust"
       },
       "path": "rust/conversion/adjacent_emphasis_merged.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "rust"
+      },
+      "path": "rust/conversion/adjacent_inserted_merged.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "rust"
+      },
+      "path": "rust/conversion/adjacent_strikethrough_merged.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "rust"
+      },
+      "path": "rust/conversion/adjacent_variable_merged.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -43111,6 +44491,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/code_inline_in_paragraph.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "rust"
+      },
+      "path": "rust/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -43833,6 +45225,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "rust"
+      },
+      "path": "rust/conversion/strike_renders_as_strikethrough.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "rust"
       },
@@ -43955,6 +45359,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "rust"
+      },
+      "path": "rust/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "rust"
+      },
+      "path": "rust/conversion/tagged_space_in_subscript_kept.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "rust"
       },
@@ -43971,6 +45399,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/unordered_list.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "rust"
+      },
+      "path": "rust/conversion/whitespace_only_code_span_kept.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -46843,10 +48283,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "swift"
+      },
+      "path": "swift/conversion/adjacent_code_spans_merged.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "swift"
       },
       "path": "swift/conversion/adjacent_emphasis_merged.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "swift"
+      },
+      "path": "swift/conversion/adjacent_inserted_merged.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "swift"
+      },
+      "path": "swift/conversion/adjacent_strikethrough_merged.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "swift"
+      },
+      "path": "swift/conversion/adjacent_variable_merged.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -46991,6 +48479,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/code_inline_in_paragraph.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "swift"
+      },
+      "path": "swift/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -47707,6 +49207,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "swift"
+      },
+      "path": "swift/conversion/strike_renders_as_strikethrough.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "swift"
       },
@@ -47827,6 +49339,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "swift"
+      },
+      "path": "swift/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "swift"
+      },
+      "path": "swift/conversion/tagged_space_in_subscript_kept.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "swift"
       },
@@ -47843,6 +49379,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/unordered_list.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "swift"
+      },
+      "path": "swift/conversion/whitespace_only_code_span_kept.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -50383,10 +51931,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "node"
+      },
+      "path": "typescript/conversion/adjacent_code_spans_merged.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "node"
       },
       "path": "typescript/conversion/adjacent_emphasis_merged.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "node"
+      },
+      "path": "typescript/conversion/adjacent_inserted_merged.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "node"
+      },
+      "path": "typescript/conversion/adjacent_strikethrough_merged.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "node"
+      },
+      "path": "typescript/conversion/adjacent_variable_merged.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -50531,6 +52127,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/code_inline_in_paragraph.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "node"
+      },
+      "path": "typescript/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -51247,6 +52855,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "node"
+      },
+      "path": "typescript/conversion/strike_renders_as_strikethrough.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "node"
       },
@@ -51367,6 +52987,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "node"
+      },
+      "path": "typescript/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "node"
+      },
+      "path": "typescript/conversion/tagged_space_in_subscript_kept.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "node"
       },
@@ -51383,6 +53027,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/unordered_list.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "node"
+      },
+      "path": "typescript/conversion/whitespace_only_code_span_kept.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -53923,10 +55579,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/adjacent_code_spans_merged.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "wasm"
       },
       "path": "wasm/conversion/adjacent_emphasis_merged.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/adjacent_inserted_merged.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/adjacent_strikethrough_merged.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/adjacent_variable_merged.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -54071,6 +55775,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/code_inline_in_paragraph.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -54787,6 +56503,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/strike_renders_as_strikethrough.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "wasm"
       },
@@ -54907,6 +56635,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/tagged_space_in_subscript_kept.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "wasm"
       },
@@ -54923,6 +56675,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/unordered_list.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/whitespace_only_code_span_kept.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -57463,10 +59227,58 @@
     },
     {
       "key": {
+        "fixture_id": "adjacent_code_spans_merged",
+        "language": "zig"
+      },
+      "path": "zig/conversion/adjacent_code_spans_merged.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "adjacent_emphasis_merged",
         "language": "zig"
       },
       "path": "zig/conversion/adjacent_emphasis_merged.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_inserted_merged",
+        "language": "zig"
+      },
+      "path": "zig/conversion/adjacent_inserted_merged.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_strikethrough_merged",
+        "language": "zig"
+      },
+      "path": "zig/conversion/adjacent_strikethrough_merged.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "adjacent_variable_merged",
+        "language": "zig"
+      },
+      "path": "zig/conversion/adjacent_variable_merged.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -57611,6 +59423,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/code_inline_in_paragraph.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_suppresses_nested_inline_markers",
+        "language": "zig"
+      },
+      "path": "zig/conversion/code_span_suppresses_nested_inline_markers.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -58327,6 +60151,18 @@
     },
     {
       "key": {
+        "fixture_id": "strike_renders_as_strikethrough",
+        "language": "zig"
+      },
+      "path": "zig/conversion/strike_renders_as_strikethrough.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "zig"
       },
@@ -58447,6 +60283,30 @@
     },
     {
       "key": {
+        "fixture_id": "tagged_space_in_strikethrough_kept",
+        "language": "zig"
+      },
+      "path": "zig/conversion/tagged_space_in_strikethrough_kept.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "tagged_space_in_subscript_kept",
+        "language": "zig"
+      },
+      "path": "zig/conversion/tagged_space_in_subscript_kept.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "tagged_space_not_duplicated",
         "language": "zig"
       },
@@ -58463,6 +60323,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/unordered_list.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_code_span_kept",
+        "language": "zig"
+      },
+      "path": "zig/conversion/whitespace_only_code_span_kept.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -61004,6 +62876,70 @@
   ],
   "expected": [
     {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "zig"
+    },
+    {
       "fixture_id": "adjacent_emphasis_merged",
       "language": "c"
     },
@@ -61065,6 +63001,198 @@
     },
     {
       "fixture_id": "adjacent_emphasis_merged",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
       "language": "zig"
     },
     {
@@ -61833,6 +63961,70 @@
     },
     {
       "fixture_id": "code_inline_in_paragraph",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
       "language": "zig"
     },
     {
@@ -74700,6 +76892,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "c"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "go"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "java"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "node"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "php"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "python"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "r"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "zig"
+    },
+    {
       "fixture_id": "structure_code_block",
       "language": "c"
     },
@@ -75977,6 +78233,134 @@
     },
     {
       "fixture_id": "table_with_colspan",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
       "language": "zig"
     },
     {
@@ -79473,6 +81857,70 @@
     },
     {
       "fixture_id": "whitespace_only",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
       "language": "zig"
     },
     {
@@ -79670,6 +82118,70 @@
   ],
   "generated": [
     {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_code_spans_merged",
+      "language": "zig"
+    },
+    {
       "fixture_id": "adjacent_emphasis_merged",
       "language": "c"
     },
@@ -79731,6 +82243,198 @@
     },
     {
       "fixture_id": "adjacent_emphasis_merged",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_inserted_merged",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_strikethrough_merged",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "c"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "go"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "java"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "node"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "php"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "python"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "r"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "adjacent_variable_merged",
       "language": "zig"
     },
     {
@@ -80499,6 +83203,70 @@
     },
     {
       "fixture_id": "code_inline_in_paragraph",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_span_suppresses_nested_inline_markers",
       "language": "zig"
     },
     {
@@ -93366,6 +96134,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "c"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "go"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "java"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "node"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "php"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "python"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "r"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "strike_renders_as_strikethrough",
+      "language": "zig"
+    },
+    {
       "fixture_id": "structure_code_block",
       "language": "c"
     },
@@ -94643,6 +97475,134 @@
     },
     {
       "fixture_id": "table_with_colspan",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "tagged_space_in_strikethrough_kept",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "tagged_space_in_subscript_kept",
       "language": "zig"
     },
     {
@@ -98139,6 +101099,70 @@
     },
     {
       "fixture_id": "whitespace_only",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "whitespace_only_code_span_kept",
       "language": "zig"
     },
     {

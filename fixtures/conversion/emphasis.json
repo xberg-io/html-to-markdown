@@ -232,5 +232,62 @@
       "stem": "tagged_space_not_duplicated",
       "title": "A whitespace-only inline element contributes exactly one space"
     }
+  },
+  {
+    "id": "strike_renders_as_strikethrough",
+    "description": "The deprecated strike tag renders as strikethrough",
+    "input": {
+      "html": "<p><strike>gone</strike></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "~~gone~~\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "strike_renders_as_strikethrough",
+      "title": "The deprecated strike tag renders as strikethrough"
+    }
+  },
+  {
+    "id": "adjacent_strikethrough_merged",
+    "description": "Adjacent strikethrough elements share one delimiter run",
+    "input": {
+      "html": "<p><del>A</del><del>B</del></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "~~AB~~\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "adjacent_strikethrough_merged",
+      "title": "Adjacent strikethrough elements share one delimiter run"
+    }
+  },
+  {
+    "id": "tagged_space_in_strikethrough_kept",
+    "description": "A whitespace-only strikethrough keeps the word separator",
+    "input": {
+      "html": "<p>A<del> </del>B</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "A B\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "tagged_space_in_strikethrough_kept",
+      "title": "A whitespace-only strikethrough keeps the word separator"
+    }
   }
 ]
