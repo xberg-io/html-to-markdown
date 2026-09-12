@@ -278,6 +278,45 @@ jobs:
           prerelease: ${{ steps.meta.outputs.is_prerelease }}
           token: ${{ steps.app-token.outputs.token }}
 
+      # ~keep Every release starts life as a draft here and is flipped by `promote-release` at
+      # the very end, so a run that dies in between leaves the draft behind. `release-report`
+      # already fails when THIS tag is still a draft, but it cannot when the whole run is
+      # cancelled -- and a draft never creates its git tag, so GitHub stores `tag_name` as
+      # `untagged-<hash>` and the release becomes invisible to every lookup by tag. Seven
+      # releases accumulated that way before anyone noticed, two of them holding the only copy
+      # of 23 and 9 published assets respectively.
+      #
+      # `prepare` is the one job early enough that a later cancellation cannot suppress it, so
+      # the audit lives here. It warns rather than fails: unrelated leftover debt must not block
+      # the release in flight.
+      - name: Audit for abandoned draft releases
+        if: ${{ steps.meta.outputs.is_tag == 'true' && steps.meta.outputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          drafts="$(gh api repos/:owner/:repo/releases --paginate \
+            --jq '.[] | select(.draft) | "\(.tag_name)\t\(.name)\t\(.assets | length)"' \
+            | grep -v "^${TAG}\b" || true)"
+          if [ -z "${drafts}" ]; then
+            echo "No abandoned draft releases." >>"$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          count="$(printf '%s\n' "${drafts}" | wc -l | tr -d ' ')"
+          echo "::warning title=Abandoned draft releases::${count} draft release(s) other than ${TAG} exist; a draft holds its assets but is invisible to lookup by tag. See the job summary."
+          {
+            echo "### ${count} abandoned draft release(s)"
+            echo
+            echo "A \`untagged-*\` tag_name means the draft never created its git tag, so the"
+            echo "release cannot be found by tag and any assets on it are stranded."
+            echo
+            echo "| stored tag_name | name | assets |"
+            echo "| --- | --- | --- |"
+            printf '%s\n' "${drafts}" | awk -F'\t' '{printf "| `%s` | %s | %s |\n", $1, $2, $3}'
+          } >>"$GITHUB_STEP_SUMMARY"
+
   validate-versions:
     name: Validate language manifest versions
     needs: prepare
