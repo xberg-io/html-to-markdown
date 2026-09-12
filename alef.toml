@@ -559,16 +559,8 @@ traineddata = "traineddata"
   "nesting-too-deep",
   "too-many-parameters",
 ]
-"crates/html-to-markdown/src/converter/inline/code.rs" = [
-  "function-too-long",
-  "nesting-too-deep",
-  "too-many-parameters",
-]
-"crates/html-to-markdown/src/converter/inline/emphasis.rs" = [
-  "cyclomatic-complexity",
-  "function-too-long",
-  "too-many-parameters",
-]
+"crates/html-to-markdown/src/converter/inline/code.rs" = ["too-many-parameters"]
+"crates/html-to-markdown/src/converter/inline/emphasis.rs" = ["function-too-long", "too-many-parameters"]
 "crates/html-to-markdown/src/converter/inline/link.rs" = [
   "cyclomatic-complexity",
   "function-too-long",
@@ -763,26 +755,8 @@ traineddata = "traineddata"
 # The php crate is MIXED: src/lib.rs, the visitor interface and the stubs are alef-generated,
 # but src/HtmlVisitor.php is hand-written and must keep its quality metrics. ~keep
 "crates/html-to-markdown-php/**" = ["comment", "doc-comment"]
-"crates/html-to-markdown-php/src/lib.rs" = [
-  "comment",
-  "doc-comment",
-  "cyclomatic-complexity",
-  "file-too-long",
-  "function-too-long",
-  "nesting-too-deep",
-  "too-many-parameters",
-  "type-too-long",
-]
-"crates/html-to-markdown-php/src/HtmlVisitorInterface.php" = [
-  "comment",
-  "doc-comment",
-  "cyclomatic-complexity",
-  "file-too-long",
-  "function-too-long",
-  "nesting-too-deep",
-  "too-many-parameters",
-  "type-too-long",
-]
+"crates/html-to-markdown-php/src/lib.rs" = ["file-too-long", "function-too-long", "too-many-parameters"]
+"crates/html-to-markdown-php/src/HtmlVisitorInterface.php" = ["type-too-long"]
 "crates/html-to-markdown-php/stubs/**" = [
   "comment",
   "doc-comment",
@@ -807,12 +781,8 @@ traineddata = "traineddata"
 # build.rs/cbindgen.toml/header) is exempt; other modules are hand-written and
 # get the uncomment sweep. ~keep
 "crates/html-to-markdown-ffi/src/lib.rs" = [
-  "comment",
-  "doc-comment",
-  "cyclomatic-complexity",
   "file-too-long",
   "function-too-long",
-  "nesting-too-deep",
   "too-many-parameters",
   "type-too-long",
 ]
@@ -820,24 +790,16 @@ traineddata = "traineddata"
 "crates/html-to-markdown-ffi/cbindgen.toml" = ["comment", "doc-comment"]
 "crates/html-to-markdown-ffi/include/html_to_markdown.h" = ["comment", "doc-comment"]
 "crates/html-to-markdown-py/src/lib.rs" = [
-  "comment",
-  "doc-comment",
-  "cyclomatic-complexity",
   "file-too-long",
   "function-too-long",
   "nesting-too-deep",
   "too-many-parameters",
-  "type-too-long",
 ]
 "crates/html-to-markdown-wasm/src/lib.rs" = [
-  "comment",
-  "doc-comment",
   "cyclomatic-complexity",
   "file-too-long",
   "function-too-long",
-  "nesting-too-deep",
   "too-many-parameters",
-  "type-too-long",
 ]
 # alef-generated e2e registry scaffold apps (alef:hash headers) — exempt from the
 # uncomment sweep; regeneration owns their comments. Distinct glob from the
@@ -864,9 +826,9 @@ traineddata = "traineddata"
 # Alef-generated API reference pages: one page per language, each a full rendering of the
 # public surface, so `file-too-long` is a property of the surface's size. ~keep
 "docs-site/src/content/docs/reference/**" = ["file-too-long"]
-".github/workflows/publish.yaml" = ["file-too-long", "typo"]
+".github/workflows/publish.yaml" = ["file-too-long"]
 "packages/r/R/version.R" = ["empty_file"]
-"crates/html-to-markdown/src/visitor/types.rs" = ["too-many-parameters", "typo"]
+"crates/html-to-markdown/src/visitor/types.rs" = ["too-many-parameters"]
 "packages/python/html_to_markdown/options.py" = ["F821"]
 "packages/kotlin-android/src/main/kotlin/**/*.kt" = ["typo"]
 "packages/swift/Sources/RustBridge*/**" = ["trailing-whitespace"]
