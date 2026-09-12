@@ -244,7 +244,7 @@ fn cmd_compare(args: CompareArgs) -> Result<()> {
     let guardrails_value = load_value(&args.guardrails)?;
     let baseline_schema = schema_of(&baseline_value);
     let guardrails_schema = schema_of(&guardrails_value);
-    let (comparisons, host_mismatch) = match (baseline_schema, guardrails_schema) {
+    let (evaluation, host_mismatch) = match (baseline_schema, guardrails_schema) {
         (1, 1) => {
             eprintln!(
                 "WARNING: schema-v1 baseline has no calibrated fixture floors; using temporary percentage-only policy"
@@ -254,21 +254,58 @@ fn cmd_compare(args: CompareArgs) -> Result<()> {
                 &serde_json::from_value::<LegacyRunResults>(baseline_value)?,
                 &serde_json::from_value::<LegacyGuardrails>(guardrails_value)?,
             )?;
-            (comparisons, None)
+            (
+                policy::Evaluation {
+                    comparisons,
+                    inventory_mismatches: Vec::new(),
+                },
+                None,
+            )
         }
         (SCHEMA_VERSION, SCHEMA_VERSION) => {
             let baseline = serde_json::from_value::<CalibratedBaseline>(baseline_value)?;
             let guardrails = serde_json::from_value::<Guardrails>(guardrails_value)?;
-            let comparisons = policy::evaluate_strict(&results, &baseline, &guardrails)?;
-            (comparisons, policy::host_mismatch(&results, &guardrails))
+            let evaluation = policy::evaluate_strict(&results, &baseline, &guardrails)?;
+            (evaluation, policy::host_mismatch(&results, &guardrails))
         }
         _ => anyhow::bail!(
             "baseline/guardrails schema mismatch: baseline={baseline_schema}, guardrails={guardrails_schema}"
         ),
     };
 
-    let failures = report_comparisons(&comparisons);
-    report_verdict(&failures, host_mismatch.as_ref(), args.allow_host_mismatch)
+    let failures = report_comparisons(&evaluation.comparisons);
+    report_inventory_mismatches(&evaluation.inventory_mismatches);
+    report_verdict(
+        &failures,
+        &evaluation.inventory_mismatches,
+        host_mismatch.as_ref(),
+        args.allow_host_mismatch,
+    )
+}
+
+/// Print inventory differences beneath the timing table.
+///
+/// ~keep Printed after the comparisons, not instead of them: an inventory difference used to abort
+/// `compare` before a single timing was evaluated, so an accepted output change hid whatever the
+/// timings were doing. Both are shown, and `report_verdict` fails on either.
+#[expect(
+    clippy::print_stderr,
+    reason = "inventory diagnostics belong on stderr with the verdict"
+)]
+fn report_inventory_mismatches(mismatches: &[String]) {
+    if mismatches.is_empty() {
+        return;
+    }
+    eprintln!(
+        "\nFIXTURE INVENTORY DIFFERS FROM THE BASELINE ({} difference(s)):",
+        mismatches.len()
+    );
+    for mismatch in mismatches {
+        eprintln!("  {mismatch}");
+    }
+    eprintln!(
+        "Re-calibrate with `task bench:calibrate` (ACCEPT_OUTPUT_CHANGE=1 when the output change is intended and reviewed)."
+    );
 }
 
 #[expect(clippy::print_stdout, reason = "per-fixture comparison table is CLI result output")]
@@ -308,6 +345,7 @@ fn report_comparisons(comparisons: &[policy::Comparison]) -> Vec<String> {
 )]
 fn report_verdict(
     failures: &[String],
+    inventory_mismatches: &[String],
     host_mismatch: Option<&policy::HostMismatch>,
     allow_host_mismatch: bool,
 ) -> Result<()> {
@@ -320,12 +358,23 @@ fn report_verdict(
             mismatch.calibrated_cpu_count,
         );
     }
-    if failures.is_empty() {
+    if failures.is_empty() && inventory_mismatches.is_empty() {
         println!("\nAll guardrails passed.");
         return Ok(());
     }
     for failure in failures {
         eprintln!("FAIL: {failure}");
+    }
+    // ~keep `--allow-host-mismatch` downgrades TIMING violations only. A fixture inventory is a
+    // property of the corpus and the converter, not of the CPU that measured it, so a different
+    // runner is never a reason to accept one -- downgrading it here would let an unreviewed output
+    // change ride into CI green on any heterogeneous pool.
+    if !inventory_mismatches.is_empty() {
+        anyhow::bail!(
+            "{} fixture inventory difference(s) and {} guardrail violation(s)",
+            inventory_mismatches.len(),
+            failures.len()
+        );
     }
     if host_mismatch.is_some() && allow_host_mismatch {
         eprintln!(

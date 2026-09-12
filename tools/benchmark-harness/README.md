@@ -62,6 +62,19 @@ Both output files are staged and backed up before promotion; if either promotion
 Baseline promotion requires retained raw artifacts, comparable hardware, a quiet-runner record, and reviewer approval.
 Never promote a baseline or populate floors merely to make CI green.
 
+### Inventory differences never hide the timing verdict
+
+`compare` evaluates the fixture inventory and the timing guardrails in one pass and reports both.
+It used to abort on the first inventory difference, which meant a release that legitimately changed
+a fixture's output printed `fixture metadata differs` and **never evaluated a single timing** — a
+real regression riding along with an accepted output change was invisible, and the green/red signal
+said nothing about performance either way. Observed in 3.12.4: one fixture's output moved by one
+byte, and three guardrail violations underneath it went unreported.
+
+Both halves are fatal. `--allow-host-mismatch` downgrades **timing** violations only: a fixture
+inventory is a property of the corpus and the converter, not of the CPU that measured it, so a
+heterogeneous runner pool is never a reason to accept an inventory change.
+
 ### Re-promoting after a deliberate conversion change
 
 The fixture inventory is validated against the baseline being replaced, so a conversion fix that

@@ -27,6 +27,21 @@ pub struct Comparison {
     pub failed: bool,
 }
 
+/// Outcome of a strict evaluation.
+///
+/// ~keep Carries the timing comparisons and the inventory differences *together* rather than
+/// letting the first inventory difference abort the run. `compare` previously bailed on inventory,
+/// so any release that legitimately changed a fixture's output reported only "fixture metadata
+/// differs" and never evaluated a single timing -- a genuine regression riding along with an
+/// accepted output change could not be seen. Both halves are computed in one pass; both are fatal.
+#[derive(Debug, Clone)]
+pub struct Evaluation {
+    /// Per-fixture timing comparisons, for every fixture present in both documents.
+    pub comparisons: Vec<Comparison>,
+    /// Human-readable inventory differences; empty when the inventories match exactly.
+    pub inventory_mismatches: Vec<String>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Metadata<'a> {
     group: &'a str,
@@ -75,14 +90,24 @@ pub fn evaluate_strict(
     results: &RunResults,
     baseline: &CalibratedBaseline,
     guardrails: &Guardrails,
-) -> Result<Vec<Comparison>> {
-    validate_strict_documents(results, baseline, guardrails)?;
+) -> Result<Evaluation> {
+    let inventory_mismatches = validate_strict_documents(results, baseline, guardrails)?;
     let baseline_map = calibrated_map(&baseline.runs)?;
-    results
+    // ~keep Indexing `baseline_map` directly would panic for a fixture the baseline lacks, which
+    // was unreachable only while an inventory mismatch aborted first. It no longer does.
+    let comparisons = results
         .runs
         .iter()
-        .map(|record| strict_record(record, baseline_map[record.fixture.as_str()], guardrails))
-        .collect()
+        .filter_map(|record| {
+            baseline_map
+                .get(record.fixture.as_str())
+                .map(|calibrated| strict_record(record, calibrated, guardrails))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    Ok(Evaluation {
+        comparisons,
+        inventory_mismatches,
+    })
 }
 
 /// Evaluate with the temporary schema-v1 percentage-only migration bridge.
@@ -120,7 +145,7 @@ fn validate_strict_documents(
     results: &RunResults,
     baseline: &CalibratedBaseline,
     guardrails: &Guardrails,
-) -> Result<()> {
+) -> Result<Vec<String>> {
     ensure_schema(results.schema, "results")?;
     ensure_schema(baseline.schema, "baseline")?;
     ensure_schema(guardrails.schema, "guardrails")?;
@@ -143,8 +168,9 @@ fn validate_strict_documents(
     );
     let result_inventory = validate_results(results)?;
     let baseline_inventory = validate_calibrated_baseline(baseline)?;
-    ensure_inventory_matches(&result_inventory, &baseline_inventory)?;
-    validate_guardrails(guardrails, &result_inventory)
+    let mismatches = inventory_mismatches(&result_inventory, &baseline_inventory);
+    validate_guardrails(guardrails, &result_inventory)?;
+    Ok(mismatches)
 }
 
 fn validate_results(results: &RunResults) -> Result<HashMap<&str, Metadata<'_>>> {
@@ -288,17 +314,41 @@ fn validate_thresholds<'a>(
     Ok(())
 }
 
+/// Collect every inventory difference instead of stopping at the first.
+///
+/// Returned messages are sorted so a CI log diffs cleanly between runs.
+fn inventory_mismatches(current: &HashMap<&str, Metadata<'_>>, baseline: &HashMap<&str, Metadata<'_>>) -> Vec<String> {
+    let mut mismatches = Vec::new();
+    if current.len() != baseline.len() {
+        mismatches.push(format!(
+            "fixture inventories differ in size: {} in results, {} in baseline",
+            current.len(),
+            baseline.len()
+        ));
+    }
+    for (fixture, metadata) in current {
+        match baseline.get(fixture) {
+            Some(baseline_metadata) if baseline_metadata == metadata => {}
+            Some(_) => mismatches.push(format!("fixture metadata differs for {fixture}")),
+            None => mismatches.push(format!("fixture {fixture} is absent from the baseline")),
+        }
+    }
+    for fixture in baseline.keys() {
+        if !current.contains_key(fixture) {
+            mismatches.push(format!("baseline fixture {fixture} is absent from the results"));
+        }
+    }
+    mismatches.sort();
+    mismatches
+}
+
+/// Inventory equality as a hard error, for the schema-v1 bridge that has no richer reporting.
 fn ensure_inventory_matches(
     current: &HashMap<&str, Metadata<'_>>,
     baseline: &HashMap<&str, Metadata<'_>>,
 ) -> Result<()> {
-    ensure!(current.len() == baseline.len(), "fixture inventories differ in size");
-    for (fixture, metadata) in current {
-        ensure!(
-            baseline.get(fixture) == Some(metadata),
-            "fixture metadata differs for {fixture}"
-        );
-    }
+    let mismatches = inventory_mismatches(current, baseline);
+    ensure!(mismatches.is_empty(), "{}", mismatches.join("; "));
     Ok(())
 }
 
@@ -408,7 +458,10 @@ mod tests {
     #[test]
     fn should_allow_tiny_fixture_delta_within_measured_floor() {
         let (results, baseline, guardrails) = scenario(vec![1.08; 9], 0.10);
-        let comparison = evaluate_strict(&results, &baseline, &guardrails).unwrap().remove(0);
+        let comparison = evaluate_strict(&results, &baseline, &guardrails)
+            .unwrap()
+            .comparisons
+            .remove(0);
         assert!(!comparison.failed);
         assert_eq!(comparison.allowed_delta_ms, 0.10);
     }
@@ -416,7 +469,7 @@ mod tests {
     #[test]
     fn should_fail_material_delta_beyond_floor_and_percentage() {
         let (results, baseline, guardrails) = scenario(vec![1.11; 9], 0.10);
-        assert!(evaluate_strict(&results, &baseline, &guardrails).unwrap()[0].failed);
+        assert!(evaluate_strict(&results, &baseline, &guardrails).unwrap().comparisons[0].failed);
     }
 
     #[test]
@@ -443,36 +496,75 @@ mod tests {
         );
     }
 
+    /// ~keep An inventory mismatch must not hide the timing verdict. `compare` used to bail on
+    /// the first differing fixture, so a release whose output legitimately changed reported
+    /// "fixture metadata differs" and never evaluated timings at all -- a real regression shipping
+    /// alongside an accepted output change would have been invisible. Both verdicts are now
+    /// produced in one pass and both are fatal.
     #[test]
-    fn should_reject_altered_group_metadata() {
-        let (mut results, baseline, guardrails) = scenario(vec![1.0; 9], 0.10);
-        results.runs[0].group = "clean_medium".to_owned();
+    fn should_report_timing_regression_alongside_inventory_mismatch() {
+        let (mut results, baseline, guardrails) = scenario(vec![5.0; 9], 0.10);
+        results.runs[0].output_bytes = 6;
+
+        let evaluation = evaluate_strict(&results, &baseline, &guardrails)
+            .expect("an inventory mismatch must not abort the evaluation");
+
+        assert_eq!(
+            evaluation.inventory_mismatches,
+            vec!["fixture metadata differs for fixture.html".to_owned()],
+            "the inventory mismatch must still be reported"
+        );
+        assert_eq!(
+            evaluation.comparisons.len(),
+            1,
+            "the timing comparison must still be computed"
+        );
         assert!(
-            evaluate_strict(&results, &baseline, &guardrails)
-                .unwrap_err()
-                .to_string()
-                .contains("fixture metadata differs")
+            evaluation.comparisons[0].failed,
+            "a 1.0ms -> 5.0ms regression must be reported even though inventory differs"
         );
     }
 
     #[test]
-    fn should_reject_altered_input_and_output_metadata() {
+    fn should_report_altered_group_metadata() {
+        let (mut results, baseline, guardrails) = scenario(vec![1.0; 9], 0.10);
+        results.runs[0].group = "clean_medium".to_owned();
+        assert_eq!(
+            evaluate_strict(&results, &baseline, &guardrails)
+                .unwrap()
+                .inventory_mismatches,
+            vec!["fixture metadata differs for fixture.html".to_owned()]
+        );
+    }
+
+    #[test]
+    fn should_report_altered_input_and_output_metadata() {
         let (mut results, baseline, guardrails) = scenario(vec![1.0; 9], 0.10);
         results.runs[0].bytes = 11;
-        assert!(
+        assert_eq!(
             evaluate_strict(&results, &baseline, &guardrails)
-                .unwrap_err()
-                .to_string()
-                .contains("fixture metadata differs")
+                .unwrap()
+                .inventory_mismatches,
+            vec!["fixture metadata differs for fixture.html".to_owned()]
         );
         results.runs[0].bytes = 10;
         results.runs[0].output_bytes = 6;
-        assert!(
+        assert_eq!(
             evaluate_strict(&results, &baseline, &guardrails)
-                .unwrap_err()
-                .to_string()
-                .contains("fixture metadata differs")
+                .unwrap()
+                .inventory_mismatches,
+            vec!["fixture metadata differs for fixture.html".to_owned()]
         );
+    }
+
+    /// A clean capture must report no inventory differences at all -- the negative control for
+    /// the three tests above, so an always-empty mismatch list cannot masquerade as a pass. ~keep
+    #[test]
+    fn should_report_no_inventory_mismatch_for_a_matching_capture() {
+        let (results, baseline, guardrails) = scenario(vec![1.0; 9], 0.10);
+        let evaluation = evaluate_strict(&results, &baseline, &guardrails).unwrap();
+        assert!(evaluation.inventory_mismatches.is_empty());
+        assert_eq!(evaluation.comparisons.len(), 1);
     }
 
     #[test]
@@ -576,7 +668,7 @@ mod tests {
         let (mut results, baseline, guardrails) = scenario(vec![1.11; 9], 0.10);
         results.provenance.cpu_model = "Other Vendor CPU".to_owned();
         results.provenance.cpu_count = 8;
-        let comparisons = evaluate_strict(&results, &baseline, &guardrails).unwrap();
+        let comparisons = evaluate_strict(&results, &baseline, &guardrails).unwrap().comparisons;
         assert_eq!(comparisons.len(), 1);
         assert!(comparisons[0].failed);
         assert_eq!(
