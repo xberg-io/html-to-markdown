@@ -21,6 +21,7 @@ on:
       - "**/*.yaml"
       - "**/*.json"
       - "**/*.md"
+      - "*.md"
       - "alef.toml"
       - ".github/workflows/ci-lint.yaml"
   pull_request:
@@ -43,6 +44,7 @@ on:
       - "**/*.yaml"
       - "**/*.json"
       - "**/*.md"
+      - "*.md"
       - "alef.toml"
       - ".github/workflows/ci-lint.yaml"
   workflow_dispatch: {}
