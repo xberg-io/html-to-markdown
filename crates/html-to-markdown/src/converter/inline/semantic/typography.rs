@@ -7,6 +7,7 @@
 //! - Abbreviation (abbr) with optional title
 //! - Span element with special OCR handling
 
+use crate::converter::inline::wrapped::{EMPHASIS_SIBLING_TAGS, InlineDelimiters, emit_wrapped_inline};
 use crate::options::{ConversionOptions, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
@@ -40,6 +41,21 @@ pub fn handle_small(
     for child_handle in children.top().iter() {
         walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
     }
+}
+
+/// Resolve a `<sub>`/`<sup>` wrapping pair for the current output format and configured symbol.
+///
+/// An HTML-ish symbol such as `<sub>` closes with its matching end tag rather than a repeat of
+/// itself; every other symbol, including the empty default, closes with the symbol as given. ~keep
+fn resolve_script_delimiters(options: &ConversionOptions, symbol: &str, djot_marker: char) -> (String, String) {
+    if options.output_format == OutputFormat::Djot {
+        let marker = djot_marker.to_string();
+        return (marker.clone(), marker);
+    }
+    if symbol.starts_with('<') && !symbol.starts_with("</") {
+        return (symbol.to_owned(), symbol.replace('<', "</"));
+    }
+    (symbol.to_owned(), symbol.to_owned())
 }
 
 /// Handle subscript element (sub tag).
@@ -123,26 +139,20 @@ pub fn handle_subscript(
         return;
     }
 
-    let (prefix, suffix, trimmed) = chomp_inline(&content);
-    if !trimmed.is_empty() {
-        output.push_str(prefix);
-        if options.output_format == OutputFormat::Djot {
-            output.push('~');
-            output.push_str(trimmed);
-            output.push('~');
-        } else if !options.sub_symbol.is_empty() {
-            output.push_str(&options.sub_symbol);
-            output.push_str(trimmed);
-            if options.sub_symbol.starts_with('<') && !options.sub_symbol.starts_with("</") {
-                output.push_str(&options.sub_symbol.replace('<', "</"));
-            } else {
-                output.push_str(&options.sub_symbol);
-            }
-        } else {
-            output.push_str(trimmed);
-        }
-        append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-    }
+    let (open, close) = resolve_script_delimiters(options, &options.sub_symbol, '~');
+    emit_wrapped_inline(
+        output,
+        &content,
+        &InlineDelimiters {
+            open: &open,
+            close: &close,
+            merge_symbol: None,
+            sibling_tag_names: &[],
+        },
+        node_handle,
+        parser,
+        dom_ctx,
+    );
 }
 
 /// Handle superscript element (sup tag).
@@ -226,106 +236,26 @@ pub fn handle_superscript(
         return;
     }
 
-    let (prefix, suffix, trimmed) = chomp_inline(&content);
-    if !trimmed.is_empty() {
-        output.push_str(prefix);
-        if options.output_format == OutputFormat::Djot {
-            output.push('^');
-            output.push_str(trimmed);
-            output.push('^');
-        } else if !options.sup_symbol.is_empty() {
-            output.push_str(&options.sup_symbol);
-            output.push_str(trimmed);
-            if options.sup_symbol.starts_with('<') && !options.sup_symbol.starts_with("</") {
-                output.push_str(&options.sup_symbol.replace('<', "</"));
-            } else {
-                output.push_str(&options.sup_symbol);
-            }
-        } else {
-            output.push_str(trimmed);
-        }
-        append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-    }
+    let (open, close) = resolve_script_delimiters(options, &options.sup_symbol, '^');
+    emit_wrapped_inline(
+        output,
+        &content,
+        &InlineDelimiters {
+            open: &open,
+            close: &close,
+            merge_symbol: None,
+            sibling_tag_names: &[],
+        },
+        node_handle,
+        parser,
+        dom_ctx,
+    );
 }
 
 /// Handle variable element (var tag).
 ///
 /// Wraps content with italic symbol (`strong_em_symbol` from options).
 pub fn handle_variable(
-    node_handle: &NodeHandle,
-    parser: &Parser,
-    output: &mut String,
-    options: &ConversionOptions,
-    ctx: &Context,
-    depth: usize,
-    dom_ctx: &DomContext,
-) {
-    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
-
-    let Some(node) = node_handle.get(parser) else { return };
-
-    let tag = match node {
-        tl::Node::Tag(tag) => tag,
-        _ => return,
-    };
-
-    let mut content = String::with_capacity(32);
-    let children = tag.children();
-    for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
-    }
-
-    let (prefix, suffix, trimmed) = chomp_inline(&content);
-    if !trimmed.is_empty() {
-        output.push_str(prefix);
-        output.push(options.strong_em_symbol);
-        output.push_str(trimmed);
-        output.push(options.strong_em_symbol);
-        append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-    }
-}
-
-/// Handle definition element (dfn tag).
-///
-/// Wraps content with italic symbol (`strong_em_symbol` from options).
-pub fn handle_definition(
-    node_handle: &NodeHandle,
-    parser: &Parser,
-    output: &mut String,
-    options: &ConversionOptions,
-    ctx: &Context,
-    depth: usize,
-    dom_ctx: &DomContext,
-) {
-    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
-
-    let Some(node) = node_handle.get(parser) else { return };
-
-    let tag = match node {
-        tl::Node::Tag(tag) => tag,
-        _ => return,
-    };
-
-    let mut content = String::with_capacity(32);
-    let children = tag.children();
-    for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
-    }
-
-    let (prefix, suffix, trimmed) = chomp_inline(&content);
-    if !trimmed.is_empty() {
-        output.push_str(prefix);
-        output.push(options.strong_em_symbol);
-        output.push_str(trimmed);
-        output.push(options.strong_em_symbol);
-        append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-    }
-}
-
-/// Handle abbreviation element (abbr tag).
-///
-/// Passes through content and optionally appends title attribute in parentheses.
-pub fn handle_abbreviation(
     node_handle: &NodeHandle,
     parser: &Parser,
     output: &mut String,
@@ -349,20 +279,115 @@ pub fn handle_abbreviation(
         walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
     }
 
-    let trimmed = content.trim();
+    let marker = options.strong_em_symbol.to_string();
+    emit_wrapped_inline(
+        output,
+        &content,
+        &InlineDelimiters {
+            open: &marker,
+            close: &marker,
+            merge_symbol: Some(options.strong_em_symbol),
+            sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
+        },
+        node_handle,
+        parser,
+        dom_ctx,
+    );
+}
 
-    if !trimmed.is_empty() {
-        output.push_str(trimmed);
+/// Handle definition element (dfn tag).
+///
+/// Wraps content with italic symbol (`strong_em_symbol` from options).
+pub fn handle_definition(
+    node_handle: &NodeHandle,
+    parser: &Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    depth: usize,
+    dom_ctx: &DomContext,
+) {
+    use crate::converter::walk_node;
 
-        if let Some(title) = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str()) {
-            let trimmed_title = title.trim();
-            if !trimmed_title.is_empty() {
-                output.push_str(" (");
-                output.push_str(trimmed_title);
-                output.push(')');
-            }
+    let Some(node) = node_handle.get(parser) else { return };
+
+    let tag = match node {
+        tl::Node::Tag(tag) => tag,
+        _ => return,
+    };
+
+    let mut content = String::with_capacity(32);
+    let children = tag.children();
+    for child_handle in children.top().iter() {
+        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+    }
+
+    let marker = options.strong_em_symbol.to_string();
+    emit_wrapped_inline(
+        output,
+        &content,
+        &InlineDelimiters {
+            open: &marker,
+            close: &marker,
+            merge_symbol: Some(options.strong_em_symbol),
+            sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
+        },
+        node_handle,
+        parser,
+        dom_ctx,
+    );
+}
+
+/// Handle abbreviation element (abbr tag).
+///
+/// Passes through content and optionally appends title attribute in parentheses.
+pub fn handle_abbreviation(
+    node_handle: &NodeHandle,
+    parser: &Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    depth: usize,
+    dom_ctx: &DomContext,
+) {
+    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
+
+    let Some(node) = node_handle.get(parser) else { return };
+
+    let tag = match node {
+        tl::Node::Tag(tag) => tag,
+        _ => return,
+    };
+
+    let mut content = String::with_capacity(32);
+    let children = tag.children();
+    for child_handle in children.top().iter() {
+        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+    }
+
+    let (prefix, suffix, trimmed) = chomp_inline(&content);
+
+    if trimmed.is_empty() {
+        // ~keep issue #481: `<abbr>` renders no delimiters of its own, so a whitespace-only
+        // ~keep body left nothing behind at all and joined the words either side of it.
+        if !content.is_empty() && !output.ends_with(' ') {
+            output.push_str(prefix);
+        }
+        return;
+    }
+
+    output.push_str(prefix);
+    output.push_str(trimmed);
+
+    if let Some(title) = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str()) {
+        let trimmed_title = title.trim();
+        if !trimmed_title.is_empty() {
+            output.push_str(" (");
+            output.push_str(trimmed_title);
+            output.push(')');
         }
     }
+    append_inline_suffix(output, suffix, true, node_handle, parser, dom_ctx);
 }
 
 /// Handle span element.

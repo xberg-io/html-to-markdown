@@ -1,19 +1,18 @@
-//! Handler for code-related inline elements (code, kbd, samp).
+//! Handler for the code-like inline elements `<kbd>` and `<samp>`.
 //!
-//! Converts HTML code elements to Markdown inline code formatting with support for:
-//! - Inline code blocks with backtick delimiters
+//! Converts them to Markdown inline code formatting with support for:
 //! - Keyboard input (<kbd>) rendered as code
 //! - Sample output (<samp>) rendered as code
-//! - Smart backtick escaping for nested backticks
-//! - Delimiter spacing to prevent ambiguous parsing
-//! - Nested code context tracking (suppress formatting in <code> within <code>)
-//! - Visitor callbacks for custom code processing
+//! - Nested code context tracking (suppress formatting inside <code>/<pre>)
 //! - Whitespace normalization for kbd/samp elements
+//!
+//! `<code>` itself is handled by `converter::handlers::code_block::handle_code`, which is
+//! what `converter::main`'s walk dispatches to; this module's own `<code>` arm was a second,
+//! silently divergent implementation that nothing ever reached. ~keep
 
+use crate::converter::inline::wrapped::emit_code_span;
 use crate::options::ConversionOptions;
 use crate::text;
-#[cfg(feature = "visitor")]
-use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
 type Context = crate::converter::Context;
@@ -42,126 +41,10 @@ pub fn handle(
     dom_ctx: &DomContext,
 ) {
     match tag_name {
-        "code" => {
-            handle_code(node_handle, parser, output, options, ctx, depth, dom_ctx);
-        }
         "kbd" | "samp" => {
             handle_kbd_samp(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
         }
         _ => {}
-    }
-}
-
-/// Handle inline code element (<code> tag).
-///
-/// Smart handling of nested code:
-/// - If already in code context (ctx.in_code), just process children without wrapping
-/// - Otherwise, wraps content with backticks with smart escaping logic
-///
-/// Smart backtick escaping:
-/// - Detects consecutive backticks in content
-/// - Adds extra backticks if needed to avoid ambiguous parsing
-/// - Adds space delimiters if content starts/ends with backticks or spaces
-fn handle_code(
-    node_handle: &NodeHandle,
-    parser: &Parser,
-    output: &mut String,
-    options: &ConversionOptions,
-    ctx: &Context,
-    depth: usize,
-    dom_ctx: &DomContext,
-) {
-    // ~keep reason: serialize_node is only used with the visitor feature; walk_node usage
-    // ~keep depends on the feature-gated code path below.
-    #[allow(unused_imports)]
-    use crate::converter::{serialize_node, walk_node};
-
-    let Some(node) = node_handle.get(parser) else { return };
-
-    let tag = match node {
-        tl::Node::Tag(tag) => tag,
-        _ => return,
-    };
-
-    if ctx.in_code {
-        let children = tag.children();
-        for child_handle in children.top().iter() {
-            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
-        }
-    } else {
-        let code_ctx = Context {
-            in_code: true,
-            ..ctx.clone()
-        };
-        let mut content = String::with_capacity(32);
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    &mut content,
-                    options,
-                    &code_ctx,
-                    depth + 1,
-                    dom_ctx,
-                );
-            }
-        }
-
-        let trimmed = &content;
-
-        if !content.trim().is_empty() {
-            #[cfg(feature = "visitor")]
-            let code_output = if let Some(ref visitor_handle) = ctx.visitor {
-                use crate::visitor::{NodeContext, NodeType, VisitResult};
-
-                let node_id = node_handle.get_inner();
-                let parent_tag = dom_ctx.parent_tag_name(node_id, parser);
-                let index_in_parent = dom_ctx.get_sibling_index(node_id).unwrap_or(0);
-
-                let node_ctx = NodeContext::with_lazy_attributes(
-                    NodeType::Code,
-                    tag.name().as_utf8_str(),
-                    tag,
-                    depth,
-                    index_in_parent,
-                    parent_tag.map(Cow::Borrowed),
-                    true,
-                );
-
-                let visit_result = {
-                    let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
-                    visitor.visit_code_inline(&node_ctx, trimmed)
-                };
-                match visit_result {
-                    VisitResult::Continue => None,
-                    VisitResult::Custom(custom) => Some(custom),
-                    VisitResult::Skip => Some(String::new()),
-                    VisitResult::PreserveHtml => Some(serialize_node(node_handle, parser)),
-                    VisitResult::Error(err) => {
-                        if ctx.visitor_error.borrow().is_none() {
-                            *ctx.visitor_error.borrow_mut() = Some(err);
-                        }
-                        None
-                    }
-                }
-            } else {
-                None
-            };
-
-            #[cfg(feature = "visitor")]
-            if let Some(custom_output) = code_output {
-                output.push_str(&custom_output);
-            } else {
-                render_code_with_escaping(trimmed, output);
-            }
-
-            #[cfg(not(feature = "visitor"))]
-            {
-                render_code_with_escaping(trimmed, output);
-            }
-        }
     }
 }
 
@@ -217,84 +100,38 @@ fn handle_kbd_samp(
     let normalized = text::normalize_whitespace(&content);
     let (prefix, suffix, trimmed) = chomp_inline(&normalized);
 
-    if !content.trim().is_empty() {
-        output.push_str(prefix);
-        output.push('`');
-        output.push_str(trimmed);
-        output.push('`');
-        append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-    } else if !content.is_empty() {
-        output.push_str(prefix);
-        append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
+    if content.is_empty() {
+        return;
     }
+
+    // ~keep issue #481: an all-whitespace body is not an empty one -- `<kbd> </kbd>` is a key
+    // ~keep whose label is a space. Render the span over the normalized body rather than over
+    // ~keep `trimmed`, which is empty exactly when the whole body was whitespace.
+    let body = if trimmed.is_empty() {
+        normalized.as_str()
+    } else {
+        trimmed
+    };
+    let emit_prefix = if trimmed.is_empty() { "" } else { prefix };
+    let emit_suffix = if trimmed.is_empty() { "" } else { suffix };
+
+    output.push_str(emit_prefix);
+    let mut span = String::with_capacity(body.len() + 4);
+    render_code_span(body, &mut span);
+    if emit_prefix.is_empty() {
+        emit_code_span(&span, body, output, node_handle, parser, dom_ctx);
+    } else {
+        output.push_str(&span);
+    }
+    append_inline_suffix(output, emit_suffix, !body.is_empty(), node_handle, parser, dom_ctx);
 }
 
-/// Render inline code with smart backtick escaping.
+/// Render `body` as an inline code span.
 ///
-/// Handles the logic for:
-/// 1. Detecting backticks in content
-/// 2. Calculating the required number of backticks
-/// 3. Adding delimiter spaces when needed
-///
-/// # Backtick Escaping Logic
-///
-/// - If content contains no backticks: use single backtick delimiters
-/// - If content has single backticks: use double backtick delimiters
-/// - If content has consecutive backticks: use single backtick but rely on spacing
-///
-/// # Delimiter Space Rules
-///
-/// Add space delimiters if:
-/// - Content is all spaces
-/// - Content starts/ends with backtick
-/// - Content starts and ends with spaces AND contains backticks
-fn render_code_with_escaping(trimmed: &str, output: &mut String) {
-    let contains_backtick = trimmed.contains('`');
-
-    let needs_delimiter_spaces = {
-        let first_char = trimmed.chars().next();
-        let last_char = trimmed.chars().last();
-        let starts_with_space = first_char == Some(' ');
-        let ends_with_space = last_char == Some(' ');
-        let starts_with_backtick = first_char == Some('`');
-        let ends_with_backtick = last_char == Some('`');
-        let all_spaces = trimmed.chars().all(|c| c == ' ');
-
-        all_spaces
-            || starts_with_backtick
-            || ends_with_backtick
-            || (starts_with_space && ends_with_space && contains_backtick)
-    };
-
-    let (num_backticks, needs_spaces) = if contains_backtick {
-        let max_consecutive = trimmed
-            .chars()
-            .fold((0, 0), |(max, current), c| {
-                if c == '`' {
-                    let new_current = current + 1;
-                    (max.max(new_current), new_current)
-                } else {
-                    (max, 0)
-                }
-            })
-            .0;
-        let num = if max_consecutive == 1 { 2 } else { 1 };
-        (num, needs_delimiter_spaces)
-    } else {
-        (1, needs_delimiter_spaces)
-    };
-
-    for _ in 0..num_backticks {
-        output.push('`');
-    }
-    if needs_spaces {
-        output.push(' ');
-    }
-    output.push_str(trimmed);
-    if needs_spaces {
-        output.push(' ');
-    }
-    for _ in 0..num_backticks {
-        output.push('`');
-    }
+/// No delimiter-space padding: `CommonMark` strips one space from each end of a code span only
+/// when the content is not entirely spaces, so an all-spaces body round-trips as written. ~keep
+fn render_code_span(body: &str, span: &mut String) {
+    span.push('`');
+    span.push_str(body);
+    span.push('`');
 }

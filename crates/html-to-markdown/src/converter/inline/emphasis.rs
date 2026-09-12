@@ -49,71 +49,9 @@ pub fn handle(
     }
 }
 
-/// Push the wrapped-content emission shared by `handle_strong` and `handle_emphasis`'s
-/// non-custom (post-visitor) path.
-///
-/// `open`/`close` are the exact delimiter strings this element wraps its trimmed content in
-/// (pass `("", "")` for a `<strong>` nested inside another `<strong>`, which Tier-2 renders
-/// with no marker of its own). `merge_symbol` is the single delimiter character `open` is
-/// built from, used to detect and merge a `CommonMark`-adjacency with the immediately
-/// preceding sibling's close marker (issue #483, see `merge_adjacent_emphasis`'s doc
-/// comment) instead of opening a second, textually-adjacent delimiter run.
-///
-/// `sibling_tag_names` lists the HTML tag names (e.g. `["strong", "b"]`) that make this
-/// element's immediately preceding DOM sibling a genuine candidate for that merge. Buffer
-/// content alone is ambiguous: ordinary prose can coincidentally end in a literal `*`/`**`
-/// (CommonMark spec example 442, `<p>*<em>foo</em></p>` -> `**foo*`, NOT a merge into
-/// `*foo*`) that is indistinguishable, byte-for-byte, from a just-emitted close marker.
-/// Requiring the DOM to actually show a matching sibling element resolves the ambiguity in
-/// favor of "no merge" whenever the preceding content is plain text rather than a real
-/// emphasis/strong element.
-///
-/// ~keep This one function is the single point of truth for both `handle_strong` and
-/// ~keep `handle_emphasis`'s emission logic, across all four (visitor x strong/emphasis)
-/// ~keep call sites that used to inline a byte-for-byte copy of it -- see the emit block
-/// ~keep duplication this replaces.
-#[allow(clippy::too_many_arguments)]
-fn emit_wrapped_inline(
-    output: &mut String,
-    content: &str,
-    open: &str,
-    close: &str,
-    merge_symbol: char,
-    sibling_tag_names: &[&str],
-    node_handle: &NodeHandle,
-    parser: &Parser,
-    dom_ctx: &DomContext,
-) {
-    use crate::converter::utility::siblings::get_previous_sibling_tag;
-    use crate::converter::{append_inline_suffix, chomp_inline, merge_adjacent_emphasis};
-
-    let (prefix, suffix, trimmed) = chomp_inline(content);
-    if !content.trim().is_empty() {
-        output.push_str(prefix);
-        let sibling_is_matching_tag = get_previous_sibling_tag(node_handle, parser, dom_ctx)
-            .is_some_and(|name| sibling_tag_names.contains(&name));
-        let merged = prefix.is_empty()
-            && sibling_is_matching_tag
-            && merge_adjacent_emphasis(output, merge_symbol, open.chars().count());
-        if !merged {
-            output.push_str(open);
-        }
-        output.push_str(trimmed);
-        output.push_str(close);
-        append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-    } else if !content.is_empty() {
-        // ~keep issue #481: a whitespace-only body (e.g. `<i> </i>`) must contribute at
-        // ~keep most one space -- `chomp_inline` above already collapsed prefix/suffix to
-        // ~keep a single representation, but the buffer can already end with a real space
-        // ~keep from a preceding sibling (e.g. `A <i> </i>B`), in which case even that one
-        // ~keep copy must be suppressed. Mirrors `text_node.rs`'s `!output.ends_with(' ')`
-        // ~keep guards, which this handler was the one outlier missing.
-        if !output.ends_with(' ') {
-            output.push_str(prefix);
-        }
-        append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
-    }
-}
+use crate::converter::inline::wrapped::{
+    EMPHASIS_SIBLING_TAGS, InlineDelimiters, STRONG_SIBLING_TAGS, emit_wrapped_inline,
+};
 
 /// Resolve `<strong>`/`<b>`'s wrapping delimiters for the current context and options, then
 /// emit via [`emit_wrapped_inline`].
@@ -126,15 +64,16 @@ fn emit_strong_wrapped(
     parser: &Parser,
     dom_ctx: &DomContext,
 ) {
-    const SIBLING_TAGS: [&str; 2] = ["strong", "b"];
     if ctx.in_strong {
         emit_wrapped_inline(
             output,
             content,
-            "",
-            "",
-            options.strong_em_symbol,
-            &SIBLING_TAGS,
+            &InlineDelimiters {
+                open: "",
+                close: "",
+                merge_symbol: Some(options.strong_em_symbol),
+                sibling_tag_names: &STRONG_SIBLING_TAGS,
+            },
             node_handle,
             parser,
             dom_ctx,
@@ -145,10 +84,12 @@ fn emit_strong_wrapped(
         emit_wrapped_inline(
             output,
             content,
-            "*",
-            "*",
-            '*',
-            &SIBLING_TAGS,
+            &InlineDelimiters {
+                open: "*",
+                close: "*",
+                merge_symbol: Some('*'),
+                sibling_tag_names: &STRONG_SIBLING_TAGS,
+            },
             node_handle,
             parser,
             dom_ctx,
@@ -158,10 +99,12 @@ fn emit_strong_wrapped(
         emit_wrapped_inline(
             output,
             content,
-            &marker,
-            &marker,
-            options.strong_em_symbol,
-            &SIBLING_TAGS,
+            &InlineDelimiters {
+                open: &marker,
+                close: &marker,
+                merge_symbol: Some(options.strong_em_symbol),
+                sibling_tag_names: &STRONG_SIBLING_TAGS,
+            },
             node_handle,
             parser,
             dom_ctx,
@@ -179,17 +122,18 @@ fn emit_emphasis_wrapped(
     parser: &Parser,
     dom_ctx: &DomContext,
 ) {
-    const SIBLING_TAGS: [&str; 2] = ["em", "i"];
     if options.output_format == OutputFormat::Djot {
         // ~keep Djot emphasis always uses `_`, independent of `options.strong_em_symbol`
         // ~keep (pre-existing behaviour, unchanged by this refactor).
         emit_wrapped_inline(
             output,
             content,
-            "_",
-            "_",
-            '_',
-            &SIBLING_TAGS,
+            &InlineDelimiters {
+                open: "_",
+                close: "_",
+                merge_symbol: Some('_'),
+                sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
+            },
             node_handle,
             parser,
             dom_ctx,
@@ -199,10 +143,12 @@ fn emit_emphasis_wrapped(
         emit_wrapped_inline(
             output,
             content,
-            &marker,
-            &marker,
-            options.strong_em_symbol,
-            &SIBLING_TAGS,
+            &InlineDelimiters {
+                open: &marker,
+                close: &marker,
+                merge_symbol: Some(options.strong_em_symbol),
+                sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
+            },
             node_handle,
             parser,
             dom_ctx,

@@ -3,7 +3,7 @@
 //! This module provides specialized handlers for inline HTML elements:
 //! - Emphasis elements (strong, b, em, i)
 //! - Links (a)
-//! - Code elements (code, kbd, samp)
+//! - Code-like elements (kbd, samp)
 //! - Semantic elements (mark, del, s, ins, u, small, sub, sup, var, dfn, abbr)
 //! - Ruby annotation elements (ruby, rb, rt, rp, rtc)
 //!
@@ -29,6 +29,7 @@ pub mod emphasis;
 pub mod link;
 pub mod ruby;
 pub mod semantic;
+pub mod wrapped;
 
 /// Dispatches inline element handling to the appropriate handler.
 ///
@@ -45,7 +46,7 @@ pub mod semantic;
 /// | `strong`, `b` | emphasis | Bold/strong text formatting |
 /// | `em`, `i` | emphasis | Italic/emphasis text formatting |
 /// | `a` | link | Hyperlinks and anchors |
-/// | `code`, `kbd`, `samp` | code | Inline code and keyboard input |
+/// | `kbd`, `samp` | code | Keyboard input and sample output, rendered as code |
 /// | `mark`, `del`, `s`, `ins`, `u`, `small`, `sub`, `sup`, `var`, `dfn`, `abbr`, `span` | semantic | Semantic formatting |
 /// | `ruby`, `rb`, `rt`, `rp`, `rtc` | ruby | Ruby annotations (East Asian typography) |
 ///
@@ -116,7 +117,7 @@ pub fn dispatch_inline_handler(
             link::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        "code" | "kbd" | "samp" => {
+        "kbd" | "samp" => {
             code::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }

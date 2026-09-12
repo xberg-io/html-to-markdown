@@ -9,6 +9,7 @@
 
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
+use crate::converter::inline::wrapped::emit_code_span;
 use crate::converter::main::walk_node;
 use crate::converter::text::dedent_code_block;
 use crate::options::ConversionOptions;
@@ -119,7 +120,12 @@ pub fn handle_code(
 
         let trimmed = &content;
 
-        if !content.trim().is_empty() {
+        // ~keep issue #481: an all-whitespace body is NOT an empty one. `<code> </code>` is a
+        // ~keep code span whose content is a space, and CommonMark spells that exactly --
+        // ~keep `format_inline_code`'s `all_spaces` branch pads with delimiter spaces so the
+        // ~keep span survives the spec's own stripping rule (spec example 138). Testing
+        // ~keep `trim()` here dropped the element outright and joined the words either side.
+        if !content.is_empty() {
             #[cfg(feature = "visitor")]
             let code_output = if let Some(ref visitor_handle) = ctx.visitor {
                 use crate::visitor::{NodeContext, NodeType, VisitResult};
@@ -162,15 +168,28 @@ pub fn handle_code(
             if let Some(custom_output) = code_output {
                 output.push_str(&custom_output);
             } else {
-                format_inline_code(trimmed, output);
+                emit_inline_code(trimmed, output, node_handle, parser, dom_ctx);
             }
 
             #[cfg(not(feature = "visitor"))]
             {
-                format_inline_code(trimmed, output);
+                emit_inline_code(trimmed, output, node_handle, parser, dom_ctx);
             }
         }
     }
+}
+
+/// Render an inline code span, then emit it through the adjacent-span merge.
+fn emit_inline_code(
+    content: &str,
+    output: &mut String,
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+) {
+    let mut span = String::with_capacity(content.len() + 2);
+    format_inline_code(content, &mut span);
+    emit_code_span(&span, content, output, node_handle, parser, dom_ctx);
 }
 
 /// Handle a `<pre>` element and convert to Markdown.
@@ -363,12 +382,11 @@ fn format_inline_code(content: &str, output: &mut String) {
         let ends_with_space = last_char == Some(' ');
         let starts_with_backtick = first_char == Some('`');
         let ends_with_backtick = last_char == Some('`');
-        let all_spaces = content.chars().all(|c| c == ' ');
-
-        all_spaces
-            || starts_with_backtick
-            || ends_with_backtick
-            || (starts_with_space && ends_with_space && contains_backtick)
+        // ~keep CommonMark strips one space from each end of a code span ONLY when the
+        // ~keep content is not entirely spaces, so an all-spaces body needs no padding --
+        // ~keep and padding it changes what the span contains (`` ` ` `` is one space,
+        // ~keep `` `   ` `` is three). Spec example 138 is exactly this case.
+        starts_with_backtick || ends_with_backtick || (starts_with_space && ends_with_space && contains_backtick)
     };
 
     let (num_backticks, needs_spaces) = if contains_backtick {

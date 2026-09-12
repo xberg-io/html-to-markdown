@@ -5,6 +5,7 @@
 //! - Strikethrough (del, s tags) with ~~ syntax
 //! - Inserted/underlined text (ins, u tags) with == syntax
 
+use crate::converter::inline::wrapped::{InlineDelimiters, emit_wrapped_inline};
 use crate::options::{ConversionOptions, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
@@ -92,55 +93,165 @@ pub fn handle_mark(
         for child_handle in children.top().iter() {
             walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
         }
+        return;
+    }
+
+    use crate::options::HighlightStyle;
+    // ~keep Bold highlighting renders its children with `in_strong` set, which suppresses a
+    // ~keep nested `<strong>`'s own markers; every other style walks them unchanged.
+    let child_ctx = if options.highlight_style == HighlightStyle::Bold {
+        Context {
+            in_strong: true,
+            ..ctx.clone()
+        }
     } else {
-        use crate::options::HighlightStyle;
-        match options.highlight_style {
-            HighlightStyle::DoubleEqual => {
-                if options.output_format == OutputFormat::Djot {
-                    output.push_str("{=");
-                } else {
-                    output.push_str("==");
-                }
-                let children = tag.children();
-                for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
-                }
-                if options.output_format == OutputFormat::Djot {
-                    output.push_str("=}");
-                } else {
-                    output.push_str("==");
-                }
-            }
-            HighlightStyle::Html => {
-                output.push_str("<mark>");
-                let children = tag.children();
-                for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
-                }
-                output.push_str("</mark>");
-            }
-            HighlightStyle::Bold => {
-                let mut symbol = String::with_capacity(2);
-                symbol.push(options.strong_em_symbol);
-                symbol.push(options.strong_em_symbol);
-                output.push_str(&symbol);
-                let bold_ctx = Context {
-                    in_strong: true,
-                    ..ctx.clone()
-                };
-                let children = tag.children();
-                for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, output, options, &bold_ctx, depth + 1, dom_ctx);
-                }
-                output.push_str(&symbol);
-            }
-            HighlightStyle::None => {
-                let children = tag.children();
-                for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
-                }
+        ctx.clone()
+    };
+    let mut content = String::with_capacity(32);
+    let children = tag.children();
+    for child_handle in children.top().iter() {
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &child_ctx,
+            depth + 1,
+            dom_ctx,
+        );
+    }
+
+    let (open, close, merge_symbol) = resolve_mark_delimiters(options);
+    emit_wrapped_inline(
+        output,
+        &content,
+        &InlineDelimiters {
+            open: &open,
+            close: &close,
+            merge_symbol,
+            sibling_tag_names: &MARK_SIBLING_TAGS,
+        },
+        node_handle,
+        parser,
+        dom_ctx,
+    );
+}
+
+/// Resolve `<mark>`'s wrapping pair, and the character it can merge a delimiter run with.
+///
+/// Only the repeated-character styles can form a run with an adjacent sibling's close marker;
+/// `<mark>`'s HTML style closes with a distinct end tag and `None` emits no marker at all, so
+/// both pass `None` and never merge. ~keep
+fn resolve_mark_delimiters(options: &ConversionOptions) -> (String, String, Option<char>) {
+    use crate::options::HighlightStyle;
+    match options.highlight_style {
+        HighlightStyle::DoubleEqual => {
+            if options.output_format == OutputFormat::Djot {
+                ("{=".to_owned(), "=}".to_owned(), None)
+            } else {
+                ("==".to_owned(), "==".to_owned(), Some('='))
             }
         }
+        HighlightStyle::Html => ("<mark>".to_owned(), "</mark>".to_owned(), None),
+        HighlightStyle::Bold => {
+            let marker: String = [options.strong_em_symbol; 2].iter().collect();
+            (marker.clone(), marker, Some(options.strong_em_symbol))
+        }
+        HighlightStyle::None => (String::new(), String::new(), None),
+    }
+}
+
+/// Tag names whose rendered `~~` pair is the same delimiter run, for adjacency merging.
+///
+/// `<strike>` is a deprecated synonym of `<s>` and renders identically, so a `<del>` closing
+/// straight into a `<strike>` forms one run just as two `<del>`s would. ~keep
+const STRIKETHROUGH_SIBLING_TAGS: [&str; 3] = ["del", "s", "strike"];
+
+/// Tag names whose rendered `==` pair is the same delimiter run, for adjacency merging.
+const INSERTED_SIBLING_TAGS: [&str; 1] = ["ins"];
+
+/// Tag names whose rendered highlight pair is the same delimiter run, for adjacency merging.
+const MARK_SIBLING_TAGS: [&str; 1] = ["mark"];
+
+/// Resolve `<del>`/`<s>`/`<strike>`'s wrapping delimiters for the current output format,
+/// then emit via [`emit_wrapped_inline`].
+fn emit_strikethrough_wrapped(
+    output: &mut String,
+    content: &str,
+    options: &ConversionOptions,
+    node_handle: &NodeHandle,
+    parser: &Parser,
+    dom_ctx: &DomContext,
+) {
+    if options.output_format == OutputFormat::Djot {
+        emit_wrapped_inline(
+            output,
+            content,
+            &InlineDelimiters {
+                open: "{-",
+                close: "-}",
+                merge_symbol: None,
+                sibling_tag_names: &STRIKETHROUGH_SIBLING_TAGS,
+            },
+            node_handle,
+            parser,
+            dom_ctx,
+        );
+    } else {
+        emit_wrapped_inline(
+            output,
+            content,
+            &InlineDelimiters {
+                open: "~~",
+                close: "~~",
+                merge_symbol: Some('~'),
+                sibling_tag_names: &STRIKETHROUGH_SIBLING_TAGS,
+            },
+            node_handle,
+            parser,
+            dom_ctx,
+        );
+    }
+}
+
+/// Resolve `<ins>`'s wrapping delimiters for the current output format, then emit via
+/// [`emit_wrapped_inline`].
+fn emit_inserted_wrapped(
+    output: &mut String,
+    content: &str,
+    options: &ConversionOptions,
+    node_handle: &NodeHandle,
+    parser: &Parser,
+    dom_ctx: &DomContext,
+) {
+    if options.output_format == OutputFormat::Djot {
+        emit_wrapped_inline(
+            output,
+            content,
+            &InlineDelimiters {
+                open: "{+",
+                close: "+}",
+                merge_symbol: None,
+                sibling_tag_names: &INSERTED_SIBLING_TAGS,
+            },
+            node_handle,
+            parser,
+            dom_ctx,
+        );
+    } else {
+        emit_wrapped_inline(
+            output,
+            content,
+            &InlineDelimiters {
+                open: "==",
+                close: "==",
+                merge_symbol: Some('='),
+                sibling_tag_names: &INSERTED_SIBLING_TAGS,
+            },
+            node_handle,
+            parser,
+            dom_ctx,
+        );
     }
 }
 
@@ -161,7 +272,7 @@ pub fn handle_strikethrough(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
+    use crate::converter::walk_node;
 
     let Some(node) = node_handle.get(parser) else { return };
 
@@ -229,48 +340,12 @@ pub fn handle_strikethrough(
         if let Some(custom_output) = strikethrough_output {
             output.push_str(&custom_output);
         } else {
-            let (prefix, suffix, trimmed) = chomp_inline(&content);
-            if !content.trim().is_empty() {
-                output.push_str(prefix);
-                if options.output_format == OutputFormat::Djot {
-                    output.push_str("{-");
-                } else {
-                    output.push_str("~~");
-                }
-                output.push_str(trimmed);
-                if options.output_format == OutputFormat::Djot {
-                    output.push_str("-}");
-                } else {
-                    output.push_str("~~");
-                }
-                append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-            } else if !content.is_empty() {
-                output.push_str(prefix);
-                append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
-            }
+            emit_strikethrough_wrapped(output, &content, options, node_handle, parser, dom_ctx);
         }
 
         #[cfg(not(feature = "visitor"))]
         {
-            let (prefix, suffix, trimmed) = chomp_inline(&content);
-            if !content.trim().is_empty() {
-                output.push_str(prefix);
-                if options.output_format == OutputFormat::Djot {
-                    output.push_str("{-");
-                } else {
-                    output.push_str("~~");
-                }
-                output.push_str(trimmed);
-                if options.output_format == OutputFormat::Djot {
-                    output.push_str("-}");
-                } else {
-                    output.push_str("~~");
-                }
-                append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-            } else if !content.is_empty() {
-                output.push_str(prefix);
-                append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
-            }
+            emit_strikethrough_wrapped(output, &content, options, node_handle, parser, dom_ctx);
         }
     }
 }
@@ -287,7 +362,7 @@ pub fn handle_inserted(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    use crate::converter::{append_inline_suffix, chomp_inline, walk_node};
+    use crate::converter::walk_node;
 
     let Some(node) = node_handle.get(parser) else { return };
 
@@ -350,42 +425,12 @@ pub fn handle_inserted(
     if let Some(custom_output) = underline_output {
         output.push_str(&custom_output);
     } else {
-        let (prefix, suffix, trimmed) = chomp_inline(&content);
-        if !trimmed.is_empty() {
-            output.push_str(prefix);
-            if options.output_format == OutputFormat::Djot {
-                output.push_str("{+");
-            } else {
-                output.push_str("==");
-            }
-            output.push_str(trimmed);
-            if options.output_format == OutputFormat::Djot {
-                output.push_str("+}");
-            } else {
-                output.push_str("==");
-            }
-            append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-        }
+        emit_inserted_wrapped(output, &content, options, node_handle, parser, dom_ctx);
     }
 
     #[cfg(not(feature = "visitor"))]
     {
-        let (prefix, suffix, trimmed) = chomp_inline(&content);
-        if !trimmed.is_empty() {
-            output.push_str(prefix);
-            if options.output_format == OutputFormat::Djot {
-                output.push_str("{+");
-            } else {
-                output.push_str("==");
-            }
-            output.push_str(trimmed);
-            if options.output_format == OutputFormat::Djot {
-                output.push_str("+}");
-            } else {
-                output.push_str("==");
-            }
-            append_inline_suffix(output, suffix, !trimmed.is_empty(), node_handle, parser, dom_ctx);
-        }
+        emit_inserted_wrapped(output, &content, options, node_handle, parser, dom_ctx);
     }
 }
 

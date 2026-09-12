@@ -217,11 +217,18 @@ pub fn handle_q(
         }
 
         let trimmed = content.trim();
-        if !trimmed.is_empty() {
-            output.push('"');
-            output.push_str(trimmed);
-            output.push('"');
+        if trimmed.is_empty() {
+            // ~keep issue #481: `<q>` wraps in quotes, which a whitespace-only body has
+            // ~keep nothing to wrap -- but the body is still the word separator the source
+            // ~keep wrote, and dropping it outright joined the words either side together.
+            if !content.is_empty() {
+                crate::converter::inline::wrapped::emit_whitespace_only_inline_body(&content, output);
+            }
+            return;
         }
+        output.push('"');
+        output.push_str(trimmed);
+        output.push('"');
     }
 }
 
