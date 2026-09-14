@@ -664,7 +664,7 @@ dependencies = [
  "finl_unicode",
  "jetscii",
  "phf 0.13.1",
- "phf_codegen 0.13.1",
+ "phf_codegen",
  "rustc-hash",
  "smallvec",
  "typed-arena",
@@ -1442,7 +1442,7 @@ checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
 
 [[package]]
 name = "html-to-markdown-bench"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "anyhow",
  "astral-tl",
@@ -1461,7 +1461,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-cli"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "assert_cmd",
  "base64 0.23.1",
@@ -1483,7 +1483,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-ffi"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "ahash",
  "async-trait",
@@ -1498,7 +1498,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-node"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",
@@ -1513,7 +1513,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-php"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "async-trait",
  "ext-php-rs",
@@ -1526,7 +1526,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-py"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "async-trait",
  "html-to-markdown-rs",
@@ -1540,7 +1540,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -1569,7 +1569,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-dart"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "async-trait",
  "flutter_rust_bridge",
@@ -1581,7 +1581,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-jni"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "async-trait",
  "base64 0.23.1",
@@ -1595,7 +1595,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-rs-swift"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "ahash",
  "async-trait",
@@ -1611,7 +1611,7 @@ dependencies = [
 
 [[package]]
 name = "html-to-markdown-wasm"
-version = "3.12.4"
+version = "3.13.0"
 dependencies = [
  "futures",
  "futures-util",
@@ -1630,13 +1630,12 @@ dependencies = [
 
 [[package]]
 name = "html5ever"
-version = "0.40.0"
+version = "0.39.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1fb45cc6b576ff3c8053c7a1a4c14b2b24ae166ab6a3e5bc5856aa45d39de70"
+checksum = "46a1761807faccc9a19e86944bbf40610014066306f96edcdedc2fb714bcb7b8"
 dependencies = [
  "log",
  "markup5ever",
- "memchr",
 ]
 
 [[package]]
@@ -2144,9 +2143,9 @@ dependencies = [
 
 [[package]]
 name = "markup5ever"
-version = "0.40.0"
+version = "0.39.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ab3dc68ac4a0f5719e560136778c1ee716e296030d75dbd4484e37e39e3a842"
+checksum = "7122d987ec5f704ee56f6e5b41a7d93722e9aae27ae07cafa4036c4d3f9757de"
 dependencies = [
  "log",
  "tendril",
@@ -2575,16 +2574,6 @@ checksum = "49aa7f9d80421bca176ca8dbfebe668cc7a2684708594ec9f3c0db0805d5d6e1"
 dependencies = [
  "phf_generator 0.13.1",
  "phf_shared 0.13.1",
-]
-
-[[package]]
-name = "phf_codegen"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41b585a510fb76fdebead6897982ef2a03a21d8e6cbcca904999742a4afc6ffe"
-dependencies = [
- "phf_generator 0.14.0",
- "phf_shared 0.14.0",
 ]
 
 [[package]]
@@ -3151,9 +3140,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.44"
+version = "0.23.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6725596c3f2c3a0aef021139e145d4eafe314a6623e4680ca83852b2c67ab2ba"
+checksum = "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634"
 dependencies = [
  "aws-lc-rs",
  "once_cell",
@@ -3520,9 +3509,9 @@ checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
 name = "smallvec"
-version = "1.16.1"
+version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba467056f1b547ed52077911161fc86985becbc60e8e1857c8a144dab0def891"
+checksum = "b9be42f50aa861c555654aa3a37f52f4b1074bacf4e48fe0ef7fa584e80f1f0f"
 
 [[package]]
 name = "socket2"
@@ -3555,24 +3544,24 @@ checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
 name = "string_cache"
-version = "0.11.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffa8a5dbe8b3f0bbe29d4c3225daafaeead63afdc1b65fc4c01a1384166038e6"
+checksum = "a18596f8c785a729f2819c0f6a7eae6ebeebdfffbfe4214ae6b087f690e31901"
 dependencies = [
  "new_debug_unreachable",
  "parking_lot",
- "phf_shared 0.14.0",
+ "phf_shared 0.13.1",
  "precomputed-hash",
 ]
 
 [[package]]
 name = "string_cache_codegen"
-version = "0.11.1"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d576664ce111e003a5db4748200f838b98043cbc44e6341025cd6a77d40e3944"
+checksum = "585635e46db231059f76c5849798146164652513eb9e8ab2685939dd90f29b69"
 dependencies = [
- "phf_generator 0.14.0",
- "phf_shared 0.14.0",
+ "phf_generator 0.13.1",
+ "phf_shared 0.13.1",
  "proc-macro2",
  "quote",
 ]
@@ -3700,7 +3689,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
@@ -4357,12 +4346,12 @@ dependencies = [
 
 [[package]]
 name = "web_atoms"
-version = "0.3.0"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7572660c8890448ba236b7376f27e389c6a7e1c70195622faced601f855c0ada"
+checksum = "ba8b815c1b593dc0baf78dd0f4fc8fdb2de53198fb1163738093e9a311c33fb3"
 dependencies = [
- "phf 0.14.0",
- "phf_codegen 0.14.0",
+ "phf 0.13.1",
+ "phf_codegen",
  "string_cache",
  "string_cache_codegen",
 ]
