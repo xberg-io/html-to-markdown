@@ -9,7 +9,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.12.4] - 2026-09-11
+## [3.13.0] - 2026-09-14
+
+### Changed
+
+- **BREAKING (java): enum constants are now `SCREAMING_SNAKE_CASE`.** `LinkStyle.Inline` becomes
+  `LinkStyle.INLINE`, `HeadingStyle.Atx` becomes `HeadingStyle.ATX`, and so on across every
+  generated enum; builder default sites move with them. The JSON wire values are unchanged, so
+  no serialized payload moves -- only the Java-facing constant names.
+
+- **BREAKING: the `RDFa` structured-data variant is spelled consistently across bindings.** One
+  Rust variant previously generated seven different names. Each binding now uses the correct
+  acronym segmentation for its own convention: `rdfa` (python `options.py`, elixir, ruby,
+  swift), `RDFA` (python stub, java, kotlin), `Rdfa` (csharp, go). Dart keeps `rdFa`, which is
+  what flutter_rust_bridge itself declares. The wire value `"rdfa"` is unchanged everywhere.
+
+- **BREAKING (python): the type stub declared an enum member the runtime does not have.** The
+  `.pyi` emitted `StructuredDataType.RD_FA` while the extension declares `RDFA`, so a type
+  checker accepted the name that raises `AttributeError` and rejected the one that works. Both
+  now agree on `RDFA`.
+
+- **BREAKING (elixir): `VisitResult`'s payload key matches the NIF struct.** `%{type: :custom,
+  value: ...}` becomes `%{type: :custom, custom: ...}`, and `:error` likewise. The NIF struct has
+  always declared `custom`/`error` fields, so the previous shape never round-tripped.
+
+- **BREAKING (ruby): `VisitResult.from_hash` reads the real wire key.** It read `_0`; the core
+  enum is adjacently tagged with `content = "output"`, so `_0` never matched and the payload was
+  silently discarded in both directions.
+
+### Fixed
+
+- **`<br>` inside an inline code span no longer emits a raw newline inside the backticks**
+  ([#487](https://github.com/xberg-io/html-to-markdown/issues/487)). `<code>A<br>B</code>`
+  produced `` `A\nB` ``, which `CommonMark` does not read back as one code span. The span is now
+  split and joined by a real hard break -- `` `A` `` + the `newline_style` marker + `` `B` `` --
+  so the marker sits outside the span, where it is syntax rather than content, and `<code>`
+  behaves like `<b>` and `<i>`, which already emitted hard breaks here. The output is round-trip
+  stable through a `CommonMark` render; the previous form was not. `<kbd>` and `<samp>` had the
+  same defect and are fixed with it.
+
+  Both tiers were wrong and disagreed with each other -- Tier 1 emitted `` `A  \nB` ``, leaking
+  the two-space marker into the code content -- and both are fixed, so the tiers now agree. A
+  pre-existing Tier-1 bug surfaced on the way: inside a link label the `<br>` branch ran before
+  the code-span check, trapping two spaces in the first segment.
+
+  Contexts that cannot carry a hard break fold to a single space instead of splitting: headings
+  and table cells. A link label splits, matching what a bare `<br>` in link text already did.
+
+- **A literal line ending inside an inline code span folds to a space.** `<code>a\nb</code>`
+  (a real newline in the source, no `<br>`) produced `` `a\nb` ``. `CommonMark` gives a line
+  ending inside a code span no hard-break meaning and renders it as a space, so the old output
+  was never round-trip stable. `<pre>` and fenced blocks are unaffected and keep every newline.
+
+### Note
+
+`html5ever` stays pinned at 0.39.0. 0.40.0's serializer drops the `C2` lead byte for every
+codepoint in U+0080-U+00BF except NBSP (`§`, `©`, `°`, `±`, `»`, ...), emitting invalid UTF-8.
+In this crate that makes `repair_with_html5ever` fail its `from_utf8` check and silently skip
+the repair pass on any document containing one of those characters -- it fails safe, but
+degrades quality invisibly. Fixed upstream in servo/html5ever#784, which is merged but not yet
+published; this crate will adopt 0.40.x once it is.
+
+## [3.12.4] - 2026-09-12
 
 ### Fixed
 

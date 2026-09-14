@@ -21,6 +21,7 @@ on:
       - ".ai-rulez/config.toml"
       - "scripts/sync_plugin_version.py"
       - ".task/tools/version-sync.yml"
+      - "scripts/tests/**"
       - ".github/workflows/ci-plugin.yaml"
   pull_request:
     branches: [main]
@@ -32,6 +33,7 @@ on:
       - ".ai-rulez/config.toml"
       - "scripts/sync_plugin_version.py"
       - ".task/tools/version-sync.yml"
+      - "scripts/tests/**"
       - ".github/workflows/ci-plugin.yaml"
   workflow_dispatch:
 
@@ -58,3 +60,37 @@ jobs:
       # Pinned to the ai-rulez version that generates them; bump in lockstep. ~keep
       - name: Verify generated plugin bundles are current
         run: uvx ai-rulez==4.11.0 verify --recursive --plugin --if-configured
+
+  launcher-contract:
+    name: Launcher contract on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both, because the launcher probes the host for npx, uvx and brew and resolves a
+        # platform triple from `uname`. A Linux-only job would never execute the macOS arm of
+        # either decision. ~keep
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Install Bats
+        uses: xberg-io/actions/install-bats@v1
+        with:
+          # Passed explicitly rather than relying on the action default: a default only helps the
+          # caller who omits it, and omitting it is how a workflow reads as pinned while
+          # installing whatever the registry served that morning. ~keep
+          version: "1.14.0"
+
+      - name: Run the launcher contract tests
+        uses: xberg-io/actions/run-bats@v1
+        env:
+          # `bats_load_library` searches BATS_LIB_PATH and nothing else. run-bats grew a lib-path
+          # input for this, but it is not in the released v1 yet, so the variable is set here;
+          # switch to `lib-path: scripts/tests/lib` once actions ships it. ~keep
+          BATS_LIB_PATH: ${{ github.workspace }}/scripts/tests/lib
+        with:
+          path: scripts/tests/bats
+          args: |-
+            --recursive
+            --print-output-on-failure

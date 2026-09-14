@@ -16,8 +16,11 @@
     "c/conversion/bold_and_italic.md",
     "c/conversion/bold_strong.md",
     "c/conversion/code_block.md",
+    "c/conversion/code_block_br_keeps_real_newline.md",
     "c/conversion/code_block_no_language.md",
     "c/conversion/code_inline_in_paragraph.md",
+    "c/conversion/code_span_br_splits_into_hard_break.md",
+    "c/conversion/code_span_literal_newline_folds_to_space.md",
     "c/conversion/code_span_suppresses_nested_inline_markers.md",
     "c/conversion/code_with_backticks_in_content.md",
     "c/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -320,8 +323,11 @@
     "csharp/conversion/bold_and_italic.md",
     "csharp/conversion/bold_strong.md",
     "csharp/conversion/code_block.md",
+    "csharp/conversion/code_block_br_keeps_real_newline.md",
     "csharp/conversion/code_block_no_language.md",
     "csharp/conversion/code_inline_in_paragraph.md",
+    "csharp/conversion/code_span_br_splits_into_hard_break.md",
+    "csharp/conversion/code_span_literal_newline_folds_to_space.md",
     "csharp/conversion/code_span_suppresses_nested_inline_markers.md",
     "csharp/conversion/code_with_backticks_in_content.md",
     "csharp/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -624,8 +630,11 @@
     "dart/conversion/bold_and_italic.md",
     "dart/conversion/bold_strong.md",
     "dart/conversion/code_block.md",
+    "dart/conversion/code_block_br_keeps_real_newline.md",
     "dart/conversion/code_block_no_language.md",
     "dart/conversion/code_inline_in_paragraph.md",
+    "dart/conversion/code_span_br_splits_into_hard_break.md",
+    "dart/conversion/code_span_literal_newline_folds_to_space.md",
     "dart/conversion/code_span_suppresses_nested_inline_markers.md",
     "dart/conversion/code_with_backticks_in_content.md",
     "dart/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -928,8 +937,11 @@
     "elixir/conversion/bold_and_italic.md",
     "elixir/conversion/bold_strong.md",
     "elixir/conversion/code_block.md",
+    "elixir/conversion/code_block_br_keeps_real_newline.md",
     "elixir/conversion/code_block_no_language.md",
     "elixir/conversion/code_inline_in_paragraph.md",
+    "elixir/conversion/code_span_br_splits_into_hard_break.md",
+    "elixir/conversion/code_span_literal_newline_folds_to_space.md",
     "elixir/conversion/code_span_suppresses_nested_inline_markers.md",
     "elixir/conversion/code_with_backticks_in_content.md",
     "elixir/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -1232,8 +1244,11 @@
     "go/conversion/bold_and_italic.md",
     "go/conversion/bold_strong.md",
     "go/conversion/code_block.md",
+    "go/conversion/code_block_br_keeps_real_newline.md",
     "go/conversion/code_block_no_language.md",
     "go/conversion/code_inline_in_paragraph.md",
+    "go/conversion/code_span_br_splits_into_hard_break.md",
+    "go/conversion/code_span_literal_newline_folds_to_space.md",
     "go/conversion/code_span_suppresses_nested_inline_markers.md",
     "go/conversion/code_with_backticks_in_content.md",
     "go/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -1536,8 +1551,11 @@
     "java/conversion/bold_and_italic.md",
     "java/conversion/bold_strong.md",
     "java/conversion/code_block.md",
+    "java/conversion/code_block_br_keeps_real_newline.md",
     "java/conversion/code_block_no_language.md",
     "java/conversion/code_inline_in_paragraph.md",
+    "java/conversion/code_span_br_splits_into_hard_break.md",
+    "java/conversion/code_span_literal_newline_folds_to_space.md",
     "java/conversion/code_span_suppresses_nested_inline_markers.md",
     "java/conversion/code_with_backticks_in_content.md",
     "java/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -1840,8 +1858,11 @@
     "kotlin-android/conversion/bold_and_italic.md",
     "kotlin-android/conversion/bold_strong.md",
     "kotlin-android/conversion/code_block.md",
+    "kotlin-android/conversion/code_block_br_keeps_real_newline.md",
     "kotlin-android/conversion/code_block_no_language.md",
     "kotlin-android/conversion/code_inline_in_paragraph.md",
+    "kotlin-android/conversion/code_span_br_splits_into_hard_break.md",
+    "kotlin-android/conversion/code_span_literal_newline_folds_to_space.md",
     "kotlin-android/conversion/code_span_suppresses_nested_inline_markers.md",
     "kotlin-android/conversion/code_with_backticks_in_content.md",
     "kotlin-android/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -2090,8 +2111,11 @@
     "php/conversion/bold_and_italic.md",
     "php/conversion/bold_strong.md",
     "php/conversion/code_block.md",
+    "php/conversion/code_block_br_keeps_real_newline.md",
     "php/conversion/code_block_no_language.md",
     "php/conversion/code_inline_in_paragraph.md",
+    "php/conversion/code_span_br_splits_into_hard_break.md",
+    "php/conversion/code_span_literal_newline_folds_to_space.md",
     "php/conversion/code_span_suppresses_nested_inline_markers.md",
     "php/conversion/code_with_backticks_in_content.md",
     "php/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -2394,8 +2418,11 @@
     "python/conversion/bold_and_italic.md",
     "python/conversion/bold_strong.md",
     "python/conversion/code_block.md",
+    "python/conversion/code_block_br_keeps_real_newline.md",
     "python/conversion/code_block_no_language.md",
     "python/conversion/code_inline_in_paragraph.md",
+    "python/conversion/code_span_br_splits_into_hard_break.md",
+    "python/conversion/code_span_literal_newline_folds_to_space.md",
     "python/conversion/code_span_suppresses_nested_inline_markers.md",
     "python/conversion/code_with_backticks_in_content.md",
     "python/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -2698,8 +2725,11 @@
     "r/conversion/bold_and_italic.md",
     "r/conversion/bold_strong.md",
     "r/conversion/code_block.md",
+    "r/conversion/code_block_br_keeps_real_newline.md",
     "r/conversion/code_block_no_language.md",
     "r/conversion/code_inline_in_paragraph.md",
+    "r/conversion/code_span_br_splits_into_hard_break.md",
+    "r/conversion/code_span_literal_newline_folds_to_space.md",
     "r/conversion/code_span_suppresses_nested_inline_markers.md",
     "r/conversion/code_with_backticks_in_content.md",
     "r/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -3002,8 +3032,11 @@
     "ruby/conversion/bold_and_italic.md",
     "ruby/conversion/bold_strong.md",
     "ruby/conversion/code_block.md",
+    "ruby/conversion/code_block_br_keeps_real_newline.md",
     "ruby/conversion/code_block_no_language.md",
     "ruby/conversion/code_inline_in_paragraph.md",
+    "ruby/conversion/code_span_br_splits_into_hard_break.md",
+    "ruby/conversion/code_span_literal_newline_folds_to_space.md",
     "ruby/conversion/code_span_suppresses_nested_inline_markers.md",
     "ruby/conversion/code_with_backticks_in_content.md",
     "ruby/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -3306,8 +3339,11 @@
     "rust/conversion/bold_and_italic.md",
     "rust/conversion/bold_strong.md",
     "rust/conversion/code_block.md",
+    "rust/conversion/code_block_br_keeps_real_newline.md",
     "rust/conversion/code_block_no_language.md",
     "rust/conversion/code_inline_in_paragraph.md",
+    "rust/conversion/code_span_br_splits_into_hard_break.md",
+    "rust/conversion/code_span_literal_newline_folds_to_space.md",
     "rust/conversion/code_span_suppresses_nested_inline_markers.md",
     "rust/conversion/code_with_backticks_in_content.md",
     "rust/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -3610,8 +3646,11 @@
     "swift/conversion/bold_and_italic.md",
     "swift/conversion/bold_strong.md",
     "swift/conversion/code_block.md",
+    "swift/conversion/code_block_br_keeps_real_newline.md",
     "swift/conversion/code_block_no_language.md",
     "swift/conversion/code_inline_in_paragraph.md",
+    "swift/conversion/code_span_br_splits_into_hard_break.md",
+    "swift/conversion/code_span_literal_newline_folds_to_space.md",
     "swift/conversion/code_span_suppresses_nested_inline_markers.md",
     "swift/conversion/code_with_backticks_in_content.md",
     "swift/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -3914,8 +3953,11 @@
     "typescript/conversion/bold_and_italic.md",
     "typescript/conversion/bold_strong.md",
     "typescript/conversion/code_block.md",
+    "typescript/conversion/code_block_br_keeps_real_newline.md",
     "typescript/conversion/code_block_no_language.md",
     "typescript/conversion/code_inline_in_paragraph.md",
+    "typescript/conversion/code_span_br_splits_into_hard_break.md",
+    "typescript/conversion/code_span_literal_newline_folds_to_space.md",
     "typescript/conversion/code_span_suppresses_nested_inline_markers.md",
     "typescript/conversion/code_with_backticks_in_content.md",
     "typescript/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -4218,8 +4260,11 @@
     "wasm/conversion/bold_and_italic.md",
     "wasm/conversion/bold_strong.md",
     "wasm/conversion/code_block.md",
+    "wasm/conversion/code_block_br_keeps_real_newline.md",
     "wasm/conversion/code_block_no_language.md",
     "wasm/conversion/code_inline_in_paragraph.md",
+    "wasm/conversion/code_span_br_splits_into_hard_break.md",
+    "wasm/conversion/code_span_literal_newline_folds_to_space.md",
     "wasm/conversion/code_span_suppresses_nested_inline_markers.md",
     "wasm/conversion/code_with_backticks_in_content.md",
     "wasm/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -4522,8 +4567,11 @@
     "zig/conversion/bold_and_italic.md",
     "zig/conversion/bold_strong.md",
     "zig/conversion/code_block.md",
+    "zig/conversion/code_block_br_keeps_real_newline.md",
     "zig/conversion/code_block_no_language.md",
     "zig/conversion/code_inline_in_paragraph.md",
+    "zig/conversion/code_span_br_splits_into_hard_break.md",
+    "zig/conversion/code_span_literal_newline_folds_to_space.md",
     "zig/conversion/code_span_suppresses_nested_inline_markers.md",
     "zig/conversion/code_with_backticks_in_content.md",
     "zig/conversion/conversion_autolink_filename_not_autolinked.md",
@@ -4995,6 +5043,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "c"
+      },
+      "path": "c/conversion/code_block_br_keeps_real_newline.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "c"
       },
@@ -5011,6 +5071,30 @@
         "language": "c"
       },
       "path": "c/conversion/code_inline_in_paragraph.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "c"
+      },
+      "path": "c/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "c"
+      },
+      "path": "c/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -8643,6 +8727,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/code_block_br_keeps_real_newline.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "csharp"
       },
@@ -8659,6 +8755,30 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/code_inline_in_paragraph.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -12291,6 +12411,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "dart"
+      },
+      "path": "dart/conversion/code_block_br_keeps_real_newline.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "dart"
       },
@@ -12307,6 +12439,30 @@
         "language": "dart"
       },
       "path": "dart/conversion/code_inline_in_paragraph.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "dart"
+      },
+      "path": "dart/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "dart"
+      },
+      "path": "dart/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -15939,6 +16095,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/code_block_br_keeps_real_newline.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "elixir"
       },
@@ -15955,6 +16123,30 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/code_inline_in_paragraph.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -19587,6 +19779,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "go"
+      },
+      "path": "go/conversion/code_block_br_keeps_real_newline.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "go"
       },
@@ -19603,6 +19807,30 @@
         "language": "go"
       },
       "path": "go/conversion/code_inline_in_paragraph.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "go"
+      },
+      "path": "go/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "go"
+      },
+      "path": "go/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -23235,6 +23463,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "java"
+      },
+      "path": "java/conversion/code_block_br_keeps_real_newline.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "java"
       },
@@ -23251,6 +23491,30 @@
         "language": "java"
       },
       "path": "java/conversion/code_inline_in_paragraph.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "java"
+      },
+      "path": "java/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "java"
+      },
+      "path": "java/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -26883,6 +27147,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/code_block_br_keeps_real_newline.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "kotlin_android"
       },
@@ -26899,6 +27175,30 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/code_inline_in_paragraph.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -29883,6 +30183,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "php"
+      },
+      "path": "php/conversion/code_block_br_keeps_real_newline.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "php"
       },
@@ -29899,6 +30211,30 @@
         "language": "php"
       },
       "path": "php/conversion/code_inline_in_paragraph.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "php"
+      },
+      "path": "php/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "php"
+      },
+      "path": "php/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -33531,6 +33867,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "python"
+      },
+      "path": "python/conversion/code_block_br_keeps_real_newline.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "python"
       },
@@ -33547,6 +33895,30 @@
         "language": "python"
       },
       "path": "python/conversion/code_inline_in_paragraph.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "python"
+      },
+      "path": "python/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "python"
+      },
+      "path": "python/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -37179,6 +37551,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "r"
+      },
+      "path": "r/conversion/code_block_br_keeps_real_newline.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "r"
       },
@@ -37195,6 +37579,30 @@
         "language": "r"
       },
       "path": "r/conversion/code_inline_in_paragraph.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "r"
+      },
+      "path": "r/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "r"
+      },
+      "path": "r/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -40827,6 +41235,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/code_block_br_keeps_real_newline.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "ruby"
       },
@@ -40843,6 +41263,30 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/code_inline_in_paragraph.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -44475,6 +44919,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "rust"
+      },
+      "path": "rust/conversion/code_block_br_keeps_real_newline.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "rust"
       },
@@ -44491,6 +44947,30 @@
         "language": "rust"
       },
       "path": "rust/conversion/code_inline_in_paragraph.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "rust"
+      },
+      "path": "rust/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "rust"
+      },
+      "path": "rust/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -48463,6 +48943,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "swift"
+      },
+      "path": "swift/conversion/code_block_br_keeps_real_newline.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "swift"
       },
@@ -48479,6 +48971,30 @@
         "language": "swift"
       },
       "path": "swift/conversion/code_inline_in_paragraph.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "swift"
+      },
+      "path": "swift/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "swift"
+      },
+      "path": "swift/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -52111,6 +52627,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "node"
+      },
+      "path": "typescript/conversion/code_block_br_keeps_real_newline.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "node"
       },
@@ -52127,6 +52655,30 @@
         "language": "node"
       },
       "path": "typescript/conversion/code_inline_in_paragraph.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "node"
+      },
+      "path": "typescript/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "node"
+      },
+      "path": "typescript/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -55759,6 +56311,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/code_block_br_keeps_real_newline.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "wasm"
       },
@@ -55775,6 +56339,30 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/code_inline_in_paragraph.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -59407,6 +59995,18 @@
     },
     {
       "key": {
+        "fixture_id": "code_block_br_keeps_real_newline",
+        "language": "zig"
+      },
+      "path": "zig/conversion/code_block_br_keeps_real_newline.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block_no_language",
         "language": "zig"
       },
@@ -59423,6 +60023,30 @@
         "language": "zig"
       },
       "path": "zig/conversion/code_inline_in_paragraph.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_br_splits_into_hard_break",
+        "language": "zig"
+      },
+      "path": "zig/conversion/code_span_br_splits_into_hard_break.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "code_span_literal_newline_folds_to_space",
+        "language": "zig"
+      },
+      "path": "zig/conversion/code_span_literal_newline_folds_to_space.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -63836,6 +64460,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "zig"
+    },
+    {
       "fixture_id": "code_block_no_language",
       "language": "c"
     },
@@ -63961,6 +64649,134 @@
     },
     {
       "fixture_id": "code_inline_in_paragraph",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
       "language": "zig"
     },
     {
@@ -83078,6 +83894,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_block_br_keeps_real_newline",
+      "language": "zig"
+    },
+    {
       "fixture_id": "code_block_no_language",
       "language": "c"
     },
@@ -83203,6 +84083,134 @@
     },
     {
       "fixture_id": "code_inline_in_paragraph",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_span_br_splits_into_hard_break",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "c"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "go"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "java"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "node"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "php"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "python"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "r"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "code_span_literal_newline_folds_to_space",
       "language": "zig"
     },
     {

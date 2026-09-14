@@ -109,6 +109,32 @@ tasks:
     cmds:
       - task: test
       - task: test:bindings
+      - task: test:scripts
+
+  test:scripts:
+    desc: "Run the Bats contract tests for the repo's own shell scripts"
+    env:
+      # Suites load the shared helpers with `bats_load_library xberg-bats`, which searches
+      # BATS_LIB_PATH and nothing else. CI sets the same directory for the bats job, so a local
+      # run and a CI run load identical bytes.
+      BATS_LIB_PATH: "{{.ROOT_DIR}}/scripts/tests/lib"
+    preconditions:
+      - sh: command -v bats
+        msg: "bats is required: brew install bats-core"
+      - sh: test -f scripts/tests/lib/xberg-bats/load.bash
+        msg: "shared Bats helpers are missing; run `task test:scripts:lib:sync`"
+    cmds:
+      - bats --recursive --print-output-on-failure scripts/tests/bats
+
+  test:scripts:lib:sync:
+    desc: "Refresh the vendored Bats helper library from xberg-io/actions"
+    cmds:
+      - scripts/task/sync-bats-lib.sh sync
+
+  test:scripts:lib:check:
+    desc: "Fail when the vendored Bats helper library has drifted from its pinned source"
+    cmds:
+      - scripts/task/sync-bats-lib.sh --check
 
   test:ci:
     desc: "Run all tests with coverage (CI mode)"
