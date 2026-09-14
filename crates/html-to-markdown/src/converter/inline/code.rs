@@ -120,14 +120,53 @@ fn handle_kbd_samp(
     let emit_suffix = if trimmed.is_empty() { "" } else { suffix };
 
     output.push_str(emit_prefix);
-    let mut span = String::with_capacity(body.len() + 4);
-    render_code_span(body, &mut span);
-    if emit_prefix.is_empty() {
-        emit_code_span(&span, body, output, node_handle, parser, dom_ctx);
-    } else {
-        output.push_str(&span);
-    }
+    emit_kbd_samp_segments(
+        body,
+        emit_prefix.is_empty(),
+        output,
+        options,
+        node_handle,
+        parser,
+        dom_ctx,
+    );
     append_inline_suffix(output, emit_suffix, !body.is_empty(), node_handle, parser, dom_ctx);
+}
+
+/// Render `body` as one or more backtick spans, split on the `'\n'` internal split marker
+/// `line_break.rs`'s code-SPAN branch pushes for each `<br>` the element contained (see
+/// `handlers::code_block::emit_inline_code`'s doc comment for the full reasoning, shared
+/// verbatim by `<kbd>`/`<samp>` here). `may_merge_first` is false whenever `emit_prefix` was
+/// non-empty (the caller already pushed literal prefix text, so the first span can no longer
+/// be adjacent to a preceding sibling's closing backtick). ~keep
+fn emit_kbd_samp_segments(
+    body: &str,
+    may_merge_first: bool,
+    output: &mut String,
+    options: &ConversionOptions,
+    node_handle: &NodeHandle,
+    parser: &Parser,
+    dom_ctx: &DomContext,
+) {
+    let separator = crate::converter::main_helpers::hard_break_marker(options.newline_style);
+    let mut first = true;
+    for segment in body.split('\n').filter(|segment| !segment.is_empty()) {
+        if first {
+            let mut span = String::with_capacity(segment.len() + 2);
+            render_code_span(segment, &mut span);
+            if may_merge_first {
+                emit_code_span(&span, segment, output, node_handle, parser, dom_ctx);
+            } else {
+                output.push_str(&span);
+            }
+        } else {
+            // ~keep Only the first segment may merge into a preceding sibling span
+            // ~keep (issue #483): every later segment is preceded by our own
+            // ~keep separator, never a bare closing backtick.
+            output.push_str(separator);
+            render_code_span(segment, output);
+        }
+        first = false;
+    }
 }
 
 /// Render `body` as an inline code span.

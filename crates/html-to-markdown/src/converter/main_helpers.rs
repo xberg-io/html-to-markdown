@@ -118,6 +118,21 @@ pub fn emit_table_cell_break(output: &mut String, br_in_tables: bool) {
     }
 }
 
+/// The literal hard-break marker `line_break.rs` emits for a real `<br>` under `style`.
+///
+/// Shared by `line_break.rs`'s own non-code fallback and by the split code-span emitters
+/// (`handlers::code_block::emit_inline_code`, `inline::code::handle_kbd_samp`) that join a
+/// `<code>`/`<kbd>`/`<samp>` element's `<br>`-separated segments with this same marker,
+/// now placed OUTSIDE the backticks where it is syntax rather than span content
+/// (issue #487).
+#[must_use]
+pub const fn hard_break_marker(style: NewlineStyle) -> &'static str {
+    match style {
+        NewlineStyle::Spaces => "  \n",
+        NewlineStyle::Backslash => "\\\n",
+    }
+}
+
 /// Collapse runs of three or more consecutive newlines into exactly two.
 ///
 /// Block-level emitters append their own trailing newlines and the next block

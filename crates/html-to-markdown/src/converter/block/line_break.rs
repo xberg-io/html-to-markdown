@@ -3,8 +3,8 @@
 //! Converts HTML line break tags to Markdown line breaks using the configured
 //! newline style (spaces, backslash, or plain newline).
 
-use crate::converter::main_helpers::{emit_table_cell_break, trim_trailing_whitespace};
-use crate::options::{ConversionOptions, NewlineStyle};
+use crate::converter::main_helpers::{emit_table_cell_break, hard_break_marker, trim_trailing_whitespace};
+use crate::options::ConversionOptions;
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
@@ -93,14 +93,37 @@ pub fn handle(
         // ~keep heading body down to one space.
         trim_trailing_whitespace(output);
         output.push(' ');
+    } else if ctx.in_table_cell && ctx.in_code && !ctx.in_code_block {
+        // ~keep Neither a code SPAN nor a table cell can carry a hard break on its own
+        // ~keep (see the two ~keep blocks this combines, immediately below and at the
+        // ~keep plain `in_table_cell` arm): fold straight to a single space rather than
+        // ~keep letting the split path below run, which would break the span in two and
+        // ~keep leave the second half on its own physical line -- corrupting the cell's
+        // ~keep pipe-row syntax exactly as a raw newline would (issue #455's rule, now
+        // ~keep also covering the `<br>`-driven case rather than only a literal source
+        // ~keep newline). Not `emit_table_cell_break`: a literal `<br>` in HTML is not
+        // ~keep valid content inside a code span regardless of `br_in_tables`, so that
+        // ~keep option is never consulted here either.
+        trim_trailing_whitespace(output);
+        output.push(' ');
+    } else if ctx.in_code_block {
+        // ~keep A `<pre>` code BLOCK reproduces its content literally, line structure
+        // ~keep included: a `<br>` here is real content, so the byte pushed is a genuine
+        // ~keep `\n`, not a marker -- `newline_style` is never consulted (issue #487).
+        output.push('\n');
     } else if ctx.in_code {
-        // ~keep A code span reproduces its content literally, so a newline_style marker is
-        // ~keep not syntax here -- it is a character in the user's code. `CommonMark` gives a
-        // ~keep line ending inside a code span no hard-break meaning and renders it as a
-        // ~keep space (<https://spec.commonmark.org/spec#code-spans>), and inside a fenced
-        // ~keep block the marker would land in the code itself. Same reasoning as the
-        // ~keep table-cell branch below: the context cannot carry a hard break, so
-        // ~keep newline_style is never consulted and both styles agree byte for byte.
+        // ~keep A code SPAN's content is otherwise reproduced literally too, but unlike a
+        // ~keep block it has no interior line structure of its own to preserve: `<br>` is
+        // ~keep a DOM-level split point, not span content. Push a plain '\n' as an
+        // ~keep internal-only split marker rather than syntax -- `format_inline_code`
+        // ~keep (`handlers/code_block.rs`) and `handle_kbd_samp` (`inline/code.rs`) later
+        // ~keep split on it, rendering each half as its own backtick span joined by the
+        // ~keep configured `newline_style` marker OUTSIDE the backticks, where it is
+        // ~keep syntax (issue #487). This byte can only have come from a real `<br>`: a
+        // ~keep source text node's own literal line ending is folded to a space before
+        // ~keep it ever reaches this buffer (`text_node.rs`'s `in_code && !in_code_block`
+        // ~keep branch), so nothing else can leave a bare '\n' here for this split to
+        // ~keep misfire on.
         output.push('\n');
     } else if ctx.in_table_cell {
         // ~keep Shared with div/p continuations inside a cell (issue #453, #454): a cell
@@ -128,9 +151,6 @@ pub fn handle(
         // ~keep another break's marker, which is what swallowed consecutive runs.
         output.push('\n');
     } else {
-        match options.newline_style {
-            NewlineStyle::Spaces => output.push_str("  \n"),
-            NewlineStyle::Backslash => output.push_str("\\\n"),
-        }
+        output.push_str(hard_break_marker(options.newline_style));
     }
 }

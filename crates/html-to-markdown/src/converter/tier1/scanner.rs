@@ -1788,23 +1788,84 @@ fn emit_void(
             // ~keep     `&nbsp;` folded to a plain space) trimmed first so the hard-break
             // ~keep     prefix is exactly two spaces, not two-plus-N.  Mirrors the
             // ~keep     table-cell branch's own `trim_trailing_whitespace` call below.
-            let link_frame_content_start = state
-                .stack
-                .iter()
-                .rev()
-                .find_map(|f| matches!(f.spec.kind, TagKind::Link).then_some(f.content_start));
+            // ~keep Guarded off when `EscapeCtx::CODE` is set (issue #487): an open code
+            // ~keep SPAN or BLOCK inside this link must run through the code-aware
+            // ~keep branches below instead, not this one. Pushing this branch's literal
+            // ~keep "  \n" straight into a still-open code span's content buffer would
+            // ~keep land ahead of `close_code`'s segment split, so `content.split('\n')`
+            // ~keep on "A  \nB" would cut "A  " -- not "A" -- as the first segment, and
+            // ~keep those two spaces end up trapped inside its closing backtick, wrong
+            // ~keep regardless of the link. Deferring here still comes out right: the
+            // ~keep code-span branch pushes the same "  \n" shape OUTSIDE the backticks
+            // ~keep once `close_code` re-joins the split segments, and `close_link`'s
+            // ~keep `normalize_link_label` then finds that already-correct marker in the
+            // ~keep assembled label text exactly as it would for plain (non-code) content.
+            let link_frame_content_start = (!state.escape_ctx.contains(EscapeCtx::CODE))
+                .then(|| {
+                    state
+                        .stack
+                        .iter()
+                        .rev()
+                        .find_map(|f| matches!(f.spec.kind, TagKind::Link).then_some(f.content_start))
+                })
+                .flatten();
             if let Some(link_content_start) = link_frame_content_start {
                 if link_content_start < state.cell_or_output_mut().len() {
                     state.cell_or_output_mut().push_str("  \n");
                 }
-            } else if state.in_table_cell() {
+            } else if state.escape_ctx.contains(EscapeCtx::CODE)
+                && !state.escape_ctx.contains(EscapeCtx::PRE)
+                && state.escape_ctx.contains(EscapeCtx::HEADING)
+            {
+                // ~keep Mirrors Tier-2's `line_break.rs`: a single-line ATX heading cannot
+                // ~keep carry a hard break at all, so a code SPAN nested inside one folds
+                // ~keep straight to a space here rather than reaching `close_code` as a
+                // ~keep splittable marker -- `close_heading`'s own blind whitespace fold
+                // ~keep runs AFTER `close_code` has already wrapped the content in
+                // ~keep backticks, so by then it can only collapse whitespace BETWEEN two
+                // ~keep already-separate spans, not merge them back into one (issue #487).
                 let dest = state.cell_or_output_mut();
                 crate::converter::main_helpers::trim_trailing_whitespace(dest);
-                if options.br_in_tables {
+                dest.push(' ');
+            } else if state.escape_ctx.contains(EscapeCtx::PRE) {
+                // ~keep A `<pre>` code BLOCK's line structure is real content: push a
+                // ~keep genuine `\n`, matching Tier-2's `in_code_block` branch. When the
+                // ~keep `<pre>` is itself inside a table cell, `close_pre` intentionally
+                // ~keep leaves this newline as-is and defers the cell's own
+                // ~keep newline-to-space fold to `close_table_cell`, exactly as it already
+                // ~keep does for every other line ending a `<pre>` accumulates.
+                state.cell_or_output_mut().push('\n');
+            } else if state.in_table_cell() {
+                // ~keep A code SPAN inside a table cell (not caught above, since it is
+                // ~keep not also inside a heading) lands here too: neither a cell nor a
+                // ~keep code span can carry a hard break, and this table-cell branch
+                // ~keep already folds to a single space (or emits nothing under an empty
+                // ~keep cell) before `close_code` ever sees a splittable byte -- the same
+                // ~keep "fold before it can split" reasoning as the heading arm above,
+                // ~keep just via the branch that already existed for ordinary (non-code)
+                // ~keep cell content. Not a literal `<br>`: that HTML tag is not valid
+                // ~keep content inside a code span regardless of `br_in_tables`.
+                let emit_literal_br = options.br_in_tables && !state.escape_ctx.contains(EscapeCtx::CODE);
+                let dest = state.cell_or_output_mut();
+                crate::converter::main_helpers::trim_trailing_whitespace(dest);
+                if emit_literal_br {
                     dest.push_str("<br>");
                 } else if !dest.is_empty() {
                     dest.push(' ');
                 }
+            } else if state.escape_ctx.contains(EscapeCtx::CODE) {
+                // ~keep A code SPAN otherwise reproduces its content literally but has no
+                // ~keep interior line structure of its own: `<br>` is a DOM-level split
+                // ~keep point, not span content. Push a plain '\n' as an internal-only
+                // ~keep split marker -- `close_code` below splits on it into one backtick
+                // ~keep span per segment, joined by the "  \n" hard-break marker OUTSIDE
+                // ~keep the backticks (Tier-1 only ever runs under `NewlineStyle::Spaces`;
+                // ~keep the router bails to Tier-2 for `Backslash`, so that is the only
+                // ~keep marker shape this scanner ever needs -- issue #487). This byte can
+                // ~keep only have come from a real `<br>`: a source text node's own
+                // ~keep literal line ending is folded to a space before it ever reaches
+                // ~keep this buffer (`flush_text`'s `in_code && !in_pre` branch).
+                state.cell_or_output_mut().push('\n');
             } else if state.stack.is_empty() {
                 // ~keep bare `<br>` at top level — Tier-2 emits nothing
             } else {
@@ -2875,45 +2936,74 @@ fn close_code(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailReason>
         return Err(BailReason::AdjacentInlineEmphasis);
     }
 
-    let contains_backtick = buf[content_start..].contains('`');
+    // ~keep issue #487: `content` may contain internal '\n' bytes, each marking where a
+    // ~keep `<br>` split this span (`emit_void`'s `TagKind::LineBreak` arm) -- a text
+    // ~keep node's own line ending never reaches this buffer as a bare '\n' (`flush_text`'s
+    // ~keep `in_code` branch already folds it to a space). Split on it and render each
+    // ~keep segment as its own smart-escaped backtick span (`format_inline_code_segment`,
+    // ~keep computed per segment rather than once over the whole original content), joined
+    // ~keep by the "  \n" hard-break marker OUTSIDE the backticks -- the only marker shape
+    // ~keep this scanner ever needs, since the router bails to Tier-2 whenever
+    // ~keep `newline_style` is not `Spaces`. An empty segment (an adjacent, leading, or
+    // ~keep trailing `<br>`) is dropped rather than rendered as a dangling empty `` `` ``
+    // ~keep pair with nothing before or after it. Only the FIRST segment can ever be
+    // ~keep adjacent to a preceding sibling's closing backtick -- checked once, above,
+    // ~keep against `buf[..content_start]` before this loop runs -- every later segment is
+    // ~keep preceded by our own separator instead.
+    let content = buf[content_start..].to_owned();
+    buf.truncate(content_start);
 
-    let (needs_spaces, num_backticks) = {
-        let content = &buf[content_start..];
-        let first_char = content.chars().next();
-        let last_char = content.chars().last();
-        let starts_with_space = first_char == Some(' ');
-        let ends_with_space = last_char == Some(' ');
-        let starts_with_backtick = first_char == Some('`');
-        let ends_with_backtick = last_char == Some('`');
-        // ~keep No all-spaces case: CommonMark strips one space from each end of a code span
-        // ~keep only when the content is NOT entirely spaces, so padding an all-spaces body
-        // ~keep changes what it contains. Mirrors `handlers::code_block::format_inline_code`.
-        let needs_delimiter_spaces =
-            starts_with_backtick || ends_with_backtick || (starts_with_space && ends_with_space && contains_backtick);
+    let mut first = true;
+    for segment in content.split('\n').filter(|segment| !segment.is_empty()) {
+        if !first {
+            buf.push_str("  \n");
+        }
+        format_inline_code_segment(buf, segment);
+        first = false;
+    }
+    Ok(())
+}
 
-        let num_backticks = if contains_backtick {
-            min_safe_code_span_delimiter_length(content)
-        } else {
-            1
-        };
-        (needs_delimiter_spaces, num_backticks)
+/// Wrap `content` in backtick delimiters, choosing the fence width and delimiter-space
+/// padding from `content` alone.
+///
+/// The per-segment counterpart to what this replaced: `close_code` used to compute these
+/// once over the whole span's content, but a `<br>`-split span now needs them computed
+/// independently for each segment, since a backtick run in one half must not force a wider
+/// fence on a half that has none (issue #487). Mirrors
+/// `handlers::code_block::format_inline_code`.
+fn format_inline_code_segment(buf: &mut String, content: &str) {
+    let contains_backtick = content.contains('`');
+    let first_char = content.chars().next();
+    let last_char = content.chars().last();
+    let starts_with_space = first_char == Some(' ');
+    let ends_with_space = last_char == Some(' ');
+    let starts_with_backtick = first_char == Some('`');
+    let ends_with_backtick = last_char == Some('`');
+    // ~keep No all-spaces case: CommonMark strips one space from each end of a code span
+    // ~keep only when the content is NOT entirely spaces, so padding an all-spaces body
+    // ~keep changes what it contains. Mirrors `handlers::code_block::format_inline_code`.
+    let needs_spaces =
+        starts_with_backtick || ends_with_backtick || (starts_with_space && ends_with_space && contains_backtick);
+    let num_backticks = if contains_backtick {
+        min_safe_code_span_delimiter_length(content)
+    } else {
+        1
     };
 
-    let mut prefix = String::with_capacity(num_backticks + 1);
     for _ in 0..num_backticks {
-        prefix.push('`');
+        buf.push('`');
     }
     if needs_spaces {
-        prefix.push(' ');
+        buf.push(' ');
     }
-    buf.insert_str(content_start, &prefix);
+    buf.push_str(content);
     if needs_spaces {
         buf.push(' ');
     }
     for _ in 0..num_backticks {
         buf.push('`');
     }
-    Ok(())
 }
 
 /// Compute the length of the longest consecutive run of `` ` `` in `content`.
@@ -4126,13 +4216,33 @@ fn flush_text(
 
     let has_entities = raw.contains('&');
 
-    if in_pre || in_code {
+    if in_pre {
         if has_entities {
             let dest = state.cell_or_output_mut();
             decode_entities_into(dest, raw, base_offset)?;
         } else {
             state.cell_or_output_mut().push_str(raw);
         }
+        return Ok(());
+    }
+
+    if in_code {
+        // ~keep Tier-2 parity (`text_node.rs`'s `in_code && !in_code_block` branch): a
+        // ~keep code SPAN folds any raw line ending -- CR, LF, or CRLF -- in its own text
+        // ~keep content to a single space; only a `<br>` element (handled separately by
+        // ~keep `emit_void`'s `TagKind::LineBreak` arm) produces the literal '\n'
+        // ~keep `close_code` treats as a split point between segments. A text node's own
+        // ~keep line ending is never that marker, so folding it here can never collide
+        // ~keep with a real `<br>` (issue #487).
+        let decoded: std::borrow::Cow<'_, str> = if has_entities {
+            let mut buf = String::with_capacity(raw.len());
+            decode_entities_into(&mut buf, raw, base_offset)?;
+            std::borrow::Cow::Owned(buf)
+        } else {
+            std::borrow::Cow::Borrowed(raw)
+        };
+        let folded = crate::text::fold_cell_line_breaks_verbatim_cow(decoded.as_ref());
+        state.cell_or_output_mut().push_str(folded.as_ref());
         return Ok(());
     }
 

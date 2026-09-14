@@ -37,6 +37,17 @@ pub type ImageMetadataPayload = (BTreeMap<String, String>, Option<u32>, Option<u
 pub struct Context {
     /// Are we inside a code-like element (pre, code, kbd, samp)?
     pub(crate) in_code: bool,
+    /// Are we inside a `<pre>` code BLOCK specifically, as opposed to an inline code SPAN
+    /// (`<code>`/`<kbd>`/`<samp>` outside a `<pre>`)?
+    ///
+    /// Set only by `handle_pre` (`handlers/code_block.rs`); `handle_code` and
+    /// `inline::code::handle` never set it themselves, so it propagates unchanged through
+    /// their `..ctx.clone()` spread into any code nested inside a `<pre>`. `line_break.rs`
+    /// needs this distinction that `in_code` alone cannot make: a `<br>` inside a code
+    /// BLOCK keeps its literal `\n` (real content structure), while a `<br>` inside a code
+    /// SPAN must split the span in two rather than embed a newline inside the backticks
+    /// (issue #487). ~keep
+    pub(crate) in_code_block: bool,
     /// Current list item counter for ordered lists.
     ///
     /// Signed so a negative `start` attribute (permitted by the HTML spec and honored by
@@ -243,6 +254,7 @@ impl Context {
 
         Self {
             in_code: false,
+            in_code_block: false,
             list_counter: 0,
             in_ordered_list: false,
             blockquote_depth: 0,

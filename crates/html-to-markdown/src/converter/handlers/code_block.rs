@@ -168,28 +168,56 @@ pub fn handle_code(
             if let Some(custom_output) = code_output {
                 output.push_str(&custom_output);
             } else {
-                emit_inline_code(trimmed, output, node_handle, parser, dom_ctx);
+                emit_inline_code(trimmed, output, options, node_handle, parser, dom_ctx);
             }
 
             #[cfg(not(feature = "visitor"))]
             {
-                emit_inline_code(trimmed, output, node_handle, parser, dom_ctx);
+                emit_inline_code(trimmed, output, options, node_handle, parser, dom_ctx);
             }
         }
     }
 }
 
-/// Render an inline code span, then emit it through the adjacent-span merge.
+/// Render a `<code>` element's content as one or more backtick spans, then emit through the
+/// adjacent-span merge.
+///
+/// `content` may contain `'\n'` bytes: `line_break.rs`'s code-SPAN branch pushes one as an
+/// internal-only split marker for each `<br>` the element contained (a source text node's own
+/// literal line ending is already folded to a space by the time it reaches this buffer, so
+/// every `'\n'` here unambiguously came from a `<br>` — see `text_node.rs`'s
+/// `in_code && !in_code_block` branch). Split on it and render each segment as its own
+/// backtick span, joined by the configured `newline_style` hard-break marker OUTSIDE the
+/// backticks, where it is syntax rather than span content (issue #487) — matching how
+/// `<b>`/`<i>` already turn an internal `<br>` into a hard break between two delimiter pairs.
+/// An empty segment (an adjacent, leading, or trailing `<br>`) is dropped rather than emitted
+/// as a dangling empty `` `` `` pair with nothing before or after it. ~keep
 fn emit_inline_code(
     content: &str,
     output: &mut String,
+    options: &ConversionOptions,
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     dom_ctx: &DomContext,
 ) {
-    let mut span = String::with_capacity(content.len() + 2);
-    format_inline_code(content, &mut span);
-    emit_code_span(&span, content, output, node_handle, parser, dom_ctx);
+    let separator = crate::converter::main_helpers::hard_break_marker(options.newline_style);
+    let mut first = true;
+    for segment in content.split('\n').filter(|segment| !segment.is_empty()) {
+        if first {
+            let mut span = String::with_capacity(segment.len() + 2);
+            format_inline_code(segment, &mut span);
+            emit_code_span(&span, segment, output, node_handle, parser, dom_ctx);
+        } else {
+            // ~keep Only the FIRST segment may merge into an immediately preceding
+            // ~keep sibling code span (issue #483): every later segment is preceded by
+            // ~keep our own separator, not a bare closing backtick, so `emit_code_span`'s
+            // ~keep merge check would never fire for it anyway -- rendered directly
+            // ~keep without going through that check at all.
+            output.push_str(separator);
+            format_inline_code(segment, output);
+        }
+        first = false;
+    }
 }
 
 /// Handle a `<pre>` element and convert to Markdown.
@@ -215,6 +243,7 @@ pub fn handle_pre(
 ) {
     let code_ctx = Context {
         in_code: true,
+        in_code_block: true,
         ..ctx.clone()
     };
 

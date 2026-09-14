@@ -232,6 +232,19 @@ pub fn process_text_node(
         // ~keep other whitespace, and regardless of whitespace_mode — this is a structural
         // ~keep constraint of the cell, not a stylistic normalization (issue #455).
         text::fold_cell_line_breaks_verbatim_cow(text.as_ref()).into_owned()
+    } else if ctx.in_code && !ctx.in_code_block {
+        // ~keep A code SPAN gives a raw line ending inside its content no hard-break
+        // ~keep meaning -- CommonMark renders it as a space (code-spans spec section) --
+        // ~keep so a literal source newline (no `<br>` at all) folds the same way a
+        // ~keep table cell's line breaks already do, just outside a cell too (issue
+        // ~keep #487). Gated on `in_code_block`, not `in_code`, because a `<pre>` code
+        // ~keep BLOCK's line endings are real content structure and stay verbatim
+        // ~keep (`ctx.in_code || ctx.in_ruby` below still catches that case). This also
+        // ~keep makes `line_break.rs`'s span-split sound: after this fold, any '\n' that
+        // ~keep survives into a code span's content buffer can only have come from a
+        // ~keep real `<br>`, never from source text, so a bare '\n' is an unambiguous
+        // ~keep split marker with no separate sentinel character needed.
+        text::fold_cell_line_breaks_verbatim_cow(text.as_ref()).into_owned()
     } else if ctx.in_code || ctx.in_ruby {
         text.into_owned()
     } else if ctx.in_table_cell {

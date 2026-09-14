@@ -725,3 +725,77 @@ fn should_preserve_a_glyphicon_code_point_alongside_a_backslash_style_hard_break
         .unwrap_or_default();
     assert_eq!(output, "[a\u{E001}b\\\nc](/x)\n");
 }
+
+// ~keep ── G. `<br>` splits a code span into two, joined by a hard break (issue #487) ────
+
+#[test]
+fn should_split_a_br_inside_a_code_span_into_two_spans_and_agree_across_tiers() {
+    let html = "<p><code>A<br>B</code></p>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "`A`  \n`B`\n");
+}
+
+#[test]
+fn should_split_a_br_inside_a_kbd_span_into_two_spans_and_agree_across_tiers() {
+    let html = "<p><kbd>A<br>B</kbd></p>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "`A`  \n`B`\n");
+}
+
+#[test]
+fn should_leave_a_br_inside_a_fenced_code_block_as_a_real_newline_and_agree_across_tiers() {
+    let html = "<pre><code>A<br>B</code></pre>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "```\nA\nB\n```\n");
+}
+
+#[test]
+fn should_fold_a_br_inside_a_code_span_inside_a_heading_and_agree_across_tiers() {
+    let html = "<h1><code>A<br>B</code></h1>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "# `A B`\n");
+}
+
+#[test]
+fn should_fold_a_br_inside_a_code_span_inside_a_table_cell_and_agree_across_tiers() {
+    let html = "<table><tr><td><code>A<br>B</code></td></tr></table>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "| `A B` |\n| ----- |\n");
+}
+
+#[test]
+fn should_collapse_an_empty_segment_from_two_adjacent_br_tags_and_agree_across_tiers() {
+    let html = "<code>A<br><br>B</code>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "`A`  \n`B`\n");
+}
+
+#[test]
+fn should_widen_only_the_backtick_bearing_segment_and_agree_across_tiers() {
+    let html = "<code>a`b<br>c</code>";
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "``a`b``  \n`c`\n");
+}
+
+/// ~keep A code span's `<br>` split composed with the pre-existing link hard-break
+/// ~keep handling (section F above): `emit_void`'s `TagKind::LineBreak` arm checked
+/// ~keep "inside a link frame" before "inside a code span", so a `<br>` inside
+/// ~keep `<code>` nested in `<a>` pushed the link branch's literal "  \n" straight into
+/// ~keep the still-open span's content, ahead of `close_code`'s segment split --
+/// ~keep `"A  \nB".split('\n')` then cut "A  " (trailing spaces included) as the first
+/// ~keep segment instead of "A", trapping them inside its closing backtick. Calling
+/// ~keep `tier1::run` directly (as `assert_tier1_matches_tier2` does) is what catches
+/// ~keep this: `TierStrategy::Auto` never reached the buggy path here in the first
+/// ~keep place, since `router::classify` already routes any `<code>` nested in `<a>`
+/// ~keep to Tier-2 for an unrelated reason, so a test going through `convert()` alone
+/// ~keep would have passed while the scanner itself stayed broken. Fixed by excluding
+/// ~keep the link branch whenever `EscapeCtx::CODE` is set, deferring to the code-aware
+/// ~keep branches below; `close_link`'s `normalize_link_label` still finds the
+/// ~keep resulting "  \n" in the assembled label text afterward, exactly as it does for
+/// ~keep non-code content.
+#[test]
+fn should_split_a_br_inside_a_code_span_inside_a_link_label_and_agree_across_tiers() {
+    let html = r#"<p><a href="https://example.com/"><code>A<br>B</code></a></p>"#;
+    let output = assert_tier1_matches_tier2(html);
+    assert_eq!(output, "[`A`  \n`B`](https://example.com/)\n");
+}

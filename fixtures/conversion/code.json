@@ -172,5 +172,62 @@
       "stem": "code_span_suppresses_nested_inline_markers",
       "title": "Inline markers inside a code span stay literal content"
     }
+  },
+  {
+    "id": "code_span_br_splits_into_hard_break",
+    "description": "A <br> inside an inline code span splits the span and emits a hard break",
+    "input": {
+      "html": "<p>X <code>A<br>B<br>C</code></p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "X `A`  \n`B`  \n`C`\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "code_span_br_splits_into_hard_break",
+      "title": "A <br> inside an inline code span splits the span and emits a hard break"
+    }
+  },
+  {
+    "id": "code_block_br_keeps_real_newline",
+    "description": "A <br> inside a fenced code block stays a real newline, not a split span",
+    "input": {
+      "html": "<pre><code>A<br>B</code></pre>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "```\nA\nB\n```\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "code_block_br_keeps_real_newline",
+      "title": "A <br> inside a fenced code block stays a real newline"
+    }
+  },
+  {
+    "id": "code_span_literal_newline_folds_to_space",
+    "description": "A literal line ending inside a code span folds to a space, per CommonMark",
+    "input": {
+      "html": "<p>see <code>a\nb</code> here</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "see `a b` here\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "code_span_literal_newline_folds_to_space",
+      "title": "A literal line ending inside a code span folds to a space"
+    }
   }
 ]

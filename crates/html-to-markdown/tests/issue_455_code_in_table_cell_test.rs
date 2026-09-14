@@ -128,24 +128,34 @@ fn should_fold_newline_in_code_span_inside_table_cell_under_strict_whitespace_mo
     );
 }
 
-/// A multi-line code span outside any table cell must keep preserving its content verbatim,
-/// including the literal newline — this is a regression guard against the in-cell fold
-/// leaking into the general (non-cell) code-span path.
+/// A multi-line code span outside any table cell must fold its literal newline to a single
+/// space, exactly like a table cell's own fold above -- just outside a cell too.
+///
+/// ~keep Superseded by issue #487: a raw line ending inside a code SPAN has no hard-break
+/// ~keep meaning at all under `CommonMark` (the code-spans section of the spec), so it always
+/// ~keep renders as a space on reparse -- preserving it verbatim (the pre-#487 assertion this
+/// ~keep replaced) was never round-trip stable. This document has no `<br>` at all, so there
+/// ~keep is nothing to split: `text_node.rs`'s `in_code && !in_code_block` branch folds the
+/// ~keep literal newline before it ever reaches `handlers::code_block::emit_inline_code`'s
+/// ~keep segment-split logic, so a single, unsplit span is what comes out.
 #[test]
-fn should_preserve_newline_verbatim_in_code_span_outside_table_cell() {
+fn should_fold_newline_to_a_space_in_code_span_outside_table_cell() {
     let html = "<p>see <code>a\nb</code> here</p>";
     let result = convert(html, None).unwrap();
-    assert_eq!(result, "see `a\nb` here\n", "actual: {result:?}");
+    assert_eq!(result, "see `a b` here\n", "actual: {result:?}");
 }
 
-/// A multi-line code span outside any table cell must also preserve a decoded `\r` verbatim
+/// A multi-line code span outside any table cell must also fold a decoded `\r` the same way
 /// (the HTML5 preprocessing step already normalizes any raw source `\r`/`\r\n` to `\n`, so a
 /// literal carriage return can only reach the converter via `&#13;`).
+///
+/// ~keep Superseded by issue #487, same reasoning as the sibling test above: a raw `\r` is
+/// ~keep still a line ending, so it folds too, not just `\n`.
 #[test]
-fn should_preserve_decoded_carriage_return_verbatim_in_code_span_outside_table_cell() {
+fn should_fold_decoded_carriage_return_to_a_space_in_code_span_outside_table_cell() {
     let html = "<p>see <code>a&#13;b</code> here</p>";
     let result = convert(html, None).unwrap();
-    assert_eq!(result, "see `a\rb` here\n", "actual: {result:?}");
+    assert_eq!(result, "see `a b` here\n", "actual: {result:?}");
 }
 
 /// `<kbd>` and `<samp>` share the same verbatim, in-code text-node path as `<code>` (both set
