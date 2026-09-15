@@ -121,6 +121,10 @@ fn child_misnest_state(info: &TagInfo, state: MisnestState, self_inside_preforma
 /// only recognises `caption`/`thead`/`tbody`/`tfoot`/`tr`/`colgroup`/`col` there —
 /// silently dropping raw text and routing anything else through a no-op handler.
 ///
+/// Also detects a `<tr>`/`<row>` or table section (`<thead>`/`<tbody>`/`<tfoot>`) with a
+/// misplaced element child (e.g. a `<p>` stranded inside a `<tr>` by a dropped `</table>`
+/// close tag). See [`is_row_context_with_misplaced_element`]. Issue #489.
+///
 /// ~keep Walks the tree top-down exactly once, carrying inherited ancestor state
 /// ~keep (see [`MisnestState`]) instead of re-walking every node's ancestor chain.
 /// ~keep The original per-node ancestor walk was O(depth) per node — O(n²) total on
@@ -156,6 +160,25 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
                     .iter()
                     .any(|child| is_foster_parenting_candidate(*child, parser, dom_ctx))
             {
+                return true;
+            }
+
+            // ~keep A <tr>/<row> or table section (<thead>/<tbody>/<tfoot>) holding a
+            // ~keep misplaced element child: `tl`'s `read_end` (astral-tl
+            // ~keep parser/base.rs:240-256) silently discards an unmatched close tag
+            // ~keep instead of erroring, so `</table>` inside a still-open `<tr>` is
+            // ~keep dropped and a following sibling element (e.g. a footer `<p>`)
+            // ~keep attaches as a child of that `<tr>` instead of becoming `<table>`'s
+            // ~keep sibling. `collect_table_cells` only walks `td`/`th`/`cell`
+            // ~keep children, so the misattached element -- and everything after it --
+            // ~keep is silently dropped (issue #489). Deliberately element-only:
+            // ~keep `is_foster_parenting_candidate`'s text arm decodes entities and
+            // ~keep treats `&nbsp;` as non-whitespace, so widening this to text would
+            // ~keep route every Outlook/newsletter `<tr>&nbsp;</tr>` through a full
+            // ~keep html5ever re-parse for no benefit. `<tr>stray text</tr>` losing its
+            // ~keep text stays a separate, documented defect (see the CONTROL test in
+            // ~keep `issue_489_regressions.rs`).
+            if is_row_context_with_misplaced_element(info, children, parser, dom_ctx) {
                 return true;
             }
 
@@ -199,6 +222,42 @@ fn is_table_structural_child(tag_name: &str) -> bool {
         tag_name,
         "caption" | "colgroup" | "col" | "thead" | "tbody" | "tfoot" | "tr" | "row" | "style" | "script" | "template"
     )
+}
+
+/// True when `info` is a `<tr>`/`<row>` or table section (`<thead>`/`<tbody>`/`<tfoot>`) with an
+/// element child outside the set valid in that context (see [`is_row_structural_child`] and
+/// [`is_section_structural_child`]). Element children only -- see the call site's doc comment for
+/// why text is deliberately excluded.
+fn is_row_context_with_misplaced_element(
+    info: &TagInfo,
+    children: &[tl::NodeHandle],
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+) -> bool {
+    let valid: fn(&str) -> bool = match info.name.as_str() {
+        "tr" | "row" => is_row_structural_child,
+        "thead" | "tbody" | "tfoot" => is_section_structural_child,
+        _ => return false,
+    };
+    children.iter().any(|child| {
+        matches!(child.get(parser), Some(tl::Node::Tag(_)))
+            && dom_ctx
+                .tag_name_for(*child, parser)
+                .is_some_and(|name| !valid(name.as_ref()))
+    })
+}
+
+/// Tag names valid as a direct child of `<tr>`/`<row>`: `td`/`th`/`cell` (this codebase's
+/// normalized cell aliases, see `converter::block::table::scanner`), plus `script`/`style`/
+/// `template`, which are left wherever they are written.
+fn is_row_structural_child(tag_name: &str) -> bool {
+    matches!(tag_name, "td" | "th" | "cell" | "script" | "style" | "template")
+}
+
+/// Tag names valid as a direct child of `<thead>`/`<tbody>`/`<tfoot>`: `tr`/`row`, plus
+/// `script`/`style`/`template`, which are left wherever they are written.
+fn is_section_structural_child(tag_name: &str) -> bool {
+    matches!(tag_name, "tr" | "row" | "script" | "style" | "template")
 }
 
 /// Compute the `has_p_ancestor` scan result to hand down to a node's children,

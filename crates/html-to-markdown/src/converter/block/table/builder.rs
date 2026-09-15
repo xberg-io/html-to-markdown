@@ -452,7 +452,7 @@ pub fn handle_table(
                                                 .tag_name_for(*row_handle, parser)
                                                 .unwrap_or_else(|| normalized_tag_name(row_tag.name().as_utf8_str()));
                                             if matches!(row_tag_name.as_ref(), "tr" | "row") {
-                                                convert_table_row(
+                                                let row_emitted = convert_table_row(
                                                     row_handle,
                                                     parser,
                                                     output,
@@ -470,7 +470,13 @@ pub fn handle_table(
                                                     &mut cell_cache,
                                                     &mut deferred_tables,
                                                 );
-                                                row_index += 1;
+                                                // ~keep Only advance the row counter for a row
+                                                // ~keep that actually emitted output -- a
+                                                // ~keep cell-less row (issue #489) must not
+                                                // ~keep consume the header slot.
+                                                if row_emitted {
+                                                    row_index += 1;
+                                                }
                                             }
                                         }
                                     }
@@ -478,7 +484,7 @@ pub fn handle_table(
                             }
 
                             "tr" | "row" => {
-                                convert_table_row(
+                                let row_emitted = convert_table_row(
                                     child_handle,
                                     parser,
                                     output,
@@ -496,7 +502,12 @@ pub fn handle_table(
                                     &mut cell_cache,
                                     &mut deferred_tables,
                                 );
-                                row_index += 1;
+                                // ~keep Only advance the row counter for a row that actually
+                                // ~keep emitted output -- a cell-less row (issue #489) must
+                                // ~keep not consume the header slot.
+                                if row_emitted {
+                                    row_index += 1;
+                                }
                             }
 
                             "colgroup" | "col" => {}

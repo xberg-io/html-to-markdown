@@ -364,6 +364,10 @@ fn emit_rowspan_continuation(
 /// * `deferred_tables` - Collects a nested table's markdown when this row's sole cell holds
 ///   one; see [`super::cell::render_cell_text`]. The caller renders these separately, after the
 ///   enclosing table, once every row has been processed (issue #484).
+///
+/// # Returns
+/// `false` when the row collected zero cells (nothing was emitted); `true` otherwise. Callers
+/// must only advance their own row counter when this returns `true` (issue #489).
 #[allow(clippy::too_many_arguments)]
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -384,7 +388,7 @@ pub fn convert_table_row(
     col_widths: &[usize],
     cell_cache: &mut CellTextCache,
     deferred_tables: &mut Vec<String>,
-) {
+) -> bool {
     let mut row_text = String::with_capacity(256);
     let mut cells = Vec::new();
 
@@ -394,6 +398,16 @@ pub fn convert_table_row(
     // ~keep column position undefined (issue #469 locks the sibling-cell shape to the
     // ~keep existing flatten-and-escape behavior; issue #484 is the single-cell-row shape).
     let is_single_cell_row = cells.len() == 1;
+
+    // ~keep A row whose only children were non-cell elements (e.g. `tl`'s `read_end`
+    // ~keep dropped an unmatched `</table>`, stranding a `<p>` inside this `<tr>`)
+    // ~keep collects zero cells here. Bailing before any output lets the *next* real
+    // ~keep row become row 0 -- and thus the header -- matching Tier 1's behavior
+    // ~keep (issue #489). The caller only advances `row_index` when this returns
+    // ~keep `true`, so a skipped row does not consume a row-index slot.
+    if cells.is_empty() {
+        return false;
+    }
 
     #[cfg(feature = "visitor")]
     let cell_contents: Vec<String> = if ctx.visitor.is_some() {
@@ -459,20 +473,22 @@ pub fn convert_table_row(
             };
             match visit_result {
                 VisitResult::Continue => {}
-                VisitResult::Skip => return,
+                // ~keep Pre-existing visitor early returns, unrelated to issue #489: `true`
+                // ~keep preserves prior behavior of always advancing `row_index` here.
+                VisitResult::Skip => return true,
                 VisitResult::Custom(custom) => {
                     output.push_str(&custom);
-                    return;
+                    return true;
                 }
                 VisitResult::Error(err) => {
                     if ctx.visitor_error.borrow().is_none() {
                         *ctx.visitor_error.borrow_mut() = Some(err);
                     }
-                    return;
+                    return true;
                 }
                 VisitResult::PreserveHtml => {
                     output.push_str(&super::super::super::serialize_node(node_handle, parser));
-                    return;
+                    return true;
                 }
             }
         }
@@ -579,4 +595,6 @@ pub fn convert_table_row(
         }
         output.push_str(" |\n");
     }
+
+    true
 }
