@@ -119,6 +119,27 @@ pub fn get_text_content(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_c
     dom_ctx.text_content(*node_handle, parser)
 }
 
+/// Determine whether a node is block-level, preferring the DOM context's precomputed tag
+/// info when available and falling back to a name-based check otherwise.
+///
+/// ~keep Shared between `collect_link_label_text` (topmost block *descendants*, for
+/// ~keep skipping block content out of an inline label) and `handlers/link.rs`'s
+/// ~keep direct-children partition (issue #490) -- both need the identical block/inline
+/// ~keep classification, or a byte could end up assigned to neither half, or both.
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn node_is_block_level(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        return false;
+    };
+    dom_ctx.tag_info(handle.get_inner(), parser).map_or_else(
+        || {
+            let tag_name = normalized_tag_name(tag.name().as_utf8_str());
+            is_block_level_element(tag_name.as_ref())
+        },
+        |info| info.is_block,
+    )
+}
+
 /// Collect inline text for link labels, skipping block-level descendants.
 #[allow(clippy::match_wildcard_for_single_variants)]
 pub fn collect_link_label_text(
@@ -140,13 +161,7 @@ pub fn collect_link_label_text(
                     text.push_str(decoded.as_ref());
                 }
                 tl::Node::Tag(tag) => {
-                    let is_block = dom_ctx.tag_info(handle.get_inner(), parser).map_or_else(
-                        || {
-                            let tag_name = normalized_tag_name(tag.name().as_utf8_str());
-                            is_block_level_element(tag_name.as_ref())
-                        },
-                        |info| info.is_block,
-                    );
+                    let is_block = node_is_block_level(&handle, parser, dom_ctx);
                     if is_block {
                         saw_block = true;
                         block_nodes.push(handle);

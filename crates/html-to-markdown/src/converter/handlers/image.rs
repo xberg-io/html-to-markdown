@@ -123,7 +123,18 @@ pub fn handle_img(
         }
     }
 
-    let keep_as_markdown = (ctx.in_heading && ctx.heading_allow_inline_images) || ctx.cell_allow_inline_images;
+    // ~keep #492: `|| ctx.link_allow_inline_images` is purely additive relative to the
+    // ~keep pre-#492 expression -- it can only turn an image ON, never off, because
+    // ~keep `link_allow_inline_images` is `false` whenever "a" is absent from
+    // ~keep `keep_inline_images_in` (its only source, `handlers/link.rs`). So callers who
+    // ~keep never set the option see byte-identical output. Deliberately NOT mirrored with
+    // ~keep the heading pattern's negative clause (`|| (in_link && !link_allow)`): the no-`<p>`
+    // ~keep control already renders an image through the inline branch with
+    // ~keep `convert_as_inline == false`, so `should_use_alt_text` is `false` there today and
+    // ~keep the image survives -- a negative term would delete it, which is a real regression.
+    let keep_as_markdown = (ctx.in_heading && ctx.heading_allow_inline_images)
+        || ctx.cell_allow_inline_images
+        || ctx.link_allow_inline_images;
 
     let should_use_alt_text =
         !keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images));

@@ -100,6 +100,11 @@ pub struct Context {
     /// Whether inline images should remain markdown inside the current
     /// layout-table cell (its tag name is in `keep_inline_images_in`).
     pub(crate) cell_allow_inline_images: bool,
+    /// Whether inline images should remain markdown inside the current `<a>` link label
+    /// ("a" is in `keep_inline_images_in`). Set once per `handle_link` call and carried
+    /// unchanged into both the block-label and inline-label branches, so the option means
+    /// the same thing whether or not the anchor happens to contain a block child (#492).
+    pub(crate) link_allow_inline_images: bool,
     /// Are we inside a paragraph element?
     pub(crate) in_paragraph: bool,
     /// Output buffer position where the current block's content starts.
@@ -272,6 +277,7 @@ impl Context {
             in_heading: false,
             heading_allow_inline_images: false,
             cell_allow_inline_images: false,
+            link_allow_inline_images: false,
             in_paragraph: false,
             block_content_start: 0,
             block_output_ptr: 0,

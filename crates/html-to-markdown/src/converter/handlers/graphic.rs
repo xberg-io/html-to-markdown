@@ -104,7 +104,13 @@ pub fn handle_graphic(
         metadata_payload = Some((attributes_map, width, height));
     }
 
-    let keep_as_markdown = (ctx.in_heading && ctx.heading_allow_inline_images) || ctx.cell_allow_inline_images;
+    // ~keep #492: byte-identical twin of `handlers/image.rs`'s `keep_as_markdown` -- see
+    // ~keep that file's comment for why `|| ctx.link_allow_inline_images` is purely additive
+    // ~keep and why the heading pattern's negative clause is deliberately not mirrored here.
+    // ~keep Kept in lockstep so `<graphic>` and `<img>` never disagree inside the same anchor.
+    let keep_as_markdown = (ctx.in_heading && ctx.heading_allow_inline_images)
+        || ctx.cell_allow_inline_images
+        || ctx.link_allow_inline_images;
 
     let should_use_alt_text =
         !keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images));

@@ -1983,9 +1983,11 @@ fn emit_void(
 /// When the feature is enabled this mirrors the Tier-2 logic in
 /// `converter.rs`:
 /// - `keep_inline_images_in` empty → always emit markdown image.
-/// - `keep_inline_images_in` non-empty → emit markdown only when the image
-///   has a heading ancestor (`h1`–`h6`) whose (lowercased) tag name is in the
-///   list; otherwise emit alt-text only.
+/// - `keep_inline_images_in` non-empty → emit markdown when the nearest
+///   heading or link ancestor (`h1`–`h6`, or `a`, whichever is closer to the
+///   `<img>`) has a (lowercased) tag name in the list, walking outward past a
+///   non-matching link to a heading further out (#492); otherwise emit
+///   alt-text only.
 ///
 /// Ancestor matching is ASCII-case-insensitive so callers may supply "H1" or
 /// "h1" interchangeably.
@@ -2009,9 +2011,13 @@ fn should_keep_image_as_markdown(html: &str, stack: &[OpenTag], options: &Conver
 ///
 /// Mirrors the Tier-2 logic in `converter.rs`: images are kept as markdown
 /// unconditionally when `keep_inline_images_in` is empty.  When the list is
-/// non-empty, an image is kept only when it has a heading ancestor (`h1`–`h6`)
-/// whose (lowercased) tag name appears in the list; otherwise the caller should
-/// emit alt-text only.
+/// non-empty, the nearest heading OR link ancestor decides: if it is a link
+/// (`<a>`) whose tag name is in the list, the image is kept regardless of any
+/// heading further out (#492, mirroring `ctx.link_allow_inline_images` in
+/// `handlers/link.rs`); if it is a link NOT in the list, that link imposes no
+/// restriction of its own and the scan continues outward to the next heading
+/// or link ancestor; if it is a heading, that heading's own list membership
+/// decides and the scan stops there, matching the pre-#492 rule.
 ///
 /// The comparison is ASCII-case-insensitive on both the stack name bytes and the
 /// user-supplied strings, so callers may supply "H1" or "h1" interchangeably.
@@ -2031,8 +2037,27 @@ fn keep_inline_image_for_ancestors(input: &[u8], stack: &[OpenTag], keep: &[Stri
             }
             return false;
         }
+        // ~keep #492: a link ancestor whose tag name is in the keep list keeps the image as
+        // ~keep markdown outright (mirrors `ctx.link_allow_inline_images` in Tier-2, which is
+        // ~keep OR'd into `keep_as_markdown` independent of any heading). A non-matching link
+        // ~keep imposes no restriction of its own -- unlike a heading, it does not stop the
+        // ~keep scan -- so a heading further out still gets to decide. A link frame OUTSIDE a
+        // ~keep heading frame is unreachable here: `<a>…<h1>` (heading opening inside a link)
+        // ~keep already bails to Tier-2 before this scanner runs (scanner.rs:1111-1128), so
+        // ~keep any `Link` frame this loop sees is nested INSIDE whichever `Heading` frame, if
+        // ~keep any, sits further down this same stack.
+        if matches!(frame.spec.kind, TagKind::Link) {
+            let name = &input[frame.name_range.clone()];
+            if keep
+                .iter()
+                .any(|keep_name| eq_ascii_ignore_case(name, keep_name.as_bytes()))
+            {
+                return true;
+            }
+        }
     }
-    // ~keep No heading ancestor at all: no restriction applies — emit markdown image.
+    // ~keep No heading or matching-link ancestor at all: no restriction applies — emit
+    // ~keep markdown image.
     // ~keep This matches Tier-2 behaviour: the `keep_inline_images_in` guard only
     // ~keep fires when `ctx.in_heading` is true.
     true

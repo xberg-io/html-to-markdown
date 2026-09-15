@@ -17,7 +17,8 @@ use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_markdown_link, has_uri_scheme};
 use crate::converter::main::walk_node;
 use crate::converter::utility::content::{
-    collect_link_label_text, escape_link_label, get_text_content, normalize_link_label, normalized_tag_name,
+    collect_link_label_text, escape_link_label, get_text_content, node_is_block_level, normalize_link_label,
+    normalized_tag_name,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -74,6 +75,12 @@ pub fn handle_link(
             owned_children.as_slice()
         };
         let (inline_label, _block_nodes, saw_block) = collect_link_label_text(children, parser, dom_ctx);
+        // ~keep #492: the only two prior consumers of `keep_inline_images_in` were headings
+        // ~keep and layout cells (#433's precedent); `<a>` had none. Computed once here and
+        // ~keep carried unchanged into both the block-label and inline-label `Context`
+        // ~keep literals below, so the option means the same thing regardless of whether the
+        // ~keep anchor happens to contain a block child.
+        let link_allow_inline_images = ctx.keep_inline_images_in.contains("a");
 
         // ~keep Without block descendants the sweep above already visited exactly the nodes
         // ~keep `get_text_content` would and decoded them the same way, so its text is reused
@@ -86,10 +93,23 @@ pub fn handle_link(
         let normalized_text = text::normalize_whitespace_cow(text_source.as_ref());
         let raw_text = normalized_text.trim();
 
+        // ~keep #490: partition the anchor's DIRECT children (not `collect_link_label_text`'s
+        // ~keep topmost block *descendants*, which can sit several inline wrappers deep) into
+        // ~keep inline and block using the identical `node_is_block_level` test, so every byte
+        // ~keep of the anchor's content lands in exactly one of the two halves -- this is also
+        // ~keep what catches a table buried under a block wrapper (`<a><div><table>...`).
+        let (inline_children, deferred) = partition_link_children(children, parser, dom_ctx);
+        let emit_blocks_separately = should_defer_table_blocks(ctx, &deferred, parser, dom_ctx);
+
         // ~keep GFM requires an absolute URI with a scheme (e.g. `https://…`, `mailto:…`);
         // ~keep bare paths or filenames must use the full `[text](href)` form (issue #397).
+        // ~keep `!emit_blocks_separately` (#490): `raw_text` is whole-subtree text including
+        // ~keep the deferred table's own cell text, so without this guard a table whose text
+        // ~keep happened to equal the href would autolink on the TABLE's text and silently
+        // ~keep drop the table itself.
         let is_autolink = options.autolinks
             && !options.default_title
+            && !emit_blocks_separately
             && !href.is_empty()
             && has_uri_scheme(href.as_str())
             && (raw_text == href || (href.starts_with("mailto:") && raw_text == &href[7..]));
@@ -148,11 +168,36 @@ pub fn handle_link(
             }
         }
 
-        let mut label = if saw_block {
+        let mut label = if emit_blocks_separately {
+            // ~keep #490: only the DIRECT inline children feed the label -- the deferred
+            // ~keep block children (which is what triggered this branch) are walked
+            // ~keep separately, after the link, near the end of this function. Walk them
+            // ~keep (do NOT reuse the text-only `inline_label`), or an `<img>` among the
+            // ~keep inline children would render as nothing instead of `![alt](src)`.
+            let mut content = String::new();
+            let link_ctx = Context {
+                inline_depth: ctx.inline_depth + 1,
+                link_allow_inline_images,
+                ..ctx.clone()
+            };
+            for child_handle in &inline_children {
+                walk_node(
+                    child_handle,
+                    parser,
+                    &mut content,
+                    options,
+                    &link_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
+            }
+            normalize_link_label(&content)
+        } else if saw_block {
             let mut content = String::new();
             let link_ctx = Context {
                 inline_depth: ctx.inline_depth + 1,
                 convert_as_inline: true,
+                link_allow_inline_images,
                 ..ctx.clone()
             };
             for child_handle in children {
@@ -184,6 +229,7 @@ pub fn handle_link(
             let mut content = String::new();
             let link_ctx = Context {
                 inline_depth: ctx.inline_depth + 1,
+                link_allow_inline_images,
                 ..ctx.clone()
             };
             for child_handle in children {
@@ -201,8 +247,12 @@ pub fn handle_link(
         };
 
         // ~keep `raw_text` is already the whole-subtree text when `saw_block`, so this single
-        // ~keep fallback covers both the block and inline cases.
-        if label.is_empty() && !raw_text.is_empty() {
+        // ~keep fallback covers both the block and inline cases. Suppressed when
+        // ~keep `emit_blocks_separately` (#490): `raw_text` there is whole-subtree text
+        // ~keep INCLUDING the deferred table's own cell text, so using it here would
+        // ~keep duplicate the table's text into the label. Suppressing it instead lets the
+        // ~keep href fallback immediately below fire.
+        if !emit_blocks_separately && label.is_empty() && !raw_text.is_empty() {
             label = normalize_link_label(raw_text);
         }
 
@@ -229,6 +279,16 @@ pub fn handle_link(
         }
 
         let escaped_label = escape_link_label(&label);
+
+        // ~keep #490: whether the deferred block children (if any) should still be walked
+        // ~keep after the link markdown below. `false` only for `Skip` (the caller asked for
+        // ~keep nothing) and `PreserveHtml` (the serialized anchor already contains the
+        // ~keep table) -- every other outcome, including the no-visitor default, still wrote
+        // ~keep the link's own markdown/custom text and expects its deferred blocks to follow.
+        #[cfg(feature = "visitor")]
+        let mut should_emit_deferred_blocks = true;
+        #[cfg(not(feature = "visitor"))]
+        let should_emit_deferred_blocks = true;
 
         #[cfg(feature = "visitor")]
         if let Some(ref visitor_handle) = ctx.visitor {
@@ -263,13 +323,16 @@ pub fn handle_link(
                     ctx.reference_collector.as_ref(),
                 ),
                 VisitResult::Custom(custom) => output.push_str(&custom),
-                VisitResult::Skip => {}
+                VisitResult::Skip => should_emit_deferred_blocks = false,
                 VisitResult::Error(err) => {
                     if ctx.visitor_error.borrow().is_none() {
                         *ctx.visitor_error.borrow_mut() = Some(err);
                     }
                 }
-                VisitResult::PreserveHtml => output.push_str(&serialize_node(node_handle, parser)),
+                VisitResult::PreserveHtml => {
+                    output.push_str(&serialize_node(node_handle, parser));
+                    should_emit_deferred_blocks = false;
+                }
             }
         } else {
             append_markdown_link(
@@ -321,6 +384,17 @@ pub fn handle_link(
                 );
             }
         }
+
+        // ~keep #490: walk the deferred block children (the wrapped `<table>`, or its block
+        // ~keep ancestor) with `ctx` UNCHANGED -- not `link_ctx` -- so it renders as a normal
+        // ~keep block (a real GFM table) rather than being forced inline. Skipped when the
+        // ~keep visitor already produced or suppressed all output for this link (see
+        // ~keep `should_emit_deferred_blocks`'s doc comment above).
+        if emit_blocks_separately && should_emit_deferred_blocks {
+            for child_handle in &deferred {
+                walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
+            }
+        }
     } else {
         let children = tag.children();
         {
@@ -328,5 +402,72 @@ pub fn handle_link(
                 walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
             }
         }
+    }
+}
+
+/// Partition an anchor's DIRECT children into (inline, block) using `node_is_block_level`
+/// (issue #490).
+///
+/// ~keep Deliberately direct children only, not `collect_link_label_text`'s topmost block
+/// ~keep *descendants* (which can sit several inline wrappers deep) -- every byte of the
+/// ~keep anchor's content must land in exactly one of the two halves, which is also what
+/// ~keep catches a table buried under a block wrapper (`<a><div><table>...`).
+fn partition_link_children(
+    children: &[tl::NodeHandle],
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+) -> (Vec<tl::NodeHandle>, Vec<tl::NodeHandle>) {
+    children
+        .iter()
+        .copied()
+        .partition(|child| !node_is_block_level(child, parser, dom_ctx))
+}
+
+/// Decide whether an anchor's deferred (direct block) children should be rendered as
+/// separate blocks after the link, instead of being walked into the inline label
+/// (issue #490).
+///
+/// ~keep A wrapped `<table>` crushed a whole GFM table into the link label: the label would
+/// ~keep contain literal `|`/`\n` that either get escaped into noise or, unescaped, corrupt
+/// ~keep the OUTER row on reparse. Emitting the table as a separate block after the link is
+/// ~keep the only shape that round-trips. Gated on an actual `<table>` inside a deferred
+/// ~keep subtree so the common case (a `<p>`/`<div>`-only anchor) pays nothing and behaves
+/// ~keep exactly as before. `!ctx.convert_as_inline` and `!ctx.in_heading` are load-bearing,
+/// ~keep not polish: a heading's `normalize_heading_text` folds `\n` to spaces, so a block
+/// ~keep table inside a heading is no better than the crushed-label bug; an inline context (a
+/// ~keep data cell's own label, or this link nested inside an outer link's label) has nowhere
+/// ~keep to put a deferred block at all.
+fn should_defer_table_blocks(
+    ctx: &Context,
+    deferred: &[tl::NodeHandle],
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+) -> bool {
+    !ctx.convert_as_inline
+        && !ctx.in_heading
+        && deferred.iter().any(|handle| subtree_has_table(handle, parser, dom_ctx))
+}
+
+/// Short-circuiting DFS: does `handle`'s subtree (itself or any descendant) contain a
+/// `<table>`?
+///
+/// ~keep Checked only against a deferred block child of an `<a>` (issue #490), so the cost
+/// ~keep is paid only when the anchor actually has a block child, and the walk stops at the
+/// ~keep first `<table>` found regardless of subtree size.
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn subtree_has_table(handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+        return false;
+    };
+    if normalized_tag_name(tag.name().as_utf8_str()) == "table" {
+        return true;
+    }
+    if let Some(children) = dom_ctx.children_of(handle.get_inner()) {
+        children.iter().any(|child| subtree_has_table(child, parser, dom_ctx))
+    } else {
+        tag.children()
+            .top()
+            .iter()
+            .any(|child| subtree_has_table(child, parser, dom_ctx))
     }
 }
