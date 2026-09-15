@@ -138,14 +138,15 @@ const CELL_TEXT_CAPACITY: usize = 128;
 ///
 /// `depth` is the cell's own recursion depth; children are walked at `depth + 1`.
 ///
-/// `deferred_tables`, when `Some`, receives a nested `<table>` child's rendered markdown
-/// verbatim (trimmed, unescaped, un-flattened) instead of folding it into this cell's single
-/// line. The caller passes `Some` only when the enclosing row holds no other cell — GFM has no
-/// way to express a real nested table, but a lone cell's content can be lifted out and rendered
-/// as its own separate table after the enclosing one, which keeps the inner table usable
-/// instead of flattening it into a line of escaped pipes (issue #484). `None` (the default, and
-/// always the case for a cell sharing its row with a sibling, per issue #469) keeps the existing
-/// flatten-and-escape behavior.
+/// `deferred_tables`, when `Some`, receives a child that is, or wraps (e.g. a `<div>`), a
+/// nested `<table>`, rendered as that child's markdown verbatim (trimmed, unescaped,
+/// un-flattened) instead of folding it into this cell's single line. The caller passes `Some`
+/// only when the enclosing row holds no other cell — GFM has no way to express a real nested
+/// table, but a lone cell's content can be lifted out and rendered as its own separate table
+/// after the enclosing one, which keeps the inner table usable instead of flattening it into a
+/// line of escaped pipes (issue #484). `None` (the default, and always the case for a cell
+/// sharing its row with a sibling, per issue #469) keeps the existing flatten-and-escape
+/// behavior.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn render_cell_text(
     node_handle: &tl::NodeHandle,
@@ -175,10 +176,13 @@ pub fn render_cell_text(
                 // ~keep so its `|` delimiters would read as *the outer row's* cell boundaries on
                 // ~keep reparse, silently widening -- and on a second parse, truncating -- the
                 // ~keep containing row's column count: real content loss, not a cosmetic diff.
-                // ~keep Scoped to nested-table children only: other block content a cell may
-                // ~keep hold (`<pre>`, code spans) is deliberately left byte-for-byte alone by
-                // ~keep their own handlers (issues #455/#456) and must not be touched here.
-                if super::utils::is_tag_name(child_handle, parser, dom_ctx, "table") {
+                // ~keep Scoped to a child that *is, or wraps* (e.g. a `<div>`), a nested table:
+                // ~keep other block content a cell may hold (`<pre>`, code spans) is deliberately
+                // ~keep left byte-for-byte alone by their own handlers (issues #455/#456) and
+                // ~keep must not be touched here. A single-node tag test here used to miss a
+                // ~keep wrapped table entirely, letting it fall through to the `else` branch
+                // ~keep below and emit raw unescaped pipes (issue #488).
+                if super::utils::is_or_contains_table(child_handle, parser, dom_ctx) {
                     let mut nested = String::new();
                     super::super::super::walk_node(
                         child_handle,
