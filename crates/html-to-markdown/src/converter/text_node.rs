@@ -12,7 +12,7 @@ use std::borrow::Cow;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
-    get_next_sibling_tag, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
+    get_next_sibling_tag, next_sibling_is_inline_content, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -442,6 +442,10 @@ pub fn process_text_node(
 /// Returns true when the node's parent is an inline-like element that is itself
 /// followed by inline content — e.g. the lone `"\n"` inside the middle `<span>`
 /// of `<span>a</span><span>\n</span><span>b</span>`.
+///
+/// "Inline content" deliberately includes a bare text sibling, not just an element: a browser
+/// renders `a<span>\n</span>b` and `a<span>\n</span><span>b</span>` identically, so asking only
+/// about a following *tag* dropped the separator and welded the words together (issue #491). ~keep
 fn newline_span_needs_separating_space(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
@@ -457,5 +461,5 @@ fn newline_span_needs_separating_space(
         return false;
     }
     let parent_handle = tl::NodeHandle::new(parent_id);
-    next_sibling_is_inline_tag(&parent_handle, parser, dom_ctx)
+    next_sibling_is_inline_content(&parent_handle, parser, dom_ctx)
 }

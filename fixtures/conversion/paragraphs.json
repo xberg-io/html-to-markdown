@@ -110,5 +110,24 @@
       "stem": "paragraph_nested_divs",
       "title": "Text nested inside divs is extracted correctly"
     }
+  },
+  {
+    "id": "paragraph_whitespace_only_span_separates_words",
+    "description": "A newline-only inline wrapper still separates the words on either side",
+    "input": {
+      "html": "Alpha<span style=\"white-space:pre\">\n</span>13"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Alpha 13\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "paragraph_whitespace_only_span_separates_words",
+      "title": "A newline-only inline wrapper still separates the words on either side"
+    }
   }
 ]
