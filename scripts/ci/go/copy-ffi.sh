@@ -10,36 +10,45 @@ os=$(uname -s)
 arch=$(uname -m)
 
 case "$os" in
-  Darwin)
-    case "$arch" in
-      arm64)  platform="macos-arm64" ;;
-      x86_64) platform="macos-x86_64" ;;
-      *)      echo "unsupported macOS arch: $arch" >&2; exit 1 ;;
-    esac
-    src="target/release/libhtml_to_markdown_ffi.dylib"
-    dst_name="libhtml_to_markdown_ffi.dylib"
-    ;;
-  Linux)
-    case "$arch" in
-      x86_64)        platform="linux-x86_64" ;;
-      aarch64|arm64) platform="linux-aarch64" ;;
-      *)             echo "unsupported Linux arch: $arch" >&2; exit 1 ;;
-    esac
-    src="target/release/libhtml_to_markdown_ffi.so"
-    dst_name="libhtml_to_markdown_ffi.so"
-    ;;
-  MINGW*|MSYS*|CYGWIN*|Windows_NT)
-    case "$arch" in
-      x86_64|AMD64) platform="windows-x86_64" ;;
-      *)            echo "unsupported Windows arch: $arch" >&2; exit 1 ;;
-    esac
-    src="target/release/html_to_markdown_ffi.dll"
-    dst_name="html_to_markdown_ffi.dll"
-    ;;
+Darwin)
+  case "$arch" in
+  arm64) platform="macos-arm64" ;;
+  x86_64) platform="macos-x86_64" ;;
   *)
-    echo "unsupported OS: $os" >&2
+    echo "unsupported macOS arch: $arch" >&2
     exit 1
     ;;
+  esac
+  src="target/release/libhtml_to_markdown_ffi.dylib"
+  dst_name="libhtml_to_markdown_ffi.dylib"
+  ;;
+Linux)
+  case "$arch" in
+  x86_64) platform="linux-x86_64" ;;
+  aarch64 | arm64) platform="linux-aarch64" ;;
+  *)
+    echo "unsupported Linux arch: $arch" >&2
+    exit 1
+    ;;
+  esac
+  src="target/release/libhtml_to_markdown_ffi.so"
+  dst_name="libhtml_to_markdown_ffi.so"
+  ;;
+MINGW* | MSYS* | CYGWIN* | Windows_NT)
+  case "$arch" in
+  x86_64 | AMD64) platform="windows-x86_64" ;;
+  *)
+    echo "unsupported Windows arch: $arch" >&2
+    exit 1
+    ;;
+  esac
+  src="target/release/html_to_markdown_ffi.dll"
+  dst_name="html_to_markdown_ffi.dll"
+  ;;
+*)
+  echo "unsupported OS: $os" >&2
+  exit 1
+  ;;
 esac
 
 dst_dir="packages/go/.lib/$platform"
