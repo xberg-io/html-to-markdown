@@ -2465,7 +2465,13 @@ jobs:
         with:
           targets: aarch64-linux-android,x86_64-linux-android,armv7-linux-androideabi,i686-linux-android
 
+      # Google removed the legacy `tools` SDK package, but setup-android's `packages` input
+      # still defaults to `tools platform-tools`, so a bare invocation now dies on
+      # `Warning: Failed to find package 'tools'` -> sdkmanager exit 1, which took out all four
+      # kotlin-android-natives legs of the 3.13.0 release. Request platform-tools explicitly. ~keep
       - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+        with:
+          packages: platform-tools
 
       # ~keep Bundle the JNI crate (libhtm_jni.so) that the Kotlin bridge loads
       # via System.loadLibrary("htm_jni") — NOT the plain C-FFI crate, whose
