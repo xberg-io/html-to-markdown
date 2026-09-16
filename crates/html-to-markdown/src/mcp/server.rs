@@ -8,7 +8,7 @@ use rmcp::{
         CallToolResult, CompleteRequestParams, CompleteResult, ContentBlock, GetPromptRequestParams, GetPromptResponse,
         Implementation, InitializeResult, JsonObject, ListPromptsResult, ListResourcesResult, PaginatedRequestParams,
         PromptsCapability, ProtocolVersion, ReadResourceRequestParams, ReadResourceResponse, ResourcesCapability,
-        ServerCapabilities, ServerInfo, ToolsCapability,
+        ServerCapabilities, ServerConfig, ToolsCapability,
     },
     service::RequestContext,
     tool, tool_handler, tool_router,
@@ -196,7 +196,7 @@ impl HtmlToMarkdownMcp {
 
 #[tool_handler]
 impl ServerHandler for HtmlToMarkdownMcp {
-    fn get_info(&self) -> ServerInfo {
+    fn get_info(&self) -> ServerConfig {
         let mut capabilities = ServerCapabilities::default();
         capabilities.tools = Some(ToolsCapability::default());
         capabilities.prompts = Some(PromptsCapability::default());
@@ -215,7 +215,7 @@ impl ServerHandler for HtmlToMarkdownMcp {
         InitializeResult::new(capabilities)
             // Advertise the newest supported MCP revision; rmcp negotiates down for older
             // clients. `ProtocolVersion::LATEST`/`default()` still resolves to 2025-11-25 as of
-            // rmcp 3.1.2 (`LATEST = V_2025_11_25`), so select 2026-07-28 explicitly. Re-check
+            // rmcp 3.4.0 (`LATEST = V_2025_11_25`), so select 2026-07-28 explicitly. Re-check
             // this on every rmcp bump: if LATEST advances, this pin becomes the older choice. ~keep
             .with_protocol_version(ProtocolVersion::V_2026_07_28)
             .with_server_info(server_info)

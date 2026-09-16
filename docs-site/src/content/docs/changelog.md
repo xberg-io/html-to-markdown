@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Upgraded `html5ever` to 0.40.1, which fixes silent content loss on the HTML repair path.**
+  0.40.0's serializer dropped the leading `0xC2` byte of a two-byte UTF-8 sequence, corrupting
+  every character in U+0080..U+00BF except NBSP -- `§`, `©`, `°`, `·` among them. Because
+  `repair_with_html5ever` serializes the repaired tree back to a string for the primary parser to
+  re-read, a single such character made the whole re-parse fail and everything after it vanish.
+  This repo was pinned to 0.39.0 to avoid it; 0.40.1 carries the upstream fix, verified here by
+  building the same tree against both versions rather than by trusting the release note. A
+  regression test now pins the behaviour with non-ASCII fixtures -- the existing repair-path tests
+  are ASCII-only and passed on the broken release, which is why the defect was invisible.
+- Upgraded `rmcp` to 3.4.0. It deprecates the `ServerInfo` alias in favour of `ServerConfig`
+  (the same type, renamed because it collided with the protocol's own `serverInfo` field), so
+  the MCP server's `get_info` moved with it. No wire-visible change.
+
 ### Fixed
 
 - **A wrapper element no longer defeats the nested-table fix**
