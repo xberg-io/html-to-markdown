@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A wrapper element no longer defeats the nested-table fix**
+  ([#488](https://github.com/xberg-io/html-to-markdown/issues/488)). A nested `<table>` inside a
+  `<td>` was detected with a single-node tag-name test over the cell's *direct* children, so
+  wrapping it in a `<div>` bypassed the 3.12.4 deferral, the pipe escaping and the row fold all at
+  once. The inner table's raw `|` characters then read as the *outer* row's cell boundaries on
+  reparse -- content loss, not a cosmetic diff. The nested-table *counter* has always descended
+  through wrappers; the two now agree. The same line fixes the sibling-cell shape, which was
+  corrupt in the same way.
+
+- **Content after a table whose last row is never closed is no longer lost**
+  ([#489](https://github.com/xberg-io/html-to-markdown/issues/489)). In
+  `<table>...<tr></table><p>Visible footer</p>`, the primary parser discards a close tag that does
+  not match the top of its open-element stack, so `</table>` vanished and the paragraph was
+  adopted by the still-open `<tr>` -- where the cell collector, which keeps only `td`/`th`, dropped
+  it. Such a document now takes the same html5ever repair path that #336, #479 and #486 already
+  use. A row that yields no cells also stops emitting a phantom empty row, so the next real row
+  becomes the header, matching Tier 1. Two further shapes are fixed by the same gate: a second
+  `<tr>` opened without closing the first (its row was silently dropped) and a `<td>` placed
+  directly inside `<tbody>` (which produced no output at all). Text-only children are deliberately
+  excluded from the gate, so a `<tr>&nbsp;</tr>` spacer does not pay for a full re-parse.
+
+- **An anchor wrapping a table renders the table, not an escaped link label**
+  ([#490](https://github.com/xberg-io/html-to-markdown/issues/490)). Any block content inside an
+  `<a>` became link-label content, so `<a href="..."><table>...</table></a>` crushed the whole
+  table into a single label -- and the label escaper then correctly escaped the markdown that
+  produced, leaving an unreadable run of `\|`. The escaping was never the bug; handing a table to
+  the label builder was. The anchor's direct children are now partitioned, the inline half forms
+  the label and the deferred half renders as blocks after it. Only a deferred subtree that
+  actually contains a `<table>` triggers this, and never inside a heading or an inline context,
+  so every other anchor shape is byte-identical.
+
+- **A whitespace-only inline wrapper still separates the words around it**
+  ([#491](https://github.com/xberg-io/html-to-markdown/issues/491)).
+  `Alpha<span style="white-space:pre">\n</span>13` rendered as `Alpha13`. The predicate added for
+  #430 asks whether the *next sibling is an element*, so a bare text node after the wrapper took
+  the failing path and the newline vanished. Tier 1 was already correct, so the two tiers
+  disagreed on this input; they are now pinned together by a parity test. Note that the reported
+  `white-space: pre` is incidental -- that property is not implemented, and the defect reproduced
+  without it, exactly as a browser collapses the newline to a space either way.
+
+- **`keepInlineImagesIn` now means something for `<a>`**
+  ([#492](https://github.com/xberg-io/html-to-markdown/issues/492)). The option was consulted for
+  headings and for layout cells, but never for anchors, so an `<img>` inside a link that also held
+  a block element was replaced by its alt text (or dropped entirely when it had none) no matter
+  what the option said. Listing `"a"` now keeps the image as markdown, in both the block and inline
+  anchor paths, and for `<graphic>` as well as `<img>`. The change is purely additive -- it can
+  turn an image on, never off -- so output is byte-identical for anyone not naming `"a"` in the
+  option. The Tier-1 scanner was updated in lockstep.
+
 ## [3.13.0] - 2026-09-14
 
 ### Changed
