@@ -187,16 +187,16 @@ jobs:
           path: rust-coverage.lcov
           retention-days: 7
 
-  # ~keep Pinned to ubuntu-24.04 so a schema-v2 calibrated baseline can approve an
-  # exact runner provenance key. Until that 40-run calibration is reviewed, the
-  # checked-in schema-v1 files retain blocking percentage-only enforcement and
-  # print a migration warning. Schema v2 never skips an incompatible runner: a
-  # provenance mismatch or missing fixture floor is a configuration failure. Host identity
-  # (CPU model and core count) is the one exception, handled at the compare step below.
-  benchmark-regression:
-    name: "Benchmark: Regression guardrail"
+  # ~keep Content gate only. The timing guardrail moved to benchmark-guardrail.yaml (nightly and
+  # manual) because it is only meaningful on a quiet runner, and making every push wait out a
+  # settle period was not worth it. `bench:oracle` is fully deterministic and host-independent --
+  # it diffs checked-in snapshots line by line rather than timing anything -- so it stays here.
+  # It ran in no workflow until #495, by which point 76 of the 116 snapshots had drifted
+  # unnoticed, one of them a real defect (#494).
+  benchmark-oracle:
+    name: "Benchmark: Output snapshots"
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -205,48 +205,12 @@ jobs:
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
         with:
-          cache-key-prefix: benchmark-regression
+          cache-key-prefix: benchmark-oracle
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
 
-      - name: Run benchmark harness
-        run: task bench:run
-        shell: bash
-
-      # ~keep Uploaded before the comparison and with always(), because the run this job
-      # produces is the only way to re-cut baselines/baseline.json: `bench:compare` runs here
-      # on ubuntu-latest, so a baseline captured on a developer machine is being compared
-      # against CI hardware and the percentages mean nothing. Without this the results file is
-      # discarded on every run, including the failing ones worth inspecting.
-      - name: Upload benchmark results
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: benchmark-results
-          path: tools/benchmark-harness/results/latest.json
-          retention-days: 14
-
-      # ~keep ALLOW_HOST_MISMATCH is passed here and nowhere else. `ubuntu-24.04` is one label
-      # over a mixed pool (AMD EPYC and Intel Xeon hosts), and the calibration campaign is
-      # workflow_dispatch-only, so it can only be captured on whichever host it drew. Without
-      # this, a run that drew the other vendor reported timing violations that are hardware
-      # differences, not code. It does not relax the provenance contract — a changed rustc,
-      # profile, build flag, feature set, or runner class still hard-fails — and on a runner
-      # whose CPU does match the baseline it changes nothing, so a real regression still fails.
-      - name: Compare against baseline (fails on regression beyond threshold)
-        run: task bench:compare ALLOW_HOST_MISMATCH=true
-        shell: bash
-
-      # ~keep Output-content gate, distinct from the timing gate above: `bench:compare` only
-      # sees `output_bytes`, so a change that rewrites text without changing its length is
-      # invisible to it. `bench:oracle` diffs the checked-in snapshots line by line and is
-      # fully deterministic, so it needs none of the host-provenance handling above.
-      # `always()` so a timing failure cannot mask a content regression, or the reverse --
-      # each gate reports on its own. It ran in no workflow until #495, by which point 76 of
-      # the 116 snapshots had drifted unnoticed, one of them a real defect (#494).
       - name: Verify output snapshots
-        if: always()
         run: task bench:oracle
         shell: bash
 

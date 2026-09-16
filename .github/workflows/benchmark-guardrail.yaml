@@ -1,0 +1,76 @@
+name: Benchmark Guardrail
+
+# ~keep Nightly and manual, never per-push. The comparison is only meaningful on a quiet runner,
+# and the quiet gate below costs several minutes of deliberate idling that every push should not
+# pay. The per-push content gate lives in ci-rust.yaml as "Benchmark: Output snapshots", which is
+# deterministic and needs no such settling.
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+  BUILD_PROFILE: "ci"
+  HTMBENCH_RUNNER_CLASS: github-hosted
+
+jobs:
+  guardrail:
+    name: "Benchmark: Regression guardrail"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        id: checkout
+
+      - name: Setup Rust
+        uses: xberg-io/actions/setup-rust@v1
+        with:
+          cache-key-prefix: benchmark-guardrail
+
+      - name: Install Task
+        uses: xberg-io/actions/install-task@v1
+
+      # ~keep The same gate `bench:calibration:collect` runs, from the same task, so the baseline
+      # and the run checked against it are measured under matching conditions. Without it the
+      # baseline is unreachable by this job: run 35086411684 read every fixture ~29% slow on
+      # hardware identical to the baseline's, purely because it measured straight after a build.
+      - name: Wait for a quiet runner
+        run: task bench:quiet-gate LOGS_DIR=benchmark-guardrail/logs
+        shell: bash
+
+      - name: Run benchmark harness
+        run: task bench:run
+        shell: bash
+
+      # ~keep Uploaded before the comparison and with always(), because the run this job produces
+      # is the only way to re-cut baselines/baseline.json, and a failing run is the one worth
+      # inspecting.
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: benchmark-results
+          path: |
+            tools/benchmark-harness/results/latest.json
+            benchmark-guardrail/logs
+          retention-days: 14
+
+      # ~keep ALLOW_HOST_MISMATCH is passed here and nowhere else. `ubuntu-24.04` is one label over
+      # a mixed pool, and the calibration campaign is dispatch-only, so it can only be captured on
+      # whichever host it drew. It does not relax the provenance contract -- a changed rustc,
+      # profile, build flag, feature set, or runner class still hard-fails -- and on a runner whose
+      # CPU matches the baseline it changes nothing, so a real regression still fails.
+      - name: Compare against baseline (fails on regression beyond threshold)
+        run: task bench:compare ALLOW_HOST_MISMATCH=true
+        shell: bash
+
+      - name: Cleanup Rust cache
+        if: always() && steps.checkout.outcome == 'success'
+        uses: xberg-io/actions/cleanup-rust-cache@v1

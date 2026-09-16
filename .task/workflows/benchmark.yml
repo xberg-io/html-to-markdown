@@ -103,9 +103,65 @@ tasks:
         logs_dir="{{.LOGS_DIR}}"
         cargo build --release -p html-to-markdown-bench --bin htmbench 2>&1 | tee "$logs_dir/build.log"
         test -x "{{.BENCH_BIN}}"
+      - task: quiet-gate
+        vars:
+          LOGS_DIR: '{{.LOGS_DIR}}'
+      - |
+        set -euo pipefail
+        artifact_dir="{{.ARTIFACT_DIR}}"
+        runs_dir="{{.RUNS_DIR}}"
+        logs_dir="{{.LOGS_DIR}}"
+        readonly calibration_runs=40
+        capture_log="$logs_dir/captures.log"
+        for run in $(seq 1 "$calibration_runs"); do
+          output="$runs_dir/$(printf '%04d.json' "$run")"
+          printf '%s capture %04d start\n' "$(date --iso-8601=seconds)" "$run" >> "$capture_log"
+          "{{.BENCH_BIN}}" run --output "$output" >> "$capture_log" 2>&1
+          jq -e '.schema == 2 and (.runs | length > 0)' "$output" >/dev/null
+          printf '%s capture %04d complete\n' "$(date --iso-8601=seconds)" "$run" >> "$capture_log"
+        done
+        capture_count="$(find "$runs_dir" -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9].json' | wc -l)"
+        test "$capture_count" -eq "$calibration_runs"
+        printf 'captures=%s\n' "$capture_count" > "$artifact_dir/summary.log"
+
+  oracle:
+    desc: "Verify oracle snapshots match current output"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- oracle
+
+  oracle:bless:
+    desc: "Regenerate oracle snapshots from current output"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- oracle --bless
+
+  survey:
+    desc: "Print fixture corpus feature-coverage survey"
+    cmds:
+      - cargo run --release -p html-to-markdown-bench -- survey
+
+  mdream:
+    desc: "Run benchmark with mdream side-by-side (requires compare-mdream feature and /tmp/mdream)"
+    cmds:
+      - mkdir -p tools/benchmark-harness/results
+      - cargo run --release -p html-to-markdown-bench --features html-to-markdown-bench/compare-mdream -- run --mdream --output tools/benchmark-harness/results/latest-mdream.json
+
+
+  quiet-gate:
+    desc: "Block until the runner is measurably quiet enough to time on"
+    # ~keep Shared by `calibration:collect` and the nightly regression guardrail so both
+    # measure under identical conditions. They diverged once: the baseline was calibrated
+    # behind this gate while `bench:compare` ran straight after a cargo build, making the
+    # baseline unreachable by the job checking against it -- every fixture read ~29% slow on
+    # identical hardware (run 35086411684). That gate had only ever passed because the older
+    # baseline came from slower hardware whose inflated numbers left accidental slack.
+    platforms: [linux]
+    vars:
+      LOGS_DIR: '{{.LOGS_DIR | default "benchmark-guardrail/logs"}}'
+    cmds:
       - |
         set -euo pipefail
         logs_dir="{{.LOGS_DIR}}"
+        mkdir -p "$logs_dir"
         readonly quiet_checks=5
         # ~keep The first interval is measured but NOT gated. /proc/loadavg's 1-minute figure is a
         # trailing average, so it still carries the `cargo build` in the step immediately above
@@ -158,41 +214,3 @@ tasks:
           echo "runner was not quiet for all $quiet_checks checks" | tee -a "$logs_dir/quiet-gate.tsv" >&2
           exit 1
         fi
-      - |
-        set -euo pipefail
-        artifact_dir="{{.ARTIFACT_DIR}}"
-        runs_dir="{{.RUNS_DIR}}"
-        logs_dir="{{.LOGS_DIR}}"
-        readonly calibration_runs=40
-        capture_log="$logs_dir/captures.log"
-        for run in $(seq 1 "$calibration_runs"); do
-          output="$runs_dir/$(printf '%04d.json' "$run")"
-          printf '%s capture %04d start\n' "$(date --iso-8601=seconds)" "$run" >> "$capture_log"
-          "{{.BENCH_BIN}}" run --output "$output" >> "$capture_log" 2>&1
-          jq -e '.schema == 2 and (.runs | length > 0)' "$output" >/dev/null
-          printf '%s capture %04d complete\n' "$(date --iso-8601=seconds)" "$run" >> "$capture_log"
-        done
-        capture_count="$(find "$runs_dir" -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9].json' | wc -l)"
-        test "$capture_count" -eq "$calibration_runs"
-        printf 'captures=%s\n' "$capture_count" > "$artifact_dir/summary.log"
-
-  oracle:
-    desc: "Verify oracle snapshots match current output"
-    cmds:
-      - cargo run --release -p html-to-markdown-bench -- oracle
-
-  oracle:bless:
-    desc: "Regenerate oracle snapshots from current output"
-    cmds:
-      - cargo run --release -p html-to-markdown-bench -- oracle --bless
-
-  survey:
-    desc: "Print fixture corpus feature-coverage survey"
-    cmds:
-      - cargo run --release -p html-to-markdown-bench -- survey
-
-  mdream:
-    desc: "Run benchmark with mdream side-by-side (requires compare-mdream feature and /tmp/mdream)"
-    cmds:
-      - mkdir -p tools/benchmark-harness/results
-      - cargo run --release -p html-to-markdown-bench --features html-to-markdown-bench/compare-mdream -- run --mdream --output tools/benchmark-harness/results/latest-mdream.json
