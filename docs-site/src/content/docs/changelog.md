@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.0] - 2026-09-16
+
 ### Changed
 
 - **Upgraded `html5ever` to 0.40.1, which fixes silent content loss on the HTML repair path.**
