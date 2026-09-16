@@ -38,8 +38,6 @@ This feature is well established and works across many devices and browser versi
 - [See full compatibility](#browser_compatibility)
 - [Report feedback](https://survey.alchemer.com/s3/7634825/MDN-baseline-feedback?page=%2Fen-US%2Fdocs%2FWeb%2FJavaScript%2FReference%2FGlobal_Objects%2FArray&level=high)
 
-  
-
 The **`Array`** object, as with arrays in other programming languages, enables [storing a collection of multiple items under a single variable name](/en-US/docs/Learn_web_development/Core/Scripting/Arrays), and has members for [performing common array operations](#examples).
 
 ## [Description](#description) ##
@@ -477,7 +475,7 @@ Returns a new [*array iterator*](/en-US/docs/Web/JavaScript/Guide/Iterators_and_
 [`Array.prototype.with()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/with)
 Returns a new array with the element at the given index replaced with the given value, without modifying the original array.
 
-[`Array.prototype[Symbol.iterator]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.iterator)
+[`Array.prototype\[Symbol.iterator\]()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Symbol.iterator)
 An alias for the [`values()`](/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values) method by default.
 
 ## [Examples](#examples) ##

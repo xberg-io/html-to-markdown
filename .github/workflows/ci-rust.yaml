@@ -238,6 +238,18 @@ jobs:
         run: task bench:compare ALLOW_HOST_MISMATCH=true
         shell: bash
 
+      # ~keep Output-content gate, distinct from the timing gate above: `bench:compare` only
+      # sees `output_bytes`, so a change that rewrites text without changing its length is
+      # invisible to it. `bench:oracle` diffs the checked-in snapshots line by line and is
+      # fully deterministic, so it needs none of the host-provenance handling above.
+      # `always()` so a timing failure cannot mask a content regression, or the reverse --
+      # each gate reports on its own. It ran in no workflow until #495, by which point 76 of
+      # the 116 snapshots had drifted unnoticed, one of them a real defect (#494).
+      - name: Verify output snapshots
+        if: always()
+        run: task bench:oracle
+        shell: bash
+
       - name: Cleanup Rust cache
         if: always() && steps.checkout.outcome == 'success'
         uses: xberg-io/actions/cleanup-rust-cache@v1

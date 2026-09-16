@@ -1,5 +1,3 @@
-
-
 [Learn React](/learn)![SVG Image](data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHdpZHRoPSIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNi44NjYxMiAxMy42MTYxQzYuMzc3OTYgMTQuMTA0MyA2LjM3Nzk2IDE0Ljg5NTcgNi44NjYxMiAxNS4zODM5QzcuMzU0MjcgMTUuODcyIDguMTQ1NzIgMTUuODcyIDguNjMzODggMTUuMzgzOUwxMy4xMzM5IDEwLjg4MzlDMTMuNjIyIDEwLjM5NTcgMTMuNjIyIDkuNjA0MjggMTMuMTMzOSA5LjExNjEyTDguNjMzODggNC42MTYxMkM4LjE0NTcyIDQuMTI3OTcgNy4zNTQyNyA0LjEyNzk3IDYuODY2MTIgNC42MTYxMkM2LjM3Nzk2IDUuMTA0MjggNi4zNzc5NiA1Ljg5NTczIDYuODY2MTIgNi4zODM4OEwxMC40ODIyIDEwTDYuODY2MTIgMTMuNjE2MVoiIGZpbGw9ImN1cnJlbnRDb2xvciIgLz48L3N2Zz4=)
 
 ![SVG Image](data:image/svg+xml;base64,PHN2ZyBjbGFzcz0idy0zLjUgaC0zLjUgbWUtMS41IiBmaWxsPSJub25lIiBoZWlnaHQ9IjFlbSIgdmlld0JveD0iMCAwIDE4IDE4IiB3aWR0aD0iMWVtIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTUuNDAzODIgMTUuMzY3MUM1LjAzMzMyIDE1LjE5MDEgNC43MDA4MSAxNC45MzgxIDQuNDI0ODEgMTQuNjI4NkM0LjM0ODMxIDE0LjU0MzEgNC4yMzkzMSAxNC41MDAxIDQuMTI5ODEgMTQuNTIwNkwzLjY2MTgxIDE0LjYwODFDMy4zMzUzMSAxNC42NjkxIDMuMDIwMzIgMTQuNDM2MSAyLjk2MjMyIDE0LjA4NzZMMS4zMDk4MSA0LjEyNTEyQzEuMjgxODEgMy45NTY2MiAxLjMxNzMxIDMuNzg2MSAxLjQwOTgxIDMuNjQ1NkMxLjUwMjMxIDMuNTA1MSAxLjY0MDgyIDMuNDExNjIgMS43OTkzMiAzLjM4MTYyTDMuMjIxMzEgMy4wMDAxMkMzLjM3NjgxIDIuOTcwNjIgMy40ODk4MSAyLjgyNzYxIDMuNDg5ODEgMi42NTk2MVYxLjkxMDFDMy40ODk4MSAxLjgyNzYgMy40OTM4MSAxLjc0NTYxIDMuNDk5MzEgMS42NjQ2MUMzLjUwOTMxIDEuNTM0NjEgMy4zNTE4MSAxLjU3MjExIDMuMzUxODEgMS41NzIxMUwxLjY0MzgxIDIuMDA3NkMxLjE4NDgxIDIuMDkzNiAwLjc1MTMxNiAyLjMyNjYyIDAuNDUxMzE2IDIuNzA2MTJDMC4wODA4MTYyIDMuMTczNjIgLTAuMDY4Njg4NSAzLjc3MjU5IDAuMDI5MzExNSA0LjM2NDU5TDEuNjgyMzEgMTQuMzI4MUMxLjg0NTMxIDE1LjMwODEgMi42NTAzMSAxNi4wMDAxIDMuNTU2MzEgMTYuMDAwMUMzLjY2NTMxIDE2LjAwMDEgMy43NzYzMSAxNS45ODk2IDMuODg3MzEgMTUuOTY5MUw1LjM2NjMyIDE1LjY5MTZDNS41MjMzMiAxNS42NjI2IDUuNTQ5ODIgMTUuNDM2NiA1LjQwMzgyIDE1LjM2NzFaTTE0LjkzMzEgNC41NTgwMUgxMi45MTE2QzEyLjEzNTEgNC41NTgwMSAxMS41MDAxIDMuOTE1MDIgMTEuNTAwMSAzLjEyOTUyVjEuMDY4MDJDMTEuNTAwMSAwLjQ4MDUyNCAxMS4wMTk2IDAgMTAuNDMyMSAwSDcuNDQxNjFDNi4zNjkxMSAwIDUuNTAwMTEgMC44Nzk1MDggNS41MDAxMSAxLjk2NDUxVjEyLjE2NjVDNS41MDAxMSAxMy4xNzkgNi4zMzQxMiAxNCA3LjM2MjYyIDE0SDE0LjEzNzFDMTUuMTY2MSAxNCAxNi4wMDAxIDEzLjE3OSAxNi4wMDAxIDEyLjE2NjVWNS42MjVDMTYuMDAwMSA1LjAzOCAxNS41MjAxIDQuNTU4MDEgMTQuOTMzMSA0LjU1ODAxWiIgZmlsbD0iY3VycmVudENvbG9yIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIC8+IDxwYXRoIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEyLjU4ODggMC4wOTE0Mzg1QzEyLjQ0OTMgMC4wMDg0Mzg0NyAxMi41MTU4IDAuMjUyNDQ5IDEyLjUxNTggMC4yNTI0NDlDMTIuNTY1MyAwLjQyODQ0OSAxMi41OTE4IDAuNjEzNDUxIDEyLjU5MTggMC44MDQ0NTFWMi45MDI5NkMxMi41OTE4IDMuMTc2NDYgMTIuODE1OCAzLjQwMDQ2IDEzLjA5MDMgMy40MDA0NkgxNS4xNzE4QzE1LjM4ODMgMy40MDA0NiAxNS41OTY4IDMuNDM0OTUgMTUuNzkxOCAzLjQ5ODQ1QzE1Ljc5MTggMy40OTg0NSAxNS45MzczIDMuNTA4NDQgMTUuOTAwOCAzLjQzNDk0QzE1LjgzODMgMy4zMzc0NCAxNS43NjczIDMuMjQ0OTQgMTUuNjgzMyAzLjE2MDQ0TDEyLjgzMDMgMC4yODk0NjdDMTIuNzU1OCAwLjIxNDQ2NyAxMi42NzQzIDAuMTQ5NDM4IDEyLjU4ODggMC4wOTE0Mzg1WiIgZmlsbD0iY3VycmVudENvbG9yIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIC8+PC9zdmc+)Copy pageCopy
@@ -24,13 +22,13 @@ React apps are made out of *components*. A component is a piece of the UI (user 
 React components are JavaScript functions that return markup:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  return (  
+  return (
 
-    <button>I'm a button</button>  
+    <button>I'm a button</button>
 
-  );  
+  );
 
 }
 ```
@@ -38,19 +36,19 @@ function MyButton() {
 Now that you’ve declared `MyButton`, you can nest it into another component:
 
 ```
-export default function MyApp() {  
+export default function MyApp() {
 
-  return (  
+  return (
 
-    <div>  
+    <div>
 
-      <h1>Welcome to my app</h1>  
+      <h1>Welcome to my app</h1>
 
-      <MyButton />  
+      <MyButton />
 
-    </div>  
+    </div>
 
-  );  
+  );
 
 }
 ```
@@ -99,19 +97,19 @@ The markup syntax you’ve seen above is called *JSX*. It is optional, but most 
 JSX is stricter than HTML. You have to close tags like `<br />`. Your component also can’t return multiple JSX tags. You have to wrap them into a shared parent, like a `<div>...</div>` or an empty `<>...</>` wrapper:
 
 ```
-function AboutPage() {  
+function AboutPage() {
 
-  return (  
+  return (
 
-    <>  
+    <>
 
-      <h1>About</h1>  
+      <h1>About</h1>
 
-      <p>Hello there.<br />How do you do?</p>  
+      <p>Hello there.<br />How do you do?</p>
 
-    </>  
+    </>
 
-  );  
+  );
 
 }
 ```
@@ -129,11 +127,11 @@ In React, you specify a CSS class with `className`. It works the same way as the
 Then you write the CSS rules for it in a separate CSS file:
 
 ```
-/* In your CSS */  
+/* In your CSS */
 
-.avatar {  
+.avatar {
 
-  border-radius: 50%;  
+  border-radius: 50%;
 
 }
 ```
@@ -145,13 +143,13 @@ React does not prescribe how you add CSS files. In the simplest case, you’ll a
 JSX lets you put markup into JavaScript. Curly braces let you “escape back” into JavaScript so that you can embed some variable from your code and display it to the user. For example, this will display `user.name`:
 
 ```
-return (  
+return (
 
-  <h1>  
+  <h1>
 
-    {user.name}  
+    {user.name}
 
-  </h1>  
+  </h1>
 
 );
 ```
@@ -159,15 +157,15 @@ return (
 You can also “escape into JavaScript” from JSX attributes, but you have to use curly braces *instead of* quotes. For example, `className="avatar"` passes the `"avatar"` string as the CSS class, but `src={user.imageUrl}` reads the JavaScript `user.imageUrl` variable value, and then passes that value as the `src` attribute:
 
 ```
-return (  
+return (
 
-  <img  
+  <img
 
-    className="avatar"  
+    className="avatar"
 
-    src={user.imageUrl}  
+    src={user.imageUrl}
 
-  />  
+  />
 
 );
 ```
@@ -218,25 +216,25 @@ In the above example, `style={{}}` is not a special syntax, but a regular `{}` o
 In React, there is no special syntax for writing conditions. Instead, you’ll use the same techniques as you use when writing regular JavaScript code. For example, you can use an [`if`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else) statement to conditionally include JSX:
 
 ```
-let content;  
+let content;
 
-if (isLoggedIn) {  
+if (isLoggedIn) {
 
-  content = <AdminPanel />;  
+  content = <AdminPanel />;
 
-} else {  
+} else {
 
-  content = <LoginForm />;  
+  content = <LoginForm />;
 
-}  
+}
 
-return (  
+return (
 
-  <div>  
+  <div>
 
-    {content}  
+    {content}
 
-  </div>  
+  </div>
 
 );
 ```
@@ -244,17 +242,17 @@ return (
 If you prefer more compact code, you can use the [conditional `?` operator.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator) Unlike `if`, it works inside JSX:
 
 ```
-<div>  
+<div>
 
-  {isLoggedIn ? (  
+  {isLoggedIn ? (
 
-    <AdminPanel />  
+    <AdminPanel />
 
-  ) : (  
+  ) : (
 
-    <LoginForm />  
+    <LoginForm />
 
-  )}  
+  )}
 
 </div>
 ```
@@ -262,9 +260,9 @@ If you prefer more compact code, you can use the [conditional `?` operator.](htt
 When you don’t need the `else` branch, you can also use a shorter [logical `&&` syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation):
 
 ```
-<div>  
+<div>
 
-  {isLoggedIn && <AdminPanel />}  
+  {isLoggedIn && <AdminPanel />}
 
 </div>
 ```
@@ -278,13 +276,13 @@ You will rely on JavaScript features like [`for` loop](https://developer.mozilla
 For example, let’s say you have an array of products:
 
 ```
-const products = [  
+const products = [
 
-  { title: 'Cabbage', id: 1 },  
+  { title: 'Cabbage', id: 1 },
 
-  { title: 'Garlic', id: 2 },  
+  { title: 'Garlic', id: 2 },
 
-  { title: 'Apple', id: 3 },  
+  { title: 'Apple', id: 3 },
 
 ];
 ```
@@ -292,19 +290,19 @@ const products = [
 Inside your component, use the `map()` function to transform an array of products into an array of `<li>` items:
 
 ```
-const listItems = products.map(product =>  
+const listItems = products.map(product =>
 
-  <li key={product.id}>  
+  <li key={product.id}>
 
-    {product.title}  
+    {product.title}
 
-  </li>  
+  </li>
 
-);  
+);
 
-return (  
+return (
 
-  <ul>{listItems}</ul>  
+  <ul>{listItems}</ul>
 
 );
 ```
@@ -353,23 +351,23 @@ export default function ShoppingList() {
 You can respond to events by declaring *event handler* functions inside your components:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  function handleClick() {  
+  function handleClick() {
 
-    alert('You clicked me!');  
+    alert('You clicked me!');
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <button onClick={handleClick}>  
+    <button onClick={handleClick}>
 
-      Click me  
+      Click me
 
-    </button>  
+    </button>
 
-  );  
+  );
 
 }
 ```
@@ -389,9 +387,9 @@ import { useState } from 'react';
 Now you can declare a *state variable* inside your component:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
   // ...
 ```
@@ -401,25 +399,25 @@ You’ll get two things from `useState`: the current state (`count`), and the fu
 The first time the button is displayed, `count` will be `0` because you passed `0` to `useState()`. When you want to change state, call `setCount()` and pass the new value to it. Clicking this button will increment the counter:
 
 ```
-function MyButton() {  
+function MyButton() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
-  function handleClick() {  
+  function handleClick() {
 
-    setCount(count + 1);  
+    setCount(count + 1);
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <button onClick={handleClick}>  
+    <button onClick={handleClick}>
 
-      Clicked {count} times  
+      Clicked {count} times
 
-    </button>  
+    </button>
 
-  );  
+  );
 
 }
 ```
@@ -480,13 +478,13 @@ Hooks are more restrictive than other functions. You can only call Hooks *at the
 
 In the previous example, each `MyButton` had its own independent `count`, and when each button was clicked, only the `count` for the button clicked changed:
 
-![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. Both MyButton components contain a count with value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child.dark.png&amp;w=828&amp;q=75)
-![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. Both MyButton components contain a count with value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child.png&amp;w=828&amp;q=75)
+![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. Both MyButton components contain a count with value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child.dark.png&w=828&q=75)
+![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. Both MyButton components contain a count with value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child.png&w=828&q=75)
 
 *Initially, each `MyButton`’s `count` state is `0`*
 
-![The same diagram as the previous, with the count of the first child MyButton component highlighted indicating a click with the count value incremented to one. The second MyButton component still contains value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child_clicked.dark.png&amp;w=828&amp;q=75)
-![The same diagram as the previous, with the count of the first child MyButton component highlighted indicating a click with the count value incremented to one. The second MyButton component still contains value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child_clicked.png&amp;w=828&amp;q=75)
+![The same diagram as the previous, with the count of the first child MyButton component highlighted indicating a click with the count value incremented to one. The second MyButton component still contains value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child_clicked.dark.png&w=828&q=75)
+![The same diagram as the previous, with the count of the first child MyButton component highlighted indicating a click with the count value incremented to one. The second MyButton component still contains value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_child_clicked.png&w=828&q=75)
 
 *The first `MyButton` updates its `count` to `1`*
 
@@ -496,13 +494,13 @@ To make both `MyButton` components display the same `count` and update together,
 
 In this example, it is `MyApp`:
 
-![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. MyApp contains a count value of zero which is passed down to both of the MyButton components, which also show value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent.dark.png&amp;w=828&amp;q=75)
-![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. MyApp contains a count value of zero which is passed down to both of the MyButton components, which also show value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent.png&amp;w=828&amp;q=75)
+![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. MyApp contains a count value of zero which is passed down to both of the MyButton components, which also show value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent.dark.png&w=828&q=75)
+![Diagram showing a tree of three components, one parent labeled MyApp and two children labeled MyButton. MyApp contains a count value of zero which is passed down to both of the MyButton components, which also show value zero.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent.png&w=828&q=75)
 
 *Initially, `MyApp`’s `count` state is `0` and is passed down to both children*
 
-![The same diagram as the previous, with the count of the parent MyApp component highlighted indicating a click with the value incremented to one. The flow to both of the children MyButton components is also highlighted, and the count value in each child is set to one indicating the value was passed down.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent_clicked.dark.png&amp;w=828&amp;q=75)
-![The same diagram as the previous, with the count of the parent MyApp component highlighted indicating a click with the value incremented to one. The flow to both of the children MyButton components is also highlighted, and the count value in each child is set to one indicating the value was passed down.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent_clicked.png&amp;w=828&amp;q=75)
+![The same diagram as the previous, with the count of the parent MyApp component highlighted indicating a click with the value incremented to one. The flow to both of the children MyButton components is also highlighted, and the count value in each child is set to one indicating the value was passed down.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent_clicked.dark.png&w=828&q=75)
+![The same diagram as the previous, with the count of the parent MyApp component highlighted indicating a click with the value incremented to one. The flow to both of the children MyButton components is also highlighted, and the count value in each child is set to one indicating the value was passed down.](/_next/image?url=%2Fimages%2Fdocs%2Fdiagrams%2Fsharing_data_parent_clicked.png&w=828&q=75)
 
 *On click, `MyApp` updates its `count` state to `1` and passes it down to both children*
 
@@ -511,35 +509,35 @@ Now when you click either button, the `count` in `MyApp` will change, which will
 First, *move the state up* from `MyButton` into `MyApp`:
 
 ```
-export default function MyApp() {  
+export default function MyApp() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
-  function handleClick() {  
+  function handleClick() {
 
-    setCount(count + 1);  
+    setCount(count + 1);
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <div>  
+    <div>
 
-      <h1>Counters that update separately</h1>  
+      <h1>Counters that update separately</h1>
 
-      <MyButton />  
+      <MyButton />
 
-      <MyButton />  
+      <MyButton />
 
-    </div>  
+    </div>
 
-  );  
+  );
 
-}  
+}
 
-function MyButton() {  
+function MyButton() {
 
-  // ... we're moving code from here ...  
+  // ... we're moving code from here ...
 
 }
 ```
@@ -547,29 +545,29 @@ function MyButton() {
 Then, *pass the state down* from `MyApp` to each `MyButton`, together with the shared click handler. You can pass information to `MyButton` using the JSX curly braces, just like you previously did with built-in tags like `<img>`:
 
 ```
-export default function MyApp() {  
+export default function MyApp() {
 
-  const [count, setCount] = useState(0);  
+  const [count, setCount] = useState(0);
 
-  function handleClick() {  
+  function handleClick() {
 
-    setCount(count + 1);  
+    setCount(count + 1);
 
-  }  
+  }
 
-  return (  
+  return (
 
-    <div>  
+    <div>
 
-      <h1>Counters that update together</h1>  
+      <h1>Counters that update together</h1>
 
-      <MyButton count={count} onClick={handleClick} />  
+      <MyButton count={count} onClick={handleClick} />
 
-      <MyButton count={count} onClick={handleClick} />  
+      <MyButton count={count} onClick={handleClick} />
 
-    </div>  
+    </div>
 
-  );  
+  );
 
 }
 ```
@@ -579,17 +577,17 @@ The information you pass down like this is called *props*. Now the `MyApp` compo
 Finally, change `MyButton` to *read* the props you have passed from its parent component:
 
 ```
-function MyButton({ count, onClick }) {  
+function MyButton({ count, onClick }) {
 
-  return (  
+  return (
 
-    <button onClick={onClick}>  
+    <button onClick={onClick}>
 
-      Clicked {count} times  
+      Clicked {count} times
 
-    </button>  
+    </button>
 
-  );  
+  );
 
 }
 ```

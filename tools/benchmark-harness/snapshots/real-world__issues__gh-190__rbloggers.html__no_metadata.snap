@@ -115,7 +115,7 @@ One more example: the simple main effects of the variable dose of vitamin on the
 aov1 <- aov(effort~dose, data=vitamin_female_blue)
 summary(aov1)
 
- Df Sum Sq Mean Sq F value Pr(>F)  
+Df Sum Sq Mean Sq F value Pr(>F)  
 dose 2 399.6 199.81 45.57 <2e-16
 
 ```
@@ -146,7 +146,7 @@ To **leave a comment** for the author, please follow the link and comment on the
 ---
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
-[![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&#038;ssl=1)](https://feeds.feedburner.com/RBloggers)
+[![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&ssl=1)](https://feeds.feedburner.com/RBloggers)
 
 > [R bloggers Facebook page](https://www.facebook.com/rbloggers/)
 
@@ -159,7 +159,7 @@ Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com
 - [How to write the first for loop in R](https://www.r-bloggers.com/2015/12/how-to-write-the-first-for-loop-in-r/ "How to write the first for loop in R")
 - [How to Calculate a Cumulative Average in R](https://www.r-bloggers.com/2022/03/how-to-calculate-a-cumulative-average-in-r/ "How to Calculate a Cumulative Average in R")
 - [Date Formats in R](https://www.r-bloggers.com/2013/08/date-formats-in-r/ "Date Formats in R")
-- [Complete tutorial on using 'apply' functions in R](https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/ "Complete tutorial on using &#039;apply&#039; functions in R")
+- [Complete tutorial on using 'apply' functions in R](https://www.r-bloggers.com/2022/03/complete-tutorial-on-using-apply-functions-in-r/ "Complete tutorial on using 'apply' functions in R")
 - [R – Sorting a data frame by the contents of a column](https://www.r-bloggers.com/2010/02/r-sorting-a-data-frame-by-the-contents-of-a-column/ "R – Sorting a data frame by the contents of a column")
 
 #### Sponsors
@@ -410,6 +410,6 @@ May 2005 (1)
 
 Copyright © 2022 | [MH Corporate basic by MH Themes](https://www.mhthemes.com/)
 
-# *Never miss an update!*  **Subscribe to R-bloggers** to receive  e-mails with the latest R posts.  (You will not see this message again.)
+# *Never miss an update!* **Subscribe to R-bloggers** to receive e-mails with the latest R posts. (You will not see this message again.)
 
 [Click here to close (This popup will not appear again)](#)

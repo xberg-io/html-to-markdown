@@ -1,6 +1,10 @@
+---
+meta-Generator: Microsoft Word 15
+meta-Originator: Microsoft Word 15
+meta-ProgId: Word.Document
+title: Pipeline Architecture
+---
 뿯붿
-
-Pipeline Architecture
 
 # Pipeline Architecture
 
@@ -12,7 +16,7 @@ reads messages from an input pipe, one at a time, processes each message, then w
 
 the result to an output pipe. Thus, it is possible to form **pipelines** of filters connected by pipes:
 
-<![if !vml]>![](pipeline_files/image002.gif)<![endif]>
+![](pipeline_files/image002.gif)
 
 The inspiration for pipeline architectures probably comes
 
@@ -44,7 +48,7 @@ LISP programmers can represent pipes by lists and filters by
 
 list processing procedures. Pipelines are built using procedural composition.
 
-For example, assume the following LISP procedures are defined[<![if !supportFootnotes]>[1]<![endif]>](#_ftn1 ""). In each
+For example, assume the following LISP procedures are defined[[1]](#_ftn1). In each
 
 case the nums parameter represents a list of integers:
 
@@ -61,7 +65,7 @@ We can use these procedures to build a pipeline that sums
 
 the squares of odd integers:
 
-<![if !vml]>![](pipeline_files/image004.gif)<![endif]>
+![](pipeline_files/image004.gif)
 
 Here's the corresponding LISP definition:
 
@@ -73,7 +77,7 @@ Pipelines have also been used to implement compilers. Each
 
 stage of compilation is a filter:
 
-<![if !vml]>![](pipeline_files/image006.gif)<![endif]>
+![](pipeline_files/image006.gif)
 
 The scanner reads a stream of characters from a source code
 
@@ -190,7 +194,7 @@ writes a message to pipe 1, the transformer reads the message, transforms it,
 
 then writes it to pipe 2. The consumer reads the message, then consumes it:
 
-<![if !vml]>![](pipeline_files/image008.gif)<![endif]>
+![](pipeline_files/image008.gif)
 
 ### 뿯½Dynamic Structure: Demand-Driven
 
@@ -208,7 +212,7 @@ pipe 2. This message is the value returned by the consumer's original call to
 
 read():
 
-<![if !vml]>![](pipeline_files/image010.gif)<![endif]>
+![](pipeline_files/image010.gif)
 
 ### A Problem
 
@@ -252,9 +256,6 @@ input pipes. In the demand-driven model filters subscribe to their output
 
 pipes.
 
-<![if !supportFootnotes]>  
-
 ---
-<![endif]>
 
-[<![if !supportFootnotes]>[1]<![endif]>](#_ftnref1 "") See Programming Note 8뿯½ in Appendix 1..
+[[1]](#_ftnref1) See Programming Note 8뿯½ in Appendix 1..
