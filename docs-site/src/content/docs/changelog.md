@@ -50,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   disagreed on this input; they are now pinned together by a parity test. Note that the reported
   `white-space: pre` is incidental -- that property is not implemented, and the defect reproduced
   without it, exactly as a browser collapses the newline to a space either way.
+  The wrapper contributes a separator only when the next word butts straight up against it;
+  text that already opens with whitespace supplies its own, and is left alone.
 
 - **`keepInlineImagesIn` now means something for `<a>`**
   ([#492](https://github.com/xberg-io/html-to-markdown/issues/492)). The option was consulted for
