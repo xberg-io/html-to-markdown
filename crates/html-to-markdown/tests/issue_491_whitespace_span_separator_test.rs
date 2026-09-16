@@ -105,3 +105,16 @@ fn should_not_double_a_separator_when_the_wrapper_follows_a_space() {
     let out = content("Alpha <span>\n</span>13");
     assert_eq!(out, "Alpha 13\n", "actual: {out:?}");
 }
+
+#[test]
+fn should_not_double_a_separator_when_the_following_text_starts_with_whitespace() {
+    // ~keep The next sibling's own leading whitespace already separates the words, so the
+    // ~keep wrapper must not contribute a second space. Found by bracketing this commit's
+    // ~keep binary against its parent over the HTML corpus: a Docusaurus admonition
+    // ~keep (`<span>\n<svg/>\n</span>\n  Tip`) went from ") Tip" to ")  Tip".
+    let out = content("<div><span>\n</span>\n   Tip</div>");
+    assert_eq!(out, "Tip\n", "actual: {out:?}");
+
+    let out = content("<div>Alpha<span>\n</span>\n   Tip</div>");
+    assert_eq!(out, "Alpha Tip\n", "actual: {out:?}");
+}

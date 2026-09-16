@@ -104,10 +104,17 @@ pub fn next_sibling_is_inline_content(node_handle: &tl::NodeHandle, parser: &tl:
             return info.is_inline_like;
         }
         if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
-            if raw.as_utf8_str().trim().is_empty() {
+            let decoded = raw.as_utf8_str();
+            if decoded.trim().is_empty() {
                 continue;
             }
-            return true;
+            // ~keep Text that already opens with whitespace supplies the separator itself, so
+            // ~keep reporting it as inline content here stacks a second space on top of it.
+            // ~keep `<span>\n</span>\n   Tip` (a Docusaurus admonition icon) regressed from
+            // ~keep ") Tip" to ")  Tip" exactly this way -- the wrapper is only load-bearing
+            // ~keep when the next word butts straight up against it, as in issue #491's
+            // ~keep `Alpha<span>\n</span>13`.
+            return !decoded.starts_with(char::is_whitespace);
         }
     }
 
