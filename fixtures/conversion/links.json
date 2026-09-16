@@ -148,5 +148,32 @@
       "stem": "link_image_inside",
       "title": "Image inside a link produces a linked image"
     }
+  },
+  {
+    "id": "link_wrapping_table_renders_table",
+    "description": "An anchor wrapping a table renders the table as a block instead of an escaped link label",
+    "input": {
+      "html": "<a href=\"https://example.com/outer\"><table><tr><td><a href=\"https://example.com/inner\">Inner</a></td></tr></table></a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "[https://example.com/outer](https://example.com/outer)",
+          "[Inner](https://example.com/inner)"
+        ]
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "\\|"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_wrapping_table_renders_table",
+      "title": "An anchor wrapping a table renders the table"
+    }
   }
 ]

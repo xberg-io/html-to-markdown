@@ -279,5 +279,56 @@
       "stem": "table_nested_in_single_cell_renders_separately",
       "title": "A table nested in a single-cell row renders as its own table"
     }
+  },
+  {
+    "id": "table_nested_in_wrapper_renders_separately",
+    "description": "A nested table wrapped in a div still renders as its own table rather than raw pipes",
+    "input": {
+      "html": "<table><tr><th>Summary</th></tr><tr><td>Before<div><table><tr><th>Item</th><th>Amount</th></tr><tr><td>Alpha</td><td>10</td></tr></table></div></td></tr></table>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "| Item  | Amount |",
+          "| Alpha | 10     |",
+          "Before"
+        ]
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "\\|"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "table_nested_in_wrapper_renders_separately",
+      "title": "A div-wrapped nested table renders as its own table"
+    }
+  },
+  {
+    "id": "table_content_after_unclosed_row_survives",
+    "description": "Content following a table whose last row is never closed is still converted",
+    "input": {
+      "html": "<table><tr><th>Before</th></tr><tr></table><p>Visible footer</p>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "| Before |",
+          "| ------ |",
+          "Visible footer"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "table_content_after_unclosed_row_survives",
+      "title": "Content after an unclosed table row survives"
+    }
   }
 ]

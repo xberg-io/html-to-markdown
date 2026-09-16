@@ -110,5 +110,33 @@
       "stem": "image_linked",
       "title": "Image inside an anchor produces a linked image"
     }
+  },
+  {
+    "id": "image_kept_inline_in_link",
+    "description": "keep_inline_images_in naming 'a' keeps an image inside a link that also holds a block element",
+    "input": {
+      "html": "<a href=\"https://example.com/file.pdf\"><img src=\"pdf.png\"><p>Download PDF</p></a>",
+      "options": {
+        "keep_inline_images_in": [
+          "a"
+        ]
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![](pdf.png)",
+          "Download PDF",
+          "https://example.com/file.pdf"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "image_kept_inline_in_link",
+      "title": "keep_inline_images_in keeps an image inside a link"
+    }
   }
 ]
