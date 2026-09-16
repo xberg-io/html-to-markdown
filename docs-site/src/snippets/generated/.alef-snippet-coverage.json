@@ -44,6 +44,7 @@
     "c/conversion/heading_h5.md",
     "c/conversion/heading_h6.md",
     "c/conversion/image_figure_figcaption.md",
+    "c/conversion/image_kept_inline_in_link.md",
     "c/conversion/image_linked.md",
     "c/conversion/image_no_alt.md",
     "c/conversion/image_simple.md",
@@ -60,6 +61,7 @@
     "c/conversion/link_simple.md",
     "c/conversion/link_with_bold_text.md",
     "c/conversion/link_with_title.md",
+    "c/conversion/link_wrapping_table_renders_table.md",
     "c/conversion/list_definition_dl.md",
     "c/conversion/list_item_multiple_paragraphs.md",
     "c/conversion/list_mixed_nested.md",
@@ -70,6 +72,7 @@
     "c/conversion/paragraph_multiple.md",
     "c/conversion/paragraph_nested_divs.md",
     "c/conversion/paragraph_simple.md",
+    "c/conversion/paragraph_whitespace_only_span_separates_words.md",
     "c/conversion/paragraph_with_inline_formatting.md",
     "c/conversion/paragraph_with_line_breaks.md",
     "c/conversion/semantic_abbr.md",
@@ -82,10 +85,12 @@
     "c/conversion/semantic_sub_superscript.md",
     "c/conversion/simple_table.md",
     "c/conversion/strike_renders_as_strikethrough.md",
+    "c/conversion/table_content_after_unclosed_row_survives.md",
     "c/conversion/table_empty.md",
     "c/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "c/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "c/conversion/table_nested_in_single_cell_renders_separately.md",
+    "c/conversion/table_nested_in_wrapper_renders_separately.md",
     "c/conversion/table_no_thead.md",
     "c/conversion/table_pipe_chars_in_content.md",
     "c/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -351,6 +356,7 @@
     "csharp/conversion/heading_h5.md",
     "csharp/conversion/heading_h6.md",
     "csharp/conversion/image_figure_figcaption.md",
+    "csharp/conversion/image_kept_inline_in_link.md",
     "csharp/conversion/image_linked.md",
     "csharp/conversion/image_no_alt.md",
     "csharp/conversion/image_simple.md",
@@ -367,6 +373,7 @@
     "csharp/conversion/link_simple.md",
     "csharp/conversion/link_with_bold_text.md",
     "csharp/conversion/link_with_title.md",
+    "csharp/conversion/link_wrapping_table_renders_table.md",
     "csharp/conversion/list_definition_dl.md",
     "csharp/conversion/list_item_multiple_paragraphs.md",
     "csharp/conversion/list_mixed_nested.md",
@@ -377,6 +384,7 @@
     "csharp/conversion/paragraph_multiple.md",
     "csharp/conversion/paragraph_nested_divs.md",
     "csharp/conversion/paragraph_simple.md",
+    "csharp/conversion/paragraph_whitespace_only_span_separates_words.md",
     "csharp/conversion/paragraph_with_inline_formatting.md",
     "csharp/conversion/paragraph_with_line_breaks.md",
     "csharp/conversion/semantic_abbr.md",
@@ -389,10 +397,12 @@
     "csharp/conversion/semantic_sub_superscript.md",
     "csharp/conversion/simple_table.md",
     "csharp/conversion/strike_renders_as_strikethrough.md",
+    "csharp/conversion/table_content_after_unclosed_row_survives.md",
     "csharp/conversion/table_empty.md",
     "csharp/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "csharp/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "csharp/conversion/table_nested_in_single_cell_renders_separately.md",
+    "csharp/conversion/table_nested_in_wrapper_renders_separately.md",
     "csharp/conversion/table_no_thead.md",
     "csharp/conversion/table_pipe_chars_in_content.md",
     "csharp/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -658,6 +668,7 @@
     "dart/conversion/heading_h5.md",
     "dart/conversion/heading_h6.md",
     "dart/conversion/image_figure_figcaption.md",
+    "dart/conversion/image_kept_inline_in_link.md",
     "dart/conversion/image_linked.md",
     "dart/conversion/image_no_alt.md",
     "dart/conversion/image_simple.md",
@@ -674,6 +685,7 @@
     "dart/conversion/link_simple.md",
     "dart/conversion/link_with_bold_text.md",
     "dart/conversion/link_with_title.md",
+    "dart/conversion/link_wrapping_table_renders_table.md",
     "dart/conversion/list_definition_dl.md",
     "dart/conversion/list_item_multiple_paragraphs.md",
     "dart/conversion/list_mixed_nested.md",
@@ -684,6 +696,7 @@
     "dart/conversion/paragraph_multiple.md",
     "dart/conversion/paragraph_nested_divs.md",
     "dart/conversion/paragraph_simple.md",
+    "dart/conversion/paragraph_whitespace_only_span_separates_words.md",
     "dart/conversion/paragraph_with_inline_formatting.md",
     "dart/conversion/paragraph_with_line_breaks.md",
     "dart/conversion/semantic_abbr.md",
@@ -696,10 +709,12 @@
     "dart/conversion/semantic_sub_superscript.md",
     "dart/conversion/simple_table.md",
     "dart/conversion/strike_renders_as_strikethrough.md",
+    "dart/conversion/table_content_after_unclosed_row_survives.md",
     "dart/conversion/table_empty.md",
     "dart/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "dart/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "dart/conversion/table_nested_in_single_cell_renders_separately.md",
+    "dart/conversion/table_nested_in_wrapper_renders_separately.md",
     "dart/conversion/table_no_thead.md",
     "dart/conversion/table_pipe_chars_in_content.md",
     "dart/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -965,6 +980,7 @@
     "elixir/conversion/heading_h5.md",
     "elixir/conversion/heading_h6.md",
     "elixir/conversion/image_figure_figcaption.md",
+    "elixir/conversion/image_kept_inline_in_link.md",
     "elixir/conversion/image_linked.md",
     "elixir/conversion/image_no_alt.md",
     "elixir/conversion/image_simple.md",
@@ -981,6 +997,7 @@
     "elixir/conversion/link_simple.md",
     "elixir/conversion/link_with_bold_text.md",
     "elixir/conversion/link_with_title.md",
+    "elixir/conversion/link_wrapping_table_renders_table.md",
     "elixir/conversion/list_definition_dl.md",
     "elixir/conversion/list_item_multiple_paragraphs.md",
     "elixir/conversion/list_mixed_nested.md",
@@ -991,6 +1008,7 @@
     "elixir/conversion/paragraph_multiple.md",
     "elixir/conversion/paragraph_nested_divs.md",
     "elixir/conversion/paragraph_simple.md",
+    "elixir/conversion/paragraph_whitespace_only_span_separates_words.md",
     "elixir/conversion/paragraph_with_inline_formatting.md",
     "elixir/conversion/paragraph_with_line_breaks.md",
     "elixir/conversion/semantic_abbr.md",
@@ -1003,10 +1021,12 @@
     "elixir/conversion/semantic_sub_superscript.md",
     "elixir/conversion/simple_table.md",
     "elixir/conversion/strike_renders_as_strikethrough.md",
+    "elixir/conversion/table_content_after_unclosed_row_survives.md",
     "elixir/conversion/table_empty.md",
     "elixir/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "elixir/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "elixir/conversion/table_nested_in_single_cell_renders_separately.md",
+    "elixir/conversion/table_nested_in_wrapper_renders_separately.md",
     "elixir/conversion/table_no_thead.md",
     "elixir/conversion/table_pipe_chars_in_content.md",
     "elixir/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -1272,6 +1292,7 @@
     "go/conversion/heading_h5.md",
     "go/conversion/heading_h6.md",
     "go/conversion/image_figure_figcaption.md",
+    "go/conversion/image_kept_inline_in_link.md",
     "go/conversion/image_linked.md",
     "go/conversion/image_no_alt.md",
     "go/conversion/image_simple.md",
@@ -1288,6 +1309,7 @@
     "go/conversion/link_simple.md",
     "go/conversion/link_with_bold_text.md",
     "go/conversion/link_with_title.md",
+    "go/conversion/link_wrapping_table_renders_table.md",
     "go/conversion/list_definition_dl.md",
     "go/conversion/list_item_multiple_paragraphs.md",
     "go/conversion/list_mixed_nested.md",
@@ -1298,6 +1320,7 @@
     "go/conversion/paragraph_multiple.md",
     "go/conversion/paragraph_nested_divs.md",
     "go/conversion/paragraph_simple.md",
+    "go/conversion/paragraph_whitespace_only_span_separates_words.md",
     "go/conversion/paragraph_with_inline_formatting.md",
     "go/conversion/paragraph_with_line_breaks.md",
     "go/conversion/semantic_abbr.md",
@@ -1310,10 +1333,12 @@
     "go/conversion/semantic_sub_superscript.md",
     "go/conversion/simple_table.md",
     "go/conversion/strike_renders_as_strikethrough.md",
+    "go/conversion/table_content_after_unclosed_row_survives.md",
     "go/conversion/table_empty.md",
     "go/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "go/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "go/conversion/table_nested_in_single_cell_renders_separately.md",
+    "go/conversion/table_nested_in_wrapper_renders_separately.md",
     "go/conversion/table_no_thead.md",
     "go/conversion/table_pipe_chars_in_content.md",
     "go/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -1579,6 +1604,7 @@
     "java/conversion/heading_h5.md",
     "java/conversion/heading_h6.md",
     "java/conversion/image_figure_figcaption.md",
+    "java/conversion/image_kept_inline_in_link.md",
     "java/conversion/image_linked.md",
     "java/conversion/image_no_alt.md",
     "java/conversion/image_simple.md",
@@ -1595,6 +1621,7 @@
     "java/conversion/link_simple.md",
     "java/conversion/link_with_bold_text.md",
     "java/conversion/link_with_title.md",
+    "java/conversion/link_wrapping_table_renders_table.md",
     "java/conversion/list_definition_dl.md",
     "java/conversion/list_item_multiple_paragraphs.md",
     "java/conversion/list_mixed_nested.md",
@@ -1605,6 +1632,7 @@
     "java/conversion/paragraph_multiple.md",
     "java/conversion/paragraph_nested_divs.md",
     "java/conversion/paragraph_simple.md",
+    "java/conversion/paragraph_whitespace_only_span_separates_words.md",
     "java/conversion/paragraph_with_inline_formatting.md",
     "java/conversion/paragraph_with_line_breaks.md",
     "java/conversion/semantic_abbr.md",
@@ -1617,10 +1645,12 @@
     "java/conversion/semantic_sub_superscript.md",
     "java/conversion/simple_table.md",
     "java/conversion/strike_renders_as_strikethrough.md",
+    "java/conversion/table_content_after_unclosed_row_survives.md",
     "java/conversion/table_empty.md",
     "java/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "java/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "java/conversion/table_nested_in_single_cell_renders_separately.md",
+    "java/conversion/table_nested_in_wrapper_renders_separately.md",
     "java/conversion/table_no_thead.md",
     "java/conversion/table_pipe_chars_in_content.md",
     "java/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -1886,6 +1916,7 @@
     "kotlin-android/conversion/heading_h5.md",
     "kotlin-android/conversion/heading_h6.md",
     "kotlin-android/conversion/image_figure_figcaption.md",
+    "kotlin-android/conversion/image_kept_inline_in_link.md",
     "kotlin-android/conversion/image_linked.md",
     "kotlin-android/conversion/image_no_alt.md",
     "kotlin-android/conversion/image_simple.md",
@@ -1902,6 +1933,7 @@
     "kotlin-android/conversion/link_simple.md",
     "kotlin-android/conversion/link_with_bold_text.md",
     "kotlin-android/conversion/link_with_title.md",
+    "kotlin-android/conversion/link_wrapping_table_renders_table.md",
     "kotlin-android/conversion/list_definition_dl.md",
     "kotlin-android/conversion/list_item_multiple_paragraphs.md",
     "kotlin-android/conversion/list_mixed_nested.md",
@@ -1912,6 +1944,7 @@
     "kotlin-android/conversion/paragraph_multiple.md",
     "kotlin-android/conversion/paragraph_nested_divs.md",
     "kotlin-android/conversion/paragraph_simple.md",
+    "kotlin-android/conversion/paragraph_whitespace_only_span_separates_words.md",
     "kotlin-android/conversion/paragraph_with_inline_formatting.md",
     "kotlin-android/conversion/paragraph_with_line_breaks.md",
     "kotlin-android/conversion/semantic_abbr.md",
@@ -1924,10 +1957,12 @@
     "kotlin-android/conversion/semantic_sub_superscript.md",
     "kotlin-android/conversion/simple_table.md",
     "kotlin-android/conversion/strike_renders_as_strikethrough.md",
+    "kotlin-android/conversion/table_content_after_unclosed_row_survives.md",
     "kotlin-android/conversion/table_empty.md",
     "kotlin-android/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "kotlin-android/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "kotlin-android/conversion/table_nested_in_single_cell_renders_separately.md",
+    "kotlin-android/conversion/table_nested_in_wrapper_renders_separately.md",
     "kotlin-android/conversion/table_no_thead.md",
     "kotlin-android/conversion/table_pipe_chars_in_content.md",
     "kotlin-android/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -2139,6 +2174,7 @@
     "php/conversion/heading_h5.md",
     "php/conversion/heading_h6.md",
     "php/conversion/image_figure_figcaption.md",
+    "php/conversion/image_kept_inline_in_link.md",
     "php/conversion/image_linked.md",
     "php/conversion/image_no_alt.md",
     "php/conversion/image_simple.md",
@@ -2155,6 +2191,7 @@
     "php/conversion/link_simple.md",
     "php/conversion/link_with_bold_text.md",
     "php/conversion/link_with_title.md",
+    "php/conversion/link_wrapping_table_renders_table.md",
     "php/conversion/list_definition_dl.md",
     "php/conversion/list_item_multiple_paragraphs.md",
     "php/conversion/list_mixed_nested.md",
@@ -2165,6 +2202,7 @@
     "php/conversion/paragraph_multiple.md",
     "php/conversion/paragraph_nested_divs.md",
     "php/conversion/paragraph_simple.md",
+    "php/conversion/paragraph_whitespace_only_span_separates_words.md",
     "php/conversion/paragraph_with_inline_formatting.md",
     "php/conversion/paragraph_with_line_breaks.md",
     "php/conversion/semantic_abbr.md",
@@ -2177,10 +2215,12 @@
     "php/conversion/semantic_sub_superscript.md",
     "php/conversion/simple_table.md",
     "php/conversion/strike_renders_as_strikethrough.md",
+    "php/conversion/table_content_after_unclosed_row_survives.md",
     "php/conversion/table_empty.md",
     "php/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "php/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "php/conversion/table_nested_in_single_cell_renders_separately.md",
+    "php/conversion/table_nested_in_wrapper_renders_separately.md",
     "php/conversion/table_no_thead.md",
     "php/conversion/table_pipe_chars_in_content.md",
     "php/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -2446,6 +2486,7 @@
     "python/conversion/heading_h5.md",
     "python/conversion/heading_h6.md",
     "python/conversion/image_figure_figcaption.md",
+    "python/conversion/image_kept_inline_in_link.md",
     "python/conversion/image_linked.md",
     "python/conversion/image_no_alt.md",
     "python/conversion/image_simple.md",
@@ -2462,6 +2503,7 @@
     "python/conversion/link_simple.md",
     "python/conversion/link_with_bold_text.md",
     "python/conversion/link_with_title.md",
+    "python/conversion/link_wrapping_table_renders_table.md",
     "python/conversion/list_definition_dl.md",
     "python/conversion/list_item_multiple_paragraphs.md",
     "python/conversion/list_mixed_nested.md",
@@ -2472,6 +2514,7 @@
     "python/conversion/paragraph_multiple.md",
     "python/conversion/paragraph_nested_divs.md",
     "python/conversion/paragraph_simple.md",
+    "python/conversion/paragraph_whitespace_only_span_separates_words.md",
     "python/conversion/paragraph_with_inline_formatting.md",
     "python/conversion/paragraph_with_line_breaks.md",
     "python/conversion/semantic_abbr.md",
@@ -2484,10 +2527,12 @@
     "python/conversion/semantic_sub_superscript.md",
     "python/conversion/simple_table.md",
     "python/conversion/strike_renders_as_strikethrough.md",
+    "python/conversion/table_content_after_unclosed_row_survives.md",
     "python/conversion/table_empty.md",
     "python/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "python/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "python/conversion/table_nested_in_single_cell_renders_separately.md",
+    "python/conversion/table_nested_in_wrapper_renders_separately.md",
     "python/conversion/table_no_thead.md",
     "python/conversion/table_pipe_chars_in_content.md",
     "python/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -2753,6 +2798,7 @@
     "r/conversion/heading_h5.md",
     "r/conversion/heading_h6.md",
     "r/conversion/image_figure_figcaption.md",
+    "r/conversion/image_kept_inline_in_link.md",
     "r/conversion/image_linked.md",
     "r/conversion/image_no_alt.md",
     "r/conversion/image_simple.md",
@@ -2769,6 +2815,7 @@
     "r/conversion/link_simple.md",
     "r/conversion/link_with_bold_text.md",
     "r/conversion/link_with_title.md",
+    "r/conversion/link_wrapping_table_renders_table.md",
     "r/conversion/list_definition_dl.md",
     "r/conversion/list_item_multiple_paragraphs.md",
     "r/conversion/list_mixed_nested.md",
@@ -2779,6 +2826,7 @@
     "r/conversion/paragraph_multiple.md",
     "r/conversion/paragraph_nested_divs.md",
     "r/conversion/paragraph_simple.md",
+    "r/conversion/paragraph_whitespace_only_span_separates_words.md",
     "r/conversion/paragraph_with_inline_formatting.md",
     "r/conversion/paragraph_with_line_breaks.md",
     "r/conversion/semantic_abbr.md",
@@ -2791,10 +2839,12 @@
     "r/conversion/semantic_sub_superscript.md",
     "r/conversion/simple_table.md",
     "r/conversion/strike_renders_as_strikethrough.md",
+    "r/conversion/table_content_after_unclosed_row_survives.md",
     "r/conversion/table_empty.md",
     "r/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "r/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "r/conversion/table_nested_in_single_cell_renders_separately.md",
+    "r/conversion/table_nested_in_wrapper_renders_separately.md",
     "r/conversion/table_no_thead.md",
     "r/conversion/table_pipe_chars_in_content.md",
     "r/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -3060,6 +3110,7 @@
     "ruby/conversion/heading_h5.md",
     "ruby/conversion/heading_h6.md",
     "ruby/conversion/image_figure_figcaption.md",
+    "ruby/conversion/image_kept_inline_in_link.md",
     "ruby/conversion/image_linked.md",
     "ruby/conversion/image_no_alt.md",
     "ruby/conversion/image_simple.md",
@@ -3076,6 +3127,7 @@
     "ruby/conversion/link_simple.md",
     "ruby/conversion/link_with_bold_text.md",
     "ruby/conversion/link_with_title.md",
+    "ruby/conversion/link_wrapping_table_renders_table.md",
     "ruby/conversion/list_definition_dl.md",
     "ruby/conversion/list_item_multiple_paragraphs.md",
     "ruby/conversion/list_mixed_nested.md",
@@ -3086,6 +3138,7 @@
     "ruby/conversion/paragraph_multiple.md",
     "ruby/conversion/paragraph_nested_divs.md",
     "ruby/conversion/paragraph_simple.md",
+    "ruby/conversion/paragraph_whitespace_only_span_separates_words.md",
     "ruby/conversion/paragraph_with_inline_formatting.md",
     "ruby/conversion/paragraph_with_line_breaks.md",
     "ruby/conversion/semantic_abbr.md",
@@ -3098,10 +3151,12 @@
     "ruby/conversion/semantic_sub_superscript.md",
     "ruby/conversion/simple_table.md",
     "ruby/conversion/strike_renders_as_strikethrough.md",
+    "ruby/conversion/table_content_after_unclosed_row_survives.md",
     "ruby/conversion/table_empty.md",
     "ruby/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "ruby/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "ruby/conversion/table_nested_in_single_cell_renders_separately.md",
+    "ruby/conversion/table_nested_in_wrapper_renders_separately.md",
     "ruby/conversion/table_no_thead.md",
     "ruby/conversion/table_pipe_chars_in_content.md",
     "ruby/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -3367,6 +3422,7 @@
     "rust/conversion/heading_h5.md",
     "rust/conversion/heading_h6.md",
     "rust/conversion/image_figure_figcaption.md",
+    "rust/conversion/image_kept_inline_in_link.md",
     "rust/conversion/image_linked.md",
     "rust/conversion/image_no_alt.md",
     "rust/conversion/image_simple.md",
@@ -3383,6 +3439,7 @@
     "rust/conversion/link_simple.md",
     "rust/conversion/link_with_bold_text.md",
     "rust/conversion/link_with_title.md",
+    "rust/conversion/link_wrapping_table_renders_table.md",
     "rust/conversion/list_definition_dl.md",
     "rust/conversion/list_item_multiple_paragraphs.md",
     "rust/conversion/list_mixed_nested.md",
@@ -3393,6 +3450,7 @@
     "rust/conversion/paragraph_multiple.md",
     "rust/conversion/paragraph_nested_divs.md",
     "rust/conversion/paragraph_simple.md",
+    "rust/conversion/paragraph_whitespace_only_span_separates_words.md",
     "rust/conversion/paragraph_with_inline_formatting.md",
     "rust/conversion/paragraph_with_line_breaks.md",
     "rust/conversion/semantic_abbr.md",
@@ -3405,10 +3463,12 @@
     "rust/conversion/semantic_sub_superscript.md",
     "rust/conversion/simple_table.md",
     "rust/conversion/strike_renders_as_strikethrough.md",
+    "rust/conversion/table_content_after_unclosed_row_survives.md",
     "rust/conversion/table_empty.md",
     "rust/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "rust/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "rust/conversion/table_nested_in_single_cell_renders_separately.md",
+    "rust/conversion/table_nested_in_wrapper_renders_separately.md",
     "rust/conversion/table_no_thead.md",
     "rust/conversion/table_pipe_chars_in_content.md",
     "rust/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -3674,6 +3734,7 @@
     "swift/conversion/heading_h5.md",
     "swift/conversion/heading_h6.md",
     "swift/conversion/image_figure_figcaption.md",
+    "swift/conversion/image_kept_inline_in_link.md",
     "swift/conversion/image_linked.md",
     "swift/conversion/image_no_alt.md",
     "swift/conversion/image_simple.md",
@@ -3690,6 +3751,7 @@
     "swift/conversion/link_simple.md",
     "swift/conversion/link_with_bold_text.md",
     "swift/conversion/link_with_title.md",
+    "swift/conversion/link_wrapping_table_renders_table.md",
     "swift/conversion/list_definition_dl.md",
     "swift/conversion/list_item_multiple_paragraphs.md",
     "swift/conversion/list_mixed_nested.md",
@@ -3700,6 +3762,7 @@
     "swift/conversion/paragraph_multiple.md",
     "swift/conversion/paragraph_nested_divs.md",
     "swift/conversion/paragraph_simple.md",
+    "swift/conversion/paragraph_whitespace_only_span_separates_words.md",
     "swift/conversion/paragraph_with_inline_formatting.md",
     "swift/conversion/paragraph_with_line_breaks.md",
     "swift/conversion/semantic_abbr.md",
@@ -3712,10 +3775,12 @@
     "swift/conversion/semantic_sub_superscript.md",
     "swift/conversion/simple_table.md",
     "swift/conversion/strike_renders_as_strikethrough.md",
+    "swift/conversion/table_content_after_unclosed_row_survives.md",
     "swift/conversion/table_empty.md",
     "swift/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "swift/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "swift/conversion/table_nested_in_single_cell_renders_separately.md",
+    "swift/conversion/table_nested_in_wrapper_renders_separately.md",
     "swift/conversion/table_no_thead.md",
     "swift/conversion/table_pipe_chars_in_content.md",
     "swift/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -3981,6 +4046,7 @@
     "typescript/conversion/heading_h5.md",
     "typescript/conversion/heading_h6.md",
     "typescript/conversion/image_figure_figcaption.md",
+    "typescript/conversion/image_kept_inline_in_link.md",
     "typescript/conversion/image_linked.md",
     "typescript/conversion/image_no_alt.md",
     "typescript/conversion/image_simple.md",
@@ -3997,6 +4063,7 @@
     "typescript/conversion/link_simple.md",
     "typescript/conversion/link_with_bold_text.md",
     "typescript/conversion/link_with_title.md",
+    "typescript/conversion/link_wrapping_table_renders_table.md",
     "typescript/conversion/list_definition_dl.md",
     "typescript/conversion/list_item_multiple_paragraphs.md",
     "typescript/conversion/list_mixed_nested.md",
@@ -4007,6 +4074,7 @@
     "typescript/conversion/paragraph_multiple.md",
     "typescript/conversion/paragraph_nested_divs.md",
     "typescript/conversion/paragraph_simple.md",
+    "typescript/conversion/paragraph_whitespace_only_span_separates_words.md",
     "typescript/conversion/paragraph_with_inline_formatting.md",
     "typescript/conversion/paragraph_with_line_breaks.md",
     "typescript/conversion/semantic_abbr.md",
@@ -4019,10 +4087,12 @@
     "typescript/conversion/semantic_sub_superscript.md",
     "typescript/conversion/simple_table.md",
     "typescript/conversion/strike_renders_as_strikethrough.md",
+    "typescript/conversion/table_content_after_unclosed_row_survives.md",
     "typescript/conversion/table_empty.md",
     "typescript/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "typescript/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "typescript/conversion/table_nested_in_single_cell_renders_separately.md",
+    "typescript/conversion/table_nested_in_wrapper_renders_separately.md",
     "typescript/conversion/table_no_thead.md",
     "typescript/conversion/table_pipe_chars_in_content.md",
     "typescript/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -4288,6 +4358,7 @@
     "wasm/conversion/heading_h5.md",
     "wasm/conversion/heading_h6.md",
     "wasm/conversion/image_figure_figcaption.md",
+    "wasm/conversion/image_kept_inline_in_link.md",
     "wasm/conversion/image_linked.md",
     "wasm/conversion/image_no_alt.md",
     "wasm/conversion/image_simple.md",
@@ -4304,6 +4375,7 @@
     "wasm/conversion/link_simple.md",
     "wasm/conversion/link_with_bold_text.md",
     "wasm/conversion/link_with_title.md",
+    "wasm/conversion/link_wrapping_table_renders_table.md",
     "wasm/conversion/list_definition_dl.md",
     "wasm/conversion/list_item_multiple_paragraphs.md",
     "wasm/conversion/list_mixed_nested.md",
@@ -4314,6 +4386,7 @@
     "wasm/conversion/paragraph_multiple.md",
     "wasm/conversion/paragraph_nested_divs.md",
     "wasm/conversion/paragraph_simple.md",
+    "wasm/conversion/paragraph_whitespace_only_span_separates_words.md",
     "wasm/conversion/paragraph_with_inline_formatting.md",
     "wasm/conversion/paragraph_with_line_breaks.md",
     "wasm/conversion/semantic_abbr.md",
@@ -4326,10 +4399,12 @@
     "wasm/conversion/semantic_sub_superscript.md",
     "wasm/conversion/simple_table.md",
     "wasm/conversion/strike_renders_as_strikethrough.md",
+    "wasm/conversion/table_content_after_unclosed_row_survives.md",
     "wasm/conversion/table_empty.md",
     "wasm/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "wasm/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "wasm/conversion/table_nested_in_single_cell_renders_separately.md",
+    "wasm/conversion/table_nested_in_wrapper_renders_separately.md",
     "wasm/conversion/table_no_thead.md",
     "wasm/conversion/table_pipe_chars_in_content.md",
     "wasm/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -4595,6 +4670,7 @@
     "zig/conversion/heading_h5.md",
     "zig/conversion/heading_h6.md",
     "zig/conversion/image_figure_figcaption.md",
+    "zig/conversion/image_kept_inline_in_link.md",
     "zig/conversion/image_linked.md",
     "zig/conversion/image_no_alt.md",
     "zig/conversion/image_simple.md",
@@ -4611,6 +4687,7 @@
     "zig/conversion/link_simple.md",
     "zig/conversion/link_with_bold_text.md",
     "zig/conversion/link_with_title.md",
+    "zig/conversion/link_wrapping_table_renders_table.md",
     "zig/conversion/list_definition_dl.md",
     "zig/conversion/list_item_multiple_paragraphs.md",
     "zig/conversion/list_mixed_nested.md",
@@ -4621,6 +4698,7 @@
     "zig/conversion/paragraph_multiple.md",
     "zig/conversion/paragraph_nested_divs.md",
     "zig/conversion/paragraph_simple.md",
+    "zig/conversion/paragraph_whitespace_only_span_separates_words.md",
     "zig/conversion/paragraph_with_inline_formatting.md",
     "zig/conversion/paragraph_with_line_breaks.md",
     "zig/conversion/semantic_abbr.md",
@@ -4633,10 +4711,12 @@
     "zig/conversion/semantic_sub_superscript.md",
     "zig/conversion/simple_table.md",
     "zig/conversion/strike_renders_as_strikethrough.md",
+    "zig/conversion/table_content_after_unclosed_row_survives.md",
     "zig/conversion/table_empty.md",
     "zig/conversion/table_layout_cell_paragraphs_stay_separated.md",
     "zig/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "zig/conversion/table_nested_in_single_cell_renders_separately.md",
+    "zig/conversion/table_nested_in_wrapper_renders_separately.md",
     "zig/conversion/table_no_thead.md",
     "zig/conversion/table_pipe_chars_in_content.md",
     "zig/conversion/table_ragged_row_fewer_cells_than_header.md",
@@ -5379,6 +5459,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "c"
+      },
+      "path": "c/conversion/image_kept_inline_in_link.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "c"
       },
@@ -5571,6 +5663,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "c"
+      },
+      "path": "c/conversion/link_wrapping_table_renders_table.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "c"
       },
@@ -5683,6 +5787,18 @@
         "language": "c"
       },
       "path": "c/conversion/paragraph_simple.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "c"
+      },
+      "path": "c/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -5835,6 +5951,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "c"
+      },
+      "path": "c/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "c"
       },
@@ -5875,6 +6003,18 @@
         "language": "c"
       },
       "path": "c/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "c"
+      },
+      "path": "c/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -9063,6 +9203,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/image_kept_inline_in_link.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "csharp"
       },
@@ -9255,6 +9407,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/link_wrapping_table_renders_table.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "csharp"
       },
@@ -9367,6 +9531,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/paragraph_simple.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -9519,6 +9695,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "csharp"
       },
@@ -9559,6 +9747,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -12747,6 +12947,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "dart"
+      },
+      "path": "dart/conversion/image_kept_inline_in_link.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "dart"
       },
@@ -12939,6 +13151,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "dart"
+      },
+      "path": "dart/conversion/link_wrapping_table_renders_table.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "dart"
       },
@@ -13051,6 +13275,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/paragraph_simple.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "dart"
+      },
+      "path": "dart/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -13203,6 +13439,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "dart"
+      },
+      "path": "dart/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "dart"
       },
@@ -13243,6 +13491,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "dart"
+      },
+      "path": "dart/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -16431,6 +16691,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/image_kept_inline_in_link.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "elixir"
       },
@@ -16623,6 +16895,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/link_wrapping_table_renders_table.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "elixir"
       },
@@ -16735,6 +17019,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/paragraph_simple.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -16887,6 +17183,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "elixir"
       },
@@ -16927,6 +17235,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -20115,6 +20435,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "go"
+      },
+      "path": "go/conversion/image_kept_inline_in_link.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "go"
       },
@@ -20307,6 +20639,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "go"
+      },
+      "path": "go/conversion/link_wrapping_table_renders_table.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "go"
       },
@@ -20419,6 +20763,18 @@
         "language": "go"
       },
       "path": "go/conversion/paragraph_simple.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "go"
+      },
+      "path": "go/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -20571,6 +20927,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "go"
+      },
+      "path": "go/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "go"
       },
@@ -20611,6 +20979,18 @@
         "language": "go"
       },
       "path": "go/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "go"
+      },
+      "path": "go/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -23799,6 +24179,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "java"
+      },
+      "path": "java/conversion/image_kept_inline_in_link.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "java"
       },
@@ -23991,6 +24383,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "java"
+      },
+      "path": "java/conversion/link_wrapping_table_renders_table.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "java"
       },
@@ -24103,6 +24507,18 @@
         "language": "java"
       },
       "path": "java/conversion/paragraph_simple.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "java"
+      },
+      "path": "java/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -24255,6 +24671,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "java"
+      },
+      "path": "java/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "java"
       },
@@ -24295,6 +24723,18 @@
         "language": "java"
       },
       "path": "java/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "java"
+      },
+      "path": "java/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -27483,6 +27923,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/image_kept_inline_in_link.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "kotlin_android"
       },
@@ -27675,6 +28127,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/link_wrapping_table_renders_table.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "kotlin_android"
       },
@@ -27787,6 +28251,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/paragraph_simple.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -27939,6 +28415,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "kotlin_android"
       },
@@ -27979,6 +28467,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -30519,6 +31019,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "php"
+      },
+      "path": "php/conversion/image_kept_inline_in_link.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "php"
       },
@@ -30711,6 +31223,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "php"
+      },
+      "path": "php/conversion/link_wrapping_table_renders_table.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "php"
       },
@@ -30823,6 +31347,18 @@
         "language": "php"
       },
       "path": "php/conversion/paragraph_simple.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "php"
+      },
+      "path": "php/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -30975,6 +31511,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "php"
+      },
+      "path": "php/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "php"
       },
@@ -31015,6 +31563,18 @@
         "language": "php"
       },
       "path": "php/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "php"
+      },
+      "path": "php/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -34203,6 +34763,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "python"
+      },
+      "path": "python/conversion/image_kept_inline_in_link.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "python"
       },
@@ -34395,6 +34967,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "python"
+      },
+      "path": "python/conversion/link_wrapping_table_renders_table.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "python"
       },
@@ -34507,6 +35091,18 @@
         "language": "python"
       },
       "path": "python/conversion/paragraph_simple.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "python"
+      },
+      "path": "python/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -34659,6 +35255,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "python"
+      },
+      "path": "python/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "python"
       },
@@ -34699,6 +35307,18 @@
         "language": "python"
       },
       "path": "python/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "python"
+      },
+      "path": "python/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -37887,6 +38507,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "r"
+      },
+      "path": "r/conversion/image_kept_inline_in_link.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "r"
       },
@@ -38079,6 +38711,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "r"
+      },
+      "path": "r/conversion/link_wrapping_table_renders_table.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "r"
       },
@@ -38191,6 +38835,18 @@
         "language": "r"
       },
       "path": "r/conversion/paragraph_simple.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "r"
+      },
+      "path": "r/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -38343,6 +38999,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "r"
+      },
+      "path": "r/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "r"
       },
@@ -38383,6 +39051,18 @@
         "language": "r"
       },
       "path": "r/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "r"
+      },
+      "path": "r/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -41571,6 +42251,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/image_kept_inline_in_link.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "ruby"
       },
@@ -41763,6 +42455,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/link_wrapping_table_renders_table.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "ruby"
       },
@@ -41875,6 +42579,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/paragraph_simple.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -42027,6 +42743,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "ruby"
       },
@@ -42067,6 +42795,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -45261,6 +46001,20 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "rust"
+      },
+      "path": "rust/conversion/image_kept_inline_in_link.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "rust"
       },
@@ -45453,6 +46207,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "rust"
+      },
+      "path": "rust/conversion/link_wrapping_table_renders_table.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "rust"
       },
@@ -45565,6 +46331,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/paragraph_simple.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "rust"
+      },
+      "path": "rust/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -45717,6 +46495,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "rust"
+      },
+      "path": "rust/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "rust"
       },
@@ -45759,6 +46549,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "rust"
+      },
+      "path": "rust/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -49279,6 +50081,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "swift"
+      },
+      "path": "swift/conversion/image_kept_inline_in_link.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "swift"
       },
@@ -49471,6 +50285,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "swift"
+      },
+      "path": "swift/conversion/link_wrapping_table_renders_table.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "swift"
       },
@@ -49583,6 +50409,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/paragraph_simple.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "swift"
+      },
+      "path": "swift/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -49735,6 +50573,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "swift"
+      },
+      "path": "swift/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "swift"
       },
@@ -49775,6 +50625,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "swift"
+      },
+      "path": "swift/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -52963,6 +53825,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "node"
+      },
+      "path": "typescript/conversion/image_kept_inline_in_link.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "node"
       },
@@ -53155,6 +54029,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "node"
+      },
+      "path": "typescript/conversion/link_wrapping_table_renders_table.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "node"
       },
@@ -53267,6 +54153,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/paragraph_simple.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "node"
+      },
+      "path": "typescript/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -53419,6 +54317,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "node"
+      },
+      "path": "typescript/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "node"
       },
@@ -53459,6 +54369,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "node"
+      },
+      "path": "typescript/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -56647,6 +57569,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/image_kept_inline_in_link.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "wasm"
       },
@@ -56839,6 +57773,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/link_wrapping_table_renders_table.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "wasm"
       },
@@ -56951,6 +57897,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/paragraph_simple.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -57103,6 +58061,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "wasm"
       },
@@ -57143,6 +58113,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -60331,6 +61313,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_kept_inline_in_link",
+        "language": "zig"
+      },
+      "path": "zig/conversion/image_kept_inline_in_link.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_linked",
         "language": "zig"
       },
@@ -60523,6 +61517,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_wrapping_table_renders_table",
+        "language": "zig"
+      },
+      "path": "zig/conversion/link_wrapping_table_renders_table.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "list_definition_dl",
         "language": "zig"
       },
@@ -60635,6 +61641,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/paragraph_simple.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "paragraph_whitespace_only_span_separates_words",
+        "language": "zig"
+      },
+      "path": "zig/conversion/paragraph_whitespace_only_span_separates_words.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -60787,6 +61805,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_content_after_unclosed_row_survives",
+        "language": "zig"
+      },
+      "path": "zig/conversion/table_content_after_unclosed_row_survives.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_empty",
         "language": "zig"
       },
@@ -60827,6 +61857,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/table_nested_in_single_cell_renders_separately.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_nested_in_wrapper_renders_separately",
+        "language": "zig"
+      },
+      "path": "zig/conversion/table_nested_in_wrapper_renders_separately.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -67212,6 +68254,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "zig"
+    },
+    {
       "fixture_id": "image_linked",
       "language": "c"
     },
@@ -68361,6 +69467,70 @@
     },
     {
       "fixture_id": "link_with_title",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
       "language": "zig"
     },
     {
@@ -76044,6 +77214,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "c"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "go"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "java"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "node"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "php"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "python"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "r"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "zig"
+    },
+    {
       "fixture_id": "paragraph_with_inline_formatting",
       "language": "c"
     },
@@ -78412,6 +79646,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "zig"
+    },
+    {
       "fixture_id": "table_empty",
       "language": "c"
     },
@@ -78665,6 +79963,70 @@
     },
     {
       "fixture_id": "table_nested_in_single_cell_renders_separately",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
       "language": "zig"
     },
     {
@@ -86646,6 +88008,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_kept_inline_in_link",
+      "language": "zig"
+    },
+    {
       "fixture_id": "image_linked",
       "language": "c"
     },
@@ -87795,6 +89221,70 @@
     },
     {
       "fixture_id": "link_with_title",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_wrapping_table_renders_table",
       "language": "zig"
     },
     {
@@ -95478,6 +96968,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "c"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "go"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "java"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "node"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "php"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "python"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "r"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "paragraph_whitespace_only_span_separates_words",
+      "language": "zig"
+    },
+    {
       "fixture_id": "paragraph_with_inline_formatting",
       "language": "c"
     },
@@ -97846,6 +99400,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_content_after_unclosed_row_survives",
+      "language": "zig"
+    },
+    {
       "fixture_id": "table_empty",
       "language": "c"
     },
@@ -98099,6 +99717,70 @@
     },
     {
       "fixture_id": "table_nested_in_single_cell_renders_separately",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_nested_in_wrapper_renders_separately",
       "language": "zig"
     },
     {

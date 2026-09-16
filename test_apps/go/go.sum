@@ -8,6 +8,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/xberg-io/html-to-markdown/packages/go/v3 v3.12.4 h1:8yW9E6IOff61ss7/gN14VXSkQWTFsAUIuVohXIfzV7M=
 github.com/xberg-io/html-to-markdown/packages/go/v3 v3.12.4/go.mod h1:B7tV2bp0ZdFmNmRlp+O0FrGDqpd82ROLssE2o40f66o=
+github.com/xberg-io/html-to-markdown/packages/go/v3 v3.13.0 h1:LgkygC8mnlr32XbliCxuxKMXtVgGdwMnnPxcplzvmq0=
+github.com/xberg-io/html-to-markdown/packages/go/v3 v3.13.0/go.mod h1:B7tV2bp0ZdFmNmRlp+O0FrGDqpd82ROLssE2o40f66o=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
