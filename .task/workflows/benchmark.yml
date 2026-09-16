@@ -107,17 +107,24 @@ tasks:
         set -euo pipefail
         logs_dir="{{.LOGS_DIR}}"
         readonly quiet_checks=5
+        # ~keep The first interval is measured but NOT gated. /proc/loadavg's 1-minute figure is a
+        # trailing average, so it still carries the `cargo build` in the step immediately above
+        # while the CPU is already idle -- runs 35080931276 and 35082358152 both failed check 1 on
+        # load (1.19 and 1.43 against a 1.00 limit) while reporting 99.85% and 99.60% idle for that
+        # same window, then passed every later check. Gating on it rejects a quiet runner for work
+        # the job itself did.
+        readonly warmup_checks=1
         readonly quiet_interval_seconds=60
         readonly max_load_fraction=0.25
         readonly min_idle_percent=80
-        printf 'check\tload_1\tload_limit\tidle_pct\n' > "$logs_dir/quiet-gate.tsv"
+        printf 'check\tgated\tload_1\tload_limit\tidle_pct\n' > "$logs_dir/quiet-gate.tsv"
         logical_cpus="$(getconf _NPROCESSORS_ONLN)"
         load_limit="$(
           awk -v cpus="$logical_cpus" -v fraction="$max_load_fraction" \
             'BEGIN { printf "%.2f", cpus * fraction }'
         )"
         quiet=1
-        for check in $(seq 1 "$quiet_checks"); do
+        for check in $(seq 1 "$((warmup_checks + quiet_checks))"); do
           read -r idle_before total_before < <(
             awk '/^cpu / { idle=$5; for (field=2; field<=9; field++) total += $field; print idle, total; exit }' /proc/stat
           )
@@ -131,8 +138,16 @@ tasks:
               'BEGIN { printf "%.2f", 100 * (idle_after - idle_before) / (total_after - total_before) }'
           )"
           load_one="$(awk '{ print $1 }' /proc/loadavg)"
-          printf '%s\t%s\t%s\t%s\n' "$check" "$load_one" "$load_limit" "$idle_pct" \
+          if test "$check" -le "$warmup_checks"; then
+            gated=no
+          else
+            gated=yes
+          fi
+          printf '%s\t%s\t%s\t%s\t%s\n' "$check" "$gated" "$load_one" "$load_limit" "$idle_pct" \
             | tee -a "$logs_dir/quiet-gate.tsv"
+          if test "$gated" = "no"; then
+            continue
+          fi
           if ! awk -v observed_load="$load_one" -v limit="$load_limit" \
             -v idle="$idle_pct" -v minimum="$min_idle_percent" \
             'BEGIN { exit !(observed_load <= limit && idle >= minimum) }'; then
