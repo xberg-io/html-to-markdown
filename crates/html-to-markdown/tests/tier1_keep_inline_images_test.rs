@@ -235,3 +235,50 @@ mod tier_parity {
         );
     }
 }
+
+#[cfg(feature = "inline-images")]
+#[test]
+fn an_image_in_a_heading_is_alt_text_in_both_tiers_when_the_option_is_unset() {
+    // ~keep Tier-1 short-circuited to "keep the image" whenever `keep_inline_images_in` was
+    // ~keep empty, calling that "the Tier-2 default". It is not: Tier-2 replaces an image in a
+    // ~keep heading with its alt text precisely when the list does not name that heading, and
+    // ~keep an empty list names nothing. The divergence was unreachable for years because such
+    // ~keep documents bailed out of Tier 1 on an unrelated entity check; removing that bail
+    // ~keep (issue #494) exposed it, and the generated-corpus parity test caught it.
+    use html_to_markdown_rs::tier1::{self};
+    use html_to_markdown_rs::{TierStrategy, prescan};
+
+    let tier2 = |html: &str| {
+        let opts = ConversionOptions {
+            tier_strategy: TierStrategy::Tier2,
+            ..ConversionOptions::default()
+        };
+        convert(html, Some(opts))
+            .expect("tier2 must succeed")
+            .content
+            .unwrap_or_default()
+    };
+
+    for (label, html) in [
+        ("h4 plain", r#"<h4><img src="/i.png" alt="fox"></h4>"#),
+        ("h1 plain", r#"<h1><img src="/i.png" alt="fox"></h1>"#),
+        ("h4 entity alt", r#"<h4><img src="/i.png" alt="fox &mdash; cafe"></h4>"#),
+    ] {
+        let tier2_output = tier2(html);
+        assert!(
+            !tier2_output.contains("!["),
+            "{label}: tier2 should emit alt text, not an image; actual: {tier2_output:?}"
+        );
+        // ~keep `tier1::run` directly, not `convert` with Auto: a bail would otherwise fall
+        // ~keep back to Tier 2 and report a pass Tier 1 never earned.
+        let (cleaned, report) = prescan::run(html);
+        let opts = ConversionOptions {
+            tier_strategy: TierStrategy::Tier1,
+            ..ConversionOptions::default()
+        };
+        match tier1::run(cleaned.as_ref(), &report, &opts) {
+            Ok(tier1_output) => assert_eq!(tier1_output, tier2_output, "{label}: tier1 vs tier2"),
+            Err(reason) => panic!("{label}: tier1 bailed ({reason:?}), so this case checked nothing"),
+        }
+    }
+}

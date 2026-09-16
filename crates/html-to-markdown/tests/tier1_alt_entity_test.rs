@@ -1,14 +1,15 @@
-//! Tier-1 alt/title entity handling (Phase DD).
+//! Tier-1 alt/title entity handling: the two tiers must agree byte for byte.
 //!
-//! Tier-2 runs source HTML through html5ever for repair when custom
-//! elements are present.  html5ever decodes numeric entities like
-//! `&#x22;` and re-emits them in the canonical named form `&quot;`.
-//! Without custom elements, Tier-2 reads tl's raw attribute bytes
-//! verbatim — entities are preserved unchanged.
+//! Both tiers now fully decode attribute character references (issue #494), so the answer no
+//! longer depends on whether html5ever repaired the document: `&#x22;`, `&quot;` and a literal
+//! `"` all converge on `"`, which is then escaped for its Markdown context. The custom-element
+//! cases below stay valuable precisely because they force the repair path -- they are what
+//! proves the two routes still converge.
 //!
-//! Tier-1 has no html5ever roundtrip, so:
-//!   * Without custom elements: pass tl's raw bytes through.
-//!   * With custom elements: canonicalize entities to match.
+//! These assertions only ever compared Tier 1 against Tier 2, so they survived that change
+//! unaltered; only the names and this note, which described the old half-decoding contract,
+//! needed correcting. `with_custom_element_title_escaped` is the one that caught Tier-1
+//! emitting an unescaped `""t""` once decoding made a raw quote reachable.
 
 #![cfg(feature = "testkit")]
 
@@ -41,36 +42,36 @@ fn assert_matches(html: &str) {
     );
 }
 
-// ~keep ── No custom elements: T2 preserves entities verbatim. ──────────────────────
+// ~keep ── No repair path: the document parses cleanly. ────────────────────────────
 
 #[test]
-fn plain_named_quote_preserved_verbatim() {
+fn plain_named_quote_matches_tier2() {
     assert_matches(r#"<p><img src="/x.png" alt="hello &quot;world&quot;"></p>"#);
 }
 
 #[test]
-fn plain_amp_preserved_verbatim() {
+fn plain_amp_matches_tier2() {
     assert_matches(r#"<p><img src="/x.png" alt="A &amp; B"></p>"#);
 }
 
 #[test]
-fn plain_hex_entity_preserved_verbatim() {
+fn plain_hex_entity_matches_tier2() {
     assert_matches(r#"<p><img src="/x.png" alt="hello &#x22;w&#x22;"></p>"#);
 }
 
-// ~keep ── Custom elements present: T2 canonicalizes via html5ever roundtrip. ───────
+// ~keep ── Repair path: a custom element sends T2 through the html5ever roundtrip. ──
 
 #[test]
-fn with_custom_element_hex_entity_canonicalized() {
+fn with_custom_element_hex_entity_matches_tier2() {
     assert_matches(r#"<my-component>x</my-component><p><img src="/x.png" alt="hello &#x22;w&#x22;"></p>"#);
 }
 
 #[test]
-fn with_custom_element_amp_canonicalized() {
+fn with_custom_element_amp_matches_tier2() {
     assert_matches(r#"<my-component>x</my-component><p><img src="/x.png" alt="A &amp; B"></p>"#);
 }
 
 #[test]
-fn with_custom_element_title_canonicalized() {
+fn with_custom_element_title_escaped() {
     assert_matches(r#"<my-component>x</my-component><p><img src="/x.png" alt="a" title="&#x22;t&#x22;"></p>"#);
 }

@@ -48,11 +48,7 @@ pub fn handle_blockquote(
         return;
     }
 
-    let cite = tag
-        .attributes()
-        .get("cite")
-        .flatten()
-        .map(|v| v.as_utf8_str().to_string());
+    let cite = crate::converter::utility::attributes::decoded_attribute(tag, "cite").map(std::borrow::Cow::into_owned);
 
     let blockquote_ctx = Context {
         blockquote_depth: ctx.blockquote_depth + 1,

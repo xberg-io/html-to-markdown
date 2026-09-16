@@ -270,8 +270,8 @@ fn walk_plain(
                 }
                 "img" => {
                     if !state.options.skip_images {
-                        if let Some(Some(alt)) = tag.attributes().get("alt") {
-                            let alt_text = alt.as_utf8_str();
+                        if let Some(alt) = crate::converter::utility::attributes::decoded_attribute(tag, "alt") {
+                            let alt_text = alt;
                             if !alt_text.is_empty() {
                                 buf.push_str(alt_text.as_ref());
                             }

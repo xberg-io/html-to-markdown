@@ -194,10 +194,8 @@ fn extract_meta(tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
             http_equiv_attr = Some(bytes.as_utf8_str().to_string());
         }
     }
-    if let Some(attr) = tag.attributes().get("content") {
-        if let Some(bytes) = attr {
-            content_attr = Some(bytes.as_utf8_str().to_string());
-        }
+    if let Some(content) = crate::converter::utility::attributes::decoded_attribute(tag, "content") {
+        content_attr = Some(content.into_owned());
     }
 
     if let Some(content) = content_attr {

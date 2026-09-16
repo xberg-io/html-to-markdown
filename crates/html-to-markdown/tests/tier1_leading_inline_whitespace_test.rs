@@ -185,16 +185,17 @@ fn should_drop_whitespace_only_text_between_leading_images_at_document_start() {
 
 #[test]
 fn should_keep_space_after_leading_image_inside_heading() {
-    // ~keep Regression guard: a heading's `<img>` is flattened to bare alt text
-    // ~keep by Tier-2's heading-specific handler (an already allow-listed,
-    // ~keep out-of-scope divergence — see `tests/tier_parity_corpus.rs`'s
-    // ~keep `heading-inline-image-and-br` entry) rather than going through the
-    // ~keep generic `at_fresh_block_start` text-node pipeline, so it always
-    // ~keep keeps a real separating space after that alt text. Both
-    // ~keep `document_start_strip` and `document_start_drops_ws` must exclude
-    // ~keep heading context or they additionally drop that space, compounding
-    // ~keep the already-allowed divergence with a new one.
+    // ~keep Regression guard for the SPACE, not for the image: a heading's `<img>` is
+    // ~keep flattened to bare alt text rather than going through the generic
+    // ~keep `at_fresh_block_start` text-node pipeline, so it must still keep a real
+    // ~keep separating space after that alt text. Both `document_start_strip` and
+    // ~keep `document_start_drops_ws` must exclude heading context or they drop it.
+    //
+    // ~keep The expectation used to be `![a](/x.png) quick`, describing the flattening as a
+    // ~keep Tier-1/Tier-2 divergence that was allow-listed and out of scope. Tier-1 now
+    // ~keep flattens too (issue #494 removed the bail that hid the divergence), so both tiers
+    // ~keep agree and the subject of this test -- the surviving space -- is unchanged.
     let html = "<h5><img src=\"/x.png\" alt=\"a\"> quick</h5>";
     let t1 = run_tier1(html);
-    assert_eq!(t1, "##### ![a](/x.png) quick\n", "unexpected tier1 output for {html:?}");
+    assert_eq!(t1, "##### a quick\n", "unexpected tier1 output for {html:?}");
 }

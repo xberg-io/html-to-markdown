@@ -70,11 +70,12 @@ pub fn handle(
         let decoded = crate::text::decode_html_entities(&v.as_utf8_str());
         sanitize_markdown_url(&decoded).into_owned()
     });
-    // ~keep Hold title as a Cow borrowed from the tag's attribute bytes (Tier-2
-    // ~keep hot-spot pass III): avoids per-link String allocation when no entity
-    // ~keep decoding is needed.  Consumers below use `.as_deref()` (`Option<&str>`),
-    // ~keep which works the same for either Cow variant.
-    let title = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str());
+    // ~keep Still a Cow borrowed from the tag's attribute bytes in the common case
+    // ~keep (Tier-2 hot-spot pass III): `decoded_attribute` returns early when the value
+    // ~keep holds no `&`, so a title without entities allocates nothing. The note that
+    // ~keep stood here claimed decoding was "not needed" and skipped it, which emitted
+    // ~keep `title="A&amp;B"` as the literal text `A&amp;B` (issue #494).
+    let title = crate::converter::utility::attributes::decoded_attribute(tag, "title");
 
     if let Some(href) = href_attr {
         if ctx.in_link {

@@ -542,21 +542,22 @@ fn collect_meta_head_metadata(
         return;
     }
 
+    // ~keep `content` is a user-visible metadata value and carries character references like
+    // ~keep any other attribute, so it is decoded before it reaches the frontmatter (#494).
+    // ~keep The key (`name`/`property`) is an identifier, not prose, and stays raw.
     if let (Some(name), Some(content)) = (
         child_tag.attributes().get("name").flatten(),
-        child_tag.attributes().get("content").flatten(),
+        crate::converter::utility::attributes::decoded_attribute(child_tag, "content"),
     ) {
         let name_str = name.as_utf8_str();
-        let content_str = content.as_utf8_str();
-        metadata.insert(format!("meta-{name_str}"), content_str.to_string());
+        metadata.insert(format!("meta-{name_str}"), content.into_owned());
     }
     if let (Some(property), Some(content)) = (
         child_tag.attributes().get("property").flatten(),
-        child_tag.attributes().get("content").flatten(),
+        crate::converter::utility::attributes::decoded_attribute(child_tag, "content"),
     ) {
         let property_str = property.as_utf8_str();
-        let content_str = content.as_utf8_str();
-        metadata.insert(format!("meta-{property_str}"), content_str.to_string());
+        metadata.insert(format!("meta-{property_str}"), content.into_owned());
     }
 }
 

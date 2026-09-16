@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
+use crate::converter::utility::attributes::decoded_attribute;
 use crate::converter::utility::content::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::ConversionOptions;
@@ -52,22 +53,13 @@ pub fn handle_img(
         Cow::Owned(sanitize_markdown_url(&resolved).into_owned())
     };
 
-    let alt = tag
-        .attributes()
-        .get("alt")
-        .flatten()
-        .map_or(Cow::Borrowed(""), |v| v.as_utf8_str());
+    let alt = decoded_attribute(tag, "alt").unwrap_or(Cow::Borrowed(""));
 
     // ~keep An empty `title=""` carries no information, and `[t](u "")` / `![a](i "")` is
     // ~keep noise that no Markdown serializer round-trips: re-rendering the output drops
     // ~keep the empty title, so the second pass no longer matches the first. Treat it as
     // ~keep absent, which is what it means.
-    let title = tag
-        .attributes()
-        .get("title")
-        .flatten()
-        .map(|v| v.as_utf8_str())
-        .filter(|v| !v.is_empty());
+    let title = decoded_attribute(tag, "title").filter(|v| !v.is_empty());
 
     #[cfg(feature = "metadata")]
     #[allow(clippy::useless_let_if_seq)]
@@ -268,18 +260,18 @@ const LAZY_SINGLE_URL_ATTRIBUTES: [&str; 3] = ["data-src", "data-lazy-src", "dat
 /// ~keep    of the above attributes byte-identical to output produced before this
 /// ~keep    fallback existed.
 fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
-    let raw_src = tag
-        .attributes()
-        .get("src")
-        .flatten()
-        .map_or(Cow::Borrowed(""), |v| v.as_utf8_str());
+    // ~keep Every read here goes through `decoded_attribute`: a URL attribute carries
+    // ~keep character references like any other (`src="i.png?a=1&amp;b=2"`), and `srcset` is
+    // ~keep parsed *after* decoding because the entity is not part of its comma/descriptor
+    // ~keep grammar. Issue #494.
+    let raw_src = decoded_attribute(tag, "src").unwrap_or(Cow::Borrowed(""));
 
     if !raw_src.trim().is_empty() && !raw_src.trim_start().starts_with("data:") {
         return raw_src;
     }
 
     for attr_name in LAZY_SINGLE_URL_ATTRIBUTES {
-        if let Some(value) = tag.attributes().get(attr_name).flatten().map(|v| v.as_utf8_str()) {
+        if let Some(value) = decoded_attribute(tag, attr_name) {
             if !value.trim().is_empty() {
                 return value;
             }
@@ -287,7 +279,7 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
     }
 
     for attr_name in ["data-srcset", "srcset"] {
-        if let Some(value) = tag.attributes().get(attr_name).flatten().map(|v| v.as_utf8_str()) {
+        if let Some(value) = decoded_attribute(tag, attr_name) {
             if let Some(candidate) = pick_best_srcset_candidate(&value) {
                 return Cow::Owned(candidate.to_string());
             }

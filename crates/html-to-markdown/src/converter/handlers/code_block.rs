@@ -253,7 +253,7 @@ pub fn handle_pre(
 
         if let Some(class_attr) = tag.attributes().get("class") {
             if let Some(class_bytes) = class_attr {
-                let class_str = class_bytes.as_utf8_str();
+                let class_str = crate::text::decode_html_entities_cow(&class_bytes.as_utf8_str()).into_owned();
                 for cls in class_str.split_whitespace() {
                     if let Some(stripped) = cls.strip_prefix("language-") {
                         lang = Some(String::from(stripped));
@@ -273,7 +273,8 @@ pub fn handle_pre(
                     if child_tag.name() == "code" {
                         if let Some(class_attr) = child_tag.attributes().get("class") {
                             if let Some(class_bytes) = class_attr {
-                                let class_str = class_bytes.as_utf8_str();
+                                let class_str =
+                                    crate::text::decode_html_entities_cow(&class_bytes.as_utf8_str()).into_owned();
                                 for cls in class_str.split_whitespace() {
                                     if let Some(stripped) = cls.strip_prefix("language-") {
                                         lang = Some(String::from(stripped));

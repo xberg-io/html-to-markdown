@@ -24,6 +24,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Character references in attribute values are now decoded**
+  ([#494](https://github.com/xberg-io/html-to-markdown/issues/494)). `<a href>` was the only
+  attribute in the converter that called the entity decoder, so every other user-visible
+  attribute emitted its raw source text: `title="A&amp;B"` reached the output as the literal
+  `A&amp;B`, and `alt="it&#39;s"` as `it&#39;s`. Twelve sites were affected -- `title` on `<a>`,
+  `<img>`, `<graphic>` and `<abbr>`; `alt` on `<img>` and `<graphic>`; `src` on `<img>`,
+  `<audio>`, `<video>`, `<iframe>` and `<source>`; `cite` on `<blockquote>`; the `language-`
+  class on a code fence; and `<meta content>` in extracted metadata. They were found by probing
+  every attribute that reaches output, not by reading the ones that looked likely.
+  Attribute reads now go through one shared accessor so a new attribute cannot reopen the gap.
+  The Markdown escaping is unchanged and was never at fault -- a literal `"` in a title was
+  always escaped correctly; the decoded character simply never arrived. Tier 1 carried the same
+  defect independently and moves in lockstep.
+
+- **Three Tier-1 divergences that entity decoding made reachable.** Each was latent long before
+  it could be triggered, and each is now pinned by a parity test. An `<img>` in a heading was
+  emitted as `![alt](src)` by the fast scanner whenever `keepInlineImagesIn` was empty, where
+  the DOM path correctly replaces it with its alt text -- an empty list names no heading, so it
+  permits nothing. A heading whose body merely *ended* in whitespace was never trimmed, because
+  the trim only ran for bodies containing a newline; a decoded `&nbsp;` therefore survived where
+  the DOM path dropped it. And a link title containing a quote was escaped as `&quot;` rather
+  than `\"`. The first two were found by the generated-corpus parity test over 3,000 documents,
+  the third by a sweep over every character decoding newly makes reachable.
+
 - **A wrapper element no longer defeats the nested-table fix**
   ([#488](https://github.com/xberg-io/html-to-markdown/issues/488)). A nested `<table>` inside a
   `<td>` was detected with a single-node tag-name test over the cell's *direct* children, so

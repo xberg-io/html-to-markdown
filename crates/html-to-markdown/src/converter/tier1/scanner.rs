@@ -116,10 +116,6 @@ pub struct ScanOutput {
 pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailReason> {
     let bytes = html.as_bytes();
     let mut state = Tier1State::new(html.len());
-    // ~keep Phase DD: Tier-2 runs an html5ever roundtrip when custom-element
-    // ~keep tags are present in the source, which canonicalizes attribute
-    // ~keep entities.  Mirror that for byte-equality.
-    state.canonicalize_attr_entities = crate::converter::main_helpers::has_custom_element_tags(html);
     let mut table_probes: Vec<TableLayoutProbe> = Vec::new();
     let mut pos = 0usize;
     let mut text_start = 0usize;
@@ -603,11 +599,14 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 // ~keep capture the abbreviation's `title` attribute and emit
                 // ~keep `" (title)"` after the abbr's text content at close time.
                 if name_lower == b"abbr" {
+                    // ~keep Decoded, not raw: Tier-2 reads this through `decoded_attribute`
+                    // ~keep (issue #494), so a raw read here would reintroduce the defect in
+                    // ~keep the fast path alone and split the two tiers.
                     let title = find_attr(&attrs, b"title")
-                        .and_then(|b| std::str::from_utf8(b).ok())
-                        .map(str::trim)
-                        .filter(|s| !s.is_empty())
-                        .map(str::to_owned);
+                        .map(decode_attr)
+                        .transpose()?
+                        .map(|t| t.trim().to_owned())
+                        .filter(|s| !s.is_empty());
                     state.abbr_titles.push(title);
                 }
 
@@ -1423,7 +1422,10 @@ fn open_pre(state: &mut Tier1State, attrs: &[(&[u8], Option<&[u8]>)]) {
 /// or `lang-X`.  Mirrors Tier-2's `extract_language_from_pre`.
 fn extract_language_from_class(attrs: &[(&[u8], Option<&[u8]>)]) -> Option<String> {
     let class_bytes = find_attr(attrs, b"class")?;
-    let class = std::str::from_utf8(class_bytes).ok()?;
+    // ~keep Decoded before the `language-` prefix scan, matching Tier-2's `code_block.rs`
+    // ~keep (issue #494). Decoding first is also what makes the split correct: a character
+    // ~keep reference can encode the whitespace this splits on.
+    let class = decode_attr(class_bytes).ok()?;
     for cls in class.split_ascii_whitespace() {
         if let Some(rest) = cls.strip_prefix("language-") {
             return Some(rest.to_owned());
@@ -1909,24 +1911,14 @@ fn emit_void(
             let alt = find_attr(attrs, b"alt").unwrap_or_default();
             let title = find_attr(attrs, b"title");
 
-            // ~keep Phase DD: src gets entity-decoding (URL semantics).
-            // ~keep For alt/title:
-            // ~keep   • With custom-element tags → T2 ran html5ever roundtrip
-            // ~keep     and canonicalized entities; decode + re-encode the
-            // ~keep     special set to match.
-            // ~keep   • Without → T2 just yields tl's raw attribute bytes;
-            // ~keep     keep entities verbatim.
             let src = decode_attr(src)?;
-            let canonicalize = state.canonicalize_attr_entities;
-            let alt_owned;
-            let alt: &str = if canonicalize {
-                alt_owned = canonicalize_attr_entities(&decode_attr(alt)?).into_owned();
-                &alt_owned
-            } else {
-                let raw = std::str::from_utf8(alt).map_err(|_| BailReason::Classifier)?;
-                bail_if_canonicalization_is_undecidable(raw, &decode_attr(alt)?)?;
-                raw
-            };
+            // ~keep Tier-2 decodes every user-visible attribute (issue #494), so its answer no
+            // ~keep longer depends on whether html5ever repaired the document: `&#x22;`,
+            // ~keep `&quot;` and a literal `"` all converge on `"`. The canonicalize/bail fork
+            // ~keep that stood here existed only to mirror that dependency, and with it gone
+            // ~keep Tier-1 both matches Tier-2 and stops bailing on entity-bearing attributes.
+            let alt_owned = decode_attr(alt)?;
+            let alt: &str = &alt_owned;
 
             let keep_as_markdown = should_keep_image_as_markdown(html, &state.stack, options);
 
@@ -1943,20 +1935,34 @@ fn emit_void(
                 // ~keep also does not call `escape_link_label`.
                 let escaped_alt = crate::converter::utility::content::escape_link_label(alt);
                 if let Some(title_bytes) = title {
-                    let title_owned;
-                    let title_str: &str = if canonicalize {
-                        title_owned = canonicalize_attr_entities(&decode_attr(title_bytes)?).into_owned();
-                        &title_owned
-                    } else {
-                        let raw = std::str::from_utf8(title_bytes).map_err(|_| BailReason::Classifier)?;
-                        bail_if_canonicalization_is_undecidable(raw, &decode_attr(title_bytes)?)?;
-                        raw
-                    };
-                    #[allow(clippy::format_push_string)]
-                    dest.push_str(&format!("![{escaped_alt}]({src} \"{title_str}\")"));
+                    // ~keep Escaped exactly as Tier-2's `handlers/image.rs` does. Before
+                    // ~keep issue #494 this path could not produce a raw `"` -- the entity
+                    // ~keep survived undecoded -- so the missing escape was invisible. Full
+                    // ~keep decoding surfaces it: `title="&#x22;t&#x22;"` emitted `""t""`,
+                    // ~keep which closes the title early and is not the document's text.
+                    let decoded_title = decode_attr(title_bytes)?;
+                    let title_owned =
+                        crate::converter::inline::link::escape_markdown_title(&decoded_title).into_owned();
+                    let title_str: &str = &title_owned;
+                    // ~keep Destination written by Tier-2's own `append_url_destination`
+                    // ~keep rather than interpolated, so the two tiers cannot drift on
+                    // ~keep `(`/`)` escaping or the angle-bracket wrapping a whitespace-
+                    // ~keep bearing URL needs. Decoding (#494) made both reachable from an
+                    // ~keep entity, and a swept parity check found all four spellings
+                    // ~keep diverging here.
+                    dest.push_str("![");
+                    dest.push_str(&escaped_alt);
+                    dest.push_str("](");
+                    crate::converter::inline::link::append_url_destination(dest, &src, options.url_escape_style, true);
+                    dest.push_str(" \"");
+                    dest.push_str(title_str);
+                    dest.push_str("\")");
                 } else {
-                    #[allow(clippy::format_push_string)]
-                    dest.push_str(&format!("![{escaped_alt}]({src})"));
+                    dest.push_str("![");
+                    dest.push_str(&escaped_alt);
+                    dest.push_str("](");
+                    crate::converter::inline::link::append_url_destination(dest, &src, options.url_escape_style, false);
+                    dest.push(')');
                 }
             } else {
                 // ~keep Strip to alt-text only — mirrors Tier-2 behaviour when the image
@@ -2023,10 +2029,13 @@ fn should_keep_image_as_markdown(html: &str, stack: &[OpenTag], options: &Conver
 /// user-supplied strings, so callers may supply "H1" or "h1" interchangeably.
 #[cfg(feature = "inline-images")]
 fn keep_inline_image_for_ancestors(input: &[u8], stack: &[OpenTag], keep: &[String]) -> bool {
-    if keep.is_empty() {
-        // ~keep No restriction — always emit markdown image (Tier-2 default).
-        return true;
-    }
+    // ~keep No `keep.is_empty()` short-circuit. One stood here returning `true`, described as
+    // ~keep "the Tier-2 default", but Tier-2 strips an image in a heading to its alt text
+    // ~keep exactly when the list does not name that heading -- and an empty list names
+    // ~keep nothing. Falling through handles both cases correctly: the heading branch's inner
+    // ~keep loop matches nothing and returns `false`, and a document with no heading ancestor
+    // ~keep still reaches the `true` at the end. Unreachable until issue #494 removed the
+    // ~keep entity bail that had been sending these documents to Tier 2 anyway.
     for frame in stack.iter().rev() {
         if matches!(frame.spec.kind, TagKind::Heading(_)) {
             let name = &input[frame.name_range.clone()];
@@ -2690,6 +2699,27 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
     // ~keep `<em>`/`<strong>` open marker by `close_inline_marker`'s leading-migration
     // ~keep step) would otherwise double up against the "# " prefix's own trailing
     // ~keep space (`<h3>&nbsp;x</h3>` -> "###  x" instead of Tier-2's "### x").
+    // ~keep Trailing side of the same `text.trim()`. The whitespace-normalizing block above
+    // ~keep only runs when the body contains a newline, so a heading whose body simply ENDS
+    // ~keep in whitespace never reached a trailing trim -- `<h4><img alt="cafe &nbsp;"></h4>`
+    // ~keep kept the decoded U+00A0 where Tier-2 dropped it. Found by the generated-corpus
+    // ~keep parity test once issue #494's decoding made `&nbsp;` reach this path as a real
+    // ~keep whitespace character rather than the literal text `&nbsp;`.
+    let trailing_ws_len = buf[content_start..]
+        .char_indices()
+        .rev()
+        .take_while(|&(_, c)| c.is_whitespace())
+        .count();
+    if trailing_ws_len > 0 {
+        let cut = buf[content_start..]
+            .char_indices()
+            .rev()
+            .take(trailing_ws_len)
+            .last()
+            .map_or(buf.len(), |(i, _)| content_start + i);
+        buf.truncate(cut);
+    }
+
     let leading_ws_len = buf[content_start..]
         .char_indices()
         .find(|&(_, c)| !c.is_whitespace())
@@ -3254,14 +3284,13 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
             // ~keep `replace('"', "\\\"")` in `escape_markdown_title` in `inline/link.rs`).  The
             // ~keep backslash-escape branch of link.rs appears unreachable in
             // ~keep practice for the title attribute path on these fixtures.
-            // ~keep Mirror the observed fixture behaviour to match expected output.
-            let escaped_title;
-            let title_out: &str = if title.contains('"') {
-                escaped_title = title.replace('"', "&quot;");
-                &escaped_title
-            } else {
-                &title
-            };
+            // ~keep Same escaper as Tier-2's `append_markdown_link`. This used to substitute
+            // ~keep `&quot;` instead, described as "mirror the observed fixture behaviour" --
+            // ~keep behaviour observed in a world where attributes were only half-decoded, so
+            // ~keep a literal `"` in a title was rare enough that the divergence from Tier-2's
+            // ~keep `\"` went unnoticed. Full decoding (issue #494) makes it reachable.
+            let escaped_title = crate::converter::inline::link::escape_markdown_title(&title);
+            let title_out: &str = &escaped_title;
             #[allow(clippy::format_push_string)]
             dest.push_str(&format!("]({href} \"{title_out}\")"));
         } else {
@@ -4800,72 +4829,11 @@ fn byte_value_has_nav_keyword(value: &[u8]) -> bool {
 /// Extract `href` and `title` from the attribute list for a link.
 fn extract_link_attrs(attrs: &[(&[u8], Option<&[u8]>)]) -> Result<(Option<String>, Option<String>), BailReason> {
     let href = find_attr(attrs, b"href").map(decode_attr).transpose()?;
-    // ~keep Mirror Tier-2's `inline/link.rs:82` which captures the title attribute
-    // ~keep via tl::parse's `as_utf8_str()` — tl decodes numeric entities
-    // ~keep (`&#039;` → `'`) but preserves named entities (`&amp;`, `&quot;`,
-    // ~keep `&lt;`).  Use a partial-decode pass for titles to match.
-    let title = find_attr(attrs, b"title").map(decode_title_attr).transpose()?;
+    // ~keep Full decode, matching Tier-2's `decoded_attribute` (issue #494). This used to be
+    // ~keep a deliberate half-decode that mirrored Tier-2 leaving named entities intact, so a
+    // ~keep `title="A&amp;B"` reached the output as the literal text `A&amp;B` in both tiers.
+    let title = find_attr(attrs, b"title").map(decode_attr).transpose()?;
     Ok((href, title))
-}
-
-/// Decode a link-title attribute: numeric entities (`&#NNN;`, `&#xNNN;`)
-/// resolve to characters, named entities (`&amp;`, `&quot;`, etc.) survive
-/// as-is.  Mirrors tl::parse's `as_utf8_str()` behaviour on attribute values.
-/// Decode a link-title attribute: numeric entities (`&#NNN;`, `&#xNNN;`)
-/// resolve to characters, named entities (`&amp;`, `&quot;`, etc.) survive
-/// as-is.  Mirrors Tier-2's observed behaviour on link titles: it decodes
-/// `&#039;` → `'` but preserves `&amp;`/`&quot;` literally.
-fn decode_title_attr(bytes: &[u8]) -> Result<String, BailReason> {
-    let s = std::str::from_utf8(bytes).map_err(|_| BailReason::Classifier)?;
-    if !s.contains("&#") {
-        return Ok(s.to_owned());
-    }
-    let mut out = String::with_capacity(s.len());
-    let bytes_s = s.as_bytes();
-    let mut i = 0;
-    while i < bytes_s.len() {
-        let Some(rel) = memchr::memchr(b'&', &bytes_s[i..]) else {
-            out.push_str(&s[i..]);
-            break;
-        };
-        let amp_pos = i + rel;
-        if amp_pos > i {
-            out.push_str(&s[i..amp_pos]);
-        }
-        if amp_pos + 1 >= bytes_s.len() || bytes_s[amp_pos + 1] != b'#' {
-            out.push('&');
-            i = amp_pos + 1;
-            continue;
-        }
-        let mut j = amp_pos + 2;
-        while j < bytes_s.len() && bytes_s[j] != b';' {
-            j += 1;
-        }
-        if j >= bytes_s.len() {
-            out.push_str(&s[amp_pos..]);
-            break;
-        }
-        let body = &s[amp_pos + 2..j];
-        let (digits, radix) = match body.strip_prefix(['x', 'X']) {
-            Some(hex) => (hex, 16),
-            None => (body, 10),
-        };
-        if let Ok(cp) = crate::text::parse_character_reference_number(digits, radix) {
-            if let Some(replacement) = crate::text::numeric_character_reference_override(cp) {
-                out.push(replacement);
-                i = j + 1;
-                continue;
-            }
-            if let Some(ch) = u32::try_from(cp).ok().and_then(char::from_u32) {
-                out.push(ch);
-                i = j + 1;
-                continue;
-            }
-        }
-        out.push_str(&s[amp_pos..=j]);
-        i = j + 1;
-    }
-    Ok(out)
 }
 
 /// Extract `start` attribute from `<ol>` (defaults to 1).
@@ -4890,64 +4858,6 @@ fn decode_attr(bytes: &[u8]) -> Result<String, BailReason> {
     let mut out = String::with_capacity(s.len());
     decode_entities_into(&mut out, s, 0)?;
     Ok(out)
-}
-
-/// Bail when this scanner cannot know whether Tier-2 will canonicalize an image's
-/// `alt`/`title` entities, and the answer would be visible in the output.
-///
-/// ~keep `canonicalize_attr_entities` is set from `has_custom_element_tags` alone,
-/// ~keep because that is the one repair trigger a byte scanner can evaluate. It is not
-/// ~keep the only one: `has_inline_block_misnest` routes a document through the same
-/// ~keep html5ever roundtrip, and that check needs a parsed DOM, which Tier-1 runs
-/// ~keep before anything has been parsed and exists precisely to avoid building.
-///
-/// ~keep So when the flag is false the scanner has not established that Tier-2 will
-/// ~keep leave entities alone -- only that ONE of the reasons to rewrite them does not
-/// ~keep apply. Emitting the raw form on that basis is a guess. It was previously right
-/// ~keep by accident: `has_custom_element_tags` treated any `<!--comment-->` as a custom
-/// ~keep element, so nearly every real document set the flag and the gap stayed hidden
-/// ~keep until that false positive was fixed.
-///
-/// ~keep Bailing is safe in both directions -- Tier-2's fallback produces Tier-2's answer
-/// ~keep whether or not it repairs -- so the only cost is losing the fast path. Restricting
-/// ~keep it to values where the two branches genuinely disagree keeps that cost off the
-/// ~keep common cases. The comparison is against what the canonicalizing branch would have
-/// ~keep emitted -- `canonicalize_attr_entities(decode_attr(raw))` -- not against `raw`
-/// ~keep itself: an `alt` written `&amp;` decodes to `&` and canonicalizes straight back to
-/// ~keep `&amp;`, so both branches agree and there is nothing to decide. Only a spelling the
-/// ~keep roundtrip would rewrite, such as `&#x22;` becoming `&quot;`, actually forks.
-fn bail_if_canonicalization_is_undecidable(raw: &str, decoded: &str) -> Result<(), BailReason> {
-    if canonicalize_attr_entities(decoded) != raw {
-        return Err(BailReason::Classifier);
-    }
-    Ok(())
-}
-
-/// Canonicalize the special-character set in an attribute value to match
-/// the output produced by html5ever's serializer (which Tier-2 runs on
-/// HTML containing custom elements).  Numeric forms like `&#x22;` decode
-/// to `"` and re-encode to the canonical named form `&quot;`; literal
-/// special chars are also escaped.  Matches the set in
-/// `html5ever::serialize::escape_for_attribute`.
-fn canonicalize_attr_entities(input: &str) -> std::borrow::Cow<'_, str> {
-    let needs_escape = input
-        .bytes()
-        .any(|b| matches!(b, b'&' | b'<' | b'>' | b'"') || b == 0xC2);
-    if !needs_escape {
-        return std::borrow::Cow::Borrowed(input);
-    }
-    let mut out = String::with_capacity(input.len() + 8);
-    for c in input.chars() {
-        match c {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            '\u{a0}' => out.push_str("&nbsp;"),
-            _ => out.push(c),
-        }
-    }
-    std::borrow::Cow::Owned(out)
 }
 
 /// Pop the topmost frame whose spec matches `spec`.

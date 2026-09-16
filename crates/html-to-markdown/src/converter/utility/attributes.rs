@@ -2,8 +2,35 @@
 //!
 //! Functions for working with element attributes, semantic detection, and hOCR document detection.
 
+use std::borrow::Cow;
+
 use crate::converter::DomContext;
 use crate::converter::utility::content::normalized_tag_name;
+
+/// Read an attribute whose value reaches the Markdown output, decoding character references.
+///
+/// HTML attribute values carry character references exactly as text nodes do, so
+/// `title="A&amp;B"` means the three characters `A&B`. Every user-visible attribute must be
+/// decoded before it is escaped for its Markdown context.
+///
+/// ~keep Issue #494: `<a href>` was the ONLY attribute site that decoded, so eleven others
+/// ~keep emitted the raw entity as literal text. Route every such read through here rather
+/// ~keep than calling `as_utf8_str()` directly, so a new attribute cannot reintroduce the gap.
+/// ~keep The Markdown escaping downstream was always correct -- a literal `"` in a title was
+/// ~keep already escaped -- it simply never received the decoded character.
+///
+/// ~keep Borrow-preserving: `decode_html_entities_cow` returns early on a value with no `&`,
+/// ~keep so the common case still allocates nothing. That was the stated reason the original
+/// ~keep `<a title>` read skipped decoding; the reason does not hold.
+// ~keep `name` carries the tag's lifetime because `tl`'s `Attributes::get` is generic over
+// ~keep `Into<Bytes<'a>>`; every call site passes a literal, so this costs nothing.
+pub fn decoded_attribute<'a>(tag: &'a tl::HTMLTag<'a>, name: &'a str) -> Option<Cow<'a, str>> {
+    let raw = tag.attributes().get(name).flatten()?.as_utf8_str();
+    Some(match raw {
+        Cow::Borrowed(borrowed) => crate::text::decode_html_entities_cow(borrowed),
+        Cow::Owned(owned) => Cow::Owned(crate::text::decode_html_entities_cow(&owned).into_owned()),
+    })
+}
 
 /// Check if a tag has main content semantics based on role or class.
 pub fn tag_has_main_semantics(tag: &tl::HTMLTag) -> bool {

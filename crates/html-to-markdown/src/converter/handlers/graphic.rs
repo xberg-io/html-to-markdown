@@ -44,37 +44,23 @@ pub fn handle_graphic(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    let src = tag
-        .attributes()
-        .get("url")
-        .flatten()
-        .or_else(|| tag.attributes().get("href").flatten())
-        .or_else(|| tag.attributes().get("xlink:href").flatten())
-        .or_else(|| tag.attributes().get("src").flatten())
-        .map_or(Cow::Borrowed(""), |v| {
-            let s = v.as_utf8_str();
+    let src = ["url", "href", "xlink:href", "src"]
+        .into_iter()
+        .find_map(|name| crate::converter::utility::attributes::decoded_attribute(tag, name))
+        .map_or(Cow::Borrowed(""), |s| {
             Cow::Owned(sanitize_markdown_url(&s).into_owned())
         });
 
     // ~keep Use "alt" attribute, fallback to "filename"
-    let alt = tag
-        .attributes()
-        .get("alt")
-        .flatten()
-        .map(|v| v.as_utf8_str())
-        .or_else(|| tag.attributes().get("filename").flatten().map(|v| v.as_utf8_str()))
+    let alt = crate::converter::utility::attributes::decoded_attribute(tag, "alt")
+        .or_else(|| crate::converter::utility::attributes::decoded_attribute(tag, "filename"))
         .unwrap_or(Cow::Borrowed(""));
 
     // ~keep An empty `title=""` carries no information, and `[t](u "")` / `![a](i "")` is
     // ~keep noise that no Markdown serializer round-trips: re-rendering the output drops
     // ~keep the empty title, so the second pass no longer matches the first. Treat it as
     // ~keep absent, which is what it means.
-    let title = tag
-        .attributes()
-        .get("title")
-        .flatten()
-        .map(|v| v.as_utf8_str())
-        .filter(|v| !v.is_empty());
+    let title = crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|v| !v.is_empty());
 
     #[cfg(feature = "metadata")]
     #[allow(clippy::useless_let_if_seq)]

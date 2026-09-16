@@ -42,10 +42,7 @@ fn append_media_src_link(output: &mut String, src: &str, options: &ConversionOpt
 
 /// Extract src attribute from media element (audio, video, iframe).
 pub fn extract_media_src<'a>(tag: &'a HTMLTag<'a>) -> Cow<'a, str> {
-    tag.attributes()
-        .get("src")
-        .flatten()
-        .map_or_else(|| Cow::Borrowed(""), |v| v.as_utf8_str())
+    crate::converter::utility::attributes::decoded_attribute(tag, "src").unwrap_or(Cow::Borrowed(""))
 }
 
 /// Try to find source src from nested source element.
@@ -59,7 +56,7 @@ where
     for child_handle in children {
         if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
             if tag_name_eq(child_tag.name().as_utf8_str(), "source") {
-                return child_tag.attributes().get("src").flatten().map(|v| v.as_utf8_str());
+                return crate::converter::utility::attributes::decoded_attribute(child_tag, "src");
             }
         }
     }
@@ -312,11 +309,7 @@ pub fn handle_iframe(
     dom_ctx: &DomContext,
     parser: &Parser,
 ) {
-    let raw_src = tag
-        .attributes()
-        .get("src")
-        .flatten()
-        .map_or(Cow::Borrowed(""), |v| v.as_utf8_str());
+    let raw_src = crate::converter::utility::attributes::decoded_attribute(tag, "src").unwrap_or(Cow::Borrowed(""));
     let src = sanitize_markdown_url(&raw_src).into_owned();
     let src_opt: Option<&str> = if src.is_empty() { None } else { Some(src.as_str()) };
 

@@ -59,12 +59,7 @@ pub fn handle_link(
     // ~keep noise that no Markdown serializer round-trips: re-rendering the output drops
     // ~keep the empty title, so the second pass no longer matches the first. Treat it as
     // ~keep absent, which is what it means.
-    let title = tag
-        .attributes()
-        .get("title")
-        .flatten()
-        .map(|v| v.as_utf8_str())
-        .filter(|v| !v.is_empty());
+    let title = crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|v| !v.is_empty());
 
     if let Some(href) = href_attr {
         let owned_children: Vec<tl::NodeHandle>;

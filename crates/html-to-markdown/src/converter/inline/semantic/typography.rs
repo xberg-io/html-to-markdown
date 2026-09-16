@@ -401,7 +401,7 @@ pub fn handle_abbreviation(
     output.push_str(prefix);
     output.push_str(trimmed);
 
-    if let Some(title) = tag.attributes().get("title").flatten().map(|v| v.as_utf8_str()) {
+    if let Some(title) = crate::converter::utility::attributes::decoded_attribute(tag, "title") {
         let trimmed_title = title.trim();
         if !trimmed_title.is_empty() {
             output.push_str(" (");
