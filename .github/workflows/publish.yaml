@@ -245,6 +245,30 @@ jobs:
         id: meta
         uses: xberg-io/actions/prepare-release-metadata@v1
 
+      # ~keep Every publish job gates on `is_tag == 'true'`, so a run that resolves it false
+      # skips all of them and still reports success -- a green check having published nothing.
+      # crawlberg run 35122273610 did exactly that: a `workflow_dispatch` carrying `ref: main`
+      # made prepare-release-metadata emit `refs/heads/main`, which is not a tag, and the Maven
+      # republish it was dispatched to perform silently never ran. `is_tag` is true in every
+      # legitimate mode, dry-run included (the synthesized `vX.Y.Z-dryrun-<sha>` tag still
+      # reads as a tag), so there is no case this refuses that should have published.
+      - name: Assert the run can publish at all
+        shell: bash
+        env:
+          IS_TAG: ${{ steps.meta.outputs.is_tag }}
+          RESOLVED_REF: ${{ steps.meta.outputs.ref }}
+          TARGETS: ${{ steps.meta.outputs.release_targets }}
+        run: |
+          set -euo pipefail
+          if [[ "${IS_TAG}" != "true" ]]; then
+            echo "::error::Resolved ref '${RESOLVED_REF}' is not a tag, so every publish job" \
+                 "would be skipped and this run would report success having published nothing." \
+                 "Requested targets: '${TARGETS}'. Dispatch with the 'tag' input alone (and" \
+                 "'republish' if the tag must move); do not pass a branch as 'ref'." >&2
+            exit 1
+          fi
+          echo "Publishing from ${RESOLVED_REF} (targets: ${TARGETS})"
+
       # ~keep The publish actions compare `expected-version` against the artifact's own version
       # string, and two ecosystems respell a semver prerelease: PyPI dist filenames carry the
       # PEP 440 form (1.9.0-rc.2 -> 1.9.0rc2) and gem filenames the RubyGems form
