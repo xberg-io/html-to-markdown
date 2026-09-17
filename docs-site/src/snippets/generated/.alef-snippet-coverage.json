@@ -46,6 +46,7 @@
     "c/conversion/image_figure_figcaption.md",
     "c/conversion/image_kept_inline_in_link.md",
     "c/conversion/image_linked.md",
+    "c/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "c/conversion/image_no_alt.md",
     "c/conversion/image_simple.md",
     "c/conversion/image_with_title.md",
@@ -57,8 +58,11 @@
     "c/conversion/link_anchor_fragment.md",
     "c/conversion/link_empty_href.md",
     "c/conversion/link_image_inside.md",
+    "c/conversion/link_label_block_marker_is_escaped.md",
+    "c/conversion/link_leading_line_break_is_kept.md",
     "c/conversion/link_mailto.md",
     "c/conversion/link_simple.md",
+    "c/conversion/link_trailing_line_break_is_kept.md",
     "c/conversion/link_with_bold_text.md",
     "c/conversion/link_with_title.md",
     "c/conversion/link_wrapping_table_renders_table.md",
@@ -358,6 +362,7 @@
     "csharp/conversion/image_figure_figcaption.md",
     "csharp/conversion/image_kept_inline_in_link.md",
     "csharp/conversion/image_linked.md",
+    "csharp/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "csharp/conversion/image_no_alt.md",
     "csharp/conversion/image_simple.md",
     "csharp/conversion/image_with_title.md",
@@ -369,8 +374,11 @@
     "csharp/conversion/link_anchor_fragment.md",
     "csharp/conversion/link_empty_href.md",
     "csharp/conversion/link_image_inside.md",
+    "csharp/conversion/link_label_block_marker_is_escaped.md",
+    "csharp/conversion/link_leading_line_break_is_kept.md",
     "csharp/conversion/link_mailto.md",
     "csharp/conversion/link_simple.md",
+    "csharp/conversion/link_trailing_line_break_is_kept.md",
     "csharp/conversion/link_with_bold_text.md",
     "csharp/conversion/link_with_title.md",
     "csharp/conversion/link_wrapping_table_renders_table.md",
@@ -670,6 +678,7 @@
     "dart/conversion/image_figure_figcaption.md",
     "dart/conversion/image_kept_inline_in_link.md",
     "dart/conversion/image_linked.md",
+    "dart/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "dart/conversion/image_no_alt.md",
     "dart/conversion/image_simple.md",
     "dart/conversion/image_with_title.md",
@@ -681,8 +690,11 @@
     "dart/conversion/link_anchor_fragment.md",
     "dart/conversion/link_empty_href.md",
     "dart/conversion/link_image_inside.md",
+    "dart/conversion/link_label_block_marker_is_escaped.md",
+    "dart/conversion/link_leading_line_break_is_kept.md",
     "dart/conversion/link_mailto.md",
     "dart/conversion/link_simple.md",
+    "dart/conversion/link_trailing_line_break_is_kept.md",
     "dart/conversion/link_with_bold_text.md",
     "dart/conversion/link_with_title.md",
     "dart/conversion/link_wrapping_table_renders_table.md",
@@ -982,6 +994,7 @@
     "elixir/conversion/image_figure_figcaption.md",
     "elixir/conversion/image_kept_inline_in_link.md",
     "elixir/conversion/image_linked.md",
+    "elixir/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "elixir/conversion/image_no_alt.md",
     "elixir/conversion/image_simple.md",
     "elixir/conversion/image_with_title.md",
@@ -993,8 +1006,11 @@
     "elixir/conversion/link_anchor_fragment.md",
     "elixir/conversion/link_empty_href.md",
     "elixir/conversion/link_image_inside.md",
+    "elixir/conversion/link_label_block_marker_is_escaped.md",
+    "elixir/conversion/link_leading_line_break_is_kept.md",
     "elixir/conversion/link_mailto.md",
     "elixir/conversion/link_simple.md",
+    "elixir/conversion/link_trailing_line_break_is_kept.md",
     "elixir/conversion/link_with_bold_text.md",
     "elixir/conversion/link_with_title.md",
     "elixir/conversion/link_wrapping_table_renders_table.md",
@@ -1294,6 +1310,7 @@
     "go/conversion/image_figure_figcaption.md",
     "go/conversion/image_kept_inline_in_link.md",
     "go/conversion/image_linked.md",
+    "go/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "go/conversion/image_no_alt.md",
     "go/conversion/image_simple.md",
     "go/conversion/image_with_title.md",
@@ -1305,8 +1322,11 @@
     "go/conversion/link_anchor_fragment.md",
     "go/conversion/link_empty_href.md",
     "go/conversion/link_image_inside.md",
+    "go/conversion/link_label_block_marker_is_escaped.md",
+    "go/conversion/link_leading_line_break_is_kept.md",
     "go/conversion/link_mailto.md",
     "go/conversion/link_simple.md",
+    "go/conversion/link_trailing_line_break_is_kept.md",
     "go/conversion/link_with_bold_text.md",
     "go/conversion/link_with_title.md",
     "go/conversion/link_wrapping_table_renders_table.md",
@@ -1606,6 +1626,7 @@
     "java/conversion/image_figure_figcaption.md",
     "java/conversion/image_kept_inline_in_link.md",
     "java/conversion/image_linked.md",
+    "java/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "java/conversion/image_no_alt.md",
     "java/conversion/image_simple.md",
     "java/conversion/image_with_title.md",
@@ -1617,8 +1638,11 @@
     "java/conversion/link_anchor_fragment.md",
     "java/conversion/link_empty_href.md",
     "java/conversion/link_image_inside.md",
+    "java/conversion/link_label_block_marker_is_escaped.md",
+    "java/conversion/link_leading_line_break_is_kept.md",
     "java/conversion/link_mailto.md",
     "java/conversion/link_simple.md",
+    "java/conversion/link_trailing_line_break_is_kept.md",
     "java/conversion/link_with_bold_text.md",
     "java/conversion/link_with_title.md",
     "java/conversion/link_wrapping_table_renders_table.md",
@@ -1918,6 +1942,7 @@
     "kotlin-android/conversion/image_figure_figcaption.md",
     "kotlin-android/conversion/image_kept_inline_in_link.md",
     "kotlin-android/conversion/image_linked.md",
+    "kotlin-android/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "kotlin-android/conversion/image_no_alt.md",
     "kotlin-android/conversion/image_simple.md",
     "kotlin-android/conversion/image_with_title.md",
@@ -1929,8 +1954,11 @@
     "kotlin-android/conversion/link_anchor_fragment.md",
     "kotlin-android/conversion/link_empty_href.md",
     "kotlin-android/conversion/link_image_inside.md",
+    "kotlin-android/conversion/link_label_block_marker_is_escaped.md",
+    "kotlin-android/conversion/link_leading_line_break_is_kept.md",
     "kotlin-android/conversion/link_mailto.md",
     "kotlin-android/conversion/link_simple.md",
+    "kotlin-android/conversion/link_trailing_line_break_is_kept.md",
     "kotlin-android/conversion/link_with_bold_text.md",
     "kotlin-android/conversion/link_with_title.md",
     "kotlin-android/conversion/link_wrapping_table_renders_table.md",
@@ -2176,6 +2204,7 @@
     "php/conversion/image_figure_figcaption.md",
     "php/conversion/image_kept_inline_in_link.md",
     "php/conversion/image_linked.md",
+    "php/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "php/conversion/image_no_alt.md",
     "php/conversion/image_simple.md",
     "php/conversion/image_with_title.md",
@@ -2187,8 +2216,11 @@
     "php/conversion/link_anchor_fragment.md",
     "php/conversion/link_empty_href.md",
     "php/conversion/link_image_inside.md",
+    "php/conversion/link_label_block_marker_is_escaped.md",
+    "php/conversion/link_leading_line_break_is_kept.md",
     "php/conversion/link_mailto.md",
     "php/conversion/link_simple.md",
+    "php/conversion/link_trailing_line_break_is_kept.md",
     "php/conversion/link_with_bold_text.md",
     "php/conversion/link_with_title.md",
     "php/conversion/link_wrapping_table_renders_table.md",
@@ -2488,6 +2520,7 @@
     "python/conversion/image_figure_figcaption.md",
     "python/conversion/image_kept_inline_in_link.md",
     "python/conversion/image_linked.md",
+    "python/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "python/conversion/image_no_alt.md",
     "python/conversion/image_simple.md",
     "python/conversion/image_with_title.md",
@@ -2499,8 +2532,11 @@
     "python/conversion/link_anchor_fragment.md",
     "python/conversion/link_empty_href.md",
     "python/conversion/link_image_inside.md",
+    "python/conversion/link_label_block_marker_is_escaped.md",
+    "python/conversion/link_leading_line_break_is_kept.md",
     "python/conversion/link_mailto.md",
     "python/conversion/link_simple.md",
+    "python/conversion/link_trailing_line_break_is_kept.md",
     "python/conversion/link_with_bold_text.md",
     "python/conversion/link_with_title.md",
     "python/conversion/link_wrapping_table_renders_table.md",
@@ -2800,6 +2836,7 @@
     "r/conversion/image_figure_figcaption.md",
     "r/conversion/image_kept_inline_in_link.md",
     "r/conversion/image_linked.md",
+    "r/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "r/conversion/image_no_alt.md",
     "r/conversion/image_simple.md",
     "r/conversion/image_with_title.md",
@@ -2811,8 +2848,11 @@
     "r/conversion/link_anchor_fragment.md",
     "r/conversion/link_empty_href.md",
     "r/conversion/link_image_inside.md",
+    "r/conversion/link_label_block_marker_is_escaped.md",
+    "r/conversion/link_leading_line_break_is_kept.md",
     "r/conversion/link_mailto.md",
     "r/conversion/link_simple.md",
+    "r/conversion/link_trailing_line_break_is_kept.md",
     "r/conversion/link_with_bold_text.md",
     "r/conversion/link_with_title.md",
     "r/conversion/link_wrapping_table_renders_table.md",
@@ -3112,6 +3152,7 @@
     "ruby/conversion/image_figure_figcaption.md",
     "ruby/conversion/image_kept_inline_in_link.md",
     "ruby/conversion/image_linked.md",
+    "ruby/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "ruby/conversion/image_no_alt.md",
     "ruby/conversion/image_simple.md",
     "ruby/conversion/image_with_title.md",
@@ -3123,8 +3164,11 @@
     "ruby/conversion/link_anchor_fragment.md",
     "ruby/conversion/link_empty_href.md",
     "ruby/conversion/link_image_inside.md",
+    "ruby/conversion/link_label_block_marker_is_escaped.md",
+    "ruby/conversion/link_leading_line_break_is_kept.md",
     "ruby/conversion/link_mailto.md",
     "ruby/conversion/link_simple.md",
+    "ruby/conversion/link_trailing_line_break_is_kept.md",
     "ruby/conversion/link_with_bold_text.md",
     "ruby/conversion/link_with_title.md",
     "ruby/conversion/link_wrapping_table_renders_table.md",
@@ -3424,6 +3468,7 @@
     "rust/conversion/image_figure_figcaption.md",
     "rust/conversion/image_kept_inline_in_link.md",
     "rust/conversion/image_linked.md",
+    "rust/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "rust/conversion/image_no_alt.md",
     "rust/conversion/image_simple.md",
     "rust/conversion/image_with_title.md",
@@ -3435,8 +3480,11 @@
     "rust/conversion/link_anchor_fragment.md",
     "rust/conversion/link_empty_href.md",
     "rust/conversion/link_image_inside.md",
+    "rust/conversion/link_label_block_marker_is_escaped.md",
+    "rust/conversion/link_leading_line_break_is_kept.md",
     "rust/conversion/link_mailto.md",
     "rust/conversion/link_simple.md",
+    "rust/conversion/link_trailing_line_break_is_kept.md",
     "rust/conversion/link_with_bold_text.md",
     "rust/conversion/link_with_title.md",
     "rust/conversion/link_wrapping_table_renders_table.md",
@@ -3736,6 +3784,7 @@
     "swift/conversion/image_figure_figcaption.md",
     "swift/conversion/image_kept_inline_in_link.md",
     "swift/conversion/image_linked.md",
+    "swift/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "swift/conversion/image_no_alt.md",
     "swift/conversion/image_simple.md",
     "swift/conversion/image_with_title.md",
@@ -3747,8 +3796,11 @@
     "swift/conversion/link_anchor_fragment.md",
     "swift/conversion/link_empty_href.md",
     "swift/conversion/link_image_inside.md",
+    "swift/conversion/link_label_block_marker_is_escaped.md",
+    "swift/conversion/link_leading_line_break_is_kept.md",
     "swift/conversion/link_mailto.md",
     "swift/conversion/link_simple.md",
+    "swift/conversion/link_trailing_line_break_is_kept.md",
     "swift/conversion/link_with_bold_text.md",
     "swift/conversion/link_with_title.md",
     "swift/conversion/link_wrapping_table_renders_table.md",
@@ -4048,6 +4100,7 @@
     "typescript/conversion/image_figure_figcaption.md",
     "typescript/conversion/image_kept_inline_in_link.md",
     "typescript/conversion/image_linked.md",
+    "typescript/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "typescript/conversion/image_no_alt.md",
     "typescript/conversion/image_simple.md",
     "typescript/conversion/image_with_title.md",
@@ -4059,8 +4112,11 @@
     "typescript/conversion/link_anchor_fragment.md",
     "typescript/conversion/link_empty_href.md",
     "typescript/conversion/link_image_inside.md",
+    "typescript/conversion/link_label_block_marker_is_escaped.md",
+    "typescript/conversion/link_leading_line_break_is_kept.md",
     "typescript/conversion/link_mailto.md",
     "typescript/conversion/link_simple.md",
+    "typescript/conversion/link_trailing_line_break_is_kept.md",
     "typescript/conversion/link_with_bold_text.md",
     "typescript/conversion/link_with_title.md",
     "typescript/conversion/link_wrapping_table_renders_table.md",
@@ -4360,6 +4416,7 @@
     "wasm/conversion/image_figure_figcaption.md",
     "wasm/conversion/image_kept_inline_in_link.md",
     "wasm/conversion/image_linked.md",
+    "wasm/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "wasm/conversion/image_no_alt.md",
     "wasm/conversion/image_simple.md",
     "wasm/conversion/image_with_title.md",
@@ -4371,8 +4428,11 @@
     "wasm/conversion/link_anchor_fragment.md",
     "wasm/conversion/link_empty_href.md",
     "wasm/conversion/link_image_inside.md",
+    "wasm/conversion/link_label_block_marker_is_escaped.md",
+    "wasm/conversion/link_leading_line_break_is_kept.md",
     "wasm/conversion/link_mailto.md",
     "wasm/conversion/link_simple.md",
+    "wasm/conversion/link_trailing_line_break_is_kept.md",
     "wasm/conversion/link_with_bold_text.md",
     "wasm/conversion/link_with_title.md",
     "wasm/conversion/link_wrapping_table_renders_table.md",
@@ -4672,6 +4732,7 @@
     "zig/conversion/image_figure_figcaption.md",
     "zig/conversion/image_kept_inline_in_link.md",
     "zig/conversion/image_linked.md",
+    "zig/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "zig/conversion/image_no_alt.md",
     "zig/conversion/image_simple.md",
     "zig/conversion/image_with_title.md",
@@ -4683,8 +4744,11 @@
     "zig/conversion/link_anchor_fragment.md",
     "zig/conversion/link_empty_href.md",
     "zig/conversion/link_image_inside.md",
+    "zig/conversion/link_label_block_marker_is_escaped.md",
+    "zig/conversion/link_leading_line_break_is_kept.md",
     "zig/conversion/link_mailto.md",
     "zig/conversion/link_simple.md",
+    "zig/conversion/link_trailing_line_break_is_kept.md",
     "zig/conversion/link_with_bold_text.md",
     "zig/conversion/link_with_title.md",
     "zig/conversion/link_wrapping_table_renders_table.md",
@@ -5483,6 +5547,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "c"
+      },
+      "path": "c/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "c"
       },
@@ -5615,6 +5691,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "c"
+      },
+      "path": "c/conversion/link_label_block_marker_is_escaped.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "c"
+      },
+      "path": "c/conversion/link_leading_line_break_is_kept.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "c"
       },
@@ -5631,6 +5731,18 @@
         "language": "c"
       },
       "path": "c/conversion/link_simple.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "c"
+      },
+      "path": "c/conversion/link_trailing_line_break_is_kept.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -9227,6 +9339,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "csharp"
       },
@@ -9359,6 +9483,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/link_label_block_marker_is_escaped.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/link_leading_line_break_is_kept.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "csharp"
       },
@@ -9375,6 +9523,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/link_simple.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/link_trailing_line_break_is_kept.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -12971,6 +13131,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "dart"
+      },
+      "path": "dart/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "dart"
       },
@@ -13103,6 +13275,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "dart"
+      },
+      "path": "dart/conversion/link_label_block_marker_is_escaped.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "dart"
+      },
+      "path": "dart/conversion/link_leading_line_break_is_kept.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "dart"
       },
@@ -13119,6 +13315,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/link_simple.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "dart"
+      },
+      "path": "dart/conversion/link_trailing_line_break_is_kept.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -16715,6 +16923,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "elixir"
       },
@@ -16847,6 +17067,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/link_label_block_marker_is_escaped.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/link_leading_line_break_is_kept.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "elixir"
       },
@@ -16863,6 +17107,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/link_simple.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/link_trailing_line_break_is_kept.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -20459,6 +20715,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "go"
+      },
+      "path": "go/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "go"
       },
@@ -20591,6 +20859,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "go"
+      },
+      "path": "go/conversion/link_label_block_marker_is_escaped.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "go"
+      },
+      "path": "go/conversion/link_leading_line_break_is_kept.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "go"
       },
@@ -20607,6 +20899,18 @@
         "language": "go"
       },
       "path": "go/conversion/link_simple.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "go"
+      },
+      "path": "go/conversion/link_trailing_line_break_is_kept.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -24203,6 +24507,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "java"
+      },
+      "path": "java/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "java"
       },
@@ -24335,6 +24651,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "java"
+      },
+      "path": "java/conversion/link_label_block_marker_is_escaped.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "java"
+      },
+      "path": "java/conversion/link_leading_line_break_is_kept.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "java"
       },
@@ -24351,6 +24691,18 @@
         "language": "java"
       },
       "path": "java/conversion/link_simple.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "java"
+      },
+      "path": "java/conversion/link_trailing_line_break_is_kept.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -27947,6 +28299,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "kotlin_android"
       },
@@ -28079,6 +28443,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/link_label_block_marker_is_escaped.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/link_leading_line_break_is_kept.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "kotlin_android"
       },
@@ -28095,6 +28483,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/link_simple.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/link_trailing_line_break_is_kept.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -31043,6 +31443,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "php"
+      },
+      "path": "php/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "php"
       },
@@ -31175,6 +31587,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "php"
+      },
+      "path": "php/conversion/link_label_block_marker_is_escaped.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "php"
+      },
+      "path": "php/conversion/link_leading_line_break_is_kept.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "php"
       },
@@ -31191,6 +31627,18 @@
         "language": "php"
       },
       "path": "php/conversion/link_simple.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "php"
+      },
+      "path": "php/conversion/link_trailing_line_break_is_kept.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -34787,6 +35235,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "python"
+      },
+      "path": "python/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "python"
       },
@@ -34919,6 +35379,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "python"
+      },
+      "path": "python/conversion/link_label_block_marker_is_escaped.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "python"
+      },
+      "path": "python/conversion/link_leading_line_break_is_kept.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "python"
       },
@@ -34935,6 +35419,18 @@
         "language": "python"
       },
       "path": "python/conversion/link_simple.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "python"
+      },
+      "path": "python/conversion/link_trailing_line_break_is_kept.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -38531,6 +39027,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "r"
+      },
+      "path": "r/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "r"
       },
@@ -38663,6 +39171,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "r"
+      },
+      "path": "r/conversion/link_label_block_marker_is_escaped.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "r"
+      },
+      "path": "r/conversion/link_leading_line_break_is_kept.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "r"
       },
@@ -38679,6 +39211,18 @@
         "language": "r"
       },
       "path": "r/conversion/link_simple.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "r"
+      },
+      "path": "r/conversion/link_trailing_line_break_is_kept.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -42275,6 +42819,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "ruby"
       },
@@ -42407,6 +42963,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/link_label_block_marker_is_escaped.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/link_leading_line_break_is_kept.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "ruby"
       },
@@ -42423,6 +43003,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/link_simple.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/link_trailing_line_break_is_kept.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -46027,6 +46619,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "rust"
+      },
+      "path": "rust/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "rust"
       },
@@ -46159,6 +46763,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "rust"
+      },
+      "path": "rust/conversion/link_label_block_marker_is_escaped.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "rust"
+      },
+      "path": "rust/conversion/link_leading_line_break_is_kept.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "rust"
       },
@@ -46175,6 +46803,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/link_simple.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "rust"
+      },
+      "path": "rust/conversion/link_trailing_line_break_is_kept.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -50105,6 +50745,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "swift"
+      },
+      "path": "swift/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "swift"
       },
@@ -50237,6 +50889,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "swift"
+      },
+      "path": "swift/conversion/link_label_block_marker_is_escaped.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "swift"
+      },
+      "path": "swift/conversion/link_leading_line_break_is_kept.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "swift"
       },
@@ -50253,6 +50929,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/link_simple.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "swift"
+      },
+      "path": "swift/conversion/link_trailing_line_break_is_kept.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -53849,6 +54537,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "node"
+      },
+      "path": "typescript/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "node"
       },
@@ -53981,6 +54681,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "node"
+      },
+      "path": "typescript/conversion/link_label_block_marker_is_escaped.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "node"
+      },
+      "path": "typescript/conversion/link_leading_line_break_is_kept.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "node"
       },
@@ -53997,6 +54721,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/link_simple.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "node"
+      },
+      "path": "typescript/conversion/link_trailing_line_break_is_kept.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -57593,6 +58329,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "wasm"
       },
@@ -57725,6 +58473,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/link_label_block_marker_is_escaped.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/link_leading_line_break_is_kept.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "wasm"
       },
@@ -57741,6 +58513,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/link_simple.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/link_trailing_line_break_is_kept.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -61337,6 +62121,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+        "language": "zig"
+      },
+      "path": "zig/conversion/image_multiline_alt_block_marker_is_escaped.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_no_alt",
         "language": "zig"
       },
@@ -61469,6 +62265,30 @@
     },
     {
       "key": {
+        "fixture_id": "link_label_block_marker_is_escaped",
+        "language": "zig"
+      },
+      "path": "zig/conversion/link_label_block_marker_is_escaped.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_leading_line_break_is_kept",
+        "language": "zig"
+      },
+      "path": "zig/conversion/link_leading_line_break_is_kept.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_mailto",
         "language": "zig"
       },
@@ -61485,6 +62305,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/link_simple.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_trailing_line_break_is_kept",
+        "language": "zig"
+      },
+      "path": "zig/conversion/link_trailing_line_break_is_kept.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -68382,6 +69214,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "zig"
+    },
+    {
       "fixture_id": "image_no_alt",
       "language": "c"
     },
@@ -69214,6 +70110,134 @@
       "language": "zig"
     },
     {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "zig"
+    },
+    {
       "fixture_id": "link_mailto",
       "language": "c"
     },
@@ -69339,6 +70363,70 @@
     },
     {
       "fixture_id": "link_simple",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
       "language": "zig"
     },
     {
@@ -88136,6 +89224,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_multiline_alt_block_marker_is_escaped",
+      "language": "zig"
+    },
+    {
       "fixture_id": "image_no_alt",
       "language": "c"
     },
@@ -88968,6 +90120,134 @@
       "language": "zig"
     },
     {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_leading_line_break_is_kept",
+      "language": "zig"
+    },
+    {
       "fixture_id": "link_mailto",
       "language": "c"
     },
@@ -89093,6 +90373,70 @@
     },
     {
       "fixture_id": "link_simple",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_trailing_line_break_is_kept",
       "language": "zig"
     },
     {

@@ -1,6 +1,6 @@
 {
   "name": "@xberg-io/opencode-html-to-markdown",
-  "version": "3.14.0",
+  "version": "3.14.1",
   "description": "Fast, lossless HTML→Markdown conversion with structured metadata, tables, and document-structure extraction.",
   "keywords": [
     "html-to-markdown",
