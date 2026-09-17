@@ -172,6 +172,7 @@ pub fn handle_link(
             let mut content = String::new();
             let link_ctx = Context {
                 inline_depth: ctx.inline_depth + 1,
+                in_link: true,
                 link_allow_inline_images,
                 ..ctx.clone()
             };
@@ -191,6 +192,7 @@ pub fn handle_link(
             let mut content = String::new();
             let link_ctx = Context {
                 inline_depth: ctx.inline_depth + 1,
+                in_link: true,
                 convert_as_inline: true,
                 link_allow_inline_images,
                 ..ctx.clone()
@@ -224,6 +226,7 @@ pub fn handle_link(
             let mut content = String::new();
             let link_ctx = Context {
                 inline_depth: ctx.inline_depth + 1,
+                in_link: true,
                 link_allow_inline_images,
                 ..ctx.clone()
             };

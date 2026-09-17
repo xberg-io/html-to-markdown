@@ -130,6 +130,16 @@ pub fn handle(
         // ~keep cannot contain a hard line break, so newline_style is never consulted and
         // ~keep source whitespace before the <br> is trimmed rather than leaked.
         emit_table_cell_break(output, options.br_in_tables);
+    } else if ctx.in_link {
+        // ~keep #497: inside a link label a `<br>` with nothing before it is still real
+        // ~keep content -- `B<a href="H"><br>A</a>` renders as B, a line break, then A, and
+        // ~keep `B[  \n A](H)` (without the space) re-parses to exactly that. The
+        // ~keep `block_content_start` test below cannot see this case: a label is built into a
+        // ~keep fresh local `String` whose length starts at 0 while `block_content_start` still
+        // ~keep refers to the ENCLOSING block's buffer, so "nothing on this line yet" comes out
+        // ~keep true or false by coincidence. Whether a break at either edge of the label
+        // ~keep survives is `normalize_link_label`'s decision, not this one's.
+        output.push_str(hard_break_marker(options.newline_style));
     } else if output.len() == ctx.block_content_start {
         // ~keep A <br> with nothing before it on the current line has no prior line to
         // ~keep break: emitting a style marker here would leave a leading artifact instead

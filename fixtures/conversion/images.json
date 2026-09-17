@@ -138,5 +138,26 @@
       "stem": "image_kept_inline_in_link",
       "title": "keep_inline_images_in keeps an image inside a link"
     }
+  },
+  {
+    "id": "image_multiline_alt_block_marker_is_escaped",
+    "description": "A block marker on a continuation line of multiline alt text is escaped",
+    "input": {
+      "html": "<img alt=\"Alpha\n-\nBeta\" src=\"image.png\">"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "![Alpha\n\\-\nBeta](image.png)"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "image_multiline_alt_block_marker_is_escaped",
+      "title": "A block marker on a continuation line of multiline alt text is escaped"
+    }
   }
 ]

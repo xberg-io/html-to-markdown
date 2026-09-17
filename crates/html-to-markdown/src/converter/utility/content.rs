@@ -215,17 +215,78 @@ const HARD_BREAK_MARKERS: [&str; 2] = ["  \n", "\\\n"];
 /// ~keep offsets (via `str::find`) is always on a char boundary -- no placeholder needed.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn normalize_link_label(label: &str) -> String {
-    let mut result = String::with_capacity(label.len());
+    let mut segments: Vec<String> = Vec::new();
+    let mut markers: Vec<&'static str> = Vec::new();
     let mut rest = label;
 
     while let Some((marker_pos, marker)) = find_earliest_hard_break_marker(rest) {
-        collapse_whitespace_into(&mut result, &rest[..marker_pos]);
-        result.push_str(marker);
+        let mut segment = String::new();
+        collapse_whitespace_into(&mut segment, &rest[..marker_pos]);
+        segments.push(segment);
+        markers.push(marker);
         rest = &rest[marker_pos + marker.len()..];
     }
-    collapse_whitespace_into(&mut result, rest);
+    let mut segment = String::new();
+    collapse_whitespace_into(&mut segment, rest);
+    segments.push(segment);
 
-    drop_boundary_hard_breaks(result.trim()).to_string()
+    assemble_label(segments, markers)
+}
+
+/// Re-join a label's whitespace-collapsed segments and the hard-break markers between them,
+/// trimming the label's own outer whitespace without eating a break that sits at either end.
+///
+/// A `<br>` against the `</a>` is real content: `<a href="H">A<br></a>B` renders as A, a line
+/// break, then B, and `[A  \n](H)B` re-parses to exactly that `<a href="H">A<br/></a>B`
+/// (issue #497). It was previously dropped because the whole label was `str::trim`-ed, and a
+/// `"  \n"` marker is indistinguishable from incidental trailing whitespace once flattened.
+///
+/// A run of breaks at either end still collapses to one. Two adjacent markers put a blank line
+/// in the label, and a blank line ends the paragraph -- so `[  \n  \nA](H)` would destroy the
+/// link rather than preserve a second break nobody can see anyway.
+fn assemble_label(mut segments: Vec<String>, mut markers: Vec<&'static str>) -> String {
+    if let Some(first) = segments.first_mut() {
+        *first = first.trim_start().to_string();
+    }
+    if let Some(last) = segments.last_mut() {
+        *last = last.trim_end().to_string();
+    }
+
+    let mut leading = "";
+    while segments.len() > 1 && segments[0].is_empty() {
+        segments.remove(0);
+        leading = markers.remove(0);
+    }
+    let mut trailing = "";
+    while segments.len() > 1 && segments.last().is_some_and(String::is_empty) {
+        segments.pop();
+        trailing = markers.pop().unwrap_or("");
+    }
+
+    // ~keep Nothing but breaks: a break needs a line on both sides to mean anything, so a
+    // ~keep label of only `<br>` collapses to empty exactly as it did before.
+    if segments.iter().all(String::is_empty) {
+        return String::new();
+    }
+
+    let mut result = String::with_capacity(label_capacity(&segments, &markers, leading, trailing));
+    result.push_str(leading);
+    for (index, segment) in segments.iter().enumerate() {
+        if index > 0 {
+            result.push_str(markers.get(index - 1).copied().unwrap_or(""));
+        }
+        result.push_str(segment);
+    }
+    result.push_str(trailing);
+    result
+}
+
+/// Exact byte length [`assemble_label`] is about to write.
+fn label_capacity(segments: &[String], markers: &[&str], leading: &str, trailing: &str) -> usize {
+    segments.iter().map(String::len).sum::<usize>()
+        + markers.iter().map(|marker| marker.len()).sum::<usize>()
+        + leading.len()
+        + trailing.len()
 }
 
 /// Find the earliest occurrence of either hard-break marker in `text`, if any.
@@ -251,28 +312,6 @@ fn collapse_whitespace_into(out: &mut String, segment: &str) {
     };
 
     out.push_str(text::normalize_whitespace_cow(folded.as_ref()).as_ref());
-}
-
-/// Drop a hard-break marker that ends up at the label's very start or end -- it has no
-/// preceding/following line to break to/from, so (matching the pre-existing behaviour of
-/// collapsing such a break down to nothing) it is removed rather than kept.
-fn drop_boundary_hard_breaks(mut text: &str) -> &str {
-    loop {
-        let without_leading = HARD_BREAK_MARKERS
-            .iter()
-            .find_map(|marker| text.strip_prefix(marker))
-            .map(str::trim_start);
-        let without_trailing = HARD_BREAK_MARKERS
-            .iter()
-            .find_map(|marker| text.strip_suffix(marker))
-            .map(str::trim_end);
-
-        let next = without_leading.or(without_trailing);
-        match next {
-            Some(stripped) if stripped != text => text = stripped,
-            _ => return text,
-        }
-    }
 }
 
 /// Normalize a tag name to lowercase, preserving borrowed input when possible.
@@ -308,9 +347,29 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
     }
 }
 
-/// Escape special Markdown characters in a link label or image alt text.
+/// Escape a link label or image alt text so it cannot break out of the `[...]` / `![...]`
+/// it is about to be wrapped in.
 ///
-/// Handles bracket escaping to prevent unintended link label termination.
+/// Two independent escapes, in order:
+///
+/// 1. [`escape_label_brackets`] -- a `]` with no local opener, or a matched pair that is
+///    itself link- or reference-link-shaped.
+/// 2. [`escape_block_openers_on_continuation_lines`] -- a `CommonMark` block-structure
+///    marker opening a line after the first (issue #496).
+///
+/// Both are unconditional, unlike the `escape_misc`/`escape_asterisks` family: those decide
+/// whether text that merely *looks* like Markdown is emitted verbatim, whereas these two
+/// decide whether the link or image survives at all.
+pub fn escape_link_label(text: &str) -> Cow<'_, str> {
+    match escape_label_brackets(text) {
+        Cow::Borrowed(bracketed) => escape_block_openers_on_continuation_lines(bracketed),
+        Cow::Owned(bracketed) => Cow::Owned(escape_block_openers_on_continuation_lines(&bracketed).into_owned()),
+    }
+}
+
+/// Escape the brackets in a link label or image alt text that would otherwise terminate it.
+///
+/// One of the two halves of [`escape_link_label`]; see there for the other.
 /// Tracks matched bracket pairs and escapes a closing bracket that has no local opener
 /// (it would otherwise close the caller's own wrapping `[`/`![` early), and escapes a
 /// matched pair outright when it is itself link- or reference-link-shaped.
@@ -329,7 +388,7 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
 ///
 /// Returns `Cow::Borrowed` when `text` contains neither `[` nor `]` (escaping is then
 /// necessarily a no-op), or `Cow::Owned` with the escaped text otherwise.
-pub fn escape_link_label(text: &str) -> Cow<'_, str> {
+fn escape_label_brackets(text: &str) -> Cow<'_, str> {
     if text.is_empty() {
         return Cow::Borrowed("");
     }
@@ -414,6 +473,257 @@ pub fn escape_link_label(text: &str) -> Cow<'_, str> {
     }
 
     Cow::Owned(result)
+}
+
+/// `CommonMark` HTML-block start conditions of type 1: raw-text elements, whose *opening*
+/// tag alone on a line starts a block. Their closing tags do not.
+const HTML_BLOCK_RAW_TEXT_TAGS: [&str; 4] = ["pre", "script", "style", "textarea"];
+
+/// `CommonMark` HTML-block start conditions of type 6 (spec 0.31.2): either an opening or a
+/// closing tag with one of these names starts a block, and type 6 -- unlike type 7 -- may
+/// interrupt a paragraph.
+const HTML_BLOCK_TAGS: [&str; 62] = [
+    "address",
+    "article",
+    "aside",
+    "base",
+    "basefont",
+    "blockquote",
+    "body",
+    "caption",
+    "center",
+    "col",
+    "colgroup",
+    "dd",
+    "details",
+    "dialog",
+    "dir",
+    "div",
+    "dl",
+    "dt",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "frame",
+    "frameset",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "head",
+    "header",
+    "hr",
+    "html",
+    "iframe",
+    "legend",
+    "li",
+    "link",
+    "main",
+    "menu",
+    "menuitem",
+    "nav",
+    "noframes",
+    "ol",
+    "optgroup",
+    "option",
+    "p",
+    "param",
+    "search",
+    "section",
+    "summary",
+    "table",
+    "tbody",
+    "td",
+    "tfoot",
+    "th",
+    "thead",
+    "title",
+    "tr",
+    "track",
+    "ul",
+];
+
+/// Escape a `CommonMark` block-structure marker that opens a *continuation* line of a link
+/// label or image alt text.
+///
+/// Block structure is parsed before inline structure (spec appendix A), so a line inside a
+/// multi-line label that reads as a block opener terminates the paragraph the label lives in
+/// and the `[` / `![` never pairs with its `]`. `![A\n-\n](S)` therefore produces no image at
+/// all -- it produces `<h2>![A</h2><p>](S)</p>`, with the image simply gone (issue #496).
+/// A hard line break does not protect the next line either: hard breaks are inline, and block
+/// parsing has already finished by the time they are looked at.
+///
+/// Only continuation lines are examined. A label's first line is preceded on that same line by
+/// the caller's `[` / `![`, so it cannot start a block however it begins.
+///
+/// Returns `Cow::Borrowed` when `text` is single-line or no continuation line opens a block.
+fn escape_block_openers_on_continuation_lines(text: &str) -> Cow<'_, str> {
+    if !text.contains('\n') {
+        return Cow::Borrowed(text);
+    }
+
+    let mut escape_at: Vec<usize> = Vec::new();
+    let mut line_start = 0usize;
+    for (index, line) in text.split('\n').enumerate() {
+        if index > 0 {
+            if let Some(offset) = block_opener_escape_offset(line) {
+                escape_at.push(line_start + offset);
+            }
+        }
+        line_start += line.len() + 1;
+    }
+
+    if escape_at.is_empty() {
+        return Cow::Borrowed(text);
+    }
+
+    let mut result = String::with_capacity(text.len() + escape_at.len());
+    let mut copied = 0usize;
+    for position in escape_at {
+        result.push_str(&text[copied..position]);
+        result.push('\\');
+        copied = position;
+    }
+    result.push_str(&text[copied..]);
+    Cow::Owned(result)
+}
+
+/// Byte offset within `line` of the character to backslash-escape so the line stops opening a
+/// block, or `None` when the line opens no block that can interrupt a paragraph.
+fn block_opener_escape_offset(line: &str) -> Option<usize> {
+    let (indent, column) = leading_indent(line);
+    // ~keep Four columns of indent is an indented code block, and an indented code block
+    // ~keep cannot interrupt a paragraph -- such a line is already inert.
+    if column >= 4 {
+        return None;
+    }
+    let rest = line.get(indent..)?;
+    let marker = *rest.as_bytes().first()?;
+    let opens_block = match marker {
+        b'>' => true,
+        b'#' => is_atx_heading(rest),
+        b'`' | b'~' => is_code_fence(rest, marker),
+        b'=' => is_setext_underline(rest, b'='),
+        b'-' => is_setext_underline(rest, b'-') || is_thematic_break(rest, b'-') || is_bullet_list_item(rest),
+        b'*' => is_thematic_break(rest, b'*') || is_bullet_list_item(rest),
+        b'+' => is_bullet_list_item(rest),
+        b'_' => is_thematic_break(rest, b'_'),
+        b'<' => is_html_block_opener(rest),
+        // ~keep A digit cannot carry a backslash escape, so an ordered-list marker is
+        // ~keep defused at its `.`/`)` delimiter instead of at its number.
+        b'0'..=b'9' => return ordered_list_delimiter_offset(rest).map(|offset| indent + offset),
+        _ => false,
+    };
+    opens_block.then_some(indent)
+}
+
+/// Split `line`'s leading indentation, returning `(byte length, column width)`.
+fn leading_indent(line: &str) -> (usize, usize) {
+    let mut length = 0usize;
+    let mut column = 0usize;
+    for &byte in line.as_bytes() {
+        match byte {
+            b' ' => column += 1,
+            // ~keep A tab advances to the next multiple of four (spec section 2.2), so a
+            // ~keep single leading tab is already four columns of indent.
+            b'\t' => column += 4 - column % 4,
+            _ => break,
+        }
+        length += 1;
+    }
+    (length, column)
+}
+
+/// An ATX heading: one to six `#`, then a space/tab or the end of the line.
+fn is_atx_heading(rest: &str) -> bool {
+    let hashes = rest.bytes().take_while(|&byte| byte == b'#').count();
+    (1..=6).contains(&hashes) && matches!(rest.as_bytes().get(hashes), None | Some(b' ' | b'\t' | b'\r'))
+}
+
+/// An opening code fence: three or more of the same fence character.
+fn is_code_fence(rest: &str, fence: u8) -> bool {
+    let run = rest.bytes().take_while(|&byte| byte == fence).count();
+    // ~keep A backtick fence's info string may not itself contain a backtick, so such a line
+    // ~keep is ordinary text and needs no escape.
+    run >= 3 && (fence != b'`' || !rest[run..].contains('`'))
+}
+
+/// A setext heading underline: nothing but `marker`, plus optional trailing whitespace.
+fn is_setext_underline(rest: &str, marker: u8) -> bool {
+    let trimmed = rest.trim_end();
+    !trimmed.is_empty() && trimmed.bytes().all(|byte| byte == marker)
+}
+
+/// A thematic break: three or more `marker` characters and nothing else but spaces/tabs.
+fn is_thematic_break(rest: &str, marker: u8) -> bool {
+    let mut count = 0usize;
+    for byte in rest.bytes() {
+        if byte == marker {
+            count += 1;
+        } else if !matches!(byte, b' ' | b'\t' | b'\r') {
+            return false;
+        }
+    }
+    count >= 3
+}
+
+/// A bullet list item that can interrupt a paragraph: a marker, a space/tab, then content.
+fn is_bullet_list_item(rest: &str) -> bool {
+    // ~keep An empty list item cannot interrupt a paragraph (spec section 5.2), so both the
+    // ~keep separating space/tab and non-blank content after it are required.
+    matches!(rest.as_bytes().get(1), Some(b' ' | b'\t')) && rest.get(2..).is_some_and(|tail| !tail.trim().is_empty())
+}
+
+/// Byte offset of the `.`/`)` of an ordered list marker that can interrupt a paragraph.
+fn ordered_list_delimiter_offset(rest: &str) -> Option<usize> {
+    // ~keep Only a list starting at 1 can interrupt a paragraph (spec section 5.2).
+    let bytes = rest.as_bytes();
+    let starts_a_list = bytes.first() == Some(&b'1')
+        && matches!(bytes.get(1), Some(b'.' | b')'))
+        && matches!(bytes.get(2), Some(b' ' | b'\t'))
+        && rest.get(3..).is_some_and(|tail| !tail.trim().is_empty());
+    starts_a_list.then_some(1)
+}
+
+/// An HTML block of type 1 to 6 -- the types that may interrupt a paragraph.
+///
+/// Type 7 (any other complete open tag alone on its line) deliberately may not, so inline
+/// markup such as a `<span>` opening a continuation line is left alone.
+fn is_html_block_opener(rest: &str) -> bool {
+    let after_bracket = &rest[1..];
+    // ~keep Types 2-5: comment, processing instruction, declaration, CDATA.
+    if after_bracket.starts_with("!--")
+        || after_bracket.starts_with('?')
+        || after_bracket.starts_with("![CDATA[")
+        || (after_bracket.starts_with('!') && after_bracket.as_bytes().get(1).is_some_and(u8::is_ascii_alphabetic))
+    {
+        return true;
+    }
+
+    let is_closing = after_bracket.starts_with('/');
+    let name_start = usize::from(is_closing);
+    let name: String = after_bracket[name_start..]
+        .bytes()
+        .take_while(u8::is_ascii_alphanumeric)
+        .map(|byte| byte.to_ascii_lowercase() as char)
+        .collect();
+    if name.is_empty() {
+        return false;
+    }
+
+    // ~keep Both start conditions require the tag name to end at whitespace, `>`, `/>` or the
+    // ~keep end of the line; anything else (`<divx`, `<div=`) is not a tag at all.
+    let tail = &after_bracket[name_start + name.len()..];
+    let is_terminated =
+        tail.is_empty() || tail.starts_with('>') || tail.starts_with("/>") || tail.starts_with(char::is_whitespace);
+
+    is_terminated
+        && (HTML_BLOCK_TAGS.contains(&name.as_str())
+            || (!is_closing && HTML_BLOCK_RAW_TEXT_TAGS.contains(&name.as_str())))
 }
 
 /// Helper for block-level element detection.
@@ -619,18 +929,43 @@ mod tests {
         assert_eq!(normalize_link_label("foo\\\nbar"), "foo\\\nbar");
     }
 
-    // ~keep A hard break with nothing before/after it has no line to break to or
-    // ~keep from, so it is dropped entirely -- matching the pre-existing behaviour of
-    // ~keep trimming a leading/trailing break down to nothing, not just collapsing it
-    // ~keep to a space.
+    // ~keep Issue #497: a break at the label's edge is real content, not incidental
+    // ~keep whitespace. `<a href="H">A<br></a>B` renders as A, a line break, then B, and
+    // ~keep `[A  \n](H)B` re-parses to exactly that -- verified against comrak. These two
+    // ~keep previously asserted the opposite (the break dropped), which is where the bug
+    // ~keep lived: the whole label was `str::trim`-ed, and a flattened `"  \n"` is
+    // ~keep indistinguishable from trailing source whitespace before a `</a>`.
     #[test]
-    fn normalize_link_label_drops_a_leading_hard_break() {
-        assert_eq!(normalize_link_label("  \nbar"), "bar");
+    fn normalize_link_label_keeps_a_leading_hard_break() {
+        assert_eq!(normalize_link_label("  \nbar"), "  \nbar");
     }
 
     #[test]
-    fn normalize_link_label_drops_a_trailing_hard_break() {
-        assert_eq!(normalize_link_label("foo  \n"), "foo");
+    fn normalize_link_label_keeps_a_trailing_hard_break() {
+        assert_eq!(normalize_link_label("foo  \n"), "foo  \n");
+    }
+
+    #[test]
+    fn normalize_link_label_keeps_a_boundary_hard_break_past_incidental_whitespace() {
+        assert_eq!(normalize_link_label(" \u{a0}foo  \n "), "foo  \n");
+    }
+
+    // ~keep A run of breaks at one edge collapses to a single break: two adjacent markers
+    // ~keep put a blank line in the label, and a blank line ends the paragraph the link
+    // ~keep lives in -- destroying the link rather than preserving a second break nobody
+    // ~keep can see.
+    #[test]
+    fn normalize_link_label_collapses_a_run_of_boundary_hard_breaks_to_one() {
+        assert_eq!(normalize_link_label("  \n  \nbar"), "  \nbar");
+        assert_eq!(normalize_link_label("foo  \n  \n"), "foo  \n");
+    }
+
+    // ~keep A break needs a line on both sides to mean anything, so a label of nothing but
+    // ~keep breaks still collapses to empty and the caller's own href fallback takes over.
+    #[test]
+    fn normalize_link_label_drops_a_label_that_is_only_hard_breaks() {
+        assert_eq!(normalize_link_label("  \n"), "");
+        assert_eq!(normalize_link_label("  \n  \n"), "");
     }
 
     // ~keep An ordinary soft newline (no `<br>` behind it, e.g. wrapped source text)

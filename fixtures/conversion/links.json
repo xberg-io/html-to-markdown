@@ -175,5 +175,68 @@
       "stem": "link_wrapping_table_renders_table",
       "title": "An anchor wrapping a table renders the table"
     }
+  },
+  {
+    "id": "link_trailing_line_break_is_kept",
+    "description": "A <br> just before </a> is kept as a hard line break in the label",
+    "input": {
+      "html": "<a href=\"https://example.com\">Alpha<br></a>Beta"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "[Alpha  \n](https://example.com)Beta"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_trailing_line_break_is_kept",
+      "title": "A <br> just before </a> is kept as a hard line break in the label"
+    }
+  },
+  {
+    "id": "link_leading_line_break_is_kept",
+    "description": "A <br> just after <a> is kept as a hard line break in the label",
+    "input": {
+      "html": "Beta<a href=\"https://example.com\"><br>Alpha</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "Beta[  \nAlpha](https://example.com)"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_leading_line_break_is_kept",
+      "title": "A <br> just after <a> is kept as a hard line break in the label"
+    }
+  },
+  {
+    "id": "link_label_block_marker_is_escaped",
+    "description": "A block marker on a continuation line of a link label is escaped",
+    "input": {
+      "html": "<a href=\"https://example.com\">Alpha<br>-<br>Beta</a>"
+    },
+    "assertions": [
+      {
+        "type": "contains_all",
+        "field": "content",
+        "values": [
+          "[Alpha  \n\\-  \nBeta](https://example.com)"
+        ]
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_label_block_marker_is_escaped",
+      "title": "A block marker on a continuation line of a link label is escaped"
+    }
   }
 ]

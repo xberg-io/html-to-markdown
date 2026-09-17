@@ -610,18 +610,23 @@ fn should_preserve_a_mid_label_hard_break_and_agree_across_tiers() {
     assert_eq!(output, "[foo  \nbar](https://example.com/)\n");
 }
 
+// ~keep Issue #497: these two previously asserted that a break at the label's edge is
+// ~keep dropped. It is not incidental whitespace -- `<a href="H">A<br></a>B` renders as A, a
+// ~keep line break, then B, and `[A  \n](H)B` re-parses to exactly that `<a>A<br/></a>B`
+// ~keep (verified against comrak). Both tiers were wrong and both are fixed, so the parity
+// ~keep assertion in the helper held before the fix and holds after it.
 #[test]
-fn should_drop_a_leading_hard_break_that_has_no_preceding_line_and_agree_across_tiers() {
+fn should_keep_a_leading_hard_break_at_the_label_edge_and_agree_across_tiers() {
     let html = r#"<p><a href="https://example.com/"><br>bar</a></p>"#;
     let output = assert_tier1_matches_tier2(html);
-    assert_eq!(output, "[bar](https://example.com/)\n");
+    assert_eq!(output, "[  \nbar](https://example.com/)\n");
 }
 
 #[test]
-fn should_drop_a_trailing_hard_break_that_has_no_following_line_and_agree_across_tiers() {
+fn should_keep_a_trailing_hard_break_at_the_label_edge_and_agree_across_tiers() {
     let html = r#"<p><a href="https://example.com/">foo<br></a></p>"#;
     let output = assert_tier1_matches_tier2(html);
-    assert_eq!(output, "[foo](https://example.com/)\n");
+    assert_eq!(output, "[foo  \n](https://example.com/)\n");
 }
 
 #[test]

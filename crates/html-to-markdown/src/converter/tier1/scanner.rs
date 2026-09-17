@@ -1802,19 +1802,15 @@ fn emit_void(
             // ~keep once `close_code` re-joins the split segments, and `close_link`'s
             // ~keep `normalize_link_label` then finds that already-correct marker in the
             // ~keep assembled label text exactly as it would for plain (non-code) content.
-            let link_frame_content_start = (!state.escape_ctx.contains(EscapeCtx::CODE))
-                .then(|| {
-                    state
-                        .stack
-                        .iter()
-                        .rev()
-                        .find_map(|f| matches!(f.spec.kind, TagKind::Link).then_some(f.content_start))
-                })
-                .flatten();
-            if let Some(link_content_start) = link_frame_content_start {
-                if link_content_start < state.cell_or_output_mut().len() {
-                    state.cell_or_output_mut().push_str("  \n");
-                }
+            let inside_link_frame = !state.escape_ctx.contains(EscapeCtx::CODE)
+                && state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
+            if inside_link_frame {
+                // ~keep #497: emitted even when the link's body is still empty. A leading
+                // ~keep `<br>` is real content -- `B<a href="H"><br>A</a>` renders as B, a
+                // ~keep line break, then A -- and `close_link` below, mirroring Tier-2's
+                // ~keep `normalize_link_label`, is where a break that turns out to have
+                // ~keep nothing to break away from is dropped again.
+                state.cell_or_output_mut().push_str("  \n");
             } else if state.escape_ctx.contains(EscapeCtx::CODE)
                 && !state.escape_ctx.contains(EscapeCtx::PRE)
                 && state.escape_ctx.contains(EscapeCtx::HEADING)
@@ -3214,19 +3210,94 @@ fn try_emit_autolink(
     Ok(true)
 }
 
+/// Trim the link label Tier-1 has just written in place, keeping a hard line break that sits
+/// at either edge of it.
+///
+/// A `<br>` against the `</a>` is real content: `<a href="H">A<br></a>B` renders as A, a line
+/// break, then B, and `[A  \n](H)B` re-parses to exactly that (issue #497). The blanket
+/// trailing-whitespace trim this replaced ate the marker's two spaces and its newline, since
+/// flattened they are indistinguishable from incidental whitespace before a `</a>`.
+///
+/// Mirrors Tier-2's `assemble_label` (`utility/content.rs`) including its two edge rules: a
+/// run of breaks at one edge collapses to a single break, because two adjacent markers put a
+/// blank line in the label and a blank line ends the paragraph the link lives in; and a label
+/// holding nothing but breaks collapses to empty, because a break needs a line on both sides
+/// to mean anything.
+///
+/// Only the `"  \n"` marker is matched: `router.rs` bails Tier-1 whenever `newline_style` is
+/// not `Spaces`, so it is the only shape Tier-1 can have emitted.
+///
+/// With `keeps_breaks` false -- a heading or a pipe-table cell, neither of which can carry a
+/// hard break at all -- every marker in the label is folded to a space instead, which is what
+/// Tier-2 does at emission time in `line_break.rs`.
+fn trim_label_preserving_boundary_hard_breaks(dest: &mut String, trim_start: usize, keeps_breaks: bool) {
+    const MARKER: &str = "  \n";
+
+    if !keeps_breaks {
+        // ~keep Fold the markers away entirely rather than merely declining to keep the ones at
+        // ~keep the edges. `close_heading` / `close_table_cell` would collapse them to a space
+        // ~keep anyway, but they run AFTER `close_link` has escaped the label, so a marker left
+        // ~keep here reaches `escape_link_label` as a real line break and its continuation line
+        // ~keep gets a #496 block-opener escape that Tier-2 -- which folds at emission time,
+        // ~keep in `line_break.rs`'s `in_heading` arm -- never applies. That divergence is
+        // ~keep visible as `# [A \- B](H)` against Tier-2's `# [A - B](H)`.
+        let label = &dest[trim_start..];
+        if label.contains(MARKER) {
+            let folded = label.replace(MARKER, " ");
+            dest.truncate(trim_start);
+            dest.push_str(&folded);
+        }
+        // ~keep Trim BOTH ends, not just the trailing one: Tier-2 reaches this label through
+        // ~keep `normalize_link_label`, which trims both, so a folded leading break that left a
+        // ~keep space behind shows up as `## [ A](H)` against Tier-2's `## [A](H)`.
+        let trimmed = dest[trim_start..].trim_matches(|c: char| c.is_whitespace()).to_owned();
+        dest.truncate(trim_start);
+        dest.push_str(&trimmed);
+        return;
+    }
+
+    let label = &dest[trim_start..];
+    let without_trailing = label.trim_end_matches(MARKER);
+    let has_trailing_break = without_trailing.len() != label.len();
+    let body = without_trailing.trim_end_matches(|c: char| c.is_whitespace());
+    let without_leading = body.trim_start_matches(MARKER);
+    let has_leading_break = without_leading.len() != body.len();
+
+    let mut rebuilt = String::with_capacity(without_leading.len() + 2 * MARKER.len());
+    if !without_leading.is_empty() {
+        if has_leading_break {
+            rebuilt.push_str(MARKER);
+        }
+        rebuilt.push_str(without_leading);
+        if has_trailing_break {
+            rebuilt.push_str(MARKER);
+        }
+    }
+
+    if rebuilt.len() != label.len() {
+        dest.truncate(trim_start);
+        dest.push_str(&rebuilt);
+    }
+}
+
 fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) -> Result<(), BailReason> {
     // ~keep Close the link: `](href "title")` or `](href)`
     // ~keep If no href, just emit the text as-is (Tier-2 behaviour: no link markup).
     // ~keep Link state was pushed to state.link_stack at open; pop it now.
     let (href, title, has_nested_tag) = state.link_stack.pop().unwrap_or((None, None, false));
+    // ~keep Mirrors the branch ORDER of Tier-2's `line_break.rs`, where `in_heading` and
+    // ~keep `in_table_cell` are both tested ahead of the link arm: a single-line ATX heading
+    // ~keep and a pipe-table cell cannot carry a hard break at all, so a `<br>` in either has
+    // ~keep already been folded to a space regardless of the link, and a marker kept at the
+    // ~keep label's edge here would only survive as a stray trailing space.
+    let keeps_boundary_hard_breaks = !state.escape_ctx.contains(EscapeCtx::HEADING) && !state.in_table_cell();
     let dest = state.cell_or_output_mut();
-    // ~keep Trim trailing whitespace inside the link label so `[text  ](url)`
-    // ~keep collapses to `[text](url)` — matches Tier-2's normalize_link_label
-    // ~keep at utility/content.rs:145 (kimbrain.html and similar source HTML
-    // ~keep with whitespace before </a>).
+    // ~keep Trim the whitespace inside the link label so `[text  ](url)` collapses to
+    // ~keep `[text](url)` — matches Tier-2's `normalize_link_label` (kimbrain.html and similar
+    // ~keep source HTML with whitespace before `</a>`), while keeping a `<br>` that sits at
+    // ~keep either edge of the label (issue #497).
     let trim_start = clamp_to_char_boundary(dest, frame.content_start);
-    let trimmed_end = dest[trim_start..].trim_end_matches(|c: char| c.is_whitespace()).len();
-    dest.truncate(trim_start + trimmed_end);
+    trim_label_preserving_boundary_hard_breaks(dest, trim_start, keeps_boundary_hard_breaks);
     // ~keep Mirror Tier-2's `normalize_whitespace_cow` step inside
     // ~keep `normalize_link_label` (utility/content.rs:144): any Unicode whitespace
     // ~keep in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII
