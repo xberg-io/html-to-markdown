@@ -56,6 +56,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in `close_link`, which is also what keeps the #496 escaping from firing on a label that is
   about to become single-line anyway.
 
+- Generated Go and R e2e suites no longer assert against strings their fixtures never
+  specified (alef pin 0.90.0 to 0.91.5). Two independent generator defects were corrupting
+  fixture values on their way into test code: alef's Go emitter rendered a multi-line value as
+  a raw backtick literal and its own writer then trimmed the trailing whitespace off every
+  physical line, so the three assertions carrying a Markdown two-space hard break read
+  `[Alpha\n](url)Beta` where the fixture said `[Alpha  \n](url)Beta`; and alef's R emitter ran
+  every plain string argument through the PascalCase-to-snake_case transform meant only for
+  enum wire values, so `Alpha<span ...>` was emitted as `alpha<span ...>` and
+  `Beta<a ...><br>Alpha</a>` as `beta<a ...><br>_alpha</a>`. The R defect had been silently
+  wrong since the 3.14.0 `paragraph_whitespace_only_span_separates_words` fixture landed; it
+  went unnoticed because the E2E workflow had skipped every language test job on the three
+  preceding commits, so "green" meant "nothing ran". Fixed upstream in alef 0.91.5 rather than
+  by trimming the fixtures. The pin bump also carries alef 0.91.0-0.91.3, which for this repo
+  is limited to a simpler argument-marshalling path in the Node visitor bridge (no API or
+  behaviour change) and dropping its unused `tokio-util` dependency.
+
 ## [3.14.0] - 2026-09-16
 
 ### Changed
