@@ -97,6 +97,14 @@ pub fn handle_table_with_context(
         }
     }
 
+    // ~keep A table that rendered to nothing (a blank layout spacer, an empty `<table>`)
+    // ~keep has nothing to separate: the blank line and trailing newline below are for
+    // ~keep content. Emitting them anyway split a layout row's list item in two around a
+    // ~keep bgcolor bar (`<td><img><table>...</table><br>links</td>`, gh-121 Hacker News).
+    if table_output.is_empty() {
+        return;
+    }
+
     if ctx.in_list_item {
         let has_caption = table_output.starts_with('*');
 

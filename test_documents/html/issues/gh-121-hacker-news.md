@@ -60,6 +60,4 @@
 - 30. [vote?id=45995816&how=up&goto=news](vote?id=45995816&how=up&goto=news) [The Lions Operating System](https://lionsos.org) ([lionsos.org](from?site=lionsos.org))
 - 190 points by [plunderer](user?id=plunderer) [21 hours ago](item?id=45995816) | [hide](hide?id=45995816&goto=news) | [57 comments](item?id=45995816)
 - [More](?p=2)
-- ![](s.gif)
-
-[Guidelines](newsguidelines.html) | [FAQ](newsfaq.html) | [Lists](lists) | [API](https://github.com/HackerNews/API) | [Security](security.html) | [Legal](https://www.ycombinator.com/legal/) | [Apply to YC](https://www.ycombinator.com/apply/) | [Contact](mailto:hn@ycombinator.com)
+- ![](s.gif) [Guidelines](newsguidelines.html) | [FAQ](newsfaq.html) | [Lists](lists) | [API](https://github.com/HackerNews/API) | [Security](security.html) | [Legal](https://www.ycombinator.com/legal/) | [Apply to YC](https://www.ycombinator.com/apply/) | [Contact](mailto:hn@ycombinator.com)

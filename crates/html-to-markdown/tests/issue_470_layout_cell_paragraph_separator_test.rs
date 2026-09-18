@@ -139,3 +139,26 @@ fn should_not_open_a_continuation_line_with_a_stray_space() {
     }
     assert!(out.contains("Actual is not normal"), "fixture content missing: {out:?}");
 }
+
+/// A `<br>` inside a layout cell follows the same settled cell rule as a `<div>`/`<p>`
+/// continuation. It used to emit a hard-break marker, which put a bare newline inside a list
+/// item's line and ended the item -- surfaced by the gh-121 Hacker News golden once issue #500
+/// stopped dropping the spacer image that used to precede the break.
+#[test]
+fn should_fold_a_br_inside_a_layout_cell_to_the_cell_boundary() {
+    let html = r#"<table border="0"><tr><td>x<br>y<div>z</div></td><td colspan="1">w</td></tr></table>"#;
+    let out = content(html, ConversionOptions::default());
+    assert_eq!(out, "- x y z w\n", "actual: {out:?}");
+    let out = content(html, reporter_options());
+    assert_eq!(out, "* x<br>y<br>z w\n", "actual: {out:?}");
+}
+
+/// A nested table that renders to nothing (a bgcolor spacer bar) must not split the layout
+/// row's list item around itself -- the second half of the gh-121 footer shape.
+#[test]
+fn should_not_split_a_layout_row_around_a_blank_nested_table() {
+    let html =
+        r#"<table border="0"><tr><td>q<table><tr><td></td></tr></table><br>x</td><td colspan="1">w</td></tr></table>"#;
+    let out = content(html, ConversionOptions::default());
+    assert_eq!(out, "- q x w\n", "actual: {out:?}");
+}

@@ -125,10 +125,12 @@ pub fn handle(
         // ~keep branch), so nothing else can leave a bare '\n' here for this split to
         // ~keep misfire on.
         output.push('\n');
-    } else if ctx.in_table_cell {
+    } else if ctx.in_table_cell || ctx.in_layout_cell {
         // ~keep Shared with div/p continuations inside a cell (issue #453, #454): a cell
         // ~keep cannot contain a hard line break, so newline_style is never consulted and
-        // ~keep source whitespace before the <br> is trimmed rather than leaked.
+        // ~keep source whitespace before the <br> is trimmed rather than leaked. A layout
+        // ~keep cell is one list item's line and already sends its div/p continuations
+        // ~keep through this rule (issue #470); a hard-break marker there ended the item.
         emit_table_cell_break(output, options.br_in_tables);
     } else if ctx.in_link {
         // ~keep #497: inside a link label a `<br>` with nothing before it is still real
