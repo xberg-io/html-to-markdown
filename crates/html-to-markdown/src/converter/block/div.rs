@@ -100,10 +100,20 @@ pub fn handle(
         output.push_str("\n\n");
     }
 
+    // ~keep Measured the same way `block/paragraph.rs` does, so a text node can tell "at the
+    // ~keep start of this div's line, in this div's buffer" from an inline wrapper's empty
+    // ~keep scratch buffer. Without it a whitespace-only `<span>` opening a `<div>` was pushed
+    // ~keep verbatim and `<span>    </span><img>` became an indented code block (issue #501).
+    let div_ctx = Context {
+        block_content_start: output.len(),
+        block_output_ptr: std::ptr::from_ref::<String>(output) as usize,
+        ..ctx.clone()
+    };
+
     let children = tag.children();
     {
         for child_handle in children.top().iter() {
-            walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
+            walk_node(child_handle, parser, output, options, &div_ctx, depth + 1, dom_ctx);
         }
     }
 

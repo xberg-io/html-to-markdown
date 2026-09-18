@@ -86,7 +86,10 @@ pub fn emit_wrapped_inline(
         // ~keep from a preceding sibling (e.g. `A <i> </i>B`), in which case even that one
         // ~keep copy must be suppressed. Mirrors `text_node.rs`'s `!output.ends_with(' ')`
         // ~keep guards, which every handler but `text_node` was originally missing.
-        if !output.ends_with(' ') {
+        // ~keep ...and at a line start it contributes nothing at all: `<p>A</p><p><i> </i>B</p>`
+        // ~keep otherwise opened its second paragraph with a stray space (issue #501's rule --
+        // ~keep leading ASCII whitespace on a line is never Markdown content).
+        if !output.ends_with(' ') && !output.is_empty() && !output.ends_with('\n') {
             output.push_str(prefix);
         }
         append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);

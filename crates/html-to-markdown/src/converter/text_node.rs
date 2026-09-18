@@ -208,6 +208,24 @@ pub fn process_text_node(
         // ~keep above: otherwise two independently-legitimate single spaces stack into a
         // ~keep literal double space that only the first Markdown->HTML->Markdown hop
         // ~keep collapses back down, breaking round-trip stability.
+        // ~keep CommonMark 4.8 / 6.9: a run of ASCII whitespace at the start of a line is
+        // ~keep never content -- at best it is stripped, at worst four of them open an indented
+        // ~keep code block. `<p>P</p><div><span>    </span><img ...></div>` reached the
+        // ~keep verbatim fallbacks below with `output` ending in "\n\n" and rendered
+        // ~keep `    ![A](S)` (issue #501): the #460 guard above is `in_paragraph`-only and
+        // ~keep `<div>` never sets it. Only genuine formatting whitespace is dropped; a run
+        // ~keep carrying a significant character (a decoded `&nbsp;`) still falls through.
+        // ~keep Judged on the block's own buffer only: an inline wrapper's empty scratch
+        // ~keep buffer (`<p>A<ins> </ins>B</p>`) is not a line start, and its one space must
+        // ~keep reach `chomp_inline` (issue #481) -- `emit_wrapped_inline` applies this same
+        // ~keep line-start rule when it splices the wrapper back in.
+        if is_ascii_whitespace_only(text.as_ref())
+            && std::ptr::from_ref::<String>(output) as usize == ctx.block_output_ptr
+            && (output.is_empty() || output.ends_with('\n'))
+        {
+            return;
+        }
+
         if previous_sibling_is_inline_tag(node_handle, parser, dom_ctx)
             && next_sibling_is_inline_tag(node_handle, parser, dom_ctx)
         {
@@ -232,7 +250,14 @@ pub fn process_text_node(
                 output.push_str(text.as_ref());
             }
         } else if !output.ends_with(' ') {
-            output.push_str(text.as_ref());
+            // ~keep A multi-character ASCII run collapses to one space here exactly as it does
+            // ~keep between two inline siblings above: `<b>A</b><span>    </span><img>` is one
+            // ~keep space in a browser, and Tier 1 already emits it that way.
+            if has_more_than_one_char(text.as_ref()) && is_ascii_whitespace_only(text.as_ref()) {
+                output.push(' ');
+            } else {
+                output.push_str(text.as_ref());
+            }
         }
         return;
     }
