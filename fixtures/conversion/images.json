@@ -159,5 +159,43 @@
       "stem": "image_multiline_alt_block_marker_is_escaped",
       "title": "A block marker on a continuation line of multiline alt text is escaped"
     }
+  },
+  {
+    "id": "image_src_entity_shaped_ampersand_kept_literal",
+    "description": "An & that would read as a character reference in an image destination stays literal",
+    "input": {
+      "html": "<img src=\"?&amp;plus;\">"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "![](?&amp;plus;)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "image_src_entity_shaped_ampersand_kept_literal",
+      "title": "An & that would read as a character reference in an image destination stays literal"
+    }
+  },
+  {
+    "id": "image_alt_unmatched_open_bracket_is_escaped",
+    "description": "An unmatched [ in image alt text is escaped so the image survives",
+    "input": {
+      "html": "<img alt=\"[A;B)\" src=\"S\">"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "![\\[A;B)](S)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "image_alt_unmatched_open_bracket_is_escaped",
+      "title": "An unmatched [ in image alt text is escaped so the image survives"
+    }
   }
 ]

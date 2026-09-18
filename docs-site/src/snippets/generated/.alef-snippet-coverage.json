@@ -15,6 +15,7 @@
     "c/conversion/blockquote_with_list.md",
     "c/conversion/bold_and_italic.md",
     "c/conversion/bold_strong.md",
+    "c/conversion/br_only_bold_wrapper_keeps_separator.md",
     "c/conversion/code_block.md",
     "c/conversion/code_block_br_keeps_real_newline.md",
     "c/conversion/code_block_no_language.md",
@@ -28,6 +29,7 @@
     "c/conversion/conversion_autolink_mailto.md",
     "c/conversion/conversion_autolink_mixed_filename_and_url.md",
     "c/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "c/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "c/conversion/emphasis_mark_highlight.md",
     "c/conversion/emphasis_strikethrough_del.md",
     "c/conversion/emphasis_strikethrough_s.md",
@@ -43,12 +45,14 @@
     "c/conversion/heading_h4.md",
     "c/conversion/heading_h5.md",
     "c/conversion/heading_h6.md",
+    "c/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "c/conversion/image_figure_figcaption.md",
     "c/conversion/image_kept_inline_in_link.md",
     "c/conversion/image_linked.md",
     "c/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "c/conversion/image_no_alt.md",
     "c/conversion/image_simple.md",
+    "c/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "c/conversion/image_with_title.md",
     "c/conversion/inline_code.md",
     "c/conversion/italic_em.md",
@@ -57,8 +61,10 @@
     "c/conversion/line_break_multiple_br.md",
     "c/conversion/link_anchor_fragment.md",
     "c/conversion/link_empty_href.md",
+    "c/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "c/conversion/link_image_inside.md",
     "c/conversion/link_label_block_marker_is_escaped.md",
+    "c/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "c/conversion/link_leading_line_break_is_kept.md",
     "c/conversion/link_mailto.md",
     "c/conversion/link_simple.md",
@@ -105,6 +111,7 @@
     "c/conversion/tagged_space_in_subscript_kept.md",
     "c/conversion/tagged_space_not_duplicated.md",
     "c/conversion/unordered_list.md",
+    "c/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "c/conversion/whitespace_only_code_span_kept.md",
     "c/edge-cases/empty_html.md",
     "c/edge-cases/encoding_c1_replacement_table.md",
@@ -169,6 +176,7 @@
     "c/metadata/twitter_card_tags.md",
     "c/options/issue_396_backticks_blank_line_after_fence.md",
     "c/options/options_autolinks_false.md",
+    "c/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "c/options/options_br_in_tables_false.md",
     "c/options/options_br_in_tables_nested_data_table.md",
     "c/options/options_br_in_tables_nested_table_rows.md",
@@ -331,6 +339,7 @@
     "csharp/conversion/blockquote_with_list.md",
     "csharp/conversion/bold_and_italic.md",
     "csharp/conversion/bold_strong.md",
+    "csharp/conversion/br_only_bold_wrapper_keeps_separator.md",
     "csharp/conversion/code_block.md",
     "csharp/conversion/code_block_br_keeps_real_newline.md",
     "csharp/conversion/code_block_no_language.md",
@@ -344,6 +353,7 @@
     "csharp/conversion/conversion_autolink_mailto.md",
     "csharp/conversion/conversion_autolink_mixed_filename_and_url.md",
     "csharp/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "csharp/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "csharp/conversion/emphasis_mark_highlight.md",
     "csharp/conversion/emphasis_strikethrough_del.md",
     "csharp/conversion/emphasis_strikethrough_s.md",
@@ -359,12 +369,14 @@
     "csharp/conversion/heading_h4.md",
     "csharp/conversion/heading_h5.md",
     "csharp/conversion/heading_h6.md",
+    "csharp/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "csharp/conversion/image_figure_figcaption.md",
     "csharp/conversion/image_kept_inline_in_link.md",
     "csharp/conversion/image_linked.md",
     "csharp/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "csharp/conversion/image_no_alt.md",
     "csharp/conversion/image_simple.md",
+    "csharp/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "csharp/conversion/image_with_title.md",
     "csharp/conversion/inline_code.md",
     "csharp/conversion/italic_em.md",
@@ -373,8 +385,10 @@
     "csharp/conversion/line_break_multiple_br.md",
     "csharp/conversion/link_anchor_fragment.md",
     "csharp/conversion/link_empty_href.md",
+    "csharp/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "csharp/conversion/link_image_inside.md",
     "csharp/conversion/link_label_block_marker_is_escaped.md",
+    "csharp/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "csharp/conversion/link_leading_line_break_is_kept.md",
     "csharp/conversion/link_mailto.md",
     "csharp/conversion/link_simple.md",
@@ -421,6 +435,7 @@
     "csharp/conversion/tagged_space_in_subscript_kept.md",
     "csharp/conversion/tagged_space_not_duplicated.md",
     "csharp/conversion/unordered_list.md",
+    "csharp/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "csharp/conversion/whitespace_only_code_span_kept.md",
     "csharp/edge-cases/empty_html.md",
     "csharp/edge-cases/encoding_c1_replacement_table.md",
@@ -485,6 +500,7 @@
     "csharp/metadata/twitter_card_tags.md",
     "csharp/options/issue_396_backticks_blank_line_after_fence.md",
     "csharp/options/options_autolinks_false.md",
+    "csharp/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "csharp/options/options_br_in_tables_false.md",
     "csharp/options/options_br_in_tables_nested_data_table.md",
     "csharp/options/options_br_in_tables_nested_table_rows.md",
@@ -647,6 +663,7 @@
     "dart/conversion/blockquote_with_list.md",
     "dart/conversion/bold_and_italic.md",
     "dart/conversion/bold_strong.md",
+    "dart/conversion/br_only_bold_wrapper_keeps_separator.md",
     "dart/conversion/code_block.md",
     "dart/conversion/code_block_br_keeps_real_newline.md",
     "dart/conversion/code_block_no_language.md",
@@ -660,6 +677,7 @@
     "dart/conversion/conversion_autolink_mailto.md",
     "dart/conversion/conversion_autolink_mixed_filename_and_url.md",
     "dart/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "dart/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "dart/conversion/emphasis_mark_highlight.md",
     "dart/conversion/emphasis_strikethrough_del.md",
     "dart/conversion/emphasis_strikethrough_s.md",
@@ -675,12 +693,14 @@
     "dart/conversion/heading_h4.md",
     "dart/conversion/heading_h5.md",
     "dart/conversion/heading_h6.md",
+    "dart/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "dart/conversion/image_figure_figcaption.md",
     "dart/conversion/image_kept_inline_in_link.md",
     "dart/conversion/image_linked.md",
     "dart/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "dart/conversion/image_no_alt.md",
     "dart/conversion/image_simple.md",
+    "dart/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "dart/conversion/image_with_title.md",
     "dart/conversion/inline_code.md",
     "dart/conversion/italic_em.md",
@@ -689,8 +709,10 @@
     "dart/conversion/line_break_multiple_br.md",
     "dart/conversion/link_anchor_fragment.md",
     "dart/conversion/link_empty_href.md",
+    "dart/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "dart/conversion/link_image_inside.md",
     "dart/conversion/link_label_block_marker_is_escaped.md",
+    "dart/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "dart/conversion/link_leading_line_break_is_kept.md",
     "dart/conversion/link_mailto.md",
     "dart/conversion/link_simple.md",
@@ -737,6 +759,7 @@
     "dart/conversion/tagged_space_in_subscript_kept.md",
     "dart/conversion/tagged_space_not_duplicated.md",
     "dart/conversion/unordered_list.md",
+    "dart/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "dart/conversion/whitespace_only_code_span_kept.md",
     "dart/edge-cases/empty_html.md",
     "dart/edge-cases/encoding_c1_replacement_table.md",
@@ -801,6 +824,7 @@
     "dart/metadata/twitter_card_tags.md",
     "dart/options/issue_396_backticks_blank_line_after_fence.md",
     "dart/options/options_autolinks_false.md",
+    "dart/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "dart/options/options_br_in_tables_false.md",
     "dart/options/options_br_in_tables_nested_data_table.md",
     "dart/options/options_br_in_tables_nested_table_rows.md",
@@ -963,6 +987,7 @@
     "elixir/conversion/blockquote_with_list.md",
     "elixir/conversion/bold_and_italic.md",
     "elixir/conversion/bold_strong.md",
+    "elixir/conversion/br_only_bold_wrapper_keeps_separator.md",
     "elixir/conversion/code_block.md",
     "elixir/conversion/code_block_br_keeps_real_newline.md",
     "elixir/conversion/code_block_no_language.md",
@@ -976,6 +1001,7 @@
     "elixir/conversion/conversion_autolink_mailto.md",
     "elixir/conversion/conversion_autolink_mixed_filename_and_url.md",
     "elixir/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "elixir/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "elixir/conversion/emphasis_mark_highlight.md",
     "elixir/conversion/emphasis_strikethrough_del.md",
     "elixir/conversion/emphasis_strikethrough_s.md",
@@ -991,12 +1017,14 @@
     "elixir/conversion/heading_h4.md",
     "elixir/conversion/heading_h5.md",
     "elixir/conversion/heading_h6.md",
+    "elixir/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "elixir/conversion/image_figure_figcaption.md",
     "elixir/conversion/image_kept_inline_in_link.md",
     "elixir/conversion/image_linked.md",
     "elixir/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "elixir/conversion/image_no_alt.md",
     "elixir/conversion/image_simple.md",
+    "elixir/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "elixir/conversion/image_with_title.md",
     "elixir/conversion/inline_code.md",
     "elixir/conversion/italic_em.md",
@@ -1005,8 +1033,10 @@
     "elixir/conversion/line_break_multiple_br.md",
     "elixir/conversion/link_anchor_fragment.md",
     "elixir/conversion/link_empty_href.md",
+    "elixir/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "elixir/conversion/link_image_inside.md",
     "elixir/conversion/link_label_block_marker_is_escaped.md",
+    "elixir/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "elixir/conversion/link_leading_line_break_is_kept.md",
     "elixir/conversion/link_mailto.md",
     "elixir/conversion/link_simple.md",
@@ -1053,6 +1083,7 @@
     "elixir/conversion/tagged_space_in_subscript_kept.md",
     "elixir/conversion/tagged_space_not_duplicated.md",
     "elixir/conversion/unordered_list.md",
+    "elixir/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "elixir/conversion/whitespace_only_code_span_kept.md",
     "elixir/edge-cases/empty_html.md",
     "elixir/edge-cases/encoding_c1_replacement_table.md",
@@ -1117,6 +1148,7 @@
     "elixir/metadata/twitter_card_tags.md",
     "elixir/options/issue_396_backticks_blank_line_after_fence.md",
     "elixir/options/options_autolinks_false.md",
+    "elixir/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "elixir/options/options_br_in_tables_false.md",
     "elixir/options/options_br_in_tables_nested_data_table.md",
     "elixir/options/options_br_in_tables_nested_table_rows.md",
@@ -1279,6 +1311,7 @@
     "go/conversion/blockquote_with_list.md",
     "go/conversion/bold_and_italic.md",
     "go/conversion/bold_strong.md",
+    "go/conversion/br_only_bold_wrapper_keeps_separator.md",
     "go/conversion/code_block.md",
     "go/conversion/code_block_br_keeps_real_newline.md",
     "go/conversion/code_block_no_language.md",
@@ -1292,6 +1325,7 @@
     "go/conversion/conversion_autolink_mailto.md",
     "go/conversion/conversion_autolink_mixed_filename_and_url.md",
     "go/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "go/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "go/conversion/emphasis_mark_highlight.md",
     "go/conversion/emphasis_strikethrough_del.md",
     "go/conversion/emphasis_strikethrough_s.md",
@@ -1307,12 +1341,14 @@
     "go/conversion/heading_h4.md",
     "go/conversion/heading_h5.md",
     "go/conversion/heading_h6.md",
+    "go/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "go/conversion/image_figure_figcaption.md",
     "go/conversion/image_kept_inline_in_link.md",
     "go/conversion/image_linked.md",
     "go/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "go/conversion/image_no_alt.md",
     "go/conversion/image_simple.md",
+    "go/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "go/conversion/image_with_title.md",
     "go/conversion/inline_code.md",
     "go/conversion/italic_em.md",
@@ -1321,8 +1357,10 @@
     "go/conversion/line_break_multiple_br.md",
     "go/conversion/link_anchor_fragment.md",
     "go/conversion/link_empty_href.md",
+    "go/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "go/conversion/link_image_inside.md",
     "go/conversion/link_label_block_marker_is_escaped.md",
+    "go/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "go/conversion/link_leading_line_break_is_kept.md",
     "go/conversion/link_mailto.md",
     "go/conversion/link_simple.md",
@@ -1369,6 +1407,7 @@
     "go/conversion/tagged_space_in_subscript_kept.md",
     "go/conversion/tagged_space_not_duplicated.md",
     "go/conversion/unordered_list.md",
+    "go/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "go/conversion/whitespace_only_code_span_kept.md",
     "go/edge-cases/empty_html.md",
     "go/edge-cases/encoding_c1_replacement_table.md",
@@ -1433,6 +1472,7 @@
     "go/metadata/twitter_card_tags.md",
     "go/options/issue_396_backticks_blank_line_after_fence.md",
     "go/options/options_autolinks_false.md",
+    "go/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "go/options/options_br_in_tables_false.md",
     "go/options/options_br_in_tables_nested_data_table.md",
     "go/options/options_br_in_tables_nested_table_rows.md",
@@ -1595,6 +1635,7 @@
     "java/conversion/blockquote_with_list.md",
     "java/conversion/bold_and_italic.md",
     "java/conversion/bold_strong.md",
+    "java/conversion/br_only_bold_wrapper_keeps_separator.md",
     "java/conversion/code_block.md",
     "java/conversion/code_block_br_keeps_real_newline.md",
     "java/conversion/code_block_no_language.md",
@@ -1608,6 +1649,7 @@
     "java/conversion/conversion_autolink_mailto.md",
     "java/conversion/conversion_autolink_mixed_filename_and_url.md",
     "java/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "java/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "java/conversion/emphasis_mark_highlight.md",
     "java/conversion/emphasis_strikethrough_del.md",
     "java/conversion/emphasis_strikethrough_s.md",
@@ -1623,12 +1665,14 @@
     "java/conversion/heading_h4.md",
     "java/conversion/heading_h5.md",
     "java/conversion/heading_h6.md",
+    "java/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "java/conversion/image_figure_figcaption.md",
     "java/conversion/image_kept_inline_in_link.md",
     "java/conversion/image_linked.md",
     "java/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "java/conversion/image_no_alt.md",
     "java/conversion/image_simple.md",
+    "java/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "java/conversion/image_with_title.md",
     "java/conversion/inline_code.md",
     "java/conversion/italic_em.md",
@@ -1637,8 +1681,10 @@
     "java/conversion/line_break_multiple_br.md",
     "java/conversion/link_anchor_fragment.md",
     "java/conversion/link_empty_href.md",
+    "java/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "java/conversion/link_image_inside.md",
     "java/conversion/link_label_block_marker_is_escaped.md",
+    "java/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "java/conversion/link_leading_line_break_is_kept.md",
     "java/conversion/link_mailto.md",
     "java/conversion/link_simple.md",
@@ -1685,6 +1731,7 @@
     "java/conversion/tagged_space_in_subscript_kept.md",
     "java/conversion/tagged_space_not_duplicated.md",
     "java/conversion/unordered_list.md",
+    "java/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "java/conversion/whitespace_only_code_span_kept.md",
     "java/edge-cases/empty_html.md",
     "java/edge-cases/encoding_c1_replacement_table.md",
@@ -1749,6 +1796,7 @@
     "java/metadata/twitter_card_tags.md",
     "java/options/issue_396_backticks_blank_line_after_fence.md",
     "java/options/options_autolinks_false.md",
+    "java/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "java/options/options_br_in_tables_false.md",
     "java/options/options_br_in_tables_nested_data_table.md",
     "java/options/options_br_in_tables_nested_table_rows.md",
@@ -1911,6 +1959,7 @@
     "kotlin-android/conversion/blockquote_with_list.md",
     "kotlin-android/conversion/bold_and_italic.md",
     "kotlin-android/conversion/bold_strong.md",
+    "kotlin-android/conversion/br_only_bold_wrapper_keeps_separator.md",
     "kotlin-android/conversion/code_block.md",
     "kotlin-android/conversion/code_block_br_keeps_real_newline.md",
     "kotlin-android/conversion/code_block_no_language.md",
@@ -1924,6 +1973,7 @@
     "kotlin-android/conversion/conversion_autolink_mailto.md",
     "kotlin-android/conversion/conversion_autolink_mixed_filename_and_url.md",
     "kotlin-android/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "kotlin-android/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "kotlin-android/conversion/emphasis_mark_highlight.md",
     "kotlin-android/conversion/emphasis_strikethrough_del.md",
     "kotlin-android/conversion/emphasis_strikethrough_s.md",
@@ -1939,12 +1989,14 @@
     "kotlin-android/conversion/heading_h4.md",
     "kotlin-android/conversion/heading_h5.md",
     "kotlin-android/conversion/heading_h6.md",
+    "kotlin-android/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "kotlin-android/conversion/image_figure_figcaption.md",
     "kotlin-android/conversion/image_kept_inline_in_link.md",
     "kotlin-android/conversion/image_linked.md",
     "kotlin-android/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "kotlin-android/conversion/image_no_alt.md",
     "kotlin-android/conversion/image_simple.md",
+    "kotlin-android/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "kotlin-android/conversion/image_with_title.md",
     "kotlin-android/conversion/inline_code.md",
     "kotlin-android/conversion/italic_em.md",
@@ -1953,8 +2005,10 @@
     "kotlin-android/conversion/line_break_multiple_br.md",
     "kotlin-android/conversion/link_anchor_fragment.md",
     "kotlin-android/conversion/link_empty_href.md",
+    "kotlin-android/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "kotlin-android/conversion/link_image_inside.md",
     "kotlin-android/conversion/link_label_block_marker_is_escaped.md",
+    "kotlin-android/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "kotlin-android/conversion/link_leading_line_break_is_kept.md",
     "kotlin-android/conversion/link_mailto.md",
     "kotlin-android/conversion/link_simple.md",
@@ -2001,6 +2055,7 @@
     "kotlin-android/conversion/tagged_space_in_subscript_kept.md",
     "kotlin-android/conversion/tagged_space_not_duplicated.md",
     "kotlin-android/conversion/unordered_list.md",
+    "kotlin-android/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "kotlin-android/conversion/whitespace_only_code_span_kept.md",
     "kotlin-android/edge-cases/empty_html.md",
     "kotlin-android/edge-cases/encoding_c1_replacement_table.md",
@@ -2060,6 +2115,7 @@
     "kotlin-android/metadata/twitter_card_tags.md",
     "kotlin-android/options/issue_396_backticks_blank_line_after_fence.md",
     "kotlin-android/options/options_autolinks_false.md",
+    "kotlin-android/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "kotlin-android/options/options_br_in_tables_false.md",
     "kotlin-android/options/options_br_in_tables_nested_data_table.md",
     "kotlin-android/options/options_br_in_tables_nested_table_rows.md",
@@ -2173,6 +2229,7 @@
     "php/conversion/blockquote_with_list.md",
     "php/conversion/bold_and_italic.md",
     "php/conversion/bold_strong.md",
+    "php/conversion/br_only_bold_wrapper_keeps_separator.md",
     "php/conversion/code_block.md",
     "php/conversion/code_block_br_keeps_real_newline.md",
     "php/conversion/code_block_no_language.md",
@@ -2186,6 +2243,7 @@
     "php/conversion/conversion_autolink_mailto.md",
     "php/conversion/conversion_autolink_mixed_filename_and_url.md",
     "php/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "php/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "php/conversion/emphasis_mark_highlight.md",
     "php/conversion/emphasis_strikethrough_del.md",
     "php/conversion/emphasis_strikethrough_s.md",
@@ -2201,12 +2259,14 @@
     "php/conversion/heading_h4.md",
     "php/conversion/heading_h5.md",
     "php/conversion/heading_h6.md",
+    "php/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "php/conversion/image_figure_figcaption.md",
     "php/conversion/image_kept_inline_in_link.md",
     "php/conversion/image_linked.md",
     "php/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "php/conversion/image_no_alt.md",
     "php/conversion/image_simple.md",
+    "php/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "php/conversion/image_with_title.md",
     "php/conversion/inline_code.md",
     "php/conversion/italic_em.md",
@@ -2215,8 +2275,10 @@
     "php/conversion/line_break_multiple_br.md",
     "php/conversion/link_anchor_fragment.md",
     "php/conversion/link_empty_href.md",
+    "php/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "php/conversion/link_image_inside.md",
     "php/conversion/link_label_block_marker_is_escaped.md",
+    "php/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "php/conversion/link_leading_line_break_is_kept.md",
     "php/conversion/link_mailto.md",
     "php/conversion/link_simple.md",
@@ -2263,6 +2325,7 @@
     "php/conversion/tagged_space_in_subscript_kept.md",
     "php/conversion/tagged_space_not_duplicated.md",
     "php/conversion/unordered_list.md",
+    "php/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "php/conversion/whitespace_only_code_span_kept.md",
     "php/edge-cases/empty_html.md",
     "php/edge-cases/encoding_c1_replacement_table.md",
@@ -2327,6 +2390,7 @@
     "php/metadata/twitter_card_tags.md",
     "php/options/issue_396_backticks_blank_line_after_fence.md",
     "php/options/options_autolinks_false.md",
+    "php/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "php/options/options_br_in_tables_false.md",
     "php/options/options_br_in_tables_nested_data_table.md",
     "php/options/options_br_in_tables_nested_table_rows.md",
@@ -2489,6 +2553,7 @@
     "python/conversion/blockquote_with_list.md",
     "python/conversion/bold_and_italic.md",
     "python/conversion/bold_strong.md",
+    "python/conversion/br_only_bold_wrapper_keeps_separator.md",
     "python/conversion/code_block.md",
     "python/conversion/code_block_br_keeps_real_newline.md",
     "python/conversion/code_block_no_language.md",
@@ -2502,6 +2567,7 @@
     "python/conversion/conversion_autolink_mailto.md",
     "python/conversion/conversion_autolink_mixed_filename_and_url.md",
     "python/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "python/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "python/conversion/emphasis_mark_highlight.md",
     "python/conversion/emphasis_strikethrough_del.md",
     "python/conversion/emphasis_strikethrough_s.md",
@@ -2517,12 +2583,14 @@
     "python/conversion/heading_h4.md",
     "python/conversion/heading_h5.md",
     "python/conversion/heading_h6.md",
+    "python/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "python/conversion/image_figure_figcaption.md",
     "python/conversion/image_kept_inline_in_link.md",
     "python/conversion/image_linked.md",
     "python/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "python/conversion/image_no_alt.md",
     "python/conversion/image_simple.md",
+    "python/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "python/conversion/image_with_title.md",
     "python/conversion/inline_code.md",
     "python/conversion/italic_em.md",
@@ -2531,8 +2599,10 @@
     "python/conversion/line_break_multiple_br.md",
     "python/conversion/link_anchor_fragment.md",
     "python/conversion/link_empty_href.md",
+    "python/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "python/conversion/link_image_inside.md",
     "python/conversion/link_label_block_marker_is_escaped.md",
+    "python/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "python/conversion/link_leading_line_break_is_kept.md",
     "python/conversion/link_mailto.md",
     "python/conversion/link_simple.md",
@@ -2579,6 +2649,7 @@
     "python/conversion/tagged_space_in_subscript_kept.md",
     "python/conversion/tagged_space_not_duplicated.md",
     "python/conversion/unordered_list.md",
+    "python/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "python/conversion/whitespace_only_code_span_kept.md",
     "python/edge-cases/empty_html.md",
     "python/edge-cases/encoding_c1_replacement_table.md",
@@ -2643,6 +2714,7 @@
     "python/metadata/twitter_card_tags.md",
     "python/options/issue_396_backticks_blank_line_after_fence.md",
     "python/options/options_autolinks_false.md",
+    "python/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "python/options/options_br_in_tables_false.md",
     "python/options/options_br_in_tables_nested_data_table.md",
     "python/options/options_br_in_tables_nested_table_rows.md",
@@ -2805,6 +2877,7 @@
     "r/conversion/blockquote_with_list.md",
     "r/conversion/bold_and_italic.md",
     "r/conversion/bold_strong.md",
+    "r/conversion/br_only_bold_wrapper_keeps_separator.md",
     "r/conversion/code_block.md",
     "r/conversion/code_block_br_keeps_real_newline.md",
     "r/conversion/code_block_no_language.md",
@@ -2818,6 +2891,7 @@
     "r/conversion/conversion_autolink_mailto.md",
     "r/conversion/conversion_autolink_mixed_filename_and_url.md",
     "r/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "r/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "r/conversion/emphasis_mark_highlight.md",
     "r/conversion/emphasis_strikethrough_del.md",
     "r/conversion/emphasis_strikethrough_s.md",
@@ -2833,12 +2907,14 @@
     "r/conversion/heading_h4.md",
     "r/conversion/heading_h5.md",
     "r/conversion/heading_h6.md",
+    "r/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "r/conversion/image_figure_figcaption.md",
     "r/conversion/image_kept_inline_in_link.md",
     "r/conversion/image_linked.md",
     "r/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "r/conversion/image_no_alt.md",
     "r/conversion/image_simple.md",
+    "r/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "r/conversion/image_with_title.md",
     "r/conversion/inline_code.md",
     "r/conversion/italic_em.md",
@@ -2847,8 +2923,10 @@
     "r/conversion/line_break_multiple_br.md",
     "r/conversion/link_anchor_fragment.md",
     "r/conversion/link_empty_href.md",
+    "r/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "r/conversion/link_image_inside.md",
     "r/conversion/link_label_block_marker_is_escaped.md",
+    "r/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "r/conversion/link_leading_line_break_is_kept.md",
     "r/conversion/link_mailto.md",
     "r/conversion/link_simple.md",
@@ -2895,6 +2973,7 @@
     "r/conversion/tagged_space_in_subscript_kept.md",
     "r/conversion/tagged_space_not_duplicated.md",
     "r/conversion/unordered_list.md",
+    "r/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "r/conversion/whitespace_only_code_span_kept.md",
     "r/edge-cases/empty_html.md",
     "r/edge-cases/encoding_c1_replacement_table.md",
@@ -2959,6 +3038,7 @@
     "r/metadata/twitter_card_tags.md",
     "r/options/issue_396_backticks_blank_line_after_fence.md",
     "r/options/options_autolinks_false.md",
+    "r/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "r/options/options_br_in_tables_false.md",
     "r/options/options_br_in_tables_nested_data_table.md",
     "r/options/options_br_in_tables_nested_table_rows.md",
@@ -3121,6 +3201,7 @@
     "ruby/conversion/blockquote_with_list.md",
     "ruby/conversion/bold_and_italic.md",
     "ruby/conversion/bold_strong.md",
+    "ruby/conversion/br_only_bold_wrapper_keeps_separator.md",
     "ruby/conversion/code_block.md",
     "ruby/conversion/code_block_br_keeps_real_newline.md",
     "ruby/conversion/code_block_no_language.md",
@@ -3134,6 +3215,7 @@
     "ruby/conversion/conversion_autolink_mailto.md",
     "ruby/conversion/conversion_autolink_mixed_filename_and_url.md",
     "ruby/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "ruby/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "ruby/conversion/emphasis_mark_highlight.md",
     "ruby/conversion/emphasis_strikethrough_del.md",
     "ruby/conversion/emphasis_strikethrough_s.md",
@@ -3149,12 +3231,14 @@
     "ruby/conversion/heading_h4.md",
     "ruby/conversion/heading_h5.md",
     "ruby/conversion/heading_h6.md",
+    "ruby/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "ruby/conversion/image_figure_figcaption.md",
     "ruby/conversion/image_kept_inline_in_link.md",
     "ruby/conversion/image_linked.md",
     "ruby/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "ruby/conversion/image_no_alt.md",
     "ruby/conversion/image_simple.md",
+    "ruby/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "ruby/conversion/image_with_title.md",
     "ruby/conversion/inline_code.md",
     "ruby/conversion/italic_em.md",
@@ -3163,8 +3247,10 @@
     "ruby/conversion/line_break_multiple_br.md",
     "ruby/conversion/link_anchor_fragment.md",
     "ruby/conversion/link_empty_href.md",
+    "ruby/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "ruby/conversion/link_image_inside.md",
     "ruby/conversion/link_label_block_marker_is_escaped.md",
+    "ruby/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "ruby/conversion/link_leading_line_break_is_kept.md",
     "ruby/conversion/link_mailto.md",
     "ruby/conversion/link_simple.md",
@@ -3211,6 +3297,7 @@
     "ruby/conversion/tagged_space_in_subscript_kept.md",
     "ruby/conversion/tagged_space_not_duplicated.md",
     "ruby/conversion/unordered_list.md",
+    "ruby/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "ruby/conversion/whitespace_only_code_span_kept.md",
     "ruby/edge-cases/empty_html.md",
     "ruby/edge-cases/encoding_c1_replacement_table.md",
@@ -3275,6 +3362,7 @@
     "ruby/metadata/twitter_card_tags.md",
     "ruby/options/issue_396_backticks_blank_line_after_fence.md",
     "ruby/options/options_autolinks_false.md",
+    "ruby/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "ruby/options/options_br_in_tables_false.md",
     "ruby/options/options_br_in_tables_nested_data_table.md",
     "ruby/options/options_br_in_tables_nested_table_rows.md",
@@ -3437,6 +3525,7 @@
     "rust/conversion/blockquote_with_list.md",
     "rust/conversion/bold_and_italic.md",
     "rust/conversion/bold_strong.md",
+    "rust/conversion/br_only_bold_wrapper_keeps_separator.md",
     "rust/conversion/code_block.md",
     "rust/conversion/code_block_br_keeps_real_newline.md",
     "rust/conversion/code_block_no_language.md",
@@ -3450,6 +3539,7 @@
     "rust/conversion/conversion_autolink_mailto.md",
     "rust/conversion/conversion_autolink_mixed_filename_and_url.md",
     "rust/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "rust/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "rust/conversion/emphasis_mark_highlight.md",
     "rust/conversion/emphasis_strikethrough_del.md",
     "rust/conversion/emphasis_strikethrough_s.md",
@@ -3465,12 +3555,14 @@
     "rust/conversion/heading_h4.md",
     "rust/conversion/heading_h5.md",
     "rust/conversion/heading_h6.md",
+    "rust/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "rust/conversion/image_figure_figcaption.md",
     "rust/conversion/image_kept_inline_in_link.md",
     "rust/conversion/image_linked.md",
     "rust/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "rust/conversion/image_no_alt.md",
     "rust/conversion/image_simple.md",
+    "rust/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "rust/conversion/image_with_title.md",
     "rust/conversion/inline_code.md",
     "rust/conversion/italic_em.md",
@@ -3479,8 +3571,10 @@
     "rust/conversion/line_break_multiple_br.md",
     "rust/conversion/link_anchor_fragment.md",
     "rust/conversion/link_empty_href.md",
+    "rust/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "rust/conversion/link_image_inside.md",
     "rust/conversion/link_label_block_marker_is_escaped.md",
+    "rust/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "rust/conversion/link_leading_line_break_is_kept.md",
     "rust/conversion/link_mailto.md",
     "rust/conversion/link_simple.md",
@@ -3527,6 +3621,7 @@
     "rust/conversion/tagged_space_in_subscript_kept.md",
     "rust/conversion/tagged_space_not_duplicated.md",
     "rust/conversion/unordered_list.md",
+    "rust/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "rust/conversion/whitespace_only_code_span_kept.md",
     "rust/edge-cases/empty_html.md",
     "rust/edge-cases/encoding_c1_replacement_table.md",
@@ -3591,6 +3686,7 @@
     "rust/metadata/twitter_card_tags.md",
     "rust/options/issue_396_backticks_blank_line_after_fence.md",
     "rust/options/options_autolinks_false.md",
+    "rust/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "rust/options/options_br_in_tables_false.md",
     "rust/options/options_br_in_tables_nested_data_table.md",
     "rust/options/options_br_in_tables_nested_table_rows.md",
@@ -3753,6 +3849,7 @@
     "swift/conversion/blockquote_with_list.md",
     "swift/conversion/bold_and_italic.md",
     "swift/conversion/bold_strong.md",
+    "swift/conversion/br_only_bold_wrapper_keeps_separator.md",
     "swift/conversion/code_block.md",
     "swift/conversion/code_block_br_keeps_real_newline.md",
     "swift/conversion/code_block_no_language.md",
@@ -3766,6 +3863,7 @@
     "swift/conversion/conversion_autolink_mailto.md",
     "swift/conversion/conversion_autolink_mixed_filename_and_url.md",
     "swift/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "swift/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "swift/conversion/emphasis_mark_highlight.md",
     "swift/conversion/emphasis_strikethrough_del.md",
     "swift/conversion/emphasis_strikethrough_s.md",
@@ -3781,12 +3879,14 @@
     "swift/conversion/heading_h4.md",
     "swift/conversion/heading_h5.md",
     "swift/conversion/heading_h6.md",
+    "swift/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "swift/conversion/image_figure_figcaption.md",
     "swift/conversion/image_kept_inline_in_link.md",
     "swift/conversion/image_linked.md",
     "swift/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "swift/conversion/image_no_alt.md",
     "swift/conversion/image_simple.md",
+    "swift/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "swift/conversion/image_with_title.md",
     "swift/conversion/inline_code.md",
     "swift/conversion/italic_em.md",
@@ -3795,8 +3895,10 @@
     "swift/conversion/line_break_multiple_br.md",
     "swift/conversion/link_anchor_fragment.md",
     "swift/conversion/link_empty_href.md",
+    "swift/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "swift/conversion/link_image_inside.md",
     "swift/conversion/link_label_block_marker_is_escaped.md",
+    "swift/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "swift/conversion/link_leading_line_break_is_kept.md",
     "swift/conversion/link_mailto.md",
     "swift/conversion/link_simple.md",
@@ -3843,6 +3945,7 @@
     "swift/conversion/tagged_space_in_subscript_kept.md",
     "swift/conversion/tagged_space_not_duplicated.md",
     "swift/conversion/unordered_list.md",
+    "swift/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "swift/conversion/whitespace_only_code_span_kept.md",
     "swift/edge-cases/empty_html.md",
     "swift/edge-cases/encoding_c1_replacement_table.md",
@@ -3907,6 +4010,7 @@
     "swift/metadata/twitter_card_tags.md",
     "swift/options/issue_396_backticks_blank_line_after_fence.md",
     "swift/options/options_autolinks_false.md",
+    "swift/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "swift/options/options_br_in_tables_false.md",
     "swift/options/options_br_in_tables_nested_data_table.md",
     "swift/options/options_br_in_tables_nested_table_rows.md",
@@ -4069,6 +4173,7 @@
     "typescript/conversion/blockquote_with_list.md",
     "typescript/conversion/bold_and_italic.md",
     "typescript/conversion/bold_strong.md",
+    "typescript/conversion/br_only_bold_wrapper_keeps_separator.md",
     "typescript/conversion/code_block.md",
     "typescript/conversion/code_block_br_keeps_real_newline.md",
     "typescript/conversion/code_block_no_language.md",
@@ -4082,6 +4187,7 @@
     "typescript/conversion/conversion_autolink_mailto.md",
     "typescript/conversion/conversion_autolink_mixed_filename_and_url.md",
     "typescript/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "typescript/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "typescript/conversion/emphasis_mark_highlight.md",
     "typescript/conversion/emphasis_strikethrough_del.md",
     "typescript/conversion/emphasis_strikethrough_s.md",
@@ -4097,12 +4203,14 @@
     "typescript/conversion/heading_h4.md",
     "typescript/conversion/heading_h5.md",
     "typescript/conversion/heading_h6.md",
+    "typescript/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "typescript/conversion/image_figure_figcaption.md",
     "typescript/conversion/image_kept_inline_in_link.md",
     "typescript/conversion/image_linked.md",
     "typescript/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "typescript/conversion/image_no_alt.md",
     "typescript/conversion/image_simple.md",
+    "typescript/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "typescript/conversion/image_with_title.md",
     "typescript/conversion/inline_code.md",
     "typescript/conversion/italic_em.md",
@@ -4111,8 +4219,10 @@
     "typescript/conversion/line_break_multiple_br.md",
     "typescript/conversion/link_anchor_fragment.md",
     "typescript/conversion/link_empty_href.md",
+    "typescript/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "typescript/conversion/link_image_inside.md",
     "typescript/conversion/link_label_block_marker_is_escaped.md",
+    "typescript/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "typescript/conversion/link_leading_line_break_is_kept.md",
     "typescript/conversion/link_mailto.md",
     "typescript/conversion/link_simple.md",
@@ -4159,6 +4269,7 @@
     "typescript/conversion/tagged_space_in_subscript_kept.md",
     "typescript/conversion/tagged_space_not_duplicated.md",
     "typescript/conversion/unordered_list.md",
+    "typescript/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "typescript/conversion/whitespace_only_code_span_kept.md",
     "typescript/edge-cases/empty_html.md",
     "typescript/edge-cases/encoding_c1_replacement_table.md",
@@ -4223,6 +4334,7 @@
     "typescript/metadata/twitter_card_tags.md",
     "typescript/options/issue_396_backticks_blank_line_after_fence.md",
     "typescript/options/options_autolinks_false.md",
+    "typescript/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "typescript/options/options_br_in_tables_false.md",
     "typescript/options/options_br_in_tables_nested_data_table.md",
     "typescript/options/options_br_in_tables_nested_table_rows.md",
@@ -4385,6 +4497,7 @@
     "wasm/conversion/blockquote_with_list.md",
     "wasm/conversion/bold_and_italic.md",
     "wasm/conversion/bold_strong.md",
+    "wasm/conversion/br_only_bold_wrapper_keeps_separator.md",
     "wasm/conversion/code_block.md",
     "wasm/conversion/code_block_br_keeps_real_newline.md",
     "wasm/conversion/code_block_no_language.md",
@@ -4398,6 +4511,7 @@
     "wasm/conversion/conversion_autolink_mailto.md",
     "wasm/conversion/conversion_autolink_mixed_filename_and_url.md",
     "wasm/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "wasm/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "wasm/conversion/emphasis_mark_highlight.md",
     "wasm/conversion/emphasis_strikethrough_del.md",
     "wasm/conversion/emphasis_strikethrough_s.md",
@@ -4413,12 +4527,14 @@
     "wasm/conversion/heading_h4.md",
     "wasm/conversion/heading_h5.md",
     "wasm/conversion/heading_h6.md",
+    "wasm/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "wasm/conversion/image_figure_figcaption.md",
     "wasm/conversion/image_kept_inline_in_link.md",
     "wasm/conversion/image_linked.md",
     "wasm/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "wasm/conversion/image_no_alt.md",
     "wasm/conversion/image_simple.md",
+    "wasm/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "wasm/conversion/image_with_title.md",
     "wasm/conversion/inline_code.md",
     "wasm/conversion/italic_em.md",
@@ -4427,8 +4543,10 @@
     "wasm/conversion/line_break_multiple_br.md",
     "wasm/conversion/link_anchor_fragment.md",
     "wasm/conversion/link_empty_href.md",
+    "wasm/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "wasm/conversion/link_image_inside.md",
     "wasm/conversion/link_label_block_marker_is_escaped.md",
+    "wasm/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "wasm/conversion/link_leading_line_break_is_kept.md",
     "wasm/conversion/link_mailto.md",
     "wasm/conversion/link_simple.md",
@@ -4475,6 +4593,7 @@
     "wasm/conversion/tagged_space_in_subscript_kept.md",
     "wasm/conversion/tagged_space_not_duplicated.md",
     "wasm/conversion/unordered_list.md",
+    "wasm/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "wasm/conversion/whitespace_only_code_span_kept.md",
     "wasm/edge-cases/empty_html.md",
     "wasm/edge-cases/encoding_c1_replacement_table.md",
@@ -4539,6 +4658,7 @@
     "wasm/metadata/twitter_card_tags.md",
     "wasm/options/issue_396_backticks_blank_line_after_fence.md",
     "wasm/options/options_autolinks_false.md",
+    "wasm/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "wasm/options/options_br_in_tables_false.md",
     "wasm/options/options_br_in_tables_nested_data_table.md",
     "wasm/options/options_br_in_tables_nested_table_rows.md",
@@ -4701,6 +4821,7 @@
     "zig/conversion/blockquote_with_list.md",
     "zig/conversion/bold_and_italic.md",
     "zig/conversion/bold_strong.md",
+    "zig/conversion/br_only_bold_wrapper_keeps_separator.md",
     "zig/conversion/code_block.md",
     "zig/conversion/code_block_br_keeps_real_newline.md",
     "zig/conversion/code_block_no_language.md",
@@ -4714,6 +4835,7 @@
     "zig/conversion/conversion_autolink_mailto.md",
     "zig/conversion/conversion_autolink_mixed_filename_and_url.md",
     "zig/conversion/conversion_autolink_relative_path_not_autolinked.md",
+    "zig/conversion/div_whitespace_only_span_does_not_indent_image.md",
     "zig/conversion/emphasis_mark_highlight.md",
     "zig/conversion/emphasis_strikethrough_del.md",
     "zig/conversion/emphasis_strikethrough_s.md",
@@ -4729,12 +4851,14 @@
     "zig/conversion/heading_h4.md",
     "zig/conversion/heading_h5.md",
     "zig/conversion/heading_h6.md",
+    "zig/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
     "zig/conversion/image_figure_figcaption.md",
     "zig/conversion/image_kept_inline_in_link.md",
     "zig/conversion/image_linked.md",
     "zig/conversion/image_multiline_alt_block_marker_is_escaped.md",
     "zig/conversion/image_no_alt.md",
     "zig/conversion/image_simple.md",
+    "zig/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
     "zig/conversion/image_with_title.md",
     "zig/conversion/inline_code.md",
     "zig/conversion/italic_em.md",
@@ -4743,8 +4867,10 @@
     "zig/conversion/line_break_multiple_br.md",
     "zig/conversion/link_anchor_fragment.md",
     "zig/conversion/link_empty_href.md",
+    "zig/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
     "zig/conversion/link_image_inside.md",
     "zig/conversion/link_label_block_marker_is_escaped.md",
+    "zig/conversion/link_label_unmatched_open_bracket_is_escaped.md",
     "zig/conversion/link_leading_line_break_is_kept.md",
     "zig/conversion/link_mailto.md",
     "zig/conversion/link_simple.md",
@@ -4791,6 +4917,7 @@
     "zig/conversion/tagged_space_in_subscript_kept.md",
     "zig/conversion/tagged_space_not_duplicated.md",
     "zig/conversion/unordered_list.md",
+    "zig/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
     "zig/conversion/whitespace_only_code_span_kept.md",
     "zig/edge-cases/empty_html.md",
     "zig/edge-cases/encoding_c1_replacement_table.md",
@@ -4855,6 +4982,7 @@
     "zig/metadata/twitter_card_tags.md",
     "zig/options/issue_396_backticks_blank_line_after_fence.md",
     "zig/options/options_autolinks_false.md",
+    "zig/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
     "zig/options/options_br_in_tables_false.md",
     "zig/options/options_br_in_tables_nested_data_table.md",
     "zig/options/options_br_in_tables_nested_table_rows.md",
@@ -5175,6 +5303,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "c"
+      },
+      "path": "c/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "c"
       },
@@ -5323,6 +5463,18 @@
         "language": "c"
       },
       "path": "c/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "c"
+      },
+      "path": "c/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -5511,6 +5663,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "c"
+      },
+      "path": "c/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "c"
       },
@@ -5575,6 +5739,18 @@
         "language": "c"
       },
       "path": "c/conversion/image_simple.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "c"
+      },
+      "path": "c/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -5679,6 +5855,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "c"
+      },
+      "path": "c/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "c"
       },
@@ -5695,6 +5883,18 @@
         "language": "c"
       },
       "path": "c/conversion/link_label_block_marker_is_escaped.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "c"
+      },
+      "path": "c/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -6247,6 +6447,18 @@
         "language": "c"
       },
       "path": "c/conversion/unordered_list.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "c"
+      },
+      "path": "c/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -7015,6 +7227,18 @@
         "language": "c"
       },
       "path": "c/options/options_autolinks_false.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "c"
+      },
+      "path": "c/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -8967,6 +9191,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "csharp"
       },
@@ -9115,6 +9351,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -9303,6 +9551,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "csharp"
       },
@@ -9367,6 +9627,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/image_simple.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -9471,6 +9743,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "csharp"
       },
@@ -9487,6 +9771,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/link_label_block_marker_is_escaped.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -10039,6 +10335,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/unordered_list.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -10807,6 +11115,18 @@
         "language": "csharp"
       },
       "path": "csharp/options/options_autolinks_false.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -12759,6 +13079,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "dart"
+      },
+      "path": "dart/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "dart"
       },
@@ -12907,6 +13239,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "dart"
+      },
+      "path": "dart/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -13095,6 +13439,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "dart"
+      },
+      "path": "dart/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "dart"
       },
@@ -13159,6 +13515,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/image_simple.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "dart"
+      },
+      "path": "dart/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -13263,6 +13631,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "dart"
+      },
+      "path": "dart/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "dart"
       },
@@ -13279,6 +13659,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/link_label_block_marker_is_escaped.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "dart"
+      },
+      "path": "dart/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -13831,6 +14223,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/unordered_list.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "dart"
+      },
+      "path": "dart/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -14599,6 +15003,18 @@
         "language": "dart"
       },
       "path": "dart/options/options_autolinks_false.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "dart"
+      },
+      "path": "dart/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -16551,6 +16967,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "elixir"
       },
@@ -16699,6 +17127,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -16887,6 +17327,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "elixir"
       },
@@ -16951,6 +17403,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/image_simple.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -17055,6 +17519,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "elixir"
       },
@@ -17071,6 +17547,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/link_label_block_marker_is_escaped.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -17623,6 +18111,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/unordered_list.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -18391,6 +18891,18 @@
         "language": "elixir"
       },
       "path": "elixir/options/options_autolinks_false.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -20343,6 +20855,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "go"
+      },
+      "path": "go/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "go"
       },
@@ -20491,6 +21015,18 @@
         "language": "go"
       },
       "path": "go/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "go"
+      },
+      "path": "go/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -20679,6 +21215,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "go"
+      },
+      "path": "go/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "go"
       },
@@ -20743,6 +21291,18 @@
         "language": "go"
       },
       "path": "go/conversion/image_simple.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "go"
+      },
+      "path": "go/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -20847,6 +21407,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "go"
+      },
+      "path": "go/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "go"
       },
@@ -20863,6 +21435,18 @@
         "language": "go"
       },
       "path": "go/conversion/link_label_block_marker_is_escaped.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "go"
+      },
+      "path": "go/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -21415,6 +21999,18 @@
         "language": "go"
       },
       "path": "go/conversion/unordered_list.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "go"
+      },
+      "path": "go/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -22183,6 +22779,18 @@
         "language": "go"
       },
       "path": "go/options/options_autolinks_false.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "go"
+      },
+      "path": "go/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -24135,6 +24743,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "java"
+      },
+      "path": "java/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "java"
       },
@@ -24283,6 +24903,18 @@
         "language": "java"
       },
       "path": "java/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "java"
+      },
+      "path": "java/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -24471,6 +25103,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "java"
+      },
+      "path": "java/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "java"
       },
@@ -24535,6 +25179,18 @@
         "language": "java"
       },
       "path": "java/conversion/image_simple.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "java"
+      },
+      "path": "java/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -24639,6 +25295,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "java"
+      },
+      "path": "java/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "java"
       },
@@ -24655,6 +25323,18 @@
         "language": "java"
       },
       "path": "java/conversion/link_label_block_marker_is_escaped.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "java"
+      },
+      "path": "java/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -25207,6 +25887,18 @@
         "language": "java"
       },
       "path": "java/conversion/unordered_list.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "java"
+      },
+      "path": "java/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -25975,6 +26667,18 @@
         "language": "java"
       },
       "path": "java/options/options_autolinks_false.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "java"
+      },
+      "path": "java/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -27927,6 +28631,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "kotlin_android"
       },
@@ -28075,6 +28791,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -28263,6 +28991,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "kotlin_android"
       },
@@ -28327,6 +29067,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/image_simple.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -28431,6 +29183,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "kotlin_android"
       },
@@ -28447,6 +29211,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/link_label_block_marker_is_escaped.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -28999,6 +29775,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/unordered_list.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -29707,6 +30495,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/options/options_autolinks_false.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -31071,6 +31871,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "php"
+      },
+      "path": "php/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "php"
       },
@@ -31219,6 +32031,18 @@
         "language": "php"
       },
       "path": "php/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "php"
+      },
+      "path": "php/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -31407,6 +32231,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "php"
+      },
+      "path": "php/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "php"
       },
@@ -31471,6 +32307,18 @@
         "language": "php"
       },
       "path": "php/conversion/image_simple.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "php"
+      },
+      "path": "php/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -31575,6 +32423,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "php"
+      },
+      "path": "php/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "php"
       },
@@ -31591,6 +32451,18 @@
         "language": "php"
       },
       "path": "php/conversion/link_label_block_marker_is_escaped.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "php"
+      },
+      "path": "php/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -32143,6 +33015,18 @@
         "language": "php"
       },
       "path": "php/conversion/unordered_list.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "php"
+      },
+      "path": "php/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -32911,6 +33795,18 @@
         "language": "php"
       },
       "path": "php/options/options_autolinks_false.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "php"
+      },
+      "path": "php/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -34863,6 +35759,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "python"
+      },
+      "path": "python/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "python"
       },
@@ -35011,6 +35919,18 @@
         "language": "python"
       },
       "path": "python/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "python"
+      },
+      "path": "python/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -35199,6 +36119,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "python"
+      },
+      "path": "python/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "python"
       },
@@ -35263,6 +36195,18 @@
         "language": "python"
       },
       "path": "python/conversion/image_simple.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "python"
+      },
+      "path": "python/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -35367,6 +36311,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "python"
+      },
+      "path": "python/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "python"
       },
@@ -35383,6 +36339,18 @@
         "language": "python"
       },
       "path": "python/conversion/link_label_block_marker_is_escaped.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "python"
+      },
+      "path": "python/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -35935,6 +36903,18 @@
         "language": "python"
       },
       "path": "python/conversion/unordered_list.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "python"
+      },
+      "path": "python/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -36703,6 +37683,18 @@
         "language": "python"
       },
       "path": "python/options/options_autolinks_false.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "python"
+      },
+      "path": "python/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -38655,6 +39647,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "r"
+      },
+      "path": "r/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "r"
       },
@@ -38803,6 +39807,18 @@
         "language": "r"
       },
       "path": "r/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "r"
+      },
+      "path": "r/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -38991,6 +40007,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "r"
+      },
+      "path": "r/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "r"
       },
@@ -39055,6 +40083,18 @@
         "language": "r"
       },
       "path": "r/conversion/image_simple.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "r"
+      },
+      "path": "r/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -39159,6 +40199,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "r"
+      },
+      "path": "r/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "r"
       },
@@ -39175,6 +40227,18 @@
         "language": "r"
       },
       "path": "r/conversion/link_label_block_marker_is_escaped.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "r"
+      },
+      "path": "r/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -39727,6 +40791,18 @@
         "language": "r"
       },
       "path": "r/conversion/unordered_list.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "r"
+      },
+      "path": "r/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -40495,6 +41571,18 @@
         "language": "r"
       },
       "path": "r/options/options_autolinks_false.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "r"
+      },
+      "path": "r/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -42447,6 +43535,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "ruby"
       },
@@ -42595,6 +43695,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -42783,6 +43895,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "ruby"
       },
@@ -42847,6 +43971,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/image_simple.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -42951,6 +44087,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "ruby"
       },
@@ -42967,6 +44115,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/link_label_block_marker_is_escaped.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -43519,6 +44679,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/unordered_list.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -44287,6 +45459,18 @@
         "language": "ruby"
       },
       "path": "ruby/options/options_autolinks_false.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -46239,6 +47423,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "rust"
+      },
+      "path": "rust/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "rust"
       },
@@ -46387,6 +47583,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "rust"
+      },
+      "path": "rust/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -46581,6 +47789,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "rust"
+      },
+      "path": "rust/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "rust"
       },
@@ -46647,6 +47867,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/image_simple.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "rust"
+      },
+      "path": "rust/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -46751,6 +47983,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "rust"
+      },
+      "path": "rust/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "rust"
       },
@@ -46767,6 +48011,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/link_label_block_marker_is_escaped.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "rust"
+      },
+      "path": "rust/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -47321,6 +48577,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/unordered_list.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "rust"
+      },
+      "path": "rust/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -48145,6 +49413,20 @@
         "language": "rust"
       },
       "path": "rust/options/options_autolinks_false.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "rust"
+      },
+      "path": "rust/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -50373,6 +51655,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "swift"
+      },
+      "path": "swift/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "swift"
       },
@@ -50521,6 +51815,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "swift"
+      },
+      "path": "swift/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -50709,6 +52015,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "swift"
+      },
+      "path": "swift/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "swift"
       },
@@ -50773,6 +52091,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/image_simple.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "swift"
+      },
+      "path": "swift/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -50877,6 +52207,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "swift"
+      },
+      "path": "swift/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "swift"
       },
@@ -50893,6 +52235,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/link_label_block_marker_is_escaped.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "swift"
+      },
+      "path": "swift/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -51445,6 +52799,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/unordered_list.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "swift"
+      },
+      "path": "swift/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -52213,6 +53579,18 @@
         "language": "swift"
       },
       "path": "swift/options/options_autolinks_false.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "swift"
+      },
+      "path": "swift/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -54165,6 +55543,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "node"
+      },
+      "path": "typescript/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "node"
       },
@@ -54313,6 +55703,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "node"
+      },
+      "path": "typescript/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -54501,6 +55903,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "node"
+      },
+      "path": "typescript/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "node"
       },
@@ -54565,6 +55979,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/image_simple.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "node"
+      },
+      "path": "typescript/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -54669,6 +56095,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "node"
+      },
+      "path": "typescript/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "node"
       },
@@ -54685,6 +56123,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/link_label_block_marker_is_escaped.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "node"
+      },
+      "path": "typescript/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -55237,6 +56687,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/unordered_list.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "node"
+      },
+      "path": "typescript/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -56005,6 +57467,18 @@
         "language": "node"
       },
       "path": "typescript/options/options_autolinks_false.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "node"
+      },
+      "path": "typescript/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -57957,6 +59431,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "wasm"
       },
@@ -58105,6 +59591,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -58293,6 +59791,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "wasm"
       },
@@ -58357,6 +59867,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/image_simple.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -58461,6 +59983,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "wasm"
       },
@@ -58477,6 +60011,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/link_label_block_marker_is_escaped.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -59029,6 +60575,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/unordered_list.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -59797,6 +61355,18 @@
         "language": "wasm"
       },
       "path": "wasm/options/options_autolinks_false.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -61749,6 +63319,18 @@
     },
     {
       "key": {
+        "fixture_id": "br_only_bold_wrapper_keeps_separator",
+        "language": "zig"
+      },
+      "path": "zig/conversion/br_only_bold_wrapper_keeps_separator.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "code_block",
         "language": "zig"
       },
@@ -61897,6 +63479,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/conversion_autolink_relative_path_not_autolinked.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+        "language": "zig"
+      },
+      "path": "zig/conversion/div_whitespace_only_span_does_not_indent_image.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -62085,6 +63679,18 @@
     },
     {
       "key": {
+        "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+        "language": "zig"
+      },
+      "path": "zig/conversion/image_alt_unmatched_open_bracket_is_escaped.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "image_figure_figcaption",
         "language": "zig"
       },
@@ -62149,6 +63755,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/image_simple.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+        "language": "zig"
+      },
+      "path": "zig/conversion/image_src_entity_shaped_ampersand_kept_literal.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -62253,6 +63871,18 @@
     },
     {
       "key": {
+        "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+        "language": "zig"
+      },
+      "path": "zig/conversion/link_href_entity_shaped_ampersand_kept_literal.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "link_image_inside",
         "language": "zig"
       },
@@ -62269,6 +63899,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/link_label_block_marker_is_escaped.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+        "language": "zig"
+      },
+      "path": "zig/conversion/link_label_unmatched_open_bracket_is_escaped.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -62821,6 +64463,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/unordered_list.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+        "language": "zig"
+      },
+      "path": "zig/conversion/whitespace_only_bold_wrapper_keeps_separator.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -63589,6 +65243,18 @@
         "language": "zig"
       },
       "path": "zig/options/options_autolinks_false.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+        "language": "zig"
+      },
+      "path": "zig/options/options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -66270,6 +67936,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "c"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "go"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "java"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "node"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "php"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "python"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "r"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "zig"
+    },
+    {
       "fixture_id": "code_block",
       "language": "c"
     },
@@ -67099,6 +68829,70 @@
     },
     {
       "fixture_id": "conversion_autolink_relative_path_not_autolinked",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "c"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "go"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "java"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "node"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "php"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "python"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "r"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
       "language": "zig"
     },
     {
@@ -69022,6 +70816,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "zig"
+    },
+    {
       "fixture_id": "image_figure_figcaption",
       "language": "c"
     },
@@ -69403,6 +71261,70 @@
     },
     {
       "fixture_id": "image_simple",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
       "language": "zig"
     },
     {
@@ -70046,6 +71968,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "zig"
+    },
+    {
       "fixture_id": "link_image_inside",
       "language": "c"
     },
@@ -70171,6 +72157,70 @@
     },
     {
       "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
       "language": "zig"
     },
     {
@@ -73051,6 +75101,70 @@
     },
     {
       "fixture_id": "options_autolinks_false",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
       "language": "zig"
     },
     {
@@ -85123,6 +87237,70 @@
     },
     {
       "fixture_id": "whitespace_only",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "c"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "go"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "java"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "node"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "php"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "python"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "r"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
       "language": "zig"
     },
     {
@@ -86280,6 +88458,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "c"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "go"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "java"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "node"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "php"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "python"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "r"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "br_only_bold_wrapper_keeps_separator",
+      "language": "zig"
+    },
+    {
       "fixture_id": "code_block",
       "language": "c"
     },
@@ -87109,6 +89351,70 @@
     },
     {
       "fixture_id": "conversion_autolink_relative_path_not_autolinked",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "c"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "go"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "java"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "node"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "php"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "python"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "r"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "div_whitespace_only_span_does_not_indent_image",
       "language": "zig"
     },
     {
@@ -89032,6 +91338,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_alt_unmatched_open_bracket_is_escaped",
+      "language": "zig"
+    },
+    {
       "fixture_id": "image_figure_figcaption",
       "language": "c"
     },
@@ -89413,6 +91783,70 @@
     },
     {
       "fixture_id": "image_simple",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "c"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "go"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "java"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "node"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "php"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "python"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "r"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "image_src_entity_shaped_ampersand_kept_literal",
       "language": "zig"
     },
     {
@@ -90056,6 +92490,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_href_entity_shaped_ampersand_kept_literal",
+      "language": "zig"
+    },
+    {
       "fixture_id": "link_image_inside",
       "language": "c"
     },
@@ -90181,6 +92679,70 @@
     },
     {
       "fixture_id": "link_label_block_marker_is_escaped",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "c"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "go"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "java"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "node"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "php"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "python"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "r"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "link_label_unmatched_open_bracket_is_escaped",
       "language": "zig"
     },
     {
@@ -93061,6 +95623,70 @@
     },
     {
       "fixture_id": "options_autolinks_false",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_br_in_tables_anchor_wrapped_nested_table_in_layout_cell",
       "language": "zig"
     },
     {
@@ -105133,6 +107759,70 @@
     },
     {
       "fixture_id": "whitespace_only",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "c"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "go"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "java"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "node"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "php"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "python"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "r"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "whitespace_only_bold_wrapper_keeps_separator",
       "language": "zig"
     },
     {

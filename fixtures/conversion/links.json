@@ -238,5 +238,43 @@
       "stem": "link_label_block_marker_is_escaped",
       "title": "A block marker on a continuation line of a link label is escaped"
     }
+  },
+  {
+    "id": "link_href_entity_shaped_ampersand_kept_literal",
+    "description": "An & that would read as a character reference in a link destination or title stays literal",
+    "input": {
+      "html": "<a href=\"?&amp;plus;\" title=\"&amp;plus;\">T</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[T](?&amp;plus; \"&amp;plus;\")\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_href_entity_shaped_ampersand_kept_literal",
+      "title": "An & that would read as a character reference in a link destination or title stays literal"
+    }
+  },
+  {
+    "id": "link_label_unmatched_open_bracket_is_escaped",
+    "description": "An unmatched [ in a link label is escaped so the link survives",
+    "input": {
+      "html": "<a href=\"S\">[A;B)</a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[\\[A;B)](S)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_label_unmatched_open_bracket_is_escaped",
+      "title": "An unmatched [ in a link label is escaped so the link survives"
+    }
   }
 ]

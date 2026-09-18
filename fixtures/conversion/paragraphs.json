@@ -129,5 +129,24 @@
       "stem": "paragraph_whitespace_only_span_separates_words",
       "title": "A newline-only inline wrapper still separates the words on either side"
     }
+  },
+  {
+    "id": "div_whitespace_only_span_does_not_indent_image",
+    "description": "A whitespace-only span opening a div does not indent the image after it into a code block",
+    "input": {
+      "html": "<p>P</p>\n<div>\n<span>    </span><img alt=\"A\" src=\"S\"/>\n</div>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "P\n\n![A](S)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "div_whitespace_only_span_does_not_indent_image",
+      "title": "A whitespace-only span opening a div does not indent the image after it into a code block"
+    }
   }
 ]

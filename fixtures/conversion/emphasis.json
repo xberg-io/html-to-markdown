@@ -289,5 +289,43 @@
       "stem": "tagged_space_in_strikethrough_kept",
       "title": "A whitespace-only strikethrough keeps the word separator"
     }
+  },
+  {
+    "id": "whitespace_only_bold_wrapper_keeps_separator",
+    "description": "A bold wrapper holding only a newline-only span still separates the words on either side",
+    "input": {
+      "html": "<b>Alpha</b><b><span>\n</span></b><b>Beta</b>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "**Alpha** **Beta**\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "whitespace_only_bold_wrapper_keeps_separator",
+      "title": "A bold wrapper holding only a newline-only span still separates the words on either side"
+    }
+  },
+  {
+    "id": "br_only_bold_wrapper_keeps_separator",
+    "description": "A bold wrapper holding only a line break still separates the words on either side",
+    "input": {
+      "html": "<b>Alpha</b><b><br></b><b>Beta</b>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "**Alpha** **Beta**\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "br_only_bold_wrapper_keeps_separator",
+      "title": "A bold wrapper holding only a line break still separates the words on either side"
+    }
   }
 ]
