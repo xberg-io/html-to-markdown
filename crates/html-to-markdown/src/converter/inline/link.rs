@@ -496,6 +496,74 @@ fn escape_ambiguous_destination_backslashes(dest: &str, title_follows: bool) -> 
     std::borrow::Cow::Owned(escaped)
 }
 
+/// Find the end of an entity-shaped reference (`#?[A-Za-z0-9]{1,32};`) starting right after
+/// the `&` at `amp_index`, returning the byte offset just past the terminating `;`.
+///
+/// Matches the syntax of both a named reference (`plus`) and a numeric one (decimal `#43` or
+/// hex `#x2B`) -- `[A-Za-z0-9]` covers hex digits and the `x` marker generically, so one scan
+/// serves both. Returns `None` when `amp_index` is not followed by this shape at all (no
+/// digit/letter run, or no terminating `;`), which is the common case for a bare `&`.
+fn entity_reference_end(bytes: &[u8], amp_index: usize) -> Option<usize> {
+    const MAX_REFERENCE_NAME_LEN: usize = 32;
+
+    let mut index = amp_index + 1;
+    if bytes.get(index) == Some(&b'#') {
+        index += 1;
+    }
+    let name_start = index;
+    while index < bytes.len() && bytes[index].is_ascii_alphanumeric() && index - name_start < MAX_REFERENCE_NAME_LEN {
+        index += 1;
+    }
+    if index == name_start {
+        return None;
+    }
+    (bytes.get(index) == Some(&b';')).then_some(index + 1)
+}
+
+/// Escape a literal `&` that starts a byte sequence CommonMark would decode as an entity or
+/// numeric character reference (`&plus;`, `&#43;`, `&#x2B;`, ...), so a destination or title
+/// string that already went through [`crate::text::decode_html_entities`] round-trips
+/// byte-for-byte through a CommonMark parser instead of being decoded a second time.
+///
+/// Only escapes references [`html_escape::decode_html_entities`] -- the same decoder used by
+/// `crate::text::decode_html_entities` -- actually changes: `&foo;` where `foo` is not a
+/// recognized reference name is left alone, matching the existing pinned behavior for
+/// `?a&b` (no terminating `;`, never a candidate at all).
+#[must_use]
+pub fn escape_entity_ampersands(text: &str) -> Cow<'_, str> {
+    if !text.contains('&') {
+        return Cow::Borrowed(text);
+    }
+
+    let bytes = text.as_bytes();
+    let mut result = String::with_capacity(text.len());
+    let mut copied_up_to = 0;
+    let mut index = 0;
+
+    while index < bytes.len() {
+        if bytes[index] == b'&' {
+            if let Some(reference_end) = entity_reference_end(bytes, index) {
+                let candidate = &text[index..reference_end];
+                if html_escape::decode_html_entities(candidate) != candidate {
+                    result.push_str(&text[copied_up_to..index]);
+                    result.push_str("&amp;");
+                    result.push_str(&text[index + 1..reference_end]);
+                    copied_up_to = reference_end;
+                    index = reference_end;
+                    continue;
+                }
+            }
+        }
+        index += 1;
+    }
+
+    if copied_up_to == 0 {
+        return Cow::Borrowed(text);
+    }
+    result.push_str(&text[copied_up_to..]);
+    Cow::Owned(result)
+}
+
 /// Escape a Markdown title's backslashes and double quotes for interpolation into a
 /// double-quoted title `"..."`.
 ///
@@ -503,10 +571,15 @@ fn escape_ambiguous_destination_backslashes(dest: &str, title_follows: bool) -> 
 /// make the following delimiter's `\"` read as an escaped quote instead of the closing
 /// delimiter, letting the title (and the destination that follows) run into whatever content
 /// comes next in the document.
+///
+/// [`escape_entity_ampersands`] runs first so the two transforms compose: an entity-shaped `&`
+/// becomes `&amp;` (no backslash or quote involved), and any literal `\`/`"` already in the
+/// title is still escaped afterward.
 #[must_use]
 pub fn escape_markdown_title(text: &str) -> std::borrow::Cow<'_, str> {
+    let text = escape_entity_ampersands(text);
     if !text.contains('\\') && !text.contains('"') {
-        return std::borrow::Cow::Borrowed(text);
+        return text;
     }
     std::borrow::Cow::Owned(text.replace('\\', "\\\\").replace('"', "\\\""))
 }
@@ -557,6 +630,13 @@ pub fn append_url_destination(
     } else {
         percent_encode_non_ascii(dest)
     };
+    let dest = dest.as_ref();
+
+    // ~keep Applied before the space/paren branches below so the two compose: this only ever
+    // ~keep turns an `&` into `&amp;`, which introduces no space and no paren, so it cannot
+    // ~keep change which of the three branches below fires -- see `escape_entity_ampersands`'s
+    // ~keep doc comment for why an entity-shaped `&` must not reach a CommonMark parser raw.
+    let dest = escape_entity_ampersands(dest);
     let dest = dest.as_ref();
 
     if dest.contains(' ') || dest.contains('\n') {
@@ -910,6 +990,45 @@ mod tests {
             None,
         );
         assert_eq!(out, "[link](/path%20with%20spaces \"My Title\")");
+    }
+
+    // ~keep Issue #498: `decoded_attribute` already decoded `&amp;plus;` to `&plus;` before this
+    // ~keep function ever sees it, so these unit tests exercise it with already-decoded input --
+    // ~keep exactly what a destination/title looks like by the time it reaches `append_url_destination`
+    // ~keep or `escape_markdown_title`.
+    #[test]
+    fn escape_entity_ampersands_escapes_a_named_reference() {
+        assert_eq!(escape_entity_ampersands("?&plus;"), "?&amp;plus;");
+    }
+
+    #[test]
+    fn escape_entity_ampersands_escapes_a_decimal_numeric_reference() {
+        assert_eq!(escape_entity_ampersands("?&#43;"), "?&amp;#43;");
+    }
+
+    #[test]
+    fn escape_entity_ampersands_escapes_a_hex_numeric_reference() {
+        assert_eq!(escape_entity_ampersands("?&#x2B;"), "?&amp;#x2B;");
+    }
+
+    #[test]
+    fn escape_entity_ampersands_leaves_a_bare_ampersand_unchanged() {
+        // ~keep `&b` has no terminating `;`, so it is never a reference candidate -- pins the
+        // ~keep existing `?a=1&b=2` behavior (link.rs's `append_markdown_link_angle_...` tests).
+        match escape_entity_ampersands("?a&b") {
+            Cow::Borrowed(unchanged) => assert_eq!(unchanged, "?a&b"),
+            Cow::Owned(owned) => panic!("expected no allocation, got {owned:?}"),
+        }
+    }
+
+    #[test]
+    fn escape_entity_ampersands_leaves_an_unrecognized_named_reference_unchanged() {
+        assert_eq!(escape_entity_ampersands("&foo;"), "&foo;");
+    }
+
+    #[test]
+    fn escape_entity_ampersands_escapes_amp_itself_since_it_is_a_valid_reference() {
+        assert_eq!(escape_entity_ampersands("&amp;"), "&amp;amp;");
     }
 
     #[test]

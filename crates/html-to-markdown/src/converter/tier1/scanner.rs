@@ -3362,11 +3362,20 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
             // ~keep `\"` went unnoticed. Full decoding (issue #494) makes it reachable.
             let escaped_title = crate::converter::inline::link::escape_markdown_title(&title);
             let title_out: &str = &escaped_title;
-            #[allow(clippy::format_push_string)]
-            dest.push_str(&format!("]({href} \"{title_out}\")"));
+            // ~keep Destination written by Tier-2's own `append_url_destination` rather than
+            // ~keep interpolated (mirrors the image path above): an entity-shaped `&` decoded
+            // ~keep by #494's full-decode (issue #498), an unbalanced paren, and a
+            // ~keep whitespace-bearing destination all need the same escaping/wrapping Tier-2
+            // ~keep applies, and interpolating `href` raw made all three diverge here.
+            dest.push_str("](");
+            crate::converter::inline::link::append_url_destination(dest, &href, options.url_escape_style, true);
+            dest.push_str(" \"");
+            dest.push_str(title_out);
+            dest.push_str("\")");
         } else {
-            #[allow(clippy::format_push_string)]
-            dest.push_str(&format!("]({href})"));
+            dest.push_str("](");
+            crate::converter::inline::link::append_url_destination(dest, &href, options.url_escape_style, false);
+            dest.push(')');
         }
     } else {
         let bracket_search_end = clamp_to_char_boundary(dest, frame.content_start);
