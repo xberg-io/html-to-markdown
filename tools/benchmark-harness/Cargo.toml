@@ -51,7 +51,7 @@ walkdir = "2"
 [dev-dependencies]
 # Optional comparison vs upstream mdream (run examples/mdream_compare.rs).
 # Pinned via Cargo.lock; not used by production code.
-mdream = "1.0"
+mdream = "1.7"
 
 # ~keep This example imports `html_to_markdown_rs::testkit` directly, so it cannot
 # build unless the feature is on. `src/main.rs` cfg-gates its own testkit use, but
