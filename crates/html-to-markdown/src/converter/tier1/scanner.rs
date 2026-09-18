@@ -1607,17 +1607,19 @@ fn open_link(state: &mut Tier1State) {
 /// Per-table inputs to Tier-2's layout-table heuristic that `TableState` does not
 /// already carry.
 ///
-/// Mirrors the three `TableScan` fields (`block/table/scanner.rs`) that Tier-2's
+/// Mirrors the two `TableScan` fields (`block/table/scanner.rs`) that Tier-2's
 /// `looks_like_layout` reads in `block/table/builder.rs`:
 ///
 /// ```text
-/// looks_like_layout = nested_table_count > 1 || distinct_counts.len() > 1
-///                                            || (has_span && has_border_zero)
+/// looks_like_layout = nested_table_count > 1 || (has_span && has_border_zero)
 /// ```
 ///
-/// Only the middle term is derivable from `TableState` (as `inconsistent_cols` in
-/// [`close_table`]); the other two are collected here.  One entry is pushed by
-/// [`open_table`] and popped by [`close_table`], in lockstep with
+/// Both are collected here; `TableState` already tracks everything else `close_table`
+/// needs, including `inconsistent_cols` (ragged row lengths), which is no longer part of
+/// Tier-2's formula (issue #500) but stays a Tier-1-only bail: a stricter-than-Tier-2 bail
+/// is parity-safe since it only ever routes more input to the fallback, and Tier-1 has no
+/// need to learn Tier-2's ragged-row padding (issue #13) just to stay in step with it. One
+/// entry is pushed by [`open_table`] and popped by [`close_table`], in lockstep with
 /// `Tier1State::table_stack`, so `last_mut()` is always the innermost open table.
 #[derive(Debug, Clone, Copy, Default)]
 struct TableLayoutProbe {
@@ -3546,11 +3548,9 @@ fn close_table(
     // ~keep   (c) looks_like_layout || is_blank || (row_count<=2 && link_count>=3)
     // ~keep
     // ~keep where (block/table/builder.rs)
-    // ~keep   looks_like_layout = nested_table_count > 1
-    // ~keep                    || distinct_counts.len() > 1
-    // ~keep                    || (has_span && has_border_zero)
+    // ~keep   looks_like_layout = nested_table_count > 1 || (has_span && has_border_zero)
     // ~keep
-    // ~keep All three disjuncts are checked below — none of them is unreachable here.
+    // ~keep Both disjuncts are checked below — neither is unreachable here.
     // ~keep An earlier revision of this comment claimed nested tables and
     // ~keep colspan/rowspan had "already bailed"; both claims were false (Phase HH
     // ~keep renders a nested table inline into the parent cell, and open_table_cell
@@ -3559,6 +3559,13 @@ fn close_table(
     // ~keep
     // ~keep If those conditions could apply to this table, we bail rather than
     // ~keep emit a GFM table that Tier-2 would have rendered differently.
+    // ~keep
+    // ~keep `inconsistent_cols` below is checked in addition to the above, not because
+    // ~keep Tier-2 treats ragged rows as layout (it no longer does, issue #500 — the
+    // ~keep regular renderer pads a short row to the table's column count instead,
+    // ~keep issue #13), but because Tier-1 has no padding logic of its own: bailing on
+    // ~keep ragged rows is stricter than Tier-2 needs, which stays parity-safe (it only
+    // ~keep ever sends more input to the fallback) without teaching Tier-1 to pad.
     // ~keep
     // ~keep When a <caption> is present, Tier-2 always takes the GFM path
     // ~keep regardless of <th> presence (has_caption short-circuits the layout check).
@@ -3578,7 +3585,8 @@ fn close_table(
         // ~keep No <th> and no <caption>: check if Tier-2 would take the layout path.
         let row_count = ts.rows.len();
 
-        // ~keep Inconsistent column counts → layout table in Tier-2.
+        // ~keep Inconsistent column counts → Tier-1-only bail (issue #500; see the module
+        // ~keep comment above `TableLayoutProbe` and the block comment above this function).
         // ~keep Compare colspan-expanded column counts (sum of cell colspans per row)
         // ~keep because Tier-2 computes column counts post-colspan expansion.
         let expanded_cols = |row: &Vec<(String, u16)>| -> usize { row.iter().map(|(_, c)| usize::from(*c)).sum() };

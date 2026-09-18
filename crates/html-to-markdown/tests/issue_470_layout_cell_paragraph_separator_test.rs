@@ -5,9 +5,11 @@
 //! with zero bytes between them, merging words and running two emphasis spans together into
 //! invalid Markdown (`**Alice Example***Customer Service*`).
 //!
-//! The cell is reached through the *layout*-table path: the reporter's third row has three
-//! cells against the others' two, which makes `looks_like_layout` true, and a header-less,
-//! caption-less layout table renders each row as a list item. `append_layout_cell_text` built
+//! The cell is reached through the *layout*-table path: `border="0"` plus a spanning cell
+//! makes `looks_like_layout` true (issue #500 dropped the reporter's original trigger, ragged
+//! row lengths, since a headerless table with ragged rows is ordinary tabular data far more
+//! often than it is layout), and a header-less, caption-less layout table renders each row as
+//! a list item. `append_layout_cell_text` built
 //! its cell context with `convert_as_inline: true` and nothing else, so `<p>`'s
 //! table-continuation branch never fired — `br_in_tables` was not even consulted — while
 //! `convert_as_inline` simultaneously suppressed the ordinary block separator. Neither
@@ -32,17 +34,17 @@ fn reporter_options() -> ConversionOptions {
     }
 }
 
-const REPORTED_HTML: &str = r"<table>
+const REPORTED_HTML: &str = r#"<table border="0">
   <tr>
     <td><p><b>Alice Example</b></p><p><i>Customer Service</i></p><p><i>Example Group</i></p></td>
-    <td>Logo</td>
+    <td colspan="1">Logo</td>
   </tr>
   <tr>
     <td><p>Example</p><p>Contact details</p></td>
     <td>Other</td>
   </tr>
   <tr><td>A</td><td>B</td><td>C</td></tr>
-</table>";
+</table>"#;
 
 fn content(html: &str, options: ConversionOptions) -> String {
     convert(html, Some(options)).unwrap().content.unwrap_or_default()
@@ -101,8 +103,7 @@ fn should_honour_br_in_tables_for_the_layout_cell_boundary() {
 /// A `<div>` continuation follows the same settled rule as `<p>`.
 #[test]
 fn should_separate_adjacent_divs_in_a_layout_cell() {
-    let html =
-        "<table><tr><td><div>A</div><div>B</div></td><td>x</td></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>";
+    let html = r#"<table border="0"><tr><td><div>A</div><div>B</div></td><td colspan="1">x</td></tr></table>"#;
     let out = content(html, reporter_options());
     assert!(!out.contains("AB"), "divs still merged: {out:?}");
 }
@@ -111,7 +112,7 @@ fn should_separate_adjacent_divs_in_a_layout_cell() {
 /// pipe/emphasis escaping along with the continuation rule.
 #[test]
 fn should_not_escape_pipes_or_emphasis_markers_in_a_layout_row() {
-    let html = "<table><tr><td><p>a|b</p><p>c*d</p></td><td>x</td></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>";
+    let html = r#"<table border="0"><tr><td><p>a|b</p><p>c*d</p></td><td colspan="1">x</td></tr></table>"#;
     let out = content(html, reporter_options());
     assert!(!out.contains(r"\|"), "pipe was escaped in a layout row: {out:?}");
     assert!(!out.contains(r"\*"), "asterisk was escaped in a layout row: {out:?}");

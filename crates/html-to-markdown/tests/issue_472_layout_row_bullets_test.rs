@@ -15,9 +15,11 @@
 
 use html_to_markdown_rs::{ConversionOptions, convert};
 
-/// Inconsistent column counts with no `<th>`/`<caption>` is what makes the converter treat a
-/// table as layout and render its rows as list items.
-const LAYOUT_TABLE: &str = "<table><tr><td>alpha</td><td>beta</td></tr><tr><td>a</td><td>b</td><td>c</td></tr></table>";
+/// A short, link-dense table with no `<th>`/`<caption>` is what makes the converter treat a
+/// table as layout and render its rows as list items (`row_count <= 2 && link_count >= 3`;
+/// issue #500 dropped ragged row lengths alone as a layout trigger, since a headerless table
+/// with ragged rows is ordinary tabular data far more often than it is layout).
+const LAYOUT_TABLE: &str = "<table><tr><td>alpha</td><td>beta</td></tr><tr><td><a href=\"/1\">a</a></td><td><a href=\"/2\">b</a></td><td><a href=\"/3\">c</a></td></tr></table>";
 
 fn content(html: &str, options: ConversionOptions) -> String {
     convert(html, Some(options)).unwrap().content.unwrap_or_default()

@@ -208,16 +208,19 @@ pub fn handle_table(
             depth + cell_depth + 1 < crate::converter::main_helpers::effective_max_depth(options)
         });
         let row_count = table_scan.row_counts.len();
-        let mut distinct_counts: Vec<_> = table_scan.row_counts.iter().copied().filter(|c| *c > 0).collect();
-        distinct_counts.sort_unstable();
-        distinct_counts.dedup();
 
         let has_border_zero = tag
             .attributes()
             .get("border")
             .is_some_and(|v| v.as_ref().is_some_and(|b| b.as_utf8_str() == "0"));
-        let looks_like_layout =
-            table_scan.nested_table_count > 1 || distinct_counts.len() > 1 || (table_scan.has_span && has_border_zero);
+        // ~keep issue #500: ragged row lengths (rows with differing cell counts) used to be
+        // ~keep treated as layout on their own. A headerless table with ragged rows is
+        // ~keep ordinary tabular data far more often than it is an email-signature-style
+        // ~keep layout table, and the regular renderer already pads short rows to the table's
+        // ~keep column count (issue #13), so ragged rows alone no longer classify a table as
+        // ~keep layout. Layout still triggers on nested tables, colspan/rowspan combined with
+        // ~keep `border="0"`, a blank table, or a short table dense with links.
+        let looks_like_layout = table_scan.nested_table_count > 1 || (table_scan.has_span && has_border_zero);
         let link_count = table_scan.link_count;
         let is_blank_table = !table_scan.has_text;
 

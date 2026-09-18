@@ -83,10 +83,11 @@ fn append_layout_cell_text(cell_handle: &tl::NodeHandle, row_text: &mut String, 
     }
 
     let mut cell_text = String::new();
-    // ~keep issue #433: honor keep_inline_images_in for images in
-    // ~keep layout-table cells even though cell content is converted
-    // ~keep as inline. A matching cell tag keeps images as markdown.
-    let cell_allow_inline_images = env.ctx.keep_inline_images_in.contains(cell_name.as_ref());
+    // ~keep issue #433/#500: a layout row renders as a list item, and list items keep inline
+    // ~keep images by default (only headings degrade an image to its alt text), so this cell
+    // ~keep always allows them regardless of `keep_inline_images_in`. That option still governs
+    // ~keep image handling elsewhere; it is simply not needed to keep images in a layout cell.
+    let cell_allow_inline_images = true;
     let cell_ctx = super::super::super::Context {
         convert_as_inline: true,
         in_layout_cell: true,

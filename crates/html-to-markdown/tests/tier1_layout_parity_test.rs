@@ -5,13 +5,12 @@
 //!
 //! ```text
 //! looks_like_layout = table_scan.nested_table_count > 1
-//!                  || distinct_counts.len() > 1
 //!                  || (table_scan.has_span && has_border_zero)
 //! ```
 //!
 //! Tier-1's `close_table` (`converter/tier1/scanner.rs`) only ever evaluated the
-//! middle disjunct (as `inconsistent_cols`). The other two were assumed
-//! unreachable — a stale comment claimed nested tables and colspan/rowspan had
+//! `has_span`/border-zero disjunct as its own check. Nested tables and
+//! colspan/rowspan were assumed unreachable — a stale comment claimed both had
 //! "already bailed" — but Phase HH renders a nested table inline into the parent
 //! cell and `open_table_cell` expands colspan, so both reach Tier-1 intact. Such a
 //! table was emitted as a GFM table by Tier-1 while Tier-2 emitted a bullet list,
@@ -22,6 +21,16 @@
 //! assertion (`tier1::run` returns `BailReason::Classifier`). The near-miss cases
 //! at the bottom guard the opposite failure: a bail predicate looser than Tier-2's
 //! would silently disable the fast path for ordinary tables.
+//!
+//! Tier-1 also bails on `inconsistent_cols` (ragged row lengths), but that is no
+//! longer part of Tier-2's formula above (issue #500): Tier-2 now pads a short row
+//! to the table's column count instead (issue #13) rather than treating it as
+//! layout. Tier-1 has no padding logic of its own, so it keeps bailing on ragged
+//! rows anyway — stricter than Tier-2 needs, but still parity-safe, since a bail
+//! only ever routes more input to the (authoritative) Tier-2 fallback. The pair
+//! below for that case therefore does not use `assert_auto_matches_tier2_layout_output`
+//! (Tier-2 no longer takes the layout path here): it asserts the bail fires and
+//! that `Auto` still matches Tier-2's now-tabular output byte for byte.
 
 #![cfg(feature = "testkit")]
 
@@ -73,6 +82,22 @@ fn assert_tier1_bails_as_classifier(html: &str, case: &str) {
         matches!(result, Err(tier1::BailReason::Classifier)),
         "{case}: expected Err(BailReason::Classifier), got {result:?}"
     );
+}
+
+/// Byte-equality contract for a table where Tier-1 bails but Tier-2 does NOT take the
+/// layout path — the ragged-row case (issue #500), where the bail is stricter than Tier-2
+/// needs. Unlike `assert_auto_matches_tier2_layout_output`, this does not assert Tier-2
+/// rendered a bullet list; it asserts the opposite (a pipe table), so a future change that
+/// makes Tier-2 treat ragged rows as layout again would fail this precondition rather than
+/// pass vacuously.
+fn assert_auto_matches_tier2_tabular_output(html: &str, case: &str) {
+    let tier2 = convert_with(html, TierStrategy::Tier2);
+    let auto = convert_with(html, TierStrategy::Auto);
+    assert!(
+        tier2.contains("| ---"),
+        "{case}: precondition — Tier-2 must render this as a pipe table, got {tier2:?}"
+    );
+    assert_eq!(auto, tier2, "{case}: Auto routing must match Tier-2 byte for byte");
 }
 
 fn assert_tier1_takes_the_fast_path(html: &str, case: &str) {
@@ -156,6 +181,22 @@ fn should_match_tier2_output_when_auto_routing_a_table_containing_two_nested_tab
 #[test]
 fn should_bail_from_tier1_when_a_table_contains_two_nested_tables() {
     assert_tier1_bails_as_classifier(TWO_NESTED_TABLES, "two nested tables");
+}
+
+// ~keep ── inconsistent_cols (Tier-1-only, issue #500) ────────────────────────────
+
+/// Ragged row lengths, headerless, no other layout signal. Tier-2 renders this as a padded
+/// pipe table (issue #13); Tier-1 still bails on it rather than learning to pad.
+const RAGGED_TABLE: &str = "<table><tr><td>A</td><td>B</td></tr><tr><td>C</td></tr></table>";
+
+#[test]
+fn should_match_tier2_tabular_output_when_auto_routing_a_ragged_table() {
+    assert_auto_matches_tier2_tabular_output(RAGGED_TABLE, "ragged table");
+}
+
+#[test]
+fn should_bail_from_tier1_when_a_table_has_ragged_rows() {
+    assert_tier1_bails_as_classifier(RAGGED_TABLE, "ragged table");
 }
 
 // ~keep ── Control ─────────────────────────────────────────────────────────────────
