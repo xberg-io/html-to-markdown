@@ -52,6 +52,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   count as a space. Both now surface as the single separating space issue #481 already gives a
   literal `<b> </b>`, still suppressed after an existing space; a truly empty `<b></b>` still
   emits nothing. Tier 1 bails on every one of these shapes, so the change is Tier-2 only.
+- **A headerless table whose rows have different cell counts is padded, not turned into a
+  list** ([#500](https://github.com/xberg-io/html-to-markdown/issues/500)).
+  `<table><tr><td>A</td><td>B</td></tr><tr><td>C</td></tr></table>` rendered `- A B` / `- C`:
+  ragged row lengths alone classified a table as a *layout* table. A headerless table with a
+  short row is ordinary tabular data far more often than it is an email-signature grid, and the
+  regular renderer already pads a short row to the table's width (issue #13), so it now renders
+  `| A | B |`, `| --- | --- |`, `| C |   |`. Layout still triggers on more than one nested table,
+  `colspan`/`rowspan` combined with `border="0"`, a blank table, or a short table dense with
+  links. Tier 1 keeps its stricter bail on ragged rows -- it has no padding of its own -- which
+  only ever sends more input to the path that does. A layout row also **keeps an image as
+  `![alt](src)`** instead of degrading it to alt text: the row is a list item, and list items and
+  data cells keep images by default; only headings degrade them. `keepInlineImagesIn` is no
+  longer needed for that (issue #433), though it still governs headings and links.
+- **A layout row stays on one line across a `<br>` or a blank nested table.** A `<br>` inside a
+  layout cell emitted a hard-break marker, and a nested table that rendered to nothing still
+  emitted the blank line meant to separate content; either put a bare newline inside a list
+  item's line and ended the item. Both were latent -- the Hacker News footer in the gh-121
+  fixture is `<img><table>bar</table><br>links`, and while the spacer image degraded to nothing
+  every separator stayed suppressed -- and keeping the image surfaced them. A `<br>` now follows
+  the settled cell rule its `<div>`/`<p>` continuations already use (issue #470), and an empty
+  table output writes no separator. Across the benchmark corpus this rejoined three split list
+  items in one fixture and changed nothing else; the other movements are images now kept in
+  layout rows and leading whitespace dropped at line starts (#501).
 - **An anchor wrapping a table inside a layout cell keeps its inner links clickable**
   ([#503](https://github.com/xberg-io/html-to-markdown/issues/503)). Issue #490 renders a
   wrapped table as a separate block after the link, but refused inside inline contexts, and a

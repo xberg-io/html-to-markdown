@@ -4,7 +4,7 @@ meta-viewport: width=device-width, initial-scale=1.0
 title: Hacker News
 ---
 
-- [https://news.ycombinator.com](https://news.ycombinator.com) **[Hacker News](news)**[new](newest) | [past](front) | [comments](newcomments) | [ask](ask) | [show](show) | [jobs](jobs) | [submit](submit) [login](login?goto=news)
+- [![](y18.svg)](https://news.ycombinator.com) **[Hacker News](news)**[new](newest) | [past](front) | [comments](newcomments) | [ask](ask) | [show](show) | [jobs](jobs) | [submit](submit) [login](login?goto=news)
 - 1. [vote?id=46001889&how=up&goto=news](vote?id=46001889&how=up&goto=news) [Olmo 3: Charting a path through the model flow to lead open-source AI](https://allenai.org/blog/olmo3) ([allenai.org](from?site=allenai.org))
 - 269 points by [mseri](user?id=mseri) [9 hours ago](item?id=46001889) | [hide](hide?id=46001889&goto=news) | [61 comments](item?id=46001889)
 - 2. [vote?id=46004386&how=up&goto=news](vote?id=46004386&how=up&goto=news) [Building a Minimal Viable Armv7 Emulator from Scratch](https://xnacly.me/posts/2025/building-a-minimal-viable-armv7-emulator/) ([xnacly.me](from?site=xnacly.me))
@@ -31,7 +31,7 @@ title: Hacker News
 - 199 points by [gurjeet](user?id=gurjeet) [12 hours ago](item?id=45937183) | [hide](hide?id=45937183&goto=news) | [44 comments](item?id=45937183)
 - 13. [vote?id=45905850&how=up&goto=news](vote?id=45905850&how=up&goto=news) [FEX-emu – Run x86 applications on ARM64 Linux devices](https://fex-emu.com/) ([fex-emu.com](from?site=fex-emu.com))
 - 244 points by [open-paren](user?id=open-paren) [17 hours ago](item?id=45905850) | [hide](hide?id=45905850&goto=news) | [101 comments](item?id=45905850)
-- 14. [Roundtable (YC S23) Is Hiring Two Sales Development Representatives (SDRs)](https://www.ycombinator.com/companies/roundtable/jobs/irJTEsg-sales-development-representative) ([ycombinator.com](from?site=ycombinator.com))
+- 14. ![](s.gif) [Roundtable (YC S23) Is Hiring Two Sales Development Representatives (SDRs)](https://www.ycombinator.com/companies/roundtable/jobs/irJTEsg-sales-development-representative) ([ycombinator.com](from?site=ycombinator.com))
 - [4 hours ago](item?id=46003686) | [hide](hide?id=46003686&goto=news)
 - 15. [vote?id=45937830&how=up&goto=news](vote?id=45937830&how=up&goto=news) [Ancient Roman Glass Reveals a Hidden "Language"](https://nautil.us/ancient-roman-glass-reveals-a-hidden-language-1247932/) ([nautil.us](from?site=nautil.us))
 - 20 points by [DrierCycle](user?id=DrierCycle) [4 hours ago](item?id=45937830) | [hide](hide?id=45937830&goto=news) | [1 comment](item?id=45937830)
@@ -66,4 +66,4 @@ title: Hacker News
 - 30. [vote?id=45995816&how=up&goto=news](vote?id=45995816&how=up&goto=news) [The Lions Operating System](https://lionsos.org) ([lionsos.org](from?site=lionsos.org))
 - 190 points by [plunderer](user?id=plunderer) [21 hours ago](item?id=45995816) | [hide](hide?id=45995816&goto=news) | [57 comments](item?id=45995816)
 - [More](?p=2)
-- [Guidelines](newsguidelines.html) | [FAQ](newsfaq.html) | [Lists](lists) | [API](https://github.com/HackerNews/API) | [Security](security.html) | [Legal](https://www.ycombinator.com/legal/) | [Apply to YC](https://www.ycombinator.com/apply/) | [Contact](mailto:hn@ycombinator.com)
+- ![](s.gif) [Guidelines](newsguidelines.html) | [FAQ](newsfaq.html) | [Lists](lists) | [API](https://github.com/HackerNews/API) | [Security](security.html) | [Legal](https://www.ycombinator.com/legal/) | [Apply to YC](https://www.ycombinator.com/apply/) | [Contact](mailto:hn@ycombinator.com)

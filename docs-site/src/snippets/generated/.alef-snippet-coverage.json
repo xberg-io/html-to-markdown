@@ -98,6 +98,7 @@
     "c/conversion/table_content_after_unclosed_row_survives.md",
     "c/conversion/table_empty.md",
     "c/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "c/conversion/table_layout_row_keeps_image.md",
     "c/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "c/conversion/table_nested_in_single_cell_renders_separately.md",
     "c/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -105,6 +106,7 @@
     "c/conversion/table_pipe_chars_in_content.md",
     "c/conversion/table_ragged_row_fewer_cells_than_header.md",
     "c/conversion/table_ragged_row_more_cells_than_header.md",
+    "c/conversion/table_ragged_rows_padded_not_listed.md",
     "c/conversion/table_with_alignment.md",
     "c/conversion/table_with_colspan.md",
     "c/conversion/tagged_space_in_strikethrough_kept.md",
@@ -422,6 +424,7 @@
     "csharp/conversion/table_content_after_unclosed_row_survives.md",
     "csharp/conversion/table_empty.md",
     "csharp/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "csharp/conversion/table_layout_row_keeps_image.md",
     "csharp/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "csharp/conversion/table_nested_in_single_cell_renders_separately.md",
     "csharp/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -429,6 +432,7 @@
     "csharp/conversion/table_pipe_chars_in_content.md",
     "csharp/conversion/table_ragged_row_fewer_cells_than_header.md",
     "csharp/conversion/table_ragged_row_more_cells_than_header.md",
+    "csharp/conversion/table_ragged_rows_padded_not_listed.md",
     "csharp/conversion/table_with_alignment.md",
     "csharp/conversion/table_with_colspan.md",
     "csharp/conversion/tagged_space_in_strikethrough_kept.md",
@@ -746,6 +750,7 @@
     "dart/conversion/table_content_after_unclosed_row_survives.md",
     "dart/conversion/table_empty.md",
     "dart/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "dart/conversion/table_layout_row_keeps_image.md",
     "dart/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "dart/conversion/table_nested_in_single_cell_renders_separately.md",
     "dart/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -753,6 +758,7 @@
     "dart/conversion/table_pipe_chars_in_content.md",
     "dart/conversion/table_ragged_row_fewer_cells_than_header.md",
     "dart/conversion/table_ragged_row_more_cells_than_header.md",
+    "dart/conversion/table_ragged_rows_padded_not_listed.md",
     "dart/conversion/table_with_alignment.md",
     "dart/conversion/table_with_colspan.md",
     "dart/conversion/tagged_space_in_strikethrough_kept.md",
@@ -1070,6 +1076,7 @@
     "elixir/conversion/table_content_after_unclosed_row_survives.md",
     "elixir/conversion/table_empty.md",
     "elixir/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "elixir/conversion/table_layout_row_keeps_image.md",
     "elixir/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "elixir/conversion/table_nested_in_single_cell_renders_separately.md",
     "elixir/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -1077,6 +1084,7 @@
     "elixir/conversion/table_pipe_chars_in_content.md",
     "elixir/conversion/table_ragged_row_fewer_cells_than_header.md",
     "elixir/conversion/table_ragged_row_more_cells_than_header.md",
+    "elixir/conversion/table_ragged_rows_padded_not_listed.md",
     "elixir/conversion/table_with_alignment.md",
     "elixir/conversion/table_with_colspan.md",
     "elixir/conversion/tagged_space_in_strikethrough_kept.md",
@@ -1394,6 +1402,7 @@
     "go/conversion/table_content_after_unclosed_row_survives.md",
     "go/conversion/table_empty.md",
     "go/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "go/conversion/table_layout_row_keeps_image.md",
     "go/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "go/conversion/table_nested_in_single_cell_renders_separately.md",
     "go/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -1401,6 +1410,7 @@
     "go/conversion/table_pipe_chars_in_content.md",
     "go/conversion/table_ragged_row_fewer_cells_than_header.md",
     "go/conversion/table_ragged_row_more_cells_than_header.md",
+    "go/conversion/table_ragged_rows_padded_not_listed.md",
     "go/conversion/table_with_alignment.md",
     "go/conversion/table_with_colspan.md",
     "go/conversion/tagged_space_in_strikethrough_kept.md",
@@ -1718,6 +1728,7 @@
     "java/conversion/table_content_after_unclosed_row_survives.md",
     "java/conversion/table_empty.md",
     "java/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "java/conversion/table_layout_row_keeps_image.md",
     "java/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "java/conversion/table_nested_in_single_cell_renders_separately.md",
     "java/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -1725,6 +1736,7 @@
     "java/conversion/table_pipe_chars_in_content.md",
     "java/conversion/table_ragged_row_fewer_cells_than_header.md",
     "java/conversion/table_ragged_row_more_cells_than_header.md",
+    "java/conversion/table_ragged_rows_padded_not_listed.md",
     "java/conversion/table_with_alignment.md",
     "java/conversion/table_with_colspan.md",
     "java/conversion/tagged_space_in_strikethrough_kept.md",
@@ -2042,6 +2054,7 @@
     "kotlin-android/conversion/table_content_after_unclosed_row_survives.md",
     "kotlin-android/conversion/table_empty.md",
     "kotlin-android/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "kotlin-android/conversion/table_layout_row_keeps_image.md",
     "kotlin-android/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "kotlin-android/conversion/table_nested_in_single_cell_renders_separately.md",
     "kotlin-android/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -2049,6 +2062,7 @@
     "kotlin-android/conversion/table_pipe_chars_in_content.md",
     "kotlin-android/conversion/table_ragged_row_fewer_cells_than_header.md",
     "kotlin-android/conversion/table_ragged_row_more_cells_than_header.md",
+    "kotlin-android/conversion/table_ragged_rows_padded_not_listed.md",
     "kotlin-android/conversion/table_with_alignment.md",
     "kotlin-android/conversion/table_with_colspan.md",
     "kotlin-android/conversion/tagged_space_in_strikethrough_kept.md",
@@ -2312,6 +2326,7 @@
     "php/conversion/table_content_after_unclosed_row_survives.md",
     "php/conversion/table_empty.md",
     "php/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "php/conversion/table_layout_row_keeps_image.md",
     "php/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "php/conversion/table_nested_in_single_cell_renders_separately.md",
     "php/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -2319,6 +2334,7 @@
     "php/conversion/table_pipe_chars_in_content.md",
     "php/conversion/table_ragged_row_fewer_cells_than_header.md",
     "php/conversion/table_ragged_row_more_cells_than_header.md",
+    "php/conversion/table_ragged_rows_padded_not_listed.md",
     "php/conversion/table_with_alignment.md",
     "php/conversion/table_with_colspan.md",
     "php/conversion/tagged_space_in_strikethrough_kept.md",
@@ -2636,6 +2652,7 @@
     "python/conversion/table_content_after_unclosed_row_survives.md",
     "python/conversion/table_empty.md",
     "python/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "python/conversion/table_layout_row_keeps_image.md",
     "python/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "python/conversion/table_nested_in_single_cell_renders_separately.md",
     "python/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -2643,6 +2660,7 @@
     "python/conversion/table_pipe_chars_in_content.md",
     "python/conversion/table_ragged_row_fewer_cells_than_header.md",
     "python/conversion/table_ragged_row_more_cells_than_header.md",
+    "python/conversion/table_ragged_rows_padded_not_listed.md",
     "python/conversion/table_with_alignment.md",
     "python/conversion/table_with_colspan.md",
     "python/conversion/tagged_space_in_strikethrough_kept.md",
@@ -2960,6 +2978,7 @@
     "r/conversion/table_content_after_unclosed_row_survives.md",
     "r/conversion/table_empty.md",
     "r/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "r/conversion/table_layout_row_keeps_image.md",
     "r/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "r/conversion/table_nested_in_single_cell_renders_separately.md",
     "r/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -2967,6 +2986,7 @@
     "r/conversion/table_pipe_chars_in_content.md",
     "r/conversion/table_ragged_row_fewer_cells_than_header.md",
     "r/conversion/table_ragged_row_more_cells_than_header.md",
+    "r/conversion/table_ragged_rows_padded_not_listed.md",
     "r/conversion/table_with_alignment.md",
     "r/conversion/table_with_colspan.md",
     "r/conversion/tagged_space_in_strikethrough_kept.md",
@@ -3284,6 +3304,7 @@
     "ruby/conversion/table_content_after_unclosed_row_survives.md",
     "ruby/conversion/table_empty.md",
     "ruby/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "ruby/conversion/table_layout_row_keeps_image.md",
     "ruby/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "ruby/conversion/table_nested_in_single_cell_renders_separately.md",
     "ruby/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -3291,6 +3312,7 @@
     "ruby/conversion/table_pipe_chars_in_content.md",
     "ruby/conversion/table_ragged_row_fewer_cells_than_header.md",
     "ruby/conversion/table_ragged_row_more_cells_than_header.md",
+    "ruby/conversion/table_ragged_rows_padded_not_listed.md",
     "ruby/conversion/table_with_alignment.md",
     "ruby/conversion/table_with_colspan.md",
     "ruby/conversion/tagged_space_in_strikethrough_kept.md",
@@ -3608,6 +3630,7 @@
     "rust/conversion/table_content_after_unclosed_row_survives.md",
     "rust/conversion/table_empty.md",
     "rust/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "rust/conversion/table_layout_row_keeps_image.md",
     "rust/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "rust/conversion/table_nested_in_single_cell_renders_separately.md",
     "rust/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -3615,6 +3638,7 @@
     "rust/conversion/table_pipe_chars_in_content.md",
     "rust/conversion/table_ragged_row_fewer_cells_than_header.md",
     "rust/conversion/table_ragged_row_more_cells_than_header.md",
+    "rust/conversion/table_ragged_rows_padded_not_listed.md",
     "rust/conversion/table_with_alignment.md",
     "rust/conversion/table_with_colspan.md",
     "rust/conversion/tagged_space_in_strikethrough_kept.md",
@@ -3932,6 +3956,7 @@
     "swift/conversion/table_content_after_unclosed_row_survives.md",
     "swift/conversion/table_empty.md",
     "swift/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "swift/conversion/table_layout_row_keeps_image.md",
     "swift/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "swift/conversion/table_nested_in_single_cell_renders_separately.md",
     "swift/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -3939,6 +3964,7 @@
     "swift/conversion/table_pipe_chars_in_content.md",
     "swift/conversion/table_ragged_row_fewer_cells_than_header.md",
     "swift/conversion/table_ragged_row_more_cells_than_header.md",
+    "swift/conversion/table_ragged_rows_padded_not_listed.md",
     "swift/conversion/table_with_alignment.md",
     "swift/conversion/table_with_colspan.md",
     "swift/conversion/tagged_space_in_strikethrough_kept.md",
@@ -4256,6 +4282,7 @@
     "typescript/conversion/table_content_after_unclosed_row_survives.md",
     "typescript/conversion/table_empty.md",
     "typescript/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "typescript/conversion/table_layout_row_keeps_image.md",
     "typescript/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "typescript/conversion/table_nested_in_single_cell_renders_separately.md",
     "typescript/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -4263,6 +4290,7 @@
     "typescript/conversion/table_pipe_chars_in_content.md",
     "typescript/conversion/table_ragged_row_fewer_cells_than_header.md",
     "typescript/conversion/table_ragged_row_more_cells_than_header.md",
+    "typescript/conversion/table_ragged_rows_padded_not_listed.md",
     "typescript/conversion/table_with_alignment.md",
     "typescript/conversion/table_with_colspan.md",
     "typescript/conversion/tagged_space_in_strikethrough_kept.md",
@@ -4580,6 +4608,7 @@
     "wasm/conversion/table_content_after_unclosed_row_survives.md",
     "wasm/conversion/table_empty.md",
     "wasm/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "wasm/conversion/table_layout_row_keeps_image.md",
     "wasm/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "wasm/conversion/table_nested_in_single_cell_renders_separately.md",
     "wasm/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -4587,6 +4616,7 @@
     "wasm/conversion/table_pipe_chars_in_content.md",
     "wasm/conversion/table_ragged_row_fewer_cells_than_header.md",
     "wasm/conversion/table_ragged_row_more_cells_than_header.md",
+    "wasm/conversion/table_ragged_rows_padded_not_listed.md",
     "wasm/conversion/table_with_alignment.md",
     "wasm/conversion/table_with_colspan.md",
     "wasm/conversion/tagged_space_in_strikethrough_kept.md",
@@ -4904,6 +4934,7 @@
     "zig/conversion/table_content_after_unclosed_row_survives.md",
     "zig/conversion/table_empty.md",
     "zig/conversion/table_layout_cell_paragraphs_stay_separated.md",
+    "zig/conversion/table_layout_row_keeps_image.md",
     "zig/conversion/table_nested_chain_not_misclassified_as_layout.md",
     "zig/conversion/table_nested_in_single_cell_renders_separately.md",
     "zig/conversion/table_nested_in_wrapper_renders_separately.md",
@@ -4911,6 +4942,7 @@
     "zig/conversion/table_pipe_chars_in_content.md",
     "zig/conversion/table_ragged_row_fewer_cells_than_header.md",
     "zig/conversion/table_ragged_row_more_cells_than_header.md",
+    "zig/conversion/table_ragged_rows_padded_not_listed.md",
     "zig/conversion/table_with_alignment.md",
     "zig/conversion/table_with_colspan.md",
     "zig/conversion/tagged_space_in_strikethrough_kept.md",
@@ -6299,6 +6331,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "c"
+      },
+      "path": "c/conversion/table_layout_row_keeps_image.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "c"
       },
@@ -6375,6 +6419,18 @@
         "language": "c"
       },
       "path": "c/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "c"
+      },
+      "path": "c/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -10187,6 +10243,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/table_layout_row_keeps_image.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "csharp"
       },
@@ -10263,6 +10331,18 @@
         "language": "csharp"
       },
       "path": "csharp/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "csharp"
+      },
+      "path": "csharp/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -14075,6 +14155,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "dart"
+      },
+      "path": "dart/conversion/table_layout_row_keeps_image.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "dart"
       },
@@ -14151,6 +14243,18 @@
         "language": "dart"
       },
       "path": "dart/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "dart"
+      },
+      "path": "dart/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -17963,6 +18067,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/table_layout_row_keeps_image.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "elixir"
       },
@@ -18039,6 +18155,18 @@
         "language": "elixir"
       },
       "path": "elixir/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "elixir"
+      },
+      "path": "elixir/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -21851,6 +21979,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "go"
+      },
+      "path": "go/conversion/table_layout_row_keeps_image.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "go"
       },
@@ -21927,6 +22067,18 @@
         "language": "go"
       },
       "path": "go/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "go"
+      },
+      "path": "go/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -25739,6 +25891,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "java"
+      },
+      "path": "java/conversion/table_layout_row_keeps_image.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "java"
       },
@@ -25815,6 +25979,18 @@
         "language": "java"
       },
       "path": "java/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "java"
+      },
+      "path": "java/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -29627,6 +29803,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/table_layout_row_keeps_image.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "kotlin_android"
       },
@@ -29703,6 +29891,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -32867,6 +33067,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "php"
+      },
+      "path": "php/conversion/table_layout_row_keeps_image.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "php"
       },
@@ -32943,6 +33155,18 @@
         "language": "php"
       },
       "path": "php/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "php"
+      },
+      "path": "php/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -36755,6 +36979,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "python"
+      },
+      "path": "python/conversion/table_layout_row_keeps_image.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "python"
       },
@@ -36831,6 +37067,18 @@
         "language": "python"
       },
       "path": "python/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "python"
+      },
+      "path": "python/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -40643,6 +40891,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "r"
+      },
+      "path": "r/conversion/table_layout_row_keeps_image.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "r"
       },
@@ -40719,6 +40979,18 @@
         "language": "r"
       },
       "path": "r/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "r"
+      },
+      "path": "r/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -44531,6 +44803,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/table_layout_row_keeps_image.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "ruby"
       },
@@ -44607,6 +44891,18 @@
         "language": "ruby"
       },
       "path": "ruby/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "ruby"
+      },
+      "path": "ruby/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -48429,6 +48725,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "rust"
+      },
+      "path": "rust/conversion/table_layout_row_keeps_image.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "rust"
       },
@@ -48505,6 +48813,18 @@
         "language": "rust"
       },
       "path": "rust/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "rust"
+      },
+      "path": "rust/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -52651,6 +52971,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "swift"
+      },
+      "path": "swift/conversion/table_layout_row_keeps_image.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "swift"
       },
@@ -52727,6 +53059,18 @@
         "language": "swift"
       },
       "path": "swift/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "swift"
+      },
+      "path": "swift/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -56539,6 +56883,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "node"
+      },
+      "path": "typescript/conversion/table_layout_row_keeps_image.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "node"
       },
@@ -56615,6 +56971,18 @@
         "language": "node"
       },
       "path": "typescript/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "node"
+      },
+      "path": "typescript/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -60427,6 +60795,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/table_layout_row_keeps_image.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "wasm"
       },
@@ -60503,6 +60883,18 @@
         "language": "wasm"
       },
       "path": "wasm/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "wasm"
+      },
+      "path": "wasm/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -64315,6 +64707,18 @@
     },
     {
       "key": {
+        "fixture_id": "table_layout_row_keeps_image",
+        "language": "zig"
+      },
+      "path": "zig/conversion/table_layout_row_keeps_image.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "table_nested_chain_not_misclassified_as_layout",
         "language": "zig"
       },
@@ -64391,6 +64795,18 @@
         "language": "zig"
       },
       "path": "zig/conversion/table_ragged_row_more_cells_than_header.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "table_ragged_rows_padded_not_listed",
+        "language": "zig"
+      },
+      "path": "zig/conversion/table_ragged_rows_padded_not_listed.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -83040,6 +83456,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "zig"
+    },
+    {
       "fixture_id": "table_nested_chain_not_misclassified_as_layout",
       "language": "c"
     },
@@ -83485,6 +83965,70 @@
     },
     {
       "fixture_id": "table_ragged_row_more_cells_than_header",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
       "language": "zig"
     },
     {
@@ -103562,6 +104106,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_layout_row_keeps_image",
+      "language": "zig"
+    },
+    {
       "fixture_id": "table_nested_chain_not_misclassified_as_layout",
       "language": "c"
     },
@@ -104007,6 +104615,70 @@
     },
     {
       "fixture_id": "table_ragged_row_more_cells_than_header",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "c"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "go"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "java"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "node"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "php"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "python"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "r"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "table_ragged_rows_padded_not_listed",
       "language": "zig"
     },
     {

@@ -330,5 +330,43 @@
       "stem": "table_content_after_unclosed_row_survives",
       "title": "Content after an unclosed table row survives"
     }
+  },
+  {
+    "id": "table_ragged_rows_padded_not_listed",
+    "description": "A headerless table whose rows have different cell counts is padded, not turned into a list",
+    "input": {
+      "html": "<table><tr><td>A</td><td>B</td></tr><tr><td>C</td></tr></table>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "| A | B |\n| --- | --- |\n| C |   |\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "table_ragged_rows_padded_not_listed",
+      "title": "A ragged headerless table is padded, not turned into a list"
+    }
+  },
+  {
+    "id": "table_layout_row_keeps_image",
+    "description": "A layout-table row keeps an image as Markdown instead of degrading it to alt text",
+    "input": {
+      "html": "<table><tr><td><img src=\"a.svg\" alt=\"A\"> <a href=\"/1\">x</a></td><td><a href=\"/2\">y</a></td></tr><tr><td><a href=\"/3\">z</a></td></tr></table>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "- ![A](a.svg) [x](/1) [y](/2)\n- [z](/3)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "table_layout_row_keeps_image",
+      "title": "A layout-table row keeps an image"
+    }
   }
 ]
