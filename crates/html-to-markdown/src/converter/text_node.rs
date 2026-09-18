@@ -123,6 +123,23 @@ pub fn process_text_node(
 
         if had_newlines {
             if output.is_empty() {
+                // ~keep An empty buffer is not always the start of the document: an inline
+                // ~keep wrapper (b/i/span/...) builds its body into a fresh local `String`, so a
+                // ~keep newline-only text node reaching it -- `<b><span>\n</span></b>`,
+                // ~keep `Alpha<i>\n</i>Beta` -- sees length 0 while real content already
+                // ~keep precedes it in the document. Dropping it there welded the words on
+                // ~keep either side together (issue #502). Surface it as the one space a
+                // ~keep whitespace-only body is worth; the wrapper's `chomp_inline` collapses
+                // ~keep it and `emit_wrapped_inline` still suppresses it after an existing
+                // ~keep space. `was_fresh_block_start` is the document-start guard: nothing
+                // ~keep precedes the node then, so nothing needs separating. `inline_depth`
+                // ~keep (raised by emphasis and link handlers) rather than a buffer-address
+                // ~keep test: a table cell or heading also renders into a fresh buffer, and
+                // ~keep a space there is leading whitespace, not a separator -- it made a
+                // ~keep cell's first `<div>` read as a continuation and emit `<br>`.
+                if !was_fresh_block_start && ctx.inline_depth > 0 {
+                    output.push(' ');
+                }
                 return;
             }
             if !output.ends_with("\n\n") {

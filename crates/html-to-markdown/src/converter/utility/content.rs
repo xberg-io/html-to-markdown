@@ -43,9 +43,11 @@ pub fn chomp_inline(text: &str) -> (&str, &str, &str) {
         // ~keep `append_inline_suffix` is a no-op), every existing caller naturally
         // ~keep collapses back to a single space. A hard trailing linebreak is excluded
         // ~keep above and keeps the full logic below -- it is not interchangeable with a
-        // ~keep plain space.
-        let prefix = if text.contains([' ', '\t']) { " " } else { "" };
-        return (prefix, "", "");
+        // ~keep plain space. A body that is only a newline counts too: that is what a
+        // ~keep `<br>` with nothing before it leaves in a wrapper's scratch buffer
+        // ~keep (`line_break.rs`'s block-start arm), and `<b>Alpha</b><b><br></b><b>Beta</b>`
+        // ~keep joined its words when it was worth nothing (issue #502).
+        return (" ", "", "");
     }
 
     let prefix = if text.starts_with(&[' ', '\t'][..]) { " " } else { "" };
