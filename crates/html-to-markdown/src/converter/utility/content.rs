@@ -373,13 +373,18 @@ pub fn escape_link_label(text: &str) -> Cow<'_, str> {
 ///
 /// One of the two halves of [`escape_link_label`]; see there for the other.
 /// Tracks matched bracket pairs and escapes a closing bracket that has no local opener
-/// (it would otherwise close the caller's own wrapping `[`/`![` early), and escapes a
-/// matched pair outright when it is itself link- or reference-link-shaped.
+/// (it would otherwise close the caller's own wrapping `[`/`![` early), an opening
+/// bracket that is never matched by a later closer (it would otherwise open a
+/// link/image span that swallows the caller's own closing `]`/`)` on reparse), and
+/// escapes a matched pair outright when it is itself link- or reference-link-shaped.
 ///
 /// # Examples
 /// ```text
 /// Input:  "]"
 /// Output: "\\]"
+///
+/// Input:  "[A;B)"
+/// Output: "\\[A;B)"
 ///
 /// Input:  "[outer [inner]]"
 /// Output: "[outer [inner]]"
@@ -464,6 +469,17 @@ fn escape_label_brackets(text: &str) -> Cow<'_, str> {
             },
             _ => {}
         }
+    }
+
+    // ~keep Whatever is left in `open_positions` once the scan ends is a `[` with no
+    // ~keep matching `]` anywhere in the label. Left alone, it starts a link/image span
+    // ~keep that CommonMark's inline parser will happily extend into the *caller's own*
+    // ~keep closing `]`/`)` on reparse -- the exact failure in issue #499, where
+    // ~keep `![[A;B)](S)` reparses as dangling `!` text followed by a real
+    // ~keep `[A;B)](S)` link, silently dropping the image. Escaping every such opener
+    // ~keep is the mirror of the unmatched-`]` case above.
+    for open_pos in open_positions {
+        escape_at[open_pos] = true;
     }
 
     let mut result = String::with_capacity(text.len() + 2);
@@ -916,6 +932,37 @@ mod tests {
     #[test]
     fn escape_link_label_escapes_only_the_link_shaped_inner_pair() {
         assert_eq!(escape_link_label("[a[b](c)]"), "[a\\[b\\](c)]");
+    }
+
+    // ~keep Regression for issue #499: an unmatched `[` is the mirror hazard of the
+    // ~keep unmatched-`]` case above -- left alone, `![[A;B)](S)` reparses as dangling
+    // ~keep `!` text followed by a real `[A;B)](S)` link, silently dropping the image.
+    #[test]
+    fn escape_link_label_escapes_an_unmatched_opening_bracket() {
+        assert_eq!(escape_link_label("[A;B)"), "\\[A;B)");
+    }
+
+    #[test]
+    fn escape_link_label_escapes_an_unmatched_opening_bracket_before_plain_text() {
+        assert_eq!(escape_link_label("[a"), "\\[a");
+    }
+
+    // ~keep The outer `[` is unmatched and must be escaped; the inner `[a]` is a
+    // ~keep matched, non-link-shaped pair and stays untouched -- the two rules apply
+    // ~keep independently at their own byte offsets.
+    #[test]
+    fn escape_link_label_escapes_an_unmatched_outer_bracket_around_a_matched_inner_pair() {
+        assert_eq!(escape_link_label("[[a]"), "\\[[a]");
+    }
+
+    #[test]
+    fn escape_link_label_escapes_an_unmatched_opening_bracket_after_plain_text() {
+        assert_eq!(escape_link_label("a[b"), "a\\[b");
+    }
+
+    #[test]
+    fn escape_link_label_leaves_an_already_escaped_opening_bracket_unchanged() {
+        assert_eq!(escape_link_label("\\[a"), "\\[a");
     }
 
     // ~keep Regression for CommonMark spec examples 642/643: a `<br>`-produced hard
