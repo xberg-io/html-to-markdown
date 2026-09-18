@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.2] - 2026-09-18
+
 ### Fixed
 
 - **An `&` that would read as a character reference in a link destination or title now stays

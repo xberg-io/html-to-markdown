@@ -9,6 +9,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.2] - 2026-09-18
+
+### Fixed
+
+- **An `&` that would read as a character reference in a link destination or title now stays
+  literal** ([#498](https://github.com/xberg-io/html-to-markdown/issues/498)). `CommonMark`
+  decodes entity and numeric character references inside destinations and titles, so the
+  decoded `?&plus;` that `<img src="?&amp;plus;">` produced from 3.14.0 on re-parsed as `?+` --
+  a different URL. `<a href>` and `title` had carried the same defect since 3.12, when they
+  started decoding; only `src` was new to it. Such an `&` is now written back as `&amp;`, the
+  form 3.13 emitted and the one non-`CommonMark` consumers of the URL also read correctly. Only a
+  reference the HTML5 decoder really recognises is touched: `?a&b` and `&foo;` are unchanged.
+  Tier 1 wrote a link's `href` straight into the output with no escaping at all, so it now
+  shares Tier 2's `append_url_destination`; that also ends a divergence unrelated to entities,
+  where Tier 1 emitted `[T](/a b(c)` and `[T](/a(b)` against Tier 2's `[T](</a b(c>)` and
+  `[T](/a\(b)`.
+- **An unmatched `[` in a link label or image `alt` is now escaped**
+  ([#499](https://github.com/xberg-io/html-to-markdown/issues/499)). `CommonMark` accepts a
+  bracket in a label only escaped or as a matched pair; an unmatched `]` was already escaped,
+  an unmatched `[` was not. `<img alt="[A;B)" src="S">` rendered `![[A;B)](S)`, which
+  re-parses as a dangling `!` followed by a real `[A;B)](S)` link -- the image was gone. The
+  shared `escape_link_label` helper now escapes every opener left without a closer, so both
+  tiers and every caller (links, images, `<graphic>`, SVG titles, embedded media) move together.
+- **A run of ASCII whitespace at the start of a line is no longer emitted**
+  ([#501](https://github.com/xberg-io/html-to-markdown/issues/501)).
+  `<p>P</p><div><span>    </span><img alt="A" src="S"></div>` rendered the image as
+  `![A](S)` indented by four columns, which `CommonMark` reads as an indented code block, so
+  the image was lost. Issue #460 dropped leading whitespace at the start of a
+  *paragraph*; a `<div>` never set that flag and the run fell through to the verbatim fallback.
+  Leading ASCII whitespace on a line is never Markdown content, so the text-node fallback now
+  drops it at a line start of the block's own buffer, the `<div>` handler measures its content
+  start the way `<p>` does so an inline wrapper's empty scratch buffer is not mistaken for one
+  (its single space must still reach the #481 handling), and a whitespace-only wrapper spliced
+  in at a line start contributes nothing -- `<p>A</p><p><i> </i>B</p>` no longer opens its
+  second paragraph with a stray space. A multi-space run mid-line collapses to one space, as it
+  already did between two inline siblings. A run carrying a decoded `&nbsp;` is untouched. Tier 1
+  already emitted every case this way.
+- **A whitespace-only inline wrapper body no longer vanishes and joins the words around it**
+  ([#502](https://github.com/xberg-io/html-to-markdown/issues/502)).
+  `<b>Alpha</b><b><span>\n</span></b><b>Beta</b>` rendered `**AlphaBeta**`, and
+  `Alpha<i>\n</i>Beta` rendered `AlphaBeta`, where a browser shows a space. Two drops of one
+  shape: a newline-only text node returned early because the wrapper's scratch buffer was empty
+  -- the buffer is fresh per wrapper, so its length says nothing about the document -- and a
+  `<br>` with nothing before it in that buffer left a bare newline that `chomp_inline` did not
+  count as a space. Both now surface as the single separating space issue #481 already gives a
+  literal `<b> </b>`, still suppressed after an existing space; a truly empty `<b></b>` still
+  emits nothing. Tier 1 bails on every one of these shapes, so the change is Tier-2 only.
+- **A headerless table whose rows have different cell counts is padded, not turned into a
+  list** ([#500](https://github.com/xberg-io/html-to-markdown/issues/500)).
+  `<table><tr><td>A</td><td>B</td></tr><tr><td>C</td></tr></table>` rendered `- A B` / `- C`:
+  ragged row lengths alone classified a table as a *layout* table. A headerless table with a
+  short row is ordinary tabular data far more often than it is an email-signature grid, and the
+  regular renderer already pads a short row to the table's width (issue #13), so it now renders
+  `| A | B |`, `| --- | --- |`, `| C |   |`. Layout still triggers on more than one nested table,
+  `colspan`/`rowspan` combined with `border="0"`, a blank table, or a short table dense with
+  links. Tier 1 keeps its stricter bail on ragged rows -- it has no padding of its own -- which
+  only ever sends more input to the path that does. A layout row also **keeps an image as
+  `![alt](src)`** instead of degrading it to alt text: the row is a list item, and list items and
+  data cells keep images by default; only headings degrade them. `keepInlineImagesIn` is no
+  longer needed for that (issue #433), though it still governs headings and links.
+- **A layout row stays on one line across a `<br>` or a blank nested table.** A `<br>` inside a
+  layout cell emitted a hard-break marker, and a nested table that rendered to nothing still
+  emitted the blank line meant to separate content; either put a bare newline inside a list
+  item's line and ended the item. Both were latent -- the Hacker News footer in the gh-121
+  fixture is `<img><table>bar</table><br>links`, and while the spacer image degraded to nothing
+  every separator stayed suppressed -- and keeping the image surfaced them. A `<br>` now follows
+  the settled cell rule its `<div>`/`<p>` continuations already use (issue #470), and an empty
+  table output writes no separator. Across the benchmark corpus this rejoined three split list
+  items in one fixture and changed nothing else; the other movements are images now kept in
+  layout rows and leading whitespace dropped at line starts (#501).
+- **An anchor wrapping a table inside a layout cell keeps its inner links clickable**
+  ([#503](https://github.com/xberg-io/html-to-markdown/issues/503)). Issue #490 renders a
+  wrapped table as a separate block after the link, but refused inside inline contexts, and a
+  cell of a table the layout heuristic turns into a bullet list converts as inline. The nested
+  table was walked into the label instead, where the bracket escaping turned `[One](/one)` and
+  `[Two](/two)` into text; only the outer destination survived. A layout cell is a list item's
+  text, not a link label, and it already holds a bare nested table on the lines after its
+  bullet, so the deferred table now lands there the same way. Headings and true inline labels
+  keep refusing. Tier 1 bails on a table opened inside a link, so this is Tier-2 only.
+
 ## [3.14.1] - 2026-09-17
 
 ### Fixed
