@@ -435,13 +435,18 @@ fn partition_link_children(
 /// ~keep table inside a heading is no better than the crushed-label bug; an inline context (a
 /// ~keep data cell's own label, or this link nested inside an outer link's label) has nowhere
 /// ~keep to put a deferred block at all.
+///
+/// ~keep A layout cell is the exception among inline contexts (issue #503): it converts as
+/// ~keep inline only because its row becomes one list item, and that item's text already
+/// ~keep holds a bare nested table. Refusing there sent the table through the label, where
+/// ~keep `escape_link_label` turned every inner link into `\[One\](/one)` text.
 fn should_defer_table_blocks(
     ctx: &Context,
     deferred: &[tl::NodeHandle],
     parser: &tl::Parser,
     dom_ctx: &DomContext,
 ) -> bool {
-    !ctx.convert_as_inline
+    (!ctx.convert_as_inline || ctx.in_layout_cell)
         && !ctx.in_heading
         && deferred.iter().any(|handle| subtree_has_table(handle, parser, dom_ctx))
 }
