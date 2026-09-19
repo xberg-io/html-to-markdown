@@ -24,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   same buffer-identity signal `text_node.rs` and `block/div.rs` already use for this exact
   hazard (`block_output_ptr`/`block_content_start`), so only a genuine line start reads as one.
   Tier 1 bails on nested emphasis, so the fix is Tier-2 only.
+- **A newline nested two levels deep inside plain inline wrappers with no next sibling of
+  their own no longer joins the words around it**
+  ([#505](https://github.com/xberg-io/html-to-markdown/issues/505)).
+  `<i>Alpha</i><span><span>\n</span></span>Beta` rendered `*Alpha*Beta`. Issue #430 taught
+  `newline_span_needs_separating_space` to look one level up -- a newline-only text node whose
+  immediate parent is inline-like and itself has a following inline sibling still separates
+  words -- but it only checked the immediate parent's own next sibling. Nested one level
+  deeper, the inner `<span>`'s parent (the outer `<span>`) has no next sibling of its own at
+  all; the real next-sibling question belongs to the outer `<span>`, one level further up. The
+  check now climbs through consecutive inline-like ancestors that themselves have no next
+  sibling, stopping the moment a level is conclusive -- a block boundary, or a real
+  blocking/qualifying sibling either way. This shape reproduces on 3.14.1 too, so it is a gap
+  #430 left one level short of, not a new regression.
 
 ## [3.14.2] - 2026-09-18
 

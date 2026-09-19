@@ -12,7 +12,7 @@ use std::borrow::Cow;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
-    get_next_sibling_tag, next_sibling_is_inline_content, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
+    get_next_sibling_tag, next_sibling_inline_content_state, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -487,21 +487,34 @@ pub fn process_text_node(
 ///
 /// "Inline content" deliberately includes a bare text sibling, not just an element: a browser
 /// renders `a<span>\n</span>b` and `a<span>\n</span><span>b</span>` identically, so asking only
-/// about a following *tag* dropped the separator and welded the words together (issue #491). ~keep
+/// about a following *tag* dropped the separator and welded the words together (issue #491).
+///
+/// Climbs through consecutive inline-like ancestors that themselves have no next sibling of
+/// their own: `<span><span>\n</span></span>Beta` nests the newline two levels deep, and the
+/// INNER span's parent (the outer span) has no sibling at all -- the real next-sibling
+/// question is the outer span's, not the inner one's (issue #505, one level short of what
+/// #430 anticipated). Stops climbing the moment a level is genuinely inconclusive: a
+/// non-inline-like ancestor (a block boundary) or a real, blocking sibling either way. ~keep
 fn newline_span_needs_separating_space(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     dom_ctx: &DomContext,
 ) -> bool {
-    let Some(parent_id) = dom_ctx.parent_of(node_handle.get_inner()) else {
-        return false;
-    };
-    let parent_is_inline = dom_ctx
-        .tag_info(parent_id, parser)
-        .is_some_and(|info| info.is_inline_like);
-    if !parent_is_inline {
-        return false;
+    let mut current_id = node_handle.get_inner();
+    loop {
+        let Some(parent_id) = dom_ctx.parent_of(current_id) else {
+            return false;
+        };
+        let parent_is_inline = dom_ctx
+            .tag_info(parent_id, parser)
+            .is_some_and(|info| info.is_inline_like);
+        if !parent_is_inline {
+            return false;
+        }
+        let parent_handle = tl::NodeHandle::new(parent_id);
+        match next_sibling_inline_content_state(&parent_handle, parser, dom_ctx) {
+            Some(is_inline_content) => return is_inline_content,
+            None => current_id = parent_id,
+        }
     }
-    let parent_handle = tl::NodeHandle::new(parent_id);
-    next_sibling_is_inline_content(&parent_handle, parser, dom_ctx)
 }

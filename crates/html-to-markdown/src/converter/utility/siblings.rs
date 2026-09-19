@@ -83,25 +83,37 @@ pub fn next_sibling_is_inline_tag(node_handle: &tl::NodeHandle, parser: &tl::Par
 /// `DomContext::next_inline_like`, which is memoised and shared with an unrelated caller. ~keep
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn next_sibling_is_inline_content(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    next_sibling_inline_content_state(node_handle, parser, dom_ctx).unwrap_or(false)
+}
+
+/// The tri-state form of [`next_sibling_is_inline_content`]: `None` when nothing after
+/// `node_handle` at this level settles the question at all -- no next sibling, or only a
+/// whitespace-only text tail -- rather than folding that case into `false` the way the bool
+/// form does.
+///
+/// A caller climbing through consecutive inline-like wrappers with no sibling of their own
+/// (`newline_span_needs_separating_space`, issue #505's `<span><span>\n</span></span>Beta`)
+/// needs exactly this distinction: "genuinely nothing follows at this level, ask the next
+/// ancestor up" is not the same question as "something follows and it blocks the separator". ~keep
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn next_sibling_inline_content_state(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    dom_ctx: &DomContext,
+) -> Option<bool> {
     let id = node_handle.get_inner();
     let siblings = match dom_ctx.parent_of(id) {
-        Some(parent_id) => match dom_ctx.children_of(parent_id) {
-            Some(children) => children,
-            None => return false,
-        },
+        Some(parent_id) => dom_ctx.children_of(parent_id)?,
         None => &dom_ctx.root_children,
     };
 
-    let Some(position) = dom_ctx
+    let position = dom_ctx
         .sibling_index(id)
-        .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))
-    else {
-        return false;
-    };
+        .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))?;
 
     for sibling in siblings.iter().skip(position + 1) {
         if let Some(info) = dom_ctx.tag_info(sibling.get_inner(), parser) {
-            return info.is_inline_like;
+            return Some(info.is_inline_like);
         }
         if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
             let decoded = raw.as_utf8_str();
@@ -114,11 +126,11 @@ pub fn next_sibling_is_inline_content(node_handle: &tl::NodeHandle, parser: &tl:
             // ~keep ") Tip" to ")  Tip" exactly this way -- the wrapper is only load-bearing
             // ~keep when the next word butts straight up against it, as in issue #491's
             // ~keep `Alpha<span>\n</span>13`.
-            return !decoded.starts_with(char::is_whitespace);
+            return Some(!decoded.starts_with(char::is_whitespace));
         }
     }
 
-    false
+    None
 }
 
 /// Append an inline suffix to output, with smart whitespace handling.
