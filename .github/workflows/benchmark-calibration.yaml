@@ -20,15 +20,15 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # ~keep v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
-        uses: xberg-io/actions/setup-rust@fc21dc868b7ec7f2b29a75c16312a818f7feb6f6 # ~keep v1
+        uses: xberg-io/actions/setup-rust@v1
         with:
           cache-key-prefix: benchmark-calibration
 
       - name: Install Task
-        uses: xberg-io/actions/install-task@fc21dc868b7ec7f2b29a75c16312a818f7feb6f6 # ~keep v1
+        uses: xberg-io/actions/install-task@v1
 
       - name: Collect calibration captures
         run: task bench:calibration:collect
@@ -36,7 +36,7 @@ jobs:
 
       - name: Upload raw calibration campaign
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # ~keep v7
+        uses: actions/upload-artifact@v7
         with:
           name: benchmark-calibration-${{ github.run_id }}
           path: benchmark-calibration/
