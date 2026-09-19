@@ -50,9 +50,9 @@ jobs:
     if: github.repository == 'xberg-io/html-to-markdown' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@v7
       - name: Install uv
-        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        uses: astral-sh/setup-uv@v10.1.0
       # Plugin version must track the core crate version (task version:sync keeps it pinned).
       - name: Verify plugin version tracks core
         run: python3 scripts/sync_plugin_version.py --check
@@ -72,7 +72,7 @@ jobs:
         # either decision. ~keep
         os: [ubuntu-latest, macos-latest]
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@v7
 
       - name: Install Bats
         uses: xberg-io/actions/install-bats@v1

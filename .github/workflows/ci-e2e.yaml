@@ -101,10 +101,10 @@ jobs:
       zig: ${{ steps.filter.outputs.zig }}
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Detect changes
-        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
+        uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -215,7 +215,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
@@ -229,7 +229,7 @@ jobs:
       # rebar or dependency install. Every other language's formatter is already on the runner
       # image or installed by the steps below.
       - name: Setup Elixir
-        uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1
+        uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.19"
           otp-version: "28.1"
@@ -300,7 +300,7 @@ jobs:
           - windows-11-arm
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Free disk space
@@ -349,7 +349,7 @@ jobs:
 
       - name: Upload FFI artifacts
         if: "!startsWith(matrix.runner, 'windows')"
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@v7
         with:
           name: ffi-${{ matrix.runner }}
           path: |
@@ -379,19 +379,19 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -402,7 +402,7 @@ jobs:
           cache-key-prefix: python-${{ matrix.os }}-${{ matrix.python }}
 
       - name: Install Python Dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -448,7 +448,7 @@ jobs:
             runtime: bun
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Install Task
@@ -465,7 +465,7 @@ jobs:
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -508,7 +508,7 @@ jobs:
         target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -575,7 +575,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -631,7 +631,7 @@ jobs:
         ruby: ["3.2", "3.3"]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -641,7 +641,7 @@ jobs:
 
       - name: Setup Ruby (Unix)
         if: runner.os != 'Windows'
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -650,7 +650,7 @@ jobs:
 
       - name: Setup Ruby (Windows)
         if: runner.os == 'Windows'
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -700,11 +700,11 @@ jobs:
           - { os: windows-latest, label: windows-x86_64 }
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           extensions: ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter
@@ -721,7 +721,7 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: locked
         env:
@@ -737,7 +737,7 @@ jobs:
           lib-name: html_to_markdown_php
 
       - name: Upload PHP extension artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@v7
         with:
           name: php-extension-${{ matrix.platform.label }}
           path: ${{ steps.build-php-extension.outputs.extension-path }}
@@ -762,7 +762,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Install Task
@@ -774,7 +774,7 @@ jobs:
           cache-key-prefix: csharp-${{ matrix.os }}
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
 
@@ -816,7 +816,7 @@ jobs:
         java: ["25"]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -846,7 +846,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -889,18 +889,18 @@ jobs:
         python: ["3.10", "3.12", "3.14"]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
 
       - name: Install uv
-        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -910,7 +910,7 @@ jobs:
           components: rustfmt, clippy, llvm-tools-preview
 
       - name: Install Python Dependencies
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -956,7 +956,7 @@ jobs:
             runtime: bun
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
@@ -970,7 +970,7 @@ jobs:
 
       - name: Setup Bun
         if: matrix.runtime == 'bun'
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -1013,14 +1013,14 @@ jobs:
         ruby: ["3.2", "3.3"]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
 
       - name: Setup Ruby (Unix)
         if: runner.os != 'Windows'
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -1029,7 +1029,7 @@ jobs:
 
       - name: Setup Ruby (Windows)
         if: runner.os == 'Windows'
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: "4.0.3"
@@ -1099,10 +1099,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
           extensions: ctype, dom, json, libxml, mbstring, tokenizer, xml, xmlwriter
@@ -1117,7 +1117,7 @@ jobs:
         shell: bash
 
       - name: Install root Composer dependencies
-        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: locked
         env:
@@ -1167,7 +1167,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
@@ -1178,7 +1178,7 @@ jobs:
           cache-key-prefix: csharp-test-${{ matrix.os }}
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.0.x"
 
@@ -1234,13 +1234,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
 
       - name: Setup Go
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
           check-latest: true
@@ -1293,7 +1293,7 @@ jobs:
         java: ["25"]
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
@@ -1329,10 +1329,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Elixir
-        uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1
+        uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.19"
           otp-version: "28.1"
@@ -1381,7 +1381,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup R
         uses: xberg-io/actions/setup-r@v1
@@ -1430,7 +1430,7 @@ jobs:
           - macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
@@ -1485,7 +1485,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
@@ -1516,7 +1516,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: xberg-io/actions/setup-rust@v1
@@ -1562,7 +1562,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -1576,7 +1576,7 @@ jobs:
       # `Warning: Failed to find package 'tools'` -> sdkmanager exit 1, which took out all four
       # kotlin-android-natives legs of the 3.13.0 release. Request platform-tools explicitly. ~keep
       - name: Setup Android SDK/NDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4
+        uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
 
@@ -1614,7 +1614,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
         id: checkout
 
       - name: Setup Rust
@@ -1627,12 +1627,12 @@ jobs:
       # `Warning: Failed to find package 'tools'` -> sdkmanager exit 1, which took out all four
       # kotlin-android-natives legs of the 3.13.0 release. Request platform-tools explicitly. ~keep
       - name: Setup Android SDK/NDK
-        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4
+        uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
 
       - name: Setup JDK
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -1662,7 +1662,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
@@ -1678,7 +1678,7 @@ jobs:
           version: "6.0"
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
 
@@ -1704,7 +1704,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
@@ -1715,7 +1715,7 @@ jobs:
           cache-key-prefix: dart
 
       - name: Setup Dart
-        uses: dart-lang/setup-dart@7654d458321ee25acccccfdb86cd48bd95768ff1 # v1
+        uses: dart-lang/setup-dart@v1
 
       - name: Install alef
         uses: xberg-io/actions/install-alef@v1
@@ -1740,7 +1740,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        uses: actions/checkout@v7
 
       - name: Install Task
         uses: xberg-io/actions/install-task@v1
