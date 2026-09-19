@@ -7,7 +7,7 @@
 //! - Abbreviation (abbr) with optional title
 //! - Span element with special OCR handling
 
-use crate::converter::inline::wrapped::{EMPHASIS_SIBLING_TAGS, InlineDelimiters, emit_wrapped_inline};
+use crate::converter::inline::wrapped::{EMPHASIS_SIBLING_TAGS, InlineDelimiters, InlineSite, emit_wrapped_inline};
 use crate::options::{ConversionOptions, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
@@ -149,9 +149,12 @@ pub fn handle_subscript(
             merge_symbol: None,
             sibling_tag_names: &[],
         },
-        node_handle,
-        parser,
-        dom_ctx,
+        InlineSite {
+            node_handle,
+            parser,
+            dom_ctx,
+            ctx,
+        },
     );
 }
 
@@ -246,9 +249,12 @@ pub fn handle_superscript(
             merge_symbol: None,
             sibling_tag_names: &[],
         },
-        node_handle,
-        parser,
-        dom_ctx,
+        InlineSite {
+            node_handle,
+            parser,
+            dom_ctx,
+            ctx,
+        },
     );
 }
 
@@ -300,9 +306,12 @@ pub fn handle_variable(
             merge_symbol: Some(options.strong_em_symbol),
             sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
         },
-        node_handle,
-        parser,
-        dom_ctx,
+        InlineSite {
+            node_handle,
+            parser,
+            dom_ctx,
+            ctx,
+        },
     );
 }
 
@@ -354,9 +363,12 @@ pub fn handle_definition(
             merge_symbol: Some(options.strong_em_symbol),
             sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
         },
-        node_handle,
-        parser,
-        dom_ctx,
+        InlineSite {
+            node_handle,
+            parser,
+            dom_ctx,
+            ctx,
+        },
     );
 }
 

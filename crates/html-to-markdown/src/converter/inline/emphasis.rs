@@ -50,7 +50,7 @@ pub fn handle(
 }
 
 use crate::converter::inline::wrapped::{
-    EMPHASIS_SIBLING_TAGS, InlineDelimiters, STRONG_SIBLING_TAGS, emit_wrapped_inline,
+    EMPHASIS_SIBLING_TAGS, InlineDelimiters, InlineSite, STRONG_SIBLING_TAGS, emit_wrapped_inline,
 };
 
 /// Resolve `<strong>`/`<b>`'s wrapping delimiters for the current context and options, then
@@ -74,9 +74,12 @@ fn emit_strong_wrapped(
                 merge_symbol: Some(options.strong_em_symbol),
                 sibling_tag_names: &STRONG_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     } else if options.output_format == OutputFormat::Djot {
         // ~keep Djot strong always uses `*`, independent of `options.strong_em_symbol`
@@ -90,9 +93,12 @@ fn emit_strong_wrapped(
                 merge_symbol: Some('*'),
                 sibling_tag_names: &STRONG_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     } else {
         let marker: String = [options.strong_em_symbol; 2].iter().collect();
@@ -105,9 +111,12 @@ fn emit_strong_wrapped(
                 merge_symbol: Some(options.strong_em_symbol),
                 sibling_tag_names: &STRONG_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     }
 }
@@ -118,6 +127,7 @@ fn emit_emphasis_wrapped(
     output: &mut String,
     content: &str,
     options: &ConversionOptions,
+    ctx: &Context,
     node_handle: &NodeHandle,
     parser: &Parser,
     dom_ctx: &DomContext,
@@ -134,9 +144,12 @@ fn emit_emphasis_wrapped(
                 merge_symbol: Some('_'),
                 sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     } else {
         let marker = options.strong_em_symbol.to_string();
@@ -149,9 +162,12 @@ fn emit_emphasis_wrapped(
                 merge_symbol: Some(options.strong_em_symbol),
                 sibling_tag_names: &EMPHASIS_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     }
 }
@@ -341,13 +357,13 @@ fn handle_emphasis(
         if let Some(custom_output) = em_output {
             output.push_str(&custom_output);
         } else {
-            emit_emphasis_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_emphasis_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
             maybe_emit_caret(output, &content, tag);
         }
 
         #[cfg(not(feature = "visitor"))]
         {
-            emit_emphasis_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_emphasis_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
             maybe_emit_caret(output, &content, tag);
         }
     }

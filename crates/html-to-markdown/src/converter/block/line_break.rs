@@ -131,7 +131,18 @@ pub fn handle(
         // ~keep source whitespace before the <br> is trimmed rather than leaked. A layout
         // ~keep cell is one list item's line and already sends its div/p continuations
         // ~keep through this rule (issue #470); a hard-break marker there ended the item.
-        emit_table_cell_break(output, options.br_in_tables);
+        // ~keep An empty buffer here is an inline wrapper's scratch buffer, not the cell's
+        // ~keep own: `<td>A<em><br></em>B</td>` saw the continuation rule suppress its space
+        // ~keep against `<em>`'s fresh `String`, and the words joined (issue #504). The one
+        // ~keep space the `<br>` stands for is pushed there; a cell's own buffer is trimmed
+        // ~keep by `render_cell_text`/`append_layout_cell_text`, so a genuinely leading
+        // ~keep `<br>` still contributes nothing. A literal `<br>` under `br_in_tables` is
+        // ~keep unchanged.
+        if output.is_empty() && !options.br_in_tables {
+            output.push(' ');
+        } else {
+            emit_table_cell_break(output, options.br_in_tables);
+        }
     } else if ctx.in_link {
         // ~keep #497: inside a link label a `<br>` with nothing before it is still real
         // ~keep content -- `B<a href="H"><br>A</a>` renders as B, a line break, then A, and

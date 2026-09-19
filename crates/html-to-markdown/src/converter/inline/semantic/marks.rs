@@ -5,7 +5,7 @@
 //! - Strikethrough (del, s tags) with ~~ syntax
 //! - Inserted/underlined text (ins, u tags) with == syntax
 
-use crate::converter::inline::wrapped::{InlineDelimiters, emit_wrapped_inline};
+use crate::converter::inline::wrapped::{InlineDelimiters, InlineSite, emit_wrapped_inline};
 use crate::options::{ConversionOptions, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
@@ -131,9 +131,12 @@ pub fn handle_mark(
             merge_symbol,
             sibling_tag_names: &MARK_SIBLING_TAGS,
         },
-        node_handle,
-        parser,
-        dom_ctx,
+        InlineSite {
+            node_handle,
+            parser,
+            dom_ctx,
+            ctx,
+        },
     );
 }
 
@@ -179,6 +182,7 @@ fn emit_strikethrough_wrapped(
     output: &mut String,
     content: &str,
     options: &ConversionOptions,
+    ctx: &Context,
     node_handle: &NodeHandle,
     parser: &Parser,
     dom_ctx: &DomContext,
@@ -193,9 +197,12 @@ fn emit_strikethrough_wrapped(
                 merge_symbol: None,
                 sibling_tag_names: &STRIKETHROUGH_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     } else {
         emit_wrapped_inline(
@@ -207,9 +214,12 @@ fn emit_strikethrough_wrapped(
                 merge_symbol: Some('~'),
                 sibling_tag_names: &STRIKETHROUGH_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     }
 }
@@ -220,6 +230,7 @@ fn emit_inserted_wrapped(
     output: &mut String,
     content: &str,
     options: &ConversionOptions,
+    ctx: &Context,
     node_handle: &NodeHandle,
     parser: &Parser,
     dom_ctx: &DomContext,
@@ -234,9 +245,12 @@ fn emit_inserted_wrapped(
                 merge_symbol: None,
                 sibling_tag_names: &INSERTED_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     } else {
         emit_wrapped_inline(
@@ -248,9 +262,12 @@ fn emit_inserted_wrapped(
                 merge_symbol: Some('='),
                 sibling_tag_names: &INSERTED_SIBLING_TAGS,
             },
-            node_handle,
-            parser,
-            dom_ctx,
+            InlineSite {
+                node_handle,
+                parser,
+                dom_ctx,
+                ctx,
+            },
         );
     }
 }
@@ -340,12 +357,12 @@ pub fn handle_strikethrough(
         if let Some(custom_output) = strikethrough_output {
             output.push_str(&custom_output);
         } else {
-            emit_strikethrough_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_strikethrough_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
         }
 
         #[cfg(not(feature = "visitor"))]
         {
-            emit_strikethrough_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_strikethrough_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
         }
     }
 }
@@ -435,12 +452,12 @@ pub fn handle_inserted(
     if let Some(custom_output) = underline_output {
         output.push_str(&custom_output);
     } else {
-        emit_inserted_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+        emit_inserted_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
     }
 
     #[cfg(not(feature = "visitor"))]
     {
-        emit_inserted_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+        emit_inserted_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
     }
 }
 

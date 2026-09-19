@@ -13,6 +13,21 @@
 use tl::{NodeHandle, Parser};
 
 type DomContext = crate::converter::DomContext;
+type Context = crate::converter::Context;
+
+/// Where a wrapper is being emitted: its DOM node, the parser and DOM lookup context, and the
+/// conversion `Context` of the buffer it writes into.
+///
+/// ~keep Bundled because every emitter passes exactly these four together; `ctx` is needed for
+/// ~keep `block_output_ptr`, which tells a block's own buffer apart from an enclosing wrapper's
+/// ~keep scratch buffer (issue #504).
+#[derive(Clone, Copy)]
+pub struct InlineSite<'p> {
+    pub node_handle: &'p NodeHandle,
+    pub parser: &'p Parser<'p>,
+    pub dom_ctx: &'p DomContext,
+    pub ctx: &'p Context,
+}
 
 /// Tag names that render with the single `strong_em_symbol` italic delimiter.
 ///
@@ -62,10 +77,14 @@ pub fn emit_wrapped_inline(
     output: &mut String,
     content: &str,
     delimiters: &InlineDelimiters<'_>,
-    node_handle: &NodeHandle,
-    parser: &Parser,
-    dom_ctx: &DomContext,
+    site: InlineSite<'_>,
 ) {
+    let InlineSite {
+        node_handle,
+        parser,
+        dom_ctx,
+        ctx,
+    } = site;
     let InlineDelimiters {
         open,
         close,
@@ -88,8 +107,17 @@ pub fn emit_wrapped_inline(
         // ~keep guards, which every handler but `text_node` was originally missing.
         // ~keep ...and at a line start it contributes nothing at all: `<p>A</p><p><i> </i>B</p>`
         // ~keep otherwise opened its second paragraph with a stray space (issue #501's rule --
-        // ~keep leading ASCII whitespace on a line is never Markdown content).
-        if !output.ends_with(' ') && !output.is_empty() && !output.ends_with('\n') {
+        // ~keep leading ASCII whitespace on a line is never Markdown content). An empty buffer
+        // ~keep is a line start only when it is the block's own buffer: an enclosing wrapper
+        // ~keep builds its body into a fresh scratch `String` that is empty mid-line, and
+        // ~keep `<strong><em><br></em></strong>` lost its one space there, so the outer body
+        // ~keep came out empty and the words either side were joined (issue #504). The
+        // ~keep address test is the one `text_node.rs` uses for the same distinction; a
+        // ~keep heading or cell buffer never matches it, and those are trimmed by their
+        // ~keep builders, so a leading space pushed there is harmless.
+        let at_block_line_start = output.ends_with('\n')
+            || (output.is_empty() && std::ptr::from_ref::<String>(output) as usize == ctx.block_output_ptr);
+        if !output.ends_with(' ') && !at_block_line_start {
             output.push_str(prefix);
         }
         append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);
