@@ -8,15 +8,11 @@
 //! and layout cells honored it, `<a>` never did).
 //!
 //! Part C, an adjacent empty-anchor duplication defect surfaced while investigating #490
-//! (`<a href="/o"><div><a href="/i">Inner</a></div></a>` emits the outer link twice, once
-//! empty), is deliberately NOT covered here. The obvious fix -- a childless `<a>` emits
-//! nothing -- directly regresses `commonmark_compliance_test`'s mandatory, currently-passing
-//! spec example 484 (`<a href="./target.md"></a>` -> `[](./target.md)`), which asserts that
-//! rendering is `CommonMark`'s own canonical, and only valid, round trip for an anchor with an
-//! empty visible label. That is a real conflict between the reported symptom (a genuine
-//! anchor SHOULD NOT be duplicated) and the proposed fix (a genuine EMPTY anchor should still
-//! render `[](href)`, not vanish) -- not a fixture that merely needs updating, so it is left
-//! unresolved here pending a decision on the narrower duplication-only fix instead.
+//! (`<a href="/o"><div><a href="/i">Inner</a></div></a>` emitted the outer link twice, once
+//! empty), became issue #493 and is fixed at parse time rather than in the renderer: a renderer
+//! rule that drops a childless `<a>` regresses `commonmark_compliance_test`'s mandatory spec
+//! example 484 (`<a href="./target.md"></a>` -> `[](./target.md)`). See
+//! `converter::anchor_origin` and `issue_493_split_anchor_collapse_test.rs`.
 
 use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1::{self, BailReason};

@@ -499,16 +499,17 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
 /// element would be left open and subsequent siblings would nest inside it, breaking
 /// visitor start/end event pairing (issue #331).
 pub fn repair_with_html5ever(input: &str) -> Option<String> {
-    use crate::rcdom::{RcDom, SerializableHandle};
+    use crate::converter::anchor_origin::{collapse_split_anchors, parse_with_anchor_origins};
+    use crate::rcdom::SerializableHandle;
     use html5ever::serialize::{SerializeOpts, serialize};
-    use html5ever::tendril::TendrilSink;
 
     let expanded = expand_xml_self_closing_tags(input);
 
-    let dom = html5ever::parse_document(RcDom::default(), Default::default())
-        .from_utf8()
-        .read_from(&mut expanded.as_bytes())
-        .ok()?;
+    // ~keep The adoption agency splits an `<a>` around a block into an authored element and
+    // ~keep clones; collapse the empty halves before the tree is flattened to a string and
+    // ~keep the provenance is gone (issue #493).
+    let dom = parse_with_anchor_origins(&expanded);
+    collapse_split_anchors(&dom.document);
 
     let mut buf = Vec::with_capacity(input.len());
     let handle = SerializableHandle::from(dom.document);
