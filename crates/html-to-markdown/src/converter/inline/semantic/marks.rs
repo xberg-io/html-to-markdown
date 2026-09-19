@@ -133,6 +133,7 @@ pub fn handle_mark(
         },
         node_handle,
         parser,
+        ctx,
         dom_ctx,
     );
 }
@@ -179,6 +180,7 @@ fn emit_strikethrough_wrapped(
     output: &mut String,
     content: &str,
     options: &ConversionOptions,
+    ctx: &Context,
     node_handle: &NodeHandle,
     parser: &Parser,
     dom_ctx: &DomContext,
@@ -195,6 +197,7 @@ fn emit_strikethrough_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     } else {
@@ -209,6 +212,7 @@ fn emit_strikethrough_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     }
@@ -220,6 +224,7 @@ fn emit_inserted_wrapped(
     output: &mut String,
     content: &str,
     options: &ConversionOptions,
+    ctx: &Context,
     node_handle: &NodeHandle,
     parser: &Parser,
     dom_ctx: &DomContext,
@@ -236,6 +241,7 @@ fn emit_inserted_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     } else {
@@ -250,6 +256,7 @@ fn emit_inserted_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     }
@@ -340,12 +347,12 @@ pub fn handle_strikethrough(
         if let Some(custom_output) = strikethrough_output {
             output.push_str(&custom_output);
         } else {
-            emit_strikethrough_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_strikethrough_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
         }
 
         #[cfg(not(feature = "visitor"))]
         {
-            emit_strikethrough_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_strikethrough_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
         }
     }
 }
@@ -435,12 +442,12 @@ pub fn handle_inserted(
     if let Some(custom_output) = underline_output {
         output.push_str(&custom_output);
     } else {
-        emit_inserted_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+        emit_inserted_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
     }
 
     #[cfg(not(feature = "visitor"))]
     {
-        emit_inserted_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+        emit_inserted_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
     }
 }
 

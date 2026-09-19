@@ -12,6 +12,7 @@
 
 use tl::{NodeHandle, Parser};
 
+type Context = crate::converter::Context;
 type DomContext = crate::converter::DomContext;
 
 /// Tag names that render with the single `strong_em_symbol` italic delimiter.
@@ -64,6 +65,7 @@ pub fn emit_wrapped_inline(
     delimiters: &InlineDelimiters<'_>,
     node_handle: &NodeHandle,
     parser: &Parser,
+    ctx: &Context,
     dom_ctx: &DomContext,
 ) {
     let InlineDelimiters {
@@ -89,7 +91,25 @@ pub fn emit_wrapped_inline(
         // ~keep ...and at a line start it contributes nothing at all: `<p>A</p><p><i> </i>B</p>`
         // ~keep otherwise opened its second paragraph with a stray space (issue #501's rule --
         // ~keep leading ASCII whitespace on a line is never Markdown content).
-        if !output.ends_with(' ') && !output.is_empty() && !output.ends_with('\n') {
+        //
+        // ~keep `output.is_empty()` alone is not "at a line start" -- it is also true of a
+        // ~keep NESTED wrapper's own fresh scratch buffer (`emphasis.rs`/`marks.rs`/
+        // ~keep `typography.rs` each build their content into a local `String` before
+        // ~keep splicing it into the real output), which can be empty while real content
+        // ~keep already precedes it in the actual document. `<strong>Alpha</strong>
+        // ~keep <strong><em><br></em></strong>Beta` fed the outer `<strong>`'s empty local
+        // ~keep buffer to the inner `<em>`'s call here, wrongly read it as a true line
+        // ~keep start, dropped the separator, and then the outer `<strong>` itself received
+        // ~keep an empty `content` and emitted nothing at all -- silently eating both the
+        // ~keep separator AND the delimiters (issue #504, a 3.14.2 regression from the
+        // ~keep #501 fix above). `block_output_ptr`/`block_content_start` are the same
+        // ~keep buffer-identity check `text_node.rs` and `block/div.rs` use for exactly
+        // ~keep this hazard: a nested wrapper's scratch buffer is a distinct `String` that
+        // ~keep never matches the enclosing block's own address, so only a genuine line
+        // ~keep start reads as one here.
+        let at_real_line_start = std::ptr::from_ref::<String>(output) as usize == ctx.block_output_ptr
+            && output.len() == ctx.block_content_start;
+        if !output.ends_with(' ') && !at_real_line_start && !output.ends_with('\n') {
             output.push_str(prefix);
         }
         append_inline_suffix(output, suffix, false, node_handle, parser, dom_ctx);

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A regression in 3.14.2: a `<br>` or whitespace-only body inside doubly-nested inline
+  formatting no longer joins the words around it**
+  ([#504](https://github.com/xberg-io/html-to-markdown/issues/504)).
+  `<strong>Alpha</strong><strong><em><br></em></strong>Beta` rendered `**Alpha**Beta` in 3.14.2;
+  3.14.1 kept `**Alpha** Beta`. The #501 fix taught `emit_wrapped_inline` to read an empty
+  `output` buffer as a genuine line start and suppress the separator there
+  (`<p>A</p><p><i> </i>B</p>` must not open its second paragraph with a stray space), but
+  `output` is not always the real block buffer: `<em>` nested inside `<strong>` writes into
+  `<strong>`'s own fresh, empty scratch buffer, indistinguishable from a true line start by
+  emptiness alone even though "Alpha" already precedes it in the document. Dropping the
+  separator there left the outer `<strong>`'s own content empty too, so it emitted nothing at
+  all -- both the space and its own delimiters vanished. `emit_wrapped_inline` now takes the
+  same buffer-identity signal `text_node.rs` and `block/div.rs` already use for this exact
+  hazard (`block_output_ptr`/`block_content_start`), so only a genuine line start reads as one.
+  Tier 1 bails on nested emphasis, so the fix is Tier-2 only.
+
 ## [3.14.2] - 2026-09-18
 
 ### Fixed

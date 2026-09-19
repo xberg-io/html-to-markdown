@@ -76,6 +76,7 @@ fn emit_strong_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     } else if options.output_format == OutputFormat::Djot {
@@ -92,6 +93,7 @@ fn emit_strong_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     } else {
@@ -107,6 +109,7 @@ fn emit_strong_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     }
@@ -118,6 +121,7 @@ fn emit_emphasis_wrapped(
     output: &mut String,
     content: &str,
     options: &ConversionOptions,
+    ctx: &Context,
     node_handle: &NodeHandle,
     parser: &Parser,
     dom_ctx: &DomContext,
@@ -136,6 +140,7 @@ fn emit_emphasis_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     } else {
@@ -151,6 +156,7 @@ fn emit_emphasis_wrapped(
             },
             node_handle,
             parser,
+            ctx,
             dom_ctx,
         );
     }
@@ -341,13 +347,13 @@ fn handle_emphasis(
         if let Some(custom_output) = em_output {
             output.push_str(&custom_output);
         } else {
-            emit_emphasis_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_emphasis_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
             maybe_emit_caret(output, &content, tag);
         }
 
         #[cfg(not(feature = "visitor"))]
         {
-            emit_emphasis_wrapped(output, &content, options, node_handle, parser, dom_ctx);
+            emit_emphasis_wrapped(output, &content, options, ctx, node_handle, parser, dom_ctx);
             maybe_emit_caret(output, &content, tag);
         }
     }
