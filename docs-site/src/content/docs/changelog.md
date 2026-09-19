@@ -9,6 +9,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.3] - 2026-09-19
+
+### Fixed
+
+- **A whitespace-only inline wrapper nested inside another wrapper keeps its separator**
+  ([#504](https://github.com/xberg-io/html-to-markdown/issues/504)).
+  `<h2><strong>Alpha</strong><strong><em><br></em></strong>Beta</h2>` rendered `## **Alpha**Beta`
+  from 3.14.2 on, where 3.14.1 kept the space, and a paragraph or table cell joined the words the
+  same way. Issue #501 taught the shared wrapper emitter that a whitespace-only body at a line
+  start contributes nothing, keyed on the destination buffer being empty -- but the destination
+  can also be an enclosing wrapper's fresh scratch buffer, which is empty mid-line, so the inner
+  `<em>`'s one space was dropped there and the outer `<strong>` came out empty. The line-start
+  rule now fires only on the block's own buffer, using the address test the text-node fallback
+  already uses for the same distinction, so `<mark>`, `<ins>`, `<del>`, `<sub>` and `<sup>`
+  wrappers move with it. A `<br>` inside a wrapper inside a table cell had the same shape on its
+  own since before 3.14.2 -- `<td>Alpha<em><br></em>Beta</td>` -- and now keeps its space too; a
+  cell's own leading `<br>` still contributes nothing. Tier 1 bails on adjacent emphasis, so the
+  change is Tier-2 only.
+- **A newline inside nested transparent inline wrappers still separates the words around it**
+  ([#505](https://github.com/xberg-io/html-to-markdown/issues/505)).
+  `<p><i>Alpha</i><span><span>\n</span></span>Beta</p>` rendered `*Alpha*Beta` where a browser
+  shows a space. Issues #430 and #491 taught the text-node fallback that a lone newline inside
+  an inline wrapper separates words when the wrapper is followed by inline content, but the check
+  looked one level up only: with a second wrapper the inner `<span>` is the last child of the
+  outer one and the newline was dropped. The check now climbs through every transparent inline
+  ancestor that has nothing after it and stops at the first block. Tier 1 already emitted the
+  space, so this was a live cross-tier divergence; the tiers now agree.
+- **An anchor that html5ever's adoption agency splits around a block is emitted once, not twice**
+  ([#493](https://github.com/xberg-io/html-to-markdown/issues/493)).
+  `<a href="/o"><div><a href="/i">Inner</a></div></a>` rendered `[](/o)` and then
+  `[](/o)[Inner](/i)`: the repair legitimately closes the outer `<a>` at the `<div>` and
+  reconstructs it inside, and the clone reached the renderer indistinguishable from an authored
+  element. A renderer rule keyed on shape would either drop a genuine empty anchor (`CommonMark`
+  example 484) or a deliberately authored duplicate, so the fix is at parse time: every `<a>`
+  start tag is stamped with a private origin id before the tree builder sees it, the clones
+  inherit it, and on the repaired tree the halves of a split anchor with no content of their own
+  are unwrapped in place. When no half has content the authored one is kept, so the destination
+  still appears once as `[](/o)`; `<a href="/o"><div>Text<a href="/i">Inner</a></div></a>` keeps
+  the half that carries `Text` and renders `[Text](/o)[Inner](/i)`. Input the repair never runs
+  on, and an anchor the repair leaves whole, are unchanged.
+
 ## [3.14.2] - 2026-09-18
 
 ### Fixed

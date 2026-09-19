@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.3] - 2026-09-19
+
 ### Fixed
 
 - **A whitespace-only inline wrapper nested inside another wrapper keeps its separator**
