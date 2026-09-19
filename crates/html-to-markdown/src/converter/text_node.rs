@@ -12,7 +12,8 @@ use std::borrow::Cow;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
-    get_next_sibling_tag, next_sibling_is_inline_content, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
+    FollowingContent, following_sibling_content, get_next_sibling_tag, next_sibling_is_inline_tag,
+    previous_sibling_is_inline_tag,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -483,7 +484,8 @@ pub fn process_text_node(
 ///
 /// Returns true when the node's parent is an inline-like element that is itself
 /// followed by inline content — e.g. the lone `"\n"` inside the middle `<span>`
-/// of `<span>a</span><span>\n</span><span>b</span>`.
+/// of `<span>a</span><span>\n</span><span>b</span>` — or when the nearest such
+/// ancestor with a following sibling is (issue #505).
 ///
 /// "Inline content" deliberately includes a bare text sibling, not just an element: a browser
 /// renders `a<span>\n</span>b` and `a<span>\n</span><span>b</span>` identically, so asking only
@@ -493,15 +495,25 @@ fn newline_span_needs_separating_space(
     parser: &tl::Parser,
     dom_ctx: &DomContext,
 ) -> bool {
-    let Some(parent_id) = dom_ctx.parent_of(node_handle.get_inner()) else {
-        return false;
-    };
-    let parent_is_inline = dom_ctx
-        .tag_info(parent_id, parser)
-        .is_some_and(|info| info.is_inline_like);
-    if !parent_is_inline {
-        return false;
+    // ~keep Climb through every transparent inline ancestor that has nothing after it: in
+    // ~keep `<span><span>\n</span></span>Beta` only the outer wrapper is followed by `Beta`,
+    // ~keep and asking the inner one alone welded the words together (issue #505). The first
+    // ~keep block ancestor ends the climb -- a newline at the end of a block separates nothing.
+    let mut node_id = node_handle.get_inner();
+    loop {
+        let Some(parent_id) = dom_ctx.parent_of(node_id) else {
+            return false;
+        };
+        let parent_is_inline = dom_ctx
+            .tag_info(parent_id, parser)
+            .is_some_and(|info| info.is_inline_like);
+        if !parent_is_inline {
+            return false;
+        }
+        match following_sibling_content(parent_id, parser, dom_ctx) {
+            FollowingContent::Inline => return true,
+            FollowingContent::NotInline => return false,
+            FollowingContent::Absent => node_id = parent_id,
+        }
     }
-    let parent_handle = tl::NodeHandle::new(parent_id);
-    next_sibling_is_inline_content(&parent_handle, parser, dom_ctx)
 }
