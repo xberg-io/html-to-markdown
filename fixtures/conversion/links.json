@@ -276,5 +276,62 @@
       "stem": "link_label_unmatched_open_bracket_is_escaped",
       "title": "An unmatched [ in a link label is escaped so the link survives"
     }
+  },
+  {
+    "id": "link_split_by_block_child_is_not_duplicated",
+    "description": "An anchor wrapping a block that holds another anchor records its destination once, not twice",
+    "input": {
+      "html": "<a href=\"/o\"><div><a href=\"/i\">Inner</a></div></a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[](/o)\n\n[Inner](/i)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_split_by_block_child_is_not_duplicated",
+      "title": "An anchor wrapping a block that holds another anchor records its destination once, not twice"
+    }
+  },
+  {
+    "id": "link_split_keeps_text_bearing_half",
+    "description": "An anchor split around a block keeps the half that carries its text",
+    "input": {
+      "html": "<a href=\"/o\">Text<div><a href=\"/i\">Inner</a></div></a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[Text](/o)\n\n[Inner](/i)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_split_keeps_text_bearing_half",
+      "title": "An anchor split around a block keeps the half that carries its text"
+    }
+  },
+  {
+    "id": "link_split_drops_empty_authored_half",
+    "description": "An anchor split around a block drops its empty half when the reconstructed half carries the text",
+    "input": {
+      "html": "<a href=\"/o\"><div>Text<a href=\"/i\">Inner</a></div></a>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "[Text](/o)[Inner](/i)\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "link_split_drops_empty_authored_half",
+      "title": "An anchor split around a block drops its empty half when the reconstructed half carries the text"
+    }
   }
 ]

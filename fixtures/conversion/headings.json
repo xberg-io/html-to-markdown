@@ -112,5 +112,24 @@
       "stem": "heading_h6",
       "title": "H6 heading"
     }
+  },
+  {
+    "id": "heading_br_only_nested_emphasis_keeps_separator",
+    "description": "A line break inside nested emphasis in a heading still separates the words on either side",
+    "input": {
+      "html": "<h2><strong>Alpha</strong><strong><em><br></em></strong>Beta</h2>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "## **Alpha** Beta\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "heading_br_only_nested_emphasis_keeps_separator",
+      "title": "A line break inside nested emphasis in a heading still separates the words on either side"
+    }
   }
 ]

@@ -148,5 +148,24 @@
       "stem": "div_whitespace_only_span_does_not_indent_image",
       "title": "A whitespace-only span opening a div does not indent the image after it into a code block"
     }
+  },
+  {
+    "id": "nested_newline_only_spans_keep_separator",
+    "description": "A newline inside two nested spans still separates the words on either side",
+    "input": {
+      "html": "<p>Alpha<span><span>\n</span></span>Beta</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Alpha Beta\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "nested_newline_only_spans_keep_separator",
+      "title": "A newline inside two nested spans still separates the words on either side"
+    }
   }
 ]

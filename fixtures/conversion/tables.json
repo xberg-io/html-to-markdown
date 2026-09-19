@@ -368,5 +368,24 @@
       "stem": "table_layout_row_keeps_image",
       "title": "A layout-table row keeps an image"
     }
+  },
+  {
+    "id": "table_cell_br_only_emphasis_keeps_separator",
+    "description": "A line-break-only emphasis inside a table cell still separates the words on either side",
+    "input": {
+      "html": "<table><tr><td><strong>Alpha</strong><em><br></em>Beta</td></tr></table>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "| **Alpha** Beta |\n| -------------- |\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "table_cell_br_only_emphasis_keeps_separator",
+      "title": "A line-break-only emphasis inside a table cell still separates the words on either side"
+    }
   }
 ]

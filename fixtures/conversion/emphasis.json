@@ -327,5 +327,62 @@
       "stem": "br_only_bold_wrapper_keeps_separator",
       "title": "A bold wrapper holding only a line break still separates the words on either side"
     }
+  },
+  {
+    "id": "br_only_emphasis_inside_empty_strong_keeps_separator",
+    "description": "A line-break-only emphasis nested inside an otherwise empty strong wrapper still separates the words on either side",
+    "input": {
+      "html": "<p><strong>Alpha</strong><strong><em><br></em></strong>Beta</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "**Alpha** Beta\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "br_only_emphasis_inside_empty_strong_keeps_separator",
+      "title": "A line-break-only emphasis nested inside an otherwise empty strong wrapper still separates the words on either side"
+    }
+  },
+  {
+    "id": "space_only_italic_inside_empty_strong_keeps_separator",
+    "description": "A space-only italic nested inside an otherwise empty strong wrapper still separates the words on either side",
+    "input": {
+      "html": "<p><strong>Alpha</strong><strong><i> </i></strong>Beta</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "**Alpha** Beta\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "space_only_italic_inside_empty_strong_keeps_separator",
+      "title": "A space-only italic nested inside an otherwise empty strong wrapper still separates the words on either side"
+    }
+  },
+  {
+    "id": "nested_newline_only_spans_after_emphasis_keep_separator",
+    "description": "A newline inside two nested spans after an emphasis still separates the words on either side",
+    "input": {
+      "html": "<p><i>Alpha</i><span><span>\n</span></span>Beta</p>"
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "*Alpha* Beta\n"
+      }
+    ],
+    "docs": {
+      "topic": "conversion",
+      "stem": "nested_newline_only_spans_after_emphasis_keep_separator",
+      "title": "A newline inside two nested spans after an emphasis still separates the words on either side"
+    }
   }
 ]
