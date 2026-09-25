@@ -208,7 +208,11 @@ before = [
 [workspace.docs.snippets.sessions.swift]
 cwd = "packages/swift"
 manifest = "packages/swift/Package.swift"
-before = ["swift build"]
+# ~keep The shim rebuilds the module layout alef looks for; Swift 6.3 changed the default
+# build system and moved it. See scripts/ci/swift/snippet-module-shim.sh for the mechanism
+# and the negative control. Without it all 341 swift snippets report Unavailable and the
+# strict run fails, with no change to this tree.
+before = ["swift build", "../../scripts/ci/swift/snippet-module-shim.sh"]
 
 [workspace.docs.snippets.sessions.dart]
 cwd = "packages/dart"

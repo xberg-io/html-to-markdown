@@ -26,8 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- CI's fixture-snippet validation now installs a Swift toolchain, fixing 341 snippets that
-  were failing as `Unavailable` rather than actually validating.
+- CI's fixture-snippet validation now really validates the 341 Swift snippets. They had all
+  been reporting `Unavailable` with `no such module 'HtmlToMarkdown'`: Swift 6.3 made
+  `swiftbuild` the default build system, whose bin path holds the `.swiftmodule` files
+  directly and emits no `Modules/` directory, while alef points `-I` at `<bin-path>/Modules`.
+  The session now reconstructs that layout after building. The gate went red without any
+  change to this tree, when the runner's preinstalled Swift moved to 6.4.
 
 ## [3.14.3] - 2026-09-19
 

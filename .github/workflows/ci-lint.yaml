@@ -92,12 +92,15 @@ jobs:
       setup-ruby: true
       setup-dart: true
       setup-elixir: true
-      # zig, R and swift snippets validated as `Unavailable` -- "toolchain not found" -- because
-      # reusable-validate wired no setup step for any of the three, and under `--strict` an
-      # Unavailable fails the run exactly like a Fail. 566 of the 1078 Unavailable in run
-      # 32541909482 were zig (283) + r (283); a later run added 341 more (swift 6 + swift/swift
-      # 335) once swift snippets were exercised without a matching setup-swift input. All three
-      # inputs are available on actions v1.8.144+. ~keep
+      # zig and R snippets validated as `Unavailable` -- "toolchain not found" -- because
+      # reusable-validate wired no setup step for either, and under `--strict` an Unavailable
+      # fails the run exactly like a Fail. 566 of the 1078 Unavailable in run 32541909482 were
+      # zig (283) + r (283). All three inputs are available on actions v1.8.144+. ~keep
+      # ~keep `setup-swift` is NOT what fixed the 341 swift Unavailable: ubuntu-latest already
+      # preinstalls Swift, so this action's own "Check existing Swift" step short-circuits and
+      # the install is skipped ("Swift already installed: Swift version 6.4" in run 36162480685,
+      # which still reported all 341). Those were a build-system layout change -- see
+      # scripts/ci/swift/snippet-module-shim.sh. Kept only so a runner without Swift still works.
       setup-zig: true
       setup-r: true
       r-install-deps-script: scripts/ci/r/install-deps.sh
