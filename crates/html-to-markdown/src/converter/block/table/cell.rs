@@ -201,7 +201,7 @@ pub fn render_cell_text(
                         continue;
                     }
                     if nested.contains('|') {
-                        nested = crate::converter::utility::content::escape_bare_pipes_outside_code_spans(&nested);
+                        nested = crate::converter::utility::escaping::escape_bare_pipes_outside_code_spans(&nested);
                     }
                     // ~keep The inner table emits one line per row, and the whole-cell fold
                     // ~keep below turns every one of those newlines into a space, running the

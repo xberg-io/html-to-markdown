@@ -989,7 +989,7 @@ fn emit_svg_from_slice(
     // ~keep (utility/content.rs) is the shared helper Tier-2's `<a>` label path
     // ~keep already uses; call the same one here rather than a third
     // ~keep hand-written escaper.
-    let escaped_title = crate::converter::utility::content::escape_link_label(&title);
+    let escaped_title = crate::converter::utility::escaping::escape_link_label(&title);
 
     let dest = state.cell_or_output_mut();
     dest.push_str("![");
@@ -1937,7 +1937,7 @@ fn emit_void(
                 // ~keep emits `alt` as plain text with no `![...]` wrapping at all,
                 // ~keep matching `format_image_markdown`'s `use_alt_only` branch, which
                 // ~keep also does not call `escape_link_label`.
-                let escaped_alt = crate::converter::utility::content::escape_link_label(alt);
+                let escaped_alt = crate::converter::utility::escaping::escape_link_label(alt);
                 if let Some(title_bytes) = title {
                     // ~keep Escaped exactly as Tier-2's `handlers/image.rs` does. Before
                     // ~keep issue #494 this path could not produce a raw `"` -- the entity
@@ -3350,7 +3350,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
         // ~keep `escaped_label` borrows from `dest` when unescaped (the common case), so it
         // ~keep cannot outlive the `truncate`/`push_str` below that mutably borrows `dest` --
         // ~keep only rewrite `dest` when escaping actually produced an owned copy.
-        match crate::converter::utility::content::escape_link_label(&dest[trim_start..]) {
+        match crate::converter::utility::escaping::escape_link_label(&dest[trim_start..]) {
             std::borrow::Cow::Borrowed(_) => {}
             std::borrow::Cow::Owned(escaped_label) => {
                 dest.truncate(trim_start);
@@ -3660,7 +3660,7 @@ fn close_table(
         let mut nested = String::new();
         emit_gfm_table(&mut nested, ts);
         if nested.contains('|') {
-            nested = crate::converter::utility::content::escape_bare_pipes_outside_code_spans(&nested);
+            nested = crate::converter::utility::escaping::escape_bare_pipes_outside_code_spans(&nested);
         }
         // ~keep Mirrors Tier-2's `fold_nested_table_rows` (block/table/cell.rs, issue #469):
         // ~keep the inner rows are joined with `<br>` under `br_in_tables` and a space

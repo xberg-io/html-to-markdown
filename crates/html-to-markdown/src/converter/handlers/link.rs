@@ -17,9 +17,9 @@ use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_markdown_link, has_uri_scheme};
 use crate::converter::main::walk_node;
 use crate::converter::utility::content::{
-    collect_link_label_text, escape_link_label, get_text_content, node_is_block_level, normalize_link_label,
-    normalized_tag_name,
+    collect_link_label_text, get_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
 };
+use crate::converter::utility::escaping::escape_link_label;
 use crate::options::ConversionOptions;
 use crate::text;
 use std::borrow::Cow;

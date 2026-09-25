@@ -7,7 +7,8 @@ use std::cell::{OnceCell, RefCell};
 use std::collections::HashMap;
 
 use crate::converter::main_helpers::is_inline_element;
-use crate::converter::utility::content::{is_block_level_name, normalized_tag_name};
+use crate::converter::utility::content::normalized_tag_name;
+use crate::converter::utility::escaping::is_block_level_name;
 use crate::text;
 
 /// Cached information about an HTML tag element.

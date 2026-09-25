@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
-use crate::converter::utility::content::escape_link_label;
+use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::ConversionOptions;
 

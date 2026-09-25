@@ -369,48 +369,30 @@ fn emit_rowspan_continuation(
 /// # Returns
 /// `false` when the row collected zero cells (nothing was emitted); `true` otherwise. Callers
 /// must only advance their own row counter when this returns `true` (issue #489).
+/// Run the row-level visitor hook, if one is registered.
+///
+/// Returns `Some(bool)` when the visitor decided the row is fully handled and
+/// `convert_table_row` must return that value immediately; `None` when rendering should
+/// continue as normal. Split out of `convert_table_row` to keep that function under the
+/// cyclomatic-complexity gate.
+#[cfg(feature = "visitor")]
 #[allow(clippy::too_many_arguments)]
-#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
-#[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn convert_table_row(
+fn run_row_visitor_hook(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     output: &mut String,
     options: &crate::options::ConversionOptions,
     ctx: &super::super::super::Context,
     row_index: usize,
-    has_span: bool,
-    rowspan_tracker: &mut [Option<usize>],
-    total_cols: usize,
-    header_cols: usize,
-    dom_ctx: &super::super::super::DomContext,
-    depth: usize,
     is_header: bool,
-    col_widths: &[usize],
-    cell_cache: &mut CellTextCache,
-    deferred_tables: &mut Vec<String>,
-) -> bool {
-    let mut row_text = String::with_capacity(256);
-    let mut cells = Vec::new();
+    cells: &[tl::NodeHandle],
+    depth: usize,
+    dom_ctx: &super::super::super::DomContext,
+) -> Option<bool> {
+    use crate::visitor::{NodeContext, NodeType, VisitResult};
 
-    collect_table_cells(node_handle, parser, dom_ctx, &mut cells);
-    // ~keep A nested table may only be deferred out of a cell that shares its row with no
-    // ~keep other cell -- pulling it out of a row with a sibling would leave that sibling's
-    // ~keep column position undefined (issue #469 locks the sibling-cell shape to the
-    // ~keep existing flatten-and-escape behavior; issue #484 is the single-cell-row shape).
-    let is_single_cell_row = cells.len() == 1;
+    let visitor_handle = ctx.visitor.as_ref()?;
 
-    // ~keep A row whose only children were non-cell elements (e.g. `tl`'s `read_end`
-    // ~keep dropped an unmatched `</table>`, stranding a `<p>` inside this `<tr>`)
-    // ~keep collects zero cells here. Bailing before any output lets the *next* real
-    // ~keep row become row 0 -- and thus the header -- matching Tier 1's behavior
-    // ~keep (issue #489). The caller only advances `row_index` when this returns
-    // ~keep `true`, so a skipped row does not consume a row-index slot.
-    if cells.is_empty() {
-        return false;
-    }
-
-    #[cfg(feature = "visitor")]
     let cell_contents: Vec<String> = if ctx.visitor.is_some() {
         // ~keep Same rule as the width pre-pass: this walk only feeds the `visit_table_row`
         // ~keep callback, the render pass below walks these cells again (a visitor disables
@@ -453,46 +435,102 @@ pub fn convert_table_row(
         Vec::new()
     };
 
-    #[cfg(feature = "visitor")]
-    if let Some(ref visitor_handle) = ctx.visitor {
-        use crate::visitor::{NodeContext, NodeType, VisitResult};
+    let tl::Node::Tag(tag) = node_handle.get(parser)? else {
+        return None;
+    };
 
-        if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-            let node_ctx = NodeContext::with_lazy_attributes(
-                NodeType::TableRow,
-                Cow::Borrowed("tr"),
-                tag,
-                depth,
-                row_index,
-                Some(Cow::Borrowed("table")),
-                false,
-            );
+    let node_ctx = NodeContext::with_lazy_attributes(
+        NodeType::TableRow,
+        Cow::Borrowed("tr"),
+        tag,
+        depth,
+        row_index,
+        Some(Cow::Borrowed("table")),
+        false,
+    );
 
-            let visit_result = {
-                let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
-                visitor.visit_table_row(&node_ctx, &cell_contents, is_header)
-            };
-            match visit_result {
-                VisitResult::Continue => {}
-                // ~keep Pre-existing visitor early returns, unrelated to issue #489: `true`
-                // ~keep preserves prior behavior of always advancing `row_index` here.
-                VisitResult::Skip => return true,
-                VisitResult::Custom(custom) => {
-                    output.push_str(&custom);
-                    return true;
-                }
-                VisitResult::Error(err) => {
-                    if ctx.visitor_error.borrow().is_none() {
-                        *ctx.visitor_error.borrow_mut() = Some(err);
-                    }
-                    return true;
-                }
-                VisitResult::PreserveHtml => {
-                    output.push_str(&super::super::super::serialize_node(node_handle, parser));
-                    return true;
-                }
-            }
+    let visit_result = {
+        let mut visitor = visitor_handle.lock().expect("visitor mutex poisoned");
+        visitor.visit_table_row(&node_ctx, &cell_contents, is_header)
+    };
+
+    match visit_result {
+        VisitResult::Continue => None,
+        // ~keep Pre-existing visitor early returns, unrelated to issue #489: `true`
+        // ~keep preserves prior behavior of always advancing `row_index` here.
+        VisitResult::Skip => Some(true),
+        VisitResult::Custom(custom) => {
+            output.push_str(&custom);
+            Some(true)
         }
+        VisitResult::Error(err) => {
+            if ctx.visitor_error.borrow().is_none() {
+                *ctx.visitor_error.borrow_mut() = Some(err);
+            }
+            Some(true)
+        }
+        VisitResult::PreserveHtml => {
+            output.push_str(&super::super::super::serialize_node(node_handle, parser));
+            Some(true)
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn convert_table_row(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &mut String,
+    options: &crate::options::ConversionOptions,
+    ctx: &super::super::super::Context,
+    row_index: usize,
+    has_span: bool,
+    rowspan_tracker: &mut [Option<usize>],
+    total_cols: usize,
+    header_cols: usize,
+    dom_ctx: &super::super::super::DomContext,
+    depth: usize,
+    is_header: bool,
+    col_widths: &[usize],
+    cell_cache: &mut CellTextCache,
+    deferred_tables: &mut Vec<String>,
+) -> bool {
+    let mut row_text = String::with_capacity(256);
+    let mut cells = Vec::new();
+
+    collect_table_cells(node_handle, parser, dom_ctx, &mut cells);
+    // ~keep A nested table may only be deferred out of a cell that shares its row with no
+    // ~keep other cell -- pulling it out of a row with a sibling would leave that sibling's
+    // ~keep column position undefined (issue #469 locks the sibling-cell shape to the
+    // ~keep existing flatten-and-escape behavior; issue #484 is the single-cell-row shape).
+    let is_single_cell_row = cells.len() == 1;
+
+    // ~keep A row whose only children were non-cell elements (e.g. `tl`'s `read_end`
+    // ~keep dropped an unmatched `</table>`, stranding a `<p>` inside this `<tr>`)
+    // ~keep collects zero cells here. Bailing before any output lets the *next* real
+    // ~keep row become row 0 -- and thus the header -- matching Tier 1's behavior
+    // ~keep (issue #489). The caller only advances `row_index` when this returns
+    // ~keep `true`, so a skipped row does not consume a row-index slot.
+    if cells.is_empty() {
+        return false;
+    }
+
+    #[cfg(feature = "visitor")]
+    if let Some(early_return) = run_row_visitor_hook(
+        node_handle,
+        parser,
+        output,
+        options,
+        ctx,
+        row_index,
+        is_header,
+        &cells,
+        depth,
+        dom_ctx,
+    ) {
+        return early_return;
     }
 
     // ~keep Build the per-cell context once for the entire row.  Tier-2 hot-spot
