@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.92.1"
+alef_version = "0.96.4"
 languages = [
   "python",
   "node",
@@ -1504,7 +1504,7 @@ path = "../../crates/html-to-markdown-node"
 [crates.e2e.packages.go]
 module = "github.com/xberg-io/html-to-markdown/packages/go/v3"
 path = "../../packages/go"
-version = "v0.0.0"
+version = "v3.15.0"
 
 [crates.e2e.packages.php]
 name = "xberg-io/html-to-markdown"
