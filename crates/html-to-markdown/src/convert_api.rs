@@ -90,6 +90,19 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::rc::Rc;
 
+    // ~keep Computed once, from the raw (pre-normalization) input, and reused for both the
+    // ~keep Tier-1 attempt and the Tier-2 fallback below -- the single most important property
+    // ~keep for `base_url`: both tiers resolve every relative destination against the exact
+    // ~keep same `Url` value, so they cannot disagree on what a relative reference resolves
+    // ~keep to. `None` (the default, `options.base_url` unset) makes every downstream
+    // ~keep resolution call a no-op, so output stays byte-identical to before this option
+    // ~keep existed.
+    let effective_base: Option<std::rc::Rc<url::Url>> = options
+        .base_url
+        .as_deref()
+        .and_then(|base| crate::converter::url_resolve::compute_effective_base(html, base))
+        .map(std::rc::Rc::new);
+
     // ~keep Tier-1 dispatcher.
     // ~keep
     // ~keep `TierStrategy::Tier2` skips this block entirely and falls straight to
@@ -128,7 +141,12 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
             let stub_report = crate::converter::prescan::PrescanReport::default();
             let decision = crate::converter::tier1::router::classify(&stub_report, &options);
             if decision == crate::converter::tier1::RouterDecision::Tier1 {
-                match crate::converter::tier1::run(normalized.as_ref(), &stub_report, &options) {
+                match crate::converter::tier1::run_with_base(
+                    normalized.as_ref(),
+                    &stub_report,
+                    &options,
+                    effective_base.clone(),
+                ) {
                     Ok(markdown) => {
                         tracing::debug!(
                             target: "html_to_markdown::convert",
@@ -172,7 +190,12 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
             // ~keep stripped or bails cleanly.
             let normalized = normalize_input(html)?;
             let stub_report = crate::converter::prescan::PrescanReport::default();
-            match crate::converter::tier1::run(normalized.as_ref(), &stub_report, &options) {
+            match crate::converter::tier1::run_with_base(
+                normalized.as_ref(),
+                &stub_report,
+                &options,
+                effective_base.clone(),
+            ) {
                 Ok(markdown) => {
                     tracing::debug!(
                         target: "html_to_markdown::convert",
@@ -294,6 +317,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 metadata_collector.as_ref().map(Rc::clone),
                 visitor,
                 structure_collector,
+                effective_base,
             )
         }
         #[cfg(all(feature = "metadata", not(feature = "inline-images")))]
@@ -305,6 +329,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 metadata_collector.as_ref().map(Rc::clone),
                 visitor,
                 structure_collector,
+                effective_base,
             )
         }
         #[cfg(all(not(feature = "metadata"), feature = "inline-images"))]
@@ -316,6 +341,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 None,
                 visitor,
                 structure_collector,
+                effective_base,
             )
         }
         #[cfg(all(not(feature = "metadata"), not(feature = "inline-images")))]
@@ -327,6 +353,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 None,
                 visitor,
                 structure_collector,
+                effective_base,
             )
         }
     }));

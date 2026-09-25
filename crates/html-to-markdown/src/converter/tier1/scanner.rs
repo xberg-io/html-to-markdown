@@ -113,9 +113,13 @@ pub struct ScanOutput {
 }
 
 /// Entry point for the Tier-1 scanner.
-pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailReason> {
+pub fn scan(
+    html: &str,
+    options: &ConversionOptions,
+    effective_base: Option<std::rc::Rc<url::Url>>,
+) -> Result<ScanOutput, BailReason> {
     let bytes = html.as_bytes();
-    let mut state = Tier1State::new(html.len());
+    let mut state = Tier1State::new(html.len(), effective_base);
     let mut table_probes: Vec<TableLayoutProbe> = Vec::new();
     let mut pos = 0usize;
     let mut text_start = 0usize;
@@ -593,6 +597,7 @@ pub fn scan(html: &str, options: &ConversionOptions) -> Result<ScanOutput, BailR
                 };
                 if matches!(spec.kind, TagKind::Link) {
                     let (href, title) = extract_link_attrs(&attrs)?;
+                    let href = href.map(|h| state.resolve_url(&h).unwrap_or(h));
                     state.link_stack.push((href, title, false));
                 }
                 // ~keep Mirror Tier-2's `semantic/attributes.rs::handle_abbr`:
@@ -1910,6 +1915,7 @@ fn emit_void(
             let title = find_attr(attrs, b"title");
 
             let src = decode_attr(src)?;
+            let src = state.resolve_url(&src).unwrap_or(src);
             // ~keep Tier-2 decodes every user-visible attribute (issue #494), so its answer no
             // ~keep longer depends on whether html5ever repaired the document: `&#x22;`,
             // ~keep `&quot;` and a literal `"` all converge on `"`. The canonicalize/bail fork

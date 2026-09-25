@@ -49,8 +49,9 @@ pub fn handle_img(
     dom_ctx: &DomContext,
 ) {
     let src: Cow<'_, str> = {
-        let resolved = resolve_effective_src(tag);
-        Cow::Owned(sanitize_markdown_url(&resolved).into_owned())
+        let effective_src = resolve_effective_src(tag);
+        let base_resolved = ctx.resolve_url(&effective_src);
+        Cow::Owned(sanitize_markdown_url(base_resolved.as_deref().unwrap_or(&effective_src)).into_owned())
     };
 
     let alt = decoded_attribute(tag, "alt").unwrap_or(Cow::Borrowed(""));

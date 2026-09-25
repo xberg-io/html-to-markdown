@@ -48,7 +48,8 @@ pub fn handle_graphic(
         .into_iter()
         .find_map(|name| crate::converter::utility::attributes::decoded_attribute(tag, name))
         .map_or(Cow::Borrowed(""), |s| {
-            Cow::Owned(sanitize_markdown_url(&s).into_owned())
+            let resolved = ctx.resolve_url(&s);
+            Cow::Owned(sanitize_markdown_url(resolved.as_deref().unwrap_or(&s)).into_owned())
         });
 
     // ~keep Use "alt" attribute, fallback to "filename"
