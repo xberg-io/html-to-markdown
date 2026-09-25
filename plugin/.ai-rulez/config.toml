@@ -4,7 +4,7 @@ description = "Fast, lossless HTML→Markdown conversion with structured metadat
 
 [plugin]
 name = "html-to-markdown"
-version = "3.14.3"
+version = "3.15.0"
 display_name = "html-to-markdown"
 description = "Fast, lossless HTML→Markdown conversion with structured metadata, tables, and document-structure extraction."
 homepage = "https://xberg.io"

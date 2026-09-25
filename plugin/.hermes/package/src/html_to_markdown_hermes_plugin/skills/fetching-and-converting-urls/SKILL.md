@@ -6,7 +6,7 @@ description: Use when fetching a live URL and converting it to Markdown. Covers 
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
 Content-Hash: blake3:0ec0d1cfab92165c75146dc9c2cd55f3885f8b8e94c2ef4adf24d251263e8697
-Source-Hash: blake3:16266da27cedcf24ed8b0cc91610be0aa0be1121adf136e2a0c9849f10e4d61f
+Source-Hash: blake3:0b39804676397ce02102fd182695f1310189e6ae171de750c182fe5e98c39599
 Schema-Version: v1
 -->
 
