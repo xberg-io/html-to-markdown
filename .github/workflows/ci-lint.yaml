@@ -92,11 +92,14 @@ jobs:
       setup-ruby: true
       setup-dart: true
       setup-elixir: true
-      # zig and R snippets validated as `Unavailable` -- "zig toolchain not found" -- because
-      # reusable-validate wired no setup step for either, and under `--strict` an Unavailable
-      # fails the run exactly like a Fail. 566 of the 1078 Unavailable in run 32541909482 were
-      # these two (zig 283 + r 283). Both inputs landed in actions v1.8.144. ~keep
+      # zig, R and swift snippets validated as `Unavailable` -- "toolchain not found" -- because
+      # reusable-validate wired no setup step for any of the three, and under `--strict` an
+      # Unavailable fails the run exactly like a Fail. 566 of the 1078 Unavailable in run
+      # 32541909482 were zig (283) + r (283); a later run added 341 more (swift 6 + swift/swift
+      # 335) once swift snippets were exercised without a matching setup-swift input. All three
+      # inputs are available on actions v1.8.144+. ~keep
       setup-zig: true
       setup-r: true
       r-install-deps-script: scripts/ci/r/install-deps.sh
+      setup-swift: true
       check-fixture-snippets: true
