@@ -67,7 +67,6 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
         max_depth: cli.max_depth,
         exclude_selectors: cli.exclude_selectors.clone().unwrap_or(defaults.exclude_selectors),
         tier_strategy: cli.tier_strategy.map_or(defaults.tier_strategy, Into::into),
-        base_url: defaults.base_url,
         visitor: None,
     }
 }

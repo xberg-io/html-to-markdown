@@ -1573,7 +1573,6 @@ dependencies = [
  "tower",
  "tower-http 0.7.1",
  "tracing",
- "url",
 ]
 
 [[package]]

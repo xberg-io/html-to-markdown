@@ -62,7 +62,6 @@ tikv-jemallocator = "0.7"
 tl = { package = "astral-tl", version = "0.8.0" }
 toml = "1.1"
 tracing = "0.1"
-url = "2.5"
 which = "8"
 
 [workspace.lints.rust]

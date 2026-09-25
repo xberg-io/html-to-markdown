@@ -306,18 +306,12 @@ pub struct Tier1State {
     /// "this wrapper's own scratch space is empty", not "we are at
     /// document start". A dedicated flag distinguishes the two.
     pub at_document_start: bool,
-
-    /// Effective base URL for resolving relative `href`/`src` destinations, computed
-    /// once in `convert_api.rs` and shared with the Tier-2 path's `Context::base_url`
-    /// so both tiers resolve the same input identically. `None` when `options.base_url`
-    /// is unset (the default), making every resolution call a no-op.
-    pub effective_base: Option<std::rc::Rc<url::Url>>,
 }
 
 impl Tier1State {
     /// Create a new `Tier1State` pre-allocating output capacity based on `input_len`.
     #[must_use]
-    pub fn new(input_len: usize, effective_base: Option<std::rc::Rc<url::Url>>) -> Self {
+    pub fn new(input_len: usize) -> Self {
         Self {
             stack: Vec::with_capacity(16),
             escape_ctx: EscapeCtx::empty(),
@@ -337,19 +331,7 @@ impl Tier1State {
             last_emitted_was_img: false,
             list_item_marker_widths: Vec::new(),
             at_document_start: true,
-            effective_base,
         }
-    }
-
-    /// Resolve a `href`/`src` attribute value against [`Self::effective_base`].
-    ///
-    /// Returns `None` (meaning: use the original text unchanged) whenever
-    /// `effective_base` is unset, `value` is empty, already absolute, or fails to
-    /// resolve. See `converter::url_resolve::resolve_attribute_url` for the full
-    /// contract. Mirrors `Context::resolve_url` on the Tier-2 path.
-    #[must_use]
-    pub fn resolve_url(&self, value: &str) -> Option<String> {
-        crate::converter::url_resolve::resolve_attribute_url(self.effective_base.as_deref()?, value)
     }
 
     /// Total continuation-indent width (in columns) for a block child of the

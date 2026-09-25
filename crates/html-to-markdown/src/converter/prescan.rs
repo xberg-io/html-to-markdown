@@ -256,7 +256,7 @@ pub fn run(html: &str) -> (Cow<'_, str>, PrescanReport) {
     (cow, report)
 }
 
-pub(crate) fn matches_tag_start(bytes: &[u8], mut start: usize, tag: &[u8]) -> bool {
+fn matches_tag_start(bytes: &[u8], mut start: usize, tag: &[u8]) -> bool {
     if start >= bytes.len() || start + tag.len() > bytes.len() {
         return false;
     }
@@ -277,7 +277,7 @@ fn matches_end_tag_start(bytes: &[u8], start: usize, tag: &[u8]) -> bool {
     matches_tag_start(bytes, start + 1, tag)
 }
 
-pub(crate) fn find_tag_end(bytes: &[u8], mut idx: usize) -> Option<usize> {
+fn find_tag_end(bytes: &[u8], mut idx: usize) -> Option<usize> {
     let len = bytes.len();
     let mut in_quote: Option<u8> = None;
     while idx < len {

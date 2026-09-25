@@ -68,8 +68,7 @@ pub fn handle(
 
     let href_attr = tag.attributes().get("href").flatten().map(|v| {
         let decoded = crate::text::decode_html_entities(&v.as_utf8_str());
-        let resolved = ctx.resolve_url(&decoded).unwrap_or(decoded);
-        sanitize_markdown_url(&resolved).into_owned()
+        sanitize_markdown_url(&decoded).into_owned()
     });
     // ~keep Still a Cow borrowed from the tag's attribute bytes in the common case
     // ~keep (Tier-2 hot-spot pass III): `decoded_attribute` returns early when the value

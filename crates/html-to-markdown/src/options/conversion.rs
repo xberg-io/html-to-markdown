@@ -205,28 +205,6 @@ pub struct ConversionOptions {
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(default))]
     pub tier_strategy: TierStrategy,
 
-    /// Base URL to resolve relative `href`/`src` destinations against.
-    ///
-    /// When set, every relative link and image/media destination (`a href`, `img src`
-    /// and its lazy-load fallbacks, `srcset`, `graphic` `url`/`href`/`xlink:href`/`src`,
-    /// `iframe`/`audio`/`video`/`source` `src`) is resolved to an absolute URL before
-    /// being written to the Markdown output, so the result is followable without the
-    /// reader knowing where the source HTML came from.
-    ///
-    /// A `<base href>` in the document, if present, is honored the way a browser
-    /// honors it: it is itself resolved against `base_url`, and that combined result
-    /// becomes the effective base every other relative reference resolves against.
-    ///
-    /// Non-hierarchical schemes (`mailto:`, `tel:`, `javascript:`, `data:`) and
-    /// already-absolute URLs are left unchanged. An unset (default) or unparseable
-    /// `base_url`, and a relative reference that fails to resolve, leave the original
-    /// attribute text unchanged -- this option never panics and never corrupts a
-    /// destination it cannot confidently resolve.
-    ///
-    /// Default `None` — no resolution, output byte-identical to versions before this
-    /// option existed.
-    pub base_url: Option<String>,
-
     /// Optional visitor for custom traversal logic.
     ///
     /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -289,7 +267,6 @@ impl Default for ConversionOptions {
             max_depth: None,
             exclude_selectors: Vec::new(),
             tier_strategy: TierStrategy::Auto,
-            base_url: None,
             #[cfg(feature = "visitor")]
             visitor: None,
         }
@@ -448,13 +425,6 @@ impl ConversionOptionsBuilder {
 
     builder_setter!(tier_strategy, TierStrategy);
 
-    /// Set the base URL used to resolve relative `href`/`src` destinations.
-    #[must_use]
-    pub fn base_url(mut self, base_url: impl Into<Option<String>>) -> Self {
-        self.0.base_url = base_url.into();
-        self
-    }
-
     /// Build the final [`ConversionOptions`].
     #[must_use]
     pub fn build(self) -> ConversionOptions {
@@ -561,8 +531,6 @@ pub struct ConversionOptionsUpdate {
     pub exclude_selectors: Option<Vec<String>>,
     /// Optional override for [`ConversionOptions::tier_strategy`].
     pub tier_strategy: Option<TierStrategy>,
-    /// Optional override for [`ConversionOptions::base_url`].
-    pub base_url: Option<Option<String>>,
     /// Optional override for [`ConversionOptions::visitor`].
     #[cfg(feature = "visitor")]
     #[cfg_attr(any(feature = "serde", feature = "metadata"), serde(skip))]
@@ -622,7 +590,6 @@ impl ConversionOptions {
         apply!(max_depth);
         apply!(exclude_selectors);
         apply!(tier_strategy);
-        apply!(base_url);
         #[cfg(feature = "visitor")]
         if let Some(visitor) = update.visitor {
             self.visitor = Some(visitor);
