@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgraded `rmcp` to 3.4.1.
+- Repinned the `alef` generator to 0.96.4 and regenerated every binding. Generator drift
+  only; no public API of any binding changed.
 - Split `converter/utility/content.rs` and `converter/inline/link.rs` (each over the
   1000-line quality gate) into smaller modules, and reduced `convert_table_row`'s cyclomatic
   complexity by extracting its visitor-hook pre-pass into a separate function. No behavior
