@@ -62,6 +62,7 @@ pub fn convert_html_impl(
     #[cfg(feature = "visitor")] visitor: Option<crate::visitor::VisitorHandle>,
     #[cfg(not(feature = "visitor"))] _visitor: Option<()>,
     structure_collector: Option<StructureCollectorHandle>,
+    base_url: Option<std::rc::Rc<url::Url>>,
 ) -> Result<ConversionOutput> {
     let stripped = strip_script_and_style_tags(html);
     // ~keep Before anything else looks for tags: an HTML5 bogus comment (`<?php … ?>`,
@@ -257,6 +258,7 @@ pub fn convert_html_impl(
         visitor,
         structure_collector.as_ref().map(std::rc::Rc::clone),
         reference_collector.as_ref().map(std::rc::Rc::clone),
+        base_url,
     );
     #[cfg(all(feature = "metadata", not(feature = "visitor")))]
     #[allow(clippy::used_underscore_binding)]
@@ -267,6 +269,7 @@ pub fn convert_html_impl(
         _visitor,
         structure_collector.as_ref().map(std::rc::Rc::clone),
         reference_collector.as_ref().map(std::rc::Rc::clone),
+        base_url,
     );
     #[cfg(all(not(feature = "metadata"), feature = "visitor"))]
     let mut ctx = Context::new(
@@ -276,6 +279,7 @@ pub fn convert_html_impl(
         visitor,
         structure_collector.as_ref().map(std::rc::Rc::clone),
         reference_collector.as_ref().map(std::rc::Rc::clone),
+        base_url,
     );
     #[cfg(all(not(feature = "metadata"), not(feature = "visitor")))]
     let mut ctx = Context::new(
@@ -285,6 +289,7 @@ pub fn convert_html_impl(
         _visitor,
         structure_collector.as_ref().map(std::rc::Rc::clone),
         reference_collector.as_ref().map(std::rc::Rc::clone),
+        base_url,
     );
 
     if !options.exclude_selectors.is_empty() {

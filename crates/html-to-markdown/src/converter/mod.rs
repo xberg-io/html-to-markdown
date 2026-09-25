@@ -111,6 +111,7 @@ pub mod semantic;
 pub mod text;
 mod text_node;
 pub mod tier1;
+pub mod url_resolve;
 pub mod utility;
 
 #[cfg(feature = "visitor")]

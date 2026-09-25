@@ -211,6 +211,11 @@ pub struct Context {
     /// Set together with `skip_visitor_hooks` when constructing `prepass_ctx`
     /// in `block::table::builder::handle_table`. Resolves issue #406.
     pub(crate) measure_width_only: bool,
+    /// Effective base URL for resolving relative `href`/`src` destinations, already
+    /// combined with any document `<base href>` (see `converter::url_resolve`).
+    /// `None` when `options.base_url` is unset -- every resolution call becomes a
+    /// no-op then, so output is byte-identical to before this option existed.
+    pub(crate) base_url: Option<Rc<url::Url>>,
 }
 
 impl Context {
@@ -236,6 +241,7 @@ impl Context {
         #[cfg(not(feature = "visitor"))] _visitor: Option<()>,
         structure_collector: Option<StructureCollectorHandle>,
         reference_collector: Option<ReferenceCollectorHandle>,
+        base_url: Option<Rc<url::Url>>,
     ) -> Self {
         #[cfg(feature = "metadata")]
         let (
@@ -312,6 +318,16 @@ impl Context {
             reference_collector,
             skip_visitor_hooks: false,
             measure_width_only: false,
+            base_url,
         }
+    }
+
+    /// Resolve a `href`/`src` attribute value against [`Self::base_url`].
+    ///
+    /// Returns `None` (meaning: use the original text unchanged) whenever `base_url`
+    /// is unset, `value` is empty, already absolute, or fails to resolve. See
+    /// `converter::url_resolve::resolve_attribute_url` for the full contract.
+    pub(crate) fn resolve_url(&self, value: &str) -> Option<String> {
+        crate::converter::url_resolve::resolve_attribute_url(self.base_url.as_deref()?, value)
     }
 }

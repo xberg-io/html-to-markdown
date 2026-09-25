@@ -114,6 +114,9 @@ pub struct ConvertConfig {
     pub exclude_selectors: Option<Vec<String>>,
     /// Conversion tier: `"auto"` (default) or `"tier2"`.
     pub tier_strategy: Option<String>,
+    /// Base URL to resolve relative `href`/`src` destinations against. Omitted (default):
+    /// no resolution.
+    pub base_url: Option<String>,
 }
 
 /// Typed mirror of [`crate::options::PreprocessingOptions`] for MCP input.
@@ -354,6 +357,7 @@ impl ConvertConfig {
             TIER_STRATEGY_VALUES,
             parse_tier_strategy,
         )?;
+        update.base_url = self.base_url.take().map(Some);
         Ok(())
     }
 }

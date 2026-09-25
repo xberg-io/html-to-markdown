@@ -55,8 +55,32 @@ use crate::options::ConversionOptions;
 ///
 /// Returns `Err(BailReason::*)` when the scanner encounters a construct it
 /// cannot handle.  The dispatcher falls back to Tier-2 transparently.
+///
+/// ~keep Kept at this exact 3-argument signature: it is re-exported (gated on
+/// ~keep `test`/`testkit`) as `html_to_markdown_rs::tier1::run` and called directly by
+/// ~keep dozens of integration tests under `tests/`. `convert_api.rs`'s production path
+/// ~keep needs to pass a resolved `base_url` through to the scanner, which those tests
+/// ~keep have no reason to exercise -- so that need is served by
+/// ~keep [`run_with_base`] instead of widening this signature.
 pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Result<String, bail::BailReason> {
-    let scanner::ScanOutput { body, head_range } = scanner::scan(html, options)?;
+    run_with_base(html, report, options, None)
+}
+
+/// Same as [`run`], but resolves relative `href`/`src` destinations against
+/// `effective_base` (see `converter::url_resolve::resolve_attribute_url`). Used by
+/// `convert_api.rs`'s production conversion path.
+///
+/// # Errors
+///
+/// Returns `Err(BailReason::*)` when the scanner encounters a construct it cannot
+/// handle.  The dispatcher falls back to Tier-2 transparently.
+pub(crate) fn run_with_base(
+    html: &str,
+    report: &PrescanReport,
+    options: &ConversionOptions,
+    effective_base: Option<std::rc::Rc<url::Url>>,
+) -> Result<String, bail::BailReason> {
+    let scanner::ScanOutput { body, head_range } = scanner::scan(html, options, effective_base)?;
 
     // ~keep Phase C: prefer the head range the scanner discovered during its single
     // ~keep walk over `html`.  Fall back to the prescan's range when the caller
