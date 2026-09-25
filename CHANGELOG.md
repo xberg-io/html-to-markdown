@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.15.0] - 2026-09-25
+
+### Added
+
+- **`ConversionOptions::base_url`** resolves relative `href`/`src` destinations against a
+  caller-supplied base URL, honoring a document's own `<base href>` the way a browser does.
+  Defaults to `None`, so output is byte-identical for callers who do not set it. Resolution
+  happens identically in both the Tier 1 and Tier 2 rendering paths.
+
+### Changed
+
+- Upgraded `rmcp` to 3.4.1.
+- Split `converter/utility/content.rs` and `converter/inline/link.rs` (each over the
+  1000-line quality gate) into smaller modules, and reduced `convert_table_row`'s cyclomatic
+  complexity by extracting its visitor-hook pre-pass into a separate function. No behavior
+  change; every existing import path is preserved via re-exports.
+
+### Fixed
+
+- CI's fixture-snippet validation now installs a Swift toolchain, fixing 341 snippets that
+  were failing as `Unavailable` rather than actually validating.
+
 ## [3.14.3] - 2026-09-19
 
 ### Fixed

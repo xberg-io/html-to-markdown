@@ -1368,6 +1368,15 @@ char *htm_conversion_options_exclude_selectors(HTMAlefHandle handle);
 HTMAlefHandle htm_conversion_options_tier_strategy(HTMAlefHandle handle);
 
 /**
+ * Get the `base_url` field from a `ConversionOptions`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `htm_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *htm_conversion_options_base_url(HTMAlefHandle handle);
+
+/**
  * Get the `visitor` field from a `ConversionOptions`.
  * A non-null returned handle is owned by the caller.
  * It must be freed with `htm_visitor_handle_free`.
@@ -2025,6 +2034,15 @@ char *htm_conversion_options_update_exclude_selectors(HTMAlefHandle handle);
  * Pointer must be a valid handle returned by this library.
  */
 HTMAlefHandle htm_conversion_options_update_tier_strategy(HTMAlefHandle handle);
+
+/**
+ * Get the `base_url` field from a `ConversionOptionsUpdate`.
+ * A non-null returned pointer is owned by the caller.
+ * It must be freed with `htm_free_string`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *htm_conversion_options_update_base_url(HTMAlefHandle handle);
 
 /**
  * Create a `ConversionResult` from a JSON string. Returns null on failure.

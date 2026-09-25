@@ -191,7 +191,7 @@ checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.14.3"
+version = "3.15.0"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -224,7 +224,7 @@ dependencies = [
 
 [[package]]
 name = "html_to_markdown_rs-e2e-rust"
-version = "3.14.3"
+version = "3.15.0"
 dependencies = [
  "html-to-markdown-rs",
  "serde_json",

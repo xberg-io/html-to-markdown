@@ -973,6 +973,7 @@ owned_paths = [
   "packages/r/NAMESPACE",
   "packages/r/R/extendr-wrappers.R",
   "packages/r/R/htmltomarkdown.R",
+  "packages/r/R/options.R",
   "packages/r/README.md",
   "packages/ruby/Gemfile",
   "packages/ruby/LICENSE",

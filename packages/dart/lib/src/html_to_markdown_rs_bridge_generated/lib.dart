@@ -557,6 +557,28 @@ class ConversionOptions {
   /// - `TierStrategy::Tier1` — always attempt Tier-1 (testkit only).
   final TierStrategy tierStrategy;
 
+  /// Base URL to resolve relative `href`/`src` destinations against.
+  ///
+  /// When set, every relative link and image/media destination (`a href`, `img src`
+  /// and its lazy-load fallbacks, `srcset`, `graphic` `url`/`href`/`xlink:href`/`src`,
+  /// `iframe`/`audio`/`video`/`source` `src`) is resolved to an absolute URL before
+  /// being written to the Markdown output, so the result is followable without the
+  /// reader knowing where the source HTML came from.
+  ///
+  /// A `<base href>` in the document, if present, is honored the way a browser
+  /// honors it: it is itself resolved against `base_url`, and that combined result
+  /// becomes the effective base every other relative reference resolves against.
+  ///
+  /// Non-hierarchical schemes (`mailto:`, `tel:`, `javascript:`, `data:`) and
+  /// already-absolute URLs are left unchanged. An unset (default) or unparseable
+  /// `base_url`, and a relative reference that fails to resolve, leave the original
+  /// attribute text unchanged -- this option never panics and never corrupts a
+  /// destination it cannot confidently resolve.
+  ///
+  /// Default `None` — no resolution, output byte-identical to versions before this
+  /// option existed.
+  final String? baseUrl;
+
   /// Optional visitor for custom traversal logic.
   ///
   /// When set, the visitor's callbacks are invoked for matching HTML elements
@@ -608,6 +630,7 @@ class ConversionOptions {
     this.maxDepth,
     required this.excludeSelectors,
     required this.tierStrategy,
+    this.baseUrl,
     this.visitor,
   });
 
@@ -656,6 +679,7 @@ class ConversionOptions {
       maxDepth.hashCode ^
       excludeSelectors.hashCode ^
       tierStrategy.hashCode ^
+      baseUrl.hashCode ^
       visitor.hashCode;
 
   @override
@@ -706,6 +730,7 @@ class ConversionOptions {
           maxDepth == other.maxDepth &&
           excludeSelectors == other.excludeSelectors &&
           tierStrategy == other.tierStrategy &&
+          baseUrl == other.baseUrl &&
           visitor == other.visitor;
 }
 
@@ -843,6 +868,9 @@ class ConversionOptionsUpdate {
   /// Optional override for [`ConversionOptions::tier_strategy`].
   final TierStrategy? tierStrategy;
 
+  /// Optional override for [`ConversionOptions::base_url`].
+  final String? baseUrl;
+
   /// Optional override for [`ConversionOptions::visitor`].
   final VisitorHandle? visitor;
 
@@ -890,6 +918,7 @@ class ConversionOptionsUpdate {
     this.maxDepth,
     this.excludeSelectors,
     this.tierStrategy,
+    this.baseUrl,
     this.visitor,
   });
 
@@ -938,6 +967,7 @@ class ConversionOptionsUpdate {
       maxDepth.hashCode ^
       excludeSelectors.hashCode ^
       tierStrategy.hashCode ^
+      baseUrl.hashCode ^
       visitor.hashCode;
 
   @override
@@ -988,6 +1018,7 @@ class ConversionOptionsUpdate {
           maxDepth == other.maxDepth &&
           excludeSelectors == other.excludeSelectors &&
           tierStrategy == other.tierStrategy &&
+          baseUrl == other.baseUrl &&
           visitor == other.visitor;
 }
 
