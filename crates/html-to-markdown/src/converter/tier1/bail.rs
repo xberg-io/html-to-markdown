@@ -194,6 +194,22 @@ pub enum BailReason {
     /// shape that is not on any hot path. Bail so Tier-2 (authoritative) wins.
     ImageLazyLoadSrc,
 
+    /// A `<blockquote>` carries a non-empty `cite` attribute.
+    ///
+    /// Tier-2's `handle_blockquote` emits the citation as a trailing
+    /// `\u{2014} <url>` line AFTER the quoted content, resolved against
+    /// `base_url`. Tier-1's `open_blockquote` reads no attributes at all, so it
+    /// dropped the citation outright — the two tiers rendered the same markup
+    /// differently, which every other bail in this file exists to prevent.
+    ///
+    /// Reproducing it here means stashing the cite across the whole quoted body
+    /// and re-deriving Tier-2's separator, and `close_blockquote` computes that
+    /// separator from the untouched pre-open tail of `output` (see its own
+    /// note) — delicate enough that a second implementation would drift. A
+    /// cited blockquote is rare and on no hot path, so bail and let Tier-2,
+    /// which is authoritative, produce it.
+    BlockquoteCite,
+
     /// A `<a>` element's href satisfies every structural autolink precondition
     /// (`options.autolinks`, `!options.default_title`, a non-empty href with a
     /// URI scheme) while at least one child tag opened inside the link before
@@ -297,6 +313,7 @@ impl fmt::Display for BailReason {
                 )
             }
             Self::ImageLazyLoadSrc => write!(f, "<img> has a lazy-load placeholder src and a fallback src attribute"),
+            Self::BlockquoteCite => write!(f, "<blockquote> carries a cite attribute that tier-1 does not render"),
             Self::LinkAutolinkNestedMarkup => {
                 write!(
                     f,

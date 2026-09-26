@@ -9,7 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.15.0] - 2026-09-25
+### Fixed
+
+- **`base_url` did not resolve a `<blockquote cite>`, and Tier 1 dropped the citation entirely.**
+  `cite` is a destination the converter renders — Tier 2 emits it as a trailing `— <url>` line —
+  but it was the one such destination `base_url` left alone, so a relative citation stayed
+  relative. Tier 1's blockquote handling read no attributes at all, so the same markup produced
+  the citation on one tier and nothing on the other; a cited blockquote now bails to Tier 2,
+  which is authoritative for it. Found while adopting `base_url` downstream, where a converter
+  that resolves every destination except this one forces the caller to keep a whole
+  link-rewriting pre-pass alive for it.
+
+## [3.15.0] - 2026-09-26
 
 ### Added
 
