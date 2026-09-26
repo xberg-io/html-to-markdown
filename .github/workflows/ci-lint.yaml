@@ -57,6 +57,17 @@ permissions:
   contents: read
 
 jobs:
+  # ~keep This lives here, not in `CI Docs`, because `CI Docs` filters on `docs-site/**`: a commit
+  # that edits only CHANGELOG.md would not trigger it, which is exactly the drift being guarded
+  # against. This workflow's filter covers `**/*.md` and `*.md`, so both changelogs match it.
+  changelog-mirror:
+    name: Changelog mirror
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the docs-site changelog mirror
+        run: ./scripts/ci/check-changelog-mirror.sh
+
   release-scripts:
     name: Verify release helper regressions
     runs-on: ubuntu-latest
