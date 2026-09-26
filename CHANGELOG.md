@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgraded `rmcp` to 3.4.1.
-- Repinned the `alef` generator to 0.96.4 and regenerated every binding. Generator drift
+- Repinned the `alef` generator to 0.96.5 and regenerated every binding. Generator drift
   only; no public API of any binding changed.
 - Split `converter/utility/content.rs` and `converter/inline/link.rs` (each over the
   1000-line quality gate) into smaller modules, and reduced `convert_table_row`'s cyclomatic
@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   change; every existing import path is preserved via re-exports.
 
 ### Fixed
+
+- **The R binding compiles again.** `ConversionOptions::base_url` is the struct's first
+  `Option<String>`, and alef's extendr backend assigned it a bare `String`, failing the whole R
+  package build with `error[E0308]: expected Option<String>, found String`. Fixed in alef 0.96.5.
+  This had been broken on `main` since `base_url` landed: CI E2E's `Test: R` leg is path-filtered
+  and did not run on the commits that introduced it, so the job reported success without ever
+  compiling R.
 
 - CI's fixture-snippet validation now really validates the 341 Swift snippets. They had all
   been reporting `Unavailable` with `no such module 'HtmlToMarkdown'`: Swift 6.3 made
