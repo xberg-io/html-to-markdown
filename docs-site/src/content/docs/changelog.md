@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.15.0] - 2026-09-25
+## [3.15.0] - 2026-09-26
 
 ### Added
 
@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgraded `rmcp` to 3.4.1.
+- Repinned the `alef` generator to 0.96.5 and regenerated every binding. Generator drift
+  only; no public API of any binding changed.
 - Split `converter/utility/content.rs` and `converter/inline/link.rs` (each over the
   1000-line quality gate) into smaller modules, and reduced `convert_table_row`'s cyclomatic
   complexity by extracting its visitor-hook pre-pass into a separate function. No behavior
@@ -28,8 +30,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- CI's fixture-snippet validation now installs a Swift toolchain, fixing 341 snippets that
-  were failing as `Unavailable` rather than actually validating.
+- **The R binding compiles again.** `ConversionOptions::base_url` is the struct's first
+  `Option<String>`, and alef's extendr backend assigned it a bare `String`, failing the whole R
+  package build with `error[E0308]: expected Option<String>, found String`. Fixed in alef 0.96.5.
+  It went unnoticed for two commits because two independent mechanisms each suppressed the leg.
+  On the commit that introduced the line, `Test: R` was **cancelled**: `ci-e2e.yaml`'s
+  `cancel-in-progress: true` group is keyed on the branch, so the next push to `main` killed the
+  run before R finished. On the commit after that, `Test: R` was **skipped**: the leg is gated on
+  a `packages/r/**`/`crates/html-to-markdown/**` paths filter that commit did not match. Neither
+  state is a failure, so `CI E2E` reported success twice without ever compiling R.
+
+- CI's fixture-snippet validation now really validates the 341 Swift snippets. They had all
+  been reporting `Unavailable` with `no such module 'HtmlToMarkdown'`: Swift 6.3 made
+  `swiftbuild` the default build system, whose bin path holds the `.swiftmodule` files
+  directly and emits no `Modules/` directory, while alef points `-I` at `<bin-path>/Modules`.
+  The session now reconstructs that layout after building. The gate went red without any
+  change to this tree, when the runner's preinstalled Swift moved to 6.4.
 
 ## [3.14.3] - 2026-09-19
 
