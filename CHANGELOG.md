@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that resolves every destination except this one forces the caller to keep a whole
   link-rewriting pre-pass alive for it.
 
+### Changed
+
+- The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
+  language. Before, a detector that stopped matching read exactly like a clean pass, so a
+  restyled binding dropped out of the diff with every check green. For C#, Java, Go and Zig the
+  check counts only the call sites inside the binding package, so the alef-generated `e2e/zig`
+  tests cannot keep a silent Zig binding looking covered. The `--json` summary now carries the per-language counts,
+  the per-binding counts and the silent detectors.
+
 ## [3.15.0] - 2026-09-26
 
 ### Added
