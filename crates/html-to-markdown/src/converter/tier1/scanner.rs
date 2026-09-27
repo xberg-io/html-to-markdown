@@ -43,11 +43,6 @@ use memchr::{memchr2, memchr3};
 /// entry in the spec table, causing an `UnknownCustomElement` bail.
 const MAX_TAG_NAME_BYTES: usize = 32;
 
-/// Maximum byte length scanned when looking for a `;` to close an entity.
-///
-/// Entities longer than this are treated as bare `&` literals.
-const MAX_ENTITY_NAME_BYTES: usize = 32;
-
 /// Minimum number of dashes in a GFM separator cell.
 ///
 /// Matches Tier-2's `col_widths.get(i).unwrap_or(0).max(MIN_SEPARATOR_DASHES)`.
@@ -4737,15 +4732,15 @@ fn decode_and_collapse_into_inner(
 
 /// Scan and decode a single HTML entity starting at `amp_pos` (the `&` byte).
 ///
-/// Looks for a matching `;` within 32 bytes and tries the hot subset in
-/// `decode_entity_into`; every other reference goes through Tier-2's decoder,
-/// `text::decode_character_reference`, so both tiers read one table.
+/// Tries the hot subset in `decode_entity_into` for an alphanumeric name closed by `;`; every
+/// other reference goes through Tier-2's decoder, `text::decode_character_reference`, so both
+/// tiers read one table. When nothing decodes, writes the `&` alone and resumes at the next byte,
+/// as Tier-2 does, so a reference after an unknown name still decodes (#554).
 ///
-/// Returns the position immediately after the entity (i.e. after the `;`), or
-/// after the bare `&` when no valid entity boundary is found.
+/// Returns the position immediately after the reference, or after the `&`.
 ///
 /// Emits `Err(BailReason::UnknownEntity)` when Tier-2's decoder would decode a
-/// reference this function does not: a legacy named reference without its `;`.
+/// reference this function does not: one without its `;`.
 fn decode_entity_at(
     bytes: &[u8],
     s: &str,
@@ -4755,15 +4750,13 @@ fn decode_entity_at(
     context: ReferenceContext,
 ) -> Result<usize, BailReason> {
     let amp = amp_pos;
-    let mut end = amp + 1;
-    while end < bytes.len() && end - amp <= MAX_ENTITY_NAME_BYTES && bytes[end] != b';' {
-        end += 1;
-    }
-    if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
-        let entity = &s[amp + 1..end];
-        if decode_entity_into(out, entity) {
-            return Ok(end + 1);
-        }
+    let name_len = bytes[amp + 1..]
+        .iter()
+        .take_while(|b| b.is_ascii_alphanumeric())
+        .count();
+    let name_end = amp + 1 + name_len;
+    if bytes.get(name_end) == Some(&b';') && decode_entity_into(out, &s[amp + 1..name_end]) {
+        return Ok(name_end + 1);
     }
     match crate::text::decode_character_reference(s, amp, context) {
         Some((reference_end, first, second)) if bytes[reference_end - 1] == b';' => {
@@ -4771,31 +4764,19 @@ fn decode_entity_at(
             if let Some(second) = second {
                 out.push(second);
             }
-            return Ok(reference_end);
+            Ok(reference_end)
         }
-        // ~keep A legacy reference without its `;` (#545) is rare; Tier-2 owns its
-        // ~keep longest-name rule and attribute exception.
-        Some(_) => {
-            let name_len = bytes[amp + 1..]
-                .iter()
-                .take_while(|b| b.is_ascii_alphanumeric())
-                .count();
-            return Err(BailReason::UnknownEntity {
-                name: s[amp + 1..amp + 1 + name_len].into(),
-                offset: base_offset + amp,
-            });
+        // ~keep A legacy named reference (#545) or a numeric one (#553) without its `;` is
+        // ~keep rare; Tier-2 owns the longest-name rule and the attribute exception.
+        Some((reference_end, ..)) => Err(BailReason::UnknownEntity {
+            name: s[amp + 1..reference_end].into(),
+            offset: base_offset + amp,
+        }),
+        None => {
+            out.push('&');
+            Ok(amp + 1)
         }
-        None => {}
     }
-    if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
-        // ~keep Phase N3: entity name (`&name;`) not in Tier-1's decode table.
-        // Tier-2 and mdream pass these through verbatim instead of decoding.
-        // Push the raw `&name;` and advance past it.
-        out.push_str(&s[amp..=end]);
-        return Ok(end + 1);
-    }
-    out.push('&');
-    Ok(amp + 1)
 }
 
 /// Apply the escape-context bits for an opening tag.

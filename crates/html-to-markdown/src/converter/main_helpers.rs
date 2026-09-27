@@ -4,6 +4,7 @@
 //! including preprocessing helpers, HTML repair, and metadata formatting.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use crate::options::ConversionOptions;
 use crate::options::NewlineStyle;
@@ -559,7 +560,8 @@ fn push_yaml_scalar(out: &mut String, value: &str) {
 }
 
 /// A conservative subset of the YAML plain scalar in block context: no leading indicator, no
-/// `: ` or ` #`, no leading or trailing space, and only printable characters.
+/// `: ` or ` #`, no leading or trailing space, only printable characters, and a value a YAML
+/// reader resolves to a string (#552).
 fn is_plain_yaml_scalar(value: &str) -> bool {
     let Some(first) = value.chars().next() else {
         return false;
@@ -589,6 +591,28 @@ fn is_plain_yaml_scalar(value: &str) -> bool {
         && !value.contains(": ")
         && !value.contains(" #")
         && value.chars().all(|c| c != '\t' && is_yaml_printable(c))
+        && !yaml_non_string_scalar().is_match(value)
+}
+
+/// Matches a plain scalar that a YAML reader resolves to null, a boolean, a number or a timestamp:
+/// the YAML 1.2 core schema, plus the YAML 1.1 forms that readers such as PyYAML still apply
+/// (`yes`/`no`/`on`/`off`, `0b`, leading-zero octal, `_` separators, base 60, dates, `=`, `<<`).
+fn yaml_non_string_scalar() -> &'static regex::Regex {
+    static RE: OnceLock<regex::Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        regex::Regex::new(concat!(
+            r"^(?:~|null|Null|NULL",
+            r"|true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO|on|On|ON|off|Off|OFF|y|Y|n|N",
+            r"|[-+]?(?:0b[01_]+|0o[0-7]+|0x[0-9a-fA-F_]+",
+            r"|[0-9][0-9_]*(?::[0-5]?[0-9])*(?:\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?",
+            r"|\.[0-9][0-9_]*(?:[eE][-+]?[0-9]+)?|\.(?:inf|Inf|INF))",
+            r"|\.(?:nan|NaN|NAN)",
+            r"|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}",
+            r"(?:(?:[Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]*)?(?:[ \t]*(?:Z|[-+][0-9]{1,2}(?::[0-9]{2})?))?)?",
+            r"|=|<<)$",
+        ))
+        .expect("YAML scalar type regex is well-formed")
+    })
 }
 
 /// The YAML 1.2 printable set, minus the Unicode line and paragraph separators and the

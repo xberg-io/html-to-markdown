@@ -4,8 +4,8 @@ meta-ResourceLoaderDynamicStyles: ""
 meta-format-detection: telephone=no
 meta-generator: MediaWiki 1.45.0-wmf.20
 meta-og:image: https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png
-meta-og:image:height: 1200
-meta-og:image:width: 1200
+meta-og:image:height: "1200"
+meta-og:image:width: "1200"
 meta-og:title: Python (programming language) - Wikipedia
 meta-og:type: website
 meta-referrer: origin-when-cross-origin

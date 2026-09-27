@@ -1,7 +1,7 @@
 ---
 canonical: https://react.dev/learn
-meta-algolia-search-order: 3
-meta-fb:app_id: 623268441017527
+meta-algolia-search-order: "3"
+meta-fb:app_id: "623268441017527"
 meta-google-site-verification: sIlAGs48RulR4DdP95YSWNKZIEtCqQmRjzn-Zq-CcD0
 meta-msapplication-TileColor: "#2b5797"
 meta-og:description: The library for web and native user interfaces

@@ -2,7 +2,6 @@
 //!
 //! This module provides specialized handlers for inline HTML elements:
 //! - Emphasis elements (strong, b, em, i)
-//! - Links (a)
 //! - Code-like elements (kbd, samp)
 //! - Semantic elements (mark, del, s, ins, u, small, sub, sup, var, dfn, abbr)
 //! - Ruby annotation elements (ruby, rb, rt, rp, rtc)
@@ -45,7 +44,6 @@ pub mod wrapped;
 /// |--------|---------|-------------|
 /// | `strong`, `b` | emphasis | Bold/strong text formatting |
 /// | `em`, `i` | emphasis | Italic/emphasis text formatting |
-/// | `a` | link | Hyperlinks and anchors |
 /// | `kbd`, `samp` | code | Keyboard input and sample output, rendered as code |
 /// | `mark`, `del`, `s`, `ins`, `u`, `small`, `sub`, `sup`, `var`, `dfn`, `abbr`, `span` | semantic | Semantic formatting |
 /// | `ruby`, `rb`, `rt`, `rp`, `rtc` | ruby | Ruby annotations (East Asian typography) |
@@ -111,10 +109,6 @@ pub fn dispatch_inline_handler(
     match tag_name {
         "strong" | "b" | "em" | "i" => {
             emphasis::handle(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
-            true
-        }
-        "a" => {
-            link::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
         "kbd" | "samp" => {
@@ -185,14 +179,6 @@ mod tests {
         assert!(matches!(
             ("abbr", "abbr"),
             (tag, _) if matches!(tag, "mark" | "del" | "s" | "ins" | "u" | "small" | "sub" | "sup" | "var" | "dfn" | "abbr")
-        ));
-    }
-
-    #[test]
-    fn test_dispatcher_recognizes_link_tag() {
-        assert!(matches!(
-            ("a", "a"),
-            (tag, _) if tag == "a"
         ));
     }
 

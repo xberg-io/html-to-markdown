@@ -487,8 +487,8 @@ pub fn fold_cell_line_breaks_verbatim_cow(text: &str) -> Cow<'_, str> {
 
 /// Parses a numeric character reference's digit run into its numeric value.
 ///
-/// `digits` must be non-empty; `radix` is 10 (decimal `&#...;`) or 16 (hex `&#x...;`).
-/// Returns `Err(())` when `digits` contains a character invalid for `radix` -- a
+/// `radix` is 10 (decimal `&#...;`) or 16 (hex `&#x...;`).
+/// Returns `Err(())` when `digits` is empty or contains a character invalid for `radix` -- a
 /// genuinely malformed reference, which callers treat as "leave the raw text alone".
 /// A digit run that is syntactically valid but too large to fit `u64` returns
 /// `Ok(u64::MAX)` rather than erroring: that value safely clears every threshold
@@ -551,46 +551,38 @@ pub fn numeric_character_reference_override(value: u64) -> Option<char> {
     Some(replacement)
 }
 
-/// Recognizes a well-formed `&#...;` / `&#x...;` numeric character reference starting
-/// at `bytes[amp]` (expected to be `&`): a digit run terminated by `;`, with no
-/// embedded `&` (which aborts the match so the caller retries from that `&` instead).
-/// Returns the offset just past the terminating `;` and the parsed value, or `None`
-/// if `bytes[amp]` does not begin such a reference.
+/// Recognizes a numeric character reference starting at `bytes[amp]` (expected to be `&`), as
+/// the WHATWG numeric character reference states read one: `&#` or `&#x`, a run of at least one
+/// digit that ends at the first other byte, and a `;` taken when one follows (#553). Returns the
+/// offset just past the reference and the parsed value, or `None` when no digit follows.
 fn scan_numeric_character_reference(bytes: &[u8], amp: usize) -> Option<(usize, u64)> {
     if bytes.get(amp + 1) != Some(&b'#') {
         return None;
     }
 
-    let mut i = amp + 2;
-    let is_hex = matches!(bytes.get(i), Some(b'x' | b'X'));
+    let mut digits_start = amp + 2;
+    let is_hex = matches!(bytes.get(digits_start), Some(b'x' | b'X'));
     if is_hex {
-        i += 1;
+        digits_start += 1;
     }
-
-    let digits_start = i;
-    loop {
-        match bytes.get(i) {
-            Some(b';') => break,
-            Some(b'&') | None => return None,
-            Some(_) => i += 1,
-        }
-    }
-
-    let digits = &bytes[digits_start..i];
     let is_valid_digit: fn(&u8) -> bool = if is_hex {
         u8::is_ascii_hexdigit
     } else {
         u8::is_ascii_digit
     };
-    if digits.is_empty() || !digits.iter().all(is_valid_digit) {
-        return None;
-    }
+    let digits_end = digits_start + bytes[digits_start..].iter().take_while(|b| is_valid_digit(b)).count();
 
-    // SAFETY-ish: `digits` was just validated as ASCII hex/decimal digits above. ~keep
-    let digits_str = std::str::from_utf8(digits).unwrap_or_default();
+    // ~keep The run holds only ASCII digits, so it is valid UTF-8. An empty run does not parse,
+    // ~keep which leaves `&#` and `&#x` as written.
+    let digits_str = std::str::from_utf8(&bytes[digits_start..digits_end]).unwrap_or_default();
     let radix = if is_hex { 16 } else { 10 };
     let value = parse_character_reference_number(digits_str, radix).ok()?;
-    Some((i + 1, value))
+    let end = if bytes.get(digits_end) == Some(&b';') {
+        digits_end + 1
+    } else {
+        digits_end
+    };
+    Some((end, value))
 }
 
 /// Where a character reference sits. The spec decodes a legacy named reference, one the
@@ -607,7 +599,7 @@ pub enum ReferenceContext {
 /// character reference state. Returns the offset just past the reference and the one or two
 /// characters it stands for, or `None` when `&` does not start a reference that decodes.
 ///
-/// Numeric references need a closing `;`, map through
+/// Numeric references take an optional closing `;`, map through
 /// [`numeric_character_reference_override`], and leave a C0 control other than ASCII
 /// whitespace undecoded. A named reference is first looked up whole (`&name;`); failing that,
 /// the longest legacy name that starts after the `&` decodes, except in an attribute value when
@@ -864,7 +856,10 @@ mod tests {
             ("&hellip x", "&hellip x", "&hellip x"),
             ("&NotEqualTilde;", "\u{2242}\u{338}", "\u{2242}\u{338}"),
             ("&#150;&#x41;&#1;&#9;", "\u{2013}A&#1;\t", "\u{2013}A&#1;\t"),
-            ("& &; &#; &#x; &#12a;", "& &; &#; &#x; &#12a;", "& &; &#; &#x; &#12a;"),
+            ("& &; &#; &#x; &#xg;", "& &; &#; &#x; &#xg;", "& &; &#; &#x; &#xg;"),
+            ("&#39s&#x27=&#65", "'s'=A", "'s'=A"),
+            ("&#12a;&#1b", "\u{c}a;&#1b", "\u{c}a;&#1b"),
+            ("&#99999999999999999999x", "\u{fffd}x", "\u{fffd}x"),
         ];
         for (input, text, attribute) in cases {
             assert_eq!(decode_html_entities_cow(input), text, "text: {input:?}");

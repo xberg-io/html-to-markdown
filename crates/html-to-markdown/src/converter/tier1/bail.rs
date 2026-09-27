@@ -109,13 +109,13 @@ pub enum BailReason {
     },
 
     /// A character reference Tier-1 does not decode but Tier-2 does: a legacy
-    /// named reference without its `;` (e.g. `&copy 2024`).
+    /// named or a numeric reference without its `;` (e.g. `&copy 2024`, `&#39s`).
     ///
     /// Tier-1 would pass the reference through verbatim, but Tier-2 decodes it to
     /// the correct character, so the outputs would diverge.  Bail so the
     /// dispatcher falls back to Tier-2.
     UnknownEntity {
-        /// The entity name between `&` and `;` (e.g. `"mdash"`, `"#x2014"`).
+        /// The reference after the `&` (e.g. `"copy"`, `"#39"`).
         name: Box<str>,
         /// Byte offset in the HTML input where the `&` was found.
         offset: usize,

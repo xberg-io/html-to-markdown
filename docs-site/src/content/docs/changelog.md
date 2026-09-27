@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Removed an unused copy of the `<a>` handler that no conversion path called. Links are
+  converted by the one live handler, as before; output does not change.
+
 ### Fixed
 
 - **Head metadata kept its character references encoded.** The `<base href>`, the
@@ -26,6 +31,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `&copy 2024` is `© 2024`. The converter kept them as written. They now decode on both tiers,
   with the spec's longest-name rule (`&notit;` is `¬it;`). In an attribute value a legacy name
   followed by `=` or a letter or digit stays as written, so `?a=1&copy=2` in an `href` is unchanged.
+- **Frontmatter values that YAML reads as numbers, booleans, null or dates were not quoted.** A
+  value such as `3`, `true`, `null` or `2024-01-01` is a valid plain scalar, so a YAML reader
+  turned `meta-algolia-search-order: 3` into the number 3. A value that the YAML 1.2 core schema
+  or a YAML 1.1 reader resolves to anything other than a string is now written in double quotes.
+- **Numeric character references without a semicolon were not decoded.** The spec decodes `&#39`
+  and `&#x27` without their `;`, in text and in attribute values, so `it&#39s` is `it's` in a
+  browser. The converter kept the reference as written. It now decodes on both tiers.
+- **Tier 1 kept a reference encoded after an unknown name.** When an unknown name such as `&foo`
+  had a `;` a few bytes later, Tier 1 wrote the whole span as it was, so `&foo &amp;` kept
+  `&amp;` where Tier 2 wrote `&`. Tier 1 now writes the `&` alone and reads on, as Tier 2 does.
 
 ## [3.15.1] - 2026-09-27
 

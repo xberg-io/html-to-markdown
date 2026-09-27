@@ -1,8 +1,4 @@
 //! URL-encoding and destination-rendering helpers for Markdown links.
-//!
-//! Split out of `link.rs` to stay under the 1000-line quality gate; these
-//! percent-encoding/title-escaping concerns evolve independently of the
-//! DOM-walking handler that remains there.
 
 use crate::options::ConversionOptions;
 use std::borrow::Cow;
