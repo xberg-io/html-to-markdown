@@ -108,11 +108,10 @@ pub enum BailReason {
         max_depth: usize,
     },
 
-    /// A named HTML entity (e.g. `&mdash;`, `&laquo;`) was encountered that is
-    /// not in Tier-1's 45-entry decode table, or a numeric character reference
-    /// was malformed / mapped to an invalid Unicode code point.
+    /// A character reference Tier-1 does not decode but Tier-2 does: a legacy
+    /// named reference without its `;` (e.g. `&copy 2024`).
     ///
-    /// Tier-1 would pass the entity through verbatim, but Tier-2 decodes it to
+    /// Tier-1 would pass the reference through verbatim, but Tier-2 decodes it to
     /// the correct character, so the outputs would diverge.  Bail so the
     /// dispatcher falls back to Tier-2.
     UnknownEntity {

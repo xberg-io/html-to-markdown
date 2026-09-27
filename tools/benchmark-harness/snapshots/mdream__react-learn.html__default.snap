@@ -3,18 +3,18 @@ canonical: https://react.dev/learn
 meta-algolia-search-order: 3
 meta-fb:app_id: 623268441017527
 meta-google-site-verification: sIlAGs48RulR4DdP95YSWNKZIEtCqQmRjzn-Zq-CcD0
-meta-msapplication-TileColor: #2b5797
+meta-msapplication-TileColor: "#2b5797"
 meta-og:description: The library for web and native user interfaces
 meta-og:image: https://react.dev/images/og-learn.png
 meta-og:title: Quick Start – React
 meta-og:type: website
 meta-og:url: https://react.dev/learn
-meta-theme-color: #23272f
+meta-theme-color: "#23272f"
 meta-twitter:card: summary_large_image
-meta-twitter:creator: @reactjs
+meta-twitter:creator: "@reactjs"
 meta-twitter:description: The library for web and native user interfaces
 meta-twitter:image: https://react.dev/images/og-learn.png
-meta-twitter:site: @reactjs
+meta-twitter:site: "@reactjs"
 meta-twitter:title: Quick Start – React
 meta-viewport: width=device-width, initial-scale=1
 title: Quick Start – React

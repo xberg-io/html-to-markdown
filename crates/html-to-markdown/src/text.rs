@@ -485,28 +485,6 @@ pub fn fold_cell_line_breaks_verbatim_cow(text: &str) -> Cow<'_, str> {
     Cow::Owned(folded)
 }
 
-/// Decode common HTML entities.
-///
-/// Decodes the most common HTML entities to their character equivalents:
-/// - `&quot;` → `"`
-/// - `&apos;` → `'`
-/// - `&lt;` → `<`
-/// - `&gt;` → `>`
-/// - `&amp;` → `&` (must be last to avoid double-decoding)
-///
-/// # Arguments
-///
-/// * `text` - Text containing HTML entities
-///
-/// # Returns
-///
-/// Text with entities decoded
-#[must_use]
-pub fn decode_html_entities(text: &str) -> String {
-    let overridden = apply_numeric_character_reference_overrides(text);
-    html_escape::decode_html_entities(overridden.as_ref()).into_owned()
-}
-
 /// Parses a numeric character reference's digit run into its numeric value.
 ///
 /// `digits` must be non-empty; `radix` is 10 (decimal `&#...;`) or 16 (hex `&#x...;`).
@@ -574,8 +552,7 @@ pub fn numeric_character_reference_override(value: u64) -> Option<char> {
 }
 
 /// Recognizes a well-formed `&#...;` / `&#x...;` numeric character reference starting
-/// at `bytes[amp]` (expected to be `&`), using exactly the syntax `html_escape`'s own
-/// decoder accepts elsewhere in this module: a digit run terminated by `;`, with no
+/// at `bytes[amp]` (expected to be `&`): a digit run terminated by `;`, with no
 /// embedded `&` (which aborts the match so the caller retries from that `&` instead).
 /// Returns the offset just past the terminating `;` and the parsed value, or `None`
 /// if `bytes[amp]` does not begin such a reference.
@@ -616,79 +593,126 @@ fn scan_numeric_character_reference(bytes: &[u8], amp: usize) -> Option<(usize, 
     Some((i + 1, value))
 }
 
-/// Rewrites the numeric character references in `text` whose value
-/// [`numeric_character_reference_override`] maps differently than `html_escape`'s own
-/// decoder would (null, out-of-range, surrogates, and the 0x80-0x9F table), leaving
-/// every other numeric reference and every named entity untouched for `html_escape`
-/// to decode as before.
+/// Where a character reference sits. The spec decodes a legacy named reference, one the
+/// table allows without a closing `;`, differently in an attribute value.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum ReferenceContext {
+    /// Text content, including `<title>`.
+    Text,
+    /// An attribute value.
+    Attribute,
+}
+
+/// Decodes the character reference that starts at `text[amp]` (a `&`), following the WHATWG
+/// character reference state. Returns the offset just past the reference and the one or two
+/// characters it stands for, or `None` when `&` does not start a reference that decodes.
 ///
-/// ~keep Safe to run as an isolated pre-pass rather than folding into a single scan:
-/// ~keep every override character is outside the ASCII set that gives `&`, digits,
-/// ~keep `x`/`X`, and `;` their meaning in entity syntax, so substituting one can never
-/// ~keep create or extend a sequence for the later `html_escape` pass to (mis)decode.
-fn apply_numeric_character_reference_overrides(text: &str) -> Cow<'_, str> {
+/// Numeric references need a closing `;`, map through
+/// [`numeric_character_reference_override`], and leave a C0 control other than ASCII
+/// whitespace undecoded. A named reference is first looked up whole (`&name;`); failing that,
+/// the longest legacy name that starts after the `&` decodes, except in an attribute value when
+/// the next character is `=` or ASCII alphanumeric (`?a=1&copy=2` stays as written).
+///
+/// <https://html.spec.whatwg.org/multipage/parsing.html#named-character-reference-state>
+#[must_use]
+pub fn decode_character_reference(
+    text: &str,
+    amp: usize,
+    context: ReferenceContext,
+) -> Option<(usize, char, Option<char>)> {
     let bytes = text.as_bytes();
-    if !bytes.contains(&b'&') {
-        return Cow::Borrowed(text);
+    if bytes.get(amp + 1) == Some(&b'#') {
+        let (end, value) = scan_numeric_character_reference(bytes, amp)?;
+        if let Some(replacement) = numeric_character_reference_override(value) {
+            return Some((end, replacement, None));
+        }
+        let ch = char::from_u32(u32::try_from(value).ok()?)?;
+        if matches!(ch, '\0'..='\u{1F}') && !matches!(ch, '\t' | '\n' | '\u{000C}' | '\r') {
+            return None;
+        }
+        return Some((end, ch, None));
     }
 
+    // ~keep html5ever's copy of the spec table keys every name without its `&`: a `;`-closed
+    // ~keep name for every reference, a bare name for each legacy one, and every proper prefix
+    // ~keep mapped to (0, 0). A real reference never maps to code point 0.
+    let lookup = |name: &str| match html5ever::data::NAMED_ENTITIES.get(name) {
+        Some(&(first, second)) if first != 0 => {
+            Some((char::from_u32(first)?, char::from_u32(second).filter(|&c| c != '\0')))
+        }
+        _ => None,
+    };
+    let name_start = amp + 1;
+    let name_len = bytes[name_start..]
+        .iter()
+        .take_while(|b| b.is_ascii_alphanumeric())
+        .count();
+    if name_len == 0 {
+        return None;
+    }
+    let name_end = name_start + name_len;
+    if bytes.get(name_end) == Some(&b';') {
+        if let Some((first, second)) = lookup(&text[name_start..=name_end]) {
+            return Some((name_end + 1, first, second));
+        }
+    }
+    // ~keep The longest legacy name is six bytes (`frac34`, `middot`, ...).
+    for len in (2..=name_len.min(6)).rev() {
+        let end = name_start + len;
+        if let Some((first, second)) = lookup(&text[name_start..end]) {
+            let next = bytes.get(end).copied();
+            if context == ReferenceContext::Attribute && next.is_some_and(|b| b == b'=' || b.is_ascii_alphanumeric()) {
+                return None;
+            }
+            return Some((end, first, second));
+        }
+    }
+    None
+}
+
+fn decode_character_references(text: &str, context: ReferenceContext) -> Cow<'_, str> {
+    let bytes = text.as_bytes();
     let mut out = String::new();
-    let mut last = 0;
+    let mut copied = 0;
     let mut i = 0;
-    let mut changed = false;
     while let Some(rel) = memchr::memchr(b'&', &bytes[i..]) {
         let amp = i + rel;
-        match scan_numeric_character_reference(bytes, amp) {
-            Some((end, value)) => {
-                if let Some(replacement) = numeric_character_reference_override(value) {
-                    out.push_str(&text[last..amp]);
-                    out.push(replacement);
-                    last = end;
-                    changed = true;
+        match decode_character_reference(text, amp, context) {
+            Some((end, first, second)) => {
+                if out.is_empty() {
+                    out.reserve(text.len());
                 }
+                out.push_str(&text[copied..amp]);
+                out.push(first);
+                if let Some(second) = second {
+                    out.push(second);
+                }
+                copied = end;
                 i = end;
             }
             None => i = amp + 1,
         }
     }
-
-    if !changed {
+    if copied == 0 {
         return Cow::Borrowed(text);
     }
-    out.push_str(&text[last..]);
+    out.push_str(&text[copied..]);
     Cow::Owned(out)
 }
 
-/// Decode HTML entities in text, returning borrowed or owned result as needed.
-///
-/// This function optimizes memory by returning a borrowed reference when no HTML
-/// entities are present, and only allocating a new string when entity decoding
-/// is necessary.
-///
-/// Decodes common HTML entities like:
-/// - `&quot;` → `"`
-/// - `&apos;` → `'`
-/// - `&lt;` → `<`
-/// - `&gt;` → `>`
-/// - `&amp;` → `&` (decoded last to avoid double-decoding)
-///
-/// # Arguments
-///
-/// * `text` - Text potentially containing HTML entities
-///
-/// # Returns
-///
-/// `Cow::Borrowed` if no entities found, or `Cow::Owned` with entities decoded
+/// Decode the character references in text content, borrowing when there are none.
 #[must_use]
 pub fn decode_html_entities_cow(text: &str) -> Cow<'_, str> {
-    if !text.contains('&') {
-        return Cow::Borrowed(text);
-    }
+    decode_character_references(text, ReferenceContext::Text)
+}
 
-    match apply_numeric_character_reference_overrides(text) {
-        Cow::Borrowed(unchanged) => html_escape::decode_html_entities(unchanged),
-        Cow::Owned(overridden) => Cow::Owned(html_escape::decode_html_entities(&overridden).into_owned()),
-    }
+/// Decode the character references in an attribute value, borrowing when there are none.
+///
+/// Differs from [`decode_html_entities_cow`] only for a legacy named reference followed by `=`
+/// or an ASCII alphanumeric, which an attribute value keeps as written.
+#[must_use]
+pub fn decode_attribute_value_cow(value: &str) -> Cow<'_, str> {
+    decode_character_references(value, ReferenceContext::Attribute)
 }
 
 /// Check if a character is a unicode space character.
@@ -816,5 +840,36 @@ mod tests {
         assert_eq!(chomp(" text"), (" ", "", "text"));
         assert_eq!(chomp("text "), ("", " ", "text"));
         assert_eq!(chomp(""), ("", "", ""));
+    }
+
+    #[test]
+    fn legacy_names_fit_the_six_byte_scan() {
+        let longest = html5ever::data::NAMED_ENTITIES
+            .entries()
+            .filter(|(name, value)| !name.ends_with(';') && value.0 != 0)
+            .map(|(name, _)| name.len())
+            .max();
+        assert_eq!(longest, Some(6));
+    }
+
+    #[test]
+    fn character_references_decode_per_context() {
+        let cases = [
+            ("&copy 2024", "\u{a9} 2024", "\u{a9} 2024"),
+            ("a&copy=2", "a\u{a9}=2", "a&copy=2"),
+            ("&copyright", "\u{a9}right", "&copyright"),
+            ("&notit;", "\u{ac}it;", "&notit;"),
+            ("&notin;", "\u{2209}", "\u{2209}"),
+            ("&amp;copy", "&copy", "&copy"),
+            ("&hellip x", "&hellip x", "&hellip x"),
+            ("&NotEqualTilde;", "\u{2242}\u{338}", "\u{2242}\u{338}"),
+            ("&#150;&#x41;&#1;&#9;", "\u{2013}A&#1;\t", "\u{2013}A&#1;\t"),
+            ("& &; &#; &#x; &#12a;", "& &; &#; &#x; &#12a;", "& &; &#; &#x; &#12a;"),
+        ];
+        for (input, text, attribute) in cases {
+            assert_eq!(decode_html_entities_cow(input), text, "text: {input:?}");
+            assert_eq!(decode_attribute_value_cow(input), attribute, "attribute: {input:?}");
+        }
+        assert!(matches!(decode_html_entities_cow("a & b"), Cow::Borrowed(_)));
     }
 }

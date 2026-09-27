@@ -68,7 +68,7 @@ pub fn handle(
     };
 
     let href_attr = tag.attributes().get("href").flatten().map(|v| {
-        let decoded = crate::text::decode_html_entities(&v.as_utf8_str());
+        let decoded = crate::text::decode_attribute_value_cow(&v.as_utf8_str()).into_owned();
         let resolved = ctx.resolve_url(&decoded).unwrap_or(decoded);
         sanitize_markdown_url(&resolved).into_owned()
     });

@@ -15,8 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<link rel="canonical">` href and the `<title>` text reached the frontmatter and the structured
   metadata as written, so `<base href="https://example.com/it&#x27;s/">` produced
   `base: https://example.com/it&#x27;s/`. They now go through the same decoder as `<meta content>`
-  and body text, including the Windows-1252 mapping for numeric references 128-159. A `&name`
-  without a semicolon, as in `?a=1&copy=2`, stays literal.
+  and body text, including the Windows-1252 mapping for numeric references 128-159.
+- **A newline in a head value started a new frontmatter key.** The frontmatter wrote each
+  `key: value` line as it was, so a `<title>` or `<meta content>` holding a newline, literal or
+  written as `&#10;`, could add or override a key. Each key and value is now one YAML scalar: a
+  value that plain YAML would misread (a newline, `: `, ` #`, a leading `-`, `#` or `@`, a
+  control character) is written in double quotes with YAML escapes. Other values stay unquoted.
+- **Legacy named references without a semicolon were not decoded.** The spec lets about a hundred
+  names such as `&copy`, `&amp` and `&eacute` close without `;`, and browsers decode them in text:
+  `&copy 2024` is `© 2024`. The converter kept them as written. They now decode on both tiers,
+  with the spec's longest-name rule (`&notit;` is `¬it;`). In an attribute value a legacy name
+  followed by `=` or a letter or digit stays as written, so `?a=1&copy=2` in an `href` is unchanged.
 
 ## [3.15.1] - 2026-09-27
 

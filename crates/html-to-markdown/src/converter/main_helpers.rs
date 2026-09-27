@@ -518,14 +518,84 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
 }
 
 /// Format metadata as YAML frontmatter.
+///
+/// Keys and values come from the page, so each is written as one YAML scalar (#544): a
+/// newline, `: ` or a leading indicator would otherwise end the line or change what YAML reads.
 pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> String {
     let mut result = String::from("---\n");
     for (key, value) in metadata {
-        use std::fmt::Write as _;
-        let _ = writeln!(&mut result, "{key}: {value}");
+        push_yaml_scalar(&mut result, key);
+        result.push_str(": ");
+        push_yaml_scalar(&mut result, value);
+        result.push('\n');
     }
     result.push_str("---\n");
     result
+}
+
+/// Append `value` as a plain YAML scalar when it reads back unchanged, else as a double-quoted
+/// scalar with every non-printable character escaped.
+fn push_yaml_scalar(out: &mut String, value: &str) {
+    if is_plain_yaml_scalar(value) {
+        out.push_str(value);
+        return;
+    }
+    out.push('"');
+    for ch in value.chars() {
+        match ch {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if is_yaml_printable(c) => out.push(c),
+            c => {
+                use std::fmt::Write as _;
+                let _ = write!(out, "\\u{:04X}", u32::from(c));
+            }
+        }
+    }
+    out.push('"');
+}
+
+/// A conservative subset of the YAML plain scalar in block context: no leading indicator, no
+/// `: ` or ` #`, no leading or trailing space, and only printable characters.
+fn is_plain_yaml_scalar(value: &str) -> bool {
+    let Some(first) = value.chars().next() else {
+        return false;
+    };
+    !matches!(
+        first,
+        '-' | '?'
+            | ':'
+            | ','
+            | '['
+            | ']'
+            | '{'
+            | '}'
+            | '#'
+            | '&'
+            | '*'
+            | '!'
+            | '|'
+            | '>'
+            | '\''
+            | '"'
+            | '%'
+            | '@'
+            | '`'
+    ) && !value.starts_with(' ')
+        && !value.ends_with([' ', ':'])
+        && !value.contains(": ")
+        && !value.contains(" #")
+        && value.chars().all(|c| c != '\t' && is_yaml_printable(c))
+}
+
+/// The YAML 1.2 printable set, minus the Unicode line and paragraph separators and the
+/// byte-order mark, which YAML 1.1 readers still treat as a line break or a document marker.
+const fn is_yaml_printable(c: char) -> bool {
+    matches!(c, '\t' | ' '..='~' | '\u{A0}'..='\u{D7FF}' | '\u{E000}'..='\u{FFFD}' | '\u{10000}'..='\u{10FFFF}')
+        && !matches!(c, '\u{2028}' | '\u{2029}' | '\u{FEFF}')
 }
 
 /// Record `<meta name>`/`<meta property>` content into `metadata`, honoring `strip_tags`/

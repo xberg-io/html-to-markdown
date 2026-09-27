@@ -152,3 +152,26 @@ fn values_are_decoded_once_after_html5ever_repair() {
         );
     }
 }
+
+/// The public document-structure builder reads the head on its own. Its `<meta content>` values
+/// must be decoded like the frontmatter's.
+#[test]
+fn document_structure_meta_content_is_decoded() {
+    let html = concat!(
+        r#"<html><head><title>Tom &amp; Jerry</title><meta name="description" content="Tom &amp; Jerry&#x27;s"></head>"#,
+        "<body><p>body</p></body></html>",
+    );
+    let dom = tl::parse(html, tl::ParserOptions::default()).expect("parse html");
+    let document = html_to_markdown_rs::types::build_document_structure(&dom);
+    let entries = document
+        .nodes
+        .iter()
+        .find_map(|node| match &node.content {
+            html_to_markdown_rs::types::NodeContent::MetadataBlock { entries } => Some(entries.clone()),
+            _ => None,
+        })
+        .expect("the head produces a metadata block");
+    let value = |key: &str| entries.iter().find(|e| e.key == key).map(|e| e.value.clone());
+    assert_eq!(value("title").as_deref(), Some("Tom & Jerry"));
+    assert_eq!(value("description").as_deref(), Some("Tom & Jerry's"));
+}
