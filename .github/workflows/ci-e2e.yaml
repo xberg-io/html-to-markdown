@@ -1470,8 +1470,9 @@ jobs:
           PC_DIR="$(pwd)/target/release/build"
           PC_FILE=$(find "$PC_DIR" -name 'html-to-markdown.pc' -path '*/html-to-markdown-ffi-*/out/*' 2>/dev/null | head -1)
           if [ -z "$PC_FILE" ]; then
-            echo "Warning: html-to-markdown.pc not found in build output"
+            echo "::error::html-to-markdown.pc not found in build output -- C and Zig consumers link against it."
             find "$PC_DIR" -name '*.pc' 2>/dev/null || echo "No .pc files found"
+            exit 1
           else
             echo "Found pkg-config file: $PC_FILE"
             cat "$PC_FILE"
