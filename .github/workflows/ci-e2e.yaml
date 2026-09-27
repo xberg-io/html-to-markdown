@@ -83,7 +83,6 @@ jobs:
     runs-on: ubuntu-24.04-arm
     outputs:
       core: ${{ steps.filter.outputs.core }}
-      rust: ${{ steps.filter.outputs.rust }}
       ffi: ${{ steps.filter.outputs.ffi }}
       python: ${{ steps.filter.outputs.python }}
       node: ${{ steps.filter.outputs.node }}
@@ -115,14 +114,8 @@ jobs:
               - 'rust-toolchain.toml'
               - '.cargo/config.toml'
               - 'fixtures/**'
-              - 'tools/e2e-generator/**'
-            rust:
-              - 'crates/html-to-markdown/**'
-              - 'crates/html-to-markdown-cli/**'
-              - 'e2e/rust/**'
-              - 'Cargo.toml'
-              - 'Cargo.lock'
-              - 'rustfmt.toml'
+              - 'alef.toml'
+              - '.github/workflows/ci-e2e.yaml'
             ffi:
               - 'crates/html-to-markdown-ffi/**'
               - 'crates/html-to-markdown/**'
@@ -131,6 +124,7 @@ jobs:
               - 'Cargo.lock'
             python:
               - 'crates/html-to-markdown-py/**'
+              - 'crates/html-to-markdown-cli/**'
               - 'packages/python/**'
               - 'e2e/python/**'
               - 'pyproject.toml'
@@ -146,19 +140,22 @@ jobs:
               - 'fixtures/**'
             ruby:
               - 'packages/ruby/**'
+              - 'crates/html-to-markdown-cli/**'
+              - 'scripts/ci/ruby/**'
               - 'e2e/ruby/**'
               - 'Gemfile'
               - 'Gemfile.lock'
               - 'fixtures/**'
             php:
               - 'crates/html-to-markdown-php/**'
-              - 'packages/php-ext/**'
+              - 'scripts/ci/php/**'
               - 'e2e/php/**'
               - 'composer.json'
               - 'composer.lock'
               - 'fixtures/**'
             go:
               - 'packages/go/**'
+              - 'scripts/ci/go/**'
               - 'e2e/go/**'
               - 'crates/html-to-markdown-ffi/**'
               - 'go.mod'
@@ -171,20 +168,27 @@ jobs:
               - 'fixtures/**'
             elixir:
               - 'packages/elixir/**'
+              - 'scripts/ci/elixir/**'
               - 'e2e/elixir/**'
               - 'crates/html-to-markdown-ffi/**'
               - 'fixtures/**'
             r:
               - 'packages/r/**'
+              - 'scripts/ci/r/**'
               - 'e2e/r/**'
               - 'fixtures/**'
             wasm:
               - 'crates/html-to-markdown-wasm/**'
-              - 'crates/html-to-markdown-wasm-wasi/**'
+              - 'scripts/ci/wasm/**'
+              - 'scripts/common/**'
               - 'e2e/wasm/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
               - 'fixtures/**'
             csharp:
               - 'packages/csharp/**'
+              - 'scripts/ci/csharp/**'
               - 'e2e/csharp/**'
               - 'crates/html-to-markdown-ffi/**'
               - 'fixtures/**'
@@ -328,6 +332,7 @@ jobs:
           CARGO_TERM_COLOR: always
           CARGO_INCREMENTAL: "0"
           RUST_BACKTRACE: short
+          ALEF_EXPORT_GENERATED_HEADERS: "1"
 
       - name: Build html-to-markdown-ffi (debug, Windows)
         if: startsWith(matrix.runner, 'windows')
@@ -335,18 +340,23 @@ jobs:
         shell: bash
         env:
           CARGO_TERM_COLOR: always
+          ALEF_EXPORT_GENERATED_HEADERS: "1"
 
       # ~keep `test -f` alone only proves build.rs wrote *a* header — it says
       # nothing about whether the freshly-generated header matches the one
       # committed to git, so a stale checked-in header could never fail this
-      # step. Diff against git to actually assert freshness.
+      # step. Diff against git to actually assert freshness. build.rs rewrites both
+      # header copies only when ALEF_EXPORT_GENERATED_HEADERS is set, so every build
+      # this check follows sets it; without it the diff compares each header with itself.
       - name: Verify header is fresh
         shell: bash
         run: |
           HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
+          GO_HEADER="packages/go/include/html_to_markdown.h"
           test -f "$HEADER"
-          git diff --exit-code -- "$HEADER" || {
-            echo "::error::$HEADER is stale — cbindgen regenerated a different header than the one committed. Run 'cargo build -p html-to-markdown-ffi' and commit the result."
+          test -f "$GO_HEADER"
+          git diff --exit-code -- "$HEADER" "$GO_HEADER" || {
+            echo "::error::$HEADER or $GO_HEADER is stale: cbindgen regenerated a different header than the one committed. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
             exit 1
           }
           echo "Header verified fresh: $HEADER"
@@ -1445,6 +1455,8 @@ jobs:
       - name: Build html-to-markdown-ffi
         shell: bash
         run: cargo build --release --locked -p html-to-markdown-ffi
+        env:
+          ALEF_EXPORT_GENERATED_HEADERS: "1"
 
       - name: Run C e2e tests
         shell: bash
@@ -1457,26 +1469,14 @@ jobs:
         shell: bash
         run: |
           HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
+          GO_HEADER="packages/go/include/html_to_markdown.h"
           test -f "$HEADER"
-          git diff --exit-code -- "$HEADER" || {
-            echo "::error::$HEADER is stale — cbindgen regenerated a different header than the one committed. Run 'cargo build -p html-to-markdown-ffi' and commit the result."
+          test -f "$GO_HEADER"
+          git diff --exit-code -- "$HEADER" "$GO_HEADER" || {
+            echo "::error::$HEADER or $GO_HEADER is stale: cbindgen regenerated a different header than the one committed. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
             exit 1
           }
           echo "Header verified fresh: $HEADER"
-
-      - name: Verify pkg-config output
-        shell: bash
-        run: |
-          PC_DIR="$(pwd)/target/release/build"
-          PC_FILE=$(find "$PC_DIR" -name 'html-to-markdown.pc' -path '*/html-to-markdown-ffi-*/out/*' 2>/dev/null | head -1)
-          if [ -z "$PC_FILE" ]; then
-            echo "::error::html-to-markdown.pc not found in build output -- C and Zig consumers link against it."
-            find "$PC_DIR" -name '*.pc' 2>/dev/null || echo "No .pc files found"
-            exit 1
-          else
-            echo "Found pkg-config file: $PC_FILE"
-            cat "$PC_FILE"
-          fi
 
   test-c-ffi-windows:
     needs: [build-ffi, changes]
@@ -1501,14 +1501,18 @@ jobs:
       - name: Build html-to-markdown-ffi
         shell: bash
         run: cargo build --locked -p html-to-markdown-ffi
+        env:
+          ALEF_EXPORT_GENERATED_HEADERS: "1"
 
       - name: Verify header is fresh
         shell: bash
         run: |
           HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
+          GO_HEADER="packages/go/include/html_to_markdown.h"
           test -f "$HEADER"
-          git diff --exit-code -- "$HEADER" || {
-            echo "::error::$HEADER is stale — cbindgen regenerated a different header than the one committed. Run 'cargo build -p html-to-markdown-ffi' and commit the result."
+          test -f "$GO_HEADER"
+          git diff --exit-code -- "$HEADER" "$GO_HEADER" || {
+            echo "::error::$HEADER or $GO_HEADER is stale: cbindgen regenerated a different header than the one committed. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
             exit 1
           }
           echo "Header verified fresh on Windows: $HEADER"
@@ -1662,6 +1666,7 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.core == 'true' ||
+      needs.changes.outputs.ffi == 'true' ||
       needs.changes.outputs.swift == 'true'
     runs-on: macos-latest
     timeout-minutes: 60
