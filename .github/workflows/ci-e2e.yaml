@@ -75,23 +75,37 @@ jobs:
   changes:
     name: "Detect Changes"
     runs-on: ubuntu-24.04-arm
+    # ~keep One `run-<job id>` output per gated leg, and each leg's `if:` reads only its own. The
+    # ~keep `e2e-result` job reads the same outputs to tell a leg the filters skipped from a leg
+    # ~keep that should have run and did not, so a leg's condition is written here and nowhere else.
     outputs:
-      core: ${{ steps.filter.outputs.core }}
-      ffi: ${{ steps.filter.outputs.ffi }}
-      python: ${{ steps.filter.outputs.python }}
-      node: ${{ steps.filter.outputs.node }}
-      ruby: ${{ steps.filter.outputs.ruby }}
-      php: ${{ steps.filter.outputs.php }}
-      go: ${{ steps.filter.outputs.go }}
-      java: ${{ steps.filter.outputs.java }}
-      elixir: ${{ steps.filter.outputs.elixir }}
-      r: ${{ steps.filter.outputs.r }}
-      wasm: ${{ steps.filter.outputs.wasm }}
-      csharp: ${{ steps.filter.outputs.csharp }}
-      kotlin: ${{ steps.filter.outputs.kotlin }}
-      swift: ${{ steps.filter.outputs.swift }}
-      dart: ${{ steps.filter.outputs.dart }}
-      zig: ${{ steps.filter.outputs.zig }}
+      run-build-ffi: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' }}
+      run-build-python: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.python == 'true' }}
+      run-build-node: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.node == 'true' }}
+      run-build-node-musl: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.node == 'true' }}
+      run-build-node-linux-arm64-gnu: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.node == 'true' }}
+      run-build-ruby: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ruby == 'true' }}
+      run-build-php: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.php == 'true' }}
+      run-build-csharp: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.csharp == 'true' }}
+      run-build-java: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.java == 'true' }}
+      run-build-wasm: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.wasm == 'true' }}
+      run-build-kotlin-android: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' || steps.filter.outputs.kotlin == 'true' }}
+      run-test-python: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.python == 'true' }}
+      run-test-node: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.node == 'true' }}
+      run-test-ruby: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ruby == 'true' }}
+      run-test-php: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.php == 'true' }}
+      run-test-csharp: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.csharp == 'true' }}
+      run-test-go: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' || steps.filter.outputs.go == 'true' }}
+      run-test-java: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.java == 'true' }}
+      run-test-elixir: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' || steps.filter.outputs.elixir == 'true' }}
+      run-test-r: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.r == 'true' }}
+      run-test-c-ffi: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' }}
+      run-test-c-ffi-windows: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' }}
+      run-test-wasm: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.wasm == 'true' }}
+      run-test-kotlin-android: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' || steps.filter.outputs.kotlin == 'true' }}
+      run-test-swift: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' || steps.filter.outputs.swift == 'true' }}
+      run-test-dart: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.dart == 'true' }}
+      run-test-zig: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.core == 'true' || steps.filter.outputs.ffi == 'true' || steps.filter.outputs.zig == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -280,10 +294,7 @@ jobs:
   build-ffi:
     needs: [changes]
     name: "Build: FFI (${{ matrix.runner }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.ffi == 'true'
+    if: needs.changes.outputs.run-build-ffi == 'true'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -374,10 +385,7 @@ jobs:
   build-python:
     needs: [changes]
     name: "Build: Python (${{ matrix.os }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.python == 'true'
+    if: needs.changes.outputs.run-build-python == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
@@ -440,10 +448,7 @@ jobs:
   build-node:
     needs: [changes]
     name: "Build: Node (${{ matrix.os }}, ${{ matrix.runtime }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.node == 'true'
+    if: needs.changes.outputs.run-build-node == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -504,10 +509,7 @@ jobs:
   build-node-musl:
     needs: [changes]
     name: "Build: Node (${{ matrix.target }}, zig cross-compile)"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.node == 'true'
+    if: needs.changes.outputs.run-build-node-musl == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
@@ -575,10 +577,7 @@ jobs:
   build-node-linux-arm64-gnu:
     needs: [changes]
     name: "Build: Node (aarch64-unknown-linux-gnu, napi-cross)"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.node == 'true'
+    if: needs.changes.outputs.run-build-node-linux-arm64-gnu == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -626,10 +625,7 @@ jobs:
   build-ruby:
     needs: [changes]
     name: "Build: Ruby (${{ matrix.os }}, ruby-${{ matrix.ruby }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.ruby == 'true'
+    if: needs.changes.outputs.run-build-ruby == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -692,10 +688,7 @@ jobs:
   build-php:
     needs: [changes]
     name: "Build: PHP (${{ matrix.platform.label }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.php == 'true'
+    if: needs.changes.outputs.run-build-php == 'true'
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     strategy:
@@ -758,10 +751,7 @@ jobs:
   build-csharp:
     needs: [changes]
     name: "Build: C# (${{ matrix.os }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.csharp == 'true'
+    if: needs.changes.outputs.run-build-csharp == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -811,10 +801,7 @@ jobs:
   build-java:
     needs: [changes]
     name: "Build: Java (${{ matrix.os }})"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.java == 'true'
+    if: needs.changes.outputs.run-build-java == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -846,10 +833,7 @@ jobs:
   build-wasm:
     needs: [changes]
     name: "Build: WASM"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.wasm == 'true'
+    if: needs.changes.outputs.run-build-wasm == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -885,9 +869,9 @@ jobs:
         uses: xberg-io/actions/cleanup-rust-cache@v1
 
   test-python:
-    needs: [build-python]
+    needs: [build-python, changes]
     name: "Test: Python (${{ matrix.os }}, py-${{ matrix.python }})"
-    if: always() && !cancelled() && needs.build-python.result != 'skipped'
+    if: always() && !cancelled() && needs.changes.outputs.run-test-python == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
@@ -949,9 +933,9 @@ jobs:
         shell: bash
 
   test-node:
-    needs: [build-node]
+    needs: [build-node, changes]
     name: "Test: Node (${{ matrix.os }}, ${{ matrix.runtime }})"
-    if: always() && !cancelled() && needs.build-node.result != 'skipped'
+    if: always() && !cancelled() && needs.changes.outputs.run-test-node == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -1009,9 +993,9 @@ jobs:
         shell: bash
 
   test-ruby:
-    needs: [build-ruby]
+    needs: [build-ruby, changes]
     name: "Test: Ruby (${{ matrix.os }}, ruby-${{ matrix.ruby }})"
-    if: always() && !cancelled() && needs.build-ruby.result != 'skipped'
+    if: always() && !cancelled() && needs.changes.outputs.run-test-ruby == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -1100,9 +1084,9 @@ jobs:
         shell: bash
 
   test-php:
-    needs: [build-php]
+    needs: [build-php, changes]
     name: "Test: PHP"
-    if: always() && !cancelled() && needs.build-php.result != 'skipped'
+    if: always() && !cancelled() && needs.changes.outputs.run-test-php == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1161,12 +1145,7 @@ jobs:
   test-csharp:
     needs: [build-csharp, build-ffi, changes]
     name: "Test: C# (${{ matrix.os }})"
-    if: |
-      always() && !cancelled() && needs.build-csharp.result != 'skipped' &&
-      (github.event_name == 'workflow_dispatch' ||
-       needs.changes.outputs.csharp == 'true' ||
-       needs.changes.outputs.ffi == 'true' ||
-       needs.changes.outputs.core == 'true')
+    if: always() && !cancelled() && needs.changes.outputs.run-test-csharp == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -1233,11 +1212,7 @@ jobs:
   test-go:
     needs: [changes]
     name: "Test: Go"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.go == 'true' ||
-      needs.changes.outputs.ffi == 'true' ||
-      needs.changes.outputs.core == 'true'
+    if: needs.changes.outputs.run-test-go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1289,9 +1264,9 @@ jobs:
         shell: bash
 
   test-java:
-    needs: [build-java]
+    needs: [build-java, changes]
     name: "Test: Java (${{ matrix.os }})"
-    if: always() && !cancelled() && needs.build-java.result != 'skipped'
+    if: always() && !cancelled() && needs.changes.outputs.run-test-java == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -1328,11 +1303,7 @@ jobs:
   test-elixir:
     needs: [changes]
     name: "Test: Elixir"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.elixir == 'true' ||
-      needs.changes.outputs.ffi == 'true' ||
-      needs.changes.outputs.core == 'true'
+    if: needs.changes.outputs.run-test-elixir == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1380,11 +1351,7 @@ jobs:
   test-r:
     needs: [changes]
     name: "Test: R"
-    if: |
-      always() && !cancelled() &&
-      (github.event_name == 'workflow_dispatch' ||
-       needs.changes.outputs.r == 'true' ||
-       needs.changes.outputs.core == 'true')
+    if: always() && !cancelled() && needs.changes.outputs.run-test-r == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1422,11 +1389,7 @@ jobs:
   test-c-ffi:
     needs: [build-ffi, changes]
     name: "Test: C FFI (${{ matrix.runner }})"
-    if: |
-      always() && !cancelled() && needs.build-ffi.result != 'skipped' &&
-      (github.event_name == 'workflow_dispatch' ||
-       needs.changes.outputs.ffi == 'true' ||
-       needs.changes.outputs.core == 'true')
+    if: always() && !cancelled() && needs.changes.outputs.run-test-c-ffi == 'true'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -1479,11 +1442,7 @@ jobs:
   test-c-ffi-windows:
     needs: [build-ffi, changes]
     name: "Test: C FFI (windows-latest)"
-    if: |
-      always() && !cancelled() && needs.build-ffi.result != 'skipped' &&
-      (github.event_name == 'workflow_dispatch' ||
-       needs.changes.outputs.ffi == 'true' ||
-       needs.changes.outputs.core == 'true')
+    if: always() && !cancelled() && needs.changes.outputs.run-test-c-ffi-windows == 'true'
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
@@ -1520,9 +1479,9 @@ jobs:
           echo "Headers verified fresh on Windows: $HEADER $GO_HEADER"
 
   test-wasm:
-    needs: [build-wasm]
+    needs: [build-wasm, changes]
     name: "Test: WASM"
-    if: always() && !cancelled() && needs.build-wasm.result != 'skipped'
+    if: always() && !cancelled() && needs.changes.outputs.run-test-wasm == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -1564,11 +1523,7 @@ jobs:
   build-kotlin-android:
     needs: [changes]
     name: "Build: Kotlin Android"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.ffi == 'true' ||
-      needs.changes.outputs.kotlin == 'true'
+    if: needs.changes.outputs.run-build-kotlin-android == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1616,11 +1571,7 @@ jobs:
   test-kotlin-android:
     needs: [changes]
     name: "Test: Kotlin Android (host JVM)"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.ffi == 'true' ||
-      needs.changes.outputs.kotlin == 'true'
+    if: needs.changes.outputs.run-test-kotlin-android == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1665,11 +1616,7 @@ jobs:
   test-swift:
     needs: [changes]
     name: "Test: Swift"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.ffi == 'true' ||
-      needs.changes.outputs.swift == 'true'
+    if: needs.changes.outputs.run-test-swift == 'true'
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
@@ -1708,10 +1655,7 @@ jobs:
   test-dart:
     needs: [changes]
     name: "Test: Dart"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.dart == 'true'
+    if: needs.changes.outputs.run-test-dart == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1743,11 +1687,7 @@ jobs:
   test-zig:
     needs: [changes]
     name: "Test: Zig"
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.core == 'true' ||
-      needs.changes.outputs.ffi == 'true' ||
-      needs.changes.outputs.zig == 'true'
+    if: needs.changes.outputs.run-test-zig == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -1777,3 +1717,55 @@ jobs:
       - name: Cleanup Rust cache
         if: always()
         uses: xberg-io/actions/cleanup-rust-cache@v1
+
+  # ~keep The run's own conclusion is green whether a leg passed, was filtered out, or was skipped
+  # ~keep for another reason, so nothing else in this workflow says which legs ran. This job fails
+  # ~keep unless every leg succeeded or was skipped because its `run-<job id>` output is false. It
+  # ~keep must list every other job in `needs`; scripts/tests/test_e2e_result.py fails otherwise.
+  e2e-result:
+    name: "E2E result"
+    needs:
+      - changes
+      - e2e-freshness
+      - build-ffi
+      - build-python
+      - build-node
+      - build-node-musl
+      - build-node-linux-arm64-gnu
+      - build-ruby
+      - build-php
+      - build-csharp
+      - build-java
+      - build-wasm
+      - build-kotlin-android
+      - test-python
+      - test-node
+      - test-ruby
+      - test-php
+      - test-csharp
+      - test-go
+      - test-java
+      - test-elixir
+      - test-r
+      - test-c-ffi
+      - test-c-ffi-windows
+      - test-wasm
+      - test-kotlin-android
+      - test-swift
+      - test-dart
+      - test-zig
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/check_e2e_result.py
+          sparse-checkout-cone-mode: false
+
+      - name: Check every leg ran or was filtered out
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 scripts/check_e2e_result.py verdict
+        shell: bash

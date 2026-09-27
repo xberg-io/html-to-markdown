@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   missing. The `--json` summary now carries the per-language counts, the per-root counts and the
   silent detectors.
 
+- CI E2E now ends in one `E2E result` job that fails unless every other job in the workflow
+  passed or was skipped because its path filters did not match. Before, a skipped leg left the
+  run as green as a passing one, whatever the reason for the skip, and no single check covered
+  every leg. Each leg's path filter condition is now written once, as an output of the change
+  detection job, and both the leg and the result job read that output. A script test fails when a
+  job is added to the workflow without being listed in the result job.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed
