@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **An `<img>` with no usable `src` could take its address from the middle of a `srcset`
+  candidate.** The fallback split `srcset` and `data-srcset` on every comma, so a comma inside a
+  parenthesised descriptor or inside a URL started a new candidate: `a.png (x, b.png 3x ), c.png 2x`
+  produced `b.png`, and `a.png?w=1,2 2x` produced `2`. Candidates are now split with the HTML
+  spec's srcset parsing steps, including the parentheses rule, and only the spec's five ASCII
+  whitespace characters separate a URL from its descriptor. The choice of candidate is unchanged:
+  the largest width or density descriptor wins, and the first candidate is used when none has one.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed

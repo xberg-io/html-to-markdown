@@ -12,6 +12,7 @@ use std::collections::BTreeMap;
 
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
+use crate::converter::handlers::srcset::srcset_candidates;
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
 use crate::converter::utility::attributes::decoded_attribute;
 use crate::converter::utility::escaping::escape_link_label;
@@ -301,29 +302,20 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
 /// ~keep low-resolution one does not). A candidate with no descriptor is treated as the
 /// ~keep first candidate when no other candidate carries one either — the HTML spec
 /// ~keep allows at most one descriptor-less candidate, so there is nothing to compare it
-/// ~keep against in that case.
-/// ~keep
-/// ~keep Splitting on `,` is a simplification of the full HTML `srcset` grammar, which
-/// ~keep in rare cases allows a literal comma inside an unescaped URL; it matches every
-/// ~keep real-world `srcset` value this crate has been fed.
+/// ~keep against in that case. Candidates are split as the HTML spec splits them (see
+/// ~keep `srcset_candidates`), so a comma inside a URL or a parenthesised descriptor does
+/// ~keep not start a new candidate.
 fn pick_best_srcset_candidate(value: &str) -> Option<&str> {
     let mut best: Option<(&str, f64)> = None;
     let mut first_url: Option<&str> = None;
 
-    for entry in value.split(',') {
-        let entry = entry.trim();
-        if entry.is_empty() {
-            continue;
-        }
-        let mut parts = entry.split_whitespace();
-        let Some(url) = parts.next() else {
-            continue;
-        };
+    for (url, descriptor) in srcset_candidates(value) {
         if first_url.is_none() {
             first_url = Some(url);
         }
 
-        let score = parts.next().and_then(|descriptor| {
+        let first_token = descriptor.split(|c: char| c.is_ascii_whitespace()).next();
+        let score = first_token.and_then(|descriptor| {
             if descriptor.len() < 2 || !(descriptor.ends_with('w') || descriptor.ends_with('x')) {
                 return None;
             }
@@ -520,6 +512,58 @@ mod tests {
             None,
         );
         assert_eq!(result, "![photo](a.png \"x\\\" [click](https://evil.example)\")");
+    }
+
+    #[test]
+    fn a_comma_inside_a_parenthesised_descriptor_does_not_start_a_candidate() {
+        assert_eq!(
+            pick_best_srcset_candidate("a.png (x, b.png 3x ), c.png 2x"),
+            Some("c.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 1x (x, y.png 9x ), b.png 2x"),
+            Some("b.png")
+        );
+    }
+
+    #[test]
+    fn a_comma_inside_a_candidate_url_stays_in_the_url() {
+        assert_eq!(
+            pick_best_srcset_candidate("a.png?x=1,2 2x, b.png 1x"),
+            Some("a.png?x=1,2")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("data:image/gif;base64,R0lG 2x, b.png 1x"),
+            Some("data:image/gif;base64,R0lG")
+        );
+        assert_eq!(pick_best_srcset_candidate("a.png,b.png 2x"), Some("a.png,b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png,2x"), Some("a.png,2x"));
+    }
+
+    #[test]
+    fn commas_around_candidates_separate_them() {
+        assert_eq!(pick_best_srcset_candidate(",,, a.png 2x, b.png 1x"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png,, b.png 2x,,"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png, b.png"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate(""), None);
+        assert_eq!(pick_best_srcset_candidate(" , ,, "), None);
+    }
+
+    #[test]
+    fn the_choice_rule_is_unchanged_for_plain_lists() {
+        assert_eq!(pick_best_srcset_candidate("a.png"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 480w, b.png 1200w"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 800w, b.png 2x"), Some("a.png"));
+    }
+
+    #[test]
+    fn only_the_five_ascii_whitespace_characters_separate_a_descriptor() {
+        assert_eq!(pick_best_srcset_candidate("a.png\t1x,\nb.png\x0C2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png\r\n3x ,\tb.png 2x"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png\u{a0}3x, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png \u{a0}9x, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a\u{a0}b.png 2x"), Some("a\u{a0}b.png"));
     }
 
     #[test]
