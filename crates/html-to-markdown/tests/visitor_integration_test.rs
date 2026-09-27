@@ -269,10 +269,10 @@ fn test_skipping_visitor_removes_links() {
     );
 }
 
-/// A link the visitor answers with `Continue` renders exactly as it would without a visitor.
+/// A link the visitor answers with `Continue` renders with its escaped label, destination and title.
 #[test]
 fn test_visitor_continue_renders_the_link() {
-    let html = r#"<p>Text with <a href="https://example.com" title="Example">a link</a> inside.</p>"#;
+    let html = r#"<p>Text with <a href="https://example.com" title="Example">a ] link</a> inside.</p>"#;
     let visitor = Arc::new(Mutex::new(SkippingVisitor {
         skip_links: false,
         skip_images: false,
@@ -284,7 +284,7 @@ fn test_visitor_continue_renders_the_link() {
         .unwrap_or_default();
 
     assert!(
-        result.contains(r#"Text with [a link](https://example.com "Example") inside."#),
+        result.contains(r#"Text with [a \] link](https://example.com "Example") inside."#),
         "Should render the link with its label, destination and title, got: {result}"
     );
 }
