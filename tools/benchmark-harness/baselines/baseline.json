@@ -164,7 +164,7 @@
       "median_ms": 1.5131390240641711,
       "mad_ms": 0.0034723850267378564,
       "mb_per_s": 18.39231125413558,
-      "output_bytes": 6934
+      "output_bytes": 7573
     },
     {
       "fixture": "real-world/issues/gh-190/rbloggers.html",
