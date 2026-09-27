@@ -80,9 +80,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **A `>` inside a `<base>` attribute value turned off the early stop of the base parse.** The
   parse is fed in pieces, and a piece could end inside the quoted value, so the `<base>` tag only
-  completed in the next piece, which was never checked. The tree is now checked after each piece
-  in which html5ever's tokenizer emits a `<base>` start tag, so the parse stops wherever the tag
-  bytes fall. The document base itself was always correct.
+  completed in the next piece, which was never checked. The parse now notes each `<base href>`
+  element when html5ever's tree builder creates it and checks only that element's ancestors, so
+  the parse stops wherever the tag bytes fall, and the cost of the check does not grow with the
+  size of the tree. The document base itself was always correct.
+
+- **The `title` metadata kept the last `<title>`, not the first.** A head with the titles First
+  and Second reported Second, while a browser shows First. The first title with text now wins on
+  both tiers, as the `base`, `canonical` and `<meta>` metadata already do.
+
+- **`<meta>` names that differ only in letter case let the last tag win.** Meta names do not
+  depend on letter case, but `<meta name="Description">` followed by `<meta name="description">`
+  gave the second value in the document metadata, and the frontmatter printed both. The names are
+  now compared in any letter case, and the first tag wins in the frontmatter and the document
+  metadata.
+
+- **A `<head>` tag inside the body gave the two tiers different metadata.** The parser ignores a
+  `<head>` tag once the body has started. Tier 1 read such a stray head when the page had no head
+  of its own, and Tier 2 read it when the real head was empty. Both tiers now read only the first
+  head before the body.
 
 ## [3.15.1] - 2026-09-27
 

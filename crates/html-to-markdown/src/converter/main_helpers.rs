@@ -3,7 +3,7 @@
 //! This module contains utility functions used by the main conversion pipeline,
 //! including preprocessing helpers, HTML repair, and metadata formatting.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 use crate::options::ConversionOptions;
 use crate::options::NewlineStyle;
@@ -529,11 +529,13 @@ pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> Strin
 }
 
 /// Record `<meta name>`/`<meta property>` content into `metadata`, honoring `strip_tags`/
-/// `preserve_tags` for `"meta"`. The first tag per key wins.
+/// `preserve_tags` for `"meta"`. The first tag per key wins, comparing keys in any letter case;
+/// `seen` holds the lower-cased keys recorded so far.
 fn collect_meta_head_metadata(
     child_tag: &tl::HTMLTag,
     options: &ConversionOptions,
     metadata: &mut BTreeMap<String, String>,
+    seen: &mut HashSet<String>,
 ) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("meta")
         || options.strip_tags.iter().any(|t| t == "meta")
@@ -549,24 +551,24 @@ fn collect_meta_head_metadata(
         child_tag.attributes().get("name").flatten(),
         crate::converter::utility::attributes::decoded_attribute(child_tag, "content"),
     ) {
-        let name_str = name.as_utf8_str();
-        metadata
-            .entry(format!("meta-{name_str}"))
-            .or_insert_with(|| content.into_owned());
+        let key = format!("meta-{}", name.as_utf8_str());
+        if seen.insert(key.to_ascii_lowercase()) {
+            metadata.insert(key, content.into_owned());
+        }
     }
     if let (Some(property), Some(content)) = (
         child_tag.attributes().get("property").flatten(),
         crate::converter::utility::attributes::decoded_attribute(child_tag, "content"),
     ) {
-        let property_str = property.as_utf8_str();
-        metadata
-            .entry(format!("meta-{property_str}"))
-            .or_insert_with(|| content.into_owned());
+        let key = format!("meta-{}", property.as_utf8_str());
+        if seen.insert(key.to_ascii_lowercase()) {
+            metadata.insert(key, content.into_owned());
+        }
     }
 }
 
 /// Record the `<title>` text into `metadata`, honoring `strip_tags`/`preserve_tags` for
-/// `"title"`. Extracted from `extract_head_metadata` — same traversal and trimming, unchanged.
+/// `"title"`. The first title with text wins.
 fn collect_title_head_metadata(
     child_tag: &tl::HTMLTag,
     parser: &tl::Parser,
@@ -589,7 +591,7 @@ fn collect_title_head_metadata(
     }
     title_content = title_content.trim().to_string();
     if !title_content.is_empty() {
-        metadata.insert("title".to_string(), title_content);
+        metadata.entry("title".to_string()).or_insert(title_content);
     }
 }
 
@@ -615,8 +617,8 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
         .or_insert_with(|| href_str.to_string());
 }
 
-/// Extract metadata from the first head element below `roots` that carries any, recording
-/// `document_base_href` as `base` whether or not the source has a `<head>` tag.
+/// Extract metadata from the head element below `roots`, recording `document_base_href` as
+/// `base` whether or not the source has a `<head>` tag.
 pub fn extract_head_metadata(
     roots: &[tl::NodeHandle],
     parser: &tl::Parser,
@@ -631,7 +633,7 @@ pub fn extract_head_metadata(
 }
 
 /// The title, meta and canonical link fields of the first head element below `roots` that
-/// carries any.
+/// comes before the body. The parser ignores a `<head>` tag once the body has started.
 fn head_element_metadata(
     roots: &[tl::NodeHandle],
     parser: &tl::Parser,
@@ -643,7 +645,11 @@ fn head_element_metadata(
             continue;
         };
 
-        if !tag.name().as_utf8_str().eq_ignore_ascii_case("head") {
+        let name = tag.name().as_utf8_str();
+        if name.eq_ignore_ascii_case("body") {
+            break;
+        }
+        if !name.eq_ignore_ascii_case("head") {
             let children: Vec<_> = tag.children().top().iter().copied().collect();
             for child_handle in children.into_iter().rev() {
                 work.push(child_handle);
@@ -652,20 +658,15 @@ fn head_element_metadata(
         }
 
         let mut metadata = BTreeMap::new();
-        {
-            let children = tag.children();
-            for child_handle in children.top().iter() {
-                if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
-                    collect_meta_head_metadata(child_tag, options, &mut metadata);
-                    collect_title_head_metadata(child_tag, parser, options, &mut metadata);
-                    collect_link_head_metadata(child_tag, &mut metadata);
-                }
+        let mut seen_meta = HashSet::new();
+        for child_handle in tag.children().top().iter() {
+            if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
+                collect_meta_head_metadata(child_tag, options, &mut metadata, &mut seen_meta);
+                collect_title_head_metadata(child_tag, parser, options, &mut metadata);
+                collect_link_head_metadata(child_tag, &mut metadata);
             }
         }
-
-        if !metadata.is_empty() {
-            return metadata;
-        }
+        return metadata;
     }
 
     BTreeMap::new()

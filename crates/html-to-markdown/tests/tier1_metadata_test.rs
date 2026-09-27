@@ -335,3 +335,128 @@ fn should_keep_the_first_meta_tag_per_name_in_the_document_metadata() {
     let document = convert(html, Some(opts)).unwrap().metadata.document;
     assert_eq!(document.description.as_deref(), Some("first"));
 }
+
+// ~keep ── 12. First title, stray head, meta name case, normalized input ──
+
+/// Convert with the Tier-1 scanner alone, which fails instead of falling back to Tier 2.
+fn t1_only(html: &str) -> String {
+    let opts = ConversionOptions {
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    html_to_markdown_rs::tier1::run(html, &html_to_markdown_rs::prescan::PrescanReport::default(), &opts)
+        .expect("tier-1 conversion must succeed")
+}
+
+/// Convert with `base_url` set on the given tier.
+fn with_base_url(html: &str, tier_strategy: TierStrategy) -> String {
+    let opts = ConversionOptions {
+        tier_strategy,
+        extract_metadata: true,
+        base_url: Some("https://example.com/dir/page".to_string()),
+        ..ConversionOptions::default()
+    };
+    convert(html, Some(opts)).unwrap().content.unwrap_or_default()
+}
+
+/// `html` as UTF-16 bytes after a byte order mark, read the way a caller with raw bytes reads
+/// them: through `String::from_utf8_lossy`.
+fn utf16_with_bom(html: &str, little_endian: bool) -> String {
+    let mut bytes = if little_endian {
+        vec![0xFF, 0xFE]
+    } else {
+        vec![0xFE, 0xFF]
+    };
+    for unit in html.encode_utf16() {
+        bytes.extend_from_slice(&if little_endian {
+            unit.to_le_bytes()
+        } else {
+            unit.to_be_bytes()
+        });
+    }
+    String::from_utf8_lossy(&bytes).into_owned()
+}
+
+#[test]
+fn should_report_the_first_title_on_both_tiers() {
+    let html = "<html><head><title>First</title><title>Second</title></head><body><p>x</p></body></html>";
+    let out = t2(html);
+    assert!(out.contains("title: First\n"), "{out}");
+    assert_eq!(t1_only(html), out);
+}
+
+#[test]
+fn should_ignore_a_head_inside_the_body_on_both_tiers() {
+    for html in [
+        "<html><head></head><body><head><title>Stray</title></head><p>x</p></body></html>",
+        "<html><body><head><title>Stray</title></head><p>x</p></body></html>",
+        "<html><head></head><head><title>Stray</title></head><body><p>x</p></body></html>",
+    ] {
+        let out = t2(html);
+        assert!(!out.contains("Stray"), "{out}");
+        assert_eq!(t1_only(html), out, "{html}");
+    }
+}
+
+#[test]
+fn should_report_the_first_meta_tag_for_names_that_differ_in_case_on_both_tiers() {
+    let html = r#"<html><head><meta name="Description" content="first"><meta name="description" content="second"><meta property="og:Title" content="first"><meta property="og:title" content="second"></head><body><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(
+        out.contains("meta-Description: first\n") && out.contains("meta-og:Title: first\n") && !out.contains("second"),
+        "{out}"
+    );
+    assert_eq!(t1_only(html), out);
+}
+
+#[test]
+fn should_read_the_base_href_of_utf16_input_on_both_tiers() {
+    let html = r#"<html><head><base href="/b/"><title>T</title></head><body><p><a href="rel">l</a></p></body></html>"#;
+    for little_endian in [true, false] {
+        let input = utf16_with_bom(html, little_endian);
+        for tier in [TierStrategy::Tier2, TierStrategy::Tier1] {
+            let out = with_base_url(&input, tier);
+            assert!(out.contains("base: /b/\n"), "{little_endian} {tier:?}: {out}");
+            assert!(
+                out.contains("(https://example.com/b/rel)"),
+                "{little_endian} {tier:?}: {out}"
+            );
+        }
+    }
+}
+
+#[test]
+fn should_read_the_base_href_of_a_tag_name_holding_a_nul_byte_on_both_tiers() {
+    let html = "<html><head><ba\0se href=\"/n/\"></head><body><p><a href=\"rel\">l</a></p></body></html>";
+    for tier in [TierStrategy::Tier2, TierStrategy::Tier1] {
+        let out = with_base_url(html, tier);
+        assert!(out.contains("base: /n/\n"), "{tier:?}: {out}");
+        assert!(out.contains("(https://example.com/n/rel)"), "{tier:?}: {out}");
+    }
+}
+
+#[test]
+fn should_strip_a_nul_byte_on_the_auto_path() {
+    // ~keep Without the `metadata` feature, these options let the router pick Tier 1.
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Auto,
+        highlight_style: HighlightStyle::None,
+        ..ConversionOptions::default()
+    };
+    let out = convert("<p>a\0b</p>", Some(opts)).unwrap().content.unwrap_or_default();
+    assert_eq!(out, "ab\n");
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_keep_the_first_title_and_the_first_meta_tag_in_any_case_in_the_document_metadata() {
+    let html = r#"<html><head><title>First</title><title>Second</title><meta name="Description" content="first"><meta name="description" content="second"></head><body><p>x</p></body></html>"#;
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    let document = convert(html, Some(opts)).unwrap().metadata.document;
+    assert_eq!(document.title.as_deref(), Some("First"));
+    assert_eq!(document.description.as_deref(), Some("first"));
+}

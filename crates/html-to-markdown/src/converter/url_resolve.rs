@@ -5,15 +5,15 @@
 //! Tier-1/Tier-2 split) and threaded into both tiers as the same value, so
 //! they cannot disagree on what a relative URL resolves to.
 
-use std::cell::Cell;
+use std::borrow::Cow;
+use std::cell::RefCell;
 use std::rc::Rc;
 
+use html5ever::interface::tree_builder::{ElementFlags, NodeOrText, QuirksMode, TreeSink};
 use html5ever::tendril::StrTendril;
-use html5ever::tokenizer::{
-    BufferQueue, StartTag, TagToken, Token, TokenSink, TokenSinkResult, Tokenizer, TokenizerOpts,
-};
+use html5ever::tokenizer::{BufferQueue, Tokenizer, TokenizerOpts};
 use html5ever::tree_builder::{TreeBuilder, TreeBuilderOpts};
-use html5ever::{TokenizerResult, local_name, ns};
+use html5ever::{Attribute, ExpandedName, QualName, TokenizerResult, local_name, ns};
 use url::Url;
 
 use crate::rcdom::{Handle, NodeData, RcDom};
@@ -90,15 +90,14 @@ pub fn resolve_attribute_url(base: &Url, value: &str) -> Option<String> {
 /// html5ever builds the document, so a `<base>` in a comment, in raw text, in `<template>`
 /// contents or in SVG does not count, and foster parenting and `<frameset>` apply. ~keep
 ///
-/// Reads the raw (pre-normalization) `html`; a `<base>` tag that only becomes well-formed
-/// after this crate's UTF-16/NUL-byte input normalization is not found. Both the effective
-/// base and the `base` metadata come from this one reading.
+/// `html` is the normalized input both tiers convert. Both the effective base and the `base`
+/// metadata come from this one reading.
 pub fn document_base_href(html: &str) -> Option<String> {
     let parse = parse_base_href(html);
     tracing::debug!(
         target: "html_to_markdown::convert",
         read = parse.read,
-        walks = parse.walks,
+        visited = parse.visited,
         "document base href parsed"
     );
     parse.href
@@ -109,8 +108,8 @@ struct BaseParse {
     href: Option<String>,
     /// Bytes of `html` fed to the parser.
     read: usize,
-    /// Walks of the partial tree made while parsing.
-    walks: usize,
+    /// Tree nodes visited while looking for the base.
+    visited: usize,
 }
 
 fn parse_base_href(html: &str) -> BaseParse {
@@ -121,21 +120,20 @@ fn parse_base_href(html: &str) -> BaseParse {
         return BaseParse {
             href: None,
             read: 0,
-            walks: 0,
+            visited: 0,
         };
     }
-    let mut has_frameset = None;
 
     let tokenizer = Tokenizer::new(
-        BaseTagWatch {
-            tree_builder: TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default()),
-            saw_base: Cell::new(false),
-        },
+        TreeBuilder::new(BaseRecordingDom::default(), TreeBuilderOpts::default()),
         TokenizerOpts::default(),
     );
+    let dom = &tokenizer.sink.sink;
     let input = BufferQueue::default();
     let mut fed = 0;
-    let mut walks = 0;
+    let mut visited = 0;
+    let mut looked_at = 0;
+    let mut may_stop = true;
     while fed < html.len() {
         // ~keep Fed in pieces cut after a `>`, an ASCII byte and so a char boundary.
         let until = memchr::memchr(b'>', &bytes[(fed + PARSE_PIECE).min(html.len())..])
@@ -143,57 +141,132 @@ fn parse_base_href(html: &str) -> BaseParse {
         input.push_back(StrTendril::from(&html[fed..until]));
         while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
         fed = until;
-        // ~keep Only a `base` start tag the tokenizer emitted can add a `<base>`, so the tree is
-        // ~keep walked after that piece, whatever piece holds the bytes of the tag.
-        if !tokenizer.sink.saw_base.replace(false) {
-            continue;
-        }
         // ~keep Later nodes go in after every node already in the tree, except a node foster
-        // ~keep parented in front of an open table and a `<frameset>` replacing the body. So a
-        // ~keep first `<base href>` outside those two reaches is final, and the rest is not parsed.
-        walks += 1;
-        if let Some(base) = first_base(&tokenizer.sink.tree_builder.sink.document) {
-            let replaceable = base.in_body && *has_frameset.get_or_insert_with(|| has_start_tag(bytes, b"frameset"));
-            if !(base.in_table || replaceable) {
+        // ~keep parented in front of an open table and a `<frameset>` replacing the body. So the
+        // ~keep first `<base href>` created that is in the document decides: outside those two
+        // ~keep reaches it stays first and the rest is not parsed; inside one, the parse runs to
+        // ~keep the end. Each `<base>` is looked at once, through its ancestors only, and the
+        // ~keep looking stops once it has visited more nodes than bytes read (many `<base>` tags
+        // ~keep deep in `<template>` contents, never in the document), so it stays linear.
+        let bases = dom.bases.borrow();
+        while may_stop && looked_at < bases.len() {
+            if visited > fed {
+                may_stop = false;
+                break;
+            }
+            let base = &bases[looked_at];
+            looked_at += 1;
+            let Some(place) = place_in_document(base, &dom.dom.document, &mut visited) else {
+                continue;
+            };
+            if place.in_table || (place.in_body && has_start_tag(bytes, b"frameset")) {
+                may_stop = false;
+            } else {
                 return BaseParse {
-                    href: Some(base.href),
+                    href: base_href(base),
                     read: fed,
-                    walks,
+                    visited,
                 };
             }
         }
     }
     tokenizer.end();
     BaseParse {
-        href: first_base(&tokenizer.sink.tree_builder.sink.document).map(|base| base.href),
+        href: first_base_href(&dom.dom.document, &mut visited),
         read: fed,
-        walks,
+        visited,
     }
 }
 
-/// A token sink that passes every token to the tree builder and notes a `base` start tag.
-/// The tree builder's `end` only pops open elements, which `RcDom` ignores, so it is not passed.
-struct BaseTagWatch {
-    tree_builder: TreeBuilder<Handle, RcDom>,
-    /// A `base` start tag reached the tree builder since the flag was last cleared.
-    saw_base: Cell<bool>,
+/// An [`RcDom`] that keeps each HTML `<base>` element with an `href` it creates, in order.
+#[derive(Default)]
+struct BaseRecordingDom {
+    dom: RcDom,
+    bases: RefCell<Vec<Handle>>,
 }
 
-impl TokenSink for BaseTagWatch {
+impl TreeSink for BaseRecordingDom {
     type Handle = Handle;
+    type Output = Self;
+    type ElemName<'a>
+        = ExpandedName<'a>
+    where
+        Self: 'a;
 
-    fn process_token(&self, token: Token, line_number: u64) -> TokenSinkResult<Handle> {
-        if let TagToken(tag) = &token {
-            if tag.kind == StartTag && tag.name == local_name!("base") {
-                self.saw_base.set(true);
-            }
-        }
-        self.tree_builder.process_token(token, line_number)
+    fn finish(self) -> Self {
+        self
     }
 
-    fn adjusted_current_node_present_but_not_in_html_namespace(&self) -> bool {
-        self.tree_builder
-            .adjusted_current_node_present_but_not_in_html_namespace()
+    fn create_element(&self, name: QualName, attrs: Vec<Attribute>, flags: ElementFlags) -> Handle {
+        let element = self.dom.create_element(name, attrs, flags);
+        if base_href(&element).is_some() {
+            self.bases.borrow_mut().push(Rc::clone(&element));
+        }
+        element
+    }
+
+    fn parse_error(&self, msg: Cow<'static, str>) {
+        self.dom.parse_error(msg);
+    }
+
+    fn get_document(&self) -> Handle {
+        self.dom.get_document()
+    }
+
+    fn elem_name<'a>(&'a self, target: &'a Handle) -> ExpandedName<'a> {
+        self.dom.elem_name(target)
+    }
+
+    fn create_comment(&self, text: StrTendril) -> Handle {
+        self.dom.create_comment(text)
+    }
+
+    fn create_pi(&self, target: StrTendril, data: StrTendril) -> Handle {
+        self.dom.create_pi(target, data)
+    }
+
+    fn append(&self, parent: &Handle, child: NodeOrText<Handle>) {
+        self.dom.append(parent, child);
+    }
+
+    fn append_based_on_parent_node(&self, element: &Handle, prev_element: &Handle, child: NodeOrText<Handle>) {
+        self.dom.append_based_on_parent_node(element, prev_element, child);
+    }
+
+    fn append_doctype_to_document(&self, name: StrTendril, public_id: StrTendril, system_id: StrTendril) {
+        self.dom.append_doctype_to_document(name, public_id, system_id);
+    }
+
+    fn get_template_contents(&self, target: &Handle) -> Handle {
+        self.dom.get_template_contents(target)
+    }
+
+    fn same_node(&self, x: &Handle, y: &Handle) -> bool {
+        self.dom.same_node(x, y)
+    }
+
+    fn set_quirks_mode(&self, mode: QuirksMode) {
+        self.dom.set_quirks_mode(mode);
+    }
+
+    fn append_before_sibling(&self, sibling: &Handle, new_node: NodeOrText<Handle>) {
+        self.dom.append_before_sibling(sibling, new_node);
+    }
+
+    fn add_attrs_if_missing(&self, target: &Handle, attrs: Vec<Attribute>) {
+        self.dom.add_attrs_if_missing(target, attrs);
+    }
+
+    fn remove_from_parent(&self, target: &Handle) {
+        self.dom.remove_from_parent(target);
+    }
+
+    fn reparent_children(&self, node: &Handle, new_parent: &Handle) {
+        self.dom.reparent_children(node, new_parent);
+    }
+
+    fn is_mathml_annotation_xml_integration_point(&self, handle: &Handle) -> bool {
+        self.dom.is_mathml_annotation_xml_integration_point(handle)
     }
 }
 
@@ -209,7 +282,7 @@ fn has_start_tag(bytes: &[u8], name: &[u8]) -> bool {
     })
 }
 
-/// The `href` of a `<base>` element, or `None` for any other node or a `<base>` without one.
+/// The `href` of an HTML `<base>` element, or `None` for any other node or a `<base>` without one.
 fn base_href(node: &Handle) -> Option<String> {
     let NodeData::Element { name, attrs, .. } = &node.data else {
         return None;
@@ -224,43 +297,51 @@ fn base_href(node: &Handle) -> Option<String> {
         .map(|attr| attr.value.to_string())
 }
 
-/// The first `<base>` with an `href` in a tree, and where it sits.
-struct FirstBase {
-    href: String,
+/// Where a node sits in a document.
+struct Place {
     /// Below a `<table>`, where foster parenting can later insert a node in front of it.
     in_table: bool,
     /// Below `<body>`, which a later `<frameset>` can replace.
     in_body: bool,
 }
 
-/// The first `<base>` with an `href` below `root`, in tree order. `<template>` contents are
-/// not children, so they are not searched.
-fn first_base(root: &Handle) -> Option<FirstBase> {
+/// Where `node` sits below `document`, from its ancestors, or `None` when it is not in
+/// `document` (it is in `<template>` contents, or was removed).
+fn place_in_document(node: &Handle, document: &Handle, visited: &mut usize) -> Option<Place> {
+    let mut place = Place {
+        in_table: false,
+        in_body: false,
+    };
+    let mut current = Rc::clone(node);
+    loop {
+        *visited += 1;
+        let parent = current.parent.take();
+        current.parent.set(parent.clone());
+        let Some(parent) = parent.and_then(|weak| weak.upgrade()) else {
+            return Rc::ptr_eq(&current, document).then_some(place);
+        };
+        if let NodeData::Element { name, .. } = &parent.data {
+            if name.ns == ns!(html) {
+                place.in_table |= name.local == local_name!("table");
+                place.in_body |= name.local == local_name!("body");
+            }
+        }
+        current = parent;
+    }
+}
+
+/// The `href` of the first `<base>` with one below `root`, in tree order. `<template>` contents
+/// are not children, so they are not searched.
+fn first_base_href(root: &Handle, visited: &mut usize) -> Option<String> {
     // ~keep The walk holds clones while the tree is alive: dropping the last handle to a
     // ~keep node empties its whole subtree (`rcdom::Node`'s drop).
-    let mut pending = vec![(Rc::clone(root), false, false)];
-    while let Some((node, in_table, in_body)) = pending.pop() {
+    let mut pending = vec![Rc::clone(root)];
+    while let Some(node) = pending.pop() {
+        *visited += 1;
         if let Some(href) = base_href(&node) {
-            return Some(FirstBase {
-                href,
-                in_table,
-                in_body,
-            });
+            return Some(href);
         }
-        let (in_table, in_body) = match &node.data {
-            NodeData::Element { name, .. } if name.ns == ns!(html) => (
-                in_table || name.local == local_name!("table"),
-                in_body || name.local == local_name!("body"),
-            ),
-            _ => (in_table, in_body),
-        };
-        pending.extend(
-            node.children
-                .borrow()
-                .iter()
-                .rev()
-                .map(|child| (Rc::clone(child), in_table, in_body)),
-        );
+        pending.extend(node.children.borrow().iter().rev().map(Rc::clone));
     }
     None
 }
@@ -593,16 +674,64 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_base_href_walks_the_tree_only_after_a_base_start_tag() {
-        // ~keep The comment holds `<base` text but no tag, `</base>` is an end tag, and the
-        // ~keep template's `<base>` is a start tag.
-        let padding = "<p>more</p>".repeat(PARSE_PIECE);
+    fn test_parse_base_href_visits_each_node_a_bounded_number_of_times() {
+        // ~keep Every piece holds a `<base>` without an `href` and `<base href>` tags in templates,
+        // ~keep and none of them lets the parse stop early.
+        let piece = format!(
+            "<base target=_blank>{}",
+            "<template><base href=/t/></template>".repeat(PARSE_PIECE / 38)
+        );
+        let html = format!("<body>{}<table><td><base href=/cell/></td></table>", piece.repeat(64));
+        let parse = parse_base_href(&html);
+        assert_eq!((parse.href.as_deref(), parse.read), (Some("/cell/"), html.len()));
+        let tags = memchr::memchr_iter(b'<', html.as_bytes()).count();
+        assert!(
+            parse.visited <= 2 * tags,
+            "visited {} nodes for {tags} tags",
+            parse.visited
+        );
+    }
+
+    #[test]
+    fn test_parse_base_href_stops_looking_at_bases_deep_in_a_template() {
         let html = format!(
-            r#"<!-- <base href="/x/"> --><body>{padding}</base>{padding}<template><base href="/t/"></template>{padding}"#
+            "<template>{}{}</template><body>{}",
+            "<div>".repeat(2000),
+            "<base href=/t/>".repeat(2000),
+            "<p>more</p>".repeat(PARSE_PIECE)
         );
         let parse = parse_base_href(&html);
         assert_eq!((parse.href, parse.read), (None, html.len()));
-        assert_eq!(parse.walks, 1);
+        assert!(
+            parse.visited <= 2 * html.len(),
+            "visited {} nodes for {} bytes",
+            parse.visited,
+            html.len()
+        );
+    }
+
+    #[test]
+    fn test_parse_base_href_looks_at_a_base_through_its_ancestors_only() {
+        // ~keep The comment and `</base>` add no `<base>`; the template's one is looked at once.
+        let html = r#"<!-- <base href="/x/"> --><template><base href="/t/"></template><body><p>x</p></base></body>"#;
+        let parse = parse_base_href(html);
+        assert_eq!((parse.href, parse.read), (None, html.len()));
+        // ~keep The template's `<base>` and its contents fragment, then the walk after the parse:
+        // ~keep document, comment, html, head, template, body, p, text.
+        assert_eq!(parse.visited, 10);
+    }
+
+    #[test]
+    fn test_compute_effective_base_takes_a_base_in_an_html_integration_point_of_mathml() {
+        let html =
+            r#"<body><math><annotation-xml encoding="text/html"><base href="/in-math/"></annotation-xml></math>"#;
+        assert_eq!(effective(html), "https://example.com/in-math/");
+    }
+
+    #[test]
+    fn test_compute_effective_base_keeps_a_first_base_in_a_closed_table() {
+        let html = r#"<body><table><tr><td><base href="/in-cell/"></td></tr></table><p><base href="/after/"></p>"#;
+        assert_eq!(effective(html), "https://example.com/in-cell/");
     }
 
     #[test]

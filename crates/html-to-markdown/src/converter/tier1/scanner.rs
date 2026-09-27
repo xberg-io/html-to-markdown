@@ -319,6 +319,13 @@ pub fn scan(
                     }
                 };
 
+                // ~keep Once the body starts the head is over, empty if no `<head>` came before,
+                // ~keep and the parser ignores a later `<head>` tag. Tier 2's head walk stops at
+                // ~keep `<body>` too.
+                if name_lower == b"body" && state.head_range.is_none() {
+                    state.head_range = Some(pos..pos);
+                }
+
                 // ~keep Raw-text "ignored" tags (`<script>`, `<style>`): their
                 // spec is `TagKind::Ignored` with `is_rawtext = true` (see
                 // tags.rs `rawtext_ignored`).  Prescan also strips their

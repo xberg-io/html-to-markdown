@@ -223,7 +223,8 @@ pub struct Tier1State {
     pub link_stack: Vec<(Option<String>, Option<String>, bool)>,
     /// Byte range of `<head>…</head>` content (between the tags) in the
     /// input the scanner walked.  Populated by the `TagKind::Ignored`
-    /// dispatch when a non-void Ignored tag (`<head>`) is encountered;
+    /// dispatch when a non-void Ignored tag (`<head>`) is encountered, or
+    /// set to an empty range when `<body>` opens before any `<head>`;
     /// `tier1::run` forwards the slice to `head_metadata::extract_frontmatter`
     /// so the YAML frontmatter pass still works without a `PrescanReport`.
     pub head_range: Option<std::ops::Range<usize>>,

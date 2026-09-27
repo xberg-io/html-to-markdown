@@ -90,12 +90,15 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::rc::Rc;
 
+    // ~keep Both tiers convert this text, so the base is read from it too.
+    let normalized_html = normalize_input(html)?;
+
     // ~keep The same `<base href>` is the `base` metadata, so both read it here, once.
     let document_base_href = (options.base_url.is_some() || options.extract_metadata)
-        .then(|| crate::converter::url_resolve::document_base_href(html))
+        .then(|| crate::converter::url_resolve::document_base_href(&normalized_html))
         .flatten();
 
-    // ~keep Computed once, from the raw (pre-normalization) input, and reused for both the
+    // ~keep Computed once, from the normalized input, and reused for both the
     // ~keep Tier-1 attempt and the Tier-2 fallback below -- the single most important property
     // ~keep for `base_url`: both tiers resolve every relative destination against the exact
     // ~keep same `Url` value, so they cannot disagree on what a relative reference resolves
@@ -115,19 +118,11 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     // ~keep
     // ~keep `TierStrategy::Auto` runs the prescan + classifier once.  If the
     // ~keep classifier returns `RouterDecision::Tier1`, the scanner is invoked.  On
-    // ~keep success the result is returned immediately.  On bail the normalized input
-    // ~keep that was already produced is threaded to the Tier-2 pipeline via
-    // ~keep `precomputed_normalized` — no re-normalisation.
+    // ~keep success the result is returned immediately.  On bail the Tier-2 pipeline
+    // ~keep below converts the same normalized input.
     // ~keep
     // ~keep `TierStrategy::Tier1` (testkit-only) bypasses the classifier and forces
     // ~keep the scanner unconditionally, still with Tier-2 fallback on bail.
-    // ~keep
-    // ~keep `precomputed_normalized` carries the `Cow<str>` produced by
-    // ~keep `normalize_input` when the Tier-1 path ran it.  The Tier-2 entry point
-    // ~keep below uses it directly; the `Tier2` branch leaves it `None` and computes
-    // ~keep it there.
-    let mut precomputed_normalized: Option<Cow<'_, str>> = None;
-
     match options.tier_strategy {
         crate::options::TierStrategy::Tier2 => {
             // ~keep Skip Tier-1 entirely; fall through to the Tier-2 path below.
@@ -142,12 +137,11 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
             // ~keep `classify`; we pass a default `PrescanReport` whose fields are
             // ~keep all false because the scanner will detect any structural
             // ~keep edge-case during its single walk.
-            let normalized = normalize_input(html)?;
             let stub_report = crate::converter::prescan::PrescanReport::default();
             let decision = crate::converter::tier1::router::classify(&stub_report, &options);
             if decision == crate::converter::tier1::RouterDecision::Tier1 {
                 match crate::converter::tier1::run_with_base(
-                    normalized.as_ref(),
+                    normalized_html.as_ref(),
                     &stub_report,
                     &options,
                     effective_base.clone(),
@@ -179,13 +173,11 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                             reason = %bail,
                             "tier-1 conversion bailed; falling back to tier-2"
                         );
-                        precomputed_normalized = Some(normalized);
                     }
                 }
             } else {
                 // ~keep RouterDecision::Tier2: fall through with the already-normalized input.
                 tracing::debug!(target: "html_to_markdown::convert", "router selected tier-2 conversion path directly");
-                precomputed_normalized = Some(normalized);
             }
         }
         #[cfg(any(test, feature = "testkit"))]
@@ -194,10 +186,9 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
             // ~keep Tier-2 fallback on bail.  Like the Auto path, skip the prescan
             // ~keep pre-pass — the scanner handles every construct it would have
             // ~keep stripped or bails cleanly.
-            let normalized = normalize_input(html)?;
             let stub_report = crate::converter::prescan::PrescanReport::default();
             match crate::converter::tier1::run_with_base(
-                normalized.as_ref(),
+                normalized_html.as_ref(),
                 &stub_report,
                 &options,
                 effective_base.clone(),
@@ -226,7 +217,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                         reason = %bail,
                         "tier-1 conversion bailed; falling back to tier-2"
                     );
-                    precomputed_normalized = Some(normalized);
                 }
             }
         }
@@ -234,11 +224,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
 
     #[cfg(feature = "visitor")]
     let visitor = options.visitor.clone();
-
-    let normalized_html = match precomputed_normalized {
-        Some(n) => n,
-        None => normalize_input(html)?,
-    };
 
     if !options.wrap {
         if let Some(markdown) = fast_text_only(normalized_html.as_ref(), &options) {
