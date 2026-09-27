@@ -117,9 +117,8 @@ impl Provenance {
     /// (`workflow_dispatch`, 360-minute budget) can only ever be captured on whichever host it
     /// happened to draw. Treating the CPU as part of the contract therefore turned an unavoidable
     /// pool difference into a coin-flip hard failure that aborted before a single timing was
-    /// evaluated. Host identity still gates *how* timing violations are reported — matched
-    /// hardware means violations are real and fatal, mismatched hardware means they may be
-    /// hardware noise and can be downgraded to advisory by an explicit opt-in.
+    /// evaluated. Host identity still decides whether timings are scored — matched hardware means
+    /// violations are real and fatal, mismatched hardware means the timings are not scored at all.
     #[must_use]
     pub fn host_matches(&self, other: &Self) -> bool {
         self.cpu_model == other.cpu_model && self.cpu_count == other.cpu_count

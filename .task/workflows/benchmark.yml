@@ -16,9 +16,10 @@ tasks:
     summary: |
       Compare latest benchmark results against the calibrated baseline.
 
-      Set ALLOW_HOST_MISMATCH=true to downgrade timing violations to advisory when the
-      current CPU is not the one the baseline was calibrated on. Intended for heterogeneous
-      CI runner pools only; it never relaxes the provenance contract, and it changes nothing
+      Timings are scored only on the CPU the baseline was calibrated on; on any other CPU the
+      run is reported as not scored and fails. Set ALLOW_HOST_MISMATCH=true to let an unscored
+      run succeed with a warning instead. Intended for heterogeneous CI runner pools only; it
+      never relaxes the provenance contract or the fixture inventory, and it changes nothing
       when the hardware matches the baseline.
     vars:
       RESULTS_FILE: '{{.RESULTS_FILE | default "tools/benchmark-harness/results/latest.json"}}'
