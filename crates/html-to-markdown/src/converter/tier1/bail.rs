@@ -289,7 +289,7 @@ impl fmt::Display for BailReason {
             Self::TableNestedTableInSingleCellRow => write!(f, "nested <table> inside a data table's single-cell row"),
             Self::TableCaption => write!(f, "<caption> element in table"),
             Self::TableSectionOrder => write!(f, "table sections in unsupported order"),
-            Self::UnknownEntity { name, offset } => write!(f, "unknown HTML entity &{name}; at byte offset {offset}"),
+            Self::UnknownEntity { name, offset } => write!(f, "unknown HTML entity &{name} at byte offset {offset}"),
             Self::DepthLimitExceeded { depth, max_depth } => {
                 write!(
                     f,

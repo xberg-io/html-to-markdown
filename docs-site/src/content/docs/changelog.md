@@ -93,6 +93,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tier 1 kept a reference encoded after an unknown name.** When an unknown name such as `&foo`
   had a `;` a few bytes later, Tier 1 wrote the whole span as it was, so `&foo &amp;` kept
   `&amp;` where Tier 2 wrote `&`. Tier 1 now writes the `&` alone and reads on, as Tier 2 does.
+- **Tier 1's fallback message added a `;` the page did not have.** When Tier 1 handed a reference
+  without its `;` to Tier 2, the log message showed `&#39;` for an input of `&#39`. The message
+  now shows the reference as written (#565).
 
 ## [3.15.1] - 2026-09-27
 

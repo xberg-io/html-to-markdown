@@ -133,3 +133,37 @@ fn json_ld_keeps_a_legacy_name_in_a_query_string() {
         metadata.structured_data[0].raw_json
     );
 }
+
+#[test]
+fn pre_language_class_is_read_as_an_attribute() {
+    assert_converts(r#"<pre class="language-a&notb">x</pre>"#, "```a&notb\nx\n```");
+}
+
+/// JSON-LD in the body goes through its own site and keeps the attribute rule too.
+#[cfg(feature = "metadata")]
+#[test]
+fn json_ld_in_the_body_keeps_a_legacy_name_in_a_query_string() {
+    let html = r#"<html><head></head><body><script type="application/ld+json">{"@type":"Article","url":"https://example.com/?a=1&copy=2"}</script><p>b</p></body></html>"#;
+    let metadata = convert(html, None).expect("convert failed").metadata;
+    assert_eq!(metadata.structured_data.len(), 1);
+    assert!(
+        metadata.structured_data[0]
+            .raw_json
+            .contains("https://example.com/?a=1&copy=2"),
+        "{:?}",
+        metadata.structured_data[0].raw_json
+    );
+}
+
+/// Text in a `<pre>`, in a code span and in a link label with a backslash goes through its own
+/// Tier 1 site. Each must read references with the text rule, so `&copy=2` decodes there as it
+/// does on Tier 2, and does not stay as written the way it would in an attribute.
+#[test]
+fn legacy_name_before_equals_decodes_in_pre_code_span_and_link_label_text() {
+    assert_converts("<pre>a&copy=2</pre>", "```\na\u{a9}=2\n```");
+    assert_converts("<p><code>a&copy=2</code></p>", "`a\u{a9}=2`");
+    assert_converts(
+        r#"<p><a href="https://example.com/">a\b &copy=2</a></p>"#,
+        "[a\\b \u{a9}=2](https://example.com/)",
+    );
+}

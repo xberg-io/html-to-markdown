@@ -36,7 +36,7 @@ fn all_variants() -> Vec<BailReason> {
             max_depth: 64,
         },
         BailReason::UnknownEntity {
-            name: "mdash".into(),
+            name: "copy".into(),
             offset: 15,
         },
         BailReason::HiddenElement { offset: 16 },
@@ -68,7 +68,7 @@ fn should_render_every_bail_reason_with_its_documented_message() {
         "<caption> element in table",
         "table sections in unsupported order",
         "open-tag nesting depth 65 reached the effective limit of 64",
-        "unknown HTML entity &mdash; at byte offset 15",
+        "unknown HTML entity &copy at byte offset 15",
         "hidden element (hidden attribute or style) at byte offset 16",
         "nested list with an ordered ancestor or ordered self (cumulative indent width)",
         "block-level child of a list item in a shape this scanner cannot render correctly",
