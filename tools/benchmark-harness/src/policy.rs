@@ -65,9 +65,9 @@ pub struct HostMismatch {
 /// Report the host-identity difference between a capture and its calibrated guardrails.
 ///
 /// Host identity is excluded from the provenance contract (see [`Provenance::contract_matches`]),
-/// so it can never abort the comparison. It is reported separately because it is the only
-/// legitimate reason to downgrade a timing violation from fatal to advisory: on hardware the
-/// baseline was never measured on, a positive delta is not evidence of a code regression.
+/// so it can never abort the comparison. It is reported separately because it decides whether
+/// timings can be scored at all: on hardware the baseline was never measured on, a delta in either
+/// direction is not evidence about the code.
 ///
 /// [`Provenance::contract_matches`]: crate::schema::Provenance::contract_matches
 #[must_use]
