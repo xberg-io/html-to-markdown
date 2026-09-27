@@ -16,8 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parenthesised descriptor or inside a URL started a new candidate: `a.png (x, b.png 3x ), c.png 2x`
   produced `b.png`, and `a.png?w=1,2 2x` produced `2`. Candidates are now split with the HTML
   spec's srcset parsing steps, including the parentheses rule, and only the spec's five ASCII
-  whitespace characters separate a URL from its descriptor. The choice of candidate is unchanged:
-  the largest width or density descriptor wins, and the first candidate is used when none has one.
+  whitespace characters separate a URL from its descriptor.
+- **The `srcset` fallback could choose a candidate a browser never loads, or compare a width with a
+  density.** Descriptors were read with Rust's float parsing and nothing else, so `a.png foo` stayed
+  eligible, `a.png infx` beat every other candidate, a first `NaNx` candidate could not be beaten,
+  `+2x` counted as `2x`, and `900x` beat `800w`. Descriptors now go through the spec's descriptor parser: a candidate with an
+  unknown token, a number outside the spec's grammar, a zero width, a second descriptor of one kind,
+  or an `h` without a `w` is dropped, and a list with no valid candidate keeps `src`. Widths and
+  densities are not compared with each other, because a browser needs `sizes` and the viewport to
+  do that: when any candidate has a width, the largest width wins, and otherwise the largest density
+  wins, a candidate with no descriptor counting as `1x`.
 
 ## [3.15.1] - 2026-09-27
 

@@ -171,6 +171,24 @@ fn should_read_the_img_srcset_and_not_a_picture_source_srcset() {
 }
 
 #[test]
+fn should_skip_a_srcset_candidate_whose_descriptor_is_invalid() {
+    let html = r#"<img srcset="https://x/a.png foo, https://x/b.png" alt="Invalid" />"#;
+    assert_eq!(convert(html), "![Invalid](https://x/b.png)\n");
+}
+
+#[test]
+fn should_skip_a_srcset_density_that_is_not_a_spec_number() {
+    let html = r#"<img srcset="https://x/a.png NaNx, https://x/b.png infx, https://x/c.png 2x" alt="Number" />"#;
+    assert_eq!(convert(html), "![Number](https://x/c.png)\n");
+}
+
+#[test]
+fn should_not_compare_a_srcset_width_with_a_density() {
+    let html = r#"<img srcset="https://x/a.png 900x, https://x/b.png 800w" alt="Kinds" />"#;
+    assert_eq!(convert(html), "![Kinds](https://x/b.png)\n");
+}
+
+#[test]
 fn should_resolve_every_data_src_image_in_the_squarespace_fixture() {
     let path = [
         env!("CARGO_MANIFEST_DIR"),

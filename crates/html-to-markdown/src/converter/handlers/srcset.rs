@@ -52,6 +52,120 @@ fn split_descriptor(after_url: &str) -> (&str, &str) {
     (descriptor, "")
 }
 
+/// A candidate's descriptor as the spec's descriptor parser reads it, before any `sizes` value.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(super) enum Descriptor {
+    /// A `w` descriptor: the image's width in pixels.
+    Width(f64),
+    /// An `x` descriptor, or 1 for a candidate with no descriptor, as the spec normalises it.
+    Density(f64),
+}
+
+/// Run the HTML "parse a srcset attribute" descriptor parser over one candidate's descriptor.
+///
+/// ~keep `None` is the spec's parse error, which drops the candidate: an unknown token, a number
+/// ~keep outside the spec's grammar (`+2x`, `infx`, `1.5w`), a zero width or height, a negative
+/// ~keep density, a second descriptor of a kind already set, a density next to a width or height,
+/// ~keep or an `h` without a `w`. A valid `h` is otherwise ignored, as the spec ignores it.
+pub(super) fn parse_descriptor(descriptor: &str) -> Option<Descriptor> {
+    let mut width = None;
+    let mut density = None;
+    let mut has_height = false;
+    for token in descriptor_tokens(descriptor) {
+        if let Some(number) = token.strip_suffix('w') {
+            if width.is_some() || density.is_some() {
+                return None;
+            }
+            width = Some(positive_integer(number)?);
+        } else if let Some(number) = token.strip_suffix('x') {
+            if width.is_some() || density.is_some() || has_height {
+                return None;
+            }
+            density = Some(non_negative_float(number)?);
+        } else if let Some(number) = token.strip_suffix('h') {
+            if has_height || density.is_some() {
+                return None;
+            }
+            positive_integer(number)?;
+            has_height = true;
+        } else {
+            return None;
+        }
+    }
+    if has_height && width.is_none() {
+        return None;
+    }
+    Some(match width {
+        Some(width) => Descriptor::Width(width),
+        None => Descriptor::Density(density.unwrap_or(1.0)),
+    })
+}
+
+/// Split a descriptor into the spec tokenizer's tokens: ASCII whitespace outside parentheses
+/// separates them, and a `(` still open at the end keeps the rest, trailing whitespace included.
+fn descriptor_tokens(descriptor: &str) -> impl Iterator<Item = &str> {
+    let mut rest = descriptor;
+    std::iter::from_fn(move || {
+        rest = rest.trim_start_matches(|c: char| c.is_ascii_whitespace());
+        if rest.is_empty() {
+            return None;
+        }
+        let mut in_parens = false;
+        let end = rest
+            .bytes()
+            .position(|byte| match byte {
+                b'(' => {
+                    in_parens = true;
+                    false
+                }
+                b')' => {
+                    in_parens = false;
+                    false
+                }
+                _ => !in_parens && byte.is_ascii_whitespace(),
+            })
+            .unwrap_or(rest.len());
+        let (token, remainder) = rest.split_at(end);
+        rest = remainder;
+        Some(token)
+    })
+}
+
+fn is_ascii_digits(text: &str) -> bool {
+    !text.is_empty() && text.bytes().all(|byte| byte.is_ascii_digit())
+}
+
+/// A "valid non-negative integer" that is not zero, the only kind a `w` or `h` accepts.
+fn positive_integer(text: &str) -> Option<f64> {
+    if !is_ascii_digits(text) {
+        return None;
+    }
+    text.parse::<f64>().ok().filter(|value| *value > 0.0)
+}
+
+/// A "valid floating-point number" that is not negative: an optional `-`, digits with an
+/// optional fraction (or a bare fraction), then an optional exponent. A value that rounds past
+/// the largest finite double is an error, as the spec's parsing rules make it.
+///
+/// ~keep Rust's float grammar is the spec's from the exponent on, but before it Rust also accepts
+/// ~keep a leading `+`, `inf`, `NaN` and `1.`, so only the part before the exponent is checked.
+fn non_negative_float(text: &str) -> Option<f64> {
+    let unsigned = text.strip_prefix('-').unwrap_or(text);
+    let mantissa = unsigned
+        .split_once(['e', 'E'])
+        .map_or(unsigned, |(mantissa, _)| mantissa);
+    let mantissa_is_valid = match mantissa.split_once('.') {
+        Some((whole, fraction)) => (whole.is_empty() || is_ascii_digits(whole)) && is_ascii_digits(fraction),
+        None => is_ascii_digits(mantissa),
+    };
+    if !mantissa_is_valid {
+        return None;
+    }
+    text.parse::<f64>()
+        .ok()
+        .filter(|value| value.is_finite() && *value >= 0.0)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -148,16 +262,53 @@ mod tests {
     fn disagreement(list: &str) -> Option<String> {
         let ours: Vec<(String, Vec<String>)> = srcset_candidates(list)
             .map(|(url, descriptor)| {
-                // ~keep The descriptor is one span; the spec's tokens are what that span tokenizes to.
-                let tokens = spec_srcset(&format!("u {descriptor}"))
-                    .pop()
-                    .map(|(_, tokens)| tokens)
-                    .unwrap_or_default();
+                let tokens = descriptor_tokens(descriptor).map(str::to_owned).collect();
                 (url.to_owned(), tokens)
             })
             .collect();
         let spec = spec_srcset(list);
         (ours != spec).then(|| format!("{list:?}: ours {ours:?}, spec {spec:?}"))
+    }
+
+    #[test]
+    fn the_descriptor_parser_follows_the_spec_steps() {
+        assert_eq!(parse_descriptor(""), Some(Descriptor::Density(1.0)));
+        assert_eq!(parse_descriptor("1.5x"), Some(Descriptor::Density(1.5)));
+        assert_eq!(parse_descriptor("-0x"), Some(Descriptor::Density(0.0)));
+        assert_eq!(parse_descriptor("-.5e-0x"), None);
+        assert_eq!(parse_descriptor("1E+1x"), Some(Descriptor::Density(10.0)));
+        assert_eq!(parse_descriptor("5e-1x"), Some(Descriptor::Density(0.5)));
+        assert_eq!(parse_descriptor("800w"), Some(Descriptor::Width(800.0)));
+        assert_eq!(parse_descriptor("007w"), Some(Descriptor::Width(7.0)));
+        assert_eq!(parse_descriptor("800w 600h"), Some(Descriptor::Width(800.0)));
+        for invalid in [
+            "x",
+            "w",
+            "2",
+            "2X",
+            "2W",
+            "1e",
+            "1e+x",
+            "1e1.5x",
+            "1e+-1x",
+            "1einfx",
+            "e1x",
+            "1.x",
+            ".x",
+            "--1x",
+            "0x1x",
+            "1_0w",
+            "\u{661}x",
+            "800w 900w",
+            "600h 700h 800w",
+            "600h",
+            "1x 600h",
+            "600h 1x",
+            "(1x)",
+            "1x (a)",
+        ] {
+            assert_eq!(parse_descriptor(invalid), None, "{invalid:?}");
+        }
     }
 
     #[test]

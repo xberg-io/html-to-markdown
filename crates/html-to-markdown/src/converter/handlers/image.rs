@@ -12,7 +12,7 @@ use std::collections::BTreeMap;
 
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
-use crate::converter::handlers::srcset::srcset_candidates;
+use crate::converter::handlers::srcset::{Descriptor, parse_descriptor, srcset_candidates};
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
 use crate::converter::utility::attributes::decoded_attribute;
 use crate::converter::utility::escaping::escape_link_label;
@@ -294,46 +294,32 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
 /// Parse a `srcset`-shaped attribute value and return the URL of its highest
 /// -resolution candidate.
 ///
-/// ~keep `srcset` lists one or more `"<url> [descriptor]"` candidates separated by
-/// ~keep commas, where a descriptor is a pixel density (`2x`) or a width (`800w`).
-/// ~keep Markdown has no responsive-image equivalent, so this picks a single URL: the
-/// ~keep candidate with the largest numeric descriptor, i.e. the highest-quality image
+/// ~keep `srcset` lists `"<url> [descriptors]"` candidates separated by commas. Markdown has
+/// ~keep no responsive-image equivalent, so this picks one URL, the highest-quality image
 /// ~keep offered (a high-resolution image degrades gracefully wherever it is viewed; a
-/// ~keep low-resolution one does not). A candidate with no descriptor is treated as the
-/// ~keep first candidate when no other candidate carries one either — the HTML spec
-/// ~keep allows at most one descriptor-less candidate, so there is nothing to compare it
-/// ~keep against in that case. Candidates are split as the HTML spec splits them (see
-/// ~keep `srcset_candidates`), so a comma inside a URL or a parenthesised descriptor does
-/// ~keep not start a new candidate.
+/// ~keep low-resolution one does not). Candidates are split and their descriptors parsed as the
+/// ~keep HTML spec does (see `srcset_candidates` and `parse_descriptor`), and a candidate the
+/// ~keep spec drops is never chosen. A browser compares a width with a density only through the
+/// ~keep `sizes` value and the viewport, which a converter does not have, so the kinds are not
+/// ~keep compared: when any candidate has a width, the largest width wins (widths keep their
+/// ~keep order under every `sizes` value); otherwise the largest density wins, a candidate with no
+/// ~keep descriptor counting as `1x`. On a tie the first candidate wins, as in the spec.
 fn pick_best_srcset_candidate(value: &str) -> Option<&str> {
-    let mut best: Option<(&str, f64)> = None;
-    let mut first_url: Option<&str> = None;
+    let mut widest: Option<(&str, f64)> = None;
+    let mut densest: Option<(&str, f64)> = None;
 
     for (url, descriptor) in srcset_candidates(value) {
-        if first_url.is_none() {
-            first_url = Some(url);
-        }
-
-        let first_token = descriptor.split(|c: char| c.is_ascii_whitespace()).next();
-        let score = first_token.and_then(|descriptor| {
-            if descriptor.len() < 2 || !(descriptor.ends_with('w') || descriptor.ends_with('x')) {
-                return None;
-            }
-            descriptor[..descriptor.len() - 1].parse::<f64>().ok()
-        });
-
-        if let Some(score) = score {
-            let is_better = match best {
-                Some((_, best_score)) => score > best_score,
-                None => true,
-            };
-            if is_better {
-                best = Some((url, score));
-            }
+        let (best, score) = match parse_descriptor(descriptor) {
+            Some(Descriptor::Width(width)) => (&mut widest, width),
+            Some(Descriptor::Density(density)) => (&mut densest, density),
+            None => continue,
+        };
+        if best.is_none_or(|(_, best_score)| score > best_score) {
+            *best = Some((url, score));
         }
     }
 
-    best.map(|(url, _)| url).or(first_url)
+    widest.or(densest).map(|(url, _)| url)
 }
 
 /// Format an image as Markdown syntax.
@@ -550,7 +536,7 @@ mod tests {
     }
 
     #[test]
-    fn the_choice_rule_is_unchanged_for_plain_lists() {
+    fn the_largest_descriptor_of_one_kind_wins() {
         assert_eq!(pick_best_srcset_candidate("a.png"), Some("a.png"));
         assert_eq!(pick_best_srcset_candidate("a.png, b.png 2x"), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png 480w, b.png 1200w"), Some("b.png"));
@@ -564,6 +550,58 @@ mod tests {
         assert_eq!(pick_best_srcset_candidate("a.png\u{a0}3x, b.png 2x"), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png \u{a0}9x, b.png 2x"), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a\u{a0}b.png 2x"), Some("a\u{a0}b.png"));
+    }
+
+    #[test]
+    fn a_candidate_with_invalid_descriptors_is_never_chosen() {
+        assert_eq!(pick_best_srcset_candidate("a.png foo"), None);
+        assert_eq!(pick_best_srcset_candidate("a.png foo, b.png"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 1x 2x, b.png 0.5x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 3x 900w, b.png 1x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 0w, b.png 10w"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 0w"), None);
+        assert_eq!(pick_best_srcset_candidate("a.png -1x, b.png 0.5x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 0x, b.png 0.5x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 0x"), Some("a.png"));
+    }
+
+    #[test]
+    fn descriptor_numbers_follow_the_spec_grammar() {
+        assert_eq!(pick_best_srcset_candidate("a.png NaNx, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png infx, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png +3x, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 3.x, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 1e400x, b.png 2x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 1.5w, b.png 1w"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png +5w, b.png 1w"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 1e1x, b.png 2x"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png .5x, b.png 0.25x"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 2.5E-1x, b.png 0.2x"), Some("a.png"));
+    }
+
+    #[test]
+    fn widths_and_densities_are_not_compared_on_one_scale() {
+        assert_eq!(pick_best_srcset_candidate("a.png 900x, b.png 800w"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png, b.png 10w"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png, b.png 0.5x"), Some("a.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 1x, b.png 2x, c.png 2x"),
+            Some("b.png")
+        );
+        assert_eq!(pick_best_srcset_candidate("a.png 900w, b.png 900w"), Some("a.png"));
+    }
+
+    #[test]
+    fn a_height_descriptor_needs_a_width() {
+        assert_eq!(pick_best_srcset_candidate("a.png 50h 100w, b.png 90w"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 100w 50h, b.png 90w"), Some("a.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 2x 50h, b.png 1x"), Some("b.png"));
+        assert_eq!(pick_best_srcset_candidate("a.png 50h, b.png 0.5x"), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 100w 50h 60h, b.png 90w"),
+            Some("b.png")
+        );
+        assert_eq!(pick_best_srcset_candidate("a.png 100w 0h, b.png 90w"), Some("b.png"));
     }
 
     #[test]
