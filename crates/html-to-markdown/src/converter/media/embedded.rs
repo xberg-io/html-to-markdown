@@ -14,9 +14,10 @@ use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::append_markdown_link;
 use crate::converter::main_helpers::tag_name_eq;
+use crate::converter::media::{first_address, inline_data_treatment};
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
-use crate::options::ConversionOptions;
+use crate::options::{ConversionOptions, InlineDataMedia};
 
 /// ~keep Append a media element's `src` as a Markdown link where the destination doubles as
 /// the label (`[src](src)`), routed through [`append_markdown_link`] so the destination gets
@@ -45,22 +46,32 @@ pub fn extract_media_src<'a>(tag: &'a HTMLTag<'a>) -> Cow<'a, str> {
     crate::converter::utility::attributes::decoded_attribute(tag, "src").unwrap_or(Cow::Borrowed(""))
 }
 
-/// Try to find source src from nested source element.
+/// The address of an `<audio>` or `<video>`: its own `src`, else its first nested `<source>`'s.
 ///
-/// Used by audio and video elements to extract src from child <source> elements
-/// when the parent doesn't have a src attribute.
-pub fn find_source_src<'a, T>(children: T, parser: &'a Parser) -> Option<Cow<'a, str>>
-where
-    T: IntoIterator<Item = &'a NodeHandle>,
-{
-    for child_handle in children {
-        if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
-            if tag_name_eq(child_tag.name().as_utf8_str(), "source") {
-                return crate::converter::utility::attributes::decoded_attribute(child_tag, "src");
-            }
-        }
+/// With any choice but [`InlineDataMedia::Keep`], a `data:` address is passed over for the next
+/// non-empty one among the element's `src` and every nested `<source>`'s.
+fn media_element_src<'a>(tag: &'a HTMLTag<'a>, parser: &'a Parser, choice: InlineDataMedia) -> Cow<'a, str> {
+    let own = extract_media_src(tag);
+    let children = tag.children();
+    let mut sources = children
+        .top()
+        .iter()
+        .filter_map(|child_handle| match child_handle.get(parser) {
+            Some(tl::Node::Tag(child_tag)) if is_source_element(child_tag) => Some(child_tag),
+            _ => None,
+        })
+        .map(|source| crate::converter::utility::attributes::decoded_attribute(source, "src"));
+    if choice == InlineDataMedia::Keep {
+        return if own.is_empty() {
+            sources.next().flatten().unwrap_or(Cow::Borrowed(""))
+        } else {
+            own
+        };
     }
-    None
+    let addresses = std::iter::once(own)
+        .chain(sources.flatten())
+        .filter(|address| !address.is_empty());
+    first_address(choice, addresses).unwrap_or(Cow::Borrowed(""))
 }
 
 /// Check if tag is a source element.
@@ -92,12 +103,7 @@ pub fn handle_audio(
 ) {
     use crate::converter::main::walk_node;
 
-    let children = tag.children();
-    let raw_src = if extract_media_src(tag).is_empty() {
-        find_source_src(children.top().iter(), parser).unwrap_or(Cow::Borrowed(""))
-    } else {
-        extract_media_src(tag)
-    };
+    let raw_src = media_element_src(tag, parser, options.inline_data_media);
     let base_resolved_src = ctx.resolve_url(&raw_src);
     let src = sanitize_markdown_url(base_resolved_src.as_deref().unwrap_or(&raw_src)).into_owned();
     let src_opt: Option<&str> = if src.is_empty() { None } else { Some(src.as_str()) };
@@ -146,7 +152,11 @@ pub fn handle_audio(
         }
     }
 
-    if should_output_media_link(&src) {
+    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    if inline_data == InlineDataMedia::DropElement {
+        return;
+    }
+    if inline_data == InlineDataMedia::Keep && should_output_media_link(&src) {
         append_media_src_link(output, &src, options, ctx);
         if !ctx.in_paragraph && !ctx.convert_as_inline {
             output.push_str("\n\n");
@@ -190,12 +200,7 @@ pub fn handle_video(
 ) {
     use crate::converter::main::walk_node;
 
-    let children = tag.children();
-    let raw_src = if extract_media_src(tag).is_empty() {
-        find_source_src(children.top().iter(), parser).unwrap_or(Cow::Borrowed(""))
-    } else {
-        extract_media_src(tag)
-    };
+    let raw_src = media_element_src(tag, parser, options.inline_data_media);
     let base_resolved_src = ctx.resolve_url(&raw_src);
     let src = sanitize_markdown_url(base_resolved_src.as_deref().unwrap_or(&raw_src)).into_owned();
     let src_opt: Option<&str> = if src.is_empty() { None } else { Some(src.as_str()) };
@@ -244,7 +249,11 @@ pub fn handle_video(
         }
     }
 
-    if should_output_media_link(&src) {
+    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    if inline_data == InlineDataMedia::DropElement {
+        return;
+    }
+    if inline_data == InlineDataMedia::Keep && should_output_media_link(&src) {
         append_media_src_link(output, &src, options, ctx);
         if !ctx.in_paragraph && !ctx.convert_as_inline {
             output.push_str("\n\n");
@@ -360,7 +369,7 @@ pub fn handle_iframe(
         }
     }
 
-    if !src.is_empty() {
+    if inline_data_treatment(options.inline_data_media, &src) == InlineDataMedia::Keep && !src.is_empty() {
         append_media_src_link(output, &src, options, ctx);
         if !ctx.in_paragraph && !ctx.convert_as_inline {
             output.push_str("\n\n");

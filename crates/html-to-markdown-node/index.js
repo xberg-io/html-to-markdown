@@ -122,6 +122,7 @@ module.exports.CodeBlockStyle = nativeBinding.CodeBlockStyle;
 module.exports.HeadingStyle = nativeBinding.HeadingStyle;
 module.exports.HighlightStyle = nativeBinding.HighlightStyle;
 module.exports.ImageType = nativeBinding.ImageType;
+module.exports.InlineDataMedia = nativeBinding.InlineDataMedia;
 module.exports.LinkStyle = nativeBinding.LinkStyle;
 module.exports.LinkType = nativeBinding.LinkType;
 module.exports.ListIndentType = nativeBinding.ListIndentType;

@@ -53,6 +53,23 @@ fn classify_routes_tier1_when_clean_and_extract_metadata_false() {
     assert_eq!(choice, RouterDecision::Tier1);
 }
 
+#[cfg(feature = "testkit")]
+#[test]
+fn classify_routes_tier2_when_inline_data_media_is_not_keep() {
+    use html_to_markdown_rs::InlineDataMedia;
+    for (choice, expected) in [
+        (InlineDataMedia::Keep, RouterDecision::Tier1),
+        (InlineDataMedia::AltTextOnly, RouterDecision::Tier2),
+        (InlineDataMedia::DropElement, RouterDecision::Tier2),
+    ] {
+        let opts = ConversionOptions {
+            inline_data_media: choice,
+            ..minimal_options()
+        };
+        assert_eq!(route("<p>hello</p>", &opts), expected, "{choice:?}");
+    }
+}
+
 // ~keep ── 3. Custom elements no longer gate routing (Phase FF) ────────────────────
 
 #[cfg(feature = "testkit")]

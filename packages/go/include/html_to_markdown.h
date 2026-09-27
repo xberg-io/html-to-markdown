@@ -224,6 +224,18 @@ typedef struct HTMImageMetadata HTMImageMetadata;
  */
 typedef struct HTMImageType HTMImageType;
 /**
+ * What the output shows for an image or embedded media element whose address is an inline
+ * `data:` URL.
+ *
+ * Applies to `<img>` (including its lazy-load attributes and `srcset` candidates), `<graphic>`,
+ * inline `<svg>`, `<video>`, `<audio>` (including their nested `<source>` elements) and
+ * `<iframe>`. Links (`<a href>`) are not media and keep their destination.
+ *
+ * With `AltTextOnly` or `DropElement`, an element that also has an address that is not `data:`
+ * uses that address instead.
+ */
+typedef struct HTMInlineDataMedia HTMInlineDataMedia;
+/**
  * Hyperlink metadata with categorization and attributes.
  *
  * Represents `<a>` elements with parsed href values, text content, and link type classification.
@@ -1268,6 +1280,15 @@ char *htm_conversion_options_preserve_tags(HTMAlefHandle handle);
 int32_t htm_conversion_options_skip_images(HTMAlefHandle handle);
 
 /**
+ * Get the `inline_data_media` field from a `ConversionOptions`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `htm_inline_data_media_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMAlefHandle htm_conversion_options_inline_data_media(HTMAlefHandle handle);
+
+/**
  * Get the `url_escape_style` field from a `ConversionOptions`.
  * A non-null returned handle is owned by the caller.
  * It must be freed with `htm_url_escape_style_free`.
@@ -1869,6 +1890,15 @@ int32_t htm_conversion_options_update_skip_images(HTMAlefHandle handle);
  * Pointer must be a valid handle returned by this library.
  */
 int32_t htm_conversion_options_update_has_skip_images(HTMAlefHandle handle);
+
+/**
+ * Get the `inline_data_media` field from a `ConversionOptionsUpdate`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `htm_inline_data_media_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMAlefHandle htm_conversion_options_update_inline_data_media(HTMAlefHandle handle);
 
 /**
  * Get the `url_escape_style` field from a `ConversionOptionsUpdate`.
@@ -3509,6 +3539,21 @@ int32_t htm_image_type_from_i32(int32_t value);
 int32_t htm_image_type_from_str(const char *name);
 
 /**
+ * Convert an integer to a `InlineDataMedia` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t htm_inline_data_media_from_i32(int32_t value);
+
+/**
+ * Convert a `InlineDataMedia` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t htm_inline_data_media_from_str(const char *name);
+
+/**
  * Convert an integer to a `LinkStyle` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -3809,6 +3854,13 @@ char *htm_image_type_to_json(HTMAlefHandle handle);
  */
 char *htm_image_type_to_string(HTMAlefHandle handle);
 #endif
+
+/**
+ * Free a `InlineDataMedia` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void htm_inline_data_media_free(HTMAlefHandle handle);
 
 /**
  * Free a `LinkStyle` handle.

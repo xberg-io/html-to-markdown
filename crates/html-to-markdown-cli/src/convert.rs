@@ -53,6 +53,7 @@ pub fn build_conversion_options(cli: &Cli) -> ConversionOptions {
         link_style: cli.link_style.map_or(defaults.link_style, Into::into),
         url_escape_style: cli.url_escape_style.map_or(defaults.url_escape_style, Into::into),
         skip_images: cli.skip_images,
+        inline_data_media: cli.inline_data_media.map_or(defaults.inline_data_media, Into::into),
         preprocessing,
         encoding: cli.encoding.clone(),
         debug: cli.debug,

@@ -60,6 +60,28 @@ fn should_percent_encode_destination_with_space_when_url_escape_style_is_percent
 }
 
 #[test]
+fn should_write_the_alt_text_for_a_data_image_when_inline_data_media_is_alt_text_only() {
+    cli()
+        .arg("--inline-data-media")
+        .arg("alt-text-only")
+        .write_stdin(r#"<p><img src="data:image/png;base64,AAAA" alt="icon"></p>"#)
+        .assert()
+        .success()
+        .stdout("icon\n");
+}
+
+#[test]
+fn should_reject_invalid_inline_data_media_value() {
+    cli()
+        .arg("--inline-data-media")
+        .arg("strip")
+        .write_stdin("<p>Test</p>")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("invalid value"));
+}
+
+#[test]
 fn should_reject_invalid_url_escape_style_value() {
     cli()
         .arg("--url-escape-style")

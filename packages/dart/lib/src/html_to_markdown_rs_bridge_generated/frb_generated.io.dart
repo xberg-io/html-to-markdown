@@ -167,6 +167,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ImageDimensions dco_decode_box_autoadd_image_dimensions(dynamic raw);
 
   @protected
+  InlineDataMedia dco_decode_box_autoadd_inline_data_media(dynamic raw);
+
+  @protected
   LinkStyle dco_decode_box_autoadd_link_style(dynamic raw);
 
   @protected
@@ -253,6 +256,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageType dco_decode_image_type(dynamic raw);
+
+  @protected
+  InlineDataMedia dco_decode_inline_data_media(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_isize(dynamic raw);
@@ -361,6 +367,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageDimensions? dco_decode_opt_box_autoadd_image_dimensions(dynamic raw);
+
+  @protected
+  InlineDataMedia? dco_decode_opt_box_autoadd_inline_data_media(dynamic raw);
 
   @protected
   LinkStyle? dco_decode_opt_box_autoadd_link_style(dynamic raw);
@@ -535,6 +544,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  InlineDataMedia sse_decode_box_autoadd_inline_data_media(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer);
 
   @protected
@@ -641,6 +655,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageType sse_decode_image_type(SseDeserializer deserializer);
+
+  @protected
+  InlineDataMedia sse_decode_inline_data_media(SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_isize(SseDeserializer deserializer);
@@ -779,6 +796,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageDimensions? sse_decode_opt_box_autoadd_image_dimensions(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  InlineDataMedia? sse_decode_opt_box_autoadd_inline_data_media(
     SseDeserializer deserializer,
   );
 
@@ -1099,6 +1121,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_inline_data_media(
+    InlineDataMedia self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_link_style(
     LinkStyle self,
     SseSerializer serializer,
@@ -1247,6 +1275,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_image_type(ImageType self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_inline_data_media(
+    InlineDataMedia self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_isize(PlatformInt64 self, SseSerializer serializer);
@@ -1417,6 +1451,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_image_dimensions(
     ImageDimensions? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_inline_data_media(
+    InlineDataMedia? self,
     SseSerializer serializer,
   );
 

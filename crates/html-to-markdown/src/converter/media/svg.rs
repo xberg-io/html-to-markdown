@@ -268,11 +268,13 @@ pub fn handle_svg(
         handle_inline_svg(collector_ref, node_handle, parser, title_opt, attributes_map);
     }
 
-    if options.skip_images {
+    // ~keep The converter writes an inline SVG as a `data:` URL it builds itself, so the
+    // ~keep inline-data choice always applies.
+    if options.skip_images || options.inline_data_media == crate::options::InlineDataMedia::DropElement {
         return;
     }
 
-    if ctx.convert_as_inline {
+    if ctx.convert_as_inline || options.inline_data_media == crate::options::InlineDataMedia::AltTextOnly {
         output.push_str(&title);
     } else {
         use base64::{Engine as _, engine::general_purpose::STANDARD};

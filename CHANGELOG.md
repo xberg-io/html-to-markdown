@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ConversionOptions::inline_data_media`** chooses what to write for an image or embedded media
+  element whose address is an inline `data:` URL, so the payload no longer has to land in the
+  output. `keep` (the default) writes the URL as before. `alt_text_only` writes the alt text: the
+  title of an inline `<svg>`, the fallback content of `<video>` and `<audio>`, nothing for an
+  `<iframe>`. `drop_element` writes nothing. It covers `<img>`, `<graphic>`, inline `<svg>`,
+  `<video>`, `<audio>` and `<iframe>`. With either of the last two choices, a real address on the
+  element wins over the `data:` one: a lazy-load attribute or `srcset` candidate on `<img>`,
+  another address attribute on `<graphic>`, a nested `<source>` on `<video>` and `<audio>`.
+  Links keep their destination, and extracted images do not change. The CLI takes it as
+  `--inline-data-media` (#528).
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed

@@ -13,10 +13,11 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
+use crate::converter::media::{inline_data_treatment, is_inline_data};
 use crate::converter::utility::attributes::decoded_attribute;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
-use crate::options::ConversionOptions;
+use crate::options::{ConversionOptions, InlineDataMedia};
 
 #[cfg(feature = "inline-images")]
 use crate::converter::media::handle_inline_data_image;
@@ -49,7 +50,7 @@ pub fn handle_img(
     dom_ctx: &DomContext,
 ) {
     let src: Cow<'_, str> = {
-        let effective_src = resolve_effective_src(tag);
+        let effective_src = resolve_effective_src(tag, options.inline_data_media != InlineDataMedia::Keep);
         let base_resolved = ctx.resolve_url(&effective_src);
         Cow::Owned(sanitize_markdown_url(base_resolved.as_deref().unwrap_or(&effective_src)).into_owned())
     };
@@ -129,8 +130,22 @@ pub fn handle_img(
         || ctx.cell_allow_inline_images
         || ctx.link_allow_inline_images;
 
-    let should_use_alt_text =
-        !keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images));
+    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    let should_use_alt_text = inline_data == InlineDataMedia::AltTextOnly
+        || (!keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images)));
+    let render = || {
+        (inline_data != InlineDataMedia::DropElement).then(|| {
+            format_image_markdown(
+                &src,
+                &alt,
+                title.as_deref(),
+                should_use_alt_text,
+                options.link_style,
+                options.url_escape_style,
+                ctx.reference_collector.as_ref(),
+            )
+        })
+    };
 
     #[cfg(feature = "visitor")]
     let image_output = if let Some(ref visitor_handle) = ctx.visitor {
@@ -155,15 +170,7 @@ pub fn handle_img(
             visitor.visit_image(&node_ctx, &src, &alt, title.as_deref())
         };
         match visit_result {
-            VisitResult::Continue => Some(format_image_markdown(
-                &src,
-                &alt,
-                title.as_deref(),
-                should_use_alt_text,
-                options.link_style,
-                options.url_escape_style,
-                ctx.reference_collector.as_ref(),
-            )),
+            VisitResult::Continue => render(),
             VisitResult::Custom(custom) => Some(custom),
             VisitResult::Skip => None,
             VisitResult::Error(err) => {
@@ -175,27 +182,11 @@ pub fn handle_img(
             VisitResult::PreserveHtml => Some(serialize_node(node_handle, parser)),
         }
     } else {
-        Some(format_image_markdown(
-            &src,
-            &alt,
-            title.as_deref(),
-            should_use_alt_text,
-            options.link_style,
-            options.url_escape_style,
-            ctx.reference_collector.as_ref(),
-        ))
+        render()
     };
 
     #[cfg(not(feature = "visitor"))]
-    let image_output = Some(format_image_markdown(
-        &src,
-        &alt,
-        title.as_deref(),
-        should_use_alt_text,
-        options.link_style,
-        options.url_escape_style,
-        ctx.reference_collector.as_ref(),
-    ));
+    let image_output = render();
 
     if !options.skip_images {
         if let Some(img_text) = image_output {
@@ -260,20 +251,24 @@ const LAZY_SINGLE_URL_ATTRIBUTES: [&str; 3] = ["data-src", "data-lazy-src", "dat
 /// ~keep    kept unchanged. This is also what makes a plain `<img src="...">` with none
 /// ~keep    of the above attributes byte-identical to output produced before this
 /// ~keep    fallback existed.
-fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
+///
+/// With `skip_inline_data`, every step passes over a `data:` value or candidate in any case, so a
+/// real address anywhere wins over an inline payload.
+fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -> Cow<'a, str> {
     // ~keep Every read here goes through `decoded_attribute`: a URL attribute carries
     // ~keep character references like any other (`src="i.png?a=1&amp;b=2"`), and `srcset` is
     // ~keep parsed *after* decoding because the entity is not part of its comma/descriptor
     // ~keep grammar. Issue #494.
     let raw_src = decoded_attribute(tag, "src").unwrap_or(Cow::Borrowed(""));
+    let is_placeholder = |value: &str| value.trim().is_empty() || (skip_inline_data && is_inline_data(value));
 
-    if !raw_src.trim().is_empty() && !raw_src.trim_start().starts_with("data:") {
+    if !is_placeholder(&raw_src) && !raw_src.trim_start().starts_with("data:") {
         return raw_src;
     }
 
     for attr_name in LAZY_SINGLE_URL_ATTRIBUTES {
         if let Some(value) = decoded_attribute(tag, attr_name) {
-            if !value.trim().is_empty() {
+            if !is_placeholder(&value) {
                 return value;
             }
         }
@@ -281,7 +276,7 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
 
     for attr_name in ["data-srcset", "srcset"] {
         if let Some(value) = decoded_attribute(tag, attr_name) {
-            if let Some(candidate) = pick_best_srcset_candidate(&value) {
+            if let Some(candidate) = pick_best_srcset_candidate(&value, skip_inline_data) {
                 return Cow::Owned(candidate.to_string());
             }
         }
@@ -306,7 +301,7 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>) -> Cow<'a, str> {
 /// ~keep Splitting on `,` is a simplification of the full HTML `srcset` grammar, which
 /// ~keep in rare cases allows a literal comma inside an unescaped URL; it matches every
 /// ~keep real-world `srcset` value this crate has been fed.
-fn pick_best_srcset_candidate(value: &str) -> Option<&str> {
+fn pick_best_srcset_candidate(value: &str, skip_inline_data: bool) -> Option<&str> {
     let mut best: Option<(&str, f64)> = None;
     let mut first_url: Option<&str> = None;
 
@@ -319,6 +314,9 @@ fn pick_best_srcset_candidate(value: &str) -> Option<&str> {
         let Some(url) = parts.next() else {
             continue;
         };
+        if skip_inline_data && is_inline_data(url) {
+            continue;
+        }
         if first_url.is_none() {
             first_url = Some(url);
         }
@@ -397,6 +395,14 @@ fn format_image_markdown(
 mod tests {
     use super::*;
     use crate::options::validation::{LinkStyle, UrlEscapeStyle};
+
+    #[test]
+    fn a_srcset_skips_data_candidates_only_when_asked() {
+        let srcset = "real.png 1x, data:x 3x";
+        assert_eq!(pick_best_srcset_candidate(srcset, false), Some("data:x"));
+        assert_eq!(pick_best_srcset_candidate(srcset, true), Some("real.png"));
+        assert_eq!(pick_best_srcset_candidate("DATA:x 1x", true), None);
+    }
 
     #[test]
     fn format_image_markdown_angle_wraps_space() {
