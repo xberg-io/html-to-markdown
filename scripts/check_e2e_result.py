@@ -34,6 +34,10 @@ def verdict(needs: dict[str, Any]) -> list[str]:
         if changes.get("result") != "success":
             problems.append(f"{CHANGES}: {changes.get('result')}, so no leg's path filters are known")
         flags = changes.get("outputs") or {}
+    # ~keep No step can read whether the run was cancelled: a step's `cancelled()` reports its own
+    # ~keep job. A cancelled job in `needs` is the only record, and it names why a leg whose filters
+    # ~keep matched was skipped by its `!cancelled()` guard.
+    run_cancelled = any(info.get("result") == "cancelled" for info in needs.values())
 
     for job, info in sorted(needs.items()):
         if job == CHANGES:
@@ -45,7 +49,9 @@ def verdict(needs: dict[str, Any]) -> list[str]:
             flag = flags.get(f"run-{job}")
             if flag == "false":
                 continue
-            if flag == "true":
+            if flag == "true" and run_cancelled:
+                problems.append(f"{job}: skipped because the run was cancelled")
+            elif flag == "true":
                 problems.append(f"{job}: skipped although its path filters matched")
             else:
                 problems.append(f"{job}: skipped, and no path filter output allows it to skip")
@@ -73,11 +79,24 @@ def check_workflow(workflow: dict[str, Any]) -> list[str]:
     problems.extend(
         f"{job}: not listed in the needs of {AGGREGATE}" for job in sorted(set(jobs) - {AGGREGATE} - aggregate_needs)
     )
-    if not any(
-        step.get("run", "").strip() == VERDICT_COMMAND and (step.get("env") or {}).get("NEEDS") == NEEDS_ENV
-        for step in aggregate.get("steps") or []
-    ):
+    if "continue-on-error" in aggregate:
+        problems.append(f"{AGGREGATE}: must not set `continue-on-error`")
+    steps = aggregate.get("steps") or []
+    verdict_steps = [
+        step
+        for step in steps
+        if step.get("run", "").strip() == VERDICT_COMMAND and (step.get("env") or {}).get("NEEDS") == NEEDS_ENV
+    ]
+    if not verdict_steps:
         problems.append(f"{AGGREGATE}: no step runs `{VERDICT_COMMAND}` with NEEDS set to `{NEEDS_ENV}`")
+    for step in verdict_steps:
+        if not any(
+            str(earlier.get("uses", "")).startswith("actions/checkout@") for earlier in steps[: steps.index(step)]
+        ):
+            problems.append(f"{AGGREGATE}: no checkout step runs before the verdict step")
+        problems.extend(
+            f"{AGGREGATE}: the verdict step must not set `{key}`" for key in ("if", "continue-on-error") if key in step
+        )
 
     outputs = set((jobs.get(CHANGES) or {}).get("outputs") or {})
     read_outputs: set[str] = set()
@@ -87,8 +106,9 @@ def check_workflow(workflow: dict[str, Any]) -> list[str]:
         read = set(CHANGES_OUTPUT.findall(str(job.get("if", ""))))
         read_outputs |= read
         own = f"run-{job_id}"
-        if "if" in job and read != {own}:
-            problems.append(f"{job_id}: its `if:` must read only needs.changes.outputs.{own}")
+        gate = f"needs.changes.outputs.{own} == 'true'"
+        if "if" in job and " ".join(str(job["if"]).split()) not in (gate, f"always() && !cancelled() && {gate}"):
+            problems.append(f"{job_id}: its `if:` must be `{gate}`, optionally after `always() && !cancelled() &&`")
         if read and own not in outputs:
             problems.append(f"{job_id}: {CHANGES} has no {own} output")
         if read and CHANGES not in _needs_list(job):

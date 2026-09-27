@@ -2,6 +2,7 @@
 
 import copy
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,53 @@ def _needs(results: dict[str, str], flags: dict[str, str], changes: str = "succe
     for job, result in results.items():
         needs[job] = {"result": result, "outputs": {}}
     return needs
+
+
+# The path filters each leg runs on, as the leg conditions on main stated them before they moved into
+# the change detection job. A term dropped from an output skips its leg with a green result, so the
+# outputs are pinned here rather than trusted.
+LEG_FILTERS = {
+    "build-ffi": {"core", "ffi"},
+    "build-python": {"core", "python"},
+    "build-node": {"core", "node"},
+    "build-node-musl": {"core", "node"},
+    "build-node-linux-arm64-gnu": {"core", "node"},
+    "build-ruby": {"core", "ruby"},
+    "build-php": {"core", "php"},
+    "build-csharp": {"core", "csharp"},
+    "build-java": {"core", "java"},
+    "build-wasm": {"core", "wasm"},
+    "build-kotlin-android": {"core", "ffi", "kotlin"},
+    "test-python": {"core", "python"},
+    "test-node": {"core", "node"},
+    "test-ruby": {"core", "ruby"},
+    "test-php": {"core", "php"},
+    "test-csharp": {"core", "csharp"},
+    "test-go": {"core", "ffi", "go"},
+    "test-java": {"core", "java"},
+    "test-elixir": {"core", "ffi", "elixir"},
+    "test-r": {"core", "r"},
+    "test-c-ffi": {"core", "ffi"},
+    "test-c-ffi-windows": {"core", "ffi"},
+    "test-wasm": {"core", "wasm"},
+    "test-kotlin-android": {"core", "ffi", "kotlin"},
+    "test-swift": {"core", "ffi", "swift"},
+    "test-dart": {"core", "dart"},
+    "test-zig": {"core", "ffi", "zig"},
+}
+DISPATCH = "github.event_name == 'workflow_dispatch'"
+FILTER_TERM = re.compile(r"steps\.filter\.outputs\.([a-z]+) == 'true'")
+
+
+def _output_filters(expression: str) -> set[str]:
+    """Return the filters a `run-*` output ORs together, refusing any other shape."""
+    body = expression.strip()
+    assert body.startswith("${{") and body.endswith("}}"), expression
+    dispatch, *terms = [term.strip() for term in body[3:-2].split("||")]
+    assert dispatch == DISPATCH, expression
+    filters = [FILTER_TERM.fullmatch(term) for term in terms]
+    assert all(filters), expression
+    return {match.group(1) for match in filters if match}
 
 
 @pytest.fixture(scope="module")
@@ -43,6 +91,15 @@ def test_should_fail_a_leg_skipped_although_its_filters_matched() -> None:
     needs = _needs({"test-r": "skipped", "test-go": "success"}, {"test-r": "true", "test-go": "true"})
 
     assert verdict(needs) == ["test-r: skipped although its path filters matched"]
+
+
+def test_should_name_cancellation_for_a_leg_the_cancelled_run_skipped() -> None:
+    needs = _needs(
+        {"build-python": "cancelled", "test-python": "skipped", "test-r": "skipped"},
+        {"build-python": "true", "test-python": "true", "test-r": "false"},
+    )
+
+    assert verdict(needs) == ["build-python: cancelled", "test-python: skipped because the run was cancelled"]
 
 
 def test_should_fail_a_skipped_leg_that_has_no_filter_output() -> None:
@@ -110,24 +167,55 @@ def test_should_report_every_existing_job_dropped_from_the_aggregate_needs(workf
         assert check_workflow(changed) == [f"{job}: not listed in the needs of {AGGREGATE}"]
 
 
-def test_should_report_a_leg_gated_on_a_condition_the_aggregate_cannot_read(workflow: dict[str, Any]) -> None:
+GATE_PROBLEM = (
+    "test-r: its `if:` must be `needs.changes.outputs.run-test-r == 'true'`, "
+    "optionally after `always() && !cancelled() &&`"
+)
+
+
+@pytest.mark.parametrize(
+    "condition",
+    [
+        pytest.param("needs.changes.outputs.run-test-go == 'true'", id="another-leg-output"),
+        pytest.param("github.event_name == 'workflow_dispatch'", id="raw-condition"),
+    ],
+)
+def test_should_report_a_leg_gated_on_something_other_than_its_own_output(
+    workflow: dict[str, Any], condition: str
+) -> None:
     changed = copy.deepcopy(workflow)
-    changed["jobs"]["test-r"]["if"] = "needs.changes.outputs.run-test-go == 'true'"
+    changed["jobs"]["test-r"]["if"] = condition
 
-    assert check_workflow(changed) == [
-        "test-r: its `if:` must read only needs.changes.outputs.run-test-r",
-        "changes: output run-test-r gates no job",
-    ]
+    assert check_workflow(changed) == [GATE_PROBLEM, "changes: output run-test-r gates no job"]
 
 
-def test_should_report_a_leg_gated_without_the_filter_outputs(workflow: dict[str, Any]) -> None:
+@pytest.mark.parametrize(
+    "condition",
+    [
+        pytest.param("always() && !cancelled() && needs.changes.outputs.run-test-r != 'true'", id="inverted"),
+        pytest.param(
+            "always() && !cancelled() && needs.changes.outputs.run-test-r == 'true' && "
+            "github.event_name != 'pull_request'",
+            id="extra-term",
+        ),
+        pytest.param("always() && needs.changes.outputs.run-test-r == 'true'", id="partial-prefix"),
+    ],
+)
+def test_should_report_a_leg_that_reads_its_own_output_in_any_other_condition(
+    workflow: dict[str, Any], condition: str
+) -> None:
     changed = copy.deepcopy(workflow)
-    changed["jobs"]["test-r"]["if"] = "github.event_name == 'workflow_dispatch'"
+    changed["jobs"]["test-r"]["if"] = condition
 
-    assert check_workflow(changed) == [
-        "test-r: its `if:` must read only needs.changes.outputs.run-test-r",
-        "changes: output run-test-r gates no job",
-    ]
+    assert check_workflow(changed) == [GATE_PROBLEM]
+
+
+def test_should_accept_both_gate_forms_across_line_breaks(workflow: dict[str, Any]) -> None:
+    changed = copy.deepcopy(workflow)
+    changed["jobs"]["test-r"]["if"] = "always() &&\n  !cancelled() &&\n  needs.changes.outputs.run-test-r == 'true'\n"
+    changed["jobs"]["test-go"]["if"] = "needs.changes.outputs.run-test-go == 'true'"
+
+    assert check_workflow(changed) == []
 
 
 def test_should_report_a_leg_that_reads_an_output_the_filter_job_lacks(workflow: dict[str, Any]) -> None:
@@ -151,9 +239,16 @@ def test_should_report_an_aggregate_that_does_not_always_run(workflow: dict[str,
     assert check_workflow(changed) == [f"{AGGREGATE}: must run with `if: always()`"]
 
 
+def _verdict_step(workflow: dict[str, Any]) -> dict[str, Any]:
+    (step,) = [
+        step for step in workflow["jobs"][AGGREGATE]["steps"] if "check_e2e_result.py verdict" in step.get("run", "")
+    ]
+    return step
+
+
 def test_should_report_an_aggregate_that_never_runs_the_verdict(workflow: dict[str, Any]) -> None:
     changed = copy.deepcopy(workflow)
-    changed["jobs"][AGGREGATE]["steps"] = changed["jobs"][AGGREGATE]["steps"][:1]
+    changed["jobs"][AGGREGATE]["steps"].remove(_verdict_step(changed))
 
     assert check_workflow(changed) == [
         (
@@ -161,6 +256,48 @@ def test_should_report_an_aggregate_that_never_runs_the_verdict(workflow: dict[s
             "with NEEDS set to `${{ toJSON(needs) }}`"
         ),
     ]
+
+
+def test_should_report_an_aggregate_that_never_checks_out_the_script(workflow: dict[str, Any]) -> None:
+    changed = copy.deepcopy(workflow)
+    steps = changed["jobs"][AGGREGATE]["steps"]
+    (checkout,) = [step for step in steps if str(step.get("uses", "")).startswith("actions/checkout@")]
+    steps.remove(checkout)
+
+    assert check_workflow(changed) == [f"{AGGREGATE}: no checkout step runs before the verdict step"]
+
+
+def test_should_report_a_checkout_that_runs_after_the_verdict(workflow: dict[str, Any]) -> None:
+    changed = copy.deepcopy(workflow)
+    steps = changed["jobs"][AGGREGATE]["steps"]
+    verdict_step = _verdict_step(changed)
+    steps.remove(verdict_step)
+    steps.insert(0, verdict_step)
+
+    assert check_workflow(changed) == [f"{AGGREGATE}: no checkout step runs before the verdict step"]
+
+
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [
+        pytest.param("if", "github.event_name == 'push'", id="if"),
+        pytest.param("continue-on-error", True, id="continue-on-error"),
+    ],
+)
+def test_should_report_a_verdict_step_that_can_stop_enforcing(
+    workflow: dict[str, Any], key: str, value: object
+) -> None:
+    changed = copy.deepcopy(workflow)
+    _verdict_step(changed)[key] = value
+
+    assert check_workflow(changed) == [f"{AGGREGATE}: the verdict step must not set `{key}`"]
+
+
+def test_should_report_an_aggregate_job_that_may_fail_without_failing_the_run(workflow: dict[str, Any]) -> None:
+    changed = copy.deepcopy(workflow)
+    changed["jobs"][AGGREGATE]["continue-on-error"] = True
+
+    assert check_workflow(changed) == [f"{AGGREGATE}: must not set `continue-on-error`"]
 
 
 def test_should_report_a_missing_aggregate(workflow: dict[str, Any]) -> None:
@@ -197,3 +334,36 @@ def test_should_refuse_an_unknown_command(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setenv("NEEDS", json.dumps(_needs({}, {})))
 
     assert check_e2e_result.main(["check_e2e_result.py", "workflow"]) == 2
+
+
+def _pinned_output_problems(workflow: dict[str, Any]) -> list[str]:
+    outputs = workflow["jobs"]["changes"]["outputs"]
+    problems = [f"run-{job}: missing" for job in LEG_FILTERS if f"run-{job}" not in outputs]
+    problems += [f"{name}: not pinned" for name in outputs if name.removeprefix("run-") not in LEG_FILTERS]
+    problems += [
+        f"run-{job}: runs on {sorted(_output_filters(outputs[f'run-{job}']))}, expected {sorted(filters)}"
+        for job, filters in LEG_FILTERS.items()
+        if f"run-{job}" in outputs and _output_filters(outputs[f"run-{job}"]) != filters
+    ]
+    return problems
+
+
+def test_should_pin_each_leg_output_to_the_filters_its_leg_runs_on(workflow: dict[str, Any]) -> None:
+    assert _pinned_output_problems(workflow) == []
+
+
+def test_should_name_only_filters_the_change_detection_step_defines(workflow: dict[str, Any]) -> None:
+    (step,) = [step for step in workflow["jobs"]["changes"]["steps"] if step.get("id") == "filter"]
+    defined = set(yaml.safe_load(step["with"]["filters"]))
+
+    assert set().union(*LEG_FILTERS.values()) <= defined
+
+
+def test_should_report_a_filter_term_dropped_from_an_output(workflow: dict[str, Any]) -> None:
+    changed = copy.deepcopy(workflow)
+    outputs = changed["jobs"]["changes"]["outputs"]
+    outputs["run-test-go"] = outputs["run-test-go"].replace(" || steps.filter.outputs.core == 'true'", "")
+
+    assert _pinned_output_problems(changed) == [
+        "run-test-go: runs on ['ffi', 'go'], expected ['core', 'ffi', 'go']",
+    ]
