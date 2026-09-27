@@ -150,6 +150,45 @@ fn should_resolve_lazy_src_for_an_img_nested_inside_a_picture_element() {
 }
 
 #[test]
+fn should_keep_a_parenthesised_comma_inside_its_srcset_candidate() {
+    let html = r#"<img srcset="https://x/a.png (x, https://x/b.png 3x ), https://x/c.png 2x" alt="Paren" />"#;
+    assert_eq!(convert(html), "![Paren](https://x/c.png)\n");
+}
+
+#[test]
+fn should_keep_a_comma_inside_a_srcset_candidate_url() {
+    let html = r#"<img srcset="https://x/a.png?w=1,2 2x, https://x/b.png 1x" alt="Comma" />"#;
+    assert_eq!(convert(html), "![Comma](https://x/a.png?w=1,2)\n");
+}
+
+#[test]
+fn should_read_the_img_srcset_and_not_a_picture_source_srcset() {
+    let html = r#"<picture>
+        <source srcset="https://x/wrong.webp 9x, https://x/also-wrong.webp (a, b)" type="image/webp">
+        <img srcset="https://x/a.png (x, https://x/b.png 3x ), https://x/c.png 2x" alt="Picture" />
+    </picture>"#;
+    assert_eq!(convert(html), "![Picture](https://x/c.png)\n");
+}
+
+#[test]
+fn should_skip_a_srcset_candidate_whose_descriptor_is_invalid() {
+    let html = r#"<img srcset="https://x/a.png foo, https://x/b.png" alt="Invalid" />"#;
+    assert_eq!(convert(html), "![Invalid](https://x/b.png)\n");
+}
+
+#[test]
+fn should_skip_a_srcset_density_that_is_not_a_spec_number() {
+    let html = r#"<img srcset="https://x/a.png NaNx, https://x/b.png infx, https://x/c.png 2x" alt="Number" />"#;
+    assert_eq!(convert(html), "![Number](https://x/c.png)\n");
+}
+
+#[test]
+fn should_not_compare_a_srcset_width_with_a_density() {
+    let html = r#"<img srcset="https://x/a.png 900x, https://x/b.png 800w" alt="Kinds" />"#;
+    assert_eq!(convert(html), "![Kinds](https://x/b.png)\n");
+}
+
+#[test]
 fn should_resolve_every_data_src_image_in_the_squarespace_fixture() {
     let path = [
         env!("CARGO_MANIFEST_DIR"),

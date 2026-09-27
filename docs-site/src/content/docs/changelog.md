@@ -22,6 +22,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Links keep their destination, and extracted images do not change. The CLI takes it as
   `--inline-data-media` (#528).
 
+### Changed
+
+- The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
+  language. Before, a detector that stopped matching read exactly like a clean pass, so a
+  restyled binding dropped out of the diff with every check green. Each detector must also match
+  in every one of its required roots: the binding package for C#, Java, Go and Zig, and both
+  `e2e/c` and `test_apps/c` for C. So the alef-generated `e2e/zig` tests cannot keep a silent Zig
+  binding looking covered, and the vendored Go copy of the C header cannot do the same for C. The
+  PHP comparison fails the same way once the extension exports a function and its probe root is
+  missing. The `--json` summary now carries the per-language counts, the per-root counts and the
+  silent detectors.
+
+- CI E2E now ends in one `E2E result` job that fails unless every other job in the workflow
+  passed or was skipped because its path filters did not match. Before, a skipped leg left the
+  run as green as a passing one, whatever the reason for the skip, and no single check covered
+  every leg. Each leg's path filter condition is now written once, as an output of the change
+  detection job, and both the leg and the result job read that output. A script test fails when a
+  job is added to the workflow without being listed in the result job.
+
+### Fixed
+
+- **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
+  runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
+  every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26
+  `FAIL` lines, and then passed the run as advisory, so the job was green while measuring nothing.
+  On a CPU other than the calibrated one no timing is scored now: the run reports
+  `TIMINGS NOT SCORED` with both CPUs and fails, and under `--allow-host-mismatch` (the nightly
+  job) it succeeds with a `Benchmark timings not scored` warning on the run page instead. The
+  fixture inventory stays fatal on any host, and a regression on the calibrated CPU still fails.
+- **The benchmark baseline recorded stale output sizes for five fixtures.** The 3.14.2
+  conversion fixes moved the Markdown output of `gh-121-hacker-news`, `gh-127-issue`,
+  `gh-190/firsteigen`, `gh-190/rbloggers` and `wikipedia/small_html`, and the baseline was never
+  updated. Each change was traced to the fix that made it and reviewed: images kept in layout rows
+  (5b26d732d, 31f2015b1), and whitespace no longer opening a line (c5b8d1baa), which also stops
+  two lines rendering as indented code blocks. Only `output_bytes` changes; the calibrated timings
+  stay as measured. `gh-190/plusblog` stays unblessed, because c5b8d1baa moved a body paragraph
+  into the preceding list item there, so the guardrail keeps reporting it until that is fixed.
+- **An `<img>` with no usable `src` could take its address from the middle of a `srcset`
+  candidate.** The fallback split `srcset` and `data-srcset` on every comma, so a comma inside a
+  parenthesised descriptor or inside a URL started a new candidate: `a.png (x, b.png 3x ), c.png 2x`
+  produced `b.png`, and `a.png?w=1,2 2x` produced `2`. Candidates are now split with the HTML
+  spec's srcset parsing steps, including the parentheses rule, and only the spec's five ASCII
+  whitespace characters separate a URL from its descriptor.
+- **The `srcset` fallback could choose a candidate a browser never loads, or compare a width with a
+  density.** Descriptors were read with Rust's float parsing and nothing else, so `a.png foo` stayed
+  eligible, `a.png infx` beat every other candidate, a first `NaNx` candidate could not be beaten,
+  `+2x` counted as `2x`, and `900x` beat `800w`. Descriptors now go through the spec's descriptor parser: a candidate with an
+  unknown token, a number outside the spec's grammar, a zero width, a second descriptor of one kind,
+  or an `h` without a `w` is dropped, and a list with no valid candidate keeps `src`. Widths and
+  densities are not compared with each other, because a browser needs `sizes` and the viewport to
+  do that: when any candidate has a width, the largest width wins, and otherwise the largest density
+  wins, a candidate with no descriptor counting as `1x`.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed
