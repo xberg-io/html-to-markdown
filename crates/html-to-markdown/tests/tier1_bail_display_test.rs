@@ -68,7 +68,7 @@ fn should_render_every_bail_reason_with_its_documented_message() {
         "<caption> element in table",
         "table sections in unsupported order",
         "open-tag nesting depth 65 reached the effective limit of 64",
-        "unknown HTML entity &copy at byte offset 15",
+        "HTML entity &copy is missing its closing semicolon at byte offset 15",
         "hidden element (hidden attribute or style) at byte offset 16",
         "nested list with an ordered ancestor or ordered self (cumulative indent width)",
         "block-level child of a list item in a shape this scanner cannot render correctly",
@@ -86,4 +86,37 @@ fn should_render_every_bail_reason_with_its_documented_message() {
         "a BailReason variant was added or removed without updating this characterization"
     );
     assert_eq!(rendered, expected, "a bail reason message changed");
+}
+
+/// #586: the message says which reference reason applies. `&#39` and `&copy` are references
+/// Tier-2's decoder knows, so the message says they are missing their `;`, not that they are
+/// unknown. `&bogusentityname` is not a reference at all, so the message keeps that wording.
+#[test]
+fn unknown_entity_message_distinguishes_a_known_reference_from_a_genuinely_unknown_one() {
+    let known_numeric = BailReason::UnknownEntity {
+        name: "#39".into(),
+        offset: 3,
+    };
+    assert_eq!(
+        known_numeric.to_string(),
+        "HTML entity &#39 is missing its closing semicolon at byte offset 3"
+    );
+
+    let known_named = BailReason::UnknownEntity {
+        name: "copy".into(),
+        offset: 7,
+    };
+    assert_eq!(
+        known_named.to_string(),
+        "HTML entity &copy is missing its closing semicolon at byte offset 7"
+    );
+
+    let unknown = BailReason::UnknownEntity {
+        name: "bogusentityname".into(),
+        offset: 9,
+    };
+    assert_eq!(
+        unknown.to_string(),
+        "unknown HTML entity &bogusentityname at byte offset 9"
+    );
 }

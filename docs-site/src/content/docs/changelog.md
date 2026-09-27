@@ -96,6 +96,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tier 1's fallback message added a `;` the page did not have.** When Tier 1 handed a reference
   without its `;` to Tier 2, the log message showed `&#39;` for an input of `&#39`. The message
   now shows the reference as written (#565).
+- **Tier 1's fallback message called a known reference unknown.** When Tier 1 handed a reference
+  without its `;` to Tier 2, the log message called it an unknown HTML entity even when the
+  reference was one Tier 2's decoder knows, such as `&#39` or `&copy`. The message now says the
+  reference is missing its `;` when the name is known, and keeps the unknown wording for names
+  that really are unknown (#586).
 
 ## [3.15.1] - 2026-09-27
 

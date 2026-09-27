@@ -114,6 +114,13 @@ pub enum BailReason {
     /// Tier-1 would pass the reference through verbatim, but Tier-2 decodes it to
     /// the correct character, so the outputs would diverge.  Bail so the
     /// dispatcher falls back to Tier-2.
+    ///
+    /// The one call site that constructs this variant reaches it only after
+    /// [`crate::text::decode_character_reference`] has already matched `name`, so
+    /// the reference is always a known one missing its `;`, never a truly unknown
+    /// name. [`fmt::Display`] still checks `name` itself before choosing the
+    /// wording, rather than trusting that invariant, so a name that is not
+    /// actually a recognized reference still reads as unknown.
     UnknownEntity {
         /// The reference after the `&` (e.g. `"copy"`, `"#39"`).
         name: Box<str>,
@@ -289,7 +296,16 @@ impl fmt::Display for BailReason {
             Self::TableNestedTableInSingleCellRow => write!(f, "nested <table> inside a data table's single-cell row"),
             Self::TableCaption => write!(f, "<caption> element in table"),
             Self::TableSectionOrder => write!(f, "table sections in unsupported order"),
-            Self::UnknownEntity { name, offset } => write!(f, "unknown HTML entity &{name} at byte offset {offset}"),
+            Self::UnknownEntity { name, offset } => {
+                if is_known_reference_name(name) {
+                    write!(
+                        f,
+                        "HTML entity &{name} is missing its closing semicolon at byte offset {offset}"
+                    )
+                } else {
+                    write!(f, "unknown HTML entity &{name} at byte offset {offset}")
+                }
+            }
             Self::DepthLimitExceeded { depth, max_depth } => {
                 write!(
                     f,
@@ -324,4 +340,13 @@ impl fmt::Display for BailReason {
             Self::InlineMarkerNotReproduced => write!(f, "inline element whose tier-2 markers tier-1 does not emit"),
         }
     }
+}
+
+/// Whether `name` (the text after `&` stored in [`BailReason::UnknownEntity`]) is a character
+/// reference [`crate::text::decode_character_reference`] recognizes, checked by feeding it back
+/// through that same decoder with a closing `;` appended. Reuses the one table both tiers read
+/// instead of a second copy of the legacy-name and numeric-reference rules.
+fn is_known_reference_name(name: &str) -> bool {
+    let closed = format!("&{name};");
+    crate::text::decode_character_reference(&closed, 0, crate::text::ReferenceContext::Text).is_some()
 }
