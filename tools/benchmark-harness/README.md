@@ -31,13 +31,15 @@ is one name over a mixed pool — the same workflow draws AMD EPYC hosts on one 
 while a calibration campaign is `workflow_dispatch`-only and can be captured on whichever host it happened to draw.
 Making the CPU part of the contract therefore turned an unavoidable pool difference into a coin-flip hard failure.
 
-Host identity instead decides how a *timing* violation is reported. When the CPU differs from the calibrated one,
-comparison prints a warning, and `--allow-host-mismatch` (`ALLOW_HOST_MISMATCH=true task bench:compare`) downgrades
-violations to advisory, because a positive delta on hardware the baseline was never measured on is not evidence of a
-code regression. The flag is off by default and is passed only by the `ci-rust.yaml` regression job. It never relaxes
-the contract, and when the hardware *does* match the baseline it changes nothing: a real regression on the calibrated
-CPU still fails the run. Never reach for it to silence a violation observed on matching hardware — re-measure, or fix
-the regression.
+Host identity instead decides whether the timings are scored at all. When the CPU differs from the calibrated one,
+`compare` scores no timing, in either direction, and prints `TIMINGS NOT SCORED` with both CPUs: a delta measured on
+hardware the baseline was never measured on is neither a pass nor a regression. Such a run fails with
+`timings not scored` by default. `--allow-host-mismatch` (`ALLOW_HOST_MISMATCH=true task bench:compare`) lets it
+succeed and prints a `Benchmark timings not scored` GitHub Actions warning, so the run page shows that nothing was
+measured. The flag is passed only by the nightly `benchmark-guardrail.yaml` job. It never relaxes the contract or the
+fixture inventory, and when the hardware *does* match the baseline it changes nothing: a real regression on the
+calibrated CPU still fails the run. The timings are scored again only after a calibration campaign on the CPU the
+runners now draw.
 
 ## Calibration and baseline promotion
 
@@ -71,7 +73,7 @@ real regression riding along with an accepted output change was invisible, and t
 said nothing about performance either way. Observed in 3.12.4: one fixture's output moved by one
 byte, and three guardrail violations underneath it went unreported.
 
-Both halves are fatal. `--allow-host-mismatch` downgrades **timing** violations only: a fixture
+Both halves are fatal. `--allow-host-mismatch` applies to **timings** only: a fixture
 inventory is a property of the corpus and the converter, not of the CPU that measured it, so a
 heterogeneous runner pool is never a reason to accept an inventory change.
 

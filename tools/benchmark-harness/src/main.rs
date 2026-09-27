@@ -227,12 +227,14 @@ struct CompareArgs {
     #[arg(long, default_value = "tools/benchmark-harness/guardrails.json")]
     guardrails: PathBuf,
 
-    /// Report timing violations as advisory when this host's CPU differs from the calibrated one.
+    /// Exit successfully when this host's CPU differs from the calibrated one, so the timings
+    /// cannot be scored.
     ///
-    /// Off by default: a violation is fatal. Only pass this where the runner pool is known to be
-    /// heterogeneous (CI), and understand what it does and does not relax — it never weakens the
-    /// provenance contract, and on hardware that *does* match the baseline it changes nothing, so
-    /// a genuine regression measured on the calibrated CPU still fails.
+    /// Timings are never scored on a CPU the baseline was not calibrated on, with or without this
+    /// flag. Off by default: such a run fails with "timings not scored". With the flag it succeeds
+    /// and prints a GitHub Actions warning instead. It never weakens the provenance contract or
+    /// the fixture inventory check, and on hardware that *does* match the baseline it changes
+    /// nothing, so a genuine regression measured on the calibrated CPU still fails.
     #[arg(long)]
     allow_host_mismatch: bool,
 }
@@ -287,7 +289,8 @@ fn cmd_compare(args: CompareArgs) -> Result<()> {
 ///
 /// ~keep Printed after the comparisons, not instead of them: an inventory difference used to abort
 /// `compare` before a single timing was evaluated, so an accepted output change hid whatever the
-/// timings were doing. Both are shown, and `report_verdict` fails on either.
+/// timings were doing. Both are shown, and `report_verdict` fails on an inventory difference on
+/// any host, and on a timing violation on the calibrated one.
 #[expect(
     clippy::print_stderr,
     reason = "inventory diagnostics belong on stderr with the verdict"
@@ -333,11 +336,11 @@ fn report_comparisons(comparisons: &[policy::Comparison]) -> Vec<String> {
     failures
 }
 
-/// Decide whether guardrail violations are fatal, and say why when they are not.
+/// Decide the run's outcome: passed, failed, or timings not scored.
 ///
-/// Violations are downgraded to advisory only when both halves hold: the capture ran on a CPU the
-/// baseline was never calibrated on, *and* the caller explicitly opted in. Either half missing
-/// keeps the violation fatal, which is what preserves regression detection on matched hardware.
+/// Timings are scored only on the CPU the baseline was calibrated on. On any other CPU they are
+/// neither a pass nor a regression, so the run is reported as unscored; `--allow-host-mismatch`
+/// decides only whether an unscored run exits successfully.
 #[expect(
     clippy::print_stdout,
     clippy::print_stderr,
@@ -350,13 +353,7 @@ fn report_verdict(
     allow_host_mismatch: bool,
 ) -> Result<()> {
     if let Some(mismatch) = host_mismatch {
-        eprintln!(
-            "WARNING: host CPU differs from the calibrated baseline host: {} ({} cores) vs calibrated {} ({} cores)",
-            mismatch.current_cpu_model,
-            mismatch.current_cpu_count,
-            mismatch.calibrated_cpu_model,
-            mismatch.calibrated_cpu_count,
-        );
+        return report_unscored(mismatch, inventory_mismatches, allow_host_mismatch);
     }
     if failures.is_empty() && inventory_mismatches.is_empty() {
         println!("\nAll guardrails passed.");
@@ -365,10 +362,6 @@ fn report_verdict(
     for failure in failures {
         eprintln!("FAIL: {failure}");
     }
-    // ~keep `--allow-host-mismatch` downgrades TIMING violations only. A fixture inventory is a
-    // property of the corpus and the converter, not of the CPU that measured it, so a different
-    // runner is never a reason to accept one -- downgrading it here would let an unreviewed output
-    // change ride into CI green on any heterogeneous pool.
     if !inventory_mismatches.is_empty() {
         anyhow::bail!(
             "{} fixture inventory difference(s) and {} guardrail violation(s)",
@@ -376,15 +369,46 @@ fn report_verdict(
             failures.len()
         );
     }
-    if host_mismatch.is_some() && allow_host_mismatch {
-        eprintln!(
-            "ADVISORY: {} guardrail(s) violated on a CPU the baseline was not calibrated on; \
-             not failing the run because --allow-host-mismatch was passed",
-            failures.len()
-        );
-        return Ok(());
-    }
     anyhow::bail!("{} guardrail(s) violated", failures.len())
+}
+
+/// Report a run whose timings cannot be scored because it ran on a CPU the baseline never saw.
+///
+/// ~keep No timing is scored here, in either direction: a delta measured on a CPU the baseline was
+/// not calibrated on reflects the host, not the code (#514). Counting such deltas as violations and
+/// then waiving them printed FAIL lines under a green run. A fixture inventory is a property of the
+/// corpus and the converter, not of the CPU, so it stays fatal on any host.
+#[expect(
+    clippy::print_stdout,
+    clippy::print_stderr,
+    reason = "guardrail verdict is this command's result output"
+)]
+fn report_unscored(
+    mismatch: &policy::HostMismatch,
+    inventory_mismatches: &[String],
+    allow_host_mismatch: bool,
+) -> Result<()> {
+    let reason = format!(
+        "this run measured on {} ({} cores), but the baseline was calibrated on {} ({} cores)",
+        mismatch.current_cpu_model,
+        mismatch.current_cpu_count,
+        mismatch.calibrated_cpu_model,
+        mismatch.calibrated_cpu_count,
+    );
+    eprintln!("TIMINGS NOT SCORED: {reason}; a timing on other hardware is neither a pass nor a regression.");
+    if !inventory_mismatches.is_empty() {
+        anyhow::bail!(
+            "{} fixture inventory difference(s); timings not scored on this host",
+            inventory_mismatches.len()
+        );
+    }
+    if !allow_host_mismatch {
+        anyhow::bail!("timings not scored: {reason}");
+    }
+    // ~keep A workflow command, so the unscored run shows on the Actions run page instead of
+    // passing as silently as a scored one. Outside Actions it is one plain line.
+    println!("::warning title=Benchmark timings not scored::{reason}");
+    Ok(())
 }
 
 #[derive(Debug, Parser)]

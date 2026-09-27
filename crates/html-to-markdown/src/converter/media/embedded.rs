@@ -12,7 +12,7 @@ use tl::{HTMLTag, NodeHandle, Parser};
 
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
-use crate::converter::inline::link::append_markdown_link;
+use crate::converter::inline::link::{MarkdownLink, append_markdown_link};
 use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
@@ -31,10 +31,12 @@ fn append_media_src_link(output: &mut String, src: &str, options: &ConversionOpt
     let escaped_label = escape_link_label(src);
     append_markdown_link(
         output,
-        &escaped_label,
-        src,
-        None,
-        "",
+        &MarkdownLink {
+            label: &escaped_label,
+            href: src,
+            title: None,
+            raw_text: "",
+        },
         options,
         ctx.reference_collector.as_ref(),
     );
