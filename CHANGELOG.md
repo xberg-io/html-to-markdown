@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
+  language. Before, a detector that stopped matching read exactly like a clean pass, so a
+  restyled binding dropped out of the diff with every check green. For C#, Java, Go and Zig the
+  check counts only the call sites inside the binding package, so the alef-generated `e2e/zig`
+  tests cannot keep a silent Zig binding looking covered. The `--json` summary now carries the
+  per-language counts, the per-binding counts and the silent detectors.
+
+## [3.15.1] - 2026-09-27
+
 ### Fixed
 
 - **`base_url` did not resolve a `<blockquote cite>`, and Tier 1 dropped the citation entirely.**
@@ -18,14 +29,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that resolves every destination except this one forces the caller to keep a whole
   link-rewriting pre-pass alive for it.
 
+- **The Go binding could read a different OS thread's FFI error slot.** `Convert`,
+  `HeaderMetadata.IsValid` and the visitor entry point now pin the goroutine for the duration of
+  the cgo call with `runtime.LockOSThread`. The FFI layer keeps its last-error state in a
+  `thread_local!` (`crates/html-to-markdown-ffi/src/lib.rs:31`), so without pinning the Go runtime
+  was free to reschedule the goroutine between the call that stamped the error and the
+  `htm_last_error_code` read that reports it — surfacing a nil error for a call that had in fact
+  failed. Emitted by alef 0.97.0; no Go API changed.
+
 ### Changed
 
-- The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
-  language. Before, a detector that stopped matching read exactly like a clean pass, so a
-  restyled binding dropped out of the diff with every check green. For C#, Java, Go and Zig the
-  check counts only the call sites inside the binding package, so the alef-generated `e2e/zig`
-  tests cannot keep a silent Zig binding looking covered. The `--json` summary now carries the per-language counts,
-  the per-binding counts and the silent detectors.
+- Repinned the `alef` generator to 0.97.0 and regenerated every binding. Apart from the Go thread
+  pinning above, the only other generated change is the Kotlin Android Gradle wrapper moving from
+  9.7.1 to 9.8.0; everything else in the regeneration is version strings and provenance hashes.
+- CI now gates the `docs-site` changelog mirror against `CHANGELOG.md`. The two are compared from
+  the first `## [` heading onward rather than over `[Unreleased]` alone, because this repo releases
+  straight out of `[Unreleased]` and leaves it empty on `main` — an Unreleased-only comparison
+  would compare zero lines and pass while a released section drifted.
 
 ## [3.15.0] - 2026-09-26
 
