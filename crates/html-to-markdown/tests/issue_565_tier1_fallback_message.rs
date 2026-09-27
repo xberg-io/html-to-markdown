@@ -17,9 +17,18 @@ fn tier1_message(html: &str) -> Option<String> {
 #[test]
 fn fallback_message_shows_a_reference_without_a_semicolon_as_written() {
     for (html, expected) in [
-        ("<p>it&#39s</p>", "HTML entity &#39 is missing its closing semicolon at byte offset 5"),
-        ("<p>it&#x27s</p>", "HTML entity &#x27 is missing its closing semicolon at byte offset 5"),
-        ("<p>&copy 2024</p>", "HTML entity &copy is missing its closing semicolon at byte offset 3"),
+        (
+            "<p>it&#39s</p>",
+            "HTML entity &#39 is missing its closing semicolon at byte offset 5",
+        ),
+        (
+            "<p>it&#x27s</p>",
+            "HTML entity &#x27 is missing its closing semicolon at byte offset 5",
+        ),
+        (
+            "<p>&copy 2024</p>",
+            "HTML entity &copy is missing its closing semicolon at byte offset 3",
+        ),
     ] {
         assert_eq!(tier1_message(html).as_deref(), Some(expected), "{html:?}");
     }
