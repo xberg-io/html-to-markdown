@@ -1189,7 +1189,7 @@ values = ["cyclomatic-complexity", "file-too-long", "function-too-long", "nestin
 [[entries]]
 relative_path = "poly.toml"
 key_path = "per-file-ignores.crates/html-to-markdown/src/converter/utility/content.rs"
-values = ["function-too-long", "nesting-too-deep"]
+values = ["nesting-too-deep"]
 
 [[entries]]
 relative_path = "poly.toml"
