@@ -49,8 +49,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   updated. Each change was traced to the fix that made it and reviewed: images kept in layout rows
   (5b26d732d, 31f2015b1), and whitespace no longer opening a line (c5b8d1baa), which also stops
   two lines rendering as indented code blocks. Only `output_bytes` changes; the calibrated timings
-  stay as measured. `gh-190/plusblog` stays unblessed, because c5b8d1baa moved a body paragraph
-  into the preceding list item there, so the guardrail keeps reporting it until that is fixed.
+  stay as measured. `gh-190/plusblog` changed for a different reason, fixed below.
+- **An `<img>` with no usable `src` could take its address from the middle of a `srcset`
+  candidate.** The fallback split `srcset` and `data-srcset` on every comma, so a comma inside a
+  parenthesised descriptor or inside a URL started a new candidate: `a.png (x, b.png 3x ), c.png 2x`
+  produced `b.png`, and `a.png?w=1,2 2x` produced `2`. Candidates are now split with the HTML
+  spec's srcset parsing steps, including the parentheses rule, and only the spec's five ASCII
+  whitespace characters separate a URL from its descriptor.
+- **The `srcset` fallback could choose a candidate a browser never loads, or compare a width with a
+  density.** Descriptors were read with Rust's float parsing and nothing else, so `a.png foo` stayed
+  eligible, `a.png infx` beat every other candidate, a first `NaNx` candidate could not be beaten,
+  `+2x` counted as `2x`, and `900x` beat `800w`. Descriptors now go through the spec's descriptor parser: a candidate with an
+  unknown token, a number outside the spec's grammar, a zero width, a second descriptor of one kind,
+  or an `h` without a `w` is dropped, and a list with no valid candidate keeps `src`. Widths and
+  densities are not compared with each other, because a browser needs `sizes` and the viewport to
+  do that: when any candidate has a width, the largest width wins, and otherwise the largest density
+  wins, a candidate with no descriptor counting as `1x`.
+- **A `<br>` in a `<span>` after a list or a layout table pulled the next paragraph into the last
+  list item.** A `<span>` removed the line break that ends the item's line, so the `<br>` became a
+  hard break at the end of the item and the paragraph after it rendered inside the item. Without a
+  `<br>`, the span's text was joined onto the item's last word, and a `<span>` right after a
+  horizontal rule was joined onto the `---`. A `<span>` now leaves the line break before it in
+  place (#546).
 
 ## [3.15.1] - 2026-09-27
 

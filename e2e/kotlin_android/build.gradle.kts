@@ -1,10 +1,12 @@
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Duration
 import java.util.zip.ZipFile
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("com.android.library") version "9.4.0"
+    id("com.android.library") version "9.4.1"
 }
 
 group = "io.xberg.android"
@@ -58,13 +60,13 @@ dependencies {
 
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.22")
-    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.22.2")
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.22.2")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.22.3")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.22.3")
 
     // jackson-module-kotlin registers constructors/properties for Kotlin data
     // classes, which have no default constructor and cannot be deserialized by
     // plain Jackson without this module.
-    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.22.2")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.22.3")
 
     // jspecify for null-safety annotations on wrapped types
     testImplementation("org.jspecify:jspecify:1.0.1")
@@ -138,6 +140,14 @@ tasks.register("copyHostJni", Copy::class) {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+    // A hung native call otherwise blocks this whole task with no attribution beyond an
+    // eventual, much later CI-level job kill -- see `[crates.e2e].timeout_seconds`. ~keep
+    timeout.set(Duration.ofSeconds(1800))
 
     // Resolve the native library location (e.g., ../../target/release)
     val libPath = System.getProperty("kb.lib.path") ?: "${rootDir}/../../target/release"
