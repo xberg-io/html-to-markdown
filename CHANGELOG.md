@@ -33,8 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   After a list it became a lazy continuation of the last item, so
   `<div><ul><li>A</li></ul>para</div>` rendered `para` inside the item; after a table it became
   one more table row. Inline content after a block now starts its own paragraph after a blank
-  line, the same as text after a paragraph, in both rendering paths. Text after a horizontal rule
-  gets the same blank line.
+  line, the same as text after a paragraph, in both rendering paths. This includes a list item
+  that ends in a line break, and a `<br>` right after a list with backslash line breaks, which
+  also put the text inside the item. Text after a horizontal rule gets the same blank line.
 - **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
   runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
   every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26

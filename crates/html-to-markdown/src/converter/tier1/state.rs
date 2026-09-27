@@ -277,11 +277,11 @@ pub struct Tier1State {
     /// as `next_tag_is_list`).
     pub last_emitted_was_img: bool,
 
-    /// True right after a block element's closing tag (or a `<hr>`), until the next opening,
-    /// closing or void tag, or the next text flush with content (read-then-clear, same
-    /// convention as `last_closed_custom_element`). Mirrors Tier-2's check in `walk_node` that
-    /// inline content whose previous sibling is a block starts a new paragraph (issues #570,
-    /// #571).
+    /// True right after the closing tag of a block element or a `<hr>` (block-level by Tier-2's
+    /// test), until the next opening, closing or void tag, or the next text flush with content
+    /// (read-then-clear, same convention as `last_closed_custom_element`). Mirrors Tier-2's check
+    /// in `walk_node` that inline content whose previous sibling is a block starts a new paragraph
+    /// (issues #570, #571).
     pub last_closed_block: bool,
 
     /// Byte width of each currently-open list item's own marker (`"- "` = 2,

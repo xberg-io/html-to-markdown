@@ -10,7 +10,7 @@
 //! own, so every block type followed by every kind of inline content must render that content as
 //! a paragraph after the block.
 
-use html_to_markdown_rs::options::WhitespaceMode;
+use html_to_markdown_rs::options::{NewlineStyle, WhitespaceMode};
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
 
@@ -20,8 +20,9 @@ const GFM_TABLE: &str = "<table><tr><th>h</th><th>g</th></tr><tr><td>c</td><td>d
 
 /// Blocks that end their last line with a single newline, then the ones that already end with a
 /// blank line, as controls.
-const BLOCKS: [&str; 12] = [
+const BLOCKS: [&str; 13] = [
     "<ul><li>A</li></ul>",
+    "<ul><li>A<br></li></ul>",
     "<ol><li>A</li></ol>",
     "<ul><li>A<ul><li>B</li></ul></li></ul>",
     LAYOUT_TABLE,
@@ -230,4 +231,184 @@ fn should_keep_text_after_a_nested_list_inside_the_outer_list_item() {
     };
     let tier1_out = tier1::run(html, &PrescanReport::default(), &options).expect("tier1 converts a nested list");
     assert_eq!(tier1_out, out, "Tier 1 and Tier 2 must agree on {html:?}");
+}
+
+/// Tier 2 output, and Tier 1 output wherever Tier 1 converts the input itself.
+fn both_tiers(html: &str) -> (String, Option<String>) {
+    let options = ConversionOptions {
+        tier_strategy: TierStrategy::Auto,
+        ..tier2_options()
+    };
+    (tier2(html), tier1::run(html, &PrescanReport::default(), &options).ok())
+}
+
+#[test]
+fn should_start_a_paragraph_after_a_list_item_that_ends_in_a_line_break() {
+    let html = "<ul><li>A<br></li></ul>ZZ";
+    let (tier2_out, tier1_out) = both_tiers(html);
+    assert_eq!(tier2_out, "- A  \n\nZZ\n", "ZZ must start a paragraph after the item");
+    assert_eq!(
+        tier1_out.as_deref(),
+        Some("- A  \n\nZZ\n"),
+        "Tier 1 must match on {html:?}"
+    );
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..tier2_options()
+    };
+    let out = convert(html, Some(backslash))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default();
+    assert!(
+        render(&out).ends_with("</ul>\n<p>ZZ</p>\n"),
+        "ZZ must render after the list with backslash breaks: {out:?} renders {:?}",
+        render(&out)
+    );
+}
+
+#[test]
+fn should_leave_a_line_break_between_inline_siblings_alone() {
+    // ~keep The break before ZZ ends a line of the same paragraph, not a block, so no blank line.
+    for html in [
+        "<div>A<br>ZZ</div>",
+        "<blockquote>A<br>ZZ</blockquote>",
+        "<div>A<br> <i>ZZ</i></div>",
+    ] {
+        let (tier2_out, tier1_out) = both_tiers(html);
+        assert!(
+            !tier2_out.contains("\n\n"),
+            "Tier 2 split a paragraph: {html:?} {tier2_out:?}"
+        );
+        if let Some(tier1_out) = tier1_out {
+            assert_eq!(tier1_out, tier2_out, "Tier 1 and Tier 2 must agree on {html:?}");
+        }
+    }
+}
+
+#[test]
+fn should_not_separate_inside_table_cells_code_or_converted_inline_output() {
+    for (html, expected) in [
+        (
+            "<table><tr><th>h</th></tr><tr><td><ul><li>A</li></ul>ZZ</td></tr></table>",
+            "| h   |\n| --- |\n| AZZ |\n",
+        ),
+        (
+            "<table><tr><th>h</th></tr><tr><td><hr>ZZ</td></tr></table>",
+            "| h      |\n| ------ |\n| --- ZZ |\n",
+        ),
+        ("<pre><ul><li>A</li></ul>ZZ</pre>", "```\n- A\nZZ\n```\n"),
+        ("<p><code><ul><li>A</li></ul>ZZ</code></p>", "`- A`  \n`ZZ`\n"),
+        ("<ul><li>X<ul><li>A</li></ul>ZZ</li></ul>", "- X\n  * A\n  ZZ\n"),
+    ] {
+        let (tier2_out, tier1_out) = both_tiers(html);
+        assert_eq!(tier2_out, expected, "Tier 2 changed an excluded context: {html:?}");
+        if let Some(tier1_out) = tier1_out {
+            assert_eq!(tier1_out, expected, "Tier 1 changed an excluded context: {html:?}");
+        }
+    }
+    // ~keep A list item outside any list sets the list-item context but not the list context.
+    // ~keep Tier 1 renders a stray item differently, so only Tier 2 is pinned here.
+    assert_eq!(
+        tier2("<div><li>X<ul><li>A</li></ul>ZZ</li></div>"),
+        "- X\n\n  - A\n  ZZ\n",
+        "Tier 2 changed text inside a stray list item"
+    );
+    let inline = ConversionOptions {
+        convert_as_inline: true,
+        ..tier2_options()
+    };
+    let out = convert("<div><ul><li>A</li></ul>ZZ</div>", Some(inline))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default();
+    assert!(
+        !out.contains("\n\n"),
+        "convert_as_inline must stay on one block: {out:?}"
+    );
+}
+
+#[test]
+fn should_agree_across_tiers_on_every_inline_element_after_a_list() {
+    let mut compared = 0;
+    for follower in [
+        r#"<input type="checkbox">ZZ"#,
+        "<wbr>ZZ",
+        "<button>ZZ</button>",
+        "<br>ZZ",
+        "<label>ZZ</label>",
+        "\n  <b>ZZ</b>",
+        "<!-- c --> <i>ZZ</i>",
+        "<x-foo>ZZ</x-foo>",
+    ] {
+        let html = format!("<div><ul><li>A</li></ul>{follower}</div>");
+        let (tier2_out, tier1_out) = both_tiers(&html);
+        if let Some(tier1_out) = tier1_out {
+            assert_eq!(tier1_out, tier2_out, "Tier 1 and Tier 2 must agree on {html:?}");
+            compared += 1;
+        }
+    }
+    assert!(compared >= 5, "Tier 1 converted only {compared} cases");
+}
+
+#[test]
+fn should_not_separate_on_whitespace_between_blocks() {
+    // ~keep Whitespace between two blocks is not content: a definition term and its description,
+    // ~keep or a list and a quote, keep the spacing their own handlers give them.
+    for (html, expected) in [
+        ("<dl><dt>T</dt>\n<dd>D</dd></dl>", "T\nD\n"),
+        (
+            "<div><ul><li>A</li></ul>\n<blockquote>Q</blockquote></div>",
+            "- A\n\n> Q\n",
+        ),
+    ] {
+        let (tier2_out, tier1_out) = both_tiers(html);
+        assert_eq!(
+            tier2_out, expected,
+            "Tier 2 changed the spacing between blocks: {html:?}"
+        );
+        if let Some(tier1_out) = tier1_out {
+            assert_eq!(
+                tier1_out, expected,
+                "Tier 1 changed the spacing between blocks: {html:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn should_start_a_paragraph_after_a_list_for_a_br_in_backslash_mode() {
+    let options = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..tier2_options()
+    };
+    let out = convert("<div><ul><li>A</li></ul><br>ZZ</div>", Some(options))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default();
+    assert!(
+        !render(&out).contains("<li>A\n<br />"),
+        "the br must not become a hard break inside the item: {out:?} renders {:?}",
+        render(&out)
+    );
+}
+
+#[test]
+fn should_keep_text_between_list_items_in_a_tight_list() {
+    let html = "<ul><li>A</li>ZZ<li>B</li></ul>";
+    let (tier2_out, tier1_out) = both_tiers(html);
+    assert!(!tier2_out.contains("\n\n"), "the list must stay tight: {tier2_out:?}");
+    if let Some(tier1_out) = tier1_out {
+        assert_eq!(tier1_out, tier2_out, "Tier 1 and Tier 2 must agree on {html:?}");
+    }
+}
+
+#[test]
+fn should_agree_across_tiers_on_the_block_before_the_text() {
+    // ~keep Tier 1 files `<canvas>` as inline; both tiers must still use Tier 2's block test for the
+    // ~keep element that closed before the text.
+    let html = "<div><canvas><ul><li>A</li></ul></canvas>ZZ</div>";
+    let (tier2_out, tier1_out) = both_tiers(html);
+    let tier1_out = tier1_out.expect("tier1 converts a canvas");
+    assert_eq!(tier1_out, tier2_out, "Tier 1 and Tier 2 must agree on {html:?}");
 }

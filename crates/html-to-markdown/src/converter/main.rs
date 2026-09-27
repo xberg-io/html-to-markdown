@@ -405,7 +405,8 @@ fn finish_structure_collector(
 /// ~keep table row. In HTML, inline content after a block starts a block of its own. The output
 /// ~keep check runs first, so the sibling lookup only happens right after such a line break.
 /// ~keep List items are left out: their continuation lines are indented by other rules. A lone line
-/// ~keep break is not a block's last line: the block before it wrote nothing.
+/// ~keep break is not a block's last line: the block before it wrote nothing. A hard break the block
+/// ~keep ended with (`<li>A<br></li>`) is still that block's last line, so it gets the blank line too.
 fn continues_block_last_line(
     node: &tl::Node,
     node_handle: &tl::NodeHandle,
@@ -414,12 +415,7 @@ fn continues_block_last_line(
     ctx: &Context,
     dom_ctx: &DomContext,
 ) -> bool {
-    if output.len() < 2
-        || !output.ends_with('\n')
-        || output.ends_with("\n\n")
-        || output.ends_with("  \n")
-        || output.ends_with("\\\n")
-    {
+    if output.len() < 2 || !output.ends_with('\n') || output.ends_with("\n\n") {
         return false;
     }
     if ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code || ctx.in_list || ctx.in_list_item {
@@ -429,7 +425,7 @@ fn continues_block_last_line(
         tl::Node::Raw(bytes) => !bytes.as_utf8_str().trim().is_empty(),
         tl::Node::Tag(_) => dom_ctx
             .tag_info(node_handle.get_inner(), parser)
-            .is_some_and(|info| is_inline_element(&info.name) && info.name != "br"),
+            .is_some_and(|info| is_inline_element(&info.name)),
         tl::Node::Comment(_) => false,
     };
     is_inline_content
