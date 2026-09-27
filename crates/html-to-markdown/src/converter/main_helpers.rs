@@ -562,8 +562,8 @@ fn collect_meta_head_metadata(
     }
 }
 
-/// Record the `<title>` text into `metadata`, honoring `strip_tags`/`preserve_tags` for
-/// `"title"`. Extracted from `extract_head_metadata` — same traversal and trimming, unchanged.
+/// Record the trimmed, decoded `<title>` text into `metadata`, honoring `strip_tags`/
+/// `preserve_tags` for `"title"`.
 fn collect_title_head_metadata(
     child_tag: &tl::HTMLTag,
     parser: &tl::Parser,
@@ -584,14 +584,14 @@ fn collect_title_head_metadata(
             title_content.push_str(raw.as_utf8_str().as_ref());
         }
     }
-    title_content = title_content.trim().to_string();
+    // ~keep The title is text and carries character references like any other text (#509).
+    let title_content = crate::text::decode_html_entities_cow(title_content.trim()).into_owned();
     if !title_content.is_empty() {
         metadata.insert("title".to_string(), title_content);
     }
 }
 
-/// Record a `<link rel="canonical">` href into `metadata`. Extracted from
-/// `extract_head_metadata` — same attribute lookups and `"canonical"` substring check, unchanged.
+/// Record the decoded href of a `<link rel="canonical">` into `metadata`.
 fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("link") {
         return;
@@ -603,24 +603,21 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
     if !rel_str.contains("canonical") {
         return;
     }
-    let Some(href_attr) = child_tag.attributes().get("href").flatten() else {
+    let Some(href) = crate::converter::utility::attributes::decoded_attribute(child_tag, "href") else {
         return;
     };
-    let href_str = href_attr.as_utf8_str();
-    metadata.insert("canonical".to_string(), href_str.to_string());
+    metadata.insert("canonical".to_string(), href.into_owned());
 }
 
-/// Record a `<base href>` into `metadata`. Extracted from `extract_head_metadata` — same
-/// attribute lookup, unchanged.
+/// Record the decoded `<base href>` into `metadata`.
 fn collect_base_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("base") {
         return;
     }
-    let Some(href_attr) = child_tag.attributes().get("href").flatten() else {
+    let Some(href) = crate::converter::utility::attributes::decoded_attribute(child_tag, "href") else {
         return;
     };
-    let href_str = href_attr.as_utf8_str();
-    metadata.insert("base".to_string(), href_str.to_string());
+    metadata.insert("base".to_string(), href.into_owned());
 }
 
 /// Extract metadata from the head element.

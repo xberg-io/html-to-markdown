@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Head metadata kept its character references encoded.** The `<base href>`, the
+  `<link rel="canonical">` href and the `<title>` text reached the frontmatter and the structured
+  metadata as written, so `<base href="https://example.com/it&#x27;s/">` produced
+  `base: https://example.com/it&#x27;s/`. They now go through the same decoder as `<meta content>`
+  and body text, including the Windows-1252 mapping for numeric references 128-159. A `&name`
+  without a semicolon, as in `?a=1&copy=2`, stays literal.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed
