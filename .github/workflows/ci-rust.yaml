@@ -10,7 +10,6 @@ on:
       - "packages/*/src/**"
       - "packages/*/rust/**"
       - "tools/benchmark-harness/**"
-      - "tools/e2e-generator/**"
       - "e2e/rust/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -31,7 +30,6 @@ on:
       - "packages/*/src/**"
       - "packages/*/rust/**"
       - "tools/benchmark-harness/**"
-      - "tools/e2e-generator/**"
       - "e2e/rust/**"
       - "Cargo.toml"
       - "Cargo.lock"
@@ -45,8 +43,10 @@ on:
       - "poly.toml"
   workflow_dispatch: {}
 
+# ~keep `github.sha` not `github.ref` for pushes: a cancelled run reports neither pass
+# ~keep nor fail, and cancelling main's previous run is one of the two ways 3.15.0's R break shipped.
 concurrency:
-  group: ci-rust-${{ github.event.pull_request.number || github.ref }}
+  group: ci-rust-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 env:
