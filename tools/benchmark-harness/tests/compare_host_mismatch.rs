@@ -71,6 +71,47 @@ fn should_report_timings_unscored_on_a_foreign_host_when_opted_in() {
 }
 
 #[test]
+fn should_leave_timings_unscored_when_only_the_cpu_model_differs() {
+    // The #514 pair: both hosts have 4 cores, only the model string differs.
+    assert_unscored_with_the_opt_in(
+        "model-only",
+        Provenance {
+            cpu_model: "AMD EPYC 9V74 80-Core Processor".to_owned(),
+            ..calibrated_host()
+        },
+        "AMD EPYC 9V74 80-Core Processor (4 cores)",
+    );
+}
+
+#[test]
+fn should_leave_timings_unscored_when_only_the_cpu_count_differs() {
+    assert_unscored_with_the_opt_in(
+        "count-only",
+        Provenance {
+            cpu_count: 8,
+            ..calibrated_host()
+        },
+        "AMD EPYC 7763 64-Core Processor (8 cores)",
+    );
+}
+
+/// Run a regression-sized sample on `host` under the flag and require an unscored, not failed, run.
+fn assert_unscored_with_the_opt_in(name: &str, host: Provenance, reported_host: &str) {
+    let case = Case::new(name);
+    let output = case.run(host, BEYOND_ALLOWANCE_MS, &["--allow-host-mismatch"]);
+    let stderr = stderr_of(&output);
+    assert!(output.status.success(), "{name}: expected success, stderr:\n{stderr}");
+    assert!(
+        stderr.contains(&format!("TIMINGS NOT SCORED: this run measured on {reported_host}")),
+        "{name}: this host must not count as the calibrated one:\n{stderr}"
+    );
+    assert!(
+        !stderr.contains("FAIL:"),
+        "{name}: a foreign-host timing was scored:\n{stderr}"
+    );
+}
+
+#[test]
 fn should_fail_a_foreign_host_as_unscored_without_the_opt_in() {
     for (name, sample) in [
         ("unscored-within", WITHIN_ALLOWANCE_MS),

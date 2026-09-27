@@ -289,7 +289,8 @@ fn cmd_compare(args: CompareArgs) -> Result<()> {
 ///
 /// ~keep Printed after the comparisons, not instead of them: an inventory difference used to abort
 /// `compare` before a single timing was evaluated, so an accepted output change hid whatever the
-/// timings were doing. Both are shown, and `report_verdict` fails on either.
+/// timings were doing. Both are shown, and `report_verdict` fails on an inventory difference on
+/// any host, and on a timing violation on the calibrated one.
 #[expect(
     clippy::print_stderr,
     reason = "inventory diagnostics belong on stderr with the verdict"
@@ -373,11 +374,10 @@ fn report_verdict(
 
 /// Report a run whose timings cannot be scored because it ran on a CPU the baseline never saw.
 ///
-/// ~keep No timing is scored here, in either direction: the runner pool moved from the calibrated
-/// AMD EPYC 9V74 to an EPYC 7763 and every fixture read 15% to 45% slower (#514), which is the
-/// host, not the code. Counting those as violations and then waiving them printed 26 FAIL lines
-/// under a green run. A fixture inventory is a property of the corpus and the converter, not of the
-/// CPU, so it stays fatal on any host.
+/// ~keep No timing is scored here, in either direction: a delta measured on a CPU the baseline was
+/// not calibrated on reflects the host, not the code (#514). Counting such deltas as violations and
+/// then waiving them printed FAIL lines under a green run. A fixture inventory is a property of the
+/// corpus and the converter, not of the CPU, so it stays fatal on any host.
 #[expect(
     clippy::print_stdout,
     clippy::print_stderr,
