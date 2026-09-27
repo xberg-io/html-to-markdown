@@ -21,12 +21,8 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "package.json"
-      - "Gemfile"
-      - "Gemfile.lock"
       - "composer.json"
       - "composer.lock"
-      - "go.mod"
-      - "go.sum"
       - "rust-toolchain.toml"
       - ".cargo/config.toml"
       - ".github/workflows/ci-e2e.yaml"
@@ -50,12 +46,8 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "package.json"
-      - "Gemfile"
-      - "Gemfile.lock"
       - "composer.json"
       - "composer.lock"
-      - "go.mod"
-      - "go.sum"
       - "rust-toolchain.toml"
       - ".cargo/config.toml"
       - ".github/workflows/ci-e2e.yaml"
@@ -143,8 +135,6 @@ jobs:
               - 'crates/html-to-markdown-cli/**'
               - 'scripts/ci/ruby/**'
               - 'e2e/ruby/**'
-              - 'Gemfile'
-              - 'Gemfile.lock'
               - 'fixtures/**'
             php:
               - 'crates/html-to-markdown-php/**'
@@ -158,8 +148,6 @@ jobs:
               - 'scripts/ci/go/**'
               - 'e2e/go/**'
               - 'crates/html-to-markdown-ffi/**'
-              - 'go.mod'
-              - 'go.sum'
               - 'fixtures/**'
             java:
               - 'packages/java/**'
@@ -353,13 +341,17 @@ jobs:
         run: |
           HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
           GO_HEADER="packages/go/include/html_to_markdown.h"
-          test -f "$HEADER"
-          test -f "$GO_HEADER"
+          for file in "$HEADER" "$GO_HEADER"; do
+            test -f "$file" || {
+              echo "::error::$file is missing after the build. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
+              exit 1
+            }
+          done
           git diff --exit-code -- "$HEADER" "$GO_HEADER" || {
             echo "::error::$HEADER or $GO_HEADER is stale: cbindgen regenerated a different header than the one committed. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
             exit 1
           }
-          echo "Header verified fresh: $HEADER"
+          echo "Headers verified fresh: $HEADER $GO_HEADER"
 
       - name: Upload FFI artifacts
         if: "!startsWith(matrix.runner, 'windows')"
@@ -1470,13 +1462,17 @@ jobs:
         run: |
           HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
           GO_HEADER="packages/go/include/html_to_markdown.h"
-          test -f "$HEADER"
-          test -f "$GO_HEADER"
+          for file in "$HEADER" "$GO_HEADER"; do
+            test -f "$file" || {
+              echo "::error::$file is missing after the build. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
+              exit 1
+            }
+          done
           git diff --exit-code -- "$HEADER" "$GO_HEADER" || {
             echo "::error::$HEADER or $GO_HEADER is stale: cbindgen regenerated a different header than the one committed. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
             exit 1
           }
-          echo "Header verified fresh: $HEADER"
+          echo "Headers verified fresh: $HEADER $GO_HEADER"
 
   test-c-ffi-windows:
     needs: [build-ffi, changes]
@@ -1509,13 +1505,17 @@ jobs:
         run: |
           HEADER="crates/html-to-markdown-ffi/include/html_to_markdown.h"
           GO_HEADER="packages/go/include/html_to_markdown.h"
-          test -f "$HEADER"
-          test -f "$GO_HEADER"
+          for file in "$HEADER" "$GO_HEADER"; do
+            test -f "$file" || {
+              echo "::error::$file is missing after the build. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
+              exit 1
+            }
+          done
           git diff --exit-code -- "$HEADER" "$GO_HEADER" || {
             echo "::error::$HEADER or $GO_HEADER is stale: cbindgen regenerated a different header than the one committed. Run 'ALEF_EXPORT_GENERATED_HEADERS=1 cargo build -p html-to-markdown-ffi' and commit the result."
             exit 1
           }
-          echo "Header verified fresh on Windows: $HEADER"
+          echo "Headers verified fresh on Windows: $HEADER $GO_HEADER"
 
   test-wasm:
     needs: [build-wasm]
