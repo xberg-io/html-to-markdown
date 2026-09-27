@@ -64,9 +64,11 @@ jobs:
 
       # ~keep ALLOW_HOST_MISMATCH is passed here and nowhere else. `ubuntu-24.04` is one label over
       # a mixed pool, and the calibration campaign is dispatch-only, so it can only be captured on
-      # whichever host it drew. It does not relax the provenance contract -- a changed rustc,
-      # profile, build flag, feature set, or runner class still hard-fails -- and on a runner whose
-      # CPU matches the baseline it changes nothing, so a real regression still fails.
+      # whichever host it drew. On a CPU other than the calibrated one no timing is scored, and the
+      # flag lets that unscored run succeed with a "Benchmark timings not scored" warning on the
+      # run page. It does not relax the provenance contract -- a changed rustc, profile, build
+      # flag, feature set, or runner class still hard-fails -- nor the fixture inventory, and on a
+      # runner whose CPU matches the baseline it changes nothing, so a real regression still fails.
       - name: Compare against baseline (fails on regression beyond threshold)
         run: task bench:compare ALLOW_HOST_MISMATCH=true
         shell: bash

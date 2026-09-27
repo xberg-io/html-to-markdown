@@ -157,10 +157,12 @@ pub fn handle(
                         let mut link_buffer = String::new();
                         append_markdown_link(
                             &mut link_buffer,
-                            &escaped_label,
-                            href.as_str(),
-                            title.as_deref(),
-                            raw_text,
+                            &MarkdownLink {
+                                label: &escaped_label,
+                                href: href.as_str(),
+                                title: title.as_deref(),
+                                raw_text,
+                            },
                             options,
                             ctx.reference_collector.as_ref(),
                         );
@@ -262,10 +264,12 @@ pub fn handle(
             match visit_result {
                 VisitResult::Continue => append_markdown_link(
                     output,
-                    &escaped_label,
-                    href.as_str(),
-                    title.as_deref(),
-                    label.as_str(),
+                    &MarkdownLink {
+                        label: &escaped_label,
+                        href: href.as_str(),
+                        title: title.as_deref(),
+                        raw_text: label.as_str(),
+                    },
                     options,
                     ctx.reference_collector.as_ref(),
                 ),
@@ -281,10 +285,12 @@ pub fn handle(
         } else {
             append_markdown_link(
                 output,
-                &escaped_label,
-                href.as_str(),
-                title.as_deref(),
-                label.as_str(),
+                &MarkdownLink {
+                    label: &escaped_label,
+                    href: href.as_str(),
+                    title: title.as_deref(),
+                    raw_text: label.as_str(),
+                },
                 options,
                 ctx.reference_collector.as_ref(),
             );
@@ -293,10 +299,12 @@ pub fn handle(
         #[cfg(not(feature = "visitor"))]
         append_markdown_link(
             output,
-            &escaped_label,
-            href.as_str(),
-            title.as_deref(),
-            label.as_str(),
+            &MarkdownLink {
+                label: &escaped_label,
+                href: href.as_str(),
+                title: title.as_deref(),
+                raw_text: label.as_str(),
+            },
             options,
             ctx.reference_collector.as_ref(),
         );
@@ -428,7 +436,17 @@ mod tests {
     fn append_markdown_link_angle_plain_url_unchanged() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "/file.pdf", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "/file.pdf",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](/file.pdf)");
     }
 
@@ -441,7 +459,17 @@ mod tests {
     fn append_markdown_link_angle_percent_encodes_non_ascii() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "öö.html", "öö.html", None, "öö.html", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "öö.html",
+                href: "öö.html",
+                title: None,
+                raw_text: "öö.html",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[öö.html](%C3%B6%C3%B6.html)");
     }
 
@@ -454,10 +482,12 @@ mod tests {
         let options = opts_with_style(UrlEscapeStyle::Angle);
         append_markdown_link(
             &mut out,
-            "text",
-            "https://example.com/söq?a=1&b=2",
-            None,
-            "text",
+            &MarkdownLink {
+                label: "text",
+                href: "https://example.com/söq?a=1&b=2",
+                title: None,
+                raw_text: "text",
+            },
             &options,
             None,
         );
@@ -474,7 +504,17 @@ mod tests {
     fn append_markdown_link_angle_does_not_percent_encode_a_fragment_destination() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "#walk-up-\u{fe0e}", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "#walk-up-\u{fe0e}",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](#walk-up-\u{fe0e})");
     }
 
@@ -482,7 +522,17 @@ mod tests {
     fn append_markdown_link_angle_wraps_space_in_angle_brackets() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "file", "/file (1).pdf", None, "file", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "file",
+                href: "/file (1).pdf",
+                title: None,
+                raw_text: "file",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[file](</file (1).pdf>)");
     }
 
@@ -490,7 +540,17 @@ mod tests {
     fn append_markdown_link_percent_encodes_spaces() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Percent);
-        append_markdown_link(&mut out, "file", "/file (1).pdf", None, "file", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "file",
+                href: "/file (1).pdf",
+                title: None,
+                raw_text: "file",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[file](/file%20%281%29.pdf)");
     }
 
@@ -498,7 +558,17 @@ mod tests {
     fn append_markdown_link_percent_encodes_angle_brackets() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Percent);
-        append_markdown_link(&mut out, "file", "/file <draft>.pdf", None, "file", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "file",
+                href: "/file <draft>.pdf",
+                title: None,
+                raw_text: "file",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[file](/file%20%3Cdraft%3E.pdf)");
     }
 
@@ -506,7 +576,17 @@ mod tests {
     fn append_markdown_link_percent_full_issue_example() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Percent);
-        append_markdown_link(&mut out, "file", "/file (1) <draft>.pdf", None, "file", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "file",
+                href: "/file (1) <draft>.pdf",
+                title: None,
+                raw_text: "file",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[file](/file%20%281%29%20%3Cdraft%3E.pdf)");
     }
 
@@ -535,10 +615,12 @@ mod tests {
         let options = opts_with_style(UrlEscapeStyle::Angle);
         append_markdown_link(
             &mut out,
-            "Rust",
-            "https://en.wikipedia.org/wiki/Rust_(programming_language)",
-            None,
-            "Rust",
+            &MarkdownLink {
+                label: "Rust",
+                href: "https://en.wikipedia.org/wiki/Rust_(programming_language)",
+                title: None,
+                raw_text: "Rust",
+            },
             &options,
             None,
         );
@@ -551,10 +633,12 @@ mod tests {
         let options = opts_with_style(UrlEscapeStyle::Angle);
         append_markdown_link(
             &mut out,
-            "link",
-            "http://example.com/a)(b",
-            None,
-            "link",
+            &MarkdownLink {
+                label: "link",
+                href: "http://example.com/a)(b",
+                title: None,
+                raw_text: "link",
+            },
             &options,
             None,
         );
@@ -565,7 +649,17 @@ mod tests {
     fn append_markdown_link_angle_escapes_gt_inside_wrap_when_href_has_space_and_gt() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "/my file >.pdf", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "/my file >.pdf",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](</my file \\>.pdf>)");
     }
 
@@ -573,7 +667,17 @@ mod tests {
     fn append_markdown_link_angle_produces_empty_angle_brackets_when_href_is_empty() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](<>)");
     }
 
@@ -583,10 +687,12 @@ mod tests {
         let options = opts_with_style(UrlEscapeStyle::Percent);
         append_markdown_link(
             &mut out,
-            "link",
-            "/path with spaces",
-            Some("My Title"),
-            "link",
+            &MarkdownLink {
+                label: "link",
+                href: "/path with spaces",
+                title: Some("My Title"),
+                raw_text: "link",
+            },
             &options,
             None,
         );
@@ -645,7 +751,17 @@ mod tests {
     fn append_markdown_link_escapes_a_trailing_backslash_in_title_so_the_closing_quote_is_not_swallowed() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "/url", Some("foo\\"), "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "/url",
+                title: Some("foo\\"),
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](/url \"foo\\\\\")");
     }
 
@@ -654,7 +770,17 @@ mod tests {
         let mut out = String::new();
         let mut options = opts_with_style(UrlEscapeStyle::Angle);
         options.default_title = true;
-        append_markdown_link(&mut out, "text", "http://a\\", None, "http://a\\", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "http://a\\",
+                title: None,
+                raw_text: "http://a\\",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](http://a\\ \"http://a\\\\\")");
     }
 
@@ -665,7 +791,17 @@ mod tests {
         // un-escaping the delimiter and terminating the destination early.
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "/my file\\>.pdf", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "/my file\\>.pdf",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](</my file\\\\\\>.pdf>)");
     }
 
@@ -677,7 +813,17 @@ mod tests {
     fn append_markdown_link_escapes_a_backslash_before_punctuation_in_a_balanced_destination() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "\\*", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "\\*",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](\\\\*)");
     }
 
@@ -695,7 +841,17 @@ mod tests {
     fn append_markdown_link_escapes_a_trailing_backslash_in_a_balanced_destination_with_no_title() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "/path\\", None, "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "/path\\",
+                title: None,
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](/path\\\\)");
     }
 
@@ -708,7 +864,17 @@ mod tests {
     fn append_markdown_link_leaves_a_trailing_backslash_in_a_balanced_destination_unescaped_when_a_title_follows() {
         let mut out = String::new();
         let options = opts_with_style(UrlEscapeStyle::Angle);
-        append_markdown_link(&mut out, "text", "/path\\", Some("t"), "text", &options, None);
+        append_markdown_link(
+            &mut out,
+            &MarkdownLink {
+                label: "text",
+                href: "/path\\",
+                title: Some("t"),
+                raw_text: "text",
+            },
+            &options,
+            None,
+        );
         assert_eq!(out, "[text](/path\\ \"t\")");
     }
 }

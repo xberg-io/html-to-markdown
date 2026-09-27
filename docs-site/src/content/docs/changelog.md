@@ -28,6 +28,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   detection job, and both the leg and the result job read that output. A script test fails when a
   job is added to the workflow without being listed in the result job.
 
+### Fixed
+
+- **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
+  runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
+  every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26
+  `FAIL` lines, and then passed the run as advisory, so the job was green while measuring nothing.
+  On a CPU other than the calibrated one no timing is scored now: the run reports
+  `TIMINGS NOT SCORED` with both CPUs and fails, and under `--allow-host-mismatch` (the nightly
+  job) it succeeds with a `Benchmark timings not scored` warning on the run page instead. The
+  fixture inventory stays fatal on any host, and a regression on the calibrated CPU still fails.
+- **The benchmark baseline recorded stale output sizes for five fixtures.** The 3.14.2
+  conversion fixes moved the Markdown output of `gh-121-hacker-news`, `gh-127-issue`,
+  `gh-190/firsteigen`, `gh-190/rbloggers` and `wikipedia/small_html`, and the baseline was never
+  updated. Each change was traced to the fix that made it and reviewed: images kept in layout rows
+  (5b26d732d, 31f2015b1), and whitespace no longer opening a line (c5b8d1baa), which also stops
+  two lines rendering as indented code blocks. Only `output_bytes` changes; the calibrated timings
+  stay as measured. `gh-190/plusblog` stays unblessed, because c5b8d1baa moved a body paragraph
+  into the preceding list item there, so the guardrail keeps reporting it until that is fixed.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed
