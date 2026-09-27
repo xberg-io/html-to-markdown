@@ -299,23 +299,14 @@ fn extract_head_metadata_entries(head_tag: &tl::HTMLTag, parser: &tl::Parser) ->
                 }
             }
             "meta" => {
-                if let (Some(Some(meta_name)), Some(Some(meta_content))) = (
-                    child_tag.attributes().get("name"),
-                    child_tag.attributes().get("content"),
-                ) {
-                    entries.push(MetadataEntry {
-                        key: meta_name.as_utf8_str().to_string(),
-                        value: meta_content.as_utf8_str().to_string(),
-                    });
-                }
-                if let (Some(Some(property)), Some(Some(content))) = (
-                    child_tag.attributes().get("property"),
-                    child_tag.attributes().get("content"),
-                ) {
-                    entries.push(MetadataEntry {
-                        key: property.as_utf8_str().to_string(),
-                        value: content.as_utf8_str().to_string(),
-                    });
+                let content = crate::converter::utility::attributes::decoded_attribute(child_tag, "content");
+                for key_attr in ["name", "property"] {
+                    if let (Some(Some(key)), Some(content)) = (child_tag.attributes().get(key_attr), content.as_ref()) {
+                        entries.push(MetadataEntry {
+                            key: key.as_utf8_str().to_string(),
+                            value: content.to_string(),
+                        });
+                    }
                 }
             }
             _ => {}

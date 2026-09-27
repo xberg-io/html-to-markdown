@@ -133,5 +133,3 @@ pub use crate::converter::utility::content::{
 pub use crate::converter::utility::serialization::{serialize_node, serialize_node_to_html};
 
 pub use crate::converter::utility::siblings::append_inline_suffix;
-
-pub use crate::converter::block::heading::find_single_heading_child;

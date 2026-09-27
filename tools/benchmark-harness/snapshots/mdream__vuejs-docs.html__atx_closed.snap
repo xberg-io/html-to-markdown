@@ -6,9 +6,9 @@ meta-og:image: https://vuejs.org/images/logo.png
 meta-og:title: Vue.js
 meta-og:type: website
 meta-og:url: https://vuejs.org/
-meta-theme-color: #3c8772
+meta-theme-color: "#3c8772"
 meta-twitter:card: summary
-meta-twitter:site: @vuejs
+meta-twitter:site: "@vuejs"
 meta-viewport: width=device-width,initial-scale=1
 title: Introduction | Vue.js
 ---

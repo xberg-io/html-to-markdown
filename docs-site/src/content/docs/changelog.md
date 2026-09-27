@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every leg. Each leg's path filter condition is now written once, as an output of the change
   detection job, and both the leg and the result job read that output. A script test fails when a
   job is added to the workflow without being listed in the result job.
+- Removed an unused copy of the `<a>` handler that no conversion path called. Links are
+  converted by the one live handler, as before; output does not change.
 
 ### Fixed
 
@@ -74,6 +76,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<br>`, the span's text was joined onto the item's last word, and a `<span>` right after a
   horizontal rule was joined onto the `---`. A `<span>` now leaves the line break before it in
   place (#546).
+- **Head metadata kept its character references encoded.** The `<base href>`, the
+  `<link rel="canonical">` href and the `<title>` text reached the frontmatter and the structured
+  metadata as written, so `<base href="https://example.com/it&#x27;s/">` produced
+  `base: https://example.com/it&#x27;s/`. They now go through the same decoder as `<meta content>`
+  and body text, including the Windows-1252 mapping for numeric references 128-159.
+- **A newline in a head value started a new frontmatter key.** The frontmatter wrote each
+  `key: value` line as it was, so a `<title>` or `<meta content>` holding a newline, literal or
+  written as `&#10;`, could add or override a key. Each key and value is now one YAML scalar: a
+  value that plain YAML would misread (a newline, `: `, ` #`, a leading `-`, `#` or `@`, a
+  control character) is written in double quotes with YAML escapes. Other values stay unquoted.
+- **Legacy named references without a semicolon were not decoded.** The spec lets about a hundred
+  names such as `&copy`, `&amp` and `&eacute` close without `;`, and browsers decode them in text:
+  `&copy 2024` is `© 2024`. The converter kept them as written. They now decode on both tiers,
+  with the spec's longest-name rule (`&notit;` is `¬it;`). In an attribute value a legacy name
+  followed by `=` or a letter or digit stays as written, so `?a=1&copy=2` in an `href` is unchanged.
+- **Frontmatter values that YAML reads as numbers, booleans, null or dates were not quoted.** A
+  value such as `3`, `true`, `null` or `2024-01-01` is a valid plain scalar, so a YAML reader
+  turned `meta-algolia-search-order: 3` into the number 3. A value that the YAML 1.2 core schema
+  or a YAML 1.1 reader resolves to anything other than a string is now written in double quotes.
+- **Numeric character references without a semicolon were not decoded.** The spec decodes `&#39`
+  and `&#x27` without their `;`, in text and in attribute values, so `it&#39s` is `it's` in a
+  browser. The converter kept the reference as written. It now decodes on both tiers.
+- **Tier 1 kept a reference encoded after an unknown name.** When an unknown name such as `&foo`
+  had a `;` a few bytes later, Tier 1 wrote the whole span as it was, so `&foo &amp;` kept
+  `&amp;` where Tier 2 wrote `&`. Tier 1 now writes the `&` alone and reads on, as Tier 2 does.
+- **Tier 1's fallback message added a `;` the page did not have.** When Tier 1 handed a reference
+  without its `;` to Tier 2, the log message showed `&#39;` for an input of `&#39`. The message
+  now shows the reference as written (#565).
+- **Tier 1's fallback message called a known reference unknown.** When Tier 1 handed a reference
+  without its `;` to Tier 2, the log message called it an unknown HTML entity even when the
+  reference was one Tier 2's decoder knows, such as `&#39` or `&copy`. The message now says the
+  reference is missing its `;` when the name is known, and keeps the unknown wording for names
+  that really are unknown (#586).
 
 ## [3.15.1] - 2026-09-27
 

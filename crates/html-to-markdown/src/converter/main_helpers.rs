@@ -4,6 +4,7 @@
 //! including preprocessing helpers, HTML repair, and metadata formatting.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use crate::options::ConversionOptions;
 use crate::options::NewlineStyle;
@@ -518,14 +519,107 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
 }
 
 /// Format metadata as YAML frontmatter.
+///
+/// Keys and values come from the page, so each is written as one YAML scalar (#544): a
+/// newline, `: ` or a leading indicator would otherwise end the line or change what YAML reads.
 pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> String {
     let mut result = String::from("---\n");
     for (key, value) in metadata {
-        use std::fmt::Write as _;
-        let _ = writeln!(&mut result, "{key}: {value}");
+        push_yaml_scalar(&mut result, key);
+        result.push_str(": ");
+        push_yaml_scalar(&mut result, value);
+        result.push('\n');
     }
     result.push_str("---\n");
     result
+}
+
+/// Append `value` as a plain YAML scalar when it reads back unchanged, else as a double-quoted
+/// scalar with every non-printable character escaped.
+fn push_yaml_scalar(out: &mut String, value: &str) {
+    if is_plain_yaml_scalar(value) {
+        out.push_str(value);
+        return;
+    }
+    out.push('"');
+    for ch in value.chars() {
+        match ch {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if is_yaml_printable(c) => out.push(c),
+            c => {
+                use std::fmt::Write as _;
+                let _ = write!(out, "\\u{:04X}", u32::from(c));
+            }
+        }
+    }
+    out.push('"');
+}
+
+/// A conservative subset of the YAML plain scalar in block context: no leading indicator, no
+/// `: ` or ` #`, no leading or trailing space, only printable characters, and a value a YAML
+/// reader resolves to a string (#552).
+fn is_plain_yaml_scalar(value: &str) -> bool {
+    let Some(first) = value.chars().next() else {
+        return false;
+    };
+    !matches!(
+        first,
+        '-' | '?'
+            | ':'
+            | ','
+            | '['
+            | ']'
+            | '{'
+            | '}'
+            | '#'
+            | '&'
+            | '*'
+            | '!'
+            | '|'
+            | '>'
+            | '\''
+            | '"'
+            | '%'
+            | '@'
+            | '`'
+    ) && !value.starts_with(' ')
+        && !value.ends_with([' ', ':'])
+        && !value.contains(": ")
+        && !value.contains(" #")
+        && value.chars().all(|c| c != '\t' && is_yaml_printable(c))
+        && !yaml_non_string_scalar().is_match(value)
+}
+
+/// Matches a plain scalar that a YAML reader resolves to null, a boolean, a number or a timestamp:
+/// the YAML 1.2 core schema, plus the YAML 1.1 forms that readers such as PyYAML still apply
+/// (`yes`/`no`/`on`/`off`, `0b`, leading-zero octal, `_` separators, base 60, dates, `=`, `<<`).
+fn yaml_non_string_scalar() -> &'static regex::Regex {
+    static RE: OnceLock<regex::Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        regex::Regex::new(concat!(
+            r"^(?:~|null|Null|NULL",
+            r"|true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO|on|On|ON|off|Off|OFF|y|Y|n|N",
+            r"|[-+]?(?:0b[01_]+|0o[0-7]+|0x[0-9a-fA-F_]+",
+            r"|[0-9][0-9_]*(?::[0-5]?[0-9])*(?:\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?",
+            r"|\.[0-9][0-9_]*(?:[eE][-+]?[0-9]+)?|\.(?:inf|Inf|INF))",
+            r"|\.(?:nan|NaN|NAN)",
+            r"|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}",
+            r"(?:(?:[Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]*)?(?:[ \t]*(?:Z|[-+][0-9]{1,2}(?::[0-9]{2})?))?)?",
+            r"|=|<<)$",
+        ))
+        .expect("YAML scalar type regex is well-formed")
+    })
+}
+
+/// The YAML 1.2 printable set, minus the Unicode line and paragraph separators and the
+/// byte-order mark, which YAML 1.1 readers still treat as a line break or a document marker.
+const fn is_yaml_printable(c: char) -> bool {
+    matches!(c, '\t' | ' '..='~' | '\u{A0}'..='\u{D7FF}' | '\u{E000}'..='\u{FFFD}' | '\u{10000}'..='\u{10FFFF}')
+        && !matches!(c, '\u{2028}' | '\u{2029}' | '\u{FEFF}')
 }
 
 /// Record `<meta name>`/`<meta property>` content into `metadata`, honoring `strip_tags`/
@@ -562,8 +656,8 @@ fn collect_meta_head_metadata(
     }
 }
 
-/// Record the `<title>` text into `metadata`, honoring `strip_tags`/`preserve_tags` for
-/// `"title"`. Extracted from `extract_head_metadata` — same traversal and trimming, unchanged.
+/// Record the trimmed, decoded `<title>` text into `metadata`, honoring `strip_tags`/
+/// `preserve_tags` for `"title"`.
 fn collect_title_head_metadata(
     child_tag: &tl::HTMLTag,
     parser: &tl::Parser,
@@ -584,14 +678,14 @@ fn collect_title_head_metadata(
             title_content.push_str(raw.as_utf8_str().as_ref());
         }
     }
-    title_content = title_content.trim().to_string();
+    // ~keep The title is text and carries character references like any other text (#509).
+    let title_content = crate::text::decode_html_entities_cow(title_content.trim()).into_owned();
     if !title_content.is_empty() {
         metadata.insert("title".to_string(), title_content);
     }
 }
 
-/// Record a `<link rel="canonical">` href into `metadata`. Extracted from
-/// `extract_head_metadata` — same attribute lookups and `"canonical"` substring check, unchanged.
+/// Record the decoded href of a `<link rel="canonical">` into `metadata`.
 fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("link") {
         return;
@@ -603,24 +697,21 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
     if !rel_str.contains("canonical") {
         return;
     }
-    let Some(href_attr) = child_tag.attributes().get("href").flatten() else {
+    let Some(href) = crate::converter::utility::attributes::decoded_attribute(child_tag, "href") else {
         return;
     };
-    let href_str = href_attr.as_utf8_str();
-    metadata.insert("canonical".to_string(), href_str.to_string());
+    metadata.insert("canonical".to_string(), href.into_owned());
 }
 
-/// Record a `<base href>` into `metadata`. Extracted from `extract_head_metadata` — same
-/// attribute lookup, unchanged.
+/// Record the decoded `<base href>` into `metadata`.
 fn collect_base_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("base") {
         return;
     }
-    let Some(href_attr) = child_tag.attributes().get("href").flatten() else {
+    let Some(href) = crate::converter::utility::attributes::decoded_attribute(child_tag, "href") else {
         return;
     };
-    let href_str = href_attr.as_utf8_str();
-    metadata.insert("base".to_string(), href_str.to_string());
+    metadata.insert("base".to_string(), href.into_owned());
 }
 
 /// Extract metadata from the head element.

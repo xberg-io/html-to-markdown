@@ -33,6 +33,7 @@ use crate::converter::tier1::tags::{ListKind, TagKind, TagSpec};
 use crate::converter::tier1::{self};
 use crate::converter::utility::attributes::NAV_KEYWORDS;
 use crate::options::ConversionOptions;
+use crate::text::ReferenceContext;
 
 use memchr::{memchr2, memchr3};
 
@@ -41,11 +42,6 @@ use memchr::{memchr2, memchr3};
 /// Names longer than this are silently truncated and will not match any
 /// entry in the spec table, causing an `UnknownCustomElement` bail.
 const MAX_TAG_NAME_BYTES: usize = 32;
-
-/// Maximum byte length scanned when looking for a `;` to close an entity.
-///
-/// Entities longer than this are treated as bare `&` literals.
-const MAX_ENTITY_NAME_BYTES: usize = 32;
 
 /// Minimum number of dashes in a GFM separator cell.
 ///
@@ -4418,7 +4414,7 @@ fn flush_text(
     if in_pre {
         if has_entities {
             let dest = state.cell_or_output_mut();
-            decode_entities_into(dest, raw, base_offset)?;
+            decode_entities_into(dest, raw, base_offset, ReferenceContext::Text)?;
         } else {
             state.cell_or_output_mut().push_str(raw);
         }
@@ -4435,7 +4431,7 @@ fn flush_text(
         // with a real `<br>` (issue #487).
         let decoded: std::borrow::Cow<'_, str> = if has_entities {
             let mut buf = String::with_capacity(raw.len());
-            decode_entities_into(&mut buf, raw, base_offset)?;
+            decode_entities_into(&mut buf, raw, base_offset, ReferenceContext::Text)?;
             std::borrow::Cow::Owned(buf)
         } else {
             std::borrow::Cow::Borrowed(raw)
@@ -4552,7 +4548,7 @@ fn flush_text(
     if inside_inline && !in_cell && raw.contains('\\') {
         let mut staged = String::with_capacity(raw.len() + 8);
         if has_entities {
-            decode_entities_into(&mut staged, raw, base_offset)?;
+            decode_entities_into(&mut staged, raw, base_offset, ReferenceContext::Text)?;
         } else {
             staged.push_str(raw);
         }
@@ -4637,7 +4633,12 @@ fn escape_backslash_run(buffer: &mut String, from: usize, run_ends_at_last_byte:
 /// Uses memchr to quickly find the next `&` and bulk-copies non-entity runs.
 ///
 /// Returns `Err(BailReason::UnknownEntity)` when an entity cannot be decoded.
-fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result<(), BailReason> {
+fn decode_entities_into(
+    out: &mut String,
+    s: &str,
+    base_offset: usize,
+    context: ReferenceContext,
+) -> Result<(), BailReason> {
     let bytes = s.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
@@ -4646,7 +4647,7 @@ fn decode_entities_into(out: &mut String, s: &str, base_offset: usize) -> Result
             if amp_pos > i {
                 out.push_str(&s[i..amp_pos]);
             }
-            i = decode_entity_at(bytes, s, amp_pos, out, base_offset)?;
+            i = decode_entity_at(bytes, s, amp_pos, out, base_offset, context)?;
         } else {
             if i < bytes.len() {
                 out.push_str(&s[i..]);
@@ -4753,7 +4754,7 @@ fn decode_and_collapse_into_inner(
                 b'&' => {
                     prev_was_space = false;
                     at_line_start = false;
-                    i = decode_entity_at(bytes, s, pos, out, base_offset)?;
+                    i = decode_entity_at(bytes, s, pos, out, base_offset, ReferenceContext::Text)?;
                 }
                 _ => unreachable!(),
             }
@@ -4769,39 +4770,51 @@ fn decode_and_collapse_into_inner(
 
 /// Scan and decode a single HTML entity starting at `amp_pos` (the `&` byte).
 ///
-/// Looks for a matching `;` within 32 bytes, then dispatches to
-/// `decode_entity_into` or `decode_numeric_entity_into`.
+/// Tries the hot subset in `decode_entity_into` for an alphanumeric name closed by `;`; every
+/// other reference goes through Tier-2's decoder, `text::decode_character_reference`, so both
+/// tiers read one table. When nothing decodes, writes the `&` alone and resumes at the next byte,
+/// as Tier-2 does, so a reference after an unknown name still decodes (#554).
 ///
-/// Returns the position immediately after the entity (i.e. after the `;`), or
-/// after the bare `&` when no valid entity boundary is found.
+/// Returns the position immediately after the reference, or after the `&`.
 ///
-/// Emits `Err(BailReason::UnknownEntity)` when an `&name;` sequence is found
-/// but the name is not in the decode table.
+/// Emits `Err(BailReason::UnknownEntity)` when Tier-2's decoder would decode a
+/// reference this function does not: one without its `;`.
 fn decode_entity_at(
     bytes: &[u8],
     s: &str,
     amp_pos: usize,
     out: &mut String,
-    _base_offset: usize,
+    base_offset: usize,
+    context: ReferenceContext,
 ) -> Result<usize, BailReason> {
     let amp = amp_pos;
-    let mut end = amp + 1;
-    while end < bytes.len() && end - amp <= MAX_ENTITY_NAME_BYTES && bytes[end] != b';' {
-        end += 1;
+    let name_len = bytes[amp + 1..]
+        .iter()
+        .take_while(|b| b.is_ascii_alphanumeric())
+        .count();
+    let name_end = amp + 1 + name_len;
+    if bytes.get(name_end) == Some(&b';') && decode_entity_into(out, &s[amp + 1..name_end]) {
+        return Ok(name_end + 1);
     }
-    if end < bytes.len() && bytes[end] == b';' && end > amp + 1 {
-        let entity = &s[amp + 1..end];
-        if decode_entity_into(out, entity) {
-            return Ok(end + 1);
+    match crate::text::decode_character_reference(s, amp, context) {
+        Some((reference_end, first, second)) if bytes[reference_end - 1] == b';' => {
+            out.push(first);
+            if let Some(second) = second {
+                out.push(second);
+            }
+            Ok(reference_end)
         }
-        // ~keep Phase N3: entity name (`&name;`) not in Tier-1's decode table.
-        // Tier-2 and mdream pass these through verbatim instead of decoding.
-        // Push the raw `&name;` and advance past it.
-        out.push_str(&s[amp..=end]);
-        return Ok(end + 1);
+        // ~keep A legacy named reference (#545) or a numeric one (#553) without its `;` is
+        // ~keep rare; Tier-2 owns the longest-name rule and the attribute exception.
+        Some((reference_end, ..)) => Err(BailReason::UnknownEntity {
+            name: s[amp + 1..reference_end].into(),
+            offset: base_offset + amp,
+        }),
+        None => {
+            out.push('&');
+            Ok(amp + 1)
+        }
     }
-    out.push('&');
-    Ok(amp + 1)
 }
 
 /// Apply the escape-context bits for an opening tag.
@@ -5001,7 +5014,7 @@ fn decode_attr(bytes: &[u8]) -> Result<String, BailReason> {
         return Ok(s.to_owned());
     }
     let mut out = String::with_capacity(s.len());
-    decode_entities_into(&mut out, s, 0)?;
+    decode_entities_into(&mut out, s, 0, ReferenceContext::Attribute)?;
     Ok(out)
 }
 
@@ -5312,13 +5325,12 @@ fn collapse_excess_blank_lines(output: &mut String) {
     });
 }
 
-/// Decode a single HTML entity name (without `&` or `;`) directly into `out`.
+/// Decode a single HTML entity name (without `&` or `;`) from Tier-1's hot subset
+/// directly into `out`.
 ///
-/// Returns `true` when the entity was recognized and written; `false` when the
-/// name didn't match any known entity (caller emits the literal `&...;`).
-///
-/// All named entities are static strings; numeric references emit a single
-/// `char`. No `String` is allocated.
+/// Returns `true` when the entity was recognized and written; `false` for any
+/// other name or a numeric reference, which the caller hands to Tier-2's decoder.
+/// No `String` is allocated.
 fn decode_entity_into(out: &mut String, name: &str) -> bool {
     let s: &str = match name {
         "amp" => "&",
@@ -5451,52 +5463,10 @@ fn decode_entity_into(out: &mut String, name: &str) -> bool {
         "yacute" => "\u{00FD}",
         "thorn" => "\u{00FE}",
         "yuml" => "\u{00FF}",
-        _ => return decode_named_entity_fallback(out, name),
+        _ => return false,
     };
     out.push_str(s);
     true
-}
-
-/// Falls back to the full WHATWG named-character-reference table for names
-/// outside the hot subset above.
-///
-/// ~keep `html_escape::NAMED_ENTITIES` is the exact table Tier-2 decodes
-/// against (see `text::decode_html_entities_cow`, which calls
-/// `html_escape::decode_html_entities`), so looking it up here — rather
-/// than hand-copying a second ~2000-entry table into Tier-1 — is what
-/// makes Tier-1 byte-identical to Tier-2 for names like `&notin;`
-/// instead of merely covering a hand-picked subset.
-fn decode_named_entity_fallback(out: &mut String, name: &str) -> bool {
-    let name_bytes = name.as_bytes();
-    if let Ok(index) = html_escape::NAMED_ENTITIES.binary_search_by(|(entity_name, _)| entity_name.cmp(&name_bytes)) {
-        out.push_str(html_escape::NAMED_ENTITIES[index].1);
-        return true;
-    }
-    decode_numeric_entity_into(out, name)
-}
-
-fn decode_numeric_entity_into(out: &mut String, name: &str) -> bool {
-    let Some(rest) = name.strip_prefix('#') else {
-        return false;
-    };
-    let (digits, radix) = match rest.strip_prefix(['x', 'X']) {
-        Some(hex) => (hex, 16),
-        None => (rest, 10),
-    };
-    let Ok(code_point) = crate::text::parse_character_reference_number(digits, radix) else {
-        return false;
-    };
-    if let Some(replacement) = crate::text::numeric_character_reference_override(code_point) {
-        out.push(replacement);
-        return true;
-    }
-    match u32::try_from(code_point).ok().and_then(char::from_u32) {
-        Some(ch) => {
-            out.push(ch);
-            true
-        }
-        None => false,
-    }
 }
 
 /// Skip `<!--...-->`, `<!DOCTYPE...>`, or any `<!...>` construct.

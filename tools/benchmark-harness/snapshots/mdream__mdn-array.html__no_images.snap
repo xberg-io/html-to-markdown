@@ -4,9 +4,9 @@ meta-description: The Array object, as with arrays in other programming language
 meta-og:description: The Array object, as with arrays in other programming languages, enables storing a collection of multiple items under a single variable name, and has members for performing common array operations.
 meta-og:image: https://developer.mozilla.org/mdn-social-image.46ac2375.png
 meta-og:image:alt: The MDN logo
-meta-og:image:height: 1024
+meta-og:image:height: "1024"
 meta-og:image:type: image/png
-meta-og:image:width: 1024
+meta-og:image:width: "1024"
 meta-og:locale: en_US
 meta-og:site_name: MDN Web Docs
 meta-og:title: Array - JavaScript | MDN
