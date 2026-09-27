@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   missing. The `--json` summary now carries the per-language counts, the per-root counts and the
   silent detectors.
 
+### Fixed
+
+- **A `<br>` in a `<span>` after a list or a layout table pulled the next paragraph into the last
+  list item.** A `<span>` removed the line break that ends the item's line, so the `<br>` became a
+  hard break at the end of the item and the paragraph after it rendered inside the item. Without a
+  `<br>`, the span's text was joined onto the item's last word, and a `<span>` right after a
+  horizontal rule was joined onto the `---`. A `<span>` now leaves the line break before it in
+  place (#546).
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed

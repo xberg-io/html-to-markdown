@@ -17,11 +17,11 @@ fn options_with_structure() -> ConversionOptions {
 
 /// The exact HTML from the bug report: `<pre>` → `<p><span>■…</span></p>`.
 ///
-/// With default options this does NOT panic because `<pre>` emits `\n\n`,
-/// so the span's whitespace-normalisation pop is guarded out.
 /// With `include_document_structure = true` the paragraph handler slices
-/// `output[content_start_pos..]` after conversion; if a pop moved the end
-/// of the string behind a multibyte char boundary the slice panics.
+/// `output[content_start_pos..]` after conversion. A `<span>` used to pop a
+/// trailing `\n` before its content, which moved the end of the string behind
+/// that start and put the slice inside a multibyte char. The span no longer
+/// removes anything (#546); this pins the slice against any other shrink.
 #[test]
 fn pre_paragraph_multibyte_span_does_not_panic() {
     let html = "<pre>previous block</pre>\n\
@@ -42,7 +42,7 @@ fn pre_paragraph_multibyte_span_does_not_panic() {
 }
 
 /// Same panic path but with a heading (`<h2>`) as the preceding block.
-/// Headings emit a single `\n` in some configurations, which triggers the pop.
+/// Headings emit a single `\n` in some configurations, which is what the span popped.
 #[test]
 fn heading_paragraph_multibyte_span_does_not_panic() {
     let html = "<h2>Section header</h2>\n\
