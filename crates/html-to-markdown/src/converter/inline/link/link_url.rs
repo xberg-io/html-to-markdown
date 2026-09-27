@@ -349,6 +349,19 @@ pub fn append_url_destination(
     }
 }
 
+/// The parts of one Markdown link, as [`append_markdown_link`] renders them.
+#[derive(Clone, Copy)]
+pub struct MarkdownLink<'a> {
+    /// The link text, already escaped for the label position.
+    pub label: &'a str,
+    /// The URL/destination.
+    pub href: &'a str,
+    /// The optional link title attribute.
+    pub title: Option<&'a str>,
+    /// The unescaped link text; the `default_title` option compares it with `href`.
+    pub raw_text: &'a str,
+}
+
 /// Format and append a Markdown link to the output string.
 ///
 /// Generates the link syntax: `[label](href "title")`
@@ -363,20 +376,21 @@ pub fn append_url_destination(
 ///
 /// # Arguments
 /// * `output` - Output buffer to append the link to
-/// * `label` - The link text (already escaped)
-/// * `href` - The URL/destination
-/// * `title` - Optional link title attribute
-/// * `raw_text` - Original unprocessed text (for `default_title` option)
+/// * `link` - The link's label, destination, title and raw text
 /// * `options` - Conversion options
+/// * `reference_collector` - Collects the destination when `link_style` is `Reference`
 pub fn append_markdown_link(
     output: &mut String,
-    label: &str,
-    href: &str,
-    title: Option<&str>,
-    raw_text: &str,
+    link: &MarkdownLink<'_>,
     options: &ConversionOptions,
     reference_collector: Option<&crate::converter::reference_collector::ReferenceCollectorHandle>,
 ) {
+    let MarkdownLink {
+        label,
+        href,
+        title,
+        raw_text,
+    } = *link;
     if options.link_style == crate::options::validation::LinkStyle::Reference && !href.is_empty() {
         if let Some(collector) = reference_collector {
             let ref_num = collector.borrow_mut().get_or_insert(href, title);

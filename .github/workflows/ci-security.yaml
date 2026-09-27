@@ -30,8 +30,10 @@ on:
     # Catch newly-published advisories against unchanged dependencies.
     - cron: "17 6 * * 1"
 
+# ~keep `github.sha` not `github.ref` for pushes: a cancelled run reports neither pass
+# ~keep nor fail, and cancelling main's previous run is one of the two ways 3.15.0's R break shipped.
 concurrency:
-  group: ci-security-${{ github.event.pull_request.number || github.ref }}
+  group: ci-security-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 permissions:

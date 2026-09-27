@@ -77,7 +77,8 @@ title: "1.1 데이터란 무엇인가? :: 파프리 블로그"
 있습니다. 예를 들면, 오늘의 날씨 정보에서 오늘 아침 기온, 습도, 날씨 등등 각각의
 수치들은 데이터가 됩니다.  
 
-- [![Actual is not normal (a tribute to Edward Tufte)](http://farm3.static.flickr.com/2173/2121472112_8ac5d673ff.jpg)](http://www.flickr.com/photos/12836528@N00/2121472112 "Actual is not normal (a tribute to Edward Tufte)") Actual is not normal (a tribute to Edward Tufte) by [kevindooley](http://www.flickr.com/photos/12836528@N00) [![저작자 표시](http://cfs.tistory.com/static/admin/editor/ccl_black01.png)](http://creativecommons.org/licenses/by/2.0/kr/)  
+- [![Actual is not normal (a tribute to Edward Tufte)](http://farm3.static.flickr.com/2173/2121472112_8ac5d673ff.jpg)](http://www.flickr.com/photos/12836528@N00/2121472112 "Actual is not normal (a tribute to Edward Tufte)") Actual is not normal (a tribute to Edward Tufte) by [kevindooley](http://www.flickr.com/photos/12836528@N00) [![저작자 표시](http://cfs.tistory.com/static/admin/editor/ccl_black01.png)](http://creativecommons.org/licenses/by/2.0/kr/)
+
 하지만 데이터 자체로는 큰 의미가 없습니다. 컴퓨터 공학에서는 데이터를 가공( 처리 : Processing )하여 정보를
 만듭니다. 예를 들면 날씨를 나타내는 데이터들 ( 기온, 습도, 풍속, 위성사진 등 )은 기상대나
 백엽상 등에서 측정 장비로 관측됩니다. 이 데이터는 그저 사실을 나타 낼 뿐이죠.

@@ -18,6 +18,7 @@ pub mod code_block;
 pub mod graphic;
 pub mod image;
 pub mod link;
+mod srcset;
 
 pub use blockquote::handle_blockquote;
 pub use code_block::{handle_code, handle_pre};

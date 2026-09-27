@@ -589,6 +589,14 @@ fn test_heading_wrapped_in_link_issue_115() {
     assert_eq!(result, "## [Heading A](https://domain.local)\n");
 }
 
+/// The heading-link label is escaped: a `]` in the heading text must not close the link early.
+#[test]
+fn test_heading_wrapped_in_link_escapes_its_label() {
+    let html = r#"<a href="https://domain.local"><h2>Heading ] A</h2></a>"#;
+    let result = convert(html, None).unwrap();
+    assert_eq!(result, "## [Heading \\] A](https://domain.local)\n");
+}
+
 #[test]
 fn test_link_text_escaping_issue_114() {
     let html = r#"<a href="https://domain.local">Hi :]</a><br><a href="https://domain.local">1<2</a>"#;

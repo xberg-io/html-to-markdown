@@ -92,7 +92,7 @@
       "median_ms": 16.560771250000002,
       "mad_ms": 1.2979302083333346,
       "mb_per_s": 56.02305023920727,
-      "output_bytes": 188626
+      "output_bytes": 188694
     },
     {
       "fixture": "real-world/wikipedia/lists_timeline.html",
@@ -164,7 +164,7 @@
       "median_ms": 1.5131390240641711,
       "mad_ms": 0.0034723850267378564,
       "mb_per_s": 18.39231125413558,
-      "output_bytes": 6934
+      "output_bytes": 7573
     },
     {
       "fixture": "real-world/issues/gh-190/rbloggers.html",
@@ -173,7 +173,7 @@
       "median_ms": 1.0290141428571429,
       "mad_ms": 0.001999598852040818,
       "mb_per_s": 43.63764628473355,
-      "output_bytes": 20142
+      "output_bytes": 20140
     },
     {
       "fixture": "real-world/issues/gh-190/ozonekorea.html",
@@ -191,7 +191,7 @@
       "median_ms": 1.5488539242424244,
       "mad_ms": 0.003281106060606276,
       "mb_per_s": 42.762380775714405,
-      "output_bytes": 25612
+      "output_bytes": 25610
     },
     {
       "fixture": "real-world/issues/gh-190/sjsu.html",
@@ -218,7 +218,7 @@
       "median_ms": 1.2716746115384616,
       "mad_ms": 0.0036613884615385173,
       "mb_per_s": 42.50336136792952,
-      "output_bytes": 11937
+      "output_bytes": 11943
     },
     {
       "fixture": "real-world/issues/gh-127-issue.html",
@@ -227,7 +227,7 @@
       "median_ms": 12.757546375,
       "mad_ms": 0.06392637500000031,
       "mb_per_s": 48.65930306521716,
-      "output_bytes": 42141
+      "output_bytes": 42138
     },
     {
       "fixture": "synthetic/optional_li.html",
