@@ -14,7 +14,7 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::block::heading::{find_single_heading_child, heading_allows_inline_images, push_heading};
 use crate::converter::dom_context::DomContext;
-use crate::converter::inline::link::{append_markdown_link, has_uri_scheme};
+use crate::converter::inline::link::{MarkdownLink, append_markdown_link, has_uri_scheme};
 use crate::converter::main::walk_node;
 use crate::converter::utility::content::{
     collect_link_label_text, get_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
@@ -150,10 +150,12 @@ pub fn handle_link(
                         let mut link_buffer = String::new();
                         append_markdown_link(
                             &mut link_buffer,
-                            &escaped_label,
-                            href.as_str(),
-                            title.as_deref(),
-                            raw_text,
+                            &MarkdownLink {
+                                label: &escaped_label,
+                                href: href.as_str(),
+                                title: title.as_deref(),
+                                raw_text,
+                            },
                             options,
                             ctx.reference_collector.as_ref(),
                         );
@@ -314,10 +316,12 @@ pub fn handle_link(
             match visit_result {
                 VisitResult::Continue => append_markdown_link(
                     output,
-                    &escaped_label,
-                    href.as_str(),
-                    title.as_deref(),
-                    label.as_str(),
+                    &MarkdownLink {
+                        label: &escaped_label,
+                        href: href.as_str(),
+                        title: title.as_deref(),
+                        raw_text: label.as_str(),
+                    },
                     options,
                     ctx.reference_collector.as_ref(),
                 ),
@@ -336,10 +340,12 @@ pub fn handle_link(
         } else {
             append_markdown_link(
                 output,
-                &escaped_label,
-                href.as_str(),
-                title.as_deref(),
-                label.as_str(),
+                &MarkdownLink {
+                    label: &escaped_label,
+                    href: href.as_str(),
+                    title: title.as_deref(),
+                    raw_text: label.as_str(),
+                },
                 options,
                 ctx.reference_collector.as_ref(),
             );
@@ -348,10 +354,12 @@ pub fn handle_link(
         #[cfg(not(feature = "visitor"))]
         append_markdown_link(
             output,
-            &escaped_label,
-            href.as_str(),
-            title.as_deref(),
-            label.as_str(),
+            &MarkdownLink {
+                label: &escaped_label,
+                href: href.as_str(),
+                title: title.as_deref(),
+                raw_text: label.as_str(),
+            },
             options,
             ctx.reference_collector.as_ref(),
         );

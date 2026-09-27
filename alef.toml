@@ -652,7 +652,7 @@ traineddata = "traineddata"
   "function-too-long",
   "nesting-too-deep",
 ]
-"crates/html-to-markdown/src/converter/utility/content.rs" = ["function-too-long", "nesting-too-deep"]
+"crates/html-to-markdown/src/converter/utility/content.rs" = ["nesting-too-deep"]
 "crates/html-to-markdown/src/converter/utility/preprocessing.rs" = [
   "file-too-long",
   "nesting-too-deep",
