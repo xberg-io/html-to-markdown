@@ -23,9 +23,10 @@ def _needs(results: dict[str, str], flags: dict[str, str], changes: str = "succe
     return needs
 
 
-# The path filters each leg runs on, as the leg conditions on main stated them before they moved into
-# the change detection job. A term dropped from an output skips its leg with a green result, so the
-# outputs are pinned here rather than trusted.
+# The path filters that actually gated each leg on main before the conditions moved into the change
+# detection job. This is the effective gating, not the stated terms: test-csharp's condition also named
+# ffi, which had no effect because the leg also required build-csharp, which ffi does not start. A term
+# dropped from an output skips its leg with a green result, so the outputs are pinned here.
 LEG_FILTERS = {
     "build-ffi": {"core", "ffi"},
     "build-python": {"core", "python"},
@@ -250,11 +251,25 @@ def test_should_report_an_aggregate_that_never_runs_the_verdict(workflow: dict[s
     changed = copy.deepcopy(workflow)
     changed["jobs"][AGGREGATE]["steps"].remove(_verdict_step(changed))
 
+    assert check_workflow(changed) == [f"{AGGREGATE}: no step runs `python3 scripts/check_e2e_result.py verdict`"]
+
+
+@pytest.mark.parametrize(
+    "env",
+    [
+        pytest.param({"NEEDS": "${{ toJSON(needs.changes) }}"}, id="narrowed"),
+        pytest.param({}, id="missing"),
+        pytest.param({"NEEDS": "${{ toJSON(needs) }}", "BASH_ENV": "/dev/null"}, id="extra"),
+    ],
+)
+def test_should_report_a_verdict_step_that_does_not_see_every_job(
+    workflow: dict[str, Any], env: dict[str, str]
+) -> None:
+    changed = copy.deepcopy(workflow)
+    _verdict_step(changed)["env"] = env
+
     assert check_workflow(changed) == [
-        (
-            f"{AGGREGATE}: no step runs `python3 scripts/check_e2e_result.py verdict` "
-            "with NEEDS set to `${{ toJSON(needs) }}`"
-        ),
+        f"{AGGREGATE}: the verdict step's env must be exactly NEEDS: `${{{{ toJSON(needs) }}}}`",
     ]
 
 
@@ -282,6 +297,7 @@ def test_should_report_a_checkout_that_runs_after_the_verdict(workflow: dict[str
     [
         pytest.param("if", "github.event_name == 'push'", id="if"),
         pytest.param("continue-on-error", True, id="continue-on-error"),
+        pytest.param("working-directory", "e2e", id="working-directory"),
     ],
 )
 def test_should_report_a_verdict_step_that_can_stop_enforcing(
@@ -290,14 +306,36 @@ def test_should_report_a_verdict_step_that_can_stop_enforcing(
     changed = copy.deepcopy(workflow)
     _verdict_step(changed)[key] = value
 
-    assert check_workflow(changed) == [f"{AGGREGATE}: the verdict step must not set `{key}`"]
+    assert check_workflow(changed) == [
+        f"{AGGREGATE}: the verdict step sets `{key}`; only name, env, run, shell are allowed",
+    ]
 
 
-def test_should_report_an_aggregate_job_that_may_fail_without_failing_the_run(workflow: dict[str, Any]) -> None:
+@pytest.mark.parametrize("shell", ["true {0}", "bash -c 'bash {0} || true'", "sh"])
+def test_should_report_a_verdict_step_whose_shell_can_discard_the_verdict(workflow: dict[str, Any], shell: str) -> None:
     changed = copy.deepcopy(workflow)
-    changed["jobs"][AGGREGATE]["continue-on-error"] = True
+    _verdict_step(changed)["shell"] = shell
 
-    assert check_workflow(changed) == [f"{AGGREGATE}: must not set `continue-on-error`"]
+    assert check_workflow(changed) == [f"{AGGREGATE}: the verdict step must set `shell: bash`"]
+
+
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [
+        pytest.param("continue-on-error", True, id="continue-on-error"),
+        pytest.param("defaults", {"run": {"shell": "true {0}"}}, id="defaults"),
+        pytest.param("strategy", {"matrix": {"x": [1]}}, id="strategy"),
+    ],
+)
+def test_should_report_an_aggregate_job_with_a_key_outside_the_allow_list(
+    workflow: dict[str, Any], key: str, value: object
+) -> None:
+    changed = copy.deepcopy(workflow)
+    changed["jobs"][AGGREGATE][key] = value
+
+    assert check_workflow(changed) == [
+        f"{AGGREGATE}: sets `{key}`; only name, needs, if, runs-on, timeout-minutes, steps are allowed",
+    ]
 
 
 def test_should_report_a_missing_aggregate(workflow: dict[str, Any]) -> None:

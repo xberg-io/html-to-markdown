@@ -20,6 +20,10 @@ AGGREGATE = "e2e-result"
 CHANGES = "changes"
 VERDICT_COMMAND = "python3 scripts/check_e2e_result.py verdict"
 NEEDS_ENV = "${{ toJSON(needs) }}"
+# ~keep Allow-lists, not deny-lists: `continue-on-error`, a step `if:` or a `shell:` override each
+# ~keep let the result job pass without the verdict failing it.
+AGGREGATE_KEYS = ("name", "needs", "if", "runs-on", "timeout-minutes", "steps")
+VERDICT_STEP_KEYS = ("name", "env", "run", "shell")
 CHANGES_OUTPUT = re.compile(r"needs\.changes\.outputs\.([A-Za-z0-9_-]+)")
 
 
@@ -34,9 +38,10 @@ def verdict(needs: dict[str, Any]) -> list[str]:
         if changes.get("result") != "success":
             problems.append(f"{CHANGES}: {changes.get('result')}, so no leg's path filters are known")
         flags = changes.get("outputs") or {}
-    # ~keep No step can read whether the run was cancelled: a step's `cancelled()` reports its own
-    # ~keep job. A cancelled job in `needs` is the only record, and it names why a leg whose filters
-    # ~keep matched was skipped by its `!cancelled()` guard.
+    # ~keep `needs` records a cancelled job, and the verdict reads that to explain a leg whose
+    # ~keep filters matched but whose `!cancelled()` guard skipped it. A leg that hits its
+    # ~keep `timeout-minutes` is also reported as cancelled, so one timeout labels an unrelated
+    # ~keep skipped leg the same way. The result stays red; only the message is imprecise.
     run_cancelled = any(info.get("result") == "cancelled" for info in needs.values())
 
     for job, info in sorted(needs.items()):
@@ -79,24 +84,29 @@ def check_workflow(workflow: dict[str, Any]) -> list[str]:
     problems.extend(
         f"{job}: not listed in the needs of {AGGREGATE}" for job in sorted(set(jobs) - {AGGREGATE} - aggregate_needs)
     )
-    if "continue-on-error" in aggregate:
-        problems.append(f"{AGGREGATE}: must not set `continue-on-error`")
+    problems.extend(
+        f"{AGGREGATE}: sets `{key}`; only {', '.join(AGGREGATE_KEYS)} are allowed"
+        for key in aggregate
+        if key not in AGGREGATE_KEYS
+    )
     steps = aggregate.get("steps") or []
-    verdict_steps = [
-        step
-        for step in steps
-        if step.get("run", "").strip() == VERDICT_COMMAND and (step.get("env") or {}).get("NEEDS") == NEEDS_ENV
-    ]
+    verdict_steps = [step for step in steps if str(step.get("run", "")).strip() == VERDICT_COMMAND]
     if not verdict_steps:
-        problems.append(f"{AGGREGATE}: no step runs `{VERDICT_COMMAND}` with NEEDS set to `{NEEDS_ENV}`")
+        problems.append(f"{AGGREGATE}: no step runs `{VERDICT_COMMAND}`")
     for step in verdict_steps:
         if not any(
             str(earlier.get("uses", "")).startswith("actions/checkout@") for earlier in steps[: steps.index(step)]
         ):
             problems.append(f"{AGGREGATE}: no checkout step runs before the verdict step")
         problems.extend(
-            f"{AGGREGATE}: the verdict step must not set `{key}`" for key in ("if", "continue-on-error") if key in step
+            f"{AGGREGATE}: the verdict step sets `{key}`; only {', '.join(VERDICT_STEP_KEYS)} are allowed"
+            for key in step
+            if key not in VERDICT_STEP_KEYS
         )
+        if step.get("env") != {"NEEDS": NEEDS_ENV}:
+            problems.append(f"{AGGREGATE}: the verdict step's env must be exactly NEEDS: `{NEEDS_ENV}`")
+        if step.get("shell") != "bash":
+            problems.append(f"{AGGREGATE}: the verdict step must set `shell: bash`")
 
     outputs = set((jobs.get(CHANGES) or {}).get("outputs") or {})
     read_outputs: set[str] = set()
