@@ -17,9 +17,10 @@ Two independent comparisons are set up:
    smoke apps probe for. This one is diffed only once the extension exports a
    ``#[php_function]``; today it exports none and is reported as not diffed.
 
-A detector that matches no call site fails the run. A language with a binding
-package is judged silent on the call sites inside that package alone, so
-generated tests cannot stand in for a binding that went silent.
+A detector that matches no call site fails the run. Each detector also names
+the roots it must match in (the binding package, or for C the e2e and test-app
+consumers), and a root with no call site fails the run too, so generated tests
+and vendored header copies cannot stand in for a consumer that went silent.
 
 Usage:
     python3 scripts/check_ffi_symbols.py               # strict: any gap fails
@@ -85,11 +86,12 @@ class Consumer:
     suffixes: tuple[str, ...]
     pattern: re.Pattern[str]
     how: str
-    # ~keep The binding package this detector guards, relative to ROOT. Its silence is
-    # ~keep judged on matches under this root alone: alef-generated e2e tests match the
-    # ~keep same pattern (most of Zig's sites), so a per-language count stays nonzero when
-    # ~keep the binding itself stops matching. None for C, which has no binding package.
-    binding_root: str | None = None
+    # ~keep The consumers this detector guards, as path prefixes relative to ROOT. Each
+    # ~keep root must match at least one call site on its own: alef-generated e2e tests
+    # ~keep match the same pattern (most of Zig's sites) and the vendored Go copy of the
+    # ~keep C header matches the C pattern, so a per-language count stays nonzero when the
+    # ~keep consumer itself stops matching. Files outside the roots are still diffed.
+    required_roots: tuple[str, ...] = ()
     strip_comments: bool = True
 
 
@@ -122,7 +124,7 @@ class Comparison:
     languages: set[str] = field(default_factory=set)
     findings: list[Finding] = field(default_factory=list)
     sites_by_language: dict[str, int] = field(default_factory=dict)
-    sites_in_binding_root: dict[str, int] = field(default_factory=dict)
+    sites_by_root: dict[str, dict[str, int]] = field(default_factory=dict)
 
 
 C_ABI_CONSUMERS: tuple[Consumer, ...] = (
@@ -131,34 +133,38 @@ C_ABI_CONSUMERS: tuple[Consumer, ...] = (
         suffixes=(".cs",),
         pattern=re.compile(r'EntryPoint\s*=\s*"(htm_[A-Za-z0-9_]+)"'),
         how='[DllImport(..., EntryPoint = "htm_*")]',
-        binding_root="packages/csharp/",
+        required_roots=("packages/csharp/",),
     ),
     Consumer(
         language="java",
         suffixes=(".java",),
         pattern=re.compile(r'\.find\(\s*"(htm_[A-Za-z0-9_]+)"\s*\)'),
         how='Panama SymbolLookup.find("htm_*")',
-        binding_root="packages/java/",
+        required_roots=("packages/java/",),
     ),
     Consumer(
         language="go",
         suffixes=(".go",),
         pattern=re.compile(r"\bC\.(htm_[A-Za-z0-9_]+)"),
         how="cgo C.htm_*",
-        binding_root="packages/go/",
+        required_roots=("packages/go/",),
     ),
     Consumer(
         language="zig",
         suffixes=(".zig",),
         pattern=re.compile(r"\bc\.(htm_[A-Za-z0-9_]+)"),
         how="@cImport c.htm_*",
-        binding_root="packages/zig/",
+        required_roots=("packages/zig/",),
     ),
     Consumer(
         language="c",
         suffixes=(".c", ".h"),
         pattern=re.compile(r"\b(htm_[A-Za-z0-9_]+)\s*\("),
         how="direct htm_*() call or declaration",
+        # ~keep C has no binding package; its consumers are the e2e suite and the test
+        # ~keep app. The vendored header in packages/go/include is scanned for drift but
+        # ~keep holds declarations, not calls, so it is not a root.
+        required_roots=("e2e/c/", "test_apps/c/"),
     ),
 )
 
@@ -170,7 +176,7 @@ PHP_FUNCTION_CALL_RE = re.compile(
 # Where PHP global-function probes live. Scoped deliberately: a repo-wide sweep
 # of *.php would match Composer vendor trees and the class-based binding's own
 # method names. ~keep
-PHP_PROBE_ROOTS = ("test_apps/php_ext",)
+PHP_PROBE_ROOTS = ("test_apps/php_ext/",)
 
 NOT_CHECKED: tuple[NotChecked, ...] = (
     NotChecked(
@@ -304,10 +310,10 @@ def php_exported_functions() -> set[str]:
     return names
 
 
-def scan_consumer(consumer: Consumer, exported: set[str]) -> tuple[int, int, list[Finding]]:
-    """Return (call sites seen, those under the binding root, findings for symbols not in ``exported``)."""
+def scan_consumer(consumer: Consumer, exported: set[str]) -> tuple[int, dict[str, int], list[Finding]]:
+    """Return (call sites seen, sites per required root, findings for symbols not in ``exported``)."""
     call_sites = 0
-    binding_sites = 0
+    sites_by_root = dict.fromkeys(consumer.required_roots, 0)
     findings: list[Finding] = []
     for path in iter_source_files(consumer.suffixes):
         text = read_text(path)
@@ -316,16 +322,16 @@ def scan_consumer(consumer: Consumer, exported: set[str]) -> tuple[int, int, lis
         if consumer.strip_comments:
             text = strip_comments(text)
         relative = path.relative_to(ROOT).as_posix()
-        in_binding = consumer.binding_root is not None and relative.startswith(consumer.binding_root)
+        root = next((root for root in consumer.required_roots if relative.startswith(root)), None)
         for line_number, line in enumerate(text.splitlines(), start=1):
             for match in consumer.pattern.finditer(line):
                 symbol = next(group for group in match.groups() if group)
                 call_sites += 1
-                if in_binding:
-                    binding_sites += 1
+                if root is not None:
+                    sites_by_root[root] += 1
                 if symbol not in exported:
                     findings.append(Finding(symbol, consumer.language, str(path.relative_to(ROOT)), line_number))
-    return call_sites, binding_sites, findings
+    return call_sites, sites_by_root, findings
 
 
 def compare_c_abi() -> tuple[Comparison, list[str]]:
@@ -345,13 +351,13 @@ def compare_c_abi() -> tuple[Comparison, list[str]]:
     # against every call site. ~keep
     comparison = Comparison(title="C ABI (htm_*)", exported=header | rust)
     for consumer in C_ABI_CONSUMERS:
-        call_sites, binding_sites, findings = scan_consumer(consumer, comparison.exported)
+        call_sites, sites_by_root, findings = scan_consumer(consumer, comparison.exported)
         comparison.call_sites += call_sites
         comparison.findings.extend(findings)
         comparison.languages.add(consumer.language)
         comparison.sites_by_language[consumer.language] = call_sites
-        if consumer.binding_root is not None:
-            comparison.sites_in_binding_root[consumer.language] = binding_sites
+        if consumer.required_roots:
+            comparison.sites_by_root[consumer.language] = sites_by_root
     return comparison, disagreements
 
 
@@ -361,22 +367,25 @@ def compare_php_functions() -> Comparison:
     # ~keep Registered as a diffed language only when something is exported to diff.
     # ~keep The extension is #[php_class]/#[php_impl] only and registers no
     # ~keep #[php_function], so this comparison is empty-vs-empty and must not be
-    # ~keep counted as coverage it does not provide.
+    # ~keep counted as coverage it does not provide. Once something is exported, a
+    # ~keep missing probe root counts as a root with no call site, not as a skipped diff.
+    sites_by_root = dict.fromkeys(PHP_PROBE_ROOTS, 0)
     for root_name in PHP_PROBE_ROOTS:
         root = ROOT / root_name
         if not root.is_dir():
             continue
-        if comparison.exported:
-            comparison.languages.add("php-ext")
         for path in sorted(root.rglob("*.php")):
             for line_number, line in enumerate(strip_php_comments(read_text(path)).splitlines(), start=1):
                 for match in PHP_FUNCTION_CALL_RE.finditer(line):
                     symbol = next(group for group in match.groups() if group)
-                    comparison.call_sites += 1
+                    sites_by_root[root_name] += 1
                     if symbol not in comparison.exported:
                         comparison.findings.append(Finding(symbol, "php-ext", str(path.relative_to(ROOT)), line_number))
-    if "php-ext" in comparison.languages:
+    comparison.call_sites = sum(sites_by_root.values())
+    if comparison.exported:
+        comparison.languages.add("php-ext")
         comparison.sites_by_language["php-ext"] = comparison.call_sites
+        comparison.sites_by_root["php-ext"] = sites_by_root
     return comparison
 
 
@@ -387,16 +396,17 @@ def group_by_symbol(findings: list[Finding]) -> dict[str, list[Finding]]:
     return dict(sorted(grouped.items()))
 
 
-def silent_languages(comparison: Comparison) -> list[str]:
-    """Languages registered as diffed whose detector matched no call site.
+def empty_roots(comparison: Comparison, language: str) -> list[str]:
+    """The required roots of ``language`` in which its detector matched no call site."""
+    return sorted(root for root, count in comparison.sites_by_root.get(language, {}).items() if count == 0)
 
-    A language with a binding root is judged on the sites under that root; any
-    other language on all of its sites.
-    """
+
+def silent_languages(comparison: Comparison) -> list[str]:
+    """Languages registered as diffed with no call site at all, or none in one of their required roots."""
     return sorted(
         language
         for language, count in comparison.sites_by_language.items()
-        if comparison.sites_in_binding_root.get(language, count) == 0
+        if count == 0 or empty_roots(comparison, language)
     )
 
 
@@ -416,16 +426,20 @@ def report_comparison(
     if comparison.sites_by_language:
         breakdown = ", ".join(f"{lang} {count}" for lang, count in sorted(comparison.sites_by_language.items()))
         print(f"  per language: {breakdown}")
-    if comparison.sites_in_binding_root:
-        breakdown = ", ".join(f"{lang} {count}" for lang, count in sorted(comparison.sites_in_binding_root.items()))
-        print(f"  per binding root: {breakdown}")
+    if comparison.sites_by_root:
+        breakdown = ", ".join(
+            f"{lang} {root} {count}"
+            for lang, roots in sorted(comparison.sites_by_root.items())
+            for root, count in sorted(roots.items())
+        )
+        print(f"  per required root: {breakdown}")
 
     # ~keep A detector whose pattern stops matching reports zero call sites and finds
     # ~keep nothing, which renders identically to a clean pass. Treated as a failure so
     # ~keep the gate cannot succeed having examined nothing. A comparison with nothing
     # ~keep exported registers no language (see the PHP comparison), so it is reported
     # ~keep as not diffed; one that still registers a language with zero sites is silent.
-    if not comparison.exported and comparison.call_sites == 0:
+    if not comparison.languages and comparison.call_sites == 0:
         print("  not diffed: nothing is exported, so no call site could disagree")
     silent = silent_languages(comparison)
 
@@ -459,7 +473,8 @@ def report_comparison(
     if not grouped:
         print("  no called-but-not-exported symbols")
     for language in silent:
-        where = " in its binding root" if language in comparison.sites_in_binding_root else ""
+        roots = empty_roots(comparison, language)
+        where = f" under {', '.join(roots)}" if roots else ""
         print(f"  SILENT  {language} is registered as diffed but matched no call site{where}")
     return blocking, allowed, resolved, orphaned, silent
 
@@ -495,7 +510,7 @@ def main() -> int:
                     "call_sites_c_abi": c_abi.call_sites,
                     "languages_c_abi": sorted(c_abi.languages),
                     "sites_by_language_c_abi": c_abi.sites_by_language,
-                    "sites_in_binding_root_c_abi": c_abi.sites_in_binding_root,
+                    "sites_by_root_c_abi": c_abi.sites_by_root,
                     "silent_detectors": silent_languages(c_abi) + silent_languages(php),
                     "export_source_disagreements": disagreements,
                     "missing": [

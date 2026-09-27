@@ -11,10 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
   language. Before, a detector that stopped matching read exactly like a clean pass, so a
-  restyled binding dropped out of the diff with every check green. For C#, Java, Go and Zig the
-  check counts only the call sites inside the binding package, so the alef-generated `e2e/zig`
-  tests cannot keep a silent Zig binding looking covered. The `--json` summary now carries the
-  per-language counts, the per-binding counts and the silent detectors.
+  restyled binding dropped out of the diff with every check green. Each detector must also match
+  in every one of its required roots: the binding package for C#, Java, Go and Zig, and both
+  `e2e/c` and `test_apps/c` for C. So the alef-generated `e2e/zig` tests cannot keep a silent Zig
+  binding looking covered, and the vendored Go copy of the C header cannot do the same for C. The
+  PHP comparison fails the same way once the extension exports a function and its probe root is
+  missing. The `--json` summary now carries the per-language counts, the per-root counts and the
+  silent detectors.
 
 ## [3.15.1] - 2026-09-27
 
