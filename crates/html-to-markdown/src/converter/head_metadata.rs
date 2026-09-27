@@ -23,11 +23,12 @@ use crate::text;
 /// computes it directly during its single pass.
 ///
 /// Returns `Some(frontmatter_string)` when `options.extract_metadata` is
-/// true AND `head_range` is `Some` AND at least one metadata field was
-/// found.  Returns `None` otherwise — callers should prepend the returned
-/// string to the body only when `Some` is returned.
+/// true AND at least one metadata field was found.  Returns `None`
+/// otherwise — callers should prepend the returned string to the body only
+/// when `Some` is returned.
 ///
-/// `document_base_href` is the document's `<base href>`, recorded as `base`.
+/// `document_base_href` is the document's `<base href>`, recorded as `base`
+/// even when the source has no `<head>` tag (`head_range` is `None`).
 pub fn extract_frontmatter(
     html: &str,
     head_range: Option<&Range<usize>>,
@@ -38,13 +39,7 @@ pub fn extract_frontmatter(
         return None;
     }
 
-    let head_range = head_range?;
-
-    if head_range.end > html.len() {
-        return None;
-    }
-
-    let head_content = &html[head_range.clone()];
+    let head_content = head_range.and_then(|range| html.get(range.clone())).unwrap_or_default();
 
     // ~keep Wrap the extracted head content in a minimal HTML document so that
     // ~keep `tl::parse` has the correct context.  The wrapper tags are never
@@ -60,18 +55,9 @@ pub fn extract_frontmatter(
         Err(_) => return None,
     };
 
-    let parser = dom.parser();
     // ~keep Delegate to the canonical Tier-2 extractor so the two tiers agree on
-    // ~keep key names / casing / value normalisation byte-for-byte.  Walk the
-    // ~keep synthesised wrapper's children to find the `<head>` node first.
-    let mut metadata = BTreeMap::new();
-    for child_handle in dom.children() {
-        let m = extract_head_metadata(child_handle, parser, options, document_base_href);
-        if !m.is_empty() {
-            metadata = m;
-            break;
-        }
-    }
+    // ~keep key names / casing / value normalisation byte-for-byte.
+    let metadata = extract_head_metadata(dom.children(), dom.parser(), options, document_base_href);
 
     if metadata.is_empty() {
         return None;

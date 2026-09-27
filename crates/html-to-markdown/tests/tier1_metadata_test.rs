@@ -268,6 +268,32 @@ fn should_report_the_first_base_href_from_the_tier1_entry_point() {
     assert!(out.contains("base: /first/\n"), "{out}");
 }
 
+#[test]
+fn should_report_the_first_meta_tag_per_name_on_both_tiers() {
+    let html = r#"<html><head><meta name="description" content="first"><meta name="description" content="second"><meta property="og:title" content="first"><meta property="og:title" content="second"></head><body><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(out.contains("meta-description: first\n"), "{out}");
+    assert!(out.contains("meta-og:title: first\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
+#[test]
+fn should_report_the_head_metadata_after_a_leading_doctype_and_comment_on_both_tiers() {
+    let html = r#"<!DOCTYPE html><!-- note --><html><head><title>T</title><base href="/b/"></head><body><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(out.contains("title: T\n") && out.contains("base: /b/\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
+#[test]
+fn should_report_the_base_href_of_a_document_without_a_head_tag_on_both_tiers() {
+    // ~keep The parser creates the head itself, and the `<base>` goes in it.
+    let html = r#"<base href="https://a.example/"><p>x</p>"#;
+    let out = t2(html);
+    assert!(out.contains("base: https://a.example/\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
 #[cfg(feature = "metadata")]
 #[test]
 fn should_keep_the_first_base_href_and_canonical_link_in_the_document_metadata() {
@@ -280,4 +306,32 @@ fn should_keep_the_first_base_href_and_canonical_link_in_the_document_metadata()
     let document = convert(html, Some(opts)).unwrap().metadata.document;
     assert_eq!(document.base_href.as_deref(), Some("/first/"));
     assert_eq!(document.canonical_url.as_deref(), Some("https://example.com/first"));
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_keep_the_base_href_of_a_document_without_a_head_tag_in_the_document_metadata() {
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    let result = convert(r#"<base href="https://a.example/"><p>x</p>"#, Some(opts)).unwrap();
+    assert_eq!(
+        result.metadata.document.base_href.as_deref(),
+        Some("https://a.example/")
+    );
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_keep_the_first_meta_tag_per_name_in_the_document_metadata() {
+    let html = r#"<html><head><meta name="description" content="first"><meta name="description" content="second"></head><body><p>x</p></body></html>"#;
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    let document = convert(html, Some(opts)).unwrap().metadata.document;
+    assert_eq!(document.description.as_deref(), Some("first"));
 }

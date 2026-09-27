@@ -529,8 +529,7 @@ pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> Strin
 }
 
 /// Record `<meta name>`/`<meta property>` content into `metadata`, honoring `strip_tags`/
-/// `preserve_tags` for `"meta"`. Extracted from `extract_head_metadata` — same tag-name,
-/// attribute-lookup, and key-formatting logic, unchanged.
+/// `preserve_tags` for `"meta"`. The first tag per key wins.
 fn collect_meta_head_metadata(
     child_tag: &tl::HTMLTag,
     options: &ConversionOptions,
@@ -551,14 +550,18 @@ fn collect_meta_head_metadata(
         crate::converter::utility::attributes::decoded_attribute(child_tag, "content"),
     ) {
         let name_str = name.as_utf8_str();
-        metadata.insert(format!("meta-{name_str}"), content.into_owned());
+        metadata
+            .entry(format!("meta-{name_str}"))
+            .or_insert_with(|| content.into_owned());
     }
     if let (Some(property), Some(content)) = (
         child_tag.attributes().get("property").flatten(),
         crate::converter::utility::attributes::decoded_attribute(child_tag, "content"),
     ) {
         let property_str = property.as_utf8_str();
-        metadata.insert(format!("meta-{property_str}"), content.into_owned());
+        metadata
+            .entry(format!("meta-{property_str}"))
+            .or_insert_with(|| content.into_owned());
     }
 }
 
@@ -612,14 +615,29 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
         .or_insert_with(|| href_str.to_string());
 }
 
-/// Extract metadata from the head element, recording `document_base_href` as `base`.
+/// Extract metadata from the first head element below `roots` that carries any, recording
+/// `document_base_href` as `base` whether or not the source has a `<head>` tag.
 pub fn extract_head_metadata(
-    node_handle: &tl::NodeHandle,
+    roots: &[tl::NodeHandle],
     parser: &tl::Parser,
     options: &ConversionOptions,
     document_base_href: Option<&str>,
 ) -> BTreeMap<String, String> {
-    let mut work = vec![*node_handle];
+    let mut metadata = head_element_metadata(roots, parser, options);
+    if let Some(href) = document_base_href {
+        metadata.insert("base".to_string(), href.to_string());
+    }
+    metadata
+}
+
+/// The title, meta and canonical link fields of the first head element below `roots` that
+/// carries any.
+fn head_element_metadata(
+    roots: &[tl::NodeHandle],
+    parser: &tl::Parser,
+    options: &ConversionOptions,
+) -> BTreeMap<String, String> {
+    let mut work: Vec<_> = roots.iter().rev().copied().collect();
     while let Some(handle) = work.pop() {
         let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
             continue;
@@ -643,9 +661,6 @@ pub fn extract_head_metadata(
                     collect_link_head_metadata(child_tag, &mut metadata);
                 }
             }
-        }
-        if let Some(href) = document_base_href {
-            metadata.insert("base".to_string(), href.to_string());
         }
 
         if !metadata.is_empty() {

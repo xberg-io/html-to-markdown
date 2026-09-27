@@ -44,6 +44,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   metadata) is now the same first `<base href>` in tree order that the document base uses, read
   once, and the first `<link rel="canonical">` wins.
 
+- **The `<meta>` metadata kept the last tag with a given name.** Each `<meta name>` or
+  `<meta property>` overwrote the value an earlier tag with the same key had stored. The first
+  tag per key now wins on both tiers, as the `base` and `canonical` metadata do.
+
+- **A page without a `<head>` tag reported no `base` metadata.** The parser creates the head
+  itself, so `<base href="https://a.example/"><p>x</p>` sets the document base, but the head
+  extractor looked for a `<head>` tag in the source and found none. The `base` metadata now comes
+  from the same parsed document as the document base on both tiers, with or without a `<head>`
+  tag.
+
+- **A `>` inside a `<base>` attribute value turned off the early stop of the base parse.** The
+  parse is fed in pieces, and a piece could end inside the quoted value, so the `<base>` tag only
+  completed in the next piece, which was never checked. The tree is now checked after each piece
+  in which html5ever's tokenizer emits a `<base>` start tag, so the parse stops wherever the tag
+  bytes fall. The document base itself was always correct.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed

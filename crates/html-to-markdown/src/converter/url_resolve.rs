@@ -5,10 +5,13 @@
 //! Tier-1/Tier-2 split) and threaded into both tiers as the same value, so
 //! they cannot disagree on what a relative URL resolves to.
 
+use std::cell::Cell;
 use std::rc::Rc;
 
 use html5ever::tendril::StrTendril;
-use html5ever::tokenizer::{BufferQueue, Tokenizer, TokenizerOpts};
+use html5ever::tokenizer::{
+    BufferQueue, StartTag, TagToken, Token, TokenSink, TokenSinkResult, Tokenizer, TokenizerOpts,
+};
 use html5ever::tree_builder::{TreeBuilder, TreeBuilderOpts};
 use html5ever::{TokenizerResult, local_name, ns};
 use url::Url;
@@ -124,7 +127,10 @@ fn parse_base_href(html: &str) -> BaseParse {
     let mut has_frameset = None;
 
     let tokenizer = Tokenizer::new(
-        TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default()),
+        BaseTagWatch {
+            tree_builder: TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default()),
+            saw_base: Cell::new(false),
+        },
         TokenizerOpts::default(),
     );
     let input = BufferQueue::default();
@@ -136,16 +142,17 @@ fn parse_base_href(html: &str) -> BaseParse {
             .map_or(html.len(), |at| fed + PARSE_PIECE + at + 1);
         input.push_back(StrTendril::from(&html[fed..until]));
         while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
-        let piece = &bytes[fed..until];
         fed = until;
-        if !has_start_tag(piece, b"base") {
+        // ~keep Only a `base` start tag the tokenizer emitted can add a `<base>`, so the tree is
+        // ~keep walked after that piece, whatever piece holds the bytes of the tag.
+        if !tokenizer.sink.saw_base.replace(false) {
             continue;
         }
         // ~keep Later nodes go in after every node already in the tree, except a node foster
         // ~keep parented in front of an open table and a `<frameset>` replacing the body. So a
         // ~keep first `<base href>` outside those two reaches is final, and the rest is not parsed.
         walks += 1;
-        if let Some(base) = first_base(&tokenizer.sink.sink.document) {
+        if let Some(base) = first_base(&tokenizer.sink.tree_builder.sink.document) {
             let replaceable = base.in_body && *has_frameset.get_or_insert_with(|| has_start_tag(bytes, b"frameset"));
             if !(base.in_table || replaceable) {
                 return BaseParse {
@@ -158,9 +165,35 @@ fn parse_base_href(html: &str) -> BaseParse {
     }
     tokenizer.end();
     BaseParse {
-        href: first_base(&tokenizer.sink.sink.document).map(|base| base.href),
+        href: first_base(&tokenizer.sink.tree_builder.sink.document).map(|base| base.href),
         read: fed,
         walks,
+    }
+}
+
+/// A token sink that passes every token to the tree builder and notes a `base` start tag.
+/// The tree builder's `end` only pops open elements, which `RcDom` ignores, so it is not passed.
+struct BaseTagWatch {
+    tree_builder: TreeBuilder<Handle, RcDom>,
+    /// A `base` start tag reached the tree builder since the flag was last cleared.
+    saw_base: Cell<bool>,
+}
+
+impl TokenSink for BaseTagWatch {
+    type Handle = Handle;
+
+    fn process_token(&self, token: Token, line_number: u64) -> TokenSinkResult<Handle> {
+        if let TagToken(tag) = &token {
+            if tag.kind == StartTag && tag.name == local_name!("base") {
+                self.saw_base.set(true);
+            }
+        }
+        self.tree_builder.process_token(token, line_number)
+    }
+
+    fn adjusted_current_node_present_but_not_in_html_namespace(&self) -> bool {
+        self.tree_builder
+            .adjusted_current_node_present_but_not_in_html_namespace()
     }
 }
 
@@ -461,6 +494,16 @@ mod tests {
     }
 
     #[test]
+    fn test_compute_effective_base_ignores_a_base_inside_svg_cdata() {
+        // ~keep In SVG, `<![CDATA[` runs to `]]>`; read as a bogus comment it would end at the
+        // ~keep first `>` and let `<p>` break out of SVG ahead of the `<base>`.
+        assert_eq!(
+            effective(r#"<body><svg><![CDATA[x><p><base href="https://evil.example/">]]></svg>"#),
+            PAGE
+        );
+    }
+
+    #[test]
     fn test_compute_effective_base_skips_a_first_base_without_href() {
         let html = r#"<head><base target="_blank"><base href="/second/"></head>"#;
         assert_eq!(effective(html), "https://example.com/second/");
@@ -527,15 +570,35 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_base_href_stops_at_a_first_base_with_a_gt_in_a_quoted_value() {
+        // ~keep The first piece ends at the `>` inside the quoted value, mid tag.
+        let href = format!("https://a.example/?q={}>", "x".repeat(PARSE_PIECE));
+        let html = format!(
+            r#"<head><base href="{href}"></head><body>{}"#,
+            "<p>more</p>".repeat(PARSE_PIECE)
+        );
+        let parse = parse_base_href(&html);
+        assert_eq!(parse.href.as_deref(), Some(href.as_str()));
+        assert!(
+            parse.read <= 3 * PARSE_PIECE,
+            "read {} of {} bytes",
+            parse.read,
+            html.len()
+        );
+    }
+
+    #[test]
     fn test_parse_base_href_does_not_parse_a_page_without_base_text() {
         assert_eq!(parse_base_href("<html><body><p>x</p></body></html>").read, 0);
     }
 
     #[test]
-    fn test_parse_base_href_walks_the_tree_only_after_a_piece_with_base_text() {
+    fn test_parse_base_href_walks_the_tree_only_after_a_base_start_tag() {
+        // ~keep The comment holds `<base` text but no tag, `</base>` is an end tag, and the
+        // ~keep template's `<base>` is a start tag.
+        let padding = "<p>more</p>".repeat(PARSE_PIECE);
         let html = format!(
-            r#"<!-- <base href="/x/"> --><body>{}"#,
-            "<p>more</p>".repeat(PARSE_PIECE)
+            r#"<!-- <base href="/x/"> --><body>{padding}</base>{padding}<template><base href="/t/"></template>{padding}"#
         );
         let parse = parse_base_href(&html);
         assert_eq!((parse.href, parse.read), (None, html.len()));
