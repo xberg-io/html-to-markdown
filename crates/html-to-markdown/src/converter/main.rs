@@ -63,6 +63,7 @@ pub fn convert_html_impl(
     #[cfg(not(feature = "visitor"))] _visitor: Option<()>,
     structure_collector: Option<StructureCollectorHandle>,
     base_url: Option<std::rc::Rc<url::Url>>,
+    document_base_href: Option<&str>,
 ) -> Result<ConversionOutput> {
     let stripped = strip_script_and_style_tags(html);
     // ~keep Before anything else looks for tags: an HTML5 bogus comment (`<?php … ?>`,
@@ -189,7 +190,7 @@ pub fn convert_html_impl(
 
         for child_handle in dom.children() {
             if head_metadata.is_none() {
-                let metadata = extract_head_metadata(child_handle, parser, options);
+                let metadata = extract_head_metadata(child_handle, parser, options, document_base_href);
                 if !metadata.is_empty() {
                     head_metadata = Some(metadata);
                 }

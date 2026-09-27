@@ -17,7 +17,7 @@
 
 #![cfg(feature = "testkit")]
 
-use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert};
 
 /// Convert with `Tier1` + `extract_metadata: true`.
 fn t1(html: &str) -> String {
@@ -206,4 +206,78 @@ fn auto_routing_with_extract_metadata_can_use_tier1() {
         auto_out.starts_with("---\n"),
         "Auto output must include YAML frontmatter"
     );
+}
+
+// ~keep ── 11. The document's first `<base href>` and first canonical link ──
+
+#[test]
+fn should_report_the_first_base_href_on_both_tiers() {
+    let html = r#"<html><head><base href="/first/"><base href="/second/"></head><body><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(out.contains("base: /first/\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
+#[test]
+fn should_report_the_base_href_the_parser_keeps_on_both_tiers() {
+    let html = r#"<html><head><title><base href="https://evil.example/"></title><base href="/real/"></head><body><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(out.contains("base: /real/\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
+#[test]
+fn should_report_a_base_href_from_the_body_with_an_empty_head_on_both_tiers() {
+    let html = r#"<html><head></head><body><base href="/in-body/"><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(out.contains("base: /in-body/\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
+#[test]
+fn should_report_the_first_base_href_on_the_auto_path() {
+    // ~keep Without the `metadata` feature, these options let the router pick Tier 1.
+    let html = r#"<html><head><base href="/first/"><base href="/second/"></head><body><p>x</p></body></html>"#;
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Auto,
+        extract_metadata: true,
+        highlight_style: HighlightStyle::None,
+        ..ConversionOptions::default()
+    };
+    let out = convert(html, Some(opts)).unwrap().content.unwrap_or_default();
+    assert!(out.contains("base: /first/\n"), "{out}");
+}
+
+#[test]
+fn should_report_the_first_canonical_link_on_both_tiers() {
+    let html = r#"<html><head><link rel="canonical" href="https://example.com/first"><link rel="canonical" href="https://example.com/second"></head><body><p>x</p></body></html>"#;
+    let out = t2(html);
+    assert!(out.contains("canonical: https://example.com/first\n"), "{out}");
+    assert_eq!(t1(html), out);
+}
+
+#[test]
+fn should_report_the_first_base_href_from_the_tier1_entry_point() {
+    let html = r#"<html><head><base href="/first/"><base href="/second/"></head><body><p>x</p></body></html>"#;
+    let opts = ConversionOptions {
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    let out = html_to_markdown_rs::tier1::run(html, &html_to_markdown_rs::prescan::PrescanReport::default(), &opts)
+        .expect("tier-1 conversion must succeed");
+    assert!(out.contains("base: /first/\n"), "{out}");
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_keep_the_first_base_href_and_canonical_link_in_the_document_metadata() {
+    let html = r#"<html><head><base href="/first/"><base href="/second/"><link rel="canonical" href="https://example.com/first"><link rel="canonical" href="https://example.com/second"></head><body><p>x</p></body></html>"#;
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    let document = convert(html, Some(opts)).unwrap().metadata.document;
+    assert_eq!(document.base_href.as_deref(), Some("/first/"));
+    assert_eq!(document.canonical_url.as_deref(), Some("https://example.com/first"));
 }

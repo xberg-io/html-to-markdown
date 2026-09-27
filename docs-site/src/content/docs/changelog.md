@@ -16,9 +16,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<title>`, `<textarea>`, `<script>`, `<style>` or another raw-text element, inside `<template>`
   or SVG, or in a body that a `<frameset>` replaces, set the base for every relative link. The base
   now comes from the first `<base>` with an `href` in tree order, read from an html5ever parse of
-  the document. The parse stops at a `<base href>` in `<head>`, and a page without a `<base` tag
-  is not parsed at all. Found while adopting `base_url` downstream, where the same two mistakes
-  had already been fixed once in a link pre-pass.
+  the document. The parse stops at the first `<base href>` once no later markup can place a node
+  in front of it or remove it, in `<head>` or in the body, and a page without a `<base` tag is not
+  parsed at all. Found while adopting `base_url` downstream, where the same two mistakes had
+  already been fixed once in a link pre-pass.
+
+- **A `data:` or `javascript:` `<base href>` became the base for relative links.** A browser
+  ignores such a base and resolves against the page's own URL, as the HTML "frozen base URL"
+  steps require. `base_url` now does the same, so relative links on such a page resolve against
+  the caller's `base_url` instead of failing to resolve.
+
+- **The `base` and `canonical` metadata kept the last tag, not the first.** The head extractor
+  overwrote each value when it met another tag, so the reported `base` could differ from the
+  base that `base_url` resolves against. The `base` metadata (and `base_href` in the document
+  metadata) is now the same first `<base href>` in tree order that the document base uses, read
+  once, and the first `<link rel="canonical">` wins.
 
 ## [3.15.1] - 2026-09-27
 

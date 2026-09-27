@@ -63,12 +63,17 @@ use crate::options::ConversionOptions;
 /// ~keep have no reason to exercise -- so that need is served by
 /// ~keep [`run_with_base`] instead of widening this signature.
 pub fn run(html: &str, report: &PrescanReport, options: &ConversionOptions) -> Result<String, bail::BailReason> {
-    run_with_base(html, report, options, None)
+    let document_base_href = options
+        .extract_metadata
+        .then(|| crate::converter::url_resolve::document_base_href(html))
+        .flatten();
+    run_with_base(html, report, options, None, document_base_href.as_deref())
 }
 
 /// Same as [`run`], but resolves relative `href`/`src` destinations against
-/// `effective_base` (see `converter::url_resolve::resolve_attribute_url`). Used by
-/// `convert_api.rs`'s production conversion path.
+/// `effective_base` (see `converter::url_resolve::resolve_attribute_url`) and takes the
+/// document's `<base href>` from the caller. Used by `convert_api.rs`'s production
+/// conversion path.
 ///
 /// # Errors
 ///
@@ -79,6 +84,7 @@ pub(crate) fn run_with_base(
     report: &PrescanReport,
     options: &ConversionOptions,
     effective_base: Option<std::rc::Rc<url::Url>>,
+    document_base_href: Option<&str>,
 ) -> Result<String, bail::BailReason> {
     let scanner::ScanOutput { body, head_range } = scanner::scan(html, options, effective_base)?;
 
@@ -104,7 +110,9 @@ pub(crate) fn run_with_base(
     // ~keep separator, so insert one explicitly: emit `\n` between frontmatter
     // ~keep (`...---\n`) and the body (`first-paragraph...`) to land on
     // ~keep `...---\n\nfirst-paragraph...`.
-    if let Some(frontmatter) = crate::converter::head_metadata::extract_frontmatter(html, head_range_ref, options) {
+    if let Some(frontmatter) =
+        crate::converter::head_metadata::extract_frontmatter(html, head_range_ref, options, document_base_href)
+    {
         let mut output = String::with_capacity(frontmatter.len() + body.len() + 1);
         output.push_str(&frontmatter);
         if !body.is_empty() && !body.starts_with('\n') && !frontmatter.ends_with("\n\n") {

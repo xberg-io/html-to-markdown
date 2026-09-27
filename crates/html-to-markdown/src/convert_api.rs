@@ -90,6 +90,11 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::rc::Rc;
 
+    // ~keep The same `<base href>` is the `base` metadata, so both read it here, once.
+    let document_base_href = (options.base_url.is_some() || options.extract_metadata)
+        .then(|| crate::converter::url_resolve::document_base_href(html))
+        .flatten();
+
     // ~keep Computed once, from the raw (pre-normalization) input, and reused for both the
     // ~keep Tier-1 attempt and the Tier-2 fallback below -- the single most important property
     // ~keep for `base_url`: both tiers resolve every relative destination against the exact
@@ -100,7 +105,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
     let effective_base: Option<std::rc::Rc<url::Url>> = options
         .base_url
         .as_deref()
-        .and_then(|base| crate::converter::url_resolve::compute_effective_base(html, base))
+        .and_then(|base| crate::converter::url_resolve::compute_effective_base(document_base_href.as_deref(), base))
         .map(std::rc::Rc::new);
 
     // ~keep Tier-1 dispatcher.
@@ -146,6 +151,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                     &stub_report,
                     &options,
                     effective_base.clone(),
+                    document_base_href.as_deref(),
                 ) {
                     Ok(markdown) => {
                         tracing::debug!(
@@ -195,6 +201,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 &stub_report,
                 &options,
                 effective_base.clone(),
+                document_base_href.as_deref(),
             ) {
                 Ok(markdown) => {
                     tracing::debug!(
@@ -318,6 +325,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 visitor,
                 structure_collector,
                 effective_base,
+                document_base_href.as_deref(),
             )
         }
         #[cfg(all(feature = "metadata", not(feature = "inline-images")))]
@@ -330,6 +338,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 visitor,
                 structure_collector,
                 effective_base,
+                document_base_href.as_deref(),
             )
         }
         #[cfg(all(not(feature = "metadata"), feature = "inline-images"))]
@@ -342,6 +351,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 visitor,
                 structure_collector,
                 effective_base,
+                document_base_href.as_deref(),
             )
         }
         #[cfg(all(not(feature = "metadata"), not(feature = "inline-images")))]
@@ -354,6 +364,7 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
                 visitor,
                 structure_collector,
                 effective_base,
+                document_base_href.as_deref(),
             )
         }
     }));

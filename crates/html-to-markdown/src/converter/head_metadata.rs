@@ -26,10 +26,13 @@ use crate::text;
 /// true AND `head_range` is `Some` AND at least one metadata field was
 /// found.  Returns `None` otherwise — callers should prepend the returned
 /// string to the body only when `Some` is returned.
+///
+/// `document_base_href` is the document's `<base href>`, recorded as `base`.
 pub fn extract_frontmatter(
     html: &str,
     head_range: Option<&Range<usize>>,
     options: &ConversionOptions,
+    document_base_href: Option<&str>,
 ) -> Option<String> {
     if !options.extract_metadata {
         return None;
@@ -42,9 +45,6 @@ pub fn extract_frontmatter(
     }
 
     let head_content = &html[head_range.clone()];
-    if head_content.is_empty() {
-        return None;
-    }
 
     // ~keep Wrap the extracted head content in a minimal HTML document so that
     // ~keep `tl::parse` has the correct context.  The wrapper tags are never
@@ -66,7 +66,7 @@ pub fn extract_frontmatter(
     // ~keep synthesised wrapper's children to find the `<head>` node first.
     let mut metadata = BTreeMap::new();
     for child_handle in dom.children() {
-        let m = extract_head_metadata(child_handle, parser, options);
+        let m = extract_head_metadata(child_handle, parser, options, document_base_href);
         if !m.is_empty() {
             metadata = m;
             break;

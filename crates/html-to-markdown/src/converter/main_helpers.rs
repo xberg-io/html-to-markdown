@@ -590,8 +590,8 @@ fn collect_title_head_metadata(
     }
 }
 
-/// Record a `<link rel="canonical">` href into `metadata`. Extracted from
-/// `extract_head_metadata` — same attribute lookups and `"canonical"` substring check, unchanged.
+/// Record the href of the first `<link rel="canonical">` into `metadata`. Extracted from
+/// `extract_head_metadata` — same attribute lookups and `"canonical"` substring check.
 fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
     if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("link") {
         return;
@@ -607,27 +607,17 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
         return;
     };
     let href_str = href_attr.as_utf8_str();
-    metadata.insert("canonical".to_string(), href_str.to_string());
+    metadata
+        .entry("canonical".to_string())
+        .or_insert_with(|| href_str.to_string());
 }
 
-/// Record a `<base href>` into `metadata`. Extracted from `extract_head_metadata` — same
-/// attribute lookup, unchanged.
-fn collect_base_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<String, String>) {
-    if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("base") {
-        return;
-    }
-    let Some(href_attr) = child_tag.attributes().get("href").flatten() else {
-        return;
-    };
-    let href_str = href_attr.as_utf8_str();
-    metadata.insert("base".to_string(), href_str.to_string());
-}
-
-/// Extract metadata from the head element.
+/// Extract metadata from the head element, recording `document_base_href` as `base`.
 pub fn extract_head_metadata(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     options: &ConversionOptions,
+    document_base_href: Option<&str>,
 ) -> BTreeMap<String, String> {
     let mut work = vec![*node_handle];
     while let Some(handle) = work.pop() {
@@ -651,9 +641,11 @@ pub fn extract_head_metadata(
                     collect_meta_head_metadata(child_tag, options, &mut metadata);
                     collect_title_head_metadata(child_tag, parser, options, &mut metadata);
                     collect_link_head_metadata(child_tag, &mut metadata);
-                    collect_base_head_metadata(child_tag, &mut metadata);
                 }
             }
+        }
+        if let Some(href) = document_base_href {
+            metadata.insert("base".to_string(), href.to_string());
         }
 
         if !metadata.is_empty() {

@@ -10,7 +10,7 @@ use std::rc::Rc;
 use html5ever::tendril::StrTendril;
 use html5ever::tokenizer::{BufferQueue, Tokenizer, TokenizerOpts};
 use html5ever::tree_builder::{TreeBuilder, TreeBuilderOpts};
-use html5ever::{LocalName, TokenizerResult, local_name, ns};
+use html5ever::{TokenizerResult, local_name, ns};
 use url::Url;
 
 use crate::rcdom::{Handle, NodeData, RcDom};
@@ -24,22 +24,26 @@ use crate::rcdom::{Handle, NodeData, RcDom};
 /// ~keep `https://example.com/assets/`, and `<base href="https://cdn.example/">`
 /// ~keep overrides the caller's base entirely, exactly as `Url::join` resolves an
 /// ~keep already-absolute reference). When the `<base href>` is present but fails
-/// ~keep to parse/join (malformed markup), it is ignored and the caller's
-/// ~keep `base_url` alone is used rather than disabling resolution entirely.
+/// ~keep to parse/join (malformed markup), or resolves to a `data:` or `javascript:`
+/// ~keep URL, it is ignored and the caller's `base_url` alone is used, as the HTML
+/// ~keep "frozen base URL" steps fall back to the document's own URL.
 ///
 /// Returns `None` when `caller_base_url` itself does not parse as an absolute
 /// URL -- resolution is then a no-op everywhere, which keeps a malformed
 /// `base_url` from ever panicking or corrupting output.
 ///
-/// Reads the raw (pre-normalization) `html`; a `<base>` tag
-/// that only becomes well-formed after this crate's UTF-16/NUL-byte input
-/// normalization is not found, and the caller's `base_url` alone is used --
-/// a safe fallback, not a correctness gap in the resolved output.
-pub fn compute_effective_base(html: &str, caller_base_url: &str) -> Option<Url> {
+/// `document_base_href` is [`document_base_href`] of the conversion's input.
+pub fn compute_effective_base(document_base_href: Option<&str>, caller_base_url: &str) -> Option<Url> {
     let caller_base = Url::parse(caller_base_url).ok()?;
 
-    match document_base_href(html) {
-        Some(href) if !href.is_empty() => Some(caller_base.join(&href).unwrap_or(caller_base)),
+    match document_base_href {
+        Some(href) if !href.is_empty() => Some(
+            caller_base
+                .join(href)
+                .ok()
+                .filter(|base| !matches!(base.scheme(), "data" | "javascript"))
+                .unwrap_or(caller_base),
+        ),
         // ~keep An empty `<base href="">` (or no `<base>` at all) leaves the document's own
         // ~keep URL as the base, per the HTML "document base URL" algorithm -- i.e. the
         // ~keep caller's `base_url`, unchanged.
@@ -82,18 +86,42 @@ pub fn resolve_attribute_url(base: &Url, value: &str) -> Option<String> {
 /// The `href` of the first HTML `<base>` with one, in tree order, as a browser picks it:
 /// html5ever builds the document, so a `<base>` in a comment, in raw text, in `<template>`
 /// contents or in SVG does not count, and foster parenting and `<frameset>` apply. ~keep
-fn document_base_href(html: &str) -> Option<String> {
+///
+/// Reads the raw (pre-normalization) `html`; a `<base>` tag that only becomes well-formed
+/// after this crate's UTF-16/NUL-byte input normalization is not found. Both the effective
+/// base and the `base` metadata come from this one reading.
+pub fn document_base_href(html: &str) -> Option<String> {
+    let parse = parse_base_href(html);
+    tracing::debug!(
+        target: "html_to_markdown::convert",
+        read = parse.read,
+        walks = parse.walks,
+        "document base href parsed"
+    );
+    parse.href
+}
+
+/// [`document_base_href`], with what finding it cost.
+struct BaseParse {
+    href: Option<String>,
+    /// Bytes of `html` fed to the parser.
+    read: usize,
+    /// Walks of the partial tree made while parsing.
+    walks: usize,
+}
+
+fn parse_base_href(html: &str) -> BaseParse {
     // ~keep A `<base>` element only comes from a start tag named `base`, so a document
     // ~keep without `<base` (in any case) is not parsed.
     let bytes = html.as_bytes();
-    let has_base_tag = memchr::memchr_iter(b'<', bytes).any(|at| {
-        bytes
-            .get(at + 1..at + 5)
-            .is_some_and(|n| n.eq_ignore_ascii_case(b"base"))
-    });
-    if !has_base_tag {
-        return None;
+    if !has_start_tag(bytes, b"base") {
+        return BaseParse {
+            href: None,
+            read: 0,
+            walks: 0,
+        };
     }
+    let mut has_frameset = None;
 
     let tokenizer = Tokenizer::new(
         TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default()),
@@ -101,25 +129,52 @@ fn document_base_href(html: &str) -> Option<String> {
     );
     let input = BufferQueue::default();
     let mut fed = 0;
+    let mut walks = 0;
     while fed < html.len() {
         // ~keep Fed in pieces cut after a `>`, an ASCII byte and so a char boundary.
         let until = memchr::memchr(b'>', &bytes[(fed + PARSE_PIECE).min(html.len())..])
             .map_or(html.len(), |at| fed + PARSE_PIECE + at + 1);
         input.push_back(StrTendril::from(&html[fed..until]));
         while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
+        let piece = &bytes[fed..until];
         fed = until;
-        // ~keep Nothing is ever placed before a child of `<head>`, so a `<base href>` already
-        // ~keep there is the first in tree order and the rest of the document is not parsed.
-        if let Some(href) = head_base_href(&tokenizer.sink.sink.document) {
-            return Some(href);
+        if !has_start_tag(piece, b"base") {
+            continue;
+        }
+        // ~keep Later nodes go in after every node already in the tree, except a node foster
+        // ~keep parented in front of an open table and a `<frameset>` replacing the body. So a
+        // ~keep first `<base href>` outside those two reaches is final, and the rest is not parsed.
+        walks += 1;
+        if let Some(base) = first_base(&tokenizer.sink.sink.document) {
+            let replaceable = base.in_body && *has_frameset.get_or_insert_with(|| has_start_tag(bytes, b"frameset"));
+            if !(base.in_table || replaceable) {
+                return BaseParse {
+                    href: Some(base.href),
+                    read: fed,
+                    walks,
+                };
+            }
         }
     }
     tokenizer.end();
-    first_base_href(&tokenizer.sink.sink.document)
+    BaseParse {
+        href: first_base(&tokenizer.sink.sink.document).map(|base| base.href),
+        read: fed,
+        walks,
+    }
 }
 
-/// Bytes of source fed to html5ever between checks of `<head>` for a `<base href>`.
+/// Bytes of source fed to html5ever between looks for a final `<base href>`.
 const PARSE_PIECE: usize = 4096;
+
+/// Whether `bytes` holds `<` followed by `name` in any case.
+fn has_start_tag(bytes: &[u8], name: &[u8]) -> bool {
+    memchr::memchr_iter(b'<', bytes).any(|at| {
+        bytes
+            .get(at + 1..at + 1 + name.len())
+            .is_some_and(|n| n.eq_ignore_ascii_case(name))
+    })
+}
 
 /// The `href` of a `<base>` element, or `None` for any other node or a `<base>` without one.
 fn base_href(node: &Handle) -> Option<String> {
@@ -136,34 +191,43 @@ fn base_href(node: &Handle) -> Option<String> {
         .map(|attr| attr.value.to_string())
 }
 
-/// The `href` of the first `<base>` with one among the children of the document's `<head>`.
-fn head_base_href(document: &Handle) -> Option<String> {
-    let html = find_element(document, local_name!("html"))?;
-    let head = find_element(&html, local_name!("head"))?;
-    head.children.borrow().iter().find_map(base_href)
+/// The first `<base>` with an `href` in a tree, and where it sits.
+struct FirstBase {
+    href: String,
+    /// Below a `<table>`, where foster parenting can later insert a node in front of it.
+    in_table: bool,
+    /// Below `<body>`, which a later `<frameset>` can replace.
+    in_body: bool,
 }
 
-/// The first child of `parent` that is the HTML element `local`.
-fn find_element(parent: &Handle, local: LocalName) -> Option<Handle> {
-    parent
-        .children
-        .borrow()
-        .iter()
-        .find(|child| matches!(&child.data, NodeData::Element { name, .. } if name.ns == ns!(html) && name.local == local))
-        .cloned()
-}
-
-/// The `href` of the first `<base>` with one below `root`, in tree order. `<template>`
-/// contents are not children, so they are not searched.
-fn first_base_href(root: &Handle) -> Option<String> {
+/// The first `<base>` with an `href` below `root`, in tree order. `<template>` contents are
+/// not children, so they are not searched.
+fn first_base(root: &Handle) -> Option<FirstBase> {
     // ~keep The walk holds clones while the tree is alive: dropping the last handle to a
     // ~keep node empties its whole subtree (`rcdom::Node`'s drop).
-    let mut pending = vec![Rc::clone(root)];
-    while let Some(node) = pending.pop() {
+    let mut pending = vec![(Rc::clone(root), false, false)];
+    while let Some((node, in_table, in_body)) = pending.pop() {
         if let Some(href) = base_href(&node) {
-            return Some(href);
+            return Some(FirstBase {
+                href,
+                in_table,
+                in_body,
+            });
         }
-        pending.extend(node.children.borrow().iter().rev().cloned());
+        let (in_table, in_body) = match &node.data {
+            NodeData::Element { name, .. } if name.ns == ns!(html) => (
+                in_table || name.local == local_name!("table"),
+                in_body || name.local == local_name!("body"),
+            ),
+            _ => (in_table, in_body),
+        };
+        pending.extend(
+            node.children
+                .borrow()
+                .iter()
+                .rev()
+                .map(|child| (Rc::clone(child), in_table, in_body)),
+        );
     }
     None
 }
@@ -250,34 +314,46 @@ mod tests {
 
     #[test]
     fn test_compute_effective_base_no_document_base_uses_caller_base() {
-        let effective = compute_effective_base("<html><body></body></html>", "https://example.com/blog/");
+        let effective = compute_effective_base(
+            document_base_href("<html><body></body></html>").as_deref(),
+            "https://example.com/blog/",
+        );
         assert_eq!(effective.unwrap().as_str(), "https://example.com/blog/");
     }
 
     #[test]
     fn test_compute_effective_base_relative_document_base_resolves_against_caller_base() {
         let html = r#"<html><head><base href="/assets/"></head><body></body></html>"#;
-        let effective = compute_effective_base(html, "https://example.com/blog/post.html");
+        let effective = compute_effective_base(
+            document_base_href(html).as_deref(),
+            "https://example.com/blog/post.html",
+        );
         assert_eq!(effective.unwrap().as_str(), "https://example.com/assets/");
     }
 
     #[test]
     fn test_compute_effective_base_absolute_document_base_overrides_caller_base() {
         let html = r#"<html><head><base href="https://cdn.example.com/"></head><body></body></html>"#;
-        let effective = compute_effective_base(html, "https://example.com/blog/post.html");
+        let effective = compute_effective_base(
+            document_base_href(html).as_deref(),
+            "https://example.com/blog/post.html",
+        );
         assert_eq!(effective.unwrap().as_str(), "https://cdn.example.com/");
     }
 
     #[test]
     fn test_compute_effective_base_empty_document_base_href_uses_caller_base() {
         let html = r#"<html><head><base href=""></head><body></body></html>"#;
-        let effective = compute_effective_base(html, "https://example.com/blog/post.html");
+        let effective = compute_effective_base(
+            document_base_href(html).as_deref(),
+            "https://example.com/blog/post.html",
+        );
         assert_eq!(effective.unwrap().as_str(), "https://example.com/blog/post.html");
     }
 
     #[test]
     fn test_compute_effective_base_malformed_caller_base_disables_resolution() {
-        let effective = compute_effective_base("<html></html>", "not a url");
+        let effective = compute_effective_base(document_base_href("<html></html>").as_deref(), "not a url");
         assert_eq!(effective, None);
     }
 
@@ -286,7 +362,7 @@ mod tests {
         // ~keep A `<base>` before any `<head>` still counts: the parser places it in the
         // ~keep head it opens.
         let html = r#"<base href="/x/"><body></body>"#;
-        let effective = compute_effective_base(html, "https://example.com/");
+        let effective = compute_effective_base(document_base_href(html).as_deref(), "https://example.com/");
         assert_eq!(effective.unwrap().as_str(), "https://example.com/x/");
     }
 
@@ -305,7 +381,9 @@ mod tests {
     const PAGE: &str = "https://example.com/blog/post.html";
 
     fn effective(html: &str) -> String {
-        compute_effective_base(html, PAGE).unwrap().to_string()
+        compute_effective_base(document_base_href(html).as_deref(), PAGE)
+            .unwrap()
+            .to_string()
     }
 
     #[test]
@@ -404,5 +482,72 @@ mod tests {
     fn test_compute_effective_base_reads_a_tag_name_ended_by_a_form_feed() {
         let html = "<head><base\x0chref=\"/ff/\"></head>";
         assert_eq!(effective(html), "https://example.com/ff/");
+    }
+
+    #[test]
+    fn test_compute_effective_base_falls_back_to_the_page_for_a_data_or_javascript_base() {
+        for href in ["data:text/html,x", "javascript:void(0)"] {
+            let html = format!(r#"<head><base href="{href}"><base href="/second/"></head>"#);
+            assert_eq!(effective(&html), PAGE, "{href}");
+        }
+        let html = r#"<head><base href="https://cdn.example/"></head>"#;
+        assert_eq!(effective(html), "https://cdn.example/");
+    }
+
+    #[test]
+    fn test_parse_base_href_stops_at_a_first_base_in_the_body() {
+        let html = format!(
+            r#"<head></head><body><p>text</p><base href="/in-body/">{}"#,
+            "<p>more</p>".repeat(PARSE_PIECE)
+        );
+        let parse = parse_base_href(&html);
+        assert_eq!(parse.href.as_deref(), Some("/in-body/"));
+        assert!(
+            parse.read <= 2 * PARSE_PIECE,
+            "read {} of {} bytes",
+            parse.read,
+            html.len()
+        );
+    }
+
+    #[test]
+    fn test_parse_base_href_stops_at_a_first_base_in_the_head() {
+        let html = format!(
+            r#"<head><base href="/in-head/"></head><body>{}"#,
+            "<p>more</p>".repeat(PARSE_PIECE)
+        );
+        let parse = parse_base_href(&html);
+        assert_eq!(parse.href.as_deref(), Some("/in-head/"));
+        assert!(
+            parse.read <= 2 * PARSE_PIECE,
+            "read {} of {} bytes",
+            parse.read,
+            html.len()
+        );
+    }
+
+    #[test]
+    fn test_parse_base_href_does_not_parse_a_page_without_base_text() {
+        assert_eq!(parse_base_href("<html><body><p>x</p></body></html>").read, 0);
+    }
+
+    #[test]
+    fn test_parse_base_href_walks_the_tree_only_after_a_piece_with_base_text() {
+        let html = format!(
+            r#"<!-- <base href="/x/"> --><body>{}"#,
+            "<p>more</p>".repeat(PARSE_PIECE)
+        );
+        let parse = parse_base_href(&html);
+        assert_eq!((parse.href, parse.read), (None, html.len()));
+        assert_eq!(parse.walks, 1);
+    }
+
+    #[test]
+    fn test_compute_effective_base_ignores_a_body_base_a_frameset_pieces_later_replaces() {
+        // ~keep `<div>` keeps the frameset allowed, where text would not.
+        let padding = "<div></div>".repeat(PARSE_PIECE);
+        let html =
+            format!(r#"<head></head><div><base href="https://evil.example/"></div>{padding}<frameset></frameset>"#);
+        assert_eq!(effective(&html), PAGE);
     }
 }
