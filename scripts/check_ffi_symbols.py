@@ -111,6 +111,7 @@ class Comparison:
     call_sites: int = 0
     languages: set[str] = field(default_factory=set)
     findings: list[Finding] = field(default_factory=list)
+    sites_by_language: dict[str, int] = field(default_factory=dict)
 
 
 C_ABI_CONSUMERS: tuple[Consumer, ...] = (
@@ -328,17 +329,23 @@ def compare_c_abi() -> tuple[Comparison, list[str]]:
         comparison.call_sites += call_sites
         comparison.findings.extend(findings)
         comparison.languages.add(consumer.language)
+        comparison.sites_by_language[consumer.language] = call_sites
     return comparison, disagreements
 
 
 def compare_php_functions() -> Comparison:
     """Diff PHP extension global functions against the ext smoke apps' probes."""
     comparison = Comparison(title="PHP extension global functions", exported=php_exported_functions())
+    # ~keep Registered as a diffed language only when something is exported to diff.
+    # ~keep The extension is #[php_class]/#[php_impl] only and registers no
+    # ~keep #[php_function], so this comparison is empty-vs-empty and must not be
+    # ~keep counted as coverage it does not provide.
     for root_name in PHP_PROBE_ROOTS:
         root = ROOT / root_name
         if not root.is_dir():
             continue
-        comparison.languages.add("php-ext")
+        if comparison.exported:
+            comparison.languages.add("php-ext")
         for path in sorted(root.rglob("*.php")):
             for line_number, line in enumerate(strip_php_comments(read_text(path)).splitlines(), start=1):
                 for match in PHP_FUNCTION_CALL_RE.finditer(line):
@@ -346,6 +353,8 @@ def compare_php_functions() -> Comparison:
                     comparison.call_sites += 1
                     if symbol not in comparison.exported:
                         comparison.findings.append(Finding(symbol, "php-ext", str(path.relative_to(ROOT)), line_number))
+    if "php-ext" in comparison.languages:
+        comparison.sites_by_language["php-ext"] = comparison.call_sites
     return comparison
 
 
@@ -361,14 +370,26 @@ def report_comparison(
     allowlist: dict[str, str],
     allow_known: bool,
     verbose: bool,
-) -> tuple[int, int, list[str]]:
-    """Print one comparison. Returns (blocking, allowed, stale allowlist entries)."""
+) -> tuple[int, int, list[str], list[str], list[str]]:
+    """Print one comparison. Returns (blocking, allowed, resolved, orphaned, silent)."""
     print(f"\n{comparison.title}")
     print(
         f"  {len(comparison.exported)} symbols exported, "
         f"{comparison.call_sites} call sites checked across "
         f"{len(comparison.languages)} languages ({', '.join(sorted(comparison.languages)) or 'none'})"
     )
+    if comparison.sites_by_language:
+        breakdown = ", ".join(f"{lang} {count}" for lang, count in sorted(comparison.sites_by_language.items()))
+        print(f"  per language: {breakdown}")
+
+    # ~keep A detector whose pattern stops matching reports zero call sites and finds
+    # ~keep nothing, which renders identically to a clean pass. Treated as a failure so
+    # ~keep the gate cannot succeed having examined nothing. An inert comparison -- no
+    # ~keep exports and no calls -- is a declared gap, not a silent detector.
+    inert = not comparison.exported and comparison.call_sites == 0
+    if inert:
+        print("  not diffed: nothing is exported, so no call site could disagree")
+    silent = [] if inert else sorted(lang for lang, count in comparison.sites_by_language.items() if count == 0)
 
     grouped = group_by_symbol(comparison.findings)
     blocking = 0
@@ -399,7 +420,9 @@ def report_comparison(
     orphaned = [s for s in allowlist if s not in grouped and s not in comparison.exported]
     if not grouped:
         print("  no called-but-not-exported symbols")
-    return blocking, allowed, resolved, orphaned
+    for language in silent:
+        print(f"  SILENT  {language} is registered as diffed but matched no call site")
+    return blocking, allowed, resolved, orphaned, silent
 
 
 def main() -> int:
@@ -454,12 +477,13 @@ def main() -> int:
     if not disagreements:
         print("  header and Rust sources agree")
 
-    c_blocking, c_allowed, c_resolved, c_orphaned = report_comparison(
+    c_blocking, c_allowed, c_resolved, c_orphaned, c_silent = report_comparison(
         c_abi, KNOWN_MISSING_EXPORTS, args.allow_known, args.verbose
     )
-    php_blocking, php_allowed, php_resolved, php_orphaned = report_comparison(
+    php_blocking, php_allowed, php_resolved, php_orphaned, php_silent = report_comparison(
         php, KNOWN_MISSING_PHP_FUNCTIONS, args.allow_known, args.verbose
     )
+    silent = c_silent + php_silent
 
     print("\nNot diffed")
     for entry in NOT_CHECKED:
@@ -496,10 +520,11 @@ def main() -> int:
     print(
         f"{blocking} blocking, {allowed} allowlisted, "
         f"{len(disagreements)} export-source disagreements, "
-        f"{len(resolved)} resolved allowlist entries, {len(orphaned)} orphaned allowlist entries"
+        f"{len(resolved)} resolved allowlist entries, {len(orphaned)} orphaned allowlist entries, "
+        f"{len(silent)} silent detectors"
     )
 
-    failed = blocking + len(disagreements) + len(stale)
+    failed = blocking + len(disagreements) + len(stale) + len(silent)
     print("FAIL" if failed else "OK")
     print("=" * 78)
     return 1 if failed else 0
