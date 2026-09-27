@@ -42,15 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   updated. Each change was traced to the fix that made it and reviewed: images kept in layout rows
   (5b26d732d, 31f2015b1), and whitespace no longer opening a line (c5b8d1baa), which also stops
   two lines rendering as indented code blocks. Only `output_bytes` changes; the calibrated timings
-  stay as measured. `gh-190/plusblog` stays unblessed, because c5b8d1baa moved a body paragraph
-  into the preceding list item there, so the guardrail keeps reporting it until that is fixed.
+  stay as measured. `gh-190/plusblog` changed for a different reason, fixed below.
 - **A `<br>` in a `<span>` after a list or a layout table pulled the next paragraph into the last
   list item.** A `<span>` removed the line break that ends the item's line, so the `<br>` became a
   hard break at the end of the item and the paragraph after it rendered inside the item. Without a
   `<br>`, the span's text was joined onto the item's last word, and a `<span>` right after a
   horizontal rule was joined onto the `---`. A `<span>` now leaves the line break before it in
   place (#546).
-
 
 ## [3.15.1] - 2026-09-27
 

@@ -21,7 +21,7 @@ fn options_with_structure() -> ConversionOptions {
 /// `output[content_start_pos..]` after conversion. A `<span>` used to pop a
 /// trailing `\n` before its content, which moved the end of the string behind
 /// that start and put the slice inside a multibyte char. The span no longer
-/// removes anything (#546); this pins the slice against any other shrink.
+/// removes anything (#546); this test keeps the multibyte case from panicking.
 #[test]
 fn pre_paragraph_multibyte_span_does_not_panic() {
     let html = "<pre>previous block</pre>\n\
