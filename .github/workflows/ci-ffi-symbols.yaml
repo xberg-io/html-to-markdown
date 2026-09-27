@@ -39,7 +39,7 @@ on:
       - "Taskfile.yaml"
 
 # ~keep `github.sha` not `github.ref` for pushes: a cancelled run reports neither pass
-# ~keep nor fail, and cancelling main's previous run is how 3.15.0's R break shipped.
+# ~keep nor fail, and cancelling main's previous run is one of the two ways 3.15.0's R break shipped.
 concurrency:
   group: ffi-symbols-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
