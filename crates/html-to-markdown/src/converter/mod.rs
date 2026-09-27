@@ -121,6 +121,7 @@ pub use self::context::Context;
 pub use self::dom_context::DomContext;
 
 pub use self::main::{convert_html_impl, walk_node};
+pub use self::main_helpers::document_head;
 pub use self::main_helpers::{emit_table_cell_break, strip_trailing_backslash_breaks, trim_trailing_whitespace};
 
 pub use crate::converter::utility::content::{

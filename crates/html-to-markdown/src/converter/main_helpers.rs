@@ -568,14 +568,20 @@ fn collect_meta_head_metadata(
 }
 
 /// Record the `<title>` text into `metadata`, honoring `strip_tags`/`preserve_tags` for
-/// `"title"`. The first title with text wins.
+/// `"title"`. The first title wins, as in a browser; an empty one records nothing.
+/// `seen_title` is whether a title came before.
 fn collect_title_head_metadata(
     child_tag: &tl::HTMLTag,
     parser: &tl::Parser,
     options: &ConversionOptions,
     metadata: &mut BTreeMap<String, String>,
+    seen_title: &mut bool,
 ) {
-    if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("title")
+    if !child_tag.name().as_utf8_str().eq_ignore_ascii_case("title") {
+        return;
+    }
+    let later_title = std::mem::replace(seen_title, true);
+    if later_title
         || options.strip_tags.iter().any(|t| t == "title")
         || options.preserve_tags.iter().any(|t| t == "title")
     {
@@ -591,7 +597,7 @@ fn collect_title_head_metadata(
     }
     title_content = title_content.trim().to_string();
     if !title_content.is_empty() {
-        metadata.entry("title".to_string()).or_insert(title_content);
+        metadata.insert("title".to_string(), title_content);
     }
 }
 
@@ -632,44 +638,73 @@ pub fn extract_head_metadata(
     metadata
 }
 
-/// The title, meta and canonical link fields of the first head element below `roots` that
-/// comes before the body. The parser ignores a `<head>` tag once the body has started.
+/// The title, meta and canonical link fields of the [`document_head`] below `roots`.
 fn head_element_metadata(
     roots: &[tl::NodeHandle],
     parser: &tl::Parser,
     options: &ConversionOptions,
 ) -> BTreeMap<String, String> {
+    let mut metadata = BTreeMap::new();
+    let Some(tl::Node::Tag(head)) = document_head(roots, parser).and_then(|handle| handle.get(parser)) else {
+        return metadata;
+    };
+    let mut seen_meta = HashSet::new();
+    let mut seen_title = false;
+    for child_handle in head.children().top().iter() {
+        if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
+            collect_meta_head_metadata(child_tag, options, &mut metadata, &mut seen_meta);
+            collect_title_head_metadata(child_tag, parser, options, &mut metadata, &mut seen_title);
+            collect_link_head_metadata(child_tag, &mut metadata);
+        }
+    }
+    metadata
+}
+
+/// The first `<head>` element below `roots` before the body starts. A browser's parser ignores
+/// a `<head>` tag once the body has started, at text or at a tag that [`starts_body`].
+pub fn document_head(roots: &[tl::NodeHandle], parser: &tl::Parser) -> Option<tl::NodeHandle> {
     let mut work: Vec<_> = roots.iter().rev().copied().collect();
     while let Some(handle) = work.pop() {
-        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
-            continue;
-        };
-
-        let name = tag.name().as_utf8_str();
-        if name.eq_ignore_ascii_case("body") {
-            break;
-        }
-        if !name.eq_ignore_ascii_case("head") {
-            let children: Vec<_> = tag.children().top().iter().copied().collect();
-            for child_handle in children.into_iter().rev() {
-                work.push(child_handle);
+        match handle.get(parser) {
+            Some(tl::Node::Raw(text)) if !text.as_bytes().iter().all(u8::is_ascii_whitespace) => return None,
+            Some(tl::Node::Tag(tag)) => {
+                let name = tag.name().as_bytes().to_ascii_lowercase();
+                match name.as_slice() {
+                    b"head" => return Some(handle),
+                    b"html" => {
+                        let first = work.len();
+                        work.extend(tag.children().top().iter().copied());
+                        work[first..].reverse();
+                    }
+                    name if starts_body(name) => return None,
+                    _ => {}
+                }
             }
-            continue;
+            _ => {}
         }
-
-        let mut metadata = BTreeMap::new();
-        let mut seen_meta = HashSet::new();
-        for child_handle in tag.children().top().iter() {
-            if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
-                collect_meta_head_metadata(child_tag, options, &mut metadata, &mut seen_meta);
-                collect_title_head_metadata(child_tag, parser, options, &mut metadata);
-                collect_link_head_metadata(child_tag, &mut metadata);
-            }
-        }
-        return metadata;
     }
+    None
+}
 
-    BTreeMap::new()
+/// Whether a start tag named `name` (lower case) starts the body when no body has started:
+/// every tag except the ones the HTML parser's "in head" insertion mode keeps in the head.
+pub fn starts_body(name: &[u8]) -> bool {
+    !matches!(
+        name,
+        b"html"
+            | b"head"
+            | b"base"
+            | b"basefont"
+            | b"bgsound"
+            | b"link"
+            | b"meta"
+            | b"noframes"
+            | b"noscript"
+            | b"script"
+            | b"style"
+            | b"template"
+            | b"title"
+    )
 }
 
 /// Check if text has more than one character.

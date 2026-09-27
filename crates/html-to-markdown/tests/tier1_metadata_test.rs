@@ -460,3 +460,112 @@ fn should_keep_the_first_title_and_the_first_meta_tag_in_any_case_in_the_documen
     assert_eq!(document.title.as_deref(), Some("First"));
     assert_eq!(document.description.as_deref(), Some("first"));
 }
+
+// ~keep ── 13. Empty first title, implicit body start, element-only base and canonical ──
+
+#[test]
+fn should_keep_an_empty_first_title_on_both_tiers() {
+    for html in [
+        "<html><head><title></title><title>Second</title></head><body><p>x</p></body></html>",
+        r#"<html><head><title> </title><title>Second</title><meta name="description" content="d"></head><body><p>x</p></body></html>"#,
+    ] {
+        let out = t2(html);
+        assert!(!out.contains("title:"), "{out}");
+        assert_eq!(t1_only(html), out, "{html}");
+    }
+}
+
+#[test]
+fn should_ignore_a_head_after_implicit_body_content_on_both_tiers() {
+    for html in [
+        "<p>x</p><head><title>Stray</title></head><p>y</p>",
+        "x<head><title>Stray</title></head><p>y</p>",
+        "<html><div>x</div><head><title>Stray</title></head><p>y</p></html>",
+    ] {
+        let out = t2(html);
+        assert!(!out.contains("Stray"), "{out}");
+        assert_eq!(t1_only(html), out, "{html}");
+    }
+}
+
+#[test]
+fn should_read_a_head_after_head_content_and_whitespace_on_both_tiers() {
+    let html = "<!DOCTYPE html>\n<meta charset=\"utf-8\">\n<head><title>Kept</title></head><p>x</p>";
+    let out = t2(html);
+    assert!(out.contains("title: Kept\n"), "{out}");
+    assert_eq!(t1_only(html), out);
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_take_the_base_href_and_canonical_link_only_from_their_elements_in_the_document_metadata() {
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        base_url: Some("https://example.com/dir/page".to_string()),
+        ..ConversionOptions::default()
+    };
+    let html = r#"<html><head><base href="/real/"><meta name="base" content="/meta/"><link rel="canonical" href="https://example.com/real"><meta name="canonical" content="https://example.com/meta"></head><body><p><a href="x">x</a></p></body></html>"#;
+    let result = convert(html, Some(opts.clone())).unwrap();
+    assert!(
+        result
+            .content
+            .unwrap_or_default()
+            .contains("(https://example.com/real/x)")
+    );
+    let document = result.metadata.document;
+    assert_eq!(document.base_href.as_deref(), Some("/real/"));
+    assert_eq!(document.canonical_url.as_deref(), Some("https://example.com/real"));
+    assert_eq!(document.meta_tags.get("base").map(String::as_str), Some("/meta/"));
+
+    let html = r#"<html><head><meta name="base" content="/meta/"><meta name="canonical" content="https://example.com/meta"></head><body><p>x</p></body></html>"#;
+    let document = convert(html, Some(opts)).unwrap().metadata.document;
+    assert_eq!(document.base_href, None);
+    assert_eq!(document.canonical_url, None);
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_give_the_document_structure_the_metadata_block_of_the_head_the_metadata_reads() {
+    use html_to_markdown_rs::types::{NodeContent, build_document_structure};
+
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    for (html, title) in [
+        (
+            "<html><head><title>Kept</title></head><body><p>x</p></body></html>",
+            Some("Kept"),
+        ),
+        (
+            "<html><body><head><title>Stray</title></head><p>x</p></body></html>",
+            None,
+        ),
+        ("<p>x</p><head><title>Stray</title></head>", None),
+        (
+            "<html><head><title>Kept</title></head><head><title>Stray</title></head><body><p>x</p></body></html>",
+            Some("Kept"),
+        ),
+    ] {
+        let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+        let blocks: Vec<Option<String>> = build_document_structure(&dom)
+            .nodes
+            .into_iter()
+            .filter_map(|node| match node.content {
+                NodeContent::MetadataBlock { entries } => Some(
+                    entries
+                        .into_iter()
+                        .find(|entry| entry.key == "title")
+                        .map(|entry| entry.value),
+                ),
+                _ => None,
+            })
+            .collect();
+        let expected: Vec<Option<String>> = title.map(|t| Some(t.to_string())).into_iter().collect();
+        assert_eq!(blocks, expected, "{html}");
+        let document = convert(html, Some(opts.clone())).unwrap().metadata.document;
+        assert_eq!(document.title.as_deref(), title, "{html}");
+    }
+}

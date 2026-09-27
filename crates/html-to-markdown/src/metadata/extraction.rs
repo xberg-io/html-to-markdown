@@ -15,6 +15,21 @@ pub(crate) fn extract_document_metadata(
     let mut doc = DocumentMetadata::default();
 
     for (raw_key, value) in head_metadata {
+        // ~keep Only the `<base>` and `<link rel="canonical">` elements write these keys. A meta
+        // ~keep tag named `base` or `canonical` arrives as `meta-base` or `meta-canonical` and is
+        // ~keep an ordinary meta tag (#589).
+        match raw_key.as_str() {
+            "base" => {
+                doc.base_href = Some(value);
+                continue;
+            }
+            "canonical" => {
+                doc.canonical_url = Some(value);
+                continue;
+            }
+            _ => {}
+        }
+
         let mut key = raw_key.as_str();
         let mut replaced_key: Option<String> = None;
 
@@ -37,8 +52,6 @@ pub(crate) fn extract_document_metadata(
                     doc.author = Some(value);
                 }
             }
-            "canonical" => doc.canonical_url = Some(value),
-            "base" | "base-href" => doc.base_href = Some(value),
             k if k.starts_with("og-") => {
                 let og_key = k.trim_start_matches("og-").replace('-', "_");
                 doc.open_graph.insert(og_key, value);

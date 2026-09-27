@@ -106,8 +106,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   size of the tree. The document base itself was always correct.
 
 - **The `title` metadata kept the last `<title>`, not the first.** A head with the titles First
-  and Second reported Second, while a browser shows First. The first title with text now wins on
-  both tiers, as the `base`, `canonical` and `<meta>` metadata already do.
+  and Second reported Second, while a browser shows First. The first title now wins on both
+  tiers, as the `base`, `canonical` and `<meta>` metadata already do. An empty first title also
+  wins, as in a browser, so the page reports no title.
 
 - **`<meta>` names that differ only in letter case let the last tag win.** Meta names do not
   depend on letter case, but `<meta name="Description">` followed by `<meta name="description">`
@@ -118,7 +119,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A `<head>` tag inside the body gave the two tiers different metadata.** The parser ignores a
   `<head>` tag once the body has started. Tier 1 read such a stray head when the page had no head
   of its own, and Tier 2 read it when the real head was empty. Both tiers now read only the first
-  head before the body.
+  head before the body. The body starts at a `<body>` tag, at text, or at any tag other than the
+  ones a head can hold, so `<p>x</p><head><title>Stray</title></head>` has no title. The
+  document structure gives a metadata block only for the head the metadata reads.
+
+- **A `<meta>` tag named `base` or `canonical` replaced the document's base and canonical link.**
+  `<meta name="base" content="/meta/">` next to `<base href="/real/">` set `base_href` in the
+  document metadata to `/meta/`, while the links resolved against `/real/`. The `base_href` and
+  `canonical_url` fields now come only from the `<base>` element and `<link rel="canonical">`,
+  and such a meta tag is an ordinary entry in `meta_tags`.
 
 ## [3.15.1] - 2026-09-27
 

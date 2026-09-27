@@ -128,6 +128,9 @@ pub fn scan(
         match bytes[pos] {
             b'<' => {
                 if text_start < pos {
+                    if !html[text_start..pos].bytes().all(|b| b.is_ascii_whitespace()) {
+                        state.start_body(text_start);
+                    }
                     // ~keep Peek the upcoming tag BEFORE flushing the preceding text: a
                     // purely-whitespace run immediately after an inline-close marker
                     // (`**`/`*`/etc.) is collapsed to one space by default, but
@@ -202,6 +205,7 @@ pub fn scan(
                 // bare `<x` as a text node). Emit the `<` and continue so
                 // we don't bail on commonly-unescaped source like `x < 5`.
                 if !parse::is_tag_name_start(next) {
+                    state.start_body(pos);
                     flush_text(&mut state, "<", pos, false, false, false)?;
                     pos += 1;
                     text_start = pos;
@@ -236,6 +240,10 @@ pub fn scan(
                     || crate::converter::utility::preprocessing::tag_has_hidden_style(tag_slice)
                 {
                     return Err(BailReason::HiddenElement { offset: pos });
+                }
+
+                if crate::converter::main_helpers::starts_body(name_lower) {
+                    state.start_body(pos);
                 }
 
                 // ~keep Phase I: `<svg>` — emit as base64 data URI matching Tier-2's
@@ -318,13 +326,6 @@ pub fn scan(
                         }
                     }
                 };
-
-                // ~keep Once the body starts the head is over, empty if no `<head>` came before,
-                // ~keep and the parser ignores a later `<head>` tag. Tier 2's head walk stops at
-                // ~keep `<body>` too.
-                if name_lower == b"body" && state.head_range.is_none() {
-                    state.head_range = Some(pos..pos);
-                }
 
                 // ~keep Raw-text "ignored" tags (`<script>`, `<style>`): their
                 // spec is `TagKind::Ignored` with `is_rawtext = true` (see
