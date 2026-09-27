@@ -190,7 +190,11 @@ jobs:
               - 'fixtures/**'
             kotlin:
               - 'packages/kotlin-android/**'
+              # ~keep build-kotlin-android builds html-to-markdown-rs-jni, NOT the plain
+              # ~keep C-FFI crate; without this a JNI-only change skipped both Kotlin jobs.
+              - 'crates/html-to-markdown-rs-jni/**'
               - 'crates/html-to-markdown-ffi/**'
+              - 'e2e/kotlin_android/**'
               - 'fixtures/**'
             swift:
               - 'packages/swift/**'
