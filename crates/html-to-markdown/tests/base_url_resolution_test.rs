@@ -137,6 +137,19 @@ fn should_let_absolute_document_base_href_override_caller_base_url_on_both_tiers
     assert_eq!(out, "[x](https://cdn.example.com/x.png)\n");
 }
 
+/// A `<base>` a browser reads as text or as a comment does not set the base.
+#[test]
+fn should_ignore_a_document_base_href_inside_a_comment_or_title_on_both_tiers() {
+    for head in [
+        r#"<!-- <base href="https://evil.example/"> -->"#,
+        r#"<title><base href="https://evil.example/"></title>"#,
+    ] {
+        let html = format!(r#"<html><head>{head}</head><body><a href="child.html">c</a></body></html>"#);
+        let out = assert_tier1_matches_tier2(&html, "https://example.com/blog/post.html");
+        assert_eq!(out, "[c](https://example.com/blog/child.html)\n", "head: {head}");
+    }
+}
+
 /// A `<blockquote cite>` is a destination the converter renders, so `base_url` must resolve it.
 ///
 /// ~keep Found while adopting `base_url` in crawlberg, whose own link pre-pass

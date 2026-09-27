@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`base_url` could pick a `<base href>` that a browser ignores.** The document base came from a
+  byte scan for the first `<base` tag in the source, so a `<base>` inside a comment, inside
+  `<title>`, `<textarea>`, `<script>`, `<style>` or another raw-text element, inside `<template>`
+  or SVG, or in a body that a `<frameset>` replaces, set the base for every relative link. The base
+  now comes from the first `<base>` with an `href` in tree order, read from an html5ever parse of
+  the document. The parse stops at a `<base href>` in `<head>`, and a page without a `<base` tag
+  is not parsed at all. Found while adopting `base_url` downstream, where the same two mistakes
+  had already been fixed once in a link pre-pass.
+
 ## [3.15.1] - 2026-09-27
 
 ### Fixed
