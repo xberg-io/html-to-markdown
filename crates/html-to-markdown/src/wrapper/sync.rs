@@ -27,6 +27,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
     let mut paragraph_indent = String::new();
     let mut in_blockquote_paragraph = false;
     let mut blockquote_prefix = String::new();
+    let mut blockquote_indent = String::new();
     let mut blockquote_buffer = String::new();
 
     for line in markdown.lines() {
@@ -66,6 +67,10 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
         }
 
         if let Some((prefix, content)) = parse_blockquote_line(line) {
+            // ~keep The indent after the quote prefix is a list item's content column inside
+            // ~keep the quote; written without it, the paragraph would leave the item.
+            let after_prefix = &line[prefix.len()..];
+            let indent = &after_prefix[..after_prefix.len() - after_prefix.trim_start().len()];
             if in_paragraph && !paragraph_buffer.is_empty() {
                 result.push_str(&wrap_indented_line(
                     &paragraph_indent,
@@ -85,7 +90,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             if content.is_empty() {
                 if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
                     result.push_str(&wrap_blockquote_paragraph(
-                        &blockquote_prefix,
+                        &format!("{blockquote_prefix}{blockquote_indent}"),
                         &blockquote_buffer,
                         options.wrap_width,
                     ));
@@ -100,7 +105,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
             if in_blockquote_paragraph && normalized_prefix != blockquote_prefix {
                 result.push_str(&wrap_blockquote_paragraph(
-                    &blockquote_prefix,
+                    &format!("{blockquote_prefix}{blockquote_indent}"),
                     &blockquote_buffer,
                     options.wrap_width,
                 ));
@@ -114,13 +119,15 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 blockquote_buffer.push_str(&content);
             } else {
                 blockquote_prefix = normalized_prefix;
+                blockquote_indent.clear();
+                blockquote_indent.push_str(indent);
                 blockquote_buffer.push_str(&content);
                 in_blockquote_paragraph = true;
             }
             continue;
         } else if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
             result.push_str(&wrap_blockquote_paragraph(
-                &blockquote_prefix,
+                &format!("{blockquote_prefix}{blockquote_indent}"),
                 &blockquote_buffer,
                 options.wrap_width,
             ));
@@ -193,7 +200,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
     if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
         result.push_str(&wrap_blockquote_paragraph(
-            &blockquote_prefix,
+            &format!("{blockquote_prefix}{blockquote_indent}"),
             &blockquote_buffer,
             options.wrap_width,
         ));

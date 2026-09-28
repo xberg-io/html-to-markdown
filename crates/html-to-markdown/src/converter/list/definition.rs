@@ -44,8 +44,9 @@ pub fn handle_dl(
     let mut content = String::new();
     let children = tag.children();
     {
+        let dl_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
         for child_handle in children.top().iter() {
-            crate::converter::walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+            crate::converter::walk_node(child_handle, parser, &mut content, options, &dl_ctx, depth + 1, dom_ctx);
         }
     }
 
@@ -83,8 +84,9 @@ pub fn handle_dt(
     let mut content = String::with_capacity(64);
     let children = tag.children();
     {
+        let dt_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
         for child_handle in children.top().iter() {
-            crate::converter::walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+            crate::converter::walk_node(child_handle, parser, &mut content, options, &dt_ctx, depth + 1, dom_ctx);
         }
     }
     let trimmed = content.trim().to_owned();
@@ -166,8 +168,9 @@ pub fn handle_dd(
     let mut content = String::with_capacity(128);
     let children = tag.children();
     {
+        let dd_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
         for child_handle in children.top().iter() {
-            crate::converter::walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+            crate::converter::walk_node(child_handle, parser, &mut content, options, &dd_ctx, depth + 1, dom_ctx);
         }
     }
 

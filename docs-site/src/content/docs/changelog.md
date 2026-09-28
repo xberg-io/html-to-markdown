@@ -48,9 +48,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   item, a block after other content of the item now starts on its own line at the item's content
   column, and text after a block starts its own paragraph at that column. A paragraph or div
   after the item's text is now its own paragraph instead of joining the text, which makes the
-  list loose. Whitespace between the marker and the item's first block no longer counts as
-  content in strict whitespace mode, and with `wrap` a paragraph inside an item keeps its
-  indent. The fast conversion path hands these items to the full converter.
+  list loose. The column is written only while the item is still open, also inside a
+  definition list or a section that the item holds. Whitespace between the marker and the
+  item's first block no longer counts as content in strict whitespace mode, and with `wrap` a
+  paragraph inside an item keeps its indent, also inside a blockquote. The fast conversion
+  path hands these items to the full converter.
 - **Text after a list or table at the end of an inline wrapper continued it (#585).** In
   `<div><span><ul><li>A</li></ul></span>para</div>`, `para` still continued the list's last item,
   because the rule from #570 looked only at the element right before the text. Text after an

@@ -28,7 +28,7 @@ use crate::converter::utility::preprocessing::{
     strip_bogus_comments, strip_hidden_elements, strip_script_and_style_tags,
 };
 use crate::converter::utility::serialization::serialize_tag_to_html;
-use crate::options::{NewlineStyle, OutputFormat};
+use crate::options::{NewlineStyle, OutputFormat, WhitespaceMode};
 
 use crate::converter::handlers::{handle_blockquote, handle_code, handle_graphic, handle_img, handle_link, handle_pre};
 use crate::error::Result;
@@ -455,9 +455,12 @@ fn separate_in_list_item(
     ctx: &Context,
     dom_ctx: &DomContext,
 ) {
+    // ~keep A block that preprocessing drops (a `<nav>`) writes nothing, so it gets no line.
     let starts_block = match node {
-        tl::Node::Tag(_) => dom_ctx.tag_info(node_handle.get_inner(), parser).is_some_and(|info| {
-            is_block_level_element(&info.name) && !matches!(info.name.as_str(), "ul" | "ol" | "li")
+        tl::Node::Tag(tag) => dom_ctx.tag_info(node_handle.get_inner(), parser).is_some_and(|info| {
+            is_block_level_element(&info.name)
+                && !matches!(info.name.as_str(), "ul" | "ol" | "li")
+                && !should_drop_for_preprocessing(&info.name, tag, options)
         }),
         _ => false,
     };
@@ -479,6 +482,11 @@ fn separate_in_list_item(
         }
         false
     } else if ends_with_block_line_end(output) && is_inline_content(node, node_handle, parser, dom_ctx) {
+        // ~keep In strict whitespace mode a text that starts with a line break writes that break
+        // ~keep itself, which would end the blank line's indent; it stays a continuation line.
+        if options.whitespace_mode == WhitespaceMode::Strict && starts_with_line_break(node) {
+            return;
+        }
         match crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx) {
             Some(block) => !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
             None => return,
@@ -486,7 +494,7 @@ fn separate_in_list_item(
     } else {
         return;
     };
-    if !crate::converter::list::utils::item_is_open(output, &indent) {
+    if !crate::converter::list::utils::item_is_open(output, &indent, ctx) {
         return;
     }
     trim_trailing_whitespace(output);
@@ -497,6 +505,14 @@ fn separate_in_list_item(
         output.push('\n');
     }
     output.push_str(&indent);
+}
+
+/// Whether `node` is a text whose leading whitespace holds a line break.
+fn starts_with_line_break(node: &tl::Node) -> bool {
+    match node {
+        tl::Node::Raw(bytes) => bytes.as_utf8_str().trim_start_matches([' ', '\t']).starts_with(['\n', '\r']),
+        _ => false,
+    }
 }
 
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since

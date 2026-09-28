@@ -393,20 +393,34 @@ pub fn line_is_bare_list_marker(output: &str) -> bool {
     false
 }
 
-/// Whether the list item that `output` ends inside is still open: the last non-blank line starts
-/// at the item's content column (`indent`), is the item's marker line, or is the buffer's first
-/// line (a task item renders into a buffer of its own).
+/// Whether the list item that `output` ends inside is still open: the item was open where this
+/// buffer is written (`ctx.list_item_open`), and the last non-blank line starts at the item's
+/// content column (`indent`), is the item's marker line, or is the buffer's first line (a task
+/// item and an inline wrapper render into a buffer that continues the item's line).
 ///
 /// ~keep A line at a shallower column is a block that already left the item. Writing the
 /// ~keep content column after it opens an indented code block once the column is 4 or more
 /// ~keep (issue #583).
-pub fn item_is_open(output: &str, indent: &str) -> bool {
+pub fn item_is_open(output: &str, indent: &str, ctx: &Context) -> bool {
+    if !ctx.list_item_open {
+        return false;
+    }
     let mut lines = output.rsplit('\n').filter(|line| !line.trim().is_empty()).peekable();
     let Some(line) = lines.next() else { return true };
     if lines.peek().is_none() || (!indent.is_empty() && line.starts_with(indent)) {
         return true;
     }
     strip_leading_bare_marker(line.trim_start_matches([' ', '\t'])).is_some()
+}
+
+/// The context for the children of a container that renders them into a buffer of its own and
+/// writes that buffer after `output`: they see whether the list item is still open there.
+pub fn nested_block_context(output: &str, ctx: &Context, options: &ConversionOptions) -> Context {
+    let indent = continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options).unwrap_or_default();
+    Context {
+        list_item_open: item_is_open(output, &indent, ctx),
+        ..ctx.clone()
+    }
 }
 
 /// Trim whitespace that follows a bare list marker at the end of `output` back to the marker's
@@ -439,7 +453,7 @@ pub fn start_block_in_list_item(output: &mut String, ctx: &Context, options: &Co
         return;
     }
     let indent = continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options).unwrap_or_default();
-    if item_is_open(output, &indent) {
+    if item_is_open(output, &indent, ctx) {
         add_list_continuation_indent(output, ctx.list_depth, ctx.list_indent_columns, true, options);
     } else {
         trim_trailing_whitespace(output);

@@ -336,12 +336,10 @@ fn should_leave_no_blank_line_for_an_empty_div_in_a_list_item() {
 
 #[test]
 fn should_agree_across_tiers_on_other_block_kinds_that_end_the_item() {
-    // ~keep These kinds reach the fast path's catch-all block arm; text after them reaches the
-    // ~keep inline-after-block hand-off instead, so they also end the item here.
+    // ~keep This kind reaches the fast path's catch-all block arm; text after it reaches the
+    // ~keep inline-after-block hand-off instead, so it also ends the item here.
     for html in [
-        "<ul><li>X<dd>A</dd></li></ul>",
         "<ul><li>X<figcaption>A</figcaption></li></ul>",
-        "<ul><li>X<dd>A</dd>ZZ</li></ul>",
         "<ul><li>X<figcaption>A</figcaption>ZZ</li></ul>",
     ] {
         if let Some(tier1_out) = tier1(html) {
@@ -483,4 +481,97 @@ fn should_keep_a_block_that_starts_the_item_on_the_fast_path() {
     // ~keep The full converter writes nothing new for a block at the item's marker line.
     let html = "<ul><li><dt>t</dt></li></ul>";
     assert!(tier1(html).is_some(), "Tier 1 handed {html:?} to Tier 2");
+}
+
+#[test]
+fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ended() {
+    let tabs = ConversionOptions {
+        list_indent_type: ListIndentType::Tabs,
+        ..tier2_options()
+    };
+    let wrap = ConversionOptions {
+        wrap: true,
+        ..tier2_options()
+    };
+    // ~keep A rule at a bare marker ends the item, and a figure is written at the start of the
+    // ~keep line: nothing rendered inside a container after either may get the column.
+    for (html, options) in [
+        (
+            r#"<ol start="10"><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
+            tier2_options(),
+        ),
+        (
+            r#"<ol start="10"><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
+            wrap,
+        ),
+        ("<ul><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ul>", tabs.clone()),
+        (r#"<ol start="10"><li>X<figure><p>a</p><hr></figure></li></ol>"#, tier2_options()),
+        (r#"<ol start="10"><li>X<details><p>a</p><hr></details></li></ol>"#, tier2_options()),
+    ] {
+        let out = convert_with(html, options);
+        let rendered = render(&out);
+        assert!(
+            !rendered.contains("<pre>") && rendered.ends_with("<hr />\n"),
+            "{html:?}: the rule was lost inside the container: {out:?} renders {rendered:?}"
+        );
+    }
+    // ~keep A list inside an inline wrapper is not a list once the wrapper's markers are added,
+    // ~keep so nothing in it gets a column that a tab would turn into a code block.
+    let out = convert_with("<b><ul><li>x<dl><dd><hr></dd></dl></li></ul></b>", tabs);
+    assert_eq!(out, "**- x\n\n---**\n", "the rule in the wrapped list got the column");
+    // ~keep While the item is open, a container's blocks stay at the column.
+    let out = tier2(r#"<ol start="10"><li>A<dl><dt>T</dt><dd><p>x</p><hr></dd></dl></li></ol>"#);
+    assert!(
+        render(&out).ends_with("<hr />\n</li>\n</ol>\n"),
+        "the definition's rule left the open item: {out:?}"
+    );
+}
+
+#[test]
+fn should_keep_a_rule_after_a_line_break_at_the_marker_a_rule() {
+    for (html, options) in [
+        (r#"<ol start="10"><li><br><hr>ZZ</li></ol>"#, tier2_options()),
+        (
+            "<ul><li><br><hr>ZZ</li></ul>",
+            ConversionOptions {
+                list_indent_type: ListIndentType::Tabs,
+                ..tier2_options()
+            },
+        ),
+    ] {
+        let out = convert_with(html, options);
+        let rendered = render(&out);
+        assert!(
+            rendered.contains("<hr />") && !rendered.contains("<pre><code>---"),
+            "{html:?}: the rule became a code block: {out:?} renders {rendered:?}"
+        );
+    }
+}
+
+#[test]
+fn should_leave_strict_text_that_starts_with_a_line_break_as_a_continuation_line() {
+    let strict = ConversionOptions {
+        whitespace_mode: WhitespaceMode::Strict,
+        ..tier2_options()
+    };
+    let out = convert_with("<ul><li>X<nav>A</nav>\nZZ</li></ul>", strict);
+    assert_eq!(
+        render(&out),
+        "<ul>\n<li>X\nZZ</li>\n</ul>\n",
+        "strict: the text left the item: {out:?}"
+    );
+}
+
+#[test]
+fn should_keep_a_paragraph_in_its_item_when_wrapping_inside_a_quote() {
+    let wrap = ConversionOptions {
+        wrap: true,
+        ..tier2_options()
+    };
+    let out = convert_with("<blockquote><ul><li>x<p>t<hr>B</p></li></ul></blockquote>", wrap);
+    let rendered = render(&out);
+    assert!(
+        rendered.contains("<p>t</p>\n</li>"),
+        "wrap: the paragraph left the item inside the quote: {out:?} renders {rendered:?}"
+    );
 }

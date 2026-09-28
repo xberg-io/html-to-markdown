@@ -52,8 +52,9 @@ pub fn handle(
         let mut content = String::with_capacity(256);
         let children = tag.children();
         {
+            let section_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
             for child_handle in children.top().iter() {
-                super::walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+                super::walk_node(child_handle, parser, &mut content, options, &section_ctx, depth + 1, dom_ctx);
             }
         }
 

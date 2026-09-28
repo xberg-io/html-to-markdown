@@ -72,16 +72,17 @@ pub fn handle(
     }
 
     // ~keep A rule after other content of a list item starts at the item's content column, or
-    // ~keep it ends the list (issue #583).
+    // ~keep it ends the list (issue #583). Whitespace after a bare marker (a `<br>` there) is
+    // ~keep not content: the rule then follows the marker like a rule at the marker.
     let list_indent = if ctx.in_list_item
         && ctx.blockquote_depth == 0
         && !ctx.convert_as_inline
         && !ctx.in_table_cell
         && !output.is_empty()
-        && !crate::converter::list::utils::line_is_bare_list_marker(output)
+        && !crate::converter::list::utils::trim_whitespace_after_bare_marker(output)
     {
         crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
-            .filter(|indent| crate::converter::list::utils::item_is_open(output, indent))
+            .filter(|indent| crate::converter::list::utils::item_is_open(output, indent, ctx))
     } else {
         None
     };

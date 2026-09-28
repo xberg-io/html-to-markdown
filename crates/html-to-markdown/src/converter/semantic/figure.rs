@@ -136,13 +136,19 @@ pub fn handle_figure(
         let mut figure_content = String::new();
         let children = tag.children();
         {
+            // ~keep The figure is written at the start of the line, so inside it the list item
+            // ~keep has ended (issue #583).
+            let figure_ctx = super::Context {
+                list_item_open: false,
+                ..ctx.clone()
+            };
             for child_handle in children.top().iter() {
                 super::walk_node(
                     child_handle,
                     parser,
                     &mut figure_content,
                     options,
-                    ctx,
+                    &figure_ctx,
                     depth + 1,
                     dom_ctx,
                 );
