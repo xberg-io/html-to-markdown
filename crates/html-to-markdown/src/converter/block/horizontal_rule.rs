@@ -88,11 +88,12 @@ pub fn handle(
             .rsplit('\n')
             .find(|line| !line.trim().is_empty())
             .is_some_and(|line| line.trim_start().starts_with('>'));
-        let needs_blank_line = !ctx.in_paragraph && !matches!(prev_tag, Some("blockquote")) && !last_line_is_blockquote;
+        // ~keep Inside a paragraph too: `---` on the line under text is a setext heading underline.
+        let needs_blank_line = !matches!(prev_tag, Some("blockquote")) && !last_line_is_blockquote;
 
         if matches!(prev_tag, Some("blockquote")) && output.ends_with("\n\n") {
             output.truncate(output.len() - 1);
-        } else if ctx.in_paragraph || !needs_blank_line {
+        } else if !needs_blank_line {
             if !output.ends_with('\n') {
                 output.push('\n');
             }
@@ -111,4 +112,12 @@ pub fn handle(
         output.push_str(&indent);
     }
     output.push_str("---\n");
+}
+
+/// Write a blank line before a container's `content` when it starts with a rule and `output` ends
+/// in text. The container rendered the rule into its own buffer, so the rule saw no text before it.
+pub fn separate_leading_rule(output: &mut String, content: &str) {
+    if content.split('\n').next() == Some("---") && !output.is_empty() && !output.ends_with("\n\n") {
+        output.push_str(if output.ends_with('\n') { "\n" } else { "\n\n" });
+    }
 }

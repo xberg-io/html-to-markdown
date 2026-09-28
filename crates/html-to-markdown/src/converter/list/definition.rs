@@ -147,6 +147,7 @@ pub fn handle_dt(
     if ctx.convert_as_inline {
         output.push_str(&trimmed);
     } else {
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed);
         output.push_str(&trimmed);
         output.push('\n');
     }
@@ -234,6 +235,7 @@ pub fn handle_dd(
     if ctx.convert_as_inline {
         output.push_str(&trimmed);
     } else {
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed);
         output.push_str(&trimmed);
         output.push_str("\n\n");
     }
