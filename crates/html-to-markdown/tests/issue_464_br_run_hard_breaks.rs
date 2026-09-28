@@ -206,9 +206,10 @@ fn should_drop_a_trailing_br_at_the_end_of_a_container_block() {
 
 #[test]
 fn should_drop_a_br_before_a_block_nested_inside_a_list_item() {
+    // ~keep The paragraph after the item's text is its own paragraph in the item (issue #583).
     assert_eq!(
         convert("<ul><li>A<br><p>B</p></li></ul>", backslash_options()),
-        "- A\n  B\n"
+        "- A\n\n  B\n"
     );
 }
 

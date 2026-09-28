@@ -72,6 +72,12 @@ pub fn handle(
     }
 
     let content_start_pos = output.len();
+    // ~keep An empty div in a list item leaves the item as it found it (issue #583): its list
+    // ~keep separator trims the line end, so the trimmed tail is kept to put back.
+    let kept = ctx.in_list_item.then(|| {
+        let kept_len = output.trim_end_matches([' ', '\t']).len();
+        (kept_len, output[kept_len..].to_string())
+    });
 
     // ~keep A plain suffix check like `output.ends_with("* ")` also matches the closing
     // ~keep "**"/"*" of `<strong>`/`<em>` immediately followed by a migrated trailing
@@ -110,6 +116,7 @@ pub fn handle(
     // ~keep start of this div's line, in this div's buffer" from an inline wrapper's empty
     // ~keep scratch buffer. Without it a whitespace-only `<span>` opening a `<div>` was pushed
     // ~keep verbatim and `<span>    </span><img>` became an indented code block (issue #501).
+    let children_start = output.len();
     let div_ctx = Context {
         block_content_start: output.len(),
         block_output_ptr: std::ptr::from_ref::<String>(output) as usize,
@@ -131,6 +138,10 @@ pub fn handle(
         strip_trailing_backslash_breaks(output, content_start_pos);
     }
 
+    if let Some((kept_len, kept_tail)) = kept.filter(|_| output.len() == children_start) {
+        output.truncate(kept_len);
+        output.push_str(&kept_tail);
+    }
     let has_content = output.len() > content_start_pos;
 
     if has_content {

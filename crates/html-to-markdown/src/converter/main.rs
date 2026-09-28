@@ -429,7 +429,7 @@ fn separate_from_block(
         && output.ends_with('\n')
         && !output.ends_with("\n\n")
         && is_inline_content(node, node_handle, parser, dom_ctx)
-        && crate::converter::utility::siblings::previous_content_ends_in_block(node_handle, parser, dom_ctx)
+        && crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx).is_some()
     {
         output.push('\n');
     }
@@ -441,7 +441,9 @@ fn separate_from_block(
 /// ~keep `CommonMark` keeps a block inside a list item only when every line of it starts at the
 /// ~keep item's content column. A block after the item's text starts on a new line at that
 /// ~keep column; each block handler then writes the blank line it needs before itself. Inline
-/// ~keep content after a block starts a paragraph of its own: a blank line, then the column.
+/// ~keep content after a block starts a paragraph of its own: a blank line, then the column. A
+/// ~keep heading is one line that nothing continues, so after it the column alone does, and the
+/// ~keep list stays tight (spec example 300: `- ## Bar\n  baz`).
 /// ~keep A list is left out as the block: it already starts its own line at its own column.
 /// ~keep A lone line break is not a block's last line: the block before it wrote nothing.
 fn separate_in_list_item(
@@ -454,12 +456,17 @@ fn separate_in_list_item(
     dom_ctx: &DomContext,
 ) {
     let starts_block = match node {
-        tl::Node::Tag(_) => dom_ctx
-            .tag_info(node_handle.get_inner(), parser)
-            .is_some_and(|info| is_block_level_element(&info.name) && !matches!(info.name.as_str(), "ul" | "ol" | "li")),
+        tl::Node::Tag(_) => dom_ctx.tag_info(node_handle.get_inner(), parser).is_some_and(|info| {
+            is_block_level_element(&info.name) && !matches!(info.name.as_str(), "ul" | "ol" | "li")
+        }),
         _ => false,
     };
     let blank_line = if starts_block {
+        // ~keep A hard break right before a block is dropped here too, since the line end
+        // ~keep written below would hide it from the dispatch strip in `walk_node`.
+        if options.newline_style == NewlineStyle::Backslash {
+            strip_trailing_backslash_breaks(output, ctx.block_content_start);
+        }
         let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
         let line = &output[line_start..];
         let after_content = line.is_empty()
@@ -468,11 +475,11 @@ fn separate_in_list_item(
             return;
         }
         false
-    } else if output.ends_with('\n')
-        && is_inline_content(node, node_handle, parser, dom_ctx)
-        && crate::converter::utility::siblings::previous_content_ends_in_block(node_handle, parser, dom_ctx)
-    {
-        true
+    } else if output.ends_with('\n') && is_inline_content(node, node_handle, parser, dom_ctx) {
+        match crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx) {
+            Some(block) => !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
+            None => return,
+        }
     } else {
         return;
     };

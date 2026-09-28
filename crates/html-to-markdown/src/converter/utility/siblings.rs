@@ -51,51 +51,52 @@ pub fn get_previous_sibling_tag<'a>(
     None
 }
 
-/// Whether the content before `node_handle` in its parent ends with a block element: the
-/// previous sibling is a block, or an inline element whose own last content ends with one
+/// The block element the content before `node_handle` in its parent ends with: the previous
+/// sibling when it is a block, or the block an inline sibling's own last content ends with
 /// (`<span><ul>...</ul></span>`). Whitespace text and comments are skipped (issue #585).
 #[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn previous_content_ends_in_block(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+pub fn previous_content_block<'a>(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    dom_ctx: &'a DomContext,
+) -> Option<&'a str> {
     let id = node_handle.get_inner();
     let siblings = match dom_ctx.parent_of(id) {
         Some(parent_id) => match dom_ctx.children_of(parent_id) {
             Some(children) => children.as_slice(),
-            None => return false,
+            None => return None,
         },
         None => dom_ctx.root_children.as_slice(),
     };
-    let Some(position) = dom_ctx
+    let position = dom_ctx
         .sibling_index(id)
-        .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))
-    else {
-        return false;
-    };
+        .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))?;
     let mut nodes = &siblings[..position.min(siblings.len())];
     // ~keep A loop rather than recursion: nested inline wrappers are attacker-controlled depth.
     'outer: loop {
         for sibling in nodes.iter().rev() {
             if let Some(info) = dom_ctx.tag_info(sibling.get_inner(), parser) {
                 if crate::converter::utility::content::is_block_level_element(&info.name) {
-                    return true;
+                    return Some(info.name.as_str());
                 }
                 if !crate::converter::main_helpers::is_inline_element(&info.name) {
-                    return false;
+                    return None;
                 }
                 match dom_ctx.children_of(sibling.get_inner()) {
                     Some(children) => {
                         nodes = children.as_slice();
                         continue 'outer;
                     }
-                    None => return false,
+                    None => return None,
                 }
             }
             if let Some(tl::Node::Raw(raw)) = sibling.get(parser) {
                 if !raw.as_utf8_str().trim().is_empty() {
-                    return false;
+                    return None;
                 }
             }
         }
-        return false;
+        return None;
     }
 }
 

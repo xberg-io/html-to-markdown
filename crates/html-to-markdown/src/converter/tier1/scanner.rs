@@ -421,6 +421,11 @@ pub fn scan(
                     let attrs_end = if close.1 { close.0.saturating_sub(1) } else { close.0 };
                     let skip_attrs = parse::collect_attrs(bytes, name_end, attrs_end);
                     if should_skip_preprocessing(name_lower, &skip_attrs, options) {
+                        // ~keep Tier-2 still sees the dropped block between two parts of a list
+                        // ~keep item (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
+                        if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
+                            return Err(BailReason::ListItemUnsupportedBlockChild);
+                        }
                         let open_end = close.0 + 1;
                         if close.1 {
                             pos = open_end;
@@ -571,8 +576,9 @@ pub fn scan(
                 }
 
                 // ~keep See `BailReason::ListItemUnsupportedBlockChild`'s doc comment for the
-                // full root-cause writeup. `<blockquote>`/`<div>`/`<table>`/`<dl>` bail
-                // unconditionally inside a list item (any position); `<p>` bails only as
+                // full root-cause writeup. `<blockquote>`, `<div>` and every other generic
+                // block container, `<table>`, `<dl>` and headings bail unconditionally
+                // inside a list item (any position); `<p>` bails only as
                 // a continuation of already-started text (its bare-marker/first-content
                 // shape is already correct); `<pre>` bails only as bare-marker/first
                 // content (its continuation shape is already correct).
@@ -580,11 +586,13 @@ pub fn scan(
                     let bare_marker_line = line_is_bare_list_marker(&state.output);
                     let bails = match spec.kind {
                         TagKind::Blockquote | TagKind::Table | TagKind::Heading(_) => true,
-                        TagKind::Block => name_lower == b"div",
-                        TagKind::List(ListKind::Definition) => true,
+                        TagKind::Block | TagKind::List(ListKind::Definition) => true,
                         TagKind::Paragraph => !bare_marker_line,
                         TagKind::Pre => bare_marker_line,
-                        _ => false,
+                        TagKind::List(_) | TagKind::ListItem => false,
+                        // ~keep Any other block, even one whose content is dropped (`<nav>`):
+                        // ~keep Tier-2 starts it, or the text after it, at the content column.
+                        _ => is_block_tag(name_lower),
                     };
                     if bails {
                         return Err(BailReason::ListItemUnsupportedBlockChild);
@@ -2250,8 +2258,7 @@ fn emit_close(
         TagKind::RawText(_) | TagKind::Ignored => {}
     }
     // ~keep An inline element whose last content is a block ends in that block too (issue #585).
-    state.last_closed_block =
-        is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
+    state.last_closed_block = is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
 
     Ok(())
 }

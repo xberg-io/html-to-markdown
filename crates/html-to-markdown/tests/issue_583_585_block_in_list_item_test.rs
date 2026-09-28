@@ -16,6 +16,8 @@ use html_to_markdown_rs::options::ListIndentType;
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
 
+const QUOTE_IN_ITEM: &str = "- A\n  > q\n  >\n  > ### H\n  >   r\n  >\n  >   ```\n  >   c\n  >   ```\n  >\n  > s\n";
+
 const GFM_TABLE: &str = "<table><tr><th>h</th></tr><tr><td>c</td></tr></table>";
 
 const LAYOUT_TABLE: &str = r#"<table><tr><td><a href="1">a</a> <a href="2">b</a></td></tr></table>"#;
@@ -39,7 +41,10 @@ const BLOCKS: [(&str, &str); 11] = [
 const ITEMS: [(&str, &str); 4] = [
     ("<ul><li>A{}tail</li></ul>", "<p>tail</p>\n</li>\n</ul>\n"),
     ("<ol><li>A{}tail</li></ol>", "<p>tail</p>\n</li>\n</ol>\n"),
-    ("<ul><li>X<ul><li>A{}tail</li></ul></li></ul>", "<p>tail</p>\n</li>\n</ul>\n</li>\n</ul>\n"),
+    (
+        "<ul><li>X<ul><li>A{}tail</li></ul></li></ul>",
+        "<p>tail</p>\n</li>\n</ul>\n</li>\n</ul>\n",
+    ),
     ("<ul><li><div>A{}tail</div></li></ul>", "<p>tail</p>\n</li>\n</ul>\n"),
 ];
 
@@ -78,29 +83,41 @@ fn render(markdown: &str) -> String {
     comrak::markdown_to_html(markdown, &options)
 }
 
-/// Whether the rendered item holds the block and the text after it, in that order.
+/// Whether the rendered item holds the block and the text after it, in that order. After a
+/// heading the list stays tight, so the text is not wrapped in a paragraph.
 fn keeps_block_and_text_in_item(rendered: &str, block: &str, item_end: &str) -> bool {
-    rendered.ends_with(item_end)
-        && rendered
-            .find(block)
-            .is_some_and(|at| at < rendered.len() - item_end.len())
+    let tight_end = item_end.replacen("<p>tail</p>\n", "tail", 1);
+    let end = if rendered.ends_with(item_end) {
+        item_end.len()
+    } else if rendered.ends_with(&tight_end) {
+        tight_end.len()
+    } else {
+        return false;
+    };
+    rendered.find(block).is_some_and(|at| at < rendered.len() - end)
 }
 
 #[test]
 fn should_render_the_heading_on_its_own_line_inside_the_item() {
     let out = tier2("<ul><li>A<h3>H</h3>tail</li></ul>");
-    assert_eq!(out, "- A\n  ### H\n\n  tail\n", "the heading must start at the content column");
     assert_eq!(
-        render(&out),
-        "<ul>\n<li>\n<p>A</p>\n<h3>H</h3>\n<p>tail</p>\n</li>\n</ul>\n"
+        out, "- A\n  ### H\n  tail\n",
+        "the heading must start at the content column"
     );
+    assert_eq!(render(&out), "<ul>\n<li>A\n<h3>H</h3>\ntail</li>\n</ul>\n");
 }
 
 #[test]
 fn should_keep_a_rule_and_the_text_after_it_inside_the_item() {
     let out = tier2("<ul><li>A<hr>tail</li></ul>");
-    assert_eq!(out, "- A\n\n  ---\n\n  tail\n", "the rule must start at the content column");
-    assert_eq!(render(&out), "<ul>\n<li>\n<p>A</p>\n<hr />\n<p>tail</p>\n</li>\n</ul>\n");
+    assert_eq!(
+        out, "- A\n\n  ---\n\n  tail\n",
+        "the rule must start at the content column"
+    );
+    assert_eq!(
+        render(&out),
+        "<ul>\n<li>\n<p>A</p>\n<hr />\n<p>tail</p>\n</li>\n</ul>\n"
+    );
 }
 
 #[test]
@@ -160,7 +177,11 @@ fn should_agree_across_tiers_or_leave_the_item_to_tier2() {
             }
         }
     }
-    assert!(failures.is_empty(), "Tier 1 must match Tier 2:\n{}", failures.join("\n"));
+    assert!(
+        failures.is_empty(),
+        "Tier 1 must match Tier 2:\n{}",
+        failures.join("\n")
+    );
 }
 
 #[test]
@@ -190,11 +211,26 @@ fn should_leave_text_between_the_items_of_a_nested_list_alone() {
 
 /// Wrappers around a block, then the text after the wrapper, with the rendered block end.
 const WRAPPED: [(&str, &str); 6] = [
-    ("<div><span><ul><li>A</li></ul></span>para</div>", "</ul>\n<p>para</p>\n"),
-    ("<div><span><span><ul><li>A</li></ul></span></span>para</div>", "</ul>\n<p>para</p>\n"),
-    ("<div><span><ul><li>A</li></ul> </span><span>para</span></div>", "</ul>\n<p>para</p>\n"),
-    ("<span><ul><li>A</li></ul></span><b>para</b>", "</ul>\n<p><strong>para</strong></p>\n"),
-    ("<div><span><table><tr><th>h</th></tr><tr><td>c</td></tr></table></span>para</div>", "</table>\n<p>para</p>\n"),
+    (
+        "<div><span><ul><li>A</li></ul></span>para</div>",
+        "</ul>\n<p>para</p>\n",
+    ),
+    (
+        "<div><span><span><ul><li>A</li></ul></span></span>para</div>",
+        "</ul>\n<p>para</p>\n",
+    ),
+    (
+        "<div><span><ul><li>A</li></ul> </span><span>para</span></div>",
+        "</ul>\n<p>para</p>\n",
+    ),
+    (
+        "<span><ul><li>A</li></ul></span><b>para</b>",
+        "</ul>\n<p><strong>para</strong></p>\n",
+    ),
+    (
+        "<div><span><table><tr><th>h</th></tr><tr><td>c</td></tr></table></span>para</div>",
+        "</table>\n<p>para</p>\n",
+    ),
     ("<div><span><hr></span>para</div>", "<hr />\n<p>para</p>\n"),
 ];
 
@@ -218,5 +254,61 @@ fn should_not_separate_text_that_continues_the_wrapper_after_its_block() {
     let html = "<div><span><ul><li>A</li></ul>x</span>para</div>";
     let out = tier2(html);
     assert_eq!(out, "- A\n\nxpara\n");
-    assert_eq!(tier1(html).as_deref(), Some("- A\n\nxpara\n"), "Tier 1 must match on {html:?}");
+    assert_eq!(
+        tier1(html).as_deref(),
+        Some("- A\n\nxpara\n"),
+        "Tier 1 must match on {html:?}"
+    );
+}
+
+#[test]
+fn should_agree_across_tiers_on_a_block_that_ends_the_item() {
+    let mut failures = Vec::new();
+    for (block, _) in BLOCKS {
+        let html = format!("<ul><li>A{block}</li></ul>");
+        if let Some(tier1_out) = tier1(&html) {
+            let tier2_out = tier2(&html);
+            if tier1_out != tier2_out {
+                failures.push(format!("{html:?}: tier1 {tier1_out:?} vs tier2 {tier2_out:?}"));
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "Tier 1 must match Tier 2:\n{}",
+        failures.join("\n")
+    );
+}
+
+#[test]
+fn should_leave_blocks_inside_a_quote_in_a_list_item_to_the_quote() {
+    // ~keep The quote renders its content on its own and prefixes each line afterwards, so the
+    // ~keep list item's content column is written once, outside the quote marker.
+    let html = "<ul><li>A<blockquote><p>q</p><h3>H</h3>r<pre>c</pre>s</blockquote></li></ul>";
+    let out = tier2(html);
+    assert_eq!(out, QUOTE_IN_ITEM, "the quote content changed");
+    assert!(
+        render(&out).ends_with("<p>r</p>\n<pre><code>c\n</code></pre>\n<p>s</p>\n</blockquote>\n</li>\n</ul>\n"),
+        "the quote must keep its blocks inside the item: {:?}",
+        render(&out)
+    );
+}
+
+#[test]
+fn should_agree_across_tiers_on_a_block_container_whose_content_is_dropped() {
+    // ~keep `<nav>` content is dropped, but it is still a block between the two texts.
+    for html in [
+        "<ul><li>X<nav>A</nav>ZZ</li></ul>",
+        "<ul><li>X<section>A</section></li></ul>",
+    ] {
+        if let Some(tier1_out) = tier1(html) {
+            assert_eq!(tier1_out, tier2(html), "Tier 1 must match Tier 2 on {html:?}");
+        }
+    }
+}
+
+#[test]
+fn should_leave_no_blank_line_for_an_empty_div_in_a_list_item() {
+    let html = "<ul><li>X<div></div>ZZ</li></ul>";
+    assert_eq!(tier2(html), "- X\n  ZZ\n", "{html:?}");
 }
