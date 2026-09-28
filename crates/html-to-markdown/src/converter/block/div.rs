@@ -94,7 +94,13 @@ pub fn handle(
     if is_table_continuation {
         emit_table_cell_break(output, options.br_in_tables);
     } else if is_list_continuation {
-        add_list_continuation_indent(output, ctx.list_depth, false, options);
+        crate::converter::list::utils::add_list_continuation_indent(
+            output,
+            ctx.list_depth,
+            ctx.list_indent_columns,
+            true,
+            options,
+        );
     } else if needs_leading_sep {
         trim_trailing_whitespace(output);
         output.push_str("\n\n");
@@ -155,21 +161,5 @@ pub fn handle(
                 output.push_str("\n\n");
             }
         }
-    }
-}
-
-/// Helper function to add list continuation indentation
-fn add_list_continuation_indent(
-    output: &mut String,
-    list_depth: usize,
-    _block_level: bool,
-    _options: &ConversionOptions,
-) {
-    if !output.ends_with('\n') {
-        output.push('\n');
-    }
-
-    for _ in 0..list_depth {
-        output.push_str("  ");
     }
 }

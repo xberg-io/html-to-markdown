@@ -579,7 +579,7 @@ pub fn scan(
                 if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
                     let bare_marker_line = line_is_bare_list_marker(&state.output);
                     let bails = match spec.kind {
-                        TagKind::Blockquote | TagKind::Table => true,
+                        TagKind::Blockquote | TagKind::Table | TagKind::Heading(_) => true,
                         TagKind::Block => name_lower == b"div",
                         TagKind::List(ListKind::Definition) => true,
                         TagKind::Paragraph => !bare_marker_line,
@@ -1106,7 +1106,7 @@ fn emit_open(
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
-        separate_inline_after_block(state);
+        separate_inline_after_block(state)?;
     }
 
     // ~keep Tier-2 wraps these in markers this scanner has no arm for, so emitting them as
@@ -1764,12 +1764,17 @@ fn emit_void(
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
-        separate_inline_after_block(state);
+        separate_inline_after_block(state)?;
     }
     state.last_closed_block = is_block_tag(name_lower);
 
     match spec.kind {
         TagKind::Hr => {
+            // ~keep Tier-2 starts a rule inside a list item at the item's content column
+            // ~keep (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
+            if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
+                return Err(BailReason::ListItemUnsupportedBlockChild);
+            }
             {
                 let dest = state.cell_or_output_mut();
                 if !dest.is_empty() && !dest.ends_with("\n\n") {
@@ -2244,7 +2249,9 @@ fn emit_close(
         TagKind::LineBreak | TagKind::Image => {}
         TagKind::RawText(_) | TagKind::Ignored => {}
     }
-    state.last_closed_block = is_block_tag(name_lower);
+    // ~keep An inline element whose last content is a block ends in that block too (issue #585).
+    state.last_closed_block =
+        is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
 
     Ok(())
 }
@@ -3871,16 +3878,25 @@ fn output_ends_with_inline_text(output: &str) -> bool {
 
 /// Start a new paragraph for inline content that directly follows a block whose output ends with
 /// a single line break (a list, a table, `<hr>`), so it does not continue the block's last line
-/// (issues #570, #571). Mirrors Tier-2's `continues_block_last_line` in `walk_node`.
-fn separate_inline_after_block(state: &mut Tier1State) {
+/// (issues #570, #571). Mirrors Tier-2's `separate_from_block` in `walk_node`.
+fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason> {
     // ~keep `<pre>` sets the CODE bit too, so one test covers code spans and code blocks.
-    if state.in_table_cell() || state.list_depth > 0 || state.escape_ctx.contains(EscapeCtx::CODE) {
-        return;
+    if state.in_table_cell() || state.escape_ctx.contains(EscapeCtx::CODE) {
+        return Ok(());
+    }
+    // ~keep Inside a list item Tier-2 starts it at the item's content column after a blank
+    // ~keep line (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
+    if state.list_continuation_indent_width() > 0 {
+        return Err(BailReason::ListItemUnsupportedBlockChild);
+    }
+    if state.list_depth > 0 {
+        return Ok(());
     }
     let dest = state.cell_or_output_mut();
     if dest.len() > 1 && dest.ends_with('\n') && !dest.ends_with("\n\n") {
         dest.push('\n');
     }
+    Ok(())
 }
 
 /// Tier-2's inline-element test, which decides what counts as inline content after a block.
@@ -3945,7 +3961,7 @@ fn flush_text(
 
     // ~keep Whitespace-only text between a block and the content after it keeps the window open.
     if !raw.trim().is_empty() && std::mem::take(&mut state.last_closed_block) {
-        separate_inline_after_block(state);
+        separate_inline_after_block(state)?;
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);

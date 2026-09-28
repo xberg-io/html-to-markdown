@@ -21,7 +21,7 @@ pub fn handle(
     node_handle: &NodeHandle,
     parser: &Parser,
     output: &mut String,
-    _options: &crate::options::ConversionOptions,
+    options: &crate::options::ConversionOptions,
     ctx: &Context,
     depth: usize,
     dom_ctx: &DomContext,
@@ -71,6 +71,17 @@ pub fn handle(
         }
     }
 
+    // ~keep A rule after other content of a list item starts at the item's content column, or
+    // ~keep it ends the list (issue #583).
+    let list_indent = if ctx.in_list_item
+        && ctx.blockquote_depth == 0
+        && !output.is_empty()
+        && !crate::converter::list::utils::line_is_bare_list_marker(output)
+    {
+        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+    } else {
+        None
+    };
     if !output.is_empty() {
         let prev_tag = get_previous_sibling_tag(node_handle, parser, dom_ctx);
         let last_line_is_blockquote = output
@@ -95,6 +106,9 @@ pub fn handle(
                 output.push_str("\n\n");
             }
         }
+    }
+    if let Some(indent) = list_indent {
+        output.push_str(&indent);
     }
     output.push_str("---\n");
 }

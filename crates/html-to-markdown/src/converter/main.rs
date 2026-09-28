@@ -396,41 +396,117 @@ fn finish_structure_collector(
     }
 }
 
-/// Whether `node` is inline content that directly follows a block sibling whose output ends with
-/// a single line break (issues #570, #571).
+/// Separate `node` from a block that ends right before it, so it does not continue that block's
+/// last line (issues #570, #571, #583, #585).
 ///
 /// ~keep Every block writes its own leading blank line, so a block after a list, a table or a
 /// ~keep rule is separated whatever that block ended with. Inline content writes none, so it
 /// ~keep continued the block's last line: a lazy continuation of the last list item, or one more
-/// ~keep table row. In HTML, inline content after a block starts a block of its own. The output
-/// ~keep check runs first, so the sibling lookup only happens right after such a line break.
-/// ~keep List items are left out: their continuation lines are indented by other rules. A lone line
-/// ~keep break is not a block's last line: the block before it wrote nothing. A hard break the block
-/// ~keep ended with (`<li>A<br></li>`) is still that block's last line, so it gets the blank line too.
-fn continues_block_last_line(
+/// ~keep table row. In HTML, inline content after a block starts a block of its own, also when
+/// ~keep the block sits at the end of an inline wrapper (`<span><ul>...</ul></span>text`).
+/// ~keep Inside a list item the same holds, and `CommonMark` keeps a block in the item only when
+/// ~keep its lines start at the item's content column: see `separate_in_list_item`.
+fn separate_from_block(
     node: &tl::Node,
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
-    output: &str,
+    output: &mut String,
+    options: &ConversionOptions,
     ctx: &Context,
     dom_ctx: &DomContext,
-) -> bool {
-    if output.len() < 2 || !output.ends_with('\n') || output.ends_with("\n\n") {
-        return false;
+) {
+    if output.len() < 2 || ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code {
+        return;
     }
-    if ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code || ctx.in_list || ctx.in_list_item {
-        return false;
+    if ctx.in_list_item {
+        // ~keep A blockquote renders its children into a scratch buffer that it prefixes
+        // ~keep afterwards, so the item's content column only applies at quote depth 0 (the
+        // ~keep same limit `handlers/blockquote.rs` puts on its own list indent).
+        if ctx.blockquote_depth == 0 && !parent_is_list(node_handle, parser, dom_ctx) {
+            separate_in_list_item(node, node_handle, parser, output, options, ctx, dom_ctx);
+        }
+    } else if !ctx.in_list
+        && output.ends_with('\n')
+        && !output.ends_with("\n\n")
+        && is_inline_content(node, node_handle, parser, dom_ctx)
+        && crate::converter::utility::siblings::previous_content_ends_in_block(node_handle, parser, dom_ctx)
+    {
+        output.push('\n');
     }
-    let is_inline_content = match node {
+}
+
+/// Start `node` at the list item's content column when it is a block after other content of the
+/// item, or inline content after a block of the item (issue #583).
+///
+/// ~keep `CommonMark` keeps a block inside a list item only when every line of it starts at the
+/// ~keep item's content column. A block after the item's text starts on a new line at that
+/// ~keep column; each block handler then writes the blank line it needs before itself. Inline
+/// ~keep content after a block starts a paragraph of its own: a blank line, then the column.
+/// ~keep A list is left out as the block: it already starts its own line at its own column.
+/// ~keep A lone line break is not a block's last line: the block before it wrote nothing.
+fn separate_in_list_item(
+    node: &tl::Node,
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    dom_ctx: &DomContext,
+) {
+    let starts_block = match node {
+        tl::Node::Tag(_) => dom_ctx
+            .tag_info(node_handle.get_inner(), parser)
+            .is_some_and(|info| is_block_level_element(&info.name) && !matches!(info.name.as_str(), "ul" | "ol" | "li")),
+        _ => false,
+    };
+    let blank_line = if starts_block {
+        let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
+        let line = &output[line_start..];
+        let after_content = line.is_empty()
+            || (!line.trim().is_empty() && !crate::converter::list::utils::line_is_bare_list_marker(output));
+        if !after_content {
+            return;
+        }
+        false
+    } else if output.ends_with('\n')
+        && is_inline_content(node, node_handle, parser, dom_ctx)
+        && crate::converter::utility::siblings::previous_content_ends_in_block(node_handle, parser, dom_ctx)
+    {
+        true
+    } else {
+        return;
+    };
+    trim_trailing_whitespace(output);
+    if !output.ends_with('\n') {
+        output.push('\n');
+    }
+    if blank_line && !output.ends_with("\n\n") {
+        output.push('\n');
+    }
+    if let Some(indent) =
+        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+    {
+        output.push_str(&indent);
+    }
+}
+
+/// Whether `node` is inline content: non-blank text or an inline element.
+fn is_inline_content(node: &tl::Node, node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    match node {
         tl::Node::Raw(bytes) => !bytes.as_utf8_str().trim().is_empty(),
         tl::Node::Tag(_) => dom_ctx
             .tag_info(node_handle.get_inner(), parser)
             .is_some_and(|info| is_inline_element(&info.name)),
         tl::Node::Comment(_) => false,
-    };
-    is_inline_content
-        && crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx)
-            .is_some_and(is_block_level_element)
+    }
+}
+
+/// Whether the parent of `node_handle` is a `<ul>` or `<ol>` (text or items between list items).
+fn parent_is_list(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    dom_ctx
+        .parent_of(node_handle.get_inner())
+        .and_then(|parent_id| dom_ctx.tag_info(parent_id, parser))
+        .is_some_and(|info| matches!(info.name.as_str(), "ul" | "ol"))
 }
 
 /// Recursively walk DOM nodes and convert to Markdown.
@@ -453,9 +529,7 @@ pub fn walk_node(
         return;
     }
 
-    if continues_block_last_line(node, node_handle, parser, output, ctx, dom_ctx) {
-        output.push('\n');
-    }
+    separate_from_block(node, node_handle, parser, output, options, ctx, dom_ctx);
 
     match node {
         tl::Node::Raw(bytes) => {
