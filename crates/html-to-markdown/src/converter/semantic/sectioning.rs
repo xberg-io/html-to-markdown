@@ -87,7 +87,7 @@ pub fn handle(
             output.push_str("\n\n");
         }
 
-        crate::converter::block::horizontal_rule::separate_leading_rule(output, &content);
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, &content, ctx);
         output.push_str(&content);
 
         if content.ends_with('\n') && !content.ends_with("\n\n") {

@@ -84,8 +84,21 @@ pub fn handle_subscript(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
+    let (open, close) = resolve_script_delimiters(options, &options.sub_symbol, '~');
+    let marker_ctx = Context {
+        text_in_markers: ctx.text_in_markers || !open.is_empty(),
+        ..ctx.clone()
+    };
     for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &marker_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     if ctx.in_code {
@@ -139,7 +152,6 @@ pub fn handle_subscript(
         return;
     }
 
-    let (open, close) = resolve_script_delimiters(options, &options.sub_symbol, '~');
     emit_wrapped_inline(
         output,
         &content,
@@ -184,8 +196,21 @@ pub fn handle_superscript(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
+    let (open, close) = resolve_script_delimiters(options, &options.sup_symbol, '^');
+    let marker_ctx = Context {
+        text_in_markers: ctx.text_in_markers || !open.is_empty(),
+        ..ctx.clone()
+    };
     for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &marker_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     if ctx.in_code {
@@ -239,7 +264,6 @@ pub fn handle_superscript(
         return;
     }
 
-    let (open, close) = resolve_script_delimiters(options, &options.sup_symbol, '^');
     emit_wrapped_inline(
         output,
         &content,
@@ -292,8 +316,20 @@ pub fn handle_variable(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
+    let marker_ctx = Context {
+        text_in_markers: true,
+        ..ctx.clone()
+    };
     for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &marker_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     let marker = options.strong_em_symbol.to_string();
@@ -349,8 +385,20 @@ pub fn handle_definition(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
+    let marker_ctx = Context {
+        text_in_markers: true,
+        ..ctx.clone()
+    };
     for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &marker_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     let marker = options.strong_em_symbol.to_string();

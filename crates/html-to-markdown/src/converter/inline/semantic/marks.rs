@@ -98,14 +98,12 @@ pub fn handle_mark(
 
     use crate::options::HighlightStyle;
     // ~keep Bold highlighting renders its children with `in_strong` set, which suppresses a
-    // ~keep nested `<strong>`'s own markers; every other style walks them unchanged.
-    let child_ctx = if options.highlight_style == HighlightStyle::Bold {
-        Context {
-            in_strong: true,
-            ..ctx.clone()
-        }
-    } else {
-        ctx.clone()
+    // ~keep nested `<strong>`'s own markers. Every style that writes markers renders them as
+    // ~keep marker text (issue #603).
+    let child_ctx = Context {
+        in_strong: ctx.in_strong || options.highlight_style == HighlightStyle::Bold,
+        text_in_markers: ctx.text_in_markers || options.highlight_style != HighlightStyle::None,
+        ..ctx.clone()
     };
     let mut content = String::with_capacity(32);
     let children = tag.children();
@@ -306,8 +304,20 @@ pub fn handle_strikethrough(
     } else {
         let mut content = String::with_capacity(32);
         let children = tag.children();
+        let marker_ctx = Context {
+            text_in_markers: true,
+            ..ctx.clone()
+        };
         for child_handle in children.top().iter() {
-            walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+            walk_node(
+                child_handle,
+                parser,
+                &mut content,
+                options,
+                &marker_ctx,
+                depth + 1,
+                dom_ctx,
+            );
         }
 
         #[cfg(feature = "visitor")]
@@ -400,8 +410,20 @@ pub fn handle_inserted(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
+    let marker_ctx = Context {
+        text_in_markers: true,
+        ..ctx.clone()
+    };
     for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &marker_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     #[cfg(feature = "visitor")]

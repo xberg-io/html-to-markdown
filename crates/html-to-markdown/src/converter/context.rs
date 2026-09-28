@@ -84,9 +84,9 @@ pub struct Context {
     /// ~keep container works that out from its own output before it renders the children, or
     /// ~keep passes false when it writes at the start of the line (issue #583).
     pub(crate) list_item_open: bool,
-    /// Whether the current output buffer is written between inline markers (a summary's `**`,
-    /// a caption's `*`): a list rendered into it is text, not a list, so its items never write
-    /// the content column (issue #583).
+    /// Whether the current output buffer is written between the markers of a block-level or
+    /// marker-only wrapper (a summary's `**`, a caption's `*`, a `<mark>`'s `==`) that does not
+    /// count in `inline_depth`. Read it through [`Self::in_marker_text`].
     pub(crate) text_in_markers: bool,
     /// List nesting depth (for indentation)
     pub(crate) list_depth: usize,
@@ -340,6 +340,13 @@ impl Context {
             measure_width_only: false,
             base_url,
         }
+    }
+
+    /// Whether the current output buffer is written between inline markers: an inline wrapper's
+    /// (`inline_depth`, a link's brackets included) or a summary's or caption's
+    /// (`text_in_markers`). Block syntax written there is text, since the markers cannot span it.
+    pub(crate) const fn in_marker_text(&self) -> bool {
+        self.inline_depth > 0 || self.text_in_markers
     }
 
     /// What to write for an element whose chosen address is `address`, as

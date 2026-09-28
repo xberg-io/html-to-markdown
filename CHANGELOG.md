@@ -52,6 +52,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A rule inside bold, italic, a summary or a caption split the emphasis markers (#603).** The
+  rule was written after a blank line, which ended the paragraph between the markers, so the
+  markers showed as literal text: `<summary>t<hr></summary>` gave `**t\n\n---**`, and a
+  definition list that starts its definition with a rule did the same inside a caption, `<b>` or
+  `<em>`. Markdown has no rule inside emphasis, so the rule is now the text `---` in the running
+  line, as it already was in a link: `**t ---**`. This covers `<b>`, `<strong>`, `<em>`, `<i>`,
+  `<summary>`, `<figcaption>`, a table caption, `<del>`, `<s>`, `<strike>`, `<ins>`, `<mark>`,
+  `<var>`, `<dfn>`, `<q>`, and `<sub>` and `<sup>` when they write a symbol.
+
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition
   reads as ordinary text by the time #527's head search sees it, and that search treated any such
@@ -146,8 +155,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A newline in a head value started a new frontmatter key.** The frontmatter wrote each
   `key: value` line as it was, so a `<title>` or `<meta content>` holding a newline, literal or
   written as `&#10;`, could add or override a key. Each key and value is now one YAML scalar: a
-  value that plain YAML would misread (a newline, `: `, ` #`, a leading `-`, `#` or `@`, a
-  control character) is written in double quotes with YAML escapes. Other values stay unquoted.
+  value that plain YAML would misread (a newline, `: `, a space before `#`, a leading `-`, `#` or
+  `@`, a control character) is written in double quotes with YAML escapes. Other values stay
+  unquoted.
 - **Legacy named references without a semicolon were not decoded.** The spec lets about a hundred
   names such as `&copy`, `&amp` and `&eacute` close without `;`, and browsers decode them in text:
   `&copy 2024` is `© 2024`. The converter kept them as written. They now decode on both tiers,

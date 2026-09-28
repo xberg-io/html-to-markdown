@@ -71,6 +71,12 @@ pub fn handle(
         }
     }
 
+    if ctx.in_marker_text() {
+        join_rule_to_text(output);
+        output.push_str("--- ");
+        return;
+    }
+
     // ~keep A rule after other content of a list item starts at the item's content column, or
     // ~keep it ends the list (issue #583). Whitespace after a bare marker (a `<br>` there) is
     // ~keep not content: the rule then follows the marker like a rule at the marker.
@@ -119,10 +125,30 @@ pub fn handle(
     output.push_str("---\n");
 }
 
+/// Continue the text in `output` with a space for a rule written between inline markers.
+///
+/// ~keep Between markers a rule has no Markdown form, so it is the word `---` in the running line,
+/// ~keep as in a link label. On a line of its own it would end the markers at the blank line
+/// ~keep before it, or turn the text above it into a heading (issue #603). A line break before it
+/// ~keep goes with the whitespace; `walk_node` already strips a backslash-style break before a block.
+fn join_rule_to_text(output: &mut String) {
+    let text_len = output.trim_end_matches([' ', '\t', '\n', '\r']).len();
+    output.truncate(text_len);
+    if !output.is_empty() {
+        output.push(' ');
+    }
+}
+
 /// Write a blank line before a container's `content` when it starts with a rule and `output` ends
-/// in text or in a bare list marker. The container rendered the rule into its own buffer, so the
+/// in text or in a bare list marker. Between inline markers, join the rule to the text instead. The container rendered the rule into its own buffer, so the
 /// rule saw nothing before it; on a marker line the rule would swallow the item (`- ---` is a rule).
-pub fn separate_leading_rule(output: &mut String, content: &str) {
+pub fn separate_leading_rule(output: &mut String, content: &str, ctx: &Context) {
+    if ctx.in_marker_text() {
+        if content.split([' ', '\n']).next() == Some("---") {
+            join_rule_to_text(output);
+        }
+        return;
+    }
     if content.split('\n').next() != Some("---") || output.is_empty() || output.ends_with("\n\n") {
         return;
     }

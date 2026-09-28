@@ -271,6 +271,14 @@ pub enum BailReason {
     /// `TierStrategy::Auto` -- it is still checked here so the Tier-1/Tier-2 byte-equality
     /// contract holds under a forced Tier-1 run rather than resting on that gate.
     InlineMarkerNotReproduced,
+
+    /// An `<hr>` opened between inline markers: inside `<strong>`/`<b>`, `<em>`/`<i>`,
+    /// `<var>`/`<dfn>`, `<del>`, `<ins>`, a `<summary>`, a `<figcaption>` or a table caption.
+    ///
+    /// Tier-2 writes such a rule as the text `---` in the running line, because on a line of
+    /// its own it would end the paragraph between the markers (issue #603). Tier-1 writes it
+    /// as a block, so it bails and lets Tier-2 (authoritative) handle it.
+    RuleBetweenInlineMarkers,
 }
 
 impl fmt::Display for BailReason {
@@ -343,6 +351,7 @@ impl fmt::Display for BailReason {
             Self::AdjacentInlineEmphasis => write!(f, "adjacent strong/emphasis elements would form one delimiter run"),
             Self::WhitespaceOnlyInlineEmphasis => write!(f, "strong/emphasis element with a whitespace-only body"),
             Self::InlineMarkerNotReproduced => write!(f, "inline element whose tier-2 markers tier-1 does not emit"),
+            Self::RuleBetweenInlineMarkers => write!(f, "horizontal rule between inline markers"),
         }
     }
 }

@@ -58,7 +58,7 @@ pub fn handle_dl(
         } else if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }
-        crate::converter::block::horizontal_rule::separate_leading_rule(output, trimmed);
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, trimmed, ctx);
         output.push_str(trimmed);
         output.push_str("\n\n");
     }
@@ -141,7 +141,7 @@ pub fn handle_dt(
     if ctx.convert_as_inline {
         output.push_str(&trimmed);
     } else {
-        crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed);
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed, ctx);
         output.push_str(&trimmed);
         output.push('\n');
     }
@@ -229,7 +229,7 @@ pub fn handle_dd(
     if ctx.convert_as_inline {
         output.push_str(&trimmed);
     } else {
-        crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed);
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, &trimmed, ctx);
         output.push_str(&trimmed);
         output.push_str("\n\n");
     }

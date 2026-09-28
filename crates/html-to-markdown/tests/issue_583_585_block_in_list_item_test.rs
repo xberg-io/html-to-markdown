@@ -575,19 +575,24 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
     // ~keep A list inside an inline wrapper, a summary or a caption is not a list once the
     // ~keep markers are added, so nothing in it gets a column that a tab would turn into code.
     for (html, expected) in [
-        ("<b><ul><li>x<dl><dd><hr></dd></dl></li></ul></b>", "**- x\n\n---**\n"),
+        ("<b><ul><li>x<dl><dd><hr></dd></dl></li></ul></b>", "**- x ---**\n"),
+        ("<b><ul><li>x<p>p</p>t</li></ul></b>", "**- x\n\np\n\nt**\n"),
+        (
+            "<details><summary><ul><li>x<dl><dd>d</dd></dl>t</li></ul></summary></details>",
+            "**- x\n\nd\n\nt**\n",
+        ),
         (
             "<details><summary><ul><li>x<dl><dd><hr></dd></dl></li></ul></summary></details>",
-            "**- x\n\n---**\n",
+            "**- x ---**\n",
         ),
         (
             "<figure><figcaption><ul><li>x<dl><dd><hr></dd></dl></li></ul></figcaption></figure>",
-            "*- x\n\n---*\n",
+            "*- x ---*\n",
         ),
-        ("<q><ul><li>x<dl><dd><hr></dd></dl></li></ul></q>", "\"- x\n\n---\"\n"),
+        ("<q><ul><li>x<dl><dd><hr></dd></dl></li></ul></q>", "\"- x ---\"\n"),
         (
             "<table><caption><ul><li>x<dl><dd><hr></dd></dl></li></ul></caption></table>",
-            "*\\- x\n\n\\-\\-\\-*\n",
+            "*\\- x \\-\\-\\-*\n",
         ),
         // ~keep A rule at the marker ends the item; the text after it gets the column from the
         // ~keep text node, and a rule after that text must not follow it into the code block.
