@@ -77,6 +77,8 @@ options from language-native types. Prefer \code{\link{ConversionOptionsBuilder}
 
 \item{\code{skip_images}}{Optional override for \code{\link[ConversionOptions:skip_images]{ConversionOptions::skip_images}}.}
 
+\item{\code{inline_data_media}}{Optional override for \code{\link[ConversionOptions:inline_data_media]{ConversionOptions::inline_data_media}}.}
+
 \item{\code{url_escape_style}}{Optional override for \code{\link[ConversionOptions:url_escape_style]{ConversionOptions::url_escape_style}}.}
 
 \item{\code{link_style}}{Optional override for \code{\link[ConversionOptions:link_style]{ConversionOptions::link_style}}.}

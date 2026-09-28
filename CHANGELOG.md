@@ -16,11 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<iframe>`. `drop_element` writes nothing. It covers `<img>`, `<graphic>`, inline `<svg>`,
   `<video>`, `<audio>` and `<iframe>`. With either of the last two choices, a real address on the
   element wins over the `data:` one: a lazy-load attribute or `srcset` candidate on `<img>`,
-  another address attribute on `<graphic>`, a nested `<source>` on `<video>` and `<audio>`.
-  Links keep their destination, and extracted images do not change. The CLI takes it as
-  `--inline-data-media` (#528).
+  another address attribute on `<graphic>`, a nested `<source>` on `<video>` and `<audio>`, and
+  a `<source>` of the `<picture>` that holds an `<img>`. The document structure follows the
+  markdown: no image node for a dropped element, and no address when only the alt text is
+  written. A link whose only content the option removed is dropped with it, instead of turning
+  into a link labelled with its own address. Links keep their destination, and extracted images
+  do not change. The CLI takes it as `--inline-data-media` (#528).
 
 ### Changed
+
+- The `alef` pin in `alef.toml` is now 0.97.1, the version that generated the committed bindings.
+  Regenerating with 0.97.0 dropped the Go binding's `runtime.LockOSThread` calls.
 
 - The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
   language. Before, a detector that stopped matching read exactly like a clean pass, so a
@@ -41,6 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **An `<img>` whose `src` spelled the `data:` scheme in upper or mixed case ignored its lazy-load
+  address.** The check that sends a `data:` source to the `data-src`, `data-lazy-src`,
+  `data-original` and `srcset` fallbacks compared the scheme in lower case only, so
+  `<img src="DATA:..." data-src="real.png">` kept the payload while the same image with `data:`
+  used `real.png`. The scheme now matches in any case.
 - **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
   runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
   every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26

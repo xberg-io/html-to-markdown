@@ -76,6 +76,8 @@ Use \code{\link[ConversionOptions:builder]{ConversionOptions::builder()}} to con
 
 \item{\code{skip_images}}{Skip conversion of \verb{<img>} elements (omit images from output).}
 
+\item{\code{inline_data_media}}{What the output shows for an image or embedded media element whose address is an inline}
+
 \item{\code{url_escape_style}}{URL encoding strategy for link and image destinations.}
 
 \item{\code{link_style}}{Link rendering style (inline or reference).}

@@ -14,7 +14,8 @@ use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::handlers::srcset::{Descriptor, parse_descriptor, srcset_candidates};
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
-use crate::converter::media::{inline_data_treatment, is_inline_data};
+use crate::converter::main_helpers::tag_name_eq;
+use crate::converter::media::is_inline_data;
 use crate::converter::utility::attributes::decoded_attribute;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
@@ -51,7 +52,13 @@ pub fn handle_img(
     dom_ctx: &DomContext,
 ) {
     let src: Cow<'_, str> = {
-        let effective_src = resolve_effective_src(tag, options.inline_data_media != InlineDataMedia::Keep);
+        let skip_inline_data = options.inline_data_media != InlineDataMedia::Keep;
+        let mut effective_src = resolve_effective_src(tag, skip_inline_data);
+        if skip_inline_data && is_inline_data(&effective_src) {
+            if let Some(source_src) = picture_source_src(node_handle, parser, dom_ctx) {
+                effective_src = Cow::Owned(source_src);
+            }
+        }
         let base_resolved = ctx.resolve_url(&effective_src);
         Cow::Owned(sanitize_markdown_url(base_resolved.as_deref().unwrap_or(&effective_src)).into_owned())
     };
@@ -131,7 +138,7 @@ pub fn handle_img(
         || ctx.cell_allow_inline_images
         || ctx.link_allow_inline_images;
 
-    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    let inline_data = ctx.inline_data_treatment(options.inline_data_media, &src);
     let should_use_alt_text = inline_data == InlineDataMedia::AltTextOnly
         || (!keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images)));
     let render = || {
@@ -216,10 +223,18 @@ pub fn handle_img(
         }
     }
 
+    // ~keep The structure shows the image the markdown shows: no node for a dropped element, and no
+    // ~keep address when only the alt text is written.
     if let Some(ref sc) = ctx.structure_collector {
-        let src_opt = if src.is_empty() { None } else { Some(src.as_ref()) };
-        let alt_opt = if alt.is_empty() { None } else { Some(alt.as_ref()) };
-        sc.borrow_mut().push_image(src_opt, alt_opt);
+        if inline_data != InlineDataMedia::DropElement {
+            let src_opt = if src.is_empty() || inline_data == InlineDataMedia::AltTextOnly {
+                None
+            } else {
+                Some(src.as_ref())
+            };
+            let alt_opt = if alt.is_empty() { None } else { Some(alt.as_ref()) };
+            sc.borrow_mut().push_image(src_opt, alt_opt);
+        }
     }
 }
 
@@ -253,24 +268,60 @@ const LAZY_SINGLE_URL_ATTRIBUTES: [&str; 3] = ["data-src", "data-lazy-src", "dat
 /// ~keep    of the above attributes byte-identical to output produced before this
 /// ~keep    fallback existed.
 ///
-/// With `skip_inline_data`, every step passes over a `data:` value or candidate in any case, so a
-/// real address anywhere wins over an inline payload.
+/// With `skip_inline_data`, every step first passes over a `data:` value or candidate in any case,
+/// so a real address anywhere wins over an inline payload; when there is none, the address the
+/// steps pick without skipping is used, so the caller sees the `data:` payload and not an empty `src`.
 fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -> Cow<'a, str> {
     // ~keep Every read here goes through `decoded_attribute`: a URL attribute carries
     // ~keep character references like any other (`src="i.png?a=1&amp;b=2"`), and `srcset` is
     // ~keep parsed *after* decoding because the entity is not part of its comma/descriptor
     // ~keep grammar. Issue #494.
     let raw_src = decoded_attribute(tag, "src").unwrap_or(Cow::Borrowed(""));
-    let is_placeholder = |value: &str| value.trim().is_empty() || (skip_inline_data && is_inline_data(value));
-
-    if !is_placeholder(&raw_src) && !raw_src.trim_start().starts_with("data:") {
+    if !raw_src.trim().is_empty() && !is_inline_data(&raw_src) {
         return raw_src;
     }
+    skip_inline_data
+        .then(|| fallback_src(tag, true))
+        .flatten()
+        .or_else(|| fallback_src(tag, false))
+        .unwrap_or(raw_src)
+}
+
+/// The address a browser loads from the `<source>` elements of the `<picture>` that holds this
+/// `<img>`: the best `srcset` candidate that is not a `data:` URL, from the first `<source>` before
+/// the image that has one. `media` and `type` are not evaluated, so the first such source wins.
+fn picture_source_src(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> Option<String> {
+    let parent_id = dom_ctx.parent_of(node_handle.get_inner())?;
+    let Some(tl::Node::Tag(picture)) = dom_ctx.node_handle(parent_id)?.get(parser) else {
+        return None;
+    };
+    if !tag_name_eq(picture.name().as_utf8_str(), "picture") {
+        return None;
+    }
+    picture
+        .children()
+        .top()
+        .iter()
+        .take_while(|child| child.get_inner() != node_handle.get_inner())
+        .filter_map(|child| match child.get(parser) {
+            Some(tl::Node::Tag(source)) if tag_name_eq(source.name().as_utf8_str(), "source") => Some(source),
+            _ => None,
+        })
+        .find_map(|source| {
+            let srcset = decoded_attribute(source, "srcset")?;
+            pick_best_srcset_candidate(&srcset, true).map(str::to_owned)
+        })
+}
+
+/// Steps 2 and 3 of [`resolve_effective_src`]: the first lazy-load address, then the best
+/// `srcset` candidate, passing over `data:` values when `skip_inline_data` is set.
+fn fallback_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -> Option<Cow<'a, str>> {
+    let is_placeholder = |value: &str| value.trim().is_empty() || (skip_inline_data && is_inline_data(value));
 
     for attr_name in LAZY_SINGLE_URL_ATTRIBUTES {
         if let Some(value) = decoded_attribute(tag, attr_name) {
             if !is_placeholder(&value) {
-                return value;
+                return Some(value);
             }
         }
     }
@@ -278,12 +329,12 @@ fn resolve_effective_src<'a>(tag: &'a tl::HTMLTag<'a>, skip_inline_data: bool) -
     for attr_name in ["data-srcset", "srcset"] {
         if let Some(value) = decoded_attribute(tag, attr_name) {
             if let Some(candidate) = pick_best_srcset_candidate(&value, skip_inline_data) {
-                return Cow::Owned(candidate.to_string());
+                return Some(Cow::Owned(candidate.to_string()));
             }
         }
     }
 
-    raw_src
+    None
 }
 
 /// Parse a `srcset`-shaped attribute value and return the URL of its highest
@@ -534,7 +585,10 @@ mod tests {
 
     #[test]
     fn commas_around_candidates_separate_them() {
-        assert_eq!(pick_best_srcset_candidate(",,, a.png 2x, b.png 1x", false), Some("a.png"));
+        assert_eq!(
+            pick_best_srcset_candidate(",,, a.png 2x, b.png 1x", false),
+            Some("a.png")
+        );
         assert_eq!(pick_best_srcset_candidate("a.png,, b.png 2x,,", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png, b.png", false), Some("a.png"));
         assert_eq!(pick_best_srcset_candidate("", false), None);
@@ -545,28 +599,55 @@ mod tests {
     fn the_largest_descriptor_of_one_kind_wins() {
         assert_eq!(pick_best_srcset_candidate("a.png", false), Some("a.png"));
         assert_eq!(pick_best_srcset_candidate("a.png, b.png 2x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 480w, b.png 1200w", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 480w, b.png 1200w", false),
+            Some("b.png")
+        );
         assert_eq!(pick_best_srcset_candidate("a.png 800w, b.png 2x", false), Some("a.png"));
     }
 
     #[test]
     fn only_the_five_ascii_whitespace_characters_separate_a_descriptor() {
-        assert_eq!(pick_best_srcset_candidate("a.png\t1x,\nb.png\x0C2x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png\r\n3x ,\tb.png 2x", false), Some("a.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png\u{a0}3x, b.png 2x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png \u{a0}9x, b.png 2x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a\u{a0}b.png 2x", false), Some("a\u{a0}b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png\t1x,\nb.png\x0C2x", false),
+            Some("b.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png\r\n3x ,\tb.png 2x", false),
+            Some("a.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png\u{a0}3x, b.png 2x", false),
+            Some("b.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png \u{a0}9x, b.png 2x", false),
+            Some("b.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a\u{a0}b.png 2x", false),
+            Some("a\u{a0}b.png")
+        );
     }
 
     #[test]
     fn a_candidate_with_invalid_descriptors_is_never_chosen() {
         assert_eq!(pick_best_srcset_candidate("a.png foo", false), None);
         assert_eq!(pick_best_srcset_candidate("a.png foo, b.png", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 1x 2x, b.png 0.5x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 3x 900w, b.png 1x", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 1x 2x, b.png 0.5x", false),
+            Some("b.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 3x 900w, b.png 1x", false),
+            Some("b.png")
+        );
         assert_eq!(pick_best_srcset_candidate("a.png 0w, b.png 10w", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png 0w", false), None);
-        assert_eq!(pick_best_srcset_candidate("a.png -1x, b.png 0.5x", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png -1x, b.png 0.5x", false),
+            Some("b.png")
+        );
         assert_eq!(pick_best_srcset_candidate("a.png 0x, b.png 0.5x", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png 0x", false), Some("a.png"));
     }
@@ -577,37 +658,67 @@ mod tests {
         assert_eq!(pick_best_srcset_candidate("a.png infx, b.png 2x", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png +3x, b.png 2x", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png 3.x, b.png 2x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 1e400x, b.png 2x", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 1e400x, b.png 2x", false),
+            Some("b.png")
+        );
         assert_eq!(pick_best_srcset_candidate("a.png 1.5w, b.png 1w", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png +5w, b.png 1w", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png 1e1x, b.png 2x", false), Some("a.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png .5x, b.png 0.25x", false), Some("a.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 2.5E-1x, b.png 0.2x", false), Some("a.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png .5x, b.png 0.25x", false),
+            Some("a.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 2.5E-1x, b.png 0.2x", false),
+            Some("a.png")
+        );
     }
 
     #[test]
     fn widths_and_densities_are_not_compared_on_one_scale() {
-        assert_eq!(pick_best_srcset_candidate("a.png 900x, b.png 800w", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 900x, b.png 800w", false),
+            Some("b.png")
+        );
         assert_eq!(pick_best_srcset_candidate("a.png, b.png 10w", false), Some("b.png"));
         assert_eq!(pick_best_srcset_candidate("a.png, b.png 0.5x", false), Some("a.png"));
         assert_eq!(
             pick_best_srcset_candidate("a.png 1x, b.png 2x, c.png 2x", false),
             Some("b.png")
         );
-        assert_eq!(pick_best_srcset_candidate("a.png 900w, b.png 900w", false), Some("a.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 900w, b.png 900w", false),
+            Some("a.png")
+        );
     }
 
     #[test]
     fn a_height_descriptor_needs_a_width() {
-        assert_eq!(pick_best_srcset_candidate("a.png 50h 100w, b.png 90w", false), Some("a.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 100w 50h, b.png 90w", false), Some("a.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 2x 50h, b.png 1x", false), Some("b.png"));
-        assert_eq!(pick_best_srcset_candidate("a.png 50h, b.png 0.5x", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 50h 100w, b.png 90w", false),
+            Some("a.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 100w 50h, b.png 90w", false),
+            Some("a.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 2x 50h, b.png 1x", false),
+            Some("b.png")
+        );
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 50h, b.png 0.5x", false),
+            Some("b.png")
+        );
         assert_eq!(
             pick_best_srcset_candidate("a.png 100w 50h 60h, b.png 90w", false),
             Some("b.png")
         );
-        assert_eq!(pick_best_srcset_candidate("a.png 100w 0h, b.png 90w", false), Some("b.png"));
+        assert_eq!(
+            pick_best_srcset_candidate("a.png 100w 0h, b.png 90w", false),
+            Some("b.png")
+        );
     }
 
     #[test]

@@ -1,0 +1,90 @@
+[
+  {
+    "id": "options_inline_data_media_keep_default",
+    "description": "Keep writes an inline data image with its payload",
+    "input": {
+      "html": "<p>Before <img src=\"data:image/png;base64,AAAA\" alt=\"icon\"> after</p>",
+      "options": {
+        "inline_data_media": "Keep"
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "![icon](data:image/png;base64,AAAA)"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_inline_data_media_keep_default",
+      "title": "Keep writes an inline data image with its payload"
+    }
+  },
+  {
+    "id": "options_inline_data_media_alt_text_only",
+    "description": "Alt text only writes the alt text of an inline data image",
+    "input": {
+      "html": "<p>Before <img src=\"data:image/png;base64,AAAA\" alt=\"icon\"> after</p>",
+      "options": {
+        "inline_data_media": "AltTextOnly"
+      }
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Before icon after\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_inline_data_media_alt_text_only",
+      "title": "Alt text only writes the alt text of an inline data image"
+    }
+  },
+  {
+    "id": "options_inline_data_media_drop_element",
+    "description": "Drop element writes nothing for an inline data image",
+    "input": {
+      "html": "<p>Before <img src=\"data:image/png;base64,AAAA\" alt=\"icon\"> after</p>",
+      "options": {
+        "inline_data_media": "DropElement"
+      }
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "Before  after\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_inline_data_media_drop_element",
+      "title": "Drop element writes nothing for an inline data image"
+    }
+  },
+  {
+    "id": "options_inline_data_media_real_address_wins",
+    "description": "A real lazy-load address wins over an inline data src when the payload is not kept",
+    "input": {
+      "html": "<p><img src=\"data:image/png;base64,AAAA\" data-src=\"https://example.com/real.png\" alt=\"icon\"></p>",
+      "options": {
+        "inline_data_media": "DropElement"
+      }
+    },
+    "assertions": [
+      {
+        "type": "equals",
+        "field": "content",
+        "value": "![icon](https://example.com/real.png)\n"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_inline_data_media_real_address_wins",
+      "title": "A real lazy-load address wins over an inline data src"
+    }
+  }
+]

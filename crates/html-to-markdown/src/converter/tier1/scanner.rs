@@ -1908,7 +1908,7 @@ fn emit_void(
             // with none of the fallback attributes is unaffected and stays on this path.
             let src_is_lazy_load_placeholder = {
                 let trimmed = src.trim_ascii();
-                trimmed.is_empty() || trimmed.starts_with(b"data:")
+                trimmed.is_empty() || trimmed.get(..5).is_some_and(|scheme| scheme.eq_ignore_ascii_case(b"data:"))
             };
             if src_is_lazy_load_placeholder
                 && [

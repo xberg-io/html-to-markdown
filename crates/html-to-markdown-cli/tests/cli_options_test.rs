@@ -255,3 +255,25 @@ fn should_reject_tier1_as_a_tier_strategy_cli_value() {
         .failure()
         .stderr(predicate::str::contains("invalid value"));
 }
+
+#[test]
+fn every_flag_in_the_help_is_listed_in_the_plugin_cli_reference() {
+    let words = |text: &str| -> std::collections::BTreeSet<String> {
+        text.split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
+            .filter(|word| word.strip_prefix("--").is_some_and(|name| name.starts_with(|c: char| c.is_ascii_alphabetic())))
+            .map(str::to_string)
+            .collect()
+    };
+    let help = cli().arg("--help").output().expect("run --help");
+    assert!(help.status.success());
+    let flags = words(&String::from_utf8(help.stdout).expect("utf-8 help"));
+    assert!(flags.len() > 50, "too few flags parsed from --help: {flags:?}");
+
+    let reference_path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../plugin/.ai-rulez/skills/html-to-markdown/references/cli-reference.md"
+    );
+    let listed = words(&std::fs::read_to_string(reference_path).expect("read the plugin CLI reference"));
+    let missing: Vec<&String> = flags.difference(&listed).collect();
+    assert!(missing.is_empty(), "flags missing from {reference_path}: {missing:?}");
+}

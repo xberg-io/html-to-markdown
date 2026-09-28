@@ -14,7 +14,7 @@ use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{MarkdownLink, append_markdown_link};
 use crate::converter::main_helpers::tag_name_eq;
-use crate::converter::media::{first_address, inline_data_treatment};
+use crate::converter::media::first_address;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -154,7 +154,7 @@ pub fn handle_audio(
         }
     }
 
-    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    let inline_data = ctx.inline_data_treatment(options.inline_data_media, &src);
     if inline_data == InlineDataMedia::DropElement {
         return;
     }
@@ -251,7 +251,7 @@ pub fn handle_video(
         }
     }
 
-    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    let inline_data = ctx.inline_data_treatment(options.inline_data_media, &src);
     if inline_data == InlineDataMedia::DropElement {
         return;
     }
@@ -371,7 +371,7 @@ pub fn handle_iframe(
         }
     }
 
-    if inline_data_treatment(options.inline_data_media, &src) == InlineDataMedia::Keep && !src.is_empty() {
+    if ctx.inline_data_treatment(options.inline_data_media, &src) == InlineDataMedia::Keep && !src.is_empty() {
         append_media_src_link(output, &src, options, ctx);
         if !ctx.in_paragraph && !ctx.convert_as_inline {
             output.push_str("\n\n");

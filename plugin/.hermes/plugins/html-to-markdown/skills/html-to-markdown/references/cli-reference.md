@@ -1,7 +1,7 @@
 <!--
 AI-RULEZ :: GENERATED FILE — DO NOT EDIT
-Content-Hash: blake3:be4783d2fe21c314ceaef8d680c4a2de5db02fd3c2629d96dca58fe0a51def39
-Source-Hash: blake3:05e4ea1e3be2938054a8db977bf8af27b4c0d80160e0dd6e57c1f7bab28ae00d
+Content-Hash: blake3:dfaf03eca6acf6844233aed17bde4f7282aeea1213133a40331becfeb81f2bd2
+Source-Hash: blake3:40c9d8731a0bb2b431bcc4467edc0dc95521b828df04060bef855ffad43cf0c7
 Schema-Version: v1
 -->
 
@@ -88,6 +88,7 @@ html-to-markdown [OPTIONS] [FILE]
 | `--max-image-size <BYTES>`           | integer                   | `5242880` | Skip inline images whose decoded payload exceeds this size. Requires `--extract-inline-images`. |
 | `--capture-svg`                      | flag                      | off     | Capture inline `<svg>` elements as extracted images. Requires `--extract-inline-images`. |
 | `--no-infer-dimensions`              | flag                      | off     | Skip inferring image width/height from the decoded payload when the HTML omits them. Inference is on by default. Requires `--extract-inline-images`. |
+| `--inline-data-media <CHOICE>`      | `keep`, `alt-text-only`, `drop-element` | `keep` | What to write for an image or media element whose address is a `data:` URL. `keep`: the URL with its payload. `alt-text-only`: the alt text (the title of an inline `<svg>`, the fallback content of `<video>` and `<audio>`). `drop-element`: nothing. A real address on the element wins over the `data:` one. |
 
 ## Tables
 

@@ -2,7 +2,7 @@
 //! an image, `<graphic>`, inline `<svg>`, `<video>`, `<audio>` or `<iframe>` whose address is an
 //! inline `data:` URL.
 
-use html_to_markdown_rs::{ConversionOptions, HighlightStyle, InlineDataMedia, convert};
+use html_to_markdown_rs::{ConversionOptions, HighlightStyle, InlineDataMedia, NodeContent, convert};
 
 const PNG: &str = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
 const MP4: &str = "data:video/mp4;base64,AAAAIGZ0eXBpc29t";
@@ -76,6 +76,220 @@ fn the_scheme_matches_in_any_case() {
     assert_eq!(
         convert_with(html, InlineDataMedia::AltTextOnly),
         "![i](https://example.com/r.png)\n"
+    );
+}
+
+#[test]
+fn an_image_whose_only_address_is_a_lazy_data_one_gets_the_choice() {
+    for html in [
+        r#"<p><img alt="a" data-src="data:image/png;base64,AAAA"></p>"#,
+        r#"<p><img alt="a" src="" data-src="data:image/png;base64,AAAA"></p>"#,
+        r#"<p><img alt="a" data-lazy-src="data:image/png;base64,AAAA"></p>"#,
+    ] {
+        let [keep, alt, drop] = all_choices(html);
+        assert_eq!(keep, "![a](data:image/png;base64,AAAA)\n", "{html}");
+        assert_eq!(alt, "a\n", "{html}");
+        assert_eq!(drop, "", "{html}");
+    }
+}
+
+#[test]
+fn an_image_whose_only_srcset_candidates_are_data_gets_the_choice() {
+    for (html, payload) in [
+        (
+            r#"<p><img alt="a" srcset="data:image/png;base64,AAAA 1x"></p>"#,
+            "data:image/png;base64,AAAA",
+        ),
+        (
+            r#"<p><img alt="a" src="data:image/gif;base64,R0lG" data-srcset="data:image/png;base64,AAAA 2x"></p>"#,
+            "data:image/png;base64,AAAA",
+        ),
+        (
+            r#"<p><img alt="a" srcset="DATA:image/png;base64,AAAA 1x"></p>"#,
+            "DATA:image/png;base64,AAAA",
+        ),
+    ] {
+        let [keep, alt, drop] = all_choices(html);
+        assert_eq!(keep, format!("![a]({payload})\n"), "{html}");
+        assert_eq!(alt, "a\n", "{html}");
+        assert_eq!(drop, "", "{html}");
+    }
+}
+
+#[test]
+fn whitespace_before_the_data_scheme_does_not_hide_it() {
+    for html in [
+        r#"<p><img alt="a" src=" data:image/png;base64,AAAA"></p>"#,
+        "<p><img alt=\"a\" src=\"\tdata:image/png;base64,AAAA\"></p>",
+    ] {
+        assert_eq!(convert_with(html, InlineDataMedia::AltTextOnly), "a\n", "{html}");
+        assert_eq!(convert_with(html, InlineDataMedia::DropElement), "", "{html}");
+    }
+}
+
+#[test]
+fn a_data_src_in_any_case_gives_way_to_a_real_lazy_address_under_every_choice() {
+    let lower = r#"<p><img src="data:image/png;base64,AAAA" data-src="https://example.com/r.png" alt="i"></p>"#;
+    for scheme in ["DATA:", "Data:", "dAtA:"] {
+        let html = lower.replace("data:image", &format!("{scheme}image"));
+        for (output, choice) in all_choices(&html).into_iter().zip(["keep", "alt", "drop"]) {
+            assert_eq!(output, "![i](https://example.com/r.png)\n", "{scheme} {choice}");
+        }
+    }
+    assert_eq!(all_choices(lower)[0], "![i](https://example.com/r.png)\n");
+}
+
+#[test]
+fn a_data_src_in_any_case_gives_way_to_a_real_lazy_address_on_the_fast_path_too() {
+    // ~keep Metadata off and no `<mark>` styling make the document eligible for the Tier-1
+    // ~keep scanner, which must hand a lazy-loaded image to Tier 2 whatever the scheme's case.
+    let options = ConversionOptions {
+        extract_metadata: false,
+        highlight_style: HighlightStyle::None,
+        ..ConversionOptions::default()
+    };
+    for scheme in ["data:", "DATA:", "Data:"] {
+        let html = format!(r#"<p><img src="{scheme}image/png;base64,AAAA" data-src="https://example.com/r.png" alt="i"></p>"#);
+        let output = convert(&html, Some(options.clone())).unwrap().content.unwrap_or_default();
+        assert_eq!(output, "![i](https://example.com/r.png)\n", "{scheme}");
+    }
+}
+
+#[test]
+fn a_picture_uses_the_address_of_its_first_source_with_a_real_one() {
+    let one = format!(
+        r#"<p><picture><source srcset="https://example.com/real.webp"><img src="{PNG}" alt="a"></picture></p>"#
+    );
+    let [keep, alt, drop] = all_choices(&one);
+    assert_eq!(keep, format!("![a]({PNG})\n"));
+    assert_eq!(alt, "![a](https://example.com/real.webp)\n");
+    assert_eq!(drop, "![a](https://example.com/real.webp)\n");
+
+    let several = format!(
+        r#"<p><picture><source srcset="data:image/webp;base64,UklG 1x"><source srcset="https://example.com/1.webp 1x, https://example.com/2.webp 2x"><source srcset="https://example.com/3.webp"><img src="{PNG}" alt="a"></picture></p>"#
+    );
+    let [keep, alt, drop] = all_choices(&several);
+    assert_eq!(keep, format!("![a]({PNG})\n"));
+    assert_eq!(alt, "![a](https://example.com/2.webp)\n");
+    assert_eq!(drop, "![a](https://example.com/2.webp)\n");
+}
+
+#[test]
+fn a_picture_with_no_usable_source_gets_the_choice() {
+    for html in [
+        format!(
+            r#"<p><picture><source srcset="data:image/webp;base64,UklG 1x"><img src="{PNG}" alt="a"></picture></p>"#
+        ),
+        format!(r#"<p><picture><source media="(min-width: 1px)"><img src="{PNG}" alt="a"></picture></p>"#),
+        format!(
+            r#"<p><picture><img src="{PNG}" alt="a"><source srcset="https://example.com/after.webp"></picture></p>"#
+        ),
+    ] {
+        let [keep, alt, drop] = all_choices(&html);
+        assert_eq!(keep, format!("![a]({PNG})\n"), "{html}");
+        assert_eq!(alt, "a\n", "{html}");
+        assert_eq!(drop, "", "{html}");
+    }
+}
+
+#[test]
+fn a_picture_source_does_not_replace_a_real_image_address() {
+    let html = r#"<p><picture><source srcset="https://example.com/s.webp"><img src="https://example.com/i.png" alt="a"></picture></p>"#;
+    for output in all_choices(html) {
+        assert_eq!(output, "![a](https://example.com/i.png)\n");
+    }
+}
+
+fn structure_images(html: &str, choice: InlineDataMedia) -> Vec<(Option<String>, Option<String>)> {
+    let options = ConversionOptions {
+        inline_data_media: choice,
+        include_document_structure: true,
+        ..ConversionOptions::default()
+    };
+    let document = convert(html, Some(options))
+        .unwrap()
+        .document
+        .expect("document structure");
+    document
+        .nodes
+        .into_iter()
+        .filter_map(|node| match node.content {
+            NodeContent::Image { src, description, .. } => Some((src, description)),
+            _ => None,
+        })
+        .collect()
+}
+
+#[test]
+fn the_document_structure_shows_the_image_the_markdown_shows() {
+    let html = format!(r#"<p>x <img src="{PNG}" alt="icon"> y</p>"#);
+    let icon = Some("icon".to_string());
+    assert_eq!(
+        structure_images(&html, InlineDataMedia::Keep),
+        [(Some(PNG.to_string()), icon.clone())]
+    );
+    assert_eq!(structure_images(&html, InlineDataMedia::AltTextOnly), [(None, icon)]);
+    assert_eq!(structure_images(&html, InlineDataMedia::DropElement), []);
+
+    let real = r#"<p><img src="https://example.com/a.png" alt="a"></p>"#;
+    for choice in [InlineDataMedia::AltTextOnly, InlineDataMedia::DropElement] {
+        assert_eq!(
+            structure_images(real, choice),
+            [(Some("https://example.com/a.png".to_string()), Some("a".to_string()))]
+        );
+    }
+}
+
+#[test]
+fn a_link_around_a_replaced_image_keeps_its_alt_text_or_goes_with_it() {
+    let html = format!(r#"<p><a href="https://example.com/x.html"><img src="{PNG}" alt="a"></a></p>"#);
+    let [keep, alt, drop] = all_choices(&html);
+    assert_eq!(keep, format!("[![a]({PNG})](https://example.com/x.html)\n"));
+    assert_eq!(alt, "[a](https://example.com/x.html)\n");
+    assert_eq!(drop, "");
+
+    let wrapped =
+        format!(r#"<p><a href="https://example.com/x.html"> <span><img src="{PNG}" alt="a"></span> </a></p>"#);
+    assert_eq!(
+        convert_with(&wrapped, InlineDataMedia::AltTextOnly),
+        "[a](https://example.com/x.html)\n"
+    );
+    assert_eq!(convert_with(&wrapped, InlineDataMedia::DropElement), "");
+
+    let no_alt = format!(r#"<p><a href="https://example.com/x.html"><img src="{PNG}"></a></p>"#);
+    assert_eq!(convert_with(&no_alt, InlineDataMedia::AltTextOnly), "");
+}
+
+#[test]
+fn a_link_around_any_dropped_media_element_goes_with_it() {
+    for media in [
+        format!(r#"<graphic src="{PNG}"></graphic>"#),
+        format!(r#"<video src="{MP4}"></video>"#),
+        format!(r#"<audio src="{MP3}"></audio>"#),
+        format!(r#"<iframe src="{HTML_PAGE}"></iframe>"#),
+        "<svg><rect/></svg>".to_string(),
+    ] {
+        let html = format!(r#"<p><a href="https://example.com/x.html">{media}</a></p>"#);
+        assert_eq!(convert_with(&html, InlineDataMedia::DropElement), "", "{media}");
+    }
+}
+
+#[test]
+fn a_link_keeps_its_other_content_and_an_unrelated_empty_link_is_unchanged() {
+    let html = format!(r#"<p><a href="https://example.com/x.html">see <img src="{PNG}" alt="a"></a></p>"#);
+    assert_eq!(
+        convert_with(&html, InlineDataMedia::DropElement),
+        "[see](https://example.com/x.html)\n"
+    );
+
+    let empty = format!(r#"<p><img src="{PNG}" alt="a"> <a href="https://example.com/x.html"><span></span></a></p>"#);
+    let [_, _, drop] = all_choices(&empty);
+    assert_eq!(
+        drop,
+        convert_with(
+            r#"<p><a href="https://example.com/x.html"><span></span></a></p>"#,
+            InlineDataMedia::Keep
+        )
     );
 }
 

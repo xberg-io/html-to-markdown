@@ -13,7 +13,7 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
-use crate::converter::media::{first_address, inline_data_treatment};
+use crate::converter::media::first_address;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -100,7 +100,7 @@ pub fn handle_graphic(
         || ctx.cell_allow_inline_images
         || ctx.link_allow_inline_images;
 
-    let inline_data = inline_data_treatment(options.inline_data_media, &src);
+    let inline_data = ctx.inline_data_treatment(options.inline_data_media, &src);
     let should_use_alt_text = inline_data == InlineDataMedia::AltTextOnly
         || (!keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images)));
     let render = || {

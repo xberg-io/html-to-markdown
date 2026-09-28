@@ -270,11 +270,15 @@ pub fn handle_svg(
 
     // ~keep The converter writes an inline SVG as a `data:` URL it builds itself, so the
     // ~keep inline-data choice always applies.
-    if options.skip_images || options.inline_data_media == crate::options::InlineDataMedia::DropElement {
+    if options.skip_images {
+        return;
+    }
+    let inline_data = ctx.inline_data_treatment(options.inline_data_media, "data:image/svg+xml");
+    if inline_data == crate::options::InlineDataMedia::DropElement {
         return;
     }
 
-    if ctx.convert_as_inline || options.inline_data_media == crate::options::InlineDataMedia::AltTextOnly {
+    if ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
         output.push_str(&title);
     } else {
         use base64::{Engine as _, engine::general_purpose::STANDARD};

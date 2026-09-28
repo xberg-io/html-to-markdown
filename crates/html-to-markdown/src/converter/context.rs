@@ -16,6 +16,7 @@ use std::rc::Rc;
 use crate::inline_images::InlineImageCollector;
 
 use crate::converter::reference_collector::ReferenceCollectorHandle;
+use crate::options::InlineDataMedia;
 use crate::types::structure_collector::StructureCollectorHandle;
 
 /// Handle type for inline image collector when feature is enabled.
@@ -160,6 +161,9 @@ pub struct Context {
     pub(crate) excluded_node_ids: Rc<HashSet<u32>>,
     /// Shared flag set when the guarded DOM walk reaches its effective depth limit.
     pub(crate) depth_limit_reached: Rc<Cell<bool>>,
+    /// Shared flag set when `inline_data_media` replaced or dropped an element. A link reads it to
+    /// tell a label emptied by that option from an empty one.
+    pub(crate) inline_data_replaced: Rc<Cell<bool>>,
     #[cfg(feature = "inline-images")]
     /// Shared collector for inline images when enabled.
     pub(crate) inline_collector: Option<InlineCollectorHandle>,
@@ -296,6 +300,7 @@ impl Context {
             keep_inline_images_in: Rc::new(options.keep_inline_images_in.iter().cloned().collect()),
             excluded_node_ids: Rc::new(HashSet::new()),
             depth_limit_reached: Rc::new(Cell::new(false)),
+            inline_data_replaced: Rc::new(Cell::new(false)),
             #[cfg(feature = "inline-images")]
             inline_collector,
             #[cfg(feature = "metadata")]
@@ -320,6 +325,17 @@ impl Context {
             measure_width_only: false,
             base_url,
         }
+    }
+
+    /// What to write for an element whose chosen address is `address`, as
+    /// [`crate::converter::media::inline_data_treatment`] decides, recording in
+    /// [`Self::inline_data_replaced`] when it is not [`InlineDataMedia::Keep`].
+    pub(crate) fn inline_data_treatment(&self, choice: InlineDataMedia, address: &str) -> InlineDataMedia {
+        let treatment = crate::converter::media::inline_data_treatment(choice, address);
+        if treatment != InlineDataMedia::Keep {
+            self.inline_data_replaced.set(true);
+        }
+        treatment
     }
 
     /// Resolve a `href`/`src` attribute value against [`Self::base_url`].
