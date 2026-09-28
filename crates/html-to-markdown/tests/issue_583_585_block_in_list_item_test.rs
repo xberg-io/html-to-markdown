@@ -308,6 +308,16 @@ fn should_agree_across_tiers_on_a_block_container_whose_content_is_dropped() {
 }
 
 #[test]
+fn should_agree_across_tiers_on_a_generic_block_container_in_an_item() {
+    // ~keep Tier 2 starts an `<address>` in an item at the content column; Tier 1 does not.
+    let html = "<ul><li>X<address>A</address>  </li></ul>";
+    assert_eq!(tier2(html), "- X\n\n  A\n");
+    if let Some(tier1_out) = tier1(html) {
+        assert_eq!(tier1_out, tier2(html), "Tier 1 must match Tier 2 on {html:?}");
+    }
+}
+
+#[test]
 fn should_leave_no_blank_line_for_an_empty_div_in_a_list_item() {
     // ~keep A task item renders its text into a buffer of its own, where a one-letter text is
     // ~keep the whole buffer before the div.

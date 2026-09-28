@@ -100,8 +100,9 @@ fn code_block_as_first_content_of_third_level_item_has_no_extra_indent() {
 /// into the middle of an inline run.
 #[test]
 fn div_after_strong_gets_its_own_indented_line() {
+    // ~keep The div is its own paragraph in the item, after a blank line (issue #583).
     let html = "<ul><li>Lead <strong>bold</strong> <div>divcontent</div></li></ul>";
-    assert_eq!(default_convert(html), "- Lead **bold**\n  divcontent\n");
+    assert_eq!(default_convert(html), "- Lead **bold**\n\n  divcontent\n");
 }
 
 /// Same handler, the missing-`"+ "` half of the idiom, mirroring the code-block case
