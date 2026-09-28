@@ -128,7 +128,7 @@ pub fn scan(
         match bytes[pos] {
             b'<' => {
                 if text_start < pos {
-                    if state.head_range.is_none() && !html[text_start..pos].bytes().all(|b| b.is_ascii_whitespace()) {
+                    if !html[text_start..pos].bytes().all(|b| b.is_ascii_whitespace()) {
                         state.start_body(text_start);
                     }
                     // ~keep Peek the upcoming tag BEFORE flushing the preceding text: a
@@ -242,7 +242,7 @@ pub fn scan(
                     return Err(BailReason::HiddenElement { offset: pos });
                 }
 
-                if state.head_range.is_none() && crate::converter::main_helpers::starts_body(name_lower) {
+                if crate::converter::main_helpers::starts_body(name_lower) {
                     state.start_body(pos);
                 }
 

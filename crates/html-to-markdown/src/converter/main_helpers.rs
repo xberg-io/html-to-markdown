@@ -518,9 +518,16 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
 }
 
 /// Format metadata as YAML frontmatter.
+///
+/// ~keep The `title` key is present whenever a title element was seen, even an empty one, so
+/// ~keep `extract_document_metadata` can tell "no title element" from "an empty one" (#527). An
+/// ~keep empty title carries no frontmatter line either way, so it is the one key skipped here.
 pub fn format_metadata_frontmatter(metadata: &BTreeMap<String, String>) -> String {
     let mut result = String::from("---\n");
     for (key, value) in metadata {
+        if key == "title" && value.is_empty() {
+            continue;
+        }
         use std::fmt::Write as _;
         let _ = writeln!(&mut result, "{key}: {value}");
     }
@@ -568,7 +575,8 @@ fn collect_meta_head_metadata(
 }
 
 /// Record the `<title>` text into `metadata`, honoring `strip_tags`/`preserve_tags` for
-/// `"title"`. The first title wins, as in a browser; an empty one records nothing.
+/// `"title"`. The first title wins, as in a browser; an empty one still records the `title` key,
+/// empty, so the element's presence survives even though its text does not (#527).
 /// `seen_title` is whether a title came before.
 fn collect_title_head_metadata(
     child_tag: &tl::HTMLTag,
@@ -596,9 +604,7 @@ fn collect_title_head_metadata(
         }
     }
     title_content = title_content.trim().to_string();
-    if !title_content.is_empty() {
-        metadata.insert("title".to_string(), title_content);
-    }
+    metadata.insert("title".to_string(), title_content);
 }
 
 /// Record the href of the first `<link rel="canonical">` into `metadata`. Extracted from

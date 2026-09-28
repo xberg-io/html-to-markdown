@@ -19,10 +19,14 @@ pub(crate) fn extract_document_metadata(
         // ~keep Only the `<title>`, `<base>` and `<link rel="canonical">` elements write these
         // ~keep keys. A meta tag named `base` or `canonical` arrives as `meta-base` or
         // ~keep `meta-canonical` and is an ordinary meta tag; one named `title` gives the title
-        // ~keep only on a page without a `<title>` element (#589).
+        // ~keep only on a page without a `<title>` element (#589). The `title` key itself is
+        // ~keep present whenever a title element was seen, even an empty one, so an empty first
+        // ~keep title still counts as a title element and blocks the meta fallback below (#527).
         match raw_key.as_str() {
             "title" => {
-                doc.title = Some(value);
+                if !value.is_empty() {
+                    doc.title = Some(value);
+                }
                 continue;
             }
             "base" => {

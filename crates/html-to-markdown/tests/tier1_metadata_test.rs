@@ -531,6 +531,32 @@ fn should_take_the_base_href_and_canonical_link_from_their_elements_and_a_meta_t
 
 #[cfg(feature = "metadata")]
 #[test]
+fn should_keep_an_empty_title_element_blocking_a_meta_title_fallback() {
+    // ~keep An empty `<title></title>` is still a title element: it blocks the meta fallback,
+    // ~keep and the page reports no title, whichever order the two tags come in (#527).
+    let opts = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    for html in [
+        r#"<html><head><title></title><meta name="title" content="Meta"></head><body><p>x</p></body></html>"#,
+        r#"<html><head><meta name="title" content="Meta"><title></title></head><body><p>x</p></body></html>"#,
+    ] {
+        let document = convert(html, Some(opts.clone())).unwrap().metadata.document;
+        assert_eq!(document.title, None, "{html}");
+        assert_eq!(
+            document.meta_tags.get("title").map(String::as_str),
+            Some("Meta"),
+            "{html}"
+        );
+        assert_eq!(t1_only(html), t2(html), "{html}");
+        assert!(!t2(html).lines().any(|line| line.starts_with("title:")), "{}", t2(html));
+    }
+}
+
+#[cfg(feature = "metadata")]
+#[test]
 fn should_give_the_document_structure_the_metadata_block_of_the_head_the_metadata_reads() {
     use html_to_markdown_rs::types::{NodeContent, build_document_structure};
 
