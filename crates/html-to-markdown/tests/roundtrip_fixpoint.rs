@@ -261,8 +261,7 @@ const KNOWN_DIVERGENCES: &[(&str, &str)] = &[
     // --- Bucket D: genuine bug family -- unescaped literal text collides with
     // CommonMark/GFM syntax on the second, spec-compliant parse. See
     // `known_issue_unescaped_lone_tilde_pairs_into_phantom_strikethrough`,
-    // `known_issue_unescaped_angle_bracket_text_becomes_a_phantom_tag`,
-    // `known_issue_unescaped_hr_adjacent_to_text_becomes_a_setext_heading`.
+    // `known_issue_unescaped_angle_bracket_text_becomes_a_phantom_tag`.
     (
         "real-world/issues/gh-190/ozonekorea.html",
         "unescaped lone '~' collides with GFM strikethrough pairing",
@@ -271,9 +270,12 @@ const KNOWN_DIVERGENCES: &[(&str, &str)] = &[
         "real-world/issues/gh-190/kimbrain.html",
         "unescaped '<word>' text is consumed as a phantom HTML tag on re-parse",
     ),
+    // ~keep rbloggers' setext-heading collision is FIXED (see `hr_adjacent_to_text_is_now_a_rule`);
+    // ~keep it stays allow-listed for two separate causes found by removing this entry.
     (
         "real-world/issues/gh-190/rbloggers.html",
-        "unescaped '<hr>'-as-'---' immediately adjacent to text becomes a setext heading underline",
+        "a two-space hard break at the end of a paragraph is dropped on the second pass, and \
+         the blank line between an image link and the quote after it moves",
     ),
     // ~keep Bucket E's empty-`title=""` cause is FIXED (an empty title now means absent, see
     // ~keep `empty_title_attribute_is_now_stable`), so this fixture is allow-listed only for
@@ -661,30 +663,23 @@ fn known_issue_unescaped_angle_bracket_text_becomes_a_phantom_tag() {
 }
 
 #[test]
-fn known_issue_unescaped_hr_adjacent_to_text_becomes_a_setext_heading() {
-    // ~keep Bucket D (instance 3), and the same underlying mechanism as the
-    // ~keep metadata-frontmatter exclusion documented on `base_options`: a bare
-    // ~keep `<hr>` immediately adjacent to text (no blank-line separator, as
-    // ~keep html5ever's implied-<p>-closing can produce for `<hr>` nested inside
-    // ~keep a <div> inside a <p>) is rendered as a bare `---` line. Without a
-    // ~keep blank line before it, CommonMark's setext-heading grammar consumes
-    // ~keep the preceding text as an H2 and the horizontal rule vanishes.
+fn hr_adjacent_to_text_is_now_a_rule() {
+    // ~keep Was `known_issue_unescaped_hr_adjacent_to_text_becomes_a_setext_heading` (bucket D,
+    // ~keep instance 3). A `<hr>` right after text inside a paragraph was written on the next
+    // ~keep line, so CommonMark read the `---` as a setext heading underline and the rule vanished
+    // ~keep (issue #584). The rule now starts after a blank line.
     let html = "<p><div>Some text here)\n<hr>Want to share more text.\n</div></p>";
     let options = base_options();
     let md1 = convert_content(html, &options);
     assert!(
-        md1.contains("---"),
-        "expected a bare '---' with no blank-line isolation: {md1:?}"
+        md1.contains("here)\n\n---\n"),
+        "expected a blank line before the rule: {md1:?}"
     );
 
     let html2 = render_markdown_to_html(&md1);
     assert!(
-        html2.contains("<h2>"),
-        "expected the '---' to be swallowed as a setext heading underline: {html2:?}"
-    );
-    assert!(
-        !html2.contains("<hr"),
-        "expected the horizontal rule to have vanished entirely: {html2:?}"
+        html2.contains("<hr />") && !html2.contains("<h2>"),
+        "expected a rule and no setext heading: {html2:?}"
     );
 }
 

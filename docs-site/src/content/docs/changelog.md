@@ -27,9 +27,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every leg. Each leg's path filter condition is now written once, as an output of the change
   detection job, and both the leg and the result job read that output. A script test fails when a
   job is added to the workflow without being listed in the result job.
+- Removed an unused copy of the `<a>` handler that no conversion path called. Links are
+  converted by the one live handler, as before; output does not change.
 
 ### Fixed
 
+- **Text right after a list or a table rendered inside it (#570, #571).** Inline content that
+  directly followed a list or a table in the same container continued the block's last line.
+  After a list it became a lazy continuation of the last item, so
+  `<div><ul><li>A</li></ul>para</div>` rendered `para` inside the item; after a table it became
+  one more table row. Inline content after a block now starts its own paragraph after a blank
+  line, the same as text after a paragraph, in both rendering paths. This includes a list item
+  that ends in a line break, and a `<br>` right after a list with backslash line breaks, which
+  also put the text inside the item. Text after a horizontal rule gets the same blank line.
+- **A horizontal rule right after a line of text turned the text into a heading (#584).** Inside
+  a paragraph, and at the start of a definition, the rule was written on the line right after
+  the text, so `<p>t<hr>B</p>` gave `t\n---` and `<dl><dt>t</dt><dd><hr></dd></dl>` gave the same.
+  Markdown reads `---` under text as a heading underline, so `t` became a heading and the rule
+  was lost. The rule now starts after a blank line there too, as it already did after text in a
+  `<div>`.
 - **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
   runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
   every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26
@@ -66,6 +82,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<br>`, the span's text was joined onto the item's last word, and a `<span>` right after a
   horizontal rule was joined onto the `---`. A `<span>` now leaves the line break before it in
   place (#546).
+- **Head metadata kept its character references encoded.** The `<base href>`, the
+  `<link rel="canonical">` href and the `<title>` text reached the frontmatter and the structured
+  metadata as written, so `<base href="https://example.com/it&#x27;s/">` produced
+  `base: https://example.com/it&#x27;s/`. They now go through the same decoder as `<meta content>`
+  and body text, including the Windows-1252 mapping for numeric references 128-159.
+- **A newline in a head value started a new frontmatter key.** The frontmatter wrote each
+  `key: value` line as it was, so a `<title>` or `<meta content>` holding a newline, literal or
+  written as `&#10;`, could add or override a key. Each key and value is now one YAML scalar: a
+  value that plain YAML would misread (a newline, `: `, ` #`, a leading `-`, `#` or `@`, a
+  control character) is written in double quotes with YAML escapes. Other values stay unquoted.
+- **Legacy named references without a semicolon were not decoded.** The spec lets about a hundred
+  names such as `&copy`, `&amp` and `&eacute` close without `;`, and browsers decode them in text:
+  `&copy 2024` is `© 2024`. The converter kept them as written. They now decode on both tiers,
+  with the spec's longest-name rule (`&notit;` is `¬it;`). In an attribute value a legacy name
+  followed by `=` or a letter or digit stays as written, so `?a=1&copy=2` in an `href` is unchanged.
+- **Frontmatter values that YAML reads as numbers, booleans, null or dates were not quoted.** A
+  value such as `3`, `true`, `null` or `2024-01-01` is a valid plain scalar, so a YAML reader
+  turned `meta-algolia-search-order: 3` into the number 3. A value that the YAML 1.2 core schema
+  or a YAML 1.1 reader resolves to anything other than a string is now written in double quotes.
+- **Numeric character references without a semicolon were not decoded.** The spec decodes `&#39`
+  and `&#x27` without their `;`, in text and in attribute values, so `it&#39s` is `it's` in a
+  browser. The converter kept the reference as written. It now decodes on both tiers.
+- **Tier 1 kept a reference encoded after an unknown name.** When an unknown name such as `&foo`
+  had a `;` a few bytes later, Tier 1 wrote the whole span as it was, so `&foo &amp;` kept
+  `&amp;` where Tier 2 wrote `&`. Tier 1 now writes the `&` alone and reads on, as Tier 2 does.
+- **Tier 1's fallback message added a `;` the page did not have.** When Tier 1 handed a reference
+  without its `;` to Tier 2, the log message showed `&#39;` for an input of `&#39`. The message
+  now shows the reference as written (#565).
+- **Tier 1's fallback message called a known reference unknown.** When Tier 1 handed a reference
+  without its `;` to Tier 2, the log message called it an unknown HTML entity even when the
+  reference was one Tier 2's decoder knows, such as `&#39` or `&copy`. The message now says the
+  reference is missing its `;` when the name is known, and keeps the unknown wording for names
+  that really are unknown (#586).
 
 - **`base_url` could pick a `<base href>` that a browser ignores.** The document base came from a
   byte scan for the first `<base` tag in the source, so a `<base>` inside a comment, inside

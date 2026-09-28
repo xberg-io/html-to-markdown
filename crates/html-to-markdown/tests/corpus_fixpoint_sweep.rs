@@ -73,9 +73,9 @@
 //!   rotation" cause already allow-listed there.
 //! - `stackoverflow/regex-html-parsing.html` is new to this corpus, but not to the underlying
 //!   cause: minimizing its diff shows the same Bucket D phantom-tag mechanism (a literal,
-//!   unescaped `<center>` in body text is consumed as a real tag on reparse) plus the same
-//!   `<hr>`-adjacent-to-text setext-collision mechanism as
-//!   `known_issue_unescaped_hr_adjacent_to_text_becomes_a_setext_heading`. Not a new bug class.
+//!   unescaped `<center>` in body text is consumed as a real tag on reparse) plus the
+//!   `<hr>`-adjacent-to-text setext collision that `hr_adjacent_to_text_is_now_a_rule` pins as
+//!   fixed; this document's output did not change with that fix. Not a new bug class.
 //!
 //! No document in this corpus surfaced a bug outside those two already-tracked buckets.
 //!

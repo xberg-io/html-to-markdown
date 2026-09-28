@@ -5,7 +5,9 @@
 Posted on May 15, 2017 by [Bogdan Anastasiei](https://www.r-bloggers.com/author/bogdan-anastasiei/) in [R bloggers](https://www.r-bloggers.com/category/r-bloggers/) | 0 Comments
 
 [This article was first published on **[R-posts.com](http://r-posts.com/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/)**, and kindly contributed to [R-bloggers](https://www.r-bloggers.com/)]. (You can report issue about the content on this page [here](https://www.r-bloggers.com/contact-us/))
+
 ---
+
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
 [Share](https://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.r-bloggers.com%2F2017%2F05%2Fthree-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects%2F)[Tweet](https://twitter.com/intent/tweet?text=Three-Way%20Analysis%20of%20Variance%3A%20Simple%20Second-Order%20Interaction%20Effects%20and%20Simple%20Main%20Effects&url=https://www.r-bloggers.com/2017/05/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/&via=Rbloggers)
@@ -40,6 +42,7 @@ In this situation, it is not advisable to report and interpret the second-order 
 1. the interaction effect of dose and type of employee, for each gender category (male and female)
 2. the interaction effect of gender and type of employee, at each dose level (placebo, low and high)
 3. the interaction effect of dose and gender, for each type of employee (blue collar and white collar).
+
 The total number of second-order interaction effect is given by the sum of the factor levels. In our case we have 7 effects (3+2+2). We will not analyze of all them, because this article would become too long. We will only focus on the first set of effects, leaving the others for you as an exercise.
 
 So let’s investigate the interaction effect of dose and type of employee for each gender group. First we have to create two separate data frames, for male and female employees. We do that with the *filter* command in the *dplyr* package (though you can also use brackets or subsets).
@@ -141,9 +144,11 @@ To learn more on data analysis in R, [check the free “Statistics with R” vid
 To **leave a comment** for the author, please follow the link and comment on their blog: **[R-posts.com](http://r-posts.com/three-way-analysis-of-variance-simple-second-order-interaction-effects-and-simple-main-effects/)**.
 
 ---
+
 [R-bloggers.com](https://www.r-bloggers.com/) offers **[daily e-mail updates](https://feedburner.google.com/fb/a/mailverify?uri=RBloggers)** about [R](https://www.r-project.org/ "The R Project for Statistical Computing") news and tutorials about [learning R](https://www.r-bloggers.com/how-to-learn-r-2/ "R tutorials") and many other topics. [Click here if you're looking to post or find an R/data-science job](https://www.r-users.com/ "Data science jobs").
 
 ---
+
 Want to share your content on R-bloggers?[click here](https://www.r-bloggers.com/add-your-blog/) if you have a blog, or [here](http://r-posts.com/) if you don't.
 
 [![](https://i1.wp.com/www.r-bloggers.com/wp-content/uploads/2020/07/RBloggers_feedburner_count_2020_07_01-e1593671704447.gif?w=578&ssl=1)](https://feeds.feedburner.com/RBloggers)

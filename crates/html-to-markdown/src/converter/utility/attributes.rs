@@ -27,8 +27,8 @@ use crate::converter::utility::content::normalized_tag_name;
 pub fn decoded_attribute<'a>(tag: &'a tl::HTMLTag<'a>, name: &'a str) -> Option<Cow<'a, str>> {
     let raw = tag.attributes().get(name).flatten()?.as_utf8_str();
     Some(match raw {
-        Cow::Borrowed(borrowed) => crate::text::decode_html_entities_cow(borrowed),
-        Cow::Owned(owned) => Cow::Owned(crate::text::decode_html_entities_cow(&owned).into_owned()),
+        Cow::Borrowed(borrowed) => crate::text::decode_attribute_value_cow(borrowed),
+        Cow::Owned(owned) => Cow::Owned(crate::text::decode_attribute_value_cow(&owned).into_owned()),
     })
 }
 
