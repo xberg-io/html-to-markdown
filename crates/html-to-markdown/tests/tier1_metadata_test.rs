@@ -480,6 +480,7 @@ fn should_ignore_a_head_after_implicit_body_content_on_both_tiers() {
     for html in [
         "<p>x</p><head><title>Stray</title></head><p>y</p>",
         "x<head><title>Stray</title></head><p>y</p>",
+        "< <head><title>Stray</title></head><p>y</p>",
         "<html><div>x</div><head><title>Stray</title></head><p>y</p></html>",
     ] {
         let out = t2(html);
@@ -498,14 +499,14 @@ fn should_read_a_head_after_head_content_and_whitespace_on_both_tiers() {
 
 #[cfg(feature = "metadata")]
 #[test]
-fn should_take_the_base_href_and_canonical_link_only_from_their_elements_in_the_document_metadata() {
+fn should_take_the_base_href_and_canonical_link_from_their_elements_and_a_meta_title_only_without_a_title_element() {
     let opts = ConversionOptions {
         tier_strategy: TierStrategy::Tier2,
         extract_metadata: true,
         base_url: Some("https://example.com/dir/page".to_string()),
         ..ConversionOptions::default()
     };
-    let html = r#"<html><head><base href="/real/"><meta name="base" content="/meta/"><link rel="canonical" href="https://example.com/real"><meta name="canonical" content="https://example.com/meta"></head><body><p><a href="x">x</a></p></body></html>"#;
+    let html = r#"<html><head><title>Real</title><meta name="title" content="Meta"><base href="/real/"><meta name="base" content="/meta/"><link rel="canonical" href="https://example.com/real"><meta name="canonical" content="https://example.com/meta"></head><body><p><a href="x">x</a></p></body></html>"#;
     let result = convert(html, Some(opts.clone())).unwrap();
     assert!(
         result
@@ -516,10 +517,14 @@ fn should_take_the_base_href_and_canonical_link_only_from_their_elements_in_the_
     let document = result.metadata.document;
     assert_eq!(document.base_href.as_deref(), Some("/real/"));
     assert_eq!(document.canonical_url.as_deref(), Some("https://example.com/real"));
+    assert_eq!(document.title.as_deref(), Some("Real"));
     assert_eq!(document.meta_tags.get("base").map(String::as_str), Some("/meta/"));
+    assert_eq!(document.meta_tags.get("title").map(String::as_str), Some("Meta"));
 
-    let html = r#"<html><head><meta name="base" content="/meta/"><meta name="canonical" content="https://example.com/meta"></head><body><p>x</p></body></html>"#;
+    let html = r#"<html><head><meta name="title" content="Meta"><meta name="base" content="/meta/"><meta name="canonical" content="https://example.com/meta"></head><body><p>x</p></body></html>"#;
     let document = convert(html, Some(opts)).unwrap().metadata.document;
+    assert_eq!(document.title.as_deref(), Some("Meta"));
+    assert!(!document.meta_tags.contains_key("title"));
     assert_eq!(document.base_href, None);
     assert_eq!(document.canonical_url, None);
 }
@@ -567,5 +572,19 @@ fn should_give_the_document_structure_the_metadata_block_of_the_head_the_metadat
         assert_eq!(blocks, expected, "{html}");
         let document = convert(html, Some(opts.clone())).unwrap().metadata.document;
         assert_eq!(document.title.as_deref(), title, "{html}");
+    }
+}
+
+#[test]
+fn should_read_the_head_after_a_utf8_byte_order_mark_on_both_tiers() {
+    let html = "\u{FEFF}<html><head><title>T</title></head><body><p>x</p></body></html>";
+    for tier in [TierStrategy::Tier2, TierStrategy::Tier1] {
+        let opts = ConversionOptions {
+            tier_strategy: tier,
+            extract_metadata: true,
+            ..ConversionOptions::default()
+        };
+        let out = convert(html, Some(opts)).unwrap().content.unwrap_or_default();
+        assert_eq!(out, "---\ntitle: T\n---\n\nx\n", "{tier:?}");
     }
 }

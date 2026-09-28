@@ -440,11 +440,13 @@ fn panic_message(payload: &(dyn std::any::Any + Send)) -> String {
     }
 }
 
-/// Validate and normalize HTML input for conversion.
+/// Validate and normalize HTML input for conversion. A leading byte order mark is dropped, as
+/// a browser's decoder drops it, so it is not text that starts the body.
 fn normalize_input(html: &str) -> Result<Cow<'_, str>> {
     let decoded = decode_utf16_if_needed(html);
     match decoded {
         Cow::Borrowed(borrowed) => {
+            let borrowed = borrowed.strip_prefix('\u{FEFF}').unwrap_or(borrowed);
             validate_input(borrowed)?;
             let sanitized = strip_nul_bytes(borrowed);
             let line_normalized = match sanitized {

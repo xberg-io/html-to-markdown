@@ -121,13 +121,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of its own, and Tier 2 read it when the real head was empty. Both tiers now read only the first
   head before the body. The body starts at a `<body>` tag, at text, or at any tag other than the
   ones a head can hold, so `<p>x</p><head><title>Stray</title></head>` has no title. The
-  document structure gives a metadata block only for the head the metadata reads.
+  document structure gives a metadata block only for the head the metadata reads. A leading
+  UTF-8 byte order mark is dropped first, as a browser's decoder drops it, so it does not start
+  the body and no longer appears at the start of the output.
 
-- **A `<meta>` tag named `base` or `canonical` replaced the document's base and canonical link.**
-  `<meta name="base" content="/meta/">` next to `<base href="/real/">` set `base_href` in the
-  document metadata to `/meta/`, while the links resolved against `/real/`. The `base_href` and
-  `canonical_url` fields now come only from the `<base>` element and `<link rel="canonical">`,
-  and such a meta tag is an ordinary entry in `meta_tags`.
+- **A `<meta>` tag named `title`, `base` or `canonical` replaced the document's title, base and
+  canonical link.** `<meta name="base" content="/meta/">` next to `<base href="/real/">` set
+  `base_href` in the document metadata to `/meta/`, while the links resolved against `/real/`, and
+  `<meta name="title">` replaced the `<title>` text. The `base_href` and `canonical_url` fields
+  now come only from the `<base>` element and `<link rel="canonical">`, and such a meta tag is an
+  ordinary entry in `meta_tags`. A `<meta name="title">` still gives the `title` of a page without
+  a `<title>` element, but it no longer replaces the text of one.
 
 ## [3.15.1] - 2026-09-27
 
