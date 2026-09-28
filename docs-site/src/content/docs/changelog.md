@@ -40,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line, the same as text after a paragraph, in both rendering paths. This includes a list item
   that ends in a line break, and a `<br>` right after a list with backslash line breaks, which
   also put the text inside the item. Text after a horizontal rule gets the same blank line.
+- **A horizontal rule right after a line of text turned the text into a heading (#584).** Inside
+  a paragraph, and at the start of a definition, the rule was written on the line right after
+  the text, so `<p>t<hr>B</p>` gave `t\n---` and `<dl><dt>t</dt><dd><hr></dd></dl>` gave the same.
+  Markdown reads `---` under text as a heading underline, so `t` became a heading and the rule
+  was lost. The rule now starts after a blank line there too, as it already did after text in a
+  `<div>`.
 - **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
   runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
   every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26
