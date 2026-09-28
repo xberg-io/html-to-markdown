@@ -201,3 +201,25 @@ fn should_keep_a_definition_that_does_not_start_with_a_rule_on_the_line_after_it
         assert_eq!(tier2(html), expected, "Tier 2 changed a definition: {html:?}");
     }
 }
+
+#[test]
+fn should_not_add_a_second_blank_line_before_a_rule_that_already_has_one() {
+    // ~keep Inside a quote every line keeps its `>`, so a second blank line survives as an extra
+    // ~keep `>` line instead of being collapsed at the end of the conversion.
+    let html = "<blockquote><dl><dt>t</dt><dd>d</dd><dd><hr></dd></dl></blockquote>";
+    assert_eq!(
+        tier2(html),
+        "> t\n> d\n>\n> ---\n",
+        "a rule after a blank line must not get another one: {html:?}"
+    );
+}
+
+#[test]
+fn should_not_start_the_output_with_blank_lines_before_a_leading_rule() {
+    let html = "<dd><hr></dd>";
+    assert_eq!(
+        tier2(html),
+        "---\n",
+        "a rule with no text before it needs no blank line: {html:?}"
+    );
+}
