@@ -679,3 +679,55 @@ fn should_reach_the_content_column_with_the_fewest_tabs() {
     );
     assert!(!render(&out).contains("<pre>"), "{out:?} renders {:?}", render(&out));
 }
+
+#[test]
+fn should_keep_the_marker_line_before_a_container_that_starts_with_a_rule() {
+    // ~keep `- ---` is a thematic break, which loses the item; the rule goes below the marker.
+    for html in [
+        "<ul><li><dl><dd><hr></dd></dl></li></ul>",
+        "<ul><li><section><hr></section></li></ul>",
+        "<ul><li><br><dl><dd><hr></dd></dl></li></ul>",
+    ] {
+        let out = tier2(html);
+        assert!(
+            render(&out).starts_with("<ul>\n<li></li>\n</ul>\n<hr />"),
+            "{html:?}: the rule swallowed the item: {out:?} renders {:?}",
+            render(&out)
+        );
+    }
+}
+
+#[test]
+fn should_keep_text_after_a_nested_task_list_on_the_fast_path() {
+    // ~keep The full converter turns the whole item into a task item and joins its text (a filed
+    // ~keep gap); the fast path's output is the one from before issue #583.
+    let auto = ConversionOptions {
+        tier_strategy: TierStrategy::Auto,
+        ..tier2_options()
+    };
+    for (html, expected) in [
+        (
+            r#"<ul><li>X<ul><li><input type="checkbox" checked> A</li></ul>ZZ</li></ul>"#,
+            "- X\n  * A\n  ZZ\n",
+        ),
+        (
+            r#"<ul><li>X<ul><li><input type="checkbox"> A</li></ul>ZZ</li></ul>"#,
+            "- X\n  * A\n  ZZ\n",
+        ),
+    ] {
+        assert_eq!(
+            tier1(html).as_deref(),
+            Some(expected),
+            "Tier 1 handed {html:?} to Tier 2"
+        );
+        assert_eq!(
+            convert_with(html, auto.clone()),
+            expected,
+            "auto mode differs on {html:?}"
+        );
+    }
+    assert!(
+        tier1("<ul><li>X<ul><li>A</li></ul>ZZ</li></ul>").is_none(),
+        "Tier 1 converted a nested list without a checkbox"
+    );
+}

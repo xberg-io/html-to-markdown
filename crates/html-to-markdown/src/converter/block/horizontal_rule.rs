@@ -74,12 +74,13 @@ pub fn handle(
     // ~keep A rule after other content of a list item starts at the item's content column, or
     // ~keep it ends the list (issue #583). Whitespace after a bare marker (a `<br>` there) is
     // ~keep not content: the rule then follows the marker like a rule at the marker.
+    let at_bare_marker = ctx.in_list_item && crate::converter::list::utils::trim_whitespace_after_bare_marker(output);
     let list_indent = if ctx.in_list_item
         && ctx.blockquote_depth == 0
         && !ctx.convert_as_inline
         && !ctx.in_table_cell
         && !output.is_empty()
-        && !crate::converter::list::utils::trim_whitespace_after_bare_marker(output)
+        && !at_bare_marker
     {
         crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
             .filter(|indent| crate::converter::list::utils::item_is_open(output, indent, ctx))
@@ -119,7 +120,8 @@ pub fn handle(
 }
 
 /// Write a blank line before a container's `content` when it starts with a rule and `output` ends
-/// in text. The container rendered the rule into its own buffer, so the rule saw no text before it.
+/// in text or in a bare list marker. The container rendered the rule into its own buffer, so the
+/// rule saw nothing before it; on a marker line the rule would swallow the item (`- ---` is a rule).
 pub fn separate_leading_rule(output: &mut String, content: &str) {
     if content.split('\n').next() != Some("---") || output.is_empty() || output.ends_with("\n\n") {
         return;

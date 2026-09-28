@@ -466,7 +466,8 @@ pub fn scan(
                 // `BailReason::BlockquoteCite` check in `emit_open` read an empty `attrs`
                 // and never fired, so Tier-1 kept dropping the citation while looking
                 // fixed. Any new attribute read from `emit_open` needs its kind added here
-                // in the same change, or the read silently sees nothing.
+                // in the same change, or the read silently sees nothing. `<input>` is here
+                // for `type`, which `emit_void` reads to spot a checkbox in a list item.
                 let needs_attrs = matches!(
                     spec.kind,
                     TagKind::Link
@@ -477,7 +478,7 @@ pub fn scan(
                         | TagKind::Pre
                         | TagKind::Code
                         | TagKind::Blockquote
-                ) || name_lower == b"abbr";
+                ) || matches!(name_lower, b"abbr" | b"input");
                 let attrs: Vec<(&[u8], Option<&[u8]>)> = if needs_attrs {
                     parse::collect_attrs(bytes, name_end, attrs_end)
                 } else {
@@ -665,6 +666,7 @@ pub fn scan(
                     ol_start,
                     name_range: name_start..name_end,
                     dropped_whitespace_only_text: false,
+                    holds_checkbox: false,
                 });
 
                 apply_open_escape_ctx(&mut state, spec);
@@ -1503,6 +1505,16 @@ fn strip_leading_bare_marker(text: &str) -> Option<&str> {
 /// Whether the scanner is inside a `<dt>` or `<dd>` that a list item holds without a `<dl>`.
 /// Tier-2 writes such a term below an empty item, so the rule after it and the text after that
 /// stay on the fast path, where `- t` keeps the term in the item.
+/// Whether the innermost open list item holds a checkbox (see `OpenTag::holds_checkbox`).
+fn item_holds_checkbox(state: &Tier1State) -> bool {
+    state
+        .stack
+        .iter()
+        .rev()
+        .find(|frame| matches!(frame.spec.kind, TagKind::ListItem))
+        .is_some_and(|frame| frame.holds_checkbox)
+}
+
 fn inside_stray_definition(state: &Tier1State) -> bool {
     for frame in state.stack.iter().rev() {
         match frame.spec.kind {
@@ -1784,6 +1796,17 @@ fn emit_void(
     // ~keep A void element closes the "just closed a custom element" boundary
     // window too (see the field's doc comment on `Tier1State`).
     state.last_closed_custom_element = false;
+    if name_lower == b"input"
+        && attrs.iter().any(|(key, value)| {
+            key.eq_ignore_ascii_case(b"type") && value.is_some_and(|v| v.eq_ignore_ascii_case(b"checkbox"))
+        })
+    {
+        for frame in &mut state.stack {
+            if matches!(frame.spec.kind, TagKind::ListItem) {
+                frame.holds_checkbox = true;
+            }
+        }
+    }
     // ~keep Closes the "just emitted an <img>" window too (see
     // `Tier1State::last_emitted_was_img`); the `TagKind::Image` arm below
     // re-sets it to true after this reset runs.
@@ -3914,7 +3937,7 @@ fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason>
     }
     // ~keep Inside a list item Tier-2 starts it at the item's content column after a blank
     // ~keep line (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
-    if state.list_continuation_indent_width() > 0 && !inside_stray_definition(state) {
+    if state.list_continuation_indent_width() > 0 && !inside_stray_definition(state) && !item_holds_checkbox(state) {
         return Err(BailReason::ListItemUnsupportedBlockChild);
     }
     if state.list_depth > 0 {

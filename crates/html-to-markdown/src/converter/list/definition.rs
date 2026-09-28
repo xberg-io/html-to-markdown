@@ -58,6 +58,7 @@ pub fn handle_dl(
         } else if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, trimmed);
         output.push_str(trimmed);
         output.push_str("\n\n");
     }
