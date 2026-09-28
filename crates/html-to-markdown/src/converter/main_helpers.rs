@@ -717,7 +717,9 @@ fn collect_link_head_metadata(child_tag: &tl::HTMLTag, metadata: &mut BTreeMap<S
     let Some(href) = crate::converter::utility::attributes::decoded_attribute(child_tag, "href") else {
         return;
     };
-    metadata.entry("canonical".to_string()).or_insert_with(|| href.into_owned());
+    metadata
+        .entry("canonical".to_string())
+        .or_insert_with(|| href.into_owned());
 }
 
 /// Extract metadata from the head element below `roots`, recording `document_base_href` as
