@@ -71,6 +71,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   off from it by a blank line for `=======`, so the heading was lost too. A rule now stays on its
   own line, and an underline stays right under its heading text, which is not reflowed, as with a
   `#` heading. Both hold inside a quote too.
+- **Wrap mode joined the keys of the frontmatter into one line.** With `wrap` on and metadata
+  extraction on, the YAML frontmatter went through the reflow like body text, so
+  `---\ntitle: My Page\n---` became `--- title: My Page ---` and the frontmatter was lost. Only
+  the text after the frontmatter is wrapped now.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition

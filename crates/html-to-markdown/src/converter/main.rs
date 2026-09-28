@@ -174,6 +174,7 @@ pub fn convert_html_impl(
     let is_plain_text = options.output_format == OutputFormat::Plain;
 
     let wants_frontmatter = options.extract_metadata && !options.convert_as_inline;
+    let mut frontmatter = String::new();
     #[cfg(feature = "metadata")]
     let wants_document = metadata_collector
         .as_ref()
@@ -210,7 +211,8 @@ pub fn convert_html_impl(
         }
 
         if wants_frontmatter && !head_metadata.is_empty() {
-            output.push_str(&format_metadata_frontmatter(&head_metadata));
+            frontmatter = format_metadata_frontmatter(&head_metadata);
+            output.push_str(&frontmatter);
         }
 
         #[cfg(feature = "metadata")]
@@ -359,6 +361,11 @@ pub fn convert_html_impl(
         collapse_excess_blank_lines(&mut output);
         output
     };
+    let output = if options.wrap {
+        wrap_after_frontmatter(&output, &frontmatter, options)
+    } else {
+        output
+    };
     let (document, tables) = finish_structure_collector(structure_collector);
     tracing::debug!(
         target: "html_to_markdown::convert",
@@ -367,6 +374,22 @@ pub fn convert_html_impl(
         "render stage complete"
     );
     Ok((output, document, tables, depth_warning))
+}
+
+/// Wrap `output` at the wrap width, leaving the `frontmatter` it starts with as it is.
+///
+/// ~keep The frontmatter is YAML, not Markdown: wrapped, its closing `---` reads as a heading
+/// ~keep underline and its keys join into one line that YAML cannot parse. The plain-text output
+/// ~keep carries no frontmatter, so all of it is wrapped.
+fn wrap_after_frontmatter(output: &str, frontmatter: &str, options: &ConversionOptions) -> String {
+    let body_start = if output.starts_with(frontmatter) {
+        frontmatter.len()
+    } else {
+        0
+    };
+    let mut wrapped = output[..body_start].to_owned();
+    wrapped.push_str(&crate::wrapper::wrap_markdown(&output[body_start..], options));
+    wrapped
 }
 
 /// Consume the structure collector and return the [`DocumentStructure`] and extracted

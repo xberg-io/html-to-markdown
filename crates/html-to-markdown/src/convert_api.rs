@@ -370,12 +370,6 @@ fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionRes
         }
     };
 
-    let markdown = if options.wrap {
-        crate::wrapper::wrap_markdown(&markdown, &options)
-    } else {
-        markdown
-    };
-
     #[cfg(feature = "metadata")]
     let metadata = if let Some(collector) = metadata_collector {
         Rc::try_unwrap(collector)

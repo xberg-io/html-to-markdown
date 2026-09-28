@@ -2,7 +2,8 @@
 #![allow(missing_docs)]
 
 //! Regression tests for issue #607: wrap mode folded a rule line, or a heading underline, into the
-//! text around it, so the rule or the heading was lost.
+//! text around it, so the rule or the heading was lost. Wrap mode also joined the keys of the
+//! frontmatter into one line.
 
 use html_to_markdown_rs::{ConversionOptions, HeadingStyle, TierStrategy, convert};
 
@@ -82,5 +83,32 @@ fn should_keep_a_rule_and_an_underline_on_their_own_lines_in_a_quote() {
         render(&out),
         "<blockquote>\n<h2>Heading</h2>\n<p>x</p>\n</blockquote>\n",
         "{out:?} must keep the heading"
+    );
+}
+
+fn convert_with(html: &str, options: ConversionOptions) -> String {
+    convert(html, Some(options))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default()
+}
+
+#[test]
+fn should_keep_the_frontmatter_a_yaml_block_when_wrapping() {
+    let options = ConversionOptions {
+        tier_strategy: TierStrategy::Tier2,
+        wrap: true,
+        wrap_width: 20,
+        ..ConversionOptions::default()
+    };
+    let out = convert_with(
+        "<html><head><title>My Page</title><meta name=\"description\" content=\"A page about things\"></head>\
+         <body><p>one two three four five six seven</p></body></html>",
+        options,
+    );
+    assert_eq!(
+        out,
+        "---\nmeta-description: A page about things\ntitle: My Page\n---\n\none two three four\nfive six seven\n\n",
+        "the frontmatter must stay one key per line and only the text after it wraps"
     );
 }
