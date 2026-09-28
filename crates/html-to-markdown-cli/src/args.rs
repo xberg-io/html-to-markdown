@@ -421,12 +421,13 @@ pub struct Cli {
     #[arg(help_heading = "Element Handling")]
     pub skip_images: bool,
 
-    /// What to write for an image or media element whose address is a data: URL
+    /// What to write for an image, media element, or link, whose address is a data: URL
     ///
-    /// Covers img, graphic, inline svg, video, audio and iframe; links keep their destination:
+    /// Covers img, graphic, inline svg, video, audio, iframe, and a link whose own address is a
+    /// data: URL:
     /// - 'keep': Write the data: URL with its payload (default)
-    /// - 'alt-text-only': Write the alt text without a destination
-    /// - 'drop-element': Write nothing for the element
+    /// - 'alt-text-only': Write the alt text without a destination; for a link, write its text
+    /// - 'drop-element': Write nothing for the element; for a link, write its text with no address
     #[arg(long, value_name = "CHOICE")]
     #[arg(help_heading = "Element Handling")]
     pub inline_data_media: Option<CliInlineDataMedia>,

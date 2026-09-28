@@ -22,8 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a `<source>` of the `<picture>` that holds an `<img>`. The document structure follows the
   markdown: no image node for a dropped element, and no address when only the alt text is
   written. A link whose only content the option removed is dropped with it, instead of turning
-  into a link labelled with its own address. Links keep their destination, and extracted images
-  do not change. The CLI takes it as `--inline-data-media` (#528).
+  into a link labelled with its own address. A link whose own address is a `data:` URL gets the
+  same choice: `alt_text_only` and `drop_element` both write the link's text with no destination,
+  since a link has no caption separate from its text the way an image has alt text, and that text
+  is never dropped along with the address. Extracted images do not change. The CLI takes it as
+  `--inline-data-media` (#528).
 
 ### Changed
 

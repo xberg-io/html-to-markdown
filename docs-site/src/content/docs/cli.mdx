@@ -114,7 +114,7 @@ html-to-markdown --url https://example.com > output.md
 | ---------------------------------- | ----------------------------------------------------------------------------------- |
 | `--keep-inline-images-in ELEMENTS` | Comma-separated element names where images stay as `![alt](src)` (e.g. `a,strong`). |
 | `--skip-images`                    | Drop all `<img>` elements entirely. No `![alt](src)` output, no alt-text fallback.  |
-| `--inline-data-media CHOICE`       | What to write for an image or media element whose address is a `data:` URL: `keep` (default, the URL with its payload), `alt-text-only`, or `drop-element`. |
+| `--inline-data-media CHOICE`       | What to write for an image, media element, or link, whose address is a `data:` URL: `keep` (default, the URL with its payload), `alt-text-only`, or `drop-element`. For a link, `alt-text-only` and `drop-element` both write its text with no address. |
 | `--max-image-size BYTES`           | Skip inline images whose decoded payload exceeds this size. Default `5242880` (5 MB). Requires `--extract-inline-images`. |
 | `--capture-svg`                    | Capture inline `<svg>` elements as extracted images. Requires `--extract-inline-images`. |
 | `--no-infer-dimensions`            | Skip inferring image width and height from the decoded payload when the HTML omits them. Requires `--extract-inline-images`. |

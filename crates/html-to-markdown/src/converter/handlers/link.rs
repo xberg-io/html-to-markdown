@@ -16,11 +16,12 @@ use crate::converter::block::heading::{find_single_heading_child, heading_allows
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{MarkdownLink, append_markdown_link, has_uri_scheme};
 use crate::converter::main::walk_node;
+use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
     collect_link_label_text, get_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
-use crate::options::ConversionOptions;
+use crate::options::{ConversionOptions, InlineDataMedia};
 use crate::text;
 use std::borrow::Cow;
 
@@ -63,6 +64,15 @@ pub fn handle_link(
     let title = crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|v| !v.is_empty());
 
     if let Some(href) = href_attr {
+        // ~keep #120 (link half): a `data:` href is not media, but it carries the same inline
+        // ~keep payload problem the image/svg/video/audio half of this option already solves.
+        // ~keep `AltTextOnly` and `DropElement` collapse to the same outcome for a link: unlike
+        // ~keep an image's alt attribute, a link has no separate "caption" distinct from its
+        // ~keep own text, and that text is content, never dropped -- only the address goes.
+        let href_addr_dropped = matches!(
+            inline_data_treatment(options.inline_data_media, &href),
+            InlineDataMedia::AltTextOnly | InlineDataMedia::DropElement
+        );
         let owned_children: Vec<tl::NodeHandle>;
         let children: &[tl::NodeHandle] = if let Some(c) = dom_ctx.children_of(node_handle.get_inner()) {
             c.as_slice()
@@ -103,10 +113,14 @@ pub fn handle_link(
         // ~keep the deferred table's own cell text, so without this guard a table whose text
         // ~keep happened to equal the href would autolink on the TABLE's text and silently
         // ~keep drop the table itself.
+        // ~keep `!href_addr_dropped` (#120): the GFM autolink form writes the href as its own
+        // ~keep visible text (`<href>`), which would put the payload right back into the
+        // ~keep output the chosen treatment asked to remove.
         let is_autolink = options.autolinks
             && !options.default_title
             && !emit_blocks_separately
             && !href.is_empty()
+            && !href_addr_dropped
             && has_uri_scheme(href.as_str())
             && (raw_text == href || (href.starts_with("mailto:") && raw_text == &href[7..]));
 
@@ -121,46 +135,51 @@ pub fn handle_link(
             return;
         }
 
-        if let Some((heading_level, heading_handle)) = find_single_heading_child(*node_handle, parser) {
-            if let Some(heading_node) = heading_handle.get(parser) {
-                if let tl::Node::Tag(heading_tag) = heading_node {
-                    let heading_name = normalized_tag_name(heading_tag.name().as_utf8_str()).into_owned();
-                    let mut heading_text = String::new();
-                    let heading_ctx = Context {
-                        in_heading: true,
-                        convert_as_inline: true,
-                        heading_allow_inline_images: heading_allows_inline_images(
-                            &heading_name,
-                            &ctx.keep_inline_images_in,
-                        ),
-                        ..ctx.clone()
-                    };
-                    walk_node(
-                        &heading_handle,
-                        parser,
-                        &mut heading_text,
-                        options,
-                        &heading_ctx,
-                        depth + 1,
-                        dom_ctx,
-                    );
-                    let trimmed_heading = heading_text.trim();
-                    if !trimmed_heading.is_empty() {
-                        let escaped_label = escape_link_label(trimmed_heading);
-                        let mut link_buffer = String::new();
-                        append_markdown_link(
-                            &mut link_buffer,
-                            &MarkdownLink {
-                                label: &escaped_label,
-                                href: href.as_str(),
-                                title: title.as_deref(),
-                                raw_text,
-                            },
+        // ~keep #120: the fast path below always writes `href` as the heading link's
+        // ~keep destination, so a dropped `data:` address must skip it and fall through to
+        // ~keep the general label logic further down, which honors `href_addr_dropped`.
+        if !href_addr_dropped {
+            if let Some((heading_level, heading_handle)) = find_single_heading_child(*node_handle, parser) {
+                if let Some(heading_node) = heading_handle.get(parser) {
+                    if let tl::Node::Tag(heading_tag) = heading_node {
+                        let heading_name = normalized_tag_name(heading_tag.name().as_utf8_str()).into_owned();
+                        let mut heading_text = String::new();
+                        let heading_ctx = Context {
+                            in_heading: true,
+                            convert_as_inline: true,
+                            heading_allow_inline_images: heading_allows_inline_images(
+                                &heading_name,
+                                &ctx.keep_inline_images_in,
+                            ),
+                            ..ctx.clone()
+                        };
+                        walk_node(
+                            &heading_handle,
+                            parser,
+                            &mut heading_text,
                             options,
-                            ctx.reference_collector.as_ref(),
+                            &heading_ctx,
+                            depth + 1,
+                            dom_ctx,
                         );
-                        push_heading(output, ctx, options, heading_level, link_buffer.as_str());
-                        return;
+                        let trimmed_heading = heading_text.trim();
+                        if !trimmed_heading.is_empty() {
+                            let escaped_label = escape_link_label(trimmed_heading);
+                            let mut link_buffer = String::new();
+                            append_markdown_link(
+                                &mut link_buffer,
+                                &MarkdownLink {
+                                    label: &escaped_label,
+                                    href: href.as_str(),
+                                    title: title.as_deref(),
+                                    raw_text,
+                                },
+                                options,
+                                ctx.reference_collector.as_ref(),
+                            );
+                            push_heading(output, ctx, options, heading_level, link_buffer.as_str());
+                            return;
+                        }
                     }
                 }
             }
@@ -263,7 +282,9 @@ pub fn handle_link(
         // ~keep fallback below would print a bare self-link where the page showed an image.
         let drop_link = label.is_empty() && ctx.inline_data_replaced.get();
 
-        if label.is_empty() && !href.is_empty() && !children.is_empty() && !drop_link {
+        // ~keep `!href_addr_dropped` (#120): this fallback's whole job is putting `href` into
+        // ~keep the visible text, which is exactly what a dropped `data:` address must not do.
+        if label.is_empty() && !href.is_empty() && !children.is_empty() && !drop_link && !href_addr_dropped {
             // ~keep The href is raw attribute text that never passed through a text node's
             // ~keep normal escaping, unlike every other label source above (heading text,
             // ~keep inline content, `raw_text`) which was already escaped while it was
@@ -286,6 +307,28 @@ pub fn handle_link(
         }
 
         let escaped_label = escape_link_label(&label);
+
+        // ~keep #120: with a dropped `data:` address, the label is written as plain text --
+        // ~keep not wrapped in `[...]`, so `escape_link_label`'s bracket-balancing (needed only
+        // ~keep to protect an OUTER `[`/`]` pair this call no longer writes) does not apply, and
+        // ~keep no destination or title survives either.
+        let write_link = |output: &mut String| {
+            if href_addr_dropped {
+                output.push_str(&label);
+            } else {
+                append_markdown_link(
+                    output,
+                    &MarkdownLink {
+                        label: &escaped_label,
+                        href: href.as_str(),
+                        title: title.as_deref(),
+                        raw_text: label.as_str(),
+                    },
+                    options,
+                    ctx.reference_collector.as_ref(),
+                );
+            }
+        };
 
         // ~keep #490: whether the deferred block children (if any) should still be walked
         // ~keep after the link markdown below. `false` only for `Skip` (the caller asked for
@@ -321,17 +364,7 @@ pub fn handle_link(
                 visitor.visit_link(&node_ctx, &href, &label, title.as_deref())
             };
             match visit_result {
-                VisitResult::Continue => append_markdown_link(
-                    output,
-                    &MarkdownLink {
-                        label: &escaped_label,
-                        href: href.as_str(),
-                        title: title.as_deref(),
-                        raw_text: label.as_str(),
-                    },
-                    options,
-                    ctx.reference_collector.as_ref(),
-                ),
+                VisitResult::Continue => write_link(output),
                 VisitResult::Custom(custom) => output.push_str(&custom),
                 VisitResult::Skip => should_emit_deferred_blocks = false,
                 VisitResult::Error(err) => {
@@ -345,32 +378,12 @@ pub fn handle_link(
                 }
             }
         } else {
-            append_markdown_link(
-                output,
-                &MarkdownLink {
-                    label: &escaped_label,
-                    href: href.as_str(),
-                    title: title.as_deref(),
-                    raw_text: label.as_str(),
-                },
-                options,
-                ctx.reference_collector.as_ref(),
-            );
+            write_link(output);
         }
 
         #[cfg(not(feature = "visitor"))]
         if !drop_link {
-            append_markdown_link(
-                output,
-                &MarkdownLink {
-                    label: &escaped_label,
-                    href: href.as_str(),
-                    title: title.as_deref(),
-                    raw_text: label.as_str(),
-                },
-                options,
-                ctx.reference_collector.as_ref(),
-            );
+            write_link(output);
         }
 
         #[cfg(feature = "metadata")]

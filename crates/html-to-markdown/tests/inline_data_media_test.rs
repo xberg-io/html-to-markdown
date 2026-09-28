@@ -362,11 +362,70 @@ fn an_inline_svg_prints_the_payload_the_title_or_nothing() {
 }
 
 #[test]
-fn a_link_to_a_data_url_is_not_media_and_stays() {
+fn a_link_to_a_data_url_keeps_the_payload_or_just_its_text() {
     let html = r#"<p><a href="data:text/plain,hello">file</a></p>"#;
+    let [keep, alt, drop] = all_choices(html);
+    assert_eq!(keep, "[file](data:text/plain,hello)\n");
+    assert_eq!(alt, "file\n");
+    assert_eq!(drop, "file\n");
+}
+
+#[test]
+fn a_link_to_a_data_url_wrapping_an_image_keeps_the_image_and_drops_the_link_address() {
+    let html = r#"<p><a href="data:text/plain,hello"><img src="pic.png" alt="pic"></a></p>"#;
+    let [keep, alt, drop] = all_choices(html);
+    assert_eq!(keep, "[![pic](pic.png)](data:text/plain,hello)\n");
+    assert_eq!(alt, "![pic](pic.png)\n");
+    assert_eq!(drop, "![pic](pic.png)\n");
+}
+
+#[test]
+fn a_data_link_whose_text_equals_its_own_address_does_not_autolink() {
+    // ~keep The GFM autolink form (`<href>`) writes `href` as the link's own visible text, which
+    // ~keep would put the payload right back into the output a dropped address asked to remove.
+    let html = r#"<p><a href="data:text/plain,hi">data:text/plain,hi</a></p>"#;
+    let [keep, alt, drop] = all_choices(html);
+    assert_eq!(keep, "<data:text/plain,hi>\n");
+    assert_eq!(alt, "data:text/plain,hi\n");
+    assert_eq!(drop, "data:text/plain,hi\n");
+}
+
+#[test]
+fn a_data_link_wrapping_a_heading_drops_the_address_not_the_heading_text() {
+    let html = r#"<a href="data:text/plain,hello"><h2>Title</h2></a>"#;
+    let [keep, alt, drop] = all_choices(html);
+    assert_eq!(keep, "## [Title](data:text/plain,hello)\n");
+    assert_eq!(alt, "Title\n");
+    assert_eq!(drop, "Title\n");
+}
+
+#[test]
+fn a_data_link_with_no_text_content_writes_nothing_once_the_address_is_dropped() {
+    // ~keep With `Keep`, an empty label falls back to the href itself so the link is never
+    // ~keep silently blank; that fallback must not fire once the choice is dropping the
+    // ~keep address, or the payload reappears as the link's own visible text.
+    let html = r#"<p><a href="data:text/plain,hello"><span></span></a></p>"#;
+    let [keep, alt, drop] = all_choices(html);
+    assert_eq!(keep, "[data:text/plain,hello](data:text/plain,hello)\n");
+    assert_eq!(alt, "");
+    assert_eq!(drop, "");
+}
+
+#[test]
+fn a_normal_link_is_unaffected_by_the_data_link_choice() {
+    let html = r#"<p><a href="https://example.com/page">text</a></p>"#;
     for output in all_choices(html) {
-        assert_eq!(output, "[file](data:text/plain,hello)\n");
+        assert_eq!(output, "[text](https://example.com/page)\n");
     }
+}
+
+#[test]
+fn a_link_to_an_upper_case_data_url_is_treated_the_same() {
+    let html = r#"<p><a href="DATA:text/plain,hello">file</a></p>"#;
+    let [keep, alt, drop] = all_choices(html);
+    assert_eq!(keep, "[file](DATA:text/plain,hello)\n");
+    assert_eq!(alt, "file\n");
+    assert_eq!(drop, "file\n");
 }
 
 #[test]
