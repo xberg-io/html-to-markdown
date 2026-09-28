@@ -21,10 +21,17 @@ use crate::options::InlineDataMedia;
 /// Whether `address` is a `data:` URL, which carries its content inline. The scheme matches in
 /// any case, after leading whitespace, as a URL parser reads it.
 pub fn is_inline_data(address: &str) -> bool {
+    data_url_body(address).is_some()
+}
+
+/// The part of a `data:` URL after its scheme (`image/png;base64,...`), or `None` when `address`
+/// is not one. Matches as [`is_inline_data`] does.
+pub fn data_url_body(address: &str) -> Option<&str> {
+    let address = address.trim_start_matches(|c: char| c.is_ascii_whitespace() || c.is_ascii_control());
     address
-        .trim_start_matches(|c: char| c.is_ascii_whitespace() || c.is_ascii_control())
         .get(..5)
-        .is_some_and(|scheme| scheme.eq_ignore_ascii_case("data:"))
+        .filter(|scheme| scheme.eq_ignore_ascii_case("data:"))
+        .map(|_| &address[5..])
 }
 
 /// What to write for an element whose chosen address is `address`: `choice` when the address is

@@ -27,15 +27,14 @@ pub fn handle_inline_data_image(
     title: Option<&str>,
     attributes: BTreeMap<String, String>,
 ) {
-    let trimmed_src = src.trim();
-    if !trimmed_src.starts_with("data:") {
+    let Some(body) = crate::converter::media::data_url_body(src.trim_end()) else {
         return;
-    }
+    };
 
     let mut collector = collector_ref.borrow_mut();
     let index = collector.next_index();
 
-    let Some((meta, payload)) = trimmed_src.split_once(',') else {
+    let Some((header, payload)) = body.split_once(',') else {
         collector.warn_skip(index, "missing data URI separator");
         return;
     };
@@ -45,12 +44,6 @@ pub fn handle_inline_data_image(
         return;
     }
 
-    if !meta.starts_with("data:") {
-        collector.warn_skip(index, "invalid data URI scheme");
-        return;
-    }
-
-    let header = &meta["data:".len()..];
     if header.is_empty() {
         collector.warn_skip(index, "missing MIME type");
         return;

@@ -149,8 +149,12 @@ fn a_data_src_in_any_case_gives_way_to_a_real_lazy_address_on_the_fast_path_too(
         ..ConversionOptions::default()
     };
     for scheme in ["data:", "DATA:", "Data:"] {
-        let html = format!(r#"<p><img src="{scheme}image/png;base64,AAAA" data-src="https://example.com/r.png" alt="i"></p>"#);
-        let output = convert(&html, Some(options.clone())).unwrap().content.unwrap_or_default();
+        let html =
+            format!(r#"<p><img src="{scheme}image/png;base64,AAAA" data-src="https://example.com/r.png" alt="i"></p>"#);
+        let output = convert(&html, Some(options.clone()))
+            .unwrap()
+            .content
+            .unwrap_or_default();
         assert_eq!(output, "![i](https://example.com/r.png)\n", "{scheme}");
     }
 }
@@ -403,6 +407,39 @@ fn extracted_images_do_not_depend_on_the_choice() {
     let result = convert(&html, Some(options)).unwrap();
     assert_eq!(result.content.unwrap_or_default(), "");
     assert_eq!(result.images.len(), 1);
+}
+
+#[cfg(feature = "inline-images")]
+#[test]
+fn an_image_is_extracted_whatever_the_case_of_its_data_scheme() {
+    for scheme in ["data:", "DATA:", "Data:"] {
+        let html = format!(r#"<p><img src="{scheme}{}" alt="icon"></p>"#, &PNG[5..]);
+        let options = ConversionOptions {
+            extract_images: true,
+            ..ConversionOptions::default()
+        };
+        let result = convert(&html, Some(options)).unwrap();
+        assert_eq!(result.images.len(), 1, "{scheme}");
+    }
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn the_metadata_reports_a_data_image_whatever_the_case_of_its_scheme() {
+    for scheme in ["data:", "DATA:", "Data:"] {
+        let html = format!(r#"<p><img src="{scheme}{}" alt="icon"></p>"#, &PNG[5..]);
+        let options = ConversionOptions {
+            extract_metadata: true,
+            ..ConversionOptions::default()
+        };
+        let metadata = convert(&html, Some(options)).unwrap().metadata;
+        assert_eq!(metadata.images.len(), 1, "{scheme}");
+        assert_eq!(
+            metadata.images[0].image_type,
+            html_to_markdown_rs::ImageType::DataUri,
+            "{scheme}"
+        );
+    }
 }
 
 #[test]

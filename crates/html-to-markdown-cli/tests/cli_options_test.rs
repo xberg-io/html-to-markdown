@@ -260,7 +260,10 @@ fn should_reject_tier1_as_a_tier_strategy_cli_value() {
 fn every_flag_in_the_help_is_listed_in_the_plugin_cli_reference() {
     let words = |text: &str| -> std::collections::BTreeSet<String> {
         text.split(|c: char| !(c.is_ascii_alphanumeric() || c == '-'))
-            .filter(|word| word.strip_prefix("--").is_some_and(|name| name.starts_with(|c: char| c.is_ascii_alphabetic())))
+            .filter(|word| {
+                word.strip_prefix("--")
+                    .is_some_and(|name| name.starts_with(|c: char| c.is_ascii_alphabetic()))
+            })
             .map(str::to_string)
             .collect()
     };

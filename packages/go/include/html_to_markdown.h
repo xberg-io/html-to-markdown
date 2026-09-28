@@ -227,12 +227,15 @@ typedef struct HTMImageType HTMImageType;
  * What the output shows for an image or embedded media element whose address is an inline
  * `data:` URL.
  *
- * Applies to `<img>` (including its lazy-load attributes and `srcset` candidates), `<graphic>`,
- * inline `<svg>`, `<video>`, `<audio>` (including their nested `<source>` elements) and
- * `<iframe>`. Links (`<a href>`) are not media and keep their destination.
+ * Applies to `<img>` (including its lazy-load attributes, its `srcset` candidates and the
+ * `<source>` elements of a `<picture>` around it), `<graphic>`, inline `<svg>`, `<video>`,
+ * `<audio>` (including their nested `<source>` elements) and `<iframe>`. Links (`<a href>`) are
+ * not media and keep their destination.
  *
  * With `AltTextOnly` or `DropElement`, an element that also has an address that is not `data:`
- * uses that address instead.
+ * uses that address instead. The document structure follows the markdown: a dropped image has
+ * no node, and an image written as its alt text has no address. A link whose only content the
+ * choice removed is dropped with it.
  */
 typedef struct HTMInlineDataMedia HTMInlineDataMedia;
 /**

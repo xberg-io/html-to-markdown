@@ -101,7 +101,7 @@ pub fn handle_img(
 
     #[cfg(feature = "inline-images")]
     if let Some(ref collector_ref) = ctx.inline_collector {
-        if src.trim_start().starts_with("data:") {
+        if is_inline_data(&src) {
             let mut attributes_map = BTreeMap::new();
             for (key, value_opt) in tag.attributes().iter() {
                 let key_str = key.to_string();

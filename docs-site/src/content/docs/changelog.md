@@ -54,6 +54,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `data-original` and `srcset` fallbacks compared the scheme in lower case only, so
   `<img src="DATA:..." data-src="real.png">` kept the payload while the same image with `data:`
   used `real.png`. The scheme now matches in any case.
+- **An image whose `data:` scheme was written in upper or mixed case was not extracted, and the
+  metadata reported it as a relative image.** Inline image extraction and the metadata image type
+  compared the scheme in lower case only. Every check now uses the one case-insensitive test the
+  converter uses for its markdown output.
 - **The nightly benchmark guardrail scored timings on hardware it was never calibrated on.** The
   runner pool moved from the AMD EPYC 9V74 the baseline was calibrated on to an EPYC 7763, and
   every fixture read 15% to 45% slower. `htmbench compare` still scored each timing, printed 26
