@@ -5,9 +5,9 @@
 #![allow(clippy::struct_excessive_bools)]
 
 use crate::validators::{
-    CliCodeBlockStyle, CliHeadingStyle, CliHighlightStyle, CliLinkStyle, CliListIndentType, CliNewlineStyle,
-    CliOutputFormat, CliPreprocessingPreset, CliTierStrategy, CliUrlEscapeStyle, CliWhitespaceMode, validate_bullets,
-    validate_strong_em_symbol,
+    CliCodeBlockStyle, CliHeadingStyle, CliHighlightStyle, CliInlineDataMedia, CliLinkStyle, CliListIndentType,
+    CliNewlineStyle, CliOutputFormat, CliPreprocessingPreset, CliTierStrategy, CliUrlEscapeStyle, CliWhitespaceMode,
+    validate_bullets, validate_strong_em_symbol,
 };
 #[cfg(feature = "mcp")]
 use clap::Subcommand;
@@ -420,6 +420,16 @@ pub struct Cli {
     #[arg(long)]
     #[arg(help_heading = "Element Handling")]
     pub skip_images: bool,
+
+    /// What to write for an image or media element whose address is a data: URL
+    ///
+    /// Covers img, graphic, inline svg, video, audio and iframe; links keep their destination:
+    /// - 'keep': Write the data: URL with its payload (default)
+    /// - 'alt-text-only': Write the alt text without a destination
+    /// - 'drop-element': Write nothing for the element
+    #[arg(long, value_name = "CHOICE")]
+    #[arg(help_heading = "Element Handling")]
+    pub inline_data_media: Option<CliInlineDataMedia>,
 
     /// CSS selectors for elements to exclude entirely
     ///

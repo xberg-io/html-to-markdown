@@ -2700,6 +2700,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  InlineDataMedia dco_decode_box_autoadd_inline_data_media(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_inline_data_media(raw);
+  }
+
+  @protected
   LinkStyle dco_decode_box_autoadd_link_style(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_link_style(raw);
@@ -2801,8 +2807,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ConversionOptions dco_decode_conversion_options(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 45)
-      throw Exception('unexpected arr length: expect 45 but see ${arr.length}');
+    if (arr.length != 46)
+      throw Exception('unexpected arr length: expect 46 but see ${arr.length}');
     return ConversionOptions(
       headingStyle: dco_decode_heading_style(arr[0]),
       listIndentType: dco_decode_list_indent_type(arr[1]),
@@ -2836,21 +2842,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       stripTags: dco_decode_list_String(arr[29]),
       preserveTags: dco_decode_list_String(arr[30]),
       skipImages: dco_decode_bool(arr[31]),
-      urlEscapeStyle: dco_decode_url_escape_style(arr[32]),
-      linkStyle: dco_decode_link_style(arr[33]),
-      outputFormat: dco_decode_output_format(arr[34]),
-      includeDocumentStructure: dco_decode_bool(arr[35]),
-      extractImages: dco_decode_bool(arr[36]),
-      maxImageSize: dco_decode_i_64(arr[37]),
-      captureSvg: dco_decode_bool(arr[38]),
-      inferDimensions: dco_decode_bool(arr[39]),
-      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[40]),
-      excludeSelectors: dco_decode_list_String(arr[41]),
-      tierStrategy: dco_decode_tier_strategy(arr[42]),
-      baseUrl: dco_decode_opt_String(arr[43]),
+      inlineDataMedia: dco_decode_inline_data_media(arr[32]),
+      urlEscapeStyle: dco_decode_url_escape_style(arr[33]),
+      linkStyle: dco_decode_link_style(arr[34]),
+      outputFormat: dco_decode_output_format(arr[35]),
+      includeDocumentStructure: dco_decode_bool(arr[36]),
+      extractImages: dco_decode_bool(arr[37]),
+      maxImageSize: dco_decode_i_64(arr[38]),
+      captureSvg: dco_decode_bool(arr[39]),
+      inferDimensions: dco_decode_bool(arr[40]),
+      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[41]),
+      excludeSelectors: dco_decode_list_String(arr[42]),
+      tierStrategy: dco_decode_tier_strategy(arr[43]),
+      baseUrl: dco_decode_opt_String(arr[44]),
       visitor:
           dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            arr[44],
+            arr[45],
           ),
     );
   }
@@ -2859,8 +2866,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ConversionOptionsUpdate dco_decode_conversion_options_update(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 45)
-      throw Exception('unexpected arr length: expect 45 but see ${arr.length}');
+    if (arr.length != 46)
+      throw Exception('unexpected arr length: expect 46 but see ${arr.length}');
     return ConversionOptionsUpdate(
       headingStyle: dco_decode_opt_box_autoadd_heading_style(arr[0]),
       listIndentType: dco_decode_opt_box_autoadd_list_indent_type(arr[1]),
@@ -2896,21 +2903,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       stripTags: dco_decode_opt_list_String(arr[29]),
       preserveTags: dco_decode_opt_list_String(arr[30]),
       skipImages: dco_decode_opt_box_autoadd_bool(arr[31]),
-      urlEscapeStyle: dco_decode_opt_box_autoadd_url_escape_style(arr[32]),
-      linkStyle: dco_decode_opt_box_autoadd_link_style(arr[33]),
-      outputFormat: dco_decode_opt_box_autoadd_output_format(arr[34]),
-      includeDocumentStructure: dco_decode_opt_box_autoadd_bool(arr[35]),
-      extractImages: dco_decode_opt_box_autoadd_bool(arr[36]),
-      maxImageSize: dco_decode_opt_box_autoadd_i_64(arr[37]),
-      captureSvg: dco_decode_opt_box_autoadd_bool(arr[38]),
-      inferDimensions: dco_decode_opt_box_autoadd_bool(arr[39]),
-      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[40]),
-      excludeSelectors: dco_decode_opt_list_String(arr[41]),
-      tierStrategy: dco_decode_opt_box_autoadd_tier_strategy(arr[42]),
-      baseUrl: dco_decode_opt_String(arr[43]),
+      inlineDataMedia: dco_decode_opt_box_autoadd_inline_data_media(arr[32]),
+      urlEscapeStyle: dco_decode_opt_box_autoadd_url_escape_style(arr[33]),
+      linkStyle: dco_decode_opt_box_autoadd_link_style(arr[34]),
+      outputFormat: dco_decode_opt_box_autoadd_output_format(arr[35]),
+      includeDocumentStructure: dco_decode_opt_box_autoadd_bool(arr[36]),
+      extractImages: dco_decode_opt_box_autoadd_bool(arr[37]),
+      maxImageSize: dco_decode_opt_box_autoadd_i_64(arr[38]),
+      captureSvg: dco_decode_opt_box_autoadd_bool(arr[39]),
+      inferDimensions: dco_decode_opt_box_autoadd_bool(arr[40]),
+      maxDepth: dco_decode_opt_box_autoadd_i_64(arr[41]),
+      excludeSelectors: dco_decode_opt_list_String(arr[42]),
+      tierStrategy: dco_decode_opt_box_autoadd_tier_strategy(arr[43]),
+      baseUrl: dco_decode_opt_String(arr[44]),
       visitor:
           dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerVisitorHandle(
-            arr[44],
+            arr[45],
           ),
     );
   }
@@ -3081,6 +3089,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ImageType dco_decode_image_type(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ImageType.values[raw as int];
+  }
+
+  @protected
+  InlineDataMedia dco_decode_inline_data_media(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return InlineDataMedia.values[raw as int];
   }
 
   @protected
@@ -3381,6 +3395,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ImageDimensions? dco_decode_opt_box_autoadd_image_dimensions(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_image_dimensions(raw);
+  }
+
+  @protected
+  InlineDataMedia? dco_decode_opt_box_autoadd_inline_data_media(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_inline_data_media(raw);
   }
 
   @protected
@@ -3807,6 +3827,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  InlineDataMedia sse_decode_box_autoadd_inline_data_media(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_inline_data_media(deserializer));
+  }
+
+  @protected
   LinkStyle sse_decode_box_autoadd_link_style(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_link_style(deserializer));
@@ -3967,6 +3995,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_stripTags = sse_decode_list_String(deserializer);
     var var_preserveTags = sse_decode_list_String(deserializer);
     var var_skipImages = sse_decode_bool(deserializer);
+    var var_inlineDataMedia = sse_decode_inline_data_media(deserializer);
     var var_urlEscapeStyle = sse_decode_url_escape_style(deserializer);
     var var_linkStyle = sse_decode_link_style(deserializer);
     var var_outputFormat = sse_decode_output_format(deserializer);
@@ -4016,6 +4045,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       stripTags: var_stripTags,
       preserveTags: var_preserveTags,
       skipImages: var_skipImages,
+      inlineDataMedia: var_inlineDataMedia,
       urlEscapeStyle: var_urlEscapeStyle,
       linkStyle: var_linkStyle,
       outputFormat: var_outputFormat,
@@ -4082,6 +4112,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_stripTags = sse_decode_opt_list_String(deserializer);
     var var_preserveTags = sse_decode_opt_list_String(deserializer);
     var var_skipImages = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_inlineDataMedia = sse_decode_opt_box_autoadd_inline_data_media(
+      deserializer,
+    );
     var var_urlEscapeStyle = sse_decode_opt_box_autoadd_url_escape_style(
       deserializer,
     );
@@ -4139,6 +4172,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       stripTags: var_stripTags,
       preserveTags: var_preserveTags,
       skipImages: var_skipImages,
+      inlineDataMedia: var_inlineDataMedia,
       urlEscapeStyle: var_urlEscapeStyle,
       linkStyle: var_linkStyle,
       outputFormat: var_outputFormat,
@@ -4347,6 +4381,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return ImageType.values[inner];
+  }
+
+  @protected
+  InlineDataMedia sse_decode_inline_data_media(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return InlineDataMedia.values[inner];
   }
 
   @protected
@@ -4814,6 +4855,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_image_dimensions(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  InlineDataMedia? sse_decode_opt_box_autoadd_inline_data_media(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_inline_data_media(deserializer));
     } else {
       return null;
     }
@@ -5556,6 +5610,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_inline_data_media(
+    InlineDataMedia self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_inline_data_media(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_link_style(
     LinkStyle self,
     SseSerializer serializer,
@@ -5732,6 +5795,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.stripTags, serializer);
     sse_encode_list_String(self.preserveTags, serializer);
     sse_encode_bool(self.skipImages, serializer);
+    sse_encode_inline_data_media(self.inlineDataMedia, serializer);
     sse_encode_url_escape_style(self.urlEscapeStyle, serializer);
     sse_encode_link_style(self.linkStyle, serializer);
     sse_encode_output_format(self.outputFormat, serializer);
@@ -5797,6 +5861,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_list_String(self.stripTags, serializer);
     sse_encode_opt_list_String(self.preserveTags, serializer);
     sse_encode_opt_box_autoadd_bool(self.skipImages, serializer);
+    sse_encode_opt_box_autoadd_inline_data_media(
+      self.inlineDataMedia,
+      serializer,
+    );
     sse_encode_opt_box_autoadd_url_escape_style(
       self.urlEscapeStyle,
       serializer,
@@ -5955,6 +6023,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void sse_encode_image_type(ImageType self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_inline_data_media(
+    InlineDataMedia self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
   }
@@ -6389,6 +6466,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_image_dimensions(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_inline_data_media(
+    InlineDataMedia? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_inline_data_media(self, serializer);
     }
   }
 

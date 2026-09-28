@@ -166,6 +166,7 @@ pub fn handle_link(
             }
         }
 
+        ctx.inline_data_replaced.set(false);
         let mut label = if emit_blocks_separately {
             // ~keep #490: only the DIRECT inline children feed the label -- the deferred
             // ~keep block children (which is what triggered this branch) are walked
@@ -257,7 +258,12 @@ pub fn handle_link(
             label = normalize_link_label(raw_text);
         }
 
-        if label.is_empty() && !href.is_empty() && !children.is_empty() {
+        // ~keep A label left empty because `inline_data_media` replaced the link's only content
+        // ~keep (an image with no alt text, or a dropped one) takes the link with it: the href
+        // ~keep fallback below would print a bare self-link where the page showed an image.
+        let drop_link = label.is_empty() && ctx.inline_data_replaced.get();
+
+        if label.is_empty() && !href.is_empty() && !children.is_empty() && !drop_link {
             // ~keep The href is raw attribute text that never passed through a text node's
             // ~keep normal escaping, unlike every other label source above (heading text,
             // ~keep inline content, `raw_text`) which was already escaped while it was
@@ -292,7 +298,8 @@ pub fn handle_link(
         let should_emit_deferred_blocks = true;
 
         #[cfg(feature = "visitor")]
-        if let Some(ref visitor_handle) = ctx.visitor {
+        if drop_link {
+        } else if let Some(ref visitor_handle) = ctx.visitor {
             use crate::visitor::{NodeContext, NodeType, VisitResult};
 
             let node_id = node_handle.get_inner();
@@ -352,17 +359,19 @@ pub fn handle_link(
         }
 
         #[cfg(not(feature = "visitor"))]
-        append_markdown_link(
-            output,
-            &MarkdownLink {
-                label: &escaped_label,
-                href: href.as_str(),
-                title: title.as_deref(),
-                raw_text: label.as_str(),
-            },
-            options,
-            ctx.reference_collector.as_ref(),
-        );
+        if !drop_link {
+            append_markdown_link(
+                output,
+                &MarkdownLink {
+                    label: &escaped_label,
+                    href: href.as_str(),
+                    title: title.as_deref(),
+                    raw_text: label.as_str(),
+                },
+                options,
+                ctx.reference_collector.as_ref(),
+            );
+        }
 
         #[cfg(feature = "metadata")]
         if ctx.metadata_wants_links {

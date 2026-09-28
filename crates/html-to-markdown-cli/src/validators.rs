@@ -6,8 +6,8 @@
 
 use clap::ValueEnum;
 use html_to_markdown_rs::{
-    CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
-    PreprocessingPreset, TierStrategy, UrlEscapeStyle, WhitespaceMode,
+    CodeBlockStyle, HeadingStyle, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType, NewlineStyle,
+    OutputFormat, PreprocessingPreset, TierStrategy, UrlEscapeStyle, WhitespaceMode,
 };
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
@@ -177,6 +177,26 @@ impl From<CliLinkStyle> for LinkStyle {
         match style {
             CliLinkStyle::Inline => Self::Inline,
             CliLinkStyle::Reference => Self::Reference,
+        }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
+pub enum CliInlineDataMedia {
+    /// Write the data: URL with its payload (default)
+    Keep,
+    /// Write the alt text without a destination
+    AltTextOnly,
+    /// Write nothing for the element
+    DropElement,
+}
+
+impl From<CliInlineDataMedia> for InlineDataMedia {
+    fn from(choice: CliInlineDataMedia) -> Self {
+        match choice {
+            CliInlineDataMedia::Keep => Self::Keep,
+            CliInlineDataMedia::AltTextOnly => Self::AltTextOnly,
+            CliInlineDataMedia::DropElement => Self::DropElement,
         }
     }
 }

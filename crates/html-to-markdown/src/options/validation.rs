@@ -242,6 +242,46 @@ impl UrlEscapeStyle {
     }
 }
 
+/// What the output shows for an image or embedded media element whose address is an inline
+/// `data:` URL.
+///
+/// Applies to `<img>` (including its lazy-load attributes, its `srcset` candidates and the
+/// `<source>` elements of a `<picture>` around it), `<graphic>`, inline `<svg>`, `<video>`,
+/// `<audio>` (including their nested `<source>` elements) and `<iframe>`. Links (`<a href>`) are
+/// not media and keep their destination.
+///
+/// With `AltTextOnly` or `DropElement`, an element that also has an address that is not `data:`
+/// uses that address instead. The document structure follows the markdown: a dropped image has
+/// no node, and an image written as its alt text has no address. A link whose only content the
+/// choice removed is dropped with it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum InlineDataMedia {
+    /// Write the `data:` URL as the destination, payload included. Default.
+    #[default]
+    Keep,
+    /// Write the alt text (the title for an `<svg>`, the fallback content for `<video>` and
+    /// `<audio>`) without a destination.
+    AltTextOnly,
+    /// Write nothing for the element.
+    DropElement,
+}
+
+impl InlineDataMedia {
+    /// Parse the choice from a string.
+    ///
+    /// Accepts "alttextonly" or "dropelement" or defaults to Keep.
+    /// Input is normalized (lowercased, alphanumeric only).
+    #[must_use]
+    #[cfg_attr(alef, alef(skip))]
+    pub fn parse(value: &str) -> Self {
+        match normalize_token(value).as_str() {
+            "alttextonly" => Self::AltTextOnly,
+            "dropelement" => Self::DropElement,
+            _ => Self::Keep,
+        }
+    }
+}
+
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.
@@ -286,8 +326,8 @@ pub(crate) fn normalize_token(value: &str) -> String {
 #[cfg(any(feature = "serde", feature = "metadata"))]
 mod serde_impls {
     use super::{
-        CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
-        UrlEscapeStyle, WhitespaceMode,
+        CodeBlockStyle, HeadingStyle, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType, NewlineStyle,
+        OutputFormat, UrlEscapeStyle, WhitespaceMode,
     };
     use serde::{Deserialize, Serialize, Serializer};
 
@@ -314,6 +354,7 @@ mod serde_impls {
     impl_deserialize_from_parse!(LinkStyle, LinkStyle::parse);
     impl_deserialize_from_parse!(UrlEscapeStyle, UrlEscapeStyle::parse);
     impl_deserialize_from_parse!(OutputFormat, OutputFormat::parse);
+    impl_deserialize_from_parse!(InlineDataMedia, InlineDataMedia::parse);
 
     impl Serialize for HeadingStyle {
         fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -418,6 +459,20 @@ mod serde_impls {
             let s = match self {
                 Self::Angle => "angle",
                 Self::Percent => "percent",
+            };
+            serializer.serialize_str(s)
+        }
+    }
+
+    impl Serialize for InlineDataMedia {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            let s = match self {
+                Self::Keep => "keep",
+                Self::AltTextOnly => "alttextonly",
+                Self::DropElement => "dropelement",
             };
             serializer.serialize_str(s)
         }

@@ -7,7 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`ConversionOptions::inline_data_media`** chooses what to write for an image or embedded media
+  element whose address is an inline `data:` URL, so the payload no longer has to land in the
+  output. `keep` (the default) writes the URL as before. `alt_text_only` writes the alt text: the
+  title of an inline `<svg>`, the fallback content of `<video>` and `<audio>`, nothing for an
+  `<iframe>`. `drop_element` writes nothing. It covers `<img>`, `<graphic>`, inline `<svg>`,
+  `<video>`, `<audio>` and `<iframe>`. With either of the last two choices, a real address on the
+  element wins over the `data:` one: a lazy-load attribute or `srcset` candidate on `<img>`,
+  another address attribute on `<graphic>`, a nested `<source>` on `<video>` and `<audio>`, and
+  a `<source>` of the `<picture>` that holds an `<img>`. The document structure follows the
+  markdown: no image node for a dropped element, and no address when only the alt text is
+  written. A link whose only content the option removed is dropped with it, instead of turning
+  into a link labelled with its own address. Links keep their destination, and extracted images
+  do not change. The CLI takes it as `--inline-data-media` (#528).
+
 ### Changed
+
+- The `alef` pin in `alef.toml` is now 0.97.1, the version that generated the committed bindings.
+  Regenerating with 0.97.0 dropped the Go binding's `runtime.LockOSThread` calls.
 
 - The FFI Symbols CI gate now fails when a detector matches no call site, and names the silent
   language. Before, a detector that stopped matching read exactly like a clean pass, so a
@@ -30,6 +49,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **An `<img>` whose `src` spelled the `data:` scheme in upper or mixed case ignored its lazy-load
+  address.** The check that sends a `data:` source to the `data-src`, `data-lazy-src`,
+  `data-original` and `srcset` fallbacks compared the scheme in lower case only, so
+  `<img src="DATA:..." data-src="real.png">` kept the payload while the same image with `data:`
+  used `real.png`. The scheme now matches in any case.
+- **An image whose `data:` scheme was written in upper or mixed case was not extracted, and the
+  metadata reported it as a relative image.** Inline image extraction and the metadata image type
+  compared the scheme in lower case only. Every check now uses the one case-insensitive test the
+  converter uses for its markdown output.
 - **Text right after a list or a table rendered inside it (#570, #571).** Inline content that
   directly followed a list or a table in the same container continued the block's last line.
   After a list it became a lazy continuation of the last item, so

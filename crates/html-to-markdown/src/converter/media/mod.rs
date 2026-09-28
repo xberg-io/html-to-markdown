@@ -16,6 +16,47 @@ pub use super::{Context, DomContext};
 #[cfg(feature = "inline-images")]
 pub use image::handle_inline_data_image;
 
+use crate::options::InlineDataMedia;
+
+/// Whether `address` is a `data:` URL, which carries its content inline. The scheme matches in
+/// any case, after leading whitespace, as a URL parser reads it.
+pub fn is_inline_data(address: &str) -> bool {
+    data_url_body(address).is_some()
+}
+
+/// The part of a `data:` URL after its scheme (`image/png;base64,...`), or `None` when `address`
+/// is not one. Matches as [`is_inline_data`] does.
+pub fn data_url_body(address: &str) -> Option<&str> {
+    let address = address.trim_start_matches(|c: char| c.is_ascii_whitespace() || c.is_ascii_control());
+    address
+        .get(..5)
+        .filter(|scheme| scheme.eq_ignore_ascii_case("data:"))
+        .map(|_| &address[5..])
+}
+
+/// What to write for an element whose chosen address is `address`: `choice` when the address is
+/// a `data:` URL, otherwise [`InlineDataMedia::Keep`].
+pub fn inline_data_treatment(choice: InlineDataMedia, address: &str) -> InlineDataMedia {
+    if is_inline_data(address) {
+        choice
+    } else {
+        InlineDataMedia::Keep
+    }
+}
+
+/// The first of `addresses` to use: with any choice but [`InlineDataMedia::Keep`], the first that
+/// is not a `data:` URL, else the first one.
+pub fn first_address<T: AsRef<str>>(choice: InlineDataMedia, addresses: impl IntoIterator<Item = T>) -> Option<T> {
+    let mut first = None;
+    for address in addresses {
+        if choice == InlineDataMedia::Keep || !is_inline_data(address.as_ref()) {
+            return Some(address);
+        }
+        first.get_or_insert(address);
+    }
+    first
+}
+
 /// Dispatches media element handling to the appropriate handler.
 ///
 /// This function routes media-related HTML elements to their specialized handlers

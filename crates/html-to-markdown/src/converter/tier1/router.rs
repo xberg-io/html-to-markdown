@@ -141,6 +141,7 @@ pub enum RouterDecision {
 /// | `link_style`         | `LinkStyle::Inline`                     | Yes — Reference                          |
 /// | `url_escape_style`   | `UrlEscapeStyle::Angle` (raw href)      | Yes — Percent                            |
 /// | `compact_tables`     | `false` (padded cells: `\| cell \|`)    | Yes — `true`                             |
+/// | `inline_data_media`  | `InlineDataMedia::Keep` (payload written) | Yes — AltTextOnly, DropElement         |
 /// | `br_in_tables`       | honored in cells (literal `<br>` vs space) | No — scanner reads the option directly |
 ///
 /// # Practical reachability & benchmark findings
@@ -207,8 +208,8 @@ pub enum RouterDecision {
 #[must_use]
 pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDecision {
     use crate::options::{
-        CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
-        PreprocessingPreset, UrlEscapeStyle, WhitespaceMode,
+        CodeBlockStyle, HeadingStyle, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType, NewlineStyle,
+        OutputFormat, PreprocessingPreset, UrlEscapeStyle, WhitespaceMode,
     };
 
     if report.had_cdata
@@ -276,6 +277,9 @@ pub fn classify(report: &PrescanReport, options: &ConversionOptions) -> RouterDe
         // ~keep compact_tables: Tier-1 always emits padded `| cell |` GFM tables.
         // ~keep compact_tables=true would produce `|cell|`, which Tier-1 never does.
         || options.compact_tables
+        // ~keep inline_data_media: Tier-1 writes every image and inline SVG destination,
+        // ~keep `data:` payload included; the other choices are Tier-2 only.
+        || options.inline_data_media != InlineDataMedia::Keep
     {
         return RouterDecision::Tier2;
     }

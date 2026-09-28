@@ -13,9 +13,10 @@ use std::collections::BTreeMap;
 use crate::converter::Context;
 use crate::converter::dom_context::DomContext;
 use crate::converter::inline::link::{append_url_destination, escape_markdown_title};
+use crate::converter::media::first_address;
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::preprocessing::sanitize_markdown_url;
-use crate::options::ConversionOptions;
+use crate::options::{ConversionOptions, InlineDataMedia};
 
 #[cfg(feature = "visitor")]
 use crate::converter::utility::serialization::serialize_node;
@@ -44,13 +45,13 @@ pub fn handle_graphic(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    let src = ["url", "href", "xlink:href", "src"]
+    let addresses = ["url", "href", "xlink:href", "src"]
         .into_iter()
-        .find_map(|name| crate::converter::utility::attributes::decoded_attribute(tag, name))
-        .map_or(Cow::Borrowed(""), |s| {
-            let resolved = ctx.resolve_url(&s);
-            Cow::Owned(sanitize_markdown_url(resolved.as_deref().unwrap_or(&s)).into_owned())
-        });
+        .filter_map(|name| crate::converter::utility::attributes::decoded_attribute(tag, name));
+    let src = first_address(options.inline_data_media, addresses).map_or(Cow::Borrowed(""), |s| {
+        let resolved = ctx.resolve_url(&s);
+        Cow::Owned(sanitize_markdown_url(resolved.as_deref().unwrap_or(&s)).into_owned())
+    });
 
     // ~keep Use "alt" attribute, fallback to "filename"
     let alt = crate::converter::utility::attributes::decoded_attribute(tag, "alt")
@@ -99,8 +100,22 @@ pub fn handle_graphic(
         || ctx.cell_allow_inline_images
         || ctx.link_allow_inline_images;
 
-    let should_use_alt_text =
-        !keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images));
+    let inline_data = ctx.inline_data_treatment(options.inline_data_media, &src);
+    let should_use_alt_text = inline_data == InlineDataMedia::AltTextOnly
+        || (!keep_as_markdown && (ctx.convert_as_inline || (ctx.in_heading && !ctx.heading_allow_inline_images)));
+    let render = || {
+        (inline_data != InlineDataMedia::DropElement).then(|| {
+            format_graphic_markdown(
+                &src,
+                &alt,
+                title.as_deref(),
+                should_use_alt_text,
+                options.link_style,
+                options.url_escape_style,
+                ctx.reference_collector.as_ref(),
+            )
+        })
+    };
 
     #[cfg(feature = "visitor")]
     let graphic_output = if let Some(ref visitor_handle) = ctx.visitor {
@@ -125,15 +140,7 @@ pub fn handle_graphic(
             visitor.visit_image(&node_ctx, &src, &alt, title.as_deref())
         };
         match visit_result {
-            VisitResult::Continue => Some(format_graphic_markdown(
-                &src,
-                &alt,
-                title.as_deref(),
-                should_use_alt_text,
-                options.link_style,
-                options.url_escape_style,
-                ctx.reference_collector.as_ref(),
-            )),
+            VisitResult::Continue => render(),
             VisitResult::Custom(custom) => Some(custom),
             VisitResult::Skip => None,
             VisitResult::Error(err) => {
@@ -145,27 +152,11 @@ pub fn handle_graphic(
             VisitResult::PreserveHtml => Some(serialize_node(node_handle, parser)),
         }
     } else {
-        Some(format_graphic_markdown(
-            &src,
-            &alt,
-            title.as_deref(),
-            should_use_alt_text,
-            options.link_style,
-            options.url_escape_style,
-            ctx.reference_collector.as_ref(),
-        ))
+        render()
     };
 
     #[cfg(not(feature = "visitor"))]
-    let graphic_output = Some(format_graphic_markdown(
-        &src,
-        &alt,
-        title.as_deref(),
-        should_use_alt_text,
-        options.link_style,
-        options.url_escape_style,
-        ctx.reference_collector.as_ref(),
-    ));
+    let graphic_output = render();
 
     if !options.skip_images {
         if let Some(graphic_text) = graphic_output {

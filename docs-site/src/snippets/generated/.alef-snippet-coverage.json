@@ -231,6 +231,10 @@
     "c/options/options_include_document_structure_true.md",
     "c/options/options_infer_dimensions_false.md",
     "c/options/options_infer_dimensions_true.md",
+    "c/options/options_inline_data_media_alt_text_only.md",
+    "c/options/options_inline_data_media_drop_element.md",
+    "c/options/options_inline_data_media_keep_default.md",
+    "c/options/options_inline_data_media_real_address_wins.md",
     "c/options/options_keep_inline_images_in_paragraph.md",
     "c/options/options_link_style_reference.md",
     "c/options/options_list_custom_bullets.md",
@@ -566,6 +570,10 @@
     "csharp/options/options_include_document_structure_true.md",
     "csharp/options/options_infer_dimensions_false.md",
     "csharp/options/options_infer_dimensions_true.md",
+    "csharp/options/options_inline_data_media_alt_text_only.md",
+    "csharp/options/options_inline_data_media_drop_element.md",
+    "csharp/options/options_inline_data_media_keep_default.md",
+    "csharp/options/options_inline_data_media_real_address_wins.md",
     "csharp/options/options_keep_inline_images_in_paragraph.md",
     "csharp/options/options_link_style_reference.md",
     "csharp/options/options_list_custom_bullets.md",
@@ -901,6 +909,10 @@
     "dart/options/options_include_document_structure_true.md",
     "dart/options/options_infer_dimensions_false.md",
     "dart/options/options_infer_dimensions_true.md",
+    "dart/options/options_inline_data_media_alt_text_only.md",
+    "dart/options/options_inline_data_media_drop_element.md",
+    "dart/options/options_inline_data_media_keep_default.md",
+    "dart/options/options_inline_data_media_real_address_wins.md",
     "dart/options/options_keep_inline_images_in_paragraph.md",
     "dart/options/options_link_style_reference.md",
     "dart/options/options_list_custom_bullets.md",
@@ -1236,6 +1248,10 @@
     "elixir/options/options_include_document_structure_true.md",
     "elixir/options/options_infer_dimensions_false.md",
     "elixir/options/options_infer_dimensions_true.md",
+    "elixir/options/options_inline_data_media_alt_text_only.md",
+    "elixir/options/options_inline_data_media_drop_element.md",
+    "elixir/options/options_inline_data_media_keep_default.md",
+    "elixir/options/options_inline_data_media_real_address_wins.md",
     "elixir/options/options_keep_inline_images_in_paragraph.md",
     "elixir/options/options_link_style_reference.md",
     "elixir/options/options_list_custom_bullets.md",
@@ -1571,6 +1587,10 @@
     "go/options/options_include_document_structure_true.md",
     "go/options/options_infer_dimensions_false.md",
     "go/options/options_infer_dimensions_true.md",
+    "go/options/options_inline_data_media_alt_text_only.md",
+    "go/options/options_inline_data_media_drop_element.md",
+    "go/options/options_inline_data_media_keep_default.md",
+    "go/options/options_inline_data_media_real_address_wins.md",
     "go/options/options_keep_inline_images_in_paragraph.md",
     "go/options/options_link_style_reference.md",
     "go/options/options_list_custom_bullets.md",
@@ -1906,6 +1926,10 @@
     "java/options/options_include_document_structure_true.md",
     "java/options/options_infer_dimensions_false.md",
     "java/options/options_infer_dimensions_true.md",
+    "java/options/options_inline_data_media_alt_text_only.md",
+    "java/options/options_inline_data_media_drop_element.md",
+    "java/options/options_inline_data_media_keep_default.md",
+    "java/options/options_inline_data_media_real_address_wins.md",
     "java/options/options_keep_inline_images_in_paragraph.md",
     "java/options/options_link_style_reference.md",
     "java/options/options_list_custom_bullets.md",
@@ -2236,6 +2260,10 @@
     "kotlin-android/options/options_include_document_structure_true.md",
     "kotlin-android/options/options_infer_dimensions_false.md",
     "kotlin-android/options/options_infer_dimensions_true.md",
+    "kotlin-android/options/options_inline_data_media_alt_text_only.md",
+    "kotlin-android/options/options_inline_data_media_drop_element.md",
+    "kotlin-android/options/options_inline_data_media_keep_default.md",
+    "kotlin-android/options/options_inline_data_media_real_address_wins.md",
     "kotlin-android/options/options_keep_inline_images_in_paragraph.md",
     "kotlin-android/options/options_link_style_reference.md",
     "kotlin-android/options/options_list_custom_bullets.md",
@@ -2522,6 +2550,10 @@
     "php/options/options_include_document_structure_true.md",
     "php/options/options_infer_dimensions_false.md",
     "php/options/options_infer_dimensions_true.md",
+    "php/options/options_inline_data_media_alt_text_only.md",
+    "php/options/options_inline_data_media_drop_element.md",
+    "php/options/options_inline_data_media_keep_default.md",
+    "php/options/options_inline_data_media_real_address_wins.md",
     "php/options/options_keep_inline_images_in_paragraph.md",
     "php/options/options_link_style_reference.md",
     "php/options/options_list_custom_bullets.md",
@@ -2857,6 +2889,10 @@
     "python/options/options_include_document_structure_true.md",
     "python/options/options_infer_dimensions_false.md",
     "python/options/options_infer_dimensions_true.md",
+    "python/options/options_inline_data_media_alt_text_only.md",
+    "python/options/options_inline_data_media_drop_element.md",
+    "python/options/options_inline_data_media_keep_default.md",
+    "python/options/options_inline_data_media_real_address_wins.md",
     "python/options/options_keep_inline_images_in_paragraph.md",
     "python/options/options_link_style_reference.md",
     "python/options/options_list_custom_bullets.md",
@@ -3192,6 +3228,10 @@
     "r/options/options_include_document_structure_true.md",
     "r/options/options_infer_dimensions_false.md",
     "r/options/options_infer_dimensions_true.md",
+    "r/options/options_inline_data_media_alt_text_only.md",
+    "r/options/options_inline_data_media_drop_element.md",
+    "r/options/options_inline_data_media_keep_default.md",
+    "r/options/options_inline_data_media_real_address_wins.md",
     "r/options/options_keep_inline_images_in_paragraph.md",
     "r/options/options_link_style_reference.md",
     "r/options/options_list_custom_bullets.md",
@@ -3527,6 +3567,10 @@
     "ruby/options/options_include_document_structure_true.md",
     "ruby/options/options_infer_dimensions_false.md",
     "ruby/options/options_infer_dimensions_true.md",
+    "ruby/options/options_inline_data_media_alt_text_only.md",
+    "ruby/options/options_inline_data_media_drop_element.md",
+    "ruby/options/options_inline_data_media_keep_default.md",
+    "ruby/options/options_inline_data_media_real_address_wins.md",
     "ruby/options/options_keep_inline_images_in_paragraph.md",
     "ruby/options/options_link_style_reference.md",
     "ruby/options/options_list_custom_bullets.md",
@@ -3862,6 +3906,10 @@
     "rust/options/options_include_document_structure_true.md",
     "rust/options/options_infer_dimensions_false.md",
     "rust/options/options_infer_dimensions_true.md",
+    "rust/options/options_inline_data_media_alt_text_only.md",
+    "rust/options/options_inline_data_media_drop_element.md",
+    "rust/options/options_inline_data_media_keep_default.md",
+    "rust/options/options_inline_data_media_real_address_wins.md",
     "rust/options/options_keep_inline_images_in_paragraph.md",
     "rust/options/options_link_style_reference.md",
     "rust/options/options_list_custom_bullets.md",
@@ -4197,6 +4245,10 @@
     "swift/options/options_include_document_structure_true.md",
     "swift/options/options_infer_dimensions_false.md",
     "swift/options/options_infer_dimensions_true.md",
+    "swift/options/options_inline_data_media_alt_text_only.md",
+    "swift/options/options_inline_data_media_drop_element.md",
+    "swift/options/options_inline_data_media_keep_default.md",
+    "swift/options/options_inline_data_media_real_address_wins.md",
     "swift/options/options_keep_inline_images_in_paragraph.md",
     "swift/options/options_link_style_reference.md",
     "swift/options/options_list_custom_bullets.md",
@@ -4532,6 +4584,10 @@
     "typescript/options/options_include_document_structure_true.md",
     "typescript/options/options_infer_dimensions_false.md",
     "typescript/options/options_infer_dimensions_true.md",
+    "typescript/options/options_inline_data_media_alt_text_only.md",
+    "typescript/options/options_inline_data_media_drop_element.md",
+    "typescript/options/options_inline_data_media_keep_default.md",
+    "typescript/options/options_inline_data_media_real_address_wins.md",
     "typescript/options/options_keep_inline_images_in_paragraph.md",
     "typescript/options/options_link_style_reference.md",
     "typescript/options/options_list_custom_bullets.md",
@@ -4867,6 +4923,10 @@
     "wasm/options/options_include_document_structure_true.md",
     "wasm/options/options_infer_dimensions_false.md",
     "wasm/options/options_infer_dimensions_true.md",
+    "wasm/options/options_inline_data_media_alt_text_only.md",
+    "wasm/options/options_inline_data_media_drop_element.md",
+    "wasm/options/options_inline_data_media_keep_default.md",
+    "wasm/options/options_inline_data_media_real_address_wins.md",
     "wasm/options/options_keep_inline_images_in_paragraph.md",
     "wasm/options/options_link_style_reference.md",
     "wasm/options/options_list_custom_bullets.md",
@@ -5202,6 +5262,10 @@
     "zig/options/options_include_document_structure_true.md",
     "zig/options/options_infer_dimensions_false.md",
     "zig/options/options_infer_dimensions_true.md",
+    "zig/options/options_inline_data_media_alt_text_only.md",
+    "zig/options/options_inline_data_media_drop_element.md",
+    "zig/options/options_inline_data_media_keep_default.md",
+    "zig/options/options_inline_data_media_real_address_wins.md",
     "zig/options/options_keep_inline_images_in_paragraph.md",
     "zig/options/options_link_style_reference.md",
     "zig/options/options_list_custom_bullets.md",
@@ -8063,6 +8127,54 @@
         "language": "c"
       },
       "path": "c/options/options_infer_dimensions_true.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "c"
+      },
+      "path": "c/options/options_inline_data_media_alt_text_only.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "c"
+      },
+      "path": "c/options/options_inline_data_media_drop_element.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "c"
+      },
+      "path": "c/options/options_inline_data_media_keep_default.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "c"
+      },
+      "path": "c/options/options_inline_data_media_real_address_wins.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -12091,6 +12203,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_inline_data_media_alt_text_only.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_inline_data_media_drop_element.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_inline_data_media_keep_default.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_inline_data_media_real_address_wins.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "csharp"
       },
@@ -16103,6 +16263,54 @@
         "language": "dart"
       },
       "path": "dart/options/options_infer_dimensions_true.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "dart"
+      },
+      "path": "dart/options/options_inline_data_media_alt_text_only.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "dart"
+      },
+      "path": "dart/options/options_inline_data_media_drop_element.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "dart"
+      },
+      "path": "dart/options/options_inline_data_media_keep_default.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "dart"
+      },
+      "path": "dart/options/options_inline_data_media_real_address_wins.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -20131,6 +20339,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_inline_data_media_alt_text_only.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_inline_data_media_drop_element.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_inline_data_media_keep_default.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_inline_data_media_real_address_wins.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "elixir"
       },
@@ -24143,6 +24399,54 @@
         "language": "go"
       },
       "path": "go/options/options_infer_dimensions_true.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "go"
+      },
+      "path": "go/options/options_inline_data_media_alt_text_only.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "go"
+      },
+      "path": "go/options/options_inline_data_media_drop_element.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "go"
+      },
+      "path": "go/options/options_inline_data_media_keep_default.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "go"
+      },
+      "path": "go/options/options_inline_data_media_real_address_wins.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -28171,6 +28475,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "java"
+      },
+      "path": "java/options/options_inline_data_media_alt_text_only.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "java"
+      },
+      "path": "java/options/options_inline_data_media_drop_element.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "java"
+      },
+      "path": "java/options/options_inline_data_media_keep_default.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "java"
+      },
+      "path": "java/options/options_inline_data_media_real_address_wins.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "java"
       },
@@ -32131,6 +32483,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_inline_data_media_alt_text_only.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_inline_data_media_drop_element.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_inline_data_media_keep_default.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_inline_data_media_real_address_wins.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "kotlin_android"
       },
@@ -35555,6 +35955,54 @@
         "language": "php"
       },
       "path": "php/options/options_infer_dimensions_true.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "php"
+      },
+      "path": "php/options/options_inline_data_media_alt_text_only.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "php"
+      },
+      "path": "php/options/options_inline_data_media_drop_element.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "php"
+      },
+      "path": "php/options/options_inline_data_media_keep_default.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "php"
+      },
+      "path": "php/options/options_inline_data_media_real_address_wins.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -39583,6 +40031,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "python"
+      },
+      "path": "python/options/options_inline_data_media_alt_text_only.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "python"
+      },
+      "path": "python/options/options_inline_data_media_drop_element.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "python"
+      },
+      "path": "python/options/options_inline_data_media_keep_default.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "python"
+      },
+      "path": "python/options/options_inline_data_media_real_address_wins.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "python"
       },
@@ -43603,6 +44099,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "r"
+      },
+      "path": "r/options/options_inline_data_media_alt_text_only.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "r"
+      },
+      "path": "r/options/options_inline_data_media_drop_element.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "r"
+      },
+      "path": "r/options/options_inline_data_media_keep_default.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "r"
+      },
+      "path": "r/options/options_inline_data_media_real_address_wins.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "r"
       },
@@ -47615,6 +48159,54 @@
         "language": "ruby"
       },
       "path": "ruby/options/options_infer_dimensions_true.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_inline_data_media_alt_text_only.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_inline_data_media_drop_element.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_inline_data_media_keep_default.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_inline_data_media_real_address_wins.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -51789,6 +52381,62 @@
         "language": "rust"
       },
       "path": "rust/options/options_infer_dimensions_true.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "rust"
+      },
+      "path": "rust/options/options_inline_data_media_alt_text_only.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "rust"
+      },
+      "path": "rust/options/options_inline_data_media_drop_element.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "rust"
+      },
+      "path": "rust/options/options_inline_data_media_keep_default.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "rust"
+      },
+      "path": "rust/options/options_inline_data_media_real_address_wins.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -56007,6 +56655,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "swift"
+      },
+      "path": "swift/options/options_inline_data_media_alt_text_only.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "swift"
+      },
+      "path": "swift/options/options_inline_data_media_drop_element.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "swift"
+      },
+      "path": "swift/options/options_inline_data_media_keep_default.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "swift"
+      },
+      "path": "swift/options/options_inline_data_media_real_address_wins.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "swift"
       },
@@ -60019,6 +60715,54 @@
         "language": "node"
       },
       "path": "typescript/options/options_infer_dimensions_true.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "node"
+      },
+      "path": "typescript/options/options_inline_data_media_alt_text_only.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "node"
+      },
+      "path": "typescript/options/options_inline_data_media_drop_element.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "node"
+      },
+      "path": "typescript/options/options_inline_data_media_keep_default.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "node"
+      },
+      "path": "typescript/options/options_inline_data_media_real_address_wins.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -64047,6 +64791,54 @@
     },
     {
       "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_inline_data_media_alt_text_only.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_inline_data_media_drop_element.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_inline_data_media_keep_default.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_inline_data_media_real_address_wins.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_keep_inline_images_in_paragraph",
         "language": "wasm"
       },
@@ -68059,6 +68851,54 @@
         "language": "zig"
       },
       "path": "zig/options/options_infer_dimensions_true.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_alt_text_only",
+        "language": "zig"
+      },
+      "path": "zig/options/options_inline_data_media_alt_text_only.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_drop_element",
+        "language": "zig"
+      },
+      "path": "zig/options/options_inline_data_media_drop_element.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_keep_default",
+        "language": "zig"
+      },
+      "path": "zig/options/options_inline_data_media_keep_default.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_inline_data_media_real_address_wins",
+        "language": "zig"
+      },
+      "path": "zig/options/options_inline_data_media_real_address_wins.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -80653,6 +81493,262 @@
     },
     {
       "fixture_id": "options_infer_dimensions_true",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
       "language": "zig"
     },
     {
@@ -101879,6 +102975,262 @@
     },
     {
       "fixture_id": "options_infer_dimensions_true",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_alt_text_only",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_drop_element",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_keep_default",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_inline_data_media_real_address_wins",
       "language": "zig"
     },
     {

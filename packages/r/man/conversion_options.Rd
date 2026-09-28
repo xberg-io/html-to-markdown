@@ -37,6 +37,7 @@ conversion_options(
   strip_tags = NULL,
   preserve_tags = NULL,
   skip_images = NULL,
+  inline_data_media = NULL,
   url_escape_style = NULL,
   link_style = NULL,
   output_format = NULL,
@@ -114,6 +115,8 @@ conversion_options(
 \item{preserve_tags}{HTML tag names that are preserved verbatim in the output}
 
 \item{skip_images}{Skip conversion of \verb{<img>} elements (omit images from output)}
+
+\item{inline_data_media}{What the output shows for an image or embedded media element whose address is an inline}
 
 \item{url_escape_style}{URL encoding strategy for link and image destinations}
 

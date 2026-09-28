@@ -57,6 +57,7 @@ fn should_not_crash_when_freeing_invalid_handle_for_every_owned_type() {
         htm_highlight_style_free(INVALID_HANDLE);
         htm_link_style_free(INVALID_HANDLE);
         htm_url_escape_style_free(INVALID_HANDLE);
+        htm_inline_data_media_free(INVALID_HANDLE);
         htm_output_format_free(INVALID_HANDLE);
         htm_node_content_free(INVALID_HANDLE);
         htm_annotation_kind_free(INVALID_HANDLE);

@@ -10,7 +10,7 @@ part 'lib.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `try_convert_annotation_kind_from_core`, `try_convert_image_type_from_core`, `try_convert_link_type_from_core`, `try_convert_node_content_from_core`, `try_convert_node_type_from_core`, `try_convert_structured_data_type_from_core`, `try_convert_text_direction_from_core`, `try_convert_tier_strategy_from_core`, `try_convert_visit_result_from_core`, `try_convert_warning_kind_from_core`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `HtmlVisitorDartImpl`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `visit_audio`, `visit_blockquote`, `visit_button`, `visit_code_block`, `visit_code_inline`, `visit_custom_element`, `visit_definition_description`, `visit_definition_list_end`, `visit_definition_list_start`, `visit_definition_term`, `visit_details`, `visit_element_end`, `visit_element_start`, `visit_emphasis`, `visit_figcaption`, `visit_figure_end`, `visit_figure_start`, `visit_form`, `visit_heading`, `visit_horizontal_rule`, `visit_iframe`, `visit_image`, `visit_input`, `visit_line_break`, `visit_link`, `visit_list_end`, `visit_list_item`, `visit_list_start`, `visit_mark`, `visit_strikethrough`, `visit_strong`, `visit_subscript`, `visit_summary`, `visit_superscript`, `visit_table_end`, `visit_table_row`, `visit_table_start`, `visit_text`, `visit_underline`, `visit_video`
 
 /// Convert HTML to Markdown, Djot, or plain text.
 ///
@@ -500,6 +500,11 @@ class ConversionOptions {
   /// Skip conversion of `<img>` elements (omit images from output).
   final bool skipImages;
 
+  /// What the output shows for an image or embedded media element whose address is an inline
+  /// `data:` URL: the URL with its payload ([`InlineDataMedia::Keep`], the default), the alt
+  /// text alone, or nothing. See [`InlineDataMedia`] for the elements it covers.
+  final InlineDataMedia inlineDataMedia;
+
   /// URL encoding strategy for link and image destinations.
   ///
   /// Controls how special characters in URL destinations are escaped:
@@ -619,6 +624,7 @@ class ConversionOptions {
     required this.stripTags,
     required this.preserveTags,
     required this.skipImages,
+    required this.inlineDataMedia,
     required this.urlEscapeStyle,
     required this.linkStyle,
     required this.outputFormat,
@@ -668,6 +674,7 @@ class ConversionOptions {
       stripTags.hashCode ^
       preserveTags.hashCode ^
       skipImages.hashCode ^
+      inlineDataMedia.hashCode ^
       urlEscapeStyle.hashCode ^
       linkStyle.hashCode ^
       outputFormat.hashCode ^
@@ -719,6 +726,7 @@ class ConversionOptions {
           stripTags == other.stripTags &&
           preserveTags == other.preserveTags &&
           skipImages == other.skipImages &&
+          inlineDataMedia == other.inlineDataMedia &&
           urlEscapeStyle == other.urlEscapeStyle &&
           linkStyle == other.linkStyle &&
           outputFormat == other.outputFormat &&
@@ -835,6 +843,9 @@ class ConversionOptionsUpdate {
   /// Optional override for [`ConversionOptions::skip_images`].
   final bool? skipImages;
 
+  /// Optional override for [`ConversionOptions::inline_data_media`].
+  final InlineDataMedia? inlineDataMedia;
+
   /// Optional override for [`ConversionOptions::url_escape_style`].
   final UrlEscapeStyle? urlEscapeStyle;
 
@@ -907,6 +918,7 @@ class ConversionOptionsUpdate {
     this.stripTags,
     this.preserveTags,
     this.skipImages,
+    this.inlineDataMedia,
     this.urlEscapeStyle,
     this.linkStyle,
     this.outputFormat,
@@ -956,6 +968,7 @@ class ConversionOptionsUpdate {
       stripTags.hashCode ^
       preserveTags.hashCode ^
       skipImages.hashCode ^
+      inlineDataMedia.hashCode ^
       urlEscapeStyle.hashCode ^
       linkStyle.hashCode ^
       outputFormat.hashCode ^
@@ -1007,6 +1020,7 @@ class ConversionOptionsUpdate {
           stripTags == other.stripTags &&
           preserveTags == other.preserveTags &&
           skipImages == other.skipImages &&
+          inlineDataMedia == other.inlineDataMedia &&
           urlEscapeStyle == other.urlEscapeStyle &&
           linkStyle == other.linkStyle &&
           outputFormat == other.outputFormat &&
@@ -1599,6 +1613,30 @@ enum ImageType {
 
   /// Relative image path
   relative,
+}
+
+/// What the output shows for an image or embedded media element whose address is an inline
+/// `data:` URL.
+///
+/// Applies to `<img>` (including its lazy-load attributes, its `srcset` candidates and the
+/// `<source>` elements of a `<picture>` around it), `<graphic>`, inline `<svg>`, `<video>`,
+/// `<audio>` (including their nested `<source>` elements) and `<iframe>`. Links (`<a href>`) are
+/// not media and keep their destination.
+///
+/// With `AltTextOnly` or `DropElement`, an element that also has an address that is not `data:`
+/// uses that address instead. The document structure follows the markdown: a dropped image has
+/// no node, and an image written as its alt text has no address. A link whose only content the
+/// choice removed is dropped with it.
+enum InlineDataMedia {
+  /// Write the `data:` URL as the destination, payload included. Default.
+  keep,
+
+  /// Write the alt text (the title for an `<svg>`, the fallback content for `<video>` and
+  /// `<audio>`) without a destination.
+  altTextOnly,
+
+  /// Write nothing for the element.
+  dropElement,
 }
 
 /// Hyperlink metadata with categorization and attributes.

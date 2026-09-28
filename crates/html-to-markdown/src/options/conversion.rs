@@ -2,8 +2,8 @@
 
 use crate::options::preprocessing::PreprocessingOptions;
 use crate::options::validation::{
-    CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
-    UrlEscapeStyle, WhitespaceMode,
+    CodeBlockStyle, HeadingStyle, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType, NewlineStyle,
+    OutputFormat, UrlEscapeStyle, WhitespaceMode,
 };
 
 /// Native recursion guard used as the default when the caller does not set an
@@ -155,6 +155,10 @@ pub struct ConversionOptions {
     pub preserve_tags: Vec<String>,
     /// Skip conversion of `<img>` elements (omit images from output).
     pub skip_images: bool,
+    /// What the output shows for an image or embedded media element whose address is an inline
+    /// `data:` URL: the URL with its payload ([`InlineDataMedia::Keep`], the default), the alt
+    /// text alone, or nothing. See [`InlineDataMedia`] for the elements it covers.
+    pub inline_data_media: InlineDataMedia,
     /// URL encoding strategy for link and image destinations.
     ///
     /// Controls how special characters in URL destinations are escaped:
@@ -278,6 +282,7 @@ impl Default for ConversionOptions {
             strip_tags: Vec::new(),
             preserve_tags: Vec::new(),
             skip_images: false,
+            inline_data_media: InlineDataMedia::Keep,
             url_escape_style: UrlEscapeStyle::default(),
             link_style: LinkStyle::default(),
             output_format: OutputFormat::default(),
@@ -392,6 +397,7 @@ impl ConversionOptionsBuilder {
 
     builder_setter!(convert_as_inline, bool);
     builder_setter!(skip_images, bool);
+    builder_setter!(inline_data_media, InlineDataMedia);
     builder_setter!(url_escape_style, UrlEscapeStyle);
 
     /// Set the list of HTML tag names whose content is stripped from output.
@@ -539,6 +545,8 @@ pub struct ConversionOptionsUpdate {
     pub preserve_tags: Option<Vec<String>>,
     /// Optional override for [`ConversionOptions::skip_images`].
     pub skip_images: Option<bool>,
+    /// Optional override for [`ConversionOptions::inline_data_media`].
+    pub inline_data_media: Option<InlineDataMedia>,
     /// Optional override for [`ConversionOptions::url_escape_style`].
     pub url_escape_style: Option<UrlEscapeStyle>,
     /// Optional override for [`ConversionOptions::link_style`].
@@ -611,6 +619,7 @@ impl ConversionOptions {
         apply!(strip_tags);
         apply!(preserve_tags);
         apply!(skip_images);
+        apply!(inline_data_media);
         apply!(url_escape_style);
         apply!(link_style);
         apply!(output_format);

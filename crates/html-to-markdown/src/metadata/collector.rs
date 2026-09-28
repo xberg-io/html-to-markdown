@@ -157,7 +157,7 @@ impl MetadataCollector {
             return;
         }
 
-        let image_type = if src.starts_with("data:") {
+        let image_type = if crate::converter::media::is_inline_data(&src) {
             ImageType::DataUri
         } else if src.starts_with("http://") || src.starts_with("https://") {
             ImageType::External

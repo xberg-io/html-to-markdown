@@ -12,6 +12,6 @@ pub mod validation;
 pub use conversion::{ConversionOptions, ConversionOptionsBuilder, ConversionOptionsUpdate, TierStrategy};
 pub use preprocessing::{PreprocessingOptions, PreprocessingOptionsUpdate, PreprocessingPreset};
 pub use validation::{
-    CodeBlockStyle, HeadingStyle, HighlightStyle, LinkStyle, ListIndentType, NewlineStyle, OutputFormat,
-    UrlEscapeStyle, WhitespaceMode,
+    CodeBlockStyle, HeadingStyle, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType, NewlineStyle,
+    OutputFormat, UrlEscapeStyle, WhitespaceMode,
 };
