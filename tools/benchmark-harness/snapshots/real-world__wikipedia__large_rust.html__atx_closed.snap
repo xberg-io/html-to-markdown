@@ -8,7 +8,7 @@ meta-og:image:height: "1200"
 meta-og:image:width: "1200"
 meta-og:title: Rust (programming language) - Wikipedia
 meta-og:type: website
-meta-referrer: origin-when-cross-origin
+meta-referrer: origin
 meta-robots: max-image-preview:standard
 meta-viewport: width=1120
 title: Rust (programming language) - Wikipedia
