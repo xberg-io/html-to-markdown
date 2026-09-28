@@ -1,8 +1,4 @@
 //! URL-encoding and destination-rendering helpers for Markdown links.
-//!
-//! Split out of `link.rs` to stay under the 1000-line quality gate; these
-//! percent-encoding/title-escaping concerns evolve independently of the
-//! DOM-walking handler that remains there.
 
 use crate::options::ConversionOptions;
 use std::borrow::Cow;
@@ -195,11 +191,11 @@ pub(super) fn entity_reference_end(bytes: &[u8], amp_index: usize) -> Option<usi
 
 /// Escape a literal `&` that starts a byte sequence CommonMark would decode as an entity or
 /// numeric character reference (`&plus;`, `&#43;`, `&#x2B;`, ...), so a destination or title
-/// string that already went through [`crate::text::decode_html_entities`] round-trips
+/// string that already went through [`crate::text::decode_attribute_value_cow`] round-trips
 /// byte-for-byte through a CommonMark parser instead of being decoded a second time.
 ///
-/// Only escapes references [`html_escape::decode_html_entities`] -- the same decoder used by
-/// `crate::text::decode_html_entities` -- actually changes: `&foo;` where `foo` is not a
+/// Only escapes references [`html_escape::decode_html_entities`] actually changes. Like
+/// CommonMark, it decodes only a reference closed by `;`: `&foo;` where `foo` is not a
 /// recognized reference name is left alone, matching the existing pinned behavior for
 /// `?a&b` (no terminating `;`, never a candidate at all).
 #[must_use]

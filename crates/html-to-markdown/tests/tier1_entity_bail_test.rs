@@ -77,17 +77,31 @@ fn decodes_named_entity_ouml() {
     assert!(md.contains('\u{00F6}'), "expected 'ö' in output, got: {md:?}");
 }
 
-/// A genuinely-unknown entity (`&notarealentityname;`) passes through raw —
+/// A genuinely-unknown entity (`&bogusentityname;`) passes through raw —
 /// neither Tier-1 nor Tier-2 decode it, so byte-equality is preserved without
 /// the historical `UnknownEntity` bail.
+// ~keep The name must not start with a legacy reference name: `&notarealentityname;` is
+// ~keep `¬arealentityname;` in text, per the spec's longest-prefix rule (#545).
 #[test]
 fn passes_unknown_entity_through_raw() {
-    let html = "<p>x &notarealentityname; y</p>";
+    let html = "<p>x &bogusentityname; y</p>";
     let md = tier1_raw(html).expect("unknown entity passes through, no bail");
     assert!(
-        md.contains("&notarealentityname;"),
+        md.contains("&bogusentityname;"),
         "expected raw entity preserved, got: {md:?}"
     );
+}
+
+/// A legacy reference without its `;` bails to Tier-2, which owns the spec's
+/// longest-prefix and attribute rules.
+#[test]
+fn bails_on_legacy_reference_without_semicolon() {
+    for html in ["<p>&copy 2024</p>", "<p>x &notarealentityname; y</p>"] {
+        assert!(
+            matches!(tier1_raw(html), Err(BailReason::UnknownEntity { .. })),
+            "expected an UnknownEntity bail for {html:?}"
+        );
+    }
 }
 
 /// Numeric hex reference `&#x1F600;` (emoji) should be decoded by the numeric

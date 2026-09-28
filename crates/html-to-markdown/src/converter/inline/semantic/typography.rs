@@ -428,7 +428,6 @@ pub fn handle_abbreviation(
 ///
 /// Processes span elements with special handling for:
 /// - OCR words (elements with class "`ocrx_word")`: adds space before if needed
-/// - Whitespace normalization in normalized mode: removes single newlines
 /// - Otherwise passes through content normally
 pub fn handle_span(
     node_handle: &NodeHandle,
@@ -459,20 +458,6 @@ pub fn handle_span(
         && !output.ends_with('\n')
     {
         output.push(' ');
-    }
-
-    if !ctx.in_code
-        && options.whitespace_mode == crate::options::WhitespaceMode::Normalized
-        && output.ends_with('\n')
-        && !output.ends_with("\n\n")
-        // ~keep issue #432: never strip an intentional Markdown hard break.
-        && !output.ends_with("  \n")
-        && !output.ends_with("\\\n")
-        // ~keep issue #431: never cross a block boundary — a table row ends with
-        // ~keep "|\n"; popping it would glue this span onto the delimiter row.
-        && !output.ends_with("|\n")
-    {
-        output.pop();
     }
 
     let children = tag.children();

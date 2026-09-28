@@ -54,7 +54,7 @@ pub fn handle_link(
         .attributes()
         .get("href")
         .flatten()
-        .map(|v| text::decode_html_entities(&v.as_utf8_str()))
+        .map(|v| text::decode_attribute_value_cow(&v.as_utf8_str()).into_owned())
         .map(|href| ctx.resolve_url(&href).unwrap_or(href));
     // ~keep An empty `title=""` carries no information, and `[t](u "")` / `![a](i "")` is
     // ~keep noise that no Markdown serializer round-trips: re-rendering the output drops

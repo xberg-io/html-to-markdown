@@ -9,7 +9,7 @@
 use crate::converter::media::svg::serialize_element;
 use crate::options::ConversionOptions;
 #[cfg(feature = "metadata")]
-use crate::text::decode_html_entities;
+use crate::text::decode_attribute_value_cow;
 use crate::text::escape;
 use tl::{NodeHandle, Parser};
 
@@ -99,7 +99,7 @@ fn handle_head(
                                 let json = child_tag.inner_text(parser);
                                 let json = json.trim();
                                 if !json.is_empty() {
-                                    let json = decode_html_entities(json);
+                                    let json = decode_attribute_value_cow(json).into_owned();
                                     if !json.is_empty() {
                                         collector.borrow_mut().add_json_ld(json);
                                     }
@@ -148,7 +148,7 @@ fn handle_script(
                 let json = tag.inner_text(parser);
                 let json = json.trim();
                 if !json.is_empty() {
-                    let json = decode_html_entities(json);
+                    let json = decode_attribute_value_cow(json).into_owned();
                     if !json.is_empty() {
                         collector.borrow_mut().add_json_ld(json);
                     }

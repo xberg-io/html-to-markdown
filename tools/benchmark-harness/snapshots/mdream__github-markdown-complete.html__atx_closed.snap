@@ -11,7 +11,7 @@ meta-path-article: get-started/writing-on-github/getting-started-with-writing-an
 meta-path-language: en
 meta-path-product: get-started
 meta-path-version: free-pro-team@latest
-meta-status: 200
+meta-status: "200"
 meta-twitter:card: summary
 meta-twitter:description: Create sophisticated formatting for your prose and code on GitHub with simple syntax.
 meta-twitter:domain: docs-internal.github.com

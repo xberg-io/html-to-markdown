@@ -16,8 +16,8 @@ use std::collections::{BTreeMap, HashSet};
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
     collapse_excess_blank_lines, effective_max_depth, extract_head_metadata, format_metadata_frontmatter,
-    has_custom_element_tags, repair_with_html5ever, strip_trailing_backslash_breaks, trim_line_end_whitespace,
-    trim_trailing_whitespace,
+    has_custom_element_tags, is_inline_element, repair_with_html5ever, strip_trailing_backslash_breaks,
+    trim_line_end_whitespace, trim_trailing_whitespace,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
@@ -396,6 +396,43 @@ fn finish_structure_collector(
     }
 }
 
+/// Whether `node` is inline content that directly follows a block sibling whose output ends with
+/// a single line break (issues #570, #571).
+///
+/// ~keep Every block writes its own leading blank line, so a block after a list, a table or a
+/// ~keep rule is separated whatever that block ended with. Inline content writes none, so it
+/// ~keep continued the block's last line: a lazy continuation of the last list item, or one more
+/// ~keep table row. In HTML, inline content after a block starts a block of its own. The output
+/// ~keep check runs first, so the sibling lookup only happens right after such a line break.
+/// ~keep List items are left out: their continuation lines are indented by other rules. A lone line
+/// ~keep break is not a block's last line: the block before it wrote nothing. A hard break the block
+/// ~keep ended with (`<li>A<br></li>`) is still that block's last line, so it gets the blank line too.
+fn continues_block_last_line(
+    node: &tl::Node,
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &str,
+    ctx: &Context,
+    dom_ctx: &DomContext,
+) -> bool {
+    if output.len() < 2 || !output.ends_with('\n') || output.ends_with("\n\n") {
+        return false;
+    }
+    if ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code || ctx.in_list || ctx.in_list_item {
+        return false;
+    }
+    let is_inline_content = match node {
+        tl::Node::Raw(bytes) => !bytes.as_utf8_str().trim().is_empty(),
+        tl::Node::Tag(_) => dom_ctx
+            .tag_info(node_handle.get_inner(), parser)
+            .is_some_and(|info| is_inline_element(&info.name)),
+        tl::Node::Comment(_) => false,
+    };
+    is_inline_content
+        && crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx)
+            .is_some_and(is_block_level_element)
+}
+
 /// Recursively walk DOM nodes and convert to Markdown.
 #[allow(clippy::only_used_in_recursion)]
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -414,6 +451,10 @@ pub fn walk_node(
     if depth >= effective_max_depth(options) {
         ctx.depth_limit_reached.set(true);
         return;
+    }
+
+    if continues_block_last_line(node, node_handle, parser, output, ctx, dom_ctx) {
+        output.push('\n');
     }
 
     match node {

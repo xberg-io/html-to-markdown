@@ -164,7 +164,7 @@
       "median_ms": 1.5131390240641711,
       "mad_ms": 0.0034723850267378564,
       "mb_per_s": 18.39231125413558,
-      "output_bytes": 6934
+      "output_bytes": 7573
     },
     {
       "fixture": "real-world/issues/gh-190/rbloggers.html",
@@ -173,7 +173,7 @@
       "median_ms": 1.0290141428571429,
       "mad_ms": 0.001999598852040818,
       "mb_per_s": 43.63764628473355,
-      "output_bytes": 20140
+      "output_bytes": 20149
     },
     {
       "fixture": "real-world/issues/gh-190/ozonekorea.html",
