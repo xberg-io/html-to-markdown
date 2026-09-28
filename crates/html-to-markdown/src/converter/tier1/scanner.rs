@@ -124,7 +124,11 @@ pub fn scan(
         match bytes[pos] {
             b'<' => {
                 if text_start < pos {
-                    if !html[text_start..pos].bytes().all(|b| b.is_ascii_whitespace()) {
+                    let next_tag_is_html = upcoming_tag_is_named(bytes, pos, b"html");
+                    if !crate::converter::main_helpers::is_ignorable_before_head(
+                        &html[text_start..pos],
+                        next_tag_is_html,
+                    ) {
                         state.start_body(text_start);
                     }
                     // ~keep Peek the upcoming tag BEFORE flushing the preceding text: a

@@ -52,6 +52,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
+  U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition
+  reads as ordinary text by the time #527's head search sees it, and that search treated any such
+  text as the start of the body, so it gave up before it ever reached `<head>` and reported no
+  title, no meta tags and no base or canonical link. A browser discards anything ahead of the
+  document's own `<html>` tag without letting it block the real head inside, so the head search
+  now does the same: text directly in front of `<html>` no longer ends the search, on both tiers.
+  A head-only fragment with no `<html>` tag is unaffected: text ahead of `<head>` there still ends
+  the search, as #527 intended.
 - **An `<img>` whose `src` spelled the `data:` scheme in upper or mixed case ignored its lazy-load
   address.** The check that sends a `data:` source to the `data-src`, `data-lazy-src`,
   `data-original` and `srcset` fallbacks compared the scheme in lower case only, so

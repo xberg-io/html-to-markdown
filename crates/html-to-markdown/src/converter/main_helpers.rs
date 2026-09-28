@@ -765,7 +765,15 @@ pub fn document_head(roots: &[tl::NodeHandle], parser: &tl::Parser) -> Option<tl
     let mut work: Vec<_> = roots.iter().rev().copied().collect();
     while let Some(handle) = work.pop() {
         match handle.get(parser) {
-            Some(tl::Node::Raw(text)) if !text.as_bytes().iter().all(u8::is_ascii_whitespace) => return None,
+            Some(tl::Node::Raw(text)) => {
+                let next_is_html = matches!(
+                    work.last().and_then(|next| next.get(parser)),
+                    Some(tl::Node::Tag(tag)) if tag.name().as_bytes().eq_ignore_ascii_case(b"html")
+                );
+                if !is_ignorable_before_head(&text.as_utf8_str(), next_is_html) {
+                    return None;
+                }
+            }
             Some(tl::Node::Tag(tag)) => {
                 let name = tag.name().as_bytes().to_ascii_lowercase();
                 match name.as_slice() {
@@ -783,6 +791,19 @@ pub fn document_head(roots: &[tl::NodeHandle], parser: &tl::Parser) -> Option<tl
         }
     }
     None
+}
+
+/// Whether a run of text before the head is found should be skipped rather than ending the
+/// search: whitespace, or any run that sits directly in front of the document's own `<html>`
+/// tag. The WHATWG "before html" insertion mode already discards anything ahead of `<html>`
+/// itself without letting it block the parser from reaching the real head inside, whether that
+/// text is a real byte order mark (stripped earlier, so it never reaches here), one a wrong
+/// encoding guess mangled beyond recognition, or ordinary prose: a browser shows the page's
+/// title and meta tags either way. Text with nothing named `html` ahead of it, a head-only
+/// fragment, still ends the search unchanged; see
+/// `should_ignore_a_head_after_implicit_body_content_on_both_tiers`.
+pub fn is_ignorable_before_head(text: &str, next_tag_is_html: bool) -> bool {
+    next_tag_is_html || text.chars().all(|c| c.is_ascii_whitespace())
 }
 
 /// Whether a start tag named `name` (lower case) starts the body when no body has started:
@@ -872,6 +893,20 @@ pub fn is_inline_element(tag_name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_is_ignorable_before_head() {
+        assert!(is_ignorable_before_head("", false));
+        assert!(is_ignorable_before_head("   \n\t", false));
+        assert!(!is_ignorable_before_head("hello", false));
+        assert!(!is_ignorable_before_head("x", false));
+        assert!(!is_ignorable_before_head("\u{FFFD}\u{FFFD}", false));
+        // ~keep Any text sitting directly in front of the document's own `<html>` tag is
+        // ~keep forgiven, garbage or genuine prose alike (#527 regression: a mangled byte
+        // ~keep order mark reads as ordinary non-whitespace text by this point).
+        assert!(is_ignorable_before_head("\u{FFFD}\u{FFFD}", true));
+        assert!(is_ignorable_before_head("hello", true));
+    }
 
     #[test]
     fn test_trim_line_end_whitespace() {

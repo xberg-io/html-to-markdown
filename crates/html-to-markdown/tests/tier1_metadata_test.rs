@@ -614,3 +614,98 @@ fn should_read_the_head_after_a_utf8_byte_order_mark_on_both_tiers() {
         assert_eq!(out, "---\ntitle: T\n---\n\nx\n", "{tier:?}");
     }
 }
+
+// ~keep ── 14. A mangled leading byte order mark no longer drops the whole head (#527 regression) ──
+
+#[test]
+fn should_recover_the_head_after_a_mangled_leading_byte_order_mark_on_both_tiers() {
+    // ~keep A stand-in for `real-world/issues/gh-190/sjsu.html`'s own opening bytes: a byte
+    // ~keep order mark a wrong encoding guess mangled beyond recognition reads as two ordinary
+    // ~keep U+FFFD characters by the time parsing sees it (a real U+FEFF is stripped earlier
+    // ~keep and never reaches here). See the fixture-accurate reproduction below.
+    let html = "\u{FFFD}\u{FFFD}<html><head><title>T</title><meta name=\"description\" content=\"d\"></head><body><p>x</p></body></html>";
+    let out = t2(html);
+    assert!(
+        out.contains("title: T\n") && out.contains("meta-description: d\n"),
+        "{out}"
+    );
+    assert!(out.contains("x\n"), "{out}");
+
+    // ~keep Tier 1 recovers the same metadata. Byte-for-byte parity with Tier 2 is not
+    // ~keep asserted: Tier 1 always inserts a blank line after frontmatter, while Tier 2
+    // ~keep leaves this bare, unwrapped leading text node exactly as authored, a combination
+    // ~keep the real fixture never reaches (it is complex enough that Tier 1 bails to Tier 2
+    // ~keep well before the head is at issue, confirmed by the oracle at zero failures).
+    let t1_out = t1_only(html);
+    assert!(
+        t1_out.contains("title: T\n") && t1_out.contains("meta-description: d\n"),
+        "{t1_out}"
+    );
+    assert!(t1_out.contains("x\n"), "{t1_out}");
+}
+
+#[test]
+fn should_recover_the_head_from_the_sjsu_fixtures_opening_bytes() {
+    // ~keep The exact byte shape `real-world/issues/gh-190/sjsu.html` opens with: its true
+    // ~keep UTF-16LE byte order mark was already mangled into two U+FFFD's worth of UTF-8
+    // ~keep bytes by an earlier, unrelated lossy conversion before this fixture was captured,
+    // ~keep and the rest of the document is genuine UTF-16LE text with no BOM left to detect.
+    // ~keep The no-BOM heuristic still decodes the whole thing as UTF-16LE, turning those six
+    // ~keep bytes into three unrelated non-ASCII characters directly ahead of `<html>`: a fixed
+    // ~keep instance of the same bug the simpler stand-in above covers.
+    let mut bytes = vec![0xEFu8, 0xBF, 0xBD, 0xEF, 0xBF, 0xBD];
+    let doc =
+        "<html><head><title>T</title><meta name=\"description\" content=\"d\"></head><body><p>x</p></body></html>";
+    for unit in doc.encode_utf16() {
+        bytes.extend_from_slice(&unit.to_le_bytes());
+    }
+    let html = String::from_utf8(bytes).expect("NUL bytes are valid single-byte UTF-8");
+    let opts = ConversionOptions {
+        extract_metadata: true,
+        ..ConversionOptions::default()
+    };
+    let out = convert(&html, Some(opts)).unwrap().content.unwrap_or_default();
+    assert!(
+        out.contains("title: T\n") && out.contains("meta-description: d\n"),
+        "{out}"
+    );
+    assert!(out.contains("x\n"), "{out}");
+}
+
+#[test]
+fn should_report_the_head_after_leading_whitespace_on_both_tiers() {
+    let html = "   \n\t <html><head><title>T</title></head><body><p>x</p></body></html>";
+    let out = t2(html);
+    assert!(out.contains("title: T\n"), "{out}");
+    assert_eq!(t1_only(html), out);
+}
+
+#[test]
+fn should_report_the_head_after_a_leading_comment_on_both_tiers() {
+    let html = "<!-- note --><html><head><title>T</title></head><body><p>x</p></body></html>";
+    let out = t2(html);
+    assert!(out.contains("title: T\n"), "{out}");
+    assert_eq!(t1_only(html), out);
+}
+
+#[test]
+fn should_report_the_head_after_a_leading_doctype_on_both_tiers() {
+    let html = "<!DOCTYPE html><html><head><title>T</title></head><body><p>x</p></body></html>";
+    let out = t2(html);
+    assert!(out.contains("title: T\n"), "{out}");
+    assert_eq!(t1_only(html), out);
+}
+
+#[test]
+fn should_report_the_head_after_leading_plain_text_directly_in_front_of_html_on_both_tiers() {
+    // ~keep Whatever sits directly in front of the document's own `<html>` tag, garbage or
+    // ~keep genuine prose, is forgiven the same way a browser discards it: the head search
+    // ~keep only stays strict for a head-only fragment with no `<html>` tag at all (the
+    // ~keep `x<head>...` cases in `should_ignore_a_head_after_implicit_body_content_on_both_tiers`).
+    let html = "hello<html><head><title>Kept</title></head><body><p>x</p></body></html>";
+    let out = t2(html);
+    assert!(out.contains("title: Kept\n"), "{out}");
+    // ~keep Not byte-for-byte parity with Tier 2 here: see the mangled-BOM test above for why
+    // ~keep a bare, unwrapped leading text node is the one case this brief leaves unaligned.
+    assert!(t1_only(html).contains("title: Kept\n"), "{}", t1_only(html));
+}
