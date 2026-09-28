@@ -232,14 +232,14 @@ fn multiple_pre_siblings_continuing_list_item_text_does_not_bail_and_matches() {
 fn hr_inside_list_item_does_not_bail_and_matches() {
     assert_not_bailed("<ul><li><hr></li></ul>");
     assert_matches("<ul><li><hr></li></ul>");
-    assert_not_bailed("<ul><li>x<hr><hr></li></ul>");
-    assert_matches("<ul><li>x<hr><hr></li></ul>");
+    // ~keep After the item's text Tier 2 starts the rule at the content column (issue #583).
+    assert_bailed("<ul><li>x<hr><hr></li></ul>");
 }
 
 #[test]
 fn nested_unordered_list_does_not_bail_and_matches() {
     assert_not_bailed("<ul><li><ul><li>y</li></ul></li></ul>");
     assert_matches("<ul><li><ul><li>y</li></ul></li></ul>");
-    assert_not_bailed("<ul><li>x<ul><li>y</li></ul>z</li></ul>");
-    assert_matches("<ul><li>x<ul><li>y</li></ul>z</li></ul>");
+    // ~keep Text after the nested list starts a paragraph at the content column (issue #583).
+    assert_bailed("<ul><li>x<ul><li>y</li></ul>z</li></ul>");
 }

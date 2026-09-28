@@ -1778,9 +1778,12 @@ fn emit_void(
 
     match spec.kind {
         TagKind::Hr => {
-            // ~keep Tier-2 starts a rule inside a list item at the item's content column
+            // ~keep Tier-2 starts a rule after an item's content at the item's content column
             // ~keep (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
-            if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
+            if !state.in_table_cell()
+                && state.list_continuation_indent_width() > 0
+                && !line_is_bare_list_marker(&state.output)
+            {
                 return Err(BailReason::ListItemUnsupportedBlockChild);
             }
             {

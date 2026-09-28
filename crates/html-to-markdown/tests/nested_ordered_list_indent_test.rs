@@ -76,9 +76,9 @@ fn should_align_continuation_paragraph_to_content_column_inside_nested_ordered_i
 
 #[test]
 fn should_pad_same_line_continuation_text_by_content_column_inside_nested_ordered_item() {
-    // A stray text node directly followed by a <p> (not wrapped in its own <p>) is rendered on
-    // the same line, padded to the item's content column rather than the parent's <p> heuristic.
+    // A stray text node directly followed by a <p> (not wrapped in its own <p>): the paragraph
+    // starts after a blank line at the item's content column (issue #583).
     let html = "<ol><li>outer<ol><li>inner<p>continuation text</p></li></ol></li></ol>";
     let result = convert(html);
-    assert_eq!(result, "1. outer\n   1. inner       continuation text\n");
+    assert_eq!(result, "1. outer\n   1. inner\n\n      continuation text\n");
 }
