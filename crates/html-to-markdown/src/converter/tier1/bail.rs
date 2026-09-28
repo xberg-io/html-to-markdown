@@ -184,6 +184,11 @@ pub enum BailReason {
     /// list-item-agnostic `ensure_blank_line` already coincides with Tier-2
     /// there). Only `<p>` opening as a CONTINUATION of already-started text
     /// bails.
+    ///
+    /// A heading or any other generic block container anywhere in a list item, an
+    /// `<hr>` after the item's content, and inline content right after a block in a
+    /// list item, bail too: Tier-2 starts each at the item's content column (issue
+    /// #583), which this scanner does not track.
     ListItemUnsupportedBlockChild,
 
     /// An `<img>` had an empty (or whitespace-only) `src`, or a `src` that is a

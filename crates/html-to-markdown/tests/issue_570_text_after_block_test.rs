@@ -216,21 +216,22 @@ fn should_not_add_a_blank_line_after_a_block_that_wrote_nothing() {
 
 #[test]
 fn should_keep_text_after_a_nested_list_inside_the_outer_list_item() {
-    // ~keep Inside a list item the text after a nested list is continued by the item's own
-    // ~keep indentation rules; a blank line there would move the text out of the list.
+    // ~keep Inside a list item the text after a nested list starts a paragraph at the item's
+    // ~keep content column (issue #583), so it stays in the outer item and leaves the inner one.
     let html = "<ul><li>A<ul><li>B</li></ul>tail</li></ul>";
     let out = tier2(html);
     let rendered = render(&out);
     assert!(
-        !rendered.contains("<p>tail</p>") && rendered.trim_end().ends_with("</ul>"),
-        "tail must stay inside the outer list: {out:?} renders {rendered:?}"
+        rendered.ends_with("</ul>\n<p>tail</p>\n</li>\n</ul>\n") && rendered.contains("<li>B</li>"),
+        "tail must be a paragraph of the outer list item: {out:?} renders {rendered:?}"
     );
     let options = ConversionOptions {
         tier_strategy: TierStrategy::Auto,
         ..tier2_options()
     };
-    let tier1_out = tier1::run(html, &PrescanReport::default(), &options).expect("tier1 converts a nested list");
-    assert_eq!(tier1_out, out, "Tier 1 and Tier 2 must agree on {html:?}");
+    if let Ok(tier1_out) = tier1::run(html, &PrescanReport::default(), &options) {
+        assert_eq!(tier1_out, out, "Tier 1 and Tier 2 must agree on {html:?}");
+    }
 }
 
 /// Tier 2 output, and Tier 1 output wherever Tier 1 converts the input itself.
@@ -299,7 +300,6 @@ fn should_not_separate_inside_table_cells_code_or_converted_inline_output() {
         ),
         ("<pre><ul><li>A</li></ul>ZZ</pre>", "```\n- A\nZZ\n```\n"),
         ("<p><code><ul><li>A</li></ul>ZZ</code></p>", "`- A`  \n`ZZ`\n"),
-        ("<ul><li>X<ul><li>A</li></ul>ZZ</li></ul>", "- X\n  * A\n  ZZ\n"),
     ] {
         let (tier2_out, tier1_out) = both_tiers(html);
         assert_eq!(tier2_out, expected, "Tier 2 changed an excluded context: {html:?}");
@@ -307,11 +307,12 @@ fn should_not_separate_inside_table_cells_code_or_converted_inline_output() {
             assert_eq!(tier1_out, expected, "Tier 1 changed an excluded context: {html:?}");
         }
     }
-    // ~keep A list item outside any list sets the list-item context but not the list context.
+    // ~keep A list item outside any list sets the list-item context but not the list context;
+    // ~keep its text after a nested list still starts a paragraph inside it (issue #583).
     // ~keep Tier 1 renders a stray item differently, so only Tier 2 is pinned here.
     assert_eq!(
         tier2("<div><li>X<ul><li>A</li></ul>ZZ</li></div>"),
-        "- X\n\n  - A\n  ZZ\n",
+        "- X\n\n  - A\n\n  ZZ\n",
         "Tier 2 changed text inside a stray list item"
     );
     let inline = ConversionOptions {

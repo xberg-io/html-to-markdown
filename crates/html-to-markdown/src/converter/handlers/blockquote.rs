@@ -134,7 +134,7 @@ pub fn handle_blockquote(
         // `blockquote_depth == 0` applies it exactly once, at the boundary where this
         // content actually reaches the list item's own text.
         let list_indent = if ctx.in_list_item && ctx.blockquote_depth == 0 {
-            crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+            crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
         } else {
             None
         };
@@ -142,7 +142,7 @@ pub fn handle_blockquote(
         // ~keep A blockquote that continues already-started list item content needs its
         // first quoted line indented too; one that is the item's first content
         // instead sits right after the marker, which already provides that column
-        // (see `block/paragraph.rs::add_list_continuation_indent` for the identical
+        // (see `block/paragraph.rs`'s `is_list_continuation` for the identical
         // first-line distinction, applied there to paragraphs only).
         // A plain suffix check like `output.ends_with("* ")` also matches the closing
         // "**"/"*" of `<strong>`/`<em>` immediately followed by a migrated trailing
@@ -166,6 +166,11 @@ pub fn handle_blockquote(
                 output.push_str("\n\n");
             }
         } else if !output.is_empty() {
+            // ~keep The quote writes its own list indent below, so the one `walk_node` put at
+            // ~keep the start of this line inside a list item goes first.
+            if ctx.in_list_item {
+                crate::converter::trim_trailing_whitespace(output);
+            }
             if output.ends_with("\n\n") {
                 output.truncate(output.len() - 1);
             } else if ctx.in_list_item {

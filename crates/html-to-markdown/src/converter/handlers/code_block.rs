@@ -534,7 +534,7 @@ fn format_code_block(
 ///
 /// ~keep A fenced (or indented) code block spans several physical lines, but the
 /// ~keep only call site that indented list continuation content
-/// ~keep (`block/paragraph.rs::add_list_continuation_indent`) indented a single
+/// ~keep (`block/paragraph.rs`'s list continuation) indented a single
 /// ~keep leading position, not every line a block emits. CommonMark's list
 /// ~keep container match is per physical line: a non-blank line that is not
 /// ~keep indented to `list_indent_columns` is not part of the item, so an
@@ -583,8 +583,7 @@ fn format_code_block_in_list_item(
     }
 
     let indent =
-        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
-            .unwrap_or_default();
+        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
 
     for (index, segment) in rendered.split_inclusive('\n').enumerate() {
         let line = segment.strip_suffix('\n').unwrap_or(segment);

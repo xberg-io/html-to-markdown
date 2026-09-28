@@ -155,6 +155,10 @@ pub struct OpenTag {
     /// distinguishes them, so `close_inline_marker` can bail (`WhitespaceOnlyInlineEmphasis`)
     /// for the latter instead of silently truncating the space away like the former.
     pub dropped_whitespace_only_text: bool,
+    /// Set on every open `ListItem` frame when a checkbox input is emitted inside it. Tier-2 turns
+    /// such an item into a task item and joins its text; text after a nested list in it stays on
+    /// this path, where the output equals the one before issue #583 (a filed gap).
+    pub holds_checkbox: bool,
 }
 
 /// Minimum capacity for each summary accumulation buffer.
@@ -279,10 +283,11 @@ pub struct Tier1State {
     pub last_emitted_was_img: bool,
 
     /// True right after the closing tag of a block element or a `<hr>` (block-level by Tier-2's
-    /// test), until the next opening, closing or void tag, or the next text flush with content
-    /// (read-then-clear, same convention as `last_closed_custom_element`). Mirrors Tier-2's check
-    /// in `walk_node` that inline content whose previous sibling is a block starts a new paragraph
-    /// (issues #570, #571).
+    /// test), until the next opening or void tag, the next closing tag that is not inline, or the
+    /// next text flush with content (read-then-clear, same convention as
+    /// `last_closed_custom_element`). Mirrors Tier-2's check in `walk_node` that inline content
+    /// after a block, or after an inline element ending in one, starts a new paragraph (issues
+    /// #570, #571, #585).
     pub last_closed_block: bool,
 
     /// Byte width of each currently-open list item's own marker (`"- "` = 2,

@@ -130,8 +130,22 @@ pub fn handle_form(
         let mut content = String::new();
         let children = tag.children();
         {
+            // ~keep The element is written at the start of the line, so inside it a list item
+            // ~keep has ended (issue #583).
+            let block_ctx = super::Context {
+                list_item_open: false,
+                ..ctx.clone()
+            };
             for child_handle in children.top().iter() {
-                walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+                walk_node(
+                    child_handle,
+                    parser,
+                    &mut content,
+                    options,
+                    &block_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
             }
         }
 
@@ -181,8 +195,22 @@ pub fn handle_fieldset(
         let mut content = String::new();
         let children = tag.children();
         {
+            // ~keep The element is written at the start of the line, so inside it a list item
+            // ~keep has ended (issue #583).
+            let block_ctx = super::Context {
+                list_item_open: false,
+                ..ctx.clone()
+            };
             for child_handle in children.top().iter() {
-                walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+                walk_node(
+                    child_handle,
+                    parser,
+                    &mut content,
+                    options,
+                    &block_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
             }
         }
 

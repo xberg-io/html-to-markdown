@@ -75,6 +75,19 @@ pub struct Context {
     pub(crate) inline_depth: usize,
     /// Are we inside a list item?
     pub(crate) in_list_item: bool,
+    /// Whether the list item is still open where the current output buffer will be written:
+    /// a block written after other content then starts at the item's content column.
+    ///
+    /// ~keep A container that renders its children into a buffer of its own (a definition
+    /// ~keep list, a sectioning element, a figure, a details element, a form) writes that buffer
+    /// ~keep as a whole, so the buffer cannot show whether the item has already ended. The
+    /// ~keep container works that out from its own output before it renders the children, or
+    /// ~keep passes false when it writes at the start of the line (issue #583).
+    pub(crate) list_item_open: bool,
+    /// Whether the current output buffer is written between inline markers (a summary's `**`,
+    /// a caption's `*`): a list rendered into it is text, not a list, so its items never write
+    /// the content column (issue #583).
+    pub(crate) text_in_markers: bool,
     /// List nesting depth (for indentation)
     pub(crate) list_depth: usize,
     /// Cumulative column width (in the `Spaces` indent type) that a nested list item at this
@@ -278,6 +291,8 @@ impl Context {
             convert_as_inline: options.convert_as_inline,
             inline_depth: 0,
             in_list_item: false,
+            list_item_open: false,
+            text_in_markers: false,
             list_depth: 0,
             list_indent_columns: 0,
             ul_depth: 0,

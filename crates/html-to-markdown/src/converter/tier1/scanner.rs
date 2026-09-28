@@ -433,6 +433,11 @@ pub fn scan(
                     let attrs_end = if close.1 { close.0.saturating_sub(1) } else { close.0 };
                     let skip_attrs = parse::collect_attrs(bytes, name_end, attrs_end);
                     if should_skip_preprocessing(name_lower, &skip_attrs, options) {
+                        // ~keep Tier-2 still sees the dropped block between two parts of a list
+                        // ~keep item (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
+                        if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
+                            return Err(BailReason::ListItemUnsupportedBlockChild);
+                        }
                         let open_end = close.0 + 1;
                         if close.1 {
                             pos = open_end;
@@ -473,7 +478,8 @@ pub fn scan(
                 // `BailReason::BlockquoteCite` check in `emit_open` read an empty `attrs`
                 // and never fired, so Tier-1 kept dropping the citation while looking
                 // fixed. Any new attribute read from `emit_open` needs its kind added here
-                // in the same change, or the read silently sees nothing.
+                // in the same change, or the read silently sees nothing. `<input>` is here
+                // for `type`, which `emit_void` reads to spot a checkbox in a list item.
                 let needs_attrs = matches!(
                     spec.kind,
                     TagKind::Link
@@ -484,7 +490,7 @@ pub fn scan(
                         | TagKind::Pre
                         | TagKind::Code
                         | TagKind::Blockquote
-                ) || name_lower == b"abbr";
+                ) || matches!(name_lower, b"abbr" | b"input");
                 let attrs: Vec<(&[u8], Option<&[u8]>)> = if needs_attrs {
                     parse::collect_attrs(bytes, name_end, attrs_end)
                 } else {
@@ -583,20 +589,26 @@ pub fn scan(
                 }
 
                 // ~keep See `BailReason::ListItemUnsupportedBlockChild`'s doc comment for the
-                // full root-cause writeup. `<blockquote>`/`<div>`/`<table>`/`<dl>` bail
-                // unconditionally inside a list item (any position); `<p>` bails only as
+                // full root-cause writeup. `<blockquote>`, `<div>` and every other generic
+                // block container, `<table>`, `<dl>` and headings bail unconditionally
+                // inside a list item (any position); `<p>` bails only as
                 // a continuation of already-started text (its bare-marker/first-content
                 // shape is already correct); `<pre>` bails only as bare-marker/first
                 // content (its continuation shape is already correct).
                 if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
                     let bare_marker_line = line_is_bare_list_marker(&state.output);
                     let bails = match spec.kind {
-                        TagKind::Blockquote | TagKind::Table => true,
-                        TagKind::Block => name_lower == b"div",
-                        TagKind::List(ListKind::Definition) => true,
+                        TagKind::Blockquote | TagKind::Table | TagKind::Heading(_) => true,
+                        TagKind::Block | TagKind::List(ListKind::Definition) => true,
                         TagKind::Paragraph => !bare_marker_line,
                         TagKind::Pre => bare_marker_line,
-                        _ => false,
+                        TagKind::List(_) | TagKind::ListItem => false,
+                        // ~keep A stray term or description is pasted onto the item's line by both
+                        // ~keep paths, so it does not end the item here.
+                        TagKind::DefinitionTerm | TagKind::DefinitionDescription => false,
+                        // ~keep Any other block after the item's content: Tier-2 starts it, or the
+                        // ~keep text after it, at the content column.
+                        _ => is_block_tag(name_lower) && !bare_marker_line,
                     };
                     if bails {
                         return Err(BailReason::ListItemUnsupportedBlockChild);
@@ -666,6 +678,7 @@ pub fn scan(
                     ol_start,
                     name_range: name_start..name_end,
                     dropped_whitespace_only_text: false,
+                    holds_checkbox: false,
                 });
 
                 apply_open_escape_ctx(&mut state, spec);
@@ -1118,7 +1131,7 @@ fn emit_open(
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
-        separate_inline_after_block(state);
+        separate_inline_after_block(state)?;
     }
 
     // ~keep Tier-2 wraps these in markers this scanner has no arm for, so emitting them as
@@ -1501,6 +1514,30 @@ fn strip_leading_bare_marker(text: &str) -> Option<&str> {
 /// rules that out, and also handles several single-child lists nested directly
 /// inside each other, whose bare markers stack on one physical line with nothing
 /// else between them.
+/// Whether the scanner is inside a `<dt>` or `<dd>` that a list item holds without a `<dl>`.
+/// Tier-2 writes such a term below an empty item, so the rule after it and the text after that
+/// stay on the fast path, where `- t` keeps the term in the item.
+/// Whether the innermost open list item holds a checkbox (see `OpenTag::holds_checkbox`).
+fn item_holds_checkbox(state: &Tier1State) -> bool {
+    state
+        .stack
+        .iter()
+        .rev()
+        .find(|frame| matches!(frame.spec.kind, TagKind::ListItem))
+        .is_some_and(|frame| frame.holds_checkbox)
+}
+
+fn inside_stray_definition(state: &Tier1State) -> bool {
+    for frame in state.stack.iter().rev() {
+        match frame.spec.kind {
+            TagKind::DefinitionTerm | TagKind::DefinitionDescription => return true,
+            TagKind::ListItem | TagKind::List(_) => return false,
+            _ => {}
+        }
+    }
+    false
+}
+
 fn line_is_bare_list_marker(output: &str) -> bool {
     let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
     let mut rest = output[line_start..].trim_start_matches([' ', '\t']);
@@ -1771,17 +1808,37 @@ fn emit_void(
     // ~keep A void element closes the "just closed a custom element" boundary
     // window too (see the field's doc comment on `Tier1State`).
     state.last_closed_custom_element = false;
+    if name_lower == b"input"
+        && attrs.iter().any(|(key, value)| {
+            key.eq_ignore_ascii_case(b"type") && value.is_some_and(|v| v.eq_ignore_ascii_case(b"checkbox"))
+        })
+    {
+        for frame in &mut state.stack {
+            if matches!(frame.spec.kind, TagKind::ListItem) {
+                frame.holds_checkbox = true;
+            }
+        }
+    }
     // ~keep Closes the "just emitted an <img>" window too (see
     // `Tier1State::last_emitted_was_img`); the `TagKind::Image` arm below
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
-        separate_inline_after_block(state);
+        separate_inline_after_block(state)?;
     }
     state.last_closed_block = is_block_tag(name_lower);
 
     match spec.kind {
         TagKind::Hr => {
+            // ~keep Tier-2 starts a rule after an item's content at the item's content column
+            // ~keep (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
+            if !state.in_table_cell()
+                && state.list_continuation_indent_width() > 0
+                && !line_is_bare_list_marker(&state.output)
+                && !inside_stray_definition(state)
+            {
+                return Err(BailReason::ListItemUnsupportedBlockChild);
+            }
             {
                 let dest = state.cell_or_output_mut();
                 if !dest.is_empty() && !dest.ends_with("\n\n") {
@@ -2259,7 +2316,8 @@ fn emit_close(
         TagKind::LineBreak | TagKind::Image => {}
         TagKind::RawText(_) | TagKind::Ignored => {}
     }
-    state.last_closed_block = is_block_tag(name_lower);
+    // ~keep An inline element whose last content is a block ends in that block too (issue #585).
+    state.last_closed_block = is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
 
     Ok(())
 }
@@ -3886,16 +3944,25 @@ fn output_ends_with_inline_text(output: &str) -> bool {
 
 /// Start a new paragraph for inline content that directly follows a block whose output ends with
 /// a single line break (a list, a table, `<hr>`), so it does not continue the block's last line
-/// (issues #570, #571). Mirrors Tier-2's `continues_block_last_line` in `walk_node`.
-fn separate_inline_after_block(state: &mut Tier1State) {
+/// (issues #570, #571). Mirrors Tier-2's `separate_from_block` in `walk_node`.
+fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason> {
     // ~keep `<pre>` sets the CODE bit too, so one test covers code spans and code blocks.
-    if state.in_table_cell() || state.list_depth > 0 || state.escape_ctx.contains(EscapeCtx::CODE) {
-        return;
+    if state.in_table_cell() || state.escape_ctx.contains(EscapeCtx::CODE) {
+        return Ok(());
+    }
+    // ~keep Inside a list item Tier-2 starts it at the item's content column after a blank
+    // ~keep line (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
+    if state.list_continuation_indent_width() > 0 && !inside_stray_definition(state) && !item_holds_checkbox(state) {
+        return Err(BailReason::ListItemUnsupportedBlockChild);
+    }
+    if state.list_depth > 0 {
+        return Ok(());
     }
     let dest = state.cell_or_output_mut();
     if dest.len() > 1 && dest.ends_with('\n') && !dest.ends_with("\n\n") {
         dest.push('\n');
     }
+    Ok(())
 }
 
 /// Tier-2's inline-element test, which decides what counts as inline content after a block.
@@ -3960,7 +4027,7 @@ fn flush_text(
 
     // ~keep Whitespace-only text between a block and the content after it keeps the window open.
     if !raw.trim().is_empty() && std::mem::take(&mut state.last_closed_block) {
-        separate_inline_after_block(state);
+        separate_inline_after_block(state)?;
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);

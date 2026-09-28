@@ -52,8 +52,17 @@ pub fn handle(
         let mut content = String::with_capacity(256);
         let children = tag.children();
         {
+            let section_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
             for child_handle in children.top().iter() {
-                super::walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+                super::walk_node(
+                    child_handle,
+                    parser,
+                    &mut content,
+                    options,
+                    &section_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
             }
         }
 
@@ -71,10 +80,14 @@ pub fn handle(
             return;
         }
 
-        if !output.is_empty() && !output.ends_with("\n\n") {
+        // ~keep Inside a list item the section starts at the item's content column (issue #583).
+        if ctx.in_list_item && ctx.blockquote_depth == 0 && !ctx.in_table_cell && !output.is_empty() {
+            crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
+        } else if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }
 
+        crate::converter::block::horizontal_rule::separate_leading_rule(output, &content);
         output.push_str(&content);
 
         if content.ends_with('\n') && !content.ends_with("\n\n") {

@@ -133,8 +133,12 @@ pub fn handle_li(
         options.list_indent_width.max(marker_len)
     };
 
+    // ~keep A list inside an inline wrapper, a summary or a caption is written into that
+    // ~keep buffer and gets its markers; the item's lines are then text, so no block gets the
+    // ~keep column.
     let li_ctx = Context {
         in_list_item: true,
+        list_item_open: ctx.inline_depth == 0 && !ctx.text_in_markers,
         list_depth: ctx.list_depth + 1,
         list_indent_columns: ctx.list_indent_columns + own_marker_width,
         ..ctx.clone()

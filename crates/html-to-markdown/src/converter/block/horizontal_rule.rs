@@ -21,7 +21,7 @@ pub fn handle(
     node_handle: &NodeHandle,
     parser: &Parser,
     output: &mut String,
-    _options: &crate::options::ConversionOptions,
+    options: &crate::options::ConversionOptions,
     ctx: &Context,
     depth: usize,
     dom_ctx: &DomContext,
@@ -71,6 +71,22 @@ pub fn handle(
         }
     }
 
+    // ~keep A rule after other content of a list item starts at the item's content column, or
+    // ~keep it ends the list (issue #583). Whitespace after a bare marker (a `<br>` there) is
+    // ~keep not content: the rule then follows the marker like a rule at the marker.
+    let at_bare_marker = ctx.in_list_item && crate::converter::list::utils::trim_whitespace_after_bare_marker(output);
+    let list_indent = if ctx.in_list_item
+        && ctx.blockquote_depth == 0
+        && !ctx.convert_as_inline
+        && !ctx.in_table_cell
+        && !output.is_empty()
+        && !at_bare_marker
+    {
+        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
+            .filter(|indent| crate::converter::list::utils::item_is_open(output, indent, ctx))
+    } else {
+        None
+    };
     if !output.is_empty() {
         let prev_tag = get_previous_sibling_tag(node_handle, parser, dom_ctx);
         let last_line_is_blockquote = output
@@ -97,13 +113,28 @@ pub fn handle(
             }
         }
     }
+    if let Some(indent) = list_indent {
+        output.push_str(&indent);
+    }
     output.push_str("---\n");
 }
 
 /// Write a blank line before a container's `content` when it starts with a rule and `output` ends
-/// in text. The container rendered the rule into its own buffer, so the rule saw no text before it.
+/// in text or in a bare list marker. The container rendered the rule into its own buffer, so the
+/// rule saw nothing before it; on a marker line the rule would swallow the item (`- ---` is a rule).
 pub fn separate_leading_rule(output: &mut String, content: &str) {
-    if content.split('\n').next() == Some("---") && !output.is_empty() && !output.ends_with("\n\n") {
+    if content.split('\n').next() != Some("---") || output.is_empty() || output.ends_with("\n\n") {
+        return;
+    }
+    // ~keep The column a list item wrote for this line stays with the rule (issue #583).
+    let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
+    let indent = if output[line_start..].trim().is_empty() {
+        output.split_off(line_start)
+    } else {
+        String::new()
+    };
+    if !output.ends_with("\n\n") {
         output.push_str(if output.ends_with('\n') { "\n" } else { "\n\n" });
     }
+    output.push_str(&indent);
 }
