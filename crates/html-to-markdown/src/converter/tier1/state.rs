@@ -155,9 +155,10 @@ pub struct OpenTag {
     /// distinguishes them, so `close_inline_marker` can bail (`WhitespaceOnlyInlineEmphasis`)
     /// for the latter instead of silently truncating the space away like the former.
     pub dropped_whitespace_only_text: bool,
-    /// Set on every open `ListItem` frame when a checkbox input is emitted inside it. Tier-2 turns
-    /// such an item into a task item and joins its text; text after a nested list in it stays on
-    /// this path, where the output equals the one before issue #583 (a filed gap).
+    /// Set on the innermost open `ListItem` frame when a checkbox input is emitted inside it (the
+    /// item that owns it; issue #604). Tier-2 turns such an item into a task item and joins its
+    /// text; text after a nested list in it stays on this path, where the output equals the one
+    /// before issue #583 (a filed gap).
     pub holds_checkbox: bool,
 }
 

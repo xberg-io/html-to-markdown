@@ -60,6 +60,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line, as it already was in a link: `**t ---**`. This covers `<b>`, `<strong>`, `<em>`, `<i>`,
   `<summary>`, `<figcaption>`, a table caption, `<del>`, `<s>`, `<strike>`, `<ins>`, `<mark>`,
   `<var>`, `<dfn>`, `<q>`, and `<sub>` and `<sup>` when they write a symbol.
+- **A list item took the checkbox of an item in its nested list (#604).**
+  `<ul><li>X<ul><li><input type="checkbox" checked> A</li></ul>ZZ</li></ul>` gave `- [x] X AZZ`:
+  the outer item became a task item and the nested list was joined into its text. A checkbox in a
+  nested list now belongs to that list's item, so the output is `- X`, the nested `- [x] A` and
+  then `ZZ`.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition

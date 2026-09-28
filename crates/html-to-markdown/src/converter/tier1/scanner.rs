@@ -1813,10 +1813,14 @@ fn emit_void(
             key.eq_ignore_ascii_case(b"type") && value.is_some_and(|v| v.eq_ignore_ascii_case(b"checkbox"))
         })
     {
-        for frame in &mut state.stack {
-            if matches!(frame.spec.kind, TagKind::ListItem) {
-                frame.holds_checkbox = true;
-            }
+        // ~keep Only the innermost item owns the checkbox; an outer item stays a plain item (#604).
+        if let Some(frame) = state
+            .stack
+            .iter_mut()
+            .rev()
+            .find(|frame| matches!(frame.spec.kind, TagKind::ListItem))
+        {
+            frame.holds_checkbox = true;
         }
     }
     // ~keep Closes the "just emitted an <img>" window too (see

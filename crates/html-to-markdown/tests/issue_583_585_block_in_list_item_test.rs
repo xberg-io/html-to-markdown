@@ -703,9 +703,9 @@ fn should_keep_the_marker_line_before_a_container_that_starts_with_a_rule() {
 }
 
 #[test]
-fn should_keep_text_after_a_nested_task_list_on_the_fast_path() {
-    // ~keep The full converter turns the whole item into a task item and joins its text (a filed
-    // ~keep gap); the fast path's output is the one from before issue #583.
+fn should_hand_text_after_a_nested_task_list_to_the_full_converter() {
+    // ~keep The checkbox belongs to the nested item, so the outer item is a plain item whose text
+    // ~keep after the nested list gets the content column, which only the full converter writes.
     let auto = ConversionOptions {
         tier_strategy: TierStrategy::Auto,
         ..tier2_options()
@@ -713,26 +713,15 @@ fn should_keep_text_after_a_nested_task_list_on_the_fast_path() {
     for (html, expected) in [
         (
             r#"<ul><li>X<ul><li><input type="checkbox" checked> A</li></ul>ZZ</li></ul>"#,
-            "- X\n  * A\n  ZZ\n",
+            "- X\n  - [x] A\n\n  ZZ\n",
         ),
         (
             r#"<ul><li>X<ul><li><input type="checkbox"> A</li></ul>ZZ</li></ul>"#,
-            "- X\n  * A\n  ZZ\n",
+            "- X\n  - [ ] A\n\n  ZZ\n",
         ),
+        ("<ul><li>X<ul><li>A</li></ul>ZZ</li></ul>", "- X\n  * A\n\n  ZZ\n"),
     ] {
-        assert_eq!(
-            tier1(html).as_deref(),
-            Some(expected),
-            "Tier 1 handed {html:?} to Tier 2"
-        );
-        assert_eq!(
-            convert_with(html, auto.clone()),
-            expected,
-            "auto mode differs on {html:?}"
-        );
+        assert!(tier1(html).is_none(), "Tier 1 converted {html:?}");
+        assert_eq!(convert_with(html, auto.clone()), expected, "auto mode on {html:?}");
     }
-    assert!(
-        tier1("<ul><li>X<ul><li>A</li></ul>ZZ</li></ul>").is_none(),
-        "Tier 1 converted a nested list without a checkbox"
-    );
 }

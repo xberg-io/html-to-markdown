@@ -103,6 +103,11 @@ pub fn handle_li(
                 }
             }
 
+            // ~keep A nested list's items own the checkboxes inside it (issue #604).
+            if matches!(normalized_tag_name(node_tag.name().as_utf8_str()).as_ref(), "ul" | "ol") {
+                return None;
+            }
+
             let children = node_tag.children();
             {
                 for child_handle in children.top().iter() {
