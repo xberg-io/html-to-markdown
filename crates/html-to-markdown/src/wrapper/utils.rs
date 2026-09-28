@@ -76,6 +76,28 @@ pub fn is_heading(trimmed: &str) -> bool {
     trimmed.starts_with('#')
 }
 
+/// Check if a line is a thematic break: three or more `-`, `*` or `_`, spaces allowed between them.
+pub fn is_thematic_break(trimmed: &str) -> bool {
+    let mut marks = trimmed.chars().filter(|c| !matches!(c, ' ' | '\t'));
+    let Some(first) = marks.next() else {
+        return false;
+    };
+    let mut count = 1;
+    for mark in marks {
+        if mark != first {
+            return false;
+        }
+        count += 1;
+    }
+    matches!(first, '-' | '*' | '_') && count >= 3
+}
+
+/// Check if a line is a setext heading underline: a run of `=` or of `-` with nothing else.
+pub fn is_setext_underline(trimmed: &str) -> bool {
+    let underline = trimmed.trim_end();
+    !underline.is_empty() && (underline.bytes().all(|b| b == b'=') || underline.bytes().all(|b| b == b'-'))
+}
+
 /// Parse a list item into its components: (indent, marker, content)
 ///
 /// Returns Some((indent, marker, content)) if the line is a valid list item,

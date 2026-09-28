@@ -1,8 +1,8 @@
 //! Synchronous text wrapping for Markdown output.
 
 use super::utils::{
-    is_heading, is_list_like, is_numbered_list, parse_blockquote_line, parse_list_item, wrap_blockquote_paragraph,
-    wrap_indented_line, wrap_list_item,
+    is_heading, is_list_like, is_numbered_list, is_setext_underline, is_thematic_break, parse_blockquote_line,
+    parse_list_item, wrap_blockquote_paragraph, wrap_indented_line, wrap_list_item,
 };
 use crate::options::ConversionOptions;
 
@@ -114,6 +114,30 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 in_blockquote_paragraph = false;
             }
 
+            // ~keep Inside a quote a rule or a heading underline keeps its own line too (#607).
+            let underline = in_blockquote_paragraph && is_setext_underline(content.trim_start());
+            if underline || is_thematic_break(content.trim_start()) {
+                if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
+                    if underline {
+                        result.push_str(&blockquote_prefix);
+                        result.push_str(&blockquote_indent);
+                        result.push_str(&blockquote_buffer);
+                    } else {
+                        result.push_str(&wrap_blockquote_paragraph(
+                            &format!("{blockquote_prefix}{blockquote_indent}"),
+                            &blockquote_buffer,
+                            options.wrap_width,
+                        ));
+                    }
+                    result.push('\n');
+                    blockquote_buffer.clear();
+                    in_blockquote_paragraph = false;
+                }
+                result.push_str(line);
+                result.push('\n');
+                continue;
+            }
+
             if in_blockquote_paragraph {
                 blockquote_buffer.push(' ');
                 blockquote_buffer.push_str(&content);
@@ -136,6 +160,20 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             in_blockquote_paragraph = false;
         }
 
+        // ~keep An underline right under paragraph text makes that text its heading: the text ends
+        // ~keep with one line break, and it is not reflowed, like an ATX heading. Folded into the
+        // ~keep text, or cut off by a blank line, the underline is lost (#607).
+        if in_paragraph && !paragraph_buffer.is_empty() && is_setext_underline(trimmed) {
+            result.push_str(&paragraph_indent);
+            result.push_str(&paragraph_buffer);
+            result.push('\n');
+            paragraph_buffer.clear();
+            in_paragraph = false;
+            result.push_str(line);
+            result.push('\n');
+            continue;
+        }
+
         if let Some((indent, marker, content)) = parse_list_item(line) {
             if in_paragraph && !paragraph_buffer.is_empty() {
                 result.push_str(&wrap_indented_line(
@@ -152,8 +190,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             continue;
         }
 
-        let is_structural =
-            is_heading(trimmed) || trimmed.starts_with('>') || trimmed.starts_with('|') || trimmed.starts_with('=');
+        let is_structural = is_heading(trimmed)
+            || is_thematic_break(trimmed)
+            || trimmed.starts_with('>')
+            || trimmed.starts_with('|')
+            || trimmed.starts_with('=');
 
         if is_structural {
             if in_paragraph && !paragraph_buffer.is_empty() {
@@ -232,6 +273,39 @@ mod tests {
         };
         let result = wrap_markdown(markdown, &options);
         assert_eq!(result, markdown);
+    }
+
+    fn wrap_at_20(markdown: &str) -> String {
+        let options = ConversionOptions {
+            wrap: true,
+            wrap_width: 20,
+            ..Default::default()
+        };
+        wrap_markdown(markdown, &options)
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_thematic_break_on_its_own_line() {
+        assert_eq!(wrap_at_20("t\n\n---\nB\n"), "t\n\n---\nB\n\n");
+        assert_eq!(wrap_at_20("***\nB\n"), "***\nB\n\n");
+        assert_eq!(wrap_at_20("___\nB\n"), "___\nB\n\n");
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_setext_underline_under_its_heading_text() {
+        assert_eq!(wrap_at_20("Heading\n-------\n\nx\n"), "Heading\n-------\n\nx\n\n");
+        assert_eq!(wrap_at_20("Heading\n=======\n\nx\n"), "Heading\n=======\n\nx\n\n");
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_rule_and_an_underline_on_their_own_lines_in_a_quote() {
+        assert_eq!(wrap_at_20("> t\n>\n> ---\n>  B\n"), "> t\n>\n> ---\n>  B\n");
+        assert_eq!(wrap_at_20("> Heading\n> -------\n> x\n"), "> Heading\n> -------\n> x\n");
+    }
+
+    #[test]
+    fn wrap_markdown_still_joins_ordinary_paragraph_lines() {
+        assert_eq!(wrap_at_20("a\nb--\n"), "a b--\n\n");
     }
 
     #[test]

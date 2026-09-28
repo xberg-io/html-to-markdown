@@ -65,6 +65,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the outer item became a task item and the nested list was joined into its text. A checkbox in a
   nested list now belongs to that list's item, so the output is `- X`, the nested `- [x] A` and
   then `ZZ`.
+- **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
+  on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
+  underline of an underlined heading was joined to the heading text (`Heading -------`), or cut
+  off from it by a blank line for `=======`, so the heading was lost too. A rule now stays on its
+  own line, and an underline stays right under its heading text, which is not reflowed, as with a
+  `#` heading. Both hold inside a quote too.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition
