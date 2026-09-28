@@ -424,13 +424,17 @@ pub fn handle_table(
                                 let mut text = String::new();
                                 let grandchildren = child_tag.children();
                                 {
+                                    let caption_ctx = super::super::super::Context {
+                                        text_in_markers: true,
+                                        ..ctx.clone()
+                                    };
                                     for grandchild_handle in grandchildren.top().iter() {
                                         super::super::super::walk_node(
                                             grandchild_handle,
                                             parser,
                                             &mut text,
                                             options,
-                                            ctx,
+                                            &caption_ctx,
                                             depth + 1,
                                             dom_ctx,
                                         );

@@ -101,7 +101,15 @@ pub fn handle_details(
                 ..ctx.clone()
             };
             for child_handle in children.top().iter() {
-                walk_node(child_handle, parser, &mut content, options, &details_ctx, depth + 1, dom_ctx);
+                walk_node(
+                    child_handle,
+                    parser,
+                    &mut content,
+                    options,
+                    &details_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
             }
         }
 
@@ -166,6 +174,7 @@ pub fn handle_summary(
         let summary_ctx = if want_strong && !ctx.in_strong {
             summary_ctx_owned = super::Context {
                 in_strong: true,
+                text_in_markers: true,
                 ..ctx.clone()
             };
             &summary_ctx_owned

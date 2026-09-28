@@ -28,7 +28,7 @@ use crate::converter::utility::preprocessing::{
     strip_bogus_comments, strip_hidden_elements, strip_script_and_style_tags,
 };
 use crate::converter::utility::serialization::serialize_tag_to_html;
-use crate::options::{NewlineStyle, OutputFormat, WhitespaceMode};
+use crate::options::{NewlineStyle, OutputFormat};
 
 use crate::converter::handlers::{handle_blockquote, handle_code, handle_graphic, handle_img, handle_link, handle_pre};
 use crate::error::Result;
@@ -465,8 +465,7 @@ fn separate_in_list_item(
         _ => false,
     };
     let indent =
-        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
-            .unwrap_or_default();
+        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
     let blank_line = if starts_block {
         // ~keep A hard break right before a block is dropped here too, since the line end
         // ~keep written below would hide it from the dispatch strip in `walk_node`.
@@ -482,11 +481,6 @@ fn separate_in_list_item(
         }
         false
     } else if ends_with_block_line_end(output) && is_inline_content(node, node_handle, parser, dom_ctx) {
-        // ~keep In strict whitespace mode a text that starts with a line break writes that break
-        // ~keep itself, which would end the blank line's indent; it stays a continuation line.
-        if options.whitespace_mode == WhitespaceMode::Strict && starts_with_line_break(node) {
-            return;
-        }
         match crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx) {
             Some(block) => !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
             None => return,
@@ -505,14 +499,6 @@ fn separate_in_list_item(
         output.push('\n');
     }
     output.push_str(&indent);
-}
-
-/// Whether `node` is a text whose leading whitespace holds a line break.
-fn starts_with_line_break(node: &tl::Node) -> bool {
-    match node {
-        tl::Node::Raw(bytes) => bytes.as_utf8_str().trim_start_matches([' ', '\t']).starts_with(['\n', '\r']),
-        _ => false,
-    }
 }
 
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since

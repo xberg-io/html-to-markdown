@@ -81,7 +81,7 @@ pub fn handle(
         && !output.is_empty()
         && !crate::converter::list::utils::trim_whitespace_after_bare_marker(output)
     {
-        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
             .filter(|indent| crate::converter::list::utils::item_is_open(output, indent, ctx))
     } else {
         None
@@ -121,7 +121,18 @@ pub fn handle(
 /// Write a blank line before a container's `content` when it starts with a rule and `output` ends
 /// in text. The container rendered the rule into its own buffer, so the rule saw no text before it.
 pub fn separate_leading_rule(output: &mut String, content: &str) {
-    if content.split('\n').next() == Some("---") && !output.is_empty() && !output.ends_with("\n\n") {
+    if content.split('\n').next() != Some("---") || output.is_empty() || output.ends_with("\n\n") {
+        return;
+    }
+    // ~keep The column a list item wrote for this line stays with the rule (issue #583).
+    let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
+    let indent = if output[line_start..].trim().is_empty() {
+        output.split_off(line_start)
+    } else {
+        String::new()
+    };
+    if !output.ends_with("\n\n") {
         output.push_str(if output.ends_with('\n') { "\n" } else { "\n\n" });
     }
+    output.push_str(&indent);
 }

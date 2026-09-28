@@ -56,28 +56,10 @@ pub fn parse_ordered_list_start(raw: &str) -> i64 {
     DEFAULT_ORDERED_LIST_START
 }
 
-/// Calculate indentation level for list item continuations.
-///
-/// Returns the number of 4-space indent groups needed for list continuations.
-///
-/// List continuations (block elements inside list items) need special indentation:
-/// - Base indentation: (depth - 1) groups (for the nesting level)
-/// - Content indentation: depth groups (for the list item content)
-/// - Combined formula: (2 * depth - 1) groups of 4 spaces each
-///
-/// # Examples
-///
-/// ```text
-/// * Item 1           (depth=0, no continuation)
-/// * Item 2           (depth=0)
-///     Continuation   (depth=0: 0 groups = 0 spaces)
-///
-/// * Level 1          (depth=0)
-///     + Level 2      (depth=1)
-///             Cont   (depth=1: (2*1-1) = 1 group = 4 spaces, total 12 with bullet indent)
-/// ```
-pub const fn calculate_list_continuation_indent(depth: usize) -> usize {
-    if depth > 0 { 2 * depth - 1 } else { 0 }
+/// The number of tabs that reaches a list item's content column: each tab is four columns
+/// wide, and a line indented by four or more columns past the content column is a code block.
+pub const fn tabs_for_column(list_indent_columns: usize) -> usize {
+    list_indent_columns.div_ceil(4)
 }
 
 /// Direct-child tag names that force a list item's own trailing separator (kept in sync with
@@ -199,7 +181,7 @@ pub fn is_loose_list(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: 
 /// # Arguments
 ///
 /// * `output` - The output string to append to
-/// * `list_depth` - Current list nesting depth
+/// * `list_indent_columns` - The item's content column
 /// * `blank_line` - If true, adds blank line separation (\n\n); if false, single newline (\n)
 ///
 /// # Examples
@@ -216,7 +198,6 @@ pub fn is_loose_list(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: 
 /// ```
 pub fn add_list_continuation_indent(
     output: &mut String,
-    list_depth: usize,
     list_indent_columns: usize,
     blank_line: bool,
     options: &ConversionOptions,
@@ -237,8 +218,7 @@ pub fn add_list_continuation_indent(
 
     match options.list_indent_type {
         ListIndentType::Tabs => {
-            let indent_level = calculate_list_continuation_indent(list_depth);
-            for _ in 0..indent_level {
+            for _ in 0..tabs_for_column(list_indent_columns) {
                 output.push('\t');
             }
         }
@@ -253,18 +233,14 @@ pub fn add_list_continuation_indent(
 }
 
 /// Calculate the indentation string for list continuations based on depth and options.
-pub fn continuation_indent_string(
-    list_depth: usize,
-    list_indent_columns: usize,
-    options: &ConversionOptions,
-) -> Option<String> {
+pub fn continuation_indent_string(list_indent_columns: usize, options: &ConversionOptions) -> Option<String> {
     match options.list_indent_type {
         ListIndentType::Tabs => {
-            let indent_level = calculate_list_continuation_indent(list_depth);
-            if indent_level == 0 {
+            let tabs = tabs_for_column(list_indent_columns);
+            if tabs == 0 {
                 return None;
             }
-            Some("\t".repeat(indent_level))
+            Some("\t".repeat(tabs))
         }
         // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
         // ~keep marker (see Context::list_indent_columns) — see item.rs's identical rationale.
@@ -393,30 +369,37 @@ pub fn line_is_bare_list_marker(output: &str) -> bool {
     false
 }
 
-/// Whether the list item that `output` ends inside is still open: the item was open where this
-/// buffer is written (`ctx.list_item_open`), and the last non-blank line starts at the item's
-/// content column (`indent`), is the item's marker line, or is the buffer's first line (a task
-/// item and an inline wrapper render into a buffer that continues the item's line).
+/// Whether the list item that `output` ends inside is still open: the item is open where this
+/// buffer starts (`ctx.list_item_open`), and every non-blank line since the item's marker line
+/// starts at the item's content column (`indent`). The buffer's first line counts as at the
+/// column: the container that owns the buffer puts it there.
 ///
-/// ~keep A line at a shallower column is a block that already left the item. Writing the
-/// ~keep content column after it opens an indented code block once the column is 4 or more
-/// ~keep (issue #583).
+/// ~keep A line at a shallower column is a block that already left the item, and nothing
+/// ~keep reopens it. Writing the content column after it opens an indented code block once the
+/// ~keep column is 4 or more (issue #583).
 pub fn item_is_open(output: &str, indent: &str, ctx: &Context) -> bool {
     if !ctx.list_item_open {
         return false;
     }
     let mut lines = output.rsplit('\n').filter(|line| !line.trim().is_empty()).peekable();
-    let Some(line) = lines.next() else { return true };
-    if lines.peek().is_none() || (!indent.is_empty() && line.starts_with(indent)) {
-        return true;
+    while let Some(line) = lines.next() {
+        if strip_leading_bare_marker(line.trim_start_matches([' ', '\t'])).is_some() {
+            return true;
+        }
+        if lines.peek().is_none() {
+            return true;
+        }
+        if indent.is_empty() || !line.starts_with(indent) {
+            return false;
+        }
     }
-    strip_leading_bare_marker(line.trim_start_matches([' ', '\t'])).is_some()
+    true
 }
 
-/// The context for the children of a container that renders them into a buffer of its own and
-/// writes that buffer after `output`: they see whether the list item is still open there.
+/// The context for the children of a container that renders them into a buffer of its own:
+/// they see whether the list item is still open where that buffer will be written.
 pub fn nested_block_context(output: &str, ctx: &Context, options: &ConversionOptions) -> Context {
-    let indent = continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options).unwrap_or_default();
+    let indent = continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
     Context {
         list_item_open: item_is_open(output, &indent, ctx),
         ..ctx.clone()
@@ -452,9 +435,9 @@ pub fn start_block_in_list_item(output: &mut String, ctx: &Context, options: &Co
     if trim_whitespace_after_bare_marker(output) {
         return;
     }
-    let indent = continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options).unwrap_or_default();
+    let indent = continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
     if item_is_open(output, &indent, ctx) {
-        add_list_continuation_indent(output, ctx.list_depth, ctx.list_indent_columns, true, options);
+        add_list_continuation_indent(output, ctx.list_indent_columns, true, options);
     } else {
         trim_trailing_whitespace(output);
         if !output.ends_with("\n\n") {

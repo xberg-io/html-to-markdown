@@ -590,6 +590,9 @@ pub fn scan(
                         TagKind::Paragraph => !bare_marker_line,
                         TagKind::Pre => bare_marker_line,
                         TagKind::List(_) | TagKind::ListItem => false,
+                        // ~keep A stray term or description is pasted onto the item's line by both
+                        // ~keep paths, so it does not end the item here.
+                        TagKind::DefinitionTerm | TagKind::DefinitionDescription => false,
                         // ~keep Any other block after the item's content: Tier-2 starts it, or the
                         // ~keep text after it, at the content column.
                         _ => is_block_tag(name_lower) && !bare_marker_line,
@@ -1497,6 +1500,20 @@ fn strip_leading_bare_marker(text: &str) -> Option<&str> {
 /// rules that out, and also handles several single-child lists nested directly
 /// inside each other, whose bare markers stack on one physical line with nothing
 /// else between them.
+/// Whether the scanner is inside a `<dt>` or `<dd>` that a list item holds without a `<dl>`.
+/// Tier-2 writes such a term below an empty item, so the rule after it and the text after that
+/// stay on the fast path, where `- t` keeps the term in the item.
+fn inside_stray_definition(state: &Tier1State) -> bool {
+    for frame in state.stack.iter().rev() {
+        match frame.spec.kind {
+            TagKind::DefinitionTerm | TagKind::DefinitionDescription => return true,
+            TagKind::ListItem | TagKind::List(_) => return false,
+            _ => {}
+        }
+    }
+    false
+}
+
 fn line_is_bare_list_marker(output: &str) -> bool {
     let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
     let mut rest = output[line_start..].trim_start_matches([' ', '\t']);
@@ -1783,6 +1800,7 @@ fn emit_void(
             if !state.in_table_cell()
                 && state.list_continuation_indent_width() > 0
                 && !line_is_bare_list_marker(&state.output)
+                && !inside_stray_definition(state)
             {
                 return Err(BailReason::ListItemUnsupportedBlockChild);
             }
@@ -3896,7 +3914,7 @@ fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason>
     }
     // ~keep Inside a list item Tier-2 starts it at the item's content column after a blank
     // ~keep line (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
-    if state.list_continuation_indent_width() > 0 {
+    if state.list_continuation_indent_width() > 0 && !inside_stray_definition(state) {
         return Err(BailReason::ListItemUnsupportedBlockChild);
     }
     if state.list_depth > 0 {

@@ -583,8 +583,7 @@ fn format_code_block_in_list_item(
     }
 
     let indent =
-        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
-            .unwrap_or_default();
+        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
 
     for (index, segment) in rendered.split_inclusive('\n').enumerate() {
         let line = segment.strip_suffix('\n').unwrap_or(segment);

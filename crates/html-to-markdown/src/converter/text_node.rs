@@ -457,7 +457,7 @@ pub fn process_text_node(
         && !output.ends_with("\n\n")
     {
         if let Some(indent) =
-            crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+            crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
         {
             output.push_str(&indent);
         }

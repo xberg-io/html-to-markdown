@@ -29,7 +29,8 @@ pub fn indent_table_for_list(
         return table_content.to_string();
     }
 
-    let Some(mut indent) = continuation_indent_string(list_depth, list_indent_columns, options) else {
+    let Some(mut indent) = crate::converter::list::utils::continuation_indent_string(list_indent_columns, options)
+    else {
         return table_content.to_string();
     };
 
@@ -52,14 +53,4 @@ pub fn indent_table_for_list(
         }
     }
     result
-}
-
-/// Get continuation indent string for list nesting.
-fn continuation_indent_string(
-    list_depth: usize,
-    list_indent_columns: usize,
-    options: &crate::options::ConversionOptions,
-) -> Option<String> {
-    use crate::converter::list::utils::continuation_indent_string;
-    continuation_indent_string(list_depth, list_indent_columns, options)
 }

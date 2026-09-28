@@ -12,7 +12,7 @@
 //! #585: text after a list or table at the end of an inline wrapper (`<span>`) continued the
 //! list's last item or the table's last row.
 
-use html_to_markdown_rs::options::{ListIndentType, WhitespaceMode};
+use html_to_markdown_rs::options::{ListIndentType, PreprocessingOptions, WhitespaceMode};
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
 
@@ -484,6 +484,35 @@ fn should_keep_a_block_that_starts_the_item_on_the_fast_path() {
 }
 
 #[test]
+fn should_keep_a_term_at_the_marker_and_the_rule_after_it_on_the_fast_path() {
+    // ~keep The full converter writes a stray `<dt>` at the marker below an empty item, so the
+    // ~keep default mode keeps the fast path's `- t` for it.
+    let auto = ConversionOptions {
+        tier_strategy: TierStrategy::Auto,
+        ..tier2_options()
+    };
+    for html in [
+        "<ul><li><dt>t</dt><dd><hr></dd></li></ul>",
+        "<ol><li><dt>t</dt><dd><hr></dd></li></ol>",
+        "<ul><li><br><dt>t</dt><dd><hr></dd></li></ul>",
+        "<ul><li><dd>xt<hr>B</dd></li></ul>",
+    ] {
+        let out = tier1(html).unwrap_or_else(|| panic!("Tier 1 handed {html:?} to Tier 2"));
+        assert_eq!(out, convert_with(html, auto.clone()), "auto mode differs on {html:?}");
+        assert!(
+            render(&out).starts_with("<ul>\n<li>t")
+                || render(&out).starts_with("<ol>\n<li>t")
+                || render(&out).starts_with("<ul>\n<li>xt"),
+            "{html:?}: {out:?}"
+        );
+    }
+    // ~keep A rule on the item's text line, and a rule after a hard break, still hand off.
+    for html in ["<ul><li>t<hr></li></ul>", "<ul><li>t<br><hr></li></ul>"] {
+        assert!(tier1(html).is_none(), "Tier 1 converted {html:?}");
+    }
+}
+
+#[test]
 fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ended() {
     let tabs = ConversionOptions {
         list_indent_type: ListIndentType::Tabs,
@@ -504,9 +533,37 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
             r#"<ol start="10"><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
             wrap,
         ),
-        ("<ul><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ul>", tabs.clone()),
-        (r#"<ol start="10"><li>X<figure><p>a</p><hr></figure></li></ol>"#, tier2_options()),
-        (r#"<ol start="10"><li>X<details><p>a</p><hr></details></li></ol>"#, tier2_options()),
+        (
+            "<ul><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ul>",
+            tabs.clone(),
+        ),
+        (
+            r#"<ol start="10"><li>X<figure><p>a</p><hr></figure></li></ol>"#,
+            tier2_options(),
+        ),
+        (
+            r#"<ol start="10"><li>X<details><p>a</p><hr></details></li></ol>"#,
+            tier2_options(),
+        ),
+        (
+            r#"<ol start="10"><li>X<form><p>a</p><hr></form></li></ol>"#,
+            ConversionOptions {
+                preprocessing: PreprocessingOptions {
+                    remove_forms: false,
+                    ..PreprocessingOptions::default()
+                },
+                ..tier2_options()
+            },
+        ),
+        (
+            r#"<ol start="10"><li>X<fieldset><p>a</p><hr></fieldset></li></ol>"#,
+            tier2_options(),
+        ),
+        // ~keep A section after the item has ended.
+        (
+            r#"<ol start="10"><li><hr><section><p>a</p><hr></section></li></ol>"#,
+            tier2_options(),
+        ),
     ] {
         let out = convert_with(html, options);
         let rendered = render(&out);
@@ -515,10 +572,38 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
             "{html:?}: the rule was lost inside the container: {out:?} renders {rendered:?}"
         );
     }
-    // ~keep A list inside an inline wrapper is not a list once the wrapper's markers are added,
-    // ~keep so nothing in it gets a column that a tab would turn into a code block.
-    let out = convert_with("<b><ul><li>x<dl><dd><hr></dd></dl></li></ul></b>", tabs);
-    assert_eq!(out, "**- x\n\n---**\n", "the rule in the wrapped list got the column");
+    // ~keep A list inside an inline wrapper, a summary or a caption is not a list once the
+    // ~keep markers are added, so nothing in it gets a column that a tab would turn into code.
+    for (html, expected) in [
+        ("<b><ul><li>x<dl><dd><hr></dd></dl></li></ul></b>", "**- x\n\n---**\n"),
+        (
+            "<details><summary><ul><li>x<dl><dd><hr></dd></dl></li></ul></summary></details>",
+            "**- x\n\n---**\n",
+        ),
+        (
+            "<figure><figcaption><ul><li>x<dl><dd><hr></dd></dl></li></ul></figcaption></figure>",
+            "*- x\n\n---*\n",
+        ),
+        ("<q><ul><li>x<dl><dd><hr></dd></dl></li></ul></q>", "\"- x\n\n---\"\n"),
+        (
+            "<table><caption><ul><li>x<dl><dd><hr></dd></dl></li></ul></caption></table>",
+            "*\\- x\n\n\\-\\-\\-*\n",
+        ),
+        // ~keep A rule at the marker ends the item; the text after it gets the column from the
+        // ~keep text node, and a rule after that text must not follow it into the code block.
+        ("<ul><li><hr>t<br><hr></li></ul>", "-\n\n---\n\tt  \n\n---\n"),
+        // ~keep The column written for a definition stays with a rule that starts it.
+        (
+            "<ul><li><dl><dt>t</dt><dd><hr><hr></dd></dl></li></ul>",
+            "- t\n\n\t---\n\n\t---\n",
+        ),
+    ] {
+        assert_eq!(
+            convert_with(html, tabs.clone()),
+            expected,
+            "{html:?}: a wrapped list got the column"
+        );
+    }
     // ~keep While the item is open, a container's blocks stay at the column.
     let out = tier2(r#"<ol start="10"><li>A<dl><dt>T</dt><dd><p>x</p><hr></dd></dl></li></ol>"#);
     assert!(
@@ -574,4 +659,23 @@ fn should_keep_a_paragraph_in_its_item_when_wrapping_inside_a_quote() {
         rendered.contains("<p>t</p>\n</li>"),
         "wrap: the paragraph left the item inside the quote: {out:?} renders {rendered:?}"
     );
+}
+
+#[test]
+fn should_reach_the_content_column_with_the_fewest_tabs() {
+    // ~keep A tab is four columns wide, and four or more columns past the item's content column
+    // ~keep is a code block; a nested item's column needs one tab, not one per level.
+    let tabs = ConversionOptions {
+        list_indent_type: ListIndentType::Tabs,
+        ..tier2_options()
+    };
+    let out = convert_with(
+        "<ul><li><ul><li>x<dl><dt>t</dt><dd>d</dd></dl></li></ul></li></ul>",
+        tabs,
+    );
+    assert_eq!(
+        out, "- * x\n\n\tt\n\td\n",
+        "the nested item's definition list got the wrong tab column"
+    );
+    assert!(!render(&out).contains("<pre>"), "{out:?} renders {:?}", render(&out));
 }

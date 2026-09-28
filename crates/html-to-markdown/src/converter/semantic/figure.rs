@@ -259,8 +259,20 @@ pub fn handle_figcaption(
         let mut text = String::new();
         let children = tag.children();
         {
+            let caption_ctx = super::Context {
+                text_in_markers: true,
+                ..ctx.clone()
+            };
             for child_handle in children.top().iter() {
-                super::walk_node(child_handle, parser, &mut text, options, ctx, depth + 1, dom_ctx);
+                super::walk_node(
+                    child_handle,
+                    parser,
+                    &mut text,
+                    options,
+                    &caption_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
             }
         }
 

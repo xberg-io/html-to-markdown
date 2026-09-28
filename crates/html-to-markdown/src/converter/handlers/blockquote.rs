@@ -134,7 +134,7 @@ pub fn handle_blockquote(
         // `blockquote_depth == 0` applies it exactly once, at the boundary where this
         // content actually reaches the list item's own text.
         let list_indent = if ctx.in_list_item && ctx.blockquote_depth == 0 {
-            crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+            crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
         } else {
             None
         };
