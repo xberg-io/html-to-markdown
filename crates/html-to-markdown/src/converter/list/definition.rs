@@ -52,16 +52,8 @@ pub fn handle_dl(
     let trimmed = content.trim();
     if !trimmed.is_empty() {
         // ~keep Inside a list item the list starts at the item's content column (issue #583).
-        if ctx.in_list_item && ctx.blockquote_depth == 0 && !output.is_empty() {
-            if !crate::converter::list::utils::line_is_bare_list_marker(output) {
-                crate::converter::list::utils::add_list_continuation_indent(
-                    output,
-                    ctx.list_depth,
-                    ctx.list_indent_columns,
-                    true,
-                    options,
-                );
-            }
+        if ctx.in_list_item && ctx.blockquote_depth == 0 && !ctx.in_table_cell && !output.is_empty() {
+            crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
         } else if !output.is_empty() && !output.ends_with("\n\n") {
             output.push_str("\n\n");
         }

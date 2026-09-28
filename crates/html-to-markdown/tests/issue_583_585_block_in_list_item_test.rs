@@ -12,11 +12,13 @@
 //! #585: text after a list or table at the end of an inline wrapper (`<span>`) continued the
 //! list's last item or the table's last row.
 
-use html_to_markdown_rs::options::ListIndentType;
+use html_to_markdown_rs::options::{ListIndentType, WhitespaceMode};
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
 
 const QUOTE_IN_ITEM: &str = "- A\n  > q\n  >\n  > ### H\n  >   r\n  >\n  >   ```\n  >   c\n  >   ```\n  >\n  > s\n";
+
+const FIGURE_THEN: &str = r#"<ol start="10"><li>X<figure><figcaption>F</figcaption></figure>{}</li></ol>"#;
 
 const GFM_TABLE: &str = "<table><tr><th>h</th></tr><tr><td>c</td></tr></table>";
 
@@ -330,4 +332,155 @@ fn should_leave_no_blank_line_for_an_empty_div_in_a_list_item() {
     ] {
         assert_eq!(tier2(html), expected, "{html:?}");
     }
+}
+
+#[test]
+fn should_agree_across_tiers_on_other_block_kinds_that_end_the_item() {
+    // ~keep These kinds reach the fast path's catch-all block arm; text after them reaches the
+    // ~keep inline-after-block hand-off instead, so they also end the item here.
+    for html in [
+        "<ul><li>X<dd>A</dd></li></ul>",
+        "<ul><li>X<figcaption>A</figcaption></li></ul>",
+        "<ul><li>X<dd>A</dd>ZZ</li></ul>",
+        "<ul><li>X<figcaption>A</figcaption>ZZ</li></ul>",
+    ] {
+        if let Some(tier1_out) = tier1(html) {
+            assert_eq!(tier1_out, tier2(html), "Tier 1 must match Tier 2 on {html:?}");
+        }
+    }
+}
+
+#[test]
+fn should_keep_a_paragraph_in_its_item_in_strict_whitespace_mode() {
+    let options = ConversionOptions {
+        whitespace_mode: WhitespaceMode::Strict,
+        ..tier2_options()
+    };
+    for html in [
+        "<ul><li>\n  <p>A</p></li></ul>",
+        "<ul><li> <p>A</p></li></ul>",
+        "<ul><li>\n  <div>A</div></li></ul>",
+    ] {
+        let out = convert_with(html, options.clone());
+        assert_eq!(
+            render(&out),
+            "<ul>\n<li>A</li>\n</ul>\n",
+            "strict: the block left the item: {out:?}"
+        );
+    }
+    let out = convert_with("<ul><li>\n<h3>H</h3>\n<hr>\n</li></ul>", options);
+    assert!(
+        render(&out).ends_with("<hr />\n</li>\n</ul>\n"),
+        "strict: the rule left the item: {out:?} renders {:?}",
+        render(&out)
+    );
+}
+
+#[test]
+fn should_keep_a_rule_a_rule_in_inline_mode_and_table_cells() {
+    let inline = ConversionOptions {
+        convert_as_inline: true,
+        ..tier2_options()
+    };
+    let out = convert_with("<ul><li>A<blockquote>q</blockquote><hr></li></ul>", inline);
+    assert!(
+        !render(&out).contains("<h2>"),
+        "inline: the item text became a heading: {out:?} renders {:?}",
+        render(&out)
+    );
+    let out = tier2("<ul><li><table><tr><td>x<hr>y</td></tr></table></li></ul>");
+    assert!(
+        !out.contains("    ---"),
+        "a rule in a table cell got the item's indent: {out:?}"
+    );
+    let out = tier2("<ul><li><table><tr><td>x<dl><dt>T</dt></dl></td></tr></table></li></ul>");
+    assert!(
+        !out.contains("x    T"),
+        "a definition list in a table cell got the item's indent: {out:?}"
+    );
+}
+
+#[test]
+fn should_not_open_a_code_block_once_earlier_content_left_the_item() {
+    let tabs = ConversionOptions {
+        list_indent_type: ListIndentType::Tabs,
+        ..tier2_options()
+    };
+    let mut cases = vec![
+        (
+            r#"<ol start="10"><li>X<section>A</section>ZZ</li></ol>"#.to_string(),
+            tier2_options(),
+        ),
+        (
+            r#"<ol start="10"><li><br><dl><dd><hr></dd></dl></li></ol>"#.to_string(),
+            tier2_options(),
+        ),
+        ("<ul><li>X<section>A</section>ZZ</li></ul>".to_string(), tabs.clone()),
+        ("<ul><li>X<article>A</article>ZZ</li></ul>".to_string(), tabs),
+    ];
+    // ~keep A figure still leaves the item, so nothing after it may get the content column.
+    for after in [
+        "ZZ",
+        "<hr>",
+        "<p>P</p>",
+        "<div>D</div>",
+        "<dl><dt>T</dt><dd>D</dd></dl>",
+    ] {
+        cases.push((FIGURE_THEN.replace("{}", after), tier2_options()));
+    }
+    for (html, options) in cases {
+        let out = convert_with(&html, options);
+        assert!(
+            !render(&out).contains("<pre>"),
+            "{html:?}: text became a code block: {out:?} renders {:?}",
+            render(&out)
+        );
+    }
+}
+
+#[test]
+fn should_keep_a_sectioning_element_and_the_text_after_it_in_the_item() {
+    for (html, item_end) in [
+        (
+            r#"<ol start="10"><li>X<section>A</section>ZZ</li></ol>"#,
+            "<p>ZZ</p>\n</li>\n</ol>\n",
+        ),
+        ("<ul><li>X<article>A</article>ZZ</li></ul>", "<p>ZZ</p>\n</li>\n</ul>\n"),
+        ("<ul><li>X<header>A</header></li></ul>", "<p>A</p>\n</li>\n</ul>\n"),
+    ] {
+        let out = tier2(html);
+        assert!(
+            render(&out).ends_with(item_end),
+            "{html:?}: {out:?} renders {:?}",
+            render(&out)
+        );
+    }
+}
+
+#[test]
+fn should_keep_a_paragraph_in_its_item_when_wrapping() {
+    let wrap = ConversionOptions {
+        wrap: true,
+        ..tier2_options()
+    };
+    for html in [
+        "<ul><li>A<p>B</p></li><li>C</li></ul>",
+        "<ul><li>A<div>B</div></li><li>C</li></ul>",
+        "<ul><li><p>A</p><p>B</p></li><li>C</li></ul>",
+        "<ul><li>X<ul><li>A</li></ul>ZZ</li><li>C</li></ul>",
+    ] {
+        let out = convert_with(html, wrap.clone());
+        let rendered = render(&out);
+        assert!(
+            rendered.matches("<ul>").count() == html.matches("<ul>").count() && rendered.ends_with("</li>\n</ul>\n"),
+            "wrap: text left the list: {html:?} gives {out:?} renders {rendered:?}"
+        );
+    }
+}
+
+#[test]
+fn should_keep_a_block_that_starts_the_item_on_the_fast_path() {
+    // ~keep The full converter writes nothing new for a block at the item's marker line.
+    let html = "<ul><li><dt>t</dt></li></ul>";
+    assert!(tier1(html).is_some(), "Tier 1 handed {html:?} to Tier 2");
 }

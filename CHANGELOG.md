@@ -41,12 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A block inside a list item, and the text after it, left the item (#583).** A heading after
   the item's text joined that text (`<li>A<h3>H</h3>tail</li>` gave `- A### H`), a rule ended the
   list, and the text after a div, table, blockquote, nested list or definition list became a lazy
-  continuation of that block. The text after a code block or paragraph, and a definition list
-  itself, fell out of the list. Inside a list item, a block after other content of the item now
-  starts on its own line at the item's content column, and text after a block starts its own
-  paragraph at that column, as `CommonMark` requires. A paragraph or div after the item's text
-  is now its own paragraph instead of joining the text. The fast conversion path hands these
-  items to the full converter.
+  continuation of that block. The text after a code block or paragraph, a definition list, and
+  a section, article, header, footer, aside or main element fell out of the list. Inside a list
+  item, a block after other content of the item now starts on its own line at the item's content
+  column, and text after a block starts its own paragraph at that column. A paragraph or div
+  after the item's text is now its own paragraph instead of joining the text, which makes the
+  list loose. Whitespace between the marker and the item's first block no longer counts as
+  content in strict whitespace mode, and with `wrap` a paragraph inside an item keeps its
+  indent. The fast conversion path hands these items to the full converter.
 - **Text after a list or table at the end of an inline wrapper continued it (#585).** In
   `<div><span><ul><li>A</li></ul></span>para</div>`, `para` still continued the list's last item,
   because the rule from #570 looked only at the element right before the text. Text after an

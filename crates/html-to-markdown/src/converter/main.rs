@@ -461,6 +461,9 @@ fn separate_in_list_item(
         }),
         _ => false,
     };
+    let indent =
+        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
+            .unwrap_or_default();
     let blank_line = if starts_block {
         // ~keep A hard break right before a block is dropped here too, since the line end
         // ~keep written below would hide it from the dispatch strip in `walk_node`.
@@ -483,6 +486,9 @@ fn separate_in_list_item(
     } else {
         return;
     };
+    if !crate::converter::list::utils::item_is_open(output, &indent) {
+        return;
+    }
     trim_trailing_whitespace(output);
     if !output.ends_with('\n') {
         output.push('\n');
@@ -490,11 +496,7 @@ fn separate_in_list_item(
     if blank_line && !output.ends_with("\n\n") {
         output.push('\n');
     }
-    if let Some(indent) =
-        crate::converter::list::utils::continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options)
-    {
-        output.push_str(&indent);
-    }
+    output.push_str(&indent);
 }
 
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since

@@ -100,13 +100,7 @@ pub fn handle(
     if is_table_continuation {
         emit_table_cell_break(output, options.br_in_tables);
     } else if is_list_continuation {
-        crate::converter::list::utils::add_list_continuation_indent(
-            output,
-            ctx.list_depth,
-            ctx.list_indent_columns,
-            true,
-            options,
-        );
+        crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
     } else if needs_leading_sep {
         trim_trailing_whitespace(output);
         output.push_str("\n\n");

@@ -181,6 +181,26 @@ pub fn wrap_line(text: &str, width: usize) -> String {
     result
 }
 
+/// Wrap a paragraph whose first line starts with `indent`, and start every wrapped line with it.
+///
+/// ~keep An indented paragraph is a list item's continuation paragraph; written at the start of
+/// ~keep the line it would leave the item.
+pub fn wrap_indented_line(indent: &str, text: &str, width: usize) -> String {
+    let wrapped = wrap_line(text, width.saturating_sub(indent.len()).max(1));
+    if indent.is_empty() {
+        return wrapped;
+    }
+    let mut result = String::with_capacity(wrapped.len() + indent.len() * 2);
+    for (index, line) in wrapped.split('\n').enumerate() {
+        if index > 0 {
+            result.push('\n');
+        }
+        result.push_str(indent);
+        result.push_str(line);
+    }
+    result
+}
+
 /// Wrap a list item while preserving its structure.
 ///
 /// The first line of output will be: `<indent><marker><content_start>`

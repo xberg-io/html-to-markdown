@@ -590,9 +590,9 @@ pub fn scan(
                         TagKind::Paragraph => !bare_marker_line,
                         TagKind::Pre => bare_marker_line,
                         TagKind::List(_) | TagKind::ListItem => false,
-                        // ~keep Any other block, even one whose content is dropped (`<nav>`):
-                        // ~keep Tier-2 starts it, or the text after it, at the content column.
-                        _ => is_block_tag(name_lower),
+                        // ~keep Any other block after the item's content: Tier-2 starts it, or the
+                        // ~keep text after it, at the content column.
+                        _ => is_block_tag(name_lower) && !bare_marker_line,
                     };
                     if bails {
                         return Err(BailReason::ListItemUnsupportedBlockChild);

@@ -2,7 +2,7 @@
 
 use super::utils::{
     is_heading, is_list_like, is_numbered_list, parse_blockquote_line, parse_list_item, wrap_blockquote_paragraph,
-    wrap_line, wrap_list_item,
+    wrap_indented_line, wrap_list_item,
 };
 use crate::options::ConversionOptions;
 
@@ -24,6 +24,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
     let mut in_code_block = false;
     let mut in_paragraph = false;
     let mut paragraph_buffer = String::new();
+    let mut paragraph_indent = String::new();
     let mut in_blockquote_paragraph = false;
     let mut blockquote_prefix = String::new();
     let mut blockquote_buffer = String::new();
@@ -40,7 +41,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
         if is_code_fence || is_indented_code {
             if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_line(&paragraph_buffer, options.wrap_width));
+                result.push_str(&wrap_indented_line(
+                    &paragraph_indent,
+                    &paragraph_buffer,
+                    options.wrap_width,
+                ));
                 result.push_str("\n\n");
                 paragraph_buffer.clear();
                 in_paragraph = false;
@@ -62,7 +67,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
         if let Some((prefix, content)) = parse_blockquote_line(line) {
             if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_line(&paragraph_buffer, options.wrap_width));
+                result.push_str(&wrap_indented_line(
+                    &paragraph_indent,
+                    &paragraph_buffer,
+                    options.wrap_width,
+                ));
                 result.push_str("\n\n");
                 paragraph_buffer.clear();
                 in_paragraph = false;
@@ -122,7 +131,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
         if let Some((indent, marker, content)) = parse_list_item(line) {
             if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_line(&paragraph_buffer, options.wrap_width));
+                result.push_str(&wrap_indented_line(
+                    &paragraph_indent,
+                    &paragraph_buffer,
+                    options.wrap_width,
+                ));
                 result.push_str("\n\n");
                 paragraph_buffer.clear();
                 in_paragraph = false;
@@ -137,7 +150,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
         if is_structural {
             if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_line(&paragraph_buffer, options.wrap_width));
+                result.push_str(&wrap_indented_line(
+                    &paragraph_indent,
+                    &paragraph_buffer,
+                    options.wrap_width,
+                ));
                 result.push_str("\n\n");
                 paragraph_buffer.clear();
                 in_paragraph = false;
@@ -150,7 +167,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
         if line.trim().is_empty() {
             if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_line(&paragraph_buffer, options.wrap_width));
+                result.push_str(&wrap_indented_line(
+                    &paragraph_indent,
+                    &paragraph_buffer,
+                    options.wrap_width,
+                ));
                 result.push_str("\n\n");
                 paragraph_buffer.clear();
                 in_paragraph = false;
@@ -162,6 +183,9 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
         if in_paragraph {
             paragraph_buffer.push(' ');
+        } else {
+            paragraph_indent.clear();
+            paragraph_indent.push_str(&line[..line.len() - trimmed.len()]);
         }
         paragraph_buffer.push_str(line.trim());
         in_paragraph = true;
@@ -177,7 +201,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
     }
 
     if in_paragraph && !paragraph_buffer.is_empty() {
-        result.push_str(&wrap_line(&paragraph_buffer, options.wrap_width));
+        result.push_str(&wrap_indented_line(
+            &paragraph_indent,
+            &paragraph_buffer,
+            options.wrap_width,
+        ));
         result.push_str("\n\n");
     }
 

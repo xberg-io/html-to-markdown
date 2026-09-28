@@ -393,6 +393,62 @@ pub fn line_is_bare_list_marker(output: &str) -> bool {
     false
 }
 
+/// Whether the list item that `output` ends inside is still open: the last non-blank line starts
+/// at the item's content column (`indent`), is the item's marker line, or is the buffer's first
+/// line (a task item renders into a buffer of its own).
+///
+/// ~keep A line at a shallower column is a block that already left the item. Writing the
+/// ~keep content column after it opens an indented code block once the column is 4 or more
+/// ~keep (issue #583).
+pub fn item_is_open(output: &str, indent: &str) -> bool {
+    let mut lines = output.rsplit('\n').filter(|line| !line.trim().is_empty()).peekable();
+    let Some(line) = lines.next() else { return true };
+    if lines.peek().is_none() || (!indent.is_empty() && line.starts_with(indent)) {
+        return true;
+    }
+    strip_leading_bare_marker(line.trim_start_matches([' ', '\t'])).is_some()
+}
+
+/// Trim whitespace that follows a bare list marker at the end of `output` back to the marker's
+/// own space, and say whether `output` ends in a bare marker afterwards.
+///
+/// ~keep Whitespace-only text after the marker (kept in strict whitespace mode) is not content:
+/// ~keep counting it made the first block of the item start after a blank line, which ends the
+/// ~keep item in `CommonMark` (issue #583).
+pub fn trim_whitespace_after_bare_marker(output: &mut String) -> bool {
+    let content_end = output.trim_end().len();
+    if content_end == output.len() {
+        return line_is_bare_list_marker(output);
+    }
+    let tail = output[content_end..].to_string();
+    output.truncate(content_end);
+    output.push(' ');
+    if line_is_bare_list_marker(output) {
+        return true;
+    }
+    output.truncate(content_end);
+    output.push_str(&tail);
+    false
+}
+
+/// Start a block inside a list item: on the marker line when the item has no content yet, after
+/// a blank line at the content column while the item is open, and after a blank line at the
+/// start of the line once the item has ended (issue #583).
+pub fn start_block_in_list_item(output: &mut String, ctx: &Context, options: &ConversionOptions) {
+    if trim_whitespace_after_bare_marker(output) {
+        return;
+    }
+    let indent = continuation_indent_string(ctx.list_depth, ctx.list_indent_columns, options).unwrap_or_default();
+    if item_is_open(output, &indent) {
+        add_list_continuation_indent(output, ctx.list_depth, ctx.list_indent_columns, true, options);
+    } else {
+        trim_trailing_whitespace(output);
+        if !output.ends_with("\n\n") {
+            output.push_str(if output.ends_with('\n') { "\n" } else { "\n\n" });
+        }
+    }
+}
+
 /// Add appropriate leading separator before a list.
 ///
 /// Lists need different separators depending on context:
