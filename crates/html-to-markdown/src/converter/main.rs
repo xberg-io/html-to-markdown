@@ -415,7 +415,7 @@ fn separate_from_block(
     ctx: &Context,
     dom_ctx: &DomContext,
 ) {
-    if output.len() < 2 || ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code {
+    if output.is_empty() || ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code {
         return;
     }
     if ctx.in_list_item {
@@ -426,7 +426,7 @@ fn separate_from_block(
             separate_in_list_item(node, node_handle, parser, output, options, ctx, dom_ctx);
         }
     } else if !ctx.in_list
-        && output.ends_with('\n')
+        && ends_with_block_line_end(output)
         && !output.ends_with("\n\n")
         && is_inline_content(node, node_handle, parser, dom_ctx)
         && crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx).is_some()
@@ -475,7 +475,7 @@ fn separate_in_list_item(
             return;
         }
         false
-    } else if output.ends_with('\n') && is_inline_content(node, node_handle, parser, dom_ctx) {
+    } else if ends_with_block_line_end(output) && is_inline_content(node, node_handle, parser, dom_ctx) {
         match crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx) {
             Some(block) => !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
             None => return,
@@ -495,6 +495,12 @@ fn separate_in_list_item(
     {
         output.push_str(&indent);
     }
+}
+
+/// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since
+/// the block before it wrote nothing.
+fn ends_with_block_line_end(output: &str) -> bool {
+    output.len() >= 2 && output.ends_with('\n')
 }
 
 /// Whether `node` is inline content: non-blank text or an inline element.

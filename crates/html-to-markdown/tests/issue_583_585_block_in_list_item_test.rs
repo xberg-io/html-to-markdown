@@ -309,6 +309,15 @@ fn should_agree_across_tiers_on_a_block_container_whose_content_is_dropped() {
 
 #[test]
 fn should_leave_no_blank_line_for_an_empty_div_in_a_list_item() {
-    let html = "<ul><li>X<div></div>ZZ</li></ul>";
-    assert_eq!(tier2(html), "- X\n  ZZ\n", "{html:?}");
+    // ~keep A task item renders its text into a buffer of its own, where a one-letter text is
+    // ~keep the whole buffer before the div.
+    for (html, expected) in [
+        ("<ul><li>X<div></div>ZZ</li></ul>", "- X\n  ZZ\n"),
+        (
+            r#"<ul><li>X<div></div><input type="checkbox">ZZ</li></ul>"#,
+            "- [ ] X\n  ZZ\n",
+        ),
+    ] {
+        assert_eq!(tier2(html), expected, "{html:?}");
+    }
 }
