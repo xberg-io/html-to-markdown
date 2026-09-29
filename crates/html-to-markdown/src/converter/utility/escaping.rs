@@ -285,8 +285,34 @@ fn block_opener_escape_offset(line: &str) -> Option<usize> {
         return None;
     }
     let rest = line.get(indent..)?;
+    block_opener_offset(rest).map(|offset| indent + offset)
+}
+
+/// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.
+pub fn opens_block(rest: &str) -> bool {
+    block_opener_offset(rest).is_some()
+}
+
+/// Whether `rest`, a line without its indentation, is a setext heading underline: nothing but `=`
+/// or nothing but `-`.
+pub fn is_heading_underline(rest: &str) -> bool {
+    is_setext_underline(rest, b'=') || is_setext_underline(rest, b'-')
+}
+
+/// The fence character and the length of its run when `rest`, a line without its indentation,
+/// opens a fenced code block.
+pub fn code_fence(rest: &str) -> Option<(u8, usize)> {
     let marker = *rest.as_bytes().first()?;
-    let opens_block = match marker {
+    let run = rest.bytes().take_while(|&byte| byte == marker).count();
+    (matches!(marker, b'`' | b'~') && is_code_fence(rest, marker)).then_some((marker, run))
+}
+
+/// Byte offset within `rest`, a line without its indentation, of the character to backslash-escape
+/// so the line stops opening a block, or `None` when it opens no block that can interrupt a
+/// paragraph.
+fn block_opener_offset(rest: &str) -> Option<usize> {
+    let marker = *rest.as_bytes().first()?;
+    let opens = match marker {
         b'>' => true,
         b'#' => is_atx_heading(rest),
         b'`' | b'~' => is_code_fence(rest, marker),
@@ -298,10 +324,10 @@ fn block_opener_escape_offset(line: &str) -> Option<usize> {
         b'<' => is_html_block_opener(rest),
         // ~keep A digit cannot carry a backslash escape, so an ordered-list marker is
         // ~keep defused at its `.`/`)` delimiter instead of at its number.
-        b'0'..=b'9' => return ordered_list_delimiter_offset(rest).map(|offset| indent + offset),
+        b'0'..=b'9' => return ordered_list_delimiter_offset(rest),
         _ => false,
     };
-    opens_block.then_some(indent)
+    opens.then_some(0)
 }
 
 /// Split `line`'s leading indentation, returning `(byte length, column width)`.

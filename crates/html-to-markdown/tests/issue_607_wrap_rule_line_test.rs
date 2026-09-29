@@ -3,9 +3,10 @@
 
 //! Regression tests for issue #607: wrap mode folded a rule line, or a heading underline, into the
 //! text around it, so the rule or the heading was lost. Wrap mode also joined the keys of the
-//! frontmatter into one line.
+//! frontmatter into one line, folded the list items, fences, headings and table rows of a quote
+//! into text, and reflowed a tilde code block.
 
-use html_to_markdown_rs::{ConversionOptions, HeadingStyle, TierStrategy, convert};
+use html_to_markdown_rs::{CodeBlockStyle, ConversionOptions, HeadingStyle, TierStrategy, convert};
 
 fn wrapped(html: &str, heading_style: HeadingStyle) -> String {
     let options = ConversionOptions {
@@ -111,4 +112,55 @@ fn should_keep_the_frontmatter_a_yaml_block_when_wrapping() {
         "---\nmeta-description: A page about things\ntitle: My Page\n---\n\none two three four\nfive six seven\n\n",
         "the frontmatter must stay one key per line and only the text after it wraps"
     );
+}
+
+#[test]
+fn should_keep_every_block_line_in_a_quote_when_wrapping() {
+    let failures: Vec<String> = [
+        "<blockquote><ul><li>alpha</li><li>beta</li></ul></blockquote>",
+        "<blockquote><ol><li>alpha</li><li>beta</li><li>gamma</li></ol></blockquote>",
+        "<blockquote><p>text</p><ul><li>alpha</li><li>beta</li></ul></blockquote>",
+        "<blockquote><pre><code>x = 1\ny = 2</code></pre></blockquote>",
+        "<blockquote><h2>Heading</h2><p>x</p></blockquote>",
+        "<blockquote><table><tr><th>h</th><th>i</th></tr><tr><td>x</td><td>y</td></tr></table></blockquote>",
+    ]
+    .iter()
+    .filter_map(|html| {
+        let unwrapped = wrapped_at(html, 0, CodeBlockStyle::Backticks);
+        let out = wrapped_at(html, 20, CodeBlockStyle::Backticks);
+        (render(&out) != render(&unwrapped)).then(|| format!("{html:?}: {out:?}, unwrapped {unwrapped:?}"))
+    })
+    .collect();
+    assert!(
+        failures.is_empty(),
+        "wrapping must not change the blocks:\n{}",
+        failures.join("\n")
+    );
+}
+
+#[test]
+fn should_keep_a_tilde_code_block_as_it_is_when_wrapping() {
+    for html in [
+        "<pre><code>alpha beta gamma\ndelta epsilon zeta\neta</code></pre><p>after</p>",
+        "<blockquote><pre><code>alpha beta gamma\ndelta epsilon zeta</code></pre></blockquote>",
+    ] {
+        let unwrapped = wrapped_at(html, 0, CodeBlockStyle::Tildes);
+        let out = wrapped_at(html, 20, CodeBlockStyle::Tildes);
+        assert_eq!(render(&out), render(&unwrapped), "{html:?}: {out:?}");
+    }
+}
+
+/// Convert `html` wrapped at `width`, or unwrapped when `width` is 0.
+fn wrapped_at(html: &str, width: usize, code_block_style: CodeBlockStyle) -> String {
+    convert_with(
+        html,
+        ConversionOptions {
+            extract_metadata: false,
+            tier_strategy: TierStrategy::Tier2,
+            wrap: width > 0,
+            wrap_width: width.max(20),
+            code_block_style,
+            ..ConversionOptions::default()
+        },
+    )
 }

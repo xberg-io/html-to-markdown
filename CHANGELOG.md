@@ -75,6 +75,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   extraction on, the YAML frontmatter went through the reflow like body text, so
   `---\ntitle: My Page\n---` became `--- title: My Page ---` and the frontmatter was lost. Only
   the text after the frontmatter is wrapped now.
+- **Wrap mode folded list items, code fences, headings and table rows inside a quote into text.**
+  With `wrap` on, `<blockquote><ul><li>alpha</li><li>beta</li></ul></blockquote>` gave
+  `> - alpha - beta`, one item, and a code block inside a quote lost its code. Outside a quote, a
+  `~~~` code block was reflowed like a paragraph. Every line that starts a block now keeps its own
+  line in and out of a quote, and a code block ends only at a fence that closes it.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition

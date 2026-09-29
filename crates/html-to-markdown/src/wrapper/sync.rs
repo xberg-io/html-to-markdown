@@ -1,10 +1,16 @@
 //! Synchronous text wrapping for Markdown output.
 
 use super::utils::{
-    is_heading, is_list_like, is_numbered_list, is_setext_underline, is_thematic_break, parse_blockquote_line,
-    parse_list_item, wrap_blockquote_paragraph, wrap_indented_line, wrap_list_item,
+    is_heading, is_list_like, is_numbered_list, parse_blockquote_line, parse_list_item, wrap_blockquote_paragraph,
+    wrap_indented_line, wrap_list_item,
 };
+use crate::converter::utility::escaping::{code_fence, is_heading_underline, opens_block};
 use crate::options::ConversionOptions;
+
+/// Whether `trimmed` closes a fenced code block opened by a run of `length` `marker` characters.
+fn closes_fence(trimmed: &str, marker: u8, length: usize) -> bool {
+    code_fence(trimmed).is_some_and(|(fence, run)| fence == marker && run >= length && trimmed[run..].trim().is_empty())
+}
 
 /// Wrap text at specified width while preserving Markdown formatting.
 ///
@@ -21,7 +27,8 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
     }
 
     let mut result = String::with_capacity(markdown.len());
-    let mut in_code_block = false;
+    let mut open_fence: Option<(u8, usize)> = None;
+    let mut quote_fence: Option<(u8, usize)> = None;
     let mut in_paragraph = false;
     let mut paragraph_buffer = String::new();
     let mut paragraph_indent = String::new();
@@ -32,7 +39,16 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
     for line in markdown.lines() {
         let trimmed = line.trim_start();
-        let is_code_fence = trimmed.starts_with("```");
+        if let Some((marker, length)) = open_fence {
+            if closes_fence(trimmed, marker, length) {
+                open_fence = None;
+            }
+            result.push_str(line);
+            result.push('\n');
+            continue;
+        }
+
+        let fence = code_fence(trimmed);
         let is_indented_code = line.starts_with("    ")
             && !is_list_like(trimmed)
             && !is_numbered_list(trimmed)
@@ -40,7 +56,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             && !trimmed.starts_with('>')
             && !trimmed.starts_with('|');
 
-        if is_code_fence || is_indented_code {
+        if fence.is_some() || is_indented_code {
             if in_paragraph && !paragraph_buffer.is_empty() {
                 result.push_str(&wrap_indented_line(
                     &paragraph_indent,
@@ -52,15 +68,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 in_paragraph = false;
             }
 
-            if is_code_fence {
-                in_code_block = !in_code_block;
-            }
-            result.push_str(line);
-            result.push('\n');
-            continue;
-        }
-
-        if in_code_block {
+            open_fence = fence;
             result.push_str(line);
             result.push('\n');
             continue;
@@ -114,9 +122,25 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 in_blockquote_paragraph = false;
             }
 
-            // ~keep Inside a quote a rule or a heading underline keeps its own line too (#607).
-            let underline = in_blockquote_paragraph && is_setext_underline(content.trim_start());
-            if underline || is_thematic_break(content.trim_start()) {
+            if let Some((marker, length)) = quote_fence {
+                if closes_fence(&content, marker, length) {
+                    quote_fence = None;
+                }
+                result.push_str(line);
+                result.push('\n');
+                continue;
+            }
+
+            // ~keep Inside a quote a line that starts a block keeps its own line, as outside one:
+            // ~keep a heading underline, a rule, a list item, a fence, a heading, a table row (#607).
+            let underline = in_blockquote_paragraph && is_heading_underline(&content);
+            let fence = code_fence(&content);
+            if underline
+                || fence.is_some()
+                || opens_block(&content)
+                || parse_list_item(&content).is_some()
+                || content.starts_with('|')
+            {
                 if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
                     if underline {
                         result.push_str(&blockquote_prefix);
@@ -133,6 +157,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                     blockquote_buffer.clear();
                     in_blockquote_paragraph = false;
                 }
+                quote_fence = fence;
                 result.push_str(line);
                 result.push('\n');
                 continue;
@@ -149,7 +174,9 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 in_blockquote_paragraph = true;
             }
             continue;
-        } else if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
+        }
+        quote_fence = None;
+        if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
             result.push_str(&wrap_blockquote_paragraph(
                 &format!("{blockquote_prefix}{blockquote_indent}"),
                 &blockquote_buffer,
@@ -163,7 +190,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
         // ~keep An underline right under paragraph text makes that text its heading: the text ends
         // ~keep with one line break, and it is not reflowed, like an ATX heading. Folded into the
         // ~keep text, or cut off by a blank line, the underline is lost (#607).
-        if in_paragraph && !paragraph_buffer.is_empty() && is_setext_underline(trimmed) {
+        if in_paragraph && !paragraph_buffer.is_empty() && is_heading_underline(trimmed) {
             result.push_str(&paragraph_indent);
             result.push_str(&paragraph_buffer);
             result.push('\n');
@@ -190,11 +217,8 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             continue;
         }
 
-        let is_structural = is_heading(trimmed)
-            || is_thematic_break(trimmed)
-            || trimmed.starts_with('>')
-            || trimmed.starts_with('|')
-            || trimmed.starts_with('=');
+        let is_structural =
+            is_heading(trimmed) || opens_block(trimmed) || trimmed.starts_with('|') || trimmed.starts_with('=');
 
         if is_structural {
             if in_paragraph && !paragraph_buffer.is_empty() {
@@ -301,6 +325,26 @@ mod tests {
     fn wrap_markdown_keeps_a_rule_and_an_underline_on_their_own_lines_in_a_quote() {
         assert_eq!(wrap_at_20("> t\n>\n> ---\n>  B\n"), "> t\n>\n> ---\n>  B\n");
         assert_eq!(wrap_at_20("> Heading\n> -------\n> x\n"), "> Heading\n> -------\n> x\n");
+        let long_heading = "> one two three four five six\n> -------\n";
+        assert_eq!(wrap_at_20(long_heading), long_heading);
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_fence_open_until_a_fence_as_long_as_its_opener() {
+        let fenced = "````\n```\none two three four five six\n````\n";
+        assert_eq!(wrap_at_20(fenced), fenced);
+        let info_string = "```\n```text\none two three four five six\n```\n";
+        assert_eq!(wrap_at_20(info_string), info_string);
+        let quoted = "> ~~~\n> ```\n> one two three four five six\n> ~~~\n";
+        assert_eq!(wrap_at_20(quoted), quoted);
+        assert_eq!(
+            wrap_at_20("> ```\n> x\n> ```\n> one two three four five six\n"),
+            "> ```\n> x\n> ```\n> one two three four\n> five six\n"
+        );
+        assert_eq!(
+            wrap_at_20("```\nx\n```\none two three four five six\n"),
+            "```\nx\n```\none two three four\nfive six\n\n"
+        );
     }
 
     #[test]
