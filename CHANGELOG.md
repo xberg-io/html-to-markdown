@@ -167,7 +167,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a quote in a list item counted the markers outside the quote too, so its lines sat further in
   than the item, and the underline of a heading sat short of it. The quote now starts its content
   as a container of its own, so a list in it counts only its own markers. A block after text in a
-  list item inside a quote now also starts its own line, as it does outside a quote. With
+  list item inside a quote now also starts its own line, as it does outside a quote. An
+  underlined heading in a quote in a list item now gets the one-dash underline it gets in a
+  quote elsewhere: `<ul><li><blockquote><h2>q</h2></blockquote></li></ul>` gives `- > q\n  > -`,
+  where it gave `- > q\n  > --`. Bold or italic around the quote no longer changes the lists in
+  it, so text after a nested quote in such a list leaves the nested quote. With
   `list_indent_type` set to `tabs`, the lines of a nested item were one tab short of its content
   column: `- a\n\t* q\n\n\tt` put `t` in the outer item. They now reach the column where the
   item's text starts, `- a\n\t* q\n\n\t\tt`.

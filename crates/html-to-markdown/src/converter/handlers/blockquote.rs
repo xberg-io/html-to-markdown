@@ -58,12 +58,16 @@ pub fn handle_blockquote(
     // ~keep The quote writes the indent of the list items around it on each of its lines, so its
     // ~keep children start at column 0 of a container of their own, outside the item: a list in
     // ~keep the quote counts only its own markers, and every line of an item in the quote gets
-    // ~keep the same column (issue #654).
+    // ~keep the same column (issue #654). Bold or italic around the item holding the quote does
+    // ~keep not make a list in the quote text: its items open. Under a caption's or summary's
+    // ~keep markers, a list in the quote is still judged by where its markers fall, as outside it.
     let blockquote_ctx = Context {
         blockquote_depth: ctx.blockquote_depth + 1,
         in_list_item: false,
         in_list: false,
         list_indent_columns: 0,
+        real_item_columns: 0,
+        inline_depth: 0,
         item_lines: crate::converter::list::utils::ItemLineScan::new_item(),
         ..ctx.clone()
     };

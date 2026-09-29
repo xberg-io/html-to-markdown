@@ -295,3 +295,86 @@ fn should_keep_the_blocks_of_a_nested_item_between_inline_markers_in_the_item_wi
         "<p>lead</p><ul><li>**a<ul><li>b<ul><li><p>x</p><blockquote><p>q</p></blockquote><p>t**</p></li></ul></li></ul></li></ul><p>tail</p>",
     );
 }
+
+fn wrapped(options: ConversionOptions) -> ConversionOptions {
+    ConversionOptions {
+        wrap: true,
+        wrap_width: 20,
+        ..options
+    }
+}
+
+#[test]
+fn should_keep_text_after_a_nested_quote_in_a_list_in_bold_in_a_quote_out_of_a_code_block() {
+    assert_converts(
+        "<ul><li>a<ul><li>b<blockquote><b><ul><li>x<blockquote>q</blockquote>t</li></ul></b></blockquote></li></ul></li></ul>",
+        &options(TierStrategy::Tier2),
+        "- a\n  * b\n    > **+ x\n    >   > q\n    >\n    > t**\n",
+        "<ul><li>a<ul><li>b<blockquote><p>**+ x</p><blockquote><p>q</p></blockquote><p>t**</p></blockquote></li></ul></li></ul>",
+    );
+    assert_converts(
+        "<ul><li>a<ul><li>b<ul><li>c<blockquote><b><ul><li>x<blockquote>q</blockquote>t</li></ul></b></blockquote></li></ul></li></ul></li></ul>",
+        &options(TierStrategy::Tier2),
+        "- a\n  * b\n    + c\n      > **- x\n      >   > q\n      >\n      > t**\n",
+        "<ul><li>a<ul><li>b<ul><li>c<blockquote><p>**- x</p><blockquote><p>q</p></blockquote><p>t**</p></blockquote></li></ul></li></ul></li></ul>",
+    );
+}
+
+#[test]
+fn should_keep_text_after_a_nested_quote_in_a_list_in_bold_in_a_quote_out_of_a_code_block_with_tab_indent() {
+    let html = "<ul><li>a<ul><li>b<blockquote><b><ul><li>x<blockquote>q</blockquote>t</li></ul></b></blockquote></li></ul></li></ul>";
+    for strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let markdown = convert(html, Some(tabs(options(strategy))))
+            .expect("conversion must succeed")
+            .content
+            .unwrap_or_default();
+        assert_eq!(
+            markdown, "- a\n\t* b\n\t\t> **+ x\n\t\t> \t> q\n\t\t> \tt**\n",
+            "{strategy:?}"
+        );
+        assert!(!render(&markdown).contains("<pre>"), "{markdown:?} ({strategy:?})");
+    }
+}
+
+#[test]
+fn should_keep_the_lists_in_a_quote_in_a_list_in_bold_at_their_own_columns() {
+    let html = "<ul><li><b>x<ul><li>y<blockquote><ul><li>z<blockquote>q</blockquote>t</li></ul></blockquote>u</li></ul></b></li></ul>";
+    let rendered = "<ul><li>**x<ul><li><p>y</p><blockquote><ul><li><p>z</p><blockquote><p>q</p></blockquote><p>t</p></li></ul></blockquote><p>u**</p></li></ul></li></ul>";
+    let two_spaces = "- **x\n  * y\n    > + z\n    >   > q\n    >\n    >   t\n\n    u**\n";
+    assert_converts(html, &options(TierStrategy::Tier2), two_spaces, rendered);
+    assert_converts(html, &wrapped(options(TierStrategy::Tier2)), two_spaces, rendered);
+    let with_tabs = "- **x\n\t* y\n\t\t> + z\n\t\t> \t> q\n\t\t>\n\t\t> \tt\n\n\t\tu**\n";
+    assert_converts(html, &tabs(options(TierStrategy::Tier2)), with_tabs, rendered);
+    assert_converts(html, &tabs(underlined(TierStrategy::Tier2)), with_tabs, rendered);
+    assert_converts(
+        html,
+        &wrapped(tabs(options(TierStrategy::Tier2))),
+        "- **x\n\t* y\n\t\t> + z\n\t\t> \t> q\n\t\t>\n\t\t> \tt\n\n\t\tu**\n\n",
+        rendered,
+    );
+    assert_converts(
+        html,
+        &ConversionOptions {
+            list_indent_width: 4,
+            ..options(TierStrategy::Tier2)
+        },
+        "- **x\n    * y\n        > + z\n        >     > q\n        >\n        >     t\n\n        u**\n",
+        rendered,
+    );
+}
+
+#[test]
+fn should_not_turn_text_after_a_nested_quote_in_a_list_in_a_caption_into_a_code_block() {
+    for html in [
+        "<ul><li>a<ul><li>b<table><caption><blockquote><ul><li>x<ul><li>y<blockquote>q</blockquote>t</li></ul></li></ul></blockquote></caption><tr><td>c</td></tr></table></li></ul></li></ul>",
+        "<ul><li>a<table><caption>v<ul><li>y<blockquote><ul><li>x<ul><li>y<blockquote>q</blockquote>t</li></ul></li></ul></blockquote>u</li></ul></caption><tr><td>c</td></tr></table></li></ul>",
+    ] {
+        for options in [options(TierStrategy::Tier2), tabs(options(TierStrategy::Tier2))] {
+            let markdown = convert(html, Some(options))
+                .expect("conversion must succeed")
+                .content
+                .unwrap_or_default();
+            assert!(!render(&markdown).contains("<pre>"), "{html}: {markdown:?}");
+        }
+    }
+}
