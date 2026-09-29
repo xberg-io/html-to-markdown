@@ -426,6 +426,9 @@ fn should_start_the_first_block_of_a_task_item_on_the_next_line_inside_a_wrapper
             "- [ ] a\n  > q\n",
         ),
         (r#"<ul><li><input type="checkbox"><div>d</div></li></ul>"#, "- [ ] d\n"),
+        // ~keep An empty container before the text renders nothing on its own walk, so the walk
+        // ~keep must keep checking siblings instead of stopping at the empty container.
+        (r#"<ul><li><input type="checkbox"><div></div>t</li></ul>"#, "- [ ] t\n"),
     ] {
         assert_eq!(
             convert_with(html, &tier2_options()),
@@ -433,6 +436,25 @@ fn should_start_the_first_block_of_a_task_item_on_the_next_line_inside_a_wrapper
             "{html:?}: the text moved to a line of its own"
         );
     }
+}
+
+/// The task walk's own depth guard, reached only when the checkbox content nests past
+/// `max_depth`: an empty container past the limit must not make the walk give up on a later
+/// sibling that does start a block.
+#[test]
+fn should_keep_text_on_the_checkbox_line_when_an_empty_container_passes_the_depth_limit() {
+    let nested_empty_divs = "<div>".repeat(10) + &"</div>".repeat(10);
+    let html = format!(r#"<ul><li><input type="checkbox">{nested_empty_divs}<blockquote>q</blockquote></li></ul>"#);
+    let options = ConversionOptions {
+        max_depth: Some(6),
+        list_indent_type: ListIndentType::Spaces,
+        ..tier2_options()
+    };
+    let out = convert_with(&html, &options);
+    assert_eq!(
+        out, "- [ ] > q\n",
+        "{html:?}: the depth limit should degrade to text, not drop the item or panic"
+    );
 }
 
 #[test]
