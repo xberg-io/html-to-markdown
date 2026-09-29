@@ -164,6 +164,12 @@ pub enum BailReason {
     /// This scanner writes `.` only.
     OrderedListAfterOrderedList,
 
+    /// A list item of a nested list closed with nothing after its marker on the marker line.
+    ///
+    /// Such a line cannot interrupt a paragraph, so Tier-2 writes a blank line before the first
+    /// item of a list after item text (issue #667). This scanner does not track open paragraphs.
+    EmptyNestedListItem,
+
     /// A `<blockquote>`, `<div>` (or other generic block container), `<table>`,
     /// `<dl>`, or a paragraph-continuation `<p>` opened while inside an open
     /// list item, in a shape this scanner cannot render correctly.
@@ -346,6 +352,9 @@ impl fmt::Display for BailReason {
             }
             Self::OrderedListAfterOrderedList => {
                 write!(f, "ordered list right after an ordered list (switched delimiter)")
+            }
+            Self::EmptyNestedListItem => {
+                write!(f, "nested list item with nothing on its marker line")
             }
             Self::ListItemUnsupportedBlockChild => {
                 write!(

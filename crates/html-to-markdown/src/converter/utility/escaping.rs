@@ -304,6 +304,14 @@ pub fn is_heading_underline(rest: &str) -> bool {
     is_setext_underline(rest, b'=') || is_setext_underline(rest, b'-')
 }
 
+/// Whether `rest`, a line without its indentation, is a thematic break: three or more `-`, `*` or
+/// `_` and nothing else but spaces/tabs.
+pub fn is_rule(rest: &str) -> bool {
+    rest.bytes()
+        .next()
+        .is_some_and(|marker| matches!(marker, b'-' | b'*' | b'_') && is_thematic_break(rest, marker))
+}
+
 /// The fence character and the length of its run when `rest`, a line without its indentation,
 /// opens a fenced code block.
 pub fn code_fence(rest: &str) -> Option<(u8, usize)> {

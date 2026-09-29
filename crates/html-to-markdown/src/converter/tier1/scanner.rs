@@ -2311,7 +2311,7 @@ fn emit_close(
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
-        TagKind::ListItem => close_list_item(state, &frame),
+        TagKind::ListItem => close_list_item(state, &frame)?,
         TagKind::DefinitionTerm => close_dt(state),
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::Hr => {}
@@ -2691,7 +2691,7 @@ fn emit_close_for_implicit(
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
         TagKind::List(kind) => close_list(state, kind),
-        TagKind::ListItem => close_list_item(state, &frame),
+        TagKind::ListItem => close_list_item(state, &frame)?,
         TagKind::DefinitionTerm => close_dt(state),
         TagKind::DefinitionDescription => close_dd(state),
         TagKind::TableCell { .. } => close_table_cell(state, true)?,
@@ -3538,7 +3538,7 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
     }
 }
 
-fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
+fn close_list_item(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailReason> {
     // ~keep When inside a table cell, Tier-2 does NOT add a trailing newline after
     // each list item (see list/item.rs: `if !ctx.in_table_cell { ... \n ... }`).
     // Items are concatenated directly in the cell accumulator.
@@ -3547,11 +3547,20 @@ fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
         while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
             cell_buf.pop();
         }
-        return;
+        return Ok(());
     }
     state.list_item_marker_widths.pop();
     trim_trailing_inline_whitespace(state);
+    // ~keep A nested item with nothing on its marker line cannot interrupt the item text before
+    // ~keep it (issue #667). Tier 2 decides whether that text is an open paragraph.
+    let nested = state.list_depth > 1;
     let dest = state.cell_or_output_mut();
+    let marker_line = dest
+        .get(clamp_to_char_boundary(dest, frame.content_start)..)
+        .unwrap_or_default();
+    if nested && marker_line.split('\n').next().unwrap_or_default().trim().is_empty() {
+        return Err(BailReason::EmptyNestedListItem);
+    }
     // ~keep Phase EE: loose-list separator.  When this item had block-level
     // children (its content range contains a `\n\n` block separator),
     // mirror Tier-2's `handle_li` ensure_trailing_blank_line behaviour
@@ -3572,6 +3581,7 @@ fn close_list_item(state: &mut Tier1State, frame: &OpenTag) {
     } else if !dest.is_empty() && !dest.ends_with('\n') {
         dest.push('\n');
     }
+    Ok(())
 }
 
 // ~keep ── Definition-list helpers ───────────────────────────────────────────────────

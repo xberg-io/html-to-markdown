@@ -131,13 +131,7 @@ pub fn handle_li(
     // ~keep only needed when this item genuinely starts a fresh physical line.
     let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
     if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
-        let indent = match options.list_indent_type {
-            crate::options::ListIndentType::Tabs => "\t".repeat(ctx.list_depth),
-            // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-            // ~keep marker (see Context::list_indent_columns), not a uniform per-depth value.
-            crate::options::ListIndentType::Spaces => " ".repeat(ctx.list_indent_columns),
-        };
-        output.push_str(&indent);
+        output.push_str(&crate::converter::list::utils::item_indent(ctx, options));
     }
 
     let mut has_block_children = false;

@@ -253,6 +253,16 @@ pub fn continuation_indent_string(list_indent_columns: usize, options: &Conversi
     }
 }
 
+/// The indent of a list item's marker line that starts a fresh line, for the item's `ctx`.
+pub fn item_indent(ctx: &Context, options: &ConversionOptions) -> String {
+    match options.list_indent_type {
+        ListIndentType::Tabs => "\t".repeat(ctx.list_depth),
+        // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
+        // ~keep marker (see Context::list_indent_columns), not a uniform per-depth value.
+        ListIndentType::Spaces => " ".repeat(ctx.list_indent_columns),
+    }
+}
+
 /// The column that the continuation indent for `list_indent_columns` reaches.
 pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) -> usize {
     continuation_indent_string(list_indent_columns, options).map_or(0, |indent| {
@@ -289,28 +299,67 @@ pub fn marker_starts_item(
     crate::converter::utility::escaping::line_opens_block(&line)
 }
 
-/// Whether the first item of a list, which starts the line after `output` inside the item at
-/// `enclosing_columns`, needs a blank line before it: its `marker` cannot interrupt a paragraph,
-/// and a paragraph is open there.
+/// Whether the first item of a list, whose marker `line` starts at `line_start` in `output` inside
+/// the item at `enclosing_columns`, needs a blank line before it: the line cannot interrupt a
+/// paragraph, and a paragraph is open there. `line` is indented from the item's content column.
 ///
-/// ~keep In `CommonMark` only an ordered marker other than `1.` cannot interrupt a paragraph
-/// ~keep (issue #662), so every other list reads no lines. In Djot no list can (issue #670). The
-/// ~keep items after the first follow a list item.
+/// ~keep In `CommonMark` a marker line with content interrupts a paragraph unless its marker is
+/// ~keep an ordered one other than `1.` (issue #662). A marker line without content (an empty
+/// ~keep item) cannot, and a lone `-` is a heading underline (issue #667). In Djot no list can
+/// ~keep (issue #670). The items after the first follow a list item.
 pub fn list_needs_blank_line(
-    output: &str,
-    marker: &str,
+    (output, line_start): (&str, usize),
+    line: &str,
     enclosing_columns: usize,
     previous: (&PreviousMarker, usize),
     options: &ConversionOptions,
 ) -> bool {
-    (options.output_format == OutputFormat::Djot
-        || !crate::converter::utility::escaping::line_opens_block(&format!("{marker}x")))
-        && paragraph_is_open_before(
-            output,
-            output.len(),
-            indent_column(enclosing_columns, options),
-            previous,
-        )
+    !marker_line_interrupts(line, options)
+        && paragraph_is_open_before(output, line_start, indent_column(enclosing_columns, options), previous)
+}
+
+/// Whether the marker `line` of a list's first item, indented from the enclosing item's content
+/// column, can interrupt a paragraph.
+fn marker_line_interrupts(line: &str, options: &ConversionOptions) -> bool {
+    use crate::converter::utility::escaping::{is_heading_underline, line_opens_block};
+    options.output_format != OutputFormat::Djot
+        && line_opens_block(line)
+        && !is_heading_underline(line.trim_start_matches([' ', '\t']))
+}
+
+/// The marker line that the first item of a list wrote at `line_start` in `output`, indented from
+/// the content column of the item at `enclosing_columns`.
+fn written_marker_line(
+    output: &str,
+    line_start: usize,
+    enclosing_columns: usize,
+    options: &ConversionOptions,
+) -> String {
+    let written = &output[line_start..];
+    let line = &written[..written.find('\n').unwrap_or(written.len())];
+    let (indent, column) = crate::converter::utility::escaping::leading_indent(line);
+    format!(
+        "{}{}",
+        " ".repeat(column.saturating_sub(indent_column(enclosing_columns, options))),
+        &line[indent..]
+    )
+}
+
+/// Whether the line of `output` that holds `end`, a line of bare list markers up to `end`, reads as
+/// a thematic break from its start or from one of its markers on.
+fn bare_marker_line_is_rule(output: &str, end: usize) -> bool {
+    let start = output[..end].rfind('\n').map_or(0, |pos| pos + 1);
+    let line_end = output[end..].find('\n').map_or(output.len(), |pos| end + pos);
+    let mut rest = output[start..line_end].trim_start_matches([' ', '\t']);
+    loop {
+        if crate::converter::utility::escaping::is_rule(rest) {
+            return true;
+        }
+        match strip_leading_bare_marker(rest) {
+            Some(next) => rest = next,
+            None => return false,
+        }
+    }
 }
 
 /// Where the last ordered list ended in a buffer: the buffer address, the content column of the
@@ -923,31 +972,59 @@ pub fn process_list_children(
                 }
                 // ~keep A first marker that cannot interrupt the paragraph before it starts after a
                 // ~keep blank line (issues #662, #670). Between inline markers the list is text. The
-                // ~keep marker character does not change the answer, so `N. ` and `- ` stand for all.
+                // ~keep marker character does not change the answer, so `N. x` and `- x` stand for
+                // ~keep every item with content. Whether the item has content is known once it is
+                // ~keep written, so a marker line that could interrupt is checked again then (issue
+                // ~keep #667). The paragraph is read once per list either way.
+                let mut marker_line_start = None;
+                let mut bare_marker_end = None;
                 if first_item && is_list_item(*child_handle, parser, dom_ctx) {
                     first_item = false;
-                    if ctx.in_list_item
-                        && ctx.inline_depth == 0
-                        && !ctx.text_in_markers
-                        && output.ends_with('\n')
-                        && list_needs_blank_line(
-                            output,
-                            &if is_ordered {
-                                format!("{counter}. ")
-                            } else {
-                                String::from("- ")
-                            },
+                    let item_block = ctx.in_list_item && ctx.inline_depth == 0 && !ctx.text_in_markers;
+                    if item_block && line_is_bare_list_marker(output) {
+                        bare_marker_end = Some(output.len());
+                    } else if item_block && output.ends_with('\n') {
+                        let marker = if is_ordered {
+                            format!("{counter}. x")
+                        } else {
+                            String::from("- x")
+                        };
+                        if list_needs_blank_line(
+                            (output, output.len()),
+                            &marker,
                             ctx.real_item_columns,
                             (&ctx.previous_marker, std::ptr::from_ref::<String>(output) as usize),
                             options,
-                        )
-                    {
-                        output.push('\n');
+                        ) {
+                            output.push('\n');
+                        } else if marker_line_interrupts(&marker, options) {
+                            marker_line_start = Some(output.len());
+                        }
                     }
                 }
 
                 use crate::converter::walk_node;
                 walk_node(child_handle, parser, output, options, &list_ctx, depth + 1, dom_ctx);
+
+                if let Some(line_start) = marker_line_start {
+                    let line = written_marker_line(output, line_start, ctx.real_item_columns, options);
+                    if list_needs_blank_line(
+                        (output, line_start),
+                        &line,
+                        ctx.real_item_columns,
+                        (&ctx.previous_marker, std::ptr::from_ref::<String>(output) as usize),
+                        options,
+                    ) {
+                        output.insert(line_start, '\n');
+                    }
+                }
+                // ~keep An empty item that ends a line of bare markers can complete a thematic
+                // ~keep break (`- - -`), so its marker starts the next line instead (issue #667).
+                if let Some(end) = bare_marker_end {
+                    if bare_marker_line_is_rule(output, end) {
+                        output.replace_range(end - 1..end, &format!("\n{}", item_indent(&list_ctx, options)));
+                    }
+                }
 
                 if is_ordered && is_list_item(*child_handle, parser, dom_ctx) {
                     if counter == i64::MAX {
