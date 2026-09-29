@@ -165,6 +165,9 @@ pub fn handle_blockquote(
                 }
                 output.push_str("\n\n");
             }
+        } else if list_indent.is_some() && crate::converter::list::utils::trim_whitespace_after_bare_marker(output) {
+            // ~keep The quote is the item's first content: it starts on the marker line. A line
+            // ~keep break after the marker left the item empty and the quote outside it.
         } else if !output.is_empty() {
             // ~keep The quote writes its own list indent below, so the one `walk_node` put at
             // ~keep the start of this line inside a list item goes first.

@@ -331,7 +331,7 @@ fn block_opener_offset(rest: &str) -> Option<usize> {
 }
 
 /// Split `line`'s leading indentation, returning `(byte length, column width)`.
-fn leading_indent(line: &str) -> (usize, usize) {
+pub fn leading_indent(line: &str) -> (usize, usize) {
     let mut length = 0usize;
     let mut column = 0usize;
     for &byte in line.as_bytes() {

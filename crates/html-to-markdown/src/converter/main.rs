@@ -454,6 +454,11 @@ fn separate_from_block(
 /// ~keep content after a block starts a paragraph of its own: a blank line, then the column. A
 /// ~keep heading is one line that nothing continues, so after it the column alone does, and the
 /// ~keep list stays tight (spec example 300: `- ## Bar\n  baz`).
+/// ~keep Where the item is not open (a list between markers is text, issue #615), a quote or a
+/// ~keep list written at a column under 4 is still a real block, and text after it on the next
+/// ~keep line continues its last paragraph lazily. That text gets the blank line, but no column.
+/// ~keep At 4 columns or a tab the block's lines are the paragraph's own text, and a blank line
+/// ~keep would split the paragraph between the markers.
 /// ~keep A list is left out as the block: it already starts its own line at its own column.
 /// ~keep A lone line break is not a block's last line: the block before it wrote nothing.
 fn separate_in_list_item(
@@ -476,7 +481,7 @@ fn separate_in_list_item(
     };
     let indent =
         crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
-    let blank_line = if starts_block {
+    let (blank_line, block_continues_lazily) = if starts_block {
         // ~keep A hard break right before a block is dropped here too, since the line end
         // ~keep written below would hide it from the dispatch strip in `walk_node`.
         if options.newline_style == NewlineStyle::Backslash {
@@ -489,16 +494,22 @@ fn separate_in_list_item(
         if !after_content {
             return;
         }
-        false
+        (false, false)
     } else if ends_with_block_line_end(output) && is_inline_content(node, node_handle, parser, dom_ctx) {
         match crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx) {
-            Some(block) => !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
+            Some(block) => (
+                !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
+                matches!(block, "blockquote" | "ul" | "ol"),
+            ),
             None => return,
         }
     } else {
         return;
     };
-    if !crate::converter::list::utils::item_is_open(output, &indent, ctx) {
+    let item_is_open = crate::converter::list::utils::item_is_open(output, &indent, ctx);
+    let block_is_real = crate::converter::utility::escaping::leading_indent(&indent).1 < 4;
+    let separates = item_is_open || (block_continues_lazily && block_is_real);
+    if !separates {
         return;
     }
     trim_trailing_whitespace(output);
@@ -508,7 +519,9 @@ fn separate_in_list_item(
     if blank_line && !output.ends_with("\n\n") {
         output.push('\n');
     }
-    output.push_str(&indent);
+    if item_is_open {
+        output.push_str(&indent);
+    }
 }
 
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since

@@ -65,6 +65,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the outer item became a task item and the nested list was joined into its text. A checkbox in a
   nested list now belongs to that list's item, so the output is `- X`, the nested `- [x] A` and
   then `ZZ`.
+- **Text after a quote, in a list inside bold, italic or `<q>`, rendered inside the quote
+  (#615).** `<b><ul><li>x<blockquote>q</blockquote>t</li></ul></b>` gave `**- x\n  > q\n  t**`,
+  so `t**` continued the quote's paragraph. The list between the markers is text, so its item
+  writes no content column, and the blank line after the quote went with the column. Text after
+  a quote or a nested list now starts after a blank line there too: `**- x\n  > q\n\nt**`. When
+  the list's column is 4 or more, or a tab, the quote's lines are already the paragraph's own
+  text, so nothing changes there and the markers stay in one paragraph.
+- **A quote that starts a list item rendered outside the item.** `<ul><li><blockquote>q</blockquote></li></ul>`
+  gave `-\n> q`, an empty item and a quote after the list. The quote now starts on the marker
+  line, `- > q`.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut
