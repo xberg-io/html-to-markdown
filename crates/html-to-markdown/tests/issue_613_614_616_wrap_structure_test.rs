@@ -136,6 +136,11 @@ fn should_not_start_a_list_or_a_block_on_a_wrapped_line() {
         "<p>a<br>--- x y</p>",
         "<p>--- x y</p>",
         "<ul><li>--- x y</li></ul>",
+        "<p>aaaa bbbb 01. cccc</p>",
+        "<p>aaaa bbbb cccc dddd 001) eeee</p>",
+        "<p>aaaa bbbb cccc dddd 000000001. eeee</p>",
+        "<p>a 01. - x</p>",
+        "<p>a<br>01.\nb</p>",
     ] {
         for newline_style in [NewlineStyle::Spaces, NewlineStyle::Backslash] {
             assert_wrap_keeps_structure(html, &ALL_WIDTHS, newline_style);

@@ -2,7 +2,7 @@
 //!
 //! This module contains helper functions for parsing and wrapping Markdown elements.
 
-use crate::converter::utility::escaping::opens_block;
+use crate::converter::utility::escaping::{first_ordered_marker_len, opens_block};
 
 /// Parse a blockquote line into its prefix and content.
 ///
@@ -175,18 +175,23 @@ fn joins_into_a_block(text: &str, line: &str) -> bool {
         .is_some_and(|start| is_bare_marker(&text[start..]) && opens_block(&format!("{} {line}", &text[start..])))
 }
 
-/// The longest line [`is_bare_marker`] accepts.
-const BARE_MARKER_LEN: usize = 3;
+/// The longest line [`is_bare_marker`] accepts: an ordered marker of nine digits.
+const BARE_MARKER_LEN: usize = 10;
+
+/// The longest line of bullet and rule characters [`is_bare_marker`] accepts.
+const BARE_RUN_LEN: usize = 3;
 
 /// Whether `line`, which opens no block, can open one once a word joins its end.
 ///
-/// ~keep Only a bare marker (`*`, `+`, `1.`) turns into a list item, and only a run of fewer than
-/// ~keep three `*` or `_` into a rule (`**` + `*`); any other line keeps opening no block.
+/// ~keep Only a bare marker (`*`, `+`, `1.`, `01)`) turns into a list item, and only a run of
+/// ~keep fewer than three `*` or `_` into a rule (`**` + `*`); any other line keeps opening no
+/// ~keep block.
 fn is_bare_marker(line: &str) -> bool {
-    line.len() <= BARE_MARKER_LEN
+    (line.len() <= BARE_RUN_LEN
         && line
             .bytes()
-            .all(|byte| matches!(byte, b'*' | b'+' | b'-' | b'_' | b'1' | b'.' | b')' | b' '))
+            .all(|byte| matches!(byte, b'*' | b'+' | b'-' | b'_' | b'1' | b'.' | b')' | b' ')))
+        || first_ordered_marker_len(line) == Some(line.len())
 }
 
 /// [`is_bare_marker`] for a line of `words`.
@@ -471,7 +476,9 @@ mod tests {
 
     #[test]
     fn wrap_line_starts_no_line_with_a_block_in_any_short_run_of_markers() {
-        let vocabulary = ["*", "**", "_", "__", "-", "+", "1.", "x", "* *", "***", "_ _"];
+        let vocabulary = [
+            "*", "**", "_", "__", "-", "+", "1.", "01.", "001)", "x", "* *", "***", "_ _",
+        ];
         let mut texts: Vec<Vec<&str>> = vec![Vec::new()];
         for _ in 0..4 {
             texts = texts
@@ -499,8 +506,10 @@ mod tests {
 
     #[test]
     fn is_bare_marker_holds_every_short_line_that_a_word_turns_into_a_block() {
-        let alphabet: Vec<char> = "*+-_1.)#>=`~< a2".chars().collect();
-        let words = ["x", "*", "-", "_", "+", "1.", "**", "__", "`", "---", "===", "!--"];
+        let alphabet: Vec<char> = "*+-_01.)#>=`~< a2".chars().collect();
+        let words = [
+            "x", "*", "-", "_", "+", "1.", "01.", "**", "__", "`", "---", "===", "!--",
+        ];
         let mut lines = vec![String::new()];
         for _ in 0..4 {
             lines = lines
@@ -523,7 +532,15 @@ mod tests {
 
     #[test]
     fn push_paragraph_line_keeps_the_line_end_after_a_bare_marker() {
-        for (first, second) in [("*", "b"), ("1.", "b c"), ("+", "b"), ("**", "*"), ("_ _", "_")] {
+        for (first, second) in [
+            ("*", "b"),
+            ("1.", "b c"),
+            ("01.", "b c"),
+            ("000000001)", "b"),
+            ("+", "b"),
+            ("**", "*"),
+            ("_ _", "_"),
+        ] {
             let mut text = String::from("a  \n");
             push_paragraph_line(&mut text, first);
             push_paragraph_line(&mut text, second);
