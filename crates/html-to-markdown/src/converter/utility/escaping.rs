@@ -394,13 +394,24 @@ fn is_bullet_list_item(rest: &str) -> bool {
 
 /// Byte offset of the `.`/`)` of an ordered list marker that can interrupt a paragraph.
 fn ordered_list_delimiter_offset(rest: &str) -> Option<usize> {
-    // ~keep Only a list starting at 1 can interrupt a paragraph (spec section 5.2).
+    let digits = first_ordered_marker_len(rest)? - 1;
     let bytes = rest.as_bytes();
-    let starts_a_list = bytes.first() == Some(&b'1')
-        && matches!(bytes.get(1), Some(b'.' | b')'))
-        && matches!(bytes.get(2), Some(b' ' | b'\t'))
-        && rest.get(3..).is_some_and(|tail| !tail.trim().is_empty());
-    starts_a_list.then_some(1)
+    let starts_a_list = matches!(bytes.get(digits + 1), Some(b' ' | b'\t'))
+        && rest.get(digits + 2..).is_some_and(|tail| !tail.trim().is_empty());
+    starts_a_list.then_some(digits)
+}
+
+/// The byte length of the ordered list marker at the start of `rest` when that marker starts a
+/// list at 1: one to nine digits whose value is 1 (`1.`, `01)`, `000000001.`), then `.` or `)`.
+///
+/// ~keep Only a list starting at 1 can interrupt a paragraph, and the start number is the
+/// ~keep marker's value, so leading zeros count; ten digits are no marker (spec section 5.2).
+pub fn first_ordered_marker_len(rest: &str) -> Option<usize> {
+    let bytes = rest.as_bytes();
+    let digits = bytes.iter().take_while(|byte| byte.is_ascii_digit()).count();
+    let value_is_one =
+        (1..=9).contains(&digits) && bytes[digits - 1] == b'1' && bytes[..digits - 1].iter().all(|&byte| byte == b'0');
+    (value_is_one && matches!(bytes.get(digits), Some(b'.' | b')'))).then_some(digits + 1)
 }
 
 /// An HTML block of type 1 to 6 -- the types that may interrupt a paragraph.
@@ -850,6 +861,30 @@ mod tests {
         let mut output = String::from("__A__");
         assert!(merge_adjacent_emphasis(&mut output, '_', 2));
         assert_eq!(output, "__A");
+    }
+
+    #[test]
+    fn opens_block_reads_an_ordered_marker_by_its_value() {
+        for line in ["1. x", "1) x", "01. x", "001) x", "000000001. x", "01.\tx"] {
+            assert!(opens_block(line), "{line:?} starts a list at 1");
+        }
+        for line in [
+            "0000000001. x",
+            "2. x",
+            "02. x",
+            "0. x",
+            "00. x",
+            "10. x",
+            "11. x",
+            "01.",
+            "01. ",
+            "01.x",
+            "01",
+        ] {
+            assert!(!opens_block(line), "{line:?} cannot interrupt a paragraph");
+        }
+        assert_eq!(block_opener_offset("001) x"), Some(3));
+        assert_eq!(block_opener_offset("1. x"), Some(1));
     }
 
     #[test]

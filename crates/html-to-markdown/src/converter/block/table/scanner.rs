@@ -28,7 +28,8 @@ pub struct TableScan {
     pub nested_table_count: usize,
     /// Count of anchor elements in the table
     pub link_count: usize,
-    /// Whether the table contains text content (not empty)
+    /// Whether the table has content to write: text, an image, a rule, or (with
+    /// `br_in_tables` on) a line break
     pub has_text: bool,
 }
 
@@ -51,14 +52,18 @@ pub struct TableScan {
 /// * `node_handle` - Handle to the table element
 /// * `parser` - HTML parser instance
 /// * `dom_ctx` - DOM context for tag name resolution
+/// * `br_in_tables` - The conversion option of the same name; a `<br>` counts as content
+///   only under this option, since it is what a cell actually writes it as (see
+///   [`apply_tag_content`])
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn scan_table(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     dom_ctx: &super::super::super::DomContext,
+    br_in_tables: bool,
 ) -> TableScan {
     let (row_counts, nested_table_count, has_span) = scan_own_structure(node_handle, parser, dom_ctx);
-    let content = content_summary(*node_handle, parser, dom_ctx);
+    let content = content_summary(*node_handle, parser, dom_ctx, br_in_tables);
     TableScan {
         row_counts,
         has_span,
@@ -181,6 +186,7 @@ fn content_summary(
     table_handle: tl::NodeHandle,
     parser: &tl::Parser,
     dom_ctx: &super::super::super::DomContext,
+    br_in_tables: bool,
 ) -> TableContentSummary {
     let table_id = table_handle.get_inner();
     if let Some(cached) = dom_ctx.cached_table_content_summary(table_id) {
@@ -191,7 +197,9 @@ fn content_summary(
     let mut work = vec![ContentFrame::Enter(table_handle)];
     while let Some(frame) = work.pop() {
         match frame {
-            ContentFrame::Enter(handle) => visit_content_node(handle, parser, dom_ctx, &mut acc_stack, &mut work),
+            ContentFrame::Enter(handle) => {
+                visit_content_node(handle, parser, dom_ctx, &mut acc_stack, &mut work, br_in_tables);
+            }
             ContentFrame::ExitTable(id) => finish_table_accumulator(id, dom_ctx, &mut acc_stack),
         }
     }
@@ -208,6 +216,7 @@ fn visit_content_node(
     dom_ctx: &super::super::super::DomContext,
     acc_stack: &mut Vec<(u32, TableContentSummary)>,
     work: &mut Vec<ContentFrame>,
+    br_in_tables: bool,
 ) {
     match handle.get(parser) {
         Some(tl::Node::Raw(bytes)) => {
@@ -226,7 +235,7 @@ fn visit_content_node(
                 acc_stack.push((id, TableContentSummary::default()));
                 work.push(ContentFrame::ExitTable(id));
             } else {
-                apply_tag_content(&tag_name, tag, acc_stack.last_mut().map(|(_, acc)| acc));
+                apply_tag_content(&tag_name, tag, acc_stack.last_mut().map(|(_, acc)| acc), br_in_tables);
             }
             work.extend(tag.children().top().iter().copied().map(ContentFrame::Enter));
         }
@@ -234,9 +243,9 @@ fn visit_content_node(
     }
 }
 
-/// Fold a single non-table tag's contribution (link/header/caption/image-alt-text) into the
-/// current accumulator, if one is open.
-fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableContentSummary>) {
+/// Fold a single non-table tag's contribution (link/header/caption/image/rule/line break)
+/// into the current accumulator, if one is open.
+fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableContentSummary>, br_in_tables: bool) {
     let Some(acc) = acc else { return };
     match tag_name {
         "a" => acc.link_count += 1,
@@ -245,6 +254,13 @@ fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableCo
         "img" | "graphic" if tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some() => {
             acc.has_text = true;
         }
+        // ~keep A rule is content without text: a table whose cells hold only rules is not a blank
+        // ~keep spacer, and dropping it lost the whole table (issue #628).
+        "hr" => acc.has_text = true,
+        // ~keep A cell writes a literal `<br>` only when `br_in_tables` is on (see
+        // ~keep `emit_table_cell_break`); with it off the break collapses to a space a cell
+        // ~keep trims away, so only the `br_in_tables` case is content (issue #646).
+        "br" if br_in_tables => acc.has_text = true,
         "cell" => {
             if let Some(Some(role)) = tag.attributes().get("role") {
                 if role.as_utf8_str() == "head" {

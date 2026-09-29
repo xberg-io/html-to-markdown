@@ -52,6 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A table whose cells held only rules was dropped (#628).** The full converter took a table
+  with no text and no image for a blank spacer table and wrote nothing, so
+  `<table><tr><td><ul><li><hr></li></ul></td></tr></table>` gave an empty document. A rule now
+  counts as content, and both converters write the table as `| --- |` over its delimiter row. Text
+  in a cell that looks like a list marker no longer turns a rule after it into `___`, and the fast
+  converter now trims the space before a rule in a cell as the full converter does.
+- **A table whose only cell held a line break was dropped with `br_in_tables` on (#646).**
+  `<table><tr><td><br></td></tr></table>` gave an empty document from the full converter while
+  the fast converter kept the table as `| <br> |`. With `br_in_tables` on, a `<br>` in a cell
+  writes a literal `<br>`, so it now counts as content, matching the fast converter; with the
+  option off it still collapses to a space the cell trims away, so the table is still dropped
+  there, as it was before.
 - **A rule inside bold, italic, a summary or a caption split the emphasis markers (#603).** The
   rule was written after a blank line, which ended the paragraph between the markers, so the
   markers showed as literal text: `<summary>t<hr></summary>` gave `**t\n\n---**`, and a
@@ -127,6 +139,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `> - alpha - beta`, one item, and a code block inside a quote lost its code. Outside a quote, a
   `~~~` code block was reflowed like a paragraph. Every line that starts a block now keeps its own
   line in and out of a quote, and a code block ends only at a fence that closes it.
+- **Wrap mode turned a tight list loose when an item went on to a second line (#616).** A line
+  right under a list item that starts no block of its own, at column 0 or indented, belongs to
+  the item's text. With `wrap` on, the reflow wrote it as a paragraph of its own and put a blank
+  line before the next item, so the list rendered loose. It now joins the item's text and is
+  wrapped with it. For the same reason, a line that starts with a number such as `1990.` or
+  `57)` stays in its paragraph, in a quote and in a list item: only a bullet or a number equal
+  to 1, such as `1.` or `01)`, can end a paragraph and start a list. Under a list item, a number
+  line left of the item's text still ends the item.
+- **Wrap mode dropped a hard line break (#613).** With `wrap` on, `<p>a<br>b</p>` gave `a b`:
+  the reflow joined the line after a `<br>` to the line before it, in a paragraph, a quote and a
+  list item. A hard break is now a line end the reflow never joins across, so each side of it is
+  wrapped on its own and the break stays, with both newline styles.
+- **Wrap mode could start a line with a list marker and turn text into a list (#614).** With
+  `wrap` on, a break before a `-`, `1.`, `#` or `>` in running text started a new line with it,
+  which opened a list, a heading or a quote. A wrapped line now never starts with a word that
+  opens a block there, also in a run such as `--- --- ---` or `* * *`; the word stays at the
+  end of the line before it, which can then run past the wrap width. A number equal to 1 with
+  leading zeros, such as `01.` or `001)`, opens a list like `1.` does, so it is kept off a line
+  start too, and a link label or image alt line that starts with one is escaped. A number
+  followed by non-breaking spaces, such as Word's `1.&nbsp;&nbsp; Cut`, is no longer read as a
+  list marker, and the reflow no longer breaks a line at a non-breaking space.
+- **Wrap mode broke a link whose address holds a space.** An address with a space is written in
+  angle brackets, `[Share](<https://example.com/?text=a b>)`, and a line end inside the brackets
+  ends the link. With `wrap` on, the reflow broke the line there. It now keeps the address in
+  angle brackets on one line.
+- **Wrap mode cut a nested list marker off from its text.** A list item that holds a nested list
+  on its own line, such as `- 3. [vote](...) title`, wrapped to `- 3.` and the text on the next
+  line. `- 3.` alone is an empty nested item, and the text below it left the nested list. The
+  reflow now treats both markers as one, so the text stays in the nested item. An item whose
+  text starts a heading or a code fence, such as `- ## Title`, is no longer reflowed: the heading
+  kept only its first words, and the code lines were joined and wrapped like text.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition

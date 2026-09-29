@@ -201,7 +201,7 @@ pub fn handle_table(
             }
         }
 
-        let table_scan = scan_table(node_handle, parser, dom_ctx);
+        let table_scan = scan_table(node_handle, parser, dom_ctx, options.br_in_tables);
         // Keep the normal table renderer at the traversal boundary: it emits the
         // truncated table structure and records the usual depth-limit warning.
         let wrapper_cell = nested_table_wrapper_cell(tag, parser, &table_scan).filter(|(_, cell_depth)| {

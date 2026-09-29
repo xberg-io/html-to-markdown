@@ -110,6 +110,8 @@ fn should_escape_every_bullet_list_marker() {
 fn should_escape_the_delimiter_of_an_ordered_list_marker() {
     assert_tiers_agree(&image_with_alt_line("1. i"), "![A\n1\\. i\nZ](S)\n");
     assert_tiers_agree(&image_with_alt_line("1) i"), "![A\n1\\) i\nZ](S)\n");
+    assert_tiers_agree(&image_with_alt_line("01. i"), "![A\n01\\. i\nZ](S)\n");
+    assert_tiers_agree(&image_with_alt_line("001) i"), "![A\n001\\) i\nZ](S)\n");
 }
 
 #[test]
@@ -147,6 +149,8 @@ fn should_not_escape_inline_html_on_a_continuation_line() {
 fn should_not_escape_a_marker_character_that_opens_no_block() {
     assert_tiers_agree(&image_with_alt_line("-x"), "![A\n-x\nZ](S)\n");
     assert_tiers_agree(&image_with_alt_line("2. i"), "![A\n2. i\nZ](S)\n");
+    assert_tiers_agree(&image_with_alt_line("02. i"), "![A\n02. i\nZ](S)\n");
+    assert_tiers_agree(&image_with_alt_line("0000000001. i"), "![A\n0000000001. i\nZ](S)\n");
     assert_tiers_agree(&image_with_alt_line("####### h"), "![A\n####### h\nZ](S)\n");
     assert_tiers_agree(&image_with_alt_line("`` x"), "![A\n`` x\nZ](S)\n");
 }
