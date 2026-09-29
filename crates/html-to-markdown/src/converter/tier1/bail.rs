@@ -191,6 +191,10 @@ pub enum BailReason {
     /// #583), which this scanner does not track.
     ListItemUnsupportedBlockChild,
 
+    /// A checkbox `<input>` opened inside a list item. Tier-2 writes that item as a task item
+    /// (`- [ ]`), which this scanner does not.
+    ListItemCheckbox,
+
     /// An `<img>` had an empty (or whitespace-only) `src`, or a `src` that is a
     /// `data:` URI, while also carrying one of the lazy-load fallback attributes
     /// (`data-src`, `data-lazy-src`, `data-original`, `data-srcset`, `srcset`).
@@ -340,6 +344,7 @@ impl fmt::Display for BailReason {
                     "block-level child of a list item in a shape this scanner cannot render correctly"
                 )
             }
+            Self::ListItemCheckbox => write!(f, "checkbox input inside a list item (a task item)"),
             Self::ImageLazyLoadSrc => write!(f, "<img> has a lazy-load placeholder src and a fallback src attribute"),
             Self::BlockquoteCite => write!(f, "<blockquote> carries a cite attribute that tier-1 does not render"),
             Self::LinkAutolinkNestedMarkup => {
