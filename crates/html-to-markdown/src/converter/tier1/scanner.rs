@@ -1847,12 +1847,14 @@ fn emit_void(
             }
             // ~keep Tier-2 starts a rule after an item's content at the item's content column
             // ~keep (issue #583); see `BailReason::ListItemUnsupportedBlockChild`.
-            if !state.in_table_cell()
-                && state.list_continuation_indent_width() > 0
-                && !line_is_bare_list_marker(&state.output)
-                && !inside_stray_definition(state)
-            {
-                return Err(BailReason::ListItemUnsupportedBlockChild);
+            if !state.in_table_cell() && state.list_continuation_indent_width() > 0 && !inside_stray_definition(state) {
+                if !line_is_bare_list_marker(&state.output) {
+                    return Err(BailReason::ListItemUnsupportedBlockChild);
+                }
+                // ~keep A rule at the marker is `___` on the marker line, as in Tier-2: `- ---` is
+                // ~keep a rule of its own.
+                state.output.push_str("___\n");
+                return Ok(());
             }
             {
                 let dest = state.cell_or_output_mut();

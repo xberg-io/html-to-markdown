@@ -85,8 +85,8 @@ pub struct Context {
     /// ~keep passes false when it writes at the start of the line (issue #583).
     pub(crate) list_item_open: bool,
     /// Whether the current output buffer is written between inline markers (a summary's `**`,
-    /// a caption's `*`): a list rendered into it is text, not a list, so its items never write
-    /// the content column (issue #583).
+    /// a caption's `*`): the first line of a list rendered into it is text, so its items are
+    /// not open and write no content column for a block (issues #583, #615).
     pub(crate) text_in_markers: bool,
     /// Whether the current output buffer is written between the markers of a marker-only
     /// wrapper that does not count in `inline_depth` (a `<mark>`'s `==`, a `<del>`'s `~~`).
@@ -95,6 +95,9 @@ pub struct Context {
     /// ~keep column, unlike under `text_in_markers`: text after a quote in its item then stays out
     /// ~keep of the quote.
     pub(crate) in_marker_span: bool,
+    /// Whether the current output buffer escapes every `-` once it is written (a table
+    /// caption): a `-` list marker there is text.
+    pub(crate) escapes_hyphens: bool,
     /// List nesting depth (for indentation)
     pub(crate) list_depth: usize,
     /// Cumulative column width (in the `Spaces` indent type) that a nested list item at this
@@ -106,6 +109,15 @@ pub struct Context {
     /// so a nested list must be indented to that marker's actual content column or CommonMark
     /// parses the child as a sibling instead of nested content.
     pub(crate) list_indent_columns: usize,
+    /// In a list written between markers, whose items are text: the `list_indent_columns` of
+    /// the innermost enclosing item whose marker line still starts a list item in the output,
+    /// or 0 where none does.
+    ///
+    /// ~keep A line between the markers starts a block only within 3 columns of that item's
+    /// ~keep content column; further in, it is the paragraph's text. The first item's marker
+    /// ~keep follows the opening marker, so it is text, but a nested item's marker starts its
+    /// ~keep own line and is a real list item (issue #615).
+    pub(crate) real_item_columns: usize,
     /// Unordered list nesting depth (for bullet cycling)
     pub(crate) ul_depth: usize,
     /// Are we inside any list (ul or ol)?
@@ -301,8 +313,10 @@ impl Context {
             list_item_open: false,
             text_in_markers: false,
             in_marker_span: false,
+            escapes_hyphens: false,
             list_depth: 0,
             list_indent_columns: 0,
+            real_item_columns: 0,
             ul_depth: 0,
             in_list: false,
             loose_list: false,

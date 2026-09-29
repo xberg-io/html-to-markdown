@@ -81,12 +81,19 @@ pub fn handle(
     // ~keep it ends the list (issue #583). Whitespace after a bare marker (a `<br>` there) is
     // ~keep not content: the rule then follows the marker like a rule at the marker.
     let at_bare_marker = ctx.in_list_item && crate::converter::list::utils::trim_whitespace_after_bare_marker(output);
+    // ~keep A rule that is the item's first content is `___` on the marker line. `- ---` is a
+    // ~keep rule of its own, and after a blank line the rule leaves the item empty and ends the
+    // ~keep list. On the next line it can make the text above a heading: an empty item after
+    // ~keep text is not an item.
+    if at_bare_marker {
+        output.push_str("___\n");
+        return;
+    }
     let list_indent = if ctx.in_list_item
         && ctx.blockquote_depth == 0
         && !ctx.convert_as_inline
         && !ctx.in_table_cell
         && !output.is_empty()
-        && !at_bare_marker
     {
         crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
             .filter(|indent| crate::converter::list::utils::item_is_open(output, indent, ctx))

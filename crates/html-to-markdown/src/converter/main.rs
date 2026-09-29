@@ -454,11 +454,12 @@ fn separate_from_block(
 /// ~keep content after a block starts a paragraph of its own: a blank line, then the column. A
 /// ~keep heading is one line that nothing continues, so after it the column alone does, and the
 /// ~keep list stays tight (spec example 300: `- ## Bar\n  baz`).
-/// ~keep Where the item is not open (a list between markers is text, issue #615), a quote or a
-/// ~keep list written at a column under 4 is still a real block, and text after it on the next
-/// ~keep line continues its last paragraph lazily. That text gets the blank line, but no column.
-/// ~keep At 4 columns or a tab the block's lines are the paragraph's own text, and a blank line
-/// ~keep would split the paragraph between the markers.
+/// ~keep Where the item is not open (a list between markers, issue #615), a quote or a
+/// ~keep list written within 3 columns of the innermost real item's content column (the start
+/// ~keep of the line when no item is real) is still a real block, and text after it on the next
+/// ~keep line continues its last paragraph lazily. That text gets the blank line and the real
+/// ~keep item's column. Further in, the block's lines are the paragraph's own text, and a blank
+/// ~keep line would split the paragraph between the markers.
 /// ~keep A list is left out as the block: it already starts its own line at its own column.
 /// ~keep A lone line break is not a block's last line: the block before it wrote nothing.
 fn separate_in_list_item(
@@ -507,7 +508,9 @@ fn separate_in_list_item(
         return;
     };
     let item_is_open = crate::converter::list::utils::item_is_open(output, &indent, ctx);
-    let block_is_real = crate::converter::utility::escaping::leading_indent(&indent).1 < 4;
+    let block_is_real = crate::converter::list::utils::indent_column(ctx.list_indent_columns, options).saturating_sub(
+        crate::converter::list::utils::indent_column(ctx.real_item_columns, options),
+    ) < 4;
     let separates = item_is_open || (block_continues_lazily && block_is_real);
     if !separates {
         return;
@@ -521,6 +524,10 @@ fn separate_in_list_item(
     }
     if item_is_open {
         output.push_str(&indent);
+    } else if let Some(real_item_indent) =
+        crate::converter::list::utils::continuation_indent_string(ctx.real_item_columns, options)
+    {
+        output.push_str(&real_item_indent);
     }
 }
 

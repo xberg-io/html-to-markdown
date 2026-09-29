@@ -253,6 +253,36 @@ pub fn continuation_indent_string(list_indent_columns: usize, options: &Conversi
     }
 }
 
+/// The column that the continuation indent for `list_indent_columns` reaches.
+pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) -> usize {
+    continuation_indent_string(list_indent_columns, options).map_or(0, |indent| {
+        crate::converter::utility::escaping::leading_indent(&indent).1
+    })
+}
+
+/// Whether the marker that a list item between markers writes on the line starting at
+/// `marker_line_start` starts a real list item, inside the item at `enclosing_columns`.
+///
+/// ~keep The marker must start its own line: the buffer's first line follows the opening
+/// ~keep marker. It must sit within 3 columns of the enclosing item's content column, or it is
+/// ~keep paragraph text, and an ordered marker other than 1 cannot interrupt a paragraph.
+pub fn marker_starts_item(
+    output: &str,
+    marker_line_start: Option<usize>,
+    enclosing_columns: usize,
+    ctx: &Context,
+    options: &ConversionOptions,
+) -> bool {
+    let Some(line_start) = marker_line_start else {
+        return false;
+    };
+    let marker_column = crate::converter::utility::escaping::leading_indent(&output[line_start..]).1;
+    if marker_column.saturating_sub(indent_column(enclosing_columns, options)) >= 4 {
+        return false;
+    }
+    !ctx.in_ordered_list || ctx.list_counter == 1 || output[..line_start].ends_with("\n\n")
+}
+
 /// If this list is immediately preceded by an HTML comment whose own immediately preceding
 /// sibling is a list of this same tag (`ul`/`ol`), return that comment's literal source text.
 ///

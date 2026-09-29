@@ -43,6 +43,7 @@ pub fn handle_li(
     // ~keep indent too double-counts it, deeply nesting single-child lists into runaway
     // ~keep padding that reparses as an indented code block (spec example 299). The indent is
     // ~keep only needed when this item genuinely starts a fresh physical line.
+    let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
     if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
         let indent = match options.list_indent_type {
             crate::options::ListIndentType::Tabs => "\t".repeat(ctx.list_depth),
@@ -139,13 +140,34 @@ pub fn handle_li(
     };
 
     // ~keep A list inside an inline wrapper, a summary or a caption is written into that
-    // ~keep buffer and gets its markers; the item's lines are then text, so no block gets the
-    // ~keep column.
+    // ~keep buffer and gets its markers; its first line is then text, so the item is not open
+    // ~keep and no block gets the column. Text after a quote or a list still takes the column
+    // ~keep of the innermost item whose marker starts a list item (issue #615).
+    let list_item_open = ctx.inline_depth == 0 && !ctx.text_in_markers;
+    let real_item_columns = if list_item_open {
+        ctx.real_item_columns
+    } else {
+        let enclosing = if ctx.list_item_open {
+            ctx.list_indent_columns
+        } else {
+            ctx.real_item_columns
+        };
+        let hyphen_marker = is_task_list || (!ctx.in_ordered_list && unordered_bullet(ctx, options) == '-');
+        let marker_is_text = ctx.escapes_hyphens && hyphen_marker;
+        if !marker_is_text
+            && crate::converter::list::utils::marker_starts_item(output, marker_line_start, enclosing, ctx, options)
+        {
+            ctx.list_indent_columns + own_marker_width
+        } else {
+            enclosing
+        }
+    };
     let li_ctx = Context {
         in_list_item: true,
-        list_item_open: ctx.inline_depth == 0 && !ctx.text_in_markers,
+        list_item_open,
         list_depth: ctx.list_depth + 1,
         list_indent_columns: ctx.list_indent_columns + own_marker_width,
+        real_item_columns,
         ..ctx.clone()
     };
 
@@ -244,8 +266,22 @@ pub fn handle_li(
                 );
             }
         }
-        output.push(' ');
         let trimmed_task = task_text.trim();
+        // ~keep After the checkbox the line is paragraph text, so a block that is the item's
+        // ~keep first content (a quote) starts on the next line at the content column.
+        match crate::converter::list::utils::continuation_indent_string(li_ctx.list_indent_columns, options) {
+            Some(indent)
+                if li_ctx.list_item_open
+                    && !ctx.in_marker_span
+                    && !ctx.in_table_cell
+                    && !ctx.convert_as_inline
+                    && task_content_starts_with_block(tag, checkbox_node, parser) =>
+            {
+                output.push('\n');
+                output.push_str(&indent);
+            }
+            _ => output.push(' '),
+        }
         if !trimmed_task.is_empty() {
             output.push_str(trimmed_task);
         }
@@ -261,14 +297,7 @@ pub fn handle_li(
             use std::fmt::Write;
             let _ = write!(output, "{}. ", ctx.list_counter);
         } else {
-            let bullets: Vec<char> = options.bullets.chars().collect();
-            let bullet_index = if ctx.ul_depth > 0 { ctx.ul_depth - 1 } else { 0 };
-            let bullet = if bullets.is_empty() {
-                '*'
-            } else {
-                bullets[bullet_index % bullets.len()]
-            };
-            output.push(bullet);
+            output.push(unordered_bullet(ctx, options));
             output.push(' ');
         }
 
@@ -350,13 +379,7 @@ pub fn handle_li(
                 let text_start = last_line.find(&marker_text).map_or(0, |pos| pos + marker_text.len());
                 (Cow::Owned(marker_text), text_start)
             } else {
-                let bullets: Vec<char> = options.bullets.chars().collect();
-                let bullet_index = if ctx.ul_depth > 0 { ctx.ul_depth - 1 } else { 0 };
-                let bullet = if bullets.is_empty() {
-                    '*'
-                } else {
-                    bullets[bullet_index % bullets.len()]
-                };
+                let bullet = unordered_bullet(ctx, options);
                 let text_start = last_line.find(bullet).map_or(0, |pos| pos + 1);
                 let mut buf = String::with_capacity(bullet.len_utf8());
                 buf.push(bullet);
@@ -413,5 +436,41 @@ pub fn handle_li(
         } else if !output.ends_with('\n') {
             output.push('\n');
         }
+    }
+}
+
+/// Whether the first content of the task item `tag` after its checkbox is a block that writes
+/// a block opener: a quote, a list, a heading or a code block.
+///
+/// ~keep Text that reads like an opener stays text. A rule is left out: on the line under the
+/// ~keep checkbox it would make the checkbox a heading.
+fn task_content_starts_with_block(tag: &tl::HTMLTag, checkbox: Option<tl::NodeHandle>, parser: &tl::Parser) -> bool {
+    for child_handle in tag.children().top().iter() {
+        if Some(*child_handle) == checkbox {
+            continue;
+        }
+        match child_handle.get(parser) {
+            Some(tl::Node::Raw(text)) if text.as_utf8_str().trim().is_empty() => {}
+            Some(tl::Node::Comment(_)) => {}
+            Some(tl::Node::Tag(child_tag)) => {
+                return matches!(
+                    normalized_tag_name(child_tag.name().as_utf8_str()).as_ref(),
+                    "blockquote" | "ul" | "ol" | "pre" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+                );
+            }
+            _ => return false,
+        }
+    }
+    false
+}
+
+/// The bullet of an unordered list item at `ctx.ul_depth`: the list's bullets cycle by depth.
+fn unordered_bullet(ctx: &Context, options: &ConversionOptions) -> char {
+    let bullets: Vec<char> = options.bullets.chars().collect();
+    let bullet_index = if ctx.ul_depth > 0 { ctx.ul_depth - 1 } else { 0 };
+    if bullets.is_empty() {
+        '*'
+    } else {
+        bullets[bullet_index % bullets.len()]
     }
 }
