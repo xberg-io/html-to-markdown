@@ -13,7 +13,7 @@ use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::main_helpers::trim_trailing_whitespace;
 use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::walk_node;
-use crate::options::{ConversionOptions, NewlineStyle};
+use crate::options::{ConversionOptions, NewlineStyle, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
 use tl;
@@ -86,9 +86,11 @@ pub fn handle_li(
             (false, false, None)
         };
 
-    // ~keep A task item in an ordered list keeps its number (issue #659).
+    // ~keep A task item in an ordered list keeps its number (issue #659). Djot has task items
+    // ~keep only in bullet lists, so there it keeps the bullet.
+    let numbered = ctx.in_ordered_list && !(is_task_list && options.output_format == OutputFormat::Djot);
     let list_marker = || {
-        if ctx.in_ordered_list {
+        if numbered {
             format!("{}. ", ctx.list_counter)
         } else if is_task_list {
             String::from("- ")
@@ -163,11 +165,11 @@ pub fn handle_li(
     }
 
     // ~keep This item's own marker width, used to grow `list_indent_columns` for descendants
-    // ~keep (nested lists and continuation content). Unordered markers, a task item's too, are
-    // ~keep always 2 wide ("- "); an ordered marker's width depends on its counter's digit count
-    // ~keep ("1. " = 3, "10. " = 4, ...). `list_indent_width` is honoured as a floor, not the
-    // ~keep literal width.
-    let own_marker_width = if ctx.in_ordered_list {
+    // ~keep (nested lists and continuation content). Unordered markers, a Djot task item's too,
+    // ~keep are always 2 wide ("- "); an ordered marker's width depends on its counter's digit
+    // ~keep count ("1. " = 3, "10. " = 4, ...). `list_indent_width` is honoured as a floor, not
+    // ~keep the literal width.
+    let own_marker_width = if numbered {
         let marker_len = format!("{}. ", ctx.list_counter).chars().count();
         options.list_indent_width.max(marker_len)
     } else {

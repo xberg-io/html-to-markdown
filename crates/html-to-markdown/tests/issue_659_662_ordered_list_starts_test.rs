@@ -6,7 +6,7 @@
 //! when it follows the text of its item (issue #662).
 
 use html_to_markdown_rs::options::ListIndentType;
-use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+use html_to_markdown_rs::{ConversionOptions, OutputFormat, TierStrategy, convert};
 
 fn tier2_options() -> ConversionOptions {
     ConversionOptions {
@@ -74,6 +74,36 @@ fn should_keep_the_number_of_a_task_item_in_an_ordered_list() {
         "- [ ] p\n",
         &["<ul>", "checkbox"],
     );
+}
+
+// ~keep Djot has task items only in bullet lists: a list item that begins with `[ ]` or `[x]`
+// ~keep after a `-`, `*` or `+` marker is a task (djot syntax.md, "Task list item"). After a
+// ~keep number the checkbox is the item's text, so an ordered task item keeps the bullet.
+#[test]
+fn should_keep_the_bullet_of_an_ordered_task_item_in_djot() {
+    for strategy in [TierStrategy::Tier2, TierStrategy::Auto, TierStrategy::Tier1] {
+        let options = ConversionOptions {
+            output_format: OutputFormat::Djot,
+            tier_strategy: strategy,
+            ..tier2_options()
+        };
+        assert_eq!(
+            convert_with(
+                r#"<ol start="10"><li><input type="checkbox" checked>p</li><li>q</li></ol>"#,
+                &options
+            ),
+            "- [x] p\n11. q\n",
+            "{strategy:?}"
+        );
+        assert_eq!(
+            convert_with(
+                r#"<ol start="9"><li><input type="checkbox"><p>a</p><p>b</p></li></ol>"#,
+                &options
+            ),
+            "- [ ] a\n\n  b\n",
+            "{strategy:?}"
+        );
+    }
 }
 
 #[test]
@@ -219,7 +249,7 @@ fn should_keep_a_nested_list_that_can_interrupt_the_text_or_follows_no_text_on_t
 }
 
 #[test]
-fn should_start_each_of_several_nested_ordered_lists_after_the_text_as_a_list() {
+fn should_start_the_first_of_several_nested_ordered_lists_after_the_text_as_a_list() {
     let options = tier2_options();
     let html =
         r#"<ul><li>a<ol start="3"><li>x</li></ol><ol start="5"><li>y</li></ol><ol start="7"><li>z</li></ol></li></ul>"#;
