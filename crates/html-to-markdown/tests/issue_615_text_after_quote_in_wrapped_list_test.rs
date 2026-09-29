@@ -442,7 +442,7 @@ fn should_start_the_first_block_of_a_task_item_on_the_next_line_inside_a_wrapper
 /// an empty container there does not hide a later quote, and a quote past the limit leaves the
 /// text after it on the checkbox line. Neither drops the item or panics.
 #[test]
-fn should_keep_text_on_the_checkbox_line_when_an_empty_container_passes_the_depth_limit() {
+fn should_keep_the_task_item_when_its_content_passes_the_depth_limit() {
     let options = ConversionOptions {
         max_depth: Some(6),
         list_indent_type: ListIndentType::Spaces,

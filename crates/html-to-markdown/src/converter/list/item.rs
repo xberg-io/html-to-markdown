@@ -193,8 +193,7 @@ pub fn handle_li(
         list_depth: ctx.list_depth + 1,
         list_indent_columns: ctx.list_indent_columns + own_marker_width,
         real_item_columns,
-        item_lines: crate::converter::list::utils::ItemLineScan::new_item(),
-        previous_marker: crate::converter::list::utils::PreviousMarker::new_item(),
+        first_writer: is_task_list.then(FirstWriter::default),
         ..ctx.clone()
     };
 
@@ -251,7 +250,6 @@ pub fn handle_li(
             depth: usize,
             checkbox: &Option<tl::NodeHandle>,
             dom_ctx: &DomContext,
-            first_writer: &mut Option<tl::NodeHandle>,
         ) {
             // ~keep Independent recursion from `walk_node` while probing for the nested
             // ~keep checkbox, so it needs its own guard rather than relying on the depth
@@ -269,31 +267,16 @@ pub fn handle_li(
                     let children = node_tag.children();
                     {
                         for child_handle in children.top().iter() {
-                            render_li_content(
-                                child_handle,
-                                parser,
-                                output,
-                                options,
-                                ctx,
-                                depth + 1,
-                                checkbox,
-                                dom_ctx,
-                                first_writer,
-                            );
+                            render_li_content(child_handle, parser, output, options, ctx, depth + 1, checkbox, dom_ctx);
                         }
                     }
                 }
             } else {
-                let start = output.len();
                 walk_node(node_handle, parser, output, options, ctx, depth, dom_ctx);
-                if first_writer.is_none() && !output[start.min(output.len())..].trim().is_empty() {
-                    *first_writer = Some(*node_handle);
-                }
             }
         }
 
         let mut task_text = String::new();
-        let mut first_writer = None;
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
@@ -306,7 +289,6 @@ pub fn handle_li(
                     depth + 1,
                     &checkbox_node,
                     dom_ctx,
-                    &mut first_writer,
                 );
             }
         }
@@ -314,7 +296,10 @@ pub fn handle_li(
         // ~keep After the checkbox the line is paragraph text, so a block that is the item's
         // ~keep first content (a quote, also inside a div) starts on the next line at the
         // ~keep content column.
-        let first_content = first_writer.map(|node| written_first_content(node, parser, options, &li_ctx, depth + 1));
+        let first_content = li_ctx
+            .first_writer
+            .as_ref()
+            .and_then(|first_writer| first_writer.content(parser, &li_ctx));
         let first_block = match first_content {
             Some(TaskFirstContent::Block) => Some(trimmed_task),
             // ~keep An indented code block's first line keeps its indent (issue #634).
@@ -516,30 +501,76 @@ enum TaskFirstContent {
     CodeBlock,
 }
 
-/// What the task item writes first after its checkbox, where `node` is the child that wrote the
-/// first content.
+/// The element of a task item whose render writes the item's first content.
 ///
-/// ~keep The render finds the node, so a node that writes nothing (an empty element, a line
-/// ~keep break, a dropped element) is never it. A block container writes nothing before its
-/// ~keep first child, so the walk goes into it.
-fn written_first_content(
-    node: tl::NodeHandle,
-    parser: &tl::Parser,
-    options: &ConversionOptions,
-    ctx: &Context,
-    depth: usize,
-) -> TaskFirstContent {
+/// ~keep Every node the item renders reports what it wrote, until one wrote content. A block
+/// ~keep container that starts with the first line of the child that wrote writes nothing before
+/// ~keep that child, so the writer is the outermost element that wrote and is not such a
+/// ~keep container. A node that writes nothing (an empty element, a line break, a dropped element,
+/// ~keep anything past `max_depth`) is never the writer. A node that drops the output of its
+/// ~keep children drops their writer too.
+#[derive(Clone, Default)]
+pub struct FirstWriter(std::rc::Rc<std::cell::RefCell<FirstWriterState>>);
+
+#[derive(Default)]
+struct FirstWriterState {
+    node: Option<tl::NodeHandle>,
+    /// The first line that `node` wrote, without its indentation.
+    first_line: String,
+}
+
+impl FirstWriter {
+    /// Whether no node has written yet, so the next node's render must report.
+    pub fn is_open(&self) -> bool {
+        self.0.borrow().node.is_none()
+    }
+
+    /// Record the render of `node`, which started while no node had written and wrote `written`.
+    pub fn record(&self, node: tl::NodeHandle, parser: &tl::Parser, written: Option<&str>) {
+        let mut state = self.0.borrow_mut();
+        let Some(text) = written.map(str::trim_start).filter(|text| !text.is_empty()) else {
+            *state = FirstWriterState::default();
+            return;
+        };
+        let first_line = text.split('\n').next().unwrap_or_default();
+        let container = state.node.is_some()
+            && is_block_container(node, parser)
+            && first_line.starts_with(state.first_line.as_str());
+        if !container {
+            state.node = Some(node);
+            state.first_line = first_line.to_string();
+        }
+    }
+
+    /// What the first writer wrote, or `None` when no node wrote.
+    ///
+    /// ~keep Text is paragraph text on the checkbox line, also when it reads like an opener. An
+    /// ~keep element that `preserve_tags` writes as HTML starts a block when its HTML does.
+    fn content(&self, parser: &tl::Parser, ctx: &Context) -> Option<TaskFirstContent> {
+        let state = self.0.borrow();
+        let Some(tl::Node::Tag(tag)) = state.node?.get(parser) else {
+            return Some(TaskFirstContent::Text);
+        };
+        let name = normalized_tag_name(tag.name().as_utf8_str());
+        Some(match block_content(&name) {
+            Some(block) => block,
+            None if ctx.preserve_tags.contains(name.as_ref())
+                && crate::converter::utility::escaping::opens_block(&state.first_line) =>
+            {
+                TaskFirstContent::Block
+            }
+            None => TaskFirstContent::Text,
+        })
+    }
+}
+
+/// Whether `node` is a block element without an opener of its own, like a `<div>`.
+fn is_block_container(node: tl::NodeHandle, parser: &tl::Parser) -> bool {
     let Some(tl::Node::Tag(tag)) = node.get(parser) else {
-        return TaskFirstContent::Text;
+        return false;
     };
     let name = normalized_tag_name(tag.name().as_utf8_str());
-    match block_content(&name) {
-        Some(block) => block,
-        None if crate::converter::utility::content::is_block_level_element(&name) => {
-            task_first_content(tag, parser, options, ctx, depth).unwrap_or(TaskFirstContent::Text)
-        }
-        None => TaskFirstContent::Text,
-    }
+    block_content(&name).is_none() && crate::converter::utility::content::is_block_level_element(&name)
 }
 
 /// The first content that an element named `name` writes when it is a block with an opener.
@@ -549,79 +580,6 @@ fn block_content(name: &str) -> Option<TaskFirstContent> {
         "blockquote" | "ul" | "ol" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => Some(TaskFirstContent::Block),
         _ => None,
     }
-}
-
-/// Whether the `<pre>` element `tag` writes a fenced code block although it holds only
-/// whitespace.
-fn fenced_code_writes(tag: &tl::HTMLTag, parser: &tl::Parser, options: &ConversionOptions) -> bool {
-    options.code_block_style != crate::options::CodeBlockStyle::Indented && !tag.inner_text(parser).is_empty()
-}
-
-/// What the block container `tag` renders first, or `None` when its children render nothing.
-///
-/// ~keep The walk follows the rendering: a block container writes nothing before its first
-/// ~keep child, so it goes into it. Text, and an inline element, are paragraph text on the
-/// ~keep checkbox line, also when they read like an opener. An inline element that renders
-/// ~keep nothing is skipped like an empty container (issue #634).
-fn task_first_content(
-    tag: &tl::HTMLTag,
-    parser: &tl::Parser,
-    options: &ConversionOptions,
-    ctx: &Context,
-    depth: usize,
-) -> Option<TaskFirstContent> {
-    if depth >= effective_max_depth(options) {
-        return Some(TaskFirstContent::Text);
-    }
-    for child_handle in tag.children().top().iter() {
-        match child_handle.get(parser) {
-            Some(tl::Node::Raw(text))
-                if crate::text::decode_html_entities_cow(&text.as_utf8_str())
-                    .trim()
-                    .is_empty() => {}
-            Some(tl::Node::Comment(_)) => {}
-            Some(tl::Node::Tag(child_tag)) => {
-                let name = normalized_tag_name(child_tag.name().as_utf8_str());
-                // ~keep An element the converter drops writes nothing.
-                if crate::converter::main_helpers::is_unrendered_element(&name)
-                    || matches!(name.as_ref(), "script" | "style")
-                    || crate::converter::preprocessing_helpers::should_drop_for_preprocessing(&name, child_tag, options)
-                {
-                    continue;
-                }
-                if let Some(block) = block_content(&name) {
-                    // ~keep A block with no content writes nothing, like an empty container. A fenced
-                    // ~keep code block with only whitespace still writes its fences.
-                    if name == "hr"
-                        || ctx.preserve_tags.contains(name.as_ref())
-                        || (name == "pre" && fenced_code_writes(child_tag, parser, options))
-                        || task_first_content(child_tag, parser, options, ctx, depth + 1).is_some()
-                    {
-                        return Some(block);
-                    }
-                    continue;
-                }
-                let is_container = crate::converter::utility::content::is_block_level_element(&name);
-                match task_first_content(child_tag, parser, options, ctx, depth + 1) {
-                    None if is_container || !writes_without_content(child_tag, &name, ctx) => {}
-                    Some(first) if is_container => return Some(first),
-                    _ => return Some(TaskFirstContent::Text),
-                }
-            }
-            _ => return Some(TaskFirstContent::Text),
-        }
-    }
-    None
-}
-
-/// Whether the element `tag` named `name` writes output with no content: a void element other
-/// than a line break (an image), a media element, a link with an address, or an element that
-/// `preserve_tags` writes as HTML.
-fn writes_without_content(tag: &tl::HTMLTag, name: &str, ctx: &Context) -> bool {
-    (crate::converter::main_helpers::is_html5_void_element(name.as_bytes()) && !matches!(name, "br" | "wbr"))
-        || crate::converter::media::is_media_element(name)
-        || (name == "a" && tag.attributes().get("href").is_some())
-        || ctx.preserve_tags.contains(name)
 }
 
 /// The bullet of an unordered list item at `ctx.ul_depth`: the list's bullets cycle by depth.

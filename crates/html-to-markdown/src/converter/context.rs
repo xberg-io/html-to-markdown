@@ -122,12 +122,15 @@ pub struct Context {
     /// ~keep follows the opening marker, so it is text, but a nested item's marker starts its
     /// ~keep own line and is a real list item (issue #615).
     pub(crate) real_item_columns: usize,
-    /// Whether a paragraph was open before the previous marker line of the innermost item's
-    /// lists: the next marker's check stops there instead of walking back over every earlier item.
+    /// Whether a paragraph was open before the previous marker line of the lists: the next
+    /// marker's check stops there instead of walking back over every earlier item.
     pub(crate) previous_marker: crate::converter::list::utils::PreviousMarker,
     /// Whether the innermost list item is still open after the lines of a buffer checked so
-    /// far: each block of the item checks only the lines written since.
+    /// far: each block checks only the lines written since.
     pub(crate) item_lines: crate::converter::list::utils::ItemLineScan,
+    /// The element of a task item whose render writes the item's first content, or `None`
+    /// outside a task item.
+    pub(crate) first_writer: Option<crate::converter::list::item::FirstWriter>,
     /// Unordered list nesting depth (for bullet cycling)
     pub(crate) ul_depth: usize,
     /// Are we inside any list (ul or ol)?
@@ -330,6 +333,7 @@ impl Context {
             real_item_columns: 0,
             previous_marker: crate::converter::list::utils::PreviousMarker::default(),
             item_lines: crate::converter::list::utils::ItemLineScan::default(),
+            first_writer: None,
             ul_depth: 0,
             in_list: false,
             loose_list: false,

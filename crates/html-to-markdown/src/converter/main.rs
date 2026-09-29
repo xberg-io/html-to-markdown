@@ -557,10 +557,33 @@ fn parent_is_list(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &D
 }
 
 /// Recursively walk DOM nodes and convert to Markdown.
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn walk_node(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    depth: usize,
+    dom_ctx: &DomContext,
+) {
+    // ~keep In a task item, the render of each node before the first content reports whether
+    // ~keep it wrote, so the item knows which element wrote first (issue #650).
+    match ctx.first_writer.as_ref().filter(|first_writer| first_writer.is_open()) {
+        Some(first_writer) => {
+            let start = output.len();
+            convert_node(node_handle, parser, output, options, ctx, depth, dom_ctx);
+            first_writer.record(*node_handle, parser, output.get(start..));
+        }
+        None => convert_node(node_handle, parser, output, options, ctx, depth, dom_ctx),
+    }
+}
+
+/// Convert one DOM node and its children to Markdown.
 #[allow(clippy::only_used_in_recursion)]
 #[allow(clippy::trivially_copy_pass_by_ref)]
 #[allow(clippy::cast_possible_truncation)]
-pub fn walk_node(
+fn convert_node(
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
     output: &mut String,
@@ -898,7 +921,7 @@ pub fn walk_node(
                     );
                 }
 
-                name if crate::converter::media::is_media_element(name) => {
+                "audio" | "video" | "picture" | "iframe" | "svg" | "math" => {
                     crate::converter::media::dispatch_media_handler(
                         &tag_name,
                         node_handle,
@@ -933,7 +956,7 @@ pub fn walk_node(
                 // ~keep shared constant) because this match also holds `svg`/`math` — which
                 // ~keep plain_text.rs skips outright but this path renders via a dedicated media
                 // ~keep handler — so the two tag sets are not actually the same list.
-                name if crate::converter::main_helpers::is_unrendered_element(name) => {}
+                "template" | "noscript" => {}
 
                 "head" | "script" | "style" => {
                     crate::converter::metadata::handle(

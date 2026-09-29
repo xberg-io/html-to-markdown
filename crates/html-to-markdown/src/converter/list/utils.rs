@@ -347,10 +347,9 @@ fn paragraph_is_open(output: &str, enclosing_column: usize, previous: Option<(us
 /// of the buffer, the line start, the line before it, the enclosing content column and whether a
 /// paragraph was open before the line.
 ///
-/// ~keep The lists of one item share it through the item's context, and every list item starts
-/// ~keep its own. The buffer address and the line before the marker line must match: in another
-/// ~keep buffer, or after a write that changed the end of the buffer, the line start means
-/// ~keep nothing.
+/// ~keep The lists share it through the context. The buffer address, the enclosing content column
+/// ~keep and the line before the marker line must match: in another buffer, in a list at another
+/// ~keep depth, or after a write that changed the end of the buffer, the line start means nothing.
 #[derive(Clone, Default)]
 pub struct PreviousMarker(std::rc::Rc<std::cell::RefCell<Option<PreviousMarkerState>>>);
 
@@ -363,11 +362,6 @@ struct PreviousMarkerState {
 }
 
 impl PreviousMarker {
-    /// The answer for a new item: the items around it keep theirs.
-    pub fn new_item() -> Self {
-        Self::default()
-    }
-
     fn get(&self, buffer: usize, output: &str, enclosing_column: usize) -> Option<(usize, bool)> {
         let state = self.0.borrow();
         let state = state.as_ref()?;
@@ -542,7 +536,9 @@ pub fn item_is_open(output: &str, indent: &str, ctx: &Context) -> bool {
 /// `None` when they are all blank. Stores the answer in `scan` for the next check.
 fn lines_are_open(output: &str, indent: &str, scan: &ItemLineScan) -> Option<bool> {
     let buffer = output.as_ptr() as usize;
-    let (start, below) = scan.read(buffer, indent, output).unwrap_or((0, None));
+    let (start, below) = scan
+        .read(buffer, indent, output)
+        .unwrap_or_else(|| (last_marker_line_start(output), None));
     let mut open = below;
     for line in output[start..].split('\n').filter(|line| !line.trim().is_empty()) {
         open = Some(match open {
@@ -554,6 +550,22 @@ fn lines_are_open(output: &str, indent: &str, scan: &ItemLineScan) -> Option<boo
     }
     scan.write(buffer, indent, output, open);
     open
+}
+
+/// The start of the last line of `output` that is a bare list marker line, or 0 when there is none.
+///
+/// ~keep A marker line opens the item whatever the lines before it say, so a check with no stored
+/// ~keep answer reads forward from there: it reads the lines of the innermost item, not the buffer.
+fn last_marker_line_start(output: &str) -> usize {
+    let mut end = output.len();
+    while end > 0 {
+        let start = output[..end - 1].rfind('\n').map_or(0, |pos| pos + 1);
+        if strip_leading_bare_marker(output[start..end].trim_start_matches([' ', '\t'])).is_some() {
+            return start;
+        }
+        end = start;
+    }
+    0
 }
 
 /// The answer of the last check of an item's lines in one buffer: the buffer address, the
@@ -577,8 +589,8 @@ struct ItemLineScanState {
 }
 
 impl ItemLineScan {
-    /// A scan for a new item, or for a container that writes a buffer of its own: the answer
-    /// kept for the enclosing buffer stays.
+    /// A scan for a quote or a container that writes a buffer of its own: the answer kept for
+    /// the enclosing buffer stays.
     pub fn new_item() -> Self {
         Self::default()
     }
@@ -833,5 +845,47 @@ pub fn process_list_children(
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn item_line_scan_reads_the_lines_again_after_its_last_line_changed() {
+        let scan = ItemLineScan::new_item();
+        let mut output = String::from("- a\n  b\n");
+        assert_eq!(lines_are_open(&output, "  ", &scan), Some(true));
+        output.clear();
+        output.push_str("a\nb\nzzz\n");
+        assert_eq!(lines_are_open(&output, "  ", &scan), Some(false));
+    }
+
+    #[test]
+    fn item_line_scan_reads_the_lines_of_another_buffer_again() {
+        let scan = ItemLineScan::new_item();
+        let first = String::from("- a\n  b\n");
+        let second = String::from("a\nb\n  b\n");
+        assert_eq!(lines_are_open(&first, "  ", &scan), Some(true));
+        assert_eq!(lines_are_open(&second, "  ", &scan), Some(false));
+    }
+
+    #[test]
+    fn item_line_scan_reads_the_lines_again_for_another_indent() {
+        let scan = ItemLineScan::new_item();
+        let output = String::from("- a\n  b\n");
+        assert_eq!(lines_are_open(&output, "  ", &scan), Some(true));
+        assert_eq!(lines_are_open(&output, "    ", &scan), Some(false));
+    }
+
+    #[test]
+    fn previous_marker_answers_only_for_its_buffer_column_and_line_before_its_marker_line() {
+        let previous = PreviousMarker::default();
+        previous.set(1, "p\n- a\n", 2, 0, true);
+        assert_eq!(previous.get(1, "p\n- a\n- b\n", 0), Some((2, true)));
+        assert_eq!(previous.get(1, "p\n- a\n- b\n", 2), None);
+        assert_eq!(previous.get(2, "p\n- a\n- b\n", 0), None);
+        assert_eq!(previous.get(1, "q\n- a\n- b\n", 0), None);
     }
 }

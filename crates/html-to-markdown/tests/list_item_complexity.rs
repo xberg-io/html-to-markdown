@@ -26,8 +26,21 @@ const REPEATS_PER_SAMPLE: usize = 3;
 const BASE_SIZE: usize = 2_000;
 
 /// The name, the HTML for `n` repeats, and whether the headings are underlined.
-fn shapes(n: usize) -> [(&'static str, String, bool); 8] {
+fn shapes(n: usize) -> [(&'static str, String, bool); 10] {
     [
+        (
+            "items of paragraphs",
+            format!("<ul>{}</ul>", "<li><p>a</p><p>b</p></li>".repeat(n)),
+            false,
+        ),
+        (
+            "items of paragraphs around a nested item",
+            format!(
+                "<ul>{}</ul>",
+                "<li>a<ul><li>b<p>x</p><p>y</p></li></ul><p>c</p><p>d</p></li>".repeat(n)
+            ),
+            false,
+        ),
         (
             "items between markers",
             format!("<b><ul><li>a<ol>{}</ol></li></ul></b>", "<li>x</li>".repeat(n)),

@@ -348,6 +348,127 @@ fn should_start_a_task_item_quote_after_an_element_that_writes_nothing_on_the_ne
 }
 
 #[test]
+fn should_start_a_task_item_quote_after_an_element_that_writes_nothing_in_a_container_on_the_next_line() {
+    let options = tier2_options();
+    let skip_images = ConversionOptions {
+        skip_images: true,
+        ..tier2_options()
+    };
+    let elements = [
+        (r#"<input type="text">"#, &options),
+        ("<meta>", &options),
+        (r#"<link rel="x">"#, &options),
+        ("<source>", &options),
+        ("<track>", &options),
+        ("<embed>", &options),
+        ("<area>", &options),
+        ("<picture></picture>", &options),
+        ("<math></math>", &options),
+        (r#"<img src="i.png" alt="i">"#, &skip_images),
+    ];
+    for (element, options) in elements {
+        for html in [
+            format!(r#"<ul><li><input type="checkbox"><div>{element}<blockquote>q</blockquote></div></li></ul>"#),
+            format!(
+                r#"<ul><li><input type="checkbox"><section>{element}<blockquote>q</blockquote></section></li></ul>"#
+            ),
+            format!(
+                r#"<ul><li><input type="checkbox"><section><div>{element}</div><blockquote>q</blockquote></section></li></ul>"#
+            ),
+        ] {
+            assert_converts(
+                &html,
+                options,
+                "- [ ]\n  > q\n",
+                &["<blockquote>\n<p>q</p>\n</blockquote>"],
+            );
+        }
+    }
+    assert_converts(
+        r#"<ul><li><input type="checkbox"><div><img src="i.png" alt="i"><blockquote>q</blockquote></div></li></ul>"#,
+        &options,
+        "- [ ] ![i](i.png)\n  > q\n",
+        &["<img src=\"i.png\" alt=\"i\" />"],
+    );
+}
+
+#[test]
+fn should_start_a_preserved_block_element_of_a_task_item_on_the_next_line() {
+    let options = ConversionOptions {
+        preserve_tags: vec!["div".to_string()],
+        ..tier2_options()
+    };
+    for html in [
+        r#"<ul><li><input type="checkbox"><div><blockquote>q</blockquote></div></li></ul>"#,
+        r#"<ul><li><input type="checkbox"><section><div><blockquote>q</blockquote></div></section></li></ul>"#,
+    ] {
+        assert_converts(
+            html,
+            &options,
+            "- [ ]\n  <div><blockquote>q</blockquote></div>\n",
+            &["<li>[ ]\n<!-- raw HTML omitted -->\n</li>"],
+        );
+    }
+}
+
+#[test]
+fn should_start_an_underlined_heading_that_starts_a_task_item_after_a_blank_line() {
+    let options = ConversionOptions {
+        heading_style: HeadingStyle::Underlined,
+        ..tier2_options()
+    };
+    for html in [
+        r#"<ul><li><input type="checkbox"><h2>q</h2></li></ul>"#,
+        r#"<ul><li><input type="checkbox"><div><h2>q</h2></div></li></ul>"#,
+    ] {
+        assert_converts(html, &options, "- [ ]\n\n  q\n  --\n", &["<p>[ ]</p>\n<h2>q</h2>"]);
+    }
+}
+
+#[cfg(feature = "visitor")]
+#[test]
+fn should_start_a_task_item_quote_after_an_element_a_visitor_skips_on_the_next_line() {
+    use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult};
+    use std::sync::{Arc, Mutex};
+
+    #[derive(Debug)]
+    struct SkipEmphasis;
+
+    impl HtmlVisitor for SkipEmphasis {
+        fn visit_element_end(&mut self, ctx: &NodeContext, _output: &str) -> VisitResult {
+            if ctx.tag_name == "em" {
+                return VisitResult::Skip;
+            }
+            VisitResult::Continue
+        }
+    }
+
+    let options = ConversionOptions {
+        visitor: Some(Arc::new(Mutex::new(SkipEmphasis))),
+        ..tier2_options()
+    };
+    for html in [
+        r#"<ul><li><input type="checkbox"><em>x</em><blockquote>q</blockquote></li></ul>"#,
+        r#"<ul><li><input type="checkbox"><div><em>x</em><blockquote>q</blockquote></div></li></ul>"#,
+    ] {
+        assert_converts(
+            html,
+            &options,
+            "- [ ]\n  > q\n",
+            &["<blockquote>\n<p>q</p>\n</blockquote>"],
+        );
+    }
+}
+
+#[test]
+fn should_keep_a_table_whose_cell_holds_a_quote_on_the_checkbox_line() {
+    let html =
+        r#"<ul><li><input type="checkbox"><table><tr><td><blockquote>q</blockquote></td></tr></table></li></ul>"#;
+    let markdown = convert_with(html, &tier2_options());
+    assert!(markdown.starts_with("- [ ] | > q |\n"), "{html}: {markdown:?}");
+}
+
+#[test]
 fn should_start_a_task_item_quote_after_an_empty_inline_element_on_the_next_line() {
     let options = tier2_options();
     for wrapper in [

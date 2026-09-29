@@ -57,12 +57,6 @@ pub fn first_address<T: AsRef<str>>(choice: InlineDataMedia, addresses: impl Int
     first
 }
 
-/// Whether `tag_name` is a media element that [`dispatch_media_handler`] routes: it writes output
-/// from its attributes, also when it has no content.
-pub fn is_media_element(tag_name: &str) -> bool {
-    matches!(tag_name, "iframe" | "video" | "audio" | "picture" | "svg" | "math")
-}
-
 /// Dispatches media element handling to the appropriate handler.
 ///
 /// This function routes media-related HTML elements to their specialized handlers
