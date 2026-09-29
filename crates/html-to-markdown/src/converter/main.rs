@@ -531,6 +531,16 @@ fn separate_in_list_item(
     }
 }
 
+/// Whether the last line of `output` holds nothing but indentation and list markers.
+///
+/// ~keep The backward scan stops at the first other character, so a long line costs nothing.
+fn at_line_start(output: &str) -> bool {
+    let before =
+        output.trim_end_matches(|c: char| c.is_ascii_digit() || matches!(c, ' ' | '\t' | '-' | '*' | '+' | '.' | ')'));
+    (before.is_empty() || before.ends_with('\n'))
+        && (output[before.len()..].trim().is_empty() || crate::converter::list::utils::line_is_bare_list_marker(output))
+}
+
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since
 /// the block before it wrote nothing.
 fn ends_with_block_line_end(output: &str) -> bool {
@@ -670,8 +680,19 @@ fn convert_node(
             }
 
             if ctx.preserve_tags.contains(tag_name.as_ref()) {
+                let starts_line = at_line_start(output);
                 let html = serialize_tag_to_html(node_handle, parser);
                 output.push_str(&html);
+                // ~keep An HTML block ends only at a blank line, so one follows it (issue #655).
+                if starts_line
+                    && !ctx.in_marker_text()
+                    && !ctx.in_table_cell
+                    && !ctx.convert_as_inline
+                    && !ctx.in_code
+                    && crate::converter::utility::escaping::opens_block(html.trim_start())
+                {
+                    output.push_str("\n\n");
+                }
                 return;
             }
 

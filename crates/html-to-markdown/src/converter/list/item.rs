@@ -55,7 +55,8 @@ pub fn handle_li(
             if tag_name_eq(node_tag.name().as_utf8_str(), "input") {
                 let input_type = node_tag.attributes().get("type").flatten().map(|v| v.as_utf8_str());
 
-                if input_type.as_deref() == Some("checkbox") {
+                // ~keep An attribute value like `CHECKBOX` names the same type.
+                if input_type.is_some_and(|input_type| input_type.eq_ignore_ascii_case("checkbox")) {
                     let checked = node_tag.attributes().get("checked").is_some();
                     return Some((checked, *node_handle));
                 }
@@ -495,7 +496,7 @@ pub fn handle_li(
 enum TaskFirstContent {
     /// Paragraph text on the checkbox line.
     Text,
-    /// A block that writes a block opener: a quote, a list, a heading or a rule.
+    /// A block that starts its own line: a quote, a list, a heading, a rule or a table.
     Block,
     /// A code block, whose first line can be indented code.
     CodeBlock,
@@ -503,12 +504,12 @@ enum TaskFirstContent {
 
 /// The element of a task item whose render writes the item's first content.
 ///
-/// ~keep Every node the item renders reports what it wrote, until one wrote content. A block
-/// ~keep container that starts with the first line of the child that wrote writes nothing before
-/// ~keep that child, so the writer is the outermost element that wrote and is not such a
-/// ~keep container. A node that writes nothing (an empty element, a line break, a dropped element,
-/// ~keep anything past `max_depth`) is never the writer. A node that drops the output of its
-/// ~keep children drops their writer too.
+/// ~keep Every node the item renders reports what it wrote, until one wrote content. An element
+/// ~keep without a block opener that starts with the first line of the child that wrote writes
+/// ~keep nothing before that child, so the writer is the outermost element that wrote and is not
+/// ~keep such a container. A node that writes nothing (an empty element, a line break, a dropped
+/// ~keep element, anything past `max_depth`) is never the writer. A node that drops the output of
+/// ~keep its children drops their writer too.
 #[derive(Clone, Default)]
 pub struct FirstWriter(std::rc::Rc<std::cell::RefCell<FirstWriterState>>);
 
@@ -533,9 +534,8 @@ impl FirstWriter {
             return;
         };
         let first_line = text.split('\n').next().unwrap_or_default();
-        let container = state.node.is_some()
-            && is_block_container(node, parser)
-            && first_line.starts_with(state.first_line.as_str());
+        let container =
+            state.node.is_some() && is_container(node, parser) && first_line.starts_with(state.first_line.as_str());
         if !container {
             state.node = Some(node);
             state.first_line = first_line.to_string();
@@ -564,20 +564,21 @@ impl FirstWriter {
     }
 }
 
-/// Whether `node` is a block element without an opener of its own, like a `<div>`.
-fn is_block_container(node: tl::NodeHandle, parser: &tl::Parser) -> bool {
+/// Whether `node` is an element without a block opener of its own, like a `<div>` or a `<span>`.
+fn is_container(node: tl::NodeHandle, parser: &tl::Parser) -> bool {
     let Some(tl::Node::Tag(tag)) = node.get(parser) else {
         return false;
     };
-    let name = normalized_tag_name(tag.name().as_utf8_str());
-    block_content(&name).is_none() && crate::converter::utility::content::is_block_level_element(&name)
+    block_content(&normalized_tag_name(tag.name().as_utf8_str())).is_none()
 }
 
 /// The first content that an element named `name` writes when it is a block with an opener.
 fn block_content(name: &str) -> Option<TaskFirstContent> {
     match name {
         "pre" => Some(TaskFirstContent::CodeBlock),
-        "blockquote" | "ul" | "ol" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => Some(TaskFirstContent::Block),
+        "blockquote" | "ul" | "ol" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "table" => {
+            Some(TaskFirstContent::Block)
+        }
         _ => None,
     }
 }

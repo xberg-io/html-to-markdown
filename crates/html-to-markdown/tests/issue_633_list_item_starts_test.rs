@@ -461,11 +461,11 @@ fn should_start_a_task_item_quote_after_an_element_a_visitor_skips_on_the_next_l
 }
 
 #[test]
-fn should_keep_a_table_whose_cell_holds_a_quote_on_the_checkbox_line() {
+fn should_start_a_table_whose_cell_holds_a_quote_after_a_blank_line() {
     let html =
         r#"<ul><li><input type="checkbox"><table><tr><td><blockquote>q</blockquote></td></tr></table></li></ul>"#;
     let markdown = convert_with(html, &tier2_options());
-    assert!(markdown.starts_with("- [ ] | > q |\n"), "{html}: {markdown:?}");
+    assert!(markdown.starts_with("- [ ]\n\n  | > q |\n"), "{html}: {markdown:?}");
 }
 
 #[test]

@@ -52,6 +52,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A table that starts a task item became the task's text (#630).**
+  `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
+  `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a
+  task item's first content now starts after a blank line at the content column, also inside a
+  `<div>` or `<section>`. A block in an element that writes nothing before it, like a `<span>` or
+  an `<hgroup>`, now also starts below the checkbox; in bold or a link it stays text on the
+  checkbox line.
+- **The fast converter dropped a task item's checkbox (#632).** With the fast converter forced,
+  `<ul><li><input type="checkbox"><p>p</p></li></ul>` gave `- p`. A list item that holds a
+  checkbox now goes to the full converter, which writes `- [ ] p`. The full converter also reads
+  `type="CHECKBOX"` as a checkbox now, as a browser does.
+- **Content after an HTML block that `preserve_tags` keeps joined the block (#655).**
+  CommonMark ends an HTML block only at a blank line, and none followed a preserved block
+  element, so in `<ul><li><input type="checkbox"><div></div><h2>h</h2>t</li></ul>` the heading
+  and the text were part of the HTML. A blank line now follows a preserved element that starts
+  an HTML block, in a list item and at the top level: `- [ ]\n  <div></div>\n\n  ## h\n  t`.
 - **A table whose cells held only rules was dropped (#628).** The full converter took a table
   with no text and no image for a blank spacer table and wrote nothing, so
   `<table><tr><td><ul><li><hr></li></ul></td></tr></table>` gave an empty document. A rule now
