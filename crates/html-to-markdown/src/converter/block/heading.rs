@@ -38,13 +38,17 @@ pub fn handle(
     let needs_leading_sep = !ctx.in_table_cell
         && !ctx.in_list_item
         && !ctx.convert_as_inline
-        && ctx.blockquote_depth == 0
+        && (ctx.blockquote_depth == 0 || continues_a_line_in_quote(output, options, level))
         && !output.is_empty()
         && !output.ends_with("\n\n");
 
     if needs_leading_sep {
         crate::converter::trim_trailing_whitespace(output);
-        output.push_str("\n\n");
+        output.push_str(if ctx.blockquote_depth > 0 && output.ends_with('\n') {
+            "\n"
+        } else {
+            "\n\n"
+        });
     }
 
     let mut text = String::new();
@@ -163,6 +167,23 @@ pub fn handle(
     }
 }
 
+/// Whether a heading in a quote's buffer would join the line before it: text on the same line,
+/// or, for an underlined heading, a line of text above it (issue #640).
+///
+/// ~keep In a quote, a heading after a block keeps the compact style of the quote (no blank
+/// ~keep line); only a line the heading would continue gets one. The underline of a heading
+/// ~keep before it ends that heading, so it is no text.
+fn continues_a_line_in_quote(output: &str, options: &ConversionOptions, level: usize) -> bool {
+    let Some(before_line_end) = output.strip_suffix('\n') else {
+        return true;
+    };
+    let line = before_line_end.rsplit('\n').next().unwrap_or_default().trim();
+    options.heading_style == HeadingStyle::Underlined
+        && level <= 2
+        && !line.is_empty()
+        && !crate::converter::utility::escaping::is_heading_underline(line)
+}
+
 /// Determine if a heading element should allow inline images.
 pub fn heading_allows_inline_images(
     tag_name: &str,
@@ -251,25 +272,23 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
         HeadingStyle::Underlined => {
             // ~keep The underline is a line of the item like every quote line, so it gets the
             // ~keep item's continuation indent; at column 0 a `-` underline is a new list item
-            // ~keep (issue #635). In a quote, only the items inside the quote count: the quote
-            // ~keep writes the indent of the items around it on each of its lines.
+            // ~keep (issue #635).
             let underline_indent = if ctx.in_list_item {
-                crate::converter::list::utils::continuation_indent_string(
-                    ctx.list_indent_columns.saturating_sub(ctx.quote_list_columns),
-                    options,
-                )
+                crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
             } else {
                 None
             };
+            // ~keep The text is a paragraph line, so a list marker or other block opener at its
+            // ~keep start is escaped (issue #653).
             if level == 1 {
-                output.push_str(text);
+                output.push_str(&crate::converter::utility::escaping::escape_paragraph_start(text));
                 output.push('\n');
                 output.push_str(underline_indent.as_deref().unwrap_or_default());
                 for _ in 0..text.len() {
                     output.push('=');
                 }
             } else if level == 2 {
-                output.push_str(text);
+                output.push_str(&crate::converter::utility::escaping::escape_paragraph_start(text));
                 output.push('\n');
                 output.push_str(underline_indent.as_deref().unwrap_or_default());
                 // ~keep In a list item a lone `-` line reads as an empty item marker, both to

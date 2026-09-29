@@ -92,12 +92,7 @@ pub fn handle(
         output.push_str("___\n");
         return;
     }
-    let list_indent = if ctx.in_list_item
-        && ctx.blockquote_depth == 0
-        && !ctx.convert_as_inline
-        && !ctx.in_table_cell
-        && !output.is_empty()
-    {
+    let list_indent = if ctx.in_list_item && !ctx.convert_as_inline && !ctx.in_table_cell && !output.is_empty() {
         crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
             .filter(|indent| crate::converter::list::utils::item_is_open(output, indent, ctx))
     } else {

@@ -13,8 +13,8 @@ use crate::options::ListIndentType;
 /// # Arguments
 /// * `table_content` - The Markdown table content to indent
 /// * `list_depth` - The nesting depth in the list hierarchy
-/// * `list_indent_columns` - Cumulative width of every ancestor `<li>`'s own marker
-///   (see `Context::list_indent_columns`); used for the `Spaces` indent type.
+/// * `list_indent_columns` - The content column of the list item (see
+///   `Context::list_indent_columns`).
 /// * `options` - Conversion options (for indent type)
 ///
 /// # Returns

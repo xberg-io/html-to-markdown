@@ -58,10 +58,6 @@ pub struct Context {
     pub(crate) in_ordered_list: bool,
     /// Blockquote nesting depth
     pub(crate) blockquote_depth: usize,
-    /// The `list_indent_columns` where the innermost quote starts: a line in the quote's buffer
-    /// is indented only by the columns of the items inside the quote, and the quote writes the
-    /// indent of the items around it.
-    pub(crate) quote_list_columns: usize,
     /// Are we inside a table cell (td/th)?
     pub(crate) in_table_cell: bool,
     /// Are we inside a *layout*-table cell, whose row renders as a list item rather than a
@@ -92,21 +88,27 @@ pub struct Context {
     /// a caption's `*`): the first line of a list rendered into it is text, so its items are
     /// not open and write no content column for a block (issues #583, #615).
     pub(crate) text_in_markers: bool,
-    /// Whether the current output buffer is written between the markers of a marker-only
-    /// wrapper that does not count in `inline_depth` (a `<mark>`'s `==`, a `<del>`'s `~~`).
+    /// Whether the current output buffer is an inline wrapper's own buffer that does not count in
+    /// `inline_depth`, and its first line follows the wrapper's opening marker (a `<mark>`'s
+    /// `==`, a `<del>`'s `~~`) or text on the line the wrapper is written on.
     ///
-    /// ~keep A rule written there is text (issue #603). A list there still writes the content
-    /// ~keep column, unlike under `text_in_markers`: text after a quote in its item then stays out
-    /// ~keep of the quote.
+    /// ~keep A rule written there is text (issue #603), and so is the first line of a list, as
+    /// ~keep under `text_in_markers`.
     pub(crate) in_marker_span: bool,
+    /// The column where the current output buffer starts when it is an inline wrapper's own
+    /// buffer with no text or opening marker before it on its line (after a list item's marker,
+    /// say): a list marker at the start of the empty buffer is written at that column, not at
+    /// the start of a line.
+    pub(crate) inline_buffer_column: Option<usize>,
     /// Whether the current output buffer escapes every `-` once it is written (a table
     /// caption): a `-` list marker there is text.
     pub(crate) escapes_hyphens: bool,
     /// List nesting depth (for indentation)
     pub(crate) list_depth: usize,
-    /// Cumulative column width (in the `Spaces` indent type) that a nested list item at this
-    /// point must be indented by: the sum of every ancestor `<li>`'s own marker width
-    /// (`"- "` = 2, `"1. "` = 3, `"10. "` = 4, ...), honouring `list_indent_width` as a floor.
+    /// The content column of the innermost list item: the column its marker is written at plus
+    /// its marker width (`"- "` = 2, `"1. "` = 3, `"10. "` = 4, ...), honouring
+    /// `list_indent_width` as a floor. With the `Tabs` indent type the marker column is the one
+    /// its tabs reach.
     ///
     /// Uniform per-depth indentation (`list_depth * list_indent_width`) is only correct when
     /// every ancestor list is unordered — an ordered ancestor's marker is wider than 2 columns,
@@ -122,6 +124,13 @@ pub struct Context {
     /// ~keep follows the opening marker, so it is text, but a nested item's marker starts its
     /// ~keep own line and is a real list item (issue #615).
     pub(crate) real_item_columns: usize,
+    /// Whether the first line of the innermost quote follows an opening inline marker, so that
+    /// line is text outside the quote.
+    ///
+    /// ~keep The quote's other lines then hold no paragraph that a line of a list item in it
+    /// ~keep can continue, so a block 4 or more columns past the column of the item whose marker
+    /// ~keep starts a list item is an indented code block there, not paragraph text.
+    pub(crate) quote_starts_after_markers: bool,
     /// Whether a paragraph was open before the previous marker line of the lists: the next
     /// marker's check stops there instead of walking back over every earlier item.
     pub(crate) previous_marker: crate::converter::list::utils::PreviousMarker,
@@ -318,7 +327,6 @@ impl Context {
             list_counter: 0,
             in_ordered_list: false,
             blockquote_depth: 0,
-            quote_list_columns: 0,
             in_table_cell: false,
             in_layout_cell: false,
             convert_as_inline: options.convert_as_inline,
@@ -327,10 +335,12 @@ impl Context {
             list_item_open: false,
             text_in_markers: false,
             in_marker_span: false,
+            inline_buffer_column: None,
             escapes_hyphens: false,
             list_depth: 0,
             list_indent_columns: 0,
             real_item_columns: 0,
+            quote_starts_after_markers: false,
             previous_marker: crate::converter::list::utils::PreviousMarker::default(),
             item_lines: crate::converter::list::utils::ItemLineScan::default(),
             first_writer: None,
@@ -387,6 +397,30 @@ impl Context {
     /// markers cannot span it.
     pub(crate) const fn in_marker_text(&self) -> bool {
         self.inline_depth > 0 || self.text_in_markers || self.in_marker_span
+    }
+
+    /// The context for the children of an inline wrapper that renders them into a buffer of its
+    /// own and then writes that buffer at the end of `output`, after its opening marker if
+    /// `opens_with_marker`.
+    ///
+    /// ~keep The buffer continues the line `output` ends on. After an opening marker or text on
+    /// ~keep that line, the first line of a list in the buffer is text, as in bold (issue #615).
+    /// ~keep After only indent or a list item's marker, the list's first marker starts an item
+    /// ~keep where that line ends, as it would with no wrapper.
+    pub(crate) fn inline_buffer(&self, output: &str, opens_with_marker: bool) -> Self {
+        let line = &output[output.rfind('\n').map_or(0, |pos| pos + 1)..];
+        let line_holds_text =
+            !line.trim().is_empty() && !crate::converter::list::utils::line_is_bare_list_marker(output);
+        let (indent_length, indent_column) = crate::converter::utility::escaping::leading_indent(line);
+        Self {
+            in_marker_span: self.in_marker_span || opens_with_marker || line_holds_text,
+            inline_buffer_column: if output.is_empty() {
+                self.inline_buffer_column
+            } else {
+                Some(indent_column + line[indent_length..].chars().count())
+            },
+            ..self.clone()
+        }
     }
 
     /// What to write for an element whose chosen address is `address`, as

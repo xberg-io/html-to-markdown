@@ -4848,6 +4848,13 @@ fn flush_text(
     // because its target must be the *decoded* text with whitespace already
     // collapsed — exactly what Tier-2 hands to `text::escape`.
     let in_cell = state.in_table_cell();
+    // ~keep Mirror Tier-2 (text_node.rs, issue #651). A heading and a table cell fold their line
+    // ~keep breaks into spaces, as Tier-2 writes them, so no line in them starts a block.
+    let folds_lines = in_cell
+        || state
+            .stack
+            .iter()
+            .any(|frame| matches!(frame.spec.kind, TagKind::Heading(_)));
 
     indent_fresh_list_item_text_line(state);
 
@@ -4868,7 +4875,12 @@ fn flush_text(
         }
         escape_backslash_run(&mut staged, 0, false);
         let dest = state.cell_or_output_mut();
-        return decode_and_collapse_into_inline(dest, &staged, false, base_offset);
+        let emitted_from = dest.len();
+        decode_and_collapse_into_inline(dest, &staged, false, base_offset)?;
+        if !folds_lines {
+            crate::converter::utility::escaping::escape_continuation_line_start(dest, emitted_from);
+        }
+        return Ok(());
     }
 
     let dest = state.cell_or_output_mut();
@@ -4894,6 +4906,9 @@ fn flush_text(
     }
 
     escape_backslash_run(dest, emitted_from, in_cell);
+    if !folds_lines {
+        crate::converter::utility::escaping::escape_continuation_line_start(dest, emitted_from);
+    }
     Ok(())
 }
 
