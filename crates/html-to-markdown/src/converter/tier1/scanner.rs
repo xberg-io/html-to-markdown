@@ -1907,7 +1907,7 @@ fn emit_void(
                 }
                 dest.push_str("---\n");
             };
-            if in_cell {
+            if in_cell && !rule_starts_a_definition(state) {
                 with_cell_scratch(state, write_rule);
             } else {
                 write_rule(state.cell_or_output_mut());
@@ -3007,31 +3007,20 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool)
 /// start of such an element in the flat cell buffer (see [`cell_scratch_start`]).
 fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> bool {
     match kind {
+        // ~keep In a cell Tier-2 writes a figure, fieldset, dl, details, dialog, menu and form
+        // ~keep straight into the cell. It gives a legend and a figure caption a buffer of their
+        // ~keep own, but this scanner writes neither the way Tier-2 does there, so they are not
+        // ~keep marked here.
         TagKind::Blockquote
         | TagKind::Heading(_)
         | TagKind::Pre
-        | TagKind::Figcaption
-        | TagKind::List(ListKind::Definition)
         | TagKind::DefinitionTerm
         | TagKind::DefinitionDescription => true,
         // ~keep Inside code Tier-2 writes these straight into the code span.
         TagKind::Code | TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted => {
             !ctx.contains(EscapeCtx::CODE)
         }
-        _ => matches!(
-            name_lower,
-            b"sub"
-                | b"sup"
-                | b"abbr"
-                | b"figure"
-                | b"details"
-                | b"dialog"
-                | b"menu"
-                | b"form"
-                | b"fieldset"
-                | b"legend"
-                | b"label"
-        ),
+        _ => matches!(name_lower, b"sub" | b"sup" | b"abbr" | b"label"),
     }
 }
 
@@ -3039,13 +3028,36 @@ fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> 
 /// the content start of the innermost element opened in this cell that has a buffer of its own,
 /// or 0 for the cell itself.
 fn cell_scratch_start(state: &Tier1State) -> usize {
+    innermost_own_buffer(state).map_or(0, |frame| frame.content_start)
+}
+
+/// The innermost element opened in the current cell that has a buffer of its own.
+fn innermost_own_buffer(state: &Tier1State) -> Option<&OpenTag> {
     state
         .stack
         .iter()
         .rev()
         .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
         .find(|frame| frame.own_buffer)
-        .map_or(0, |frame| frame.content_start)
+}
+
+/// Whether a rule is the first content of a definition term or definition. Tier-2 separates such a
+/// rule from the content before the term, so the rule sees the whole cell.
+fn rule_starts_a_definition(state: &mut Tier1State) -> bool {
+    let Some(start) = innermost_own_buffer(state)
+        .filter(|frame| {
+            matches!(
+                frame.spec.kind,
+                TagKind::DefinitionTerm | TagKind::DefinitionDescription
+            )
+        })
+        .map(|frame| frame.content_start)
+    else {
+        return false;
+    };
+    let cell_buf = state.cell_or_output_mut();
+    let start = clamp_to_char_boundary(cell_buf, start);
+    cell_buf[start..].trim().is_empty()
 }
 
 /// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell

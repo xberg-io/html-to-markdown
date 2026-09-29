@@ -252,11 +252,27 @@ fn should_break_before_a_block_in_bold_inside_code_in_a_cell() {
 /// Tier-2 writes a definition term, a definition and a label into a buffer of their own, so a
 /// block at their start has no content to break from.
 #[test]
-fn should_write_no_break_before_a_block_at_the_start_of_a_definition_or_label() {
+fn should_write_no_break_before_a_block_at_the_start_of_a_definition_term() {
+    check(&[("a <dt><p>b</p></dt>c", "a b c", "a b<br>c")]);
+}
+
+#[test]
+fn should_write_no_break_before_a_block_at_the_start_of_a_definition() {
+    check(&[("a <dd><p>b</p></dd>c", "a b c", "a b<br>c")]);
+}
+
+#[test]
+fn should_write_no_break_before_a_block_at_the_start_of_a_label() {
+    check(&[("a <label><p>b</p></label>c", "a b c", "a b<br>c")]);
+}
+
+/// Tier-2 separates a rule that starts a definition term or definition from the cell content
+/// before the term with a blank line, which the cell folds into two spaces.
+#[test]
+fn should_separate_a_rule_that_starts_a_definition_in_a_cell() {
     check(&[
-        ("a <dt><p>b</p></dt>c", "a b c", "a b<br>c"),
-        ("a <dd><p>b</p></dd>c", "a b c", "a b<br>c"),
-        ("a <label><p>b</p></label>c", "a b c", "a b<br>c"),
+        ("a<dt><hr></dt>c", "a  --- c", "a  ---<br>c"),
+        ("a<dd> <hr></dd>c", "a  --- c", "a  ---<br>c"),
     ]);
 }
 
