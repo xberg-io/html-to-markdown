@@ -268,7 +268,15 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
                 output.push_str(text);
                 output.push('\n');
                 output.push_str(underline_indent.as_deref().unwrap_or_default());
-                for _ in 0..text.len() {
+                // ~keep In a list item a lone `-` line reads as an empty item marker, both to
+                // ~keep `CommonMark` after a blank line and to the item's own marker checks, so the
+                // ~keep underline there has at least two dashes (issue #635).
+                let width = if ctx.in_list_item {
+                    text.len().max(2)
+                } else {
+                    text.len()
+                };
+                for _ in 0..width {
                     output.push('-');
                 }
             } else {

@@ -128,10 +128,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **An underlined heading ended its list item (#635).** With `heading_style` set to `underlined`,
   the underline of a heading in a list item was written at column 0: `<ul><li><h2>q</h2></li></ul>`
   gave `- q\n-`, an item and an empty item. The underline now gets the item's content column,
-  `- q\n  -`, also in a list inside a quote: `> - q\n>   -`. After a line of the item, the heading
+  `- q\n  --`, also in a list inside a quote: `> - q\n>   --`. After a line of the item, the heading
   starts after a blank line, so it does not continue that line's paragraph: `- a\n\n  q\n  -`. A
   block after a heading of one letter starts its own paragraph: `<ul><li><h2>q</h2><p>t</p></li></ul>`
-  gives `- q\n  -\n\n  t`, where the `-` underline was read as an empty item before.
+  gives `- q\n  --\n\n  t`. In a list item the underline has at least two dashes, since a lone `-`
+  line reads as an empty item.
 - **Many blocks in one list item took quadratic time (#649).** Each block checked every earlier
   line of the item to see whether the item was still open, and each item of a list inside bold or
   italic checked every earlier item. `<ul><li>` with 5000 headings after text took seconds. Each

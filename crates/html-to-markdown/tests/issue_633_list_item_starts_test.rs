@@ -393,7 +393,7 @@ fn should_write_an_underlined_heading_in_a_list_item_at_the_content_column() {
     for (html, expected, heading) in [
         (
             r#"<ul><li><input type="checkbox"><h2>q</h2></li></ul>"#,
-            "- [ ]\n\n  q\n  -\n",
+            "- [ ]\n\n  q\n  --\n",
             "<h2>q</h2>",
         ),
         (
@@ -401,25 +401,25 @@ fn should_write_an_underlined_heading_in_a_list_item_at_the_content_column() {
             "- [ ]\n\n  q\n  =\n",
             "<h1>q</h1>",
         ),
-        ("<ul><li><h2>q</h2></li></ul>", "- q\n  -\n", "<h2>q</h2>"),
+        ("<ul><li><h2>q</h2></li></ul>", "- q\n  --\n", "<h2>q</h2>"),
         (
             "<ul><li>a<ul><li><h2>q</h2></li></ul></li></ul>",
-            "- a\n  * q\n    -\n",
+            "- a\n  * q\n    --\n",
             "<h2>q</h2>",
         ),
         (
             "<ul><li><p>a</p><h2>q</h2></li></ul>",
-            "- a\n\n  q\n  -\n",
+            "- a\n\n  q\n  --\n",
             "<h2>q</h2>",
         ),
         (
             "<ul><li><blockquote><h2>q</h2></blockquote></li></ul>",
-            "- > q\n  > -\n",
+            "- > q\n  > --\n",
             "<h2>q</h2>",
         ),
         (
             "<ul><li><blockquote><p>a</p><h2>q</h2></blockquote></li></ul>",
-            "- > a\n  >\n  > q\n  > -\n",
+            "- > a\n  >\n  > q\n  > --\n",
             "<p>a</p>\n<h2>q</h2>",
         ),
     ] {
@@ -437,7 +437,7 @@ fn should_start_an_underlined_heading_after_a_line_of_the_item_after_a_blank_lin
     for (html, expected, heading) in [
         (
             "<ul><li>a<h2>q</h2></li></ul>",
-            "- a\n\n  q\n  -\n",
+            "- a\n\n  q\n  --\n",
             "<p>a</p>\n<h2>q</h2>",
         ),
         (
@@ -447,12 +447,12 @@ fn should_start_an_underlined_heading_after_a_line_of_the_item_after_a_blank_lin
         ),
         (
             "<ul><li>a<blockquote>p</blockquote><h2>q</h2></li></ul>",
-            "- a\n  > p\n\n  q\n  -\n",
+            "- a\n  > p\n\n  q\n  --\n",
             "</blockquote>\n<h2>q</h2>",
         ),
         (
             "<ol><li>a<h2>q</h2>b</li><li>c</li></ol>",
-            "1. a\n\n   q\n   -\n   b\n2. c\n",
+            "1. a\n\n   q\n   --\n   b\n2. c\n",
             "<h2>q</h2>\n<p>b</p>",
         ),
     ] {
@@ -477,19 +477,19 @@ fn should_write_an_underlined_heading_in_a_list_in_a_quote_at_the_content_column
     for (html, expected) in [
         (
             "<blockquote><ul><li><h2>q</h2></li></ul></blockquote>",
-            "> - q\n>   -\n",
+            "> - q\n>   --\n",
         ),
         (
             r#"<blockquote><ul><li><input type="checkbox"><h2>q</h2></li></ul></blockquote>"#,
-            "> - [ ]\n>\n>   q\n>   -\n",
+            "> - [ ]\n>\n>   q\n>   --\n",
         ),
         (
             "<ul><li><blockquote><ul><li><h2>q</h2></li></ul></blockquote></li></ul>",
-            "- > * q\n  >   -\n",
+            "- > * q\n  >   --\n",
         ),
         (
             "<ul><li><blockquote><h2>q</h2></blockquote></li></ul>",
-            "- > q\n  > -\n",
+            "- > q\n  > --\n",
         ),
     ] {
         assert_converts(html, &options, expected, &["<h2>q</h2>"]);
@@ -502,7 +502,7 @@ fn should_write_an_underlined_heading_in_a_list_in_a_quote_at_the_content_column
     assert_converts(
         "<blockquote><ul><li><h2>q</h2></li></ul></blockquote>",
         &tabs,
-        "> - q\n> \t-\n",
+        "> - q\n> \t--\n",
         &["<h2>q</h2>"],
     );
 }
@@ -514,15 +514,15 @@ fn should_start_a_block_after_an_underlined_heading_of_one_letter_in_its_own_par
         ..tier2_options()
     };
     for (html, expected) in [
-        ("<ul><li><h2>q</h2><p>t</p></li></ul>", "- q\n  -\n\n  t\n"),
+        ("<ul><li><h2>q</h2><p>t</p></li></ul>", "- q\n  --\n\n  t\n"),
         (
             r#"<ul><li><input type="checkbox"><h2>q</h2><p>t</p></li></ul>"#,
-            "- [ ]\n\n  q\n  -\n\n  t\n",
+            "- [ ]\n\n  q\n  --\n\n  t\n",
         ),
-        ("<ol><li><h2>q</h2><p>t</p></li></ol>", "1. q\n   -\n\n   t\n"),
+        ("<ol><li><h2>q</h2><p>t</p></li></ol>", "1. q\n   --\n\n   t\n"),
         (
             "<ul><li>a<ul><li><h2>q</h2><p>t</p></li></ul></li></ul>",
-            "- a\n  * q\n    -\n\n    t\n",
+            "- a\n  * q\n    --\n\n    t\n",
         ),
     ] {
         assert_converts(html, &options, expected, &["<h2>q</h2>\n<p>t</p>"]);

@@ -621,15 +621,11 @@ pub fn nested_block_context(output: &str, ctx: &Context, options: &ConversionOpt
 ///
 /// ~keep Whitespace-only text after the marker (kept in strict whitespace mode) is not content:
 /// ~keep counting it made the first block of the item start after a blank line, which ends the
-/// ~keep item in `CommonMark` (issue #583). A marker ends in its own space, so a `-` that a line
-/// ~keep end follows is a setext underline, not a marker (issue #635).
+/// ~keep item in `CommonMark` (issue #583).
 pub fn trim_whitespace_after_bare_marker(output: &mut String) -> bool {
     let content_end = output.trim_end().len();
     if content_end == output.len() {
         return line_is_bare_list_marker(output);
-    }
-    if !output[content_end..].starts_with([' ', '\t']) {
-        return false;
     }
     let tail = output[content_end..].to_string();
     output.truncate(content_end);
