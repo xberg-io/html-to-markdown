@@ -231,10 +231,23 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             continue;
         }
 
-        if let Some((indent, marker, content)) = parse_list_item(line) {
+        if let Some((indent, mut marker, mut content)) = parse_list_item(line) {
+            // ~keep An item whose text starts with a marker holds a nested list on the same line, and
+            // ~keep its text continues at the nested item's content column: `- 1.` alone on a line is
+            // ~keep an empty item that the next line cannot join. Both markers wrap as one.
+            while let Some((_, inner_marker, inner_content)) = parse_list_item(&content) {
+                marker.push_str(&inner_marker);
+                content = inner_content;
+            }
             paragraph.flush(&mut result, width);
             if content.is_empty() {
                 result.push_str(&wrap_list_item(&indent, &marker, &content, width));
+            } else if opens_block(&content) {
+                // ~keep Text that starts a heading, a fence, a quote or a rule is not a paragraph:
+                // ~keep reflowed, a heading loses its words to the next line and a fence its code.
+                open_fence = code_fence(&content);
+                result.push_str(line);
+                result.push('\n');
             } else {
                 paragraph.open(&indent, &marker, &content);
             }
@@ -350,6 +363,24 @@ mod tests {
         assert_eq!(wrap_at_20("1. a\n\n   para\n2. b\n"), "1. a\n\n   para\n\n2. b\n");
         assert_eq!(wrap_at_20("- a\n---\n"), "- a\n---\n");
         assert_eq!(wrap_at_20("- \n- b\n"), "-\n- b\n");
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_nested_marker_on_the_line_of_its_text() {
+        assert_eq!(
+            wrap_at_20("- 1. [vote](https://example.com/vote) title\n"),
+            "- 1. [vote](https://example.com/vote)\n     title\n"
+        );
+        assert_eq!(wrap_at_20("- 1.\n"), "- 1.\n");
+        assert_eq!(
+            wrap_at_20("- ## one two three four five\n"),
+            "- ## one two three four five\n"
+        );
+        let fenced = "- ```\n  one two three four five six\n  ```\nafter\n";
+        assert_eq!(
+            wrap_at_20(fenced),
+            "- ```\n  one two three four five six\n  ```\nafter\n\n"
+        );
     }
 
     #[test]

@@ -101,6 +101,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   angle brackets, `[Share](<https://example.com/?text=a b>)`, and a line end inside the brackets
   ends the link. With `wrap` on, the reflow broke the line there. It now keeps the address in
   angle brackets on one line.
+- **Wrap mode cut a nested list marker off from its text.** A list item that holds a nested list
+  on its own line, such as `- 3. [vote](...) title`, wrapped to `- 3.` and the text on the next
+  line. `- 3.` alone is an empty nested item, and the text below it left the nested list. The
+  reflow now treats both markers as one, so the text stays in the nested item. An item whose
+  text starts a heading or a code fence, such as `- ## Title`, is no longer reflowed: the heading
+  kept only its first words, and the code lines were joined and wrapped like text.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition

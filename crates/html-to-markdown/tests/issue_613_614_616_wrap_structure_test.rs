@@ -130,3 +130,23 @@ fn should_keep_a_link_destination_with_spaces_on_one_line_when_wrapping() {
     );
     assert_wrap_keeps_structure(html, &[20, 40, 80], NewlineStyle::Spaces);
 }
+
+#[test]
+fn should_keep_a_nested_list_marker_with_its_text_when_wrapping() {
+    let html = "<ul><li><ol start=\"3\"><li><a href=\"https://news.example.com/vote?id=46001889&amp;how=up\">vote</a> Olmo 3: Charting a path</li></ol></li></ul>";
+    assert!(
+        converted(html, None, NewlineStyle::Spaces).starts_with("- 3. [vote]"),
+        "the nested marker must still share the line of the outer marker"
+    );
+    assert_wrap_keeps_structure(html, &[20, 40], NewlineStyle::Spaces);
+}
+
+#[test]
+fn should_not_reflow_a_heading_or_a_code_block_that_starts_a_list_item() {
+    for html in [
+        "<ul><li><h2>one two three four five six seven</h2></li></ul>",
+        "<ul><li><pre>one two three four five six seven</pre></li></ul>",
+    ] {
+        assert_wrap_keeps_structure(html, &[20], NewlineStyle::Spaces);
+    }
+}
