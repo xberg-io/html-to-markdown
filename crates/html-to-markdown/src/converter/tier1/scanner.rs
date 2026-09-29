@@ -679,6 +679,7 @@ pub fn scan(
                     ol_start,
                     name_range: name_start..name_end,
                     dropped_whitespace_only_text: false,
+                    own_buffer: renders_into_own_buffer(spec.kind, name_lower, prev_ctx),
                 });
 
                 apply_open_escape_ctx(&mut state, spec);
@@ -1299,23 +1300,24 @@ fn emit_open(
                 // `block_container_is_passthrough`'s doc comment.
             } else if state.in_table_cell() {
                 let br_in_tables = options.br_in_tables;
-                let cell_buf = state.cell_or_output_mut();
-                if !cell_buf.is_empty()
-                    && !cell_buf.ends_with('|')
-                    && !cell_buf.ends_with("<br>")
-                    && !cell_buf.ends_with("  \n")
-                {
-                    // ~keep Routed through the same helper Tier-2's `is_table_continuation`
-                    // branch uses (`block/div.rs` -> `emit_table_cell_break`) rather
-                    // than pushing `"  \n"` unconditionally. The hardcoded form ignored
-                    // `br_in_tables`, which defaults to false: Tier-2 emits a single
-                    // space, while `"  \n"` survives `close_table_cell`'s
-                    // `replace('\n', ' ')` as a three-space run, so two sibling block
-                    // containers in one cell rendered `a   b` here against Tier-2's
-                    // `a b`. The list path was already moved onto this helper; the
-                    // block path was missed.
-                    crate::converter::main_helpers::emit_table_cell_break(cell_buf, br_in_tables);
-                }
+                with_cell_scratch(state, |cell_buf| {
+                    if !cell_buf.is_empty()
+                        && !cell_buf.ends_with('|')
+                        && !cell_buf.ends_with("<br>")
+                        && !cell_buf.ends_with('\n')
+                    {
+                        // ~keep Routed through the same helper Tier-2's `is_table_continuation`
+                        // branch uses (`block/div.rs` -> `emit_table_cell_break`) rather
+                        // than pushing `"  \n"` unconditionally. The hardcoded form ignored
+                        // `br_in_tables`, which defaults to false: Tier-2 emits a single
+                        // space, while `"  \n"` survives `close_table_cell`'s
+                        // `replace('\n', ' ')` as a three-space run, so two sibling block
+                        // containers in one cell rendered `a   b` here against Tier-2's
+                        // `a b`. The list path was already moved onto this helper; the
+                        // block path was missed.
+                        crate::converter::main_helpers::emit_table_cell_break(cell_buf, br_in_tables);
+                    }
+                });
             } else {
                 // ~keep Tier-2's `needs_leading_sep` (block/div.rs) appends "\n\n" BLINDLY
                 // whenever the output doesn't already end with a blank line — it does
@@ -1361,11 +1363,11 @@ fn open_paragraph(state: &mut Tier1State, br_in_tables: bool) {
     // (issue #647); we mirror that behaviour so the cell buffer stays on one
     // logical line (no `\n` in cell output to collapse later).
     if state.in_table_cell() {
-        let cell_buf = state.cell_or_output_mut();
-        if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with("<br>") && !cell_buf.ends_with('\n')
-        {
-            crate::converter::main_helpers::emit_table_cell_break(cell_buf, br_in_tables);
-        }
+        with_cell_scratch(state, |cell_buf| {
+            if !cell_buf.is_empty() && !cell_buf.ends_with("<br>") && !cell_buf.ends_with('\n') {
+                crate::converter::main_helpers::emit_table_cell_break(cell_buf, br_in_tables);
+            }
+        });
         return;
     }
     // ~keep Mirrors Tier-2: when output is non-empty and doesn't already end
@@ -1560,14 +1562,19 @@ fn open_list(state: &mut Tier1State, kind: ListKind, options: &ConversionOptions
     // `br_in_tables`, otherwise a single space, exactly like
     // `main_helpers::emit_table_cell_break`.  Do not touch `state.output`.
     if state.in_table_cell() {
-        let cell_buf = state.cell_or_output_mut();
-        if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with(' ') && !cell_buf.ends_with("<br>") {
-            if options.br_in_tables {
-                cell_buf.push_str("<br>");
-            } else {
-                cell_buf.push(' ');
+        with_cell_scratch(state, |cell_buf| {
+            if !cell_buf.is_empty()
+                && !cell_buf.ends_with('|')
+                && !cell_buf.ends_with(' ')
+                && !cell_buf.ends_with("<br>")
+            {
+                if options.br_in_tables {
+                    cell_buf.push_str("<br>");
+                } else {
+                    cell_buf.push(' ');
+                }
             }
-        }
+        });
         state.list_depth = state.list_depth.saturating_add(1);
         if matches!(kind, ListKind::Unordered) {
             state.ul_depth = state.ul_depth.saturating_add(1);
@@ -1626,14 +1633,19 @@ fn open_list_item(state: &mut Tier1State, options: &ConversionOptions) {
         if find_parent_list_kind(&state.stack) == Some(ListKind::Ordered) {
             increment_ol_counter(&mut state.stack);
         }
-        let cell_buf = state.cell_or_output_mut();
-        if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with(' ') && !cell_buf.ends_with("<br>") {
-            if options.br_in_tables {
-                cell_buf.push_str("<br>");
-            } else {
-                cell_buf.push(' ');
+        with_cell_scratch(state, |cell_buf| {
+            if !cell_buf.is_empty()
+                && !cell_buf.ends_with('|')
+                && !cell_buf.ends_with(' ')
+                && !cell_buf.ends_with("<br>")
+            {
+                if options.br_in_tables {
+                    cell_buf.push_str("<br>");
+                } else {
+                    cell_buf.push(' ');
+                }
             }
-        }
+        });
         return;
     }
     let parent_kind = find_parent_list_kind(&state.stack);
@@ -1872,9 +1884,8 @@ fn emit_void(
                 state.output.push_str("___\n");
                 return Ok(());
             }
-            {
-                let in_cell = state.in_table_cell();
-                let dest = state.cell_or_output_mut();
+            let in_cell = state.in_table_cell();
+            let write_rule = |dest: &mut String| {
                 // ~keep Tier-2 trims the space a cell break left before the rule (issue #628).
                 if in_cell {
                     crate::converter::main_helpers::trim_trailing_whitespace(dest);
@@ -1886,8 +1897,13 @@ fn emit_void(
                         dest.push_str("\n\n");
                     }
                 }
+                dest.push_str("---\n");
+            };
+            if in_cell {
+                with_cell_scratch(state, write_rule);
+            } else {
+                write_rule(state.cell_or_output_mut());
             }
-            state.cell_or_output_mut().push_str("---\n");
         }
 
         TagKind::LineBreak => {
@@ -1974,14 +1990,18 @@ fn emit_void(
                 // just via the branch that already existed for ordinary (non-code)
                 // cell content. Not a literal `<br>`: that HTML tag is not valid
                 // content inside a code span regardless of `br_in_tables`.
+                // ~keep Tier-2 writes the space into an inline element's own buffer even when that
+                // ~keep buffer is empty; only a break at the start of the cell writes nothing.
                 let emit_literal_br = options.br_in_tables && !state.escape_ctx.contains(EscapeCtx::CODE);
-                let dest = state.cell_or_output_mut();
-                crate::converter::main_helpers::trim_trailing_whitespace(dest);
-                if emit_literal_br {
-                    dest.push_str("<br>");
-                } else if !dest.is_empty() {
-                    dest.push(' ');
-                }
+                let cell_is_empty = state.cell_or_output_mut().is_empty();
+                with_cell_scratch(state, |dest| {
+                    crate::converter::main_helpers::trim_trailing_whitespace(dest);
+                    if emit_literal_br {
+                        dest.push_str("<br>");
+                    } else if !cell_is_empty {
+                        dest.push(' ');
+                    }
+                });
             } else if state.escape_ctx.contains(EscapeCtx::CODE) {
                 // ~keep A code SPAN otherwise reproduces its content literally but has no
                 // interior line structure of its own: `<br>` is a DOM-level split
@@ -2887,8 +2907,9 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool)
             // ~keep In code Tier-2 keeps the line ends the quote writes there; the cell folds them.
             let cell_buf = state.cell_or_output_mut();
             let content_start = clamp_to_char_boundary(cell_buf, frame.content_start);
-            if !cell_buf[content_start..].trim().is_empty() {
-                let content = cell_buf.split_off(content_start);
+            // ~keep A quote that holds only whitespace writes nothing, as in Tier-2.
+            let content = cell_buf.split_off(content_start);
+            if !content.trim().is_empty() {
                 if !cell_buf.is_empty() && !cell_buf.ends_with('\n') {
                     cell_buf.push('\n');
                 }
@@ -2969,28 +2990,61 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool)
     }
 }
 
+/// Whether Tier-2 renders the content of the element `name_lower` of kind `kind`, opened in the
+/// escape context `ctx`, into a buffer of its own rather than into its parent's.
+///
+/// A cell break checks and trims only that buffer in Tier-2, so Tier-1 must not look past the
+/// start of such an element in the flat cell buffer (see [`cell_scratch_start`]).
+fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> bool {
+    match kind {
+        TagKind::Blockquote | TagKind::Heading(_) | TagKind::Pre => true,
+        // ~keep Inside code Tier-2 writes these straight into the code span.
+        TagKind::Code | TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted => {
+            !ctx.contains(EscapeCtx::CODE)
+        }
+        _ => matches!(name_lower, b"sub" | b"sup" | b"abbr"),
+    }
+}
+
+/// The start, in the current cell buffer, of the buffer Tier-2 writes the current content into:
+/// the content start of the innermost element opened in this cell that has a buffer of its own,
+/// or 0 for the cell itself.
+fn cell_scratch_start(state: &Tier1State) -> usize {
+    state
+        .stack
+        .iter()
+        .rev()
+        .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
+        .find(|frame| frame.own_buffer)
+        .map_or(0, |frame| frame.content_start)
+}
+
+/// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell
+/// break checks and trims only that content, as Tier-2's does (issue #645).
+fn with_cell_scratch<R>(state: &mut Tier1State, write: impl FnOnce(&mut String) -> R) -> R {
+    let start = cell_scratch_start(state);
+    let cell_buf = state.cell_or_output_mut();
+    let start = clamp_to_char_boundary(cell_buf, start);
+    if start == 0 {
+        return write(cell_buf);
+    }
+    let mut scratch = cell_buf.split_off(start);
+    let result = write(&mut scratch);
+    cell_buf.push_str(&scratch);
+    result
+}
+
 /// Write the cell break at `at` in the cell buffer, between a block in a table cell and the cell
 /// content before it, as Tier-2 does (issue #645).
 ///
-/// Tier-2 renders emphasis, code and the other marker elements into a scratch buffer of their
-/// own, so only the content written since the innermost of them opened counts. Inside a heading or
-/// code Tier-2 writes the content inline with no break. Tier-2 trims the start of a block's
-/// content, so the content after `at` is trimmed too.
+/// Only the content written since the innermost element with a buffer of its own opened counts
+/// (see [`cell_scratch_start`]). Inside a heading or code Tier-2 writes the content inline with no
+/// break. Tier-2 trims the start of a block's content, so the content after `at` is trimmed too.
 fn separate_block_in_cell_at(state: &mut Tier1State, at: usize, br_in_tables: bool) {
     if state.escape_ctx.intersects(EscapeCtx::HEADING | EscapeCtx::CODE) {
         return;
     }
-    let scratch_start = state
-        .stack
-        .iter()
-        .rev()
-        .find(|frame| {
-            matches!(
-                frame.spec.kind,
-                TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted | TagKind::Code
-            )
-        })
-        .map_or(0, |frame| frame.content_start);
+    let scratch_start = cell_scratch_start(state);
     let cell_buf = state.cell_or_output_mut();
     let at = clamp_to_char_boundary(cell_buf, at);
     let scratch_start = clamp_to_char_boundary(cell_buf, scratch_start.min(at));
@@ -3863,11 +3917,31 @@ fn close_table(
         // otherwise, so `close_table_cell`'s unconditional newline fold has nothing left
         // to flatten and both tiers spell the boundary the same way.
         let nested = crate::converter::block::table::cell::fold_nested_table_rows(&nested, options.br_in_tables);
-        let dest = state.cell_or_output_mut();
-        if !nested.is_empty() && !dest.trim_end().is_empty() {
-            crate::converter::main_helpers::emit_table_cell_break(dest, options.br_in_tables);
+        let write_nested = |dest: &mut String| {
+            if !nested.is_empty() && !dest.trim_end().is_empty() {
+                crate::converter::main_helpers::emit_table_cell_break(dest, options.br_in_tables);
+            }
+            dest.push_str(&nested);
+        };
+        // ~keep Tier-2 separates the cell's child that holds the table from the whole cell
+        // ~keep before it, but a quote, heading or code block around the table separates
+        // ~keep itself when it closes, so the table breaks only inside that block.
+        let in_block = state
+            .stack
+            .iter()
+            .rev()
+            .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. }))
+            .any(|frame| {
+                matches!(
+                    frame.spec.kind,
+                    TagKind::Blockquote | TagKind::Heading(_) | TagKind::Pre
+                )
+            });
+        if in_block {
+            with_cell_scratch(state, write_nested);
+        } else {
+            write_nested(state.cell_or_output_mut());
         }
-        dest.push_str(&nested);
     } else {
         emit_gfm_table(&mut state.output, ts);
     }

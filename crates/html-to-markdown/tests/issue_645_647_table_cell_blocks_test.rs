@@ -93,7 +93,7 @@ fn should_separate_text_before_a_heading_or_code_block_in_a_cell() {
 }
 
 #[test]
-fn should_write_one_break_where_the_cell_already_has_one() {
+fn should_write_no_break_after_a_break_or_around_an_empty_block() {
     check(&[
         ("<p>a</p> b", "a b", "a<br> b"),
         ("<p>a</p><br>b", "a b", "a<br>b"),
@@ -102,11 +102,101 @@ fn should_write_one_break_where_the_cell_already_has_one() {
         ("a<h2> </h2>b", "a b", "a<br>b"),
         ("a<h2> </h2>", "a", "a"),
         ("a<blockquote> </blockquote>", "a", "a"),
-        ("a<b><h2>b</h2></b>", "a**b**", "a**b**"),
         ("<p>a<br></p>b", "a b", "a<br>b"),
         ("<section>a</section>b", "a b", "a<br>b"),
+    ]);
+}
+
+/// Both converters write an emphasis, code, sub, sup, abbr, quote or heading in a cell into a
+/// buffer of its own, so a block at the start of one has no content to break from.
+#[test]
+fn should_write_no_break_before_a_block_at_the_start_of_inline_markup() {
+    check(&[
+        ("a<b><h2>b</h2></b>", "a**b**", "a**b**"),
+        ("a<sub><pre>b</pre></sub>c", "ab c", "ab<br>c"),
+        ("a<sup><p>b</p></sup>c", "ab c", "ab<br>c"),
+        ("a<abbr><p>b</p></abbr>c", "ab c", "ab<br>c"),
+        ("a<kbd><p>b</p></kbd>c", "a`b` c", "a`b`<br>c"),
+        ("a<em><p>b</p></em>c", "a*b* c", "a*b*<br>c"),
+        ("<em><p>a</p>b</em>", "*a b*", "*a<br>b*"),
+        ("x<h2><div>b</div></h2>", "x b", "x<br>b"),
+        ("a<b><div>b</div></b>", "a**b**", "a**b**"),
+        ("a<b><ul><li>x</li></ul></b>", "a**x**", "a**x**"),
+        ("a<b><li>x</li></b>", "a**x**", "a**x**"),
+    ]);
+}
+
+/// A cell break never trims the space before a quote: the quote's content starts after it.
+#[test]
+fn should_keep_the_cell_break_whole_before_a_quote_in_a_cell() {
+    check(&[
+        ("a <blockquote><p>b</p></blockquote>", "a b", "a<br>b"),
+        (
+            "<section>- x <blockquote><div></div></blockquote></section>",
+            "- x",
+            "- x",
+        ),
+        ("<div><hr><blockquote><pre><li></pre></blockquote></div>", "---", "---"),
+        ("a <blockquote><br>b</blockquote>", "a b", "a<br><br>b"),
+        ("a <blockquote><hr></blockquote>", "a ---", "a<br>---"),
+        ("x <pre><p>b</p></pre>", "x b", "x<br>b"),
+        ("x<pre><li>b</li></pre>", "x b", "x<br>b"),
+        ("a <sub><hr></sub>", "a ---", "a ---"),
+        ("<li>a</li><li><code><br></code></li>b", "a ` ` b", "a<br>` `<br>b"),
+        (
+            "a <blockquote><details><summary>s<p>x</p></summary></details></blockquote>",
+            "a **s x**",
+            "a<br>**s<br>x**",
+        ),
+    ]);
+}
+
+/// A quote or a table next to it outside the cell does not change where the cell's content starts.
+#[test]
+fn should_write_the_same_cell_in_a_table_inside_a_quote_in_both_tiers() {
+    for (html, cell) in [
+        (
+            "abc<blockquote><table><tr><td>a<p>b</p></td></tr></table></blockquote>",
+            "| a b |",
+        ),
+        (
+            "<table><tr><td>a <blockquote><table><tr><td>x</td></tr></table></blockquote></td><td>z</td></tr></table>",
+            r"| a \| x \| \| --- \| | z |",
+        ),
+        (
+            "<table><tr><td>a<sub><table><tr><td>x</td></tr></table></sub></td><td>z</td></tr></table>",
+            r"| a \| x \| \| --- \| | z |",
+        ),
+    ] {
+        for br_in_tables in [false, true] {
+            let tier2_out = tier2(html, br_in_tables);
+            let tier1_out = tier1_run(html, br_in_tables).expect("tier 1 must not bail");
+            let row = |markdown: &str| markdown.lines().find(|line| line.contains("| ")).map(str::to_string);
+            assert_eq!(row(&tier1_out), row(&tier2_out), "{html:?}");
+            if !br_in_tables {
+                assert!(tier2_out.contains(cell), "{html:?}: {tier2_out:?}");
+            }
+        }
+    }
+}
+
+/// A line end in a code block is a break of its own, which the cell folds.
+#[test]
+fn should_write_no_cell_break_after_a_line_end_in_a_code_block() {
+    check(&[
+        ("<pre>a<br><p>b</p></pre>", "a b", "a b"),
+        ("<pre>a<br><div>b</div></pre>", "a b", "a b"),
+    ]);
+}
+
+#[test]
+fn should_write_no_break_for_a_block_inside_code_or_a_heading() {
+    check(&[
         ("<code>a<h2>b</h2></code>", "`ab`", "`ab`"),
         ("<code>a<pre>b</pre></code>", "`ab`", "`ab`"),
+        ("<h2>a<blockquote>b</blockquote></h2>", "ab", "ab"),
+        ("<code>b c<code><br></code></code>", "`b c `", "`b c `"),
+        ("<code>a<blockquote> </blockquote></code>", "`a`", "`a`"),
     ]);
 }
 
@@ -119,6 +209,11 @@ fn should_write_a_quote_in_a_cell_without_its_marker_in_both_tiers() {
         ("<blockquote><p>a</p><p>b</p></blockquote>", "a b", "a<br>b"),
         ("<blockquote><blockquote>a</blockquote>b</blockquote>", "a b", "a<br>b"),
         ("<code><blockquote>a</blockquote>b</code>", "`a`   `b`", "`a`   `b`"),
+        (
+            "x<code>a<blockquote>q</blockquote>b</code>",
+            "x`a`   `q`   `b`",
+            "x`a`   `q`   `b`",
+        ),
     ]);
 }
 

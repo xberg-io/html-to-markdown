@@ -431,8 +431,9 @@ fn separate_from_block(
     if ctx.in_table_cell {
         // ~keep A block in a cell ends with no line end, so the cell break separates the inline
         // ~keep content after it (issue #645). A line break is a break of its own, and without
-        // ~keep `br_in_tables` a text's leading space is the break. A kept HTML block is text in a cell,
-        // ~keep and a nested table is lifted out of it or folded with its own breaks.
+        // ~keep `br_in_tables` a text's leading space is the break. A kept HTML block is text in a cell.
+        // ~keep A nested table adds no break: a table moved out of the cell ends its own line, and the
+        // ~keep text after a table folded into the cell joins the table's last row.
         if is_inline_content(node, node_handle, parser, dom_ctx)
             && !is_line_break(node_handle, parser, dom_ctx)
             && (options.br_in_tables || !starts_with_space(node))
