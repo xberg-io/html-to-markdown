@@ -439,6 +439,8 @@ pub fn scan(
                         if !state.in_table_cell() && state.list_continuation_indent_width() > 0 {
                             return Err(BailReason::ListItemUnsupportedBlockChild);
                         }
+                        // ~keep Tier-2 still sees the dropped block before the content after it.
+                        state.last_closed_block = true;
                         let open_end = close.0 + 1;
                         if close.1 {
                             pos = open_end;
@@ -569,7 +571,13 @@ pub fn scan(
                             | TagKind::DefinitionDescription
                             | TagKind::Table
                     );
-                    if !inlineable {
+                    // ~keep Tier-2 separates a sectioning element from the cell content before it
+                    // ~keep with a blank line, which the cell folds into two spaces.
+                    let sectioning_after_content = matches!(
+                        name_lower,
+                        b"article" | b"section" | b"nav" | b"aside" | b"header" | b"footer" | b"main"
+                    ) && !state.cell_or_output_mut().is_empty();
+                    if !inlineable || sectioning_after_content {
                         return Err(BailReason::TableBlockChildInCell);
                     }
                 }
@@ -2375,7 +2383,9 @@ fn emit_close(
         TagKind::RawText(_) | TagKind::Ignored => {}
     }
     // ~keep An inline element whose last content is a block ends in that block too (issue #585).
-    state.last_closed_block = is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
+    // ~keep In a cell Tier-2 writes no break after a nested table (see `separate_from_block`).
+    let breaks_after = is_block_tag(name_lower) && !(matches!(spec.kind, TagKind::Table) && state.in_table_cell());
+    state.last_closed_block = breaks_after || (state.last_closed_block && is_inline_tag(name_lower));
 
     Ok(())
 }
@@ -2997,12 +3007,31 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool)
 /// start of such an element in the flat cell buffer (see [`cell_scratch_start`]).
 fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> bool {
     match kind {
-        TagKind::Blockquote | TagKind::Heading(_) | TagKind::Pre => true,
+        TagKind::Blockquote
+        | TagKind::Heading(_)
+        | TagKind::Pre
+        | TagKind::Figcaption
+        | TagKind::List(ListKind::Definition)
+        | TagKind::DefinitionTerm
+        | TagKind::DefinitionDescription => true,
         // ~keep Inside code Tier-2 writes these straight into the code span.
         TagKind::Code | TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted => {
             !ctx.contains(EscapeCtx::CODE)
         }
-        _ => matches!(name_lower, b"sub" | b"sup" | b"abbr"),
+        _ => matches!(
+            name_lower,
+            b"sub"
+                | b"sup"
+                | b"abbr"
+                | b"figure"
+                | b"details"
+                | b"dialog"
+                | b"menu"
+                | b"form"
+                | b"fieldset"
+                | b"legend"
+                | b"label"
+        ),
     }
 }
 

@@ -238,3 +238,69 @@ fn should_write_the_same_paragraph_break_in_a_cell_in_both_tiers() {
 fn should_keep_the_code_span_after_an_empty_heading_in_a_cell() {
     check(&[("<hr><code><h2></h2>b c</code>", "--- `b c`", "---<br>`b c`")]);
 }
+
+/// Inside code Tier-2 writes bold into the code span, so a block in the bold breaks from the
+/// code before it.
+#[test]
+fn should_break_before_a_block_in_bold_inside_code_in_a_cell() {
+    check(&[
+        ("<code>a<b><p>y</p></b>q</code>", "`a yq`", "`a<br>yq`"),
+        ("<pre>a<b><p>y</p></b>q</pre>", "a yq", "a<br>yq"),
+    ]);
+}
+
+/// Tier-2 writes a definition term, a definition and a label into a buffer of their own, so a
+/// block at their start has no content to break from.
+#[test]
+fn should_write_no_break_before_a_block_at_the_start_of_a_definition_or_label() {
+    check(&[
+        ("a <dt><p>b</p></dt>c", "a b c", "a b<br>c"),
+        ("a <dd><p>b</p></dd>c", "a b c", "a b<br>c"),
+        ("a <label><p>b</p></label>c", "a b c", "a b<br>c"),
+    ]);
+}
+
+/// Tier-2 still sees a navigation block that preprocessing drops, so the text after it breaks.
+#[test]
+fn should_separate_text_after_a_dropped_navigation_block_in_a_cell() {
+    check(&[("a<nav>x <p>b</p></nav>c", "a c", "a<br>c")]);
+}
+
+/// The text after a nested table folded into a cell joins the table's last row in both tiers.
+#[test]
+fn should_join_text_after_a_folded_nested_table_in_both_tiers() {
+    let html = "<table><tr><td><table><tr><td>x</td></tr></table>b</td><td>z</td></tr></table>";
+    for (br_in_tables, cell) in [
+        (false, r"| \| x \| \| --- \|b | z |"),
+        (true, r"| \| x \|<br>\| --- \|b | z |"),
+    ] {
+        let tier2_out = tier2(html, br_in_tables);
+        assert_eq!(tier2_out.lines().next(), Some(cell), "br_in_tables={br_in_tables}");
+        let tier1_out = tier1_run(html, br_in_tables).expect("tier 1 must not bail");
+        assert_eq!(tier1_out.lines().next(), Some(cell), "br_in_tables={br_in_tables}");
+    }
+}
+
+/// Tier-2 separates a section from the cell content before it with a blank line, which the cell
+/// folds into two spaces, so the fast converter leaves that cell to Tier-2.
+#[test]
+fn should_leave_a_section_after_cell_content_to_tier2() {
+    for cell in ["a<section>b</section>c", "<code>a<section></section></code>"] {
+        for br_in_tables in [false, true] {
+            assert!(
+                matches!(
+                    tier1_run(&table(cell), br_in_tables),
+                    Err(tier1::BailReason::TableBlockChildInCell)
+                ),
+                "{cell:?} br_in_tables={br_in_tables}"
+            );
+        }
+    }
+    let auto = ConversionOptions {
+        tier_strategy: TierStrategy::Auto,
+        ..tier2_options(false)
+    };
+    let html = table("a<section>b</section>c");
+    let auto_out = convert(&html, Some(auto)).expect("conversion must succeed").content;
+    assert_eq!(auto_out, Some(tier2(&html, false)));
+}
