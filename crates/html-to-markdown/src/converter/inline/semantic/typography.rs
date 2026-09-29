@@ -86,7 +86,7 @@ pub fn handle_subscript(
     let children = tag.children();
     let (open, close) = resolve_script_delimiters(options, &options.sub_symbol, '~');
     let marker_ctx = Context {
-        text_in_markers: ctx.text_in_markers || !open.is_empty(),
+        in_marker_span: ctx.in_marker_span || !open.is_empty(),
         ..ctx.clone()
     };
     for child_handle in children.top().iter() {
@@ -198,7 +198,7 @@ pub fn handle_superscript(
     let children = tag.children();
     let (open, close) = resolve_script_delimiters(options, &options.sup_symbol, '^');
     let marker_ctx = Context {
-        text_in_markers: ctx.text_in_markers || !open.is_empty(),
+        in_marker_span: ctx.in_marker_span || !open.is_empty(),
         ..ctx.clone()
     };
     for child_handle in children.top().iter() {
@@ -317,7 +317,7 @@ pub fn handle_variable(
     let mut content = String::with_capacity(32);
     let children = tag.children();
     let marker_ctx = Context {
-        text_in_markers: true,
+        in_marker_span: true,
         ..ctx.clone()
     };
     for child_handle in children.top().iter() {
@@ -386,7 +386,7 @@ pub fn handle_definition(
     let mut content = String::with_capacity(32);
     let children = tag.children();
     let marker_ctx = Context {
-        text_in_markers: true,
+        in_marker_span: true,
         ..ctx.clone()
     };
     for child_handle in children.top().iter() {

@@ -246,3 +246,62 @@ fn should_agree_across_tiers_on_a_rule_between_markers() {
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
+
+#[test]
+fn should_join_a_rule_that_starts_a_term_or_a_section_between_markers() {
+    for (html, expected) in [
+        ("<div><b><dl><dd>d</dd><dt><hr>t</dt></dl></b></div>", "**d --- t**"),
+        ("<div><b>a<section><hr>x</section></b></div>", "**a --- x**"),
+    ] {
+        assert_eq!(tier2(html).trim_end(), expected, "{html:?}");
+    }
+}
+
+/// A paragraph between the markers already splits them (a known gap); the rule after it still
+/// follows the markers' judgement and continues the text.
+#[test]
+fn should_write_a_rule_after_a_paragraph_between_markers_as_text() {
+    assert_eq!(tier2("<div><b>a<p>x</p><hr>c</b></div>").trim_end(), "**a\n\nx --- c**");
+}
+
+#[test]
+fn should_write_the_content_column_of_a_list_in_a_marker_only_wrapper() {
+    let with_script_symbols = ConversionOptions {
+        sub_symbol: "~".to_owned(),
+        sup_symbol: "^".to_owned(),
+        ..tier2_options()
+    };
+    let mut failures = Vec::new();
+    for (tag, open, close) in [
+        ("del", "~~", "~~"),
+        ("s", "~~", "~~"),
+        ("mark", "==", "=="),
+        ("ins", "==", "=="),
+        ("var", "*", "*"),
+        ("dfn", "*", "*"),
+        ("sub", "~", "~"),
+        ("sup", "^", "^"),
+    ] {
+        for (body, expected) in [
+            (
+                "<ul><li>x<blockquote>q</blockquote>t</li></ul>",
+                format!("{open}- x\n  > q\n\n  t{close}"),
+            ),
+            (
+                "<ul><li>x<p>p</p>t</li></ul>",
+                format!("{open}- x\n\n  p\n\n  t{close}"),
+            ),
+        ] {
+            let html = format!("<div><{tag}>{body}</{tag}></div>");
+            let out = convert_with(&html, &with_script_symbols);
+            if out.trim_end() != expected {
+                failures.push(format!("{html:?}: {out:?}, expected {expected:?}"));
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "the item must keep its content column, so text after a quote leaves the quote:\n{}",
+        failures.join("\n")
+    );
+}

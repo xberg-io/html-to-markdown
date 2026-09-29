@@ -84,10 +84,17 @@ pub struct Context {
     /// ~keep container works that out from its own output before it renders the children, or
     /// ~keep passes false when it writes at the start of the line (issue #583).
     pub(crate) list_item_open: bool,
-    /// Whether the current output buffer is written between the markers of a block-level or
-    /// marker-only wrapper (a summary's `**`, a caption's `*`, a `<mark>`'s `==`) that does not
-    /// count in `inline_depth`. Read it through [`Self::in_marker_text`].
+    /// Whether the current output buffer is written between inline markers (a summary's `**`,
+    /// a caption's `*`): a list rendered into it is text, not a list, so its items never write
+    /// the content column (issue #583).
     pub(crate) text_in_markers: bool,
+    /// Whether the current output buffer is written between the markers of a marker-only
+    /// wrapper that does not count in `inline_depth` (a `<mark>`'s `==`, a `<del>`'s `~~`).
+    ///
+    /// ~keep A rule written there is text (issue #603). A list there still writes the content
+    /// ~keep column, unlike under `text_in_markers`: text after a quote in its item then stays out
+    /// ~keep of the quote.
+    pub(crate) in_marker_span: bool,
     /// List nesting depth (for indentation)
     pub(crate) list_depth: usize,
     /// Cumulative column width (in the `Spaces` indent type) that a nested list item at this
@@ -293,6 +300,7 @@ impl Context {
             in_list_item: false,
             list_item_open: false,
             text_in_markers: false,
+            in_marker_span: false,
             list_depth: 0,
             list_indent_columns: 0,
             ul_depth: 0,
@@ -343,10 +351,11 @@ impl Context {
     }
 
     /// Whether the current output buffer is written between inline markers: an inline wrapper's
-    /// (`inline_depth`, a link's brackets included) or a summary's or caption's
-    /// (`text_in_markers`). Block syntax written there is text, since the markers cannot span it.
+    /// (`inline_depth`, a link's brackets included), a summary's or caption's (`text_in_markers`)
+    /// or a marker-only wrapper's (`in_marker_span`). A rule written there is text, since the
+    /// markers cannot span it.
     pub(crate) const fn in_marker_text(&self) -> bool {
-        self.inline_depth > 0 || self.text_in_markers
+        self.inline_depth > 0 || self.text_in_markers || self.in_marker_span
     }
 
     /// What to write for an element whose chosen address is `address`, as

@@ -102,7 +102,7 @@ pub fn handle_mark(
     // ~keep marker text (issue #603).
     let child_ctx = Context {
         in_strong: ctx.in_strong || options.highlight_style == HighlightStyle::Bold,
-        text_in_markers: ctx.text_in_markers || options.highlight_style != HighlightStyle::None,
+        in_marker_span: ctx.in_marker_span || options.highlight_style != HighlightStyle::None,
         ..ctx.clone()
     };
     let mut content = String::with_capacity(32);
@@ -305,7 +305,7 @@ pub fn handle_strikethrough(
         let mut content = String::with_capacity(32);
         let children = tag.children();
         let marker_ctx = Context {
-            text_in_markers: true,
+            in_marker_span: true,
             ..ctx.clone()
         };
         for child_handle in children.top().iter() {
@@ -411,7 +411,7 @@ pub fn handle_inserted(
     let mut content = String::with_capacity(32);
     let children = tag.children();
     let marker_ctx = Context {
-        text_in_markers: true,
+        in_marker_span: true,
         ..ctx.clone()
     };
     for child_handle in children.top().iter() {
