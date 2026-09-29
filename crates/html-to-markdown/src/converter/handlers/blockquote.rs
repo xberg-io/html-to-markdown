@@ -59,8 +59,10 @@ pub fn handle_blockquote(
     // ~keep children start at column 0 of a container of their own, outside the item: a list in
     // ~keep the quote counts only its own markers, and every line of an item in the quote gets
     // ~keep the same column (issue #654). Bold or italic around the item holding the quote does
-    // ~keep not make a list in the quote text: its items open. Under a caption's or summary's
-    // ~keep markers, a list in the quote is still judged by where its markers fall, as outside it.
+    // ~keep not make a list in the quote text: its items open. Under the markers of a caption, a
+    // ~keep summary or an inline wrapper that does not count in the inline depth (a highlight, a
+    // ~keep deletion, a subscript), a list in the quote is still judged by where its markers fall,
+    // ~keep as outside it.
     // ~keep A quote right after an opening inline marker starts on that marker's line, so its
     // ~keep first line is text between the markers.
     let first_line_follows_markers = output.is_empty() && ctx.in_marker_text();
@@ -70,6 +72,7 @@ pub fn handle_blockquote(
         in_list: false,
         list_indent_columns: 0,
         real_item_columns: 0,
+        inline_buffer_column: None,
         inline_depth: if first_line_follows_markers {
             ctx.inline_depth
         } else {

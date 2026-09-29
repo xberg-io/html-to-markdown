@@ -85,10 +85,7 @@ pub fn handle_subscript(
     let mut content = String::with_capacity(32);
     let children = tag.children();
     let (open, close) = resolve_script_delimiters(options, &options.sub_symbol, '~');
-    let marker_ctx = Context {
-        in_marker_span: ctx.in_marker_span || !open.is_empty(),
-        ..ctx.clone()
-    };
+    let marker_ctx = ctx.inline_buffer(output, !open.is_empty());
     for child_handle in children.top().iter() {
         walk_node(
             child_handle,
@@ -197,10 +194,7 @@ pub fn handle_superscript(
     let mut content = String::with_capacity(32);
     let children = tag.children();
     let (open, close) = resolve_script_delimiters(options, &options.sup_symbol, '^');
-    let marker_ctx = Context {
-        in_marker_span: ctx.in_marker_span || !open.is_empty(),
-        ..ctx.clone()
-    };
+    let marker_ctx = ctx.inline_buffer(output, !open.is_empty());
     for child_handle in children.top().iter() {
         walk_node(
             child_handle,
@@ -316,10 +310,7 @@ pub fn handle_variable(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
-    let marker_ctx = Context {
-        in_marker_span: true,
-        ..ctx.clone()
-    };
+    let marker_ctx = ctx.inline_buffer(output, true);
     for child_handle in children.top().iter() {
         walk_node(
             child_handle,
@@ -385,10 +376,7 @@ pub fn handle_definition(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
-    let marker_ctx = Context {
-        in_marker_span: true,
-        ..ctx.clone()
-    };
+    let marker_ctx = ctx.inline_buffer(output, true);
     for child_handle in children.top().iter() {
         walk_node(
             child_handle,
@@ -443,8 +431,17 @@ pub fn handle_abbreviation(
 
     let mut content = String::with_capacity(32);
     let children = tag.children();
+    let abbr_ctx = ctx.inline_buffer(output, false);
     for child_handle in children.top().iter() {
-        walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+        walk_node(
+            child_handle,
+            parser,
+            &mut content,
+            options,
+            &abbr_ctx,
+            depth + 1,
+            dom_ctx,
+        );
     }
 
     let (prefix, suffix, trimmed) = chomp_inline(&content);

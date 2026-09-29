@@ -125,10 +125,16 @@ pub fn handle_li(
     // ~keep no block gives way to the column of the item whose marker starts a list item.
     // ~keep An empty buffer between inline markers is written after the opening marker, so a
     // ~keep marker at its start does not start a line: the indent written before it is not a
-    // ~keep column, and the marker is text.
+    // ~keep column, and the marker is text. An empty inline wrapper's buffer after only indent or
+    // ~keep a list item's marker is written where that line ends, and needs no indent.
     let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
     let marker_follows_markers = output.is_empty() && ctx.in_marker_text();
-    let marker_column = if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
+    let buffer_column = ctx
+        .inline_buffer_column
+        .filter(|_| output.is_empty() && !marker_follows_markers);
+    let marker_column = if let Some(column) = buffer_column {
+        column
+    } else if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
         let indent = crate::converter::list::utils::continuation_indent_string(
             crate::converter::list::utils::block_columns(ctx, options),
             options,

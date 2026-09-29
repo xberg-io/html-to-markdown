@@ -5,7 +5,7 @@
 //! underlined heading whose text starts a block (issue #653), and the lines of a list item in a
 //! quote or under the tab indent (issue #654).
 
-use html_to_markdown_rs::options::{HeadingStyle, ListIndentType};
+use html_to_markdown_rs::options::{HeadingStyle, HighlightStyle, ListIndentType};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 fn options(strategy: TierStrategy) -> ConversionOptions {
@@ -564,6 +564,83 @@ fn should_keep_text_after_a_quote_in_a_list_in_a_caption_or_summary_after_the_li
             &tabs(options(TierStrategy::Tier2)),
             &format!("- a\n\t* b\n\n{markers}+ y\n\t\t> - x\n\t\t> \t> q\n\t\t> \tt\n\t\tu{markers}\n"),
             &format!("<ul><li>a<ul><li>b</li></ul></li></ul><p><{tag}>+ y&gt; - x&gt; \t&gt; q&gt; \ttu</{tag}></p>"),
+        );
+    }
+}
+
+#[test]
+fn should_keep_text_after_a_block_in_a_list_after_text_in_a_wrapper_without_markers_out_of_a_code_block() {
+    for (tag, space) in [("sub", " "), ("sup", " "), ("abbr", " "), ("label", ""), ("ruby", "")] {
+        let html = format!("<ul><li>a<{tag}><ul><li>x<p>p</p>t</li></ul></{tag}></li></ul>");
+        for options in [width4(options(TierStrategy::Tier2)), tabs(options(TierStrategy::Tier2))] {
+            assert_converts(
+                &html,
+                &options,
+                &format!("- a{space}* x\n\np\n\nt\n"),
+                &format!("<ul><li>a{space}* x</li></ul><p>p</p><p>t</p>"),
+            );
+        }
+        let html = format!("<blockquote>a<{tag}><ul><li>x<blockquote>q</blockquote>t</li></ul></{tag}></blockquote>");
+        assert_converts(
+            &html,
+            &width4(options(TierStrategy::Tier2)),
+            "> a- x\n>     > q\n>     t\n",
+            "<blockquote><p>a- x&gt; qt</p></blockquote>",
+        );
+        assert_converts(
+            &html,
+            &tabs(options(TierStrategy::Tier2)),
+            "> a- x\n> \t> q\n> \tt\n",
+            "<blockquote><p>a- x</p><blockquote><p>qt</p></blockquote></blockquote>",
+        );
+    }
+    let no_highlight = |options: ConversionOptions| ConversionOptions {
+        highlight_style: HighlightStyle::None,
+        ..options
+    };
+    for (html, markers) in [
+        (
+            "<ul><li>a<legend><ul><li>x<p>p</p>t</li></ul></legend></li></ul>",
+            ["**", "**"],
+        ),
+        (
+            "<ul><li>a<mark><ul><li>x<p>p</p>t</li></ul></mark></li></ul>",
+            [" ", ""],
+        ),
+    ] {
+        let [open, close] = markers;
+        for options in [width4(options(TierStrategy::Tier2)), tabs(options(TierStrategy::Tier2))] {
+            let options = if html.contains("mark") {
+                no_highlight(options)
+            } else {
+                options
+            };
+            assert_converts(
+                html,
+                &options,
+                &format!("- a{open}* x\n\np\n\nt{close}\n"),
+                &format!("<ul><li>a{open}* x</li></ul><p>p</p><p>t{close}</p>"),
+            );
+        }
+    }
+}
+
+#[test]
+fn should_start_a_list_in_a_wrapper_without_markers_after_a_list_item_marker_at_that_column() {
+    for tag in ["sub", "abbr", "label", "ruby"] {
+        let html = format!("<ul><li><{tag}><ul><li>x<p>p</p>t</li></ul></{tag}></li></ul>");
+        let rendered = "<ul><li><ul><li><p>x</p><p>p</p><p>t</p></li></ul></li></ul>";
+        assert_converts(
+            &html,
+            &width4(options(TierStrategy::Tier2)),
+            "- * x\n\n      p\n\n      t\n",
+            rendered,
+        );
+        assert_converts(
+            &html,
+            &tabs(options(TierStrategy::Tier2)),
+            "- * x\n\n\tp\n\n\tt\n",
+            rendered,
         );
     }
 }

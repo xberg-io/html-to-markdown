@@ -88,12 +88,18 @@ pub struct Context {
     /// a caption's `*`): the first line of a list rendered into it is text, so its items are
     /// not open and write no content column for a block (issues #583, #615).
     pub(crate) text_in_markers: bool,
-    /// Whether the current output buffer is written between the markers of a marker-only
-    /// wrapper that does not count in `inline_depth` (a `<mark>`'s `==`, a `<del>`'s `~~`).
+    /// Whether the current output buffer is an inline wrapper's own buffer that does not count in
+    /// `inline_depth`, and its first line follows the wrapper's opening marker (a `<mark>`'s
+    /// `==`, a `<del>`'s `~~`) or text on the line the wrapper is written on.
     ///
     /// ~keep A rule written there is text (issue #603), and so is the first line of a list, as
     /// ~keep under `text_in_markers`.
     pub(crate) in_marker_span: bool,
+    /// The column where the current output buffer starts when it is an inline wrapper's own
+    /// buffer with no text or opening marker before it on its line (after a list item's marker,
+    /// say): a list marker at the start of the empty buffer is written at that column, not at
+    /// the start of a line.
+    pub(crate) inline_buffer_column: Option<usize>,
     /// Whether the current output buffer escapes every `-` once it is written (a table
     /// caption): a `-` list marker there is text.
     pub(crate) escapes_hyphens: bool,
@@ -329,6 +335,7 @@ impl Context {
             list_item_open: false,
             text_in_markers: false,
             in_marker_span: false,
+            inline_buffer_column: None,
             escapes_hyphens: false,
             list_depth: 0,
             list_indent_columns: 0,
@@ -390,6 +397,30 @@ impl Context {
     /// markers cannot span it.
     pub(crate) const fn in_marker_text(&self) -> bool {
         self.inline_depth > 0 || self.text_in_markers || self.in_marker_span
+    }
+
+    /// The context for the children of an inline wrapper that renders them into a buffer of its
+    /// own and then writes that buffer at the end of `output`, after its opening marker if
+    /// `opens_with_marker`.
+    ///
+    /// ~keep The buffer continues the line `output` ends on. After an opening marker or text on
+    /// ~keep that line, the first line of a list in the buffer is text, as in bold (issue #615).
+    /// ~keep After only indent or a list item's marker, the list's first marker starts an item
+    /// ~keep where that line ends, as it would with no wrapper.
+    pub(crate) fn inline_buffer(&self, output: &str, opens_with_marker: bool) -> Self {
+        let line = &output[output.rfind('\n').map_or(0, |pos| pos + 1)..];
+        let line_holds_text =
+            !line.trim().is_empty() && !crate::converter::list::utils::line_is_bare_list_marker(output);
+        let (indent_length, indent_column) = crate::converter::utility::escaping::leading_indent(line);
+        Self {
+            in_marker_span: self.in_marker_span || opens_with_marker || line_holds_text,
+            inline_buffer_column: if output.is_empty() {
+                self.inline_buffer_column
+            } else {
+                Some(indent_column + line[indent_length..].chars().count())
+            },
+            ..self.clone()
+        }
     }
 
     /// What to write for an element whose chosen address is `address`, as
