@@ -1,8 +1,8 @@
 //! Synchronous text wrapping for Markdown output.
 
 use super::utils::{
-    is_heading, is_list_like, is_numbered_list, parse_blockquote_line, parse_list_item, wrap_blockquote_paragraph,
-    wrap_indented_line, wrap_list_item,
+    is_heading, is_list_like, is_numbered_list, parse_blockquote_line, parse_list_item, push_paragraph_line,
+    wrap_blockquote_paragraph, wrap_indented_line, wrap_list_item,
 };
 use crate::converter::utility::escaping::{code_fence, is_heading_underline, opens_block};
 use crate::options::ConversionOptions;
@@ -39,10 +39,7 @@ impl OpenParagraph {
     }
 
     fn push_line(&mut self, line: &str) {
-        if !self.text.is_empty() {
-            self.text.push(' ');
-        }
-        self.text.push_str(line.trim());
+        push_paragraph_line(&mut self.text, line);
     }
 
     /// Whether `line`, which follows the paragraph without a blank line, continues it; `trimmed`
@@ -187,17 +184,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 || content.starts_with('|')
             {
                 if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
-                    if underline {
-                        result.push_str(&blockquote_prefix);
-                        result.push_str(&blockquote_indent);
-                        result.push_str(&blockquote_buffer);
-                    } else {
-                        result.push_str(&wrap_blockquote_paragraph(
-                            &format!("{blockquote_prefix}{blockquote_indent}"),
-                            &blockquote_buffer,
-                            width,
-                        ));
-                    }
+                    result.push_str(&wrap_blockquote_paragraph(
+                        &format!("{blockquote_prefix}{blockquote_indent}"),
+                        &blockquote_buffer,
+                        if underline { usize::MAX } else { width },
+                    ));
                     result.push('\n');
                     blockquote_buffer.clear();
                     in_blockquote_paragraph = false;
@@ -208,16 +199,13 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 continue;
             }
 
-            if in_blockquote_paragraph {
-                blockquote_buffer.push(' ');
-                blockquote_buffer.push_str(&content);
-            } else {
+            if !in_blockquote_paragraph {
                 blockquote_prefix = normalized_prefix;
                 blockquote_indent.clear();
                 blockquote_indent.push_str(indent);
-                blockquote_buffer.push_str(&content);
                 in_blockquote_paragraph = true;
             }
+            push_paragraph_line(&mut blockquote_buffer, after_prefix);
             continue;
         }
         quote_fence = None;

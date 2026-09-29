@@ -44,6 +44,8 @@ fn assert_wrap_keeps_structure(html: &str, widths: &[usize], newline_style: Newl
 fn should_keep_a_list_tight_when_an_item_continues_on_the_next_line() {
     for html in [
         "<ol><li>Refers to the mainland only. The source document states: the data\nfor the country do not include its regions.</li><li>Including the islands.</li></ol>",
+        "<ul><li>a<br>b</li><li>c</li></ul>",
+        "<ul><li>one two three four five six seven eight<br>nine ten</li><li>c</li></ul>",
         "<ul><li>x<ul><li>one two three\nfour five six seven eight</li><li>y</li></ul></li><li>z</li></ul>",
     ] {
         assert_wrap_keeps_structure(html, &[20, 80], NewlineStyle::Spaces);
@@ -58,4 +60,26 @@ fn should_keep_a_line_that_cannot_start_a_list_in_its_paragraph() {
     ] {
         assert_wrap_keeps_structure(html, &[20, 80], NewlineStyle::Spaces);
     }
+}
+
+#[test]
+fn should_keep_a_hard_line_break_when_wrapping() {
+    for newline_style in [NewlineStyle::Spaces, NewlineStyle::Backslash] {
+        for html in [
+            "<p>a<br>b</p>",
+            "<p>one two three four five six seven<br>eight nine ten eleven twelve</p>",
+            "<p>one<br>two<br>three four five six seven eight nine</p>",
+            "<blockquote>t<br>more text here that is long enough to wrap</blockquote>",
+            "<blockquote><p>one two three four five six seven<br>eight</p></blockquote>",
+            "<ol><li>one two three four five six<br>seven eight nine ten</li><li>c</li></ol>",
+            "<ul><li><p>x</p><p>one two three four five six<br>seven eight</p></li></ul>",
+        ] {
+            assert_wrap_keeps_structure(html, &[5, 12, 20, 80], newline_style);
+        }
+    }
+    assert_eq!(converted("<p>a<br>b</p>", Some(20), NewlineStyle::Spaces), "a  \nb\n\n");
+    assert_eq!(
+        converted("<p>a<br>b</p>", Some(20), NewlineStyle::Backslash),
+        "a\\\nb\n\n"
+    );
 }

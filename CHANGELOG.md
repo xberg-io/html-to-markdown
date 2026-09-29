@@ -87,6 +87,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wrapped with it. For the same reason, a paragraph line that starts with a number such as
   `1990.` or `57)` stays in its paragraph: only a bullet or `1.` can end a paragraph and start a
   list.
+- **Wrap mode dropped a hard line break (#613).** With `wrap` on, `<p>a<br>b</p>` gave `a b`:
+  the reflow joined the line after a `<br>` to the line before it, in a paragraph, a quote and a
+  list item. A hard break is now a line end the reflow never joins across, so each side of it is
+  wrapped on its own and the break stays, with both newline styles.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition
