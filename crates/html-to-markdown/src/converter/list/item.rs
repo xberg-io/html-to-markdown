@@ -13,7 +13,7 @@ use crate::converter::main_helpers::tag_name_eq;
 use crate::converter::main_helpers::trim_trailing_whitespace;
 use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::walk_node;
-use crate::options::{ConversionOptions, NewlineStyle};
+use crate::options::{ConversionOptions, NewlineStyle, OutputFormat};
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
 use tl;
@@ -86,13 +86,23 @@ pub fn handle_li(
             (false, false, None)
         };
 
-    let marker = || {
-        if is_task_list {
-            String::from(if task_checked { "- [x] " } else { "- [ ] " })
-        } else if ctx.in_ordered_list {
+    // ~keep A task item in an ordered list keeps its number (issue #659). Djot has task items
+    // ~keep only in bullet lists, so there it keeps the bullet.
+    let numbered = ctx.in_ordered_list && !(is_task_list && options.output_format == OutputFormat::Djot);
+    let list_marker = || {
+        if numbered {
             format!("{}. ", ctx.list_counter)
+        } else if is_task_list {
+            String::from("- ")
         } else {
             format!("{} ", unordered_bullet(ctx, options))
+        }
+    };
+    let marker = || {
+        if is_task_list {
+            format!("{}{} ", list_marker(), if task_checked { "[x]" } else { "[ ]" })
+        } else {
+            list_marker()
         }
     };
 
@@ -176,14 +186,15 @@ pub fn handle_li(
     }
 
     // ~keep This item's own marker width, used to grow `list_indent_columns` for descendants
-    // ~keep (nested lists and continuation content). Unordered/task markers are always 2 wide
-    // ~keep ("- "); an ordered marker's width depends on its counter's digit count ("1. " = 3,
-    // ~keep "10. " = 4, ...). `list_indent_width` is honoured as a floor, not the literal width.
-    let own_marker_width = if is_task_list || !ctx.in_ordered_list {
-        options.list_indent_width.max(2)
-    } else {
+    // ~keep (nested lists and continuation content). Unordered markers, a Djot task item's too,
+    // ~keep are always 2 wide ("- "); an ordered marker's width depends on its counter's digit
+    // ~keep count ("1. " = 3, "10. " = 4, ...). `list_indent_width` is honoured as a floor, not
+    // ~keep the literal width.
+    let own_marker_width = if numbered {
         let marker_len = format!("{}. ", ctx.list_counter).chars().count();
         options.list_indent_width.max(marker_len)
+    } else {
+        options.list_indent_width.max(2)
     };
 
     // ~keep A list inside an inline wrapper, a highlight, a summary or a caption is written into
@@ -220,8 +231,7 @@ pub fn handle_li(
     };
 
     if is_task_list {
-        output.push('-');
-        output.push(' ');
+        output.push_str(&list_marker());
         output.push_str(if task_checked { "[x]" } else { "[ ]" });
 
         #[allow(clippy::ref_option)]
