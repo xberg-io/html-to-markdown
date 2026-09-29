@@ -319,3 +319,34 @@ fn deeply_nested_single_child_lists_stay_on_one_line() {
     let result = convert(html, None).unwrap();
     assert_eq!(result, "1. - 2. foo\n");
 }
+
+#[test]
+fn task_item_leading_blockquote_starts_its_own_line() {
+    // Anything between the checkbox and the quote that renders only whitespace (or nothing)
+    // must not glue the quote's `>` onto the `[ ]` line as literal task text.
+    for between in [
+        "",
+        "<br>",
+        "<span>&nbsp;</span>",
+        "<template>x</template>",
+        "<noscript>x</noscript>",
+    ] {
+        let html = format!(r#"<ul><li><input type="checkbox">{between}<blockquote>q</blockquote></li></ul>"#);
+        let result = convert(&html, None).unwrap();
+        assert_eq!(result, "- [ ]\n  > q\n", "between = {between:?}");
+    }
+}
+
+#[test]
+fn nested_task_item_leading_blockquote_uses_nested_indent() {
+    let html = r#"<ul><li><input type="checkbox"> a<ul><li><input type="checkbox"><br><blockquote>q</blockquote></li></ul></li></ul>"#;
+    let result = convert(html, None).unwrap();
+    assert_eq!(result, "- [ ] a\n  - [ ]\n    > q\n");
+}
+
+#[test]
+fn task_item_text_before_blockquote_stays_on_marker_line() {
+    let html = r#"<ul><li><input type="checkbox">a<blockquote>q</blockquote></li></ul>"#;
+    let result = convert(html, None).unwrap();
+    assert_eq!(result, "- [ ] a\n  > q\n");
+}
