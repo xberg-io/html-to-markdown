@@ -83,3 +83,38 @@ fn should_keep_a_hard_line_break_when_wrapping() {
         "a\\\nb\n\n"
     );
 }
+
+#[test]
+fn should_not_start_a_list_or_a_block_on_a_wrapped_line() {
+    for html in [
+        "<p>aaaa bbbb cccc dddd - eeee</p>",
+        "<p>aaaa bbbb cccc dddd 1. eeee</p>",
+        "<p>aaaa bbbb cccc dddd 1) eeee</p>",
+        "<p>aaaa bbbb cccc dddd + eeee</p>",
+        "<p>aaaa bbbb cccc dddd * eeee</p>",
+        "<p>aaaa bbbb cccc dddd # eeee</p>",
+        "<p>aaaa bbbb cccc dddd &gt; eeee</p>",
+        "<p>aaaa bbbb cccc dddd ---</p>",
+        "<p>aaaa bbbb cccc dddd ===</p>",
+        "<p>aaaa bbbb cccc dddd - - eeee</p>",
+        "<p>aaaa bbbb <code>cccc dddd - eeee</code></p>",
+        "<blockquote>aaaa bbbb cccc dddd - eeee</blockquote>",
+        "<ul><li>aaaa bbbb cccc dddd - eeee</li></ul>",
+    ] {
+        assert_wrap_keeps_structure(html, &[20], NewlineStyle::Spaces);
+    }
+}
+
+#[test]
+fn should_keep_a_fake_numbered_paragraph_plain_text_when_wrapping() {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../test_documents/html/office-word/word-mso-fake-list.html"
+    );
+    let html = std::fs::read_to_string(path).expect("fixture must exist");
+    assert!(
+        converted(&html, None, NewlineStyle::Spaces).contains("1.\u{a0}\u{a0} Cut"),
+        "the fixture must still write the fake number with its non-breaking spaces"
+    );
+    assert_wrap_keeps_structure(&html, &[20, 80], NewlineStyle::Spaces);
+}

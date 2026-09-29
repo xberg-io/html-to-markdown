@@ -2,6 +2,8 @@
 //!
 //! This module contains helper functions for parsing and wrapping Markdown elements.
 
+use crate::converter::utility::escaping::opens_block;
+
 /// Parse a blockquote line into its prefix and content.
 ///
 /// Returns Some((prefix, content)) if the line is a blockquote, None otherwise.
@@ -87,40 +89,27 @@ pub fn is_heading(trimmed: &str) -> bool {
 /// - "1. text" -> ("", "1. ", "text")
 /// - "  42) text" -> ("  ", "42) ", "text")
 pub fn parse_list_item(line: &str) -> Option<(String, String, String)> {
-    let trimmed = line.trim_start();
+    let trimmed = line.trim_ascii_start();
     let indent = &line[..line.len() - trimmed.len()];
-
-    if let Some(rest) = trimmed.strip_prefix('-') {
-        if rest.starts_with(' ') || rest.is_empty() {
-            return Some((indent.to_string(), "- ".to_string(), rest.trim_start().to_string()));
+    let bytes = trimmed.as_bytes();
+    // ~keep Only a space or a tab ends a list marker; a non-breaking space after `1.` is text.
+    let marker_len = if let Some(b'-' | b'*' | b'+') = bytes.first() {
+        1
+    } else {
+        let digits = bytes.iter().take_while(|byte| byte.is_ascii_digit()).count();
+        if digits == 0 || !matches!(bytes.get(digits), Some(b'.' | b')')) {
+            return None;
         }
+        digits + 1
+    };
+    if !matches!(bytes.get(marker_len), None | Some(b' ' | b'\t')) {
+        return None;
     }
-    if let Some(rest) = trimmed.strip_prefix('*') {
-        if rest.starts_with(' ') || rest.is_empty() {
-            return Some((indent.to_string(), "* ".to_string(), rest.trim_start().to_string()));
-        }
-    }
-    if let Some(rest) = trimmed.strip_prefix('+') {
-        if rest.starts_with(' ') || rest.is_empty() {
-            return Some((indent.to_string(), "+ ".to_string(), rest.trim_start().to_string()));
-        }
-    }
-
-    let first_token = trimmed.split_whitespace().next()?;
-    if first_token.ends_with('.') || first_token.ends_with(')') {
-        let digits = first_token.trim_end_matches(['.', ')']);
-        if !digits.is_empty() && digits.chars().all(|c| c.is_ascii_digit()) {
-            let marker_len = first_token.len();
-            let rest = trimmed[marker_len..].trim_start();
-            return Some((
-                indent.to_string(),
-                trimmed[..marker_len].to_string() + " ",
-                rest.to_string(),
-            ));
-        }
-    }
-
-    None
+    Some((
+        indent.to_string(),
+        format!("{} ", &trimmed[..marker_len]),
+        trimmed[marker_len..].trim_ascii_start().to_string(),
+    ))
 }
 
 /// Check if content is a single inline link (e.g., "[text](#anchor)").
@@ -165,7 +154,7 @@ pub fn push_paragraph_line(text: &mut String, line: &str) {
     if !text.is_empty() && !text.ends_with('\n') {
         text.push(' ');
     }
-    text.push_str(line.trim());
+    text.push_str(line.trim_matches([' ', '\t']));
     if let Some(spaces) = hard_break(line) {
         text.push_str(spaces);
         text.push('\n');
@@ -196,17 +185,35 @@ pub fn wrap_line(text: &str, width: usize) -> String {
     result
 }
 
+/// The words of `text`, split at spaces and tabs.
+///
+/// ~keep Only a space or a tab separates words: a non-breaking space is part of its word (#614).
+fn words(text: &str) -> Vec<&str> {
+    text.split([' ', '\t']).filter(|word| !word.is_empty()).collect()
+}
+
 /// Wrap the words of `text`, a text without newlines, at `width` onto `result`.
+///
+/// ~keep A wrapped line never starts with a word that would open a block there (a list marker,
+/// ~keep a `#`, a `>`, a rule); that word stays at the end of the line before it (#614). An
+/// ~keep escape would not do: inside a code span the backslash is literal text.
 fn wrap_words(text: &str, width: usize, result: &mut String) {
     let mut lines: Vec<Vec<&str>> = vec![Vec::new()];
     let mut line_len = 0;
-    for word in text.split_whitespace() {
+    for word in words(text) {
         if line_len > 0 && line_len + 1 + word.len() > width {
             lines.push(Vec::new());
             line_len = 0;
         }
         line_len += usize::from(line_len > 0) + word.len();
         lines.last_mut().expect("lines starts with one line").push(word);
+    }
+
+    for index in 1..lines.len() {
+        while !lines[index].is_empty() && opens_block(&lines[index].join(" ")) {
+            let word = lines[index].remove(0);
+            lines[index - 1].push(word);
+        }
     }
     let lines: Vec<String> = lines
         .iter()
@@ -312,5 +319,12 @@ mod tests {
     #[test]
     fn wrap_line_drops_a_hard_break_at_the_end_of_the_text() {
         assert_eq!(wrap_line("one two  \n", 5), "one\ntwo");
+    }
+
+    #[test]
+    fn push_paragraph_line_keeps_non_breaking_spaces_at_the_line_ends() {
+        let mut text = String::new();
+        push_paragraph_line(&mut text, "\u{a0}x\u{a0}");
+        assert_eq!(text, "\u{a0}x\u{a0}");
     }
 }

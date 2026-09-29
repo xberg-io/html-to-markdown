@@ -94,7 +94,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
     let mut blockquote_buffer = String::new();
 
     for line in markdown.lines() {
-        let trimmed = line.trim_start();
+        let trimmed = line.trim_start_matches([' ', '\t']);
         if let Some((marker, length)) = open_fence {
             if closes_fence(trimmed, marker, length) {
                 open_fence = None;
@@ -350,6 +350,16 @@ mod tests {
         assert_eq!(wrap_at_20("1. a\n\n   para\n2. b\n"), "1. a\n\n   para\n\n2. b\n");
         assert_eq!(wrap_at_20("- a\n---\n"), "- a\n---\n");
         assert_eq!(wrap_at_20("- \n- b\n"), "-\n- b\n");
+    }
+
+    #[test]
+    fn wrap_markdown_reads_a_non_breaking_space_as_text() {
+        assert_eq!(wrap_at_20("a\n\u{a0}- b c\n"), "a \u{a0}- b c\n\n");
+        assert_eq!(wrap_at_20("\u{a0}- b c\n"), "\u{a0}- b c\n\n");
+        assert_eq!(
+            wrap_at_20("\u{a0}one two three four five six\n"),
+            "\u{a0}one two three four\nfive six\n\n"
+        );
     }
 
     #[test]
