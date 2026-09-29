@@ -429,10 +429,7 @@ fn separate_from_block(
         return;
     }
     if ctx.in_list_item {
-        // ~keep A blockquote renders its children into a scratch buffer that it prefixes
-        // ~keep afterwards, so the item's content column only applies at quote depth 0 (the
-        // ~keep same limit `handlers/blockquote.rs` puts on its own list indent).
-        if ctx.blockquote_depth == 0 && !parent_is_list(node_handle, parser, dom_ctx) {
+        if !parent_is_list(node_handle, parser, dom_ctx) {
             separate_in_list_item(node, node_handle, parser, output, options, ctx, dom_ctx);
         }
     } else if !ctx.in_list

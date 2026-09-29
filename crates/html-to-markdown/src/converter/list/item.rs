@@ -117,16 +117,19 @@ pub fn handle_li(
     // ~keep indent too double-counts it, deeply nesting single-child lists into runaway
     // ~keep padding that reparses as an indented code block (spec example 299). The indent is
     // ~keep only needed when this item genuinely starts a fresh physical line.
+    // ~keep The marker starts at the content column of the item around it, as every other line
+    // ~keep of that item does. A tab indent can pass that column, so this item's content column
+    // ~keep is counted from where its marker is written, and every line of the item reaches it
+    // ~keep (issue #654).
     let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
-    if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
-        let indent = match options.list_indent_type {
-            crate::options::ListIndentType::Tabs => "\t".repeat(ctx.list_depth),
-            // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-            // ~keep marker (see Context::list_indent_columns), not a uniform per-depth value.
-            crate::options::ListIndentType::Spaces => " ".repeat(ctx.list_indent_columns),
-        };
+    let marker_column = if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
+        let indent = crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
+            .unwrap_or_default();
         output.push_str(&indent);
-    }
+        crate::converter::utility::escaping::leading_indent(&indent).1
+    } else {
+        ctx.list_indent_columns
+    };
 
     let mut has_block_children = false;
     let children = tag.children();
@@ -183,7 +186,7 @@ pub fn handle_li(
             )
     };
     let real_item_columns = if item_is_real {
-        ctx.list_indent_columns + own_marker_width
+        marker_column + own_marker_width
     } else {
         ctx.real_item_columns
     };
@@ -191,7 +194,7 @@ pub fn handle_li(
         in_list_item: true,
         list_item_open,
         list_depth: ctx.list_depth + 1,
-        list_indent_columns: ctx.list_indent_columns + own_marker_width,
+        list_indent_columns: marker_column + own_marker_width,
         real_item_columns,
         first_writer: is_task_list.then(FirstWriter::default),
         ..ctx.clone()

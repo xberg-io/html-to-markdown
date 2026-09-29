@@ -58,10 +58,6 @@ pub struct Context {
     pub(crate) in_ordered_list: bool,
     /// Blockquote nesting depth
     pub(crate) blockquote_depth: usize,
-    /// The `list_indent_columns` where the innermost quote starts: a line in the quote's buffer
-    /// is indented only by the columns of the items inside the quote, and the quote writes the
-    /// indent of the items around it.
-    pub(crate) quote_list_columns: usize,
     /// Are we inside a table cell (td/th)?
     pub(crate) in_table_cell: bool,
     /// Are we inside a *layout*-table cell, whose row renders as a list item rather than a
@@ -104,9 +100,10 @@ pub struct Context {
     pub(crate) escapes_hyphens: bool,
     /// List nesting depth (for indentation)
     pub(crate) list_depth: usize,
-    /// Cumulative column width (in the `Spaces` indent type) that a nested list item at this
-    /// point must be indented by: the sum of every ancestor `<li>`'s own marker width
-    /// (`"- "` = 2, `"1. "` = 3, `"10. "` = 4, ...), honouring `list_indent_width` as a floor.
+    /// The content column of the innermost list item: the column its marker is written at plus
+    /// its marker width (`"- "` = 2, `"1. "` = 3, `"10. "` = 4, ...), honouring
+    /// `list_indent_width` as a floor. With the `Tabs` indent type the marker column is the one
+    /// its tabs reach.
     ///
     /// Uniform per-depth indentation (`list_depth * list_indent_width`) is only correct when
     /// every ancestor list is unordered — an ordered ancestor's marker is wider than 2 columns,
@@ -318,7 +315,6 @@ impl Context {
             list_counter: 0,
             in_ordered_list: false,
             blockquote_depth: 0,
-            quote_list_columns: 0,
             in_table_cell: false,
             in_layout_cell: false,
             convert_as_inline: options.convert_as_inline,

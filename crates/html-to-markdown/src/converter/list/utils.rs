@@ -222,8 +222,8 @@ pub fn add_list_continuation_indent(
                 output.push('\t');
             }
         }
-        // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-        // ~keep marker (see Context::list_indent_columns) — see item.rs's identical rationale.
+        // ~keep `list_indent_columns` is the item's content column (see
+        // ~keep Context::list_indent_columns), not a uniform per-depth value.
         ListIndentType::Spaces => {
             for _ in 0..list_indent_columns {
                 output.push(' ');
@@ -242,8 +242,8 @@ pub fn continuation_indent_string(list_indent_columns: usize, options: &Conversi
             }
             Some("\t".repeat(tabs))
         }
-        // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-        // ~keep marker (see Context::list_indent_columns) — see item.rs's identical rationale.
+        // ~keep `list_indent_columns` is the item's content column (see
+        // ~keep Context::list_indent_columns), not a uniform per-depth value.
         ListIndentType::Spaces => {
             if list_indent_columns == 0 {
                 return None;

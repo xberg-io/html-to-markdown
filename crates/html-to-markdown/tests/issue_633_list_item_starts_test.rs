@@ -535,12 +535,12 @@ fn should_write_an_underlined_heading_in_a_list_item_at_the_content_column() {
         ),
         (
             "<ul><li><blockquote><h2>q</h2></blockquote></li></ul>",
-            "- > q\n  > --\n",
+            "- > q\n  > -\n",
             "<h2>q</h2>",
         ),
         (
             "<ul><li><blockquote><p>a</p><h2>q</h2></blockquote></li></ul>",
-            "- > a\n  >\n  > q\n  > --\n",
+            "- > a\n  >\n  > q\n  > -\n",
             "<p>a</p>\n<h2>q</h2>",
         ),
     ] {
@@ -610,7 +610,7 @@ fn should_write_an_underlined_heading_in_a_list_in_a_quote_at_the_content_column
         ),
         (
             "<ul><li><blockquote><h2>q</h2></blockquote></li></ul>",
-            "- > q\n  > --\n",
+            "- > q\n  > -\n",
         ),
     ] {
         assert_converts(html, &options, expected, &["<h2>q</h2>"]);

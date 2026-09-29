@@ -138,6 +138,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line of the item to see whether the item was still open, and each item of a list inside bold or
   italic checked every earlier item. `<ul><li>` with 5000 headings after text took seconds. Each
   check now reads only the lines written since the last one, so the time grows linearly.
+- **A heading after text in a quote joined the text (#640).** `<blockquote>a<h2>q</h2></blockquote>`
+  gave `> a## q`, a paragraph, and with `heading_style` set to `underlined` it gave `> aq\n> -`,
+  one heading. The heading now starts after a blank quote line: `> a\n>\n> ## q`. An underlined
+  heading does the same after any line of text in the quote, such as a line that ends in a hard
+  break or the last item of a list.
+- **An underlined heading whose text starts a block lost its heading (#653).** With
+  `heading_style` set to `underlined`, `<h2>-</h2>` gave `-\n-`, two empty list items. The text of
+  an underlined heading is now escaped where it would start a block: a list marker (`-`, `*`,
+  `1.`, also on its own), a quote, a `#` heading or a rule. `<h2>-</h2>` gives `\-\n-`.
+- **The lines of a list item in a quote or under tab indent left the item (#654).** A list inside
+  a quote in a list item counted the markers outside the quote too, so its lines sat further in
+  than the item, and the underline of a heading sat short of it. The quote now starts its content
+  as a container of its own, so a list in it counts only its own markers. A block after text in a
+  list item inside a quote now also starts its own line, as it does outside a quote. With
+  `list_indent_type` set to `tabs`, the lines of a nested item were one tab short of its content
+  column: `- a\n\t* q\n\n\tt` put `t` in the outer item. They now reach the column where the
+  item's text starts, `- a\n\t* q\n\n\t\tt`.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut
