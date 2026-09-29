@@ -58,6 +58,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   counts as content, and both converters write the table as `| --- |` over its delimiter row. Text
   in a cell that looks like a list marker no longer turns a rule after it into `___`, and the fast
   converter now trims the space before a rule in a cell as the full converter does.
+- **A table whose only cell held a line break was dropped with `br_in_tables` on (#646).**
+  `<table><tr><td><br></td></tr></table>` gave an empty document from the full converter while
+  the fast converter kept the table as `| <br> |`. With `br_in_tables` on, a `<br>` in a cell
+  writes a literal `<br>`, so it now counts as content, matching the fast converter; with the
+  option off it still collapses to a space the cell trims away, so the table is still dropped
+  there, as it was before.
 - **A rule inside bold, italic, a summary or a caption split the emphasis markers (#603).** The
   rule was written after a blank line, which ended the paragraph between the markers, so the
   markers showed as literal text: `<summary>t<hr></summary>` gave `**t\n\n---**`, and a
