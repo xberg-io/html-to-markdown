@@ -56,7 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<ol><li>a</li></ol><ol><li>b</li></ol>` gave `1. a\n\n1. b`, which CommonMark and Djot read
   as one list, because a blank line does not end a list. An ordered list that follows an ordered
   list with only blank lines between them now writes the other delimiter, so it gives
-  `1. a\n\n1) b`. A list written as text, in a heading or between inline markers, keeps `.`.
+  `1. a\n\n1) b`, also when a section, article, figure or similar element wraps either list. A
+  list written as text, in a heading or between inline markers, keeps `.`.
 - **In Djot output a nested list directly under its item's text was text (#670).**
   Djot needs a blank line before a list that follows text, so `- a\n  * b` is one paragraph
   there. A nested list after its item's text now starts after a blank line in Djot output:

@@ -577,6 +577,7 @@ pub fn walk_node(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    ctx.last_list.check(output);
     // ~keep In a task item, the render of each node before the first content reports whether
     // ~keep it wrote, so the item knows which element wrote first (issue #650).
     match ctx.first_writer.as_ref().filter(|first_writer| first_writer.is_open()) {

@@ -313,62 +313,120 @@ pub fn list_needs_blank_line(
         )
 }
 
-/// Where the last ordered list ended in a buffer: the buffer address, the content column of the
-/// item around the list, the delimiter its items wrote and the end of its text.
+/// The last ordered list whose text still ends the output: its last line, the place it sits in
+/// and the delimiter its items wrote.
 ///
 /// ~keep A list continues after blank lines when the next marker has the same type (issue #666),
-/// ~keep so an ordered list that starts after only whitespace, in the same buffer and column,
-/// ~keep writes the other delimiter. A list whose last line opens a block left of its items' content is
-/// ~keep already closed, so it stores nothing. A stale answer only switches a marker that did not
-/// ~keep need it.
+/// ~keep so an ordered list that starts where the output still ends with an ordered list, in the
+/// ~keep same place, writes the other delimiter. Elements such as `<section>` write into a buffer
+/// ~keep of their own and append it to their parent's, so the key is the list's last line without
+/// ~keep its indentation (which the parent can add), not a buffer: each node checks it on entry
+/// ~keep (`walk_node`) and drops it once the output ends in something else. An empty buffer checks
+/// ~keep nothing, as the output around it ends where it starts. The check compares the line's
+/// ~keep length and its last bytes only, so it costs the same for any line length. A list whose
+/// ~keep last line opens a block left of its items' content is already closed, so it stores nothing.
+/// ~keep A stale answer only switches a marker that did not need it.
 #[derive(Clone, Default)]
-pub struct LastList(std::rc::Rc<std::cell::Cell<Option<LastListState>>>);
+pub struct LastList(std::rc::Rc<std::cell::RefCell<Option<LastListState>>>);
 
-#[derive(Clone, Copy)]
 struct LastListState {
-    buffer: usize,
-    columns: usize,
+    line_len: usize,
+    line_tail: Box<[u8]>,
+    place: ListPlace,
     delimiter: char,
-    end: usize,
+}
+
+/// How many bytes at the end of the list's last line the check compares.
+const LINE_TAIL_BYTES: usize = 32;
+
+/// Where a list sits: the content column of the item around it and the quote depth.
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct ListPlace {
+    columns: usize,
+    quotes: usize,
+}
+
+impl ListPlace {
+    const fn of(ctx: &Context) -> Self {
+        Self {
+            columns: ctx.list_indent_columns,
+            quotes: ctx.blockquote_depth,
+        }
+    }
+}
+
+/// `output` without trailing ASCII whitespace; `&nbsp;` is text, not a blank.
+fn trimmed_content(output: &str) -> &str {
+    output.trim_end_matches(|c: char| c.is_ascii_whitespace())
+}
+
+/// `line` without its indentation, which a parent adds when it appends a child's buffer inside a
+/// list item.
+fn unindented(line: &str) -> &str {
+    line.trim_start_matches([' ', '\t'])
+}
+
+impl LastListState {
+    /// Whether `content` ends with the list's last line, after any indentation.
+    fn ends(&self, content: &[u8]) -> bool {
+        let Some(start) = content.len().checked_sub(self.line_len) else {
+            return false;
+        };
+        let indent_start = content[..start]
+            .iter()
+            .rposition(|&byte| byte != b' ' && byte != b'\t')
+            .map_or(0, |pos| pos + 1);
+        content.ends_with(&self.line_tail) && (indent_start == 0 || content[indent_start - 1] == b'\n')
+    }
 }
 
 impl LastList {
-    /// Store the end of an ordered list whose items wrote `delimiter` in `output` at address
-    /// `buffer`, inside the item at `columns`.
-    pub fn set(&self, (output, buffer): (&str, usize), columns: usize, delimiter: char) {
+    /// Store the end of an ordered list whose items wrote `delimiter` at the end of `output`.
+    pub fn set(&self, output: &str, ctx: &Context, delimiter: char) {
         use crate::converter::utility::escaping::{leading_indent, opens_block};
-        let content = output.trim_end();
+        let content = trimmed_content(output);
         let line = &content[content.rfind('\n').map_or(0, |pos| pos + 1)..];
         let (indent, column) = leading_indent(line);
         let rest = &line[indent..];
-        let closed = column < columns + 2 && opens_block(rest) && strip_leading_bare_marker(rest).is_none();
-        self.0.set((!closed).then_some(LastListState {
-            buffer,
-            columns,
+        let closed =
+            column < ctx.list_indent_columns + 2 && opens_block(rest) && strip_leading_bare_marker(rest).is_none();
+        let line = unindented(line).as_bytes();
+        *self.0.borrow_mut() = (!closed).then(|| LastListState {
+            line_len: line.len(),
+            line_tail: line[line.len().saturating_sub(LINE_TAIL_BYTES)..].into(),
+            place: ListPlace::of(ctx),
             delimiter,
-            end: content.len(),
-        }));
+        });
     }
 
-    fn delimiter_before(&self, (output, buffer): (&str, usize), columns: usize) -> Option<char> {
-        let state = self.0.get()?;
-        (state.buffer == buffer
-            && state.columns == columns
-            && output.get(state.end..).is_some_and(|rest| rest.trim().is_empty()))
-        .then_some(state.delimiter)
+    /// Drop the stored list when `output` holds text and no longer ends with it.
+    pub fn check(&self, output: &str) {
+        let mut state = self.0.borrow_mut();
+        if state.as_ref().is_some_and(|state| {
+            let content = trimmed_content(output).as_bytes();
+            !content.is_empty() && !state.ends(content)
+        }) {
+            *state = None;
+        }
+    }
+
+    fn delimiter_before(&self, ctx: &Context) -> Option<char> {
+        let state = self.0.borrow();
+        let state = state.as_ref()?;
+        (state.place == ListPlace::of(ctx)).then_some(state.delimiter)
     }
 }
 
-/// The delimiter of an ordered list that starts at the end of `output` (at address `buffer`):
-/// `)` right after an ordered list that wrote `.`, so the two stay two lists (issue #666).
-pub fn switched_delimiter(output: (&str, usize), ctx: &Context) -> Option<char> {
+/// The delimiter of an ordered list that starts here: `)` right after an ordered list that wrote
+/// `.`, so the two stay two lists (issue #666).
+pub fn switched_delimiter(ctx: &Context) -> Option<char> {
     // ~keep A list in heading text, inline text or text between markers is text: it continues
     // ~keep nothing.
     (!ctx.convert_as_inline
         && ctx.inline_depth == 0
         && !ctx.text_in_markers
         && !ctx.in_marker_span
-        && ctx.last_list.delimiter_before(output, ctx.list_indent_columns) == Some('.'))
+        && ctx.last_list.delimiter_before(ctx) == Some('.'))
     .then_some(')')
 }
 

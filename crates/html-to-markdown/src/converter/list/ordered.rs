@@ -40,7 +40,7 @@ pub fn handle_ol(
         output.push_str("\n\n");
         None
     } else {
-        switched_delimiter((output.as_str(), std::ptr::from_ref::<String>(output) as usize), ctx)
+        switched_delimiter(ctx)
     };
 
     let nested_depth = calculate_list_nesting_depth(ctx);
@@ -205,11 +205,7 @@ pub fn handle_ol(
         }
     }
 
-    ctx.last_list.set(
-        (output.as_str(), std::ptr::from_ref::<String>(output) as usize),
-        ctx.list_indent_columns,
-        delimiter.unwrap_or('.'),
-    );
+    ctx.last_list.set(output, ctx, delimiter.unwrap_or('.'));
 }
 
 /// Public alias for `handle_ol` to match the expected module interface.
