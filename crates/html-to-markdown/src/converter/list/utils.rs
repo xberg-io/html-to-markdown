@@ -5,7 +5,7 @@
 
 use crate::converter::main_helpers::{tag_name_eq, trim_trailing_whitespace};
 use crate::converter::utility::content::normalized_tag_name;
-use crate::options::{ConversionOptions, ListIndentType};
+use crate::options::{ConversionOptions, ListIndentType, OutputFormat};
 use tl;
 
 type Context = crate::converter::Context;
@@ -293,8 +293,9 @@ pub fn marker_starts_item(
 /// `enclosing_columns`, needs a blank line before it: its `marker` cannot interrupt a paragraph,
 /// and a paragraph is open there.
 ///
-/// ~keep Only an ordered marker other than `1.` cannot interrupt a paragraph (issue #662), so
-/// ~keep every other list reads no lines. The items after the first follow a list item.
+/// ~keep In `CommonMark` only an ordered marker other than `1.` cannot interrupt a paragraph
+/// ~keep (issue #662), so every other list reads no lines. In Djot no list can (issue #670). The
+/// ~keep items after the first follow a list item.
 pub fn list_needs_blank_line(
     output: &str,
     marker: &str,
@@ -302,13 +303,73 @@ pub fn list_needs_blank_line(
     previous: (&PreviousMarker, usize),
     options: &ConversionOptions,
 ) -> bool {
-    !crate::converter::utility::escaping::line_opens_block(&format!("{marker}x"))
+    (options.output_format == OutputFormat::Djot
+        || !crate::converter::utility::escaping::line_opens_block(&format!("{marker}x")))
         && paragraph_is_open_before(
             output,
             output.len(),
             indent_column(enclosing_columns, options),
             previous,
         )
+}
+
+/// Where the last ordered list ended in a buffer: the buffer address, the content column of the
+/// item around the list, the delimiter its items wrote and the end of its text.
+///
+/// ~keep A list continues after blank lines when the next marker has the same type (issue #666),
+/// ~keep so an ordered list that starts after only whitespace, in the same buffer and column,
+/// ~keep writes the other delimiter. A list whose last line opens a block left of its items' content is
+/// ~keep already closed, so it stores nothing. A stale answer only switches a marker that did not
+/// ~keep need it.
+#[derive(Clone, Default)]
+pub struct LastList(std::rc::Rc<std::cell::Cell<Option<LastListState>>>);
+
+#[derive(Clone, Copy)]
+struct LastListState {
+    buffer: usize,
+    columns: usize,
+    delimiter: char,
+    end: usize,
+}
+
+impl LastList {
+    /// Store the end of an ordered list whose items wrote `delimiter` in `output` at address
+    /// `buffer`, inside the item at `columns`.
+    pub fn set(&self, (output, buffer): (&str, usize), columns: usize, delimiter: char) {
+        use crate::converter::utility::escaping::{leading_indent, opens_block};
+        let content = output.trim_end();
+        let line = &content[content.rfind('\n').map_or(0, |pos| pos + 1)..];
+        let (indent, column) = leading_indent(line);
+        let rest = &line[indent..];
+        let closed = column < columns + 2 && opens_block(rest) && strip_leading_bare_marker(rest).is_none();
+        self.0.set((!closed).then_some(LastListState {
+            buffer,
+            columns,
+            delimiter,
+            end: content.len(),
+        }));
+    }
+
+    fn delimiter_before(&self, (output, buffer): (&str, usize), columns: usize) -> Option<char> {
+        let state = self.0.get()?;
+        (state.buffer == buffer
+            && state.columns == columns
+            && output.get(state.end..).is_some_and(|rest| rest.trim().is_empty()))
+        .then_some(state.delimiter)
+    }
+}
+
+/// The delimiter of an ordered list that starts at the end of `output` (at address `buffer`):
+/// `)` right after an ordered list that wrote `.`, so the two stay two lists (issue #666).
+pub fn switched_delimiter(output: (&str, usize), ctx: &Context) -> Option<char> {
+    // ~keep A list in heading text, inline text or text between markers is text: it continues
+    // ~keep nothing.
+    (!ctx.convert_as_inline
+        && ctx.inline_depth == 0
+        && !ctx.text_in_markers
+        && !ctx.in_marker_span
+        && ctx.last_list.delimiter_before(output, ctx.list_indent_columns) == Some('.'))
+    .then_some(')')
 }
 
 /// Whether a paragraph is open before the line at `line_start`, stored for the next marker line.
@@ -478,12 +539,13 @@ pub fn preceding_same_type_list_separator_comment(
 }
 
 /// Strip one bare list marker -- a single bullet char (`-`, `*`, `+`) followed by a space,
-/// or one-or-more ASCII digits followed by `". "` -- from the front of `text`, returning
-/// what remains after it. Returns `None` when `text` does not start with a marker.
+/// or one-or-more ASCII digits followed by `". "` or `") "` -- from the front of `text`,
+/// returning what remains after it. Returns `None` when `text` does not start with a marker.
 fn strip_leading_bare_marker(text: &str) -> Option<&str> {
     let digit_count = text.bytes().take_while(u8::is_ascii_digit).count();
     if digit_count > 0 {
-        if let Some(rest) = text[digit_count..].strip_prefix(". ") {
+        let rest = &text[digit_count..];
+        if let Some(rest) = rest.strip_prefix(". ").or_else(|| rest.strip_prefix(") ")) {
             return Some(rest);
         }
     }
@@ -824,10 +886,12 @@ pub fn process_list_children(
     is_loose: bool,
     nested_depth: usize,
     start_counter: i64,
+    delimiter: Option<char>,
     dom_ctx: &DomContext,
 ) {
     let mut counter = start_counter;
     let mut counter_saturated = false;
+    let mut first_item = true;
 
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let children = tag.children();
@@ -843,6 +907,7 @@ pub fn process_list_children(
                 ul_depth: if is_ordered { ctx.ul_depth } else { ctx.ul_depth + 1 },
                 loose_list: is_loose,
                 prev_item_had_blocks: false,
+                ordered_delimiter: delimiter,
                 ..ctx.clone()
             };
 
@@ -855,17 +920,23 @@ pub fn process_list_children(
 
                 if is_ordered {
                     list_ctx.list_counter = counter;
-                    // ~keep A first marker that cannot interrupt the paragraph before it starts
-                    // ~keep after a blank line (issue #662). Between inline markers the list is text.
-                    if counter == start_counter
-                        && ctx.in_list_item
+                }
+                // ~keep A first marker that cannot interrupt the paragraph before it starts after a
+                // ~keep blank line (issues #662, #670). Between inline markers the list is text. The
+                // ~keep marker character does not change the answer, so `N. ` and `- ` stand for all.
+                if first_item && is_list_item(*child_handle, parser, dom_ctx) {
+                    first_item = false;
+                    if ctx.in_list_item
                         && ctx.inline_depth == 0
                         && !ctx.text_in_markers
                         && output.ends_with('\n')
-                        && is_list_item(*child_handle, parser, dom_ctx)
                         && list_needs_blank_line(
                             output,
-                            &format!("{counter}. "),
+                            &if is_ordered {
+                                format!("{counter}. ")
+                            } else {
+                                String::from("- ")
+                            },
                             ctx.real_item_columns,
                             (&ctx.previous_marker, std::ptr::from_ref::<String>(output) as usize),
                             options,

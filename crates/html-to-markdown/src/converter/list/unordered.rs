@@ -119,6 +119,7 @@ pub fn handle_ul(
         is_loose,
         nested_depth,
         1,
+        None,
         dom_ctx,
     );
 

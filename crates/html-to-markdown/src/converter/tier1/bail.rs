@@ -158,6 +158,12 @@ pub enum BailReason {
     /// Bail so Tier-2 (which computes cumulative marker widths) is authoritative.
     ListNestedOrdered,
 
+    /// An ordered list opened after only whitespace following an ordered list.
+    ///
+    /// Tier-2 writes it with the `)` delimiter so the two lists do not merge into one (issue #666).
+    /// This scanner writes `.` only.
+    OrderedListAfterOrderedList,
+
     /// A `<blockquote>`, `<div>` (or other generic block container), `<table>`,
     /// `<dl>`, or a paragraph-continuation `<p>` opened while inside an open
     /// list item, in a shape this scanner cannot render correctly.
@@ -337,6 +343,9 @@ impl fmt::Display for BailReason {
                     f,
                     "nested list with an ordered ancestor or ordered self (cumulative indent width)"
                 )
+            }
+            Self::OrderedListAfterOrderedList => {
+                write!(f, "ordered list right after an ordered list (switched delimiter)")
             }
             Self::ListItemUnsupportedBlockChild => {
                 write!(
