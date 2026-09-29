@@ -12,6 +12,66 @@ fn closes_fence(trimmed: &str, marker: u8, length: usize) -> bool {
     code_fence(trimmed).is_some_and(|(fence, run)| fence == marker && run >= length && trimmed[run..].trim().is_empty())
 }
 
+/// The paragraph the reflow is collecting: plain text, or the text of a list item.
+#[derive(Default)]
+struct OpenParagraph {
+    indent: String,
+    /// The list item's marker, or empty for a plain paragraph.
+    marker: String,
+    text: String,
+}
+
+impl OpenParagraph {
+    const fn is_open(&self) -> bool {
+        !self.text.is_empty()
+    }
+
+    const fn is_item(&self) -> bool {
+        !self.marker.is_empty()
+    }
+
+    fn open(&mut self, indent: &str, marker: &str, line: &str) {
+        self.indent.clear();
+        self.indent.push_str(indent);
+        self.marker.clear();
+        self.marker.push_str(marker);
+        self.push_line(line);
+    }
+
+    fn push_line(&mut self, line: &str) {
+        if !self.text.is_empty() {
+            self.text.push(' ');
+        }
+        self.text.push_str(line.trim());
+    }
+
+    /// Whether `line`, which follows the paragraph without a blank line, continues it; `trimmed`
+    /// is `line` without its indentation.
+    ///
+    /// ~keep A line that cannot start a block is paragraph continuation text in CommonMark, at
+    /// ~keep column 0 too (a lazy line), so it stays in the paragraph or the list item (#616).
+    fn continues_with(&self, line: &str, trimmed: &str) -> bool {
+        !trimmed.is_empty()
+            && !opens_block(trimmed)
+            && !trimmed.starts_with('|')
+            && !((self.is_item() || !self.indent.is_empty()) && parse_list_item(line).is_some())
+    }
+
+    /// Write the paragraph: a plain one ends with a blank line, a list item with its line end.
+    fn flush(&mut self, out: &mut String, width: usize) {
+        if self.text.is_empty() {
+            return;
+        }
+        if self.is_item() {
+            out.push_str(&wrap_list_item(&self.indent, &self.marker, &self.text, width));
+        } else {
+            out.push_str(&wrap_indented_line(&self.indent, &self.text, width));
+            out.push_str("\n\n");
+        }
+        self.text.clear();
+    }
+}
+
 /// Wrap text at specified width while preserving Markdown formatting.
 ///
 /// This function wraps paragraphs of text at the specified width, but:
@@ -26,12 +86,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
         return markdown.to_string();
     }
 
+    let width = options.wrap_width;
     let mut result = String::with_capacity(markdown.len());
     let mut open_fence: Option<(u8, usize)> = None;
     let mut quote_fence: Option<(u8, usize)> = None;
-    let mut in_paragraph = false;
-    let mut paragraph_buffer = String::new();
-    let mut paragraph_indent = String::new();
+    let mut paragraph = OpenParagraph::default();
     let mut in_blockquote_paragraph = false;
     let mut blockquote_prefix = String::new();
     let mut blockquote_indent = String::new();
@@ -48,6 +107,11 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             continue;
         }
 
+        if paragraph.is_open() && paragraph.continues_with(line, trimmed) {
+            paragraph.push_line(line);
+            continue;
+        }
+
         let fence = code_fence(trimmed);
         let is_indented_code = line.starts_with("    ")
             && !is_list_like(trimmed)
@@ -57,17 +121,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             && !trimmed.starts_with('|');
 
         if fence.is_some() || is_indented_code {
-            if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_indented_line(
-                    &paragraph_indent,
-                    &paragraph_buffer,
-                    options.wrap_width,
-                ));
-                result.push_str("\n\n");
-                paragraph_buffer.clear();
-                in_paragraph = false;
-            }
-
+            paragraph.flush(&mut result, width);
             open_fence = fence;
             result.push_str(line);
             result.push('\n');
@@ -79,16 +133,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             // ~keep the quote; written without it, the paragraph would leave the item.
             let after_prefix = &line[prefix.len()..];
             let indent = &after_prefix[..after_prefix.len() - after_prefix.trim_start().len()];
-            if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_indented_line(
-                    &paragraph_indent,
-                    &paragraph_buffer,
-                    options.wrap_width,
-                ));
-                result.push_str("\n\n");
-                paragraph_buffer.clear();
-                in_paragraph = false;
-            }
+            paragraph.flush(&mut result, width);
 
             let mut normalized_prefix = prefix;
             if !normalized_prefix.ends_with(' ') {
@@ -100,7 +145,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                     result.push_str(&wrap_blockquote_paragraph(
                         &format!("{blockquote_prefix}{blockquote_indent}"),
                         &blockquote_buffer,
-                        options.wrap_width,
+                        width,
                     ));
                     result.push('\n');
                     blockquote_buffer.clear();
@@ -115,7 +160,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                 result.push_str(&wrap_blockquote_paragraph(
                     &format!("{blockquote_prefix}{blockquote_indent}"),
                     &blockquote_buffer,
-                    options.wrap_width,
+                    width,
                 ));
                 result.push('\n');
                 blockquote_buffer.clear();
@@ -150,7 +195,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                         result.push_str(&wrap_blockquote_paragraph(
                             &format!("{blockquote_prefix}{blockquote_indent}"),
                             &blockquote_buffer,
-                            options.wrap_width,
+                            width,
                         ));
                     }
                     result.push('\n');
@@ -180,7 +225,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             result.push_str(&wrap_blockquote_paragraph(
                 &format!("{blockquote_prefix}{blockquote_indent}"),
                 &blockquote_buffer,
-                options.wrap_width,
+                width,
             ));
             result.push('\n');
             blockquote_buffer.clear();
@@ -190,30 +235,21 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
         // ~keep An underline right under paragraph text makes that text its heading: the text ends
         // ~keep with one line break, and it is not reflowed, like an ATX heading. Folded into the
         // ~keep text, or cut off by a blank line, the underline is lost (#607).
-        if in_paragraph && !paragraph_buffer.is_empty() && is_heading_underline(trimmed) {
-            result.push_str(&paragraph_indent);
-            result.push_str(&paragraph_buffer);
-            result.push('\n');
-            paragraph_buffer.clear();
-            in_paragraph = false;
+        if paragraph.is_open() && !paragraph.is_item() && is_heading_underline(trimmed) {
+            paragraph.flush(&mut result, usize::MAX);
+            result.pop();
             result.push_str(line);
             result.push('\n');
             continue;
         }
 
         if let Some((indent, marker, content)) = parse_list_item(line) {
-            if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_indented_line(
-                    &paragraph_indent,
-                    &paragraph_buffer,
-                    options.wrap_width,
-                ));
-                result.push_str("\n\n");
-                paragraph_buffer.clear();
-                in_paragraph = false;
+            paragraph.flush(&mut result, width);
+            if content.is_empty() {
+                result.push_str(&wrap_list_item(&indent, &marker, &content, width));
+            } else {
+                paragraph.open(&indent, &marker, &content);
             }
-
-            result.push_str(&wrap_list_item(&indent, &marker, &content, options.wrap_width));
             continue;
         }
 
@@ -221,16 +257,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             is_heading(trimmed) || opens_block(trimmed) || trimmed.starts_with('|') || trimmed.starts_with('=');
 
         if is_structural {
-            if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_indented_line(
-                    &paragraph_indent,
-                    &paragraph_buffer,
-                    options.wrap_width,
-                ));
-                result.push_str("\n\n");
-                paragraph_buffer.clear();
-                in_paragraph = false;
-            }
+            paragraph.flush(&mut result, width);
 
             result.push_str(line);
             result.push('\n');
@@ -238,48 +265,27 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
         }
 
         if line.trim().is_empty() {
-            if in_paragraph && !paragraph_buffer.is_empty() {
-                result.push_str(&wrap_indented_line(
-                    &paragraph_indent,
-                    &paragraph_buffer,
-                    options.wrap_width,
-                ));
-                result.push_str("\n\n");
-                paragraph_buffer.clear();
-                in_paragraph = false;
-            } else if !in_paragraph {
+            let was_plain = paragraph.is_open() && !paragraph.is_item();
+            paragraph.flush(&mut result, width);
+            if !was_plain {
                 result.push('\n');
             }
             continue;
         }
 
-        if in_paragraph {
-            paragraph_buffer.push(' ');
-        } else {
-            paragraph_indent.clear();
-            paragraph_indent.push_str(&line[..line.len() - trimmed.len()]);
-        }
-        paragraph_buffer.push_str(line.trim());
-        in_paragraph = true;
+        paragraph.open(&line[..line.len() - trimmed.len()], "", line);
     }
 
     if in_blockquote_paragraph && !blockquote_buffer.is_empty() {
         result.push_str(&wrap_blockquote_paragraph(
             &format!("{blockquote_prefix}{blockquote_indent}"),
             &blockquote_buffer,
-            options.wrap_width,
+            width,
         ));
         result.push('\n');
     }
 
-    if in_paragraph && !paragraph_buffer.is_empty() {
-        result.push_str(&wrap_indented_line(
-            &paragraph_indent,
-            &paragraph_buffer,
-            options.wrap_width,
-        ));
-        result.push_str("\n\n");
-    }
+    paragraph.flush(&mut result, width);
 
     result
 }
@@ -345,6 +351,17 @@ mod tests {
             wrap_at_20("```\nx\n```\none two three four five six\n"),
             "```\nx\n```\none two three four\nfive six\n\n"
         );
+    }
+
+    #[test]
+    fn wrap_markdown_ends_a_paragraph_or_an_item_only_at_a_line_that_starts_a_block() {
+        assert_eq!(
+            wrap_at_20("text\n| a | b |\n| --- | --- |\n"),
+            "text\n\n| a | b |\n| --- | --- |\n"
+        );
+        assert_eq!(wrap_at_20("1. a\n\n   para\n2. b\n"), "1. a\n\n   para\n\n2. b\n");
+        assert_eq!(wrap_at_20("- a\n---\n"), "- a\n---\n");
+        assert_eq!(wrap_at_20("- \n- b\n"), "-\n- b\n");
     }
 
     #[test]

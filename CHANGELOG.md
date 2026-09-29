@@ -80,6 +80,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `> - alpha - beta`, one item, and a code block inside a quote lost its code. Outside a quote, a
   `~~~` code block was reflowed like a paragraph. Every line that starts a block now keeps its own
   line in and out of a quote, and a code block ends only at a fence that closes it.
+- **Wrap mode turned a tight list loose when an item went on to a second line (#616).** A line
+  right under a list item that starts no block of its own, at column 0 or indented, belongs to
+  the item's text. With `wrap` on, the reflow wrote it as a paragraph of its own and put a blank
+  line before the next item, so the list rendered loose. It now joins the item's text and is
+  wrapped with it. For the same reason, a paragraph line that starts with a number such as
+  `1990.` or `57)` stays in its paragraph: only a bullet or `1.` can end a paragraph and start a
+  list.
 
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition
