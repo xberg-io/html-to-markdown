@@ -63,7 +63,10 @@ pub fn handle_li(
             }
 
             // ~keep A nested list's items own the checkboxes inside it (issue #604).
-            if matches!(normalized_tag_name(node_tag.name().as_utf8_str()).as_ref(), "ul" | "ol") {
+            if matches!(
+                normalized_tag_name(node_tag.name().as_utf8_str()).as_ref(),
+                "ul" | "ol" | "menu"
+            ) {
                 return None;
             }
 
@@ -576,7 +579,7 @@ fn is_container(node: tl::NodeHandle, parser: &tl::Parser) -> bool {
 fn block_content(name: &str) -> Option<TaskFirstContent> {
     match name {
         "pre" => Some(TaskFirstContent::CodeBlock),
-        "blockquote" | "ul" | "ol" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "table" => {
+        "blockquote" | "ul" | "ol" | "menu" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "table" => {
             Some(TaskFirstContent::Block)
         }
         _ => None,

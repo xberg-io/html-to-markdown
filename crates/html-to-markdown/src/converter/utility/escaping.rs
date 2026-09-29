@@ -452,6 +452,9 @@ fn is_html_block_opener(rest: &str) -> bool {
 }
 
 /// Helper for block-level element detection.
+///
+/// ~keep The converter writes center, details, dialog, hgroup, legend, menu, search and summary as
+/// ~keep blocks too, so text after one starts a new paragraph, also inside a list item (issue #657).
 pub fn is_block_level_name(tag_name: &str, is_inline: bool) -> bool {
     !is_inline
         && matches!(
@@ -461,7 +464,10 @@ pub fn is_block_level_name(tag_name: &str, is_inline: bool) -> bool {
                 | "aside"
                 | "blockquote"
                 | "canvas"
+                | "center"
                 | "dd"
+                | "details"
+                | "dialog"
                 | "div"
                 | "dl"
                 | "dt"
@@ -477,14 +483,19 @@ pub fn is_block_level_name(tag_name: &str, is_inline: bool) -> bool {
                 | "h5"
                 | "h6"
                 | "header"
+                | "hgroup"
                 | "hr"
+                | "legend"
                 | "li"
                 | "main"
+                | "menu"
                 | "nav"
                 | "ol"
                 | "p"
                 | "pre"
+                | "search"
                 | "section"
+                | "summary"
                 | "table"
                 | "tfoot"
                 | "ul"

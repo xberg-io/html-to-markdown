@@ -165,7 +165,7 @@ pub fn is_loose_list(node_handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: 
             if BLOCK_FORCING_CHILD_TAGS.contains(&name.as_str()) {
                 return true;
             }
-            if matches!(name.as_str(), "ul" | "ol") && is_loose_list(*li_child_handle, parser, dom_ctx) {
+            if matches!(name.as_str(), "ul" | "ol" | "menu") && is_loose_list(*li_child_handle, parser, dom_ctx) {
                 return true;
             }
         }
@@ -666,6 +666,24 @@ pub fn start_block_in_list_item(output: &mut String, ctx: &Context, options: &Co
             output.push_str(if output.ends_with('\n') { "\n" } else { "\n\n" });
         }
     }
+}
+
+/// Start the content of a container that rendered its children into a buffer of its own: at the
+/// list item's content column inside a list item, after a blank line elsewhere.
+///
+/// ~keep A container written at the start of the line would leave the list item (issue #657).
+pub fn start_container_block(output: &mut String, ctx: &Context, options: &ConversionOptions) {
+    if container_starts_in_list_item(output, ctx) {
+        start_block_in_list_item(output, ctx, options);
+    } else if !output.is_empty() && !output.ends_with("\n\n") {
+        output.push_str("\n\n");
+    }
+}
+
+/// Whether a container that rendered its children into a buffer of its own starts inside the
+/// list item that `output` ends in.
+pub const fn container_starts_in_list_item(output: &str, ctx: &Context) -> bool {
+    ctx.in_list_item && !ctx.in_table_cell && !output.is_empty()
 }
 
 /// Add appropriate leading separator before a list.

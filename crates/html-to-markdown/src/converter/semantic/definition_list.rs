@@ -220,36 +220,33 @@ pub fn handle_menu(
     depth: usize,
     dom_ctx: &super::DomContext,
 ) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let content_start = output.len();
+    if let Some(tl::Node::Tag(_)) = node_handle.get(parser) {
+        use crate::converter::list::utils;
 
         let menu_options = crate::options::ConversionOptions {
             bullets: "-".to_string(),
             ..options.clone()
         };
 
-        let list_ctx = super::Context {
-            in_ordered_list: false,
-            list_counter: 0,
-            in_list: true,
-            list_depth: ctx.list_depth,
-            ..ctx.clone()
-        };
-
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    &menu_options,
-                    &list_ctx,
-                    depth + 1,
-                    dom_ctx,
-                );
-            }
+        // ~keep The items are those of an unordered list, so inside a list item they nest in
+        // ~keep it like a `<ul>` (issue #657).
+        if ctx.in_list_item {
+            utils::add_list_leading_separator(output, ctx, options);
         }
+        let content_start = output.len();
+        utils::process_list_children(
+            *node_handle,
+            parser,
+            output,
+            &menu_options,
+            ctx,
+            depth,
+            false,
+            false,
+            ctx.list_depth,
+            1,
+            dom_ctx,
+        );
 
         if options.newline_style == crate::options::NewlineStyle::Backslash {
             // ~keep A trailing <br> run with no following sibling has no next dispatch to
@@ -259,7 +256,9 @@ pub fn handle_menu(
             crate::converter::main_helpers::strip_trailing_backslash_breaks(output, content_start);
         }
 
-        if !ctx.convert_as_inline && output.len() > content_start {
+        if ctx.in_list_item {
+            utils::add_nested_list_trailing_separator(output, ctx);
+        } else if !ctx.convert_as_inline && output.len() > content_start {
             if !output.ends_with("\n\n") {
                 if output.ends_with('\n') {
                     output.push('\n');

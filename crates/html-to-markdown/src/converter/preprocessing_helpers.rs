@@ -279,7 +279,7 @@ fn p_ancestor_state_for(tag_name: &str, inherited: bool) -> bool {
 /// Compute the `list_item_ancestor_state` scan result to hand down to a node's
 /// children, given the node's own tag name and the state its own parent handed down.
 ///
-/// A `<li>`/`<dt>`/`<dd>` ancestor found before crossing a `<ul>`/`<ol>`/`<dl>`
+/// A `<li>`/`<dt>`/`<dd>` ancestor found before crossing a `<ul>`/`<ol>`/`<menu>`/`<dl>`
 /// (a new list context) counts; crossing into a new list container, or the
 /// `table`/`body`/`html` boundary, resets the search — a `<li>` nested inside a
 /// genuinely new list (or a new formatting context such as a table cell) is not
@@ -287,7 +287,7 @@ fn p_ancestor_state_for(tag_name: &str, inherited: bool) -> bool {
 fn list_item_ancestor_state_for(tag_name: &str, inherited: bool) -> bool {
     if matches!(tag_name, "li" | "dt" | "dd") {
         true
-    } else if matches!(tag_name, "ul" | "ol" | "dl" | "table" | "body" | "html") {
+    } else if matches!(tag_name, "ul" | "ol" | "menu" | "dl" | "table" | "body" | "html") {
         false
     } else {
         inherited

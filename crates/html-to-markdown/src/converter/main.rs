@@ -16,8 +16,8 @@ use std::collections::HashSet;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
     collapse_excess_blank_lines, effective_max_depth, extract_head_metadata, format_metadata_frontmatter,
-    has_custom_element_tags, is_inline_element, repair_with_html5ever, strip_trailing_backslash_breaks,
-    trim_line_end_whitespace, trim_trailing_whitespace,
+    has_custom_element_tags, repair_with_html5ever, strip_trailing_backslash_breaks, trim_line_end_whitespace,
+    trim_trailing_whitespace, writes_inline,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
@@ -475,7 +475,7 @@ fn separate_in_list_item(
     let starts_block = match node {
         tl::Node::Tag(tag) => dom_ctx.tag_info(node_handle.get_inner(), parser).is_some_and(|info| {
             is_block_level_element(&info.name)
-                && !matches!(info.name.as_str(), "ul" | "ol" | "li")
+                && !matches!(info.name.as_str(), "ul" | "ol" | "li" | "menu")
                 && !should_drop_for_preprocessing(&info.name, tag, options)
         }),
         _ => false,
@@ -553,17 +553,17 @@ fn is_inline_content(node: &tl::Node, node_handle: &tl::NodeHandle, parser: &tl:
         tl::Node::Raw(bytes) => !bytes.as_utf8_str().trim().is_empty(),
         tl::Node::Tag(_) => dom_ctx
             .tag_info(node_handle.get_inner(), parser)
-            .is_some_and(|info| is_inline_element(&info.name)),
+            .is_some_and(|info| writes_inline(&info.name)),
         tl::Node::Comment(_) => false,
     }
 }
 
-/// Whether the parent of `node_handle` is a `<ul>` or `<ol>` (text or items between list items).
+/// Whether the parent of `node_handle` is a `<ul>`, `<ol>` or `<menu>` (text or items between list items).
 fn parent_is_list(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
     dom_ctx
         .parent_of(node_handle.get_inner())
         .and_then(|parent_id| dom_ctx.tag_info(parent_id, parser))
-        .is_some_and(|info| matches!(info.name.as_str(), "ul" | "ol"))
+        .is_some_and(|info| matches!(info.name.as_str(), "ul" | "ol" | "menu"))
 }
 
 /// Recursively walk DOM nodes and convert to Markdown.

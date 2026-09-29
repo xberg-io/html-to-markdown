@@ -3990,7 +3990,7 @@ fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason>
 
 /// Tier-2's inline-element test, which decides what counts as inline content after a block.
 fn is_inline_tag(name_lower: &[u8]) -> bool {
-    std::str::from_utf8(name_lower).is_ok_and(crate::converter::main_helpers::is_inline_element)
+    std::str::from_utf8(name_lower).is_ok_and(crate::converter::main_helpers::writes_inline)
 }
 
 /// Tier-2's block-level test, which decides what counts as the block before inline content.

@@ -79,7 +79,7 @@ pub fn previous_content_block<'a>(
                 if crate::converter::utility::content::is_block_level_element(&info.name) {
                     return Some(info.name.as_str());
                 }
-                if !crate::converter::main_helpers::is_inline_element(&info.name) {
+                if !crate::converter::main_helpers::writes_inline(&info.name) {
                     return None;
                 }
                 match dom_ctx.children_of(sibling.get_inner()) {

@@ -890,6 +890,15 @@ pub fn is_inline_element(tag_name: &str) -> bool {
     )
 }
 
+/// Whether an element writes its content as inline content: an inline element, or a custom
+/// element (its name holds a `-`), which HTML also shows inline.
+///
+/// ~keep A custom element after a block in a list item is text of a new paragraph there, so it
+/// ~keep starts at the item's content column (issue #658).
+pub fn writes_inline(tag_name: &str) -> bool {
+    is_inline_element(tag_name) || tag_name.contains('-')
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

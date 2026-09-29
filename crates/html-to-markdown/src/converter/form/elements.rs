@@ -130,12 +130,7 @@ pub fn handle_form(
         let mut content = String::new();
         let children = tag.children();
         {
-            // ~keep The element is written at the start of the line, so inside it a list item
-            // ~keep has ended (issue #583).
-            let block_ctx = super::Context {
-                list_item_open: false,
-                ..ctx.clone()
-            };
+            let block_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
             for child_handle in children.top().iter() {
                 walk_node(
                     child_handle,
@@ -151,10 +146,7 @@ pub fn handle_form(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            if !output.is_empty() && !output.ends_with("\n\n") {
-                output.push_str("\n\n");
-            }
-
+            crate::converter::list::utils::start_container_block(output, ctx, options);
             output.push_str(trimmed);
             output.push_str("\n\n");
         }
@@ -195,12 +187,7 @@ pub fn handle_fieldset(
         let mut content = String::new();
         let children = tag.children();
         {
-            // ~keep The element is written at the start of the line, so inside it a list item
-            // ~keep has ended (issue #583).
-            let block_ctx = super::Context {
-                list_item_open: false,
-                ..ctx.clone()
-            };
+            let block_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
             for child_handle in children.top().iter() {
                 walk_node(
                     child_handle,
@@ -216,10 +203,7 @@ pub fn handle_fieldset(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            if !output.is_empty() && !output.ends_with("\n\n") {
-                output.push_str("\n\n");
-            }
-
+            crate::converter::list::utils::start_container_block(output, ctx, options);
             output.push_str(trimmed);
             output.push_str("\n\n");
         }

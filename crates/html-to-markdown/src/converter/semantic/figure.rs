@@ -127,21 +127,14 @@ pub fn handle_figure(
             }
         }
 
-        if !output.is_empty() && !output.ends_with("\n\n") {
-            output.push_str("\n\n");
-        }
-
+        let figure_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
+        let in_list_item = crate::converter::list::utils::container_starts_in_list_item(output, ctx);
+        crate::converter::list::utils::start_container_block(output, ctx, options);
         let figure_start = output.len();
 
         let mut figure_content = String::new();
         let children = tag.children();
         {
-            // ~keep The figure is written at the start of the line, so inside it the list item
-            // ~keep has ended (issue #583).
-            let figure_ctx = super::Context {
-                list_item_open: false,
-                ..ctx.clone()
-            };
             for child_handle in children.top().iter() {
                 super::walk_node(
                     child_handle,
@@ -165,8 +158,12 @@ pub fn handle_figure(
             options.newline_style,
         );
 
-        figure_content = figure_content.replace("\n![", "![");
-        figure_content = figure_content.replace(" ![", "![");
+        // ~keep In a list item the lines of the figure start at the item's content column, and
+        // ~keep the space before an image is part of that indent.
+        if !in_list_item {
+            figure_content = figure_content.replace("\n![", "![");
+            figure_content = figure_content.replace(" ![", "![");
+        }
 
         let trimmed = figure_content.trim_matches(|c| c == '\n' || c == ' ' || c == '\t');
         if !trimmed.is_empty() {
@@ -350,7 +347,9 @@ pub fn handle_figcaption(
             }
         }
 
-        if !output.is_empty() {
+        if crate::converter::list::utils::container_starts_in_list_item(output, ctx) {
+            crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
+        } else if !output.is_empty() {
             if output.ends_with("```\n") {
                 output.push('\n');
             } else {

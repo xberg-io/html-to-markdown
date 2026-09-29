@@ -52,6 +52,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Details, figure, fieldset, menu and hgroup elements in a list item left the item (#657).**
+  `<ul><li><details><summary>s</summary>d</details></li></ul>` gave `-\n\n**s**\n\nd`, an empty
+  item with the content after the list, and `<ul><li><menu><li>m</li></menu></li></ul>` split the
+  item in two. These containers, and a form, now start at the item's content column like a
+  `<div>`, and the text after one of them stays in the item. A menu nests in the item like a
+  `<ul>`. Center, search, dialog, summary and legend elements now count as blocks, so the text
+  after them starts a new paragraph.
+- **A custom element after a paragraph in a list item left the item (#658).** With
+  `preserve_tags: ["my-el"]`, `<ol><li><p>a</p><my-el></my-el><h2>h</h2>t</li></ol>` gave
+  `1. a\n\n<my-el></my-el>## h`, so the heading was text outside the list. A custom element after
+  a block of the item now starts a paragraph at the content column, preserved or not.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a

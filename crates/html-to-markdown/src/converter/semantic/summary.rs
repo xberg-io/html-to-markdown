@@ -94,12 +94,7 @@ pub fn handle_details(
         let mut content = String::with_capacity(256);
         let children = tag.children();
         {
-            // ~keep The details element is written at the start of the line, so inside it the
-            // ~keep list item has ended (issue #583).
-            let details_ctx = super::Context {
-                list_item_open: false,
-                ..ctx.clone()
-            };
+            let details_ctx = crate::converter::list::utils::nested_block_context(output, ctx, options);
             for child_handle in children.top().iter() {
                 walk_node(
                     child_handle,
@@ -124,10 +119,7 @@ pub fn handle_details(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            if !output.is_empty() && !output.ends_with("\n\n") {
-                output.push_str("\n\n");
-            }
-
+            crate::converter::list::utils::start_container_block(output, ctx, options);
             output.push_str(trimmed);
             output.push_str("\n\n");
         }
