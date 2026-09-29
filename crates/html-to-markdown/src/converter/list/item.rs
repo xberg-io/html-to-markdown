@@ -6,7 +6,7 @@
 //! - Proper bullet/number formatting
 //! - Indentation and spacing
 
-use crate::converter::list::utils::add_list_leading_separator;
+use crate::converter::list::utils::{add_list_leading_separator, continuation_indent_string};
 use crate::converter::main_helpers::effective_max_depth;
 use crate::converter::main_helpers::strip_trailing_backslash_breaks;
 use crate::converter::main_helpers::tag_name_eq;
@@ -220,9 +220,17 @@ pub fn handle_li(
         }
 
         let mut task_text = String::new();
+        // ~keep Whether the first child that renders visible content (whitespace-only output
+        // ~keep such as a `<br>`, a `&nbsp;` span, or a dropped `<template>`/`<noscript>` does
+        // ~keep not count) is a `<blockquote>`. The joiner below trims `task_text` and glues it
+        // ~keep to the marker with a single space, which is right for the item's leading
+        // ~keep paragraph text but turns a leading quote's `>` into literal task text
+        // ~keep ("- [ ] > q"), so that case starts the quote on its own continuation line.
+        let mut starts_with_blockquote = false;
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
+                let opens_content = task_text.chars().all(char::is_whitespace);
                 render_li_content(
                     child_handle,
                     parser,
@@ -233,12 +241,28 @@ pub fn handle_li(
                     &checkbox_node,
                     dom_ctx,
                 );
+                if opens_content && !task_text.chars().all(char::is_whitespace) {
+                    starts_with_blockquote = matches!(
+                        child_handle.get(parser),
+                        Some(tl::Node::Tag(child_tag)) if tag_name_eq(child_tag.name().as_utf8_str(), "blockquote")
+                    );
+                }
             }
         }
-        output.push(' ');
         let trimmed_task = task_text.trim();
-        if !trimmed_task.is_empty() {
+        if starts_with_blockquote {
+            // ~keep The blockquote handler already indents every quoted line after its first
+            // ~keep with this same continuation indent; trimming stripped only the first's.
+            output.push_str("\n\n");
+            if let Some(indent) = continuation_indent_string(li_ctx.list_depth, li_ctx.list_indent_columns, options) {
+                output.push_str(&indent);
+            }
             output.push_str(trimmed_task);
+        } else {
+            output.push(' ');
+            if !trimmed_task.is_empty() {
+                output.push_str(trimmed_task);
+            }
         }
     } else {
         if ctx.in_table_cell {
