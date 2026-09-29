@@ -47,11 +47,13 @@ impl OpenParagraph {
     ///
     /// ~keep A line that cannot start a block is paragraph continuation text in CommonMark, at
     /// ~keep column 0 too (a lazy line), so it stays in the paragraph or the list item (#616).
+    /// ~keep A list item line left of the text's column leaves the item and starts a list at any
+    /// ~keep number; at or right of that column only a line that interrupts a paragraph does.
     fn continues_with(&self, line: &str, trimmed: &str) -> bool {
         !trimmed.is_empty()
             && !opens_block(trimmed)
             && !trimmed.starts_with('|')
-            && !((self.is_item() || !self.indent.is_empty()) && parse_list_item(line).is_some())
+            && parse_list_item(line).is_none_or(|(indent, _, _)| indent.len() >= self.indent.len() + self.marker.len())
     }
 
     /// Write the paragraph: a plain one ends with a blank line, a list item with its line end.
@@ -175,6 +177,8 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
 
             // ~keep Inside a quote a line that starts a block keeps its own line, as outside one:
             // ~keep a heading underline, a rule, a list item, a fence, a heading, a table row (#607).
+            // ~keep A hard break before such a line stays: a `1990.` line can continue the paragraph,
+            // ~keep and the reflow does not know the column of a list item in a quote to tell.
             let underline = in_blockquote_paragraph && is_heading_underline(&content);
             let fence = code_fence(&content);
             if underline
@@ -189,6 +193,9 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
                         &blockquote_buffer,
                         if underline { usize::MAX } else { width },
                     ));
+                    if let Some(text) = blockquote_buffer.strip_suffix('\n') {
+                        result.push_str(&text[text.trim_end_matches(' ').len()..]);
+                    }
                     result.push('\n');
                     blockquote_buffer.clear();
                     in_blockquote_paragraph = false;
@@ -363,6 +370,33 @@ mod tests {
         assert_eq!(wrap_at_20("1. a\n\n   para\n2. b\n"), "1. a\n\n   para\n\n2. b\n");
         assert_eq!(wrap_at_20("- a\n---\n"), "- a\n---\n");
         assert_eq!(wrap_at_20("- \n- b\n"), "-\n- b\n");
+    }
+
+    #[test]
+    fn wrap_markdown_ends_an_item_at_a_number_line_only_left_of_its_text() {
+        assert_eq!(wrap_at_20("- a  \n  1990. b\n"), "- a  \n  1990. b\n");
+        assert_eq!(wrap_at_20("1. a\\\n   57) b\n"), "1. a\\\n   57) b\n");
+        assert_eq!(
+            wrap_at_20("1. first\n\n   Released in  \n   2004. Updated later.\n"),
+            "1. first\n\n   Released in  \n   2004. Updated\n   later.\n\n"
+        );
+        assert_eq!(wrap_at_20("- a\n1990. b\n"), "- a\n1990. b\n");
+        assert_eq!(wrap_at_20("1. a\n  2. b\n"), "1. a\n  2. b\n");
+        assert_eq!(wrap_at_20("1. a\n\n   p\n  2. b\n"), "1. a\n\n   p\n\n  2. b\n");
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_hard_break_before_a_number_line_in_a_quote() {
+        assert_eq!(wrap_at_20("> a  \n> 1990. b\n"), "> a  \n> 1990. b\n");
+        assert_eq!(wrap_at_20("> 2. b\n"), "> 2. b\n");
+        assert_eq!(wrap_at_20("> - a\n>   2. b\n"), "> - a\n>   2. b\n");
+        assert_eq!(wrap_at_20("> - x\n> lazy\n> 2. b\n"), "> - x\n> lazy\n> 2. b\n");
+        assert_eq!(wrap_at_20("> a\\\n> 1990. b\n"), "> a\\\n> 1990. b\n");
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_an_item_of_non_breaking_spaces() {
+        assert_eq!(wrap_at_20("- \u{a0}\n"), "- \u{a0}\n");
     }
 
     #[test]

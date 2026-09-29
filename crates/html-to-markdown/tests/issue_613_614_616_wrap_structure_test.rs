@@ -28,6 +28,17 @@ fn render(markdown: &str) -> String {
     html.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+/// Every wrap width from 1 to 80.
+const ALL_WIDTHS: [usize; 80] = {
+    let mut widths = [0; 80];
+    let mut index = 0;
+    while index < 80 {
+        widths[index] = index + 1;
+        index += 1;
+    }
+    widths
+};
+
 /// Asserts that wrapping `html` at each width renders the same HTML as the unwrapped output.
 fn assert_wrap_keeps_structure(html: &str, widths: &[usize], newline_style: NewlineStyle) {
     let unwrapped = converted(html, None, newline_style);
@@ -55,11 +66,19 @@ fn should_keep_a_list_tight_when_an_item_continues_on_the_next_line() {
 
 #[test]
 fn should_keep_a_line_that_cannot_start_a_list_in_its_paragraph() {
-    for html in [
-        "<p>It was first described in\n1990. That year the first browser shipped to more people.</p>",
-        "<p>It was part of Firefox\n57) as part of the Gecko engine and the Quantum project.</p>",
-    ] {
-        assert_wrap_keeps_structure(html, &[20, 80], NewlineStyle::Spaces);
+    for newline_style in [NewlineStyle::Spaces, NewlineStyle::Backslash] {
+        for html in [
+            "<p>It was first described in\n1990. That year the first browser shipped to more people.</p>",
+            "<p>It was part of Firefox\n57) as part of the Gecko engine and the Quantum project.</p>",
+            "<ul><li>a<br>1990. b</li></ul>",
+            "<ol><li>a<br>57) b</li></ol>",
+            "<ul><li>a<br>2. b</li></ul>",
+            "<ul><li>born in<br>1990. moved in<br>2001. retired</li></ul>",
+            "<ol><li><p>first</p><p>Released in<br>2004. Updated later.</p></li><li>second</li></ol>",
+            "<blockquote><p>a<br>1990. b</p></blockquote>",
+        ] {
+            assert_wrap_keeps_structure(html, &ALL_WIDTHS, newline_style);
+        }
     }
 }
 
@@ -101,8 +120,26 @@ fn should_not_start_a_list_or_a_block_on_a_wrapped_line() {
         "<p>aaaa bbbb <code>cccc dddd - eeee</code></p>",
         "<blockquote>aaaa bbbb cccc dddd - eeee</blockquote>",
         "<ul><li>aaaa bbbb cccc dddd - eeee</li></ul>",
+        "<p>xx --- --- --- --- --- --- --- --- yy zz</p>",
+        "<p>intro text * * * * * * * * * * * * outro</p>",
+        "<p>a - - x</p>",
+        "<p>a * - x</p>",
+        "<p>a - b - c - d - e - f</p>",
+        "<p>word - - - more words here</p>",
+        "<p>some words here === === === === === === === more text</p>",
+        "<ul><li>xx --- --- --- --- --- yy zz</li></ul>",
+        "<blockquote>intro text * * * * * * outro</blockquote>",
+        "<p>a<br>*\nb</p>",
+        "<p>a<br>1.\nb</p>",
+        "<p>a<br>+\nb c</p>",
+        "<ul><li>a<br>*\nb</li></ul>",
+        "<p>a<br>--- x y</p>",
+        "<p>--- x y</p>",
+        "<ul><li>--- x y</li></ul>",
     ] {
-        assert_wrap_keeps_structure(html, &[20], NewlineStyle::Spaces);
+        for newline_style in [NewlineStyle::Spaces, NewlineStyle::Backslash] {
+            assert_wrap_keeps_structure(html, &ALL_WIDTHS, newline_style);
+        }
     }
 }
 

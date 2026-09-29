@@ -84,9 +84,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   right under a list item that starts no block of its own, at column 0 or indented, belongs to
   the item's text. With `wrap` on, the reflow wrote it as a paragraph of its own and put a blank
   line before the next item, so the list rendered loose. It now joins the item's text and is
-  wrapped with it. For the same reason, a paragraph line that starts with a number such as
-  `1990.` or `57)` stays in its paragraph: only a bullet or `1.` can end a paragraph and start a
-  list.
+  wrapped with it. For the same reason, a line that starts with a number such as `1990.` or
+  `57)` stays in its paragraph, in a quote and in a list item: only a bullet or `1.` can end a
+  paragraph and start a list. Under a list item, a number line left of the item's text still
+  ends the item.
 - **Wrap mode dropped a hard line break (#613).** With `wrap` on, `<p>a<br>b</p>` gave `a b`:
   the reflow joined the line after a `<br>` to the line before it, in a paragraph, a quote and a
   list item. A hard break is now a line end the reflow never joins across, so each side of it is
@@ -94,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Wrap mode could start a line with a list marker and turn text into a list (#614).** With
   `wrap` on, a break before a `-`, `1.`, `#` or `>` in running text started a new line with it,
   which opened a list, a heading or a quote. A wrapped line now never starts with a word that
-  opens a block there; the word stays at the end of the line before it. A number followed by
+  opens a block there, also in a run such as `--- --- ---` or `* * *`; the word stays at the
+  end of the line before it, which can then run past the wrap width. A number followed by
   non-breaking spaces, such as Word's `1.&nbsp;&nbsp; Cut`, is no longer read as a list marker,
   and the reflow no longer breaks a line at a non-breaking space.
 - **Wrap mode broke a link whose address holds a space.** An address with a space is written in

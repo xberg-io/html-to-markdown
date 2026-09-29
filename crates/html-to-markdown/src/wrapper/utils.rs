@@ -146,27 +146,62 @@ pub fn hard_break(line: &str) -> Option<&str> {
 }
 
 /// Append `line` to paragraph `text`: after a space, or on a new line when the text so far ends
-/// with a hard line break.
+/// with a hard line break or when the joined text would open a block.
 ///
 /// ~keep A hard break is a line end the reflow never joins across, so `text` keeps it as a
-/// ~keep newline and [`wrap_line`] wraps the text on each side of it on its own (#613).
+/// ~keep newline and [`wrap_line`] wraps the text on each side of it on its own (#613). A line
+/// ~keep that starts with a bare marker (`*`, `1.`) or a short run of rule characters opens a
+/// ~keep block once the next line joins it, so that line end is kept as well (#614).
 pub fn push_paragraph_line(text: &mut String, line: &str) {
+    let line_text = line.trim_matches([' ', '\t']);
     if !text.is_empty() && !text.ends_with('\n') {
-        text.push(' ');
+        text.push(if joins_into_a_block(text, line_text) { '\n' } else { ' ' });
     }
-    text.push_str(line.trim_matches([' ', '\t']));
+    text.push_str(line_text);
     if let Some(spaces) = hard_break(line) {
         text.push_str(spaces);
         text.push('\n');
     }
 }
 
+/// Whether the last line of `text`, which opens no block, opens one once `line` joins it.
+///
+/// ~keep Only the end of `text` is read, so joining many lines stays linear.
+fn joins_into_a_block(text: &str, line: &str) -> bool {
+    let bytes = text.as_bytes();
+    (bytes.len().saturating_sub(BARE_MARKER_LEN)..bytes.len())
+        .rev()
+        .find(|&start| start == 0 || bytes[start - 1] == b'\n')
+        .is_some_and(|start| is_bare_marker(&text[start..]) && opens_block(&format!("{} {line}", &text[start..])))
+}
+
+/// The longest line [`is_bare_marker`] accepts.
+const BARE_MARKER_LEN: usize = 3;
+
+/// Whether `line`, which opens no block, can open one once a word joins its end.
+///
+/// ~keep Only a bare marker (`*`, `+`, `1.`) turns into a list item, and only a run of fewer than
+/// ~keep three `*` or `_` into a rule (`**` + `*`); any other line keeps opening no block.
+fn is_bare_marker(line: &str) -> bool {
+    line.len() <= BARE_MARKER_LEN
+        && line
+            .bytes()
+            .all(|byte| matches!(byte, b'*' | b'+' | b'-' | b'_' | b'1' | b'.' | b')' | b' '))
+}
+
+/// [`is_bare_marker`] for a line of `words`.
+fn words_are_bare_marker(words: &[&str]) -> bool {
+    words.len() <= 2
+        && words.iter().map(|word| word.len() + 1).sum::<usize>() <= BARE_MARKER_LEN + 1
+        && is_bare_marker(&words.join(" "))
+}
+
 /// Wrap a single line of text at the specified width.
 ///
 /// This function wraps text without breaking long words or on hyphens,
 /// similar to Python's `textwrap.fill()` with `break_long_words=False` and `break_on_hyphens=False`.
-/// A newline in `text` is a hard line break: the text on each side is wrapped on its own, and
-/// the spaces before the newline are kept.
+/// A newline in `text` is a line end the reflow keeps: the text on each side is wrapped on its
+/// own, and the spaces of a hard break before the newline are kept.
 pub fn wrap_line(text: &str, width: usize) -> String {
     let text = text.trim_end_matches(['\n', ' ']);
     if text.len() <= width {
@@ -217,32 +252,94 @@ fn words(text: &str) -> Vec<&str> {
 /// Wrap the words of `text`, a text without newlines, at `width` onto `result`.
 ///
 /// ~keep A wrapped line never starts with a word that would open a block there (a list marker,
-/// ~keep a `#`, a `>`, a rule); that word stays at the end of the line before it (#614). An
-/// ~keep escape would not do: inside a code span the backslash is literal text.
+/// ~keep a `#`, a `>`, a rule); that word moves to the end of the line before it (#614). An
+/// ~keep escape would not do: inside a code span the backslash is literal text. A line left
+/// ~keep empty is dropped. Only a bare marker or rule characters open a block by taking a word
+/// ~keep (`*` + `-` opens a list); such a line that then opens one joins the line before it, so
+/// ~keep a run of `*` lines is not moved one word at a time. A first line that opens a block
+/// ~keep (`---` of `--- x`) takes words from the lines after it, twice as many each time; `text`
+/// ~keep itself opens no block, so that ends. Every step moves a line start right or drops a
+/// ~keep line, so the loop ends. A line that takes words can run past `width`.
 fn wrap_words(text: &str, width: usize, result: &mut String) {
-    let mut lines: Vec<Vec<&str>> = vec![Vec::new()];
+    let words = words(text);
+    let mut greedy_ends = Vec::new();
     let mut line_len = 0;
-    for word in words(text) {
+    for (index, word) in words.iter().enumerate() {
         if line_len > 0 && line_len + 1 + word.len() > width {
-            lines.push(Vec::new());
+            greedy_ends.push(index);
             line_len = 0;
         }
         line_len += usize::from(line_len > 0) + word.len();
-        lines.last_mut().expect("lines starts with one line").push(word);
     }
+    greedy_ends.push(words.len());
 
-    for index in 1..lines.len() {
-        while !lines[index].is_empty() && opens_block(&lines[index].join(" ")) {
-            let word = lines[index].remove(0);
-            lines[index - 1].push(word);
+    let opens = |start: usize, end: usize| opens_block(&words[start..end].join(" "));
+    // ~keep Line `k` is `words[starts[k]..starts[k + 1]]`, the last one ends at `end`.
+    let mut starts: Vec<usize> = Vec::new();
+    let mut end = 0;
+    for greedy_end in greedy_ends {
+        if greedy_end <= end {
+            continue;
+        }
+        starts.push(end);
+        end = greedy_end;
+        let mut index = starts.len() - 1;
+        while index < starts.len() {
+            let line_end = starts.get(index + 1).copied().unwrap_or(end);
+            if !opens(starts[index], line_end) {
+                index += 1;
+            } else if index == 0 {
+                let mut step = 1;
+                let mut first_end = line_end;
+                while first_end < words.len() && opens(0, first_end) {
+                    first_end = (first_end + step).min(words.len());
+                    step *= 2;
+                    while starts.len() > 1 && starts.get(2).copied().unwrap_or(end) <= first_end {
+                        starts.remove(1);
+                    }
+                    if starts.len() > 1 {
+                        starts[1] = starts[1].max(first_end);
+                    } else {
+                        end = end.max(first_end);
+                    }
+                }
+                index = 1;
+            } else {
+                let receiver = index - 1;
+                let receiver_may_open = words_are_bare_marker(&words[starts[receiver]..starts[index]]);
+                starts[index] += 1;
+                if starts[index] == line_end {
+                    starts.remove(index);
+                }
+                if receiver_may_open && receiver == 0 {
+                    index = 0;
+                } else if receiver_may_open && opens(starts[receiver], starts.get(index).copied().unwrap_or(end)) {
+                    // ~keep Merged into the line before it, with every bare marker line right
+                    // ~keep before it, a line cannot open a block unless it is the first line.
+                    let mut merged = receiver;
+                    while merged > 0 {
+                        let previous_bare = words_are_bare_marker(&words[starts[merged - 1]..starts[merged]]);
+                        starts.remove(merged);
+                        index -= 1;
+                        merged -= 1;
+                        if !previous_bare {
+                            break;
+                        }
+                        if merged == 0 {
+                            index = 0;
+                        }
+                    }
+                }
+            }
         }
     }
-    let lines: Vec<String> = lines
-        .iter()
-        .filter(|line| !line.is_empty())
-        .map(|line| line.join(" "))
-        .collect();
-    result.push_str(&lines.join("\n"));
+
+    for (index, &start) in starts.iter().enumerate() {
+        if index > 0 {
+            result.push('\n');
+        }
+        result.push_str(&words[start..starts.get(index + 1).copied().unwrap_or(end)].join(" "));
+    }
 }
 
 /// Wrap a paragraph whose first line starts with `indent`, and start every wrapped line with it.
@@ -288,9 +385,6 @@ pub fn wrap_list_item(indent: &str, marker: &str, content: &str, width: usize) -
     let continuation_indent = format!("{}{}", indent, " ".repeat(marker.len()));
     let prefix_len = full_marker.len();
     let wrapped = wrap_line(content, if width > prefix_len { width - prefix_len } else { width });
-    if wrapped.trim().is_empty() {
-        return format!("{}\n", full_marker.trim_end());
-    }
 
     let mut result = String::with_capacity(wrapped.len() + prefix_len * 2);
     for (index, line) in wrapped.split('\n').enumerate() {
@@ -344,6 +438,101 @@ mod tests {
             wrap_line("see [x](<a b c d e f>) and more", 10),
             "see\n[x](<a b c d e f>)\nand more"
         );
+    }
+
+    #[test]
+    fn wrap_line_checks_a_line_again_when_a_word_moves_into_it() {
+        assert_eq!(wrap_line("a - - x", 1), "a - -\nx");
+        assert_eq!(wrap_line("a * - x", 1), "a * -\nx");
+        assert_eq!(wrap_line("--- x y", 1), "--- x\ny");
+        for text in [
+            "xx --- --- --- --- --- --- --- --- yy zz",
+            "intro text * * * * * * * * * * * * outro",
+            "some words here === === === === === === === more text",
+            "a - b - c - d - e - f",
+            "a * - x * * - - + y",
+        ] {
+            for width in 1..=40 {
+                let wrapped = wrap_line(text, width);
+                assert_eq!(
+                    wrapped.split_whitespace().collect::<Vec<_>>(),
+                    words(text),
+                    "{text:?} at {width}"
+                );
+                for line in wrapped.lines() {
+                    assert!(
+                        !opens_block(line),
+                        "{text:?} at {width}: {line:?} opens a block in {wrapped:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn wrap_line_starts_no_line_with_a_block_in_any_short_run_of_markers() {
+        let vocabulary = ["*", "**", "_", "__", "-", "+", "1.", "x", "* *", "***", "_ _"];
+        let mut texts: Vec<Vec<&str>> = vec![Vec::new()];
+        for _ in 0..4 {
+            texts = texts
+                .iter()
+                .flat_map(|text| {
+                    vocabulary.iter().map(move |word| {
+                        let mut longer = text.clone();
+                        longer.push(*word);
+                        longer
+                    })
+                })
+                .collect();
+            for text in &texts {
+                let text = text.join(" ");
+                if opens_block(&text) {
+                    continue;
+                }
+                for width in 1..=6 {
+                    let wrapped = wrap_line(&text, width);
+                    assert!(!wrapped.lines().any(opens_block), "{text:?} at {width}: {wrapped:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn is_bare_marker_holds_every_short_line_that_a_word_turns_into_a_block() {
+        let alphabet: Vec<char> = "*+-_1.)#>=`~< a2".chars().collect();
+        let words = ["x", "*", "-", "_", "+", "1.", "**", "__", "`", "---", "===", "!--"];
+        let mut lines = vec![String::new()];
+        for _ in 0..4 {
+            lines = lines
+                .iter()
+                .flat_map(|line| alphabet.iter().map(move |c| format!("{line}{c}")))
+                .collect();
+            for line in &lines {
+                if line.starts_with(' ') || line.ends_with(' ') || line.contains("  ") || opens_block(line) {
+                    continue;
+                }
+                for word in words {
+                    assert!(
+                        is_bare_marker(line) || !opens_block(&format!("{line} {word}")),
+                        "{line:?} + {word:?} opens a block"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn push_paragraph_line_keeps_the_line_end_after_a_bare_marker() {
+        for (first, second) in [("*", "b"), ("1.", "b c"), ("+", "b"), ("**", "*"), ("_ _", "_")] {
+            let mut text = String::from("a  \n");
+            push_paragraph_line(&mut text, first);
+            push_paragraph_line(&mut text, second);
+            assert_eq!(text, format!("a  \n{first}\n{second}"));
+        }
+        let mut text = String::from("x");
+        push_paragraph_line(&mut text, "*");
+        push_paragraph_line(&mut text, "b");
+        assert_eq!(text, "x * b");
     }
 
     #[test]
