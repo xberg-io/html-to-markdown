@@ -505,10 +505,8 @@ fn separate_in_list_item(
         return;
     };
     let item_is_open = crate::converter::list::utils::item_is_open(output, &indent, ctx);
-    let block_is_real = crate::converter::list::utils::indent_column(ctx.list_indent_columns, options).saturating_sub(
-        crate::converter::list::utils::indent_column(ctx.real_item_columns, options),
-    ) < 4;
-    let separates = item_is_open || (block_continues_lazily && block_is_real);
+    let separates =
+        item_is_open || (block_continues_lazily && crate::converter::list::utils::block_is_real(ctx, options));
     if !separates {
         return;
     }

@@ -265,7 +265,7 @@ fn should_write_a_rule_after_a_paragraph_between_markers_as_text() {
 }
 
 #[test]
-fn should_write_the_content_column_of_a_list_in_a_marker_only_wrapper() {
+fn should_write_text_after_a_block_in_a_list_in_a_marker_only_wrapper_out_of_the_block() {
     let with_script_symbols = ConversionOptions {
         sub_symbol: "~".to_owned(),
         sup_symbol: "^".to_owned(),
@@ -285,12 +285,9 @@ fn should_write_the_content_column_of_a_list_in_a_marker_only_wrapper() {
         for (body, expected) in [
             (
                 "<ul><li>x<blockquote>q</blockquote>t</li></ul>",
-                format!("{open}- x\n  > q\n\n  t{close}"),
+                format!("{open}- x\n  > q\n\nt{close}"),
             ),
-            (
-                "<ul><li>x<p>p</p>t</li></ul>",
-                format!("{open}- x\n\n  p\n\n  t{close}"),
-            ),
+            ("<ul><li>x<p>p</p>t</li></ul>", format!("{open}- x\n\np\n\nt{close}")),
         ] {
             let html = format!("<div><{tag}>{body}</{tag}></div>");
             let out = convert_with(&html, &with_script_symbols);
@@ -301,7 +298,7 @@ fn should_write_the_content_column_of_a_list_in_a_marker_only_wrapper() {
     }
     assert!(
         failures.is_empty(),
-        "the item must keep its content column, so text after a quote leaves the quote:\n{}",
+        "the item's marker is text, so the text after a block starts at column 0 and leaves the block:\n{}",
         failures.join("\n")
     );
 }

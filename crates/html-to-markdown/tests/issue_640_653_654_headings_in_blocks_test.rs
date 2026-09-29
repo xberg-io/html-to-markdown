@@ -378,3 +378,192 @@ fn should_not_turn_text_after_a_nested_quote_in_a_list_in_a_caption_into_a_code_
         }
     }
 }
+
+fn width4(options: ConversionOptions) -> ConversionOptions {
+    ConversionOptions {
+        list_indent_width: 4,
+        ..options
+    }
+}
+
+#[test]
+fn should_keep_a_quote_in_a_list_in_bold_in_a_quote_as_text_of_the_bold_with_wide_indents() {
+    let html = "<blockquote><b><ul><li>x<blockquote>q</blockquote>t</li></ul></b></blockquote>";
+    assert_converts(
+        html,
+        &width4(options(TierStrategy::Tier2)),
+        "> **- x\n>     > q\n>     t**\n",
+        "<blockquote><p><strong>- x&gt; qt</strong></p></blockquote>",
+    );
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        "> **- x\n> \t> q\n> \tt**\n",
+        "<blockquote><p>**- x</p><blockquote><p>qt**</p></blockquote></blockquote>",
+    );
+}
+
+#[test]
+fn should_keep_a_quote_in_a_list_in_a_quote_after_an_inline_marker_out_of_a_code_block_with_wide_indents() {
+    let quote = "<blockquote><ul><li>x<blockquote>q</blockquote>t</li></ul></blockquote>";
+    for (html, width4_markdown, tabs_markdown, rendered) in [
+        (
+            format!("<b>{quote}</b>"),
+            "**> - x\n> > q\n>     t**\n",
+            "**> - x\n> > q\n> \tt**\n",
+            "<p>**&gt; - x</p><blockquote><blockquote><p>qt**</p></blockquote></blockquote>",
+        ),
+        (
+            format!("<details><summary>{quote}</summary></details>"),
+            "**> - x\n> > q\n>     t**\n",
+            "**> - x\n> > q\n> \tt**\n",
+            "<p>**&gt; - x</p><blockquote><blockquote><p>qt**</p></blockquote></blockquote>",
+        ),
+        (
+            format!("<table><caption>{quote}</caption><tr><td>c</td></tr></table>"),
+            "*> \\- x\n> > q\n>     t*\n\n| c |\n| --- |\n",
+            "*> \\- x\n> > q\n> \tt*\n\n| c |\n| --- |\n",
+            "<p>*&gt; - x</p><blockquote><blockquote><p>qt*</p></blockquote></blockquote><p>| c || --- |</p>",
+        ),
+        (
+            format!("<ul><li>a<b>{quote}</b></li></ul>"),
+            "- a**> * x\n    > > q\n    >     t**\n",
+            "- a**> * x\n\t> > q\n\t> \tt**\n",
+            "<ul><li>a**&gt; * x<blockquote><blockquote><p>qt**</p></blockquote></blockquote></li></ul>",
+        ),
+    ] {
+        assert_converts(&html, &width4(options(TierStrategy::Tier2)), width4_markdown, rendered);
+        assert_converts(&html, &tabs(options(TierStrategy::Tier2)), tabs_markdown, rendered);
+    }
+}
+
+#[test]
+fn should_keep_a_nested_list_in_a_quote_after_an_inline_marker_out_of_a_code_block_with_wide_indents() {
+    let html = "<b><blockquote><ul><li>x<ul><li>y<blockquote>q</blockquote>t</li></ul></li></ul></blockquote></b>";
+    let rendered = "<p>**&gt; - x</p><blockquote><ul><li><p>y</p><blockquote><p>q</p></blockquote><p>t**</p></li></ul></blockquote>";
+    assert_converts(
+        html,
+        &width4(options(TierStrategy::Tier2)),
+        "**> - x\n> * y\n>     > q\n>\n>     t**\n",
+        rendered,
+    );
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        "**> - x\n> * y\n> \t> q\n>\n> \tt**\n",
+        rendered,
+    );
+}
+
+#[test]
+fn should_keep_text_after_a_quote_in_a_list_in_a_highlight_or_a_deletion_out_of_a_code_block_with_wide_indents() {
+    for (tag, marker) in [("mark", "=="), ("del", "~~")] {
+        let html = format!("<blockquote><{tag}><ul><li>x<blockquote>q</blockquote>t</li></ul></{tag}></blockquote>");
+        assert_converts(
+            &html,
+            &width4(options(TierStrategy::Tier2)),
+            &format!("> {marker}- x\n>     > q\n>     t{marker}\n"),
+            &format!("<blockquote><p>{marker}- x&gt; qt{marker}</p></blockquote>"),
+        );
+        assert_converts(
+            &html,
+            &tabs(options(TierStrategy::Tier2)),
+            &format!("> {marker}- x\n> \t> q\n> \tt{marker}\n"),
+            &format!("<blockquote><p>{marker}- x</p><blockquote><p>qt{marker}</p></blockquote></blockquote>"),
+        );
+    }
+    let html =
+        "<blockquote><mark><ul><li>x<ul><li>y<blockquote>q</blockquote>t</li></ul></li></ul></mark></blockquote>";
+    assert_converts(
+        html,
+        &width4(options(TierStrategy::Tier2)),
+        "> ==- x\n>     * y\n>         > q\n>         t==\n",
+        "<blockquote><p>==- x* y&gt; qt==</p></blockquote>",
+    );
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        "> ==- x\n> \t* y\n> \t\t> q\n> \t\tt==\n",
+        "<blockquote><p>==- x</p><ul><li>y<blockquote><p>qt==</p></blockquote></li></ul></blockquote>",
+    );
+}
+
+#[test]
+fn should_count_the_column_of_a_list_right_after_an_inline_marker_in_a_list_item_from_the_item() {
+    let html = "<ul><li>a<mark><ul><li>y<blockquote><ul><li>x<blockquote>q</blockquote>t</li></ul></blockquote>u</li></ul></mark></li></ul>";
+    assert_converts(
+        html,
+        &width4(options(TierStrategy::Tier2)),
+        "- a ==* y\n        > + x\n        >     > q\n        >     t\n        u==\n",
+        "<ul><li>a ==* y&gt; + x&gt;     &gt; q&gt;     tu==</li></ul>",
+    );
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        "- a ==* y\n\t> + x\n\t> \t> q\n\t> \tt\n\n\tu==\n",
+        "<ul><li><p>a ==* y</p><blockquote><ul><li>x<blockquote><p>qt</p></blockquote></li></ul></blockquote><p>u==</p></li></ul>",
+    );
+    let html = "<ul><li>a<b><ul><li>y<blockquote><ul><li>x<blockquote>q</blockquote>t</li></ul></blockquote>u</li></ul></b></li></ul>";
+    assert_converts(
+        html,
+        &width4(options(TierStrategy::Tier2)),
+        "- a *** y\n        > + x\n        >     > q\n        >\n        >     t\n        u**\n",
+        "<ul><li>a *** y&gt; + x&gt;     &gt; q&gt;&gt;     tu**</li></ul>",
+    );
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        "- a *** y\n\t> + x\n\t> \t> q\n\t>\n\t> \tt\n\n\tu**\n",
+        "<ul><li><p>a *** y</p><blockquote><ul><li><p>x</p><blockquote><p>q</p></blockquote><p>t</p></li></ul></blockquote><p>u**</p></li></ul>",
+    );
+}
+
+#[test]
+fn should_keep_the_text_of_a_quote_in_a_wide_ordered_item_right_after_an_inline_marker() {
+    let html = "<ol start=\"100\"><li><b><ol start=\"100\"><li>a<blockquote><b><ul><li>x<blockquote>q</blockquote>t</li></ul></b>u</blockquote></li></ol></b></li></ol>";
+    assert_converts(
+        html,
+        &width4(options(TierStrategy::Tier2)),
+        "100.  **100. a\n          > - x\n          >     > q\n          >     tu**\n",
+        "<ol start=\"100\"><li><strong>100. a&gt; - x&gt;     &gt; q&gt;     tu</strong></li></ol>",
+    );
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        "100.  **100. a\n\t\t\t> - x\n\t\t\t> \t> q\n\t\t\t> \ttu**\n",
+        "<ol start=\"100\"><li><strong>100. a&gt; - x&gt; \t&gt; q&gt; \ttu</strong></li></ol>",
+    );
+}
+
+#[test]
+fn should_keep_text_after_a_quote_in_a_list_in_a_caption_or_summary_after_the_list_item_ended_out_of_a_code_block() {
+    for (html, markers, tag) in [
+        (
+            "<ul><li>a<ul><li>b<figure><figcaption><ul><li>y<blockquote><ul><li>x<blockquote>q</blockquote>t</li></ul></blockquote>u</li></ul></figcaption></figure></li></ul></li></ul>",
+            "*",
+            "em",
+        ),
+        (
+            "<ul><li>a<ul><li>b<details><summary><ul><li>y<blockquote><ul><li>x<blockquote>q</blockquote>t</li></ul></blockquote>u</li></ul></summary></details></li></ul></li></ul>",
+            "**",
+            "strong",
+        ),
+    ] {
+        assert_converts(
+            html,
+            &width4(options(TierStrategy::Tier2)),
+            &format!(
+                "- a\n    * b\n\n{markers}+ y\n            > - x\n            >     > q\n            >     t\n            u{markers}\n"
+            ),
+            &format!(
+                "<ul><li>a<ul><li>b</li></ul></li></ul><p><{tag}>+ y&gt; - x&gt;     &gt; q&gt;     tu</{tag}></p>"
+            ),
+        );
+        assert_converts(
+            html,
+            &tabs(options(TierStrategy::Tier2)),
+            &format!("- a\n\t* b\n\n{markers}+ y\n\t\t> - x\n\t\t> \t> q\n\t\t> \tt\n\t\tu{markers}\n"),
+            &format!("<ul><li>a<ul><li>b</li></ul></li></ul><p><{tag}>+ y&gt; - x&gt; \t&gt; q&gt; \ttu</{tag}></p>"),
+        );
+    }
+}

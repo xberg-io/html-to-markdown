@@ -260,6 +260,27 @@ pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) ->
     })
 }
 
+/// Whether a line at the list item's content column can start a block: it is within 3 columns
+/// of the content column of the innermost item whose marker starts a list item. Further in, the
+/// line is the text of that item's paragraph.
+pub fn block_is_real(ctx: &Context, options: &ConversionOptions) -> bool {
+    indent_column(ctx.list_indent_columns, options).saturating_sub(indent_column(ctx.real_item_columns, options)) < 4
+}
+
+/// The column a block that starts its own line in the list item is written at: the item's content
+/// column, or the column of the item whose marker starts a list item where the content column
+/// starts no block in a quote whose first line is outside it.
+///
+/// ~keep That quote holds no paragraph for a line at the content column to continue, so the
+/// ~keep line would be an indented code block.
+pub fn block_columns(ctx: &Context, options: &ConversionOptions) -> usize {
+    if ctx.quote_starts_after_markers && !block_is_real(ctx, options) {
+        ctx.real_item_columns
+    } else {
+        ctx.list_indent_columns
+    }
+}
+
 /// Whether `marker`, written by a list item between markers on the line starting at
 /// `marker_line_start`, starts a real list item inside the item at `enclosing_columns`.
 ///

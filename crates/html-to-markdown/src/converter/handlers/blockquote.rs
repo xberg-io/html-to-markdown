@@ -61,13 +61,21 @@ pub fn handle_blockquote(
     // ~keep the same column (issue #654). Bold or italic around the item holding the quote does
     // ~keep not make a list in the quote text: its items open. Under a caption's or summary's
     // ~keep markers, a list in the quote is still judged by where its markers fall, as outside it.
+    // ~keep A quote right after an opening inline marker starts on that marker's line, so its
+    // ~keep first line is text between the markers.
+    let first_line_follows_markers = output.is_empty() && ctx.in_marker_text();
     let blockquote_ctx = Context {
         blockquote_depth: ctx.blockquote_depth + 1,
         in_list_item: false,
         in_list: false,
         list_indent_columns: 0,
         real_item_columns: 0,
-        inline_depth: 0,
+        inline_depth: if first_line_follows_markers {
+            ctx.inline_depth
+        } else {
+            0
+        },
+        quote_starts_after_markers: first_line_follows_markers,
         item_lines: crate::converter::list::utils::ItemLineScan::new_item(),
         ..ctx.clone()
     };
@@ -139,7 +147,10 @@ pub fn handle_blockquote(
 
     if !trimmed_content.is_empty() {
         let list_indent = if ctx.in_list_item {
-            crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
+            crate::converter::list::utils::continuation_indent_string(
+                crate::converter::list::utils::block_columns(ctx, options),
+                options,
+            )
         } else {
             None
         };

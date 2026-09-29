@@ -174,7 +174,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it, so text after a nested quote in such a list leaves the nested quote. With
   `list_indent_type` set to `tabs`, the lines of a nested item were one tab short of its content
   column: `- a\n\t* q\n\n\tt` put `t` in the outer item. They now reach the column where the
-  item's text starts, `- a\n\t* q\n\n\t\tt`.
+  item's text starts, `- a\n\t* q\n\n\t\tt`. With `list_indent_width` set to 4 or with tab
+  indent, a quote right after an opening bold marker, a summary's or a caption's, now writes a
+  nested quote or list of its list at the column of the nearest real list item, where they became
+  a code block. A list inside `<mark>` or `<del>` is now text after its marker, as inside bold,
+  so text after a quote in it no longer becomes a code block.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut

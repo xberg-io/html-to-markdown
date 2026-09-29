@@ -91,9 +91,8 @@ pub struct Context {
     /// Whether the current output buffer is written between the markers of a marker-only
     /// wrapper that does not count in `inline_depth` (a `<mark>`'s `==`, a `<del>`'s `~~`).
     ///
-    /// ~keep A rule written there is text (issue #603). A list there still writes the content
-    /// ~keep column, unlike under `text_in_markers`: text after a quote in its item then stays out
-    /// ~keep of the quote.
+    /// ~keep A rule written there is text (issue #603), and so is the first line of a list, as
+    /// ~keep under `text_in_markers`.
     pub(crate) in_marker_span: bool,
     /// Whether the current output buffer escapes every `-` once it is written (a table
     /// caption): a `-` list marker there is text.
@@ -119,6 +118,13 @@ pub struct Context {
     /// ~keep follows the opening marker, so it is text, but a nested item's marker starts its
     /// ~keep own line and is a real list item (issue #615).
     pub(crate) real_item_columns: usize,
+    /// Whether the first line of the innermost quote follows an opening inline marker, so that
+    /// line is text outside the quote.
+    ///
+    /// ~keep The quote's other lines then hold no paragraph that a line of a list item in it
+    /// ~keep can continue, so a block 4 or more columns past the column of the item whose marker
+    /// ~keep starts a list item is an indented code block there, not paragraph text.
+    pub(crate) quote_starts_after_markers: bool,
     /// Whether a paragraph was open before the previous marker line of the lists: the next
     /// marker's check stops there instead of walking back over every earlier item.
     pub(crate) previous_marker: crate::converter::list::utils::PreviousMarker,
@@ -327,6 +333,7 @@ impl Context {
             list_depth: 0,
             list_indent_columns: 0,
             real_item_columns: 0,
+            quote_starts_after_markers: false,
             previous_marker: crate::converter::list::utils::PreviousMarker::default(),
             item_lines: crate::converter::list::utils::ItemLineScan::default(),
             first_writer: None,
