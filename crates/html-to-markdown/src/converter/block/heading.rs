@@ -117,6 +117,10 @@ pub fn handle(
                 output.push('\n');
                 output.push_str(&indent);
             }
+            // ~keep In a cell the heading's text is a block of the cell's one line (issue #645).
+            if ctx.in_table_cell && !ctx.convert_as_inline && !ctx.in_code && !heading_text.is_empty() {
+                crate::converter::main_helpers::separate_block_in_cell(output, options.br_in_tables);
+            }
             output.push_str(&heading_text);
         }
 

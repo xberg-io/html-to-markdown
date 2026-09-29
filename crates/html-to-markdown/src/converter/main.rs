@@ -425,7 +425,22 @@ fn separate_from_block(
     ctx: &Context,
     dom_ctx: &DomContext,
 ) {
-    if output.is_empty() || ctx.in_table_cell || ctx.convert_as_inline || ctx.in_code {
+    if output.is_empty() || ctx.convert_as_inline || ctx.in_code {
+        return;
+    }
+    if ctx.in_table_cell {
+        // ~keep A block in a cell ends with no line end, so the cell break separates the inline
+        // ~keep content after it (issue #645). A line break is a break of its own, and without
+        // ~keep `br_in_tables` a text's leading space is the break. A kept HTML block is text in a cell,
+        // ~keep and a nested table is lifted out of it or folded with its own breaks.
+        if is_inline_content(node, node_handle, parser, dom_ctx)
+            && !is_line_break(node_handle, parser, dom_ctx)
+            && (options.br_in_tables || !starts_with_space(node))
+            && crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx)
+                .is_some_and(|block| block != "table" && !ctx.preserve_tags.contains(block))
+        {
+            crate::converter::main_helpers::separate_block_in_cell(output, options.br_in_tables);
+        }
         return;
     }
     if ctx.in_list_item {
@@ -556,6 +571,18 @@ fn is_inline_content(node: &tl::Node, node_handle: &tl::NodeHandle, parser: &tl:
             .is_some_and(|info| is_inline_element(&info.name)),
         tl::Node::Comment(_) => false,
     }
+}
+
+/// Whether `node` is text that starts with whitespace.
+fn starts_with_space(node: &tl::Node) -> bool {
+    matches!(node, tl::Node::Raw(bytes) if bytes.as_bytes().first().is_some_and(u8::is_ascii_whitespace))
+}
+
+/// Whether `node_handle` is a `<br>` element.
+fn is_line_break(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    dom_ctx
+        .tag_info(node_handle.get_inner(), parser)
+        .is_some_and(|info| info.name == "br")
 }
 
 /// Whether the parent of `node_handle` is a `<ul>` or `<ol>` (text or items between list items).

@@ -52,6 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Text next to a paragraph, heading or other block in a table cell joined it (#645).**
+  `<table><tr><td><p>a</p>b</td></tr></table>` gave `| ab |`, and so did a heading, a `<div>`,
+  a list or a code block before the text. Text before a heading or a code block joined it too.
+  A block in a cell is now separated from the content before and after it by the cell break:
+  `| a b |`, or `| a<br>b |` with `br_in_tables` on.
+- **The two converters wrote a quote or a paragraph in a table cell differently (#647).** A quote
+  in a cell now has no `>` marker in either converter, as a heading, a list and a code block in a
+  cell have none: `<blockquote>a</blockquote>b` gives `| a b |`. The fast converter wrote a
+  paragraph after other cell content as `<br>` with `br_in_tables` off; it now writes a space, as
+  the full converter does.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a

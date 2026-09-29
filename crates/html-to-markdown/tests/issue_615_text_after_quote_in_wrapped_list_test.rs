@@ -524,7 +524,7 @@ fn should_keep_a_quote_that_starts_a_task_item_in_the_item() {
         (
             r#"<table><tr><td><ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul></td></tr></table>"#,
             tier2_options(),
-            "| - [ ] > q |\n| --------- |\n",
+            "| - [ ] q |\n| ------- |\n",
         ),
         (
             r#"<ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul>"#,

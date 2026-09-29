@@ -157,6 +157,7 @@ pub fn scan(
                         next_tag_is_list,
                         next_tag_is_img,
                         next_tag_is_span,
+                        options.br_in_tables,
                     )?;
                 }
 
@@ -206,7 +207,7 @@ pub fn scan(
                 // we don't bail on commonly-unescaped source like `x < 5`.
                 if !parse::is_tag_name_start(next) {
                     state.start_body(pos);
-                    flush_text(&mut state, "<", pos, false, false, false)?;
+                    flush_text(&mut state, "<", pos, false, false, false, options.br_in_tables)?;
                     pos += 1;
                     text_start = pos;
                     continue;
@@ -547,9 +548,9 @@ pub fn scan(
                 // appear in a cell; every kind in it has cell-aware open/close helpers
                 // that redirect output to the cell accumulator and match Tier-2's
                 // `cell_text_content` normalisation (`text.replace('\n', " ")` when
-                // `br_in_tables` is false).  Blockquote and Pre are included: their
-                // close helpers return early in a cell (Phase GG) rather than emitting
-                // a `> ` prefix or a code fence, which is what Tier-2 does too.
+                // `br_in_tables` is false).  Blockquote and Pre are included: in a cell
+                // their close helpers write the cell break before the content rather
+                // than a `> ` prefix or a code fence, which is what Tier-2 does too.
                 // A block kind bails only when it has no cell-aware helper, so adding
                 // one here without adding the helper will silently diverge from Tier-2.
                 if state.in_table_cell() && spec.is_block {
@@ -708,7 +709,15 @@ pub fn scan(
     }
 
     if text_start < pos {
-        flush_text(&mut state, &html[text_start..pos], text_start, false, false, false)?;
+        flush_text(
+            &mut state,
+            &html[text_start..pos],
+            text_start,
+            false,
+            false,
+            false,
+            options.br_in_tables,
+        )?;
     }
 
     // ~keep Phase N2: implicitly close all remaining open elements at EOF.
@@ -1130,7 +1139,7 @@ fn emit_open(
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
-        separate_inline_after_block(state)?;
+        separate_inline_after_block(state, options.br_in_tables)?;
     }
 
     // ~keep Tier-2 wraps these in markers this scanner has no arm for, so emitting them as
@@ -1160,7 +1169,7 @@ fn emit_open(
         return Err(BailReason::Classifier);
     }
     match spec.kind {
-        TagKind::Paragraph => open_paragraph(state),
+        TagKind::Paragraph => open_paragraph(state, options.br_in_tables),
         TagKind::Heading(_) => open_heading(state),
         TagKind::Blockquote => {
             // ~keep A citation is rendered after the quoted content and resolved against
@@ -1345,15 +1354,17 @@ fn emit_open(
     Ok(())
 }
 
-fn open_paragraph(state: &mut Tier1State) {
+fn open_paragraph(state: &mut Tier1State, br_in_tables: bool) {
     // ~keep When inside a table cell, treat `<p>` as a transparent container.
-    // Tier-2's paragraph.rs emits `<br>` when `in_table_cell` and there is
-    // already cell content; we mirror that behaviour so the cell buffer stays
-    // on one logical line (no `\n` in cell output to collapse later).
+    // Tier-2's paragraph.rs writes the cell break (`<br>` under `br_in_tables`,
+    // a space otherwise) when `in_table_cell` and there is already cell content
+    // (issue #647); we mirror that behaviour so the cell buffer stays on one
+    // logical line (no `\n` in cell output to collapse later).
     if state.in_table_cell() {
         let cell_buf = state.cell_or_output_mut();
-        if !cell_buf.is_empty() && !cell_buf.ends_with("<br>") {
-            cell_buf.push_str("<br>");
+        if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with("<br>") && !cell_buf.ends_with('\n')
+        {
+            crate::converter::main_helpers::emit_table_cell_break(cell_buf, br_in_tables);
         }
         return;
     }
@@ -1828,8 +1839,12 @@ fn emit_void(
     // `Tier1State::last_emitted_was_img`); the `TagKind::Image` arm below
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
-    if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
-        separate_inline_after_block(state)?;
+    // ~keep In a cell a line break is a break of its own (issue #645).
+    if std::mem::take(&mut state.last_closed_block)
+        && is_inline_tag(name_lower)
+        && !(state.in_table_cell() && matches!(spec.kind, TagKind::LineBreak))
+    {
+        separate_inline_after_block(state, options.br_in_tables)?;
     }
     state.last_closed_block = is_block_tag(name_lower);
 
@@ -2276,8 +2291,8 @@ fn emit_close(
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
-        TagKind::Heading(n) => close_heading(state, &frame, n, false)?,
-        TagKind::Blockquote => close_blockquote(state, &frame),
+        TagKind::Heading(n) => close_heading(state, &frame, n, false, options.br_in_tables)?,
+        TagKind::Blockquote => close_blockquote(state, &frame, options.br_in_tables),
         TagKind::Pre => close_pre(state, &frame, options),
         // ~keep Strong: suppress close marker when inside summary, or when this
         // frame nested inside another `<strong>` and so never emitted an
@@ -2656,8 +2671,8 @@ fn emit_close_for_implicit(
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
-        TagKind::Heading(n) => close_heading(state, &frame, n, true)?,
-        TagKind::Blockquote => close_blockquote(state, &frame),
+        TagKind::Heading(n) => close_heading(state, &frame, n, true, options.br_in_tables)?,
+        TagKind::Blockquote => close_blockquote(state, &frame, options.br_in_tables),
         TagKind::Pre => close_pre(state, &frame, options),
         // ~keep Strong: suppress close marker when inside summary, or when this
         // frame nested inside another `<strong>` and so never emitted an
@@ -2734,7 +2749,13 @@ fn close_paragraph(state: &mut Tier1State) {
 /// When `is_implicit` is true the empty-heading guard is skipped: implicitly
 /// closed headings have already had their content flushed through the normal
 /// path, so we just prepend the prefix unconditionally.
-fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bool) -> Result<(), BailReason> {
+fn close_heading(
+    state: &mut Tier1State,
+    frame: &OpenTag,
+    n: u8,
+    is_implicit: bool,
+    br_in_tables: bool,
+) -> Result<(), BailReason> {
     // ~keep When inside a table cell, Tier-2 emits the heading text directly into
     // the cell accumulator — no `#` prefix, no block separators.  The
     // `frame.content_start` is a position in the CELL buffer (set by
@@ -2742,7 +2763,8 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
     // arithmetic must use the cell buffer, not `state.output`.
     if state.in_table_cell() {
         let cell_buf = state.cell_or_output_mut();
-        while cell_buf.ends_with(' ') || cell_buf.ends_with('\t') {
+        // ~keep Only the heading's own trailing whitespace: a cell break before it stays.
+        while cell_buf.len() > frame.content_start && (cell_buf.ends_with(' ') || cell_buf.ends_with('\t')) {
             cell_buf.pop();
         }
         if !is_implicit {
@@ -2753,6 +2775,7 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
                 state.cell_or_output_mut().truncate(content_start);
             }
         }
+        separate_closed_block_in_cell(state, frame.content_start, br_in_tables);
         return Ok(());
     }
 
@@ -2855,11 +2878,26 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
     Ok(())
 }
 
-fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
+fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool) {
     // ~keep Phase GG follow-up: inside a table cell `frame.content_start` indexes
     // into the cell buffer, not `state.output`.  Don't prefix `> ` — Tier-2
-    // also collapses blockquote inside cells to plain inline text.
+    // also sheds the quote marker inside cells (issue #647).
     if state.in_table_cell() {
+        if state.escape_ctx.contains(EscapeCtx::CODE) {
+            // ~keep In code Tier-2 keeps the line ends the quote writes there; the cell folds them.
+            let cell_buf = state.cell_or_output_mut();
+            let content_start = clamp_to_char_boundary(cell_buf, frame.content_start);
+            if !cell_buf[content_start..].trim().is_empty() {
+                let content = cell_buf.split_off(content_start);
+                if !cell_buf.is_empty() && !cell_buf.ends_with('\n') {
+                    cell_buf.push('\n');
+                }
+                cell_buf.push_str(content.trim());
+                cell_buf.push('\n');
+            }
+        } else {
+            separate_closed_block_in_cell(state, frame.content_start, br_in_tables);
+        }
         return;
     }
     let content_start = clamp_to_char_boundary(&state.output, frame.content_start);
@@ -2931,6 +2969,49 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag) {
     }
 }
 
+/// Write the cell break at `at` in the cell buffer, between a block in a table cell and the cell
+/// content before it, as Tier-2 does (issue #645).
+///
+/// Tier-2 renders emphasis, code and the other marker elements into a scratch buffer of their
+/// own, so only the content written since the innermost of them opened counts. Inside a heading or
+/// code Tier-2 writes the content inline with no break. Tier-2 trims the start of a block's
+/// content, so the content after `at` is trimmed too.
+fn separate_block_in_cell_at(state: &mut Tier1State, at: usize, br_in_tables: bool) {
+    if state.escape_ctx.intersects(EscapeCtx::HEADING | EscapeCtx::CODE) {
+        return;
+    }
+    let scratch_start = state
+        .stack
+        .iter()
+        .rev()
+        .find(|frame| {
+            matches!(
+                frame.spec.kind,
+                TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted | TagKind::Code
+            )
+        })
+        .map_or(0, |frame| frame.content_start);
+    let cell_buf = state.cell_or_output_mut();
+    let at = clamp_to_char_boundary(cell_buf, at);
+    let scratch_start = clamp_to_char_boundary(cell_buf, scratch_start.min(at));
+    if cell_buf[scratch_start..at].trim().is_empty() {
+        return;
+    }
+    let content = cell_buf.split_off(at);
+    crate::converter::main_helpers::separate_block_in_cell(cell_buf, br_in_tables);
+    cell_buf.push_str(content.trim_start());
+}
+
+/// Separate the content of a block that closes in a table cell from the cell content before it.
+fn separate_closed_block_in_cell(state: &mut Tier1State, content_start: usize, br_in_tables: bool) {
+    let cell_buf = state.cell_or_output_mut();
+    let content_start = clamp_to_char_boundary(cell_buf, content_start);
+    if cell_buf[content_start..].trim().is_empty() {
+        return;
+    }
+    separate_block_in_cell_at(state, content_start, br_in_tables);
+}
+
 fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
     use crate::options::CodeBlockStyle;
     // ~keep Phase GG follow-up: when `<pre>` opened inside a table cell, its content
@@ -2939,6 +3020,7 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
     // code fence — Tier-2 also collapses pre inside cells to plain inline text
     // (the cell's `replace('\n', ' ')` step does the rest).
     if state.in_table_cell() {
+        separate_closed_block_in_cell(state, frame.content_start, options.br_in_tables);
         return;
     }
     let content_start = clamp_to_char_boundary(&state.output, frame.content_start);
@@ -3967,10 +4049,17 @@ fn output_ends_with_inline_text(output: &str) -> bool {
 
 /// Start a new paragraph for inline content that directly follows a block whose output ends with
 /// a single line break (a list, a table, `<hr>`), so it does not continue the block's last line
-/// (issues #570, #571). Mirrors Tier-2's `separate_from_block` in `walk_node`.
-fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason> {
+/// (issues #570, #571). In a table cell the cell break separates it instead (issue #645).
+/// Mirrors Tier-2's `separate_from_block` in `walk_node`.
+fn separate_inline_after_block(state: &mut Tier1State, br_in_tables: bool) -> Result<(), BailReason> {
     // ~keep `<pre>` sets the CODE bit too, so one test covers code spans and code blocks.
-    if state.in_table_cell() || state.escape_ctx.contains(EscapeCtx::CODE) {
+    if state.escape_ctx.contains(EscapeCtx::CODE) {
+        return Ok(());
+    }
+    // ~keep A block in a cell ends with no line end: the cell break separates (issue #645).
+    if state.in_table_cell() {
+        let at = state.cell_or_output_mut().len();
+        separate_block_in_cell_at(state, at, br_in_tables);
         return Ok(());
     }
     // ~keep Inside a list item Tier-2 starts it at the item's content column after a blank
@@ -4005,6 +4094,7 @@ fn flush_text(
     next_tag_is_list: bool,
     next_tag_is_img: bool,
     next_tag_is_span: bool,
+    br_in_tables: bool,
 ) -> Result<(), BailReason> {
     if raw.is_empty() {
         return Ok(());
@@ -4049,8 +4139,12 @@ fn flush_text(
     }
 
     // ~keep Whitespace-only text between a block and the content after it keeps the window open.
-    if !raw.trim().is_empty() && std::mem::take(&mut state.last_closed_block) {
-        separate_inline_after_block(state)?;
+    // ~keep In a cell without `br_in_tables` a text's leading space is the break (issue #645).
+    if !raw.trim().is_empty()
+        && std::mem::take(&mut state.last_closed_block)
+        && (br_in_tables || !state.in_table_cell() || !raw.as_bytes().first().is_some_and(u8::is_ascii_whitespace))
+    {
+        separate_inline_after_block(state, br_in_tables)?;
     }
 
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
