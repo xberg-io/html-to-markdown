@@ -36,49 +36,6 @@ pub fn handle_li(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
-    // ~keep A nested list whose enclosing <li> has no other content renders directly after
-    // ~keep that parent's own bare marker on the SAME physical line (see
-    // ~keep `add_list_leading_separator`'s bare-marker exclusion) -- the parent marker's own
-    // ~keep printed width already reaches this item's target column, so pushing this
-    // ~keep indent too double-counts it, deeply nesting single-child lists into runaway
-    // ~keep padding that reparses as an indented code block (spec example 299). The indent is
-    // ~keep only needed when this item genuinely starts a fresh physical line.
-    let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
-    if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
-        let indent = match options.list_indent_type {
-            crate::options::ListIndentType::Tabs => "\t".repeat(ctx.list_depth),
-            // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-            // ~keep marker (see Context::list_indent_columns), not a uniform per-depth value.
-            crate::options::ListIndentType::Spaces => " ".repeat(ctx.list_indent_columns),
-        };
-        output.push_str(&indent);
-    }
-
-    let mut has_block_children = false;
-    let children = tag.children();
-    {
-        for child_handle in children.top().iter() {
-            if let Some(info) = dom_ctx.tag_info(child_handle.get_inner(), parser) {
-                if matches!(
-                    info.name.as_str(),
-                    "p" | "div" | "blockquote" | "pre" | "table" | "hr" | "dl"
-                ) {
-                    has_block_children = true;
-                    break;
-                }
-            } else if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
-                let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
-                if matches!(
-                    tag_name.as_ref(),
-                    "p" | "div" | "blockquote" | "pre" | "table" | "hr" | "dl"
-                ) {
-                    has_block_children = true;
-                    break;
-                }
-            }
-        }
-    }
-
     #[allow(clippy::trivially_copy_pass_by_ref)]
     fn find_checkbox<'a>(
         node_handle: &tl::NodeHandle,
@@ -128,6 +85,74 @@ pub fn handle_li(
             (false, false, None)
         };
 
+    let marker = || {
+        if is_task_list {
+            String::from(if task_checked { "- [x] " } else { "- [ ] " })
+        } else if ctx.in_ordered_list {
+            format!("{}. ", ctx.list_counter)
+        } else {
+            format!("{} ", unordered_bullet(ctx, options))
+        }
+    };
+
+    // ~keep A marker written after text on its line is text (issue #625): text inside the list
+    // ~keep before this item ends its line first, and a blank line follows it when the marker
+    // ~keep line cannot interrupt that paragraph. A bare marker line holds the markers of
+    // ~keep single-child lists nested in each other (spec example 299), which stay on it.
+    let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
+    if !ctx.in_table_cell
+        && !output[line_start..].trim().is_empty()
+        && !crate::converter::list::utils::line_is_bare_list_marker(output)
+    {
+        output.push('\n');
+        if !crate::converter::utility::escaping::line_opens_block(&format!("{}x", marker())) {
+            output.push('\n');
+        }
+    }
+
+    // ~keep A nested list whose enclosing <li> has no other content renders directly after
+    // ~keep that parent's own bare marker on the SAME physical line (see
+    // ~keep `add_list_leading_separator`'s bare-marker exclusion) -- the parent marker's own
+    // ~keep printed width already reaches this item's target column, so pushing this
+    // ~keep indent too double-counts it, deeply nesting single-child lists into runaway
+    // ~keep padding that reparses as an indented code block (spec example 299). The indent is
+    // ~keep only needed when this item genuinely starts a fresh physical line.
+    let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
+    if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
+        let indent = match options.list_indent_type {
+            crate::options::ListIndentType::Tabs => "\t".repeat(ctx.list_depth),
+            // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
+            // ~keep marker (see Context::list_indent_columns), not a uniform per-depth value.
+            crate::options::ListIndentType::Spaces => " ".repeat(ctx.list_indent_columns),
+        };
+        output.push_str(&indent);
+    }
+
+    let mut has_block_children = false;
+    let children = tag.children();
+    {
+        for child_handle in children.top().iter() {
+            if let Some(info) = dom_ctx.tag_info(child_handle.get_inner(), parser) {
+                if matches!(
+                    info.name.as_str(),
+                    "p" | "div" | "blockquote" | "pre" | "table" | "hr" | "dl"
+                ) {
+                    has_block_children = true;
+                    break;
+                }
+            } else if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
+                let tag_name = normalized_tag_name(child_tag.name().as_utf8_str());
+                if matches!(
+                    tag_name.as_ref(),
+                    "p" | "div" | "blockquote" | "pre" | "table" | "hr" | "dl"
+                ) {
+                    has_block_children = true;
+                    break;
+                }
+            }
+        }
+    }
+
     // ~keep This item's own marker width, used to grow `list_indent_columns` for descendants
     // ~keep (nested lists and continuation content). Unordered/task markers are always 2 wide
     // ~keep ("- "); an ordered marker's width depends on its counter's digit count ("1. " = 3,
@@ -145,13 +170,7 @@ pub fn handle_li(
     // ~keep of the innermost item whose marker starts a list item (issue #615).
     let list_item_open = ctx.inline_depth == 0 && !ctx.text_in_markers;
     let item_is_real = list_item_open || {
-        let marker = if is_task_list {
-            String::from(if task_checked { "- [x] " } else { "- [ ] " })
-        } else if ctx.in_ordered_list {
-            format!("{}. ", ctx.list_counter)
-        } else {
-            format!("{} ", unordered_bullet(ctx, options))
-        };
+        let marker = marker();
         // ~keep An escaped `-` marker is text.
         !(ctx.escapes_hyphens && marker.starts_with('-'))
             && crate::converter::list::utils::marker_starts_item(
@@ -275,29 +294,42 @@ pub fn handle_li(
         // ~keep After the checkbox the line is paragraph text, so a block that is the item's
         // ~keep first content (a quote, also inside a div) starts on the next line at the
         // ~keep content column.
-        match crate::converter::list::utils::continuation_indent_string(li_ctx.list_indent_columns, options) {
-            Some(indent)
-                if li_ctx.list_item_open
-                    && !ctx.in_marker_span
-                    && !ctx.in_table_cell
-                    && !ctx.convert_as_inline
-                    && task_content_starts_with_block(tag, checkbox_node, parser, options, depth + 1) == Some(true) =>
+        let first_block = match task_first_content(tag, checkbox_node, parser, options, depth + 1) {
+            Some(TaskFirstContent::Block) => Some(trimmed_task),
+            // ~keep An indented code block's first line keeps its indent (issue #634).
+            Some(TaskFirstContent::CodeBlock) => {
+                let content = task_text.trim_end();
+                let first = content.len() - content.trim_start().len();
+                Some(&content[content[..first].rfind('\n').map_or(0, |pos| pos + 1)..])
+            }
+            _ => None,
+        };
+        match (
+            crate::converter::list::utils::continuation_indent_string(li_ctx.list_indent_columns, options),
+            first_block,
+        ) {
+            (Some(indent), Some(block))
+                if li_ctx.list_item_open && !ctx.in_marker_span && !ctx.in_table_cell && !ctx.convert_as_inline =>
             {
-                // ~keep A `---` line under the checkbox line would make it a heading.
-                let first_line = trimmed_task.lines().next().unwrap_or_default();
+                // ~keep A line that cannot interrupt the checkbox paragraph needs a blank line
+                // ~keep before it, and a `---` line under it would make it a heading (issue #634).
+                let first_line = block.lines().next().unwrap_or_default();
                 output.push_str(
-                    if crate::converter::utility::escaping::is_heading_underline(first_line) {
+                    if crate::converter::utility::escaping::is_heading_underline(first_line)
+                        || !crate::converter::utility::escaping::line_opens_block(first_line)
+                    {
                         "\n\n"
                     } else {
                         "\n"
                     },
                 );
                 output.push_str(&indent);
+                output.push_str(block);
             }
-            _ => output.push(' '),
-        }
-        if !trimmed_task.is_empty() {
-            output.push_str(trimmed_task);
+            _ => {
+                output.push(' ');
+                output.push_str(trimmed_task);
+            }
         }
     } else {
         if ctx.in_table_cell {
@@ -453,23 +485,33 @@ pub fn handle_li(
     }
 }
 
-/// Whether the first content that the task item `tag` renders after its checkbox is a block that
-/// writes a block opener: a quote, a list, a heading, a code block or a rule. `None` when the
-/// children render nothing.
+/// What a task item renders first after its checkbox.
+enum TaskFirstContent {
+    /// Paragraph text on the checkbox line.
+    Text,
+    /// A block that writes a block opener: a quote, a list, a heading or a rule.
+    Block,
+    /// A code block, whose first line can be indented code.
+    CodeBlock,
+}
+
+/// What the task item `tag` renders first after its checkbox, or `None` when the children render
+/// nothing.
 ///
 /// ~keep The walk follows the rendering: an element that holds the checkbox and a block
 /// ~keep container write nothing before their first child, so it goes into them. Text, and an
 /// ~keep inline element, are paragraph text on the checkbox line, also when they read like an
-/// ~keep opener.
-fn task_content_starts_with_block(
+/// ~keep opener. An inline element that renders nothing is skipped like an empty container
+/// ~keep (issue #634).
+fn task_first_content(
     tag: &tl::HTMLTag,
     checkbox: Option<tl::NodeHandle>,
     parser: &tl::Parser,
     options: &ConversionOptions,
     depth: usize,
-) -> Option<bool> {
+) -> Option<TaskFirstContent> {
     if depth >= effective_max_depth(options) {
-        return Some(false);
+        return Some(TaskFirstContent::Text);
     }
     for child_handle in tag.children().top().iter() {
         if Some(*child_handle) == checkbox {
@@ -480,11 +522,19 @@ fn task_content_starts_with_block(
             Some(tl::Node::Comment(_)) => {}
             Some(tl::Node::Tag(child_tag)) => {
                 let name = normalized_tag_name(child_tag.name().as_utf8_str());
-                if matches!(
-                    name.as_ref(),
-                    "blockquote" | "ul" | "ol" | "pre" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
-                ) {
-                    return Some(true);
+                let block = match name.as_ref() {
+                    "pre" => Some(TaskFirstContent::CodeBlock),
+                    "blockquote" | "ul" | "ol" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" => {
+                        Some(TaskFirstContent::Block)
+                    }
+                    _ => None,
+                };
+                if let Some(block) = block {
+                    // ~keep A block with no content writes nothing, like an empty container.
+                    if name == "hr" || task_first_content(child_tag, checkbox, parser, options, depth + 1).is_some() {
+                        return Some(block);
+                    }
+                    continue;
                 }
                 let holds_checkbox = checkbox
                     .and_then(|checkbox| checkbox.get(parser))
@@ -495,19 +545,25 @@ fn task_content_starts_with_block(
                             .iter()
                             .any(|node| std::ptr::eq(node, checkbox))
                     });
-                if !holds_checkbox && !crate::converter::utility::content::is_block_level_element(&name) {
-                    return Some(false);
-                }
-                if let Some(starts_with_block) =
-                    task_content_starts_with_block(child_tag, checkbox, parser, options, depth + 1)
-                {
-                    return Some(starts_with_block);
+                let is_container = holds_checkbox || crate::converter::utility::content::is_block_level_element(&name);
+                match task_first_content(child_tag, checkbox, parser, options, depth + 1) {
+                    None if is_container || !writes_without_content(child_tag, &name) => {}
+                    Some(first) if is_container => return Some(first),
+                    _ => return Some(TaskFirstContent::Text),
                 }
             }
-            _ => return Some(false),
+            _ => return Some(TaskFirstContent::Text),
         }
     }
     None
+}
+
+/// Whether the element `tag` named `name` writes output with no content: a void element (an
+/// image, a line break), a media element, or a link with an address.
+fn writes_without_content(tag: &tl::HTMLTag, name: &str) -> bool {
+    crate::converter::main_helpers::is_html5_void_element(name.as_bytes())
+        || crate::converter::media::is_media_element(name)
+        || (name == "a" && tag.attributes().get("href").is_some())
 }
 
 /// The bullet of an unordered list item at `ctx.ul_depth`: the list's bullets cycle by depth.

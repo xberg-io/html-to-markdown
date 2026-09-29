@@ -266,8 +266,8 @@ pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) ->
 /// ~keep The marker must start its own line: the buffer's first line follows the opening
 /// ~keep marker. Measured from the enclosing item's content column, the marker line with the
 /// ~keep item's content after it must open a block that can interrupt a paragraph (the check
-/// ~keep that escapes a link label's continuation lines). After a blank line no paragraph is
-/// ~keep open, so any marker within 3 columns starts an item.
+/// ~keep that escapes a link label's continuation lines). Where no paragraph is open, any
+/// ~keep marker within 3 columns starts an item.
 pub fn marker_starts_item(
     output: &str,
     marker_line_start: Option<usize>,
@@ -278,13 +278,53 @@ pub fn marker_starts_item(
     let Some(line_start) = marker_line_start else {
         return false;
     };
+    let enclosing_column = indent_column(enclosing_columns, options);
     let marker_column = crate::converter::utility::escaping::leading_indent(&output[line_start..]).1;
-    let column = marker_column.saturating_sub(indent_column(enclosing_columns, options));
-    if output[..line_start].ends_with("\n\n") {
+    let column = marker_column.saturating_sub(enclosing_column);
+    if !paragraph_is_open(&output[..line_start], enclosing_column) {
         return column < 4;
     }
     let line = format!("{}{marker}x", " ".repeat(column));
     crate::converter::utility::escaping::line_opens_block(&line)
+}
+
+/// Whether a paragraph is open at the end of `output` in the item whose content starts at
+/// `enclosing_column`: only then must a marker line interrupt it to start a list item.
+///
+/// ~keep `CommonMark` checks the interrupt rule only when the deepest open block a line reaches
+/// ~keep is a paragraph (issue #633). The lines within 3 columns of the item's content column
+/// ~keep decide it; a deeper line is inside the block above it. A blank line, or a line that
+/// ~keep opens a block, leaves no paragraph open: after a list item's line the open block is
+/// ~keep the list.
+/// ~keep A marker line that cannot interrupt a paragraph is an item only when none was open
+/// ~keep before it, so the walk looks past it. Any other line is paragraph text, and so is the
+/// ~keep buffer's first line, which follows the opening marker.
+fn paragraph_is_open(output: &str, enclosing_column: usize) -> bool {
+    use crate::converter::utility::escaping::{leading_indent, opens_block};
+    let mut lines = output.strip_suffix('\n').unwrap_or(output).rsplit('\n').peekable();
+    while let Some(line) = lines.next() {
+        if lines.peek().is_none() {
+            return true;
+        }
+        if line.trim().is_empty() {
+            return false;
+        }
+        let (indent, column) = leading_indent(line);
+        if column < enclosing_column {
+            return true;
+        }
+        if column - enclosing_column >= 4 {
+            continue;
+        }
+        let rest = &line[indent..];
+        if opens_block(rest) {
+            return false;
+        }
+        if strip_leading_bare_marker(rest).is_none() {
+            return true;
+        }
+    }
+    true
 }
 
 /// If this list is immediately preceded by an HTML comment whose own immediately preceding

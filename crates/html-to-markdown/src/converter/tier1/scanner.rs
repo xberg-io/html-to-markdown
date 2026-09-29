@@ -1644,13 +1644,26 @@ fn open_list_item(state: &mut Tier1State, options: &ConversionOptions) {
     // printed width already reaches this item's target column, so indenting here
     // too would double-count it. The indent is only needed when this item genuinely
     // starts a fresh physical line.
+    let ordered_index = (parent_kind == Some(ListKind::Ordered)).then(|| {
+        let counter = increment_ol_counter(&mut state.stack);
+        find_ol_start(&state.stack).saturating_sub(1) + counter
+    });
+    // ~keep Mirror Tier-2 (list/item.rs, issue #625): text inside the list before this item
+    // ~keep ends its line, with a blank line when the marker line cannot interrupt the text. A
+    // ~keep bullet with content always can.
+    let line_start = state.output.rfind('\n').map_or(0, |pos| pos + 1);
+    if !state.output[line_start..].trim().is_empty() && !line_is_bare_list_marker(&state.output) {
+        state.output.push('\n');
+        if ordered_index
+            .is_some_and(|index| !crate::converter::utility::escaping::line_opens_block(&format!("{index}. x")))
+        {
+            state.output.push('\n');
+        }
+    }
     if indent_depth > 0 && (state.output.is_empty() || state.output.ends_with('\n')) {
         push_list_item_indent(&mut state.output, indent_depth);
     }
-    if parent_kind == Some(ListKind::Ordered) {
-        let counter = increment_ol_counter(&mut state.stack);
-        let start = find_ol_start(&state.stack);
-        let index = start.saturating_sub(1) + counter;
+    if let Some(index) = ordered_index {
         let marker = format!("{index}. ");
         state.list_item_marker_widths.push(marker.len());
         state.output.push_str(&marker);

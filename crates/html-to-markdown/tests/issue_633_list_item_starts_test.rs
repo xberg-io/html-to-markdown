@@ -1,0 +1,381 @@
+// ~keep Rust inner attributes below are crate-level attributes, not a shell shebang.
+#![allow(missing_docs)]
+
+//! Regression tests for where a list item starts: text inside a list before an item (issue #625),
+//! an item after a real item or a quote between inline markers (issue #633), the first block of a
+//! task item (issue #634) and an underlined heading in a list item (issue #635).
+
+use html_to_markdown_rs::options::{CodeBlockStyle, HeadingStyle};
+use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+
+fn tier2_options() -> ConversionOptions {
+    ConversionOptions {
+        extract_metadata: false,
+        tier_strategy: TierStrategy::Tier2,
+        ..ConversionOptions::default()
+    }
+}
+
+fn convert_with(html: &str, options: &ConversionOptions) -> String {
+    convert(html, Some(options.clone()))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default()
+}
+
+fn render(markdown: &str) -> String {
+    comrak::markdown_to_html(markdown, &comrak::Options::default())
+}
+
+/// Convert `html` with `options`, assert the exact markdown, and assert that its rendering holds
+/// every one of `rendered`.
+fn assert_converts(html: &str, options: &ConversionOptions, expected: &str, rendered: &[&str]) {
+    let markdown = convert_with(html, options);
+    assert_eq!(markdown, expected, "{html}");
+    let html_out = render(&markdown);
+    for fragment in rendered {
+        assert!(html_out.contains(fragment), "{html}: {fragment:?} not in {html_out:?}");
+    }
+}
+
+#[test]
+fn should_start_a_list_item_on_its_own_line_after_text_in_the_list() {
+    let options = tier2_options();
+    let html5lib = include_str!("../../../test_documents/html/html5lib/unclosed-li-siblings-nested-ul.html");
+    for strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let options = ConversionOptions {
+            tier_strategy: strategy,
+            ..tier2_options()
+        };
+        assert_converts(
+            html5lib,
+            &options,
+            "- hello\n- world\n\nhow\n  - do\n\n  you\n",
+            &["<p>how</p>", "<li>do</li>"],
+        );
+    }
+    let wrapped = ConversionOptions {
+        wrap: true,
+        ..tier2_options()
+    };
+    let markdown = convert_with(html5lib, &wrapped);
+    assert!(render(&markdown).contains("<li>do</li>"), "{markdown:?}");
+    assert_converts(
+        "<ul>how<li>do</li></ul>",
+        &options,
+        "how\n- do\n",
+        &["<p>how</p>", "<li>do</li>"],
+    );
+    assert_converts(
+        "<ul><li>a<ul>how<li>do</li></ul></li></ul>",
+        &options,
+        "- a\n  how\n  * do\n",
+        &["<li>do</li>"],
+    );
+    assert_converts(
+        "<ul><li>a</li>x<li>b</li></ul>",
+        &options,
+        "- a\nx\n- b\n",
+        &["<li>b</li>"],
+    );
+    assert_eq!(
+        convert_with("<table><tr><td><ul>how<li>do</li></ul></td></tr></table>", &options),
+        "| how do |\n| ------ |\n"
+    );
+    assert_converts(
+        "<ul><li>a<ol>how<li>do</li></ol></li></ul>",
+        &options,
+        "- a\n  how\n  1. do\n",
+        &["<ol>\n<li>do</li>"],
+    );
+}
+
+#[test]
+fn should_start_a_list_item_after_text_in_the_list_the_same_way_in_tier_1() {
+    let tier1 = ConversionOptions {
+        tier_strategy: TierStrategy::Tier1,
+        ..tier2_options()
+    };
+    for (html, expected) in [
+        ("<ul><li>a</li>x<li>b</li></ul>", "- a\nx\n- b\n"),
+        (r#"<ol start="3"><li>a</li>x<li>b</li></ol>"#, "3. a\nx\n\n4. b\n"),
+    ] {
+        assert_eq!(convert_with(html, &tier1), expected, "{html}");
+        assert_eq!(convert_with(html, &tier2_options()), expected, "{html}");
+    }
+}
+
+#[test]
+fn should_leave_a_blank_line_before_an_item_that_cannot_interrupt_the_text() {
+    let options = tier2_options();
+    assert_converts(
+        r#"<ol start="3">how<li>do</li></ol>"#,
+        &options,
+        "how\n\n3. do\n",
+        &["<p>how</p>", "<ol start=\"3\">\n<li>do</li>"],
+    );
+    assert_converts(
+        r#"<ul><li>a<ol start="3">how<li>do</li></ol></li></ul>"#,
+        &options,
+        "- a\n  how\n\n  3. do\n",
+        &["<ol start=\"3\">\n<li>do</li>"],
+    );
+}
+
+#[test]
+fn should_keep_text_after_a_quote_in_a_sibling_item_between_markers() {
+    let options = tier2_options();
+    for (html, expected) in [
+        (
+            "<b><ul><li>a<ol><li>x</li><li>y<blockquote>q</blockquote>t</li></ol></li></ul></b>",
+            "**- a\n  1. x\n  2. y\n     > q\n\n     t**\n",
+        ),
+        (
+            "<em><ul><li>a<ol><li>x</li><li>y<blockquote>q</blockquote>t</li></ol></li></ul></em>",
+            "*- a\n  1. x\n  2. y\n     > q\n\n     t*\n",
+        ),
+        (
+            "<b><ul><li>a<ol><li>x</li><li>y</li><li>z<blockquote>q</blockquote>t</li></ol></li></ul></b>",
+            "**- a\n  1. x\n  2. y\n  3. z\n     > q\n\n     t**\n",
+        ),
+        (
+            "<b><ul><li>a<ol><li>x<ol><li>m<ul><li>n</li></ul></li></ol></li><li>y<blockquote>q</blockquote>t</li></ol></li></ul></b>",
+            "**- a\n  1. x\n     1. m\n        * n\n  2. y\n     > q\n\n     t**\n",
+        ),
+    ] {
+        assert_converts(html, &options, expected, &["<blockquote>\n<p>q</p>\n</blockquote>"]);
+    }
+    let tier1 = ConversionOptions {
+        tier_strategy: TierStrategy::Tier1,
+        ..tier2_options()
+    };
+    assert_converts(
+        "<b><ul><li>a<ol><li>x</li><li>y<blockquote>q</blockquote>t</li></ol></li></ul></b>",
+        &tier1,
+        "**- a\n  1. x\n  2. y\n     > q\n\n     t**\n",
+        &["<blockquote>\n<p>q</p>\n</blockquote>"],
+    );
+}
+
+#[test]
+fn should_start_an_item_after_a_quote_between_markers() {
+    assert_converts(
+        r#"<b><ul><li>a<blockquote>p</blockquote><ol start="2"><li>x<blockquote>q</blockquote>t</li></ol></li></ul></b>"#,
+        &tier2_options(),
+        "**- a\n  > p\n  2. x\n     > q\n\n     t**\n",
+        &[
+            "<ol start=\"2\">\n<li>\n<p>x</p>",
+            "<blockquote>\n<p>q</p>\n</blockquote>",
+        ],
+    );
+}
+
+#[test]
+fn should_keep_items_that_cannot_interrupt_the_text_between_markers_as_text() {
+    let options = tier2_options();
+    for (html, expected, text) in [
+        (
+            r#"<b><ul><li>a<ol start="3"><li>x</li><li>y<blockquote>q</blockquote>t</li></ol></li></ul></b>"#,
+            "**- a\n  3. x\n  4. y\n     > q\n     t**\n",
+            "3. x\n4. y",
+        ),
+        (
+            r#"<b><ul><li>a<ol start="2"><li>x<blockquote>q</blockquote>t</li></ol></li></ul></b>"#,
+            "**- a\n  2. x\n     > q\n     t**\n",
+            "2. x",
+        ),
+        (
+            "<b><ol><li>x</li><li>y<blockquote>q</blockquote>t</li></ol></b>",
+            "**1. x\n2. y\n   > q\n\nt**\n",
+            "1. x\n2. y",
+        ),
+        (
+            r#"<b>x<ul><li>a<ol start="3"><li>y<blockquote>q</blockquote>t</li></ol></li></ul></b>"#,
+            "**x\n\n- a\n  3. y\n     > q\n\n  t**\n",
+            "a\n3. y",
+        ),
+        (
+            r#"<b><ul><li>a<blockquote>p</blockquote>u<ol start="2"><li>x<blockquote>q</blockquote>t</li></ol></li></ul></b>"#,
+            "**- a\n  > p\n\nu\n  2. x\n     > q\n     t**\n",
+            "u\n2. x",
+        ),
+        (
+            r#"<b><ul><li>a<br>b<ol start="2"><li>x<blockquote>q</blockquote>t</li></ol></li></ul></b>"#,
+            "**- a  \n  b\n  2. x\n     > q\n     t**\n",
+            "b\n2. x",
+        ),
+    ] {
+        let markdown = convert_with(html, &options);
+        assert_eq!(markdown, expected, "{html}");
+        assert!(render(&markdown).contains(text), "{markdown:?}");
+    }
+}
+
+#[test]
+fn should_start_the_first_block_of_a_task_item_that_cannot_interrupt_the_checkbox_line_after_a_blank_line() {
+    let options = tier2_options();
+    for html in [
+        r#"<ul><li><input type="checkbox"><div><ol start="3"><li>x</li></ol></div></li></ul>"#,
+        r#"<ul><li><input type="checkbox"><ol start="3"><li>x</li></ol></li></ul>"#,
+    ] {
+        assert_converts(html, &options, "- [ ]\n\n  3. x\n", &["<ol start=\"3\">\n<li>x</li>"]);
+    }
+    let indented = ConversionOptions {
+        code_block_style: CodeBlockStyle::Indented,
+        ..tier2_options()
+    };
+    for html in [
+        r#"<ul><li><input type="checkbox"><div><pre>c</pre></div></li></ul>"#,
+        r#"<ul><li><input type="checkbox"><pre>c</pre></li></ul>"#,
+    ] {
+        assert_converts(html, &indented, "- [ ]\n\n      c\n", &["<pre><code>c\n</code></pre>"]);
+    }
+    assert_converts(
+        r#"<ul><li><input type="checkbox"><pre>c&#10;d</pre>t</li></ul>"#,
+        &indented,
+        "- [ ]\n\n      c\n      d\n\n  t\n",
+        &["<pre><code>c\nd\n</code></pre>", "<p>t</p>"],
+    );
+    for (html, expected) in [
+        (
+            r#"<ul><li><input type="checkbox"><pre>c</pre></li></ul>"#,
+            "- [ ]\n  ```\n  c\n  ```\n",
+        ),
+        (
+            r#"<ul><li><input type="checkbox"><ol><li>x</li></ol></li></ul>"#,
+            "- [ ]\n  1. x\n",
+        ),
+        (r#"<ul><li><input type="checkbox"><hr></li></ul>"#, "- [ ]\n\n  ---\n"),
+        (
+            r#"<ul><li><input type="checkbox"><blockquote></blockquote></li></ul>"#,
+            "- [ ]\n",
+        ),
+        (r#"<ul><li><input type="checkbox"><ul></ul>t</li></ul>"#, "- [ ] t\n"),
+        (r#"<ul><li><input type="checkbox"><h2></h2>t</li></ul>"#, "- [ ] t\n"),
+        (r#"<ul><li><input type="checkbox"><pre></pre>t</li></ul>"#, "- [ ] t\n"),
+    ] {
+        assert_eq!(convert_with(html, &options), expected, "{html}");
+    }
+}
+
+#[test]
+fn should_start_a_task_item_quote_after_an_empty_inline_element_on_the_next_line() {
+    let options = tier2_options();
+    for wrapper in [
+        "<span></span>",
+        "<b></b>",
+        "<center></center>",
+        "<span> </span>",
+        "<span><b></b></span>",
+        r#"<a id="x"></a>"#,
+        r#"<i class="icon"></i>"#,
+    ] {
+        assert_converts(
+            &format!(r#"<ul><li><input type="checkbox">{wrapper}<blockquote>q</blockquote></li></ul>"#),
+            &options,
+            "- [ ]\n  > q\n",
+            &["<blockquote>\n<p>q</p>\n</blockquote>"],
+        );
+    }
+    for (wrapper, expected) in [
+        (r#"<img src="i.png" alt="i">"#, "- [ ] ![i](i.png)\n  > q\n"),
+        ("<span>s</span>", "- [ ] s\n  > q\n"),
+        ("<br>", "- [ ] > q\n"),
+        ("<b>", "- [ ] **> q**\n"),
+    ] {
+        let html = format!(r#"<ul><li><input type="checkbox">{wrapper}<blockquote>q</blockquote></li></ul>"#);
+        assert_eq!(convert_with(&html, &options), expected, "{html}");
+    }
+    for (wrapper, first_line) in [
+        (r#"<a href="u"></a>"#, "- [ ] [](u)\n"),
+        ("<svg></svg>", "- [ ] ![SVG Image]"),
+    ] {
+        let html = format!(r#"<ul><li><input type="checkbox">{wrapper}<blockquote>q</blockquote></li></ul>"#);
+        let markdown = convert_with(&html, &options);
+        assert!(markdown.starts_with(first_line), "{html}: {markdown:?}");
+    }
+}
+
+#[test]
+fn should_write_an_underlined_heading_in_a_list_item_at_the_content_column() {
+    let options = ConversionOptions {
+        heading_style: HeadingStyle::Underlined,
+        ..tier2_options()
+    };
+    for (html, expected, heading) in [
+        (
+            r#"<ul><li><input type="checkbox"><h2>q</h2></li></ul>"#,
+            "- [ ]\n\n  q\n  -\n",
+            "<h2>q</h2>",
+        ),
+        (
+            r#"<ul><li><input type="checkbox"><h1>q</h1></li></ul>"#,
+            "- [ ]\n\n  q\n  =\n",
+            "<h1>q</h1>",
+        ),
+        ("<ul><li><h2>q</h2></li></ul>", "- q\n  -\n", "<h2>q</h2>"),
+        (
+            "<ul><li>a<ul><li><h2>q</h2></li></ul></li></ul>",
+            "- a\n  * q\n    -\n",
+            "<h2>q</h2>",
+        ),
+        (
+            "<ul><li><p>a</p><h2>q</h2></li></ul>",
+            "- a\n\n  q\n  -\n",
+            "<h2>q</h2>",
+        ),
+        (
+            "<ul><li><blockquote><h2>q</h2></blockquote></li></ul>",
+            "- > q\n  > -\n",
+            "<h2>q</h2>",
+        ),
+        (
+            "<ul><li><blockquote><p>a</p><h2>q</h2></blockquote></li></ul>",
+            "- > a\n  >\n  > q\n  > -\n",
+            "<p>a</p>\n<h2>q</h2>",
+        ),
+    ] {
+        assert_converts(html, &options, expected, &[heading]);
+        assert!(!render(expected).contains("<li></li>"), "{html}");
+    }
+}
+
+#[test]
+fn should_start_an_underlined_heading_after_a_line_of_the_item_after_a_blank_line() {
+    let options = ConversionOptions {
+        heading_style: HeadingStyle::Underlined,
+        ..tier2_options()
+    };
+    for (html, expected, heading) in [
+        (
+            "<ul><li>a<h2>q</h2></li></ul>",
+            "- a\n\n  q\n  -\n",
+            "<p>a</p>\n<h2>q</h2>",
+        ),
+        (
+            "<ul><li>a<h1>q</h1></li></ul>",
+            "- a\n\n  q\n  =\n",
+            "<p>a</p>\n<h1>q</h1>",
+        ),
+        (
+            "<ul><li>a<blockquote>p</blockquote><h2>q</h2></li></ul>",
+            "- a\n  > p\n\n  q\n  -\n",
+            "</blockquote>\n<h2>q</h2>",
+        ),
+        (
+            "<ol><li>a<h2>q</h2>b</li><li>c</li></ol>",
+            "1. a\n\n   q\n   -\n   b\n2. c\n",
+            "<h2>q</h2>\n<p>b</p>",
+        ),
+    ] {
+        assert_converts(html, &options, expected, &[heading]);
+    }
+    assert_eq!(
+        convert_with("<ul><li>a<h3>q</h3></li></ul>", &options),
+        "- a\n  ### q\n"
+    );
+    assert_eq!(
+        convert_with("<ul><li>a<h2>q</h2></li></ul>", &tier2_options()),
+        "- a\n  ## q\n"
+    );
+}
