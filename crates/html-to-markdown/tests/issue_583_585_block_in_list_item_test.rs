@@ -522,19 +522,19 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
         wrap: true,
         ..tier2_options()
     };
-    // ~keep A rule at a bare marker ends the item, and a figure is written at the start of the
-    // ~keep line: nothing rendered inside a container after either may get the column.
+    // ~keep A figure is written at the start of the line, so the item has ended: nothing
+    // ~keep rendered inside a container after it may get the column.
     for (html, options) in [
         (
-            r#"<ol start="10"><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
+            r#"<ol start="10"><li>X<figure><p>a</p></figure><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
             tier2_options(),
         ),
         (
-            r#"<ol start="10"><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
+            r#"<ol start="10"><li>X<figure><p>a</p></figure><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ol>"#,
             wrap,
         ),
         (
-            "<ul><li><hr><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ul>",
+            "<ul><li>X<figure><p>a</p></figure><dl><dt>t</dt><dd><p>x</p><hr></dd></dl></li></ul>",
             tabs.clone(),
         ),
         (
@@ -561,7 +561,7 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
         ),
         // ~keep A section after the item has ended.
         (
-            r#"<ol start="10"><li><hr><section><p>a</p><hr></section></li></ol>"#,
+            r#"<ol start="10"><li>X<figure><p>a</p></figure><section><p>a</p><hr></section></li></ol>"#,
             tier2_options(),
         ),
     ] {
@@ -594,9 +594,13 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
             "<table><caption><ul><li>x<dl><dd><hr></dd></dl></li></ul></caption></table>",
             "*\\- x \\-\\-\\-*\n",
         ),
-        // ~keep A rule at the marker ends the item; the text after it gets the column from the
-        // ~keep text node, and a rule after that text must not follow it into the code block.
-        ("<ul><li><hr>t<br><hr></li></ul>", "-\n\n---\n\tt  \n\n---\n"),
+        // ~keep A figure ends the item; a rule after the text after it gets no column either.
+        (
+            "<ul><li>X<figure><p>a</p></figure>t<br><hr></li></ul>",
+            "- X\n\na\n\nt  \n\n---\n",
+        ),
+        // ~keep A rule at the marker stays in the item, so the text and the rule after it do.
+        ("<ul><li><hr>t<br><hr></li></ul>", "- ___\n\n\tt  \n\n\t---\n"),
         // ~keep The column written for a definition stays with a rule that starts it.
         (
             "<ul><li><dl><dt>t</dt><dd><hr><hr></dd></dl></li></ul>",

@@ -426,6 +426,7 @@ pub fn handle_table(
                                 {
                                     let caption_ctx = super::super::super::Context {
                                         text_in_markers: true,
+                                        escapes_hyphens: true,
                                         ..ctx.clone()
                                     };
                                     for grandchild_handle in grandchildren.top().iter() {

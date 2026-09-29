@@ -65,6 +65,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the outer item became a task item and the nested list was joined into its text. A checkbox in a
   nested list now belongs to that list's item, so the output is `- X`, the nested `- [x] A` and
   then `ZZ`.
+- **Text after a quote, in a list inside bold, italic or `<q>`, rendered inside the quote
+  (#615).** `<b><ul><li>x<blockquote>q</blockquote>t</li></ul></b>` gave `**- x\n  > q\n  t**`,
+  so `t**` continued the quote's paragraph. The first item's marker follows the opening marker,
+  so that item is text and writes no content column, and the blank line after the quote went
+  with the column. A nested item's marker starts its own line, so it is a real list item, and
+  `**- a\n  * x\n    > q\n    t**` kept `t` in the quote too. Text after a quote or a nested
+  list now starts after a blank line, at the column of the innermost real list item:
+  `**- x\n  > q\n\nt**` and `**- a\n  * x\n    > q\n\n    t**`. A quote 4 or more columns
+  past that item's column, or past the start of the line when no item is real, is the
+  paragraph's own text, so nothing changes there and the markers stay in one paragraph.
+- **A quote that starts a list item rendered outside the item (#617).**
+  `<ul><li><blockquote>q</blockquote></li></ul>` gave `-\n> q`, an empty item and a quote after
+  the list, also when the list is inside a quote. The quote now starts on the marker line,
+  `- > q`.
+- **A quote that starts a task item became the task's text (#622).** A checked task item whose
+  first content is `<blockquote>q</blockquote>` gave `- [x] > q`, which renders the text
+  `[x] > q`. The quote now starts on the next line at the item's content column, `- [x]\n  > q`.
+  A nested list, a heading or a code block that starts a task item does the same, also inside a
+  `<div>` or a `<section>`, and also when the checkbox is in a `<p>` of its own. A rule there
+  gave `- [ ] ---`, the text `[ ] ---`; it now comes after a blank line, `- [ ]\n\n  ---`, since
+  `---` right under the checkbox line makes that line a heading.
+- **A rule that starts a list item rendered outside the item (#623).**
+  `<ul><li><hr></li></ul>` gave `-\n\n---`, an empty item and a rule after the list. The rule is
+  now `___` on the marker line, `- ___`: `- ---` is a rule of its own.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut
