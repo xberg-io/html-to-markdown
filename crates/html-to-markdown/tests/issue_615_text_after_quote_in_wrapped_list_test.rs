@@ -225,7 +225,7 @@ fn should_keep_a_quote_that_starts_a_list_item_in_the_item() {
         (
             "<blockquote><ul><li><blockquote><p>a</p><p>b</p></blockquote></li></ul></blockquote>",
             tier2_options(),
-            "> - > a\n>   >\n>   >   b\n",
+            "> - > a\n>   >\n>   > b\n",
         ),
     ] {
         let out = convert_with(html, &options);

@@ -98,6 +98,7 @@ pub fn handle_details(
             // ~keep list item has ended (issue #583).
             let details_ctx = super::Context {
                 list_item_open: false,
+                real_item_columns: 0,
                 ..ctx.clone()
             };
             for child_handle in children.top().iter() {
