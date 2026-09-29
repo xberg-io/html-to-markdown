@@ -4,6 +4,7 @@
 //! Regression tests for issues #613, #614 and #616: wrap mode changed the block structure of the
 //! output. It dropped a hard line break, it wrote a line that opens a list where the unwrapped
 //! output has text, and it cut a list item's continuation line off into a paragraph of its own.
+//! It also broke a link whose address, written in angle brackets, holds a space.
 
 use html_to_markdown_rs::{ConversionOptions, NewlineStyle, TierStrategy, convert};
 
@@ -117,4 +118,15 @@ fn should_keep_a_fake_numbered_paragraph_plain_text_when_wrapping() {
         "the fixture must still write the fake number with its non-breaking spaces"
     );
     assert_wrap_keeps_structure(&html, &[20, 80], NewlineStyle::Spaces);
+}
+
+#[test]
+fn should_keep_a_link_destination_with_spaces_on_one_line_when_wrapping() {
+    let html =
+        "<ul><li><a href=\"https://t.example/share?text=How to Improve Data Quality Today\">Share</a> now</li></ul>";
+    assert!(
+        converted(html, None, NewlineStyle::Spaces).contains("](<https://"),
+        "the destination must still be written in angle brackets"
+    );
+    assert_wrap_keeps_structure(html, &[20, 40, 80], NewlineStyle::Spaces);
 }

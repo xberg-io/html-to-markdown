@@ -188,8 +188,30 @@ pub fn wrap_line(text: &str, width: usize) -> String {
 /// The words of `text`, split at spaces and tabs.
 ///
 /// ~keep Only a space or a tab separates words: a non-breaking space is part of its word (#614).
+/// ~keep A link destination in angle brackets cannot hold a line end, so it is one word even
+/// ~keep when it holds spaces.
 fn words(text: &str) -> Vec<&str> {
-    text.split([' ', '\t']).filter(|word| !word.is_empty()).collect()
+    let bytes = text.as_bytes();
+    let mut words = Vec::new();
+    let mut start = None;
+    let mut in_destination = false;
+    for (index, &byte) in bytes.iter().enumerate() {
+        if in_destination {
+            in_destination = !(byte == b'>' && bytes[index - 1] != b'\\');
+        } else if byte == b'<' && bytes[..index].ends_with(b"](") {
+            in_destination = true;
+        } else if matches!(byte, b' ' | b'\t') {
+            if let Some(word_start) = start.take() {
+                words.push(&text[word_start..index]);
+            }
+            continue;
+        }
+        start.get_or_insert(index);
+    }
+    if let Some(word_start) = start {
+        words.push(&text[word_start..]);
+    }
+    words
 }
 
 /// Wrap the words of `text`, a text without newlines, at `width` onto `result`.
@@ -317,6 +339,14 @@ mod tests {
     }
 
     #[test]
+    fn wrap_line_keeps_a_link_destination_in_angle_brackets_whole() {
+        assert_eq!(
+            wrap_line("see [x](<a b c d e f>) and more", 10),
+            "see\n[x](<a b c d e f>)\nand more"
+        );
+    }
+
+    #[test]
     fn wrap_line_drops_a_hard_break_at_the_end_of_the_text() {
         assert_eq!(wrap_line("one two  \n", 5), "one\ntwo");
     }
@@ -326,5 +356,13 @@ mod tests {
         let mut text = String::new();
         push_paragraph_line(&mut text, "\u{a0}x\u{a0}");
         assert_eq!(text, "\u{a0}x\u{a0}");
+    }
+
+    #[test]
+    fn wrap_line_keeps_an_escaped_bracket_inside_a_link_destination() {
+        assert_eq!(
+            wrap_line("see [x](<a\\> b c d e>) and more", 10),
+            "see\n[x](<a\\> b c d e>)\nand more"
+        );
     }
 }
