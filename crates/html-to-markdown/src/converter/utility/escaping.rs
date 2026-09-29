@@ -288,6 +288,11 @@ fn block_opener_escape_offset(line: &str) -> Option<usize> {
     block_opener_offset(rest).map(|offset| indent + offset)
 }
 
+/// Whether `line`, with its indentation, opens a block that can interrupt a paragraph.
+pub fn line_opens_block(line: &str) -> bool {
+    block_opener_escape_offset(line).is_some()
+}
+
 /// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.
 pub fn opens_block(rest: &str) -> bool {
     block_opener_offset(rest).is_some()

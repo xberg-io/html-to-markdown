@@ -260,27 +260,31 @@ pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) ->
     })
 }
 
-/// Whether the marker that a list item between markers writes on the line starting at
-/// `marker_line_start` starts a real list item, inside the item at `enclosing_columns`.
+/// Whether `marker`, written by a list item between markers on the line starting at
+/// `marker_line_start`, starts a real list item inside the item at `enclosing_columns`.
 ///
 /// ~keep The marker must start its own line: the buffer's first line follows the opening
-/// ~keep marker. It must sit within 3 columns of the enclosing item's content column, or it is
-/// ~keep paragraph text, and an ordered marker other than 1 cannot interrupt a paragraph.
+/// ~keep marker. Measured from the enclosing item's content column, the marker line with the
+/// ~keep item's content after it must open a block that can interrupt a paragraph (the check
+/// ~keep that escapes a link label's continuation lines). After a blank line no paragraph is
+/// ~keep open, so any marker within 3 columns starts an item.
 pub fn marker_starts_item(
     output: &str,
     marker_line_start: Option<usize>,
+    marker: &str,
     enclosing_columns: usize,
-    ctx: &Context,
     options: &ConversionOptions,
 ) -> bool {
     let Some(line_start) = marker_line_start else {
         return false;
     };
     let marker_column = crate::converter::utility::escaping::leading_indent(&output[line_start..]).1;
-    if marker_column.saturating_sub(indent_column(enclosing_columns, options)) >= 4 {
-        return false;
+    let column = marker_column.saturating_sub(indent_column(enclosing_columns, options));
+    if output[..line_start].ends_with("\n\n") {
+        return column < 4;
     }
-    !ctx.in_ordered_list || ctx.list_counter == 1 || output[..line_start].ends_with("\n\n")
+    let line = format!("{}{marker}x", " ".repeat(column));
+    crate::converter::utility::escaping::line_opens_block(&line)
 }
 
 /// If this list is immediately preceded by an HTML comment whose own immediately preceding

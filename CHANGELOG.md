@@ -79,13 +79,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<ul><li><blockquote>q</blockquote></li></ul>` gave `-\n> q`, an empty item and a quote after
   the list, also when the list is inside a quote. The quote now starts on the marker line,
   `- > q`.
-- **A quote that starts a task item became the task's text.** A checked task item whose first
-  content is `<blockquote>q</blockquote>` gave `- [x] > q`, which renders the text `[x] > q`.
-  The quote now starts on the next line at the item's content column, `- [x]\n  > q`. A nested
-  list, a heading or a code block that starts a task item does the same.
-- **A rule that starts a list item rendered outside the item.** `<ul><li><hr></li></ul>` gave
-  `-\n\n---`, an empty item and a rule after the list. The rule is now `___` on the marker line,
-  `- ___`: `- ---` is a rule of its own.
+- **A quote that starts a task item became the task's text (#622).** A checked task item whose
+  first content is `<blockquote>q</blockquote>` gave `- [x] > q`, which renders the text
+  `[x] > q`. The quote now starts on the next line at the item's content column, `- [x]\n  > q`.
+  A nested list, a heading or a code block that starts a task item does the same, also inside a
+  `<div>` or a `<section>`, and also when the checkbox is in a `<p>` of its own. A rule there
+  gave `- [ ] ---`, the text `[ ] ---`; it now comes after a blank line, `- [ ]\n\n  ---`, since
+  `---` right under the checkbox line makes that line a heading.
+- **A rule that starts a list item rendered outside the item (#623).**
+  `<ul><li><hr></li></ul>` gave `-\n\n---`, an empty item and a rule after the list. The rule is
+  now `___` on the marker line, `- ___`: `- ---` is a rule of its own.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut

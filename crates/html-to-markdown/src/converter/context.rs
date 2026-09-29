@@ -109,8 +109,8 @@ pub struct Context {
     /// so a nested list must be indented to that marker's actual content column or CommonMark
     /// parses the child as a sibling instead of nested content.
     pub(crate) list_indent_columns: usize,
-    /// In a list written between markers, whose items are text: the `list_indent_columns` of
-    /// the innermost enclosing item whose marker line still starts a list item in the output,
+    /// The `list_indent_columns` of the innermost enclosing item whose marker line starts a list
+    /// item in the output (an open item, or a marker between markers that starts its own line),
     /// or 0 where none does.
     ///
     /// ~keep A line between the markers starts a block only within 3 columns of that item's

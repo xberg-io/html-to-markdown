@@ -144,23 +144,28 @@ pub fn handle_li(
     // ~keep and no block gets the column. Text after a quote or a list still takes the column
     // ~keep of the innermost item whose marker starts a list item (issue #615).
     let list_item_open = ctx.inline_depth == 0 && !ctx.text_in_markers;
-    let real_item_columns = if list_item_open {
-        ctx.real_item_columns
-    } else {
-        let enclosing = if ctx.list_item_open {
-            ctx.list_indent_columns
+    let item_is_real = list_item_open || {
+        let marker = if is_task_list {
+            String::from(if task_checked { "- [x] " } else { "- [ ] " })
+        } else if ctx.in_ordered_list {
+            format!("{}. ", ctx.list_counter)
         } else {
-            ctx.real_item_columns
+            format!("{} ", unordered_bullet(ctx, options))
         };
-        let hyphen_marker = is_task_list || (!ctx.in_ordered_list && unordered_bullet(ctx, options) == '-');
-        let marker_is_text = ctx.escapes_hyphens && hyphen_marker;
-        if !marker_is_text
-            && crate::converter::list::utils::marker_starts_item(output, marker_line_start, enclosing, ctx, options)
-        {
-            ctx.list_indent_columns + own_marker_width
-        } else {
-            enclosing
-        }
+        // ~keep An escaped `-` marker is text.
+        !(ctx.escapes_hyphens && marker.starts_with('-'))
+            && crate::converter::list::utils::marker_starts_item(
+                output,
+                marker_line_start,
+                &marker,
+                ctx.real_item_columns,
+                options,
+            )
+    };
+    let real_item_columns = if item_is_real {
+        ctx.list_indent_columns + own_marker_width
+    } else {
+        ctx.real_item_columns
     };
     let li_ctx = Context {
         in_list_item: true,
@@ -268,16 +273,25 @@ pub fn handle_li(
         }
         let trimmed_task = task_text.trim();
         // ~keep After the checkbox the line is paragraph text, so a block that is the item's
-        // ~keep first content (a quote) starts on the next line at the content column.
+        // ~keep first content (a quote, also inside a div) starts on the next line at the
+        // ~keep content column.
         match crate::converter::list::utils::continuation_indent_string(li_ctx.list_indent_columns, options) {
             Some(indent)
                 if li_ctx.list_item_open
                     && !ctx.in_marker_span
                     && !ctx.in_table_cell
                     && !ctx.convert_as_inline
-                    && task_content_starts_with_block(tag, checkbox_node, parser) =>
+                    && task_content_starts_with_block(tag, checkbox_node, parser, options, depth + 1) == Some(true) =>
             {
-                output.push('\n');
+                // ~keep A `---` line under the checkbox line would make it a heading.
+                let first_line = trimmed_task.lines().next().unwrap_or_default();
+                output.push_str(
+                    if crate::converter::utility::escaping::is_heading_underline(first_line) {
+                        "\n\n"
+                    } else {
+                        "\n"
+                    },
+                );
                 output.push_str(&indent);
             }
             _ => output.push(' '),
@@ -439,12 +453,24 @@ pub fn handle_li(
     }
 }
 
-/// Whether the first content of the task item `tag` after its checkbox is a block that writes
-/// a block opener: a quote, a list, a heading or a code block.
+/// Whether the first content that the task item `tag` renders after its checkbox is a block that
+/// writes a block opener: a quote, a list, a heading, a code block or a rule. `None` when the
+/// children render nothing.
 ///
-/// ~keep Text that reads like an opener stays text. A rule is left out: on the line under the
-/// ~keep checkbox it would make the checkbox a heading.
-fn task_content_starts_with_block(tag: &tl::HTMLTag, checkbox: Option<tl::NodeHandle>, parser: &tl::Parser) -> bool {
+/// ~keep The walk follows the rendering: an element that holds the checkbox and a block
+/// ~keep container write nothing before their first child, so it goes into them. Text, and an
+/// ~keep inline element, are paragraph text on the checkbox line, also when they read like an
+/// ~keep opener.
+fn task_content_starts_with_block(
+    tag: &tl::HTMLTag,
+    checkbox: Option<tl::NodeHandle>,
+    parser: &tl::Parser,
+    options: &ConversionOptions,
+    depth: usize,
+) -> Option<bool> {
+    if depth >= effective_max_depth(options) {
+        return Some(false);
+    }
     for child_handle in tag.children().top().iter() {
         if Some(*child_handle) == checkbox {
             continue;
@@ -453,15 +479,35 @@ fn task_content_starts_with_block(tag: &tl::HTMLTag, checkbox: Option<tl::NodeHa
             Some(tl::Node::Raw(text)) if text.as_utf8_str().trim().is_empty() => {}
             Some(tl::Node::Comment(_)) => {}
             Some(tl::Node::Tag(child_tag)) => {
-                return matches!(
-                    normalized_tag_name(child_tag.name().as_utf8_str()).as_ref(),
-                    "blockquote" | "ul" | "ol" | "pre" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
-                );
+                let name = normalized_tag_name(child_tag.name().as_utf8_str());
+                if matches!(
+                    name.as_ref(),
+                    "blockquote" | "ul" | "ol" | "pre" | "hr" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+                ) {
+                    return Some(true);
+                }
+                let holds_checkbox = checkbox
+                    .and_then(|checkbox| checkbox.get(parser))
+                    .is_some_and(|checkbox| {
+                        child_tag
+                            .children()
+                            .all(parser)
+                            .iter()
+                            .any(|node| std::ptr::eq(node, checkbox))
+                    });
+                if !holds_checkbox && !crate::converter::utility::content::is_block_level_element(&name) {
+                    return Some(false);
+                }
+                if let Some(starts_with_block) =
+                    task_content_starts_with_block(child_tag, checkbox, parser, options, depth + 1)
+                {
+                    return Some(starts_with_block);
+                }
             }
-            _ => return false,
+            _ => return Some(false),
         }
     }
-    false
+    None
 }
 
 /// The bullet of an unordered list item at `ctx.ul_depth`: the list's bullets cycle by depth.

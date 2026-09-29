@@ -180,6 +180,20 @@ fn should_keep_a_list_between_markers_one_paragraph_when_its_blocks_are_text() {
 }
 
 #[test]
+fn should_not_take_a_marker_four_columns_in_after_a_blank_line_for_a_list_item() {
+    // ~keep After a blank line a marker 4 or more columns past the real item's column opens a
+    // ~keep code block, not an item, so the text after its quote gets no blank line.
+    let html =
+        r#"<div><b><ol start="10"><li>b<p>p</p><ul><li>x<blockquote>q</blockquote>t</li></ul></li></ol></b></div>"#;
+    let out = convert_with(html, &tier2_options());
+    assert!(out.contains("- x\n"), "{html:?}: the list was lost: {out:?}");
+    assert!(
+        !out.contains("> q\n\n"),
+        "{html:?}: a blank line split the code block: {out:?}"
+    );
+}
+
+#[test]
 fn should_keep_a_quote_that_starts_a_list_item_in_the_item() {
     let tabs = ConversionOptions {
         list_indent_type: ListIndentType::Tabs,
@@ -226,13 +240,14 @@ fn should_keep_a_quote_that_starts_a_list_item_in_the_item() {
 
 /// A nested list between markers, three deep, a nested list after the item's text, and a list
 /// after text: each marker line after the first is a real list item.
-const NESTED_BODIES: [&str; 6] = [
+const NESTED_BODIES: [&str; 7] = [
     "<ul><li>a<ul><li>x<blockquote>q</blockquote>t</li></ul></li></ul>",
     "<ol><li>a<ol><li>x<blockquote>q</blockquote>t</li></ol></li></ol>",
     "<ul><li>a<ul><li>b<ul><li>x<blockquote>q</blockquote>t</li></ul></li></ul></li></ul>",
     "<ul><li>a<ul><li>x<ul><li>n</li></ul>t</li></ul></li></ul>",
     "<ul><li>a<ul><li>x<blockquote>q</blockquote>t</li></ul>u</li></ul>",
     "a<ul><li>x<blockquote>q</blockquote>t</li></ul>",
+    r#"<ul><li>a<ul><li><input type="checkbox">x<blockquote>q</blockquote>t</li></ul></li></ul>"#,
 ];
 
 #[test]
@@ -246,6 +261,13 @@ fn should_write_text_after_a_block_outside_it_in_a_nested_list_between_markers()
             "<div><b><ul><li>a<ul><li>x<blockquote>q</blockquote>t</li></ul></li></ul></b></div>",
             tier2_options(),
             "**- a\n  * x\n    > q\n\n    t**\n",
+        ),
+        // ~keep Each nested marker is measured from the column of the item that holds it, so the
+        // ~keep text goes to the innermost item.
+        (
+            "<div><b><ul><li>a<ul><li>b<ul><li>x<blockquote>q</blockquote>t</li></ul></li></ul></li></ul></b></div>",
+            tier2_options(),
+            "**- a\n  * b\n    + x\n      > q\n\n      t**\n",
         ),
         (
             "<div><b><ul><li>a<ul><li>x<ul><li>n</li></ul>t</li></ul></li></ul></b></div>",
@@ -320,6 +342,97 @@ fn should_write_text_after_a_block_outside_it_in_a_nested_list_between_markers()
         "the text after a block in a nested item joined the block:\n{}",
         failures.join("\n")
     );
+}
+
+#[test]
+fn should_keep_the_second_paragraph_of_a_quote_at_a_nested_marker_in_a_quote_in_the_item() {
+    // ~keep In a quote that holds the list, the quote's later lines take the marker line's width,
+    // ~keep its indent included.
+    let html =
+        "<blockquote><ul><li>a<ul><li><blockquote><p>q</p><p>r</p></blockquote></li></ul></li></ul></blockquote>";
+    let out = convert_with(html, &tier2_options());
+    let rendered = render(&out);
+    let quote = rendered
+        .split("<ul>\n<li>\n<blockquote>\n<p>q</p>")
+        .nth(1)
+        .and_then(|inside| inside.split("</blockquote>").next());
+    assert!(
+        quote.is_some_and(|inside| inside.contains('r')),
+        "{out:?}: the second paragraph left the nested item's quote: {rendered:?}"
+    );
+}
+
+#[test]
+fn should_start_the_first_block_of_a_task_item_on_the_next_line_inside_a_wrapper() {
+    for (html, expected, rendered_part) in [
+        (
+            r#"<ul><li><input type="checkbox"><div><blockquote>q</blockquote></div></li></ul>"#,
+            "- [ ]\n  > q\n",
+            "]\n<blockquote>",
+        ),
+        (
+            r#"<ul><li><p><input type="checkbox"></p><blockquote>q</blockquote></li></ul>"#,
+            "- [ ]\n  > q\n",
+            "]\n<blockquote>",
+        ),
+        (
+            r#"<ul><li><label><input type="checkbox"></label><blockquote>q</blockquote></li></ul>"#,
+            "- [ ]\n  > q\n",
+            "]\n<blockquote>",
+        ),
+        (
+            r#"<ul><li><input type="checkbox"><div><ul><li>n</li></ul></div></li></ul>"#,
+            "- [ ]\n  * n\n",
+            "]\n<ul>",
+        ),
+        (
+            r#"<ul><li><input type="checkbox"><section><h2>h</h2></section></li></ul>"#,
+            "- [ ]\n  ## h\n",
+            "]\n<h2>",
+        ),
+        (
+            r#"<ul><li><input type="checkbox"><pre>c</pre></li></ul>"#,
+            "- [ ]\n  ```\n  c\n  ```\n",
+            "]\n<pre>",
+        ),
+        // ~keep Under the checkbox line `---` underlines a heading, so a blank line comes first.
+        (
+            r#"<ul><li><input type="checkbox"><hr></li></ul>"#,
+            "- [ ]\n\n  ---\n",
+            "[ ]</p>\n<hr />",
+        ),
+        (
+            r#"<ul><li><input type="checkbox"><div><hr></div></li></ul>"#,
+            "- [ ]\n\n  ---\n",
+            "[ ]</p>\n<hr />",
+        ),
+    ] {
+        let out = convert_with(html, &tier2_options());
+        assert_eq!(out, expected, "{html:?}: the block became the task's text");
+        assert!(
+            render(&out).contains(rendered_part),
+            "{html:?}: {out:?} renders {:?}",
+            render(&out)
+        );
+    }
+    // ~keep Text first, also inside a wrapper, stays on the checkbox line.
+    for (html, expected) in [
+        (
+            r#"<ul><li><input type="checkbox"><p>&gt; x</p></li></ul>"#,
+            "- [ ] > x\n",
+        ),
+        (
+            r#"<ul><li><p><input type="checkbox"> a</p><blockquote>q</blockquote></li></ul>"#,
+            "- [ ] a\n  > q\n",
+        ),
+        (r#"<ul><li><input type="checkbox"><div>d</div></li></ul>"#, "- [ ] d\n"),
+    ] {
+        assert_eq!(
+            convert_with(html, &tier2_options()),
+            expected,
+            "{html:?}: the text moved to a line of its own"
+        );
+    }
 }
 
 #[test]
