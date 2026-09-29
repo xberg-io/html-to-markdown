@@ -827,6 +827,11 @@ pub fn starts_body(name: &[u8]) -> bool {
     )
 }
 
+/// Whether `name` is an element whose content never renders: a `<template>` or a `<noscript>`.
+pub fn is_unrendered_element(name: &str) -> bool {
+    matches!(name, "template" | "noscript")
+}
+
 /// Check if text has more than one character.
 pub fn has_more_than_one_char(text: &str) -> bool {
     let mut chars = text.chars();

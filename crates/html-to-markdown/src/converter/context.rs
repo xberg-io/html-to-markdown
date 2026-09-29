@@ -58,6 +58,10 @@ pub struct Context {
     pub(crate) in_ordered_list: bool,
     /// Blockquote nesting depth
     pub(crate) blockquote_depth: usize,
+    /// The `list_indent_columns` where the innermost quote starts: a line in the quote's buffer
+    /// is indented only by the columns of the items inside the quote, and the quote writes the
+    /// indent of the items around it.
+    pub(crate) quote_list_columns: usize,
     /// Are we inside a table cell (td/th)?
     pub(crate) in_table_cell: bool,
     /// Are we inside a *layout*-table cell, whose row renders as a list item rather than a
@@ -118,6 +122,12 @@ pub struct Context {
     /// ~keep follows the opening marker, so it is text, but a nested item's marker starts its
     /// ~keep own line and is a real list item (issue #615).
     pub(crate) real_item_columns: usize,
+    /// Whether a paragraph was open before the previous marker line of the innermost item's
+    /// lists: the next marker's check stops there instead of walking back over every earlier item.
+    pub(crate) previous_marker: crate::converter::list::utils::PreviousMarker,
+    /// Whether the innermost list item is still open after the lines of a buffer checked so
+    /// far: each block of the item checks only the lines written since.
+    pub(crate) item_lines: crate::converter::list::utils::ItemLineScan,
     /// Unordered list nesting depth (for bullet cycling)
     pub(crate) ul_depth: usize,
     /// Are we inside any list (ul or ol)?
@@ -305,6 +315,7 @@ impl Context {
             list_counter: 0,
             in_ordered_list: false,
             blockquote_depth: 0,
+            quote_list_columns: 0,
             in_table_cell: false,
             in_layout_cell: false,
             convert_as_inline: options.convert_as_inline,
@@ -317,6 +328,8 @@ impl Context {
             list_depth: 0,
             list_indent_columns: 0,
             real_item_columns: 0,
+            previous_marker: crate::converter::list::utils::PreviousMarker::default(),
+            item_lines: crate::converter::list::utils::ItemLineScan::default(),
             ul_depth: 0,
             in_list: false,
             loose_list: false,

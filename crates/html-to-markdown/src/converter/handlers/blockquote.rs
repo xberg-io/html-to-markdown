@@ -57,6 +57,8 @@ pub fn handle_blockquote(
 
     let blockquote_ctx = Context {
         blockquote_depth: ctx.blockquote_depth + 1,
+        quote_list_columns: ctx.list_indent_columns,
+        item_lines: crate::converter::list::utils::ItemLineScan::new_item(),
         ..ctx.clone()
     };
 

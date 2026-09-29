@@ -247,9 +247,13 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
         HeadingStyle::Underlined => {
             // ~keep The underline is a line of the item like every quote line, so it gets the
             // ~keep item's continuation indent; at column 0 a `-` underline is a new list item
-            // ~keep (issue #635).
-            let underline_indent = if ctx.in_list_item && ctx.blockquote_depth == 0 {
-                crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
+            // ~keep (issue #635). In a quote, only the items inside the quote count: the quote
+            // ~keep writes the indent of the items around it on each of its lines.
+            let underline_indent = if ctx.in_list_item {
+                crate::converter::list::utils::continuation_indent_string(
+                    ctx.list_indent_columns.saturating_sub(ctx.quote_list_columns),
+                    options,
+                )
             } else {
                 None
             };

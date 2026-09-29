@@ -898,7 +898,7 @@ pub fn walk_node(
                     );
                 }
 
-                "audio" | "video" | "picture" | "iframe" | "svg" | "math" => {
+                name if crate::converter::media::is_media_element(name) => {
                     crate::converter::media::dispatch_media_handler(
                         &tag_name,
                         node_handle,
@@ -933,7 +933,7 @@ pub fn walk_node(
                 // ~keep shared constant) because this match also holds `svg`/`math` — which
                 // ~keep plain_text.rs skips outright but this path renders via a dedicated media
                 // ~keep handler — so the two tag sets are not actually the same list.
-                "template" | "noscript" => {}
+                name if crate::converter::main_helpers::is_unrendered_element(name) => {}
 
                 "head" | "script" | "style" => {
                     crate::converter::metadata::handle(

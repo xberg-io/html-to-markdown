@@ -116,14 +116,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   checkbox line, so they now start after a blank line: `- [ ]\n\n  3. x` and `- [ ]\n\n      c`.
   The code block keeps its indent; before, `- [ ]\n  c` lost the code. A quote after an empty
   inline element, such as `<span></span>`, now starts on the next line like a quote right after
-  the checkbox. An image or a line break before the quote is still text on the checkbox line.
-  An empty list, heading or code block writes nothing, so text after it stays on the checkbox
-  line: `- [ ] t`.
+  the checkbox. An image before the quote is still text on the checkbox line, and so is an empty
+  element that `preserve_tags` writes as HTML. An empty list, heading or code block writes
+  nothing, so text after it stays on the checkbox line: `- [ ] t`. A fenced code block that holds
+  only whitespace still writes its fences, so it starts on the next line and the text after it
+  stays out of the code.
+- **A quote after a line break in a task item stayed on the checkbox line (#650).**
+  `<ul><li><input type="checkbox"><br><blockquote>q</blockquote></li></ul>` gave `- [ ] > q`, and
+  the quote was text. A line break, a `&nbsp;`, a `<template>` or a `<noscript>` before the quote
+  writes nothing there, so the quote now starts on the next line: `- [ ]\n  > q`.
 - **An underlined heading ended its list item (#635).** With `heading_style` set to `underlined`,
   the underline of a heading in a list item was written at column 0: `<ul><li><h2>q</h2></li></ul>`
   gave `- q\n-`, an item and an empty item. The underline now gets the item's content column,
-  `- q\n  -`. After a line of the item, the heading starts after a blank line, so it does not
-  continue that line's paragraph: `- a\n\n  q\n  -`.
+  `- q\n  -`, also in a list inside a quote: `> - q\n>   -`. After a line of the item, the heading
+  starts after a blank line, so it does not continue that line's paragraph: `- a\n\n  q\n  -`. A
+  block after a heading of one letter starts its own paragraph: `<ul><li><h2>q</h2><p>t</p></li></ul>`
+  gives `- q\n  -\n\n  t`, where the `-` underline was read as an empty item before.
+- **Many blocks in one list item took quadratic time (#649).** Each block checked every earlier
+  line of the item to see whether the item was still open, and each item of a list inside bold or
+  italic checked every earlier item. `<ul><li>` with 5000 headings after text took seconds. Each
+  check now reads only the lines written since the last one, so the time grows linearly.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut

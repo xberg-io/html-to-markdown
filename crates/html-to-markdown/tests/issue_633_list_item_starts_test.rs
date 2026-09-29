@@ -5,7 +5,7 @@
 //! an item after a real item or a quote between inline markers (issue #633), the first block of a
 //! task item (issue #634) and an underlined heading in a list item (issue #635).
 
-use html_to_markdown_rs::options::{CodeBlockStyle, HeadingStyle};
+use html_to_markdown_rs::options::{CodeBlockStyle, HeadingStyle, ListIndentType, NewlineStyle};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 fn tier2_options() -> ConversionOptions {
@@ -253,9 +253,98 @@ fn should_start_the_first_block_of_a_task_item_that_cannot_interrupt_the_checkbo
         (r#"<ul><li><input type="checkbox"><ul></ul>t</li></ul>"#, "- [ ] t\n"),
         (r#"<ul><li><input type="checkbox"><h2></h2>t</li></ul>"#, "- [ ] t\n"),
         (r#"<ul><li><input type="checkbox"><pre></pre>t</li></ul>"#, "- [ ] t\n"),
+        (
+            r#"<ul><li><input type="checkbox"><h2><br></h2>t</li></ul>"#,
+            "- [ ] t\n",
+        ),
     ] {
         assert_eq!(convert_with(html, &options), expected, "{html}");
     }
+}
+
+#[test]
+fn should_keep_task_text_after_a_code_block_of_only_whitespace_out_of_the_code_block() {
+    let options = tier2_options();
+    for html in [
+        r#"<ul><li><input type="checkbox"><pre> </pre>t</li></ul>"#,
+        "<ul><li><input type=\"checkbox\"><pre>\n\n</pre>t</li></ul>",
+        r#"<ul><li><input type="checkbox"><div><pre> </pre>t</div></li></ul>"#,
+    ] {
+        let markdown = convert_with(html, &options);
+        assert!(markdown.starts_with("- [ ]\n  ```\n"), "{html}: {markdown:?}");
+        let rendered = render(&markdown);
+        assert!(rendered.contains("<p>t</p>"), "{html}: {rendered:?}");
+        assert!(!rendered.contains("t\n</code>"), "{html}: {rendered:?}");
+    }
+}
+
+#[test]
+fn should_keep_an_empty_preserved_element_on_the_checkbox_line() {
+    let options = ConversionOptions {
+        preserve_tags: ["span", "b", "a", "q", "abbr"].map(String::from).to_vec(),
+        ..tier2_options()
+    };
+    for element in [
+        "<span></span>",
+        r#"<span title="x"></span>"#,
+        r#"<a name="x"></a>"#,
+        r#"<abbr title="x"></abbr>"#,
+        "<q></q>",
+        "<b> </b>",
+    ] {
+        for html in [
+            format!(r#"<ul><li><input type="checkbox">{element}<blockquote>q</blockquote></li></ul>"#),
+            format!(r#"<ul><li><input type="checkbox"><div>{element}<blockquote>q</blockquote></div></li></ul>"#),
+        ] {
+            assert_converts(
+                &html,
+                &options,
+                &format!("- [ ] {element}\n  > q\n"),
+                &["<blockquote>\n<p>q</p>\n</blockquote>"],
+            );
+        }
+    }
+}
+
+#[test]
+fn should_start_a_task_item_quote_after_an_element_that_writes_nothing_on_the_next_line() {
+    let options = tier2_options();
+    for element in [
+        "<br>",
+        "<span>&nbsp;</span>",
+        "&nbsp;",
+        "<template>x</template>",
+        "<noscript>x</noscript>",
+        "<h2><br></h2>",
+    ] {
+        for html in [
+            format!(r#"<ul><li><input type="checkbox">{element}<blockquote>q</blockquote></li></ul>"#),
+            format!(r#"<ul><li><input type="checkbox"><div>{element}<blockquote>q</blockquote></div></li></ul>"#),
+        ] {
+            assert_converts(
+                &html,
+                &options,
+                "- [ ]\n  > q\n",
+                &["<blockquote>\n<p>q</p>\n</blockquote>"],
+            );
+        }
+    }
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..tier2_options()
+    };
+    assert_converts(
+        r#"<ul><li><input type="checkbox"><br><blockquote>q</blockquote></li></ul>"#,
+        &backslash,
+        "- [ ]\n  > q\n",
+        &["<blockquote>\n<p>q</p>\n</blockquote>"],
+    );
+    assert_converts(
+        r#"<ul><li><input type="checkbox"><br>t<blockquote>q</blockquote></li></ul>"#,
+        &options,
+        "- [ ] t\n  > q\n",
+        &["[ ] t\n<blockquote>"],
+    );
 }
 
 #[test]
@@ -280,7 +369,6 @@ fn should_start_a_task_item_quote_after_an_empty_inline_element_on_the_next_line
     for (wrapper, expected) in [
         (r#"<img src="i.png" alt="i">"#, "- [ ] ![i](i.png)\n  > q\n"),
         ("<span>s</span>", "- [ ] s\n  > q\n"),
-        ("<br>", "- [ ] > q\n"),
         ("<b>", "- [ ] **> q**\n"),
     ] {
         let html = format!(r#"<ul><li><input type="checkbox">{wrapper}<blockquote>q</blockquote></li></ul>"#);
@@ -378,4 +466,65 @@ fn should_start_an_underlined_heading_after_a_line_of_the_item_after_a_blank_lin
         convert_with("<ul><li>a<h2>q</h2></li></ul>", &tier2_options()),
         "- a\n  ## q\n"
     );
+}
+
+#[test]
+fn should_write_an_underlined_heading_in_a_list_in_a_quote_at_the_content_column() {
+    let options = ConversionOptions {
+        heading_style: HeadingStyle::Underlined,
+        ..tier2_options()
+    };
+    for (html, expected) in [
+        (
+            "<blockquote><ul><li><h2>q</h2></li></ul></blockquote>",
+            "> - q\n>   -\n",
+        ),
+        (
+            r#"<blockquote><ul><li><input type="checkbox"><h2>q</h2></li></ul></blockquote>"#,
+            "> - [ ]\n>\n>   q\n>   -\n",
+        ),
+        (
+            "<ul><li><blockquote><ul><li><h2>q</h2></li></ul></blockquote></li></ul>",
+            "- > * q\n  >   -\n",
+        ),
+        (
+            "<ul><li><blockquote><h2>q</h2></blockquote></li></ul>",
+            "- > q\n  > -\n",
+        ),
+    ] {
+        assert_converts(html, &options, expected, &["<h2>q</h2>"]);
+        assert!(!render(expected).contains("<li></li>"), "{html}");
+    }
+    let tabs = ConversionOptions {
+        list_indent_type: ListIndentType::Tabs,
+        ..options
+    };
+    assert_converts(
+        "<blockquote><ul><li><h2>q</h2></li></ul></blockquote>",
+        &tabs,
+        "> - q\n> \t-\n",
+        &["<h2>q</h2>"],
+    );
+}
+
+#[test]
+fn should_start_a_block_after_an_underlined_heading_of_one_letter_in_its_own_paragraph() {
+    let options = ConversionOptions {
+        heading_style: HeadingStyle::Underlined,
+        ..tier2_options()
+    };
+    for (html, expected) in [
+        ("<ul><li><h2>q</h2><p>t</p></li></ul>", "- q\n  -\n\n  t\n"),
+        (
+            r#"<ul><li><input type="checkbox"><h2>q</h2><p>t</p></li></ul>"#,
+            "- [ ]\n\n  q\n  -\n\n  t\n",
+        ),
+        ("<ol><li><h2>q</h2><p>t</p></li></ol>", "1. q\n   -\n\n   t\n"),
+        (
+            "<ul><li>a<ul><li><h2>q</h2><p>t</p></li></ul></li></ul>",
+            "- a\n  * q\n    -\n\n    t\n",
+        ),
+    ] {
+        assert_converts(html, &options, expected, &["<h2>q</h2>\n<p>t</p>"]);
+    }
 }
