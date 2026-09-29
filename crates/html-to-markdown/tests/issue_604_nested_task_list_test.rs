@@ -31,7 +31,7 @@ const NESTED_TASKS: [(&str, &str); 5] = [
     ),
     (
         "<ul><li>X<ol><li><input type=\"checkbox\" checked> A</li></ol>ZZ</li></ul>",
-        "- X\n  - [x] A\n\n  ZZ\n",
+        "- X\n  1. [x] A\n\n  ZZ\n",
     ),
     (
         "<ul><li>X<ul><li><input type=\"checkbox\" checked> A</li></ul></li></ul>",

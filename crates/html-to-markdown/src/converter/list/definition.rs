@@ -52,12 +52,7 @@ pub fn handle_dl(
 
     let trimmed = content.trim();
     if !trimmed.is_empty() {
-        // ~keep Inside a list item the list starts at the item's content column (issue #583).
-        if ctx.in_list_item && ctx.blockquote_depth == 0 && !ctx.in_table_cell && !output.is_empty() {
-            crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
-        } else if !output.is_empty() && !output.ends_with("\n\n") {
-            output.push_str("\n\n");
-        }
+        crate::converter::list::utils::start_container_block(output, ctx, options);
         crate::converter::block::horizontal_rule::separate_leading_rule(output, trimmed, ctx);
         output.push_str(trimmed);
         output.push_str("\n\n");

@@ -16,7 +16,7 @@ use html_to_markdown_rs::options::{ListIndentType, PreprocessingOptions, Whitesp
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
 
-const QUOTE_IN_ITEM: &str = "- A\n  > q\n  >\n  > ### H\n  >   r\n  >\n  >   ```\n  >   c\n  >   ```\n  >\n  > s\n";
+const QUOTE_IN_ITEM: &str = "- A\n  > q\n  >\n  > ### H\n  >\n  > r\n  >\n  > ```\n  > c\n  > ```\n  >\n  > s\n";
 
 const FIGURE_THEN: &str = r#"<ol start="10"><li>X<figure><figcaption>F</figcaption></figure>{}</li></ol>"#;
 
@@ -513,7 +513,7 @@ fn should_keep_a_term_at_the_marker_and_the_rule_after_it_on_the_fast_path() {
 }
 
 #[test]
-fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ended() {
+fn should_keep_a_rule_in_a_container_after_the_item_text_a_rule_in_the_item() {
     let tabs = ConversionOptions {
         list_indent_type: ListIndentType::Tabs,
         ..tier2_options()
@@ -559,7 +559,7 @@ fn should_not_write_the_content_column_inside_a_container_once_the_item_has_ende
             r#"<ol start="10"><li>X<fieldset><p>a</p><hr></fieldset></li></ol>"#,
             tier2_options(),
         ),
-        // ~keep A section after the item has ended.
+        // ~keep A section after a figure in the item.
         (
             r#"<ol start="10"><li>X<figure><p>a</p></figure><section><p>a</p><hr></section></li></ol>"#,
             tier2_options(),
@@ -666,7 +666,7 @@ fn should_keep_a_paragraph_in_its_item_when_wrapping_inside_a_quote() {
     let out = convert_with("<blockquote><ul><li>x<p>t<hr>B</p></li></ul></blockquote>", wrap);
     let rendered = render(&out);
     assert!(
-        rendered.contains("<p>t</p>\n</li>"),
+        rendered.contains("<p>t</p>\n<hr />\n<p>B</p>\n</li>"),
         "wrap: the paragraph left the item inside the quote: {out:?} renders {rendered:?}"
     );
 }

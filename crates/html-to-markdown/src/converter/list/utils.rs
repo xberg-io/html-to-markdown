@@ -222,8 +222,8 @@ pub fn add_list_continuation_indent(
                 output.push('\t');
             }
         }
-        // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-        // ~keep marker (see Context::list_indent_columns) — see item.rs's identical rationale.
+        // ~keep `list_indent_columns` is the item's content column (see
+        // ~keep Context::list_indent_columns), not a uniform per-depth value.
         ListIndentType::Spaces => {
             for _ in 0..list_indent_columns {
                 output.push(' ');
@@ -242,8 +242,8 @@ pub fn continuation_indent_string(list_indent_columns: usize, options: &Conversi
             }
             Some("\t".repeat(tabs))
         }
-        // ~keep `list_indent_columns` is the cumulative width of every ancestor <li>'s own
-        // ~keep marker (see Context::list_indent_columns) — see item.rs's identical rationale.
+        // ~keep `list_indent_columns` is the item's content column (see
+        // ~keep Context::list_indent_columns), not a uniform per-depth value.
         ListIndentType::Spaces => {
             if list_indent_columns == 0 {
                 return None;
@@ -258,6 +258,27 @@ pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) ->
     continuation_indent_string(list_indent_columns, options).map_or(0, |indent| {
         crate::converter::utility::escaping::leading_indent(&indent).1
     })
+}
+
+/// Whether a line at the list item's content column can start a block: it is within 3 columns
+/// of the content column of the innermost item whose marker starts a list item. Further in, the
+/// line is the text of that item's paragraph.
+pub fn block_is_real(ctx: &Context, options: &ConversionOptions) -> bool {
+    indent_column(ctx.list_indent_columns, options).saturating_sub(indent_column(ctx.real_item_columns, options)) < 4
+}
+
+/// The column a block that starts its own line in the list item is written at: the item's content
+/// column, or the column of the item whose marker starts a list item where the content column
+/// starts no block in a quote whose first line is outside it.
+///
+/// ~keep That quote holds no paragraph for a line at the content column to continue, so the
+/// ~keep line would be an indented code block.
+pub fn block_columns(ctx: &Context, options: &ConversionOptions) -> usize {
+    if ctx.quote_starts_after_markers && !block_is_real(ctx, options) {
+        ctx.real_item_columns
+    } else {
+        ctx.list_indent_columns
+    }
 }
 
 /// Whether `marker`, written by a list item between markers on the line starting at
@@ -282,18 +303,49 @@ pub fn marker_starts_item(
     let enclosing_column = indent_column(enclosing_columns, options);
     let marker_column = crate::converter::utility::escaping::leading_indent(&output[line_start..]).1;
     let column = marker_column.saturating_sub(enclosing_column);
-    let (previous, buffer) = previous;
+    if !paragraph_is_open_before(output, line_start, enclosing_column, previous) {
+        return column < 4;
+    }
+    let line = format!("{}{marker}x", " ".repeat(column));
+    crate::converter::utility::escaping::line_opens_block(&line)
+}
+
+/// Whether the first item of a list, which starts the line after `output` inside the item at
+/// `enclosing_columns`, needs a blank line before it: its `marker` cannot interrupt a paragraph,
+/// and a paragraph is open there.
+///
+/// ~keep Only an ordered marker other than `1.` cannot interrupt a paragraph (issue #662), so
+/// ~keep every other list reads no lines. The items after the first follow a list item.
+pub fn list_needs_blank_line(
+    output: &str,
+    marker: &str,
+    enclosing_columns: usize,
+    previous: (&PreviousMarker, usize),
+    options: &ConversionOptions,
+) -> bool {
+    !crate::converter::utility::escaping::line_opens_block(&format!("{marker}x"))
+        && paragraph_is_open_before(
+            output,
+            output.len(),
+            indent_column(enclosing_columns, options),
+            previous,
+        )
+}
+
+/// Whether a paragraph is open before the line at `line_start`, stored for the next marker line.
+fn paragraph_is_open_before(
+    output: &str,
+    line_start: usize,
+    enclosing_column: usize,
+    (previous, buffer): (&PreviousMarker, usize),
+) -> bool {
     let open = paragraph_is_open(
         &output[..line_start],
         enclosing_column,
         previous.get(buffer, output, enclosing_column),
     );
     previous.set(buffer, output, line_start, enclosing_column, open);
-    if !open {
-        return column < 4;
-    }
-    let line = format!("{}{marker}x", " ".repeat(column));
-    crate::converter::utility::escaping::line_opens_block(&line)
+    open
 }
 
 /// Whether a paragraph is open at the end of `output` in the item whose content starts at
@@ -618,11 +670,22 @@ impl ItemLineScan {
 }
 
 /// The context for the children of a container that renders them into a buffer of its own:
-/// they see whether the list item is still open where that buffer will be written.
+/// they see whether the list item is still open where that buffer will be written, and the
+/// column its lines start at.
+///
+/// ~keep A tab indent can pass the item's content column, and the container's lines start where
+/// ~keep the tabs reach. A list between markers at the start of the buffer counts its column from
+/// ~keep there, so a quote in it stays 4 columns past the container's text and is text too.
 pub fn nested_block_context(output: &str, ctx: &Context, options: &ConversionOptions) -> Context {
     let indent = continuation_indent_string(ctx.list_indent_columns, options).unwrap_or_default();
+    let list_item_open = item_is_open(output, &indent, ctx);
     Context {
-        list_item_open: item_is_open(output, &indent, ctx),
+        list_item_open,
+        list_indent_columns: if list_item_open {
+            indent_column(ctx.list_indent_columns, options)
+        } else {
+            ctx.list_indent_columns
+        },
         item_lines: ItemLineScan::new_item(),
         ..ctx.clone()
     }
@@ -842,6 +905,24 @@ pub fn process_list_children(
 
                 if is_ordered {
                     list_ctx.list_counter = counter;
+                    // ~keep A first marker that cannot interrupt the paragraph before it starts
+                    // ~keep after a blank line (issue #662). Between inline markers the list is text.
+                    if counter == start_counter
+                        && ctx.in_list_item
+                        && ctx.inline_depth == 0
+                        && !ctx.text_in_markers
+                        && output.ends_with('\n')
+                        && is_list_item(*child_handle, parser, dom_ctx)
+                        && list_needs_blank_line(
+                            output,
+                            &format!("{counter}. "),
+                            ctx.real_item_columns,
+                            (&ctx.previous_marker, std::ptr::from_ref::<String>(output) as usize),
+                            options,
+                        )
+                    {
+                        output.push('\n');
+                    }
                 }
 
                 use crate::converter::walk_node;

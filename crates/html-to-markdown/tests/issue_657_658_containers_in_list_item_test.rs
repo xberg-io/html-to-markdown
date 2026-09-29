@@ -4,7 +4,7 @@
 //! Regression tests for block containers in a list item: details, figure, fieldset, menu and
 //! hgroup (issue #657), and a custom element after a block of the item (issue #658).
 
-use html_to_markdown_rs::options::ListIndentType;
+use html_to_markdown_rs::options::{ListIndentType, NewlineStyle};
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
 
 fn options_for(tier_strategy: TierStrategy) -> ConversionOptions {
@@ -278,10 +278,50 @@ fn should_keep_a_details_element_in_a_list_item_in_a_table_cell_on_the_cell_line
 }
 
 #[test]
-fn should_start_a_details_element_in_a_list_item_in_a_quote_on_the_marker_line() {
+fn should_keep_a_details_element_in_a_list_item_in_a_quote_in_the_item() {
     assert_converts_in_both_tiers(
         "<blockquote><ul><li><details><summary>s</summary>d</details></li></ul></blockquote>",
-        "> - **s**\n>\n> d\n",
-        &["<blockquote>\n<ul>\n<li><strong>s</strong></li>"],
+        "> - **s**\n>\n>   d\n",
+        &["<blockquote>\n<ul>\n<li>\n<p><strong>s</strong></p>\n<p>d</p>\n</li>"],
     );
+}
+
+#[test]
+fn should_keep_a_hard_break_before_an_element_that_continues_the_paragraph() {
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..options_for(TierStrategy::Tier2)
+    };
+    let spaces = options_for(TierStrategy::Tier2);
+    for (tag, text) in [("dialog", "x"), ("summary", "**x**"), ("legend", "**x**")] {
+        let html = format!("<p>a<br><{tag}>x</{tag}>y</p>");
+        assert_converts(&html, &backslash, &format!("a\\\n{text}\n\ny\n"), &["a<br />"]);
+        assert_converts(&html, &spaces, &format!("a  \n{text}\n\ny\n"), &["a<br />"]);
+        let html = format!("<ul><li>a<br><{tag}>x</{tag}>y</li></ul>");
+        assert_converts(&html, &backslash, &format!("- a\\\n  {text}\n\n  y\n"), &["a<br />"]);
+        assert_converts(&html, &spaces, &format!("- a  \n  {text}\n\n  y\n"), &["a<br />"]);
+    }
+}
+
+#[test]
+fn should_drop_a_hard_break_before_an_element_that_ends_the_paragraph() {
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..options_for(TierStrategy::Tier2)
+    };
+    for (html, expected) in [
+        ("<p>a<br><center>x</center>y</p>", "a\n\nx\n\ny\n"),
+        (
+            "<p>a<br><details><summary>s</summary>x</details>y</p>",
+            "a\n\n**s**\n\nx\n\ny\n",
+        ),
+        ("<ul><li>a<br><h2>x</h2>y</li></ul>", "- a\n  ## x\n  y\n"),
+        (
+            "<blockquote><p>a<br><h2>x</h2>y</p></blockquote>",
+            "> a\n> ## x\n>\n> y\n",
+        ),
+    ] {
+        assert_converts(html, &backslash, expected, &[]);
+        assert!(!convert_with(html, &backslash).contains('\\'), "{html}");
+    }
 }

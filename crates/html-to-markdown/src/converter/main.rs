@@ -16,8 +16,9 @@ use std::collections::HashSet;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
     collapse_excess_blank_lines, effective_max_depth, extract_head_metadata, format_metadata_frontmatter,
-    has_custom_element_tags, repair_with_html5ever, strip_trailing_backslash_breaks, trim_line_end_whitespace,
-    trim_trailing_whitespace, writes_inline,
+    has_custom_element_tags, repair_with_html5ever, restore_break_before_paragraph_text,
+    strip_trailing_backslash_breaks, trailing_backslash_breaks, trim_line_end_whitespace, trim_trailing_whitespace,
+    writes_inline,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
@@ -429,10 +430,7 @@ fn separate_from_block(
         return;
     }
     if ctx.in_list_item {
-        // ~keep A blockquote renders its children into a scratch buffer that it prefixes
-        // ~keep afterwards, so the item's content column only applies at quote depth 0 (the
-        // ~keep same limit `handlers/blockquote.rs` puts on its own list indent).
-        if ctx.blockquote_depth == 0 && !parent_is_list(node_handle, parser, dom_ctx) {
+        if !parent_is_list(node_handle, parser, dom_ctx) {
             separate_in_list_item(node, node_handle, parser, output, options, ctx, dom_ctx);
         }
     } else if !ctx.in_list
@@ -508,10 +506,8 @@ fn separate_in_list_item(
         return;
     };
     let item_is_open = crate::converter::list::utils::item_is_open(output, &indent, ctx);
-    let block_is_real = crate::converter::list::utils::indent_column(ctx.list_indent_columns, options).saturating_sub(
-        crate::converter::list::utils::indent_column(ctx.real_item_columns, options),
-    ) < 4;
-    let separates = item_is_open || (block_continues_lazily && block_is_real);
+    let separates =
+        item_is_open || (block_continues_lazily && crate::converter::list::utils::block_is_real(ctx, options));
     if !separates {
         return;
     }
@@ -608,6 +604,16 @@ fn convert_node(
         ctx.depth_limit_reached.set(true);
         return;
     }
+
+    // ~keep One hard break written by a `<br>` right before this element, which the dispatch
+    // ~keep drops if the element is a block: see `restore_break_before_paragraph_text`. A run
+    // ~keep of breaks leaves a blank line, and a break at the end of a closed element (a `<dt>`
+    // ~keep before its `<dd>`) is at the end of that element's block: both stay dropped.
+    let break_start = (options.newline_style == NewlineStyle::Backslash
+        && matches!(node, tl::Node::Tag(_))
+        && trailing_backslash_breaks(output, ctx.block_content_start) == 1
+        && crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx) == Some("br"))
+    .then(|| output.len() - "\\\n".len());
 
     separate_from_block(node, node_handle, parser, output, options, ctx, dom_ctx);
 
@@ -1025,6 +1031,10 @@ fn convert_node(
                         depth,
                     },
                 );
+            }
+
+            if let Some(break_start) = break_start {
+                restore_break_before_paragraph_text(output, break_start);
             }
         }
 

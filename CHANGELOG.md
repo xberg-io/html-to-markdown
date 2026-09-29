@@ -52,6 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A task item in an ordered list lost its number (#659).**
+  `<ol><li><input type="checkbox">p</li></ol>` gave `- [ ] p`, a bullet list. A task item now
+  writes the marker of its own list, so it gives `1. [ ] p`, and its content column follows the
+  width of that number. Djot output keeps `- [ ] p`, because Djot has task items only in bullet
+  lists.
+- **A nested ordered list that does not start at 1 joined the text before it (#662).**
+  CommonMark lets only a list that starts at 1 interrupt a paragraph, so in
+  `<ol start="10"><li>a<ol start="100"><li>q</li></ol></li></ol>` the line `100. q` was part of
+  the paragraph `a`. Such a list now starts after a blank line when a paragraph is open before
+  it: `10. a\n\n    100. q`. The blank line makes the outer list loose.
 - **Details, figure, fieldset, menu and hgroup elements in a list item left the item (#657).**
   `<ul><li><details><summary>s</summary>d</details></li></ul>` gave `-\n\n**s**\n\nd`, an empty
   item with the content after the list, and `<ul><li><menu><li>m</li></menu></li></ul>` split the
@@ -59,6 +69,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<div>`, and the text after one of them stays in the item. A menu nests in the item like a
   `<ul>`. Center, search, dialog, summary and legend elements now count as blocks, so the text
   after them starts a new paragraph.
+- **The eight elements center, details, dialog, hgroup, legend, menu, search and summary are now
+  blocks outside list items too.** In bold, italic or a span they split the wrapper like a
+  `<div>`: `<p><strong>a<center>x</center>y</strong></p>` gives `**a**\n\n**x**\n\n**y**`, and
+  plain text output puts them in a paragraph of their own. In a link they are separated from
+  the text before them by a space. With the backslash newline style, a hard break before a
+  center, details, hgroup or search element is dropped, because a new paragraph starts there.
+  A visitor now gets `is_inline: false` in the node context of these eight elements.
 - **A custom element after a paragraph in a list item left the item (#658).** With
   `preserve_tags: ["my-el"]`, `<ol><li><p>a</p><my-el></my-el><h2>h</h2>t</li></ol>` gave
   `1. a\n\n<my-el></my-el>## h`, so the heading was text outside the list. A custom element after
@@ -165,6 +182,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line of the item to see whether the item was still open, and each item of a list inside bold or
   italic checked every earlier item. `<ul><li>` with 5000 headings after text took seconds. Each
   check now reads only the lines written since the last one, so the time grows linearly.
+- **A heading after text in a quote joined the text (#640).** `<blockquote>a<h2>q</h2></blockquote>`
+  gave `> a## q`, a paragraph, and with `heading_style` set to `underlined` it gave `> aq\n> -`,
+  one heading. The heading now starts after a blank quote line: `> a\n>\n> ## q`. An underlined
+  heading does the same after any line of text in the quote, such as a line that ends in a hard
+  break or the last item of a list.
+- **An underlined heading whose text starts a block lost its heading (#653).** With
+  `heading_style` set to `underlined`, `<h2>-</h2>` gave `-\n-`, two empty list items. The text of
+  an underlined heading is now escaped where it would start a block: a list marker (`-`, `*`,
+  `1.`, also on its own), a quote, a `#` heading or a rule. `<h2>-</h2>` gives `\-\n-`.
+- **The lines of a list item in a quote or under tab indent left the item (#654).** A list inside
+  a quote in a list item counted the markers outside the quote too, so its lines sat further in
+  than the item, and the underline of a heading sat short of it. The quote now starts its content
+  as a container of its own, so a list in it counts only its own markers. A block after text in a
+  list item inside a quote now also starts its own line, as it does outside a quote. An
+  underlined heading in a quote in a list item now gets the one-dash underline it gets in a
+  quote elsewhere: `<ul><li><blockquote><h2>q</h2></blockquote></li></ul>` gives `- > q\n  > -`,
+  where it gave `- > q\n  > --`. Bold or italic around the quote no longer changes the lists in
+  it, so text after a nested quote in such a list leaves the nested quote. With
+  `list_indent_type` set to `tabs`, the lines of a nested item were one tab short of its content
+  column: `- a\n\t* q\n\n\tt` put `t` in the outer item. They now reach the column where the
+  item's text starts, `- a\n\t* q\n\n\t\tt`. With `list_indent_width` set to 4 or with tab
+  indent, a quote right after an opening bold marker, a summary's or a caption's, now writes a
+  nested quote or list of its list at the column of the nearest real list item, where they became
+  a code block. A list inside `<mark>` or `<del>` is now text after its marker, as inside bold,
+  so text after a quote in it no longer becomes a code block.
 - **Wrap mode joined a rule or a heading underline to the text next to it (#607).** With `wrap`
   on, a `---` line followed by text became one line of text, `--- B`, and the rule was lost. The
   underline of an underlined heading was joined to the heading text (`Heading -------`), or cut
