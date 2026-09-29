@@ -282,18 +282,49 @@ pub fn marker_starts_item(
     let enclosing_column = indent_column(enclosing_columns, options);
     let marker_column = crate::converter::utility::escaping::leading_indent(&output[line_start..]).1;
     let column = marker_column.saturating_sub(enclosing_column);
-    let (previous, buffer) = previous;
+    if !paragraph_is_open_before(output, line_start, enclosing_column, previous) {
+        return column < 4;
+    }
+    let line = format!("{}{marker}x", " ".repeat(column));
+    crate::converter::utility::escaping::line_opens_block(&line)
+}
+
+/// Whether the first item of a list, which starts the line after `output` inside the item at
+/// `enclosing_columns`, needs a blank line before it: its `marker` cannot interrupt a paragraph,
+/// and a paragraph is open there.
+///
+/// ~keep Only an ordered marker other than `1.` cannot interrupt a paragraph (issue #662), so
+/// ~keep every other list reads no lines. The items after the first follow a list item.
+pub fn list_needs_blank_line(
+    output: &str,
+    marker: &str,
+    enclosing_columns: usize,
+    previous: (&PreviousMarker, usize),
+    options: &ConversionOptions,
+) -> bool {
+    !crate::converter::utility::escaping::line_opens_block(&format!("{marker}x"))
+        && paragraph_is_open_before(
+            output,
+            output.len(),
+            indent_column(enclosing_columns, options),
+            previous,
+        )
+}
+
+/// Whether a paragraph is open before the line at `line_start`, stored for the next marker line.
+fn paragraph_is_open_before(
+    output: &str,
+    line_start: usize,
+    enclosing_column: usize,
+    (previous, buffer): (&PreviousMarker, usize),
+) -> bool {
     let open = paragraph_is_open(
         &output[..line_start],
         enclosing_column,
         previous.get(buffer, output, enclosing_column),
     );
     previous.set(buffer, output, line_start, enclosing_column, open);
-    if !open {
-        return column < 4;
-    }
-    let line = format!("{}{marker}x", " ".repeat(column));
-    crate::converter::utility::escaping::line_opens_block(&line)
+    open
 }
 
 /// Whether a paragraph is open at the end of `output` in the item whose content starts at
@@ -824,6 +855,24 @@ pub fn process_list_children(
 
                 if is_ordered {
                     list_ctx.list_counter = counter;
+                    // ~keep A first marker that cannot interrupt the paragraph before it starts
+                    // ~keep after a blank line (issue #662). Between inline markers the list is text.
+                    if counter == start_counter
+                        && ctx.in_list_item
+                        && ctx.inline_depth == 0
+                        && !ctx.text_in_markers
+                        && output.ends_with('\n')
+                        && is_list_item(*child_handle, parser, dom_ctx)
+                        && list_needs_blank_line(
+                            output,
+                            &format!("{counter}. "),
+                            ctx.real_item_columns,
+                            (&ctx.previous_marker, std::ptr::from_ref::<String>(output) as usize),
+                            options,
+                        )
+                    {
+                        output.push('\n');
+                    }
                 }
 
                 use crate::converter::walk_node;

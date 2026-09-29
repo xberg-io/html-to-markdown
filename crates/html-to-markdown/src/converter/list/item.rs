@@ -86,13 +86,21 @@ pub fn handle_li(
             (false, false, None)
         };
 
-    let marker = || {
-        if is_task_list {
-            String::from(if task_checked { "- [x] " } else { "- [ ] " })
-        } else if ctx.in_ordered_list {
+    // ~keep A task item in an ordered list keeps its number (issue #659).
+    let list_marker = || {
+        if ctx.in_ordered_list {
             format!("{}. ", ctx.list_counter)
+        } else if is_task_list {
+            String::from("- ")
         } else {
             format!("{} ", unordered_bullet(ctx, options))
+        }
+    };
+    let marker = || {
+        if is_task_list {
+            format!("{}{} ", list_marker(), if task_checked { "[x]" } else { "[ ]" })
+        } else {
+            list_marker()
         }
     };
 
@@ -155,14 +163,15 @@ pub fn handle_li(
     }
 
     // ~keep This item's own marker width, used to grow `list_indent_columns` for descendants
-    // ~keep (nested lists and continuation content). Unordered/task markers are always 2 wide
-    // ~keep ("- "); an ordered marker's width depends on its counter's digit count ("1. " = 3,
-    // ~keep "10. " = 4, ...). `list_indent_width` is honoured as a floor, not the literal width.
-    let own_marker_width = if is_task_list || !ctx.in_ordered_list {
-        options.list_indent_width.max(2)
-    } else {
+    // ~keep (nested lists and continuation content). Unordered markers, a task item's too, are
+    // ~keep always 2 wide ("- "); an ordered marker's width depends on its counter's digit count
+    // ~keep ("1. " = 3, "10. " = 4, ...). `list_indent_width` is honoured as a floor, not the
+    // ~keep literal width.
+    let own_marker_width = if ctx.in_ordered_list {
         let marker_len = format!("{}. ", ctx.list_counter).chars().count();
         options.list_indent_width.max(marker_len)
+    } else {
+        options.list_indent_width.max(2)
     };
 
     // ~keep A list inside an inline wrapper, a summary or a caption is written into that
@@ -199,8 +208,7 @@ pub fn handle_li(
     };
 
     if is_task_list {
-        output.push('-');
-        output.push(' ');
+        output.push_str(&list_marker());
         output.push_str(if task_checked { "[x]" } else { "[ ]" });
 
         #[allow(clippy::ref_option)]

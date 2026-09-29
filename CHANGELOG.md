@@ -52,6 +52,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A task item in an ordered list lost its number (#659).**
+  `<ol><li><input type="checkbox">p</li></ol>` gave `- [ ] p`, a bullet list. A task item now
+  writes the marker of its own list, so it gives `1. [ ] p`, and its content column follows the
+  width of that number.
+- **A nested ordered list that does not start at 1 joined the text before it (#662).**
+  CommonMark lets only a list that starts at 1 interrupt a paragraph, so in
+  `<ol start="10"><li>a<ol start="100"><li>q</li></ol></li></ol>` the line `100. q` was part of
+  the paragraph `a`. Such a list now starts after a blank line when a paragraph is open before
+  it: `10. a\n\n    100. q`. The blank line makes the outer list loose.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a
