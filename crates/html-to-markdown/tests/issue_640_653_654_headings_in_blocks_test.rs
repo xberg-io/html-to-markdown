@@ -644,3 +644,37 @@ fn should_start_a_list_in_a_wrapper_without_markers_after_a_list_item_marker_at_
         );
     }
 }
+
+#[test]
+fn should_start_a_list_in_a_quote_in_a_wrapper_without_markers_after_a_list_item_marker_at_the_quote_column() {
+    for tag in ["sub", "abbr", "label", "ruby"] {
+        let html = format!("<ul><li><{tag}><blockquote><ul><li>x<p>p</p>t</li></ul></blockquote></{tag}></li></ul>");
+        assert_converts(
+            &html,
+            &width4(options(TierStrategy::Tier2)),
+            "- > * x\n    >\n    >     p\n    >\n    >     t\n",
+            "<ul><li><blockquote><ul><li><p>x</p><p>p</p><p>t</p></li></ul></blockquote></li></ul>",
+        );
+        let html = format!("<ol><li><{tag}><blockquote><ul><li>x<p>p</p>t</li></ul></blockquote></{tag}></li></ol>");
+        assert_converts(
+            &html,
+            &tabs(options(TierStrategy::Tier2)),
+            "1. > - x\n\t>\n\t> \tp\n\t>\n\t> \tt\n",
+            "<ol><li><blockquote><ul><li><p>x</p><p>p</p><p>t</p></li></ul></blockquote></li></ol>",
+        );
+    }
+}
+
+#[test]
+fn should_start_a_nested_list_that_starts_past_one_after_a_blank_line_under_the_tab_indent() {
+    let html = r#"<ul><li>a<ul><li>b<ol start="3"><li>c</li></ol></li></ul></li></ul>"#;
+    let expected = "- a\n\t* b\n\n\t\t3. c\n";
+    assert_converts(
+        html,
+        &tabs(options(TierStrategy::Tier2)),
+        expected,
+        r#"<ul><li>a<ul><li><p>b</p><ol start="3"><li>c</li></ol></li></ul></li></ul>"#,
+    );
+    let tier1 = convert(html, Some(tabs(options(TierStrategy::Tier1)))).expect("conversion must succeed");
+    assert_eq!(tier1.content.as_deref(), Some(expected));
+}
