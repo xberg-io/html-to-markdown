@@ -249,7 +249,7 @@ pub fn handle_legend(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::new();
 
-        let mut legend_ctx = ctx.clone();
+        let mut legend_ctx = ctx.inline_buffer(output, !ctx.convert_as_inline);
         if !ctx.convert_as_inline {
             legend_ctx.in_strong = true;
         }
@@ -309,9 +309,18 @@ pub fn handle_label(
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         let mut content = String::new();
         let children = tag.children();
+        let label_ctx = ctx.inline_buffer(output, false);
         {
             for child_handle in children.top().iter() {
-                super::walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+                super::walk_node(
+                    child_handle,
+                    parser,
+                    &mut content,
+                    options,
+                    &label_ctx,
+                    depth + 1,
+                    dom_ctx,
+                );
             }
         }
 

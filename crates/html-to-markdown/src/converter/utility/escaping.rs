@@ -288,6 +288,39 @@ fn block_opener_escape_offset(line: &str) -> Option<usize> {
     block_opener_offset(rest).map(|offset| indent + offset)
 }
 
+/// Escape the character that makes `rest`, the first line of a paragraph without its
+/// indentation, start a block.
+///
+/// ~keep At the start of a paragraph more lines start a block than can interrupt one: an empty
+/// ~keep list item (`-`, `*`, `1.`) and an ordered list at any number (spec section 5.2). An
+/// ~keep underlined heading writes its text as such a line (issue #653).
+pub fn escape_paragraph_start(rest: &str) -> Cow<'_, str> {
+    block_opener_offset(rest)
+        .or_else(|| list_marker_offset(rest))
+        .map_or(Cow::Borrowed(rest), |at| {
+            Cow::Owned(format!("{}\\{}", &rest[..at], &rest[at..]))
+        })
+}
+
+/// Byte offset of the delimiter of the list marker that starts `rest`, a line without its
+/// indentation: a bullet, or one to nine digits then `.` or `)`, followed by a space, a tab or
+/// the end of the line.
+fn list_marker_offset(rest: &str) -> Option<usize> {
+    let bytes = rest.as_bytes();
+    let delimiter = match bytes.first()? {
+        b'-' | b'*' | b'+' => 0,
+        b'0'..=b'9' => {
+            let digits = bytes.iter().take_while(|byte| byte.is_ascii_digit()).count();
+            if digits > 9 || !matches!(bytes.get(digits), Some(b'.' | b')')) {
+                return None;
+            }
+            digits
+        }
+        _ => return None,
+    };
+    matches!(bytes.get(delimiter + 1), None | Some(b' ' | b'\t')).then_some(delimiter)
+}
+
 /// Whether `line`, with its indentation, opens a block that can interrupt a paragraph.
 pub fn line_opens_block(line: &str) -> bool {
     block_opener_escape_offset(line).is_some()

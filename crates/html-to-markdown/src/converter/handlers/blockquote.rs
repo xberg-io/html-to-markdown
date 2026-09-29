@@ -55,9 +55,30 @@ pub fn handle_blockquote(
         .map(std::borrow::Cow::into_owned)
         .map(|value| ctx.resolve_url(&value).unwrap_or(value));
 
+    // ~keep The quote writes the indent of the list items around it on each of its lines, so its
+    // ~keep children start at column 0 of a container of their own, outside the item: a list in
+    // ~keep the quote counts only its own markers, and every line of an item in the quote gets
+    // ~keep the same column (issue #654). Bold or italic around the item holding the quote does
+    // ~keep not make a list in the quote text: its items open. Under the markers of a caption, a
+    // ~keep summary or an inline wrapper that does not count in the inline depth (a highlight, a
+    // ~keep deletion, a subscript), a list in the quote is still judged by where its markers fall,
+    // ~keep as outside it.
+    // ~keep A quote right after an opening inline marker starts on that marker's line, so its
+    // ~keep first line is text between the markers.
+    let first_line_follows_markers = output.is_empty() && ctx.in_marker_text();
     let blockquote_ctx = Context {
         blockquote_depth: ctx.blockquote_depth + 1,
-        quote_list_columns: ctx.list_indent_columns,
+        in_list_item: false,
+        in_list: false,
+        list_indent_columns: 0,
+        real_item_columns: 0,
+        inline_buffer_column: None,
+        inline_depth: if first_line_follows_markers {
+            ctx.inline_depth
+        } else {
+            0
+        },
+        quote_starts_after_markers: first_line_follows_markers,
         item_lines: crate::converter::list::utils::ItemLineScan::new_item(),
         ..ctx.clone()
     };
@@ -128,15 +149,11 @@ pub fn handle_blockquote(
     }
 
     if !trimmed_content.is_empty() {
-        // ~keep Only the outermost blockquote call writes into the real document buffer —
-        // a nested blockquote's own call writes into its parent's local `content`
-        // scratch buffer instead (see above), which the parent then re-prefixes with
-        // its own "> " on the way out. Applying the list continuation indent at every
-        // nesting level would stack it once per level; restricting it to
-        // `blockquote_depth == 0` applies it exactly once, at the boundary where this
-        // content actually reaches the list item's own text.
-        let list_indent = if ctx.in_list_item && ctx.blockquote_depth == 0 {
-            crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
+        let list_indent = if ctx.in_list_item {
+            crate::converter::list::utils::continuation_indent_string(
+                crate::converter::list::utils::block_columns(ctx, options),
+                options,
+            )
         } else {
             None
         };
@@ -165,18 +182,9 @@ pub fn handle_blockquote(
         // ~keep quote that holds the list (issue #617).
         let at_bare_marker =
             ctx.in_list_item && crate::converter::list::utils::trim_whitespace_after_bare_marker(output);
-        // ~keep In a quote that holds the list, the marker is in this quote's own buffer, and
-        // ~keep the marker line's width is the item's content column there.
-        let list_indent = if at_bare_marker && list_indent.is_none() {
-            let line = &output[output.rfind('\n').map_or(0, |pos| pos + 1)..];
-            let (indent_length, indent_column) = crate::converter::utility::escaping::leading_indent(line);
-            Some(" ".repeat(indent_column + line[indent_length..].chars().count()))
-        } else {
-            list_indent
-        };
         if at_bare_marker {
             // ~keep Nothing to separate: the marker line is the quote's first line.
-        } else if ctx.blockquote_depth > 0 {
+        } else if ctx.blockquote_depth > 0 && !ctx.in_list_item {
             if !output.is_empty() {
                 while output.ends_with('\n') {
                     output.truncate(output.len() - 1);

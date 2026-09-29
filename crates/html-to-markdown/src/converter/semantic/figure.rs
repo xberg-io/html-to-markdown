@@ -140,6 +140,7 @@ pub fn handle_figure(
             // ~keep has ended (issue #583).
             let figure_ctx = super::Context {
                 list_item_open: false,
+                real_item_columns: 0,
                 ..ctx.clone()
             };
             for child_handle in children.top().iter() {

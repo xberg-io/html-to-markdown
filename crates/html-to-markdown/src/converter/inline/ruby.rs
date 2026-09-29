@@ -65,7 +65,7 @@ pub fn handle(
 
     match tag_name {
         "ruby" => {
-            let ruby_ctx = ctx.clone();
+            let ruby_ctx = ctx.inline_buffer(output, false);
 
             let tag_sequence: Vec<String> = tag
                 .children()
@@ -247,9 +247,10 @@ pub fn handle(
         "rb" => {
             let mut text = String::new();
             let children = tag.children();
+            let text_ctx = ctx.inline_buffer(output, false);
             {
                 for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, &mut text, options, ctx, depth + 1, dom_ctx);
+                    walk_node(child_handle, parser, &mut text, options, &text_ctx, depth + 1, dom_ctx);
                 }
             }
             output.push_str(text.trim());
@@ -258,9 +259,10 @@ pub fn handle(
         "rt" => {
             let mut text = String::new();
             let children = tag.children();
+            let text_ctx = ctx.inline_buffer(output, true);
             {
                 for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, &mut text, options, ctx, depth + 1, dom_ctx);
+                    walk_node(child_handle, parser, &mut text, options, &text_ctx, depth + 1, dom_ctx);
                 }
             }
             let trimmed = text.trim();
@@ -279,9 +281,18 @@ pub fn handle(
             // ~keep In Markdown output, generally skip these as annotations are in parentheses
             let mut content = String::new();
             let children = tag.children();
+            let content_ctx = ctx.inline_buffer(output, false);
             {
                 for child_handle in children.top().iter() {
-                    walk_node(child_handle, parser, &mut content, options, ctx, depth + 1, dom_ctx);
+                    walk_node(
+                        child_handle,
+                        parser,
+                        &mut content,
+                        options,
+                        &content_ctx,
+                        depth + 1,
+                        dom_ctx,
+                    );
                 }
             }
             let trimmed = content.trim();
