@@ -52,6 +52,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A table whose cells held only rules was dropped (#628).** The full converter took a table
+  with no text and no image for a blank spacer table and wrote nothing, so
+  `<table><tr><td><ul><li><hr></li></ul></td></tr></table>` gave an empty document. A rule now
+  counts as content, and both converters write the table as `| --- |` over its delimiter row. Text
+  in a cell that looks like a list marker no longer turns a rule after it into `___`, and the fast
+  converter now trims the space before a rule in a cell as the full converter does.
 - **A rule inside bold, italic, a summary or a caption split the emphasis markers (#603).** The
   rule was written after a blank line, which ended the paragraph between the markers, so the
   markers showed as literal text: `<summary>t<hr></summary>` gave `**t\n\n---**`, and a

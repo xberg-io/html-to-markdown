@@ -1857,7 +1857,12 @@ fn emit_void(
                 return Ok(());
             }
             {
+                let in_cell = state.in_table_cell();
                 let dest = state.cell_or_output_mut();
+                // ~keep Tier-2 trims the space a cell break left before the rule (issue #628).
+                if in_cell {
+                    crate::converter::main_helpers::trim_trailing_whitespace(dest);
+                }
                 if !dest.is_empty() && !dest.ends_with("\n\n") {
                     if dest.ends_with('\n') {
                         dest.push('\n');

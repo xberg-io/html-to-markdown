@@ -28,7 +28,7 @@ pub struct TableScan {
     pub nested_table_count: usize,
     /// Count of anchor elements in the table
     pub link_count: usize,
-    /// Whether the table contains text content (not empty)
+    /// Whether the table has content to write: text, an image, or a rule
     pub has_text: bool,
 }
 
@@ -234,7 +234,7 @@ fn visit_content_node(
     }
 }
 
-/// Fold a single non-table tag's contribution (link/header/caption/image-alt-text) into the
+/// Fold a single non-table tag's contribution (link/header/caption/image/rule) into the
 /// current accumulator, if one is open.
 fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableContentSummary>) {
     let Some(acc) = acc else { return };
@@ -245,6 +245,9 @@ fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableCo
         "img" | "graphic" if tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some() => {
             acc.has_text = true;
         }
+        // ~keep A rule is content without text: a table whose cells hold only rules is not a blank
+        // ~keep spacer, and dropping it lost the whole table (issue #628).
+        "hr" => acc.has_text = true,
         "cell" => {
             if let Some(Some(role)) = tag.attributes().get("role") {
                 if role.as_utf8_str() == "head" {
