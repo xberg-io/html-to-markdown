@@ -273,6 +273,22 @@ fn should_separate_a_rule_that_starts_a_definition_in_a_cell() {
     check(&[
         ("a<dt><hr></dt>c", "a  --- c", "a  ---<br>c"),
         ("a<dd> <hr></dd>c", "a  --- c", "a  ---<br>c"),
+        ("a<dt><label><hr></label></dt>c", "a  --- c", "a  ---<br>c"),
+        ("a<dt><sub><hr></sub></dt>c", "a  --- c", "a  ---<br>c"),
+    ]);
+}
+
+/// Tier-2 keeps a space at the start of an inline element's own buffer, even after a space
+/// before the element, so a block after it breaks from that space.
+#[test]
+fn should_keep_the_space_at_the_start_of_sub_or_abbr_before_a_block() {
+    check(&[
+        ("a <sub> <p>b</p></sub>c", "a b c", "a <br>b<br>c"),
+        ("<p>a</p><sub> <ul><li>b</li></ul></sub>c", "a  b c", "a<br> b<br>c"),
+        ("a <abbr> <dt>b</dt></abbr>c", "a  b c", "a  b<br>c"),
+        ("a <abbr> <dd>b</dd></abbr>c", "a  b c", "a  b<br>c"),
+        ("a <sub> <label><p>b</p></label></sub>c", "a  b c", "a  b<br>c"),
+        ("a <sub> <dl><dt>b</dt></dl></sub>c", "a  b c", "a  b<br>c"),
     ]);
 }
 

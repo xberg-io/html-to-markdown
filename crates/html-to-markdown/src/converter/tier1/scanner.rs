@@ -3041,11 +3041,16 @@ fn innermost_own_buffer(state: &Tier1State) -> Option<&OpenTag> {
         .find(|frame| frame.own_buffer)
 }
 
-/// Whether a rule is the first content of a definition term or definition. Tier-2 separates such a
-/// rule from the content before the term, so the rule sees the whole cell.
+/// Whether a rule is the first content of a definition term or definition: the elements between
+/// the term and the rule wrote nothing yet. Tier-2 separates such a rule from the content before
+/// the term, so the rule sees the whole cell.
 fn rule_starts_a_definition(state: &mut Tier1State) -> bool {
-    let Some(start) = innermost_own_buffer(state)
-        .filter(|frame| {
+    let Some(start) = state
+        .stack
+        .iter()
+        .rev()
+        .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
+        .find(|frame| {
             matches!(
                 frame.spec.kind,
                 TagKind::DefinitionTerm | TagKind::DefinitionDescription
@@ -4472,10 +4477,14 @@ fn flush_text(
         }
         // ~keep `after_custom_element_close` overrides the usual "already ends
         // with a space, skip" dedup — see `Tier1State::last_closed_custom_element`.
-        let dest = state.cell_or_output_mut();
-        if !dest.is_empty() && !dest.ends_with('\n') && (after_custom_element_close || !dest.ends_with(' ')) {
-            dest.push(' ');
-        }
+        // ~keep Tier-2 checks the trailing space in an inline element's own buffer, which holds
+        // ~keep no space from before the element; only the start of the cell writes nothing.
+        let cell_is_empty = state.cell_or_output_mut().is_empty();
+        with_cell_scratch(state, |dest| {
+            if !cell_is_empty && !dest.ends_with('\n') && (after_custom_element_close || !dest.ends_with(' ')) {
+                dest.push(' ');
+            }
+        });
         return Ok(());
     }
     // ~keep Whitespace-only text outside any inline element (link / strong / em /
