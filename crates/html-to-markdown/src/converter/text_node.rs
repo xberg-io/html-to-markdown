@@ -541,12 +541,16 @@ fn escape_line_start(buffer: &mut String, from: usize, options: &ConversionOptio
 /// ~keep In Djot `--` and `---` are an en and an em dash wherever they stand, and a line of them
 /// ~keep is a rule; a backtick run opens verbatim text, which without a closing run lasts to the
 /// ~keep end of the paragraph and can take a link's `](u)` with it. The byte before `from` counts
-/// ~keep too, so a run of dashes split over text nodes is escaped as it is written.
+/// ~keep too, so a run of dashes split over text nodes is escaped as it is written. A line of only
+/// ~keep dashes and stars is a rule as well, the stars of strong markup included (`*-*`). Text of
+/// ~keep other characters cannot stand on such a line, so every dash of text of only dashes, stars
+/// ~keep and spaces is escaped, and an escaped dash ends the rule.
 fn escape_djot_text(buffer: &mut String, from: usize) {
     let text = &buffer[from..];
     if !text.contains(['-', '`']) {
         return;
     }
+    let rule_text = text.chars().all(|ch| matches!(ch, '-' | '*') || ch.is_whitespace());
     let before = &buffer[..from];
     let mut previous_dash = before.ends_with('-') && !before.ends_with("\\-");
     let mut after_backslash = false;
@@ -560,7 +564,7 @@ fn escape_djot_text(buffer: &mut String, from: usize) {
             escaped.push(ch);
             continue;
         }
-        if ch == '`' || (dash && (previous_dash || chars.peek() == Some(&'-'))) {
+        if ch == '`' || (dash && (rule_text || previous_dash || chars.peek() == Some(&'-'))) {
             escaped.push('\\');
         }
         after_backslash = ch == '\\';

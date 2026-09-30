@@ -128,6 +128,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dashes wherever they stand, a line of them is a rule, and a backtick run starts verbatim text
   that, without a closing run, swallows the rest of the paragraph and the end of a link. Djot text
   now escapes each backtick and each dash next to another dash: `a \-\-\- b`.
+- **A lone dash in bold made a Djot rule.** A line of only dashes and stars is a rule, the
+  stars of strong markup included, so `<p><b>-</b></p>` gave `*-*`, and
+  `<ul><li><b>-</b></li></ul>` lost its item. Every dash of Djot text of only dashes, stars and
+  spaces is now escaped: `*\-*`.
 - **An inline element after a line break could start a block or leave the list item.** The full
   converter wrote an element's markup, or text it built in a buffer of its own, where the line
   start escape for text after a hard break did not see it: `<p>a<br><abbr>- t</abbr></p>` gave
@@ -139,8 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the break was trimmed, the break's backslash stood right before the closing marker, and the
   bold was lost. The break now goes after the closing marker, in both converters.
 - **A run of line breaks before text took quadratic time.** Each line of the run got its
-  backslash in a separate insert that moved the rest of the output, so 80,000 `<br>` took ten
-  times as long as before. The run is now rewritten in one pass.
+  backslash in a separate insert that moved the rest of the output, so 100,000 `<br>` took
+  eleven times as long as one pass does. The run is now rewritten in one pass.
 - **Text after line breaks at the start of a list item left the item.** `<ol><li><br><br>x</li></ol>`
   gave `1.  \n  \\\n   x`: the break line stood at column 2, left of the item's content, so the
   text left the list. A break line now takes the indent of the text after it. And

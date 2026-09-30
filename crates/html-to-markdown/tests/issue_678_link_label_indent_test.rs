@@ -312,12 +312,18 @@ fn should_escape_djot_dashes_and_backticks_wherever_they_stand() {
         ("<ul><li>---</li></ul>", "- \\-\\-\\-\n"),
         ("<p>a --- b</p>", "a \\-\\-\\- b\n"),
         ("<p>-- a</p>", "\\-\\- a\n"),
-        ("<p>a<br>-<span>--</span></p>", "a\\\n-\\-\\-\n"),
+        ("<p>a<br>-<span>--</span></p>", "a\\\n\\-\\-\\-\n"),
         ("<p>a<br><sub>---</sub></p>", "a\\\n~\\-\\-\\-~\n"),
         ("<p>a<br><b>```</b></p>", "a\\\n*\\`\\`\\`*\n"),
         ("<p>a-b - c</p>", "a-b - c\n"),
         ("<p><code>a--b</code></p>", "`a--b`\n"),
-        ("<p>a<span>-</span>-b</p>", "a-\\-b\n"),
+        ("<p>a<span>-</span>-b</p>", "a\\--b\n"),
+        ("<p><b>-</b></p>", "*\\-*\n"),
+        ("<ul><li><b>-</b></li></ul>", "- *\\-*\n"),
+        ("<p>-<b>-</b>-</p>", "\\-*\\-*\\-\n"),
+        ("<p><em>-</em> <b>- -</b></p>", "_\\-_ *\\- \\-*\n"),
+        ("<p>-*-</p>", "\\-*\\-\n"),
+        ("<p><b>- * -</b></p>", "*\\- * \\-*\n"),
     ];
     for (html, expected) in cases {
         assert_eq!(convert_with(html, djot()), expected, "{html}");
@@ -387,6 +393,18 @@ fn should_write_a_break_at_the_end_of_an_inline_element_outside_its_closing_mark
             },
         );
         assert!(!djot.contains("\\*") && !djot.contains("\\_"), "{html} Djot: {djot:?}");
+    }
+    // ~keep With the default spaces style, a break run before a space at the element's end ends
+    // ~keep its line with a backslash too.
+    for html in ["<p><b>a<br><br> </b>b</p>", "<p><b>a<br> <br> </b>b</p>"] {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(html, options(tier));
+            let rendered = render(&markdown);
+            assert!(
+                rendered.contains("<strong>a</strong>") && !markdown.contains("\\*"),
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
+        }
     }
 }
 

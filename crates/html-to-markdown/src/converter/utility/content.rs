@@ -503,4 +503,37 @@ mod tests {
             assert_eq!(buffer, expected, "{text:?}");
         }
     }
+
+    /// ~keep The fastest of three rewrites of a run of `n` break lines before text. Only the
+    /// ~keep rewrite is timed, so the conversion around it cannot hide its cost.
+    fn rewrite_seconds(n: usize) -> f64 {
+        let text = format!("a  \n{}b", "  \n".repeat(n));
+        (0..3)
+            .map(|_| {
+                let mut buffer = text.clone();
+                let from = buffer.len() - 1;
+                let start = std::time::Instant::now();
+                assert_eq!(end_break_lines_with_a_backslash(&mut buffer, from), n);
+                start.elapsed().as_secs_f64().max(1e-6)
+            })
+            .fold(f64::INFINITY, f64::min)
+    }
+
+    // ~keep Issue #690: the library converts untrusted HTML and nothing bounds a run of `<br>`.
+    // ~keep A backslash inserted per line moved the rest of the buffer each time, so each doubling
+    // ~keep of the run took four times as long; linear code takes twice as long, and 3.0 separates
+    // ~keep the two. A failure must repeat on three attempts to count.
+    #[test]
+    fn end_break_lines_with_a_backslash_is_linear_in_the_run() {
+        let mut failures = Vec::new();
+        for _ in 0..3 {
+            let [small, medium, large] = [20_000, 40_000, 80_000].map(rewrite_seconds);
+            let ratios = (medium / small, large / medium);
+            if ratios.0 < 3.0 && ratios.1 < 3.0 {
+                return;
+            }
+            failures.push(format!("{ratios:.1?} ({small:.4}s, {medium:.4}s, {large:.4}s)"));
+        }
+        panic!("each doubling of the run took over 3x as long: {failures:?}");
+    }
 }
