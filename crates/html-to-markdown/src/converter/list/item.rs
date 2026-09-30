@@ -386,14 +386,12 @@ fn write_li(
         // ~keep cmark-gfm prints a bare `[ ]` line as text. A space written as a character
         // ~keep reference is that content and renders as a space; a trailing space is not
         // ~keep (markdown-it drops the checkbox, cmark-gfm moves a block after a blank line out
-        // ~keep of the item). A table cell and inline mode hold no task item, and code shows the
-        // ~keep reference as written.
+        // ~keep of the item). A table cell and inline mode hold no task item, code would show the
+        // ~keep reference as written, and Djot keeps its own form: an empty item there keeps the
+        // ~keep plain space after the checkbox.
+        const CHECKBOX_CONTENT: &str = " &#32;";
         let item_starts = li_ctx.list_item_open && !ctx.in_table_cell && !ctx.convert_as_inline;
-        let checkbox_content = if options.output_format == OutputFormat::Markdown && !ctx.in_code {
-            " &#32;"
-        } else {
-            ""
-        };
+        let writes_checkbox_content = item_starts && options.output_format == OutputFormat::Markdown && !ctx.in_code;
         match (
             crate::converter::list::utils::continuation_indent_string(li_ctx.list_indent_columns, options),
             first_block,
@@ -402,7 +400,9 @@ fn write_li(
                 // ~keep A line that cannot interrupt the checkbox paragraph needs a blank line
                 // ~keep before it, and a `---` line under it would make it a heading (issue #634).
                 let first_line = block.lines().next().unwrap_or_default();
-                output.push_str(checkbox_content);
+                if writes_checkbox_content {
+                    output.push_str(CHECKBOX_CONTENT);
+                }
                 output.push_str(
                     if crate::converter::utility::escaping::is_heading_underline(first_line)
                         || !crate::converter::utility::escaping::line_opens_block(first_line)
@@ -415,7 +415,7 @@ fn write_li(
                 output.push_str(&indent);
                 output.push_str(block);
             }
-            _ if item_starts && trimmed_task.is_empty() => output.push_str(checkbox_content),
+            _ if writes_checkbox_content && trimmed_task.is_empty() => output.push_str(CHECKBOX_CONTENT),
             _ => {
                 output.push(' ');
                 output.push_str(trimmed_task);

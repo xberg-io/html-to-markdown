@@ -153,25 +153,41 @@ fn should_keep_the_checkbox_of_an_empty_task_item() {
 }
 
 #[test]
-fn should_write_no_reference_where_a_checkbox_is_text() {
-    let options = options_with(TierStrategy::Tier2);
-    let html = r#"<table><tr><td><ul><li><input type="checkbox"></li></ul></td></tr></table>"#;
-    assert!(!convert_with(html, &options).contains("&#32;"));
-    let inline = ConversionOptions {
-        convert_as_inline: true,
-        ..options_with(TierStrategy::Tier2)
-    };
-    for html in [
-        r#"<ul><li><input type="checkbox"></li></ul>"#,
-        r#"<ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul>"#,
-    ] {
-        assert!(!convert_with(html, &inline).contains("&#32;"), "{html}");
-    }
-    for html in [
-        r#"<code><ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul></code>"#,
-        r#"<pre><ul><li><input type="checkbox"></li></ul></pre>"#,
-    ] {
-        assert!(!convert_with(html, &options).contains("&#32;"), "{html}");
+fn should_keep_the_output_where_a_checkbox_is_text() {
+    // Code, a table cell and inline mode write no reference, and an empty item there keeps the
+    // space after its checkbox, in both output formats and both tiers.
+    let empty = r#"<ul><li><input type="checkbox"></li></ul>"#;
+    let quote = r#"<ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul>"#;
+    let cases = [
+        (false, format!("<code>{empty}</code>"), "`- [ ] `\n"),
+        (false, format!("<code><b>{empty}</b></code>"), "`- [ ] `\n"),
+        (false, format!("<code>{quote}</code>"), "`- [ ]`  \n`  > q`\n"),
+        (false, format!("<pre>{empty}</pre>"), "```\n- [ ]\n```\n"),
+        (false, format!("<pre>{quote}</pre>"), "```\n- [ ]\n  > q\n```\n"),
+        (
+            false,
+            format!("<table><tr><td>{quote}</td></tr></table>"),
+            "| - [ ] q |\n| ------- |\n",
+        ),
+        (true, empty.to_string(), "- [ ]\n"),
+        (true, quote.to_string(), "- [ ] q\n"),
+        (true, format!("<code>{empty}</code>"), "`- [ ] `\n"),
+    ];
+    for format in [OutputFormat::Markdown, OutputFormat::Djot] {
+        for strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            for (inline, html, expected) in &cases {
+                let options = ConversionOptions {
+                    output_format: format,
+                    convert_as_inline: *inline,
+                    ..options_with(strategy)
+                };
+                assert_eq!(
+                    convert_with(html, &options),
+                    *expected,
+                    "{html} {format:?} {strategy:?} inline={inline}"
+                );
+            }
+        }
     }
 }
 
