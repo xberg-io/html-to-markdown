@@ -52,6 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Two ordered lists next to each other became one list (#666).**
+  `<ol><li>a</li></ol><ol><li>b</li></ol>` gave `1. a\n\n1. b`, which CommonMark and Djot read
+  as one list, because a blank line does not end a list. An ordered list that follows an ordered
+  list with only blank lines between them now writes the other delimiter, so it gives
+  `1. a\n\n1) b`, also when a section, article, figure or similar element wraps either list. A
+  list written as text, in a heading or between inline markers, keeps `.`.
+- **In Djot output a nested list directly under its item's text was text (#670).**
+  Djot needs a blank line before a list that follows text, so `- a\n  * b` is one paragraph
+  there. A nested list after its item's text now starts after a blank line in Djot output:
+  `- a\n\n  * b`.
 - **A task item in an ordered list lost its number (#659).**
   `<ol><li><input type="checkbox">p</li></ol>` gave `- [ ] p`, a bullet list. A task item now
   writes the marker of its own list, so it gives `1. [ ] p`, and its content column follows the

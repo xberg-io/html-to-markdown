@@ -9,7 +9,7 @@
 use super::utils::{
     DEFAULT_ORDERED_LIST_START, add_list_leading_separator, add_nested_list_trailing_separator,
     calculate_list_nesting_depth, is_loose_list, parse_ordered_list_start, preceding_same_type_list_separator_comment,
-    process_list_children,
+    process_list_children, switched_delimiter,
 };
 use crate::options::ConversionOptions;
 #[cfg(feature = "visitor")]
@@ -35,10 +35,13 @@ pub fn handle_ol(
 ) {
     let separator_comment = preceding_same_type_list_separator_comment(*node_handle, parser, dom_ctx, "ol");
     add_list_leading_separator(output, ctx, options);
-    if let Some(comment) = separator_comment {
+    let delimiter = if let Some(comment) = separator_comment {
         output.push_str(&comment);
         output.push_str("\n\n");
-    }
+        None
+    } else {
+        switched_delimiter(output, ctx)
+    };
 
     let nested_depth = calculate_list_nesting_depth(ctx);
     let is_loose = is_loose_list(*node_handle, parser, dom_ctx);
@@ -126,6 +129,7 @@ pub fn handle_ol(
         is_loose,
         nested_depth,
         start,
+        delimiter,
         dom_ctx,
     );
 
@@ -200,6 +204,8 @@ pub fn handle_ol(
             }
         }
     }
+
+    ctx.last_list.set(output, ctx, delimiter.unwrap_or('.'));
 }
 
 /// Public alias for `handle_ol` to match the expected module interface.

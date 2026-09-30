@@ -586,6 +586,15 @@ pub fn scan(
                     {
                         return Err(BailReason::ListNestedOrdered);
                     }
+                    if let Some(end) = state.last_ordered_list_end.filter(|_| kind == ListKind::Ordered) {
+                        if state
+                            .cell_or_output_mut()
+                            .get(end..)
+                            .is_some_and(|rest| rest.trim().is_empty())
+                        {
+                            return Err(BailReason::OrderedListAfterOrderedList);
+                        }
+                    }
                 }
 
                 // ~keep See `BailReason::ListItemUnsupportedBlockChild`'s doc comment for the
@@ -3522,6 +3531,10 @@ fn close_list(state: &mut Tier1State, kind: ListKind) {
     let dest = state.cell_or_output_mut();
     if !dest.ends_with('\n') {
         dest.push('\n');
+    }
+    if kind == ListKind::Ordered {
+        let end = dest.trim_end().len();
+        state.last_ordered_list_end = Some(end);
     }
 }
 
