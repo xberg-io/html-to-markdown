@@ -326,11 +326,7 @@ pub fn handle_label(
 
         let trimmed = content.trim();
         if !trimmed.is_empty() {
-            let text_start = output.len();
             output.push_str(trimmed);
-            if !ctx.in_code {
-                crate::converter::text_node::escape_line_start(output, text_start, options);
-            }
             if !ctx.convert_as_inline {
                 output.push_str("\n\n");
             }

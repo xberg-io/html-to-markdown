@@ -149,7 +149,6 @@ pub fn handle_subscript(
         return;
     }
 
-    let text_start = output.len();
     emit_wrapped_inline(
         output,
         &content,
@@ -166,7 +165,6 @@ pub fn handle_subscript(
             ctx,
         },
     );
-    crate::converter::text_node::escape_line_start(output, text_start, options);
 }
 
 /// Handle superscript element (sup tag).
@@ -260,7 +258,6 @@ pub fn handle_superscript(
         return;
     }
 
-    let text_start = output.len();
     emit_wrapped_inline(
         output,
         &content,
@@ -277,7 +274,6 @@ pub fn handle_superscript(
             ctx,
         },
     );
-    crate::converter::text_node::escape_line_start(output, text_start, options);
 }
 
 /// Handle variable element (var tag).
@@ -459,12 +455,8 @@ pub fn handle_abbreviation(
         return;
     }
 
-    let text_start = output.len();
     output.push_str(prefix);
     output.push_str(trimmed);
-    if !ctx.in_code {
-        crate::converter::text_node::escape_line_start(output, text_start, options);
-    }
 
     if let Some(title) = crate::converter::utility::attributes::decoded_attribute(tag, "title") {
         let trimmed_title = title.trim();

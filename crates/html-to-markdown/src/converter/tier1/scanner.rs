@@ -2047,6 +2047,7 @@ fn emit_void(
 
             let keep_as_markdown = should_keep_image_as_markdown(html, &state.stack, options);
 
+            let image_start = state.cell_or_output_mut().len();
             let dest = state.cell_or_output_mut();
             if keep_as_markdown {
                 // ~keep Security fix mirror (`handlers/image.rs::format_image_markdown`,
@@ -2094,6 +2095,7 @@ fn emit_void(
                 // is in a heading whose tag is not in `keep_inline_images_in`.
                 dest.push_str(alt);
             }
+            escape_inline_line_start(state, image_start);
             // ~keep Set regardless of `keep_as_markdown` — Tier-2's `is_empty_inline_element`
             // (paragraph.rs) checks the DOM tag name only, not how it renders.
             state.last_emitted_was_img = true;
@@ -2348,10 +2350,45 @@ fn emit_close(
         TagKind::LineBreak | TagKind::Image => {}
         TagKind::RawText(_) | TagKind::Ignored => {}
     }
+    if !spec.is_block {
+        escape_inline_line_start(state, frame.content_start);
+    }
     // ~keep An inline element whose last content is a block ends in that block too (issue #585).
     state.last_closed_block = is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
 
     Ok(())
+}
+
+/// Escape the start of the line after a hard break that an inline element's output starts, as
+/// Tier-2's `finish_inline_element` does: a line of only spaces above it, and a block opener.
+///
+/// ~keep The element's markup comes before its text on the line (`<ins>=</ins>` writes `=====`),
+/// ~keep so the escape in `flush_text` never sees the line start. Headings and table cells fold
+/// ~keep their lines, and code keeps its bytes, as in `flush_text`.
+fn escape_inline_line_start(state: &mut Tier1State, content_start: usize) {
+    if state.escape_ctx.contains(EscapeCtx::CODE)
+        || state.escape_ctx.contains(EscapeCtx::PRE)
+        || state.in_table_cell()
+        || state
+            .stack
+            .iter()
+            .any(|open| matches!(open.spec.kind, TagKind::Heading(_)))
+    {
+        return;
+    }
+    let in_link = state.stack.iter().any(|open| matches!(open.spec.kind, TagKind::Link));
+    let dest = state.cell_or_output_mut();
+    let content_start = clamp_to_char_boundary(dest, content_start);
+    if content_start == dest.len() {
+        return;
+    }
+    // ~keep Only the element's own opening markers and the indent may stand between the line
+    // ~keep start and its content; the scan back stops at the first other byte, so it stays linear.
+    let text_start = dest[..content_start].trim_end_matches(['*', '_', '~', '=', '[']).len();
+    if !crate::converter::utility::content::follows_a_hard_break(dest, text_start) {
+        return;
+    }
+    crate::converter::utility::content::escape_text_line_start(dest, text_start, in_link);
 }
 
 /// Append a paragraph-break separator after a generic block container close
@@ -4659,6 +4696,7 @@ fn flush_text(
             .stack
             .iter()
             .any(|frame| matches!(frame.spec.kind, TagKind::Heading(_)));
+    let in_link = state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
 
     indent_fresh_list_item_text_line(state);
 
@@ -4682,7 +4720,7 @@ fn flush_text(
         let emitted_from = dest.len();
         decode_and_collapse_into_inline(dest, &staged, false, base_offset)?;
         if !folds_lines {
-            crate::converter::utility::escaping::escape_continuation_line_start(dest, emitted_from);
+            crate::converter::utility::content::escape_text_line_start(dest, emitted_from, in_link);
         }
         return Ok(());
     }
@@ -4711,7 +4749,7 @@ fn flush_text(
 
     escape_backslash_run(dest, emitted_from, in_cell);
     if !folds_lines {
-        crate::converter::utility::escaping::escape_continuation_line_start(dest, emitted_from);
+        crate::converter::utility::content::escape_text_line_start(dest, emitted_from, in_link);
     }
     Ok(())
 }

@@ -345,9 +345,8 @@ pub fn escape_continuation_line_start(buffer: &mut String, from: usize) {
     }
 }
 
-/// The first line of `buffer[from..]` when that text starts a line that continues the paragraph
-/// above it: only indent before it on its line, and text on the line above.
-pub fn continuation_line(buffer: &str, from: usize) -> Option<&str> {
+/// The first line of `buffer[from..]` when it continues the paragraph on the line above it.
+fn continuation_line(buffer: &str, from: usize) -> Option<&str> {
     let line_end = buffer[..from].trim_end_matches([' ', '\t']).strip_suffix('\n')?;
     let line_above = &line_end[line_end.rfind('\n').map_or(0, |pos| pos + 1)..];
     let text = &buffer[from..];
@@ -658,10 +657,7 @@ mod tests {
         assert_eq!(escape_link_label("[outer [inner]]"), "[outer [inner]]");
     }
 
-    // ~keep Regression for Cluster B (image alt text losing its nested destination):
-    // ~keep `<img alt="[foo](uri2)">` must not let the alt text's own `[foo](uri2)` be
-    // ~keep reparsed as a real nested link, or `uri2` is silently dropped on a second
-    // ~keep conversion pass (CommonMark parses an image's alt as full inline content).
+    // ~keep Two breaks in a row in a label: the second break's line is not blank (issue #690).
     #[test]
     fn escape_link_label_makes_a_break_on_a_line_of_its_own_a_backslash_break() {
         assert_eq!(escape_link_label("a  \n  \n  b"), "a  \n  \\\n  b");
@@ -669,6 +665,10 @@ mod tests {
         assert_eq!(escape_link_label("a  \n \nb"), "a  \n \nb");
     }
 
+    // ~keep Regression for Cluster B (image alt text losing its nested destination):
+    // ~keep `<img alt="[foo](uri2)">` must not let the alt text's own `[foo](uri2)` be
+    // ~keep reparsed as a real nested link, or `uri2` is silently dropped on a second
+    // ~keep conversion pass (CommonMark parses an image's alt as full inline content).
     #[test]
     fn escape_link_label_escapes_a_link_shaped_bracket_pair() {
         assert_eq!(escape_link_label("[foo](uri2)"), "\\[foo\\](uri2)");

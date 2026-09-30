@@ -448,19 +448,8 @@ pub fn process_text_node(
     // ~keep scratch buffer rather than the real document (`in_table_cell`, `convert_as_inline`),
     // ~keep where `output` is not the list item's own accumulating text and indenting it would
     // ~keep corrupt literal content instead.
-    if ctx.in_list_item
-        && !ctx.in_code
-        && !ctx.in_ruby
-        && !ctx.in_table_cell
-        && !ctx.convert_as_inline
-        && output.ends_with('\n')
-        && !output.ends_with("\n\n")
-    {
-        if let Some(indent) =
-            crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
-        {
-            output.push_str(&indent);
-        }
+    if let Some(indent) = list_item_line_indent(output, options, ctx) {
+        output.push_str(&indent);
     }
 
     let text_start = output.len();
@@ -481,44 +470,116 @@ pub fn process_text_node(
 
     // ~keep Code keeps its bytes.
     if !ctx.in_code {
-        escape_line_start(output, text_start, options);
-    }
-}
-
-/// Escape what would turn `buffer[from..]`, text just written, into markup when that text starts
-/// a continuation line of a paragraph. Also called by the wrappers that write their text into a
-/// buffer of their own, where the text node cannot see the line it starts.
-///
-/// ~keep A Djot paragraph ends only at a blank line, so a Djot line needs only its dashes and
-/// ~keep backticks escaped.
-pub fn escape_line_start(buffer: &mut String, from: usize, options: &ConversionOptions) {
-    match options.output_format {
-        crate::options::OutputFormat::Markdown => {
-            crate::converter::utility::escaping::escape_continuation_line_start(buffer, from);
+        if options.output_format == crate::options::OutputFormat::Djot {
+            escape_djot_text(output, text_start);
         }
-        crate::options::OutputFormat::Djot => escape_djot_continuation_line_start(buffer, from),
-        crate::options::OutputFormat::Plain => {}
+        escape_line_start(output, text_start, options, ctx);
     }
 }
 
-/// Escape each character of the run of dashes or backticks that starts `buffer[from..]`, text
-/// just written, when that text starts a continuation line of a paragraph.
+/// The list item's continuation indent when `output` ends on a fresh, still-unindented line
+/// inside a list item, in a context that writes into the item's own text.
+fn list_item_line_indent(output: &str, options: &ConversionOptions, ctx: &Context) -> Option<String> {
+    if ctx.in_list_item
+        && !ctx.in_code
+        && !ctx.in_ruby
+        && !ctx.in_table_cell
+        && !ctx.convert_as_inline
+        && output.ends_with('\n')
+        && !output.ends_with("\n\n")
+    {
+        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
+    } else {
+        None
+    }
+}
+
+/// Finish the output of an inline element, `buffer[from..]`, when it starts a line: give a Djot
+/// line the list item's indent, and escape a line start after a hard break that would open a
+/// block.
 ///
-/// ~keep In Djot `--` and `---` are dashes and a backtick run opens verbatim text, which can run
-/// ~keep past a link's `](u)` and take the link with it. djot.js keeps the characters only when
-/// ~keep each one is escaped: `\---` still renders an en dash.
-fn escape_djot_continuation_line_start(buffer: &mut String, from: usize) {
-    let Some(line) = crate::converter::utility::escaping::continuation_line(buffer, from) else {
+/// ~keep An element writes its own markup, or text it built in a buffer of its own, before or
+/// ~keep instead of a text node on that line (`<abbr>- t</abbr>`, `<mark>=</mark>` as `=====`),
+/// ~keep so the text node's indent and escape never see the line. Checking every inline
+/// ~keep element's output covers each of them without a list of tags. The escape waits for a
+/// ~keep break, and skips an element that holds a block: a line that a block inside the element
+/// ~keep wrote (`<b><hr></b>`, `<q><blockquote>`) is that block.
+pub fn finish_inline_element(
+    buffer: &mut String,
+    from: usize,
+    options: &ConversionOptions,
+    ctx: &Context,
+    holds_a_block: impl FnOnce() -> bool,
+) {
+    // ~keep An element may trim the buffer below where it started before it writes.
+    let Some(written) = buffer.get(from..) else {
         return;
     };
-    let run = match line.as_bytes().first() {
-        Some(&byte @ (b'-' | b'`')) => line.bytes().take_while(|next| *next == byte).count(),
-        _ => 0,
-    };
-    if run > 1 || line.starts_with('`') {
-        let escaped: String = line[..run].chars().flat_map(|mark| ['\\', mark]).collect();
-        buffer.replace_range(from..from + run, &escaped);
+    if written.is_empty() || ctx.in_code {
+        return;
     }
+    // ~keep A flush-left Markdown line continues the item's paragraph lazily, as Tier-1 writes it
+    // ~keep after markup; a Djot line that starts a block (`- t`, `*---*`) leaves the item.
+    let djot_line =
+        options.output_format == crate::options::OutputFormat::Djot && !written.starts_with([' ', '\t', '\n']);
+    let indent = if djot_line {
+        list_item_line_indent(&buffer[..from], options, ctx)
+    } else {
+        None
+    };
+    if let Some(indent) = indent {
+        buffer.insert_str(from, &indent);
+    }
+    let text_start = buffer.len() - buffer[from..].trim_start_matches([' ', '\t']).len();
+    if crate::converter::utility::content::follows_a_hard_break(buffer, text_start) && !holds_a_block() {
+        escape_line_start(buffer, text_start, options, ctx);
+    }
+}
+
+/// Escape what would end the paragraph above `buffer[from..]`, just written, or turn it into a
+/// block when it starts a continuation line of that paragraph.
+///
+/// ~keep A Djot paragraph ends only at a blank line, and Djot writes no line of only spaces, so
+/// ~keep no Djot line needs it.
+fn escape_line_start(buffer: &mut String, from: usize, options: &ConversionOptions, ctx: &Context) {
+    if options.output_format == crate::options::OutputFormat::Markdown {
+        crate::converter::utility::content::escape_text_line_start(buffer, from, ctx.in_link);
+    }
+}
+
+/// Escape each backtick, and each dash next to another dash, in `buffer[from..]`, text just
+/// written as Djot.
+///
+/// ~keep In Djot `--` and `---` are an en and an em dash wherever they stand, and a line of them
+/// ~keep is a rule; a backtick run opens verbatim text, which without a closing run lasts to the
+/// ~keep end of the paragraph and can take a link's `](u)` with it. The byte before `from` counts
+/// ~keep too, so a run of dashes split over text nodes is escaped as it is written.
+fn escape_djot_text(buffer: &mut String, from: usize) {
+    let text = &buffer[from..];
+    if !text.contains(['-', '`']) {
+        return;
+    }
+    let before = &buffer[..from];
+    let mut previous_dash = before.ends_with('-') && !before.ends_with("\\-");
+    let mut after_backslash = false;
+    let mut escaped = String::with_capacity(text.len() + 8);
+    let mut chars = text.chars().peekable();
+    while let Some(ch) = chars.next() {
+        let dash = ch == '-';
+        if after_backslash {
+            after_backslash = false;
+            previous_dash = false;
+            escaped.push(ch);
+            continue;
+        }
+        if ch == '`' || (dash && (previous_dash || chars.peek() == Some(&'-'))) {
+            escaped.push('\\');
+        }
+        after_backslash = ch == '\\';
+        previous_dash = dash;
+        escaped.push(ch);
+    }
+    buffer.replace_range(from.., &escaped);
 }
 
 /// Whether a whitespace-only newline text node with no in-parent next sibling

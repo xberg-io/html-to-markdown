@@ -72,24 +72,22 @@ fn should_drop_a_trailing_br_run_entirely() {
 // ~keep ── Equivalent cases, two-space style ───────────────────────────────────────────
 
 #[test]
-fn a_two_br_run_collapses_under_the_two_space_style_because_a_blank_line_cannot_carry_a_marker() {
-    // ~keep NOT the same expectation as the backslash case above, and deliberately so. The
-    // ~keep second break's marker would have to live on an otherwise-empty line, and this
-    // ~keep crate strips trailing whitespace from blank lines by design -- see the locked
-    // ~keep `whitespace_only_output_test.rs::should_keep_hard_break_after_content_but_not_on_a_blank_line`.
-    // ~keep So the two-space style CANNOT express consecutive hard breaks; that limitation is
-    // ~keep exactly why the backslash style exists and why issue #464 was reported against it.
-    // ~keep Pinned here so a future change to the blank-line rule shows up as this test failing.
-    assert_eq!(convert("<p>A<br/><br/>B</p>", spaces_options_on_tier2()), "A  \n\nB\n");
+fn should_end_the_blank_line_of_a_two_br_run_with_a_backslash_under_the_two_space_style() {
+    // ~keep NOT the same output as the backslash case above. The second break's two spaces sit
+    // ~keep on a line of their own, and a line of only spaces is blank, which ends the paragraph
+    // ~keep (issue #690). A backslash after them makes the line a hard break, as it already does
+    // ~keep in a link label, so the paragraph stays whole.
+    assert_eq!(
+        convert("<p>A<br/><br/>B</p>", spaces_options_on_tier2()),
+        "A  \n  \\\nB\n"
+    );
 }
 
 #[test]
-fn a_three_br_run_collapses_the_same_way_under_the_two_space_style() {
-    // ~keep Byte-identical to the two-<br> case: every marker after the first would need a
-    // ~keep blank line to sit on. See the two-<br> test above for why that is by design.
+fn should_end_every_blank_line_of_a_three_br_run_with_a_backslash_under_the_two_space_style() {
     assert_eq!(
         convert("<p>A<br/><br/><br/>B</p>", spaces_options_on_tier2()),
-        "A  \n\nB\n"
+        "A  \n  \\\n  \\\nB\n"
     );
 }
 

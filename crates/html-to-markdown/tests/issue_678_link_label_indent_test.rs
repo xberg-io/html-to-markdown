@@ -215,17 +215,144 @@ fn should_keep_a_link_whole_across_two_hard_breaks() {
 }
 
 #[test]
-fn should_escape_a_line_start_that_a_wrapper_writes_after_a_hard_break() {
-    for tag in ["abbr", "sub", "sup", "label"] {
+fn should_escape_a_line_start_that_an_inline_element_writes_after_a_hard_break() {
+    let tags = [
+        "abbr", "sub", "sup", "label", "span", "small", "cite", "u", "bdi", "time", "x-tag",
+    ];
+    for tag in tags {
         let html = format!("<p>a<br><{tag}>- t</{tag}></p>");
         for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
             let markdown = convert_with(&html, options(tier));
             assert!(markdown.starts_with("a  \n\\- t"), "{html} {tier:?}: {markdown:?}");
         }
     }
-    for tag in ["abbr", "label"] {
-        let html = format!("<p>a<br><{tag}>---</{tag}></p>");
-        let markdown = convert_with(&html, djot());
-        assert!(markdown.starts_with("a\\\n\\-\\-\\-"), "{html}: {markdown:?}");
+    let blocks = [
+        "<p>a<br><ruby>- t<rt>r</rt></ruby></p>",
+        "<p>a<br><mark>=</mark></p>",
+        "<p>a<br><ins>=</ins></p>",
+        "<p>a<br><kbd>```</kbd></p>",
+        "<ul><li>a<br><kbd>```</kbd></li></ul>",
+    ];
+    for html in blocks {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(html, options(tier));
+            let rendered = render(&markdown);
+            for tag in ["h1", "h2", "pre", "hr"] {
+                assert_eq!(count(&rendered, tag), 0, "{html} {tier:?}: {markdown:?} {rendered}");
+            }
+            let items = count(&rendered, "li");
+            assert_eq!(items, count(html, "li"), "{html} {tier:?}: {markdown:?} {rendered}");
+        }
+    }
+}
+
+#[test]
+fn should_indent_an_inline_element_line_after_a_hard_break_in_a_djot_list_item() {
+    let cases = [
+        ("<ul><li>a<br><abbr>- t</abbr></li></ul>", "- a\\\n  - t\n"),
+        ("<ul><li>a<br><label># t</label></li></ul>", "- a\\\n  # t\n"),
+        ("<ul><li>a<br><b>---</b></li></ul>", "- a\\\n  *\\-\\-\\-*\n"),
+    ];
+    for (html, expected) in cases {
+        assert_eq!(convert_with(html, djot()), expected, "{html}");
+    }
+}
+
+#[test]
+fn should_keep_a_paragraph_whole_across_two_hard_breaks() {
+    let cases = [
+        ("<p><b>a<br><br>b</b></p>", "**a  \n  \\\nb**\n"),
+        ("<p>a<br><br><br>b</p>", "a  \n  \\\n  \\\nb\n"),
+        ("<ul><li><em>a<br><br>b</em></li></ul>", "- *a  \n  \\\n  b*\n"),
+        ("<p>a<br><br><i>b</i></p>", "a  \n  \\\n*b*\n"),
+        ("<p>a<br><br><a href=\"u\">b</a></p>", "a  \n  \\\n[b](u)\n"),
+        ("<p>a<br><br><img src=\"u\" alt=\"i\"></p>", "a  \n  \\\n![i](u)\n"),
+    ];
+    for (html, expected) in cases {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(html, options(tier));
+            assert_eq!(markdown, expected, "{html} {tier:?}");
+            let rendered = render(&markdown);
+            assert_eq!(count(&rendered, "p"), count(html, "p"), "{html} {tier:?}: {rendered}");
+            assert!(!rendered.contains('\\'), "{html} {tier:?}: {rendered}");
+        }
+    }
+    let trailing_runs = [
+        "<p>a<br><br></p><p>b</p>",
+        "<p>a<br><br><b></b></p><p>b</p>",
+        "<p>a<br><br><span></span></p><p>b</p>",
+    ];
+    for html in trailing_runs {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let rendered = render(&convert_with(html, options(tier)));
+            assert_eq!(count(&rendered, "p"), 2, "{html} {tier:?}: {rendered}");
+            assert!(!rendered.contains('\\'), "{html} {tier:?}: {rendered}");
+        }
+    }
+    let quote = "<blockquote><b>a<br><br>b</b></blockquote>";
+    let tier1 = convert_with(quote, options(TierStrategy::Tier1));
+    assert_eq!(tier1, convert_with(quote, options(TierStrategy::Tier2)));
+    assert_eq!(count(&render(&tier1), "p"), 1, "{tier1:?}");
+    assert_eq!(count(&render(&tier1), "br"), 2, "{tier1:?}");
+}
+
+#[test]
+fn should_keep_the_text_and_the_link_of_a_backtick_pair_after_a_djot_break() {
+    assert_eq!(
+        convert_with(r#"<p><a href="u">a<br>`x`</a></p>"#, djot()),
+        "[a\\\n\\`x\\`](u)\n"
+    );
+    assert_eq!(convert_with("<p>a<br>`x`</p>", djot()), "a\\\n\\`x\\`\n");
+}
+
+#[test]
+fn should_escape_djot_dashes_and_backticks_wherever_they_stand() {
+    let cases = [
+        ("<p>---</p>", "\\-\\-\\-\n"),
+        ("<ul><li>---</li></ul>", "- \\-\\-\\-\n"),
+        ("<p>a --- b</p>", "a \\-\\-\\- b\n"),
+        ("<p>-- a</p>", "\\-\\- a\n"),
+        ("<p>a<br>-<span>--</span></p>", "a\\\n-\\-\\-\n"),
+        ("<p>a<br><sub>---</sub></p>", "a\\\n~\\-\\-\\-~\n"),
+        ("<p>a<br><b>```</b></p>", "a\\\n*\\`\\`\\`*\n"),
+        ("<p>a-b - c</p>", "a-b - c\n"),
+        ("<p><code>a--b</code></p>", "`a--b`\n"),
+        ("<p>a<span>-</span>-b</p>", "a-\\-b\n"),
+    ];
+    for (html, expected) in cases {
+        assert_eq!(convert_with(html, djot()), expected, "{html}");
+    }
+    let escape_misc = ConversionOptions {
+        escape_misc: true,
+        ..djot()
+    };
+    assert_eq!(convert_with("<p>a--b `x`</p>", escape_misc), "a\\-\\-b \\`x\\`\n");
+}
+
+#[test]
+fn should_convert_an_inline_element_that_merges_into_the_one_before_it() {
+    let markdown = convert_with("<p><em>a</em><em>é</em></p>", options(TierStrategy::Tier2));
+    assert_eq!(markdown, "*aé*\n");
+}
+
+#[test]
+fn should_leave_a_block_inside_an_inline_element_that_no_break_precedes_as_a_block() {
+    let cases = [
+        r#"<ol start="2"><blockquote><br></blockquote><b><hr></b></ol>"#,
+        r#"<ol start="2"><blockquote><span></span><br></blockquote><b><hr></b><pre>x</pre></ol>"#,
+        r#"<ul><li><input type="checkbox"><b></b><li></li></li><ol start="2"><blockquote><span></span><br></blockquote><b><hr></b></ol></ul>"#,
+        r#"<i>x<hr><br>x<ol start="2"><li><b><p></p><ul><ul>t</ul><b><hr><hr></b>1. y</ul>t</b></li></ol></i>"#,
+        "<blockquote><p><li><br> <br></li>t</p></blockquote>",
+        r#"<ol start="3"><li><br><q><blockquote>2. z</blockquote></q></li></ol>"#,
+        r#"<ol start="3"><li>a<br><i><blockquote>b</blockquote></i></li></ol>"#,
+        "<p>a<br><i><h2>t</h2></i></p>",
+        "<ul><li>a<br><b><pre>x</pre></b></li></ul>",
+        "<p>a<br><span><ul><li>b</li></ul></span></p>",
+    ];
+    for html in cases {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(html, options(tier));
+            assert!(!markdown.contains('\\'), "{html} {tier:?}: {markdown:?}");
+        }
     }
 }

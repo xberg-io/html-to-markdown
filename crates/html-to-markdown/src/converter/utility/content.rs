@@ -245,6 +245,62 @@ fn label_segment(text: &str) -> String {
     segment
 }
 
+/// Escape what would end the paragraph or start a block at `buffer[from..]`, text that starts a
+/// line: a line of only spaces above it, then a block opener. In a link label only the block
+/// opener, since the label escape (`escape_link_label`) ends a line of only spaces itself.
+pub fn escape_text_line_start(buffer: &mut String, from: usize, in_link: bool) {
+    let from = if in_link {
+        from
+    } else {
+        from + end_break_lines_with_a_backslash(buffer, from)
+    };
+    crate::converter::utility::escaping::escape_continuation_line_start(buffer, from);
+}
+
+/// Whether `buffer[from..]` starts the line after a hard break: only indent before it on its
+/// line, and a break marker at the end of the line above.
+pub fn follows_a_hard_break(buffer: &str, from: usize) -> bool {
+    let before = buffer[..from].trim_end_matches([' ', '\t']);
+    before
+        .strip_suffix('\n')
+        .is_some_and(|above| above.ends_with("  ") || above.ends_with('\\'))
+}
+
+/// End each line that holds only a spaces break, right above `buffer[from..]`, text that starts a
+/// line, with a backslash when the line above that run ends with a hard break. Returns the bytes
+/// inserted.
+///
+/// ~keep Two `<br>` in a row write a spaces break, `  `, on a line of its own, and a line of only
+/// ~keep spaces is blank, which ends the paragraph (issue #690). Once text follows, a backslash
+/// ~keep after the spaces makes the line a break, as in a link label. A run with nothing after it
+/// ~keep stays trailing whitespace, which the block end trims. A container that indents the line
+/// ~keep has ended the paragraph there, so only a bare `  ` counts. Only the run is read.
+fn end_break_lines_with_a_backslash(buffer: &mut String, from: usize) -> usize {
+    let before = buffer[..from].trim_end_matches([' ', '\t']);
+    let Some(mut line_end) = before.strip_suffix('\n').map(str::len) else {
+        return 0;
+    };
+    let mut run = Vec::new();
+    loop {
+        let line_start = buffer[..line_end].rfind('\n').map_or(0, |pos| pos + 1);
+        let line = &buffer[line_start..line_end];
+        if line != "  " {
+            if line.trim().is_empty() || !(line.ends_with("  ") || line.ends_with('\\')) {
+                return 0;
+            }
+            for end in &run {
+                buffer.insert(*end, '\\');
+            }
+            return run.len();
+        }
+        run.push(line_end);
+        let Some(above) = line_start.checked_sub(1) else {
+            return 0;
+        };
+        line_end = above;
+    }
+}
+
 /// Re-join a label's whitespace-collapsed segments and the hard-break markers between them,
 /// trimming the label's own outer whitespace without eating a break that sits at either end.
 ///
@@ -361,7 +417,7 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::normalize_link_label;
+    use super::{end_break_lines_with_a_backslash, normalize_link_label};
 
     // ~keep Issue #678: the spaces or tabs after a break are the list item's indent.
     #[test]
@@ -370,5 +426,28 @@ mod tests {
         assert_eq!(normalize_link_label("a\\\n\t2. t"), "a\\\n\t2. t");
         assert_eq!(normalize_link_label("  \n  2. t"), "  \n  2. t");
         assert_eq!(normalize_link_label("  a  \n  "), "a  \n");
+    }
+
+    // ~keep Issue #690: a line of only spaces between a hard break and text gets a backslash.
+    #[test]
+    fn end_break_lines_with_a_backslash_ends_only_a_run_after_a_hard_break() {
+        let cases = [
+            ("a  \n  \nb", "a  \n  \\\nb", 1),
+            ("a  \n  \n  \n  b", "a  \n  \\\n  \\\n  b", 2),
+            ("a\\\n  \nb", "a\\\n  \\\nb", 1),
+            ("a\n  \nb", "a\n  \nb", 0),
+            ("a  \n\nb", "a  \n\nb", 0),
+            ("a  \n \nb", "a  \n \nb", 0),
+            ("a  \n   \nb", "a  \n   \nb", 0),
+            ("  \nb", "  \nb", 0),
+            ("a  \nb", "a  \nb", 0),
+        ];
+        for (text, expected, inserted) in cases {
+            let mut buffer = text.to_string();
+            let from = buffer.len() - 1;
+            let count = end_break_lines_with_a_backslash(&mut buffer, from);
+            assert_eq!(count, inserted, "{text:?}");
+            assert_eq!(buffer, expected, "{text:?}");
+        }
     }
 }

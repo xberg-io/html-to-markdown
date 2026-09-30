@@ -586,6 +586,20 @@ pub fn walk_node(
     ctx.last_list.leave(output);
 }
 
+/// Whether a block element sits anywhere inside `tag`.
+fn holds_a_block(tag: &tl::HTMLTag<'_>, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let mut pending: Vec<tl::NodeHandle> = tag.children().top().iter().copied().collect();
+    while let Some(handle) = pending.pop() {
+        if crate::converter::utility::content::node_is_block_level(&handle, parser, dom_ctx) {
+            return true;
+        }
+        if let Some(tl::Node::Tag(child)) = handle.get(parser) {
+            pending.extend(child.children().top().iter().copied());
+        }
+    }
+    false
+}
+
 /// Convert one DOM node and its children to Markdown.
 #[allow(clippy::only_used_in_recursion)]
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -708,7 +722,6 @@ fn convert_node(
                 }
             }
 
-            #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
             let element_output_start = output.len();
 
             // ~keep A hard line break has no effect at the end of a block (CommonMark
@@ -1022,6 +1035,12 @@ fn convert_node(
                         depth,
                     },
                 );
+            }
+
+            if tag_name != "br" && !is_block_level_element(tag_name.as_ref()) {
+                crate::converter::text_node::finish_inline_element(output, element_output_start, options, ctx, || {
+                    holds_a_block(tag, parser, dom_ctx)
+                });
             }
         }
 
