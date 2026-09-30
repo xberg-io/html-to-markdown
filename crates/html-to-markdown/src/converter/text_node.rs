@@ -386,6 +386,11 @@ pub fn process_text_node(
                     final_text.push('\n');
                 } else if let Some(next_tag) = get_next_sibling_tag(node_handle, parser, dom_ctx) {
                     if matches!(next_tag, "span") {
+                    } else if next_tag == "br" {
+                        // ~keep The <br> that follows is this line's ending: its hard-break
+                        // ~keep marker must attach to this text. A '\n' pushed here would
+                        // ~keep strand the marker on a line of its own, which cleanup then
+                        // ~keep turns into a paragraph break (issue #683).
                     } else if ctx.inline_depth > 0 || ctx.convert_as_inline || ctx.in_paragraph {
                         final_text.push(' ');
                     } else {
