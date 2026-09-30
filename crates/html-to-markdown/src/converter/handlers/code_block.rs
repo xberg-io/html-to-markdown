@@ -466,7 +466,14 @@ fn format_code_block(
         if !content.is_empty() && !ctx.convert_as_inline && !ctx.in_code {
             crate::converter::main_helpers::separate_block_in_cell(output, options.br_in_tables);
         }
-        output.push_str(crate::text::fold_cell_line_breaks_verbatim_cow(content).as_ref());
+        let folded = crate::text::fold_cell_line_breaks_verbatim_cow(content);
+        // ~keep The block's text is verbatim, so it becomes a code span: as plain text its
+        // ~keep `*` and `\` would read as Markdown. Blank content stays plain, as the cell trims it.
+        if ctx.in_code || folded.trim().is_empty() {
+            output.push_str(folded.as_ref());
+        } else {
+            format_inline_code(folded.as_ref(), output);
+        }
         return;
     }
 

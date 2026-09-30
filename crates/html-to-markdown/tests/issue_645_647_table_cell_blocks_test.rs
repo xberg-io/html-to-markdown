@@ -90,7 +90,7 @@ fn should_separate_text_after_a_paragraph_or_heading_in_a_cell() {
         ("<h2>a</h2><h2>b</h2>", "a b", "a<br>b"),
         ("<div>a</div>b", "a b", "a<br>b"),
         ("<ul><li>a</li></ul>b", "a b", "a<br>b"),
-        ("<pre>a</pre>b", "a b", "a<br>b"),
+        ("<pre>a</pre>b", "`a` b", "`a`<br>b"),
     ]);
 }
 
@@ -106,8 +106,8 @@ fn should_render_the_words_after_a_paragraph_in_a_cell_apart() {
 fn should_separate_text_before_a_heading_or_code_block_in_a_cell() {
     check(&[
         ("a<h2>b</h2>c", "a b c", "a<br>b<br>c"),
-        ("a<pre>b</pre>c", "a b c", "a<br>b<br>c"),
-        ("a<pre> b</pre>", "a b", "a<br>b"),
+        ("a<pre>b</pre>c", "a `b` c", "a<br>`b`<br>c"),
+        ("a<pre> b</pre>", "a `b`", "a<br>`b`"),
     ]);
 }
 
@@ -146,8 +146,8 @@ fn should_keep_the_cell_break_whole_before_a_quote_in_a_cell() {
         ("<div><hr><blockquote><pre><li></pre></blockquote></div>", "---", "---"),
         ("a <blockquote><br>b</blockquote>", "a b", "a<br><br>b"),
         ("a <blockquote><hr></blockquote>", "a ---", "a<br>---"),
-        ("x <pre><p>b</p></pre>", "x b", "x<br>b"),
-        ("x<pre><li>b</li></pre>", "x b", "x<br>b"),
+        ("x <pre><p>b</p></pre>", "x `b`", "x<br>`b`"),
+        ("x<pre><li>b</li></pre>", "x `b`", "x<br>`b`"),
         (
             "a <blockquote><details><summary>s<p>x</p></summary></details></blockquote>",
             "a **s x**",
@@ -185,8 +185,8 @@ fn should_write_the_same_cell_in_a_table_inside_a_quote_in_both_tiers() {
 #[test]
 fn should_write_no_cell_break_after_a_line_end_in_a_code_block() {
     check(&[
-        ("<pre>a<br><p>b</p></pre>", "a b", "a b"),
-        ("<pre>a<br><div>b</div></pre>", "a b", "a b"),
+        ("<pre>a<br><p>b</p></pre>", "`a b`", "`a b`"),
+        ("<pre>a<br><div>b</div></pre>", "`a b`", "`a b`"),
     ]);
 }
 
@@ -230,7 +230,7 @@ fn should_write_the_same_paragraph_break_in_a_cell_in_both_tiers() {
 /// code before it.
 #[test]
 fn should_break_before_a_block_in_bold_inside_a_code_block_in_a_cell() {
-    check(&[("<pre>a<b><p>y</p></b>q</pre>", "a yq", "a<br>yq")]);
+    check(&[("<pre>a<b><p>y</p></b>q</pre>", "`a yq`", "`a<br>yq`")]);
 }
 
 /// Tier-2 still sees a navigation block that preprocessing drops, so the text after it breaks.
@@ -287,7 +287,7 @@ fn should_leave_a_block_in_inline_markup_or_a_label_in_a_cell_to_tier2() {
     check_tier2(&[
         ("<b><h2>a</h2>b</b>", "**a b**", "**a<br>b**"),
         ("a<b><h2>b</h2></b>", "a**b**", "a**b**"),
-        ("a<sub><pre>b</pre></sub>c", "ab c", "ab<br>c"),
+        ("a<sub><pre>b</pre></sub>c", "a`b` c", "a`b`<br>c"),
         ("a<sup><p>b</p></sup>c", "ab c", "ab<br>c"),
         ("a<abbr><p>b</p></abbr>c", "ab c", "ab<br>c"),
         ("a<kbd><p>b</p></kbd>c", "a`b` c", "a`b`<br>c"),

@@ -9,7 +9,7 @@
 
 use html_to_markdown_rs::prescan;
 use html_to_markdown_rs::tier1;
-use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert};
+use html_to_markdown_rs::{ConversionOptions, OutputFormat, TierStrategy, convert};
 
 const TEXT: &str = "sample_value and 2*3 [x] a~b";
 
@@ -284,4 +284,71 @@ fn issue_638_pipe_from_any_handler_keeps_the_row_whole() {
             }
         }
     }
+}
+
+fn djot(html: &str) -> String {
+    let options = ConversionOptions {
+        output_format: OutputFormat::Djot,
+        ..options(Flags(0))
+    };
+    auto(html, &options)
+}
+
+#[test]
+fn issue_638_djot_cell_keeps_a_code_span_pipe_bare() {
+    // ~keep Djot does not split a row inside a verbatim span, and a backslash there is literal.
+    let out = djot("<table><tr><td><code>a|b</code></td><td>z</td></tr></table>");
+    assert!(first_cell_row(&out).contains("| `a|b` | z |"), "{out:?}");
+}
+
+#[test]
+fn issue_638_djot_cell_escapes_a_link_pipe() {
+    let out = djot("<table><tr><td><a href=\"http://e.x/a|b\" title=\"c|d\">t</a></td><td>z</td></tr></table>");
+    assert!(
+        first_cell_row(&out).contains(r#"| [t](http://e.x/a\|b "c\|d") | z |"#),
+        "{out:?}"
+    );
+}
+
+#[test]
+fn issue_638_pre_in_cell_is_a_code_span_in_both_converters() {
+    for (html, expected) in [
+        (
+            r"<table><tr><td><pre>*x* a\*b</pre></td><td>z</td></tr></table>",
+            r"| `*x* a\*b` | z |",
+        ),
+        (
+            "<table><tr><td>t<pre>a\n`b`</pre></td><td>z</td></tr></table>",
+            "| t `` a `b` `` | z |",
+        ),
+    ] {
+        let opts = options(Flags(0));
+        let full = tier2(html, &opts);
+        assert!(first_cell_row(&full).contains(expected), "{html}: {full:?}");
+        assert!(render(&full).contains("<code>"), "{html}: {full:?}");
+        match tier1_run(html, &opts) {
+            Ok(fast) => assert_eq!(fast, full, "fast and full converters differ: {html}"),
+            Err(reason) => panic!("fast converter bailed ({reason:?}): {html}"),
+        }
+    }
+    // ~keep Blank or space-padded content: both converters write the same cell.
+    for html in [
+        "<table><tr><td>x<pre> </pre>y</td><td>z</td></tr></table>",
+        "<table><tr><td>x<pre> b </pre></td><td>z</td></tr></table>",
+    ] {
+        let opts = options(Flags(0));
+        let full = tier2(html, &opts);
+        match tier1_run(html, &opts) {
+            Ok(fast) => assert_eq!(fast, full, "fast and full converters differ: {html}"),
+            Err(reason) => panic!("fast converter bailed ({reason:?}): {html}"),
+        }
+    }
+}
+
+fn first_cell_row(markdown: &str) -> String {
+    markdown
+        .lines()
+        .find(|line| line.trim_start().starts_with('|'))
+        .unwrap_or_default()
+        .to_string()
 }

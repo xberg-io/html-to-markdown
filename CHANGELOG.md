@@ -63,8 +63,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<table><tr><td><code>a|b</code></td></tr></table>` gave ``| `a|b` |``. GFM splits a row on
   a pipe in a code span too, so the row no longer matched the delimiter row and the whole table
   became a paragraph. A pipe in a link destination or title, an image description, preformatted
-  text or a code span in a nested table did the same. Every pipe in a cell is now escaped as
-  `\|`, which GFM reads as `|` in a code span too.
+  text or a code span in a nested table did the same. In Markdown output every pipe in a cell is
+  now escaped as `\|`, which GFM reads as `|` in a code span too. In Djot output a pipe in a
+  link or an image in a cell is now escaped as `\|`, and a pipe in a verbatim span stays bare,
+  because Djot does not split a row there.
+- **Preformatted text in a table cell was written as plain text.** `<td><pre>*x*</pre></td>`
+  gave `| *x* |`, which renders as emphasis. A `<pre>` in a cell is now a code span, `` | `*x*` | ``,
+  in both converters.
 - **Text next to a paragraph, heading or other block in a table cell joined it (#645).**
   `<table><tr><td><p>a</p>b</td></tr></table>` gave `| ab |`, and so did a heading, a `<div>`,
   a list or a code block before the text. Text before a heading or a code block joined it too.

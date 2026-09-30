@@ -252,9 +252,19 @@ pub fn render_cell_text(
         text = text.replace('\n', " ");
     }
     // ~keep A `|` a handler wrote into the cell (a code span, a link destination or title, an
-    // ~keep image description, a nested table) splits the GFM row like one in plain text does.
-    if options.output_format == crate::options::OutputFormat::Markdown && text.contains('|') {
-        text = crate::converter::utility::escaping::escape_cell_pipes(&text).into_owned();
+    // ~keep image description, a nested table) splits the row like one in plain text does.
+    // ~keep GFM splits on a pipe in a code span too and reads `\|` there as `|`; Djot does not
+    // ~keep split inside a verbatim span, and a backslash there stays literal.
+    if text.contains('|') {
+        match options.output_format {
+            crate::options::OutputFormat::Markdown => {
+                text = crate::converter::utility::escaping::escape_cell_pipes(&text).into_owned();
+            }
+            crate::options::OutputFormat::Djot => {
+                text = crate::converter::utility::escaping::escape_bare_pipes_outside_code_spans(&text);
+            }
+            crate::options::OutputFormat::Plain => {}
+        }
     }
     text
 }

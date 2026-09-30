@@ -23,7 +23,7 @@ fn cell_options(br_in_tables: bool) -> ConversionOptions {
 fn should_drop_code_fence_when_pre_is_inside_table_cell_and_br_in_tables_is_true() {
     let html = "<table><tr><td><pre>a\nb</pre></td></tr></table>";
     let result = convert(html, Some(cell_options(true))).unwrap();
-    assert_eq!(result, "| a b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b` |\n| --- |\n", "actual: {result:?}");
     assert!(
         !result.contains("```"),
         "no code fence may appear in a cell: {result:?}"
@@ -42,7 +42,7 @@ fn should_drop_code_fence_when_pre_is_inside_table_cell_and_br_in_tables_is_true
 fn should_drop_code_fence_when_pre_is_inside_table_cell_and_br_in_tables_is_false() {
     let html = "<table><tr><td><pre>a\nb</pre></td></tr></table>";
     let result = convert(html, Some(cell_options(false))).unwrap();
-    assert_eq!(result, "| a b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b` |\n| --- |\n", "actual: {result:?}");
     assert!(
         !result.contains("```"),
         "no code fence may appear in a cell: {result:?}"
@@ -55,7 +55,7 @@ fn should_drop_code_fence_when_pre_is_inside_table_cell_and_br_in_tables_is_fals
 fn should_drop_code_fence_when_pre_wraps_a_code_element_inside_table_cell() {
     let html = "<table><tr><td><pre><code>a\nb</code></pre></td></tr></table>";
     let result = convert(html, Some(cell_options(true))).unwrap();
-    assert_eq!(result, "| a b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b` |\n| --- |\n", "actual: {result:?}");
 }
 
 /// The `Indented` code-block style corrupts the row too — it has no fence, but it brackets the
@@ -71,7 +71,7 @@ fn should_drop_indented_code_block_when_pre_is_inside_table_cell() {
         ..Default::default()
     };
     let result = convert(html, Some(options)).unwrap();
-    assert_eq!(result, "| a b<br>tail |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b`<br>tail |\n| --- |\n", "actual: {result:?}");
     assert_eq!(
         result.lines().count(),
         2,
@@ -89,7 +89,7 @@ fn should_drop_tilde_fence_when_pre_is_inside_table_cell() {
         ..Default::default()
     };
     let result = convert(html, Some(options)).unwrap();
-    assert_eq!(result, "| a b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b` |\n| --- |\n", "actual: {result:?}");
     assert!(
         !result.contains("~~~"),
         "no tilde fence may appear in a cell: {result:?}"
@@ -102,20 +102,20 @@ fn should_drop_tilde_fence_when_pre_is_inside_table_cell() {
 fn should_not_emit_language_info_string_when_pre_is_inside_table_cell() {
     let html = "<table><tr><td><pre class=\"language-rust\">a\nb</pre></td></tr></table>";
     let result = convert(html, Some(cell_options(true))).unwrap();
-    assert_eq!(result, "| a b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b` |\n| --- |\n", "actual: {result:?}");
     assert!(
         !result.contains("rust"),
         "language must not leak into the cell: {result:?}"
     );
 }
 
-/// Backticks inside the content are no longer fence-relevant once the fence is gone, so they
-/// pass through as ordinary cell text rather than driving fence widening.
+/// The content becomes a code span in the cell, so a backtick in it widens the span's
+/// delimiters, as for inline code.
 #[test]
-fn should_pass_through_backticks_in_pre_content_inside_table_cell() {
+fn should_widen_the_code_span_for_backticks_in_pre_content_inside_table_cell() {
     let html = "<table><tr><td><pre>a`b</pre></td></tr></table>";
     let result = convert(html, Some(cell_options(true))).unwrap();
-    assert_eq!(result, "| a`b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| ``a`b`` |\n| --- |\n", "actual: {result:?}");
 }
 
 /// The fold must hold under `Strict` too: `whitespace_mode` does not make a raw newline legal
@@ -130,7 +130,7 @@ fn should_drop_code_fence_when_pre_is_inside_table_cell_under_strict_whitespace_
     };
     let html = "<table><tr><td><pre>a\nb</pre></td></tr></table>";
     let result = convert(html, Some(options)).unwrap();
-    assert_eq!(result, "| a b |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| `a b` |\n| --- |\n", "actual: {result:?}");
     assert_eq!(
         result.lines().count(),
         2,
