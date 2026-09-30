@@ -27,6 +27,13 @@ fn render(markdown: &str) -> String {
     comrak::markdown_to_html(markdown, &comrak::Options::default())
 }
 
+/// Render `markdown` with GFM task list items, which shows whether a checkbox survives.
+fn render_tasklist(markdown: &str) -> String {
+    let mut options = comrak::Options::default();
+    options.extension.tasklist = true;
+    comrak::markdown_to_html(markdown, &options)
+}
+
 /// Convert `html` with `options`, assert the exact markdown, and assert that its rendering holds
 /// every one of `rendered`.
 fn assert_converts(html: &str, options: &ConversionOptions, expected: &str, rendered: &[&str]) {
@@ -218,7 +225,12 @@ fn should_start_the_first_block_of_a_task_item_that_cannot_interrupt_the_checkbo
         r#"<ul><li><input type="checkbox"><div><ol start="3"><li>x</li></ol></div></li></ul>"#,
         r#"<ul><li><input type="checkbox"><ol start="3"><li>x</li></ol></li></ul>"#,
     ] {
-        assert_converts(html, &options, "- [ ]\n\n  3. x\n", &["<ol start=\"3\">\n<li>x</li>"]);
+        assert_converts(
+            html,
+            &options,
+            "- [ ] &#32;\n\n  3. x\n",
+            &["<ol start=\"3\">\n<li>x</li>"],
+        );
     }
     let indented = ConversionOptions {
         code_block_style: CodeBlockStyle::Indented,
@@ -228,27 +240,35 @@ fn should_start_the_first_block_of_a_task_item_that_cannot_interrupt_the_checkbo
         r#"<ul><li><input type="checkbox"><div><pre>c</pre></div></li></ul>"#,
         r#"<ul><li><input type="checkbox"><pre>c</pre></li></ul>"#,
     ] {
-        assert_converts(html, &indented, "- [ ]\n\n      c\n", &["<pre><code>c\n</code></pre>"]);
+        assert_converts(
+            html,
+            &indented,
+            "- [ ] &#32;\n\n      c\n",
+            &["<pre><code>c\n</code></pre>"],
+        );
     }
     assert_converts(
         r#"<ul><li><input type="checkbox"><pre>c&#10;d</pre>t</li></ul>"#,
         &indented,
-        "- [ ]\n\n      c\n      d\n\n  t\n",
+        "- [ ] &#32;\n\n      c\n      d\n\n  t\n",
         &["<pre><code>c\nd\n</code></pre>", "<p>t</p>"],
     );
     for (html, expected) in [
         (
             r#"<ul><li><input type="checkbox"><pre>c</pre></li></ul>"#,
-            "- [ ]\n  ```\n  c\n  ```\n",
+            "- [ ] &#32;\n  ```\n  c\n  ```\n",
         ),
         (
             r#"<ul><li><input type="checkbox"><ol><li>x</li></ol></li></ul>"#,
-            "- [ ]\n  1. x\n",
+            "- [ ] &#32;\n  1. x\n",
         ),
-        (r#"<ul><li><input type="checkbox"><hr></li></ul>"#, "- [ ]\n\n  ---\n"),
+        (
+            r#"<ul><li><input type="checkbox"><hr></li></ul>"#,
+            "- [ ] &#32;\n\n  ---\n",
+        ),
         (
             r#"<ul><li><input type="checkbox"><blockquote></blockquote></li></ul>"#,
-            "- [ ]\n",
+            "- [ ] &#32;\n",
         ),
         (r#"<ul><li><input type="checkbox"><ul></ul>t</li></ul>"#, "- [ ] t\n"),
         (r#"<ul><li><input type="checkbox"><h2></h2>t</li></ul>"#, "- [ ] t\n"),
@@ -271,7 +291,7 @@ fn should_keep_task_text_after_a_code_block_of_only_whitespace_out_of_the_code_b
         r#"<ul><li><input type="checkbox"><div><pre> </pre>t</div></li></ul>"#,
     ] {
         let markdown = convert_with(html, &options);
-        assert!(markdown.starts_with("- [ ]\n  ```\n"), "{html}: {markdown:?}");
+        assert!(markdown.starts_with("- [ ] &#32;\n  ```\n"), "{html}: {markdown:?}");
         let rendered = render(&markdown);
         assert!(rendered.contains("<p>t</p>"), "{html}: {rendered:?}");
         assert!(!rendered.contains("t\n</code>"), "{html}: {rendered:?}");
@@ -324,7 +344,7 @@ fn should_start_a_task_item_quote_after_an_element_that_writes_nothing_on_the_ne
             assert_converts(
                 &html,
                 &options,
-                "- [ ]\n  > q\n",
+                "- [ ] &#32;\n  > q\n",
                 &["<blockquote>\n<p>q</p>\n</blockquote>"],
             );
         }
@@ -336,7 +356,7 @@ fn should_start_a_task_item_quote_after_an_element_that_writes_nothing_on_the_ne
     assert_converts(
         r#"<ul><li><input type="checkbox"><br><blockquote>q</blockquote></li></ul>"#,
         &backslash,
-        "- [ ]\n  > q\n",
+        "- [ ] &#32;\n  > q\n",
         &["<blockquote>\n<p>q</p>\n</blockquote>"],
     );
     assert_converts(
@@ -379,7 +399,7 @@ fn should_start_a_task_item_quote_after_an_element_that_writes_nothing_in_a_cont
             assert_converts(
                 &html,
                 options,
-                "- [ ]\n  > q\n",
+                "- [ ] &#32;\n  > q\n",
                 &["<blockquote>\n<p>q</p>\n</blockquote>"],
             );
         }
@@ -402,11 +422,15 @@ fn should_start_a_preserved_block_element_of_a_task_item_on_the_next_line() {
         r#"<ul><li><input type="checkbox"><div><blockquote>q</blockquote></div></li></ul>"#,
         r#"<ul><li><input type="checkbox"><section><div><blockquote>q</blockquote></div></section></li></ul>"#,
     ] {
-        assert_converts(
-            html,
-            &options,
-            "- [ ]\n  <div><blockquote>q</blockquote></div>\n",
-            &["<li>[ ]\n<!-- raw HTML omitted -->\n</li>"],
+        let markdown = convert_with(html, &options);
+        assert_eq!(
+            markdown, "- [ ] &#32;\n  <div><blockquote>q</blockquote></div>\n",
+            "{html}"
+        );
+        let rendered = render_tasklist(&markdown);
+        assert!(
+            rendered.contains("<li><input type=\"checkbox\" disabled=\"\" />  \n<!-- raw HTML omitted -->\n</li>"),
+            "{html}: {rendered:?}"
         );
     }
 }
@@ -421,7 +445,13 @@ fn should_start_an_underlined_heading_that_starts_a_task_item_after_a_blank_line
         r#"<ul><li><input type="checkbox"><h2>q</h2></li></ul>"#,
         r#"<ul><li><input type="checkbox"><div><h2>q</h2></div></li></ul>"#,
     ] {
-        assert_converts(html, &options, "- [ ]\n\n  q\n  --\n", &["<p>[ ]</p>\n<h2>q</h2>"]);
+        let markdown = convert_with(html, &options);
+        assert_eq!(markdown, "- [ ] &#32;\n\n  q\n  --\n", "{html}");
+        let rendered = render_tasklist(&markdown);
+        assert!(
+            rendered.contains("<input type=\"checkbox\" disabled=\"\" /> \n<p> </p>\n<h2>q</h2>"),
+            "{html}: {rendered:?}"
+        );
     }
 }
 
@@ -454,7 +484,7 @@ fn should_start_a_task_item_quote_after_an_element_a_visitor_skips_on_the_next_l
         assert_converts(
             html,
             &options,
-            "- [ ]\n  > q\n",
+            "- [ ] &#32;\n  > q\n",
             &["<blockquote>\n<p>q</p>\n</blockquote>"],
         );
     }
@@ -465,7 +495,10 @@ fn should_start_a_table_whose_cell_holds_a_quote_after_a_blank_line() {
     let html =
         r#"<ul><li><input type="checkbox"><table><tr><td><blockquote>q</blockquote></td></tr></table></li></ul>"#;
     let markdown = convert_with(html, &tier2_options());
-    assert!(markdown.starts_with("- [ ]\n\n  | > q |\n"), "{html}: {markdown:?}");
+    assert!(
+        markdown.starts_with("- [ ] &#32;\n\n  | > q |\n"),
+        "{html}: {markdown:?}"
+    );
 }
 
 #[test]
@@ -483,7 +516,7 @@ fn should_start_a_task_item_quote_after_an_empty_inline_element_on_the_next_line
         assert_converts(
             &format!(r#"<ul><li><input type="checkbox">{wrapper}<blockquote>q</blockquote></li></ul>"#),
             &options,
-            "- [ ]\n  > q\n",
+            "- [ ] &#32;\n  > q\n",
             &["<blockquote>\n<p>q</p>\n</blockquote>"],
         );
     }
@@ -514,12 +547,12 @@ fn should_write_an_underlined_heading_in_a_list_item_at_the_content_column() {
     for (html, expected, heading) in [
         (
             r#"<ul><li><input type="checkbox"><h2>q</h2></li></ul>"#,
-            "- [ ]\n\n  q\n  --\n",
+            "- [ ] &#32;\n\n  q\n  --\n",
             "<h2>q</h2>",
         ),
         (
             r#"<ul><li><input type="checkbox"><h1>q</h1></li></ul>"#,
-            "- [ ]\n\n  q\n  =\n",
+            "- [ ] &#32;\n\n  q\n  =\n",
             "<h1>q</h1>",
         ),
         ("<ul><li><h2>q</h2></li></ul>", "- q\n  --\n", "<h2>q</h2>"),
@@ -602,7 +635,7 @@ fn should_write_an_underlined_heading_in_a_list_in_a_quote_at_the_content_column
         ),
         (
             r#"<blockquote><ul><li><input type="checkbox"><h2>q</h2></li></ul></blockquote>"#,
-            "> - [ ]\n>\n>   q\n>   --\n",
+            "> - [ ] &#32;\n>\n>   q\n>   --\n",
         ),
         (
             "<ul><li><blockquote><ul><li><h2>q</h2></li></ul></blockquote></li></ul>",
@@ -638,7 +671,7 @@ fn should_start_a_block_after_an_underlined_heading_of_one_letter_in_its_own_par
         ("<ul><li><h2>q</h2><p>t</p></li></ul>", "- q\n  --\n\n  t\n"),
         (
             r#"<ul><li><input type="checkbox"><h2>q</h2><p>t</p></li></ul>"#,
-            "- [ ]\n\n  q\n  --\n\n  t\n",
+            "- [ ] &#32;\n\n  q\n  --\n\n  t\n",
         ),
         ("<ol><li><h2>q</h2><p>t</p></li></ol>", "1. q\n   --\n\n   t\n"),
         (

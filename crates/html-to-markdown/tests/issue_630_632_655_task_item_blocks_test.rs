@@ -26,6 +26,7 @@ fn convert_with(html: &str, options: &ConversionOptions) -> String {
 fn render(markdown: &str) -> String {
     let mut options = comrak::Options::default();
     options.extension.table = true;
+    options.extension.tasklist = true;
     comrak::markdown_to_html(markdown, &options)
 }
 
@@ -52,21 +53,24 @@ fn should_start_a_table_that_starts_a_task_item_after_a_blank_line() {
         assert_converts(
             html,
             &options,
-            "- [ ]\n\n  | c |\n    | --- |\n",
-            &["<p>[ ]</p>\n<table>", "<th>c</th>"],
+            "- [ ] &#32;\n\n  | c |\n    | --- |\n",
+            &[
+                "<input type=\"checkbox\" disabled=\"\" /> \n<p> </p>\n<table>",
+                "<th>c</th>",
+            ],
         );
     }
     assert_converts(
         r#"<ul><li><input type="checkbox" checked><table><tr><td><blockquote>q</blockquote></td></tr></table>t</li></ul>"#,
         &options,
-        "- [x]\n\n  | > q |\n    | --- |\n\n  t\n",
+        "- [x] &#32;\n\n  | > q |\n    | --- |\n\n  t\n",
         &["<th>&gt; q</th>", "<p>t</p>\n</li>"],
     );
     assert_converts(
         r#"<ol><li>a<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul></li></ol>"#,
         &options,
-        "1. a\n   - [ ]\n\n     | c |\n     | --- |\n",
-        &["<p>[ ]</p>\n<table>"],
+        "1. a\n   - [ ] &#32;\n\n     | c |\n     | --- |\n",
+        &["<input type=\"checkbox\" disabled=\"\" /> \n<p> </p>\n<table>"],
     );
     let tabs = ConversionOptions {
         list_indent_type: ListIndentType::Tabs,
@@ -75,8 +79,8 @@ fn should_start_a_table_that_starts_a_task_item_after_a_blank_line() {
     assert_converts(
         r#"<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>"#,
         &tabs,
-        "- [ ]\n\n\t| c |\n\t| --- |\n",
-        &["<p>[ ]</p>\n<table>"],
+        "- [ ] &#32;\n\n\t| c |\n\t| --- |\n",
+        &["<input type=\"checkbox\" disabled=\"\" /> \n<p> </p>\n<table>"],
     );
 }
 
@@ -87,13 +91,18 @@ fn should_start_a_block_in_an_element_that_writes_nothing_before_it_on_the_next_
         r#"<ul><li><input type="checkbox"><span><h2>h</h2></span>t</li></ul>"#,
         r#"<ul><li><input type="checkbox"><font><h2>h</h2></font>t</li></ul>"#,
     ] {
-        assert_converts(html, &options, "- [ ]\n  ## h\n  t\n", &["<li>[ ]\n<h2>h</h2>\nt</li>"]);
+        assert_converts(
+            html,
+            &options,
+            "- [ ] &#32;\n  ## h\n  t\n",
+            &["<li><input type=\"checkbox\" disabled=\"\" />  \n<h2>h</h2>\nt</li>"],
+        );
     }
     assert_converts(
         r#"<ul><li><input type="checkbox"><hgroup><h2>h</h2></hgroup></li></ul>"#,
         &options,
-        "- [ ]\n  ## h\n",
-        &["<li>[ ]\n<h2>h</h2>\n</li>"],
+        "- [ ] &#32;\n  ## h\n",
+        &["<li><input type=\"checkbox\" disabled=\"\" />  \n<h2>h</h2>\n</li>"],
     );
     let underlined = ConversionOptions {
         heading_style: HeadingStyle::Underlined,
@@ -102,7 +111,7 @@ fn should_start_a_block_in_an_element_that_writes_nothing_before_it_on_the_next_
     assert_converts(
         r#"<ul><li><input type="checkbox"><hgroup><h2>h</h2></hgroup></li></ul>"#,
         &underlined,
-        "- [ ]\n\n  h\n  --\n",
+        "- [ ] &#32;\n\n  h\n  --\n",
         &["<h2>h</h2>"],
     );
 }
@@ -189,20 +198,20 @@ fn should_leave_a_blank_line_after_a_preserved_html_block_in_a_task_item() {
         assert_converts(
             &format!(r#"<ul><li><input type="checkbox">{element}<h2>h</h2>t</li></ul>"#),
             &options,
-            &format!("- [ ]\n  {element}\n\n  ## h\n  t\n"),
+            &format!("- [ ] &#32;\n  {element}\n\n  ## h\n  t\n"),
             &["<h2>h</h2>\n<p>t</p>\n</li>"],
         );
     }
     assert_converts(
         r#"<ul><li><input type="checkbox"><div></div><ul><li>x</li></ul>t</li></ul>"#,
         &options,
-        "- [ ]\n  <div></div>\n\n  * x\n\n  t\n",
+        "- [ ] &#32;\n  <div></div>\n\n  * x\n\n  t\n",
         &["<li>x</li>", "<p>t</p>"],
     );
     assert_converts(
         r#"<ul><li><input type="checkbox"><div></div>t <em>e</em></li></ul>"#,
         &options,
-        "- [ ]\n  <div></div>\n\n  t *e*\n",
+        "- [ ] &#32;\n  <div></div>\n\n  t *e*\n",
         &["<p>t <em>e</em></p>"],
     );
 }
