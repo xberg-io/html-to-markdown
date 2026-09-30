@@ -2846,6 +2846,11 @@ fn close_heading(state: &mut Tier1State, frame: &OpenTag, n: u8, is_implicit: bo
         buf.replace_range(content_start..content_start + leading_ws_len, "");
     }
 
+    // ~keep Mirror Tier-2 (heading.rs, issue #661): a `#` run the line would close on stays text.
+    if let Some(at) = crate::converter::utility::escaping::atx_closing_sequence_offset(&buf[content_start..]) {
+        buf.insert(content_start + at, '\\');
+    }
+
     let prefix = heading_prefix(n);
     buf.insert_str(content_start, prefix);
     // ~keep Tier-2 leaves a blank line ("\n\n") after a heading. A
