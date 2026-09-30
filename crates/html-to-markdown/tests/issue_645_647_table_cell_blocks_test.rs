@@ -61,6 +61,27 @@ fn check(cases: &[(&str, &str, &str)]) {
     assert!(failures.is_empty(), "cell differs:\n{}", failures.join("\n"));
 }
 
+/// The cell Tier-2 writes, as `(cell html, br_in_tables off, br_in_tables on)`, for a cell the
+/// fast converter leaves to Tier-2.
+fn check_tier2(cases: &[(&str, &str, &str)]) {
+    let mut failures = Vec::new();
+    for (cell, off, on) in cases {
+        let html = table(cell);
+        for (br_in_tables, expected) in [(false, off), (true, on)] {
+            let tier2_out = tier2(&html, br_in_tables);
+            let tier1_out = tier1_run(&html, br_in_tables);
+            if tier2_out.lines().next() != Some(format!("| {expected} |").as_str())
+                || !matches!(tier1_out, Err(tier1::BailReason::TableBlockChildInCell))
+            {
+                failures.push(format!(
+                    "{cell:?} br_in_tables={br_in_tables}: tier2 {tier2_out:?} tier1 {tier1_out:?}, want | {expected} |"
+                ));
+            }
+        }
+    }
+    assert!(failures.is_empty(), "cell differs:\n{}", failures.join("\n"));
+}
+
 #[test]
 fn should_separate_text_after_a_paragraph_or_heading_in_a_cell() {
     check(&[
@@ -71,7 +92,6 @@ fn should_separate_text_after_a_paragraph_or_heading_in_a_cell() {
         ("<ul><li>a</li></ul>b", "a b", "a<br>b"),
         ("<pre>a</pre>b", "a b", "a<br>b"),
         ("<p>a</p><b>b</b>", "a **b**", "a<br>**b**"),
-        ("<b><h2>a</h2>b</b>", "**a b**", "**a<br>b**"),
     ]);
 }
 
@@ -111,19 +131,7 @@ fn should_write_no_break_after_a_break_or_around_an_empty_block() {
 /// buffer of its own, so a block at the start of one has no content to break from.
 #[test]
 fn should_write_no_break_before_a_block_at_the_start_of_inline_markup() {
-    check(&[
-        ("a<b><h2>b</h2></b>", "a**b**", "a**b**"),
-        ("a<sub><pre>b</pre></sub>c", "ab c", "ab<br>c"),
-        ("a<sup><p>b</p></sup>c", "ab c", "ab<br>c"),
-        ("a<abbr><p>b</p></abbr>c", "ab c", "ab<br>c"),
-        ("a<kbd><p>b</p></kbd>c", "a`b` c", "a`b`<br>c"),
-        ("a<em><p>b</p></em>c", "a*b* c", "a*b*<br>c"),
-        ("<em><p>a</p>b</em>", "*a b*", "*a<br>b*"),
-        ("x<h2><div>b</div></h2>", "x b", "x<br>b"),
-        ("a<b><div>b</div></b>", "a**b**", "a**b**"),
-        ("a<b><ul><li>x</li></ul></b>", "a**x**", "a**x**"),
-        ("a<b><li>x</li></b>", "a**x**", "a**x**"),
-    ]);
+    check(&[("x<h2><div>b</div></h2>", "x b", "x<br>b")]);
 }
 
 /// A cell break never trims the space before a quote: the quote's content starts after it.
@@ -141,8 +149,6 @@ fn should_keep_the_cell_break_whole_before_a_quote_in_a_cell() {
         ("a <blockquote><hr></blockquote>", "a ---", "a<br>---"),
         ("x <pre><p>b</p></pre>", "x b", "x<br>b"),
         ("x<pre><li>b</li></pre>", "x b", "x<br>b"),
-        ("a <sub><hr></sub>", "a ---", "a ---"),
-        ("<li>a</li><li><code><br></code></li>b", "a ` ` b", "a<br>` `<br>b"),
         (
             "a <blockquote><details><summary>s<p>x</p></summary></details></blockquote>",
             "a **s x**",
@@ -161,10 +167,6 @@ fn should_write_the_same_cell_in_a_table_inside_a_quote_in_both_tiers() {
         ),
         (
             "<table><tr><td>a <blockquote><table><tr><td>x</td></tr></table></blockquote></td><td>z</td></tr></table>",
-            r"| a \| x \| \| --- \| | z |",
-        ),
-        (
-            "<table><tr><td>a<sub><table><tr><td>x</td></tr></table></sub></td><td>z</td></tr></table>",
             r"| a \| x \| \| --- \| | z |",
         ),
     ] {
@@ -192,11 +194,8 @@ fn should_write_no_cell_break_after_a_line_end_in_a_code_block() {
 #[test]
 fn should_write_no_break_for_a_block_inside_code_or_a_heading() {
     check(&[
-        ("<code>a<h2>b</h2></code>", "`ab`", "`ab`"),
-        ("<code>a<pre>b</pre></code>", "`ab`", "`ab`"),
         ("<h2>a<blockquote>b</blockquote></h2>", "ab", "ab"),
         ("<code>b c<code><br></code></code>", "`b c `", "`b c `"),
-        ("<code>a<blockquote> </blockquote></code>", "`a`", "`a`"),
     ]);
 }
 
@@ -208,12 +207,6 @@ fn should_write_a_quote_in_a_cell_without_its_marker_in_both_tiers() {
         ("a<blockquote>b</blockquote>c", "a b c", "a<br>b<br>c"),
         ("<blockquote><p>a</p><p>b</p></blockquote>", "a b", "a<br>b"),
         ("<blockquote><blockquote>a</blockquote>b</blockquote>", "a b", "a<br>b"),
-        ("<code><blockquote>a</blockquote>b</code>", "`a`   `b`", "`a`   `b`"),
-        (
-            "x<code>a<blockquote>q</blockquote>b</code>",
-            "x`a`   `q`   `b`",
-            "x`a`   `q`   `b`",
-        ),
     ]);
 }
 
@@ -234,19 +227,11 @@ fn should_write_the_same_paragraph_break_in_a_cell_in_both_tiers() {
     ]);
 }
 
-#[test]
-fn should_keep_the_code_span_after_an_empty_heading_in_a_cell() {
-    check(&[("<hr><code><h2></h2>b c</code>", "--- `b c`", "---<br>`b c`")]);
-}
-
 /// Inside code Tier-2 writes bold into the code span, so a block in the bold breaks from the
 /// code before it.
 #[test]
 fn should_break_before_a_block_in_bold_inside_code_in_a_cell() {
-    check(&[
-        ("<code>a<b><p>y</p></b>q</code>", "`a yq`", "`a<br>yq`"),
-        ("<pre>a<b><p>y</p></b>q</pre>", "a yq", "a<br>yq"),
-    ]);
+    check(&[("<pre>a<b><p>y</p></b>q</pre>", "a yq", "a<br>yq")]);
 }
 
 /// Tier-2 writes a definition term, a definition and a label into a buffer of their own, so a
@@ -261,11 +246,6 @@ fn should_write_no_break_before_a_block_at_the_start_of_a_definition() {
     check(&[("a <dd><p>b</p></dd>c", "a b c", "a b<br>c")]);
 }
 
-#[test]
-fn should_write_no_break_before_a_block_at_the_start_of_a_label() {
-    check(&[("a <label><p>b</p></label>c", "a b c", "a b<br>c")]);
-}
-
 /// Tier-2 separates a rule that starts a definition term or definition from the cell content
 /// before the term with a blank line, which the cell folds into two spaces.
 #[test]
@@ -273,33 +253,7 @@ fn should_separate_a_rule_that_starts_a_definition_in_a_cell() {
     check(&[
         ("a<dt><hr></dt>c", "a  --- c", "a  ---<br>c"),
         ("a<dd> <hr></dd>c", "a  --- c", "a  ---<br>c"),
-        ("a<dt><label><hr></label></dt>c", "a  --- c", "a  ---<br>c"),
-        ("a<dt><sub><hr></sub></dt>c", "a  --- c", "a  ---<br>c"),
-    ]);
-}
-
-/// Tier-2 keeps a space at the start of an inline element's own buffer, even after a space
-/// before the element, so a block after it breaks from that space.
-#[test]
-fn should_keep_the_space_at_the_start_of_sub_or_abbr_before_a_block() {
-    check(&[
-        ("a <sub> <p>b</p></sub>c", "a b c", "a <br>b<br>c"),
-        ("<p>a</p><sub> <ul><li>b</li></ul></sub>c", "a  b c", "a<br> b<br>c"),
-        ("a <abbr> <dt>b</dt></abbr>c", "a  b c", "a  b<br>c"),
-        ("a <abbr> <dd>b</dd></abbr>c", "a  b c", "a  b<br>c"),
-        ("a <sub> <label><p>b</p></label></sub>c", "a  b c", "a  b<br>c"),
-        ("a <sub> <dl><dt>b</dt></dl></sub>c", "a  b c", "a  b<br>c"),
-    ]);
-}
-
-/// Tier-2 trims the buffer of a definition term, a definition and a label, so a space at their
-/// start is dropped.
-#[test]
-fn should_drop_the_space_at_the_start_of_a_definition_or_label_in_a_cell() {
-    check(&[
-        ("a <sub><dt> <ul><li>b</li></ul></dt></sub>c", "a b c", "a b<br>c"),
-        ("a <abbr><dd> <ul><li>b</li></ul></dd></abbr>c", "a b c", "a b<br>c"),
-        ("a <sub><label> <ul><li>b</li></ul></label></sub>c", "a b c", "a b<br>c"),
+        ("a<dt><blockquote><hr></blockquote></dt>c", "a  --- c", "a  ---<br>c"),
     ]);
 }
 
@@ -346,4 +300,58 @@ fn should_leave_a_section_after_cell_content_to_tier2() {
     let html = table("a<section>b</section>c");
     let auto_out = convert(&html, Some(auto)).expect("conversion must succeed").content;
     assert_eq!(auto_out, Some(tier2(&html, false)));
+}
+
+/// Tier-2 lays out a block or a line break at the start of bold, code, sub, sup or abbr, and a
+/// legend, figure caption or label, with whitespace the fast converter does not reproduce in a
+/// cell, so the fast converter leaves the cell to Tier-2.
+#[test]
+fn should_leave_a_block_in_inline_markup_or_a_label_in_a_cell_to_tier2() {
+    check_tier2(&[
+        ("<b><h2>a</h2>b</b>", "**a b**", "**a<br>b**"),
+        ("a<b><h2>b</h2></b>", "a**b**", "a**b**"),
+        ("a<sub><pre>b</pre></sub>c", "ab c", "ab<br>c"),
+        ("a<sup><p>b</p></sup>c", "ab c", "ab<br>c"),
+        ("a<abbr><p>b</p></abbr>c", "ab c", "ab<br>c"),
+        ("a<kbd><p>b</p></kbd>c", "a`b` c", "a`b`<br>c"),
+        ("a<em><p>b</p></em>c", "a*b* c", "a*b*<br>c"),
+        ("<em><p>a</p>b</em>", "*a b*", "*a<br>b*"),
+        ("a<b><div>b</div></b>", "a**b**", "a**b**"),
+        ("a<b><ul><li>x</li></ul></b>", "a**x**", "a**x**"),
+        ("a<b><li>x</li></b>", "a**x**", "a**x**"),
+        ("a <sub><hr></sub>", "a ---", "a ---"),
+        ("<li>a</li><li><code><br></code></li>b", "a ` ` b", "a<br>` `<br>b"),
+        ("<code>a<h2>b</h2></code>", "`ab`", "`ab`"),
+        ("<code>a<pre>b</pre></code>", "`ab`", "`ab`"),
+        ("<code>a<blockquote> </blockquote></code>", "`a`", "`a`"),
+        ("<code><blockquote>a</blockquote>b</code>", "`a`   `b`", "`a`   `b`"),
+        ("<code>a<b><p>y</p></b>q</code>", "`a yq`", "`a<br>yq`"),
+        ("a<dt><label><hr></label></dt>c", "a  --- c", "a  ---<br>c"),
+        ("a<dt><sub><hr></sub></dt>c", "a  --- c", "a  ---<br>c"),
+        ("a <sub> <p>b</p></sub>c", "a b c", "a <br>b<br>c"),
+        ("<p>a</p><sub> <ul><li>b</li></ul></sub>c", "a  b c", "a<br> b<br>c"),
+        ("a <abbr> <dt>b</dt></abbr>c", "a  b c", "a  b<br>c"),
+        ("a <abbr> <dd>b</dd></abbr>c", "a  b c", "a  b<br>c"),
+        ("a <sub> <label><p>b</p></label></sub>c", "a  b c", "a  b<br>c"),
+        ("a <sub> <dl><dt>b</dt></dl></sub>c", "a  b c", "a  b<br>c"),
+        ("a <sub><dt> <ul><li>b</li></ul></dt></sub>c", "a b c", "a b<br>c"),
+        ("a <abbr><dd> <ul><li>b</li></ul></dd></abbr>c", "a b c", "a b<br>c"),
+        ("a <sub><label> <ul><li>b</li></ul></label></sub>c", "a b c", "a b<br>c"),
+        (
+            "x<code>a<blockquote>q</blockquote>b</code>",
+            "x`a`   `q`   `b`",
+            "x`a`   `q`   `b`",
+        ),
+        ("<hr><code><h2></h2>b c</code>", "--- `b c`", "---<br>`b c`"),
+        ("a <label><p>b</p></label>c", "a b c", "a b<br>c"),
+        ("a <sub> <br>b</sub>c", "a bc", "a <br>bc"),
+        ("<legend><hr></legend>c", "**---**  c", "**---**  c"),
+        ("a<figcaption><p>b</p></figcaption>c", "a  *b* c", "a  *b*<br>c"),
+        ("a<label> b</label>c", "ab  c", "ab  c"),
+    ]);
+    let html = "<table><tr><td>a<sub><table><tr><td>x</td></tr></table></sub></td><td>z</td></tr></table>";
+    assert!(matches!(
+        tier1_run(html, false),
+        Err(tier1::BailReason::TableBlockChildInCell)
+    ));
 }

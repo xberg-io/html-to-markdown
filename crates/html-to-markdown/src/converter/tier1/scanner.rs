@@ -515,6 +515,9 @@ pub fn scan(
                 }
 
                 if spec.is_void || close.1 {
+                    if cell_needs_tier2(&mut state, spec, name_lower) {
+                        return Err(BailReason::TableBlockChildInCell);
+                    }
                     emit_void(&mut state, spec, name_lower, &attrs, html, options)?;
                     text_start = pos;
                     continue;
@@ -555,6 +558,9 @@ pub fn scan(
                 // than a `> ` prefix or a code fence, which is what Tier-2 does too.
                 // A block kind bails only when it has no cell-aware helper, so adding
                 // one here without adding the helper will silently diverge from Tier-2.
+                if cell_needs_tier2(&mut state, spec, name_lower) {
+                    return Err(BailReason::TableBlockChildInCell);
+                }
                 if state.in_table_cell() && spec.is_block {
                     let inlineable = matches!(
                         spec.kind,
@@ -571,13 +577,7 @@ pub fn scan(
                             | TagKind::DefinitionDescription
                             | TagKind::Table
                     );
-                    // ~keep Tier-2 separates a sectioning element from the cell content before it
-                    // ~keep with a blank line, which the cell folds into two spaces.
-                    let sectioning_after_content = matches!(
-                        name_lower,
-                        b"article" | b"section" | b"nav" | b"aside" | b"header" | b"footer" | b"main"
-                    ) && !state.cell_or_output_mut().is_empty();
-                    if !inlineable || sectioning_after_content {
+                    if !inlineable {
                         return Err(BailReason::TableBlockChildInCell);
                     }
                 }
@@ -2316,9 +2316,6 @@ fn emit_close(
 
     state.escape_ctx = frame.prev_escape_ctx;
     state.last_closed_custom_element = std::ptr::eq(spec, &raw const CUSTOM_ELEMENT_INLINE_SPEC);
-    if matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription) || name_lower == b"label" {
-        trim_start_of_cell_content(state, frame.content_start);
-    }
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
@@ -3023,7 +3020,7 @@ fn renders_into_own_buffer(kind: TagKind, name_lower: &[u8], ctx: EscapeCtx) -> 
         TagKind::Code | TagKind::Strong | TagKind::Emphasis | TagKind::Strikethrough | TagKind::Inserted => {
             !ctx.contains(EscapeCtx::CODE)
         }
-        _ => matches!(name_lower, b"sub" | b"sup" | b"abbr" | b"label"),
+        _ => matches!(name_lower, b"sub" | b"sup" | b"abbr"),
     }
 }
 
@@ -3042,6 +3039,40 @@ fn innermost_own_buffer(state: &Tier1State) -> Option<&OpenTag> {
         .rev()
         .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
         .find(|frame| frame.own_buffer)
+}
+
+/// Whether Tier-2 lays out `name_lower` in the current table cell in a way this scanner does not
+/// reproduce, so the cell goes to Tier-2 (issue #645): a block inside an inline element with a
+/// buffer of its own, a line break at the start of such an element, a legend, a figure caption
+/// or a label, and a sectioning element after other cell content, which Tier-2 separates with a
+/// blank line that the cell folds into two spaces.
+fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -> bool {
+    if !state.in_table_cell() {
+        return false;
+    }
+    if matches!(name_lower, b"legend" | b"figcaption" | b"label") {
+        return true;
+    }
+    let sectioning = matches!(
+        name_lower,
+        b"article" | b"section" | b"nav" | b"aside" | b"header" | b"footer" | b"main"
+    );
+    let in_inline_buffer = state
+        .stack
+        .iter()
+        .rev()
+        .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
+        .any(|frame| frame.own_buffer && !frame.spec.is_block);
+    let inline_buffer_start = innermost_own_buffer(state)
+        .filter(|frame| !frame.spec.is_block)
+        .map(|frame| frame.content_start);
+    let cell_buf = state.cell_or_output_mut();
+    let break_at_buffer_start = matches!(spec.kind, TagKind::LineBreak)
+        && inline_buffer_start.is_some_and(|start| {
+            let start = clamp_to_char_boundary(cell_buf, start);
+            cell_buf[start..].trim().is_empty()
+        });
+    (sectioning && !cell_buf.is_empty()) || (spec.is_block && in_inline_buffer) || break_at_buffer_start
 }
 
 /// Whether a rule is the first content of a definition term or definition: the elements between
@@ -3066,23 +3097,6 @@ fn rule_starts_a_definition(state: &mut Tier1State) -> bool {
     let cell_buf = state.cell_or_output_mut();
     let start = clamp_to_char_boundary(cell_buf, start);
     cell_buf[start..].trim().is_empty()
-}
-
-/// Drop the whitespace at the start of the content an element wrote into a table cell from
-/// `content_start`. Tier-2 trims the buffer of a definition term, a definition and a label, then
-/// writes a blank line before a rule that starts it (see [`rule_starts_a_definition`]), so the
-/// blank line before a leading rule stays.
-fn trim_start_of_cell_content(state: &mut Tier1State, content_start: usize) {
-    if !state.in_table_cell() {
-        return;
-    }
-    let cell_buf = state.cell_or_output_mut();
-    let start = clamp_to_char_boundary(cell_buf, content_start);
-    if cell_buf[start..].trim_start().starts_with("---") {
-        return;
-    }
-    let leading = cell_buf[start..].len() - cell_buf[start..].trim_start().len();
-    cell_buf.replace_range(start..start + leading, "");
 }
 
 /// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell
@@ -4497,14 +4511,10 @@ fn flush_text(
         }
         // ~keep `after_custom_element_close` overrides the usual "already ends
         // with a space, skip" dedup — see `Tier1State::last_closed_custom_element`.
-        // ~keep Tier-2 checks the trailing space in an inline element's own buffer, which holds
-        // ~keep no space from before the element; only the start of the cell writes nothing.
-        let cell_is_empty = state.cell_or_output_mut().is_empty();
-        with_cell_scratch(state, |dest| {
-            if !cell_is_empty && !dest.ends_with('\n') && (after_custom_element_close || !dest.ends_with(' ')) {
-                dest.push(' ');
-            }
-        });
+        let dest = state.cell_or_output_mut();
+        if !dest.is_empty() && !dest.ends_with('\n') && (after_custom_element_close || !dest.ends_with(' ')) {
+            dest.push(' ');
+        }
         return Ok(());
     }
     // ~keep Whitespace-only text outside any inline element (link / strong / em /
