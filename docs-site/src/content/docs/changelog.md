@@ -54,6 +54,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A line break on its own source line became a paragraph break (#683).** `First\n<br>\nSecond`
+  gave `First\n\nSecond`, two paragraphs: the newline before the `<br>` put its hard-break marker
+  on a line of its own, and an empty line ends a paragraph. The break now ends the line of the text
+  before it, `First  \nSecond`, in both converters and with both newline styles. This also holds
+  when that text ends inside an element that writes no line end, such as `<span>`, `<font>` or a
+  custom element: `<span>First\n</span><br>Second`.
 - **A page whose bytes open with a mangled byte order mark lost its whole head.** A real leading
   U+FEFF is stripped before parsing, but one a wrong encoding guess mangles beyond recognition
   reads as ordinary text by the time #527's head search sees it, and that search treated any such
@@ -148,8 +154,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A newline in a head value started a new frontmatter key.** The frontmatter wrote each
   `key: value` line as it was, so a `<title>` or `<meta content>` holding a newline, literal or
   written as `&#10;`, could add or override a key. Each key and value is now one YAML scalar: a
-  value that plain YAML would misread (a newline, `: `, ` #`, a leading `-`, `#` or `@`, a
-  control character) is written in double quotes with YAML escapes. Other values stay unquoted.
+  value that plain YAML would misread (a newline, `: `, a space before `#`, a leading `-`, `#` or
+  `@`, a control character) is written in double quotes with YAML escapes. Other values stay
+  unquoted.
 - **Legacy named references without a semicolon were not decoded.** The spec lets about a hundred
   names such as `&copy`, `&amp` and `&eacute` close without `;`, and browsers decode them in text:
   `&copy 2024` is `© 2024`. The converter kept them as written. They now decode on both tiers,

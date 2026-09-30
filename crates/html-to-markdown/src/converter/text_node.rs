@@ -12,8 +12,8 @@ use std::borrow::Cow;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
-    FollowingContent, following_sibling_content, get_next_sibling_tag, get_previous_sibling_tag,
-    next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
+    FollowingContent, br_follows_enclosing_elements, following_sibling_content, get_next_sibling_tag,
+    get_previous_sibling_tag, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -398,6 +398,9 @@ pub fn process_text_node(
                     }
                 } else if ctx.inline_depth > 0 || ctx.convert_as_inline || ctx.in_paragraph {
                     final_text.push(' ');
+                } else if br_follows_enclosing_elements(node_handle.get_inner(), parser, dom_ctx) {
+                    // ~keep Same as the `<br>` sibling case above, one element further out:
+                    // ~keep `<span>First\n</span><br>` (issue #683).
                 } else {
                     final_text.push('\n');
                 }

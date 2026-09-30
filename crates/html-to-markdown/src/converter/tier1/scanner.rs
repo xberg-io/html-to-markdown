@@ -146,17 +146,24 @@ pub fn scan(
                     let next_tag_is_img = upcoming_tag_is_named(bytes, pos, b"img");
                     // ~keep A trailing bare `\n` (no accompanying space/tab) on an
                     // otherwise non-whitespace text node needs to know whether the
-                    // upcoming sibling is specifically `<span>` — see
-                    // `trailing_single_newline_join`'s doc comment for why that one
-                    // tag is special-cased.
-                    let next_tag_is_span = upcoming_tag_is_named(bytes, pos, b"span");
+                    // upcoming sibling is a `<span>` or a `<br>` — see
+                    // `trailing_single_newline_join`'s doc comment for why those
+                    // tags are special-cased. Only such a text node looks ahead, so
+                    // each run of closing tags and comments is scanned once.
+                    let text = &html[text_start..pos];
+                    let newline_follower =
+                        if text.ends_with(['\n', '\r']) && !text.trim_matches(['\n', '\r', ' ', '\t']).is_empty() {
+                            upcoming_newline_follower(bytes, pos)
+                        } else {
+                            NewlineFollower::Other
+                        };
                     flush_text(
                         &mut state,
                         &html[text_start..pos],
                         text_start,
                         next_tag_is_list,
                         next_tag_is_img,
-                        next_tag_is_span,
+                        newline_follower,
                         options.br_in_tables,
                     )?;
                 }
@@ -207,7 +214,15 @@ pub fn scan(
                 // we don't bail on commonly-unescaped source like `x < 5`.
                 if !parse::is_tag_name_start(next) {
                     state.start_body(pos);
-                    flush_text(&mut state, "<", pos, false, false, false, options.br_in_tables)?;
+                    flush_text(
+                        &mut state,
+                        "<",
+                        pos,
+                        false,
+                        false,
+                        NewlineFollower::Other,
+                        options.br_in_tables,
+                    )?;
                     pos += 1;
                     text_start = pos;
                     continue;
@@ -736,7 +751,7 @@ pub fn scan(
             text_start,
             false,
             false,
-            false,
+            NewlineFollower::Other,
             options.br_in_tables,
         )?;
     }
@@ -4330,7 +4345,7 @@ fn flush_text(
     base_offset: usize,
     next_tag_is_list: bool,
     next_tag_is_img: bool,
-    next_tag_is_span: bool,
+    newline_follower: NewlineFollower,
     br_in_tables: bool,
 ) -> Result<(), BailReason> {
     if raw.is_empty() {
@@ -4966,7 +4981,7 @@ fn flush_text(
                 } else if trailing.bytes().any(|b| b == b' ' || b == b'\t') {
                     " "
                 } else if trail_has_nl {
-                    trailing_single_newline_join(state, next_tag_is_span)
+                    trailing_single_newline_join(state, newline_follower)
                 } else {
                     trailing
                 };
@@ -6041,6 +6056,9 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 /// guarantees is `state.output` too).
 ///
 /// - `<span>` is a hardcoded exception in Tier-2's source: no join at all.
+/// - A `<br>` ends the line itself, so no join either: a `'\n'` here would put
+///   the hard-break marker on a line of its own, which cleanup turns into a
+///   paragraph break (issue #683).
 /// - Otherwise: a blank-line break already in place needs nothing either. The
 ///   "already" is scoped to the enclosing `<p>`/`<div>`'s OWN content (Tier-2's
 ///   `ctx.block_content_start`, i.e. `nearest_block_content_start` here) —
@@ -6051,9 +6069,12 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 ///   blank line" and wrongly swallowing the join.
 /// - Otherwise: a paragraph ancestor, or a `<strong>`/`<em>` (Tier-2's
 ///   `inline_depth`-incrementing wrappers) ancestor, joins with a single
-///   space; anything else (e.g. a bare `<div>`) joins with a literal newline.
-fn trailing_single_newline_join(state: &Tier1State, next_tag_is_span: bool) -> &'static str {
-    if next_tag_is_span {
+///   space.
+/// - Otherwise: a `<br>` after the elements this text ends
+///   (`<span>First\n</span><br>`) needs no join, as for a `<br>` sibling;
+///   anything else (e.g. a bare `<div>`) joins with a literal newline.
+fn trailing_single_newline_join(state: &Tier1State, newline_follower: NewlineFollower) -> &'static str {
+    if matches!(newline_follower, NewlineFollower::Span | NewlineFollower::Br) {
         return "";
     }
     let block_start = clamp_to_char_boundary(&state.output, nearest_block_content_start(state));
@@ -6066,7 +6087,68 @@ fn trailing_single_newline_join(state: &Tier1State, next_tag_is_span: bool) -> &
             TagKind::Paragraph | TagKind::Strong | TagKind::Emphasis
         )
     });
-    if in_paragraph_or_inline_wrapper { " " } else { "\n" }
+    if in_paragraph_or_inline_wrapper {
+        " "
+    } else if newline_follower == NewlineFollower::BrAfterClose {
+        ""
+    } else {
+        "\n"
+    }
+}
+
+/// What the markup after a text node starts with, as far as the join for a
+/// trailing bare `\n` is concerned (see `trailing_single_newline_join`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum NewlineFollower {
+    /// An opening `<span>`.
+    Span,
+    /// A `<br>`, after only whitespace and comments.
+    Br,
+    /// A `<br>` after closing tags of elements this text is the last content of.
+    BrAfterClose,
+    /// Anything else.
+    Other,
+}
+
+/// Classify the markup at `bytes[lt_pos]` for `flush_text`. Mirrors Tier-2's
+/// sibling lookup, which skips whitespace text and comments to reach the next
+/// tag, and climbs out of the elements the text is the last content of.
+fn upcoming_newline_follower(bytes: &[u8], lt_pos: usize) -> NewlineFollower {
+    if upcoming_tag_is_named(bytes, lt_pos, b"span") {
+        return NewlineFollower::Span;
+    }
+    let mut pos = lt_pos;
+    let mut closed = false;
+    loop {
+        while bytes.get(pos).is_some_and(u8::is_ascii_whitespace) {
+            pos += 1;
+        }
+        let rest = &bytes[pos.min(bytes.len())..];
+        if rest.starts_with(b"<!--") {
+            let Some(end) = memchr::memmem::find(&rest[4..], b"-->") else {
+                return NewlineFollower::Other;
+            };
+            pos += 4 + end + 3;
+        } else if rest.starts_with(b"</") {
+            let mut close = parse::scan_tag_name(bytes, pos + 2);
+            while bytes.get(close).is_some_and(u8::is_ascii_whitespace) {
+                close += 1;
+            }
+            if bytes.get(close) != Some(&b'>') {
+                return NewlineFollower::Other;
+            }
+            closed = true;
+            pos = close + 1;
+        } else if upcoming_tag_is_named(bytes, pos, b"br") {
+            return if closed {
+                NewlineFollower::BrAfterClose
+            } else {
+                NewlineFollower::Br
+            };
+        } else {
+            return NewlineFollower::Other;
+        }
+    }
 }
 
 /// Position where the innermost enclosing `<p>`/`<div>` frame's OWN content

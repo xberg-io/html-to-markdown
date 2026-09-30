@@ -191,6 +191,26 @@ pub fn following_sibling_content(id: u32, parser: &tl::Parser, dom_ctx: &DomCont
     FollowingContent::Absent
 }
 
+/// Whether a `<br>` follows the elements that `id` is the last content of:
+/// `<span>First\n</span><br>` ends the line of `First` at that `<br>` (issue #683), just as
+/// `First\n<br>` does. Whitespace text and comments between them are skipped. A block
+/// ancestor ends its own line before the `<br>` is written, so the answer changes the output
+/// only for elements that write no line end: `<span>`, `<font>`, a custom element.
+pub fn br_follows_enclosing_elements(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let mut id = id;
+    // ~keep A loop rather than recursion: nested wrappers are attacker-controlled depth.
+    while following_sibling_content(id, parser, dom_ctx) == FollowingContent::Absent {
+        let Some(parent) = dom_ctx.parent_of(id) else {
+            return false;
+        };
+        if let Some(next) = dom_ctx.next_tag_id(parent, parser) {
+            return dom_ctx.tag_info(next, parser).is_some_and(|info| info.name == "br");
+        }
+        id = parent;
+    }
+    false
+}
+
 /// Append an inline suffix to output, with smart whitespace handling.
 ///
 /// Avoids adding spaces before siblings that are already whitespace.
