@@ -12,8 +12,8 @@ use std::borrow::Cow;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
-    FollowingContent, following_sibling_content, get_next_sibling_tag, next_sibling_is_inline_tag,
-    previous_sibling_is_inline_tag,
+    FollowingContent, following_sibling_content, get_next_sibling_tag, get_previous_sibling_tag,
+    next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -349,6 +349,13 @@ pub fn process_text_node(
             || output.ends_with(". ")
             || output.ends_with("] ")
             || (output.ends_with('\n') && prefix == " ")
+            // ~keep In a heading a `<br>` is written as the space itself (`line_break.rs`), so
+            // ~keep the text after it adds no second one: `<h2>a<br> b</h2>` is `## a b`. Only
+            // ~keep after a `<br>`: `<h2><span>a </span> b</h2>` keeps both spaces, as Tier-1 does.
+            || (ctx.in_heading
+                && output.ends_with(' ')
+                && prefix == " "
+                && get_previous_sibling_tag(node_handle, parser, dom_ctx) == Some("br"))
             || (output.ends_with(' ')
                 && prefix == " "
                 && !previous_sibling_is_inline_tag(node_handle, parser, dom_ctx));
@@ -448,9 +455,7 @@ pub fn process_text_node(
     // ~keep scratch buffer rather than the real document (`in_table_cell`, `convert_as_inline`),
     // ~keep where `output` is not the list item's own accumulating text and indenting it would
     // ~keep corrupt literal content instead.
-    if let Some(indent) = list_item_line_indent(output, options, ctx) {
-        output.push_str(&indent);
-    }
+    crate::converter::list::utils::indent_list_item_line_start(output, ctx, options);
 
     let text_start = output.len();
     if ctx.in_list_item && final_text.contains("\n\n") {
@@ -474,23 +479,6 @@ pub fn process_text_node(
             escape_djot_text(output, text_start);
         }
         escape_line_start(output, text_start, options, ctx);
-    }
-}
-
-/// The list item's continuation indent when `output` ends on a fresh, still-unindented line
-/// inside a list item, in a context that writes into the item's own text.
-fn list_item_line_indent(output: &str, options: &ConversionOptions, ctx: &Context) -> Option<String> {
-    if ctx.in_list_item
-        && !ctx.in_code
-        && !ctx.in_ruby
-        && !ctx.in_table_cell
-        && !ctx.convert_as_inline
-        && output.ends_with('\n')
-        && !output.ends_with("\n\n")
-    {
-        crate::converter::list::utils::continuation_indent_string(ctx.list_indent_columns, options)
-    } else {
-        None
     }
 }
 
@@ -523,7 +511,7 @@ pub fn finish_inline_element(
     let djot_line =
         options.output_format == crate::options::OutputFormat::Djot && !written.starts_with([' ', '\t', '\n']);
     let indent = if djot_line {
-        list_item_line_indent(&buffer[..from], options, ctx)
+        crate::converter::list::utils::list_item_line_indent(&buffer[..from], ctx, options)
     } else {
         None
     };

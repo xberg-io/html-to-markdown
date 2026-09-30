@@ -75,7 +75,13 @@ pub fn strip_trailing_backslash_breaks(output: &mut String, block_start: usize) 
     let block_start = crate::converter::utility::content::floor_char_boundary(output, block_start.min(output.len()));
     let mut stripped_breaks = 0usize;
     while output.len() > block_start && output[block_start..].ends_with("\\\n") {
-        let new_len = output.len() - "\\\n".len();
+        let mut new_len = output.len() - "\\\n".len();
+        // ~keep A marker on a line of its own in a list item follows the item's indent
+        // ~keep (issue #681); left behind, the indent hid the marker before it from this loop.
+        let indent_start = output[..new_len].trim_end_matches([' ', '\t']).len();
+        if indent_start >= block_start && output[..indent_start].ends_with('\n') {
+            new_len = indent_start;
+        }
         output.truncate(new_len);
         stripped_breaks += 1;
     }

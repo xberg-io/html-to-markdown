@@ -253,6 +253,31 @@ pub fn continuation_indent_string(list_indent_columns: usize, options: &Conversi
     }
 }
 
+/// Write the list item's continuation indent when `output` is at the start of a line inside the
+/// item, so the text or hard break written next stays in the item. Not in verbatim content or in a
+/// detached buffer, where `output` is not the item's own text.
+pub fn indent_list_item_line_start(output: &mut String, ctx: &Context, options: &ConversionOptions) {
+    if let Some(indent) = list_item_line_indent(output, ctx, options) {
+        output.push_str(&indent);
+    }
+}
+
+/// The indent that [`indent_list_item_line_start`] writes after `output`, if any.
+pub fn list_item_line_indent(output: &str, ctx: &Context, options: &ConversionOptions) -> Option<String> {
+    if ctx.in_list_item
+        && !ctx.in_code
+        && !ctx.in_ruby
+        && !ctx.in_table_cell
+        && !ctx.convert_as_inline
+        && output.ends_with('\n')
+        && !output.ends_with("\n\n")
+    {
+        continuation_indent_string(ctx.list_indent_columns, options)
+    } else {
+        None
+    }
+}
+
 /// The column that the continuation indent for `list_indent_columns` reaches.
 pub fn indent_column(list_indent_columns: usize, options: &ConversionOptions) -> usize {
     continuation_indent_string(list_indent_columns, options).map_or(0, |indent| {

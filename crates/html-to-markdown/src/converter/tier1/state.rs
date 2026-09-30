@@ -155,6 +155,10 @@ pub struct OpenTag {
     /// distinguishes them, so `close_inline_marker` can bail (`WhitespaceOnlyInlineEmphasis`)
     /// for the latter instead of silently truncating the space away like the former.
     pub dropped_whitespace_only_text: bool,
+    /// Tier-2 renders this element's children into a fresh buffer of their own (`<mark>`,
+    /// `<sub>`, `<sup>`, `<abbr>`, `<dt>`, `<dd>`), so its text sees an empty buffer, not
+    /// the line before the element.
+    pub children_in_own_buffer: bool,
 }
 
 /// Minimum capacity for each summary accumulation buffer.

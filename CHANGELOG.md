@@ -52,6 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The fast converter dropped a line break that no element encloses (#679).**
+  `a<br>1) t` gave `a1) t`, so the two lines joined. The fast converter now writes the break as
+  the full converter does, `a  \n1\) t`, the same as when the input sits in `<body>`. The line
+  after a hard break also no longer keeps a leading space: `<div>a<br> b</div>` gives `a  \nb` in
+  both converters.
+- **Hard breaks that differed between the converters or lost their place.**
+  A whitespace character reference after a break (`a<br>&#10;b`) no longer makes a paragraph
+  break in the fast converter. A break in a heading followed by a space
+  gives one space (`## a b`). With the backslash newline style, a line in a list item that holds
+  only a break keeps the item's indent (#681). Wrap no longer cuts a list item's text at a `===`
+  line left of the item's column, which dropped the hard breaks after it (#680), and keeps a
+  hard break right before such a line.
 - **Two ordered lists next to each other became one list (#666).**
   `<ol><li>a</li></ol><ol><li>b</li></ol>` gave `1. a\n\n1. b`, which CommonMark and Djot read
   as one list, because a blank line does not end a list. An ordered list that follows an ordered
