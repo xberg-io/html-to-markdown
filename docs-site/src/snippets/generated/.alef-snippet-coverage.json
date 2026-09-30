@@ -208,8 +208,10 @@
     "c/options/options_encoding_utf8.md",
     "c/options/options_escape_ascii_enabled.md",
     "c/options/options_escape_asterisks.md",
+    "c/options/options_escape_asterisks_off_in_table_cell.md",
     "c/options/options_escape_misc.md",
     "c/options/options_escape_underscores.md",
+    "c/options/options_escape_underscores_off_in_table_cell.md",
     "c/options/options_exclude_selectors_attribute.md",
     "c/options/options_exclude_selectors_class.md",
     "c/options/options_exclude_selectors_empty_noop.md",
@@ -547,8 +549,10 @@
     "csharp/options/options_encoding_utf8.md",
     "csharp/options/options_escape_ascii_enabled.md",
     "csharp/options/options_escape_asterisks.md",
+    "csharp/options/options_escape_asterisks_off_in_table_cell.md",
     "csharp/options/options_escape_misc.md",
     "csharp/options/options_escape_underscores.md",
+    "csharp/options/options_escape_underscores_off_in_table_cell.md",
     "csharp/options/options_exclude_selectors_attribute.md",
     "csharp/options/options_exclude_selectors_class.md",
     "csharp/options/options_exclude_selectors_empty_noop.md",
@@ -886,8 +890,10 @@
     "dart/options/options_encoding_utf8.md",
     "dart/options/options_escape_ascii_enabled.md",
     "dart/options/options_escape_asterisks.md",
+    "dart/options/options_escape_asterisks_off_in_table_cell.md",
     "dart/options/options_escape_misc.md",
     "dart/options/options_escape_underscores.md",
+    "dart/options/options_escape_underscores_off_in_table_cell.md",
     "dart/options/options_exclude_selectors_attribute.md",
     "dart/options/options_exclude_selectors_class.md",
     "dart/options/options_exclude_selectors_empty_noop.md",
@@ -1225,8 +1231,10 @@
     "elixir/options/options_encoding_utf8.md",
     "elixir/options/options_escape_ascii_enabled.md",
     "elixir/options/options_escape_asterisks.md",
+    "elixir/options/options_escape_asterisks_off_in_table_cell.md",
     "elixir/options/options_escape_misc.md",
     "elixir/options/options_escape_underscores.md",
+    "elixir/options/options_escape_underscores_off_in_table_cell.md",
     "elixir/options/options_exclude_selectors_attribute.md",
     "elixir/options/options_exclude_selectors_class.md",
     "elixir/options/options_exclude_selectors_empty_noop.md",
@@ -1564,8 +1572,10 @@
     "go/options/options_encoding_utf8.md",
     "go/options/options_escape_ascii_enabled.md",
     "go/options/options_escape_asterisks.md",
+    "go/options/options_escape_asterisks_off_in_table_cell.md",
     "go/options/options_escape_misc.md",
     "go/options/options_escape_underscores.md",
+    "go/options/options_escape_underscores_off_in_table_cell.md",
     "go/options/options_exclude_selectors_attribute.md",
     "go/options/options_exclude_selectors_class.md",
     "go/options/options_exclude_selectors_empty_noop.md",
@@ -1903,8 +1913,10 @@
     "java/options/options_encoding_utf8.md",
     "java/options/options_escape_ascii_enabled.md",
     "java/options/options_escape_asterisks.md",
+    "java/options/options_escape_asterisks_off_in_table_cell.md",
     "java/options/options_escape_misc.md",
     "java/options/options_escape_underscores.md",
+    "java/options/options_escape_underscores_off_in_table_cell.md",
     "java/options/options_exclude_selectors_attribute.md",
     "java/options/options_exclude_selectors_class.md",
     "java/options/options_exclude_selectors_empty_noop.md",
@@ -2237,8 +2249,10 @@
     "kotlin-android/options/options_encoding_utf8.md",
     "kotlin-android/options/options_escape_ascii_enabled.md",
     "kotlin-android/options/options_escape_asterisks.md",
+    "kotlin-android/options/options_escape_asterisks_off_in_table_cell.md",
     "kotlin-android/options/options_escape_misc.md",
     "kotlin-android/options/options_escape_underscores.md",
+    "kotlin-android/options/options_escape_underscores_off_in_table_cell.md",
     "kotlin-android/options/options_exclude_selectors_attribute.md",
     "kotlin-android/options/options_exclude_selectors_class.md",
     "kotlin-android/options/options_exclude_selectors_empty_noop.md",
@@ -2527,8 +2541,10 @@
     "php/options/options_encoding_utf8.md",
     "php/options/options_escape_ascii_enabled.md",
     "php/options/options_escape_asterisks.md",
+    "php/options/options_escape_asterisks_off_in_table_cell.md",
     "php/options/options_escape_misc.md",
     "php/options/options_escape_underscores.md",
+    "php/options/options_escape_underscores_off_in_table_cell.md",
     "php/options/options_exclude_selectors_attribute.md",
     "php/options/options_exclude_selectors_class.md",
     "php/options/options_exclude_selectors_empty_noop.md",
@@ -2866,8 +2882,10 @@
     "python/options/options_encoding_utf8.md",
     "python/options/options_escape_ascii_enabled.md",
     "python/options/options_escape_asterisks.md",
+    "python/options/options_escape_asterisks_off_in_table_cell.md",
     "python/options/options_escape_misc.md",
     "python/options/options_escape_underscores.md",
+    "python/options/options_escape_underscores_off_in_table_cell.md",
     "python/options/options_exclude_selectors_attribute.md",
     "python/options/options_exclude_selectors_class.md",
     "python/options/options_exclude_selectors_empty_noop.md",
@@ -3205,8 +3223,10 @@
     "r/options/options_encoding_utf8.md",
     "r/options/options_escape_ascii_enabled.md",
     "r/options/options_escape_asterisks.md",
+    "r/options/options_escape_asterisks_off_in_table_cell.md",
     "r/options/options_escape_misc.md",
     "r/options/options_escape_underscores.md",
+    "r/options/options_escape_underscores_off_in_table_cell.md",
     "r/options/options_exclude_selectors_attribute.md",
     "r/options/options_exclude_selectors_class.md",
     "r/options/options_exclude_selectors_empty_noop.md",
@@ -3544,8 +3564,10 @@
     "ruby/options/options_encoding_utf8.md",
     "ruby/options/options_escape_ascii_enabled.md",
     "ruby/options/options_escape_asterisks.md",
+    "ruby/options/options_escape_asterisks_off_in_table_cell.md",
     "ruby/options/options_escape_misc.md",
     "ruby/options/options_escape_underscores.md",
+    "ruby/options/options_escape_underscores_off_in_table_cell.md",
     "ruby/options/options_exclude_selectors_attribute.md",
     "ruby/options/options_exclude_selectors_class.md",
     "ruby/options/options_exclude_selectors_empty_noop.md",
@@ -3883,8 +3905,10 @@
     "rust/options/options_encoding_utf8.md",
     "rust/options/options_escape_ascii_enabled.md",
     "rust/options/options_escape_asterisks.md",
+    "rust/options/options_escape_asterisks_off_in_table_cell.md",
     "rust/options/options_escape_misc.md",
     "rust/options/options_escape_underscores.md",
+    "rust/options/options_escape_underscores_off_in_table_cell.md",
     "rust/options/options_exclude_selectors_attribute.md",
     "rust/options/options_exclude_selectors_class.md",
     "rust/options/options_exclude_selectors_empty_noop.md",
@@ -4222,8 +4246,10 @@
     "swift/options/options_encoding_utf8.md",
     "swift/options/options_escape_ascii_enabled.md",
     "swift/options/options_escape_asterisks.md",
+    "swift/options/options_escape_asterisks_off_in_table_cell.md",
     "swift/options/options_escape_misc.md",
     "swift/options/options_escape_underscores.md",
+    "swift/options/options_escape_underscores_off_in_table_cell.md",
     "swift/options/options_exclude_selectors_attribute.md",
     "swift/options/options_exclude_selectors_class.md",
     "swift/options/options_exclude_selectors_empty_noop.md",
@@ -4561,8 +4587,10 @@
     "typescript/options/options_encoding_utf8.md",
     "typescript/options/options_escape_ascii_enabled.md",
     "typescript/options/options_escape_asterisks.md",
+    "typescript/options/options_escape_asterisks_off_in_table_cell.md",
     "typescript/options/options_escape_misc.md",
     "typescript/options/options_escape_underscores.md",
+    "typescript/options/options_escape_underscores_off_in_table_cell.md",
     "typescript/options/options_exclude_selectors_attribute.md",
     "typescript/options/options_exclude_selectors_class.md",
     "typescript/options/options_exclude_selectors_empty_noop.md",
@@ -4900,8 +4928,10 @@
     "wasm/options/options_encoding_utf8.md",
     "wasm/options/options_escape_ascii_enabled.md",
     "wasm/options/options_escape_asterisks.md",
+    "wasm/options/options_escape_asterisks_off_in_table_cell.md",
     "wasm/options/options_escape_misc.md",
     "wasm/options/options_escape_underscores.md",
+    "wasm/options/options_escape_underscores_off_in_table_cell.md",
     "wasm/options/options_exclude_selectors_attribute.md",
     "wasm/options/options_exclude_selectors_class.md",
     "wasm/options/options_exclude_selectors_empty_noop.md",
@@ -5239,8 +5269,10 @@
     "zig/options/options_encoding_utf8.md",
     "zig/options/options_escape_ascii_enabled.md",
     "zig/options/options_escape_asterisks.md",
+    "zig/options/options_escape_asterisks_off_in_table_cell.md",
     "zig/options/options_escape_misc.md",
     "zig/options/options_escape_underscores.md",
+    "zig/options/options_escape_underscores_off_in_table_cell.md",
     "zig/options/options_exclude_selectors_attribute.md",
     "zig/options/options_exclude_selectors_class.md",
     "zig/options/options_exclude_selectors_empty_noop.md",
@@ -7859,6 +7891,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "c"
+      },
+      "path": "c/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "c"
       },
@@ -7875,6 +7919,18 @@
         "language": "c"
       },
       "path": "c/options/options_escape_underscores.md",
+      "language": "c",
+      "target": "c",
+      "session": "c",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "c"
+      },
+      "path": "c/options/options_escape_underscores_off_in_table_cell.md",
       "language": "c",
       "target": "c",
       "session": "c",
@@ -11927,6 +11983,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "csharp"
       },
@@ -11943,6 +12011,18 @@
         "language": "csharp"
       },
       "path": "csharp/options/options_escape_underscores.md",
+      "language": "csharp",
+      "target": "csharp",
+      "session": "csharp",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "csharp"
+      },
+      "path": "csharp/options/options_escape_underscores_off_in_table_cell.md",
       "language": "csharp",
       "target": "csharp",
       "session": "csharp",
@@ -15995,6 +16075,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "dart"
+      },
+      "path": "dart/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "dart"
       },
@@ -16011,6 +16103,18 @@
         "language": "dart"
       },
       "path": "dart/options/options_escape_underscores.md",
+      "language": "dart",
+      "target": "dart",
+      "session": "dart",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "dart"
+      },
+      "path": "dart/options/options_escape_underscores_off_in_table_cell.md",
       "language": "dart",
       "target": "dart",
       "session": "dart",
@@ -20063,6 +20167,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "elixir"
       },
@@ -20079,6 +20195,18 @@
         "language": "elixir"
       },
       "path": "elixir/options/options_escape_underscores.md",
+      "language": "elixir",
+      "target": "elixir",
+      "session": "elixir",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "elixir"
+      },
+      "path": "elixir/options/options_escape_underscores_off_in_table_cell.md",
       "language": "elixir",
       "target": "elixir",
       "session": "elixir",
@@ -24131,6 +24259,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "go"
+      },
+      "path": "go/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "go"
       },
@@ -24147,6 +24287,18 @@
         "language": "go"
       },
       "path": "go/options/options_escape_underscores.md",
+      "language": "go",
+      "target": "go",
+      "session": "go",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "go"
+      },
+      "path": "go/options/options_escape_underscores_off_in_table_cell.md",
       "language": "go",
       "target": "go",
       "session": "go",
@@ -28199,6 +28351,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "java"
+      },
+      "path": "java/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "java"
       },
@@ -28215,6 +28379,18 @@
         "language": "java"
       },
       "path": "java/options/options_escape_underscores.md",
+      "language": "java",
+      "target": "java",
+      "session": "java",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "java"
+      },
+      "path": "java/options/options_escape_underscores_off_in_table_cell.md",
       "language": "java",
       "target": "java",
       "session": "java",
@@ -32207,6 +32383,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "kotlin_android"
       },
@@ -32223,6 +32411,18 @@
         "language": "kotlin_android"
       },
       "path": "kotlin-android/options/options_escape_underscores.md",
+      "language": "kotlin",
+      "target": "kotlin_android",
+      "session": "kotlin_android",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "kotlin_android"
+      },
+      "path": "kotlin-android/options/options_escape_underscores_off_in_table_cell.md",
       "language": "kotlin",
       "target": "kotlin_android",
       "session": "kotlin_android",
@@ -35687,6 +35887,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "php"
+      },
+      "path": "php/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "php"
       },
@@ -35703,6 +35915,18 @@
         "language": "php"
       },
       "path": "php/options/options_escape_underscores.md",
+      "language": "php",
+      "target": "php",
+      "session": "php",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "php"
+      },
+      "path": "php/options/options_escape_underscores_off_in_table_cell.md",
       "language": "php",
       "target": "php",
       "session": "php",
@@ -39755,6 +39979,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "python"
+      },
+      "path": "python/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "python"
       },
@@ -39771,6 +40007,18 @@
         "language": "python"
       },
       "path": "python/options/options_escape_underscores.md",
+      "language": "python",
+      "target": "python",
+      "session": "python",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "python"
+      },
+      "path": "python/options/options_escape_underscores_off_in_table_cell.md",
       "language": "python",
       "target": "python",
       "session": "python",
@@ -43823,6 +44071,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "r"
+      },
+      "path": "r/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "r"
       },
@@ -43839,6 +44099,18 @@
         "language": "r"
       },
       "path": "r/options/options_escape_underscores.md",
+      "language": "r",
+      "target": "r",
+      "session": "r",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "r"
+      },
+      "path": "r/options/options_escape_underscores_off_in_table_cell.md",
       "language": "r",
       "target": "r",
       "session": "r",
@@ -47891,6 +48163,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "ruby"
       },
@@ -47907,6 +48191,18 @@
         "language": "ruby"
       },
       "path": "ruby/options/options_escape_underscores.md",
+      "language": "ruby",
+      "target": "ruby",
+      "session": "ruby",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "ruby"
+      },
+      "path": "ruby/options/options_escape_underscores_off_in_table_cell.md",
       "language": "ruby",
       "target": "ruby",
       "session": "ruby",
@@ -52069,6 +52365,20 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "rust"
+      },
+      "path": "rust/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "rust"
       },
@@ -52087,6 +52397,20 @@
         "language": "rust"
       },
       "path": "rust/options/options_escape_underscores.md",
+      "language": "rust",
+      "target": "rust",
+      "session": "rust",
+      "requires": [
+        "crate:serde_json"
+      ],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "rust"
+      },
+      "path": "rust/options/options_escape_underscores_off_in_table_cell.md",
       "language": "rust",
       "target": "rust",
       "session": "rust",
@@ -56379,6 +56703,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "swift"
+      },
+      "path": "swift/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "swift"
       },
@@ -56395,6 +56731,18 @@
         "language": "swift"
       },
       "path": "swift/options/options_escape_underscores.md",
+      "language": "swift",
+      "target": "swift",
+      "session": "swift",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "swift"
+      },
+      "path": "swift/options/options_escape_underscores_off_in_table_cell.md",
       "language": "swift",
       "target": "swift",
       "session": "swift",
@@ -60447,6 +60795,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "node"
+      },
+      "path": "typescript/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "node"
       },
@@ -60463,6 +60823,18 @@
         "language": "node"
       },
       "path": "typescript/options/options_escape_underscores.md",
+      "language": "typescript",
+      "target": "node",
+      "session": "node",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "node"
+      },
+      "path": "typescript/options/options_escape_underscores_off_in_table_cell.md",
       "language": "typescript",
       "target": "node",
       "session": "node",
@@ -64515,6 +64887,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "wasm"
       },
@@ -64531,6 +64915,18 @@
         "language": "wasm"
       },
       "path": "wasm/options/options_escape_underscores.md",
+      "language": "typescript",
+      "target": "wasm",
+      "session": "wasm",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "wasm"
+      },
+      "path": "wasm/options/options_escape_underscores_off_in_table_cell.md",
       "language": "typescript",
       "target": "wasm",
       "session": "wasm",
@@ -68583,6 +68979,18 @@
     },
     {
       "key": {
+        "fixture_id": "options_escape_asterisks_off_in_table_cell",
+        "language": "zig"
+      },
+      "path": "zig/options/options_escape_asterisks_off_in_table_cell.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
         "fixture_id": "options_escape_misc",
         "language": "zig"
       },
@@ -68599,6 +69007,18 @@
         "language": "zig"
       },
       "path": "zig/options/options_escape_underscores.md",
+      "language": "zig",
+      "target": "zig",
+      "session": "zig",
+      "requires": [],
+      "side_effect": "safe"
+    },
+    {
+      "key": {
+        "fixture_id": "options_escape_underscores_off_in_table_cell",
+        "language": "zig"
+      },
+      "path": "zig/options/options_escape_underscores_off_in_table_cell.md",
       "language": "zig",
       "target": "zig",
       "session": "zig",
@@ -80024,6 +80444,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "zig"
+    },
+    {
       "fixture_id": "options_escape_misc",
       "language": "c"
     },
@@ -80149,6 +80633,70 @@
     },
     {
       "fixture_id": "options_escape_underscores",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
       "language": "zig"
     },
     {
@@ -101506,6 +102054,70 @@
       "language": "zig"
     },
     {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_escape_asterisks_off_in_table_cell",
+      "language": "zig"
+    },
+    {
       "fixture_id": "options_escape_misc",
       "language": "c"
     },
@@ -101631,6 +102243,70 @@
     },
     {
       "fixture_id": "options_escape_underscores",
+      "language": "zig"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "c"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "csharp"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "dart"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "elixir"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "go"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "java"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "kotlin_android"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "node"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "php"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "python"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "r"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "ruby"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "rust"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "swift"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
+      "language": "wasm"
+    },
+    {
+      "fixture_id": "options_escape_underscores_off_in_table_cell",
       "language": "zig"
     },
     {

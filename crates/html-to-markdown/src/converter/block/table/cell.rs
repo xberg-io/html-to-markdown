@@ -282,13 +282,17 @@ fn trim_in_place(text: &mut String) {
 
 /// Escape text for use inside a table cell.
 ///
-/// Always escapes `*` and `_` (to prevent unintended emphasis inside cells),
-/// applies `escape_misc` / `escape_ascii` per options, and escapes `|` (pipe)
-/// when `escape_misc` is not already handling it.
+/// Applies every `escape_*` option exactly as outside a table (issue #638), and
+/// escapes `|` (pipe) when neither `escape_misc` nor `escape_ascii` already does.
 fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> String {
-    // ~keep Always escape * and _ in table cells to prevent unintended emphasis.
-    let escaped = crate::text::escape(text, options.escape_misc, true, true, options.escape_ascii);
-    if options.escape_misc {
+    let escaped = crate::text::escape(
+        text,
+        options.escape_misc,
+        options.escape_asterisks,
+        options.escape_underscores,
+        options.escape_ascii,
+    );
+    if options.escape_misc || options.escape_ascii {
         escaped.into_owned()
     } else {
         escaped.replace('|', r"\|")
@@ -299,7 +303,6 @@ fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> 
 ///
 /// Processes cell content and renders it with pipe delimiters for Markdown tables.
 /// Handles colspan by adding extra pipes, and escapes pipes in cell content.
-/// Always escapes `*` and `_` to prevent unintended emphasis inside cells.
 ///
 /// # Arguments
 /// * `node_handle` - Handle to the cell element

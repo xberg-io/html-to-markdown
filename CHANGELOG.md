@@ -52,6 +52,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A table cell ignored `escape_underscores` and `escape_asterisks` (#638).**
+  The full converter always escaped `_` and `*` in a cell, so
+  `<table><tr><td>sample_value</td></tr></table>` gave `sample\_value` while
+  `<p>sample_value</p>` gave `sample_value`. Every escape option now acts the same in a cell as
+  anywhere else. A `|` in a cell is still escaped whatever the options say, and with
+  `escape_ascii` on and `escape_misc` off it is now escaped once, as `\|`, instead of as `\\|`,
+  which split the cell in two.
 - **Two ordered lists next to each other became one list (#666).**
   `<ol><li>a</li></ol><ol><li>b</li></ol>` gave `1. a\n\n1. b`, which CommonMark and Djot read
   as one list, because a blank line does not end a list. An ordered list that follows an ordered
