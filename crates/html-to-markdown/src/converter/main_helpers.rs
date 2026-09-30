@@ -72,44 +72,16 @@ pub fn strip_trailing_backslash_breaks(output: &mut String, block_start: usize) 
     // ~keep same index the same way for the same reason. The `output.len() > block_start`
     // ~keep loop guard below already rules out an out-of-bounds slice, but not a stale index
     // ~keep that lands mid-UTF-8-character, which slicing would also panic on.
-    let stripped_breaks = trailing_backslash_breaks(output, block_start);
-    output.truncate(output.len() - stripped_breaks * "\\\n".len());
+    let block_start = crate::converter::utility::content::floor_char_boundary(output, block_start.min(output.len()));
+    let mut stripped_breaks = 0usize;
+    while output.len() > block_start && output[block_start..].ends_with("\\\n") {
+        let new_len = output.len() - "\\\n".len();
+        output.truncate(new_len);
+        stripped_breaks += 1;
+    }
     for _ in 0..stripped_breaks {
         output.push('\n');
     }
-}
-
-/// The number of `"\\\n"` hard-break markers that end `output` after `block_start`.
-pub fn trailing_backslash_breaks(output: &str, block_start: usize) -> usize {
-    let block_start = crate::converter::utility::content::floor_char_boundary(output, block_start.min(output.len()));
-    let mut end = output.len();
-    let mut breaks = 0usize;
-    while end > block_start && output[block_start..end].ends_with("\\\n") {
-        end -= "\\\n".len();
-        breaks += 1;
-    }
-    breaks
-}
-
-/// Put back the backslash hard break that the dispatch of an element dropped at `break_start`,
-/// when the element's output continues the paragraph on the next line.
-///
-/// ~keep The dispatch drops a hard break before a block-level element because the break is at
-/// ~keep the end of a paragraph there. The element's own output is what decides it: a dialog, a
-/// ~keep summary or a legend writes its text on the next line of the paragraph, so the break is
-/// ~keep in the middle of the paragraph and must stay. An element that writes nothing leaves
-/// ~keep the paragraph open too. A blank line or a line that opens a block (a heading in a list
-/// ~keep item or a quote) ends the paragraph, and the break stays dropped.
-pub fn restore_break_before_paragraph_text(output: &mut String, break_start: usize) {
-    if output.get(break_start..=break_start) != Some("\n") {
-        return;
-    }
-    let rest = output[break_start + 1..].trim_start_matches([' ', '\t']);
-    let line = rest.split('\n').next().unwrap_or_default();
-    if !rest.is_empty() && (line.trim().is_empty() || crate::converter::utility::escaping::opens_block(line)) {
-        return;
-    }
-    output.insert(break_start, '\\');
 }
 
 /// Strip a trailing backslash hard-break run from a self-contained block-content buffer,

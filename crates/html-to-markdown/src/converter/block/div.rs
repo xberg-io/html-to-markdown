@@ -44,14 +44,7 @@ pub fn handle(
         _ => return,
     };
 
-    let is_table_continuation = (ctx.in_table_cell || ctx.in_layout_cell)
-        && !output.is_empty()
-        && !output.ends_with('|')
-        && !output.ends_with("<br>")
-        // ~keep A layout cell, unlike a real one, may already hold a newline: its row renders as a
-        // ~keep list item, not a pipe row. Separating there opens the next line with a stray space.
-        // ~keep Inert for `in_table_cell`, whose buffer never holds a newline by construction.
-        && !output.ends_with('\n');
+    let is_table_continuation = continues_table_cell(output, ctx);
 
     if ctx.convert_as_inline {
         // ~keep A layout-table cell converts as inline but is still a cell, so its sibling
@@ -79,32 +72,7 @@ pub fn handle(
         (kept_len, output[kept_len..].to_string())
     });
 
-    // ~keep A plain suffix check like `output.ends_with("* ")` also matches the closing
-    // ~keep "**"/"*" of `<strong>`/`<em>` immediately followed by a migrated trailing
-    // ~keep space, indistinguishable from a real bare bullet by suffix alone -- and,
-    // ~keep being hardcoded to `-`/`*`, never matched the third bullet `+` at all. The
-    // ~keep false positive misclassified this div as sitting right after the marker,
-    // ~keep which skips BOTH branches below (neither `is_list_continuation` nor
-    // ~keep `needs_leading_sep` fires), so the div's content got glued directly onto the
-    // ~keep preceding inline text with no separator at all. See
-    // ~keep `list::utils::line_is_bare_list_marker`'s doc comment for the full rationale.
-    let is_list_continuation =
-        ctx.in_list_item && !output.is_empty() && !crate::converter::list::utils::line_is_bare_list_marker(output);
-
-    let needs_leading_sep = !ctx.in_table_cell
-        && !ctx.in_list_item
-        && !ctx.convert_as_inline
-        && !output.is_empty()
-        && !output.ends_with("\n\n");
-
-    if is_table_continuation {
-        emit_table_cell_break(output, options.br_in_tables);
-    } else if is_list_continuation {
-        crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
-    } else if needs_leading_sep {
-        trim_trailing_whitespace(output);
-        output.push_str("\n\n");
-    }
+    let is_list_continuation = start_block(output, ctx, options);
 
     // ~keep Measured the same way `block/paragraph.rs` does, so a text node can tell "at the
     // ~keep start of this div's line, in this div's buffer" from an inline wrapper's empty
@@ -167,4 +135,48 @@ pub fn handle(
             }
         }
     }
+}
+
+/// Whether a block written into a table cell's buffer continues content already in the cell.
+fn continues_table_cell(output: &str, ctx: &Context) -> bool {
+    (ctx.in_table_cell || ctx.in_layout_cell)
+        && !output.is_empty()
+        && !output.ends_with('|')
+        && !output.ends_with("<br>")
+        // ~keep A layout cell, unlike a real one, may already hold a newline: its row renders as a
+        // ~keep list item, not a pipe row. Separating there opens the next line with a stray space.
+        // ~keep Inert for `in_table_cell`, whose buffer never holds a newline by construction.
+        && !output.ends_with('\n')
+}
+
+/// Separate a block from the content before it, as a `<div>` does: a cell break in a table cell,
+/// the item's content column in a list item, and a blank line elsewhere. Returns whether the
+/// block continues a list item after its content.
+///
+/// ~keep A plain suffix check like `output.ends_with("* ")` also matches the closing
+/// ~keep "**"/"*" of `<strong>`/`<em>` immediately followed by a migrated trailing
+/// ~keep space, indistinguishable from a real bare bullet by suffix alone -- and,
+/// ~keep being hardcoded to `-`/`*`, never matched the third bullet `+` at all. The
+/// ~keep false positive misclassified this div as sitting right after the marker,
+/// ~keep which skips BOTH branches below (neither `is_list_continuation` nor
+/// ~keep `needs_leading_sep` fires), so the div's content got glued directly onto the
+/// ~keep preceding inline text with no separator at all. See
+/// ~keep `list::utils::line_is_bare_list_marker`'s doc comment for the full rationale.
+pub fn start_block(output: &mut String, ctx: &Context, options: &ConversionOptions) -> bool {
+    let is_list_continuation =
+        ctx.in_list_item && !output.is_empty() && !crate::converter::list::utils::line_is_bare_list_marker(output);
+    let needs_leading_sep = !ctx.in_table_cell
+        && !ctx.in_list_item
+        && !ctx.convert_as_inline
+        && !output.is_empty()
+        && !output.ends_with("\n\n");
+    if continues_table_cell(output, ctx) {
+        emit_table_cell_break(output, options.br_in_tables);
+    } else if is_list_continuation {
+        crate::converter::list::utils::start_block_in_list_item(output, ctx, options);
+    } else if needs_leading_sep {
+        trim_trailing_whitespace(output);
+        output.push_str("\n\n");
+    }
+    is_list_continuation
 }

@@ -309,55 +309,59 @@ fn should_keep_a_details_element_in_a_list_item_in_a_quote_in_the_item() {
 }
 
 #[test]
-fn should_keep_a_hard_break_before_an_element_that_continues_the_paragraph() {
+fn should_start_a_dialog_like_a_div() {
     let backslash = ConversionOptions {
         newline_style: NewlineStyle::Backslash,
         ..options_for(TierStrategy::Tier2)
     };
-    let spaces = options_for(TierStrategy::Tier2);
-    for (tag, text) in [("dialog", "x"), ("summary", "**x**"), ("legend", "**x**")] {
-        let html = format!("<p>a<br><{tag}>x</{tag}>y</p>");
-        assert_converts(&html, &backslash, &format!("a\\\n{text}\n\ny\n"), &["a<br />"]);
-        assert_converts(&html, &spaces, &format!("a  \n{text}\n\ny\n"), &["a<br />"]);
-        let html = format!("<ul><li>a<br><{tag}>x</{tag}>y</li></ul>");
-        assert_converts(&html, &backslash, &format!("- a\\\n  {text}\n\n  y\n"), &["a<br />"]);
-        assert_converts(&html, &spaces, &format!("- a  \n  {text}\n\n  y\n"), &["a<br />"]);
+    for html in [
+        "<p>a<br><dialog>x</dialog>y</p>",
+        "<p>a<dialog>x</dialog>y</p>",
+        "<p>a<br><dialog></dialog>y</p>",
+        "<ul><li>a<br><dialog>x</dialog>y</li></ul>",
+        "<ul><li>a<br><dialog></dialog><p>z</p></li></ul>",
+    ] {
+        let as_div = html.replace("dialog>", "div>");
+        for options in [options_for(TierStrategy::Tier2), backslash.clone()] {
+            assert_eq!(convert_with(html, &options), convert_with(&as_div, &options), "{html}");
+        }
     }
 }
 
 #[test]
-fn should_keep_a_hard_break_in_a_wrapper_or_before_an_empty_element_in_the_paragraph() {
+fn should_start_a_summary_or_legend_as_a_paragraph_of_its_own() {
     let backslash = ConversionOptions {
         newline_style: NewlineStyle::Backslash,
         ..options_for(TierStrategy::Tier2)
     };
-    assert_converts(
-        "<p><b>a<br></b><dialog>x</dialog>y</p>",
-        &backslash,
-        "**a**\\\nx\n\ny\n",
-        &["a</strong><br />"],
-    );
-    assert_converts("<p>a<br><dialog></dialog>y</p>", &backslash, "a\\\ny\n", &["a<br />"]);
-    assert_converts(
-        "<p>a<br>&#10;<dialog>x</dialog>y</p>",
-        &backslash,
-        "a\\\nx\n\ny\n",
-        &["a<br />"],
-    );
+    for tag in ["summary", "legend"] {
+        let html = format!("<p>a<br><{tag}>x</{tag}>y</p>");
+        assert_converts(
+            &html,
+            &backslash,
+            "a\n\n**x**\n\ny\n",
+            &["<p>a</p>\n<p><strong>x</strong></p>"],
+        );
+        let html = format!("<ul><li>a<br><{tag}>x</{tag}>y</li></ul>");
+        assert_converts(
+            &html,
+            &backslash,
+            "- a\n\n  **x**\n\n  y\n",
+            &["<p><strong>x</strong></p>"],
+        );
+    }
 }
 
 #[test]
-fn should_put_back_only_a_single_hard_break_before_an_element_in_the_paragraph() {
+fn should_not_leave_a_backslash_when_a_block_follows_a_hard_break() {
     let backslash = ConversionOptions {
         newline_style: NewlineStyle::Backslash,
         ..options_for(TierStrategy::Tier2)
     };
-    assert_converts(
-        "<p>a<br><br><br><dialog><br>x</dialog>y</p>",
-        &backslash,
-        "a\n\n\\\nx\n\ny\n",
-        &[],
-    );
+    for tag in ["div", "dialog", "center", "section"] {
+        let html = format!("<ul><li>a<br><{tag}></{tag}><p>z</p></li></ul>");
+        assert_converts(&html, &backslash, "- a\n\n  z\n", &[]);
+    }
 }
 
 #[test]

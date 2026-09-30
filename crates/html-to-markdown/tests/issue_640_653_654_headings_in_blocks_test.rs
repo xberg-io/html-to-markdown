@@ -600,19 +600,22 @@ fn should_keep_text_after_a_block_in_a_list_after_text_in_a_wrapper_without_mark
         highlight_style: HighlightStyle::None,
         ..options
     };
-    // ~keep A legend is a block, so it starts its own line in the item (issue #657); the line
-    // ~keep continues the item's paragraph, and the list in it is text as before.
-    for (html, markers) in [
+    // ~keep A legend is a block like a div, so it starts a paragraph of its own in the item
+    // ~keep (issue #657), and the list in it is text as before.
+    for (html, open, rendered, close) in [
         (
             "<ul><li>a<legend><ul><li>x<p>p</p>t</li></ul></legend></li></ul>",
-            ["\nINDENT**", "**", "**"],
+            "\n\nINDENT**",
+            "<ul><li><p>a</p><p>*** x</p></li></ul><p>p</p><p>t**</p>",
+            "**",
         ),
         (
             "<ul><li>a<mark><ul><li>x<p>p</p>t</li></ul></mark></li></ul>",
-            [" ", " ", ""],
+            " ",
+            "<ul><li>a * x</li></ul><p>p</p><p>t</p>",
+            "",
         ),
     ] {
-        let [open, rendered_open, close] = markers;
         for (options, indent) in [
             (width4(options(TierStrategy::Tier2)), "    "),
             (tabs(options(TierStrategy::Tier2)), "\t"),
@@ -623,12 +626,7 @@ fn should_keep_text_after_a_block_in_a_list_after_text_in_a_wrapper_without_mark
                 options
             };
             let open = open.replace("INDENT", indent);
-            assert_converts(
-                html,
-                &options,
-                &format!("- a{open}* x\n\np\n\nt{close}\n"),
-                &format!("<ul><li>a{rendered_open}* x</li></ul><p>p</p><p>t{close}</p>"),
-            );
+            assert_converts(html, &options, &format!("- a{open}* x\n\np\n\nt{close}\n"), rendered);
         }
     }
 }

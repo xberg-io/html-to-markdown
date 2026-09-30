@@ -3,7 +3,7 @@
 //! This module provides specialized handlers for semantic HTML5 elements:
 //! - Sectioning elements (article, section, nav, aside, header, footer, main)
 //! - Figure elements (figure, figcaption)
-//! - Interactive elements (details, summary, dialog)
+//! - Interactive elements (details, summary)
 //! - Semantic inline attributes (cite, q, abbr, dfn, time, data)
 //!
 //! These handlers are designed to be extracted from the main `converter.rs`
@@ -49,7 +49,7 @@ pub use summary::handle as handle_summary;
 /// The following tag routes are supported:
 /// - **Sectioning**: article, section, nav, aside, header, footer, main
 /// - **Figure**: figure, figcaption
-/// - **Summary**: details, summary, dialog
+/// - **Summary**: details, summary
 /// - **Definition List**: hgroup, dl, dt, dd
 /// - **Attributes**: cite, q, abbr, dfn, time, data
 ///
@@ -87,7 +87,7 @@ pub fn dispatch_semantic_handler(
             true
         }
         // ~keep Summary and interactive elements
-        "details" | "summary" | "dialog" => {
+        "details" | "summary" => {
             handle_summary(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }

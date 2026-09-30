@@ -1,9 +1,8 @@
 //! Handlers for HTML5 interactive elements.
 //!
-//! Processes interactive disclosure and dialog semantic elements:
+//! Processes interactive disclosure semantic elements:
 //! - `<details>` - Expandable/collapsible disclosure widget
 //! - `<summary>` - Summary or caption for a details element
-//! - `<dialog>` - Dialog box overlay widget
 //!
 //! These elements are treated as block-level content containers
 //! with special formatting for the summary element.
@@ -254,6 +253,7 @@ pub fn handle_summary(
         if ctx.convert_as_inline {
             output.push_str(trimmed);
         } else {
+            crate::converter::block::div::start_block(output, ctx, options);
             let mut symbol = String::with_capacity(2);
             symbol.push(options.strong_em_symbol);
             symbol.push(options.strong_em_symbol);
@@ -265,75 +265,9 @@ pub fn handle_summary(
     }
 }
 
-/// Handles the `<dialog>` element.
-///
-/// A dialog element represents a modal dialog box. In Markdown, it's rendered
-/// as a block container with content visible.
-///
-/// # Behavior
-///
-/// - **Inline mode**: Children are processed inline without block spacing
-/// - **Block mode**: Content is processed and wrapped with proper blank lines
-/// - Trailing whitespace is removed from collected content
-///
-/// # Implementation Details
-///
-/// The handler:
-/// 1. Marks the position in output before processing children
-/// 2. Processes all children in the normal context
-/// 3. Removes trailing spaces and tabs from the output
-/// 4. Ensures proper blank-line spacing after the dialog
-pub fn handle_dialog(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    output: &mut String,
-    options: &crate::options::ConversionOptions,
-    ctx: &super::Context,
-    depth: usize,
-    dom_ctx: &super::DomContext,
-) {
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        if ctx.convert_as_inline {
-            let children = tag.children();
-            {
-                for child_handle in children.top().iter() {
-                    super::walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
-                }
-            }
-            return;
-        }
-
-        let content_start = output.len();
-
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                super::walk_node(child_handle, parser, output, options, ctx, depth + 1, dom_ctx);
-            }
-        }
-
-        while output.len() > content_start && (output.ends_with(' ') || output.ends_with('\t')) {
-            output.pop();
-        }
-
-        if options.newline_style == crate::options::NewlineStyle::Backslash {
-            // ~keep A trailing <br> run with no following sibling has no next dispatch to
-            // ~keep catch it in `walk_node`'s pre-block-dispatch strip, since the dialog's
-            // ~keep own content is simply finished here — so this closes its own trailing
-            // ~keep run the same way `paragraph.rs` closes its own (issue #464 follow-up).
-            crate::converter::main_helpers::strip_trailing_backslash_breaks(output, content_start);
-        }
-
-        if output.len() > content_start && !output.ends_with("\n\n") {
-            output.push_str("\n\n");
-        }
-    }
-}
-
 /// Dispatcher for interactive elements.
 ///
-/// Routes `<details>`, `<summary>`, and `<dialog>` elements to their respective handlers.
+/// Routes `<details>` and `<summary>` elements to their handlers.
 pub fn handle(
     tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -347,7 +281,6 @@ pub fn handle(
     match tag_name {
         "details" => handle_details(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
         "summary" => handle_summary(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
-        "dialog" => handle_dialog(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
         _ => {}
     }
 }

@@ -16,9 +16,8 @@ use std::collections::HashSet;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{
     collapse_excess_blank_lines, effective_max_depth, extract_head_metadata, format_metadata_frontmatter,
-    has_custom_element_tags, repair_with_html5ever, restore_break_before_paragraph_text,
-    strip_trailing_backslash_breaks, trailing_backslash_breaks, trim_line_end_whitespace, trim_trailing_whitespace,
-    writes_inline,
+    has_custom_element_tags, repair_with_html5ever, strip_trailing_backslash_breaks, trim_line_end_whitespace,
+    trim_trailing_whitespace, writes_inline,
 };
 use crate::converter::plain_text::extract_plain_text;
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, should_drop_for_preprocessing};
@@ -538,10 +537,9 @@ fn at_line_start(output: &str) -> bool {
 }
 
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since
-/// the block before it wrote nothing, and neither is a backslash hard break, since every block
-/// drops the one it ends with (issue #464).
+/// the block before it wrote nothing.
 fn ends_with_block_line_end(output: &str) -> bool {
-    output.len() >= 2 && output.ends_with('\n') && !output.ends_with("\\\n")
+    output.len() >= 2 && output.ends_with('\n')
 }
 
 /// Whether `node` is inline content: non-blank text or an inline element.
@@ -607,17 +605,6 @@ fn convert_node(
         ctx.depth_limit_reached.set(true);
         return;
     }
-
-    // ~keep One hard break at the end of the paragraph before this element, which the dispatch
-    // ~keep drops if the element is a block: see `restore_break_before_paragraph_text`. A run
-    // ~keep of breaks leaves a blank line, and a break at the end of a closed block element (a
-    // ~keep `<dt>` before its `<dd>`) is at the end of that element's block: both stay dropped.
-    let break_start = (options.newline_style == NewlineStyle::Backslash
-        && matches!(node, tl::Node::Tag(_))
-        && trailing_backslash_breaks(output, ctx.block_content_start) == 1
-        && !crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx)
-            .is_some_and(is_block_level_element))
-    .then(|| output.len() - "\\\n".len());
 
     separate_from_block(node, node_handle, parser, output, options, ctx, dom_ctx);
 
@@ -837,7 +824,7 @@ fn convert_node(
                     crate::converter::block::div::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
                 }
 
-                // ~keep `<address>`/`<search>`/`<hgroup>`/`<center>` are content-bearing block
+                // ~keep `<address>`/`<search>`/`<hgroup>`/`<center>`/`<dialog>` are content-bearing block
                 // ~keep containers with no formatting of their own beyond block separation --
                 // ~keep the same shape as `<div>`. Routing them through `div::handle` (rather
                 // ~keep than a semantic-module dispatcher) matters for Tier-1 parity: Tier-1's
@@ -847,7 +834,7 @@ fn convert_node(
                 // ~keep `div::handle` here -- instead of `semantic::sectioning::handle`, which
                 // ~keep has no table-cell/list-item special-casing -- keeps both tiers in
                 // ~keep agreement. See `tests/tier1_address_block_separator_test.rs`.
-                "address" | "search" | "hgroup" | "center" => {
+                "address" | "search" | "hgroup" | "center" | "dialog" => {
                     crate::converter::block::div::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
                 }
                 "caption" => crate::converter::block::table::handle_caption(
@@ -939,7 +926,7 @@ fn convert_node(
                     );
                 }
 
-                "details" | "summary" | "dialog" => {
+                "details" | "summary" => {
                     crate::converter::semantic::dispatch_semantic_handler(
                         &tag_name,
                         node_handle,
@@ -1035,10 +1022,6 @@ fn convert_node(
                         depth,
                     },
                 );
-            }
-
-            if let Some(break_start) = break_start {
-                restore_break_before_paragraph_text(output, break_start);
             }
         }
 

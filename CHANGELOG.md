@@ -76,17 +76,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<ul><li><details><summary>s</summary>d</details></li></ul>` gave `-\n\n**s**\n\nd`, an empty
   item with the content after the list, and `<ul><li><menu><li>m</li></menu></li></ul>` split the
   item in two. These containers, and a form, now start at the item's content column like a
-  `<div>`, and the text after one of them stays in the item. A menu is now converted exactly
-  like a `<ul>`: it nests in the item, cycles the configured `bullets`, and a visitor gets the
-  list callbacks for it. Center, search, dialog, summary and legend elements now count as blocks, so the text
-  after them starts a new paragraph.
+  `<div>`, and the text after one of them stays in the item. In Markdown output a menu is now
+  converted like a `<ul>`: it nests in the item, cycles the configured `bullets`, and a visitor
+  gets the list callbacks for it, with the tag name `ul`. Center, search, dialog, summary and
+  legend elements now count as blocks, so the text after them starts a new paragraph.
 - **The eight elements center, details, dialog, hgroup, legend, menu, search and summary are now
   blocks outside list items too.** In bold, italic or a span they split the wrapper like a
   `<div>`: `<p><strong>a<center>x</center>y</strong></p>` gives `**a**\n\n**x**\n\n**y**`, and
   plain text output puts them in a paragraph of their own. In a link they are separated from
-  the text before them by a space. With the backslash newline style, a hard break before a
-  center, details, hgroup or search element is dropped, because a new paragraph starts there.
-  A visitor now gets `is_inline: false` in the node context of these eight elements.
+  the text before them by a space. A dialog is converted like a `<div>`, and a summary or legend
+  outside its container starts a paragraph of its own, as a `<div>` does:
+  `<p>a<dialog>x</dialog>y</p>` gives `a\n\nx\n\ny`, where it gave `ax\n\ny`. A hard break
+  right before one of the eight elements is dropped, as before a `<div>`, because a new
+  paragraph starts there. A visitor now gets `is_inline: false` in the node context of these
+  eight elements.
 - **A custom element after a paragraph in a list item left the item (#658).** With
   `preserve_tags: ["my-el"]`, `<ol><li><p>a</p><my-el></my-el><h2>h</h2>t</li></ol>` gave
   `1. a\n\n<my-el></my-el>## h`, so the heading was text outside the list. A custom element after

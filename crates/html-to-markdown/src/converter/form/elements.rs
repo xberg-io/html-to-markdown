@@ -258,6 +258,7 @@ pub fn handle_legend(
             if ctx.convert_as_inline {
                 output.push_str(trimmed);
             } else {
+                crate::converter::block::div::start_block(output, ctx, options);
                 let mut symbol = String::with_capacity(2);
                 symbol.push(options.strong_em_symbol);
                 symbol.push(options.strong_em_symbol);
