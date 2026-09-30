@@ -164,6 +164,10 @@ pub struct OpenTag {
     /// Whether the first content of this quote or heading in a table cell was whitespace, which
     /// Tier-2 keeps at the start of the element's own buffer (see `scanner::flush_text`).
     pub starts_with_whitespace: bool,
+    /// Tier-2 renders this element's children into a fresh buffer of their own (`<mark>`,
+    /// `<sub>`, `<sup>`, `<abbr>`, `<dt>`, `<dd>`), so its text sees an empty buffer, not
+    /// the line before the element.
+    pub children_in_own_buffer: bool,
 }
 
 /// Minimum capacity for each summary accumulation buffer.
