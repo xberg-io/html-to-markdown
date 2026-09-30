@@ -113,12 +113,14 @@ fn should_leave_the_text_of_a_closed_atx_heading_as_it_is() {
 
 #[test]
 fn should_leave_the_hash_of_a_djot_heading_as_it_is() {
-    let djot = ConversionOptions {
-        output_format: OutputFormat::Djot,
-        ..options(TierStrategy::Tier2, HeadingStyle::Atx)
-    };
-    assert_eq!(convert_with("<h1>#</h1>", &djot), "# #\n");
-    assert_eq!(convert_with("<h1>a #</h1>", &djot), "# a #\n");
+    for tier in TIERS {
+        let djot = ConversionOptions {
+            output_format: OutputFormat::Djot,
+            ..options(tier, HeadingStyle::Atx)
+        };
+        assert_eq!(convert_with("<h1>#</h1>", &djot), "# #\n", "{tier:?}");
+        assert_eq!(convert_with("<h1>a #</h1>", &djot), "# a #\n", "{tier:?}");
+    }
 }
 
 #[test]

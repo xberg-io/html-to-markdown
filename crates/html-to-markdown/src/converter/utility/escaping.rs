@@ -308,9 +308,10 @@ pub fn escape_paragraph_start(rest: &str, underline: u8) -> Cow<'_, str> {
 /// definition when a setext underline of `underline` follows it: a label, a colon, then a
 /// destination with an optional title and nothing after it, or nothing at all.
 ///
-/// ~keep With nothing after the colon the destination is read from the next line. An `=`
-/// ~keep underline can be that destination; a `-` underline as long as a label and a colon is a
-/// ~keep thematic break, which ends the definition first.
+/// ~keep With nothing after the colon the destination is read from the next line. markdown-it
+/// ~keep takes an `=` underline as that destination (`CommonMark` renderers keep the heading); a
+/// ~keep `-` underline as long as a label and a colon is a thematic break, which ends the
+/// ~keep definition first in both.
 fn starts_link_reference_definition(rest: &str, underline: u8) -> bool {
     let Some(after_label) = link_label_len(rest).and_then(|len| rest[len..].strip_prefix(':')) else {
         return false;
@@ -404,16 +405,15 @@ fn is_link_title(text: &str) -> bool {
     false
 }
 
-/// Byte offset within `text`, the text of an ATX heading, of the `#` run at its end when a parser
+/// Byte offset within `text`, the trimmed text of an ATX heading, of the `#` run at its end when a parser
 /// reads that run as the heading's closing sequence: the run is all of the text, or follows a
 /// space or tab (spec section 4.2).
 ///
 /// ~keep Escaping the run's first `#` keeps it as text: the run then follows a backslash
 /// ~keep (issue #661).
 pub fn atx_closing_sequence_offset(text: &str) -> Option<usize> {
-    let body = text.trim_end_matches([' ', '\t']);
-    let run_start = body.trim_end_matches('#').len();
-    let closes = run_start < body.len() && (run_start == 0 || matches!(body.as_bytes()[run_start - 1], b' ' | b'\t'));
+    let run_start = text.trim_end_matches('#').len();
+    let closes = run_start < text.len() && (run_start == 0 || matches!(text.as_bytes()[run_start - 1], b' ' | b'\t'));
     closes.then_some(run_start)
 }
 
