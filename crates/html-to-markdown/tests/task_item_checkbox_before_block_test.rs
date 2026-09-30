@@ -154,36 +154,45 @@ fn should_keep_the_checkbox_of_an_empty_task_item() {
 
 #[test]
 fn should_keep_the_output_where_a_checkbox_is_text() {
-    // Code, a table cell and inline mode write no reference, and an empty item there keeps the
-    // space after its checkbox, in both output formats and both tiers.
+    // Code, an inline element around the list, a table cell and inline mode write no reference,
+    // and an empty item there keeps the space after its checkbox, in both output formats and both
+    // tiers. Each case gives the Markdown output, then the Djot output.
     let empty = r#"<ul><li><input type="checkbox"></li></ul>"#;
     let quote = r#"<ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul>"#;
+    let same = |inline: bool, html: String, expected: &'static str| (inline, html, expected, expected);
     let cases = [
-        (false, format!("<code>{empty}</code>"), "`- [ ] `\n"),
-        (false, format!("<code><b>{empty}</b></code>"), "`- [ ] `\n"),
-        (false, format!("<code>{quote}</code>"), "`- [ ]`  \n`  > q`\n"),
-        (false, format!("<pre>{empty}</pre>"), "```\n- [ ]\n```\n"),
-        (false, format!("<pre>{quote}</pre>"), "```\n- [ ]\n  > q\n```\n"),
-        (
+        same(false, format!("<code>{empty}</code>"), "`- [ ] `\n"),
+        same(false, format!("<code><b>{empty}</b></code>"), "`- [ ] `\n"),
+        same(false, format!("<code>{quote}</code>"), "`- [ ]`  \n`  > q`\n"),
+        same(false, format!("<pre>{empty}</pre>"), "```\n- [ ]\n```\n"),
+        same(false, format!("<pre>{quote}</pre>"), "```\n- [ ]\n  > q\n```\n"),
+        (false, format!("<b>{empty}</b>"), "**- [ ]**\n", "*- [ ]*\n"),
+        (false, format!("<b>{quote}</b>"), "**- [ ] > q**\n", "*- [ ] > q*\n"),
+        (false, format!("<em>{empty}</em>"), "*- [ ]*\n", "_- [ ]_\n"),
+        (false, format!("<em>{quote}</em>"), "*- [ ] > q*\n", "_- [ ] > q_\n"),
+        same(false, format!(r#"<a href="u">{empty}</a>"#), "[- [ ]](u)\n"),
+        same(false, format!(r#"<a href="u">{quote}</a>"#), "[- [ ] q](u)\n"),
+        same(
             false,
             format!("<table><tr><td>{quote}</td></tr></table>"),
             "| - [ ] q |\n| ------- |\n",
         ),
-        (true, empty.to_string(), "- [ ]\n"),
-        (true, quote.to_string(), "- [ ] q\n"),
-        (true, format!("<code>{empty}</code>"), "`- [ ] `\n"),
+        same(true, empty.to_string(), "- [ ]\n"),
+        same(true, quote.to_string(), "- [ ] q\n"),
+        same(true, format!("<code>{empty}</code>"), "`- [ ] `\n"),
     ];
     for format in [OutputFormat::Markdown, OutputFormat::Djot] {
         for strategy in [TierStrategy::Tier1, TierStrategy::Tier2] {
-            for (inline, html, expected) in &cases {
+            for (inline, html, markdown, djot) in &cases {
                 let options = ConversionOptions {
                     output_format: format,
                     convert_as_inline: *inline,
                     ..options_with(strategy)
                 };
+                let expected = if format == OutputFormat::Djot { *djot } else { *markdown };
                 assert_eq!(
                     convert_with(html, &options),
-                    *expected,
+                    expected,
                     "{html} {format:?} {strategy:?} inline={inline}"
                 );
             }

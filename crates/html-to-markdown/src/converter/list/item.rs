@@ -386,9 +386,10 @@ fn write_li(
         // ~keep cmark-gfm prints a bare `[ ]` line as text. A space written as a character
         // ~keep reference is that content and renders as a space; a trailing space is not
         // ~keep (markdown-it drops the checkbox, cmark-gfm moves a block after a blank line out
-        // ~keep of the item). A table cell and inline mode hold no task item, code would show the
-        // ~keep reference as written, and Djot keeps its own form: an empty item there keeps the
-        // ~keep plain space after the checkbox.
+        // ~keep of the item). A list inside an inline element such as `<b>`, a table cell and
+        // ~keep inline mode hold no task item, code would show the reference as written, and
+        // ~keep Djot keeps its own form: an empty item there keeps the plain space after the
+        // ~keep checkbox.
         const CHECKBOX_CONTENT: &str = " &#32;";
         let item_starts = li_ctx.list_item_open && !ctx.in_table_cell && !ctx.convert_as_inline;
         let writes_checkbox_content = item_starts && options.output_format == OutputFormat::Markdown && !ctx.in_code;
