@@ -94,9 +94,24 @@ fn should_drop_the_leading_space_of_the_line_after_a_hard_break() {
         "<body>a<br>  1) t</body>",
         "<div>a<br>\t- t</div>",
         "<p><b>a</b><br> b</p>",
+        // ~keep Inside an element with a buffer of its own that already holds text, the
+        // ~keep break is in that buffer, so the space is dropped there too.
+        "<dl><dd>a<br> b</dd></dl>",
+        "<dl><dt>a<br> b</dt></dl>",
+        "<div>a<br><sup>y<br> x</sup></div>",
     ] {
         assert_eq!(tier1(html), tier2(html), "input: {html:?}");
     }
+    let no_highlight = ConversionOptions {
+        highlight_style: HighlightStyle::None,
+        ..options(TierStrategy::Tier2)
+    };
+    let html = "<p>a<br><mark>y<br> x</mark></p>";
+    let scanned = tier1::run(html, &PrescanReport::default(), &no_highlight).expect("the fast converter must not bail");
+    let converted = convert(html, Some(no_highlight))
+        .expect("conversion must succeed")
+        .content;
+    assert_eq!(Some(scanned), converted);
 }
 
 #[test]
