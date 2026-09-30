@@ -40,7 +40,7 @@ pub fn handle_ol(
         output.push_str("\n\n");
         None
     } else {
-        switched_delimiter(ctx)
+        switched_delimiter(output, ctx)
     };
 
     let nested_depth = calculate_list_nesting_depth(ctx);

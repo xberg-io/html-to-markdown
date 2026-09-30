@@ -342,6 +342,8 @@ fn should_keep_the_dot_delimiter_after_a_wrapped_list_that_something_follows() {
         "<ol><li>a</li></ol><blockquote><ol><li>b</li></ol></blockquote>",
         "<blockquote><ol><li>a</li></ol></blockquote><ol><li>b</li></ol>",
         "<ol><li>a</li></ol><table><tr><td><ol><li>b</li></ol></td></tr></table>",
+        // ~keep The next item's marker comes after the nested list, in the same buffer.
+        "<ol><li>a<ol><li>x</li></ol></li><li><ol><li>y</li></ol></li></ol>",
         // ~keep A last line as long as the list's, and one that ends with the list's text.
         "<section><ol><li>a</li></ol></section><p>wxyz</p><section><ol><li>b</li></ol></section>",
         "<ol><li>a</li></ol><p>z1. a</p><ol><li>b</li></ol>",
@@ -350,5 +352,39 @@ fn should_keep_the_dot_delimiter_after_a_wrapped_list_that_something_follows() {
     ] {
         let markdown = convert_with(html, &options);
         assert!(!markdown.contains("1)"), "{html}: {markdown:?}");
+    }
+}
+
+// ~keep A wrapper that rewrites the end of its text (a figure moving an image next to the text,
+// ~keep strict whitespace trimming a no-break space) still leaves the list at the end.
+#[test]
+fn should_keep_adjacent_ordered_lists_apart_when_the_wrapper_rewrites_the_list_end() {
+    let strict = ConversionOptions {
+        whitespace_mode: html_to_markdown_rs::options::WhitespaceMode::Strict,
+        ..tier2_options()
+    };
+    for strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let options = ConversionOptions {
+            tier_strategy: strategy,
+            ..tier2_options()
+        };
+        for html in [
+            r#"<figure><ol><li>a <img src="x.png"></li></ol></figure><ol><li>b</li></ol>"#,
+            r#"<figure><ol><li>a<br><img src="x.png"></li></ol></figure><ol><li>b</li></ol>"#,
+            r#"<figure><ol><li>a <img src="x.png"></li></ol></figure><figure><ol><li>b</li></ol></figure>"#,
+        ] {
+            let markdown = convert_with(html, &options);
+            assert!(markdown.contains("1) b"), "{strategy:?} {html}: {markdown:?}");
+            assert_eq!(render(&markdown).matches("<ol").count(), 2, "{html}: {markdown:?}");
+        }
+    }
+    for html in [
+        "<details><ol><li>a&nbsp;</li></ol></details><ol><li>b</li></ol>",
+        "<details><ol><li>a&emsp;</li></ol></details><ol><li>b</li></ol>",
+        "<fieldset><ol><li>a&nbsp;</li></ol></fieldset><ol><li>b</li></ol>",
+    ] {
+        let markdown = convert_with(html, &strict);
+        assert!(markdown.contains("1) b"), "{html}: {markdown:?}");
+        assert_eq!(render(&markdown).matches("<ol").count(), 2, "{html}: {markdown:?}");
     }
 }
