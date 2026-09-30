@@ -148,6 +148,32 @@ pub fn handle_blockquote(
         }
     }
 
+    if ctx.in_table_cell {
+        // ~keep A cell holds one line, so a quote in it sheds its marker as a heading, a list and
+        // ~keep a code block do there, and the cell break separates it like any block (issue #647).
+        if !trimmed_content.is_empty() {
+            // ~keep In code the quote keeps the line ends it writes there, which the cell folds.
+            if ctx.in_code {
+                if !output.is_empty() && !output.ends_with('\n') {
+                    output.push('\n');
+                }
+            } else {
+                crate::converter::main_helpers::separate_block_in_cell(output, options.br_in_tables);
+            }
+            output.push_str(trimmed_content);
+            if ctx.in_code {
+                output.push('\n');
+            }
+            if let Some(url) = cite {
+                crate::converter::main_helpers::separate_block_in_cell(output, options.br_in_tables);
+                output.push_str("— <");
+                output.push_str(&url);
+                output.push('>');
+            }
+        }
+        return;
+    }
+
     if !trimmed_content.is_empty() {
         let list_indent = if ctx.in_list_item {
             crate::converter::list::utils::continuation_indent_string(
@@ -256,7 +282,7 @@ pub fn handle_blockquote(
 
         // ~keep Add trailing newlines only when appropriate for proper spacing
         // (matching paragraph conditional logic for CommonMark compliance)
-        if !ctx.convert_as_inline && !ctx.in_table_cell && !ctx.in_list_item {
+        if !ctx.convert_as_inline && !ctx.in_list_item {
             while output.ends_with('\n') {
                 output.truncate(output.len() - 1);
             }

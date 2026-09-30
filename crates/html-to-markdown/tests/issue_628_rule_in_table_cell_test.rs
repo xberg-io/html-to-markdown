@@ -95,8 +95,7 @@ fn should_keep_the_table_for_a_rule_in_each_block_of_a_cell() {
     );
 }
 
-/// A rule in a quote in a cell. Tier 1 writes a quote in a cell without its marker, so only the
-/// full converter's table is checked here.
+/// A rule in a quote in a cell. A quote in a cell has no marker in either tier (issue #647).
 const RULE_IN_QUOTE_IN_CELL: [&str; 2] = [
     "<table><tr><td><blockquote><hr></blockquote></td></tr></table>",
     "<table><tr><td><blockquote><ul><li><hr></li></ul></blockquote></td></tr></table>",
@@ -107,9 +106,11 @@ fn should_keep_the_table_for_a_rule_in_a_quote_in_a_cell() {
     for br_in_tables in [false, true] {
         for html in RULE_IN_QUOTE_IN_CELL {
             let markdown = tier2(html, br_in_tables);
+            assert_eq!(markdown, "| --- |\n| --- |\n", "{html:?} br_in_tables={br_in_tables}");
             assert_eq!(
-                markdown, "| > --- |\n| ----- |\n",
-                "{html:?} br_in_tables={br_in_tables}"
+                tier1_run(html, br_in_tables).ok().as_deref(),
+                Some(markdown.as_str()),
+                "{html:?}"
             );
             assert!(render(&markdown).starts_with("<table>"), "{html:?}: {markdown:?}");
         }
