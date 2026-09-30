@@ -223,17 +223,26 @@ pub fn normalize_link_label(label: &str) -> String {
     let mut rest = label;
 
     while let Some((marker_pos, marker)) = find_earliest_hard_break_marker(rest) {
-        let mut segment = String::new();
-        collapse_whitespace_into(&mut segment, &rest[..marker_pos]);
-        segments.push(segment);
+        segments.push(label_segment(&rest[..marker_pos]));
         markers.push(marker);
         rest = &rest[marker_pos + marker.len()..];
     }
-    let mut segment = String::new();
-    collapse_whitespace_into(&mut segment, rest);
-    segments.push(segment);
+    segments.push(label_segment(rest));
 
     assemble_label(segments, markers)
+}
+
+/// Collapse the whitespace of one marker-free segment of a label, keeping its leading spaces
+/// and tabs.
+///
+/// ~keep After a hard break they are the indent of the list item the label sits in, which the
+/// ~keep text node wrote there; collapsed to one space, the line left the item and the link
+/// ~keep broke (issue #678). The label's own two ends are trimmed later, in `assemble_label`.
+fn label_segment(text: &str) -> String {
+    let body = text.trim_start_matches([' ', '\t']);
+    let mut segment = text[..text.len() - body.len()].to_string();
+    collapse_whitespace_into(&mut segment, body);
+    segment
 }
 
 /// Re-join a label's whitespace-collapsed segments and the hard-break markers between them,

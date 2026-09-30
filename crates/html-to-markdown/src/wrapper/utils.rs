@@ -382,14 +382,16 @@ pub fn wrap_list_item(indent: &str, marker: &str, content: &str, width: usize) -
         return format!("{}{}\n", indent, marker.trim_end());
     }
 
-    if is_single_inline_link(content) {
-        return format!("{}{}{}\n", indent, marker, content.trim());
-    }
-
     let full_marker = format!("{indent}{marker}");
     let continuation_indent = format!("{}{}", indent, " ".repeat(marker.len()));
     let prefix_len = full_marker.len();
-    let wrapped = wrap_line(content, if width > prefix_len { width - prefix_len } else { width });
+    // ~keep A link-only item is not reflowed, but a line after a hard break in its label still
+    // ~keep needs the item's indent, or it leaves the item and the link breaks (issue #678).
+    let wrapped = if is_single_inline_link(content) {
+        content.trim().to_string()
+    } else {
+        wrap_line(content, if width > prefix_len { width - prefix_len } else { width })
+    };
 
     let mut result = String::with_capacity(wrapped.len() + prefix_len * 2);
     for (index, line) in wrapped.split('\n').enumerate() {

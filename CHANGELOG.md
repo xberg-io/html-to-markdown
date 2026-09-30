@@ -68,6 +68,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`1.`, `1)`, `01.`, `-`, `+`, `*`, `>`, `#`, a rule, a fence or an underline) now has that
   character escaped, `1\) t`, in both converters. A line that cannot interrupt a paragraph, like
   `2. t`, is left as it is.
+- **A line after a hard break in a link in a list item left the item (#678).**
+  `<ul><li><a href="u">a<br>2. t</a></li></ul>` gave `- [a  \n 2. t](u)`: the full converter
+  folded the item's indent before `2. t` to one space, so the line started a new list and the
+  link broke. The line now keeps the item's indent, `- [a  \n  2. t](u)`, in nested items, ordered
+  items, tab indents and quotes as well, and both converters give the same output. With wrap on, the later
+  lines of a list item that holds only a link now get the item's indent too.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a

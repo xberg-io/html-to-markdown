@@ -628,4 +628,11 @@ mod tests {
         assert!(result.contains("- [A very long link label that would exceed wrap width](#a-very-long-link-label)"));
         assert!(result.contains("  - [Nested very long link label that would also exceed](#nested)"));
     }
+
+    // ~keep Issue #678: the line after a hard break in a link-only item keeps the item's indent.
+    #[test]
+    fn wrap_markdown_indents_the_lines_of_a_link_only_item() {
+        assert_eq!(wrap_at_20("- [a  \n  2. t](u)\n"), "- [a  \n  2. t](u)\n");
+        assert_eq!(wrap_at_20("- q\n  * [a  \n    b](u)\n"), "- q\n  * [a  \n    b](u)\n");
+    }
 }
