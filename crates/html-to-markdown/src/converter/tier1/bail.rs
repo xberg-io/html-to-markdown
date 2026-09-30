@@ -164,10 +164,11 @@ pub enum BailReason {
     /// This scanner writes `.` only.
     OrderedListAfterOrderedList,
 
-    /// A list item of a nested list closed with nothing after its marker on the marker line.
+    /// A list item of a nested list, or one after text inside its list, closed with nothing after
+    /// its marker on the marker line.
     ///
-    /// Such a line cannot interrupt a paragraph, so Tier-2 writes a blank line before the first
-    /// item of a list after item text (issue #667). This scanner does not track open paragraphs.
+    /// Such a line cannot interrupt a paragraph, so Tier-2 writes a blank line before it when it
+    /// follows text (issue #667). This scanner does not track open paragraphs.
     EmptyNestedListItem,
 
     /// A `<blockquote>`, `<div>` (or other generic block container), `<table>`,

@@ -1650,7 +1650,9 @@ fn open_list_item(state: &mut Tier1State, options: &ConversionOptions) {
     // ~keep ends its line, with a blank line when the marker line cannot interrupt the text. A
     // ~keep bullet with content always can.
     let line_start = state.output.rfind('\n').map_or(0, |pos| pos + 1);
-    if !state.output[line_start..].trim().is_empty() && !line_is_bare_list_marker(&state.output) {
+    let after_text = !state.output[line_start..].trim().is_empty() && !line_is_bare_list_marker(&state.output);
+    state.list_items_after_text.push(after_text);
+    if after_text {
         state.output.push('\n');
         if ordered_index
             .is_some_and(|index| !crate::converter::utility::escaping::line_opens_block(&format!("{index}. x")))
@@ -3550,15 +3552,17 @@ fn close_list_item(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailRe
         return Ok(());
     }
     state.list_item_marker_widths.pop();
+    let after_text = state.list_items_after_text.pop().unwrap_or_default();
     trim_trailing_inline_whitespace(state);
-    // ~keep A nested item with nothing on its marker line cannot interrupt the item text before
-    // ~keep it (issue #667). Tier 2 decides whether that text is an open paragraph.
-    let nested = state.list_depth > 1;
+    // ~keep A nested item, or an item after text inside its list, with nothing on its marker line
+    // ~keep cannot interrupt the text before it (issue #667). Tier 2 decides whether that text is
+    // ~keep an open paragraph.
+    let follows_text = state.list_depth > 1 || after_text;
     let dest = state.cell_or_output_mut();
     let marker_line = dest
         .get(clamp_to_char_boundary(dest, frame.content_start)..)
         .unwrap_or_default();
-    if nested && marker_line.split('\n').next().unwrap_or_default().trim().is_empty() {
+    if follows_text && marker_line.split('\n').next().unwrap_or_default().trim().is_empty() {
         return Err(BailReason::EmptyNestedListItem);
     }
     // ~keep Phase EE: loose-list separator.  When this item had block-level

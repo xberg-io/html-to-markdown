@@ -303,6 +303,11 @@ pub struct Tier1State {
     /// `Tier1State::list_continuation_indent_width`.
     pub list_item_marker_widths: Vec<usize>,
 
+    /// Whether each currently-open list item's marker line follows text inside its list on the
+    /// line above, one entry per open `<li>` frame, pushed and popped with
+    /// `list_item_marker_widths`.
+    pub list_items_after_text: Vec<bool>,
+
     /// `true` until the first text node carrying real (non-whitespace)
     /// content has been processed anywhere in the document, then
     /// permanently `false`.
@@ -350,6 +355,7 @@ impl Tier1State {
             last_closed_block: false,
             last_ordered_list_end: None,
             list_item_marker_widths: Vec::new(),
+            list_items_after_text: Vec::new(),
             at_document_start: true,
             effective_base,
         }

@@ -66,8 +66,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<ol><li>a<ul><li></li></ul></li></ol>` gave `1. a\n   -\n`: an empty item cannot interrupt a
   paragraph, so the lone `-` read as a heading underline and the item was lost. A nested list whose
   first item writes nothing on its marker line now starts after a blank line: `1. a\n\n   -\n`.
-  With custom `bullets` such as `-`, nested single-item lists that end in an empty item wrote
-  `- - -`, a thematic break. The empty item's marker now starts the next line: `- -\n    -`.
+  An empty item after text directly inside its list does the same: `<ul>t<li></li></ul>` gives
+  `t\n\n-\n`, not `t\n-\n`. A list between inline markers, such as a highlight, is text and
+  does not change. With custom `bullets` such as `-`, nested single-item lists that end in an
+  empty item wrote `- - -`, a thematic break. The empty item's marker now starts the next line,
+  at the column it had on the line of markers: `- -\n    -`.
 - **A task item in an ordered list lost its number (#659).**
   `<ol><li><input type="checkbox">p</li></ol>` gave `- [ ] p`, a bullet list. A task item now
   writes the marker of its own list, so it gives `1. [ ] p`, and its content column follows the
