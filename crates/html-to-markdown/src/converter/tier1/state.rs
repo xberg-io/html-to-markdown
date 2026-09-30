@@ -298,6 +298,14 @@ pub struct Tier1State {
     /// after a block, or after an inline element ending in one, starts a new paragraph (issues
     /// #570, #571, #585).
     pub last_closed_block: bool,
+    /// The length of the output right after a text node's trailing source newline was written
+    /// as a `'\n'` join. Cleared by an opening tag other than `<br>`, `<script>` or `<style>`,
+    /// and by the closing tag of a block or of a form element that Tier-2 writes on a line of its
+    /// own; any other output leaves it behind the end. An inline closing tag that leaves the join
+    /// last moves it to the new end. A `<br>` that finds the output still that long removes the
+    /// join: the break ends the text's line, as in Tier-2 (issue #683). Deciding at the `<br>`
+    /// rather than looking ahead from the text reads each byte of the markup between them once.
+    pub pending_newline_join: Option<usize>,
     /// The end of the text of the last ordered list closed outside a table cell: an ordered list
     /// that opens after only whitespace there continues it.
     pub last_ordered_list_end: Option<usize>,
@@ -366,6 +374,7 @@ impl Tier1State {
             last_closed_custom_element: false,
             last_emitted_was_img: false,
             last_closed_block: false,
+            pending_newline_join: None,
             last_ordered_list_end: None,
             list_item_marker_widths: Vec::new(),
             list_items_after_text: Vec::new(),
