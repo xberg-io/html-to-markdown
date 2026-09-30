@@ -316,6 +316,12 @@ fn should_keep_a_hard_break_in_a_wrapper_or_before_an_empty_element_in_the_parag
         &["a</strong><br />"],
     );
     assert_converts("<p>a<br><dialog></dialog>y</p>", &backslash, "a\\\ny\n", &["a<br />"]);
+    assert_converts(
+        "<p>a<br>&#10;<dialog>x</dialog>y</p>",
+        &backslash,
+        "a\\\nx\n\ny\n",
+        &["a<br />"],
+    );
 }
 
 #[test]

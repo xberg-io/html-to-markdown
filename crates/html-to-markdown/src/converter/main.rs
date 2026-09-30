@@ -613,8 +613,8 @@ fn convert_node(
     let break_start = (options.newline_style == NewlineStyle::Backslash
         && matches!(node, tl::Node::Tag(_))
         && trailing_backslash_breaks(output, ctx.block_content_start) == 1
-        && crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx)
-            .is_some_and(|name| !is_block_level_element(name)))
+        && !crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx)
+            .is_some_and(is_block_level_element))
     .then(|| output.len() - "\\\n".len());
 
     separate_from_block(node, node_handle, parser, output, options, ctx, dom_ctx);
