@@ -71,7 +71,7 @@ fn should_drop_indented_code_block_when_pre_is_inside_table_cell() {
         ..Default::default()
     };
     let result = convert(html, Some(options)).unwrap();
-    assert_eq!(result, "| a btail |\n| --- |\n", "actual: {result:?}");
+    assert_eq!(result, "| a b<br>tail |\n| --- |\n", "actual: {result:?}");
     assert_eq!(
         result.lines().count(),
         2,

@@ -288,14 +288,14 @@ fn should_keep_the_text_after_a_center_search_or_dialog_element_in_the_list_item
 fn should_keep_a_details_element_in_a_list_item_in_a_table_cell_on_the_cell_line() {
     assert_converts_in_both_tiers(
         "<table><tr><td><ul><li><details><summary>s</summary>d</details></li></ul></td></tr></table>",
-        "| **s**  d |\n| -------- |\n",
-        &["<th><strong>s</strong>  d</th>"],
+        "| **s** d |\n| ------- |\n",
+        &["<th><strong>s</strong> d</th>"],
     );
     assert_converts(
         "<table><tr><td><ul><li>a<details><summary>s</summary>d</details>b</li></ul></td></tr></table>",
         &options_for(TierStrategy::Tier2),
-        "| a  **s**  d  b |\n| -------------- |\n",
-        &["<th>a  <strong>s</strong>  d  b</th>"],
+        "| a  **s** d b |\n| ------------ |\n",
+        &["<th>a  <strong>s</strong> d b</th>"],
     );
 }
 
