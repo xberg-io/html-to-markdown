@@ -64,6 +64,33 @@ pub fn handle(
         return;
     }
 
+    let (open, div_ctx) = open_div(output, ctx, options);
+
+    let children = tag.children();
+    {
+        for child_handle in children.top().iter() {
+            walk_node(child_handle, parser, output, options, &div_ctx, depth + 1, dom_ctx);
+        }
+    }
+
+    close_div(node_handle, parser, output, options, ctx, dom_ctx, open);
+}
+
+/// Where a div's content starts, measured before its children are written.
+struct OpenDiv {
+    content_start_pos: usize,
+    children_start: usize,
+    is_list_continuation: bool,
+    kept: Option<(usize, String)>,
+}
+
+/// Separate the div from the content before it and build the context its children run in.
+///
+/// ~keep Kept out of `handle` with `close_div`: `handle` recurses once per nested div, and in
+/// ~keep a debug build every temporary of a function holds its stack slot for the whole call,
+/// ~keep so the work before and after the children would stay on the stack at every level.
+#[inline(never)]
+fn open_div(output: &mut String, ctx: &Context, options: &ConversionOptions) -> (OpenDiv, Context) {
     let content_start_pos = output.len();
     // ~keep An empty div in a list item leaves the item as it found it (issue #583): its list
     // ~keep separator trims the line end, so the trimmed tail is kept to put back.
@@ -90,12 +117,34 @@ pub fn handle(
         ..ctx.clone()
     };
 
-    let children = tag.children();
-    {
-        for child_handle in children.top().iter() {
-            walk_node(child_handle, parser, output, options, &div_ctx, depth + 1, dom_ctx);
-        }
-    }
+    (
+        OpenDiv {
+            content_start_pos,
+            children_start,
+            is_list_continuation,
+            kept,
+        },
+        div_ctx,
+    )
+}
+
+/// Strip the div's trailing breaks and write the separator after it.
+#[inline(never)]
+fn close_div(
+    node_handle: &NodeHandle,
+    parser: &Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    dom_ctx: &DomContext,
+    open: OpenDiv,
+) {
+    let OpenDiv {
+        content_start_pos,
+        children_start,
+        is_list_continuation,
+        kept,
+    } = open;
 
     if options.newline_style == NewlineStyle::Backslash {
         // ~keep A trailing <br> run with no following sibling has no next dispatch to catch
