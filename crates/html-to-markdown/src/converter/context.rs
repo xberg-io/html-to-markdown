@@ -134,6 +134,10 @@ pub struct Context {
     /// Whether a paragraph was open before the previous marker line of the lists: the next
     /// marker's check stops there instead of walking back over every earlier item.
     pub(crate) previous_marker: crate::converter::list::utils::PreviousMarker,
+    /// Where the last ordered list ended, and the delimiter it wrote.
+    pub(crate) last_list: crate::converter::list::utils::LastList,
+    /// The delimiter of the innermost ordered list when it is not `.`.
+    pub(crate) ordered_delimiter: Option<char>,
     /// Whether the innermost list item is still open after the lines of a buffer checked so
     /// far: each block checks only the lines written since.
     pub(crate) item_lines: crate::converter::list::utils::ItemLineScan,
@@ -342,6 +346,8 @@ impl Context {
             real_item_columns: 0,
             quote_starts_after_markers: false,
             previous_marker: crate::converter::list::utils::PreviousMarker::default(),
+            last_list: crate::converter::list::utils::LastList::default(),
+            ordered_delimiter: None,
             item_lines: crate::converter::list::utils::ItemLineScan::default(),
             first_writer: None,
             ul_depth: 0,
