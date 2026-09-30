@@ -333,7 +333,7 @@ fn task_item_leading_blockquote_starts_its_own_line() {
     ] {
         let html = format!(r#"<ul><li><input type="checkbox">{between}<blockquote>q</blockquote></li></ul>"#);
         let result = convert(&html, None).unwrap();
-        assert_eq!(result, "- [ ]\n  > q\n", "between = {between:?}");
+        assert_eq!(result, "- [ ] &#32;\n  > q\n", "between = {between:?}");
     }
 }
 
@@ -341,7 +341,7 @@ fn task_item_leading_blockquote_starts_its_own_line() {
 fn nested_task_item_leading_blockquote_uses_nested_indent() {
     let html = r#"<ul><li><input type="checkbox"> a<ul><li><input type="checkbox"><br><blockquote>q</blockquote></li></ul></li></ul>"#;
     let result = convert(html, None).unwrap();
-    assert_eq!(result, "- [ ] a\n  - [ ]\n    > q\n");
+    assert_eq!(result, "- [ ] a\n  - [ ] &#32;\n    > q\n");
 }
 
 #[test]

@@ -52,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **An empty task item lost its checkbox on GitHub.** `<ul><li><input type="checkbox"></li></ul>`
+  gave `- [ ]`. GFM reads a checkbox only when content follows it, so cmark-gfm and markdown-it
+  showed the text `[ ]`. It now gives `- [ ] &#32;`, a checkbox: the character reference renders
+  as a space. Djot output does not change.
 - **Text next to a paragraph, heading or other block in a table cell joined it (#645).**
   `<table><tr><td><p>a</p>b</td></tr></table>` gave `| ab |`, and so did a heading, a `<div>`,
   a list or a code block before the text. Text before a heading or a code block joined it too.
@@ -173,7 +177,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   CommonMark ends an HTML block only at a blank line, and none followed a preserved block
   element, so in `<ul><li><input type="checkbox"><div></div><h2>h</h2>t</li></ul>` the heading
   and the text were part of the HTML. A blank line now follows a preserved element that starts
-  an HTML block, in a list item and at the top level: `- [ ]\n  <div></div>\n\n  ## h\n  t`.
+  an HTML block, in a list item and at the top level:
+  `- [ ] &#32;\n  <div></div>\n\n  ## h\n  t`.
 - **A table whose cells held only rules was dropped (#628).** The full converter took a table
   with no text and no image for a blank spacer table and wrote nothing, so
   `<table><tr><td><ul><li><hr></li></ul></td></tr></table>` gave an empty document. A rule now
@@ -215,11 +220,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `- > q`.
 - **A quote that starts a task item became the task's text (#622).** A checked task item whose
   first content is `<blockquote>q</blockquote>` gave `- [x] > q`, which renders the text
-  `[x] > q`. The quote now starts on the next line at the item's content column, `- [x]\n  > q`.
+  `[x] > q`. The quote now starts on the next line at the item's content column,
+  `- [x] &#32;\n  > q`. The checkbox line ends in a space written as a character reference: GFM
+  reads a checkbox only when content follows it, so cmark-gfm shows a bare `[x]` line as text.
   A nested list, a heading or a code block that starts a task item does the same, also inside a
   `<div>` or a `<section>`, and also when the checkbox is in a `<p>` of its own. A rule there
-  gave `- [ ] ---`, the text `[ ] ---`; it now comes after a blank line, `- [ ]\n\n  ---`, since
-  `---` right under the checkbox line makes that line a heading.
+  gave `- [ ] ---`, the text `[ ] ---`; it now comes after a blank line,
+  `- [ ] &#32;\n\n  ---`, since `---` right under the checkbox line makes that line a heading.
 - **A rule that starts a list item rendered outside the item (#623).**
   `<ul><li><hr></li></ul>` gave `-\n\n---`, an empty item and a rule after the list. The rule is
   now `___` on the marker line, `- ___`: `- ---` is a rule of its own.
@@ -235,7 +242,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   after the quote now starts after a blank line: `**- a\n  1. x\n  2. y\n     > q\n\n     t**`.
 - **Some first blocks of a task item still became the task's text (#634).** An ordered list that
   starts at a number other than 1 and a code block in the indented style cannot interrupt the
-  checkbox line, so they now start after a blank line: `- [ ]\n\n  3. x` and `- [ ]\n\n      c`.
+  checkbox line, so they now start after a blank line: `- [ ] &#32;\n\n  3. x` and
+  `- [ ] &#32;\n\n      c`.
   The code block keeps its indent; before, `- [ ]\n  c` lost the code. A quote after an empty
   inline element, such as `<span></span>`, now starts on the next line like a quote right after
   the checkbox. An image before the quote is still text on the checkbox line, and so is an empty
@@ -248,7 +256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the quote was text. The converter's own output now decides which element writes first, also
   inside a `<div>` or a `<section>`. A line break, a `&nbsp;`, a `<template>`, a `<noscript>`, an
   `<input>` that is not the checkbox, an empty `<picture>` or an image with `skip_images` writes
-  nothing there, so the quote now starts on the next line: `- [ ]\n  > q`.
+  nothing there, so the quote now starts on the next line: `- [ ] &#32;\n  > q`.
 - **An underlined heading ended its list item (#635).** With `heading_style` set to `underlined`,
   the underline of a heading in a list item was written at column 0: `<ul><li><h2>q</h2></li></ul>`
   gave `- q\n-`, an item and an empty item. The underline now gets the item's content column,

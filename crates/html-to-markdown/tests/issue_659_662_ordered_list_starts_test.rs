@@ -118,8 +118,11 @@ fn should_start_the_content_of_an_ordered_task_item_at_its_content_column() {
     assert_converts(
         r#"<ol start="10"><li><input type="checkbox"><blockquote>q</blockquote></li></ol>"#,
         &options,
-        "10. [ ]\n    > q\n",
-        &[r#"<ol start="10">"#, "<blockquote>\n<p>q</p>"],
+        "10. [ ] &#32;\n    > q\n",
+        &[
+            r#"<ol start="10">"#,
+            "<li><input type=\"checkbox\" disabled=\"\" />  \n<blockquote>\n<p>q</p>",
+        ],
     );
     assert_converts(
         r#"<ol start="10"><li><input type="checkbox"><p>a</p><p>b</p></li></ol>"#,
