@@ -176,10 +176,8 @@ pub fn render_cell_text(
                 // ~keep so its `|` delimiters would read as *the outer row's* cell boundaries on
                 // ~keep reparse, silently widening -- and on a second parse, truncating -- the
                 // ~keep containing row's column count: real content loss, not a cosmetic diff.
-                // ~keep Scoped to a child that *is, or wraps* (e.g. a `<div>`), a nested table:
-                // ~keep other block content a cell may hold (`<pre>`, code spans) is deliberately
-                // ~keep left byte-for-byte alone by their own handlers (issues #455/#456) and
-                // ~keep must not be touched here. A single-node tag test here used to miss a
+                // ~keep Scoped to a child that *is, or wraps* (e.g. a `<div>`), a nested table.
+                // ~keep A single-node tag test here used to miss a
                 // ~keep wrapped table entirely, letting it fall through to the `else` branch
                 // ~keep below and emit raw unescaped pipes (issue #488).
                 if super::utils::is_or_contains_table(child_handle, parser, dom_ctx) {
@@ -252,6 +250,11 @@ pub fn render_cell_text(
     // ~keep they are in a cell still emit `<br>` themselves; this only catches what they miss.
     if text.contains('\n') {
         text = text.replace('\n', " ");
+    }
+    // ~keep A `|` a handler wrote into the cell (a code span, a link destination or title, an
+    // ~keep image description, a nested table) splits the GFM row like one in plain text does.
+    if options.output_format == crate::options::OutputFormat::Markdown && text.contains('|') {
+        text = crate::converter::utility::escaping::escape_cell_pipes(&text).into_owned();
     }
     text
 }

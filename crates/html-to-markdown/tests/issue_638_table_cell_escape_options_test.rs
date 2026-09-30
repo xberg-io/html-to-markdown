@@ -235,3 +235,53 @@ fn issue_638_fast_converter_agrees_with_full_converter_in_cells() {
         }
     }
 }
+
+/// Cell content whose `|` another handler writes, with the HTML that must survive in the
+/// rendered cell.
+const PIPE_HOLDERS: &[(&str, &str, &str)] = &[
+    ("code span", "<code>a|b</code>", "<code>a|b</code>"),
+    ("code span after text", "x <code>a|b</code>", "<code>a|b</code>"),
+    (
+        "link destination",
+        "<a href=\"http://e.x/a|b\">t</a>",
+        "href=\"http://e.x/a%7Cb\"",
+    ),
+    (
+        "link title",
+        "<a href=\"http://e.x/\" title=\"a|b\">t</a>",
+        "title=\"a|b\"",
+    ),
+    (
+        "image description",
+        "<img src=\"http://e.x/i.png\" alt=\"a|b\">",
+        "alt=\"a|b\"",
+    ),
+    ("preformatted text", "<pre>a | b</pre>", "a | b"),
+    (
+        "code span in a nested table",
+        "<table><tr><td><code>a|b</code></td><td>c</td></tr></table>",
+        "<code>a|b</code>",
+    ),
+];
+
+#[test]
+fn issue_638_pipe_from_any_handler_keeps_the_row_whole() {
+    for flags in all_flags() {
+        for (variant, opts) in table_variants(options(flags)) {
+            for (holder, inner, survives) in PIPE_HOLDERS {
+                let html = format!("<table><tr><td>{inner}</td><td>z</td></tr></table>");
+                let out = tier2(&html, &opts);
+                let html_out = render(&out);
+                let cells = html_out.matches("<th>").count() + html_out.matches("<td>").count();
+                assert_eq!(
+                    cells, 2,
+                    "the pipe split the row: {flags:?}, {variant}, {holder}, {out:?}"
+                );
+                assert!(
+                    html_out.contains(survives),
+                    "the cell lost {survives:?}: {flags:?}, {variant}, {holder}, {html_out:?}"
+                );
+            }
+        }
+    }
+}

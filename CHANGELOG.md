@@ -58,7 +58,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<p>sample_value</p>` gave `sample_value`. Every escape option now acts the same in a cell as
   anywhere else. A `|` in a cell is still escaped whatever the options say, and with
   `escape_ascii` on and `escape_misc` off it is now escaped once, as `\|`, instead of as `\\|`,
-  which split the cell in two.
+  which some renderers show with a stray backslash.
+- **A `|` in a code span, link or image in a table cell broke the table.**
+  `<table><tr><td><code>a|b</code></td></tr></table>` gave ``| `a|b` |``. GFM splits a row on
+  a pipe in a code span too, so the row no longer matched the delimiter row and the whole table
+  became a paragraph. A pipe in a link destination or title, an image description, preformatted
+  text or a code span in a nested table did the same. Every pipe in a cell is now escaped as
+  `\|`, which GFM reads as `|` in a code span too.
 - **Text next to a paragraph, heading or other block in a table cell joined it (#645).**
   `<table><tr><td><p>a</p>b</td></tr></table>` gave `| ab |`, and so did a heading, a `<div>`,
   a list or a code block before the text. Text before a heading or a code block joined it too.

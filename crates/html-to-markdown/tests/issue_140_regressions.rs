@@ -88,7 +88,7 @@ fn converts_table_cell_pipe_fixture() {
 }
 
 #[test]
-fn escapes_only_literal_pipes_in_table_cells() {
+fn escapes_every_pipe_in_table_cells() {
     let html = r"
         <table>
             <thead><tr><th>Type</th><th>Span</th><th>Block</th></tr></thead>
@@ -103,40 +103,11 @@ fn escapes_only_literal_pipes_in_table_cells() {
     ";
 
     let markdown = convert(html, Some(default_options())).expect("conversion should succeed");
-    assert!(
-        markdown.contains("text \\| content"),
-        "literal pipe in text cell should be escaped"
-    );
-    assert!(
-        markdown.contains("`code | span`"),
-        "pipe inside code span should not be escaped"
-    );
-    assert!(
-        !markdown.contains("`code \\| span`"),
-        "code spans must not receive backslash escaping"
-    );
-    assert!(
-        markdown.contains("block | content"),
-        "pre/code blocks should retain literal pipe characters"
-    );
-    assert!(
-        !markdown.contains("block \\| content"),
-        "pre/code block content should not be escaped"
-    );
-
-    let markdown_with_misc = convert(html, Some(escape_misc_options())).expect("conversion should succeed");
-    assert!(
-        markdown_with_misc.contains("text \\| content"),
-        "literal pipe in text cell should be escaped when escape_misc=true"
-    );
-    assert!(
-        markdown_with_misc.contains("`code | span`"),
-        "code span pipe should remain unescaped when escape_misc=true"
-    );
-    assert!(
-        !markdown_with_misc.contains("`code \\| span`"),
-        "code spans must not be escaped when escape_misc=true"
-    );
+    // ~keep GFM splits a row on every unescaped pipe, a code span's included, so a pipe in a
+    // ~keep cell is escaped whatever holds it; `\|` reads as `|` inside the code span too.
+    for expected in [r"text \| content", r"`code \| span`", r"block \| content"] {
+        assert!(markdown.contains(expected), "expected {expected:?} in {markdown:?}");
+    }
 }
 
 #[test]
