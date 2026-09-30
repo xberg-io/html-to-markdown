@@ -80,6 +80,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `preserve_tags: ["my-el"]`, `<ol><li><p>a</p><my-el></my-el><h2>h</h2>t</li></ol>` gave
   `1. a\n\n<my-el></my-el>## h`, so the heading was text outside the list. A custom element after
   a block of the item now starts a paragraph at the content column, preserved or not.
+- **Text after a line break became a list, quote or heading (#651).** `<p>a<br>1) t</p>` gave
+  `a  \n1) t`, so `1) t` became a list item; in bold, in a list item, in a quote and at the top
+  level alike. Text that starts the line after a hard break and would interrupt the paragraph
+  (`1.`, `1)`, `01.`, `-`, `+`, `*`, `>`, `#`, a rule, a fence or an underline) now has that
+  character escaped, `1\) t`, in both converters. A line that cannot interrupt a paragraph, like
+  `2. t`, is left as it is.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a

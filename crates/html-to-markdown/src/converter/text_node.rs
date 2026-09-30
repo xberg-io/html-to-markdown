@@ -463,6 +463,7 @@ pub fn process_text_node(
         }
     }
 
+    let text_start = output.len();
     if ctx.in_list_item && final_text.contains("\n\n") {
         let indent = " ".repeat(4 * ctx.list_depth);
         let mut first = true;
@@ -476,6 +477,12 @@ pub fn process_text_node(
         }
     } else {
         output.push_str(&final_text);
+    }
+
+    // ~keep Code keeps its bytes; a Djot paragraph ends only at a blank line, so no line in it
+    // ~keep needs the escape.
+    if !ctx.in_code && options.output_format == crate::options::OutputFormat::Markdown {
+        crate::converter::utility::escaping::escape_continuation_line_start(output, text_start);
     }
 }
 

@@ -326,6 +326,30 @@ pub fn line_opens_block(line: &str) -> bool {
     block_opener_escape_offset(line).is_some()
 }
 
+/// Escape the block opener at the start of `buffer[from..]`, text just written, when that text
+/// starts a line that continues the paragraph above it.
+///
+/// ~keep A line after a hard break continues its paragraph only if it cannot interrupt it, the
+/// ~keep rule a link label's continuation lines follow (issue #651). The text starts such a line
+/// ~keep when only its container's indent is before it on the line and the line above holds text;
+/// ~keep after a blank line it starts a paragraph of its own. The indent scan stops at the first
+/// ~keep other byte, and the line above is read once per line, so the check stays linear.
+pub fn escape_continuation_line_start(buffer: &mut String, from: usize) {
+    let before = &buffer[..from];
+    let Some(line_end) = before.trim_end_matches([' ', '\t']).strip_suffix('\n') else {
+        return;
+    };
+    let line_above = &line_end[line_end.rfind('\n').map_or(0, |pos| pos + 1)..];
+    if line_above.trim().is_empty() {
+        return;
+    }
+    let text = &buffer[from..];
+    let line = &text[..text.find('\n').unwrap_or(text.len())];
+    if let Some(offset) = block_opener_escape_offset(line) {
+        buffer.insert(from + offset, '\\');
+    }
+}
+
 /// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.
 pub fn opens_block(rest: &str) -> bool {
     block_opener_offset(rest).is_some()
@@ -929,6 +953,40 @@ mod tests {
         }
         assert_eq!(block_opener_offset("001) x"), Some(3));
         assert_eq!(block_opener_offset("1. x"), Some(1));
+    }
+
+    fn escaped_continuation(before: &str, text: &str) -> String {
+        let mut buffer = format!("{before}{text}");
+        escape_continuation_line_start(&mut buffer, before.len());
+        buffer
+    }
+
+    #[test]
+    fn escape_continuation_line_start_escapes_a_line_after_text() {
+        assert_eq!(escaped_continuation("a  \n", "1) t"), "a  \n1\\) t");
+        assert_eq!(escaped_continuation("x\n- a  \n  ", "- t"), "x\n- a  \n  \\- t");
+        assert_eq!(escaped_continuation("a\\\n\t", "> t"), "a\\\n\t\\> t");
+        assert_eq!(escaped_continuation("a  \n", "-\nx"), "a  \n\\-\nx");
+    }
+
+    #[test]
+    fn escape_continuation_line_start_leaves_other_text_alone() {
+        for (before, text) in [
+            ("", "1) t"),
+            ("a", "1) t"),
+            ("a  \nb ", "1) t"),
+            ("a\n\n", "1) t"),
+            ("a\n  \n", "1) t"),
+            ("a  \n", "2. t"),
+            ("a  \n", "    1) t"),
+            ("a  \n", "1)\n- t"),
+        ] {
+            assert_eq!(
+                escaped_continuation(before, text),
+                format!("{before}{text}"),
+                "{before:?} {text:?}"
+            );
+        }
     }
 
     #[test]
