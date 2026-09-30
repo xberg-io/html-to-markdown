@@ -167,7 +167,7 @@ pub fn push_paragraph_line(text: &mut String, line: &str) {
 /// Whether the last line of `text`, which opens no block, opens one once `line` joins it.
 ///
 /// ~keep Only the end of `text` is read, so joining many lines stays linear.
-fn joins_into_a_block(text: &str, line: &str) -> bool {
+pub fn joins_into_a_block(text: &str, line: &str) -> bool {
     let bytes = text.as_bytes();
     (bytes.len().saturating_sub(BARE_MARKER_LEN)..bytes.len())
         .rev()
