@@ -16,7 +16,7 @@ use html_to_markdown_rs::options::{ListIndentType, PreprocessingOptions, Whitesp
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
 
-const QUOTE_IN_ITEM: &str = "- A\n  > q\n  >\n  > ### H\n  >   r\n  >\n  >   ```\n  >   c\n  >   ```\n  >\n  > s\n";
+const QUOTE_IN_ITEM: &str = "- A\n  > q\n  >\n  > ### H\n  >\n  > r\n  >\n  > ```\n  > c\n  > ```\n  >\n  > s\n";
 
 const FIGURE_THEN: &str = r#"<ol start="10"><li>X<figure><figcaption>F</figcaption></figure>{}</li></ol>"#;
 
@@ -665,7 +665,7 @@ fn should_keep_a_paragraph_in_its_item_when_wrapping_inside_a_quote() {
     let out = convert_with("<blockquote><ul><li>x<p>t<hr>B</p></li></ul></blockquote>", wrap);
     let rendered = render(&out);
     assert!(
-        rendered.contains("<p>t</p>\n</li>"),
+        rendered.contains("<p>t</p>\n<hr />\n<p>B</p>\n</li>"),
         "wrap: the paragraph left the item inside the quote: {out:?} renders {rendered:?}"
     );
 }

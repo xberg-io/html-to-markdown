@@ -429,10 +429,7 @@ fn separate_from_block(
         return;
     }
     if ctx.in_list_item {
-        // ~keep A blockquote renders its children into a scratch buffer that it prefixes
-        // ~keep afterwards, so the item's content column only applies at quote depth 0 (the
-        // ~keep same limit `handlers/blockquote.rs` puts on its own list indent).
-        if ctx.blockquote_depth == 0 && !parent_is_list(node_handle, parser, dom_ctx) {
+        if !parent_is_list(node_handle, parser, dom_ctx) {
             separate_in_list_item(node, node_handle, parser, output, options, ctx, dom_ctx);
         }
     } else if !ctx.in_list
@@ -508,10 +505,8 @@ fn separate_in_list_item(
         return;
     };
     let item_is_open = crate::converter::list::utils::item_is_open(output, &indent, ctx);
-    let block_is_real = crate::converter::list::utils::indent_column(ctx.list_indent_columns, options).saturating_sub(
-        crate::converter::list::utils::indent_column(ctx.real_item_columns, options),
-    ) < 4;
-    let separates = item_is_open || (block_continues_lazily && block_is_real);
+    let separates =
+        item_is_open || (block_continues_lazily && crate::converter::list::utils::block_is_real(ctx, options));
     if !separates {
         return;
     }
@@ -577,6 +572,7 @@ pub fn walk_node(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    ctx.last_list.enter(output);
     // ~keep In a task item, the render of each node before the first content reports whether
     // ~keep it wrote, so the item knows which element wrote first (issue #650).
     match ctx.first_writer.as_ref().filter(|first_writer| first_writer.is_open()) {
@@ -587,6 +583,7 @@ pub fn walk_node(
         }
         None => convert_node(node_handle, parser, output, options, ctx, depth, dom_ctx),
     }
+    ctx.last_list.leave(output);
 }
 
 /// Convert one DOM node and its children to Markdown.

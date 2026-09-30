@@ -148,6 +148,14 @@ fn should_keep_a_nested_item_on_the_line_after_its_text_when_it_can_interrupt_it
         "- a\n  > q\n  *\n",
         2,
     );
+    // ~keep A list between inline markers is indented past the item's content column.
+    assert_eq!(
+        convert_with(
+            "<div><mark><ol start=\"10\"><li>x<ul><li>n</li></ul>t</li></ol></mark></div>",
+            &options
+        ),
+        "==10. x\n    - n\n    t==\n"
+    );
     // ~keep Only the list's first item follows the text.
     assert_items(
         "<ul><li>a<ul><li>b</li><li></li></ul></li></ul>",

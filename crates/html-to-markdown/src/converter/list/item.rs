@@ -129,10 +129,37 @@ pub fn handle_li(
     // ~keep indent too double-counts it, deeply nesting single-child lists into runaway
     // ~keep padding that reparses as an indented code block (spec example 299). The indent is
     // ~keep only needed when this item genuinely starts a fresh physical line.
+    // ~keep The marker starts at the content column of the item around it, as every other line
+    // ~keep of that item does. A tab indent can pass that column, so this item's content column
+    // ~keep is counted from where its marker is written, and every line of the item reaches it
+    // ~keep (issue #654). In a quote whose first line is outside it, a content column that starts
+    // ~keep no block gives way to the column of the item whose marker starts a list item.
+    // ~keep An empty buffer between inline markers is written after the opening marker, so a
+    // ~keep marker at its start does not start a line: the indent written before it is not a
+    // ~keep column, and the marker is text. An empty inline wrapper's buffer after only indent or
+    // ~keep a list item's marker is written where that line ends, and needs no indent.
     let marker_line_start = (!output.is_empty() && output.ends_with('\n')).then_some(output.len());
-    if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
-        output.push_str(&crate::converter::list::utils::item_indent(ctx, options));
-    }
+    let marker_follows_markers = output.is_empty() && ctx.in_marker_text();
+    let buffer_column = ctx
+        .inline_buffer_column
+        .filter(|_| output.is_empty() && !marker_follows_markers);
+    let marker_column = if let Some(column) = buffer_column {
+        column
+    } else if ctx.list_depth > 0 && (output.is_empty() || output.ends_with('\n')) {
+        let indent = crate::converter::list::utils::continuation_indent_string(
+            crate::converter::list::utils::block_columns(ctx, options),
+            options,
+        )
+        .unwrap_or_default();
+        output.push_str(&indent);
+        if marker_follows_markers {
+            ctx.list_indent_columns
+        } else {
+            crate::converter::utility::escaping::leading_indent(&indent).1
+        }
+    } else {
+        ctx.list_indent_columns
+    };
 
     let mut has_block_children = false;
     let children = tag.children();
@@ -171,11 +198,11 @@ pub fn handle_li(
         options.list_indent_width.max(2)
     };
 
-    // ~keep A list inside an inline wrapper, a summary or a caption is written into that
-    // ~keep buffer and gets its markers; its first line is then text, so the item is not open
-    // ~keep and no block gets the column. Text after a quote or a list still takes the column
-    // ~keep of the innermost item whose marker starts a list item (issue #615).
-    let list_item_open = ctx.inline_depth == 0 && !ctx.text_in_markers;
+    // ~keep A list inside an inline wrapper, a highlight, a summary or a caption is written into
+    // ~keep that buffer and gets its markers; its first line is then text, so the item is not
+    // ~keep open and no block gets the column. Text after a quote or a list still takes the
+    // ~keep column of the innermost item whose marker starts a list item (issue #615).
+    let list_item_open = !ctx.in_marker_text();
     let item_is_real = list_item_open || {
         let marker = marker();
         // ~keep An escaped `-` marker is text.
@@ -190,7 +217,7 @@ pub fn handle_li(
             )
     };
     let real_item_columns = if item_is_real {
-        ctx.list_indent_columns + own_marker_width
+        marker_column + own_marker_width
     } else {
         ctx.real_item_columns
     };
@@ -198,7 +225,7 @@ pub fn handle_li(
         in_list_item: true,
         list_item_open,
         list_depth: ctx.list_depth + 1,
-        list_indent_columns: ctx.list_indent_columns + own_marker_width,
+        list_indent_columns: marker_column + own_marker_width,
         real_item_columns,
         first_writer: is_task_list.then(FirstWriter::default),
         ..ctx.clone()
@@ -320,9 +347,7 @@ pub fn handle_li(
             crate::converter::list::utils::continuation_indent_string(li_ctx.list_indent_columns, options),
             first_block,
         ) {
-            (Some(indent), Some(block))
-                if li_ctx.list_item_open && !ctx.in_marker_span && !ctx.in_table_cell && !ctx.convert_as_inline =>
-            {
+            (Some(indent), Some(block)) if li_ctx.list_item_open && !ctx.in_table_cell && !ctx.convert_as_inline => {
                 // ~keep A line that cannot interrupt the checkbox paragraph needs a blank line
                 // ~keep before it, and a `---` line under it would make it a heading (issue #634).
                 let first_line = block.lines().next().unwrap_or_default();

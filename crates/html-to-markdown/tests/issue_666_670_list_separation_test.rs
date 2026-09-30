@@ -261,3 +261,130 @@ fn should_keep_the_dot_delimiter_after_an_ordered_list_that_a_block_closed() {
         "1. a\n\n## h\n\n1. b\n"
     );
 }
+
+// ~keep Sectioning and grouping elements write into a buffer of their own and append it to
+// ~keep their parent's: the list before still ends the output, so the next list switches.
+const WRAPPERS: [&str; 9] = [
+    "section", "article", "main", "aside", "header", "footer", "figure", "details", "fieldset",
+];
+
+fn wrapped(tag: &str, inner: &str) -> String {
+    format!("<{tag}>{inner}</{tag}>")
+}
+
+/// The two adjacent lists `<ol>a</ol><ol>b</ol>` with `tag` around both, only the first, only
+/// the second, and both inside a second wrapper.
+fn wrapped_pairs(tag: &str) -> [String; 4] {
+    let (a, b) = ("<ol><li>a</li></ol>", "<ol><li>b</li></ol>");
+    [
+        format!("{}{}", wrapped(tag, a), wrapped(tag, b)),
+        format!("{}{b}", wrapped(tag, a)),
+        format!("{a}{}", wrapped(tag, b)),
+        format!(
+            "{}{}",
+            wrapped(tag, &wrapped("section", a)),
+            wrapped("div", &wrapped(tag, b))
+        ),
+    ]
+}
+
+#[test]
+fn should_keep_adjacent_ordered_lists_apart_when_an_element_wraps_either_list() {
+    for strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let options = ConversionOptions {
+            tier_strategy: strategy,
+            ..tier2_options()
+        };
+        for tag in WRAPPERS {
+            for html in wrapped_pairs(tag) {
+                let markdown = convert_with(&html, &options);
+                assert!(markdown.contains("1. a\n\n1) b\n"), "{strategy:?} {html}: {markdown:?}");
+                assert_eq!(render(&markdown).matches("<ol").count(), 2, "{html}: {markdown:?}");
+            }
+        }
+    }
+}
+
+#[test]
+fn should_keep_wrapped_adjacent_ordered_lists_apart_in_djot() {
+    for tag in WRAPPERS {
+        for html in wrapped_pairs(tag) {
+            let markdown = convert_with(&html, &djot_options());
+            assert!(markdown.contains("1. a\n\n1) b\n"), "{html}: {markdown:?}");
+        }
+    }
+}
+
+#[test]
+fn should_keep_wrapped_adjacent_ordered_lists_apart_inside_a_list_item_and_a_quote() {
+    let options = tier2_options();
+    for tag in WRAPPERS {
+        for html in wrapped_pairs(tag) {
+            for outer in [
+                format!("<ul><li>x{html}</li></ul>"),
+                format!("<blockquote>{html}</blockquote>"),
+            ] {
+                let markdown = convert_with(&outer, &options);
+                assert!(markdown.contains("1) b"), "{outer}: {markdown:?}");
+                assert_eq!(render(&markdown).matches("<ol").count(), 2, "{outer}: {markdown:?}");
+            }
+        }
+    }
+}
+
+#[test]
+fn should_keep_the_dot_delimiter_after_a_wrapped_list_that_something_follows() {
+    let options = tier2_options();
+    for html in [
+        "<section><ol><li>a</li></ol></section><p>x</p><section><ol><li>b</li></ol></section>",
+        "<section><ol><li>a</li></ol><p>x</p></section><section><ol><li>b</li></ol></section>",
+        "<section><ol><li>a</li></ol></section><section><p>x</p><ol><li>b</li></ol></section>",
+        "<ol><li>a</li></ol><blockquote><ol><li>b</li></ol></blockquote>",
+        "<blockquote><ol><li>a</li></ol></blockquote><ol><li>b</li></ol>",
+        "<ol><li>a</li></ol><table><tr><td><ol><li>b</li></ol></td></tr></table>",
+        // ~keep The next item's marker comes after the nested list, in the same buffer.
+        "<ol><li>a<ol><li>x</li></ol></li><li><ol><li>y</li></ol></li></ol>",
+        // ~keep A last line as long as the list's, and one that ends with the list's text.
+        "<section><ol><li>a</li></ol></section><p>wxyz</p><section><ol><li>b</li></ol></section>",
+        "<ol><li>a</li></ol><p>z1. a</p><ol><li>b</li></ol>",
+        // ~keep A no-break space is text, not a blank line: it ends the list.
+        "<ol><li>a</li></ol>&nbsp;<ol><li>b</li></ol>",
+    ] {
+        let markdown = convert_with(html, &options);
+        assert!(!markdown.contains("1)"), "{html}: {markdown:?}");
+    }
+}
+
+// ~keep A wrapper that rewrites the end of its text (a figure moving an image next to the text,
+// ~keep strict whitespace trimming a no-break space) still leaves the list at the end.
+#[test]
+fn should_keep_adjacent_ordered_lists_apart_when_the_wrapper_rewrites_the_list_end() {
+    let strict = ConversionOptions {
+        whitespace_mode: html_to_markdown_rs::options::WhitespaceMode::Strict,
+        ..tier2_options()
+    };
+    for strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let options = ConversionOptions {
+            tier_strategy: strategy,
+            ..tier2_options()
+        };
+        for html in [
+            r#"<figure><ol><li>a <img src="x.png"></li></ol></figure><ol><li>b</li></ol>"#,
+            r#"<figure><ol><li>a<br><img src="x.png"></li></ol></figure><ol><li>b</li></ol>"#,
+            r#"<figure><ol><li>a <img src="x.png"></li></ol></figure><figure><ol><li>b</li></ol></figure>"#,
+        ] {
+            let markdown = convert_with(html, &options);
+            assert!(markdown.contains("1) b"), "{strategy:?} {html}: {markdown:?}");
+            assert_eq!(render(&markdown).matches("<ol").count(), 2, "{html}: {markdown:?}");
+        }
+    }
+    for html in [
+        "<details><ol><li>a&nbsp;</li></ol></details><ol><li>b</li></ol>",
+        "<details><ol><li>a&emsp;</li></ol></details><ol><li>b</li></ol>",
+        "<fieldset><ol><li>a&nbsp;</li></ol></fieldset><ol><li>b</li></ol>",
+    ] {
+        let markdown = convert_with(html, &strict);
+        assert!(markdown.contains("1) b"), "{html}: {markdown:?}");
+        assert_eq!(render(&markdown).matches("<ol").count(), 2, "{html}: {markdown:?}");
+    }
+}
