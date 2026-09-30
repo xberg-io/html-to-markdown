@@ -36,6 +36,43 @@ pub fn handle_li(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    let mut line_after_text = None;
+    write_li(
+        node_handle,
+        tag,
+        parser,
+        output,
+        options,
+        ctx,
+        depth,
+        dom_ctx,
+        &mut line_after_text,
+    );
+    // ~keep Whether the item has content is known once it is written: a marker line without
+    // ~keep content cannot interrupt the text before it either (issue #667).
+    if let Some(line_start) = line_after_text {
+        if line_start < output.len()
+            && crate::converter::list::utils::marker_line_after_text_needs_blank_line(output, line_start)
+        {
+            output.insert(line_start, '\n');
+        }
+    }
+}
+
+/// Write the list item, and set `line_after_text` to the start of its marker line when that line
+/// follows text inside the list and the check with an item that has content wrote no blank line.
+#[allow(clippy::too_many_arguments)]
+fn write_li(
+    node_handle: &tl::NodeHandle,
+    tag: &tl::HTMLTag,
+    parser: &tl::Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    depth: usize,
+    dom_ctx: &DomContext,
+    line_after_text: &mut Option<usize>,
+) {
     #[allow(clippy::trivially_copy_pass_by_ref)]
     fn find_checkbox<'a>(
         node_handle: &tl::NodeHandle,
@@ -119,6 +156,8 @@ pub fn handle_li(
         output.push('\n');
         if !crate::converter::utility::escaping::line_opens_block(&format!("{}x", marker())) {
             output.push('\n');
+        } else if !ctx.in_marker_text() {
+            *line_after_text = Some(output.len());
         }
     }
 

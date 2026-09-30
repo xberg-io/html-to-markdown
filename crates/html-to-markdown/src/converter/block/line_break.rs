@@ -161,11 +161,10 @@ pub fn handle(
         // ~keep first" check (`output.ends_with('\n')`), which also matched — and silently
         // ~keep collapsed — a run of *consecutive* breaks with real content before them.
         // ~keep Unguarded by `ctx.in_paragraph` (unlike `text_node.rs`'s identical-looking
-        // ~keep check): a bare top-level <br> with no enclosing paragraph/div must also
-        // ~keep no-op here, matching Tier-1's explicit "bare <br> at top level emits
-        // ~keep nothing" contract (`tier1/scanner.rs`'s `TagKind::LineBreak` arm) — the
-        // ~keep default `block_content_start: 0` from a fresh `Context` still equals
-        // ~keep `output.len()` at true document start, so this stays correct there.
+        // ~keep check): a bare top-level <br> with no enclosing paragraph/div takes the
+        // ~keep same two arms -- the default `block_content_start: 0` from a fresh `Context`
+        // ~keep equals `output.len()` only at true document start, so `a<br>b` gets the
+        // ~keep marker below exactly as it would inside `<body>` (Tier-1 matches, issue #679).
         //
         // ~keep The bare `\n` (rather than no output at all) is load-bearing and predates
         // ~keep #464: `integration_test.rs::test_breaks_and_newlines_issue_112` pins that a
@@ -174,6 +173,9 @@ pub fn handle(
         // ~keep another break's marker, which is what swallowed consecutive runs.
         output.push('\n');
     } else {
+        // ~keep A break on a line of its own (`<li>a<br><br>b</li>`) is written at the item's
+        // ~keep content column like text there, or a backslash line leaves the item (issue #681).
+        crate::converter::list::utils::indent_list_item_line_start(output, ctx, options);
         output.push_str(hard_break_marker(options.newline_style));
     }
 }
