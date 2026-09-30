@@ -386,3 +386,70 @@ fn should_drop_a_hard_break_before_an_element_that_ends_the_paragraph() {
         assert!(!convert_with(html, &backslash).contains('\\'), "{html}");
     }
 }
+
+#[test]
+fn should_escape_text_that_would_start_a_block_at_the_start_of_a_div_inside_a_paragraph() {
+    assert_converts(
+        "<p>a<br><dialog>1. x</dialog>y</p>",
+        &options_for(TierStrategy::Tier2),
+        "a  \n\n1\\. x\n\ny\n",
+        &["<p>1. x</p>"],
+    );
+    assert_converts(
+        "<p>a<div>&gt; x</div>y</p>",
+        &options_for(TierStrategy::Tier2),
+        "a\n\n\\> x\n\ny\n",
+        &["<p>&gt; x</p>"],
+    );
+    assert_converts_in_both_tiers(
+        "<blockquote>a<br><div>- x</div>y</blockquote>",
+        "> a  \n>\n>\n> \\- x\n>\n> y\n",
+        &["<p>- x</p>"],
+    );
+}
+
+#[test]
+fn should_not_escape_a_div_that_starts_after_a_paragraph_ends() {
+    assert_converts_in_both_tiers("<p>a</p><div>1. x</div>", "a\n\n1. x\n", &[]);
+}
+
+#[test]
+fn should_keep_the_text_after_a_div_apart_in_a_table_cell() {
+    assert_converts_in_both_tiers(
+        "<table><tr><td>a<div>x</div>y</td><td>z</td></tr></table>",
+        "| a x y | z |\n| ----- | --- |\n",
+        &["<th>a x y</th>"],
+    );
+    assert_converts_in_both_tiers(
+        "<table><tr><td>a<br><dialog>x</dialog>y</td></tr></table>",
+        "| a x y |\n| ----- |\n",
+        &["<th>a x y</th>"],
+    );
+}
+
+#[test]
+fn should_keep_the_text_after_a_div_apart_when_a_line_break_starts_the_list_item() {
+    for html in [
+        "<ul><li><br><div>x</div>y</li></ul>",
+        "<ul><li><br><dialog>x</dialog>y</li></ul>",
+        "<ul><li><br><p>x</p>y</li></ul>",
+    ] {
+        assert_converts_in_both_tiers(html, "- x\n\n  y\n", &["<p>x</p>", "<p>y</p>"]);
+    }
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..options_for(TierStrategy::Tier2)
+    };
+    assert_converts(
+        "<ul><li><br><div>x<br></div>y</li></ul>",
+        &backslash,
+        "- x\n\n  y\n",
+        &["<p>x</p>"],
+    );
+    assert_converts(
+        "<ul><li><br><div></div>y</li></ul>",
+        &backslash,
+        "-   y\n",
+        &["<li>y</li>"],
+    );
+}

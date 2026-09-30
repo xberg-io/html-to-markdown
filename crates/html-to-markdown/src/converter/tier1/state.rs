@@ -285,6 +285,14 @@ pub struct Tier1State {
     /// after a block, or after an inline element ending in one, starts a new paragraph (issues
     /// #570, #571, #585).
     pub last_closed_block: bool,
+    /// `options.br_in_tables`: how a cell break is written after a div in a table cell.
+    pub br_in_tables: bool,
+    /// True when the tag `last_closed_block` records is a div-path element closed in a table
+    /// cell: the inline content after it gets a cell break.
+    pub last_closed_div_in_cell: bool,
+    /// Where the first text of a block that opened inside a paragraph is written in `output`.
+    /// Mirrors Tier-2's `Context::paragraph_start_at`; read-then-clear at the next text flush.
+    pub paragraph_start_at: Option<usize>,
     /// The end of the text of the last ordered list closed outside a table cell: an ordered list
     /// that opens after only whitespace there continues it.
     pub last_ordered_list_end: Option<usize>,
@@ -348,6 +356,9 @@ impl Tier1State {
             last_closed_custom_element: false,
             last_emitted_was_img: false,
             last_closed_block: false,
+            br_in_tables: false,
+            last_closed_div_in_cell: false,
+            paragraph_start_at: None,
             last_ordered_list_end: None,
             list_item_marker_widths: Vec::new(),
             at_document_start: true,

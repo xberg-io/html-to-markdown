@@ -350,6 +350,30 @@ pub fn escape_continuation_line_start(buffer: &mut String, from: usize) {
     }
 }
 
+/// Escape the block opener at the start of `buffer[from..]`, text just written at the start of a
+/// paragraph that a block element opened inside another paragraph.
+///
+/// ~keep Without the block the text continued the paragraph and could not start a list there;
+/// ~keep as the first text of a paragraph it can, so the paragraph-start rule applies.
+pub fn escape_opened_paragraph_start(buffer: &mut String, from: usize) {
+    let text = &buffer[from..];
+    let line = &text[..text.find('\n').unwrap_or(text.len())];
+    if let Some(offset) = block_opener_offset(line).or_else(|| list_marker_offset(line)) {
+        buffer.insert(from + offset, '\\');
+    }
+}
+
+/// Whether `output` ends in a line of paragraph text, or in a hard break after one: a block
+/// written next starts inside that paragraph. A list item's bare marker is not text.
+pub fn ends_in_paragraph_text(output: &str) -> bool {
+    let end = output.trim_end_matches([' ', '\t']);
+    let end = end
+        .strip_suffix('\n')
+        .map_or(end, |line_end| line_end.strip_suffix('\\').unwrap_or(line_end));
+    let line = &end[end.rfind('\n').map_or(0, |pos| pos + 1)..];
+    !line.trim().is_empty() && !crate::converter::list::utils::line_is_bare_list_marker(end)
+}
+
 /// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.
 pub fn opens_block(rest: &str) -> bool {
     block_opener_offset(rest).is_some()

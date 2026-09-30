@@ -72,6 +72,10 @@ pub fn handle(
         (kept_len, output[kept_len..].to_string())
     });
 
+    // ~keep A div that opens at the start of another block's first text passes that start on.
+    let opens_in_paragraph = (!ctx.in_table_cell
+        && crate::converter::utility::escaping::ends_in_paragraph_text(output))
+        || ctx.paragraph_start_at == Some((std::ptr::from_ref::<String>(output) as usize, output.len()));
     let is_list_continuation = start_block(output, ctx, options);
 
     // ~keep Measured the same way `block/paragraph.rs` does, so a text node can tell "at the
@@ -82,6 +86,7 @@ pub fn handle(
     let div_ctx = Context {
         block_content_start: output.len(),
         block_output_ptr: std::ptr::from_ref::<String>(output) as usize,
+        paragraph_start_at: opens_in_paragraph.then(|| (std::ptr::from_ref::<String>(output) as usize, output.len())),
         ..ctx.clone()
     };
 
@@ -97,14 +102,19 @@ pub fn handle(
         // ~keep it in `walk_node`'s pre-block-dispatch strip, since the div is simply
         // ~keep finishing here — so this closes its own trailing run the same way
         // ~keep `paragraph.rs` closes its own (issue #464 follow-up).
-        strip_trailing_backslash_breaks(output, content_start_pos);
+        strip_trailing_backslash_breaks(output, content_start_pos.min(children_start));
     }
 
+    // ~keep In a list item the separator can take back the hard break the div follows, so the
+    // ~keep output can end before the position measured on entry although the children wrote
+    // ~keep content. Such a div looked empty and wrote no line end before the text after it.
+    // ~keep The trailing-break strip above starts at the children for the same reason.
+    let children_wrote = output.len() > children_start;
     if let Some((kept_len, kept_tail)) = kept.filter(|_| output.len() == children_start) {
         output.truncate(kept_len);
         output.push_str(&kept_tail);
     }
-    let has_content = output.len() > content_start_pos;
+    let has_content = children_wrote || output.len() > content_start_pos;
 
     if has_content {
         if content_start_pos == 0 && output.starts_with('\n') && !output.starts_with("\n\n") {
@@ -113,7 +123,13 @@ pub fn handle(
         trim_trailing_whitespace(output);
 
         if ctx.in_table_cell {
-            // ~keep No trailing separator in table cells
+            // ~keep Inline content after the div gets the cell break a block after it would get,
+            // ~keep so its first word does not join the div's last one.
+            if crate::converter::utility::siblings::following_sibling_content(node_handle.get_inner(), parser, dom_ctx)
+                == crate::converter::utility::siblings::FollowingContent::Inline
+            {
+                emit_table_cell_break(output, options.br_in_tables);
+            }
         } else if ctx.in_list_item {
             if is_list_continuation {
                 if !output.ends_with('\n') {
@@ -135,6 +151,11 @@ pub fn handle(
             }
         }
     }
+}
+
+/// Whether the converter writes the element `name` with the `<div>` handler.
+pub fn writes_like_div(name: &str) -> bool {
+    matches!(name, "div" | "address" | "search" | "hgroup" | "center" | "dialog")
 }
 
 /// Whether a block written into a table cell's buffer continues content already in the cell.

@@ -90,6 +90,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   right before one of the eight elements is dropped, as before a `<div>`, because a new
   paragraph starts there. A visitor now gets `is_inline: false` in the node context of these
   eight elements.
+- **Text at the start of a div that opens inside a paragraph became a list, quote or heading.**
+  `<p>a<br><dialog>1. x</dialog>y</p>` gave `a  \n\n1. x`, so `1. x` rendered as a list item and
+  the `1` was lost. The first text of a div, dialog, center, search, hgroup or address that
+  opens after text of the paragraph now escapes a block opener, `1\. x`, as the text after a
+  line break does.
+- **Text after a div in a table cell joined the div's text.** `<td>a<div>x</div>y</td>` gave
+  `| a xy |`. Inline content after a block in a cell now gets the same cell break as a block,
+  `| a x y |`, a `<br>` with `br_in_tables`.
+- **A div or paragraph after a line break at the start of a list item joined the text after it.**
+  `<ul><li><br><div>x</div>y</li></ul>` gave `- xy`. It now gives `- x\n\n  y`.
 - **A custom element after a paragraph in a list item left the item (#658).** With
   `preserve_tags: ["my-el"]`, `<ol><li><p>a</p><my-el></my-el><h2>h</h2>t</li></ol>` gave
   `1. a\n\n<my-el></my-el>## h`, so the heading was text outside the list. A custom element after

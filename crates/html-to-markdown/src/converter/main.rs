@@ -820,11 +820,7 @@ fn convert_node(
                     depth,
                     dom_ctx,
                 ),
-                "div" => {
-                    crate::converter::block::div::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
-                }
-
-                // ~keep `<address>`/`<search>`/`<hgroup>`/`<center>`/`<dialog>` are content-bearing block
+                // ~keep `<div>`, and `<address>`/`<search>`/`<hgroup>`/`<center>`/`<dialog>`, which are content-bearing block
                 // ~keep containers with no formatting of their own beyond block separation --
                 // ~keep the same shape as `<div>`. Routing them through `div::handle` (rather
                 // ~keep than a semantic-module dispatcher) matters for Tier-1 parity: Tier-1's
@@ -834,7 +830,7 @@ fn convert_node(
                 // ~keep `div::handle` here -- instead of `semantic::sectioning::handle`, which
                 // ~keep has no table-cell/list-item special-casing -- keeps both tiers in
                 // ~keep agreement. See `tests/tier1_address_block_separator_test.rs`.
-                "address" | "search" | "hgroup" | "center" | "dialog" => {
+                name if crate::converter::block::div::writes_like_div(name) => {
                     crate::converter::block::div::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
                 }
                 "caption" => crate::converter::block::table::handle_caption(

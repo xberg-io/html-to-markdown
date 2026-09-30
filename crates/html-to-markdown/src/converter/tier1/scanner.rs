@@ -116,6 +116,7 @@ pub fn scan(
 ) -> Result<ScanOutput, BailReason> {
     let bytes = html.as_bytes();
     let mut state = Tier1State::new(html.len(), effective_base);
+    state.br_in_tables = options.br_in_tables;
     let mut table_probes: Vec<TableLayoutProbe> = Vec::new();
     let mut pos = 0usize;
     let mut text_start = 0usize;
@@ -1332,10 +1333,13 @@ fn emit_open(
                 // that pop collapse a lone newline straight back down to one, losing the
                 // separator — hence the blind push here instead of `ensure_blank_line`.
                 let dest = &mut state.output;
+                let opens_in_paragraph = crate::converter::utility::escaping::ends_in_paragraph_text(dest)
+                    && std::str::from_utf8(name_lower).is_ok_and(crate::converter::block::div::writes_like_div);
                 if !dest.is_empty() && !dest.ends_with("\n\n") {
                     crate::converter::tier1::state::trim_trailing_horizontal(dest);
                     dest.push_str("\n\n");
                 }
+                state.paragraph_start_at = opens_in_paragraph.then_some(state.output.len());
             }
         }
         // ~keep Summary: push accumulation buffer so children redirect into it (Phase R).
@@ -2350,6 +2354,8 @@ fn emit_close(
     }
     // ~keep An inline element whose last content is a block ends in that block too (issue #585).
     state.last_closed_block = is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
+    state.last_closed_div_in_cell = state.in_table_cell()
+        && std::str::from_utf8(name_lower).is_ok_and(crate::converter::block::div::writes_like_div);
 
     Ok(())
 }
@@ -3983,7 +3989,20 @@ fn output_ends_with_inline_text(output: &str) -> bool {
 /// (issues #570, #571). Mirrors Tier-2's `separate_from_block` in `walk_node`.
 fn separate_inline_after_block(state: &mut Tier1State) -> Result<(), BailReason> {
     // ~keep `<pre>` sets the CODE bit too, so one test covers code spans and code blocks.
-    if state.in_table_cell() || state.escape_ctx.contains(EscapeCtx::CODE) {
+    if state.escape_ctx.contains(EscapeCtx::CODE) {
+        return Ok(());
+    }
+    // ~keep In a table cell only a div writes a cell break before the inline content after it,
+    // ~keep as Tier-2's `div::handle` does.
+    if state.in_table_cell() {
+        if !std::mem::take(&mut state.last_closed_div_in_cell) {
+            return Ok(());
+        }
+        let br_in_tables = state.br_in_tables;
+        let cell_buf = state.cell_or_output_mut();
+        if !cell_buf.is_empty() && !cell_buf.ends_with('|') && !cell_buf.ends_with("<br>") {
+            crate::converter::main_helpers::emit_table_cell_break(cell_buf, br_in_tables);
+        }
         return Ok(());
     }
     // ~keep Inside a list item Tier-2 starts it at the item's content column after a blank
@@ -4661,6 +4680,7 @@ fn flush_text(
             .any(|frame| matches!(frame.spec.kind, TagKind::Heading(_)));
 
     indent_fresh_list_item_text_line(state);
+    let paragraph_start_at = state.paragraph_start_at.take();
 
     // ~keep A link label and a `<summary>` body are the exception: Tier-1 folds their
     // newlines into spaces while collapsing, but Tier-2 escapes the text node
@@ -4711,7 +4731,11 @@ fn flush_text(
 
     escape_backslash_run(dest, emitted_from, in_cell);
     if !folds_lines {
-        crate::converter::utility::escaping::escape_continuation_line_start(dest, emitted_from);
+        if !in_cell && paragraph_start_at == Some(emitted_from) {
+            crate::converter::utility::escaping::escape_opened_paragraph_start(dest, emitted_from);
+        } else {
+            crate::converter::utility::escaping::escape_continuation_line_start(dest, emitted_from);
+        }
     }
     Ok(())
 }

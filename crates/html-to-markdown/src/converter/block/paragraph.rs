@@ -121,6 +121,9 @@ pub fn handle(
         crate::converter::strip_trailing_backslash_breaks(output, p_ctx.block_content_start);
     }
 
+    // ~keep In a list item the separator can take back the hard break the paragraph follows, so
+    // ~keep its content can start before the position measured on entry (see `div::handle`).
+    let content_start_pos = content_start_pos.min(p_ctx.block_content_start);
     let has_content = output.len() > content_start_pos;
 
     if has_content && !ctx.convert_as_inline && !ctx.in_table_cell {

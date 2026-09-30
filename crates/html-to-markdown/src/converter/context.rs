@@ -186,6 +186,12 @@ pub struct Context {
     /// paragraphs, as Google Docs exports) puts a genuine, buffer-sharing paragraph body
     /// at non-zero `inline_depth`.
     pub(crate) block_output_ptr: usize,
+    /// The buffer address and offset where the first text of a block that starts inside a
+    /// paragraph is written, as `(*const String as usize, offset)`.
+    ///
+    /// ~keep That text starts a paragraph of its own, so a list marker, a quote marker or a rule
+    /// ~keep at its start is escaped: it continued the paragraph before the block started it.
+    pub(crate) paragraph_start_at: Option<(usize, usize)>,
     /// Shared flag: true until the first non-whitespace text content is emitted.
     ///
     /// ~keep `block_content_start` cannot answer "is this text node at the very start of a
@@ -361,6 +367,7 @@ impl Context {
             in_paragraph: false,
             block_content_start: 0,
             block_output_ptr: 0,
+            paragraph_start_at: None,
             at_fresh_block_start: Rc::new(Cell::new(true)),
             in_ruby: false,
             in_strong: false,
