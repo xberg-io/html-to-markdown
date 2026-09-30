@@ -151,7 +151,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   eleven times as long as one pass does. The run is now rewritten in one pass.
 - **Text after line breaks at the start of a list item left the item.** `<ol><li><br><br>x</li></ol>`
   gave `1.  \n  \\\n   x`: the break line stood at column 2, left of the item's content, so the
-  text left the list. A break line now takes the indent of the text after it. And
+  text left the list. A break line now takes the indent of the text after it, up to the item's
+  content column: a list indent width of 4 or a tab indent puts the text further in, and a break
+  line four columns past the content column is an indented code block. And
   `<ul><li><br>2. z</li></ul>` gave `-  \n  2. z`, a nested list: text after a break that follows
   only the item's marker now gets the escape for the start of a paragraph, `2\. z`.
 - **Heading text that reads as a closing `#` or a link definition lost the heading (#661).**

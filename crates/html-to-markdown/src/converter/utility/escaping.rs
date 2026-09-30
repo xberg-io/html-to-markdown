@@ -459,10 +459,10 @@ pub fn escape_continuation_line_start(buffer: &mut String, from: usize) {
         return;
     };
     let offset = if item_start {
-        let (indent, column) = leading_indent(line);
-        line.get(indent..)
-            .filter(|_| column < 4)
-            .and_then(|rest| block_opener_offset(rest).or_else(|| list_marker_offset(rest)))
+        let (indent, _) = leading_indent(line);
+        let rest = &line[indent..];
+        block_opener_offset(rest)
+            .or_else(|| list_marker_offset(rest))
             .map(|offset| indent + offset)
     } else {
         block_opener_escape_offset(line)
@@ -484,16 +484,36 @@ fn continuation_line(buffer: &str, from: usize) -> Option<(&str, bool)> {
     let line_above_start = line_end.rfind('\n').map_or(0, |pos| pos + 1);
     let line_above = &line_end[line_above_start..];
     let break_at_start = line_above_start == 0 && (line_above == "  " || line_above == "\\");
-    let marker = line_above.trim();
-    let marker = marker.strip_suffix('\\').unwrap_or(marker).trim_end();
-    let bare_marker = !marker.is_empty() && list_marker_offset(marker) == Some(marker.len() - 1);
     let text = &buffer[from..];
     (break_at_start || !line_above.trim().is_empty()).then(|| {
         (
             &text[..text.find('\n').unwrap_or(text.len())],
-            break_at_start || bare_marker,
+            break_at_start || bare_list_marker(line_above).is_some(),
         )
     })
+}
+
+/// The byte length of `line` up to the end of its last list marker, when `line` holds only an
+/// indent, list markers and a break: the first line of a list item that starts with a break. The
+/// item's content column is one column past that end.
+///
+/// ~keep A list whose first item holds only a list stacks both markers on one line, `- 1.  `.
+pub fn bare_list_marker(line: &str) -> Option<usize> {
+    let (indent, _) = leading_indent(line);
+    let body = line.trim_end();
+    let body = body.strip_suffix('\\').unwrap_or(body).trim_end();
+    let mut rest = body.get(indent..).filter(|rest| !rest.is_empty())?;
+    let mut end = indent;
+    loop {
+        let marker = list_marker_offset(rest)? + 1;
+        let after = rest[marker..].trim_start_matches([' ', '\t']);
+        end += marker;
+        if after.is_empty() {
+            return Some(end);
+        }
+        end += rest.len() - marker - after.len();
+        rest = after;
+    }
 }
 
 /// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.

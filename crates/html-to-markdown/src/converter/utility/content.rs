@@ -3,7 +3,7 @@
 //! Functions for extracting and processing element content, including text collection
 //! and empty element detection.
 
-use crate::converter::utility::escaping::is_block_level_name;
+use crate::converter::utility::escaping::{bare_list_marker, is_block_level_name, leading_indent};
 use crate::text;
 use std::borrow::Cow;
 #[cfg(feature = "visitor")]
@@ -81,10 +81,8 @@ pub fn chomp_inline(text: &str) -> (&str, &str, &str) {
 /// ~keep right before the closing marker escapes it: `*a\*` shows the asterisks. A backslash
 /// ~keep is a break only when a line end follows it in `text`.
 fn drop_trailing_break_backslashes<'a>(text: &'a str, trimmed: &'a str, suffix: &'a str) -> (&'a str, &'a str) {
-    if trimmed.is_empty() {
-        return (trimmed, suffix);
-    }
-    // ~keep A non-empty trimmed body starts at the first non-space byte of `text`.
+    // ~keep A non-empty trimmed body starts at the first non-space byte of `text`; an empty one
+    // ~keep stays empty, since the loop needs a backslash before `end`.
     let start = text.len() - text.trim_start().len();
     let mut end = start + trimmed.len();
     let mut suffix = suffix;
@@ -278,7 +276,7 @@ pub fn escape_text_line_start(buffer: &mut String, from: usize, in_link: bool) {
     let from = if in_link {
         from
     } else {
-        from + end_break_lines_with_a_backslash(buffer, from)
+        end_break_lines_with_a_backslash(buffer, from)
     };
     crate::converter::utility::escaping::escape_continuation_line_start(buffer, from);
 }
@@ -293,24 +291,26 @@ pub fn follows_a_hard_break(buffer: &str, from: usize) -> bool {
 }
 
 /// End each line that holds only a spaces break, right above `buffer[from..]`, text that starts a
-/// line, with a backslash when the line above that run ends with a hard break. Returns the bytes
-/// inserted.
+/// line, with a backslash when the line above that run ends with a hard break. Returns where the
+/// text starts afterwards.
 ///
 /// ~keep Two `<br>` in a row write a spaces break, `  `, on a line of its own, and a line of only
 /// ~keep spaces is blank, which ends the paragraph (issue #690). Once text follows, a backslash
 /// ~keep after the spaces makes the line a break, as in a link label. A run with nothing after it
 /// ~keep stays trailing whitespace, which the block end trims. A break line is bare, or carries the
-/// ~keep indent of the text line, the list item's content column (issue #681), and it gets that
-/// ~keep indent: a bare line before the text of an ordered item (`1. ` is 3 columns) leaves the
-/// ~keep item. A line with another indent belongs to a container that has ended the paragraph. Only the run is read,
-/// ~keep and it is rewritten once: a backslash inserted per line moves the rest of the buffer each
-/// ~keep time, quadratic in the length of the run.
+/// ~keep indent of the text line (issue #681), and it gets that indent, capped at the content
+/// ~keep column of an item that starts with the run: a bare line before the text of an ordered
+/// ~keep item (`1. ` is 3 columns) leaves the item. A line with another indent belongs to a
+/// ~keep container that has ended the paragraph. Only the run is read, and it is rewritten once: a
+/// ~keep backslash inserted per line moves the rest of the buffer each time, quadratic in the length
+/// ~keep of the run.
 fn end_break_lines_with_a_backslash(buffer: &mut String, from: usize) -> usize {
     let before = buffer[..from].trim_end_matches([' ', '\t']);
     let Some(mut line_end) = before.strip_suffix('\n').map(str::len) else {
-        return 0;
+        return from;
     };
-    let break_line = format!("{}  ", &buffer[line_end + 1..from]);
+    let text_indent = &buffer[line_end + 1..from];
+    let break_line = format!("{text_indent}  ");
     let mut run_start = None;
     let mut run = 0;
     loop {
@@ -318,25 +318,49 @@ fn end_break_lines_with_a_backslash(buffer: &mut String, from: usize) -> usize {
         let line = &buffer[line_start..line_end];
         if line != break_line && line != "  " {
             if line.trim().is_empty() || !(line.ends_with("  ") || line.ends_with('\\')) {
-                return 0;
+                return from;
             }
             let Some(run_start) = run_start else {
-                return 0;
+                return from;
             };
+            let indent = content_column_indent(line, text_indent);
             let run_end = before.len() - 1;
-            let mut lines = format!("{break_line}\\\n").repeat(run);
+            let mut lines = format!("{indent}  \\\n").repeat(run);
             lines.pop();
-            let inserted = lines.len() - (run_end - run_start);
+            let text_start = from - (run_end - run_start) + lines.len();
             buffer.replace_range(run_start..run_end, &lines);
-            return inserted;
+            return text_start;
         }
         run_start = Some(line_start);
         run += 1;
         let Some(above) = line_start.checked_sub(1) else {
-            return 0;
+            return from;
         };
         line_end = above;
     }
+}
+
+/// The indent of a break line under `line_above`, the line above the run: the text's indent, but
+/// never past the content column of a list item whose marker stands alone on `line_above`.
+///
+/// ~keep There the break line starts the item's paragraph, and four columns past the content
+/// ~keep column make it an indented code block. A list indent width of 4 or a tab puts the text
+/// ~keep further in than the marker: `-  ` then `    2. z` (content column 2).
+fn content_column_indent<'a>(line_above: &'a str, text_indent: &'a str) -> Cow<'a, str> {
+    let Some(marker_end) = bare_list_marker(line_above) else {
+        return Cow::Borrowed(text_indent);
+    };
+    let (indent, indent_column) = leading_indent(line_above);
+    // ~keep Markers are ASCII, one column per byte.
+    let content_column = indent_column + marker_end - indent + 1;
+    if leading_indent(text_indent).1 <= content_column {
+        return Cow::Borrowed(text_indent);
+    }
+    Cow::Owned(format!(
+        "{}{}",
+        &line_above[..indent],
+        " ".repeat(content_column - indent_column)
+    ))
 }
 
 /// Re-join a label's whitespace-collapsed segments and the hard-break markers between them,
@@ -479,61 +503,73 @@ mod tests {
     }
 
     // ~keep Issue #690: a line of only spaces between a hard break and text gets a backslash.
+    // ~keep Under a list marker alone on its line the break line starts the item's paragraph, and
+    // ~keep its indent stops at the item's content column (a list indent width of 4, a tab).
     #[test]
     fn end_break_lines_with_a_backslash_ends_only_a_run_after_a_hard_break() {
         let cases = [
-            ("a  \n  \nb", "a  \n  \\\nb", 1),
-            ("a  \n  \n  \n  b", "a  \n    \\\n    \\\n  b", 6),
-            ("1.  \n     \n   x", "1.  \n     \\\n   x", 1),
-            ("- a  \n    \n    \n  x", "- a  \n    \\\n    \\\n  x", 2),
-            ("1.  \n  \n   x", "1.  \n     \\\n   x", 4),
-            ("a\\\n  \nb", "a\\\n  \\\nb", 1),
-            ("a\n  \nb", "a\n  \nb", 0),
-            ("a  \n\nb", "a  \n\nb", 0),
-            ("a  \n \nb", "a  \n \nb", 0),
-            ("a  \n   \nb", "a  \n   \nb", 0),
-            ("  \nb", "  \nb", 0),
-            ("a  \nb", "a  \nb", 0),
+            ("a  \n  \nb", "a  \n  \\\nb"),
+            ("a  \n  \n  \n  b", "a  \n    \\\n    \\\n  b"),
+            ("1.  \n     \n   x", "1.  \n     \\\n   x"),
+            ("- a  \n    \n    \n  x", "- a  \n    \\\n    \\\n  x"),
+            ("1.  \n  \n   x", "1.  \n     \\\n   x"),
+            ("a\\\n  \nb", "a\\\n  \\\nb"),
+            ("-  \n      \n      \n    x", "-  \n    \\\n    \\\n    x"),
+            ("1.  \n      \n    x", "1.  \n     \\\n    x"),
+            ("-  \n\t  \n\tx", "-  \n    \\\n\tx"),
+            ("\t-  \n\t\t  \n\t\tx", "\t-  \n\t    \\\n\t\tx"),
+            ("- a  \n      \n    x", "- a  \n      \\\n    x"),
+            ("- 1.  \n          \n        x", "- 1.  \n       \\\n        x"),
+            ("\t* 1)\\\n\t\t\t  \n\t\t\tx", "\t* 1)\\\n\t       \\\n\t\t\tx"),
+            ("a\n  \nb", "a\n  \nb"),
+            ("a  \n\nb", "a  \n\nb"),
+            ("a  \n \nb", "a  \n \nb"),
+            ("a  \n   \nb", "a  \n   \nb"),
+            ("  \nb", "  \nb"),
+            ("a  \nb", "a  \nb"),
         ];
-        for (text, expected, inserted) in cases {
+        for (text, expected) in cases {
             let mut buffer = text.to_string();
             let from = buffer.len() - 1;
-            let count = end_break_lines_with_a_backslash(&mut buffer, from);
-            assert_eq!(count, inserted, "{text:?}");
+            let text_start = end_break_lines_with_a_backslash(&mut buffer, from);
             assert_eq!(buffer, expected, "{text:?}");
+            assert_eq!(text_start, buffer.len() - 1, "{text:?}");
         }
     }
 
-    /// ~keep The fastest of three rewrites of a run of `n` break lines before text. Only the
-    /// ~keep rewrite is timed, so the conversion around it cannot hide its cost.
-    fn rewrite_seconds(n: usize) -> f64 {
-        let text = format!("a  \n{}b", "  \n".repeat(n));
+    /// ~keep The fastest of three runs of `pass` over a copy of `text`. Only the pass is timed.
+    fn fastest_seconds(text: &str, pass: impl Fn(&mut String)) -> f64 {
         (0..3)
             .map(|_| {
-                let mut buffer = text.clone();
-                let from = buffer.len() - 1;
+                let mut buffer = text.to_string();
                 let start = std::time::Instant::now();
-                assert_eq!(end_break_lines_with_a_backslash(&mut buffer, from), n);
+                pass(&mut buffer);
+                std::hint::black_box(&buffer);
                 start.elapsed().as_secs_f64().max(1e-6)
             })
             .fold(f64::INFINITY, f64::min)
     }
 
     // ~keep Issue #690: the library converts untrusted HTML and nothing bounds a run of `<br>`.
-    // ~keep A backslash inserted per line moved the rest of the buffer each time, so each doubling
-    // ~keep of the run took four times as long; linear code takes twice as long, and 3.0 separates
-    // ~keep the two. A failure must repeat on three attempts to count.
+    // ~keep A backslash inserted per line moved the rest of the buffer each time: rewriting 80,000
+    // ~keep break lines took 28 times as long as one plain pass over the same buffer in a debug
+    // ~keep build. The one-pass rewrite stays under 10 times, also on two loaded cores: both passes
+    // ~keep run on the same machine at the same time, so load slows them alike.
     #[test]
     fn end_break_lines_with_a_backslash_is_linear_in_the_run() {
-        let mut failures = Vec::new();
-        for _ in 0..3 {
-            let [small, medium, large] = [20_000, 40_000, 80_000].map(rewrite_seconds);
-            let ratios = (medium / small, large / medium);
-            if ratios.0 < 3.0 && ratios.1 < 3.0 {
-                return;
-            }
-            failures.push(format!("{ratios:.1?} ({small:.4}s, {medium:.4}s, {large:.4}s)"));
-        }
-        panic!("each doubling of the run took over 3x as long: {failures:?}");
+        let n = 80_000;
+        let text = format!("a  \n{}b", "  \n".repeat(n));
+        let from = text.len() - 1;
+        let rewrite = fastest_seconds(&text, |buffer| {
+            assert_eq!(end_break_lines_with_a_backslash(buffer, from), from + n);
+        });
+        let pass = fastest_seconds(&text, |buffer| {
+            *buffer = std::hint::black_box(&*buffer).replace("  \n", "  \\\n");
+        });
+        assert!(
+            rewrite < 10.0 * pass,
+            "rewriting {n} break lines took {:.1}x as long as one pass ({rewrite:.4}s, {pass:.4}s)",
+            rewrite / pass
+        );
     }
 }

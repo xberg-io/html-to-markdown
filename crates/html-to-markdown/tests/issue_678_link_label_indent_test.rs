@@ -408,40 +408,75 @@ fn should_write_a_break_at_the_end_of_an_inline_element_outside_its_closing_mark
     }
 }
 
+// ~keep The break lines before the text start the item's paragraph, so they stay within three
+// ~keep columns of the item's content column whatever the list indent: four columns past it are
+// ~keep an indented code block.
 #[test]
 fn should_keep_the_text_after_breaks_at_an_item_start_in_the_item() {
-    for (html, lists) in [
-        ("<ol><li><br><br>x</li></ol>", "ol"),
-        ("<ol start=\"10\"><li><br><br>x</li></ol>", "ol"),
-        ("<ul><li><br><br>x</li></ul>", "ul"),
-        ("<ul><li><br>2. z</li></ul>", "ul"),
+    let indents = [
+        (ListIndentType::Spaces, 2),
+        (ListIndentType::Spaces, 4),
+        (ListIndentType::Tabs, 2),
+    ];
+    for (html, lists, text) in [
+        ("<ol><li><br><br>x</li></ol>", "ol", "x"),
+        ("<ol start=\"10\"><li><br><br>x</li></ol>", "ol", "x"),
+        ("<ul><li><br><br>x</li></ul>", "ul", "x"),
+        ("<ul><li><br>2. z</li></ul>", "ul", "2. z"),
+        ("<ul><li><br><br>2. z</li></ul>", "ul", "2. z"),
+        ("<ol><li><br><br>2. z</li></ol>", "ol", "2. z"),
+        ("<ul><li>a<ul><li><br><br>2. z</li></ul></li></ul>", "ul", "2. z"),
+        ("<ul><li><ol><li><br><br>2. z</li></ol></li></ul>", "ol", "2. z"),
+        ("<ul><li><ol><li><br>2. z</li></ol></li></ul>", "ol", "2. z"),
     ] {
         for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
-            let markdown = convert_with(html, options(tier));
-            let rendered = render(&markdown);
-            assert_eq!(
-                count(&rendered, lists),
-                1,
-                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
-            );
-            assert_eq!(
-                count(&rendered, "li"),
-                1,
-                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
-            );
-            assert_eq!(
-                count(&rendered, "p"),
-                0,
-                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
-            );
-            assert!(
-                rendered.trim_end().ends_with("</li>\n</ol>") || rendered.trim_end().ends_with("</li>\n</ul>"),
-                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
-            );
-            assert!(
-                !rendered.contains("<pre>"),
-                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
-            );
+            for (list_indent_type, list_indent_width) in indents {
+                for newline_style in [NewlineStyle::Spaces, NewlineStyle::Backslash] {
+                    let markdown = convert_with(
+                        html,
+                        ConversionOptions {
+                            list_indent_type,
+                            list_indent_width,
+                            newline_style,
+                            ..options(tier)
+                        },
+                    );
+                    let rendered = render(&markdown);
+                    let label = format!("{html} {tier:?} {list_indent_type:?} {list_indent_width} {newline_style:?}");
+                    assert_eq!(
+                        count(&rendered, lists),
+                        count(html, lists),
+                        "{label}: {markdown:?} renders {rendered:?}"
+                    );
+                    assert_eq!(
+                        count(&rendered, "li"),
+                        count(html, "li"),
+                        "{label}: {markdown:?} renders {rendered:?}"
+                    );
+                    assert!(
+                        rendered.contains(&format!("{text}</li>")),
+                        "{label}: {markdown:?} renders {rendered:?}"
+                    );
+                    assert!(
+                        !rendered.contains("<pre>") && !rendered.contains('\\'),
+                        "{label}: {markdown:?} renders {rendered:?}"
+                    );
+                }
+            }
         }
+    }
+}
+
+// ~keep In the fast converter a break at the very start of a paragraph is the first line of the
+// ~keep buffer, and the text after it starts the paragraph, where `2. z` opens a list.
+#[test]
+fn should_keep_the_text_after_a_break_at_a_paragraph_start_as_text() {
+    for html in ["<p><br>2. z</p>", "<dl><dd><br>2. z</dd></dl>"] {
+        let markdown = convert_with(html, options(TierStrategy::Tier1));
+        let rendered = render(&markdown);
+        assert!(
+            !rendered.contains("<ol") && rendered.contains("<p>2. z</p>"),
+            "{html}: {markdown:?} renders {rendered:?}"
+        );
     }
 }
