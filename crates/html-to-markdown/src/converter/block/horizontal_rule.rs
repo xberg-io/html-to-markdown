@@ -157,6 +157,10 @@ pub fn separate_leading_rule(output: &mut String, content: &str, ctx: &Context) 
     if content.split('\n').next() != Some("---") || output.is_empty() || output.ends_with("\n\n") {
         return;
     }
+    // ~keep In a cell the blank line takes the place of a cell break before the rule (issue #628).
+    if ctx.in_table_cell {
+        crate::converter::main_helpers::trim_trailing_whitespace(output);
+    }
     // ~keep The column a list item wrote for this line stays with the rule (issue #583).
     let line_start = output.rfind('\n').map_or(0, |pos| pos + 1);
     let indent = if output[line_start..].trim().is_empty() {

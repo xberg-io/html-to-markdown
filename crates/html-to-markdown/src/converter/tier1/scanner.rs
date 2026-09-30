@@ -1157,6 +1157,10 @@ fn emit_open(
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
     if std::mem::take(&mut state.last_closed_block) && is_inline_tag(name_lower) {
+        // ~keep An inline element after a block in a cell is left to Tier-2 (see `cell_needs_tier2`).
+        if state.in_table_cell() {
+            return Err(BailReason::TableBlockChildInCell);
+        }
         separate_inline_after_block(state, options.br_in_tables)?;
     }
 
@@ -1916,7 +1920,7 @@ fn emit_void(
                 }
                 dest.push_str("---\n");
             };
-            if in_cell && !rule_starts_a_definition(state) {
+            if in_cell {
                 with_cell_scratch(state, write_rule);
             } else {
                 write_rule(state.cell_or_output_mut());
@@ -3052,9 +3056,12 @@ fn innermost_own_buffer(state: &Tier1State) -> Option<&OpenTag> {
 
 /// Whether Tier-2 lays out `name_lower` in the current table cell in a way this scanner does not
 /// reproduce, so the cell goes to Tier-2 (issue #645): a block inside an inline element with a
-/// buffer of its own, a line break at the start of such an element, a legend, a figure caption
-/// or a label, and a sectioning element after other cell content, which Tier-2 separates with a
-/// blank line that the cell folds into two spaces.
+/// buffer of its own, a line break at the start of such an element or of a definition term or
+/// definition, a block at the start of a definition term or definition after other cell content, a
+/// legend, a
+/// figure caption or a label, and a sectioning element after other cell content, which Tier-2
+/// separates with a blank line that the cell folds into two spaces. An inline element right
+/// after a block in a cell is left to Tier-2 too (see `emit_open`).
 fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -> bool {
     if !state.in_table_cell() {
         return false;
@@ -3072,40 +3079,24 @@ fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -
         .rev()
         .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
         .any(|frame| frame.own_buffer && !frame.spec.is_block);
-    let inline_buffer_start = innermost_own_buffer(state)
-        .filter(|frame| !frame.spec.is_block)
+    let inline_buffer = innermost_own_buffer(state)
+        .filter(|frame| {
+            !frame.spec.is_block
+                || matches!(
+                    frame.spec.kind,
+                    TagKind::DefinitionTerm | TagKind::DefinitionDescription
+                )
+        })
         .map(|frame| frame.content_start);
     let cell_buf = state.cell_or_output_mut();
-    let break_at_buffer_start = matches!(spec.kind, TagKind::LineBreak)
-        && inline_buffer_start.is_some_and(|start| {
-            let start = clamp_to_char_boundary(cell_buf, start);
-            cell_buf[start..].trim().is_empty()
-        });
-    (sectioning && !cell_buf.is_empty()) || (spec.is_block && in_inline_buffer) || break_at_buffer_start
-}
-
-/// Whether a rule is the first content of a definition term or definition: the elements between
-/// the term and the rule wrote nothing yet. Tier-2 separates such a rule from the content before
-/// the term, so the rule sees the whole cell.
-fn rule_starts_a_definition(state: &mut Tier1State) -> bool {
-    let Some(start) = state
-        .stack
-        .iter()
-        .rev()
-        .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
-        .find(|frame| {
-            matches!(
-                frame.spec.kind,
-                TagKind::DefinitionTerm | TagKind::DefinitionDescription
-            )
-        })
-        .map(|frame| frame.content_start)
-    else {
-        return false;
-    };
-    let cell_buf = state.cell_or_output_mut();
-    let start = clamp_to_char_boundary(cell_buf, start);
-    cell_buf[start..].trim().is_empty()
+    let buffer_so_far = inline_buffer.map(|start| &cell_buf[clamp_to_char_boundary(cell_buf, start)..]);
+    let at_buffer_start = buffer_so_far.is_some_and(|text| text.trim().is_empty());
+    let break_at_buffer_start = matches!(spec.kind, TagKind::LineBreak) && at_buffer_start;
+    let block_at_buffer_start = spec.is_block && at_buffer_start && !cell_buf.trim().is_empty();
+    (sectioning && !cell_buf.is_empty())
+        || (spec.is_block && in_inline_buffer)
+        || break_at_buffer_start
+        || block_at_buffer_start
 }
 
 /// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell

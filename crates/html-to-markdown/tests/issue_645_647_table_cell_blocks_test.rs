@@ -91,7 +91,6 @@ fn should_separate_text_after_a_paragraph_or_heading_in_a_cell() {
         ("<div>a</div>b", "a b", "a<br>b"),
         ("<ul><li>a</li></ul>b", "a b", "a<br>b"),
         ("<pre>a</pre>b", "a b", "a<br>b"),
-        ("<p>a</p><b>b</b>", "a **b**", "a<br>**b**"),
     ]);
 }
 
@@ -127,10 +126,10 @@ fn should_write_no_break_after_a_break_or_around_an_empty_block() {
     ]);
 }
 
-/// Both converters write an emphasis, code, sub, sup, abbr, quote or heading in a cell into a
-/// buffer of its own, so a block at the start of one has no content to break from.
+/// Both converters write a heading in a cell into a buffer of its own, so a block at its start
+/// has no content to break from.
 #[test]
-fn should_write_no_break_before_a_block_at_the_start_of_inline_markup() {
+fn should_write_no_break_before_a_block_at_the_start_of_a_heading() {
     check(&[("x<h2><div>b</div></h2>", "x b", "x<br>b")]);
 }
 
@@ -227,34 +226,11 @@ fn should_write_the_same_paragraph_break_in_a_cell_in_both_tiers() {
     ]);
 }
 
-/// Inside code Tier-2 writes bold into the code span, so a block in the bold breaks from the
+/// Inside a code block Tier-2 writes bold into the code, so a block in the bold breaks from the
 /// code before it.
 #[test]
-fn should_break_before_a_block_in_bold_inside_code_in_a_cell() {
+fn should_break_before_a_block_in_bold_inside_a_code_block_in_a_cell() {
     check(&[("<pre>a<b><p>y</p></b>q</pre>", "a yq", "a<br>yq")]);
-}
-
-/// Tier-2 writes a definition term, a definition and a label into a buffer of their own, so a
-/// block at their start has no content to break from.
-#[test]
-fn should_write_no_break_before_a_block_at_the_start_of_a_definition_term() {
-    check(&[("a <dt><p>b</p></dt>c", "a b c", "a b<br>c")]);
-}
-
-#[test]
-fn should_write_no_break_before_a_block_at_the_start_of_a_definition() {
-    check(&[("a <dd><p>b</p></dd>c", "a b c", "a b<br>c")]);
-}
-
-/// Tier-2 separates a rule that starts a definition term or definition from the cell content
-/// before the term with a blank line, which the cell folds into two spaces.
-#[test]
-fn should_separate_a_rule_that_starts_a_definition_in_a_cell() {
-    check(&[
-        ("a<dt><hr></dt>c", "a  --- c", "a  ---<br>c"),
-        ("a<dd> <hr></dd>c", "a  --- c", "a  ---<br>c"),
-        ("a<dt><blockquote><hr></blockquote></dt>c", "a  --- c", "a  ---<br>c"),
-    ]);
 }
 
 /// Tier-2 still sees a navigation block that preprocessing drops, so the text after it breaks.
@@ -302,7 +278,8 @@ fn should_leave_a_section_after_cell_content_to_tier2() {
     assert_eq!(auto_out, Some(tier2(&html, false)));
 }
 
-/// Tier-2 lays out a block or a line break at the start of bold, code, sub, sup or abbr, and a
+/// Tier-2 lays out a block inside bold, code, sub, sup or abbr, a block or line break at the start
+/// of one of these or of a definition term or definition, an inline element after a block, and a
 /// legend, figure caption or label, with whitespace the fast converter does not reproduce in a
 /// cell, so the fast converter leaves the cell to Tier-2.
 #[test]
@@ -348,6 +325,13 @@ fn should_leave_a_block_in_inline_markup_or_a_label_in_a_cell_to_tier2() {
         ("<legend><hr></legend>c", "**---**  c", "**---**  c"),
         ("a<figcaption><p>b</p></figcaption>c", "a  *b* c", "a  *b*<br>c"),
         ("a<label> b</label>c", "ab  c", "ab  c"),
+        ("<p>a</p><b>b</b>", "a **b**", "a<br>**b**"),
+        ("a <dt><p>b</p></dt>c", "a b c", "a b<br>c"),
+        ("a <dd><p>b</p></dd>c", "a b c", "a b<br>c"),
+        ("a<dt><hr></dt>c", "a  --- c", "a  ---<br>c"),
+        ("a<dd> <hr></dd>c", "a  --- c", "a  ---<br>c"),
+        ("a<dt><blockquote><hr></blockquote></dt>c", "a  --- c", "a  ---<br>c"),
+        ("<p>a</p><span><dt><hr></dt></span>c", "a  --- c", "a<br>  ---<br>c"),
     ]);
     let html = "<table><tr><td>a<sub><table><tr><td>x</td></tr></table></sub></td><td>z</td></tr></table>";
     assert!(matches!(
