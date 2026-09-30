@@ -41,7 +41,9 @@ pub fn dispatch_list_handler(
             ordered::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        "ul" => {
+        // ~keep A menu is an unordered list in HTML, so it takes the `<ul>` path: the same bullet,
+        // ~keep blank lines and nesting (issue #657).
+        "ul" | "menu" => {
             unordered::handle(node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }

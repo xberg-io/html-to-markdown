@@ -498,7 +498,7 @@ fn separate_in_list_item(
         match crate::converter::utility::siblings::previous_content_block(node_handle, parser, dom_ctx) {
             Some(block) => (
                 !matches!(block, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"),
-                matches!(block, "blockquote" | "ul" | "ol"),
+                matches!(block, "blockquote" | "ul" | "ol" | "menu"),
             ),
             None => return,
         }
@@ -884,7 +884,7 @@ fn convert_node(
                     );
                 }
 
-                "ul" | "ol" | "li" | "dl" | "dt" | "dd" => {
+                "ul" | "ol" | "menu" | "li" | "dl" | "dt" | "dd" => {
                     crate::converter::list::dispatch_list_handler(
                         &tag_name,
                         node_handle,
@@ -937,7 +937,7 @@ fn convert_node(
                     );
                 }
 
-                "details" | "summary" | "dialog" | "menu" => {
+                "details" | "summary" | "dialog" => {
                     crate::converter::semantic::dispatch_semantic_handler(
                         &tag_name,
                         node_handle,

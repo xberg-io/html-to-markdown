@@ -50,7 +50,7 @@ pub use summary::handle as handle_summary;
 /// - **Sectioning**: article, section, nav, aside, header, footer, main
 /// - **Figure**: figure, figcaption
 /// - **Summary**: details, summary, dialog
-/// - **Definition List**: hgroup, dl, dt, dd, menu
+/// - **Definition List**: hgroup, dl, dt, dd
 /// - **Attributes**: cite, q, abbr, dfn, time, data
 ///
 /// # Returns
@@ -91,7 +91,7 @@ pub fn dispatch_semantic_handler(
             handle_summary(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }
-        "hgroup" | "dl" | "dt" | "dd" | "menu" => {
+        "hgroup" | "dl" | "dt" | "dd" => {
             handle_definition_list(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx);
             true
         }

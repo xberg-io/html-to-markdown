@@ -135,12 +135,12 @@ fn should_keep_a_fieldset_in_the_list_item() {
 fn should_nest_a_menu_in_the_list_item_like_a_list() {
     assert_converts_in_both_tiers(
         "<ul><li><menu><li>m</li></menu></li></ul>",
-        "- - m\n",
+        "- * m\n",
         &["<li>\n<ul>\n<li>m</li>\n</ul>\n</li>"],
     );
     assert_converts_in_both_tiers(
         "<ul><li>a<menu><li>m</li><li>n</li></menu>b</li></ul>",
-        "- a\n  - m\n  - n\n\n  b\n",
+        "- a\n  * m\n  * n\n\n  b\n",
         &["<ul>\n<li>m</li>\n<li>n</li>\n</ul>\n<p>b</p>\n</li>"],
     );
     assert_converts_in_both_tiers(
@@ -150,7 +150,7 @@ fn should_nest_a_menu_in_the_list_item_like_a_list() {
     );
     assert_converts_in_both_tiers(
         r#"<ul><li><input type="checkbox"><menu><li>m</li></menu></li></ul>"#,
-        "- [ ]\n  - m\n",
+        "- [ ]\n  * m\n",
         &["<ul>\n<li>m</li>\n</ul>\n</li>"],
     );
 }
@@ -231,7 +231,7 @@ fn should_keep_the_items_of_a_menu_in_a_heading_on_the_heading_line() {
 fn should_keep_text_between_the_items_of_a_menu_in_a_list_item_in_the_item() {
     assert_converts_in_both_tiers(
         "<ul><li>a<menu>x<li>m</li>y<li>n</li></menu></li></ul>",
-        "- a\n  x\n  - m\n  y\n  - n\n",
+        "- a\n  x\n  * m\n  y\n  * n\n",
         &["<li>a\nx\n<ul>"],
     );
 }
@@ -240,7 +240,7 @@ fn should_keep_text_between_the_items_of_a_menu_in_a_list_item_in_the_item() {
 fn should_make_the_list_loose_when_a_menu_in_an_item_is_loose() {
     assert_converts_in_both_tiers(
         "<ul><li>a<menu><li><p>m</p></li><li>n</li></menu></li><li>b</li></ul>",
-        "- a\n\n  - m\n\n  - n\n\n- b\n",
+        "- a\n\n  * m\n\n  * n\n\n- b\n",
         &["<li>\n<p>a</p>\n<ul>\n<li>\n<p>m</p>\n</li>\n<li>\n<p>n</p>\n</li>\n</ul>\n</li>\n<li>\n<p>b</p>\n</li>"],
     );
 }
@@ -252,6 +252,28 @@ fn should_give_the_checkbox_in_a_menu_item_to_that_item() {
         "- - [ ] c\n",
         &["<li>\n<ul>\n<li>[ ] c</li>\n</ul>\n</li>"],
     );
+}
+
+#[test]
+fn should_write_a_menu_exactly_like_an_unordered_list() {
+    for html in [
+        "<ul><li>a<br><menu><li> </li></menu>y</li></ul>",
+        "<dl><dt>t</dt><dd>a<br><menu><li> </li></menu>y</dd></dl>",
+        "<ul><li><h2>h</h2><menu><li>x</li></menu>y</li></ul>",
+        "<ul><li>o<ul><li>a<menu><li>m</li></menu>b</li></ul></li></ul>",
+        "<menu><li>a</li><li>b</li></menu>",
+        "<ul><li>a<details><summary><ul><li>x<menu><li>y</li></menu>t</li></ul></summary></details></li></ul>",
+        "<ul><li>a<figure><figcaption><ul><li>x<menu><li>y</li></menu>t</li></ul></figcaption></figure></li></ul>",
+    ] {
+        let options = options_for(TierStrategy::Tier2);
+        let as_list = html.replace("menu>", "ul>");
+        let markdown = convert_with(html, &options);
+        assert_eq!(markdown, convert_with(&as_list, &options), "{html}");
+        assert!(
+            !render(&markdown).contains("<h2>t") && !render(&markdown).contains("<h2>a"),
+            "{html}"
+        );
+    }
 }
 
 #[test]

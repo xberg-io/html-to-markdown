@@ -66,8 +66,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `<ul><li><details><summary>s</summary>d</details></li></ul>` gave `-\n\n**s**\n\nd`, an empty
   item with the content after the list, and `<ul><li><menu><li>m</li></menu></li></ul>` split the
   item in two. These containers, and a form, now start at the item's content column like a
-  `<div>`, and the text after one of them stays in the item. A menu nests in the item like a
-  `<ul>`. Center, search, dialog, summary and legend elements now count as blocks, so the text
+  `<div>`, and the text after one of them stays in the item. A menu is now converted exactly
+  like a `<ul>`: it nests in the item, cycles the configured `bullets`, and a visitor gets the
+  list callbacks for it. Center, search, dialog, summary and legend elements now count as blocks, so the text
   after them starts a new paragraph.
 - **The eight elements center, details, dialog, hgroup, legend, menu, search and summary are now
   blocks outside list items too.** In bold, italic or a span they split the wrapper like a

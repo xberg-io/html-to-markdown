@@ -5,7 +5,6 @@
 //! - `<dl>` - Definition list container
 //! - `<dt>` - Definition term
 //! - `<dd>` - Definition description
-//! - `<menu>` - Semantic list (typically unordered)
 //!
 //! These elements have special formatting requirements for proper Markdown output.
 
@@ -199,84 +198,9 @@ pub fn handle_dd(
     }
 }
 
-/// Handles the `<menu>` element.
-///
-/// A menu element is a semantic list, typically used for command menus or
-/// navigation. It is rendered as an unordered list with dashes.
-///
-/// # Behavior
-///
-/// - **Inline mode**: Children are processed inline without list formatting
-/// - **Block mode**: Content is rendered as an unordered list
-/// - Uses `-` as the list bullet (overrides configured bullets)
-/// - Proper blank-line spacing is maintained
-pub fn handle_menu(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    output: &mut String,
-    options: &crate::options::ConversionOptions,
-    ctx: &super::Context,
-    depth: usize,
-    dom_ctx: &super::DomContext,
-) {
-    if let Some(tl::Node::Tag(_)) = node_handle.get(parser) {
-        use crate::converter::list::utils;
-
-        let menu_options = crate::options::ConversionOptions {
-            bullets: "-".to_string(),
-            ..options.clone()
-        };
-
-        // ~keep The items are those of an unordered list, so inside a list item they nest in
-        // ~keep it like a `<ul>` (issue #657).
-        if ctx.in_list_item {
-            utils::add_list_leading_separator(output, ctx, options);
-        }
-        let content_start = output.len();
-        utils::process_list_children(
-            *node_handle,
-            parser,
-            output,
-            &menu_options,
-            ctx,
-            depth,
-            false,
-            false,
-            ctx.list_depth,
-            1,
-            dom_ctx,
-        );
-
-        if options.newline_style == crate::options::NewlineStyle::Backslash {
-            // ~keep A trailing <br> run with no following sibling has no next dispatch to
-            // ~keep catch it in `walk_node`'s pre-block-dispatch strip, since the menu's own
-            // ~keep content is simply finished here — so this closes its own trailing run
-            // ~keep the same way `paragraph.rs` closes its own (issue #464 follow-up).
-            crate::converter::main_helpers::strip_trailing_backslash_breaks(output, content_start);
-        }
-
-        if ctx.in_list_item {
-            utils::add_nested_list_trailing_separator(output, ctx);
-        } else if !ctx.convert_as_inline && output.len() > content_start {
-            if !output.ends_with("\n\n") {
-                if output.ends_with('\n') {
-                    output.push('\n');
-                } else {
-                    output.push_str("\n\n");
-                }
-            }
-        } else if ctx.convert_as_inline {
-            while output.ends_with('\n') {
-                output.pop();
-            }
-        }
-    }
-}
-
 /// Dispatcher for definition list and related elements.
 ///
-/// Routes `<hgroup>`, `<dl>`, `<dt>`, `<dd>`, and `<menu>` elements
+/// Routes `<hgroup>`, `<dl>`, `<dt>` and `<dd>` elements
 /// to their respective handlers.
 pub fn handle(
     tag_name: &str,
@@ -293,7 +217,6 @@ pub fn handle(
         "dl" => handle_dl(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
         "dt" => handle_dt(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
         "dd" => handle_dd(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
-        "menu" => handle_menu(tag_name, node_handle, parser, output, options, ctx, depth, dom_ctx),
         _ => {}
     }
 }
