@@ -390,6 +390,19 @@ pub fn scan(
                     if is_adjacent_rawtext_ignored_open(bytes, pos) {
                         return Err(BailReason::AdjacentRawTextTags { offset: pos });
                     }
+                    // ~keep Tier-2 reads the whitespace on both sides of the removed element as one
+                    // ~keep text, so `First\n<script>x</script>\n<br>` ends in a blank line, as
+                    // ~keep `First\n\n<br>` does: the `<br>` must not remove the join (issue #683).
+                    let after = &bytes[pos..];
+                    let after_ws = &after[..after
+                        .iter()
+                        .position(|b| !b.is_ascii_whitespace())
+                        .unwrap_or(after.len())];
+                    let newline_before = name_start >= 2 && bytes[name_start - 2] == b'\n';
+                    if (newline_before && after_ws.first() == Some(&b'\n')) || after_ws.windows(2).any(|w| w == b"\n\n")
+                    {
+                        state.pending_newline_join = None;
+                    }
 
                     text_start = pos;
                     // ~keep Mirror the single-element boundary-space rule: a space is

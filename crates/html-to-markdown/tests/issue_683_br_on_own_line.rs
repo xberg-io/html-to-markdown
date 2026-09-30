@@ -41,6 +41,14 @@ fn fast(html: &str) -> String {
     .unwrap_or_else(|reason| panic!("the fast converter must not bail on {html:?}: {reason:?}"))
 }
 
+/// The output of the default route, which picks the converter.
+fn auto(html: &str) -> String {
+    convert(html, Some(options(NewlineStyle::Spaces, TierStrategy::Auto)))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default()
+}
+
 /// `own_line` gives what `inline`, the same markup without the source newlines, gives, in both
 /// converters.
 fn assert_matches_inline_form(own_line: &str, inline: &str) {
@@ -220,6 +228,39 @@ fn should_keep_the_hard_break_past_markup_the_full_converter_does_not_see() {
     ] {
         assert_eq!(full(html, NewlineStyle::Spaces), "a  \ny\n", "full converter: {html:?}");
         assert_eq!(fast(html), "a  \ny\n", "fast converter: {html:?}");
+    }
+}
+
+#[test]
+fn should_keep_a_blank_line_across_a_script_or_style_before_a_br_as_a_paragraph_break() {
+    for html in [
+        "First\n<script>x</script>\n<br>Second",
+        "First\n<style>p { color: red }</style>\n<br>Second",
+        "First\r\n<script>x</script>\n<br>Second",
+        "First\n<script>x</script>\n \n<br>Second",
+        "<div>First\n<style>x</style>\n<br>Second</div>",
+        "<span>First\n<script>x</script>\n<br>Second</span>",
+        "First\n<script>a</script>\n<style>b</style>\n<br>Second",
+    ] {
+        assert_eq!(
+            full(html, NewlineStyle::Spaces),
+            "First\n\nSecond\n",
+            "full converter: {html:?}"
+        );
+        assert_eq!(fast(html), "First\n\nSecond\n", "fast converter: {html:?}");
+        assert_eq!(auto(html), "First\n\nSecond\n", "auto route: {html:?}");
+    }
+    for html in [
+        "First\n<script>x</script> \n<br>Second",
+        "First\n<style>x</style>\t\n<br>Second",
+    ] {
+        assert_eq!(
+            full(html, NewlineStyle::Spaces),
+            "First  \nSecond\n",
+            "full converter: {html:?}"
+        );
+        assert_eq!(fast(html), "First  \nSecond\n", "fast converter: {html:?}");
+        assert_eq!(auto(html), "First  \nSecond\n", "auto route: {html:?}");
     }
 }
 
