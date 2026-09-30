@@ -6,7 +6,7 @@
 //! - Metadata collection (headers, IDs)
 //! - Visitor callbacks for custom heading processing
 
-use crate::options::{ConversionOptions, HeadingStyle};
+use crate::options::{ConversionOptions, HeadingStyle, OutputFormat};
 use std::borrow::Cow;
 use tl::{NodeHandle, Parser};
 
@@ -281,14 +281,14 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
             // ~keep The text is a paragraph line, so a list marker or other block opener at its
             // ~keep start is escaped (issue #653).
             if level == 1 {
-                output.push_str(&crate::converter::utility::escaping::escape_paragraph_start(text));
+                output.push_str(&crate::converter::utility::escaping::escape_paragraph_start(text, b'='));
                 output.push('\n');
                 output.push_str(underline_indent.as_deref().unwrap_or_default());
                 for _ in 0..text.len() {
                     output.push('=');
                 }
             } else if level == 2 {
-                output.push_str(&crate::converter::utility::escaping::escape_paragraph_start(text));
+                output.push_str(&crate::converter::utility::escaping::escape_paragraph_start(text, b'-'));
                 output.push('\n');
                 output.push_str(underline_indent.as_deref().unwrap_or_default());
                 // ~keep In a list item a lone `-` line reads as an empty item marker, both to
@@ -307,7 +307,7 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
                     output.push('#');
                 }
                 output.push(' ');
-                output.push_str(text);
+                output.push_str(&atx_heading_text(text, options));
             }
         }
         HeadingStyle::Atx => {
@@ -315,7 +315,7 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
                 output.push('#');
             }
             output.push(' ');
-            output.push_str(text);
+            output.push_str(&atx_heading_text(text, options));
         }
         HeadingStyle::AtxClosed => {
             for _ in 0..level {
@@ -330,6 +330,19 @@ pub fn push_heading(output: &mut String, ctx: &Context, options: &ConversionOpti
         }
     }
     output.push_str(heading_suffix);
+}
+
+/// The text of an ATX heading line that ends without a closing sequence of its own, with a `#` run
+/// at its end escaped when a parser would read it as that sequence (issue #661).
+///
+/// ~keep A Djot heading has no closing sequence, so its text stays as it is.
+fn atx_heading_text<'a>(text: &'a str, options: &ConversionOptions) -> Cow<'a, str> {
+    match crate::converter::utility::escaping::atx_closing_sequence_offset(text) {
+        Some(at) if options.output_format == OutputFormat::Markdown => {
+            Cow::Owned(format!("{}\\{}", &text[..at], &text[at..]))
+        }
+        _ => Cow::Borrowed(text),
+    }
 }
 
 /// Get continuation indent string for list items.
