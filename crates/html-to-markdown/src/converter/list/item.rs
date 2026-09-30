@@ -92,9 +92,10 @@ pub fn handle_li(
     // ~keep A task item in an ordered list keeps its number (issue #659). Djot has task items
     // ~keep only in bullet lists, so there it keeps the bullet.
     let numbered = ctx.in_ordered_list && !(is_task_list && options.output_format == OutputFormat::Djot);
+    // ~keep An ordered list right after an ordered list writes `)` (issue #666).
     let list_marker = || {
         if numbered {
-            format!("{}. ", ctx.list_counter)
+            format!("{}{} ", ctx.list_counter, ctx.ordered_delimiter.unwrap_or('.'))
         } else if is_task_list {
             String::from("- ")
         } else {
@@ -378,12 +379,8 @@ pub fn handle_li(
             // ~keep the enclosing <ul>/<ol> opens so consecutive items get the identical
             // ~keep <br> boundary already established for <p>/<div> siblings in a cell.
             add_list_leading_separator(output, ctx, options);
-        } else if ctx.in_ordered_list {
-            use std::fmt::Write;
-            let _ = write!(output, "{}. ", ctx.list_counter);
         } else {
-            output.push(unordered_bullet(ctx, options));
-            output.push(' ');
+            output.push_str(&list_marker());
         }
 
         let item_start_pos = output.len();
@@ -459,16 +456,10 @@ pub fn handle_li(
                 let task_marker = if task_checked { "- [x]" } else { "- [ ]" };
                 let text_start = last_line.find(task_marker).map_or(0, |pos| pos + task_marker.len());
                 (Cow::Borrowed(task_marker), text_start)
-            } else if ctx.in_ordered_list {
-                let marker_text = format!("{}.", ctx.list_counter);
+            } else {
+                let marker_text = list_marker().trim_end().to_string();
                 let text_start = last_line.find(&marker_text).map_or(0, |pos| pos + marker_text.len());
                 (Cow::Owned(marker_text), text_start)
-            } else {
-                let bullet = unordered_bullet(ctx, options);
-                let text_start = last_line.find(bullet).map_or(0, |pos| pos + 1);
-                let mut buf = String::with_capacity(bullet.len_utf8());
-                buf.push(bullet);
-                (Cow::Owned(buf), text_start)
             };
             let text_content = last_line[text_start..].trim();
 
