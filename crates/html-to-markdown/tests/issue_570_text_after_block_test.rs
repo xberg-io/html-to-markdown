@@ -288,11 +288,11 @@ fn should_leave_a_line_break_between_inline_siblings_alone() {
 }
 
 #[test]
-fn should_not_separate_inside_table_cells_code_or_converted_inline_output() {
+fn should_write_the_cell_break_in_a_cell_and_no_line_in_code_or_converted_inline_output() {
     for (html, expected) in [
         (
             "<table><tr><th>h</th></tr><tr><td><ul><li>A</li></ul>ZZ</td></tr></table>",
-            "| h   |\n| --- |\n| AZZ |\n",
+            "| h    |\n| ---- |\n| A ZZ |\n",
         ),
         (
             "<table><tr><th>h</th></tr><tr><td><hr>ZZ</td></tr></table>",
