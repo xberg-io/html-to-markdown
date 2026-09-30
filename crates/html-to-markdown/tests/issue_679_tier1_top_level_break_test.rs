@@ -182,6 +182,10 @@ fn should_write_one_space_for_a_hard_break_in_a_heading() {
         assert_eq!(tier2(html), "## a b\n", "input: {html:?}");
         assert_eq!(tier1(html), "## a b\n", "input: {html:?}");
     }
+    // ~keep A space the text before wrote is not a break: both converters keep both spaces.
+    for html in ["<h2><span>a </span> b</h2>", "<h2><b>a </b> b</h2>"] {
+        assert_eq!(tier2(html), tier1(html), "input: {html:?}");
+    }
 }
 
 #[test]
@@ -214,6 +218,19 @@ fn should_indent_a_line_that_holds_only_a_hard_break_in_a_list_item() {
     ] {
         assert_eq!(convert_with(html, backslash(false)), expected, "input: {html:?}");
         assert_eq!(convert_with(html, backslash(true)), expected, "wrapped input: {html:?}");
+    }
+    // ~keep A break-only line at the end of the item has no line to break, so no `\` is left.
+    for (html, expected) in [
+        ("<ul><li>a<br><br></li></ul>", "- a\n"),
+        ("<ul><li>a<br><br><br></li><li>b</li></ul>", "- a\n\n- b\n"),
+        ("<ol><li>a<br><br></li></ol>", "1. a\n"),
+    ] {
+        assert_eq!(convert_with(html, backslash(false)), expected, "input: {html:?}");
+        let auto = ConversionOptions {
+            newline_style: NewlineStyle::Backslash,
+            ..options(TierStrategy::Auto)
+        };
+        assert_eq!(convert_with(html, auto), expected, "auto input: {html:?}");
     }
     // ~keep With the spaces style the line stays blank.
     for (html, expected) in [

@@ -62,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   break in the fast converter. A break in a heading followed by a space
   gives one space (`## a b`). With the backslash newline style, a line in a list item that holds
   only a break keeps the item's indent (#681). Wrap no longer cuts a list item's text at a `===`
-  line left of the item's column, which dropped the hard breaks after it (#680).
+  line left of the item's column, which dropped the hard breaks after it (#680), and keeps a
+  hard break right before such a line.
 - **Two ordered lists next to each other became one list (#666).**
   `<ol><li>a</li></ol><ol><li>b</li></ol>` gave `1. a\n\n1. b`, which CommonMark and Djot read
   as one list, because a blank line does not end a list. An ordered list that follows an ordered

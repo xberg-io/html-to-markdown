@@ -12,8 +12,8 @@ use std::borrow::Cow;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
-    FollowingContent, following_sibling_content, get_next_sibling_tag, next_sibling_is_inline_tag,
-    previous_sibling_is_inline_tag,
+    FollowingContent, following_sibling_content, get_next_sibling_tag, get_previous_sibling_tag,
+    next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
 };
 use crate::options::ConversionOptions;
 use crate::text;
@@ -350,8 +350,12 @@ pub fn process_text_node(
             || output.ends_with("] ")
             || (output.ends_with('\n') && prefix == " ")
             // ~keep In a heading a `<br>` is written as the space itself (`line_break.rs`), so
-            // ~keep the text after it adds no second one: `<h2>a<br> b</h2>` is `## a b`.
-            || (ctx.in_heading && output.ends_with(' ') && prefix == " ")
+            // ~keep the text after it adds no second one: `<h2>a<br> b</h2>` is `## a b`. Only
+            // ~keep after a `<br>`: `<h2><span>a </span> b</h2>` keeps both spaces, as Tier-1 does.
+            || (ctx.in_heading
+                && output.ends_with(' ')
+                && prefix == " "
+                && get_previous_sibling_tag(node_handle, parser, dom_ctx) == Some("br"))
             || (output.ends_with(' ')
                 && prefix == " "
                 && !previous_sibling_is_inline_tag(node_handle, parser, dom_ctx));

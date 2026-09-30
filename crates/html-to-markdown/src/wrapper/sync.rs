@@ -63,7 +63,7 @@ impl OpenParagraph {
     /// ~keep (issue #680). A `-` run left of the column is a thematic break and ends the item.
     /// Only when the run joins the line above: on a line of its own at the item's column, after a
     /// hard break or after a bare marker the run would make a list item (`1.`), it would underline
-    /// the text above.
+    /// the text above, so the paragraph ends there and keeps its hard break (`flush_before_line`).
     fn is_lazy_equals_underline(&self, line: &str, trimmed: &str) -> bool {
         self.is_item()
             && !self.text.ends_with('\n')
@@ -84,6 +84,27 @@ impl OpenParagraph {
             out.push_str("\n\n");
         }
         self.text.clear();
+    }
+
+    /// Write the paragraph before a line that ends it without a blank line between them.
+    ///
+    /// ~keep A list item's text that ends with a hard break keeps it: the line after it can still
+    /// ~keep be text of the item, a lazy `===` line after a break (`- a  \n===`), so dropped, the
+    /// ~keep break would be lost (issue #680). Before a line that ends the item it has no effect.
+    fn flush_before_line(&mut self, out: &mut String, width: usize) {
+        let spaces = if self.is_item() {
+            self.text
+                .strip_suffix('\n')
+                .map(|text| text.len() - text.trim_end_matches(' ').len())
+        } else {
+            None
+        };
+        self.flush(out, width);
+        if let Some(spaces) = spaces.filter(|&spaces| spaces >= 2) {
+            out.pop();
+            out.extend(std::iter::repeat_n(' ', spaces));
+            out.push('\n');
+        }
     }
 }
 
@@ -281,7 +302,7 @@ pub fn wrap_markdown(markdown: &str, options: &ConversionOptions) -> String {
             is_heading(trimmed) || opens_block(trimmed) || trimmed.starts_with('|') || trimmed.starts_with('=');
 
         if is_structural {
-            paragraph.flush(&mut result, width);
+            paragraph.flush_before_line(&mut result, width);
 
             result.push_str(line);
             result.push('\n');
@@ -413,9 +434,10 @@ mod tests {
         assert_eq!(wrap_at_20("- a\n  ===\n"), "- a\n  ===\n");
         assert_eq!(wrap_at_20("  a\n===\n"), "  a\n===\n");
         // ~keep After a hard break the run would start a line of its own at the item's column
-        // ~keep and underline the text above, so the paragraph ends before it and the run
-        // ~keep stays left of the column.
-        assert_eq!(wrap_at_20("- a  \n===\n"), "- a\n===\n");
+        // ~keep and underline the text above, so the paragraph ends before it, the run stays
+        // ~keep left of the column and the break stays.
+        assert_eq!(wrap_at_20("- a  \n===\n"), "- a  \n===\n");
+        assert_eq!(wrap_at_20("- a\n===  \n===\n"), "- a ===  \n===\n");
         assert_eq!(wrap_at_20("- q  \n  1.\n===\n"), "- q  \n  1.\n===\n");
     }
 
