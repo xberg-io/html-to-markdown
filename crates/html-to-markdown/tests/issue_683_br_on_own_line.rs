@@ -223,78 +223,79 @@ fn should_keep_the_hard_break_past_markup_the_full_converter_does_not_see() {
     }
 }
 
-/// ~keep Linear code doubles its time when the input doubles, quadratic code quadruples it, and
-/// ~keep 3.0 separates the two with room for noise (the instrument of `bare_lt_complexity.rs`).
-const MAX_DOUBLING_RATIO: f64 = 3.0;
+/// ~keep `<canvas>` is inline in the fast converter's tag table and a block in the full
+/// ~keep converter's block list. Its close must keep the join, and the `<br>` must remove it before
+/// ~keep the fast converter separates inline content after a block, as the full converter does.
+#[test]
+fn should_keep_a_br_after_text_that_ends_inside_a_canvas_as_a_hard_break() {
+    assert_matches_inline_form("<canvas>First\n</canvas><br>Second", "<canvas>First</canvas><br>Second");
+    let html = "<canvas>First\n</canvas><br>Second";
+    assert_eq!(full(html, NewlineStyle::Spaces), "First  \nSecond\n");
+    assert_eq!(fast(html), "First  \nSecond\n");
+}
 
-/// ~keep A failure must reproduce on every independent attempt; one that does not is noise.
-const MAX_MEASUREMENT_ATTEMPTS: usize = 3;
+/// ~keep Lines of markup between the text and the `<br>`: enough that a scan of that markup for
+/// ~keep each text node in it takes seconds, while one scan takes a few milliseconds.
+const HOSTILE_LINES: usize = 20_000;
 
-/// ~keep Large enough that a quadratic scan of the markup between the text and the `<br>` is
-/// ~keep not lost in noise, small enough that it still finishes in seconds in a debug build.
-const BASE_SIZE: usize = 2_000;
+/// ~keep One conversion against one plain pass over the same bytes, both timed in the same
+/// ~keep process, so a loaded machine slows both. Measured at 20k lines: the linear scan takes 18
+/// ~keep times the pass in a debug build and 14 times in release; the scan that looked ahead from
+/// ~keep each text node took about 27,000 times the pass.
+const MAX_TIME_RATIO: f64 = 200.0;
 
-/// Text ending in a source newline, `n` comments each followed by a form feed and a newline,
-/// then a `<br>`: markup between the text and the `<br>` that the fast converter must not scan
-/// again for each text node in it.
-fn form_feed_runs(n: usize) -> [(&'static str, String); 2] {
-    let run = "<!--c-->\x0C\n".repeat(n);
+/// Text ending in a source newline, comments each followed by a form feed and a newline, then a
+/// `<br>`: markup between the text and the `<br>` that the fast converter must not scan again for
+/// each text node in it.
+fn form_feed_runs() -> [(&'static str, String); 2] {
+    let run = "<!--c-->\x0C\n".repeat(HOSTILE_LINES);
     [
         ("top level", format!("a\n{run}<br>b")),
         ("in a span", format!("<span>a\n{run}</span><br>b")),
     ]
 }
 
-fn fastest_fast_conversion(html: &str) -> Duration {
+/// The fastest of three runs of `work`.
+fn fastest_of_three(mut work: impl FnMut()) -> Duration {
     (0..3)
         .map(|_| {
             let start = Instant::now();
-            let output = fast(html);
-            let elapsed = start.elapsed();
-            assert!(output.ends_with("b\n"), "{output:?}");
-            elapsed
+            work();
+            start.elapsed()
         })
         .min()
         .expect("at least one run")
 }
 
-/// The two doubling ratios of one shape, or a description of why they look quadratic.
-fn measure_form_feed_run(index: usize) -> Result<(), String> {
-    let seconds: Vec<f64> = [BASE_SIZE, BASE_SIZE * 2, BASE_SIZE * 4]
-        .into_iter()
-        .map(|n| {
-            fastest_fast_conversion(&form_feed_runs(n)[index].1)
-                .as_secs_f64()
-                .max(1e-6)
-        })
-        .collect();
-    let first = seconds[1] / seconds[0];
-    let second = seconds[2] / seconds[1];
-    if first < MAX_DOUBLING_RATIO && second < MAX_DOUBLING_RATIO {
-        return Ok(());
+/// A linear pass over the bytes of `html` that copies each character, escaping the markup ones.
+fn plain_pass(html: &str) -> String {
+    let mut out = String::with_capacity(html.len() * 2);
+    for character in std::hint::black_box(html).chars() {
+        if matches!(character, '<' | '>' | '&') {
+            out.push('\\');
+        }
+        out.push(character);
     }
-    let name = form_feed_runs(1)[index].0;
-    Err(format!(
-        "{name}: doublings took {first:.1}x and {second:.1}x as long ({:.4}s, {:.4}s, {:.4}s); \
-         expected under {MAX_DOUBLING_RATIO}x each",
-        seconds[0], seconds[1], seconds[2]
-    ))
+    out
 }
 
 #[test]
 fn should_scan_the_markup_before_a_br_in_linear_time() {
-    for index in 0..form_feed_runs(1).len() {
-        let mut failures = Vec::with_capacity(MAX_MEASUREMENT_ATTEMPTS);
-        for attempt in 1..=MAX_MEASUREMENT_ATTEMPTS {
-            match measure_form_feed_run(index) {
-                Ok(()) => break,
-                Err(reason) => failures.push(format!("attempt {attempt}: {reason}")),
-            }
-        }
+    for (name, html) in form_feed_runs() {
+        let conversion = fastest_of_three(|| {
+            let output = fast(&html);
+            assert!(output.ends_with("b\n"), "{output:?}");
+        });
+        let pass = fastest_of_three(|| {
+            std::hint::black_box(plain_pass(&html));
+        });
+        let ratio = conversion.as_secs_f64() / pass.as_secs_f64().max(1e-9);
         assert!(
-            failures.len() < MAX_MEASUREMENT_ATTEMPTS,
-            "the fast converter scaled super-linearly on every attempt:\n{}",
-            failures.join("\n")
+            ratio < MAX_TIME_RATIO,
+            "{name}: the conversion took {ratio:.0} times as long as a plain pass over the same \
+             bytes ({:.4}s vs {:.6}s), expected under {MAX_TIME_RATIO}",
+            conversion.as_secs_f64(),
+            pass.as_secs_f64()
         );
     }
 }

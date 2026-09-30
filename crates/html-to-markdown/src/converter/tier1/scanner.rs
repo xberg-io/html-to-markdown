@@ -1906,6 +1906,16 @@ fn emit_void(
     // `Tier1State::last_emitted_was_img`); the `TagKind::Image` arm below
     // re-sets it to true after this reset runs.
     state.last_emitted_was_img = false;
+    // ~keep A `<br>` ends the line of the text before it: a `'\n'` join still at the end would put
+    // ~keep the marker on a line of its own, which cleanup turns into a paragraph break (issue
+    // ~keep #683). The join goes before the block check below, which must not see a line end
+    // ~keep Tier-2 never wrote (`<canvas>First\n</canvas><br>`).
+    if let Some(join_end) = state.pending_newline_join.take() {
+        let dest = state.cell_or_output_mut();
+        if matches!(spec.kind, TagKind::LineBreak) && join_end == dest.len() {
+            dest.pop();
+        }
+    }
     // ~keep In a cell a line break is a break of its own (issue #645).
     if std::mem::take(&mut state.last_closed_block)
         && is_inline_tag(name_lower)
@@ -2072,14 +2082,7 @@ fn emit_void(
             } else {
                 // ~keep Also a `<br>` that no element encloses (`a<br>b`): Tier-2 writes the
                 // same marker there as inside `<body>`, so the top level is not a case of its own.
-                let pending_newline_join = state.pending_newline_join.take();
                 let dest = state.cell_or_output_mut();
-                // ~keep This `<br>` ends the line of the text before it: a `'\n'` join still at
-                // ~keep the end would put the marker on a line of its own, which cleanup turns into
-                // ~keep a paragraph break (issue #683).
-                if pending_newline_join == Some(dest.len()) {
-                    dest.pop();
-                }
                 crate::converter::main_helpers::trim_trailing_whitespace(dest);
                 dest.push_str("  \n");
             }
