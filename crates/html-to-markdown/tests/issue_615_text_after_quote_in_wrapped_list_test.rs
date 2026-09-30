@@ -367,44 +367,44 @@ fn should_start_the_first_block_of_a_task_item_on_the_next_line_inside_a_wrapper
     for (html, expected, rendered_part) in [
         (
             r#"<ul><li><input type="checkbox"><div><blockquote>q</blockquote></div></li></ul>"#,
-            "- [ ]\n  > q\n",
-            "]\n<blockquote>",
+            "- [ ] &#32;\n  > q\n",
+            "]  \n<blockquote>",
         ),
         (
             r#"<ul><li><p><input type="checkbox"></p><blockquote>q</blockquote></li></ul>"#,
-            "- [ ]\n  > q\n",
-            "]\n<blockquote>",
+            "- [ ] &#32;\n  > q\n",
+            "]  \n<blockquote>",
         ),
         (
             r#"<ul><li><label><input type="checkbox"></label><blockquote>q</blockquote></li></ul>"#,
-            "- [ ]\n  > q\n",
-            "]\n<blockquote>",
+            "- [ ] &#32;\n  > q\n",
+            "]  \n<blockquote>",
         ),
         (
             r#"<ul><li><input type="checkbox"><div><ul><li>n</li></ul></div></li></ul>"#,
-            "- [ ]\n  * n\n",
-            "]\n<ul>",
+            "- [ ] &#32;\n  * n\n",
+            "]  \n<ul>",
         ),
         (
             r#"<ul><li><input type="checkbox"><section><h2>h</h2></section></li></ul>"#,
-            "- [ ]\n  ## h\n",
-            "]\n<h2>",
+            "- [ ] &#32;\n  ## h\n",
+            "]  \n<h2>",
         ),
         (
             r#"<ul><li><input type="checkbox"><pre>c</pre></li></ul>"#,
-            "- [ ]\n  ```\n  c\n  ```\n",
-            "]\n<pre>",
+            "- [ ] &#32;\n  ```\n  c\n  ```\n",
+            "]  \n<pre>",
         ),
         // ~keep Under the checkbox line `---` underlines a heading, so a blank line comes first.
         (
             r#"<ul><li><input type="checkbox"><hr></li></ul>"#,
-            "- [ ]\n\n  ---\n",
-            "[ ]</p>\n<hr />",
+            "- [ ] &#32;\n\n  ---\n",
+            "[ ]  </p>\n<hr />",
         ),
         (
             r#"<ul><li><input type="checkbox"><div><hr></div></li></ul>"#,
-            "- [ ]\n\n  ---\n",
-            "[ ]</p>\n<hr />",
+            "- [ ] &#32;\n\n  ---\n",
+            "[ ]  </p>\n<hr />",
         ),
     ] {
         let out = convert_with(html, &tier2_options());
@@ -453,7 +453,7 @@ fn should_keep_the_task_item_when_its_content_passes_the_depth_limit() {
     for (html, expected) in [
         (
             format!(r#"<ul><li><input type="checkbox">{open}{close}<blockquote>q</blockquote></li></ul>"#),
-            "- [ ]\n  > q\n",
+            "- [ ] &#32;\n  > q\n",
         ),
         (
             format!(r#"<ul><li><input type="checkbox">{open}<blockquote>q</blockquote>{close}t</li></ul>"#),
@@ -480,21 +480,21 @@ fn should_keep_a_quote_that_starts_a_task_item_in_the_item() {
     for (html, expected) in [
         (
             r#"<ul><li><input type="checkbox" checked><blockquote>q</blockquote></li></ul>"#,
-            "- [x]\n  > q\n",
+            "- [x] &#32;\n  > q\n",
         ),
         (
             r#"<ul><li>a<ul><li><input type="checkbox"><blockquote>q</blockquote></li></ul></li></ul>"#,
-            "- a\n  - [ ]\n    > q\n",
+            "- a\n  - [ ] &#32;\n    > q\n",
         ),
         (
             r#"<ul><li><input type="checkbox" checked> <!-- c --><blockquote>q</blockquote></li></ul>"#,
-            "- [x]\n  > q\n",
+            "- [x] &#32;\n  > q\n",
         ),
     ] {
         let out = convert_with(html, &tier2_options());
         assert_eq!(out, expected, "{html:?}: the quote became the task's text");
         assert!(
-            render(&out).contains("]\n<blockquote>"),
+            render(&out).contains("]  \n<blockquote>"),
             "{html:?}: {out:?} renders {:?}",
             render(&out)
         );
@@ -502,11 +502,11 @@ fn should_keep_a_quote_that_starts_a_task_item_in_the_item() {
     for (html, expected) in [
         (
             r#"<ul><li><input type="checkbox"><ul><li>n</li></ul></li></ul>"#,
-            "- [ ]\n  * n\n",
+            "- [ ] &#32;\n  * n\n",
         ),
         (
             r#"<ul><li><input type="checkbox"><h3>h</h3></li></ul>"#,
-            "- [ ]\n  ### h\n",
+            "- [ ] &#32;\n  ### h\n",
         ),
     ] {
         assert_eq!(
