@@ -339,3 +339,28 @@ fn should_leave_a_block_in_inline_markup_or_a_label_in_a_cell_to_tier2() {
         Err(tier1::BailReason::TableBlockChildInCell)
     ));
 }
+
+/// Tier-2 trims the start of a definition term or definition, so a space at its start after
+/// other cell content is dropped in both tiers. A definition that starts with a rule keeps the
+/// space before the rule.
+#[test]
+fn should_trim_the_start_of_a_definition_after_cell_text_in_both_tiers() {
+    check(&[
+        ("a<dt> b </dt>", "ab", "ab"),
+        ("a<dd> b </dd>", "ab", "ab"),
+        ("a<dt> <!--x--> ---</dt>", "a  ---", "a  ---"),
+        ("<p>a</p><dd> <!--x--> ---</dd>", "a  ---", "a  ---"),
+    ]);
+}
+
+/// Tier-2 keeps a space at the start of a quote or heading after cell text that ends with a space,
+/// and breaks the cell twice before its first block, so the fast converter leaves that cell to
+/// Tier-2.
+#[test]
+fn should_leave_a_quote_or_heading_that_starts_with_a_space_after_cell_text_to_tier2() {
+    check_tier2(&[
+        ("a <blockquote> <p>b</p></blockquote>c", "a b c", "a<br><br>b<br>c"),
+        ("a <h3> <p>b</p></h3>c", "a b c", "a<br><br>b<br>c"),
+        ("a <span><h3> <p>b</p></h3></span>", "a b", "a<br><br>b"),
+    ]);
+}

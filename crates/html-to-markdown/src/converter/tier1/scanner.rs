@@ -2329,6 +2329,9 @@ fn emit_close(
 
     state.escape_ctx = frame.prev_escape_ctx;
     state.last_closed_custom_element = std::ptr::eq(spec, &raw const CUSTOM_ELEMENT_INLINE_SPEC);
+    if matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription) {
+        trim_start_of_cell_content(state, frame.content_start);
+    }
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
@@ -3061,7 +3064,8 @@ fn innermost_own_buffer(state: &Tier1State) -> Option<&OpenTag> {
 /// legend, a
 /// figure caption or a label, and a sectioning element after other cell content, which Tier-2
 /// separates with a blank line that the cell folds into two spaces. An inline element right
-/// after a block in a cell is left to Tier-2 too (see `emit_open`).
+/// after a block in a cell is left to Tier-2 too (see `emit_open`), and so is a quote or heading
+/// that starts with a space (see `flush_text`).
 fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -> bool {
     if !state.in_table_cell() {
         return false;
@@ -3097,6 +3101,22 @@ fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -
         || (spec.is_block && in_inline_buffer)
         || break_at_buffer_start
         || block_at_buffer_start
+}
+
+/// Drop the whitespace at the start of the content a definition term or definition wrote into a
+/// table cell from `content_start`, as Tier-2 trims the buffer of each. Tier-2 separates content
+/// that starts with `---` from the cell content before it, so the whitespace before it stays.
+fn trim_start_of_cell_content(state: &mut Tier1State, content_start: usize) {
+    if !state.in_table_cell() {
+        return;
+    }
+    let cell_buf = state.cell_or_output_mut();
+    let start = clamp_to_char_boundary(cell_buf, content_start);
+    if cell_buf[start..].trim_start().starts_with("---") {
+        return;
+    }
+    let leading = cell_buf[start..].len() - cell_buf[start..].trim_start().len();
+    cell_buf.replace_range(start..start + leading, "");
 }
 
 /// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell
@@ -4513,9 +4533,18 @@ fn flush_text(
         if matches!(state.stack.last().map(|f| f.spec.kind), Some(TagKind::List(_))) {
             return Ok(());
         }
+        // ~keep Tier-2 checks the trailing space in the own buffer of a quote or heading, which holds
+        // ~keep no space from before it, so it keeps a space at its start and breaks the cell twice
+        // ~keep before its first block. That cell is left to Tier-2.
+        let block_start = innermost_own_buffer(state)
+            .filter(|frame| matches!(frame.spec.kind, TagKind::Blockquote | TagKind::Heading(_)))
+            .map(|frame| frame.content_start);
+        let dest = state.cell_or_output_mut();
+        if block_start == Some(dest.len()) && dest.ends_with(' ') && !after_custom_element_close {
+            return Err(BailReason::TableBlockChildInCell);
+        }
         // ~keep `after_custom_element_close` overrides the usual "already ends
         // with a space, skip" dedup — see `Tier1State::last_closed_custom_element`.
-        let dest = state.cell_or_output_mut();
         if !dest.is_empty() && !dest.ends_with('\n') && (after_custom_element_close || !dest.ends_with(' ')) {
             dest.push(' ');
         }
