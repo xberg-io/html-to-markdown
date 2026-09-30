@@ -1333,8 +1333,12 @@ fn emit_open(
                 // that pop collapse a lone newline straight back down to one, losing the
                 // separator — hence the blind push here instead of `ensure_blank_line`.
                 let dest = &mut state.output;
-                let opens_in_paragraph = crate::converter::utility::escaping::ends_in_paragraph_text(dest)
-                    && std::str::from_utf8(name_lower).is_ok_and(crate::converter::block::div::writes_like_div);
+                // ~keep A div that opens at the start of another div's first text passes that start on,
+                // ~keep as Tier-2's `div::handle` does.
+                let opens_in_paragraph = std::str::from_utf8(name_lower)
+                    .is_ok_and(crate::converter::block::div::writes_like_div)
+                    && (crate::converter::utility::escaping::ends_in_paragraph_text(dest)
+                        || state.paragraph_start_at == Some(dest.len()));
                 if !dest.is_empty() && !dest.ends_with("\n\n") {
                     crate::converter::tier1::state::trim_trailing_horizontal(dest);
                     dest.push_str("\n\n");
@@ -1845,6 +1849,7 @@ fn emit_void(
         separate_inline_after_block(state)?;
     }
     state.last_closed_block = is_block_tag(name_lower);
+    state.last_closed_div_in_cell = false;
 
     match spec.kind {
         TagKind::Hr => {
@@ -2354,8 +2359,10 @@ fn emit_close(
     }
     // ~keep An inline element whose last content is a block ends in that block too (issue #585).
     state.last_closed_block = is_block_tag(name_lower) || (state.last_closed_block && is_inline_tag(name_lower));
+    // ~keep An inline element that ends with such a div ends with it too, as for `last_closed_block`.
     state.last_closed_div_in_cell = state.in_table_cell()
-        && std::str::from_utf8(name_lower).is_ok_and(crate::converter::block::div::writes_like_div);
+        && (std::str::from_utf8(name_lower).is_ok_and(crate::converter::block::div::writes_like_div)
+            || (state.last_closed_div_in_cell && is_inline_tag(name_lower)));
 
     Ok(())
 }

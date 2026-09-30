@@ -125,9 +125,7 @@ pub fn handle(
         if ctx.in_table_cell {
             // ~keep Inline content after the div gets the cell break a block after it would get,
             // ~keep so its first word does not join the div's last one.
-            if crate::converter::utility::siblings::following_sibling_content(node_handle.get_inner(), parser, dom_ctx)
-                == crate::converter::utility::siblings::FollowingContent::Inline
-            {
+            if inline_content_follows(node_handle.get_inner(), parser, dom_ctx) {
                 emit_table_cell_break(output, options.br_in_tables);
             }
         } else if ctx.in_list_item {
@@ -149,6 +147,29 @@ pub fn handle(
             } else {
                 output.push_str("\n\n");
             }
+        }
+    }
+}
+
+/// Whether inline content follows the node `id`, also after the inline elements that end with it
+/// (`<span><div>x</div></span>y`).
+fn inline_content_follows(id: u32, parser: &Parser, dom_ctx: &DomContext) -> bool {
+    use crate::converter::utility::siblings::{FollowingContent, following_sibling_content};
+    let mut id = id;
+    loop {
+        match following_sibling_content(id, parser, dom_ctx) {
+            FollowingContent::Inline => return true,
+            FollowingContent::NotInline => return false,
+            FollowingContent::Absent => match dom_ctx.parent_of(id) {
+                Some(parent_id)
+                    if dom_ctx
+                        .tag_info(parent_id, parser)
+                        .is_some_and(|info| info.is_inline_like) =>
+                {
+                    id = parent_id;
+                }
+                _ => return false,
+            },
         }
     }
 }

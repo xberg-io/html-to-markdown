@@ -406,6 +406,11 @@ fn should_escape_text_that_would_start_a_block_at_the_start_of_a_div_inside_a_pa
         "> a  \n>\n>\n> \\- x\n>\n> y\n",
         &["<p>- x</p>"],
     );
+    assert_converts_in_both_tiers(
+        "<blockquote>a<br><div><div>- x</div></div>y</blockquote>",
+        "> a  \n>\n>\n> \\- x\n>\n> y\n",
+        &["<p>- x</p>"],
+    );
 }
 
 #[test]
@@ -425,6 +430,20 @@ fn should_keep_the_text_after_a_div_apart_in_a_table_cell() {
         "| a x y |\n| ----- |\n",
         &["<th>a x y</th>"],
     );
+    assert_converts_in_both_tiers(
+        "<table><tr><td>a<br><span><dialog>x</dialog></span>y</td></tr></table>",
+        "| a x y |\n| ----- |\n",
+        &["<th>a x y</th>"],
+    );
+    let tier1 = convert_with(
+        "<table><tr><td>a<div>x</div><hr>y</td></tr></table>",
+        &options_for(TierStrategy::Tier1),
+    );
+    let tier2 = convert_with(
+        "<table><tr><td>a<div>x</div><hr>y</td></tr></table>",
+        &options_for(TierStrategy::Tier2),
+    );
+    assert_eq!(tier1, tier2, "a rule after a div in a cell: the tiers differ");
 }
 
 #[test]
