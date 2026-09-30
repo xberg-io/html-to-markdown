@@ -5,7 +5,7 @@
 //! Regression tests for issue #679: the fast converter dropped a line break that no element
 //! encloses (`a<br>b` with no `<p>`, `<div>` or `<body>` around it), so the two lines joined.
 
-use html_to_markdown_rs::options::HighlightStyle;
+use html_to_markdown_rs::options::{HighlightStyle, NewlineStyle};
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{ConversionOptions, TierStrategy, convert, tier1};
 
@@ -153,4 +153,94 @@ fn should_keep_a_top_level_hard_break_when_auto_picks_the_fast_converter() {
     let converted = convert(html, Some(auto)).expect("conversion must succeed").content;
     assert_eq!(scanned, "a  \nb\n");
     assert_eq!(converted.as_deref(), Some("a  \nb\n"));
+}
+
+#[test]
+fn should_drop_a_whitespace_character_reference_after_a_hard_break() {
+    // ~keep A newline written as `&#10;` after a break made a blank line in the fast converter.
+    for (html, expected) in [
+        ("<div>a<br>&#10;b</div>", "a  \nb\n"),
+        ("<p>a<br>&#xA;&#10;b</p>", "a  \nb\n"),
+        ("<p>a<br>&#32;b</p>", "a  \nb\n"),
+        ("<p>a<br>&#9;b</p>", "a  \nb\n"),
+        ("<p>a<br>&#13;b</p>", "a  \nb\n"),
+        ("<ul><li>a<br>&#10;b</li></ul>", "- a  \n  b\n"),
+    ] {
+        assert_eq!(tier1(html), expected, "input: {html:?}");
+        assert_eq!(tier2(html), expected, "input: {html:?}");
+    }
+}
+
+#[test]
+fn should_write_one_space_for_a_hard_break_in_a_heading() {
+    for html in [
+        "<h2>a<br> b</h2>",
+        "<h2>a <br>  b</h2>",
+        "<h2>a<br>\n  b</h2>",
+        "<h2>a<br>&nbsp;b</h2>",
+    ] {
+        assert_eq!(tier2(html), "## a b\n", "input: {html:?}");
+        assert_eq!(tier1(html), "## a b\n", "input: {html:?}");
+    }
+}
+
+#[test]
+fn should_indent_a_line_that_holds_only_a_hard_break_in_a_list_item() {
+    // ~keep Issue #681: the second backslash line had no indent, and with wrap on the lines
+    // ~keep after it left the item.
+    let backslash = |wrap: bool| ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        wrap,
+        wrap_width: 20,
+        ..options(TierStrategy::Tier2)
+    };
+    let convert_with = |html: &str, options: ConversionOptions| {
+        convert(html, Some(options))
+            .expect("conversion must succeed")
+            .content
+            .unwrap_or_default()
+    };
+    for (html, expected) in [
+        ("<ul><li>a<br><br>b</li></ul>", "- a\\\n  \\\n  b\n"),
+        ("<ol><li>a<br><br>b</li></ol>", "1. a\\\n   \\\n   b\n"),
+        (
+            "<ul><li>x<ul><li>a<br><br>b</li></ul></li></ul>",
+            "- x\n  * a\\\n    \\\n    b\n",
+        ),
+        (
+            "<blockquote><ul><li>a<br><br>b</li></ul></blockquote>",
+            "> - a\\\n>   \\\n>   b\n",
+        ),
+    ] {
+        assert_eq!(convert_with(html, backslash(false)), expected, "input: {html:?}");
+        assert_eq!(convert_with(html, backslash(true)), expected, "wrapped input: {html:?}");
+    }
+    // ~keep With the spaces style the line stays blank.
+    for (html, expected) in [
+        ("<ul><li>a<br><br>b</li></ul>", "- a  \n\n  b\n"),
+        (
+            "<blockquote><ul><li>a<br><br>b</li></ul></blockquote>",
+            "> - a  \n>\n>   b\n",
+        ),
+    ] {
+        assert_eq!(tier2(html), expected, "input: {html:?}");
+    }
+}
+
+#[test]
+fn should_keep_a_hard_break_before_an_escaped_line_when_wrapping() {
+    // ~keep Issue #680: a `===` line left of the item's text column cannot underline the item's
+    // ~keep paragraph, so it is paragraph text; the wrapper cut the paragraph there, read the
+    // ~keep `1990.` line as an empty list item and dropped its hard break.
+    let html = "<ul><li>q<br>word<br> &nbsp; *** - - *\n ===<br>2) ---<br>1990.<br> &gt;</li></ul>";
+    let wrapped = ConversionOptions {
+        wrap: true,
+        wrap_width: 80,
+        ..options(TierStrategy::Tier2)
+    };
+    let output = convert(html, Some(wrapped))
+        .expect("conversion must succeed")
+        .content
+        .unwrap_or_default();
+    assert!(output.contains("1990.  \n  \\>"), "output: {output:?}");
 }

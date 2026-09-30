@@ -173,6 +173,9 @@ pub fn handle(
         // ~keep another break's marker, which is what swallowed consecutive runs.
         output.push('\n');
     } else {
+        // ~keep A break on a line of its own (`<li>a<br><br>b</li>`) is written at the item's
+        // ~keep content column like text there, or a backslash line leaves the item (issue #681).
+        crate::converter::list::utils::indent_list_item_line_start(output, ctx, options);
         output.push_str(hard_break_marker(options.newline_style));
     }
 }

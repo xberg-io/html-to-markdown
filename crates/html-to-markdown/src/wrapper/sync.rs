@@ -1,8 +1,8 @@
 //! Synchronous text wrapping for Markdown output.
 
 use super::utils::{
-    is_heading, is_list_like, is_numbered_list, parse_blockquote_line, parse_list_item, push_paragraph_line,
-    wrap_blockquote_paragraph, wrap_indented_line, wrap_list_item,
+    is_heading, is_list_like, is_numbered_list, joins_into_a_block, parse_blockquote_line, parse_list_item,
+    push_paragraph_line, wrap_blockquote_paragraph, wrap_indented_line, wrap_list_item,
 };
 use crate::converter::utility::escaping::{code_fence, is_heading_underline, opens_block};
 use crate::options::ConversionOptions;
@@ -51,9 +51,25 @@ impl OpenParagraph {
     /// ~keep number; at or right of that column only a line that interrupts a paragraph does.
     fn continues_with(&self, line: &str, trimmed: &str) -> bool {
         !trimmed.is_empty()
-            && !opens_block(trimmed)
+            && (!opens_block(trimmed) || self.is_lazy_equals_underline(line, trimmed))
             && !trimmed.starts_with('|')
             && parse_list_item(line).is_none_or(|(indent, _, _)| indent.len() >= self.indent.len() + self.marker.len())
+    }
+
+    /// Whether `line` is a run of `=` left of the list item's text column.
+    ///
+    /// ~keep A setext underline cannot be a lazy line (CommonMark 4.3), so there it is paragraph
+    /// ~keep text; cutting the paragraph at it made the lines after it lose their hard breaks
+    /// ~keep (issue #680). A `-` run left of the column is a thematic break and ends the item.
+    /// Only when the run joins the line above: on a line of its own at the item's column, after a
+    /// hard break or after a bare marker the run would make a list item (`1.`), it would underline
+    /// the text above.
+    fn is_lazy_equals_underline(&self, line: &str, trimmed: &str) -> bool {
+        self.is_item()
+            && !self.text.ends_with('\n')
+            && line.len() - trimmed.len() < self.indent.len() + self.marker.len()
+            && trimmed.trim_end().bytes().all(|byte| byte == b'=')
+            && !joins_into_a_block(&self.text, trimmed.trim_matches([' ', '\t']))
     }
 
     /// Write the paragraph: a plain one ends with a blank line, a list item with its line end.
@@ -383,6 +399,24 @@ mod tests {
         assert_eq!(wrap_at_20("- a\n1990. b\n"), "- a\n1990. b\n");
         assert_eq!(wrap_at_20("1. a\n  2. b\n"), "1. a\n  2. b\n");
         assert_eq!(wrap_at_20("1. a\n\n   p\n  2. b\n"), "1. a\n\n   p\n\n  2. b\n");
+    }
+
+    #[test]
+    fn wrap_markdown_keeps_a_lazy_equals_line_in_the_list_item_paragraph() {
+        // ~keep Issue #680: cut at the `===` line, the item lost the hard break after `1990.`.
+        assert_eq!(
+            wrap_at_20("- a\n===  \n  1990.  \n  b\n"),
+            "- a ===  \n  1990.  \n  b\n"
+        );
+        // ~keep At the item's text column, or under an indented plain paragraph, the run is an
+        // ~keep underline and keeps its own line.
+        assert_eq!(wrap_at_20("- a\n  ===\n"), "- a\n  ===\n");
+        assert_eq!(wrap_at_20("  a\n===\n"), "  a\n===\n");
+        // ~keep After a hard break the run would start a line of its own at the item's column
+        // ~keep and underline the text above, so the paragraph ends before it and the run
+        // ~keep stays left of the column.
+        assert_eq!(wrap_at_20("- a  \n===\n"), "- a\n===\n");
+        assert_eq!(wrap_at_20("- q  \n  1.\n===\n"), "- q  \n  1.\n===\n");
     }
 
     #[test]

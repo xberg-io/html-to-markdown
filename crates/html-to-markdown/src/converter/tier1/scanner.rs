@@ -4523,7 +4523,7 @@ fn flush_text(
             || after_line_end
             || bare_inline_frame_start_after_space)
     {
-        let trimmed = raw.trim_start_matches([' ', '\t', '\n', '\r']);
+        let trimmed = trim_leading_text_whitespace(raw);
         if leading_ws_migrates_out && trimmed.len() < raw.len() {
             state.cell_or_output_mut().push(' ');
         }
@@ -4907,6 +4907,26 @@ fn decode_and_collapse_into_inner(
         }
     }
     Ok(())
+}
+
+/// `raw` without its leading whitespace, where a character reference that decodes to whitespace
+/// (`&#10;`, `&#32;`, `&Tab;`) counts as whitespace too.
+///
+/// ~keep Tier-2 decodes a text node before it trims the node's leading whitespace, so a newline
+/// ~keep written as `&#10;` after a hard break is dropped there; trimmed before decoding, it
+/// ~keep survived here as a second line end and made a blank line.
+fn trim_leading_text_whitespace(raw: &str) -> &str {
+    const WHITESPACE: [char; 4] = [' ', '\t', '\n', '\r'];
+    let mut rest = raw.trim_start_matches(WHITESPACE);
+    while rest.starts_with('&') {
+        match crate::text::decode_character_reference(rest, 0, ReferenceContext::Text) {
+            Some((end, first, None)) if rest.as_bytes()[end - 1] == b';' && WHITESPACE.contains(&first) => {
+                rest = rest[end..].trim_start_matches(WHITESPACE);
+            }
+            _ => break,
+        }
+    }
+    rest
 }
 
 /// Scan and decode a single HTML entity starting at `amp_pos` (the `&` byte).
