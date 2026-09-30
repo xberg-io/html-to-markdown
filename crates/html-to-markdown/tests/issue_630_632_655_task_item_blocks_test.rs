@@ -63,8 +63,8 @@ fn should_start_a_table_that_starts_a_task_item_after_a_blank_line() {
     assert_converts(
         r#"<ul><li><input type="checkbox" checked><table><tr><td><blockquote>q</blockquote></td></tr></table>t</li></ul>"#,
         &options,
-        "- [x] &#32;\n\n  | > q |\n    | --- |\n\n  t\n",
-        &["<th>&gt; q</th>", "<p>t</p>\n</li>"],
+        "- [x] &#32;\n\n  | q |\n    | --- |\n\n  t\n",
+        &["<th>q</th>", "<p>t</p>\n</li>"],
     );
     assert_converts(
         r#"<ol><li>a<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul></li></ol>"#,

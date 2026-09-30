@@ -56,6 +56,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gave `- [ ]`. GFM reads a checkbox only when content follows it, so cmark-gfm and markdown-it
   showed the text `[ ]`. It now gives `- [ ] &#32;`, a checkbox: the character reference renders
   as a space. Djot output does not change.
+- **Text next to a paragraph, heading or other block in a table cell joined it (#645).**
+  `<table><tr><td><p>a</p>b</td></tr></table>` gave `| ab |`, and so did a heading, a `<div>`,
+  a list or a code block before the text. Text before a heading or a code block joined it too.
+  A block in a cell is now separated from the cell content before and after it by the cell break:
+  `| a b |`, or `| a<br>b |` with `br_in_tables` on. A block at the start of bold, a code span or
+  another inline element still joins the text before that element, and a block inside a heading
+  still joins the text next to it.
+- **The two converters wrote a quote or a paragraph in a table cell differently (#647).** A quote
+  in a cell now has no `>` marker in either converter, as a heading, a list and a code block in a
+  cell have none: `<blockquote>a</blockquote>b` gives `| a b |`. The fast converter wrote a
+  paragraph after other cell content as `<br>` with `br_in_tables` off; it now writes a space, as
+  the full converter does.
+- **The fast converter dropped a line break that no element encloses (#679).**
+  `a<br>1) t` gave `a1) t`, so the two lines joined. The fast converter now writes the break as
+  the full converter does, `a  \n1\) t`, the same as when the input sits in `<body>`. The line
+  after a hard break also no longer keeps a leading space: `<div>a<br> b</div>` gives `a  \nb` in
+  both converters.
+- **Hard breaks that differed between the converters or lost their place.**
+  A whitespace character reference after a break (`a<br>&#10;b`) no longer makes a paragraph
+  break in the fast converter. A break in a heading followed by a space
+  gives one space (`## a b`). With the backslash newline style, a line in a list item that holds
+  only a break keeps the item's indent (#681). Wrap no longer cuts a list item's text at a `===`
+  line left of the item's column, which dropped the hard breaks after it (#680), and keeps a
+  hard break right before such a line.
+- **Two ordered lists next to each other became one list (#666).**
+  `<ol><li>a</li></ol><ol><li>b</li></ol>` gave `1. a\n\n1. b`, which CommonMark and Djot read
+  as one list, because a blank line does not end a list. An ordered list that follows an ordered
+  list with only blank lines between them now writes the other delimiter, so it gives
+  `1. a\n\n1) b`, also when a section, article, figure or similar element wraps either list. A
+  list written as text, in a heading or between inline markers, keeps `.`.
+- **In Djot output a nested list directly under its item's text was text (#670).**
+  Djot needs a blank line before a list that follows text, so `- a\n  * b` is one paragraph
+  there. A nested list after its item's text now starts after a blank line in Djot output:
+  `- a\n\n  * b`.
+- **An empty nested list item after text turned the text into a heading (#667).**
+  `<ol><li>a<ul><li></li></ul></li></ol>` gave `1. a\n   -\n`: an empty item cannot interrupt a
+  paragraph, so the lone `-` read as a heading underline and the item was lost. A nested list whose
+  first item writes nothing on its marker line now starts after a blank line: `1. a\n\n   -\n`.
+  An empty item after text directly inside its list does the same: `<ul>t<li></li></ul>` gives
+  `t\n\n-\n`, not `t\n-\n`. A list between inline markers, such as a highlight, is text and
+  does not change. With custom `bullets` such as `-`, nested single-item lists that end in an
+  empty item wrote `- - -`, a thematic break. The empty item's marker now starts the next line,
+  at the column it had on the line of markers: `- -\n    -`.
 - **A task item in an ordered list lost its number (#659).**
   `<ol><li><input type="checkbox">p</li></ol>` gave `- [ ] p`, a bullet list. A task item now
   writes the marker of its own list, so it gives `1. [ ] p`, and its content column follows the

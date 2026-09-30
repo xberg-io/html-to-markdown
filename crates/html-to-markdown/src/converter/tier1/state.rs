@@ -107,6 +107,9 @@ pub struct TableState {
     /// defers just that row's nested table instead, issue #484): only `close_table` has
     /// seen every row.
     pub had_single_cell_nested_table_row: bool,
+    /// True once a definition term or definition opened in the current cell. Tier-2 separates a
+    /// definition from one before it in the same cell, so a second one goes to Tier-2.
+    pub definition_in_cell: bool,
 }
 
 bitflags::bitflags! {
@@ -155,6 +158,16 @@ pub struct OpenTag {
     /// distinguishes them, so `close_inline_marker` can bail (`WhitespaceOnlyInlineEmphasis`)
     /// for the latter instead of silently truncating the space away like the former.
     pub dropped_whitespace_only_text: bool,
+    /// Whether Tier-2 renders this element's content into a buffer of its own, so that a block
+    /// inside it sees only that content (see `scanner::cell_scratch_start`).
+    pub own_buffer: bool,
+    /// Whether the first content of this quote or heading in a table cell was whitespace, which
+    /// Tier-2 keeps at the start of the element's own buffer (see `scanner::flush_text`).
+    pub starts_with_whitespace: bool,
+    /// Tier-2 renders this element's children into a fresh buffer of their own (`<mark>`,
+    /// `<sub>`, `<sup>`, `<abbr>`, `<dt>`, `<dd>`), so its text sees an empty buffer, not
+    /// the line before the element.
+    pub children_in_own_buffer: bool,
 }
 
 /// Minimum capacity for each summary accumulation buffer.
@@ -285,6 +298,9 @@ pub struct Tier1State {
     /// after a block, or after an inline element ending in one, starts a new paragraph (issues
     /// #570, #571, #585).
     pub last_closed_block: bool,
+    /// The end of the text of the last ordered list closed outside a table cell: an ordered list
+    /// that opens after only whitespace there continues it.
+    pub last_ordered_list_end: Option<usize>,
 
     /// Byte width of each currently-open list item's own marker (`"- "` = 2,
     /// `"1. "` = 3, `"10. "` = 4, ...), one entry per open `<li>` frame,
@@ -299,6 +315,11 @@ pub struct Tier1State {
     /// Summing this stack gives that column directly; see
     /// `Tier1State::list_continuation_indent_width`.
     pub list_item_marker_widths: Vec<usize>,
+
+    /// Whether each currently-open list item's marker line follows text inside its list on the
+    /// line above, one entry per open `<li>` frame, pushed and popped with
+    /// `list_item_marker_widths`.
+    pub list_items_after_text: Vec<bool>,
 
     /// `true` until the first text node carrying real (non-whitespace)
     /// content has been processed anywhere in the document, then
@@ -345,7 +366,9 @@ impl Tier1State {
             last_closed_custom_element: false,
             last_emitted_was_img: false,
             last_closed_block: false,
+            last_ordered_list_end: None,
             list_item_marker_widths: Vec::new(),
+            list_items_after_text: Vec::new(),
             at_document_start: true,
             effective_base,
         }

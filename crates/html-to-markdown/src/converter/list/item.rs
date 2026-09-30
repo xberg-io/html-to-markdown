@@ -36,6 +36,43 @@ pub fn handle_li(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    let mut line_after_text = None;
+    write_li(
+        node_handle,
+        tag,
+        parser,
+        output,
+        options,
+        ctx,
+        depth,
+        dom_ctx,
+        &mut line_after_text,
+    );
+    // ~keep Whether the item has content is known once it is written: a marker line without
+    // ~keep content cannot interrupt the text before it either (issue #667).
+    if let Some(line_start) = line_after_text {
+        if line_start < output.len()
+            && crate::converter::list::utils::marker_line_after_text_needs_blank_line(output, line_start)
+        {
+            output.insert(line_start, '\n');
+        }
+    }
+}
+
+/// Write the list item, and set `line_after_text` to the start of its marker line when that line
+/// follows text inside the list and the check with an item that has content wrote no blank line.
+#[allow(clippy::too_many_arguments)]
+fn write_li(
+    node_handle: &tl::NodeHandle,
+    tag: &tl::HTMLTag,
+    parser: &tl::Parser,
+    output: &mut String,
+    options: &ConversionOptions,
+    ctx: &Context,
+    depth: usize,
+    dom_ctx: &DomContext,
+    line_after_text: &mut Option<usize>,
+) {
     #[allow(clippy::trivially_copy_pass_by_ref)]
     fn find_checkbox<'a>(
         node_handle: &tl::NodeHandle,
@@ -89,9 +126,10 @@ pub fn handle_li(
     // ~keep A task item in an ordered list keeps its number (issue #659). Djot has task items
     // ~keep only in bullet lists, so there it keeps the bullet.
     let numbered = ctx.in_ordered_list && !(is_task_list && options.output_format == OutputFormat::Djot);
+    // ~keep An ordered list right after an ordered list writes `)` (issue #666).
     let list_marker = || {
         if numbered {
-            format!("{}. ", ctx.list_counter)
+            format!("{}{} ", ctx.list_counter, ctx.ordered_delimiter.unwrap_or('.'))
         } else if is_task_list {
             String::from("- ")
         } else {
@@ -118,6 +156,8 @@ pub fn handle_li(
         output.push('\n');
         if !crate::converter::utility::escaping::line_opens_block(&format!("{}x", marker())) {
             output.push('\n');
+        } else if !ctx.in_marker_text() {
+            *line_after_text = Some(output.len());
         }
     }
 
@@ -389,12 +429,8 @@ pub fn handle_li(
             // ~keep the enclosing <ul>/<ol> opens so consecutive items get the identical
             // ~keep <br> boundary already established for <p>/<div> siblings in a cell.
             add_list_leading_separator(output, ctx, options);
-        } else if ctx.in_ordered_list {
-            use std::fmt::Write;
-            let _ = write!(output, "{}. ", ctx.list_counter);
         } else {
-            output.push(unordered_bullet(ctx, options));
-            output.push(' ');
+            output.push_str(&list_marker());
         }
 
         let item_start_pos = output.len();
@@ -470,16 +506,10 @@ pub fn handle_li(
                 let task_marker = if task_checked { "- [x]" } else { "- [ ]" };
                 let text_start = last_line.find(task_marker).map_or(0, |pos| pos + task_marker.len());
                 (Cow::Borrowed(task_marker), text_start)
-            } else if ctx.in_ordered_list {
-                let marker_text = format!("{}.", ctx.list_counter);
+            } else {
+                let marker_text = list_marker().trim_end().to_string();
                 let text_start = last_line.find(&marker_text).map_or(0, |pos| pos + marker_text.len());
                 (Cow::Owned(marker_text), text_start)
-            } else {
-                let bullet = unordered_bullet(ctx, options);
-                let text_start = last_line.find(bullet).map_or(0, |pos| pos + 1);
-                let mut buf = String::with_capacity(bullet.len_utf8());
-                buf.push(bullet);
-                (Cow::Owned(buf), text_start)
             };
             let text_content = last_line[text_start..].trim();
 

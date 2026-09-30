@@ -495,10 +495,7 @@ fn should_start_a_table_whose_cell_holds_a_quote_after_a_blank_line() {
     let html =
         r#"<ul><li><input type="checkbox"><table><tr><td><blockquote>q</blockquote></td></tr></table></li></ul>"#;
     let markdown = convert_with(html, &tier2_options());
-    assert!(
-        markdown.starts_with("- [ ] &#32;\n\n  | > q |\n"),
-        "{html}: {markdown:?}"
-    );
+    assert!(markdown.starts_with("- [ ] &#32;\n\n  | q |\n"), "{html}: {markdown:?}");
 }
 
 #[test]

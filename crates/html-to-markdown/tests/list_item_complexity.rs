@@ -3,7 +3,8 @@
 //! An item between inline markers checked every earlier item of its list to see whether a
 //! paragraph was open before its marker. Each block of an item checked every earlier line of the
 //! item to see whether the item was still open (issue #649). A nested list that cannot interrupt
-//! a paragraph checks the lines before it the same way (issue #662). The library converts
+//! a paragraph checks the lines before it the same way (issue #662). An ordered list checks
+//! whether the output still ends with the ordered list before it (issue #666). The library converts
 //! untrusted HTML, so each is a denial-of-service vector.
 
 use std::time::{Duration, Instant};
@@ -27,7 +28,7 @@ const REPEATS_PER_SAMPLE: usize = 3;
 const BASE_SIZE: usize = 2_000;
 
 /// The name, the HTML for `n` repeats, and whether the headings are underlined.
-fn shapes(n: usize) -> [(&'static str, String, bool); 11] {
+fn shapes(n: usize) -> [(&'static str, String, bool); 14] {
     [
         (
             "items of paragraphs",
@@ -58,6 +59,16 @@ fn shapes(n: usize) -> [(&'static str, String, bool); 11] {
         (
             "lists after text in one item",
             format!("<ul><li>a{}</li></ul>", "<ol start=\"2\"><li>x</li></ol>".repeat(n)),
+            false,
+        ),
+        (
+            "empty lists after text in one item",
+            format!("<ul><li>a{}</li></ul>", "<ul><li></li></ul>".repeat(n)),
+            false,
+        ),
+        (
+            "lists of empty items after text in one item",
+            format!("<ul><li>a{}</li></ul>", "<ol><li></li></ol>b".repeat(n)),
             false,
         ),
         (
@@ -93,6 +104,14 @@ fn shapes(n: usize) -> [(&'static str, String, bool); 11] {
             format!(
                 "<ul><li>{}</li></ul>",
                 "<p>a</p><section><p>x</p><p>y</p></section>".repeat(n)
+            ),
+            false,
+        ),
+        (
+            "whitespace spans in a preformatted block after a list",
+            format!(
+                "<ol><li>a</li></ol><pre>{}</pre><ol><li>b</li></ol>",
+                format!("<span>{}</span>", " ".repeat(50)).repeat(n * 10)
             ),
             false,
         ),
