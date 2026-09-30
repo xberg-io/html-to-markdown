@@ -289,6 +289,9 @@ pub struct Tier1State {
     /// after a block, or after an inline element ending in one, starts a new paragraph (issues
     /// #570, #571, #585).
     pub last_closed_block: bool,
+    /// The end of the text of the last ordered list closed outside a table cell: an ordered list
+    /// that opens after only whitespace there continues it.
+    pub last_ordered_list_end: Option<usize>,
 
     /// Byte width of each currently-open list item's own marker (`"- "` = 2,
     /// `"1. "` = 3, `"10. "` = 4, ...), one entry per open `<li>` frame,
@@ -349,6 +352,7 @@ impl Tier1State {
             last_closed_custom_element: false,
             last_emitted_was_img: false,
             last_closed_block: false,
+            last_ordered_list_end: None,
             list_item_marker_widths: Vec::new(),
             at_document_start: true,
             effective_base,

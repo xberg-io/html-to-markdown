@@ -572,6 +572,7 @@ pub fn walk_node(
     depth: usize,
     dom_ctx: &DomContext,
 ) {
+    ctx.last_list.enter(output);
     // ~keep In a task item, the render of each node before the first content reports whether
     // ~keep it wrote, so the item knows which element wrote first (issue #650).
     match ctx.first_writer.as_ref().filter(|first_writer| first_writer.is_open()) {
@@ -582,6 +583,7 @@ pub fn walk_node(
         }
         None => convert_node(node_handle, parser, output, options, ctx, depth, dom_ctx),
     }
+    ctx.last_list.leave(output);
 }
 
 /// Convert one DOM node and its children to Markdown.
