@@ -2341,7 +2341,7 @@ fn emit_close(
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
-        TagKind::Heading(n) => close_heading(state, &frame, n, false, options.br_in_tables)?,
+        TagKind::Heading(n) => close_heading(state, &frame, n, false, options)?,
         TagKind::Blockquote => close_blockquote(state, &frame, options.br_in_tables),
         TagKind::Pre => close_pre(state, &frame, options),
         // ~keep Strong: suppress close marker when inside summary, or when this
@@ -2723,7 +2723,7 @@ fn emit_close_for_implicit(
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
-        TagKind::Heading(n) => close_heading(state, &frame, n, true, options.br_in_tables)?,
+        TagKind::Heading(n) => close_heading(state, &frame, n, true, options)?,
         TagKind::Blockquote => close_blockquote(state, &frame, options.br_in_tables),
         TagKind::Pre => close_pre(state, &frame, options),
         // ~keep Strong: suppress close marker when inside summary, or when this
@@ -2806,7 +2806,7 @@ fn close_heading(
     frame: &OpenTag,
     n: u8,
     is_implicit: bool,
-    br_in_tables: bool,
+    options: &ConversionOptions,
 ) -> Result<(), BailReason> {
     // ~keep When inside a table cell, Tier-2 emits the heading text directly into
     // the cell accumulator — no `#` prefix, no block separators.  The
@@ -2827,7 +2827,7 @@ fn close_heading(
                 state.cell_or_output_mut().truncate(content_start);
             }
         }
-        separate_closed_block_in_cell(state, frame.content_start, br_in_tables);
+        separate_closed_block_in_cell(state, frame.content_start, options.br_in_tables);
         return Ok(());
     }
 
@@ -2919,6 +2919,14 @@ fn close_heading(
         .map_or(buf.len() - content_start, |(i, _)| i);
     if leading_ws_len > 0 {
         buf.replace_range(content_start..content_start + leading_ws_len, "");
+    }
+
+    // ~keep Mirror Tier-2 (heading.rs, issue #661): a `#` run the line would close on stays text.
+    // ~keep A Djot heading has no closing sequence.
+    if options.output_format == crate::options::OutputFormat::Markdown {
+        if let Some(at) = crate::converter::utility::escaping::atx_closing_sequence_offset(&buf[content_start..]) {
+            buf.insert(content_start + at, '\\');
+        }
     }
 
     let prefix = heading_prefix(n);

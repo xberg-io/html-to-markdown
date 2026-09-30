@@ -124,6 +124,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`1.`, `1)`, `01.`, `-`, `+`, `*`, `>`, `#`, a rule, a fence or an underline) now has that
   character escaped, `1\) t`, in both converters. A line that cannot interrupt a paragraph, like
   `2. t`, is left as it is.
+- **Heading text that reads as a closing `#` or a link definition lost the heading (#661).**
+  `<h1>#</h1>` gave `# #`, an empty heading, because CommonMark reads a `#` run at the end of the
+  line as the heading's closing sequence; `a #` and `##` lost their `#` the same way. Such a run
+  now has its first `#` escaped, `# \#`, in both converters. With `heading_style: underlined`,
+  `<h1>[a]: b</h1>` gave `[a]: b` over its underline, which is a link reference definition, so
+  the heading was lost. Text that starts a definition now has its `[` escaped, `\[a]: b`. A Djot
+  heading and a closed ATX heading keep their `#` run as it is, and plain heading text is
+  unchanged.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a
