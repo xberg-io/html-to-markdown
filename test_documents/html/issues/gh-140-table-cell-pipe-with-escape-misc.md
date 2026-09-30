@@ -8,7 +8,7 @@
 | \#        | Octothorpe ("Hash" or "Number" sign) |
 | @         | At symbol                            |
 | \&        | Ampersand                            |
-| \*        | Asterisk                             |
-| \_        | Underscore                           |
+| *         | Asterisk                             |
+| _         | Underscore                           |
 | \+        | Plus                                 |
 | \|        | Pipe                                 |

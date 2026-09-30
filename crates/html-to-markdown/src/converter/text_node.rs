@@ -291,11 +291,9 @@ pub fn process_text_node(
     } else if ctx.in_code || ctx.in_ruby {
         text.into_owned()
     } else if ctx.in_table_cell {
-        // ~keep Always escape * and _ in table cells to prevent unintended emphasis.
-        // ~keep When escape_misc is false the previous implementation appended a
-        // ~keep post-pass `String::replace('|', "\\|")`.  We fold the pipe escape
-        // ~keep into the misc set so the byte-loop handles it in the same walk,
-        // ~keep avoiding a second allocation.
+        // ~keep Every escape_* option applies in a cell exactly as outside one (issue #638).
+        // ~keep A `|` is table syntax, so it is escaped even when escape_misc and escape_ascii
+        // ~keep are off; either of those escapes it already, and a second pass would double it.
         let normalized_text = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
             text::normalize_cell_whitespace_cow(text.as_ref())
         } else {
@@ -307,8 +305,15 @@ pub fn process_text_node(
         };
         let src = normalized_text.as_ref();
         let mut out = String::with_capacity(src.len());
-        text::escape_into(&mut out, src, options.escape_misc, true, true, options.escape_ascii);
-        if !options.escape_misc {
+        text::escape_into(
+            &mut out,
+            src,
+            options.escape_misc,
+            options.escape_asterisks,
+            options.escape_underscores,
+            options.escape_ascii,
+        );
+        if !options.escape_misc && !options.escape_ascii {
             if out.contains('|') {
                 out = out.replace('|', r"\|");
             }

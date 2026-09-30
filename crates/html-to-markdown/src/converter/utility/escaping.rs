@@ -671,15 +671,37 @@ pub fn is_block_level_name(tag_name: &str, is_inline: bool) -> bool {
         )
 }
 
+/// Escape every `|` in a Markdown table cell that no backslash escapes yet.
+///
+/// GFM splits a row on each unescaped `|` before it reads any inline syntax, so a pipe in a
+/// code span, a link destination or title, an image description or a flattened nested table
+/// ends the cell like a pipe in plain text does, and the row no longer matches the delimiter
+/// row. `\|` is a literal pipe everywhere in a cell, code spans included. A pipe after an odd
+/// run of backslashes is escaped already and stays as it is.
+pub fn escape_cell_pipes(text: &str) -> Cow<'_, str> {
+    if !text.contains('|') {
+        return Cow::Borrowed(text);
+    }
+    let mut out = String::with_capacity(text.len() + 4);
+    let mut backslashes = 0usize;
+    for c in text.chars() {
+        if c == '|' && backslashes.is_multiple_of(2) {
+            out.push('\\');
+        }
+        backslashes = if c == '\\' { backslashes + 1 } else { 0 };
+        out.push(c);
+    }
+    Cow::Owned(out)
+}
+
 /// Escape any bare pipe left in a nested table's rendered markdown: one that is neither
 /// already backslash-escaped nor inside a matched backtick code span (a `CommonMark`-
 /// compliant reparse does not treat either as a cell delimiter, so this must not touch
 /// them either).
 ///
 /// Scoped to a nested `<table>`'s own rendered text (see the call site in
-/// [`render_cell_text`]) rather than applied to a whole cell's composed text: other block
-/// content a cell may hold, such as `<pre>`, is deliberately left byte-for-byte alone by
-/// its own handler (issues #455/#456) and must not be escaped here.
+/// [`render_cell_text`]). Markdown output then escapes the whole cell with
+/// [`escape_cell_pipes`], because GFM also splits a row on a pipe in a code span.
 ///
 /// Walks backtick runs the same way a spec-compliant parser does: a run of N backticks
 /// opens a code span only if a later run of exactly N backticks closes it; otherwise the
@@ -752,6 +774,16 @@ pub fn find_matching_backtick_run(chars: &[char], start: usize, run_len: usize) 
 mod tests {
     use super::super::content::{chomp_inline, merge_adjacent_emphasis, normalize_link_label};
     use super::*;
+
+    #[test]
+    fn escape_cell_pipes_escapes_each_pipe_no_backslash_escapes() {
+        assert!(matches!(escape_cell_pipes("a b"), Cow::Borrowed("a b")));
+        assert_eq!(escape_cell_pipes("a|b"), r"a\|b");
+        assert_eq!(escape_cell_pipes(r"a\|b"), r"a\|b");
+        assert_eq!(escape_cell_pipes(r"a\\|b"), r"a\\\|b");
+        assert_eq!(escape_cell_pipes("`a|b` [t](u|v)"), r"`a\|b` [t](u\|v)");
+        assert_eq!(escape_cell_pipes("||"), r"\|\|");
+    }
 
     #[test]
     fn escape_link_label_leaves_plain_text_unchanged() {

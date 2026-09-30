@@ -88,5 +88,60 @@
       "stem": "options_escape_misc",
       "title": "escape_misc option escapes miscellaneous markdown characters"
     }
+  },
+  {
+    "id": "options_escape_underscores_off_in_table_cell",
+    "description": "escape_underscores off leaves underscores in a table cell unescaped while escape_asterisks still applies",
+    "input": {
+      "html": "<table><tr><td>sample_value 2*3</td></tr></table>",
+      "options": {
+        "escape_underscores": false,
+        "escape_asterisks": true
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "| sample_value 2\\*3 |"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "sample\\_value"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_escape_underscores_off_in_table_cell",
+      "title": "escape_underscores off leaves underscores in a table cell unescaped while escape_asterisks still applies"
+    }
+  },
+  {
+    "id": "options_escape_asterisks_off_in_table_cell",
+    "description": "escape_asterisks off leaves asterisks in a table cell unescaped",
+    "input": {
+      "html": "<table><tr><td>2*3 = 6</td></tr></table>",
+      "options": {
+        "escape_asterisks": false
+      }
+    },
+    "assertions": [
+      {
+        "type": "contains",
+        "field": "content",
+        "value": "| 2*3 = 6 |"
+      },
+      {
+        "type": "not_contains",
+        "field": "content",
+        "value": "2\\*3"
+      }
+    ],
+    "docs": {
+      "topic": "options",
+      "stem": "options_escape_asterisks_off_in_table_cell",
+      "title": "escape_asterisks off leaves asterisks in a table cell unescaped"
+    }
   }
 ]

@@ -115,11 +115,11 @@ fn should_escape_backslash_in_table_cell_text() {
         </table>
     ";
     let markdown = convert(html, default_options());
-    // ~keep A cell escapes `*` regardless of `escape_asterisks` (block/table/cell.rs),
-    // ~keep independently of and in addition to the backslash rule — so the `\` is
-    // ~keep doubled and the `*` picks up its own escape.
+    // ~keep A cell follows `escape_asterisks` like a paragraph (issue #638), so with the
+    // ~keep default options only the backslash rule applies: the `\` is doubled and the
+    // ~keep `*` stays as it is.
     assert!(
-        markdown.contains(r"3\\\*4"),
+        markdown.contains(r"3\\*4") && !markdown.contains(r"3\\\*4"),
         "literal backslash in a table cell should be escaped, got: {markdown}"
     );
 }

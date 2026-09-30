@@ -176,10 +176,8 @@ pub fn render_cell_text(
                 // ~keep so its `|` delimiters would read as *the outer row's* cell boundaries on
                 // ~keep reparse, silently widening -- and on a second parse, truncating -- the
                 // ~keep containing row's column count: real content loss, not a cosmetic diff.
-                // ~keep Scoped to a child that *is, or wraps* (e.g. a `<div>`), a nested table:
-                // ~keep other block content a cell may hold (`<pre>`, code spans) is deliberately
-                // ~keep left byte-for-byte alone by their own handlers (issues #455/#456) and
-                // ~keep must not be touched here. A single-node tag test here used to miss a
+                // ~keep Scoped to a child that *is, or wraps* (e.g. a `<div>`), a nested table.
+                // ~keep A single-node tag test here used to miss a
                 // ~keep wrapped table entirely, letting it fall through to the `else` branch
                 // ~keep below and emit raw unescaped pipes (issue #488).
                 if super::utils::is_or_contains_table(child_handle, parser, dom_ctx) {
@@ -253,6 +251,21 @@ pub fn render_cell_text(
     if text.contains('\n') {
         text = text.replace('\n', " ");
     }
+    // ~keep A `|` a handler wrote into the cell (a code span, a link destination or title, an
+    // ~keep image description, a nested table) splits the row like one in plain text does.
+    // ~keep GFM splits on a pipe in a code span too and reads `\|` there as `|`; Djot does not
+    // ~keep split inside a verbatim span, and a backslash there stays literal.
+    if text.contains('|') {
+        match options.output_format {
+            crate::options::OutputFormat::Markdown => {
+                text = crate::converter::utility::escaping::escape_cell_pipes(&text).into_owned();
+            }
+            crate::options::OutputFormat::Djot => {
+                text = crate::converter::utility::escaping::escape_bare_pipes_outside_code_spans(&text);
+            }
+            crate::options::OutputFormat::Plain => {}
+        }
+    }
     text
 }
 
@@ -282,13 +295,17 @@ fn trim_in_place(text: &mut String) {
 
 /// Escape text for use inside a table cell.
 ///
-/// Always escapes `*` and `_` (to prevent unintended emphasis inside cells),
-/// applies `escape_misc` / `escape_ascii` per options, and escapes `|` (pipe)
-/// when `escape_misc` is not already handling it.
+/// Applies every `escape_*` option exactly as outside a table (issue #638), and
+/// escapes `|` (pipe) when neither `escape_misc` nor `escape_ascii` already does.
 fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> String {
-    // ~keep Always escape * and _ in table cells to prevent unintended emphasis.
-    let escaped = crate::text::escape(text, options.escape_misc, true, true, options.escape_ascii);
-    if options.escape_misc {
+    let escaped = crate::text::escape(
+        text,
+        options.escape_misc,
+        options.escape_asterisks,
+        options.escape_underscores,
+        options.escape_ascii,
+    );
+    if options.escape_misc || options.escape_ascii {
         escaped.into_owned()
     } else {
         escaped.replace('|', r"\|")
@@ -299,7 +316,6 @@ fn escape_cell_text(text: &str, options: &crate::options::ConversionOptions) -> 
 ///
 /// Processes cell content and renders it with pipe delimiters for Markdown tables.
 /// Handles colspan by adding extra pipes, and escapes pipes in cell content.
-/// Always escapes `*` and `_` to prevent unintended emphasis inside cells.
 ///
 /// # Arguments
 /// * `node_handle` - Handle to the cell element

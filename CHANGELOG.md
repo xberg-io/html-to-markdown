@@ -58,6 +58,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before it, `First  \nSecond`, in both converters and with both newline styles. This also holds
   when that text ends inside an element that writes no line end, such as `<span>`, `<font>` or a
   custom element: `<span>First\n</span><br>Second`.
+- **A table cell ignored `escape_underscores` and `escape_asterisks` (#638).**
+  The full converter always escaped `_` and `*` in a cell, so
+  `<table><tr><td>sample_value</td></tr></table>` gave `sample\_value` while
+  `<p>sample_value</p>` gave `sample_value`. Every escape option now acts the same in a cell as
+  anywhere else. A `|` in a cell is still escaped whatever the options say, and with
+  `escape_ascii` on and `escape_misc` off it is now escaped once, as `\|`, instead of as `\\|`,
+  which some renderers show with a stray backslash.
+- **A `|` in a code span, link or image in a table cell broke the table.**
+  `<table><tr><td><code>a|b</code></td></tr></table>` gave ``| `a|b` |``. GFM splits a row on
+  a pipe in a code span too, so the row no longer matched the delimiter row and the whole table
+  became a paragraph. A pipe in a link destination or title, an image description, preformatted
+  text or a code span in a nested table did the same. In Markdown output every pipe in a cell is
+  now escaped as `\|`, which GFM reads as `|` in a code span too. In Djot output a pipe in a
+  link or an image in a cell is now escaped as `\|`, and a pipe in a verbatim span stays bare,
+  because Djot does not split a row there.
 - **An empty task item lost its checkbox on GitHub.** `<ul><li><input type="checkbox"></li></ul>`
   gave `- [ ]`. GFM reads a checkbox only when content follows it, so cmark-gfm and markdown-it
   showed the text `[ ]`. It now gives `- [ ] &#32;`, a checkbox: the character reference renders
