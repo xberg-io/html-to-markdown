@@ -697,6 +697,7 @@ pub fn scan(
                     name_range: name_start..name_end,
                     dropped_whitespace_only_text: false,
                     own_buffer: renders_into_own_buffer(spec.kind, name_lower, prev_ctx),
+                    starts_with_whitespace: false,
                 });
 
                 apply_open_escape_ctx(&mut state, spec);
@@ -1834,6 +1835,7 @@ fn open_table_cell(
     if let Some(ts) = state.table_stack.last_mut() {
         ts.current_cell.clear();
         ts.in_cell = true;
+        ts.definition_in_cell = false;
         ts.current_cell_colspan = colspan;
         if is_header {
             ts.has_th = true;
@@ -2330,8 +2332,9 @@ fn emit_close(
     state.escape_ctx = frame.prev_escape_ctx;
     state.last_closed_custom_element = std::ptr::eq(spec, &raw const CUSTOM_ELEMENT_INLINE_SPEC);
     if matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription) {
-        trim_start_of_cell_content(state, frame.content_start);
+        trim_start_of_cell_content(state, frame.content_start)?;
     }
+    check_whitespace_led_block_in_cell(state, &frame)?;
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
@@ -3064,13 +3067,18 @@ fn innermost_own_buffer(state: &Tier1State) -> Option<&OpenTag> {
 /// legend, a
 /// figure caption or a label, and a sectioning element after other cell content, which Tier-2
 /// separates with a blank line that the cell folds into two spaces. An inline element right
-/// after a block in a cell is left to Tier-2 too (see `emit_open`), and so is a quote or heading
-/// that starts with a space (see `flush_text`).
+/// after a block in a cell is left to Tier-2 too (see `emit_open`), and so are a definition after
+/// another definition in the cell and a quote or heading that starts with whitespace (see
+/// `check_whitespace_led_block_in_cell`).
 fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -> bool {
     if !state.in_table_cell() {
         return false;
     }
     if matches!(name_lower, b"legend" | b"figcaption" | b"label") {
+        return true;
+    }
+    let definition = matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription);
+    if definition && state.table_stack.last().is_some_and(|ts| ts.definition_in_cell) {
         return true;
     }
     let sectioning = matches!(
@@ -3104,19 +3112,37 @@ fn cell_needs_tier2(state: &mut Tier1State, spec: &TagSpec, name_lower: &[u8]) -
 }
 
 /// Drop the whitespace at the start of the content a definition term or definition wrote into a
-/// table cell from `content_start`, as Tier-2 trims the buffer of each. Tier-2 separates content
-/// that starts with `---` from the cell content before it, so the whitespace before it stays.
-fn trim_start_of_cell_content(state: &mut Tier1State, content_start: usize) {
+/// table cell from `content_start`, as Tier-2 trims the buffer of each. Tier-2 separates a rule at
+/// the start of a definition from the cell content before it, and this scanner cannot tell a rule
+/// from `---` text there, so content that starts with whitespace and `---` goes to Tier-2.
+fn trim_start_of_cell_content(state: &mut Tier1State, content_start: usize) -> Result<(), BailReason> {
     if !state.in_table_cell() {
-        return;
+        return Ok(());
     }
     let cell_buf = state.cell_or_output_mut();
     let start = clamp_to_char_boundary(cell_buf, content_start);
-    if cell_buf[start..].trim_start().starts_with("---") {
-        return;
+    let content = cell_buf[start..].trim_start();
+    let leading = cell_buf.len() - start - content.len();
+    if leading > 0 && content.starts_with("---") {
+        return Err(BailReason::TableBlockChildInCell);
     }
-    let leading = cell_buf[start..].len() - cell_buf[start..].trim_start().len();
     cell_buf.replace_range(start..start + leading, "");
+    Ok(())
+}
+
+/// Leave a table cell to Tier-2 when a quote or heading in it closes with content after
+/// whitespace at its start: Tier-2 keeps that whitespace in the element's own buffer and breaks
+/// the cell twice before the content. A quote or heading with no other content writes nothing.
+fn check_whitespace_led_block_in_cell(state: &mut Tier1State, frame: &OpenTag) -> Result<(), BailReason> {
+    if !frame.starts_with_whitespace || !state.in_table_cell() {
+        return Ok(());
+    }
+    let cell_buf = state.cell_or_output_mut();
+    let start = clamp_to_char_boundary(cell_buf, frame.content_start);
+    if cell_buf[start..].trim().is_empty() {
+        return Ok(());
+    }
+    Err(BailReason::TableBlockChildInCell)
 }
 
 /// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell
@@ -3825,9 +3851,19 @@ fn open_dl(state: &mut Tier1State) {
     state.ensure_blank_line();
 }
 
-const fn open_dt(_state: &mut Tier1State) {}
+fn open_dt(state: &mut Tier1State) {
+    mark_definition_in_cell(state);
+}
 
-const fn open_dd(_state: &mut Tier1State) {}
+fn open_dd(state: &mut Tier1State) {
+    mark_definition_in_cell(state);
+}
+
+fn mark_definition_in_cell(state: &mut Tier1State) {
+    if let Some(ts) = state.table_stack.last_mut().filter(|ts| ts.in_cell) {
+        ts.definition_in_cell = true;
+    }
+}
 
 fn close_dt(state: &mut Tier1State) {
     if state.in_table_cell() {
@@ -4533,16 +4569,21 @@ fn flush_text(
         if matches!(state.stack.last().map(|f| f.spec.kind), Some(TagKind::List(_))) {
             return Ok(());
         }
-        // ~keep Tier-2 checks the trailing space in the own buffer of a quote or heading, which holds
-        // ~keep no space from before it, so it keeps a space at its start and breaks the cell twice
-        // ~keep before its first block. That cell is left to Tier-2.
-        let block_start = innermost_own_buffer(state)
+        // ~keep Tier-2 keeps whitespace at the start of the own buffer of a quote or heading. Mark
+        // ~keep the element, so its close leaves the cell to Tier-2 if content follows.
+        let cell_len = state.cell_or_output_mut().len();
+        if let Some(frame) = state
+            .stack
+            .iter_mut()
+            .rev()
+            .take_while(|frame| !matches!(frame.spec.kind, TagKind::TableCell { .. } | TagKind::Summary))
+            .find(|frame| frame.own_buffer)
             .filter(|frame| matches!(frame.spec.kind, TagKind::Blockquote | TagKind::Heading(_)))
-            .map(|frame| frame.content_start);
-        let dest = state.cell_or_output_mut();
-        if block_start == Some(dest.len()) && dest.ends_with(' ') && !after_custom_element_close {
-            return Err(BailReason::TableBlockChildInCell);
+            .filter(|frame| frame.content_start == cell_len)
+        {
+            frame.starts_with_whitespace = true;
         }
+        let dest = state.cell_or_output_mut();
         // ~keep `after_custom_element_close` overrides the usual "already ends
         // with a space, skip" dedup — see `Tier1State::last_closed_custom_element`.
         if !dest.is_empty() && !dest.ends_with('\n') && (after_custom_element_close || !dest.ends_with(' ')) {

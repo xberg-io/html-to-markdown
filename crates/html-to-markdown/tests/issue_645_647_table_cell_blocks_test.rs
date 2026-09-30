@@ -341,26 +341,54 @@ fn should_leave_a_block_in_inline_markup_or_a_label_in_a_cell_to_tier2() {
 }
 
 /// Tier-2 trims the start of a definition term or definition, so a space at its start after
-/// other cell content is dropped in both tiers. A definition that starts with a rule keeps the
-/// space before the rule.
+/// other cell content is dropped in both tiers.
 #[test]
 fn should_trim_the_start_of_a_definition_after_cell_text_in_both_tiers() {
-    check(&[
-        ("a<dt> b </dt>", "ab", "ab"),
-        ("a<dd> b </dd>", "ab", "ab"),
+    check(&[("a<dt> b </dt>", "ab", "ab"), ("a<dd> b </dd>", "ab", "ab")]);
+}
+
+/// Tier-2 separates a definition from a definition before it in the same cell, and separates a
+/// rule, but not `---` text, at the start of a definition. The fast converter leaves both cells
+/// to Tier-2.
+#[test]
+fn should_leave_a_second_definition_or_a_dash_led_definition_in_a_cell_to_tier2() {
+    check_tier2(&[
+        ("<b>a</b><dt><!--x-->b</dt><dt> c</dt>", "**a**b c", "**a**b c"),
+        ("<dt> - b</dt><dt> c</dt>", "- b c", "- b c"),
+        ("<dd> b </dd><dd> c</dd>", "b  c", "b  c"),
+        ("<b>a</b><dd> --- b</dd>", "**a**--- b", "**a**--- b"),
         ("a<dt> <!--x--> ---</dt>", "a  ---", "a  ---"),
         ("<p>a</p><dd> <!--x--> ---</dd>", "a  ---", "a  ---"),
     ]);
 }
 
-/// Tier-2 keeps a space at the start of a quote or heading after cell text that ends with a space,
-/// and breaks the cell twice before its first block, so the fast converter leaves that cell to
-/// Tier-2.
+/// Whitespace between two inline elements inside a quote or heading is not at its start, so the
+/// fast converter writes that cell itself.
 #[test]
-fn should_leave_a_quote_or_heading_that_starts_with_a_space_after_cell_text_to_tier2() {
+fn should_write_a_quote_or_heading_with_inner_whitespace_on_the_fast_path() {
+    check(&[
+        (
+            "a<blockquote><b>x</b> <i>y</i></blockquote>",
+            "a **x** *y*",
+            "a<br>**x** *y*",
+        ),
+        ("a<h3><b>x</b> <i>y</i></h3>", "a **x** *y*", "a<br>**x** *y*"),
+    ]);
+}
+
+/// Tier-2 keeps whitespace at the start of a quote or heading in a cell and breaks the cell twice
+/// before its first block, so the fast converter leaves that cell to Tier-2.
+#[test]
+fn should_leave_a_quote_or_heading_that_starts_with_whitespace_in_a_cell_to_tier2() {
     check_tier2(&[
         ("a <blockquote> <p>b</p></blockquote>c", "a b c", "a<br><br>b<br>c"),
         ("a <h3> <p>b</p></h3>c", "a b c", "a<br><br>b<br>c"),
         ("a <span><h3> <p>b</p></h3></span>", "a b", "a<br><br>b"),
+        ("a<blockquote> <hr></blockquote> c", "a --- c", "a<br>---<br> c"),
+        (
+            "a<blockquote><blockquote>\n<p>b</p></blockquote></blockquote>c",
+            "a b c",
+            "a<br>b<br>c",
+        ),
     ]);
 }
