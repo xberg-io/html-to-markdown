@@ -1876,8 +1876,7 @@ fn emit_void(
         }
 
         TagKind::LineBreak => {
-            // ~keep `<br>` outside any block context emits nothing (Tier-2 behaviour).
-            // Three context-dependent emissions:
+            // ~keep Three context-dependent emissions:
             //   - Inside a link (anywhere): `"  \n"`, unmodified, UNLESS the link's
             //     body is still empty (nothing emitted since the `<a>`/wrapper
             //     opened), in which case nothing is emitted at all. Tier-2's
@@ -1980,9 +1979,9 @@ fn emit_void(
                 // literal line ending is folded to a space before it ever reaches
                 // this buffer (`flush_text`'s `in_code && !in_pre` branch).
                 state.cell_or_output_mut().push('\n');
-            } else if state.stack.is_empty() {
-                // ~keep bare `<br>` at top level — Tier-2 emits nothing
             } else {
+                // ~keep Also a `<br>` that no element encloses (`a<br>b`): Tier-2 writes the
+                // same marker there as inside `<body>`, so the top level is not a case of its own.
                 let dest = state.cell_or_output_mut();
                 crate::converter::main_helpers::trim_trailing_whitespace(dest);
                 dest.push_str("  \n");
@@ -4448,14 +4447,11 @@ fn flush_text(
     // ~keep Tier-2's `process_text_node` (`text_node.rs`) drops a text node's leading
     // whitespace run whenever `output.ends_with('\n') && prefix == " "` — one of
     // several `skip_prefix` conditions, and unlike the others it is not limited
-    // to a double newline. A hard break inside a link (`<a>foo<br> bar</a>`) is
-    // the only way link content ever ends in a bare `\n` (see `normalize_link_label`
-    // and the `TagKind::LineBreak` `in_link` arm above, which now preserve/emit it
-    // rather than folding it to a space), so this mirrors that one `skip_prefix`
-    // arm scoped to exactly the case Tier-1 can produce it in: right after such a
-    // break, `bar`'s leading space must not survive, or Tier-1 emits
-    // `[foo  \n bar]` where Tier-2 emits `[foo  \nbar]`.
-    let after_link_hard_break = in_link_frame && state.cell_or_output_mut().ends_with('\n');
+    // to a double newline. The usual source of that bare `\n` is a hard break, inside
+    // a link (`<a>foo<br> bar</a>`) or not (`a<br> b`): right after it, the next
+    // line's leading space must not survive, or Tier-1 emits `[foo  \n bar]` and
+    // `a  \n b` where Tier-2 emits `[foo  \nbar]` and `a  \nb`.
+    let after_line_end = state.cell_or_output_mut().ends_with('\n');
     // ~keep Distinct from `at_inline_frame_start` above (whose unconditional strip is reserved
     // for Link/Strong/Emphasis/Code -- kinds with their own always-on trim wrapper in
     // Tier-2: link-label normalization, `chomp_inline`'s marker migration, code's verbatim
@@ -4499,7 +4495,7 @@ fn flush_text(
         && (at_inline_frame_start
             || block_separator_after
             || document_start_strip
-            || after_link_hard_break
+            || after_line_end
             || bare_inline_frame_start_after_space)
     {
         let trimmed = raw.trim_start_matches([' ', '\t', '\n', '\r']);

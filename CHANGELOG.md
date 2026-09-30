@@ -52,6 +52,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The fast converter dropped a line break that no element encloses (#679).**
+  `a<br>1) t` gave `a1) t`, so the two lines joined. The fast converter now writes the break as
+  the full converter does, `a  \n1\) t`, the same as when the input sits in `<body>`. The line
+  after a hard break also no longer keeps a leading space: `<div>a<br> b</div>` gives `a  \nb` in
+  both converters.
 - **A task item in an ordered list lost its number (#659).**
   `<ol><li><input type="checkbox">p</li></ol>` gave `- [ ] p`, a bullet list. A task item now
   writes the marker of its own list, so it gives `1. [ ] p`, and its content column follows the
