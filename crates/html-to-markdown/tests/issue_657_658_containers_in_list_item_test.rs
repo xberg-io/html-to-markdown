@@ -304,6 +304,35 @@ fn should_keep_a_hard_break_before_an_element_that_continues_the_paragraph() {
 }
 
 #[test]
+fn should_keep_a_hard_break_in_a_wrapper_or_before_an_empty_element_in_the_paragraph() {
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..options_for(TierStrategy::Tier2)
+    };
+    assert_converts(
+        "<p><b>a<br></b><dialog>x</dialog>y</p>",
+        &backslash,
+        "**a**\\\nx\n\ny\n",
+        &["a</strong><br />"],
+    );
+    assert_converts("<p>a<br><dialog></dialog>y</p>", &backslash, "a\\\ny\n", &["a<br />"]);
+}
+
+#[test]
+fn should_put_back_only_a_single_hard_break_before_an_element_in_the_paragraph() {
+    let backslash = ConversionOptions {
+        newline_style: NewlineStyle::Backslash,
+        ..options_for(TierStrategy::Tier2)
+    };
+    assert_converts(
+        "<p>a<br><br><br><dialog><br>x</dialog>y</p>",
+        &backslash,
+        "a\n\n\\\nx\n\ny\n",
+        &[],
+    );
+}
+
+#[test]
 fn should_drop_a_hard_break_before_an_element_that_ends_the_paragraph() {
     let backslash = ConversionOptions {
         newline_style: NewlineStyle::Backslash,

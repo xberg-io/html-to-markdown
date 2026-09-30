@@ -97,15 +97,16 @@ pub fn trailing_backslash_breaks(output: &str, block_start: usize) -> usize {
 /// ~keep The dispatch drops a hard break before a block-level element because the break is at
 /// ~keep the end of a paragraph there. The element's own output is what decides it: a dialog, a
 /// ~keep summary or a legend writes its text on the next line of the paragraph, so the break is
-/// ~keep in the middle of the paragraph and must stay. A blank line or a line that opens a block
-/// ~keep (a heading in a list item or a quote) ends the paragraph, and the break stays dropped.
+/// ~keep in the middle of the paragraph and must stay. An element that writes nothing leaves
+/// ~keep the paragraph open too. A blank line or a line that opens a block (a heading in a list
+/// ~keep item or a quote) ends the paragraph, and the break stays dropped.
 pub fn restore_break_before_paragraph_text(output: &mut String, break_start: usize) {
     if output.get(break_start..=break_start) != Some("\n") {
         return;
     }
     let rest = output[break_start + 1..].trim_start_matches([' ', '\t']);
     let line = rest.split('\n').next().unwrap_or_default();
-    if line.trim().is_empty() || crate::converter::utility::escaping::opens_block(line) {
+    if !rest.is_empty() && (line.trim().is_empty() || crate::converter::utility::escaping::opens_block(line)) {
         return;
     }
     output.insert(break_start, '\\');

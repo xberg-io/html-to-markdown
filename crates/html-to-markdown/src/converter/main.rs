@@ -538,9 +538,10 @@ fn at_line_start(output: &str) -> bool {
 }
 
 /// Whether `output` ends with a line end that a block wrote: a lone line break is not one, since
-/// the block before it wrote nothing.
+/// the block before it wrote nothing, and neither is a backslash hard break, since every block
+/// drops the one it ends with (issue #464).
 fn ends_with_block_line_end(output: &str) -> bool {
-    output.len() >= 2 && output.ends_with('\n')
+    output.len() >= 2 && output.ends_with('\n') && !output.ends_with("\\\n")
 }
 
 /// Whether `node` is inline content: non-blank text or an inline element.
@@ -605,14 +606,15 @@ fn convert_node(
         return;
     }
 
-    // ~keep One hard break written by a `<br>` right before this element, which the dispatch
+    // ~keep One hard break at the end of the paragraph before this element, which the dispatch
     // ~keep drops if the element is a block: see `restore_break_before_paragraph_text`. A run
-    // ~keep of breaks leaves a blank line, and a break at the end of a closed element (a `<dt>`
-    // ~keep before its `<dd>`) is at the end of that element's block: both stay dropped.
+    // ~keep of breaks leaves a blank line, and a break at the end of a closed block element (a
+    // ~keep `<dt>` before its `<dd>`) is at the end of that element's block: both stay dropped.
     let break_start = (options.newline_style == NewlineStyle::Backslash
         && matches!(node, tl::Node::Tag(_))
         && trailing_backslash_breaks(output, ctx.block_content_start) == 1
-        && crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx) == Some("br"))
+        && crate::converter::utility::siblings::get_previous_sibling_tag(node_handle, parser, dom_ctx)
+            .is_some_and(|name| !is_block_level_element(name)))
     .then(|| output.len() - "\\\n".len());
 
     separate_from_block(node, node_handle, parser, output, options, ctx, dom_ctx);
