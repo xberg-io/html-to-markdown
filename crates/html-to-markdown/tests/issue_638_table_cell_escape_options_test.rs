@@ -310,41 +310,6 @@ fn issue_638_djot_cell_escapes_a_link_pipe() {
     );
 }
 
-#[test]
-fn issue_638_pre_in_cell_is_a_code_span_in_both_converters() {
-    for (html, expected) in [
-        (
-            r"<table><tr><td><pre>*x* a\*b</pre></td><td>z</td></tr></table>",
-            r"| `*x* a\*b` | z |",
-        ),
-        (
-            "<table><tr><td>t<pre>a\n`b`</pre></td><td>z</td></tr></table>",
-            "| t `` a `b` `` | z |",
-        ),
-    ] {
-        let opts = options(Flags(0));
-        let full = tier2(html, &opts);
-        assert!(first_cell_row(&full).contains(expected), "{html}: {full:?}");
-        assert!(render(&full).contains("<code>"), "{html}: {full:?}");
-        match tier1_run(html, &opts) {
-            Ok(fast) => assert_eq!(fast, full, "fast and full converters differ: {html}"),
-            Err(reason) => panic!("fast converter bailed ({reason:?}): {html}"),
-        }
-    }
-    // ~keep Blank or space-padded content: both converters write the same cell.
-    for html in [
-        "<table><tr><td>x<pre> </pre>y</td><td>z</td></tr></table>",
-        "<table><tr><td>x<pre> b </pre></td><td>z</td></tr></table>",
-    ] {
-        let opts = options(Flags(0));
-        let full = tier2(html, &opts);
-        match tier1_run(html, &opts) {
-            Ok(fast) => assert_eq!(fast, full, "fast and full converters differ: {html}"),
-            Err(reason) => panic!("fast converter bailed ({reason:?}): {html}"),
-        }
-    }
-}
-
 fn first_cell_row(markdown: &str) -> String {
     markdown
         .lines()

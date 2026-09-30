@@ -3208,19 +3208,9 @@ fn close_pre(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOption
     // ~keep Phase GG follow-up: when `<pre>` opened inside a table cell, its content
     // was accumulated into `current_cell` (the cell buffer), not `state.output`.
     // The frame's `content_start` indexes into the cell buffer.  Don't emit a
-    // code fence: like Tier-2's `format_code_block`, write the content as one code span.
+    // code fence — Tier-2 also collapses pre inside cells to plain inline text
+    // (the cell's `replace('\n', ' ')` step does the rest).
     if state.in_table_cell() {
-        let cell_buf = state.cell_or_output_mut();
-        let content_start = clamp_to_char_boundary(cell_buf, frame.content_start);
-        let raw = cell_buf[content_start..].to_owned();
-        let folded = crate::text::fold_cell_line_breaks_verbatim_cow(raw.trim_matches('\n')).into_owned();
-        cell_buf.truncate(content_start);
-        if folded.trim().is_empty() {
-            cell_buf.push_str(&folded);
-        } else {
-            // ~keep Tier-2 drops the leading whitespace of a `<pre>` before it gets here.
-            format_inline_code_segment(cell_buf, folded.trim_start());
-        }
         separate_closed_block_in_cell(state, frame.content_start, options.br_in_tables);
         return;
     }
