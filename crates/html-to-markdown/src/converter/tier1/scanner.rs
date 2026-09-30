@@ -2316,6 +2316,9 @@ fn emit_close(
 
     state.escape_ctx = frame.prev_escape_ctx;
     state.last_closed_custom_element = std::ptr::eq(spec, &raw const CUSTOM_ELEMENT_INLINE_SPEC);
+    if matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription) || name_lower == b"label" {
+        trim_start_of_cell_content(state, frame.content_start);
+    }
 
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
@@ -3063,6 +3066,23 @@ fn rule_starts_a_definition(state: &mut Tier1State) -> bool {
     let cell_buf = state.cell_or_output_mut();
     let start = clamp_to_char_boundary(cell_buf, start);
     cell_buf[start..].trim().is_empty()
+}
+
+/// Drop the whitespace at the start of the content an element wrote into a table cell from
+/// `content_start`. Tier-2 trims the buffer of a definition term, a definition and a label, then
+/// writes a blank line before a rule that starts it (see [`rule_starts_a_definition`]), so the
+/// blank line before a leading rule stays.
+fn trim_start_of_cell_content(state: &mut Tier1State, content_start: usize) {
+    if !state.in_table_cell() {
+        return;
+    }
+    let cell_buf = state.cell_or_output_mut();
+    let start = clamp_to_char_boundary(cell_buf, content_start);
+    if cell_buf[start..].trim_start().starts_with("---") {
+        return;
+    }
+    let leading = cell_buf[start..].len() - cell_buf[start..].trim_start().len();
+    cell_buf.replace_range(start..start + leading, "");
 }
 
 /// Run `write` on the part of the cell buffer Tier-2 writes the current content into, so a cell

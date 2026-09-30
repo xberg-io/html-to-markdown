@@ -292,6 +292,17 @@ fn should_keep_the_space_at_the_start_of_sub_or_abbr_before_a_block() {
     ]);
 }
 
+/// Tier-2 trims the buffer of a definition term, a definition and a label, so a space at their
+/// start is dropped.
+#[test]
+fn should_drop_the_space_at_the_start_of_a_definition_or_label_in_a_cell() {
+    check(&[
+        ("a <sub><dt> <ul><li>b</li></ul></dt></sub>c", "a b c", "a b<br>c"),
+        ("a <abbr><dd> <ul><li>b</li></ul></dd></abbr>c", "a b c", "a b<br>c"),
+        ("a <sub><label> <ul><li>b</li></ul></label></sub>c", "a b c", "a b<br>c"),
+    ]);
+}
+
 /// Tier-2 still sees a navigation block that preprocessing drops, so the text after it breaks.
 #[test]
 fn should_separate_text_after_a_dropped_navigation_block_in_a_cell() {
