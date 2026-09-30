@@ -58,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   A block in a cell is now separated from the cell content before and after it by the cell break:
   `| a b |`, or `| a<br>b |` with `br_in_tables` on. A block at the start of bold, a code span or
   another inline element still joins the text before that element, and a block inside a heading
-  or code still joins the text next to it.
+  still joins the text next to it.
 - **The two converters wrote a quote or a paragraph in a table cell differently (#647).** A quote
   in a cell now has no `>` marker in either converter, as a heading, a list and a code block in a
   cell have none: `<blockquote>a</blockquote>b` gives `| a b |`. The fast converter wrote a
