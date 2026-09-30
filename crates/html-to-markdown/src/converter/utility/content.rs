@@ -358,3 +358,17 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
         i
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::normalize_link_label;
+
+    // ~keep Issue #678: the spaces or tabs after a break are the list item's indent.
+    #[test]
+    fn normalize_link_label_keeps_the_indent_after_a_hard_break_but_not_at_the_label_ends() {
+        assert_eq!(normalize_link_label("a  \n    2.  t"), "a  \n    2. t");
+        assert_eq!(normalize_link_label("a\\\n\t2. t"), "a\\\n\t2. t");
+        assert_eq!(normalize_link_label("  \n  2. t"), "  \n  2. t");
+        assert_eq!(normalize_link_label("  a  \n  "), "a  \n");
+    }
+}

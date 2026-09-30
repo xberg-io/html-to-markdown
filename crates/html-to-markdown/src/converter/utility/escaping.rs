@@ -243,6 +243,9 @@ const HTML_BLOCK_TAGS: [&str; 62] = [
 /// Only continuation lines are examined. A label's first line is preceded on that same line by
 /// the caller's `[` / `![`, so it cannot start a block however it begins.
 ///
+/// ~keep A continuation line of only a spaces break (two `<br>` in a row) is blank, and a blank
+/// ~keep line ends the paragraph; a backslash after its spaces makes it a break (issue #678).
+///
 /// Returns `Cow::Borrowed` when `text` is single-line or no continuation line opens a block.
 fn escape_block_openers_on_continuation_lines(text: &str) -> Cow<'_, str> {
     if !text.contains('\n') {
@@ -255,6 +258,8 @@ fn escape_block_openers_on_continuation_lines(text: &str) -> Cow<'_, str> {
         if index > 0 {
             if let Some(offset) = block_opener_escape_offset(line) {
                 escape_at.push(line_start + offset);
+            } else if line.len() > 1 && line.bytes().all(|byte| byte == b' ') && line_start + line.len() < text.len() {
+                escape_at.push(line_start + line.len());
             }
         }
         line_start += line.len() + 1;
@@ -335,19 +340,18 @@ pub fn line_opens_block(line: &str) -> bool {
 /// ~keep after a blank line it starts a paragraph of its own. The indent scan stops at the first
 /// ~keep other byte, and the line above is read once per line, so the check stays linear.
 pub fn escape_continuation_line_start(buffer: &mut String, from: usize) {
-    let before = &buffer[..from];
-    let Some(line_end) = before.trim_end_matches([' ', '\t']).strip_suffix('\n') else {
-        return;
-    };
-    let line_above = &line_end[line_end.rfind('\n').map_or(0, |pos| pos + 1)..];
-    if line_above.trim().is_empty() {
-        return;
-    }
-    let text = &buffer[from..];
-    let line = &text[..text.find('\n').unwrap_or(text.len())];
-    if let Some(offset) = block_opener_escape_offset(line) {
+    if let Some(offset) = continuation_line(buffer, from).and_then(block_opener_escape_offset) {
         buffer.insert(from + offset, '\\');
     }
+}
+
+/// The first line of `buffer[from..]` when that text starts a line that continues the paragraph
+/// above it: only indent before it on its line, and text on the line above.
+pub fn continuation_line(buffer: &str, from: usize) -> Option<&str> {
+    let line_end = buffer[..from].trim_end_matches([' ', '\t']).strip_suffix('\n')?;
+    let line_above = &line_end[line_end.rfind('\n').map_or(0, |pos| pos + 1)..];
+    let text = &buffer[from..];
+    (!line_above.trim().is_empty()).then(|| &text[..text.find('\n').unwrap_or(text.len())])
 }
 
 /// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.
@@ -659,6 +663,13 @@ mod tests {
     // ~keep reparsed as a real nested link, or `uri2` is silently dropped on a second
     // ~keep conversion pass (CommonMark parses an image's alt as full inline content).
     #[test]
+    fn escape_link_label_makes_a_break_on_a_line_of_its_own_a_backslash_break() {
+        assert_eq!(escape_link_label("a  \n  \n  b"), "a  \n  \\\n  b");
+        assert_eq!(escape_link_label("a  \n  "), "a  \n  ");
+        assert_eq!(escape_link_label("a  \n \nb"), "a  \n \nb");
+    }
+
+    #[test]
     fn escape_link_label_escapes_a_link_shaped_bracket_pair() {
         assert_eq!(escape_link_label("[foo](uri2)"), "\\[foo\\](uri2)");
     }
@@ -789,15 +800,6 @@ mod tests {
     fn normalize_link_label_still_collapses_an_incidental_newline_to_a_space() {
         assert_eq!(normalize_link_label("foo\nbar"), "foo bar");
         assert_eq!(normalize_link_label("foo \n bar"), "foo bar");
-    }
-
-    // ~keep Issue #678: the spaces or tabs after a break are the list item's indent.
-    #[test]
-    fn normalize_link_label_keeps_the_indent_after_a_hard_break_but_not_at_the_label_ends() {
-        assert_eq!(normalize_link_label("a  \n    2.  t"), "a  \n    2. t");
-        assert_eq!(normalize_link_label("a\\\n\t2. t"), "a\\\n\t2. t");
-        assert_eq!(normalize_link_label("  \n  2. t"), "  \n  2. t");
-        assert_eq!(normalize_link_label("  a  \n  "), "a  \n");
     }
 
     #[test]

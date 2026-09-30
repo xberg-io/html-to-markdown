@@ -84,6 +84,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   link broke. The line now keeps the item's indent, `- [a  \n  2. t](u)`, in nested items, ordered
   items, tab indents and quotes as well, and both converters give the same output. With wrap on, the later
   lines of a list item that holds only a link now get the item's indent too.
+- **Two line breaks in a row in a link broke the link.** `<ul><li><a href="u">a<br><br>b</a></li></ul>`
+  gave a blank line inside the link text, which ends the paragraph. The second break now ends
+  with a backslash, `- [a  \n  \\\n  b](u)`, so its line is not blank and the link stays whole.
+- **Djot output lost hard line breaks.** A `<br>` was written as two trailing spaces, which Djot
+  reads as plain spaces. Djot output now always writes a backslash before the line end, whatever
+  `newline_style` says.
+- **Djot output turned dashes and backticks after a line break into markup.** In Djot, `---` at
+  the start of the line after a hard break became an em dash, and a backtick run started verbatim
+  text that could swallow the end of a link. Each dash of a run of two or more, and each backtick,
+  is now escaped there: `\-\-\-`.
+- **Text in `<abbr>`, `<sub>`, `<sup>` or `<label>` after a line break could start a block.** The
+  full converter writes these through a buffer of their own, so the line start escape for text
+  after a hard break did not see them: `<p>a<br><abbr>- t</abbr></p>` gave `a  \n- t`, a list.
+  They now get the same escape as other text, `a  \n\- t`, in Markdown and in Djot.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a

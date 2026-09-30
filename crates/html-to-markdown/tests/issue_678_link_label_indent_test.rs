@@ -130,7 +130,7 @@ fn should_indent_a_label_line_in_djot_output() {
         ..options(TierStrategy::Tier2)
     };
     let markdown = convert_with(r#"<ul><li><a href="u">a<br>2. t</a></li></ul>"#, djot);
-    assert_eq!(markdown, "- [a  \n  2. t](u)\n");
+    assert_eq!(markdown, "- [a\\\n  2. t](u)\n");
 }
 
 #[test]
@@ -163,5 +163,69 @@ fn should_indent_a_label_line_of_a_link_only_item_with_wrap_on() {
             };
             assert_link_kept(html, wrap, expected);
         }
+    }
+}
+
+fn djot() -> ConversionOptions {
+    ConversionOptions {
+        output_format: OutputFormat::Djot,
+        ..options(TierStrategy::Tier2)
+    }
+}
+
+#[test]
+fn should_write_a_djot_hard_break_as_a_backslash() {
+    assert_eq!(convert_with("<p>a<br>b</p>", djot()), "a\\\nb\n");
+    assert_eq!(convert_with("<ul><li>a<br>b</li></ul>", djot()), "- a\\\n  b\n");
+    assert_eq!(
+        convert_with(r#"<p><a href="u">a<br>b</a></p>"#, djot()),
+        "[a\\\nb](u)\n"
+    );
+    let spaces = ConversionOptions {
+        newline_style: NewlineStyle::Spaces,
+        ..djot()
+    };
+    assert_eq!(convert_with("<p>a<br>b</p>", spaces), "a\\\nb\n");
+}
+
+#[test]
+fn should_escape_each_dash_and_backtick_that_starts_a_djot_line() {
+    let cases = [
+        ("<p>a<br>---</p>", "a\\\n\\-\\-\\-\n"),
+        ("<p>a<br><span>-- t</span></p>", "a\\\n\\-\\- t\n"),
+        (
+            r#"<ol start="10"><li><a href="u">a<br><span>```</span></a></li></ol>"#,
+            "10. [a\\\n    \\`\\`\\`](u)\n",
+        ),
+        (r#"<ul><li><a href="u">a<br>`x</a></li></ul>"#, "- [a\\\n  \\`x](u)\n"),
+        ("<p>a<br>- t</p>", "a\\\n- t\n"),
+    ];
+    for (html, expected) in cases {
+        assert_eq!(convert_with(html, djot()), expected, "{html}");
+    }
+}
+
+#[test]
+fn should_keep_a_link_whole_across_two_hard_breaks() {
+    let html = r#"<ul><li><a href="u">a<br><br>b</a></li></ul>"#;
+    for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+        assert_link_kept(html, options(tier), "- [a  \n  \\\n  b](u)\n");
+    }
+    assert_eq!(convert_with(html, djot()), "- [a\\\n\\\n  b](u)\n");
+}
+
+#[test]
+fn should_escape_a_line_start_that_a_wrapper_writes_after_a_hard_break() {
+    for tag in ["abbr", "sub", "sup", "label"] {
+        let html = format!("<p>a<br><{tag}>- t</{tag}></p>");
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(&html, options(tier));
+            assert!(markdown.starts_with("a  \n\\- t"), "{html} {tier:?}: {markdown:?}");
+        }
+    }
+    for tag in ["abbr", "label"] {
+        let html = format!("<p>a<br><{tag}>---</{tag}></p>");
+        let markdown = convert_with(&html, djot());
+        assert!(markdown.starts_with("a\\\n\\-\\-\\-"), "{html}: {markdown:?}");
     }
 }

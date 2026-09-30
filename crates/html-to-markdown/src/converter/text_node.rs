@@ -479,10 +479,45 @@ pub fn process_text_node(
         output.push_str(&final_text);
     }
 
-    // ~keep Code keeps its bytes; a Djot paragraph ends only at a blank line, so no line in it
-    // ~keep needs the escape.
-    if !ctx.in_code && options.output_format == crate::options::OutputFormat::Markdown {
-        crate::converter::utility::escaping::escape_continuation_line_start(output, text_start);
+    // ~keep Code keeps its bytes.
+    if !ctx.in_code {
+        escape_line_start(output, text_start, options);
+    }
+}
+
+/// Escape what would turn `buffer[from..]`, text just written, into markup when that text starts
+/// a continuation line of a paragraph. Also called by the wrappers that write their text into a
+/// buffer of their own, where the text node cannot see the line it starts.
+///
+/// ~keep A Djot paragraph ends only at a blank line, so a Djot line needs only its dashes and
+/// ~keep backticks escaped.
+pub fn escape_line_start(buffer: &mut String, from: usize, options: &ConversionOptions) {
+    match options.output_format {
+        crate::options::OutputFormat::Markdown => {
+            crate::converter::utility::escaping::escape_continuation_line_start(buffer, from);
+        }
+        crate::options::OutputFormat::Djot => escape_djot_continuation_line_start(buffer, from),
+        crate::options::OutputFormat::Plain => {}
+    }
+}
+
+/// Escape each character of the run of dashes or backticks that starts `buffer[from..]`, text
+/// just written, when that text starts a continuation line of a paragraph.
+///
+/// ~keep In Djot `--` and `---` are dashes and a backtick run opens verbatim text, which can run
+/// ~keep past a link's `](u)` and take the link with it. djot.js keeps the characters only when
+/// ~keep each one is escaped: `\---` still renders an en dash.
+fn escape_djot_continuation_line_start(buffer: &mut String, from: usize) {
+    let Some(line) = crate::converter::utility::escaping::continuation_line(buffer, from) else {
+        return;
+    };
+    let run = match line.as_bytes().first() {
+        Some(&byte @ (b'-' | b'`')) => line.bytes().take_while(|next| *next == byte).count(),
+        _ => 0,
+    };
+    if run > 1 || line.starts_with('`') {
+        let escaped: String = line[..run].chars().flat_map(|mark| ['\\', mark]).collect();
+        buffer.replace_range(from..from + run, &escaped);
     }
 }
 

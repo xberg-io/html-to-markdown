@@ -84,7 +84,12 @@ pub fn convert(html: &str, options: impl Into<Option<ConversionOptions>>) -> Res
     convert_inner(html, options)
 }
 
-fn convert_inner(html: &str, options: ConversionOptions) -> Result<ConversionResult> {
+fn convert_inner(html: &str, mut options: ConversionOptions) -> Result<ConversionResult> {
+    // ~keep Djot has one hard line break, a backslash before the line end: two trailing spaces
+    // ~keep are plain spaces there, and the break was lost.
+    if options.output_format == crate::options::OutputFormat::Djot {
+        options.newline_style = crate::options::NewlineStyle::Backslash;
+    }
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
     use std::cell::RefCell;
     #[cfg(any(feature = "metadata", feature = "inline-images"))]
