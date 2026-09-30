@@ -460,8 +460,13 @@ fn format_code_block(
         // ~keep content inline with the block syntax dropped — the same degradation Tier-1's
         // ~keep `close_pre` already performs, and consistent with headings and list items
         // ~keep shedding their markers in a cell. Line breaks fold to a space rather than to
-        // ~keep `<br>` so that the two tiers stay byte-equal.
-        output.push_str(crate::text::fold_cell_line_breaks_verbatim_cow(content.trim_matches('\n')).as_ref());
+        // ~keep `<br>` so that the two tiers stay byte-equal. The cell break separates the block
+        // ~keep from the cell content before it (issue #645).
+        let content = content.trim_matches('\n');
+        if !content.is_empty() && !ctx.convert_as_inline && !ctx.in_code {
+            crate::converter::main_helpers::separate_block_in_cell(output, options.br_in_tables);
+        }
+        output.push_str(crate::text::fold_cell_line_breaks_verbatim_cow(content).as_ref());
         return;
     }
 

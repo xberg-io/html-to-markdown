@@ -75,7 +75,13 @@ pub fn strip_trailing_backslash_breaks(output: &mut String, block_start: usize) 
     let block_start = crate::converter::utility::content::floor_char_boundary(output, block_start.min(output.len()));
     let mut stripped_breaks = 0usize;
     while output.len() > block_start && output[block_start..].ends_with("\\\n") {
-        let new_len = output.len() - "\\\n".len();
+        let mut new_len = output.len() - "\\\n".len();
+        // ~keep A marker on a line of its own in a list item follows the item's indent
+        // ~keep (issue #681); left behind, the indent hid the marker before it from this loop.
+        let indent_start = output[..new_len].trim_end_matches([' ', '\t']).len();
+        if indent_start >= block_start && output[..indent_start].ends_with('\n') {
+            new_len = indent_start;
+        }
         output.truncate(new_len);
         stripped_breaks += 1;
     }
@@ -116,6 +122,19 @@ pub fn emit_table_cell_break(output: &mut String, br_in_tables: bool) {
         output.push_str("<br>");
     } else if !output.is_empty() {
         output.push(' ');
+    }
+}
+
+/// Separate a block in a table cell from the cell content before it (issue #645).
+///
+/// A cell holds one line, so the cell break of [`emit_table_cell_break`] stands for the line a
+/// block starts or ends outside a cell. Nothing is written when the cell holds no content yet or
+/// already ends with a `<br>`. A line end that a block left folds into the break.
+pub fn separate_block_in_cell(output: &mut String, br_in_tables: bool) {
+    let content_end = output.trim_end_matches([' ', '\t', '\n']).len();
+    output.truncate(content_end);
+    if !output.is_empty() && !output.ends_with("<br>") {
+        emit_table_cell_break(output, br_in_tables);
     }
 }
 
