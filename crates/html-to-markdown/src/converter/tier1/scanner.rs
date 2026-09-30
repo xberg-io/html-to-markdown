@@ -678,6 +678,8 @@ pub fn scan(
                     ol_start,
                     name_range: name_start..name_end,
                     dropped_whitespace_only_text: false,
+                    children_in_own_buffer: matches!(name_lower, b"mark" | b"sub" | b"sup" | b"abbr")
+                        || matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription),
                 });
 
                 apply_open_escape_ctx(&mut state, spec);
@@ -4450,8 +4452,18 @@ fn flush_text(
     // to a double newline. The usual source of that bare `\n` is a hard break, inside
     // a link (`<a>foo<br> bar</a>`) or not (`a<br> b`): right after it, the next
     // line's leading space must not survive, or Tier-1 emits `[foo  \n bar]` and
-    // `a  \n b` where Tier-2 emits `[foo  \nbar]` and `a  \nb`.
-    let after_line_end = state.cell_or_output_mut().ends_with('\n');
+    // `a  \n b` where Tier-2 emits `[foo  \nbar]` and `a  \nb`. Tier-2's `output` is the
+    // element's own buffer when the text is the first content of an element Tier-2 renders
+    // into a fresh buffer (`a<br><sup> 1</sup>` keeps ` 1`), so the line end does not count
+    // there -- the same "nothing written into the frame yet" test as the bare-inline rule below.
+    let active_len = state.cell_or_output_mut().len();
+    let opens_own_buffer = state
+        .stack
+        .iter()
+        .rev()
+        .take_while(|frame| frame.content_start >= active_len)
+        .any(|frame| frame.children_in_own_buffer);
+    let after_line_end = !opens_own_buffer && state.cell_or_output_mut().ends_with('\n');
     // ~keep Distinct from `at_inline_frame_start` above (whose unconditional strip is reserved
     // for Link/Strong/Emphasis/Code -- kinds with their own always-on trim wrapper in
     // Tier-2: link-label normalization, `chomp_inline`'s marker migration, code's verbatim

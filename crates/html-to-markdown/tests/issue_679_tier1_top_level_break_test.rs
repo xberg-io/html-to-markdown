@@ -100,6 +100,32 @@ fn should_drop_the_leading_space_of_the_line_after_a_hard_break() {
 }
 
 #[test]
+fn should_keep_the_leading_space_of_an_element_the_full_converter_renders_on_its_own() {
+    // ~keep The full converter writes these elements' children into a buffer of their own, so
+    // ~keep the line end before the element does not drop the space at their start.
+    for html in [
+        "<div>a<br><sup> x</sup></div>",
+        "<blockquote>a<br><sub> x</sub></blockquote>",
+        "<p>a<br><abbr> x</abbr></p>",
+        "<div>a<br><sup><span> x</span></sup></div>",
+        "<dl><dt>a</dt> <dd> b</dd></dl>",
+        "<dl><dt>a</dt> <dt> b</dt></dl>",
+    ] {
+        assert_eq!(tier1(html), tier2(html), "input: {html:?}");
+    }
+    let no_highlight = ConversionOptions {
+        highlight_style: HighlightStyle::None,
+        ..options(TierStrategy::Tier2)
+    };
+    let html = "<div>a<br><mark> x</mark></div>";
+    let scanned = tier1::run(html, &PrescanReport::default(), &no_highlight).expect("the fast converter must not bail");
+    let converted = convert(html, Some(no_highlight))
+        .expect("conversion must succeed")
+        .content;
+    assert_eq!(Some(scanned), converted);
+}
+
+#[test]
 fn should_keep_a_top_level_hard_break_when_auto_picks_the_fast_converter() {
     // ~keep With metadata off and no highlight marker the router picks the fast converter,
     // ~keep and the scanner does not bail on this input, so Auto's output is the scanner's.
