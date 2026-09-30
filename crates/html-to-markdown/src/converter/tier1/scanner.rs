@@ -2667,7 +2667,19 @@ fn close_inline_marker(state: &mut Tier1State, frame: &OpenTag, marker: &str) ->
     let content_str = &buf[content_start..];
     let trailing_len = content_str.len() - content_str.trim_end().len();
     if trailing_len > 0 {
-        let trailing_start = buf.len() - trailing_len;
+        let mut trailing_start = buf.len() - trailing_len;
+        // ~keep A backslash break before that run goes outside with it: right before the
+        // ~keep closing marker it escapes the marker (`**a\**`), as in Tier-2's `chomp_inline`.
+        while trailing_start > content_start
+            && buf[..trailing_start].ends_with('\\')
+            && buf[trailing_start..].starts_with('\n')
+        {
+            let body_end = content_start + buf[content_start..trailing_start - 1].trim_end().len();
+            if body_end == content_start {
+                break;
+            }
+            trailing_start = body_end;
+        }
         let trailing: String = buf[trailing_start..].to_owned();
         buf.truncate(trailing_start);
         buf.push_str(marker);

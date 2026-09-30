@@ -232,16 +232,11 @@ fn should_indent_a_line_that_holds_only_a_hard_break_in_a_list_item() {
         };
         assert_eq!(convert_with(html, auto), expected, "auto input: {html:?}");
     }
-    // ~keep With the spaces style the line stays blank.
-    for (html, expected) in [
-        ("<ul><li>a<br><br>b</li></ul>", "- a  \n\n  b\n"),
-        (
-            "<blockquote><ul><li>a<br><br>b</li></ul></blockquote>",
-            "> - a  \n>\n>   b\n",
-        ),
-    ] {
-        assert_eq!(tier2(html), expected, "input: {html:?}");
-    }
+    // ~keep With the spaces style the break line ends with a backslash, so it is not blank and
+    // ~keep the item's paragraph goes on (issue #690).
+    assert_eq!(tier2("<ul><li>a<br><br>b</li></ul>"), "- a  \n    \\\n  b\n");
+    let quoted = tier2("<blockquote><ul><li>a<br><br>b</li></ul></blockquote>");
+    assert!(quoted.contains("  \\\n") && !quoted.contains("\n>\n"), "{quoted:?}");
 }
 
 #[test]

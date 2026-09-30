@@ -263,7 +263,7 @@ fn should_keep_a_paragraph_whole_across_two_hard_breaks() {
     let cases = [
         ("<p><b>a<br><br>b</b></p>", "**a  \n  \\\nb**\n"),
         ("<p>a<br><br><br>b</p>", "a  \n  \\\n  \\\nb\n"),
-        ("<ul><li><em>a<br><br>b</em></li></ul>", "- *a  \n  \\\n  b*\n"),
+        ("<ul><li><em>a<br><br>b</em></li></ul>", "- *a  \n    \\\n  b*\n"),
         ("<p>a<br><br><i>b</i></p>", "a  \n  \\\n*b*\n"),
         ("<p>a<br><br><a href=\"u\">b</a></p>", "a  \n  \\\n[b](u)\n"),
         ("<p>a<br><br><img src=\"u\" alt=\"i\"></p>", "a  \n  \\\n![i](u)\n"),
@@ -353,6 +353,77 @@ fn should_leave_a_block_inside_an_inline_element_that_no_break_precedes_as_a_blo
         for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
             let markdown = convert_with(html, options(tier));
             assert!(!markdown.contains('\\'), "{html} {tier:?}: {markdown:?}");
+        }
+    }
+}
+
+#[test]
+fn should_write_a_break_at_the_end_of_an_inline_element_outside_its_closing_marker() {
+    for html in [
+        "<p><b>a<br> </b>b</p>",
+        "<p><b>a<br><br></b>b</p>",
+        "<p><em>a<br> </em>b</p>",
+    ] {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(
+                html,
+                ConversionOptions {
+                    newline_style: NewlineStyle::Backslash,
+                    ..options(tier)
+                },
+            );
+            let rendered = render(&markdown);
+            assert!(
+                rendered.contains("<strong>a</strong>") || rendered.contains("<em>a</em>"),
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
+            assert!(!markdown.contains("\\*"), "{html} {tier:?}: {markdown:?}");
+        }
+        let djot = convert_with(
+            html,
+            ConversionOptions {
+                output_format: OutputFormat::Djot,
+                ..options(TierStrategy::Tier2)
+            },
+        );
+        assert!(!djot.contains("\\*") && !djot.contains("\\_"), "{html} Djot: {djot:?}");
+    }
+}
+
+#[test]
+fn should_keep_the_text_after_breaks_at_an_item_start_in_the_item() {
+    for (html, lists) in [
+        ("<ol><li><br><br>x</li></ol>", "ol"),
+        ("<ol start=\"10\"><li><br><br>x</li></ol>", "ol"),
+        ("<ul><li><br><br>x</li></ul>", "ul"),
+        ("<ul><li><br>2. z</li></ul>", "ul"),
+    ] {
+        for tier in [TierStrategy::Tier1, TierStrategy::Tier2] {
+            let markdown = convert_with(html, options(tier));
+            let rendered = render(&markdown);
+            assert_eq!(
+                count(&rendered, lists),
+                1,
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
+            assert_eq!(
+                count(&rendered, "li"),
+                1,
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
+            assert_eq!(
+                count(&rendered, "p"),
+                0,
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
+            assert!(
+                rendered.trim_end().ends_with("</li>\n</ol>") || rendered.trim_end().ends_with("</li>\n</ul>"),
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
+            assert!(
+                !rendered.contains("<pre>"),
+                "{html} {tier:?}: {markdown:?} renders {rendered:?}"
+            );
         }
     }
 }

@@ -113,6 +113,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `a  \n- t`, a list, and `<p>a<br><mark>=</mark></p>` gave an underlined heading. The output of
   every inline element that starts a line now gets that escape, `a  \n\- t`, and in a Djot list
   item the item's indent.
+- **A line break at the end of bold or emphasis escaped the closing marker.** With the backslash
+  break style, and always in Djot, `<p><b>a<br> </b>b</p>` gave `**a\** b`: once the space after
+  the break was trimmed, the break's backslash stood right before the closing marker, and the
+  bold was lost. The break now goes after the closing marker, in both converters.
+- **A run of line breaks before text took quadratic time.** Each line of the run got its
+  backslash in a separate insert that moved the rest of the output, so 80,000 `<br>` took ten
+  times as long as before. The run is now rewritten in one pass.
+- **Text after line breaks at the start of a list item left the item.** `<ol><li><br><br>x</li></ol>`
+  gave `1.  \n  \\\n   x`: the break line stood at column 2, left of the item's content, so the
+  text left the list. A break line now takes the indent of the text after it. And
+  `<ul><li><br>2. z</li></ul>` gave `-  \n  2. z`, a nested list: text after a break that follows
+  only the item's marker now gets the escape for the start of a paragraph, `2\. z`.
 - **A table that starts a task item became the task's text (#630).**
   `<ul><li><input type="checkbox"><table><tr><td>c</td></tr></table></li></ul>` gave
   `- [ ] | c |`, so the header row was the task's text and the table was lost. A table that is a

@@ -340,17 +340,45 @@ pub fn line_opens_block(line: &str) -> bool {
 /// ~keep after a blank line it starts a paragraph of its own. The indent scan stops at the first
 /// ~keep other byte, and the line above is read once per line, so the check stays linear.
 pub fn escape_continuation_line_start(buffer: &mut String, from: usize) {
-    if let Some(offset) = continuation_line(buffer, from).and_then(block_opener_escape_offset) {
+    let Some((line, item_start)) = continuation_line(buffer, from) else {
+        return;
+    };
+    let offset = if item_start {
+        let (indent, column) = leading_indent(line);
+        line.get(indent..)
+            .filter(|_| column < 4)
+            .and_then(|rest| block_opener_offset(rest).or_else(|| list_marker_offset(rest)))
+            .map(|offset| indent + offset)
+    } else {
+        block_opener_escape_offset(line)
+    };
+    if let Some(offset) = offset {
         buffer.insert(from + offset, '\\');
     }
 }
 
-/// The first line of `buffer[from..]` when it continues the paragraph on the line above it.
-fn continuation_line(buffer: &str, from: usize) -> Option<&str> {
+/// The first line of `buffer[from..]` when it continues the paragraph on the line above it, and
+/// whether that line is the first text of an empty list item.
+///
+/// ~keep A list item that starts with a break (`<li><br>2. z</li>`) has only its marker and the
+/// ~keep break above the text: `-  ` on the line above, or the break alone on the first line of
+/// ~keep the buffer the item writes after its marker. The text there is the start of the item's
+/// ~keep paragraph, where `2. z` opens a nested list too.
+fn continuation_line(buffer: &str, from: usize) -> Option<(&str, bool)> {
     let line_end = buffer[..from].trim_end_matches([' ', '\t']).strip_suffix('\n')?;
-    let line_above = &line_end[line_end.rfind('\n').map_or(0, |pos| pos + 1)..];
+    let line_above_start = line_end.rfind('\n').map_or(0, |pos| pos + 1);
+    let line_above = &line_end[line_above_start..];
+    let break_at_start = line_above_start == 0 && (line_above == "  " || line_above == "\\");
+    let marker = line_above.trim();
+    let marker = marker.strip_suffix('\\').unwrap_or(marker).trim_end();
+    let bare_marker = !marker.is_empty() && list_marker_offset(marker) == Some(marker.len() - 1);
     let text = &buffer[from..];
-    (!line_above.trim().is_empty()).then(|| &text[..text.find('\n').unwrap_or(text.len())])
+    (break_at_start || !line_above.trim().is_empty()).then(|| {
+        (
+            &text[..text.find('\n').unwrap_or(text.len())],
+            break_at_start || bare_marker,
+        )
+    })
 }
 
 /// Whether `rest`, a line without its indentation, opens a block that can interrupt a paragraph.

@@ -70,7 +70,33 @@ pub fn chomp_inline(text: &str) -> (&str, &str, &str) {
         text.trim()
     };
 
+    let (trimmed, suffix) = drop_trailing_break_backslashes(text, trimmed, suffix);
     (prefix, suffix, trimmed)
+}
+
+/// Move each backslash break at the end of `trimmed`, a slice of `text`, into the suffix.
+///
+/// ~keep A break followed by a space or a second break (`<b>a<br> </b>`) leaves its backslash
+/// ~keep at the end of the trimmed body once the whitespace after it is gone, and a backslash
+/// ~keep right before the closing marker escapes it: `*a\*` shows the asterisks. A backslash
+/// ~keep is a break only when a line end follows it in `text`.
+fn drop_trailing_break_backslashes<'a>(text: &'a str, trimmed: &'a str, suffix: &'a str) -> (&'a str, &'a str) {
+    if trimmed.is_empty() {
+        return (trimmed, suffix);
+    }
+    // ~keep A non-empty trimmed body starts at the first non-space byte of `text`.
+    let start = text.len() - text.trim_start().len();
+    let mut end = start + trimmed.len();
+    let mut suffix = suffix;
+    while text[..end].ends_with('\\') && text[end..].starts_with('\n') {
+        let body_end = start + text[start..end - 1].trim_end().len();
+        if body_end == start {
+            break;
+        }
+        end = body_end;
+        suffix = "\\\n";
+    }
+    (&text[start..end], suffix)
 }
 
 /// Merge a newly-opening emphasis delimiter into the matching close marker `output` already
@@ -273,27 +299,39 @@ pub fn follows_a_hard_break(buffer: &str, from: usize) -> bool {
 /// ~keep Two `<br>` in a row write a spaces break, `  `, on a line of its own, and a line of only
 /// ~keep spaces is blank, which ends the paragraph (issue #690). Once text follows, a backslash
 /// ~keep after the spaces makes the line a break, as in a link label. A run with nothing after it
-/// ~keep stays trailing whitespace, which the block end trims. A container that indents the line
-/// ~keep has ended the paragraph there, so only a bare `  ` counts. Only the run is read.
+/// ~keep stays trailing whitespace, which the block end trims. A break line is bare, or carries the
+/// ~keep indent of the text line, the list item's content column (issue #681), and it gets that
+/// ~keep indent: a bare line before the text of an ordered item (`1. ` is 3 columns) leaves the
+/// ~keep item. A line with another indent belongs to a container that has ended the paragraph. Only the run is read,
+/// ~keep and it is rewritten once: a backslash inserted per line moves the rest of the buffer each
+/// ~keep time, quadratic in the length of the run.
 fn end_break_lines_with_a_backslash(buffer: &mut String, from: usize) -> usize {
     let before = buffer[..from].trim_end_matches([' ', '\t']);
     let Some(mut line_end) = before.strip_suffix('\n').map(str::len) else {
         return 0;
     };
-    let mut run = Vec::new();
+    let break_line = format!("{}  ", &buffer[line_end + 1..from]);
+    let mut run_start = None;
+    let mut run = 0;
     loop {
         let line_start = buffer[..line_end].rfind('\n').map_or(0, |pos| pos + 1);
         let line = &buffer[line_start..line_end];
-        if line != "  " {
+        if line != break_line && line != "  " {
             if line.trim().is_empty() || !(line.ends_with("  ") || line.ends_with('\\')) {
                 return 0;
             }
-            for end in &run {
-                buffer.insert(*end, '\\');
-            }
-            return run.len();
+            let Some(run_start) = run_start else {
+                return 0;
+            };
+            let run_end = before.len() - 1;
+            let mut lines = format!("{break_line}\\\n").repeat(run);
+            lines.pop();
+            let inserted = lines.len() - (run_end - run_start);
+            buffer.replace_range(run_start..run_end, &lines);
+            return inserted;
         }
-        run.push(line_end);
+        run_start = Some(line_start);
+        run += 1;
         let Some(above) = line_start.checked_sub(1) else {
             return 0;
         };
@@ -417,7 +455,19 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{end_break_lines_with_a_backslash, normalize_link_label};
+    use super::{chomp_inline, end_break_lines_with_a_backslash, normalize_link_label};
+
+    // ~keep A backslash break before a space or a second break at an element's end goes outside
+    // ~keep the closing marker, never before it.
+    #[test]
+    fn chomp_inline_moves_a_trailing_backslash_break_into_the_suffix() {
+        assert_eq!(chomp_inline("a\\\n "), ("", "\\\n", "a"));
+        assert_eq!(chomp_inline("a\\\n\\\n"), ("", "\\\n", "a"));
+        assert_eq!(chomp_inline(" a\\\n \\\n "), (" ", "\\\n", "a"));
+        assert_eq!(chomp_inline("a\\\\ "), ("", " ", "a\\\\"));
+        assert_eq!(chomp_inline("a\\\nb "), ("", " ", "a\\\nb"));
+        assert_eq!(chomp_inline("\\\n "), ("", " ", "\\"));
+    }
 
     // ~keep Issue #678: the spaces or tabs after a break are the list item's indent.
     #[test]
@@ -433,7 +483,10 @@ mod tests {
     fn end_break_lines_with_a_backslash_ends_only_a_run_after_a_hard_break() {
         let cases = [
             ("a  \n  \nb", "a  \n  \\\nb", 1),
-            ("a  \n  \n  \n  b", "a  \n  \\\n  \\\n  b", 2),
+            ("a  \n  \n  \n  b", "a  \n    \\\n    \\\n  b", 6),
+            ("1.  \n     \n   x", "1.  \n     \\\n   x", 1),
+            ("- a  \n    \n    \n  x", "- a  \n    \\\n    \\\n  x", 2),
+            ("1.  \n  \n   x", "1.  \n     \\\n   x", 4),
             ("a\\\n  \nb", "a\\\n  \\\nb", 1),
             ("a\n  \nb", "a\n  \nb", 0),
             ("a  \n\nb", "a  \n\nb", 0),
