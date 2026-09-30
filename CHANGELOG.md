@@ -52,6 +52,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Text next to a paragraph, heading or other block in a table cell joined it (#645).**
+  `<table><tr><td><p>a</p>b</td></tr></table>` gave `| ab |`, and so did a heading, a `<div>`,
+  a list or a code block before the text. Text before a heading or a code block joined it too.
+  A block in a cell is now separated from the cell content before and after it by the cell break:
+  `| a b |`, or `| a<br>b |` with `br_in_tables` on. A block at the start of bold, a code span or
+  another inline element still joins the text before that element, and a block inside a heading
+  still joins the text next to it.
+- **The two converters wrote a quote or a paragraph in a table cell differently (#647).** A quote
+  in a cell now has no `>` marker in either converter, as a heading, a list and a code block in a
+  cell have none: `<blockquote>a</blockquote>b` gives `| a b |`. The fast converter wrote a
+  paragraph after other cell content as `<br>` with `br_in_tables` off; it now writes a space, as
+  the full converter does.
 - **The fast converter dropped a line break that no element encloses (#679).**
   `a<br>1) t` gave `a1) t`, so the two lines joined. The fast converter now writes the break as
   the full converter does, `a  \n1\) t`, the same as when the input sits in `<body>`. The line
