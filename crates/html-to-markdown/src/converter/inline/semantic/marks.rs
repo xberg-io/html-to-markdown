@@ -80,6 +80,15 @@ pub fn handle_mark(handler: HandlerContext<'_>) {
     walk_children(tag, &mut content, &child_ctx, depth, site);
 
     let (open, close, merge_symbol) = resolve_mark_delimiters(options);
+    // ~keep Markdown delimiters hoist edge whitespace, but raw HTML must preserve the source boundary exactly (#744).
+    if options.highlight_style == HighlightStyle::Html {
+        if !content.is_empty() {
+            output.push_str(&open);
+            output.push_str(&content);
+            output.push_str(&close);
+        }
+        return;
+    }
     emit_wrapped_inline(
         output,
         &content,
