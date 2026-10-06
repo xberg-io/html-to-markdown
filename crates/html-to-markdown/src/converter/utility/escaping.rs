@@ -38,10 +38,41 @@ pub fn escape_link_label(text: &str) -> Cow<'_, str> {
 
 /// Escape raw image-alt text before placing it inside a Markdown image label. ~keep
 pub fn escape_image_alt(text: &str) -> Cow<'_, str> {
-    match crate::text::escape(text, false, false, false, false) {
-        Cow::Borrowed(escaped) => escape_link_label(escaped),
-        Cow::Owned(escaped) => Cow::Owned(escape_link_label(&escaped).into_owned()),
+    if !contains_blank_line(text) {
+        return match crate::text::escape(text, false, false, false, false) {
+            Cow::Borrowed(escaped) => escape_link_label(escaped),
+            Cow::Owned(escaped) => Cow::Owned(escape_link_label(&escaped).into_owned()),
+        };
     }
+
+    let mut normalized = String::with_capacity(text.len() + 8);
+    let mut lines = text.split_inclusive('\n').peekable();
+    while let Some(line) = lines.next() {
+        if lines.peek().is_some_and(|next| is_blank_line(next)) {
+            normalized.push_str(line.strip_suffix('\n').unwrap_or(line));
+            normalized.push_str("&#10;");
+        } else {
+            normalized.push_str(line);
+        }
+    }
+
+    let escaped = crate::text::escape(&normalized, false, false, false, false);
+    Cow::Owned(escape_link_label(&escaped).into_owned())
+}
+
+fn contains_blank_line(text: &str) -> bool {
+    let mut lines = text.split_inclusive('\n').peekable();
+    while lines.next().is_some() {
+        if lines.peek().is_some_and(|line| is_blank_line(line)) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_blank_line(line: &str) -> bool {
+    line.strip_suffix('\n')
+        .is_some_and(|content| content.bytes().all(|byte| matches!(byte, b' ' | b'\t')))
 }
 
 /// Escape the brackets in a link label or image alt text that would otherwise terminate it.
@@ -454,6 +485,27 @@ mod tests {
     #[test]
     fn escape_link_label_leaves_an_already_escaped_opening_bracket_unchanged() {
         assert_eq!(escape_link_label("\\[a"), "\\[a");
+    }
+
+    #[test]
+    fn escape_image_alt_encodes_blank_line_as_html_line_feed() {
+        assert_eq!(escape_image_alt("A\n\n B C"), "A&#10;\n B C");
+    }
+
+    #[test]
+    fn escape_image_alt_encodes_each_blank_line_without_losing_line_feeds() {
+        assert_eq!(escape_image_alt("A\n\n\nB"), "A&#10;&#10;\nB");
+    }
+
+    #[test]
+    fn escape_image_alt_encodes_space_and_tab_only_blank_lines() {
+        assert_eq!(escape_image_alt("A\n \nB"), "A&#10; \nB");
+        assert_eq!(escape_image_alt("A\n\t\nB"), "A&#10;\t\nB");
+    }
+
+    #[test]
+    fn escape_image_alt_preserves_single_newline() {
+        assert_eq!(escape_image_alt("A\nB"), "A\nB");
     }
 
     // ~keep Regression for CommonMark spec examples 642/643: a `<br>`-produced hard

@@ -494,6 +494,30 @@ mod tests {
     }
 
     #[test]
+    fn format_image_markdown_handles_multiline_alt_text() {
+        let result = format_image_markdown(
+            "image.png",
+            "line one\nline two\nline three",
+            None,
+            image_format(LinkStyle::Inline, UrlEscapeStyle::Angle, None),
+        );
+
+        assert_eq!(result, "![line one\nline two\nline three](image.png)");
+    }
+
+    #[test]
+    fn format_image_markdown_escapes_blank_lines_in_alt_text() {
+        let result = format_image_markdown(
+            "S",
+            "A\n\n B C",
+            None,
+            image_format(LinkStyle::Inline, UrlEscapeStyle::Angle, None),
+        );
+
+        assert_eq!(result, "![A&#10;\n B C](S)");
+    }
+
+    #[test]
     fn format_image_markdown_angle_wraps_space() {
         let result = format_image_markdown(
             "/img (1).png",
