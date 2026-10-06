@@ -131,8 +131,18 @@ fn should_skip_interstitial_whitespace(
     if !is_ascii_whitespace_only(&text) || index == 0 || index == child_handles.len() - 1 {
         return false;
     }
+    if is_image_element(&child_handles[index - 1], parser) && is_image_element(&child_handles[index + 1], parser) {
+        return false;
+    }
     is_empty_inline_element(&child_handles[index - 1], parser)
         && is_empty_inline_element(&child_handles[index + 1], parser)
+}
+
+fn is_image_element(node_handle: &NodeHandle, parser: &Parser) -> bool {
+    matches!(
+        node_handle.get(parser),
+        Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("img")
+    )
 }
 
 fn close_paragraph(

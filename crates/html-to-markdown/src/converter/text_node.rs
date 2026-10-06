@@ -132,6 +132,10 @@ impl TextProcessor<'_, '_, '_> {
             self.emit_strict_whitespace(value, facts.has_double_newline);
             return;
         }
+        if self.between_adjacent_images() {
+            self.output.push(if facts.had_newlines { '\n' } else { ' ' });
+            return;
+        }
         if self.at_paragraph_buffer_start() || self.at_fresh_block_start(facts.was_fresh_block_start) {
             return;
         }
@@ -143,6 +147,11 @@ impl TextProcessor<'_, '_, '_> {
             return;
         }
         self.emit_inline_whitespace(value);
+    }
+
+    fn between_adjacent_images(&self) -> bool {
+        get_previous_sibling_tag(self.node_handle, self.parser, self.handler.dom_ctx) == Some("img")
+            && get_next_sibling_tag(self.node_handle, self.parser, self.handler.dom_ctx) == Some("img")
     }
 
     fn emit_strict_whitespace(&mut self, value: &str, has_double_newline: bool) {

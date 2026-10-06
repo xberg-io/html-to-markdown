@@ -101,9 +101,27 @@ fn handle_whitespace_text(
     history: WhitespaceHistory,
     upcoming: UpcomingTextSibling,
 ) -> bool {
-    drop_block_edge_whitespace(state, raw, in_pre, position)
+    handle_adjacent_image_whitespace(state, raw, in_pre, position, history, upcoming)
+        || drop_block_edge_whitespace(state, raw, in_pre, position)
         || handle_cell_whitespace(state, raw, in_pre, position, history.after_custom_element)
         || handle_outer_whitespace(state, raw, in_pre, position, history, upcoming)
+}
+
+fn handle_adjacent_image_whitespace(
+    state: &mut Tier1State,
+    raw: &str,
+    in_pre: bool,
+    position: TextPosition,
+    history: WhitespaceHistory,
+    upcoming: UpcomingTextSibling,
+) -> bool {
+    if in_pre || state.in_table_cell() || !position.whitespace_only || !history.after_img || !upcoming.is_img {
+        return false;
+    }
+    state
+        .cell_or_output_mut()
+        .push(if raw.contains(['\n', '\r']) { '\n' } else { ' ' });
+    true
 }
 
 fn text_position(state: &mut Tier1State, raw: &str) -> TextPosition {
