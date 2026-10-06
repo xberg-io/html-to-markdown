@@ -23,6 +23,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   static final instance = RustLib._();
 
   RustLib._();
+
   /// Resolve the prebuilt native library from the environment, the package's bundled
   /// natives, or the versioned user cache — downloading it if the cache is cold.
   ///
@@ -117,8 +118,9 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
       final rid = computeRid();
       if (rid != null) {
-        final packageRoot =
-            await Isolate.resolvePackageUri(_DartCore.Uri.parse('package:h2m/h2m.dart'));
+        final packageRoot = await Isolate.resolvePackageUri(
+          _DartCore.Uri.parse('package:h2m/h2m.dart'),
+        );
         if (packageRoot != null) {
           final ridDir = packageRoot.resolve('src/native/$rid/');
           for (final candidate in candidates) {
@@ -132,10 +134,13 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       }
 
       // Check legacy package-installed location as fallback.
-      final packageRoot =
-          await Isolate.resolvePackageUri(_DartCore.Uri.parse('package:h2m/h2m.dart'));
+      final packageRoot = await Isolate.resolvePackageUri(
+        _DartCore.Uri.parse('package:h2m/h2m.dart'),
+      );
       if (packageRoot != null) {
-        final libDir = packageRoot.resolve('src/html_to_markdown_rs_bridge_generated/');
+        final libDir = packageRoot.resolve(
+          'src/html_to_markdown_rs_bridge_generated/',
+        );
         for (final candidate in candidates) {
           final libPath = libDir.resolve(candidate).toFilePath();
           if (candidateExists(libPath)) {
@@ -159,8 +164,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       try {
         final scriptPath = Platform.script.toFilePath();
         var dir = File(scriptPath).absolute.parent;
-        while (dir.parent.path != dir.path
-            && !File('${dir.path}/pubspec.yaml').existsSync()) {
+        while (dir.parent.path != dir.path &&
+            !File('${dir.path}/pubspec.yaml').existsSync()) {
           dir = dir.parent;
         }
         if (File('${dir.path}/pubspec.yaml').existsSync()) {

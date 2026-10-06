@@ -59,6 +59,12 @@ let package = Package(
       name: "RustBridge",
       dependencies: ["RustBridgeC"],
       path: "Sources/RustBridge",
+      // swift-bridge's generated async glue (`withCheckedThrowingContinuation` fed by a
+      // non-`@Sendable` callback) does not pass Swift 6 region-isolation checking: every
+      // `async fn` bridge function fails with "sending 'rustFnRetVal' risks causing data
+      // races". The generated code is not ours to edit, so this target stays in Swift 5
+      // language mode; the facade module keeps the manifest's default. ~keep
+      swiftSettings: [.swiftLanguageMode(.v5)],
       linkerSettings: [
         .unsafeFlags([
           resolvedStaticLib("html_to_markdown_rs_swift"),

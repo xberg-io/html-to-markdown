@@ -505,6 +505,7 @@ enum HTMAlefFfiErrorCode
   HtmAlefUnknown = 2,
   HtmAlefPanic = 3,
   HtmAlefInvalidHandle = 4,
+  HtmAlefCancelled = 5,
 };
 #if __STDC_VERSION__ >= 202311L
 typedef enum HTMAlefFfiErrorCode HTMAlefFfiErrorCode;
@@ -991,6 +992,16 @@ int32_t htm_last_error_code(void);
  * The returned pointer is borrowed from thread-local storage and must NOT be freed.
  */
 const char *htm_last_error_context(void);
+
+/**
+ * Return the variant name of the last typed error, such as `RateLimited`.
+ * The pointer is NULL when the last error did not come from a typed error value, and is borrowed
+ * and valid until the next FFI call on this thread.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * The returned pointer is borrowed from thread-local storage and must NOT be freed.
+ */
+const char *htm_last_error_variant(void);
 
 /**
  * Free a string previously returned by this library.

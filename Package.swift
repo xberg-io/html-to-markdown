@@ -33,7 +33,7 @@ let package = Package(
     // sibling RustBridge target below and link against this binary.
     .binaryTarget(
       name: "RustBridgeBinary",
-      url: "https://github.com/xberg-io/html-to-markdown/releases/download/v3.17.1/HtmlToMarkdown-rs.artifactbundle.zip",
+      url: "https://github.com/xberg-io/html-to-markdown/releases/download/v3.17.2/HtmlToMarkdown-rs.artifactbundle.zip",
       checksum: "__ALEF_SWIFT_CHECKSUM__"
     ),
     // RustBridge: Swift wrapper module owning the swift-bridge generated
@@ -43,6 +43,12 @@ let package = Package(
       name: "RustBridge",
       dependencies: ["RustBridgeC", "RustBridgeBinary"],
       path: "packages/swift/Sources/RustBridge",
+      // swift-bridge's generated async glue (`withCheckedThrowingContinuation` fed by a
+      // non-`@Sendable` callback) does not pass Swift 6 region-isolation checking: every
+      // `async fn` bridge function fails with "sending 'rustFnRetVal' risks causing data
+      // races". The generated code is not ours to edit, so this target stays in Swift 5
+      // language mode; the facade module keeps the manifest's default. ~keep
+      swiftSettings: [.swiftLanguageMode(.v5)],
       // The pre-built static library inside RustBridgeBinary references Apple
       // system frameworks (e.g. reqwest's proxy detection pulls in the Rust
       // `system_configuration` crate → `SC*` symbols) and native system

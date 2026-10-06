@@ -85,9 +85,9 @@ checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
 
 [[package]]
 name = "brotli-decompressor"
-version = "6.0.0"
+version = "6.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46087801e40b785410c352bee60e9b6226312709cf52d5fff92776cdf5cf6490"
+checksum = "941cd9bd4ddab83cb46fa5a2d428f1c857b24ac78cb876cf7beb710840934bd7"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
@@ -233,7 +233,7 @@ checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
 
 [[package]]
 name = "html-to-markdown-rs"
-version = "3.17.1"
+version = "3.17.2"
 dependencies = [
  "ahash",
  "astral-tl",
@@ -266,7 +266,7 @@ dependencies = [
 
 [[package]]
 name = "html_to_markdown_nif"
-version = "3.17.1"
+version = "3.17.2"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",

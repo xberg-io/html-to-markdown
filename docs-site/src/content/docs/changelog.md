@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.17.2] - 2026-10-06
+
+### Changed
+
+- Rust dependencies and all generated bindings, documentation, test applications and E2E suites
+  were refreshed with Alef 0.105.0.
+
+### Fixed
+
+- HTML highlight output now preserves leading and trailing whitespace inside `<mark>` boundaries
+  ([#744](https://github.com/xberg-io/html-to-markdown/issues/744)).
+- Whitespace between adjacent inline images is preserved instead of joining their Markdown output
+  ([#746](https://github.com/xberg-io/html-to-markdown/issues/746)).
+- Blank lines in image alternative text are encoded without losing line feeds or producing invalid
+  Markdown image labels ([#747](https://github.com/xberg-io/html-to-markdown/issues/747)).
+
 ## [3.17.1] - 2026-10-05
 
 ### Fixed
