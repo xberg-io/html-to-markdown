@@ -377,8 +377,9 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 /// slice of the real `output`, which the same non-inline/non-cell precondition
 /// guarantees is `state.output` too).
 ///
-/// - `<span>` is a hardcoded exception in Tier-2's source: no join at all.
-/// - Otherwise: a blank-line break already in place needs nothing either. The
+/// - The element that follows does not change the join: before any element the line end is
+///   white space between two words (issue #778).
+/// - A blank-line break already in place needs nothing. The
 ///   "already" is scoped to the enclosing `<p>`/`<div>`'s OWN content (Tier-2's
 ///   `ctx.block_content_start`, i.e. `nearest_block_content_start` here) —
 ///   never the whole document buffer. A paragraph that just opened right
@@ -390,10 +391,7 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 ///   `inline_depth`-incrementing wrappers) ancestor, joins with a single
 ///   space; anything else (e.g. a bare `<div>`) joins with a literal newline,
 ///   which a `<br>` that follows removes again (`Tier1State::pending_newline_join`).
-fn trailing_single_newline_join(state: &Tier1State, next_tag_is_span: bool) -> &'static str {
-    if next_tag_is_span {
-        return "";
-    }
+fn trailing_single_newline_join(state: &Tier1State) -> &'static str {
     let block_start = clamp_to_char_boundary(&state.output, nearest_block_content_start(state));
     if state.output[block_start..].ends_with("\n\n") {
         return "";

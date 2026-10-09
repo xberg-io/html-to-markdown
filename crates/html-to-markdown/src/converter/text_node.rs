@@ -14,7 +14,7 @@ use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, following_sibling_content, get_next_sibling_tag,
-    get_previous_sibling_tag, next_sibling_is_inline_tag, previous_sibling_is_inline_tag,
+    get_previous_sibling_tag, next_sibling_is_inline_tag,
 };
 use crate::text;
 #[cfg(feature = "visitor")]
@@ -96,7 +96,6 @@ impl TextProcessor<'_, '_, '_> {
             }
             return;
         }
-        self.handler.ctx.at_fresh_block_start.set(false);
         let escape_asterisks = self.escape_asterisks();
         let capture_semantic = crate::converter::structure_capture::is_text_capture_active(self.handler.ctx);
         let processed = self.process_content(decoded, escape_asterisks, facts.was_fresh_block_start, capture_semantic);
@@ -227,15 +226,13 @@ impl TextProcessor<'_, '_, '_> {
     }
 
     fn emit_inline_whitespace(&mut self, value: &str) {
-        let between_inline = previous_sibling_is_inline_tag(self.node_handle, self.parser, self.handler.dom_ctx)
-            && next_sibling_is_inline_tag(self.node_handle, self.parser, self.handler.dom_ctx);
-        if self.output.ends_with(' ') {
-            return;
-        }
-        if has_more_than_one_char(value) && is_ascii_whitespace_only(value) {
-            self.output.push(' ');
-        } else if between_inline || !self.output.ends_with(' ') {
+        // ~keep White space of the source is one space, whatever it is (a tab was written as a
+        // ~keep tab), and none after a space. A no-break space is not white space that
+        // ~keep collapses: it is kept, also after a space.
+        if !is_ascii_whitespace_only(value) {
             self.output.push_str(value);
+        } else if !self.output.ends_with(' ') {
+            self.output.push(' ');
         }
     }
 
@@ -274,7 +271,12 @@ impl TextProcessor<'_, '_, '_> {
     fn process_table_cell(&self, value: &str, escape_asterisks: bool, capture_semantic: bool) -> ProcessedText {
         let options = self.handler.options;
         let normalized = if options.whitespace_mode == crate::options::WhitespaceMode::Normalized {
-            text::normalize_cell_whitespace_cow(value)
+            let collapsed = text::normalize_cell_whitespace_cow(value);
+            // ~keep White space after a space is the same run of white space, as in `skip_prefix`.
+            match collapsed.strip_prefix(' ') {
+                Some(rest) if self.output.ends_with(' ') => Cow::Owned(rest.to_string()),
+                _ => collapsed,
+            }
         } else {
             text::fold_cell_line_breaks_verbatim_cow(value)
         };
@@ -384,14 +386,9 @@ impl TextProcessor<'_, '_, '_> {
             || ["* ", "- ", ". ", "] "]
                 .iter()
                 .any(|ending| self.output.ends_with(ending))
-            || (self.output.ends_with('\n') && prefix == " ")
-            || (ctx.in_heading
-                && self.output.ends_with(' ')
-                && prefix == " "
-                && get_previous_sibling_tag(self.node_handle, self.parser, self.handler.dom_ctx) == Some("br"))
-            || (self.output.ends_with(' ')
-                && prefix == " "
-                && !previous_sibling_is_inline_tag(self.node_handle, self.parser, self.handler.dom_ctx))
+            // ~keep White space after a space is the same run of white space, whatever lies
+            // ~keep between the two: an element that wrote nothing is no word.
+            || ((self.output.ends_with('\n') || self.output.ends_with(' ')) && prefix == " ")
     }
 
     fn append_trailing_line_ending(&self, output: &mut String, has_double_newline: bool) {
@@ -419,7 +416,9 @@ impl TextProcessor<'_, '_, '_> {
     }
 
     fn append_before_next_tag(&self, output: &mut String, next_tag: &str) {
-        if matches!(next_tag, "span" | "br") {
+        // ~keep Only a line break ends the line: before any other element the line end of the
+        // ~keep source is white space between two words, also when the element is empty (#778).
+        if next_tag == "br" {
             return;
         }
         let ctx = self.handler.ctx;

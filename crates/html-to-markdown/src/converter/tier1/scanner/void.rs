@@ -233,11 +233,13 @@ fn emit_image(
         .map(|title| crate::converter::inline::link::escape_markdown_title(&title).into_owned());
     let keep_as_markdown = should_keep_image_as_markdown(html, &state.stack, options);
     let dest = state.cell_or_output_mut();
+    let written_from = dest.len();
     if keep_as_markdown {
         emit_markdown_image(dest, &src, &alt, title.as_deref(), options);
     } else {
         dest.push_str(&alt);
     }
+    state.end_document_start_if_written(written_from);
     state.last_emitted_was_img = true;
     Ok(())
 }

@@ -83,7 +83,6 @@ impl<'a> Tier1Scanner<'a> {
         let upcoming = UpcomingTextSibling {
             is_list: upcoming_tag_is_list_open(self.bytes, self.pos),
             is_img: upcoming_tag_is_named(self.bytes, self.pos, b"img"),
-            is_span: upcoming_tag_is_named(self.bytes, self.pos, b"span"),
             is_inline: upcoming_tag_is_inline(self.bytes, self.pos),
         };
         flush_text(
@@ -290,12 +289,14 @@ impl<'a> Tier1Scanner<'a> {
         } else {
             find_svg_close(self.bytes, open_tag_end).unwrap_or(self.bytes.len())
         };
+        let written_from = self.state.cell_or_output_mut().len();
         emit_svg_from_slice(
             &self.html[tag_open_start..svg_end],
             tag_open_start,
             &mut self.state,
             self.options,
         )?;
+        self.state.end_document_start_if_written(written_from);
         self.pos = svg_end;
         self.text_start = self.pos;
         Ok(true)

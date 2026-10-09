@@ -2,7 +2,6 @@
 struct UpcomingTextSibling {
     is_list: bool,
     is_img: bool,
-    is_span: bool,
     is_inline: bool,
 }
 
@@ -276,15 +275,14 @@ fn trim_leading_text_run<'a>(
         );
     let in_link_frame = matches!(state.stack.last().map(|frame| frame.spec.kind), Some(TagKind::Link));
     let after_line_end = follows_line_end(state);
-    let bare_inline_after_space = bare_inline_follows_space(state);
+    // ~keep White space after a space is the same run of white space, whatever lies between
+    // ~keep the two: an element that wrote nothing is no word. Mirrors Tier-2's `skip_prefix`.
+    let after_space = state.cell_or_output_mut().ends_with(' ');
     let should_trim = !in_pre
         && !in_code
-        && (!state.in_table_cell() || in_link_frame)
-        && (at_inline_frame_start
-            || block_separator_after
-            || document_start_strip
-            || after_line_end
-            || bare_inline_after_space);
+        && (after_space
+            || ((!state.in_table_cell() || in_link_frame)
+                && (at_inline_frame_start || block_separator_after || document_start_strip || after_line_end)));
     if !should_trim {
         return std::borrow::Cow::Borrowed(raw);
     }
@@ -320,15 +318,6 @@ fn follows_line_end(state: &mut Tier1State) -> bool {
         .take_while(|frame| frame.content_start >= active_len)
         .any(|frame| frame.children_in_own_buffer);
     !opens_own_buffer && state.cell_or_output_mut().ends_with('\n')
-}
-
-fn bare_inline_follows_space(state: &mut Tier1State) -> bool {
-    let buffer_len = state.cell_or_output_mut().len();
-    let at_bare_inline_start = matches!(
-        state.stack.last(),
-        Some(frame) if frame.content_start >= buffer_len && matches!(frame.spec.kind, TagKind::Inline)
-    );
-    at_bare_inline_start && state.cell_or_output_mut().ends_with(' ')
 }
 
 fn emit_verbatim_text(
@@ -373,7 +362,6 @@ fn prepare_normal_text<'a>(
     raw: &'a str,
     inside_inline: bool,
     base_offset: usize,
-    next_tag_is_span: bool,
 ) -> Result<PreparedText<'a>, BailReason> {
     let in_cell = state.in_table_cell();
     let (decoded, predecoded) = if !inside_inline && !in_cell && raw.contains('&') {
@@ -384,7 +372,7 @@ fn prepare_normal_text<'a>(
         (std::borrow::Cow::Borrowed(raw), false)
     };
     let transformed = if !inside_inline && !in_cell {
-        chomp_normal_text(state, decoded.as_ref(), next_tag_is_span)
+        chomp_normal_text(state, decoded.as_ref())
     } else {
         None
     };
@@ -400,7 +388,7 @@ fn prepare_normal_text<'a>(
     })
 }
 
-fn chomp_normal_text(state: &Tier1State, raw: &str, next_tag_is_span: bool) -> Option<(String, bool)> {
+fn chomp_normal_text(state: &Tier1State, raw: &str) -> Option<(String, bool)> {
     let trim_chars: &[char] = &['\n', '\r', ' ', '\t'];
     let after_leading = raw.trim_start_matches(trim_chars);
     let leading_len = raw.len() - after_leading.len();
@@ -414,14 +402,14 @@ fn chomp_normal_text(state: &Tier1State, raw: &str, next_tag_is_span: bool) -> O
         return None;
     }
     let prefix = if leading_len > 0 { " " } else { "" };
-    let (suffix, ends_in_newline_join) = trailing_text_suffix(state, trailing, next_tag_is_span);
+    let (suffix, ends_in_newline_join) = trailing_text_suffix(state, trailing);
     Some((
         format!("{prefix}{}{suffix}", &raw[leading_len..trimmed_len]),
         ends_in_newline_join,
     ))
 }
 
-fn trailing_text_suffix<'a>(state: &Tier1State, trailing: &'a str, next_tag_is_span: bool) -> (&'a str, bool) {
+fn trailing_text_suffix<'a>(state: &Tier1State, trailing: &'a str) -> (&'a str, bool) {
     if contains_blank_line(trailing.as_bytes()) {
         return ("\n\n", false);
     }
@@ -429,7 +417,7 @@ fn trailing_text_suffix<'a>(state: &Tier1State, trailing: &'a str, next_tag_is_s
         return (" ", false);
     }
     if trailing.bytes().any(|byte| matches!(byte, b'\n' | b'\r')) {
-        let join = trailing_single_newline_join(state, next_tag_is_span);
+        let join = trailing_single_newline_join(state);
         return (join, join == "\n");
     }
     (trailing, false)
@@ -644,7 +632,7 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
     let inside_inline = state.in_table_cell()
         || state.in_summary()
         || state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
-    let prepared = prepare_normal_text(state, raw, inside_inline, base_offset, upcoming.is_span)?;
+    let prepared = prepare_normal_text(state, raw, inside_inline, base_offset)?;
     if prepared.text.is_empty() {
         return Ok(());
     }

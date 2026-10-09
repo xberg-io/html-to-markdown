@@ -5,9 +5,7 @@
 //!
 //! Root cause: Tier-2's generic per-text-node `skip_prefix` (`src/converter/text_node.rs`)
 //! drops a text node's leading whitespace run to nothing when `output.ends_with(' ') &&
-//! prefix == " " && !previous_sibling_is_inline_tag(...)`. A text node with no previous
-//! sibling at all (i.e. it is the first child of its parent) trivially satisfies
-//! `!previous_sibling_is_inline_tag`. Tier-1's `at_inline_frame_start` (in
+//! prefix == " "`, whatever the previous sibling is. Tier-1's `at_inline_frame_start` (in
 //! `src/converter/tier1/scanner.rs`) already mirrors this for `<a>`/`<strong>`/`<em>`/
 //! `<code>` -- kinds with their own always-on trim wrapper in Tier-2 (link-label
 //! normalization, `chomp_inline`'s marker migration, code's verbatim path) -- but a bare

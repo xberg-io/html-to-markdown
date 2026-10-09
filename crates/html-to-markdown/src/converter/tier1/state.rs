@@ -336,7 +336,8 @@ pub struct Tier1State {
     pub list_items_after_text: Vec<bool>,
 
     /// `true` until the first text node carrying real (non-whitespace)
-    /// content has been processed anywhere in the document, then
+    /// content has been processed anywhere in the document, or an image or
+    /// a graphic has written content (`end_document_start_if_written`), then
     /// permanently `false`.
     ///
     /// Mirrors Tier-2's `Context::at_fresh_block_start` (an
@@ -451,6 +452,22 @@ impl Tier1State {
             }
         }
         &mut self.output
+    }
+
+    /// Ends the start of the document when an element wrote content of its own (an image, a
+    /// graphic) from `written_from` on in the buffer that inline text lands in. Mirrors the
+    /// check that Tier-2's `convert_node` does for every node (issue #762).
+    pub fn end_document_start_if_written(&mut self, written_from: usize) {
+        if !self.at_document_start {
+            return;
+        }
+        let wrote_content = self
+            .cell_or_output_mut()
+            .get(written_from..)
+            .is_some_and(|written| !written.trim().is_empty());
+        if wrote_content {
+            self.at_document_start = false;
+        }
     }
 
     /// True when the scanner is currently accumulating `<summary>` or

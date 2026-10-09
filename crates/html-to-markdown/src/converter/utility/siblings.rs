@@ -100,12 +100,6 @@ pub fn previous_content_block<'a>(
     }
 }
 
-/// Check if the previous sibling is an inline tag.
-#[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn previous_sibling_is_inline_tag(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
-    dom_ctx.previous_inline_like(*node_handle, parser)
-}
-
 /// Check if the next sibling is whitespace-only text.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn next_sibling_is_whitespace_text(
