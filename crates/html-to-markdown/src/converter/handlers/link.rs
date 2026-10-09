@@ -19,8 +19,8 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_conte
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
-    collect_link_label_text, link_holds_graphic, link_text_content, node_is_block_level, normalize_link_label,
-    normalized_tag_name,
+    collect_link_label_text, link_accessible_name, link_holds_graphic, link_text_content, node_is_block_level,
+    normalize_link_label, normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -122,11 +122,7 @@ fn is_same_page_fragment(raw_href: &str, resolved_href: &str, base: Option<&url:
 impl<'a> LinkData<'a> {
     /// The name of the link apart from its content: its `aria-label`, else its `title`.
     fn accessible_name(&self) -> Option<&str> {
-        self.aria_label
-            .as_deref()
-            .map(str::trim)
-            .filter(|label| !label.is_empty())
-            .or(self.title.as_deref())
+        link_accessible_name(self.aria_label.as_deref(), self.title.as_deref())
     }
 
     /// Whether the link is the icon of a heading permalink: it points into its own page and
@@ -351,8 +347,10 @@ fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &Hand
     if !data.emit_blocks_separately && label.is_empty() && !data.raw_text.is_empty() {
         *label = normalize_link_label(&data.raw_text);
     }
-    // ~keep A link with no text of its own is named as a browser names it: by its `aria-label`,
-    // ~keep then by its `title`. Its own address is the last label, for a link with no name at all.
+    // ~keep A link whose content gives no text, whatever that content is, is named as a browser
+    // ~keep names it: by its `aria-label`, then by its `title`. A named link is also kept when
+    // ~keep `inline_data_media` removed its content. Its own address is the last label, for a link
+    // ~keep with no name at all.
     if label.is_empty() && !data.children.is_empty() && !data.is_icon_permalink(handler) {
         if let Some(name) = data.accessible_name() {
             *label = normalize_link_label(name);

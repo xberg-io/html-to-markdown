@@ -163,6 +163,20 @@ pub fn link_text_content(children: &[tl::NodeHandle], parser: &tl::Parser, dom_c
     walk_link_text(children, parser, dom_ctx, |_| true)
 }
 
+/// The name of a link apart from its content: its `aria-label`, else its `title`. A value of
+/// white space only is no name.
+///
+/// ~keep The order is the order of a browser's accessible name. Both converters ask this one
+/// ~keep function: the full one to label a link whose content gives no text, the fast one to
+/// ~keep leave such a link to the full one.
+pub fn link_accessible_name<'a>(aria_label: Option<&'a str>, title: Option<&'a str>) -> Option<&'a str> {
+    [aria_label, title]
+        .into_iter()
+        .flatten()
+        .map(str::trim)
+        .find(|name| !name.is_empty())
+}
+
 /// Whether a descendant of a link is an inline `<svg>`.
 pub fn link_holds_graphic(children: &[tl::NodeHandle], parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
     let mut stack: Vec<_> = children.to_vec();

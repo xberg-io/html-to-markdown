@@ -348,6 +348,64 @@ fn should_keep_a_link_around_a_graphic_with_no_text_and_name_it_as_a_browser_doe
     );
 }
 
+#[test]
+fn should_name_any_link_whose_content_gives_no_text_in_both_converters() {
+    const PNG: &str = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+    let drop = || ConversionOptions {
+        inline_data_media: InlineDataMedia::DropElement,
+        ..ConversionOptions::default()
+    };
+    for (html, options, expected) in [
+        // ~keep A link with no graphic: an icon font. `convert_with` also compares the converters.
+        (
+            r#"<p><a href="/page" aria-label="Next page"><i class="fa fa-cart"></i></a></p>"#.to_string(),
+            ConversionOptions::default(),
+            "[Next page](/page)\n",
+        ),
+        (
+            r#"<h2>Head <a href="/page" aria-label="Next page"><i class="fa fa-cart"></i></a></h2>"#.to_string(),
+            ConversionOptions::default(),
+            "## Head [Next page](/page)\n",
+        ),
+        (
+            r#"<table><tr><th>H</th></tr><tr><td><a href="/page" title="Go to page"><i class="fa"></i></a></td></tr></table>"#
+                .to_string(),
+            ConversionOptions::default(),
+            "| H                                |\n| -------------------------------- |\n| [Go to page](/page \"Go to page\") |\n",
+        ),
+        // ~keep The `aria-label` comes before the `title`, as in the name a browser computes.
+        (
+            r#"<p><a href="/page" aria-label="Next page" title="Go to page"><i class="fa"></i></a></p>"#.to_string(),
+            ConversionOptions::default(),
+            "[Next page](/page \"Go to page\")\n",
+        ),
+        // ~keep An `aria-label` of white space only is no name.
+        (
+            r#"<p><a href="/page" aria-label="   " title="Go to page"><i class="fa"></i></a></p>"#.to_string(),
+            ConversionOptions::default(),
+            "[Go to page](/page \"Go to page\")\n",
+        ),
+        // ~keep A named link is kept when `drop_element` removes its content.
+        (
+            format!(r#"<p>a <a href="/files/report.pdf" aria-label="Download report">{ICON}</a> b</p>"#),
+            drop(),
+            "a [Download report](/files/report.pdf) b\n",
+        ),
+        (
+            format!(r#"<p>a <a href="/files/report.pdf" aria-label="Download report"><img src="{PNG}"></a> b</p>"#),
+            drop(),
+            "a [Download report](/files/report.pdf) b\n",
+        ),
+        (
+            format!(r#"<p>a <a href="/files/report.pdf"><img src="{PNG}"></a> b</p>"#),
+            drop(),
+            "a  b\n",
+        ),
+    ] {
+        assert_eq!(convert_with(&html, options), expected, "{html}");
+    }
+}
+
 #[cfg(feature = "metadata")]
 #[test]
 fn should_record_a_kept_link_under_the_label_the_markdown_shows() {
@@ -696,6 +754,37 @@ fn should_leave_a_graphic_with_a_hidden_element_to_the_full_converter_and_no_oth
             markdown.starts_with("a ![") && markdown.ends_with(") b\n"),
             "{html} -> {markdown:?}"
         );
+    }
+}
+
+#[cfg(feature = "testkit")]
+#[test]
+fn should_leave_only_a_named_link_with_no_text_to_the_full_converter() {
+    use html_to_markdown_rs::prescan::PrescanReport;
+    use html_to_markdown_rs::{HighlightStyle, tier1};
+
+    let options = ConversionOptions {
+        extract_metadata: false,
+        highlight_style: HighlightStyle::None,
+        ..ConversionOptions::default()
+    };
+    let fast = |html: &str| tier1::run(html, &PrescanReport::default(), &options);
+    for html in [
+        r#"<p><a href="/page" aria-label="Next page"><i class="fa"></i></a></p>"#,
+        r#"<p><a href="/page" title="Go to page"><i class="fa"></i></a></p>"#,
+    ] {
+        assert!(fast(html).is_err(), "the fast converter kept {html}");
+    }
+    // ~keep A link that has text keeps its text as its label, so the fast converter converts it.
+    for (html, expected) in [
+        (
+            r#"<p><a href="/page" aria-label="Next page" title="Go to page">Next</a></p>"#,
+            "[Next](/page \"Go to page\")\n",
+        ),
+        (r#"<p><a href="/page">Next</a></p>"#, "[Next](/page)\n"),
+    ] {
+        let markdown = fast(html).unwrap_or_else(|reason| panic!("the fast converter left {html}: {reason:?}"));
+        assert_eq!(markdown, expected, "{html}");
     }
 }
 

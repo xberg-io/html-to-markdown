@@ -233,7 +233,10 @@ pub struct Tier1State {
     /// its ancestor). `close_link` reads it to bail (`BailReason::LinkAutolinkNestedMarkup`)
     /// rather than risk a false negative against Tier-2's tag-stripped autolink
     /// predicate — see that bail reason's doc comment.
-    pub link_stack: Vec<(Option<String>, Option<String>, bool)>,
+    ///
+    /// The last flag says that the link has a name of its own (`aria-label` or `title`).
+    /// `close_link` reads it to leave a link with a name and no text to Tier-2, which labels it.
+    pub link_stack: Vec<(Option<String>, Option<String>, bool, bool)>,
     /// Byte range of `<head>…</head>` content (between the tags) in the
     /// input the scanner walked.  Populated by the `TagKind::Ignored`
     /// dispatch when a non-void Ignored tag (`<head>`) is encountered, or
