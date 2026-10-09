@@ -166,8 +166,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A line break beside a zero-width space is no space, as in a browser: the zero-width space is a
   place where a line can break, so the two parts are one word.
   `<p>one \n <span></span>&#8203;two</p>` gave `one`, a space, the zero-width space and `two`, and
-  gives `one`, the zero-width space and `two`. A space that is not a line break stays, and so does
-  a line break before an element with a `style` attribute.
+  gives `one`, the zero-width space and `two`. The line break can be the last content of an
+  element that only wraps text: `<p><span>one\n</span>&#8203;two</p>` gave `one`, a space, the
+  zero-width space and `two`, and gives `one`, the zero-width space and `two`. A space that is not
+  a line break stays, and so does a line break before or in an element with a `style` attribute.
+
+- White space at the start or the end of a link label is one space outside the link. The label is
+  written without that white space, and before, the words on its two sides were joined. This
+  changes the default output: `<p>Press <a href="/p">Go </a>now.</p>` gave `Press [Go](/p)now.`
+  and gives `Press [Go](/p) now.`, and `<p>Press<a href="/p"> Go</a> now.</p>` gave
+  `Press[Go](/p) now.` and gives `Press [Go](/p) now.`. The same holds for a link around an image,
+  for an autolink (`<p>Press <a href="https://e.org/">https://e.org/ </a>now.</p>` gave
+  `Press <https://e.org/>now.` and gives `Press <https://e.org/> now.`) and for a no-break space
+  at an end of the label. A short quotation follows the rule of the other inline elements:
+  `<p>Press <q>Go </q>now.</p>` gave `Press "Go"now.` and gives `Press "Go" now.`, and a line
+  break at the end of a quotation is kept. With no white space in the source the output has none
+  ([#800](https://github.com/xberg-io/html-to-markdown/issues/800)).
 
 - The white space after an image, an inline graphic, a video or a form control at the start of a
   document is kept. This changes the default output: `<p><img src="/i.png" alt="alt"> text</p>`

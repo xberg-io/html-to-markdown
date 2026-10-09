@@ -18,11 +18,13 @@ use crate::converter::inline::HandlerContext;
 use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_context, has_uri_scheme};
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
+use crate::converter::text_node::is_fresh_block_start;
 use crate::converter::utility::content::{
-    collect_link_label_text, link_accessible_name, link_text_content, node_is_block_level, normalize_link_label,
-    normalized_tag_name,
+    collect_link_label_text, label_edge_spaces, link_accessible_name, link_text_content, node_is_block_level,
+    normalize_link_label, normalized_tag_name, push_inline_prefix,
 };
 use crate::converter::utility::escaping::escape_link_label;
+use crate::converter::utility::siblings::append_inline_suffix;
 use crate::options::{ConversionOptions, InlineDataMedia};
 use crate::text;
 use std::borrow::Cow;
@@ -94,11 +96,15 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     }
 
     handler.context.inline_data_replaced.set(false);
-    let mut label = build_label(&data, &handler);
+    let content = build_label_content(&data, &handler);
+    let edge_spaces = label_edge_spaces(&content);
+    let mut label = normalize_link_label(&content);
     apply_label_fallbacks(&data, &mut label, &handler);
     indent_hard_break_continuations(&mut label, handler.context, handler.options);
     let drop_link = data.is_dropped(&label, &handler);
+    push_space_before_link(edge_spaces, &mut handler);
     let emit_deferred = emit_link(tag, &data, &label, drop_link, &mut handler);
+    push_space_after_link(edge_spaces, &mut handler);
     #[cfg(feature = "metadata")]
     record_link_metadata(tag, &data, &label, handler.context);
     if data.emit_blocks_separately && emit_deferred {
@@ -112,6 +118,8 @@ struct LinkData<'a> {
     children: Vec<tl::NodeHandle>,
     inline_label: String,
     raw_text: String,
+    /// Whether the text of the link starts with white space, and whether it ends with it.
+    text_edge_spaces: (bool, bool),
     inline_children: Vec<tl::NodeHandle>,
     deferred: Vec<tl::NodeHandle>,
     emit_blocks_separately: bool,
@@ -204,6 +212,10 @@ impl<'a> LinkData<'a> {
             inline_label.clone()
         };
         let raw_text = text::normalize_whitespace_cow(&text_source).trim().to_string();
+        let text_edge_spaces = (
+            !raw_text.is_empty() && text_source.starts_with(char::is_whitespace),
+            !raw_text.is_empty() && text_source.ends_with(char::is_whitespace),
+        );
         let (inline_children, deferred) = partition_link_children(&children, handler.parser, handler.dom_context);
         Some(Self {
             href_addr_dropped: matches!(
@@ -224,6 +236,7 @@ impl<'a> LinkData<'a> {
             children,
             inline_label,
             raw_text,
+            text_edge_spaces,
             inline_children,
             deferred,
             saw_block,
@@ -293,6 +306,11 @@ fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool 
     if !data.is_autolink(handler.options) {
         return false;
     }
+    // ~keep The text of the link is not walked here, so the rule of a text node for white space
+    // ~keep at the start of a fresh block is asked directly.
+    let at_block_start = is_fresh_block_start(handler.context, handler.context.at_fresh_block_start.get());
+    let edge_spaces = (data.text_edge_spaces.0 && !at_block_start, data.text_edge_spaces.1);
+    push_space_before_link(edge_spaces, handler);
     handler.output.push('<');
     if data.href.starts_with("mailto:") && data.raw_text == data.href[7..] {
         handler.output.push_str(&data.raw_text);
@@ -300,7 +318,30 @@ fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool 
         handler.output.push_str(&data.href);
     }
     handler.output.push('>');
+    push_space_after_link(edge_spaces, handler);
     true
+}
+
+/// Writes the white space that the content of a link starts with as one space before the link,
+/// when a space is owed there (issue #800).
+fn push_space_before_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
+    if edge_spaces.0 {
+        push_inline_prefix(handler.output, " ");
+    }
+}
+
+/// Writes the white space that the content of a link ends with as one space after the link.
+fn push_space_after_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
+    if edge_spaces.1 {
+        append_inline_suffix(
+            handler.output,
+            " ",
+            true,
+            handler.node_handle,
+            handler.parser,
+            handler.dom_context,
+        );
+    }
 }
 
 fn emit_heading_link(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool {
@@ -330,28 +371,21 @@ fn emit_heading_link(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> b
     true
 }
 
-fn build_label(data: &LinkData<'_>, handler: &HandlerContext<'_>) -> String {
+/// The content of the label as the walk writes it, with the white space at its two ends. The
+/// caller reads those ends (`label_edge_spaces`) and then writes the label without them.
+fn build_label_content(data: &LinkData<'_>, handler: &HandlerContext<'_>) -> String {
     if data.emit_blocks_separately {
-        return walk_label(&data.inline_children, false, data, handler);
+        return walk_label_content(&data.inline_children, false, data, handler);
     }
     if data.saw_block {
         let content = walk_label_content(&data.children, true, data, handler);
         return if content.trim().is_empty() {
-            normalize_link_label(&data.inline_label)
+            data.inline_label.clone()
         } else {
-            normalize_link_label(&content)
+            content
         };
     }
-    walk_label(&data.children, false, data, handler)
-}
-
-fn walk_label(
-    children: &[tl::NodeHandle],
-    convert_as_inline: bool,
-    data: &LinkData<'_>,
-    handler: &HandlerContext<'_>,
-) -> String {
-    normalize_link_label(&walk_label_content(children, convert_as_inline, data, handler))
+    walk_label_content(&data.children, false, data, handler)
 }
 
 /// The context that the label of a link is built with outside code.

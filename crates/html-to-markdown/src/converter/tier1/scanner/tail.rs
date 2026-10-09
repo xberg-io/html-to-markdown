@@ -428,17 +428,18 @@ fn inline_follows_comments(bytes: &[u8], lt_pos: usize) -> bool {
 }
 
 /// Whether the text that follows the markup at `bytes[lt_pos]` starts with a zero-width space.
-/// The scan looks into the elements that only wrap text and passes the empty ones, comments
-/// and `<wbr>`. Any other element, an element with a `style` attribute and the end of the
-/// parent end the scan.
+/// The scan looks into the elements that only wrap text, leaves such an open element of
+/// `stack` at its end tag and passes the empty ones, comments and `<wbr>`. Any other element,
+/// an element with a `style` attribute and the end of any other parent end the scan.
 ///
 /// ~keep Mirrors Tier-2's `zero_width_space_follows`, which asks the same of the tree.
-fn zero_width_space_is_upcoming(html: &str, lt_pos: usize) -> bool {
-    use crate::converter::utility::content::{ZERO_WIDTH_SPACE, is_text_wrapper};
+fn zero_width_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) -> bool {
+    use crate::converter::utility::content::ZERO_WIDTH_SPACE;
 
     let bytes = html.as_bytes();
     let mut pos = lt_pos;
     let mut open_wrappers = 0usize;
+    let mut enclosing = stack.iter().rev();
     while pos < bytes.len() {
         if bytes[pos] != b'<' {
             // ~keep The first character decides, and no character reference is longer than this.
@@ -453,10 +454,14 @@ fn zero_width_space_is_upcoming(html: &str, lt_pos: usize) -> bool {
                 Err(_) => return false,
             },
             Some(b'/') => {
-                if open_wrappers == 0 {
+                if open_wrappers > 0 {
+                    open_wrappers -= 1;
+                } else if !enclosing
+                    .next()
+                    .is_some_and(|frame| closes_plain_text_wrapper(bytes, pos, frame))
+                {
                     return false;
                 }
-                open_wrappers -= 1;
                 let Some((close, _)) = parse::find_tag_close(bytes, pos + 2) else {
                     return false;
                 };
@@ -468,19 +473,9 @@ fn zero_width_space_is_upcoming(html: &str, lt_pos: usize) -> bool {
                     return false;
                 };
                 let is_wbr = name == b"wbr";
-                if !is_wbr && !std::str::from_utf8(name).is_ok_and(is_text_wrapper) {
-                    return false;
-                }
-                let attributes_start = pos + 1 + name.len();
-                let Some((close, self_closing)) = parse::find_tag_close(bytes, attributes_start) else {
+                let Some((close, self_closing)) = plain_text_wrapper_open_end(bytes, name, pos + 1 + name.len()) else {
                     return false;
                 };
-                let has_style = parse::collect_attrs(bytes, attributes_start, close)
-                    .iter()
-                    .any(|(key, _)| *key == b"style");
-                if has_style {
-                    return false;
-                }
                 if !is_wbr && !self_closing {
                     open_wrappers += 1;
                 }
@@ -489,6 +484,35 @@ fn zero_width_space_is_upcoming(html: &str, lt_pos: usize) -> bool {
         }
     }
     false
+}
+
+/// Where the open tag of an element that only wraps text (or of a `<wbr>`) ends, and whether
+/// it closes itself. `name` is the lowercase name of the tag and its attributes start at
+/// `attributes_start`. `None` for any other element and for one with a `style` attribute.
+fn plain_text_wrapper_open_end(bytes: &[u8], name: &[u8], attributes_start: usize) -> Option<(usize, bool)> {
+    use crate::converter::utility::content::is_text_wrapper;
+
+    if name != b"wbr" && !std::str::from_utf8(name).is_ok_and(is_text_wrapper) {
+        return None;
+    }
+    let (close, self_closing) = parse::find_tag_close(bytes, attributes_start)?;
+    let has_style = parse::collect_attrs(bytes, attributes_start, close)
+        .iter()
+        .any(|(key, _)| *key == b"style");
+    (!has_style).then_some((close, self_closing))
+}
+
+/// Whether the end tag at `bytes[lt_pos]` closes `frame`, and `frame` is an element that only
+/// wraps text and has no `style` attribute.
+fn closes_plain_text_wrapper(bytes: &[u8], lt_pos: usize, frame: &OpenTag) -> bool {
+    let name_start = lt_pos + 2;
+    let closed = &bytes[name_start..parse::scan_tag_name(bytes, name_start)];
+    let Some(opened) = bytes.get(frame.name_range.clone()) else {
+        return false;
+    };
+    let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
+    let name = lowercase_into(opened, &mut name_buf);
+    closed.eq_ignore_ascii_case(opened) && plain_text_wrapper_open_end(bytes, name, frame.name_range.end).is_some()
 }
 
 fn contains_blank_line(bytes: &[u8]) -> bool {

@@ -136,6 +136,20 @@ fn a_line_break_before_an_inline_element_is_a_space_in_each_container() {
     ]);
 }
 
+/// Before an element that the converter does not know as inline (a custom element), a line end
+/// is a space in running text: a paragraph, a heading, an inline element. In a `<div>` and a list
+/// item it stays a line end, as it was before.
+#[test]
+fn a_line_break_before_a_custom_element_is_a_space_in_running_text_only() {
+    assert_on_both(&[
+        ("<p>one\n<x-y>two</x-y></p>", "one two\n"),
+        ("<div><b>one\n<x-y>two</x-y></b></div>", "**one two**\n"),
+        ("<h2>one\n<x-y>two</x-y></h2>", "## one two\n"),
+        ("<div>one\n<x-y>two</x-y></div>", "one\ntwo\n"),
+        ("<ul><li>one\n<x-y>two</x-y></li></ul>", "- one\n  two\n"),
+    ]);
+}
+
 /// A span that holds only white space after a line end is the same run of white space.
 #[test]
 fn a_line_break_before_white_space_in_an_element_is_one_space_in_each_container() {
@@ -265,6 +279,18 @@ fn a_line_end_before_a_zero_width_space_is_no_space() {
             "> one\u{200b}two\n",
         ),
         ("one\n<span></span>\u{200b}two", "one\u{200b}two\n"),
+        // ~keep The line end is the last thing in an element and the zero-width space follows
+        // ~keep that element.
+        ("<p><span>one\n</span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p><b>one\n</b>\u{200b}two</p>", "**one**\u{200b}two\n"),
+        ("<p><b><i>one\n</i></b>\u{200b}two</p>", "***one***\u{200b}two\n"),
+        ("<p><b>one\n</b><i>\u{200b}two</i></p>", "**one***\u{200b}two*\n"),
+        ("<ul><li><span>one\n</span>\u{200b}two</li></ul>", "- one\u{200b}two\n"),
+        ("<p><b>one\n</b><span></span>\u{200b}two</p>", "**one**\u{200b}two\n"),
+        (
+            "<p><b>x</b> <a href=\"/x\">one\n</a>\u{200b}two</p>",
+            "**x** [one](/x)\u{200b}two\n",
+        ),
         (
             "<table><tr><td>one\n<span></span>\u{200b}two</td></tr></table>",
             "| one\u{200b}two |\n| ------- |\n",
@@ -282,7 +308,6 @@ fn a_line_end_before_a_zero_width_space_is_no_space() {
 fn a_space_beside_a_zero_width_space_is_kept() {
     assert_on_both(&[
         ("<p>one <span></span>\u{200b}two</p>", "one \u{200b}two\n"),
-        ("<p>one\n<span> </span>\u{200b}two</p>", "one \u{200b}two\n"),
         ("<p>one\n<span></span>two</p>", "one two\n"),
         ("<p>one\n<wbr>two</p>", "one two\n"),
         (
@@ -290,7 +315,13 @@ fn a_space_beside_a_zero_width_space_is_kept() {
             "one ![i](/i.png)\u{200b}two\n",
         ),
         ("<p>one\n<span>x</span>\u{200b}two</p>", "one x\u{200b}two\n"),
-        ("<p><span>one\n</span>\u{200b}two</p>", "one \u{200b}two\n"),
+        ("<p><span>one </span>\u{200b}two</p>", "one \u{200b}two\n"),
+        // ~keep The line end is the last thing in an element with a style, or in a block.
+        (
+            "<p><span style=\"display:inline-block\">one\n</span>\u{200b}two</p>",
+            "one \u{200b}two\n",
+        ),
+        ("<div><span>one\n</span></div>\u{200b}two", "one\n\n\u{200b}two\n"),
         // ~keep An element with a style can be a box of its own, and a browser keeps the
         // ~keep line end before such a box.
         (
@@ -318,6 +349,155 @@ fn the_space_after_a_link_without_text_is_kept() {
         ("<a href=\"/y\"></a> one", "[](/y) one\n"),
         ("<p> <a href=\"/y\"></a>\none </p>", "[](/y) one\n"),
         ("<p><a id=\"n\"></a> one</p>", "one\n"),
+    ]);
+}
+
+/// A link label is written without the white space at its two ends. That white space is still
+/// white space between two words: it is one space outside the link (issue #800).
+#[test]
+fn white_space_at_an_end_of_a_link_label_is_one_space_outside_the_link() {
+    assert_on_both(&[
+        ("<p>Press <a href=\"/p\">Go </a>now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press<a href=\"/p\"> Go</a> now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press<a href=\"/p\"> Go </a>now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press <a href=\"/p\">Go\n</a>now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press<a href=\"/p\">\nGo</a> now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press <a href=\"/p\">Go\t</a>now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press <a href=\"/p\">Go </a> now.</p>", "Press [Go](/p) now.\n"),
+        ("<p>Press <a href=\"/p\"> Go</a> now.</p>", "Press [Go](/p) now.\n"),
+        (
+            "<p>Press <a href=\"/p\" title=\"t\">Go </a>now.</p>",
+            "Press [Go](/p \"t\") now.\n",
+        ),
+        ("Press <a href=\"/p\">Go </a>now.", "Press [Go](/p) now.\n"),
+        ("Press<a href=\"/p\"> Go</a> now.", "Press [Go](/p) now.\n"),
+        ("<div>Press <a href=\"/p\">Go </a>now.</div>", "Press [Go](/p) now.\n"),
+        (
+            "<ul><li>Press <a href=\"/p\">Go </a>now.</li></ul>",
+            "- Press [Go](/p) now.\n",
+        ),
+        (
+            "<ul><li>Press<a href=\"/p\"> Go</a> now.</li></ul>",
+            "- Press [Go](/p) now.\n",
+        ),
+        ("<h2>Press <a href=\"/p\">Go </a>now.</h2>", "## Press [Go](/p) now.\n"),
+        (
+            "<blockquote><p>Press <a href=\"/p\">Go </a>now.</p></blockquote>",
+            "> Press [Go](/p) now.\n",
+        ),
+        (
+            "<table><tr><th>h</th></tr><tr><td>Press <a href=\"/p\">Go </a>now.</td></tr></table>",
+            "| h                   |\n| ------------------- |\n| Press [Go](/p) now. |\n",
+        ),
+        (
+            "<table><tr><th>h</th></tr><tr><td>Press<a href=\"/p\"> Go</a> now.</td></tr></table>",
+            "| h                   |\n| ------------------- |\n| Press [Go](/p) now. |\n",
+        ),
+        (
+            "<p><a href=\"/a\">one </a><a href=\"/b\">two</a></p>",
+            "[one](/a) [two](/b)\n",
+        ),
+        (
+            "<p><a href=\"/a\">one</a><a href=\"/b\"> two</a></p>",
+            "[one](/a) [two](/b)\n",
+        ),
+        ("<p><a href=\"/a\">one </a><b>two</b></p>", "[one](/a) **two**\n"),
+        (
+            "<p>Press <a href=\"/p\"><b>Go </b></a>now.</p>",
+            "Press [**Go**](/p) now.\n",
+        ),
+        (
+            "<p>Press<a href=\"/p\"><b> Go</b></a> now.</p>",
+            "Press [**Go**](/p) now.\n",
+        ),
+        (
+            "<p>Press <a href=\"/p\"><span>Go </span></a>now.</p>",
+            "Press [Go](/p) now.\n",
+        ),
+        (
+            "<p>Press <a href=\"https://e.org/\">https://e.org/ </a>now.</p>",
+            "Press <https://e.org/> now.\n",
+        ),
+        (
+            "<p>Press <a href=\"/p\"><img src=\"/i.png\" alt=\"Go\"> </a>now.</p>",
+            "Press [![Go](/i.png)](/p) now.\n",
+        ),
+        (
+            "<p>Press<a href=\"/p\"> <img src=\"/i.png\" alt=\"Go\"></a> now.</p>",
+            "Press [![Go](/i.png)](/p) now.\n",
+        ),
+        ("<p>Press <a>Go </a>now.</p>", "Press Go now.\n"),
+        ("<p>Press<a> Go</a> now.</p>", "Press Go now.\n"),
+        ("<p>Press<a> Go </a>now.</p>", "Press Go now.\n"),
+        ("<p>Press <a href=\"/p\">Go&nbsp;</a>now.</p>", "Press [Go](/p) now.\n"),
+        (
+            "<p>Press<a href=\"https://e.org/\"> https://e.org/</a> now.</p>",
+            "Press <https://e.org/> now.\n",
+        ),
+        (
+            "<p>Press<a href=\"/p\">\n<img src=\"/i.png\" alt=\"Go\"></a> now.</p>",
+            "Press [![Go](/i.png)](/p) now.\n",
+        ),
+        (
+            "<p>Press<a href=\"/p\"><span> Go</span></a> now.</p>",
+            "Press [Go](/p) now.\n",
+        ),
+        (
+            "<p>Press <b><a href=\"/p\">Go </a></b>now.</p>",
+            "Press **[Go](/p)** now.\n",
+        ),
+    ]);
+}
+
+/// The white space at an end of a label is no space at the start or the end of a line, and a
+/// label with no white space at its ends gets no space.
+#[test]
+fn a_link_label_gets_no_space_that_the_source_does_not_have() {
+    assert_on_both(&[
+        ("<p>Press<a href=\"/p\">Go</a>now.</p>", "Press[Go](/p)now.\n"),
+        ("<p>Press <a href=\"/p\">Go </a></p>", "Press [Go](/p)\n"),
+        ("<p><a href=\"/p\"> Go</a> now.</p>", "[Go](/p) now.\n"),
+        ("<a href=\"/p\"> Go</a> now.", "[Go](/p) now.\n"),
+        ("<ul><li><a href=\"/p\"> Go </a></li></ul>", "- [Go](/p)\n"),
+        (
+            "<p>Press<a href=\"/p\"><img src=\"/i.png\" alt=\"Go\"></a>now.</p>",
+            "Press[![Go](/i.png)](/p)now.\n",
+        ),
+        ("<p>Press<a>Go</a>now.</p>", "PressGonow.\n"),
+        ("<p>x</p><p><a href=\"/p\"> Go</a> now.</p>", "x\n\n[Go](/p) now.\n"),
+        ("<h2><a href=\"/p\"> Go </a></h2>", "## [Go](/p)\n"),
+        (
+            "<table><tr><th>h</th></tr><tr><td><a href=\"/p\"> Go </a>now.</td></tr></table>",
+            "| h             |\n| ------------- |\n| [Go](/p) now. |\n",
+        ),
+        (
+            "<p><a href=\"https://e.org/\"> https://e.org/</a> now.</p>",
+            "<https://e.org/> now.\n",
+        ),
+        (
+            "<div><a href=\"https://e.org/\"> https://e.org/</a> now.</div>",
+            "<https://e.org/> now.\n",
+        ),
+        // ~keep A line break at an end of the label is no white space.
+        ("<p>Press<a href=\"/p\"><br>Go</a> now.</p>", "Press[  \nGo](/p) now.\n"),
+        ("<p>Press <a href=\"/p\">Go<br></a>now.</p>", "Press [Go  \n](/p)now.\n"),
+    ]);
+}
+
+/// A short quotation is written without the white space at its two ends too, and that white
+/// space is one space outside the quotation marks. The fast converter does not write these marks.
+#[test]
+fn white_space_at_an_end_of_a_short_quotation_is_one_space_outside_the_marks() {
+    assert_on_full(&[
+        ("<p>Press <q>Go </q>now.</p>", "Press \"Go\" now.\n"),
+        ("<p>Press<q> Go</q> now.</p>", "Press \"Go\" now.\n"),
+        ("<p>Press<q> Go </q>now.</p>", "Press \"Go\" now.\n"),
+        ("<p>Press <q>Go </q> now.</p>", "Press \"Go\" now.\n"),
+        ("<p>Press <q> Go</q>now.</p>", "Press \"Go\"now.\n"),
+        ("<p>Press<q>Go</q>now.</p>", "Press\"Go\"now.\n"),
+        ("<p>Press <q>Go </q></p>", "Press \"Go\"\n"),
+        ("<ul><li>Press <q>Go </q>now.</li></ul>", "- Press \"Go\" now.\n"),
+        ("<p>Press <b><q>Go </q></b>now.</p>", "Press **\"Go\"** now.\n"),
     ]);
 }
 

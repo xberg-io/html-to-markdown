@@ -48,6 +48,13 @@ pub fn process_text_node(
     .process(raw);
 }
 
+/// Whether white space is written at the start of a fresh block, where it is no space.
+/// `was_fresh` is the fresh block flag of the context before the node wrote anything. A text
+/// node asks for its own white space, and an autolink asks for the white space its text starts with.
+pub const fn is_fresh_block_start(ctx: &Context, was_fresh: bool) -> bool {
+    was_fresh && !ctx.convert_as_inline && !ctx.in_table_cell && !ctx.in_list_item
+}
+
 struct WhitespaceFacts {
     had_newlines: bool,
     has_double_newline: bool,
@@ -192,8 +199,7 @@ impl TextProcessor<'_, '_, '_> {
     }
 
     const fn at_fresh_block_start(&self, was_fresh: bool) -> bool {
-        let ctx = self.handler.ctx;
-        was_fresh && !ctx.convert_as_inline && !ctx.in_table_cell && !ctx.in_list_item
+        is_fresh_block_start(self.handler.ctx, was_fresh)
     }
 
     fn emit_newline_whitespace(&mut self, value: &str, was_fresh: bool) {
@@ -399,8 +405,7 @@ impl TextProcessor<'_, '_, '_> {
     }
 
     fn skip_prefix(&self, prefix: &str, was_fresh: bool) -> bool {
-        let ctx = self.handler.ctx;
-        (was_fresh && !ctx.convert_as_inline && !ctx.in_table_cell && !ctx.in_list_item)
+        is_fresh_block_start(self.handler.ctx, was_fresh)
             || self.output.ends_with("\n\n")
             || ["* ", "- ", ". ", "] "]
                 .iter()

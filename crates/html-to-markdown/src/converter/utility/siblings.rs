@@ -205,18 +205,18 @@ pub fn br_follows_enclosing_elements(id: u32, parser: &tl::Parser, dom_ctx: &Dom
     false
 }
 
-/// Whether the text that follows `node_handle` in its parent starts with a zero-width space.
-/// The walk looks into the elements that only wrap text and passes the empty ones, comments
-/// and `<wbr>`. Any other element is content of its own and ends the walk, and so does an
-/// element with a `style` attribute: it can be a box of its own (`display: inline-block`), and
-/// a browser keeps the line end before such a box.
+/// Whether the text that follows `node_handle` starts with a zero-width space. The walk looks
+/// into the elements that only wrap text, leaves such an element at its end (the text node can
+/// be the last content of one) and passes the empty ones, comments and `<wbr>`. Any other
+/// element is content of its own and ends the walk, and so does an element with a `style`
+/// attribute: it can be a box of its own (`display: inline-block`), and a browser keeps the
+/// line end before such a box.
 ///
 /// ~keep Tier-1 answers the same question on the bytes (`zero_width_space_is_upcoming`).
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
-    use crate::converter::utility::content::{ZERO_WIDTH_SPACE, is_text_wrapper};
+    use crate::converter::utility::content::ZERO_WIDTH_SPACE;
 
-    let text_parent = dom_ctx.parent_of(node_handle.get_inner());
     let mut current = node_handle.get_inner();
     // ~keep A loop rather than recursion: nested wrappers are attacker-controlled depth. Each
     // ~keep turn moves forward in the document, so the walk ends.
@@ -225,14 +225,10 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
             if let Some(next) = next_sibling(current, dom_ctx) {
                 break next;
             }
-            let parent = dom_ctx.parent_of(current);
-            if parent == text_parent {
-                return false;
+            match dom_ctx.parent_of(current) {
+                Some(parent) if is_plain_text_wrapper(parent, parser, dom_ctx) => current = parent,
+                _ => return false,
             }
-            let Some(parent) = parent else {
-                return false;
-            };
-            current = parent;
         };
         loop {
             match node.get(parser) {
@@ -244,11 +240,8 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
                     }
                     return text.starts_with(ZERO_WIDTH_SPACE);
                 }
-                Some(tl::Node::Tag(tag)) => {
-                    let wraps_text = dom_ctx
-                        .tag_info(node.get_inner(), parser)
-                        .is_some_and(|info| info.name == "wbr" || is_text_wrapper(&info.name));
-                    if !wraps_text || tag.attributes().get("style").is_some() {
+                Some(tl::Node::Tag(_)) => {
+                    if !is_plain_text_wrapper(node.get_inner(), parser, dom_ctx) {
                         return false;
                     }
                     match dom_ctx
@@ -267,16 +260,26 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
     }
 }
 
+/// Whether the element `id` only wraps text (or is a `<wbr>`) and has no `style` attribute.
+fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    use crate::converter::utility::content::is_text_wrapper;
+
+    let Some(tl::Node::Tag(tag)) = tl::NodeHandle::new(id).get(parser) else {
+        return false;
+    };
+    dom_ctx
+        .tag_info(id, parser)
+        .is_some_and(|info| info.name == "wbr" || is_text_wrapper(&info.name))
+        && tag.attributes().get("style").is_none()
+}
+
 /// The node after `id` among the children of its parent.
 fn next_sibling(id: u32, dom_ctx: &DomContext) -> Option<tl::NodeHandle> {
     let siblings = match dom_ctx.parent_of(id) {
         Some(parent_id) => dom_ctx.children_of(parent_id)?,
         None => &dom_ctx.root_children,
     };
-    let position = dom_ctx
-        .sibling_index(id)
-        .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))?;
-    siblings.get(position + 1).copied()
+    siblings.get(dom_ctx.sibling_index(id)? + 1).copied()
 }
 
 /// Append an inline suffix to output, with smart whitespace handling.

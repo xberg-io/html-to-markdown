@@ -93,7 +93,7 @@ impl<'a> Tier1Scanner<'a> {
                 &self.html[self.text_start..self.pos],
             )
             .is_some()
-                && zero_width_space_is_upcoming(self.html, self.pos),
+                && zero_width_space_is_upcoming(self.html, self.pos, &self.state.stack),
         };
         flush_text(
             &mut self.state,

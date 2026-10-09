@@ -53,7 +53,7 @@ pub fn handle_dfn(
 
         let (prefix, suffix, trimmed) = chomp_inline(&content);
         if !trimmed.is_empty() {
-            crate::converter::utility::content::push_inline_prefix(output, prefix);
+            output.push_str(prefix);
             output.push(handler.options.strong_em_symbol);
             output.push_str(trimmed);
             output.push(handler.options.strong_em_symbol);
@@ -262,8 +262,7 @@ pub fn handle_q(
             }
         }
 
-        let trimmed = content.trim();
-        if trimmed.is_empty() {
+        if content.trim().is_empty() {
             // ~keep issue #481: `<q>` wraps in quotes, which a whitespace-only body has
             // ~keep nothing to wrap -- but the body is still the word separator the source
             // ~keep wrote, and dropping it outright joined the words either side together.
@@ -272,9 +271,14 @@ pub fn handle_q(
             }
             return;
         }
+        // ~keep The white space at the two ends of the quotation is white space between two
+        // ~keep words: it is one space outside the marks, as for every inline element (#800).
+        let (prefix, suffix, trimmed) = chomp_inline(&content);
+        crate::converter::utility::content::push_inline_prefix(output, prefix);
         output.push('"');
         output.push_str(trimmed);
         output.push('"');
+        crate::converter::append_inline_suffix(output, suffix, true, node_handle, parser, handler.dom_ctx);
     }
 }
 

@@ -143,6 +143,24 @@ pub fn push_inline_prefix(output: &mut String, prefix: &str) {
     }
 }
 
+/// Whether the content of a link label starts with white space, and whether it ends with it.
+/// A label is written without the white space at its two ends. That white space is still white
+/// space between two words, so both converters write it as one space outside the link
+/// (issue #800). Content of white space only has no ends.
+///
+/// ~keep A line end at an end of the content belongs to a line break of the label (`<br>`): it
+/// ~keep is no white space, and neither are the two spaces of the marker before it.
+#[must_use]
+pub fn label_edge_spaces(content: &str) -> (bool, bool) {
+    if content.trim().is_empty() {
+        return (false, false);
+    }
+    let is_space = |character: char| character.is_whitespace() && character != '\n';
+    let after_leading = content.trim_start_matches(is_space);
+    let starts_with_space = after_leading.len() < content.len() && !after_leading.starts_with('\n');
+    (starts_with_space, content.ends_with(is_space))
+}
+
 /// What one line end of the source becomes before the element that follows it: a space in
 /// running text and before an inline element, a line end before a block. Both converters ask
 /// here, so a line end is the same space in a paragraph, a `<div>`, a list item and the root.
