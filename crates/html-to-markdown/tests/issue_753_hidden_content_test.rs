@@ -439,6 +439,60 @@ fn should_close_a_kept_template_with_its_own_end_tag() {
 }
 
 #[test]
+fn should_keep_the_hidden_text_of_a_graphic_only_when_asked() {
+    // ~keep A graphic hides an element with the same attribute and styles as the page, and with
+    // ~keep its own `display` and `visibility` attributes. One choice governs all of them.
+    let graphics = [
+        "<p>a <svg><text hidden>kept text</text><text>shown text</text></svg> b</p>",
+        r#"<p>a <svg><g><text>shown text</text><text style="visibility: hidden">kept text</text></g></svg> b</p>"#,
+        r#"<p>a <svg><text display="none">kept text</text><text>shown text</text></svg> b</p>"#,
+        r#"<p>a <svg><g visibility="hidden"><text>kept text</text></g><text>shown text</text></svg> b</p>"#,
+        r#"<p>a <svg><text>shown text</text><foreignObject display="none"><div>kept text</div></foreignObject></svg> b</p>"#,
+        r#"<p>a <svg display="none"><text>shown text</text><text>kept text</text></svg> b</p>"#,
+        r#"<p>shown text <a href="/page"><svg><text display="none">kept text</text></svg></a></p>"#,
+    ];
+    let mut failures = Vec::new();
+    let mut total = 0;
+    for html in graphics {
+        // ~keep The whole graphic of this input is hidden, so `Drop` writes none of its text.
+        let whole_graphic_hidden = html.contains("<svg display");
+        for mode in modes() {
+            for choice in CHOICES {
+                total += 1;
+                let output = convert_in(html, choice, mode);
+                let keeps = choice != HiddenContent::Drop;
+                check(&mut failures, output.contains("kept text") == keeps, || {
+                    format!("{html} {choice:?} {mode:?}: hidden text kept={} in {output:?}", !keeps)
+                });
+                let shows = keeps || !whole_graphic_hidden;
+                check(&mut failures, output.contains("shown text") == shows, || {
+                    format!("{html} {choice:?} {mode:?}: shown text is wrong in {output:?}")
+                });
+            }
+        }
+    }
+    report(&failures, total);
+}
+
+#[test]
+fn should_write_the_text_of_a_graphic_as_its_alt_text_for_each_choice() {
+    let html = r#"<p>a <svg><text display="none">kept text</text><text>shown text</text></svg> b</p>"#;
+    let plain = Mode {
+        tier_strategy: TierStrategy::Auto,
+        output_format: OutputFormat::Plain,
+    };
+    assert_eq!(convert_in(html, HiddenContent::Drop, plain), "a shown text b\n");
+    assert_eq!(
+        convert_in(html, HiddenContent::Reachable, plain),
+        "a kept text shown text b\n"
+    );
+    assert_eq!(
+        convert_in(html, HiddenContent::All, plain),
+        "a kept text shown text b\n"
+    );
+}
+
+#[test]
 fn should_keep_aria_hidden_content_with_every_choice() {
     // ~keep `aria-hidden` takes an element away from assistive technology. A browser shows it.
     let cases = [
@@ -556,23 +610,29 @@ fn should_convert_a_document_that_ends_in_an_unterminated_comment() {
 
 #[test]
 fn should_stay_linear_on_unterminated_tags() {
-    // ~keep No `>` after the first tag: a scan that looks for the end of each `<a` reads the rest
-    // ~keep of the input every time.
-    let html = format!("<p>visible</p>{}", "<a ".repeat(200_000));
-    let timed = |choice| {
-        let started = std::time::Instant::now();
-        let output = convert_with(&html, choice);
-        assert!(output.contains("visible"), "the text before the run is kept");
-        started.elapsed()
-    };
-    let dropped = timed(HiddenContent::Drop);
-    let kept = timed(HiddenContent::All);
-    // ~keep A quadratic scan reads 60 GB here. The bound is a multiple of the same input under
-    // ~keep Drop, so a loaded host moves both sides.
-    assert!(
-        kept < dropped * 20 + std::time::Duration::from_secs(5),
-        "All took {kept:?}, Drop took {dropped:?}"
-    );
+    // ~keep No tag of the run ends: no `>` is left, or the quote before the last `>` has no
+    // ~keep partner. A scan that looks for the end of each `<a` reads the rest of the input
+    // ~keep every time.
+    let run = "<a ".repeat(200_000);
+    for tail in ["", "\">", "'>"] {
+        let html = format!("<p>visible</p>{run}{tail}");
+        let timed = |choice| {
+            let started = std::time::Instant::now();
+            let output = convert_with(&html, choice);
+            assert!(output.contains("visible"), "the text before the run is kept");
+            started.elapsed()
+        };
+        let dropped = timed(HiddenContent::Drop);
+        for choice in [HiddenContent::Reachable, HiddenContent::All] {
+            let kept = timed(choice);
+            // ~keep A quadratic scan reads 60 GB here. The bound is a multiple of the same input
+            // ~keep under Drop, so a loaded host moves both sides.
+            assert!(
+                kept < dropped * 20 + std::time::Duration::from_secs(5),
+                "tail {tail:?}: {choice:?} took {kept:?}, Drop took {dropped:?}"
+            );
+        }
+    }
 }
 
 #[test]

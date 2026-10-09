@@ -344,7 +344,11 @@ fn dispatch_plain_tag(
         // ~keep style sheets and scripts are not text of the page.
         "svg" => {
             if !state.options.skip_images {
-                buf.push_str(&crate::converter::media::svg::graphic_text(tag, parser));
+                buf.push_str(&crate::converter::media::svg::graphic_text(
+                    tag,
+                    parser,
+                    state.options.hidden_content,
+                ));
             }
         }
         "table" => {

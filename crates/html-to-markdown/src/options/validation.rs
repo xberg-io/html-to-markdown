@@ -295,6 +295,7 @@ impl InlineDataMedia {
 /// | --- | --- | --- | --- |
 /// | An element with the `hidden` attribute, any value (`hidden="until-found"` too) | dropped | kept | kept |
 /// | An element with inline `display: none`, `visibility: hidden` or `font-size: 0` | dropped | kept | kept |
+/// | An element of an inline `<svg>` with `display="none"` or `visibility="hidden"` | dropped | kept | kept |
 /// | A declarative shadow root (`<template shadowrootmode>`) | dropped | kept | kept |
 /// | Any other `<template>`, and `<noscript>` | dropped | dropped | kept |
 /// | `<script>`, `<style>`, comments, the value of `<input type="hidden">` | dropped | dropped | dropped |

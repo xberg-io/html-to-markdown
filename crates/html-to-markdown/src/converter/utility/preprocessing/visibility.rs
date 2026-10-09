@@ -284,6 +284,35 @@ impl TagEnds {
     }
 }
 
+/// The tag ends of one page for a scan that asks at many tag starts.
+///
+/// ~keep A tag start with no end makes `find_tag_end` read to the end of the page: no `>` is
+/// ~keep left, or a quote before it has no partner. A page with many such starts made a scan
+/// ~keep that asks at each of them quadratic (#765). After the first scan that fails, the ends
+/// ~keep come from a table that reads the page once.
+struct TagEndScan<'a> {
+    bytes: &'a [u8],
+    table: Option<TagEnds>,
+}
+
+impl<'a> TagEndScan<'a> {
+    const fn new(bytes: &'a [u8]) -> Self {
+        Self { bytes, table: None }
+    }
+
+    /// The result of `find_tag_end(bytes, from)`.
+    fn tag_end(&mut self, from: usize) -> Option<usize> {
+        if let Some(table) = &self.table {
+            return table.tag_end(from);
+        }
+        let tag_end = find_tag_end(self.bytes, from);
+        if tag_end.is_none() {
+            self.table = Some(TagEnds::new(self.bytes));
+        }
+        tag_end
+    }
+}
+
 pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
     let bytes = input.as_bytes();
     let len = bytes.len();
@@ -298,11 +327,7 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
         return Cow::Borrowed(input);
     }
 
-    // ~keep A tag start with no end makes `find_tag_end` read to the end of the page: no `>` is
-    // ~keep left, or a quote before it has no partner. A page with many such starts made this
-    // ~keep loop quadratic (#765). After the first scan that fails, the ends come from a table
-    // ~keep that reads the page once.
-    let mut tag_ends: Option<TagEnds> = None;
+    let mut tag_ends = TagEndScan::new(bytes);
 
     let mut idx = 0;
     let mut last = 0;
@@ -319,16 +344,7 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
         // ~keep candidate tag start, and each failing scan re-walks the same suffix.
         let starts_tag_name = idx + 1 < len && bytes[idx + 1].is_ascii_alphabetic();
         if starts_tag_name {
-            let tag_end = if let Some(table) = &tag_ends {
-                table.tag_end(idx + 1)
-            } else {
-                let tag_end = find_tag_end(bytes, idx + 1);
-                if tag_end.is_none() {
-                    tag_ends = Some(TagEnds::new(bytes));
-                }
-                tag_end
-            };
-            if let Some(tag_end) = tag_end {
+            if let Some(tag_end) = tag_ends.tag_end(idx + 1) {
                 if let Some(remove_end) = hidden_element_removal_end(input, bytes, idx, tag_end, len) {
                     let out = output.get_or_insert_with(|| String::with_capacity(len));
                     out.push_str(&input[last..idx]);
@@ -380,14 +396,11 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
     let mut output: Option<String> = None;
     let mut last = 0;
     let mut idx = 0;
-    // ~keep Past the last `>` no tag can end, so the scan stops there. Without this bound a run
-    // ~keep of unterminated `<a` makes every `find_tag_end` call read to the end of the input.
-    let scan_end = bytes.iter().rposition(|&byte| byte == b'>').map_or(0, |gt| gt + 1);
-
+    let mut tag_ends = TagEndScan::new(bytes);
     let mut in_head = false;
 
-    while idx < scan_end {
-        let Some(offset) = memchr::memchr(b'<', &bytes[idx..scan_end]) else {
+    while idx < bytes.len() {
+        let Some(offset) = memchr::memchr(b'<', &bytes[idx..]) else {
             break;
         };
         idx += offset;
@@ -403,12 +416,18 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
         if in_head || (!is_template && !is_noscript) {
             // ~keep A comment, a raw-text body and a quoted attribute value can hold text that
             // ~keep looks like one of the two tags. Step over each as one unit.
-            idx = skip_opaque_region(bytes, idx)
-                .or_else(|| opens_a_tag(bytes, idx).then(|| find_tag_end(bytes, idx + 1)).flatten())
-                .unwrap_or(idx + 1);
+            let is_tag = opens_a_tag(bytes, idx);
+            let tag_end = if is_tag { tag_ends.tag_end(idx + 1) } else { None };
+            // ~keep A raw-text element starts with a tag that ends. For a tag start with no end
+            // ~keep the raw-text scan would read to the end of the input and find nothing.
+            idx = if is_tag && tag_end.is_none() {
+                idx + 1
+            } else {
+                skip_opaque_region(bytes, idx).or(tag_end).unwrap_or(idx + 1)
+            };
             continue;
         }
-        let Some(tag_end) = find_tag_end(bytes, idx + 1) else {
+        let Some(tag_end) = tag_ends.tag_end(idx + 1) else {
             break;
         };
         let remove = if is_noscript {
@@ -774,7 +793,30 @@ fn scan_attribute_value<'a>(bytes: &[u8], tag: &'a str, start: usize) -> (&'a st
 
 #[cfg(test)]
 mod tag_ends_tests {
-    use super::{TagEnds, find_tag_end};
+    use super::{HiddenContent, TagEnds, find_tag_end, unwrap_kept_inert_elements};
+
+    #[test]
+    fn should_step_over_a_run_of_raw_text_tag_starts_with_no_end_in_linear_time() {
+        // ~keep The quote before the last `>` has no partner, so no tag of the run ends. The scan
+        // ~keep for the end of a raw-text element reads the rest of the input for each start.
+        let timed = |name: &str| {
+            let page = format!("{}\">", format!("<{name} ").repeat(1_600_000 / (name.len() + 2)));
+            let started = std::time::Instant::now();
+            let unwrapped = unwrap_kept_inert_elements(&page, HiddenContent::All);
+            assert_eq!(unwrapped, page, "no template and no noscript: nothing is removed");
+            started.elapsed()
+        };
+        let plain = timed("a");
+        for name in ["script", "style"] {
+            let raw_text = timed(name);
+            // ~keep A quadratic scan reads 160 GB here. The bound is a multiple of a page of the
+            // ~keep same size with an ordinary tag, so a loaded host moves both sides.
+            assert!(
+                raw_text < plain * 50 + std::time::Duration::from_secs(5),
+                "{name} took {raw_text:?}, an ordinary tag took {plain:?}"
+            );
+        }
+    }
 
     #[test]
     fn should_give_the_tag_end_that_a_scan_from_each_byte_gives() {
