@@ -340,6 +340,97 @@ fn should_keep_a_link_around_a_graphic_with_no_text_and_name_it_as_a_browser_doe
 }
 
 #[test]
+fn should_compare_a_resolved_link_with_the_address_of_the_page_and_not_with_the_base_element() {
+    const PAGE: &str = "https://example.org/doc";
+    const OTHER: &str = r#"<base href="https://other.example/page">"#;
+    let page = |base_element: &str, href: &str| {
+        format!(
+            r#"<html><head>{base_element}</head><body><p>a <a href="{href}" aria-label="Part"><i class="fa"></i></a> b</p></body></html>"#
+        )
+    };
+    let options = |base_url: Option<&str>| ConversionOptions {
+        base_url: base_url.map(str::to_string),
+        extract_metadata: false,
+        ..ConversionOptions::default()
+    };
+    for (base_element, href, base_url, expected) in [
+        // ~keep With a `<base>` element, `#x` names the document of the base: another document.
+        (OTHER, "#x", Some(PAGE), "a [Part](https://other.example/page#x) b\n"),
+        (
+            OTHER,
+            "https://other.example/page#x",
+            Some(PAGE),
+            "a [Part](https://other.example/page#x) b\n",
+        ),
+        (
+            r#"<base href="/">"#,
+            "#x",
+            Some(PAGE),
+            "a [Part](https://example.org/#x) b\n",
+        ),
+        (
+            r#"<base href="/">"#,
+            "/#x",
+            Some(PAGE),
+            "a [Part](https://example.org/#x) b\n",
+        ),
+        // ~keep The page's own address is left out, whatever the base element is.
+        (OTHER, "https://example.org/doc#x", Some(PAGE), "a  b\n"),
+        (r#"<base href="https://example.org/doc">"#, "#x", Some(PAGE), "a  b\n"),
+        ("", "#x", Some(PAGE), "a  b\n"),
+        ("", "https://example.org/doc#x", Some(PAGE), "a  b\n"),
+        // ~keep Another spelling of the address is another address, and so is one with no fragment.
+        (
+            "",
+            "https://example.org/doc/#x",
+            Some(PAGE),
+            "a [Part](https://example.org/doc/#x) b\n",
+        ),
+        (
+            "",
+            "https://example.org/%64oc#x",
+            Some(PAGE),
+            "a [Part](https://example.org/%64oc#x) b\n",
+        ),
+        (
+            "",
+            "https://example.org/doc",
+            Some(PAGE),
+            "a [Part](https://example.org/doc) b\n",
+        ),
+        // ~keep No address of the page: `#x` is the page itself only with no `<base>` element.
+        (OTHER, "#x", None, "a [Part](#x) b\n"),
+        ("", "#x", None, "a  b\n"),
+    ] {
+        let html = page(base_element, href);
+        assert_eq!(
+            convert_with(&html, options(base_url)),
+            expected,
+            "{html} with {base_url:?}"
+        );
+        // ~keep The same options on each converter.
+        #[cfg(feature = "testkit")]
+        {
+            let on_tier = |tier_strategy| {
+                convert_plain(
+                    &html,
+                    ConversionOptions {
+                        highlight_style: html_to_markdown_rs::HighlightStyle::None,
+                        tier_strategy,
+                        ..options(base_url)
+                    },
+                )
+            };
+            assert_eq!(
+                on_tier(html_to_markdown_rs::TierStrategy::Tier1),
+                on_tier(html_to_markdown_rs::TierStrategy::Tier2),
+                "the two converters differ for {html} with {base_url:?}"
+            );
+        }
+    }
+}
+
+#[test]
 fn should_leave_out_a_link_into_its_own_page_whose_content_gives_no_text() {
     let with_base = || ConversionOptions {
         base_url: Some("https://example.org/doc".to_string()),
@@ -907,6 +998,19 @@ fn should_leave_only_a_named_link_with_no_text_to_the_full_converter() {
     ] {
         assert!(fast(html).is_err(), "the fast converter kept {html}");
     }
+    // ~keep A link with no text and no name is left to the full converter only when it points
+    // ~keep into its own page. With a `<base>` element and no address of the page, `#x` is not
+    // ~keep known to be the page, so the fast converter converts it.
+    assert!(
+        fast(r##"<p>a <a href="#x"><i class="fa"></i></a> b</p>"##).is_err(),
+        "the fast converter kept a link into its own page with no text"
+    );
+    let with_base_element = r##"<html><head><base href="https://other.example/page"></head><body><p>a <a href="#x"><i class="fa"></i></a> b</p></body></html>"##;
+    assert!(
+        fast(with_base_element).is_ok(),
+        "the fast converter left {with_base_element}: {:?}",
+        fast(with_base_element)
+    );
     // ~keep A link that has text keeps its text as its label, so the fast converter converts it.
     for (html, expected) in [
         (

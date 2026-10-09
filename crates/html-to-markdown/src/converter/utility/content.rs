@@ -177,26 +177,6 @@ pub fn link_accessible_name<'a>(aria_label: Option<&'a str>, title: Option<&'a s
         .find(|name| !name.is_empty())
 }
 
-/// Whether a link address points into the page that holds the link: `#part`, or with a known
-/// base an address that differs from the base only by its fragment.
-///
-/// ~keep Both converters ask this function: such a link is left out when its content gives no
-/// ~keep text, by the full converter itself, and the fast converter leaves the page to it.
-pub fn is_same_page_fragment(raw_href: &str, resolved_href: &str, base: Option<&url::Url>) -> bool {
-    if raw_href.trim_start().starts_with('#') {
-        return true;
-    }
-    let without_fragment = |url: &url::Url| {
-        let mut url = url.clone();
-        url.set_fragment(None);
-        url
-    };
-    base.zip(url::Url::parse(resolved_href).ok())
-        .is_some_and(|(base, target)| {
-            target.fragment().is_some() && without_fragment(&target) == without_fragment(base)
-        })
-}
-
 /// Walks the descendants of a link for their text. `enter_block` gets each topmost block-level
 /// element and says whether to read inside it.
 ///

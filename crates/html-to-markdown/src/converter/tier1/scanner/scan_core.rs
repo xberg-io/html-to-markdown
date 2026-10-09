@@ -358,11 +358,12 @@ impl<'a> Tier1Scanner<'a> {
                 crate::converter::utility::content::link_accessible_name(aria_label.as_deref(), title.as_deref())
                     .is_some();
             let same_page = raw_href.as_deref().zip(href.as_deref()).is_some_and(|(raw, resolved)| {
-                crate::converter::utility::content::is_same_page_fragment(
-                    raw,
-                    resolved,
-                    self.state.effective_base.as_deref(),
-                )
+                self.state
+                    .own_page
+                    .get_or_init(|| {
+                        crate::converter::url_resolve::OwnPage::of(self.html, self.options.base_url.as_deref())
+                    })
+                    .holds(raw, resolved)
             });
             self.state.link_stack.push((href, title, false, has_name || same_page));
         }

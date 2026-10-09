@@ -22,9 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (a graphic with no text, an empty element, nothing) and whether or not the link has a name. It
   is the icon of a heading permalink or of a "back to top" link, and it leads nowhere else:
   `<h2>Title <a href="#title"><svg>...</svg></a></h2>` gives `## Title`, and
-  `<a href="#top" aria-label="Back to top"></a>` gave `[](#top)` and gives nothing. A link into
-  its own page is `href="#part"`, or with `base_url` set an address that differs from it only by
-  the fragment. Such a link that has text is kept with its text.
+  `<a href="#top" aria-label="Back to top"></a>` gave `[](#top)` and gives nothing. A link is
+  into its own page when its address, after it is resolved, differs from the address of the page
+  (`base_url`) only by a fragment. A `<base>` element changes what `#part` resolves to, so on such
+  a page `#part` can name another document, and that link is kept. With no `base_url`, a written
+  `#part` is into its own page when the document has no `<base>` element; with one, the link is
+  kept. Such a link that has text is kept with its text.
 - A link whose only content is an inline `<svg>` with no text is no longer labelled `SVG Image`.
   The link is kept and labelled by the first rule above:
   `<a href="/page" aria-label="Next"><div><svg>...</svg></div></a>` gives `[Next](/page)`

@@ -356,6 +356,10 @@ pub struct Tier1State {
     /// so both tiers resolve the same input identically. `None` when `options.base_url`
     /// is unset (the default), making every resolution call a no-op.
     pub effective_base: Option<std::rc::Rc<url::Url>>,
+
+    /// The address of the page, as far as it is known; read when the first link opens. The
+    /// same value Tier-2 holds in `Context::own_page`.
+    pub own_page: std::cell::OnceCell<crate::converter::url_resolve::OwnPage>,
 }
 
 impl Tier1State {
@@ -387,6 +391,7 @@ impl Tier1State {
             list_items_after_text: Vec::new(),
             at_document_start: true,
             effective_base,
+            own_page: std::cell::OnceCell::new(),
         }
     }
 

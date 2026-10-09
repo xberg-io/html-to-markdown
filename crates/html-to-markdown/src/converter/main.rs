@@ -114,6 +114,7 @@ pub fn convert_html_impl(
             structure_collector: structure_collector.as_ref().map(std::rc::Rc::clone),
             reference_collector: reference_collector.as_ref().map(std::rc::Rc::clone),
             base_url,
+            own_page: crate::converter::url_resolve::OwnPage::of(html, options.base_url.as_deref()),
         },
     );
 

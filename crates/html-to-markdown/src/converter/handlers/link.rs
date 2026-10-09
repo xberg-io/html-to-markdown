@@ -19,8 +19,8 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_conte
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
-    collect_link_label_text, is_same_page_fragment, link_accessible_name, link_text_content, node_is_block_level,
-    normalize_link_label, normalized_tag_name,
+    collect_link_label_text, link_accessible_name, link_text_content, node_is_block_level, normalize_link_label,
+    normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -128,7 +128,7 @@ impl<'a> LinkData<'a> {
             .context
             .resolve_url(&raw_href, handler.node_handle, handler.parser, handler.dom_context)
             .unwrap_or_else(|| raw_href.clone());
-        let same_page_fragment = is_same_page_fragment(&raw_href, &href, handler.context.base_url.as_deref());
+        let same_page_fragment = handler.context.own_page.holds(&raw_href, &href);
         // ~keep Empty titles are absent because Markdown serializers drop `""` on reparse.
         let title =
             crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|value| !value.is_empty());
