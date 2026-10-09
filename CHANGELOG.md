@@ -123,6 +123,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a line of code: `<pre>import a\n\n\nclass B:\n</pre>` wrote one blank line and now writes two. The
   rules that fold blank lines and trim line ends still apply to the text outside of code
   ([#783](https://github.com/xberg-io/html-to-markdown/issues/783)).
+- With `code_block_style = indented`, a code block that starts a block quote keeps the four spaces of
+  its first line. Without them a Markdown reader takes the code for a paragraph:
+  `<blockquote><pre>a\nb\n</pre></blockquote>` wrote `> a`, `>     b` and now writes `>     a`,
+  `>     b`. With that style the blank lines and the spaces at the end of a line of code also stay, at
+  the top level, in a block quote and in a list item: `<pre>a   \n\n\nb\n</pre>` wrote `    a  `, one
+  blank line, `    b` and now writes `    a   `, two blank lines, `    b`
+  ([#799](https://github.com/xberg-io/html-to-markdown/issues/799)).
+- With `code_block_style = indented`, a code block that starts the description of a definition list
+  keeps the four spaces of its first line, and a blank line goes between the term and the code:
+  the full converter wrote `t`, `a`, `    b` for `<dl><dt>t</dt><dd><pre>a\nb\n</pre></dd></dl>`, and
+  the full and fast converters now write `t`, a blank line, `    a`, `    b`. The spaces at the end of
+  the last line of that code stay too
+  ([#799](https://github.com/xberg-io/html-to-markdown/issues/799)).
 
 ## [3.17.2] - 2026-10-06
 
