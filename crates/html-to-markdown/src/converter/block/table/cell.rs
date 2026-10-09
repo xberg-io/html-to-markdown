@@ -151,9 +151,8 @@ const CELL_TEXT_CAPACITY: usize = 128;
 /// only when the enclosing row holds no other cell — GFM has no way to express a real nested
 /// table, but a lone cell's content can be lifted out and rendered as its own separate table
 /// after the enclosing one, which keeps the inner table usable instead of flattening it into a
-/// line of escaped pipes (issue #484). `None` (the default, and always the case for a cell
-/// sharing its row with a sibling, per issue #469) keeps the existing flatten-and-escape
-/// behavior.
+/// line of cell content (issue #484). `None` (the default, and always the case for a cell
+/// sharing its row with a sibling) flattens nested rows without table syntax (#760).
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn render_cell_text(
     node_handle: &tl::NodeHandle,
@@ -197,7 +196,7 @@ fn render_cell_content(
 }
 
 /// ~keep A nested table's structural pipes bypass text-node escaping. It must either be deferred
-/// ~keep from a single-cell row or flattened with escaped pipes and explicit row separators;
+/// ~keep from a single-cell row or flattened to cell content with explicit row separators;
 /// ~keep otherwise reparsing widens and eventually truncates the outer row (issues #469/#484/#488).
 fn render_cell_child(
     child_handle: &tl::NodeHandle,
@@ -221,13 +220,17 @@ fn render_cell_child(
         return;
     }
     let mut nested = String::new();
+    let nested_context = crate::converter::Context {
+        allow_nested_table_markup: deferred_tables.is_some(),
+        ..handler.ctx.clone()
+    };
     super::super::super::walk_node(
         child_handle,
         parser,
         &mut nested,
         crate::converter::block::container::HandlerContext::new(
             handler.options,
-            handler.ctx,
+            &nested_context,
             handler.depth + 1,
             handler.dom_ctx,
         ),

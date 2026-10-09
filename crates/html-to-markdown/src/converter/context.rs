@@ -124,6 +124,8 @@ pub struct Context {
     pub(crate) blockquote_depth: usize,
     /// Are we inside a table cell (td/th)?
     pub(crate) in_table_cell: bool,
+    /// ~keep Deferred single-cell tables keep their surrounding cell context but render as blocks.
+    pub(crate) allow_nested_table_markup: bool,
     /// Are we inside a *layout*-table cell, whose row renders as a list item rather than a
     /// pipe row?
     ///
@@ -375,6 +377,7 @@ impl Context {
             in_ordered_list: false,
             blockquote_depth: 0,
             in_table_cell: false,
+            allow_nested_table_markup: false,
             in_layout_cell: false,
             convert_as_inline: options.convert_as_inline,
             inline_depth: 0,
@@ -507,5 +510,17 @@ impl Context {
             return None;
         }
         crate::converter::url_resolve::resolve_attribute_url(self.base_url.as_deref()?, value)
+    }
+    pub(crate) fn resolve_link_url(
+        &self,
+        value: &str,
+        node_handle: &tl::NodeHandle,
+        parser: &tl::Parser,
+        dom_ctx: &crate::converter::DomContext,
+    ) -> Option<String> {
+        if dom_ctx.has_raw_text_ancestor(node_handle.get_inner(), parser) {
+            return None;
+        }
+        crate::converter::url_resolve::resolve_link_url(self.base_url.as_deref()?, value)
     }
 }

@@ -76,7 +76,9 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     let mut label = build_label(&data, &handler);
     apply_label_fallbacks(&data, &mut label, &handler);
     indent_hard_break_continuations(&mut label, handler.context, handler.options);
-    let drop_link = label.is_empty() && handler.context.inline_data_replaced.get();
+    let drop_link = label.is_empty()
+        && handler.context.inline_data_replaced.get()
+        && handler.options.inline_data_media == InlineDataMedia::DropElement;
     let emit_deferred = emit_link(tag, &data, &label, drop_link, &mut handler);
     #[cfg(feature = "metadata")]
     record_link_metadata(tag, &data, &label, handler.context);
@@ -97,6 +99,8 @@ struct LinkData<'a> {
     href_addr_dropped: bool,
     link_allow_inline_images: bool,
     saw_block: bool,
+    accessible_name: Option<Cow<'a, str>>,
+    empty_span_content: bool,
 }
 
 impl<'a> LinkData<'a> {
@@ -109,7 +113,7 @@ impl<'a> LinkData<'a> {
             .map(|href| {
                 handler
                     .context
-                    .resolve_url(&href, handler.node_handle, handler.parser, handler.dom_context)
+                    .resolve_link_url(&href, handler.node_handle, handler.parser, handler.dom_context)
                     .unwrap_or(href)
             })?;
         // ~keep Empty titles are absent because Markdown serializers drop `""` on reparse.
@@ -139,6 +143,11 @@ impl<'a> LinkData<'a> {
                 handler.dom_context,
             ),
             link_allow_inline_images: handler.context.keep_inline_images_in.contains("a"),
+            accessible_name: crate::converter::utility::attributes::decoded_attribute(tag, "aria-label")
+                .filter(|value| !value.trim().is_empty())
+                .or_else(|| title.clone()),
+            empty_span_content: !children.is_empty()
+                && children.iter().all(|child| empty_span_child(child, handler.parser)),
             href,
             title,
             children,
@@ -149,6 +158,24 @@ impl<'a> LinkData<'a> {
             saw_block,
         })
     }
+}
+
+// ~keep Empty span wrappers carry no textual or media fallback; preserve their destination
+// ~keep without inserting URL words into document content (#771). Icon fonts and images
+// ~keep still use the link-name/address fallback required by #774 and #775.
+fn empty_span_child(handle: &tl::NodeHandle, parser: &tl::Parser<'_>) -> bool {
+    let mut pending = vec![*handle];
+    while let Some(child) = pending.pop() {
+        match child.get(parser) {
+            Some(tl::Node::Raw(raw)) if raw.as_utf8_str().trim().is_empty() => {}
+            Some(tl::Node::Comment(_)) => {}
+            Some(tl::Node::Tag(tag)) if tag.name().as_utf8_str().eq_ignore_ascii_case("span") => {
+                pending.extend(tag.children().top().iter().copied());
+            }
+            _ => return false,
+        }
+    }
+    true
 }
 
 fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool {
@@ -309,8 +336,21 @@ fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &Hand
     if !data.emit_blocks_separately && label.is_empty() && !data.raw_text.is_empty() {
         *label = normalize_link_label(&data.raw_text);
     }
-    let drop_link = label.is_empty() && handler.context.inline_data_replaced.get();
-    if label.is_empty() && !data.href.is_empty() && !data.children.is_empty() && !drop_link && !data.href_addr_dropped {
+    let drop_link = label.is_empty()
+        && handler.context.inline_data_replaced.get()
+        && handler.options.inline_data_media == InlineDataMedia::DropElement;
+    if label.is_empty() && !drop_link && !data.href_addr_dropped {
+        if let Some(name) = data.accessible_name.as_deref() {
+            *label = normalize_link_label(name);
+        }
+    }
+    if label.is_empty()
+        && !data.href.is_empty()
+        && !data.children.is_empty()
+        && !data.empty_span_content
+        && !drop_link
+        && !data.href_addr_dropped
+    {
         *label = text::escape(
             &data.href,
             handler.options.escape_misc,
@@ -345,7 +385,7 @@ fn emit_link(
 }
 
 fn write_link(output: &mut String, data: &LinkData<'_>, label: &str, options: &ConversionOptions, context: &Context) {
-    if data.href_addr_dropped {
+    if data.href_addr_dropped || data.href.is_empty() {
         output.push_str(label);
         return;
     }

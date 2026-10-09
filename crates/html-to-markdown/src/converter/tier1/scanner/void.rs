@@ -228,6 +228,9 @@ fn emit_image(
         return Err(BailReason::ImageLazyLoadSrc);
     }
     let src = decode_attr(raw_src)?;
+    if src.trim().is_empty() {
+        return Err(BailReason::ImageMissingSource);
+    }
     let src = state.resolve_url(&src).unwrap_or(src);
     let alt = decode_attr(find_attr(attrs, b"alt").unwrap_or_default())?;
     let title = find_attr(attrs, b"title")
