@@ -125,6 +125,9 @@ fn child_misnest_state(info: &TagInfo, state: MisnestState, self_inside_preforma
 /// misplaced element child (e.g. a `<p>` stranded inside a `<tr>` by a dropped `</table>`
 /// close tag). See [`is_row_context_with_misplaced_element`]. Issue #489.
 ///
+/// Also detects an element with content that is still open at the end of the input. See
+/// [`has_omitted_end_tag`]. Issue #772.
+///
 /// ~keep Walks the tree top-down exactly once, carrying inherited ancestor state
 /// ~keep (see [`MisnestState`]) instead of re-walking every node's ancestor chain.
 /// ~keep The original per-node ancestor walk was O(depth) per node — O(n²) total on

@@ -154,6 +154,157 @@ fn an_end_tag_with_no_start_tag_changes_nothing() {
     assert_all_routes("<!doctype html>one</div>two</span>three", "onetwothree\n");
 }
 
+/// For an input where the fast converter writes other Markdown for the closed form too.
+fn assert_default_and_tier2(html: &str, expected: &str) {
+    let default = convert(html, None).expect("conversion must succeed");
+    assert_eq!(default.content.as_deref(), Some(expected), "default options: {html:?}");
+    let tier2 = convert_with(html, TierStrategy::Tier2);
+    assert_eq!(tier2.content.as_deref(), Some(expected), "Tier2: {html:?}");
+}
+
+#[test]
+fn a_block_in_an_open_list_item_or_section_ends_with_its_parent() {
+    assert_all_routes(
+        "<!doctype html><ul><li><div>one</div><li><div>two</ul>after",
+        "- one\n\n- two\n\nafter\n",
+    );
+    assert_all_routes(
+        "<!doctype html><ol><li>one<p>two<li>three</ol>after",
+        "1. one\n\n   two\n\n2. three\n\nafter\n",
+    );
+    assert_all_routes(
+        "<!doctype html><article><header><p>h</header><p>one</article><footer><p>f</footer>tail",
+        "h\n\none\n\nf\n\ntail\n",
+    );
+    assert_all_routes("<!doctype html><dl><dt>a<dt>b<dd>c</dl>after", "a\nb\nc\n\nafter\n");
+    assert_default_and_tier2(
+        "<!doctype html><dl><dt>t<dd><p>d1<p>d2</dl>after",
+        "t\nd1\n\nd2\n\nafter\n",
+    );
+}
+
+#[test]
+fn options_with_no_end_tag_give_the_output_of_closed_options() {
+    assert_all_routes(
+        "<!doctype html><select><option>one<option>two</select>after",
+        "onetwoafter\n",
+    );
+    assert_all_routes(
+        "<!doctype html><p>before <select><option>one<option>two</select> after<p>next",
+        "before onetwo after\n\nnext\n",
+    );
+    let closed = "<!doctype html><select><optgroup label=a><option>x</option></optgroup>\
+                  <optgroup label=b><option>y</option></optgroup></select>after";
+    let open = "<!doctype html><select><optgroup label=a><option>x<optgroup label=b><option>y</select>after";
+    for tier_strategy in [TierStrategy::Tier2, TierStrategy::Tier1] {
+        assert_eq!(
+            convert_with(open, tier_strategy).content,
+            convert_with(closed, tier_strategy).content,
+            "{tier_strategy:?}"
+        );
+    }
+    assert_eq!(
+        convert(open, None).expect("conversion must succeed").content,
+        convert(closed, None).expect("conversion must succeed").content
+    );
+}
+
+#[test]
+fn ruby_text_with_no_end_tag_ends_at_the_next_ruby_part() {
+    assert_all_routes(
+        "<!doctype html><p><ruby>base<rt>top</ruby> after</p>",
+        "base(top) after\n",
+    );
+    assert_all_routes("<!doctype html><p><ruby>a<rt>b<rt>c</ruby> after", "a(b)(c) after\n");
+    assert_all_routes(
+        "<!doctype html><p><ruby>kan<rp>(<rt>ji<rp>)</ruby> after<p>next",
+        "kan(ji) after\n\nnext\n",
+    );
+}
+
+#[test]
+fn each_table_part_with_no_end_tag_keeps_every_row() {
+    let two_columns = "| a | b |\n| --- | --- |\n| c | d |\n\nafter\n";
+    assert_all_routes(
+        "<!doctype html><table><tr><th>a</th><th>b</th><tr><td>c</td><td>d</td></table>after",
+        two_columns,
+    );
+    assert_all_routes(
+        "<!doctype html><table><tr><th>a<th>b</tr><tr><td>c</td><td>d</td></tr></table>after",
+        two_columns,
+    );
+    assert_all_routes(
+        "<!doctype html><table><tr><th>a</th><th>b</th></tr><tr><td>c<td>d</tr></table>after",
+        two_columns,
+    );
+    assert_all_routes(
+        "<!doctype html><table><thead><tr><th>a</th></tr><tbody><tr><td>b</td></tr></tbody></table>after",
+        "| a |\n| --- |\n| b |\n\nafter\n",
+    );
+    assert_all_routes(
+        "<!doctype html><table><thead><tr><th>h</th></tr></thead><tbody><tr><td>a</td></tr>\
+         <tbody><tr><td>b</td></tr><tfoot><tr><td>f</td></tr></table>after",
+        "| h |\n| --- |\n| a |\n| b |\n| f |\n\nafter\n",
+    );
+}
+
+#[test]
+fn a_head_with_no_end_tag_ends_at_the_first_body_content() {
+    for (html, body) in [
+        (
+            "<!doctype html><html><head><title>T</title><body><p>one</p></body></html>",
+            "one\n",
+        ),
+        (
+            "<!doctype html><html><head><title>T</title><meta charset=utf-8><p>one<p>two",
+            "one\n\ntwo\n",
+        ),
+        (
+            "<!doctype html><html><head><title>T</title><div><p>one</div>tail",
+            "one\n\ntail\n",
+        ),
+    ] {
+        for tier_strategy in [TierStrategy::Tier2, TierStrategy::Tier1] {
+            let result = convert_with(html, tier_strategy);
+            assert_eq!(result.content.as_deref(), Some(body), "{tier_strategy:?}: {html:?}");
+        }
+        let default = convert(html, None).expect("conversion must succeed");
+        let expected = format!("---\ntitle: T\n---\n\n{body}");
+        assert_eq!(default.content.as_deref(), Some(expected.as_str()), "{html:?}");
+    }
+    assert_all_routes("<!doctype html><body><p>one</body><p>two", "one\n\ntwo\n");
+}
+
+#[test]
+fn an_end_tag_with_no_start_tag_ends_no_other_element() {
+    assert_all_routes(
+        "<!doctype html><ul><li>one</li></li><li>two</li></ul></ul>after",
+        "- one\n- two\n\nafter\n",
+    );
+    assert_all_routes(
+        "<!doctype html><table><tr><th>a</th></th><th>b</th></tr></tr><tr><td>c</td><td>d</td></tr></table></table>after",
+        "| a | b |\n| --- | --- |\n| c | d |\n\nafter\n",
+    );
+    assert_all_routes("<!doctype html></div><p>one</p></section>", "one\n");
+    assert_all_routes(
+        "<!doctype html><p>one</b> two</em> three</p><p>four</p>",
+        "one two three\n\nfour\n",
+    );
+    assert_all_routes("<!doctype html><p>one</p></body></html>", "one\n");
+}
+
+#[test]
+fn an_end_tag_in_another_spelling_ends_its_element() {
+    assert_all_routes("<!doctype html><DIV><p>one</p></div><p>two</p>", "one\n\ntwo\n");
+    assert_all_routes("<!doctype html><div><p>one</p></div ><p>two</p>", "one\n\ntwo\n");
+    assert_all_routes(
+        "<!doctype html><DIV><P>one</DIV><DIV><P>two</DIV>tail",
+        "one\n\ntwo\n\ntail\n",
+    );
+    // ~keep The end tag of any heading ends an open heading.
+    assert_default_and_tier2("<!doctype html><h2>one</h3>two", "## one\n\ntwo\n");
+}
+
 #[test]
 fn a_page_that_nests_past_the_limit_is_still_cut_and_reports_it() {
     let html = format!(
@@ -161,8 +312,15 @@ fn a_page_that_nests_past_the_limit_is_still_cut_and_reports_it() {
         "<div>".repeat(70),
         "</div>".repeat(70)
     );
-    let result = convert(&html, None).expect("conversion must succeed");
-    assert_eq!(result.content.as_deref(), Some("Shallow text.\n"));
-    assert_eq!(result.warnings.len(), 1, "warnings: {:?}", result.warnings);
-    assert!(matches!(result.warnings[0].kind, WarningKind::DepthLimitExceeded));
+    let default = convert(&html, None).expect("conversion must succeed");
+    let routes = [
+        default,
+        convert_with(&html, TierStrategy::Tier2),
+        convert_with(&html, TierStrategy::Tier1),
+    ];
+    for result in routes {
+        assert_eq!(result.content.as_deref(), Some("Shallow text.\n"));
+        assert_eq!(result.warnings.len(), 1, "warnings: {:?}", result.warnings);
+        assert!(matches!(result.warnings[0].kind, WarningKind::DepthLimitExceeded));
+    }
 }
