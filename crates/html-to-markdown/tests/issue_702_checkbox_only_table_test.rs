@@ -36,7 +36,7 @@ fn should_keep_a_table_whose_only_content_is_a_checked_input() {
     let html = r#"<table><tr><td><input type="checkbox" checked></td></tr></table>"#;
 
     for tier_strategy in [TierStrategy::Tier1, TierStrategy::Tier2, TierStrategy::Auto] {
-        assert_eq!(markdown(html, tier_strategy), "| [x] |\n| --- |\n", "{tier_strategy:?}");
+        assert_eq!(markdown(html, tier_strategy), "| ☑ |\n| --- |\n", "{tier_strategy:?}");
     }
 }
 

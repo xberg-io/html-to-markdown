@@ -254,13 +254,7 @@ fn apply_tag_content(tag_name: &str, tag: &tl::HTMLTag, acc: Option<&mut TableCo
         "img" | "graphic" if tag.attributes().get("src").is_some() || tag.attributes().get("alt").is_some() => {
             acc.has_text = true;
         }
-        "input"
-            if tag
-                .attributes()
-                .get("type")
-                .flatten()
-                .is_some_and(|value| value.as_utf8_str().eq_ignore_ascii_case("checkbox")) =>
-        {
+        "input" if crate::converter::form::elements::checkbox_state(tag).is_some() => {
             acc.has_text = true;
         }
         // ~keep A rule is content without text: a table whose cells hold only rules is not a blank

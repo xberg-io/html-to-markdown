@@ -289,6 +289,13 @@ pub enum BailReason {
     /// contract holds under a forced Tier-1 run rather than resting on that gate.
     InlineMarkerNotReproduced,
 
+    /// A form control whose text Tier-2 separates from the text around it: `<select>`,
+    /// `<option>`, `<optgroup>`, `<datalist>`, an `<input>` that is not `type="hidden"` right
+    /// after text, and a `<button>`, `<output>`, `<meter>` or `<progress>` in a heading, a
+    /// summary, a caption or a link. The space after such a control depends on the text that
+    /// follows it, which this scanner has not read yet.
+    FormControl,
+
     /// An `<hr>` opened between inline markers: inside `<strong>`/`<b>`, `<em>`/`<i>`,
     /// `<var>`/`<dfn>`, `<del>`, `<ins>`, a `<summary>`, a `<figcaption>` or a table caption.
     ///
@@ -375,6 +382,7 @@ impl fmt::Display for BailReason {
             Self::AdjacentInlineEmphasis => write!(f, "adjacent strong/emphasis elements would form one delimiter run"),
             Self::WhitespaceOnlyInlineEmphasis => write!(f, "strong/emphasis element with a whitespace-only body"),
             Self::InlineMarkerNotReproduced => write!(f, "inline element whose tier-2 markers tier-1 does not emit"),
+            Self::FormControl => write!(f, "form control whose text tier-2 separates from the text around it"),
             Self::RuleBetweenInlineMarkers => write!(f, "horizontal rule between inline markers"),
         }
     }

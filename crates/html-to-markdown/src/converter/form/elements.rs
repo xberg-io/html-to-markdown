@@ -13,6 +13,7 @@
 //! extract and format the content in a readable manner.
 
 use super::FormContext;
+use super::spacing::{ControlStart, separate_from_next_text};
 use super::walk_node;
 use std::borrow::Cow;
 
@@ -267,13 +268,9 @@ pub fn handle_legend(
 
 /// Handles the `<label>` element.
 ///
-/// A label element associates text with a form control. It's rendered as
-/// inline content.
-///
-/// # Behavior
-///
-/// - Content is collected from children
-/// - Non-empty content is output without adding block separators
+/// A label element associates text with a form control. It is inline content. White space at
+/// the end of its content stays in the line, so `<label>Name <input></label>` and the text after
+/// it do not join.
 pub fn handle_label(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -304,34 +301,92 @@ pub fn handle_label(
 
         let trimmed = rendered.trim();
         if !trimmed.is_empty() {
+            // ~keep In the label's own buffer a control at its start has no text before it.
+            let start = ControlStart::new(output);
             output.push_str(trimmed);
+            if starts_with_control(tag, parser) {
+                start.finish(output);
+            }
+            if rendered.ends_with([' ', '\t']) {
+                output.push(' ');
+            }
         }
     }
 }
 
-fn emit_checkbox_input(node_handle: &tl::NodeHandle, parser: &tl::Parser, output: &mut String) {
-    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
-        return;
+/// Whether the first content of `tag` is a form control that a reader sees.
+fn starts_with_control(tag: &tl::HTMLTag, parser: &tl::Parser) -> bool {
+    let first = tag.children().top().iter().find_map(|child| match child.get(parser)? {
+        tl::Node::Raw(raw) if raw.as_utf8_str().trim().is_empty() => None,
+        tl::Node::Comment(_) => None,
+        node => Some(node),
+    });
+    let Some(tl::Node::Tag(control)) = first else {
+        return false;
     };
-    let is_checkbox = tag
-        .attributes()
+    match crate::converter::utility::content::normalized_tag_name(control.name().as_utf8_str()).as_ref() {
+        "input" => !is_hidden_input(control),
+        name => super::spacing::writes_own_text(name),
+    }
+}
+
+fn is_hidden_input(tag: &tl::HTMLTag) -> bool {
+    tag.attributes()
+        .get("type")
+        .flatten()
+        .is_some_and(|value| value.as_utf8_str().eq_ignore_ascii_case("hidden"))
+}
+
+/// The checked state of `tag` when it is a checkbox a reader sees as one. An input whose `role`
+/// names another role is not one: `role="button"` marks the switch of a menu.
+pub fn checkbox_state(tag: &tl::HTMLTag) -> Option<bool> {
+    let attributes = tag.attributes();
+    let is_checkbox = attributes
         .get("type")
         .flatten()
         .is_some_and(|value| value.as_utf8_str().eq_ignore_ascii_case("checkbox"));
-    if is_checkbox {
-        output.push_str(if tag.attributes().get("checked").is_some() {
-            "[x]"
-        } else {
-            "[ ]"
-        });
+    let has_other_role = attributes.get("role").flatten().is_some_and(|role| {
+        role.as_utf8_str().split_ascii_whitespace().next().is_some_and(|first| {
+            !["checkbox", "switch", "menuitemcheckbox"]
+                .iter()
+                .any(|checkbox_role| first.eq_ignore_ascii_case(checkbox_role))
+        })
+    });
+    (is_checkbox && !has_other_role).then(|| attributes.get("checked").is_some())
+}
+
+/// Writes what a reader sees of an input: the state of a checkbox as one character, and the
+/// space that keeps the words on both sides of the control apart.
+///
+/// ~keep The task marker `[ ]` belongs to a list item (`list/item.rs`). Anywhere else a bracket
+/// ~keep pair is link syntax: `[x](note)` and `[x]` beside a `[x]:` definition render as links.
+fn emit_input(
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &mut String,
+    ctx: &crate::converter::Context,
+    dom_ctx: &crate::converter::DomContext,
+) {
+    let Some(tl::Node::Tag(tag)) = node_handle.get(parser) else {
+        return;
+    };
+    if is_hidden_input(tag) {
+        return;
     }
+    if let Some(checked) = checkbox_state(tag) {
+        let start = ControlStart::new(output);
+        output.push(if checked { '☑' } else { '☐' });
+        start.finish(output);
+        // ~keep The character is content: white space after it is not the start of the document.
+        ctx.at_fresh_block_start.set(false);
+    }
+    separate_from_next_text(output, *node_handle, parser, dom_ctx);
 }
 
 /// Handles the `<input>` element.
 ///
-/// Checkbox inputs render their visible checked state; other inputs have no text output. ~keep
+/// A checkbox writes its checked state; other inputs have no text output.
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
-#[allow(clippy::ptr_arg, clippy::needless_pass_by_ref_mut, clippy::missing_const_for_fn)]
 pub fn handle_input(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -401,21 +456,17 @@ pub fn handle_input(
         }
     }
 
-    emit_checkbox_input(node_handle, parser, output);
+    emit_input(node_handle, parser, output, ctx, dom_ctx);
 }
 
-/// Handles the `<textarea>` element.
+/// Writes the children of a control that ends its line: `<textarea>`, `<button>`, `<output>`,
+/// `<meter>` and `<progress>`.
 ///
-/// A textarea element represents a multi-line text input. Its content is
-/// rendered as plain text, with blank lines added after in block mode.
-///
-/// # Behavior
-///
-/// - Content is collected from children
-/// - Blank lines are added after content in block mode only
-pub fn handle_textarea(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
+/// The text is a word of its own after the text before it. A blank line follows it in block
+/// mode; in inline mode, where the line goes on, the text after it is a word of its own too.
+fn write_line_end_control(
+    node_handle: tl::NodeHandle,
+    tag: &tl::HTMLTag,
     parser: &tl::Parser,
     output: &mut String,
     context: FormContext<'_>,
@@ -426,36 +477,44 @@ pub fn handle_textarea(
         depth,
         dom_ctx,
     } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let start_len = output.len();
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
-        }
+    let start = ControlStart::new(output);
+    for child_handle in tag.children().top().iter() {
+        walk_node(
+            child_handle,
+            parser,
+            output,
+            crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
+        );
+    }
+    if !start.finish(output) {
+        return;
+    }
+    if ctx.convert_as_inline {
+        separate_from_next_text(output, node_handle, parser, dom_ctx);
+    } else {
+        output.push_str("\n\n");
     }
 }
 
-/// Handles the `<select>` element.
+/// Handles the `<textarea>`, `<output>`, `<meter>` and `<progress>` elements: their text content
+/// is plain text that ends its line.
+pub fn handle_line_end_control(
+    _tag_name: &str,
+    node_handle: &tl::NodeHandle,
+    parser: &tl::Parser,
+    output: &mut String,
+    context: FormContext<'_>,
+) {
+    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
+        write_line_end_control(*node_handle, tag, parser, output, context);
+    }
+}
+
+/// Handles the `<select>` and `<datalist>` elements.
 ///
-/// A select element represents a dropdown list of options. Its options are
-/// rendered as inline text.
-///
-/// # Behavior
-///
-/// - Content (options) is collected from children
-/// - No block separator is added after the select
-pub fn handle_select(
+/// The options are one control in the line: one space separates each option from the option
+/// before it, and the control from the text before and after it.
+pub fn handle_option_list(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
     parser: &tl::Parser,
@@ -469,30 +528,38 @@ pub fn handle_select(
         dom_ctx,
     } = context;
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
+        let mut rendered = String::new();
+        let list_ctx = ctx.inline_buffer(output, false);
+        for child_handle in tag.children().top().iter() {
+            walk_node(
+                child_handle,
+                parser,
+                &mut rendered,
+                crate::converter::block::container::HandlerContext::new(options, &list_ctx, depth + 1, dom_ctx),
+            );
         }
+        let trimmed = rendered.trim();
+        if trimmed.is_empty() {
+            return;
+        }
+        let start = ControlStart::new(output);
+        output.push_str(trimmed);
+        start.finish(output);
+        separate_from_next_text(output, *node_handle, parser, dom_ctx);
+    }
+}
+
+/// Starts an option or a group label in the buffer of its list: one space after what the list
+/// already holds.
+fn start_list_entry(output: &mut String) {
+    if !output.is_empty() && !output.ends_with(char::is_whitespace) {
+        output.push(' ');
     }
 }
 
 /// Handles the `<option>` element.
 ///
-/// An option element represents a choice within a select element.
-/// Options are rendered as inline text.
-///
-/// # Behavior
-///
-/// - Content is collected from children
-/// - Selection state does not change the visible label
-/// - No block separator is added after an option
+/// An option is inline text. Selection state does not change the visible label.
 pub fn handle_option(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -522,6 +589,7 @@ pub fn handle_option(
 
         let trimmed = text.trim();
         if !trimmed.is_empty() {
+            start_list_entry(output);
             output.push_str(trimmed);
         }
     }
@@ -529,13 +597,8 @@ pub fn handle_option(
 
 /// Handles the `<optgroup>` element.
 ///
-/// An optgroup element groups options within a select element with an optional label.
-/// The label is rendered as strong (bold) text, followed by the grouped options.
-///
-/// # Behavior
-///
-/// - The `label` attribute is output as strong text (if present)
-/// - Options within the group are rendered normally
+/// The `label` attribute is written as strong text in the line of the options, followed by the
+/// grouped options.
 pub fn handle_optgroup(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -560,10 +623,10 @@ pub fn handle_optgroup(
             let mut symbol = String::with_capacity(2);
             symbol.push(options.strong_em_symbol);
             symbol.push(options.strong_em_symbol);
+            start_list_entry(output);
             output.push_str(&symbol);
             output.push_str(&label);
             output.push_str(&symbol);
-            output.push('\n');
         }
 
         let children = tag.children();
@@ -582,13 +645,8 @@ pub fn handle_optgroup(
 
 /// Handles the `<button>` element.
 ///
-/// A button element represents a clickable button. Its text content is rendered
-/// as plain text, with blank lines added in block mode.
-///
-/// # Behavior
-///
-/// - Content is collected from children
-/// - Blank lines are added after content in block mode only
+/// A button element represents a clickable button. Its text content is plain text that ends
+/// its line.
 #[cfg_attr(not(feature = "visitor"), allow(unused_variables))]
 pub fn handle_button(
     _tag_name: &str,
@@ -598,10 +656,7 @@ pub fn handle_button(
     context: FormContext<'_>,
 ) {
     let FormContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
+        ctx, depth, dom_ctx, ..
     } = context;
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
         #[cfg(feature = "visitor")]
@@ -650,190 +705,7 @@ pub fn handle_button(
             }
         }
 
-        let start_len = output.len();
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
-        }
-    }
-}
-
-/// Handles the `<progress>` element.
-///
-/// A progress element represents a progress bar. It typically has no visible
-/// text content, but we render any child content present.
-///
-/// # Behavior
-///
-/// - Content is collected from children (usually empty)
-/// - Blank lines are added after content in block mode only
-pub fn handle_progress(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    output: &mut String,
-    context: FormContext<'_>,
-) {
-    let FormContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
-    } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let start_len = output.len();
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
-        }
-    }
-}
-
-/// Handles the `<meter>` element.
-///
-/// A meter element represents a scalar measurement (e.g., disk usage, temperature).
-/// It typically has no visible text content, but we render any child content.
-///
-/// # Behavior
-///
-/// - Content is collected from children (usually empty)
-/// - Blank lines are added after content in block mode only
-pub fn handle_meter(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    output: &mut String,
-    context: FormContext<'_>,
-) {
-    let FormContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
-    } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let start_len = output.len();
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
-        }
-    }
-}
-
-/// Handles the `<output>` element.
-///
-/// An output element represents the result of a calculation. It renders its
-/// text content as plain output, with blank lines in block mode.
-///
-/// # Behavior
-///
-/// - Content is collected from children
-/// - Blank lines are added after content in block mode only
-pub fn handle_output(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    output: &mut String,
-    context: FormContext<'_>,
-) {
-    let FormContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
-    } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let start_len = output.len();
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
-        }
-    }
-}
-
-/// Handles the `<datalist>` element.
-///
-/// A datalist element provides a list of predefined options for an input element.
-/// Options are rendered as a list with newlines between them.
-///
-/// # Behavior
-///
-/// - Content (options) is collected from children
-/// - A single newline is added after the datalist in block mode
-pub fn handle_datalist(
-    _tag_name: &str,
-    node_handle: &tl::NodeHandle,
-    parser: &tl::Parser,
-    output: &mut String,
-    context: FormContext<'_>,
-) {
-    let FormContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
-    } = context;
-    if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let start_len = output.len();
-        let children = tag.children();
-        {
-            for child_handle in children.top().iter() {
-                walk_node(
-                    child_handle,
-                    parser,
-                    output,
-                    crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
-                );
-            }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push('\n');
-        }
+        write_line_end_control(*node_handle, tag, parser, output, context);
     }
 }
 
@@ -853,15 +725,13 @@ pub fn handle(
         "legend" => handle_legend(tag_name, node_handle, parser, output, context),
         "label" => handle_label(tag_name, node_handle, parser, output, context),
         "input" => handle_input(tag_name, node_handle, parser, output, context),
-        "textarea" => handle_textarea(tag_name, node_handle, parser, output, context),
-        "select" => handle_select(tag_name, node_handle, parser, output, context),
+        "textarea" | "output" | "meter" | "progress" => {
+            handle_line_end_control(tag_name, node_handle, parser, output, context);
+        }
+        "select" | "datalist" => handle_option_list(tag_name, node_handle, parser, output, context),
         "option" => handle_option(tag_name, node_handle, parser, output, context),
         "optgroup" => handle_optgroup(tag_name, node_handle, parser, output, context),
         "button" => handle_button(tag_name, node_handle, parser, output, context),
-        "progress" => handle_progress(tag_name, node_handle, parser, output, context),
-        "meter" => handle_meter(tag_name, node_handle, parser, output, context),
-        "output" => handle_output(tag_name, node_handle, parser, output, context),
-        "datalist" => handle_datalist(tag_name, node_handle, parser, output, context),
         _ => {}
     }
 }

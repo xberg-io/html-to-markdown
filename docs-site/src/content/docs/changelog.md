@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- A checkbox outside a task list item now writes its state as one character, `☐` or `☑`, instead of
+  task brackets. `<p>Agree <input type="checkbox"> to the terms</p>` gave `Agree [ ] to the terms`
+  and now gives `Agree ☐ to the terms`; a table cell that gave `| [x] |` now gives `| ☑ |`. Bracket
+  pairs in running text are link syntax: `[x](optional)` rendered as a link. A list item is a task
+  item only when the checkbox is its first content: `<li>Text <input type="checkbox"> more</li>` gave
+  `- [ ] Text  more` and now gives `- Text ☐ more`. A checkbox with the role of a button, the menu
+  switch of many themes, writes nothing
+  ([#757](https://github.com/xberg-io/html-to-markdown/issues/757)).
 - A link whose content gives no text is labelled with the name of the link: its `aria-label`,
   then its `title`. Before, the label was the address of the link. This changes the default
   output for every such link, with or without a graphic:
@@ -65,6 +73,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is on, and `build_document_structure` no longer panics on it. The Markdown is the same as with the
   structure off. Neither builder records an empty heading, paragraph or list item
   ([#749](https://github.com/xberg-io/html-to-markdown/issues/749)).
+- The options of a select list and the texts of neighbouring form controls are separated by one
+  space instead of joined into one word. A select list with the options `Quickstart`, `Installation`
+  and `Ruby 101` gave `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`;
+  a label, a select list and a text area in one form gave `NameOneTwoarea words` and now give
+  `Name One Two area words`. A group label is written in the line of its options, and both converters
+  give the same text for output, meter and progress elements
+  ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
 
 ## [3.17.2] - 2026-10-06
 
