@@ -161,7 +161,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   outside the marks of the element: `<p>one <b> y</b>two</p>` gave `one  **y**two` with two spaces
   and gives `one **y**two`. The same holds for `<kbd>`, `<samp>`, `<abbr>`, `<dfn>`, `<del>`,
   `<ins>`, `<mark>`, `<sub>` and `<sup>`. At the start of a line such an element starts with no
-  space: `<div>a<br><sup> x</sup></div>` gave ` x` on the second line and gives `x`.
+  space: `<div>a<br><sup> x</sup></div>` gave a space and `x` on the second line and gives `x`.
 
 - A line break beside a zero-width space is no space, as in a browser: the zero-width space is a
   place where a line can break, so the two parts are one word.

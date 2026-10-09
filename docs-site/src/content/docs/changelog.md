@@ -148,6 +148,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line of that code stay too
   ([#799](https://github.com/xberg-io/html-to-markdown/issues/799)).
 
+- A line break in the source before an inline element is one space between two words, in every
+  container. Before, the words on the two sides of a `<span>` were joined, with an empty span and
+  with a span that holds text. This changes the default output:
+  `<p>hard to read\n<span id="index-0"></span>docstrings</p>` gave `hard to readdocstrings` and
+  gives `hard to read docstrings`, `<p>one\n<span>two</span> three</p>` gave `onetwo three` and
+  gives `one two three`, and `<ul><li>one\n<span id="a"></span>two</li></ul>` gave `- onetwo` and
+  gives `- one two`. Outside a paragraph the line break before any other inline element was a line
+  break, and it is a space now, as a browser shows it: `<div>one\n<b>y</b></div>` gave `one` and
+  `**y**` on two lines and gives `one **y**`. A line break before a block stays a line break
+  ([#778](https://github.com/xberg-io/html-to-markdown/issues/778)).
+
+- White space on the two sides of the start of an inline element is one space, and it goes
+  outside the marks of the element: `<p>one <b> y</b>two</p>` gave `one  **y**two` with two spaces
+  and gives `one **y**two`. The same holds for `<kbd>`, `<samp>`, `<abbr>`, `<dfn>`, `<del>`,
+  `<ins>`, `<mark>`, `<sub>` and `<sup>`. At the start of a line such an element starts with no
+  space: `<div>a<br><sup> x</sup></div>` gave a space and `x` on the second line and gives `x`.
+
+- A line break beside a zero-width space is no space, as in a browser: the zero-width space is a
+  place where a line can break, so the two parts are one word.
+  `<p>one \n <span></span>&#8203;two</p>` gave `one`, a space, the zero-width space and `two`, and
+  gives `one`, the zero-width space and `two`. The line break can be the last content of an
+  element that only wraps text: `<p><span>one\n</span>&#8203;two</p>` gave `one`, a space, the
+  zero-width space and `two`, and gives `one`, the zero-width space and `two`. A space that is not
+  a line break stays, and so does a line break before or in an element with a `style` attribute.
+
+- White space at the start or the end of a link label is one space outside the link. The label is
+  written without that white space, and before, the words on its two sides were joined. This
+  changes the default output: `<p>Press <a href="/p">Go </a>now.</p>` gave `Press [Go](/p)now.`
+  and gives `Press [Go](/p) now.`, and `<p>Press<a href="/p"> Go</a> now.</p>` gave
+  `Press[Go](/p) now.` and gives `Press [Go](/p) now.`. The same holds for a link around an image,
+  for an autolink (`<p>Press <a href="https://e.org/">https://e.org/ </a>now.</p>` gave
+  `Press <https://e.org/>now.` and gives `Press <https://e.org/> now.`) and for a no-break space
+  at an end of the label. A short quotation follows the rule of the other inline elements:
+  `<p>Press <q>Go </q>now.</p>` gave `Press "Go"now.` and gives `Press "Go" now.`, and a line
+  break at the end of a quotation is kept. With no white space in the source the output has none
+  ([#800](https://github.com/xberg-io/html-to-markdown/issues/800)).
+
+- The white space after an image, an inline graphic, a video or a form control at the start of a
+  document is kept. This changes the default output: `<p><img src="/i.png" alt="alt"> text</p>`
+  gave `![alt](/i.png)text` and gives `![alt](/i.png) text`, and
+  `<p><a href="/x"><img src="/i.png" alt="alt"> text</a></p>` gave `[![alt](/i.png)text](/x)` and
+  gives `[![alt](/i.png) text](/x)`. With no white space in the source the output has none
+  ([#762](https://github.com/xberg-io/html-to-markdown/issues/762)).
+
+- Blocks inside a link label or a heading are separate words at every depth of nesting. This
+  changes the default output:
+  `<a href="/x"><div><div>Next</div><div>Cross-references</div></div></a>` gave
+  `[NextCross-references](/x)` and gives `[Next Cross-references](/x)`, and
+  `<h2><p>a</p><p>b</p></h2>` gave `## ab` and gives `## a b`. Inline content beside a block in a
+  link no longer gets a space that the source does not have:
+  `<a href="/x"><b>H</b>ello<div>x</div></a>` gave `[**H** ello x](/x)` and gives
+  `[**H**ello x](/x)`. The text of an image stays a word of its own there:
+  `<a href="/x"><img src="/i.png" alt="Logo"><span>Docs</span><p>desc</p></a>` gives
+  `[Logo Docs desc](/x)`, as before
+  ([#751](https://github.com/xberg-io/html-to-markdown/issues/751)).
+
+- An inline element that holds only a tab is one space: `<p>one<span>\t</span>two</p>` gave `one`,
+  a tab and `two`, and gives `one two`.
+
+- White space on the two sides of an element that writes nothing is one space, also in a table
+  cell: `<p>one <span id="a"></span> two</p>` gave `one  two` with two spaces and gives `one two`,
+  and `<p><span>one </span> two</p>` does the same. The rule holds for every element that writes
+  nothing: an image that `inline_data_media: DropElement` removes, a link with no name, an
+  element that a visitor skips. With `DropElement`,
+  `<p>Before <img src="data:image/png;base64,AAAA" alt="icon"> after</p>` gave `Before  after`
+  and gives `Before after`.
+
+- A no-break space in an element of its own is kept after a space:
+  `<p>one <span>&nbsp;</span> two</p>` gave `one  two` and gives `one`, a space, the no-break
+  space, a space and `two`. A no-break space in running text is one space, as before. In a link
+  label a no-break space beside a space is one space on both converters.
+
 ## [3.17.2] - 2026-10-06
 
 ### Changed
