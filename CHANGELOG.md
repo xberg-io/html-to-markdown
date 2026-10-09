@@ -7,7 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A link whose only content is an inline `<svg>` with no text is no longer labelled `SVG Image`.
+  The link is kept, and its label is the `aria-label` of the link, then its `title`, then its own
+  address, as for a link around an image with no alt text:
+  `<a href="/page" aria-label="Next"><div><svg>...</svg></div></a>` gives `[Next](/page)`. One
+  link is left out: the icon of a heading permalink, a link into its own page that holds nothing
+  but such a graphic. `<h2>Title <a href="#title"><svg>...</svg></a></h2>` gives `## Title`
+  ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
+
 ### Fixed
+
+- An inline `<svg>` keeps its text and no longer adds the words `SVG Image`. Its text is its
+  `aria-label`, the `<title>` and `<desc>` of the graphic, its `<text>` elements and the HTML in a
+  `<foreignObject>`, in document order. Style sheets, scripts, metadata and the content of `<defs>`
+  and `<symbol>` are not text, and a `<use>` reference is not followed. A `<switch>` gives the child
+  that a reader of English gets. An element with `display="none"` or `visibility="hidden"` gives
+  nothing, as hidden text outside a graphic gives nothing. `aria-hidden="true"` removes the label,
+  the title and the description. That text is the alt text of the image, and it is what
+  `inline_data_media = alt_text_only`, a heading and plain text output write, with the escaping of
+  any other text. A graphic with no text writes nothing there, and an image with an empty alt text
+  when the payload is kept. An icon link no longer takes the style sheet of its graphic as its
+  label ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
+- A graphic in a heading is written as its text also with `extract_metadata = false` and
+  `highlight_style = none`. With those options it was written as a `data:` image, because the fast
+  converter has no rule for a heading. It now leaves a page with a graphic in a heading, or with
+  a hidden element in a graphic, to the full converter
+  ([#766](https://github.com/xberg-io/html-to-markdown/issues/766)).
+- A page with many tag starts before one `>`, or before a quote that has no partner, no longer
+  takes quadratic time: 40,000 of them took 16 seconds. The pass that removes hidden elements now
+  reads each tag once. A `<` inside a tag is part of an attribute value there, so an attribute
+  value that holds markup is no longer cut
+  ([#765](https://github.com/xberg-io/html-to-markdown/issues/765)).
 
 - Text that is only white space no longer makes the conversion fail when `include_document_structure`
   is on, and `build_document_structure` no longer panics on it. The Markdown is the same as with the

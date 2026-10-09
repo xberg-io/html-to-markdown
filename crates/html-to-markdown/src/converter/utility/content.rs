@@ -163,6 +163,20 @@ pub fn link_text_content(children: &[tl::NodeHandle], parser: &tl::Parser, dom_c
     walk_link_text(children, parser, dom_ctx, |_| true)
 }
 
+/// Whether a descendant of a link is an inline `<svg>`.
+pub fn link_holds_graphic(children: &[tl::NodeHandle], parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let mut stack: Vec<_> = children.to_vec();
+    while let Some(handle) = stack.pop() {
+        if let Some(tl::Node::Tag(tag)) = handle.get(parser) {
+            if tag.name().as_utf8_str().eq_ignore_ascii_case("svg") {
+                return true;
+            }
+            push_label_children(&mut stack, handle, tag, dom_ctx);
+        }
+    }
+    false
+}
+
 /// Walks the descendants of a link for their text. `enter_block` gets each topmost block-level
 /// element and says whether to read inside it.
 ///

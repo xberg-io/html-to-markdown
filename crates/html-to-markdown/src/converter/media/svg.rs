@@ -264,15 +264,56 @@ fn is_aria_hidden(tag: &tl::HTMLTag<'_>) -> bool {
         .is_some_and(|value| value.as_utf8_str().trim().eq_ignore_ascii_case("true"))
 }
 
+/// Whether the `display` or `visibility` attribute of an element of a graphic hides it.
+///
+/// ~keep The two attributes are the SVG spelling of the style declarations with the same names.
+/// ~keep The function that judges a `style` attribute judges them, so text in a graphic and text
+/// ~keep outside one are hidden by one decision. An element hidden by its `style` or by the
+/// ~keep `hidden` attribute is already gone when the graphic is parsed.
+fn is_hidden_in_graphic(tag: &tl::HTMLTag<'_>) -> bool {
+    use crate::converter::utility::preprocessing::{HiddenStyleReason, style_value_hidden_reason};
+
+    ["display", "visibility"].iter().any(|property| {
+        tag.attributes().get(*property).flatten().is_some_and(|value| {
+            let declaration = format!("{property}:{}", value.as_utf8_str());
+            style_value_hidden_reason(&declaration) == Some(HiddenStyleReason::Definitive)
+        })
+    })
+}
+
+/// Whether the `systemLanguage` test of a child of a `switch` holds for a reader of English.
+fn system_language_holds(tag: &tl::HTMLTag<'_>) -> bool {
+    // ~keep The parser keeps the case of the name in a page and lowers it in a fragment.
+    let Some(value) = ["systemLanguage", "systemlanguage"]
+        .iter()
+        .find_map(|key| tag.attributes().get(*key))
+    else {
+        return true;
+    };
+    value.is_some_and(|value| {
+        value.as_utf8_str().split(',').any(|language| {
+            let language = language.trim();
+            language.eq_ignore_ascii_case("en")
+                || language
+                    .get(..3)
+                    .is_some_and(|prefix| prefix.eq_ignore_ascii_case("en-"))
+        })
+    })
+}
+
 /// The text of an inline `<svg>` for a reader who does not get the picture, on one line.
 ///
 /// In reading order: the `aria-label` of the graphic, then the `title` and `desc` of each `svg`
 /// element, each `text` element and each `foreignObject`, joined by one space. Only elements that
-/// draw their children are entered (`svg`, `g`, `a`, the first child of `switch`), so `defs`,
-/// `symbol`, `style`, `script` and `metadata` give nothing, and a `use` reference is not followed.
-/// `aria-hidden="true"` removes the label, the title and the description, and keeps drawn text.
-/// A graphic with none of these gives the empty string.
+/// draw their children are entered (`svg`, `g`, `a`, the child of `switch` that a reader of
+/// English gets), so `defs`, `symbol`, `style`, `script` and `metadata` give nothing, and a `use`
+/// reference is not followed. An element with `display="none"` or `visibility="hidden"` gives
+/// nothing. `aria-hidden="true"` removes the label, the title and the description, and keeps
+/// drawn text. A graphic with none of these gives the empty string.
 pub fn graphic_text(svg: &tl::HTMLTag<'_>, parser: &Parser<'_>) -> String {
+    if is_hidden_in_graphic(svg) {
+        return String::new();
+    }
     let named = !is_aria_hidden(svg);
     let mut out = GraphicParts::default();
     if named {
@@ -335,6 +376,9 @@ fn visit_graphic_tag(
     stack: &mut Vec<GraphicStep>,
     out: &mut GraphicParts,
 ) {
+    if is_hidden_in_graphic(tag) {
+        return;
+    }
     let name = normalized_tag_name(tag.name().as_utf8_str());
     let nested_svg = |named: bool| GraphicScope::Drawing {
         of_svg: true,
@@ -353,12 +397,14 @@ fn visit_graphic_tag(
             push_graphic_children(stack, tag, GraphicScope::Drawing { of_svg: false, named });
         }
         (GraphicScope::Drawing { named, .. }, "switch") => {
-            // ~keep A `switch` draws one child: the first that is an element.
+            // ~keep A `switch` draws one child: the first element whose test attributes hold. The
+            // ~keep converter knows no language of the reader, so a `systemLanguage` holds only
+            // ~keep when it names English, and a child without the attribute is the fallback.
             let first = tag
                 .children()
                 .top()
                 .iter()
-                .find(|child| matches!(child.get(parser), Some(tl::Node::Tag(_))))
+                .find(|child| matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if system_language_holds(child_tag)))
                 .copied();
             stack.extend(first.map(|child| GraphicStep::Visit(child, GraphicScope::Drawing { of_svg: false, named })));
         }
@@ -441,24 +487,38 @@ pub fn handle_svg(
     if options.skip_images {
         return;
     }
-    let inline_data = ctx.inline_data_treatment(options.inline_data_media, "data:image/svg+xml");
+    let inline_data = super::inline_data_treatment(options.inline_data_media, "data:image/svg+xml");
     if inline_data == crate::options::InlineDataMedia::DropElement {
+        // ~keep Only this choice removes the element. A link around a graphic that is written as
+        // ~keep its text keeps its address also when that text is empty, so the flag stays unset.
+        ctx.inline_data_replaced.set(true);
         return;
     }
 
     let title = graphic_text(tag, parser);
     if ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
-        // ~keep An inline context replaces the payload by the text whatever the option says, so a
-        // ~keep link that this leaves empty goes with it and is not labelled with its own address.
-        ctx.inline_data_replaced.set(true);
-        // ~keep Written as running text, so it gets the escaping of a text node.
-        output.push_str(&crate::text::escape(
+        // ~keep Written as running text through the function a text node uses, so it gets the same
+        // ~keep escaping, also where it starts a line.
+        let escaped = crate::text::escape(
             &title,
             options.escape_misc,
             options.escape_asterisks,
             options.escape_underscores,
             options.escape_ascii,
-        ));
+        );
+        if !escaped.is_empty() {
+            crate::converter::text_node::push_running_text(
+                output,
+                &escaped,
+                crate::converter::text_node::TextSite {
+                    node_handle,
+                    parser,
+                    options,
+                    ctx,
+                    dom_ctx: context.dom_ctx,
+                },
+            );
+        }
     } else {
         use base64::{Engine as _, engine::general_purpose::STANDARD};
 

@@ -19,7 +19,8 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_conte
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
-    collect_link_label_text, link_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
+    collect_link_label_text, link_holds_graphic, link_text_content, node_is_block_level, normalize_link_label,
+    normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -76,7 +77,7 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     let mut label = build_label(&data, &handler);
     apply_label_fallbacks(&data, &mut label, &handler);
     indent_hard_break_continuations(&mut label, handler.context, handler.options);
-    let drop_link = label.is_empty() && handler.context.inline_data_replaced.get();
+    let drop_link = data.is_dropped(&label, &handler);
     let emit_deferred = emit_link(tag, &data, &label, drop_link, &mut handler);
     #[cfg(feature = "metadata")]
     record_link_metadata(tag, &data, &label, handler.context);
@@ -97,21 +98,60 @@ struct LinkData<'a> {
     href_addr_dropped: bool,
     link_allow_inline_images: bool,
     saw_block: bool,
+    aria_label: Option<Cow<'a, str>>,
+    same_page_fragment: bool,
+}
+
+/// Whether a link address points into the page that holds the link: `#part`, or with a known
+/// base an address that differs from the base only by its fragment.
+fn is_same_page_fragment(raw_href: &str, resolved_href: &str, base: Option<&url::Url>) -> bool {
+    if raw_href.trim_start().starts_with('#') {
+        return true;
+    }
+    let without_fragment = |url: &url::Url| {
+        let mut url = url.clone();
+        url.set_fragment(None);
+        url
+    };
+    base.zip(url::Url::parse(resolved_href).ok())
+        .is_some_and(|(base, target)| {
+            target.fragment().is_some() && without_fragment(&target) == without_fragment(base)
+        })
 }
 
 impl<'a> LinkData<'a> {
+    /// The name of the link apart from its content: its `aria-label`, else its `title`.
+    fn accessible_name(&self) -> Option<&str> {
+        self.aria_label
+            .as_deref()
+            .map(str::trim)
+            .filter(|label| !label.is_empty())
+            .or(self.title.as_deref())
+    }
+
+    /// Whether the link is the icon of a heading permalink: it points into its own page and
+    /// holds an inline graphic. With an empty label it is dropped; it leads nowhere else.
+    fn is_icon_permalink(&self, handler: &HandlerContext<'_>) -> bool {
+        self.same_page_fragment && link_holds_graphic(&self.children, handler.parser, handler.dom_context)
+    }
+
+    /// Whether the link is left out of the output: its label is empty, and either the
+    /// `inline_data_media` choice removed its content or it is an icon permalink.
+    fn is_dropped(&self, label: &str, handler: &HandlerContext<'_>) -> bool {
+        label.is_empty() && (handler.context.inline_data_replaced.get() || self.is_icon_permalink(handler))
+    }
+
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {
-        let href = tag
+        let raw_href = tag
             .attributes()
             .get("href")
             .flatten()
-            .map(|value| text::decode_attribute_value_cow(&value.as_utf8_str()).into_owned())
-            .map(|href| {
-                handler
-                    .context
-                    .resolve_url(&href, handler.node_handle, handler.parser, handler.dom_context)
-                    .unwrap_or(href)
-            })?;
+            .map(|value| text::decode_attribute_value_cow(&value.as_utf8_str()).into_owned())?;
+        let href = handler
+            .context
+            .resolve_url(&raw_href, handler.node_handle, handler.parser, handler.dom_context)
+            .unwrap_or_else(|| raw_href.clone());
+        let same_page_fragment = is_same_page_fragment(&raw_href, &href, handler.context.base_url.as_deref());
         // ~keep Empty titles are absent because Markdown serializers drop `""` on reparse.
         let title =
             crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|value| !value.is_empty());
@@ -139,6 +179,8 @@ impl<'a> LinkData<'a> {
                 handler.dom_context,
             ),
             link_allow_inline_images: handler.context.keep_inline_images_in.contains("a"),
+            aria_label: crate::converter::utility::attributes::decoded_attribute(tag, "aria-label"),
+            same_page_fragment,
             href,
             title,
             children,
@@ -309,7 +351,14 @@ fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &Hand
     if !data.emit_blocks_separately && label.is_empty() && !data.raw_text.is_empty() {
         *label = normalize_link_label(&data.raw_text);
     }
-    let drop_link = label.is_empty() && handler.context.inline_data_replaced.get();
+    // ~keep A link with no text of its own is named as a browser names it: by its `aria-label`,
+    // ~keep then by its `title`. Its own address is the last label, for a link with no name at all.
+    if label.is_empty() && !data.children.is_empty() && !data.is_icon_permalink(handler) {
+        if let Some(name) = data.accessible_name() {
+            *label = normalize_link_label(name);
+        }
+    }
+    let drop_link = data.is_dropped(label, handler);
     if label.is_empty() && !data.href.is_empty() && !data.children.is_empty() && !drop_link && !data.href_addr_dropped {
         *label = text::escape(
             &data.href,

@@ -9,11 +9,36 @@ const SVG_URL: &str = "](data:image/svg+xml;base64,";
 const ICON: &str = r#"<svg width="9" height="9"><path d="M1 1"/></svg>"#;
 const STYLED_ICON: &str = r#"<svg><style>.cls{fill:#000}</style><path d="M1 1"/></svg>"#;
 
-fn convert_with(html: &str, options: ConversionOptions) -> String {
+fn convert_plain(html: &str, options: ConversionOptions) -> String {
     convert(html, Some(options))
         .expect("conversion should succeed")
         .content
         .unwrap_or_default()
+}
+
+/// Converts `html` with `options`. Every input of this file also goes through both converters
+/// with the options that select the fast one, and the two results must be equal (#766).
+fn convert_with(html: &str, options: ConversionOptions) -> String {
+    #[cfg(feature = "testkit")]
+    {
+        let on_tier = |tier_strategy| {
+            convert_plain(
+                html,
+                ConversionOptions {
+                    extract_metadata: false,
+                    highlight_style: html_to_markdown_rs::HighlightStyle::None,
+                    tier_strategy,
+                    ..ConversionOptions::default()
+                },
+            )
+        };
+        assert_eq!(
+            on_tier(html_to_markdown_rs::TierStrategy::Tier1),
+            on_tier(html_to_markdown_rs::TierStrategy::Tier2),
+            "the two converters differ for {html}"
+        );
+    }
+    convert_plain(html, options)
 }
 
 fn text_only() -> ConversionOptions {
@@ -170,7 +195,7 @@ fn should_leave_out_what_the_graphic_does_not_draw() {
 fn should_convert_a_graphic_in_a_link_a_button_a_heading_a_cell_and_a_list() {
     assert_text_only(&[
         (r#"<a href="/x"><svg><path d="M1 1"/></svg> Home</a>"#, "[Home](/x)\n"),
-        (r#"<a href="/x"><svg><path d="M1 1"/></svg></a>"#, ""),
+        (r#"<a href="/x"><svg><path d="M1 1"/></svg></a>"#, "[/x](/x)\n"),
         (
             r#"<a href="/x"><svg><title>Home</title><path d="M1 1"/></svg></a>"#,
             "[Home](/x)\n",
@@ -201,7 +226,7 @@ fn should_not_label_an_icon_link_with_the_style_sheet_of_its_graphic() {
     let in_block = format!(r#"<a href="/x"><div>{STYLED_ICON}</div></a>"#);
     for html in [&inline, &in_block] {
         for (name, options, expected) in [
-            ("alt_text_only", text_only(), ""),
+            ("alt_text_only", text_only(), "[/x](/x)\n"),
             (
                 "drop_element",
                 ConversionOptions {
@@ -222,21 +247,6 @@ fn should_not_label_an_icon_link_with_the_style_sheet_of_its_graphic() {
             assert_eq!(convert_with(html, options), expected, "{name}: {html}");
         }
     }
-    // ~keep A heading and a link around a block write a graphic as text under every option, so an
-    // ~keep icon link there is dropped as well and not labelled with its address.
-    for (html, expected) in [
-        (
-            format!(r##"<h2>Head<a href="#x" title="Link for this heading">{ICON}</a></h2>"##),
-            "## Head\n",
-        ),
-        (format!(r#"<a href="/x"><div>{STYLED_ICON}</div></a>"#), ""),
-        (
-            r##"<h2>Head <a href="#x"><svg><title>Anchor</title></svg></a></h2>"##.to_string(),
-            "## Head [Anchor](#x)\n",
-        ),
-    ] {
-        assert_eq!(convert_with(&html, ConversionOptions::default()), expected, "{html}");
-    }
     // ~keep The text of the link itself is still its label.
     assert_eq!(
         convert_with(
@@ -245,6 +255,213 @@ fn should_not_label_an_icon_link_with_the_style_sheet_of_its_graphic() {
         ),
         "[Docs](/x)\n"
     );
+}
+
+#[test]
+fn should_keep_a_link_around_a_graphic_with_no_text_and_name_it_as_a_browser_does() {
+    let with_base = || ConversionOptions {
+        base_url: Some("https://example.org/doc".to_string()),
+        ..ConversionOptions::default()
+    };
+    for (html, options, expected) in [
+        // ~keep The label of the link, then its title, then its address: a link that leaves the
+        // ~keep page is never lost.
+        (
+            format!(r#"<a href="https://example.org/meta" aria-label="Meta Open Source"><div>{ICON}</div></a>"#),
+            ConversionOptions::default(),
+            "[Meta Open Source](https://example.org/meta)\n",
+        ),
+        (
+            format!(r#"<a href="/page" title="Open page"><div>{ICON}</div></a>"#),
+            ConversionOptions::default(),
+            "[Open page](/page \"Open page\")\n",
+        ),
+        (
+            format!(r#"<a href="/page"><p>{ICON}</p></a>"#),
+            ConversionOptions::default(),
+            "[/page](/page)\n",
+        ),
+        (
+            format!(r#"<h2>Head <a href="/page">{ICON}</a></h2>"#),
+            ConversionOptions::default(),
+            "## Head [/page](/page)\n",
+        ),
+        (
+            format!(r#"<ul><li><a href="/prev"><div>{ICON}</div></a></li></ul>"#),
+            ConversionOptions::default(),
+            "- [/prev](/prev)\n",
+        ),
+        (
+            format!(r#"<a href="/x"><div>{STYLED_ICON}</div></a>"#),
+            ConversionOptions::default(),
+            "[/x](/x)\n",
+        ),
+        (
+            format!(r#"<p><a href="/files/report.pdf" aria-label="Report">{ICON}</a></p>"#),
+            text_only(),
+            "[Report](/files/report.pdf)\n",
+        ),
+        // ~keep The same link around an image with no alt text follows the same rule.
+        (
+            r#"<a href="/page"><div><img src="/i.png"></div></a>"#.to_string(),
+            ConversionOptions::default(),
+            "[/page](/page)\n",
+        ),
+        (
+            r#"<a href="/page" aria-label="Photo"><div><img src="/i.png"></div></a>"#.to_string(),
+            ConversionOptions::default(),
+            "[Photo](/page)\n",
+        ),
+        // ~keep Only the icon of a heading permalink is dropped: a link into its own page whose
+        // ~keep content is a graphic with no text.
+        (
+            format!(r##"<h2>Head<a href="#x" title="Link for this heading" aria-label="Link">{ICON}</a></h2>"##),
+            ConversionOptions::default(),
+            "## Head\n",
+        ),
+        (
+            format!(r#"<h2>Head<a href="https://example.org/doc#part">{ICON}</a></h2>"#),
+            with_base(),
+            "## Head\n",
+        ),
+        (
+            format!(r#"<h2>Head<a href="https://example.org/other#part">{ICON}</a></h2>"#),
+            with_base(),
+            "## Head[https://example.org/other#part](https://example.org/other#part)\n",
+        ),
+        (
+            r##"<h2>Head <a href="#x"><svg><title>Anchor</title></svg></a></h2>"##.to_string(),
+            ConversionOptions::default(),
+            "## Head [Anchor](#x)\n",
+        ),
+    ] {
+        assert_eq!(convert_with(&html, options), expected, "{html}");
+    }
+    // ~keep A permalink around an image is not the icon of a graphic: it keeps the label that a
+    // ~keep link around an image with no alt text has.
+    assert_eq!(
+        convert_plain(
+            r##"<h2>Head<a href="#x"><img src="/i.png"></a></h2>"##,
+            ConversionOptions::default()
+        ),
+        "## Head[#x](#x)\n"
+    );
+}
+
+#[cfg(feature = "metadata")]
+#[test]
+fn should_record_a_kept_link_under_the_label_the_markdown_shows() {
+    let html = format!(
+        r#"<a href="https://example.org/meta" aria-label="Meta Open Source"><div>{ICON}</div></a><a href="/page"><p>{ICON}</p></a>"#
+    );
+    let result = convert(&html, None).expect("conversion should succeed");
+    let links: Vec<(&str, &str)> = result
+        .metadata
+        .links
+        .iter()
+        .map(|link| (link.href.as_str(), link.text.as_str()))
+        .collect();
+    assert_eq!(
+        links,
+        [("https://example.org/meta", "Meta Open Source"), ("/page", "/page")]
+    );
+}
+
+#[test]
+fn should_write_no_text_that_the_graphic_hides() {
+    assert_text_only(&[
+        (
+            concat!(
+                "<svg><text display=\"none\">unseen</text><g display=\"none\"><text>unseen</text></g>",
+                "<text visibility=\"hidden\">unseen</text><foreignObject visibility=\"hidden\"><div>unseen</div></foreignObject>",
+                "<text style=\"display:none\">unseen</text><text>seen</text></svg>"
+            ),
+            "seen\n",
+        ),
+        (
+            r#"<p>a <svg display="none"><title>T</title><text>unseen</text></svg> b</p>"#,
+            "a b\n",
+        ),
+        (
+            "<p>a <svg><title display=\"NONE\">T</title><text>seen</text></svg> b</p>",
+            "a seen b\n",
+        ),
+        // ~keep `display="inline"` hides nothing, and neither does a transparent element: the
+        // ~keep converter keeps the same text outside a graphic.
+        (
+            "<p><span style=\"opacity:0\">faint</span> <svg><text display=\"inline\" opacity=\"0\">faint too</text></svg></p>",
+            "faint faint too\n",
+        ),
+    ]);
+}
+
+#[test]
+fn should_draw_the_child_of_a_switch_that_a_reader_of_english_gets() {
+    assert_text_only(&[
+        (
+            r#"<svg><switch><text systemLanguage="de">Hallo Welt</text><text systemLanguage="en">Hello world</text><text>Fallback</text></switch></svg>"#,
+            "Hello world\n",
+        ),
+        (
+            r#"<svg><switch><text systemLanguage="fr, en-GB">Hello world</text><text systemLanguage="de">Hallo Welt</text><text>Fallback</text></switch></svg>"#,
+            "Hello world\n",
+        ),
+        (
+            r#"<svg><switch><g systemLanguage="zz"><text>never shown</text></g><g><text>default shown</text></g></switch></svg>"#,
+            "default shown\n",
+        ),
+        (
+            r#"<p>a <svg><switch><text systemLanguage="de">Hallo Welt</text><text systemLanguage="">leer</text></switch></svg> b</p>"#,
+            "a b\n",
+        ),
+    ]);
+}
+
+#[test]
+fn should_escape_the_text_of_a_graphic_at_the_start_of_a_line_as_a_text_node_is() {
+    let mut wrong = Vec::new();
+    for words in [
+        "# heading words",
+        "1. one",
+        "1) one",
+        "- item",
+        "+ item",
+        "* item",
+        "&gt; quote",
+        "| a | b |",
+        "```",
+        "~~~",
+        "---",
+        "===",
+        "[a]: b",
+        "plain words",
+    ] {
+        for template in [
+            "<p>{X}</p>",
+            "<p>before<br>{X}</p>",
+            "<ul><li>{X}</li></ul>",
+            "<blockquote>{X}</blockquote>",
+            "<div>{X}</div>",
+        ] {
+            let graphic = template.replace("{X}", &format!("<svg><text>{words}</text></svg>"));
+            let span = template.replace("{X}", &format!("<span>{words}</span>"));
+            let (graphic_out, span_out) = (convert_with(&graphic, text_only()), convert_with(&span, text_only()));
+            if graphic_out != span_out {
+                wrong.push(format!("{graphic}\n  graphic {graphic_out:?}\n  span    {span_out:?}"));
+            }
+        }
+    }
+    assert!(
+        wrong.is_empty(),
+        "{} inputs differ from a span:\n{}",
+        wrong.len(),
+        wrong.join("\n")
+    );
+    assert_text_only(&[
+        ("<p><svg><text># heading words</text></svg></p>", "\\# heading words\n"),
+        ("<p><svg><text>1. one</text></svg></p>", "1\\. one\n"),
+        ("<p><svg><text>- item</text></svg></p>", "\\- item\n"),
+    ]);
 }
 
 #[test]
@@ -409,7 +626,9 @@ fn should_write_the_same_alt_text_in_both_tiers() {
     let mut wrong = Vec::new();
     for html in [
         r#"<p>a <svg ARIA-LABEL="Upper &amp; lower"><TITLE>T</TITLE></svg> b</p>"#,
-        r#"<p>a <svg><text style="display:none">unseen</text><text hidden>unseen</text><text>seen</text></svg> b</p>"#,
+        r#"<p>a <svg><text style="display:none">unseen</text><text>seen</text></svg> b</p>"#,
+        "<p>a <svg><text hidden>unseen</text><text>seen</text></svg> b</p>",
+        r#"<p>a <svg><g><text>seen</text><text style="visibility: hidden">unseen</text></g></svg> b</p>"#,
         r#"<p>a <svg aria-hidden="true"><title>T</title><text>seen</text></svg> b</p>"#,
         "<p>a <svg><title>one <b>two</b>\nthree</title></svg> b</p>",
         "<p>a <svg><svg><title>Inner</title></svg><text>out</text></svg> b</p>",
@@ -421,14 +640,14 @@ fn should_write_the_same_alt_text_in_both_tiers() {
         "<p>a <svg><text>x<tspan x=\"0\">y</tspan></text><style>.a{}</style></svg> b</p>",
     ] {
         converted += usize::from(tier1::run(html, &PrescanReport::default(), &tier1_options()).is_ok());
-        let fast = convert_with(
+        let fast = convert_plain(
             html,
             ConversionOptions {
                 tier_strategy: TierStrategy::Tier1,
                 ..tier1_options()
             },
         );
-        let full = convert_with(
+        let full = convert_plain(
             html,
             ConversionOptions {
                 tier_strategy: TierStrategy::Tier2,
@@ -446,4 +665,85 @@ fn should_write_the_same_alt_text_in_both_tiers() {
         wrong.len(),
         wrong.join("\n")
     );
+}
+
+#[cfg(feature = "testkit")]
+#[test]
+fn should_leave_a_graphic_with_a_hidden_element_to_the_full_converter_and_no_other() {
+    use html_to_markdown_rs::prescan::PrescanReport;
+    use html_to_markdown_rs::{HighlightStyle, tier1};
+
+    let options = ConversionOptions {
+        extract_metadata: false,
+        highlight_style: HighlightStyle::None,
+        ..ConversionOptions::default()
+    };
+    let fast = |html: &str| tier1::run(html, &PrescanReport::default(), &options);
+    for html in [
+        r#"<p>a <svg><text style="display:none">unseen</text><text>seen</text></svg> b</p>"#,
+        "<p>a <svg><text hidden>unseen</text><text>seen</text></svg> b</p>",
+    ] {
+        assert!(fast(html).is_err(), "the fast converter kept {html}");
+    }
+    // ~keep A `<` inside a tag is part of an attribute, so the scan does not read it as a tag.
+    for html in [
+        r#"<p>a <svg><text data-note="<b hidden>">seen</text></svg> b</p>"#,
+        r#"<p>a <svg><text data-note="<b style='display:none'>">seen</text></svg> b</p>"#,
+        "<p>a <svg><title>T</title><text>seen</text></svg> b</p>",
+    ] {
+        let markdown = fast(html).unwrap_or_else(|reason| panic!("the fast converter left {html}: {reason:?}"));
+        assert!(
+            markdown.starts_with("a ![") && markdown.ends_with(") b\n"),
+            "{html} -> {markdown:?}"
+        );
+    }
+}
+
+#[cfg(feature = "testkit")]
+#[test]
+fn should_write_a_graphic_in_a_heading_as_text_whatever_the_other_options_are() {
+    use html_to_markdown_rs::{HighlightStyle, TierStrategy};
+
+    for (html, expected) in [
+        (
+            r#"<h2>Head <svg width="40" height="20"><title>T</title></svg></h2>"#.to_string(),
+            "## Head T\n",
+        ),
+        (format!("<h2>Head {ICON}</h2>"), "## Head\n"),
+        (format!(r##"<h2>Title <a href="#title">{ICON}</a></h2>"##), "## Title\n"),
+        (
+            format!(r#"<h2>Title <a href="/page">{ICON}</a></h2>"#),
+            "## Title [/page](/page)\n",
+        ),
+    ] {
+        for (name, options) in [
+            ("default", ConversionOptions::default()),
+            (
+                "no metadata",
+                ConversionOptions {
+                    extract_metadata: false,
+                    ..ConversionOptions::default()
+                },
+            ),
+            (
+                "no metadata, no highlight",
+                ConversionOptions {
+                    extract_metadata: false,
+                    highlight_style: HighlightStyle::None,
+                    ..ConversionOptions::default()
+                },
+            ),
+            (
+                "fast converter asked for",
+                ConversionOptions {
+                    extract_metadata: false,
+                    highlight_style: HighlightStyle::None,
+                    tier_strategy: TierStrategy::Tier1,
+                    ..ConversionOptions::default()
+                },
+            ),
+        ] {
+            assert_eq!(convert_with(&html, options), expected, "{name}: {html}");
+        }
+    }
 }

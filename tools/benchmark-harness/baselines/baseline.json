@@ -74,7 +74,7 @@
       "median_ms": 11.2530497,
       "mad_ms": 0.059547700000000425,
       "mb_per_s": 22.469003268139822,
-      "output_bytes": 58175
+      "output_bytes": 58223
     },
     {
       "fixture": "mdream/github-markdown-complete.html",
@@ -191,7 +191,7 @@
       "median_ms": 2.02843646,
       "mad_ms": 0.005187359999999863,
       "mb_per_s": 32.65208577172492,
-      "output_bytes": 24859
+      "output_bytes": 24791
     },
     {
       "fixture": "real-world/issues/gh-190/sjsu.html",
