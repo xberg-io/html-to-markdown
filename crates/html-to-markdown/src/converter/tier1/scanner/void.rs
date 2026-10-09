@@ -456,7 +456,7 @@ fn dispatch_close(
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
         TagKind::Heading(n) => close_heading(state, frame, n, false, options)?,
-        TagKind::Blockquote => close_blockquote(state, frame, options.br_in_tables),
+        TagKind::Blockquote => close_blockquote(state, frame, options),
         TagKind::Pre => close_pre(state, frame, options),
         TagKind::Strong if suppress_close_marker(state, EscapeCtx::STRONG, true) => {}
         TagKind::Strong => close_inline_marker(state, frame, "**")?,

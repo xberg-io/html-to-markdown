@@ -5,6 +5,7 @@
 //!
 //! Each expected block was compared with the lines that Chrome renders for the same `pre`.
 
+use html_to_markdown_rs::options::WhitespaceMode;
 use html_to_markdown_rs::{CodeBlockStyle, ConversionOptions, TierStrategy, convert};
 
 struct Case {
@@ -335,6 +336,36 @@ const CASES: &[Case] = &[
         "| h     |\n| ----- |\n| `a b` |\n",
     ),
     tier1_case("a block with no content", "<p>x</p><pre></pre><p>y</p>", "x\n\ny\n"),
+    tier1_case(
+        "line feeds at the start of the block",
+        "<pre>\n\na\nb\n</pre>",
+        "```\na\nb\n```\n",
+    ),
+    tier1_case(
+        "a language class on the code element",
+        "<pre><code class=\"language-python\">x = 1\n</code></pre>",
+        "```python\nx = 1\n```\n",
+    ),
+    case(
+        "a link in code whose text is its address",
+        "<pre>see <a href=\"https://example.com/a_b\">https://example.com/a_b</a></pre>",
+        "```\nsee https://example.com/a_b\n```\n",
+    ),
+    tier1_case(
+        "a line of three backticks in the code, then a second block",
+        "<pre>a\n```\nb\n\n\nc\n</pre><p>x</p><pre>d\n\n\ne\n</pre>",
+        "````\na\n```\nb\n\n\nc\n````\n\nx\n\n```\nd\n\n\ne\n```\n",
+    ),
+    tier1_case(
+        "a line of five backticks in the code",
+        "<pre>`````\na\n\n\nb\n</pre>",
+        "``````\n`````\na\n\n\nb\n``````\n",
+    ),
+    tier1_case(
+        "a line of tildes in the code of a backtick fence",
+        "<pre>~~~\na\n\n\nb\n</pre><p>x</p><pre>c\n\n\nd\n</pre>",
+        "```\n~~~\na\n\n\nb\n```\n\nx\n\n```\nc\n\n\nd\n```\n",
+    ),
 ];
 
 fn options(tier_strategy: TierStrategy) -> ConversionOptions {
@@ -413,6 +444,345 @@ fn should_indent_every_line_of_an_indented_code_block_in_a_list_item() {
         converted(html, Some(options)),
         "1. Save this:\n\n       def f(x):\n           if x:\n\n               return 1\n"
     );
+}
+
+/// The tiers a test can ask for by name: Tier-1 only where the test kit exposes it.
+fn tiers() -> Vec<TierStrategy> {
+    vec![
+        TierStrategy::Tier2,
+        #[cfg(feature = "testkit")]
+        TierStrategy::Tier1,
+    ]
+}
+
+/// Converts each input in `style` on every tier and reports the outputs that differ.
+fn assert_style(style: CodeBlockStyle, cases: &[(&str, &str)]) {
+    let mut failures = Vec::new();
+    let mut checked = 0;
+    for (html, expected) in cases {
+        for tier_strategy in tiers() {
+            checked += 1;
+            let options = ConversionOptions {
+                code_block_style: style,
+                ..options(tier_strategy)
+            };
+            let actual = converted(html, Some(options));
+            if actual != *expected {
+                failures.push(format!(
+                    "{html:?} ({style:?}, {tier_strategy:?}):\n  expected {expected:?}\n  actual   {actual:?}"
+                ));
+            }
+        }
+    }
+    assert_eq!(checked, cases.len() * tiers().len());
+    assert_none(&failures, checked);
+}
+
+#[test]
+fn should_keep_the_lines_of_an_indented_code_block() {
+    assert_style(
+        CodeBlockStyle::Indented,
+        &[
+            (
+                "<pre>a   \n\n\nb\n</pre><p>x</p><pre>c \t\n\n\n\nd   \n</pre>",
+                "    a   \n\n\n    b\n\nx\n\n    c \t\n\n\n\n    d   \n",
+            ),
+            (
+                "<pre>a   \n```\n\n\nb\n</pre><p>x</p><pre>c   \n~~~~\n\n\nd\n</pre>",
+                "    a   \n    ```\n\n\n    b\n\nx\n\n    c   \n    ~~~~\n\n\n    d\n",
+            ),
+            (
+                "<blockquote><pre>a   \n\n\nb\n</pre></blockquote>",
+                ">     a   \n>\n>\n>     b\n",
+            ),
+            (
+                "<blockquote><pre>a   \n\n\nb   \n</pre></blockquote>",
+                ">     a   \n>\n>\n>     b   \n",
+            ),
+            (
+                "<blockquote><p>t</p><pre>a   \n\n\nb\n</pre><p>u</p></blockquote>",
+                "> t\n>\n>     a   \n>\n>\n>     b\n>\n> u\n",
+            ),
+            (
+                "<ul><li><p>t</p><pre>a   \n\n\nb\n</pre></li></ul>",
+                "- t\n\n      a   \n\n\n      b\n",
+            ),
+            (
+                "<ul><li><pre>a   \n\n\nb\n</pre></li></ul>",
+                "-     a   \n\n\n      b\n",
+            ),
+            (
+                "<blockquote><ul><li><pre>a   \n\n\nb\n</pre></li></ul></blockquote>",
+                "> -     a   \n>\n>\n>       b\n",
+            ),
+        ],
+    );
+}
+
+#[test]
+fn should_keep_a_line_of_spaces_of_a_code_block_in_a_block_quote() {
+    let html = "<blockquote><pre>a\n   \nb\n</pre></blockquote>";
+    assert_style(CodeBlockStyle::Indented, &[(html, ">     a\n>        \n>     b\n")]);
+    assert_style(CodeBlockStyle::Backticks, &[(html, "> ```\n> a\n>    \n> b\n> ```\n")]);
+}
+
+#[test]
+fn should_keep_the_first_line_of_an_indented_code_block_in_a_wrapper_in_a_block_quote() {
+    assert_style(
+        CodeBlockStyle::Indented,
+        &[
+            (
+                "<blockquote>\n<div><pre>a\nb\n</pre></div></blockquote>",
+                ">     a\n>     b\n",
+            ),
+            (
+                "<blockquote><blockquote><pre>a\nb\n</pre></blockquote></blockquote>",
+                "> >     a\n> >     b\n",
+            ),
+        ],
+    );
+}
+
+#[test]
+fn should_not_read_text_that_starts_with_spaces_in_a_block_quote_as_code() {
+    for tier_strategy in tiers() {
+        let options = ConversionOptions {
+            whitespace_mode: WhitespaceMode::Strict,
+            code_block_style: CodeBlockStyle::Indented,
+            ..options(tier_strategy)
+        };
+        let actual = converted("<blockquote><p>      text</p></blockquote>", Some(options));
+        assert_eq!(actual, "> text\n", "{tier_strategy:?}");
+    }
+}
+
+#[test]
+fn should_not_close_a_fenced_block_on_a_fence_line_of_the_code() {
+    assert_style(
+        CodeBlockStyle::Backticks,
+        &[
+            (
+                "<pre>a   \n```\nb   \n\n\nc\n````\nd   \n\n\ne\n</pre><p>x</p><pre>f   \n\n\ng\n</pre>",
+                "`````\na   \n```\nb   \n\n\nc\n````\nd   \n\n\ne\n`````\n\nx\n\n```\nf   \n\n\ng\n```\n",
+            ),
+            (
+                "<blockquote><pre>a   \n```\nb   \n\n\nc\n</pre></blockquote>",
+                "> ````\n> a   \n> ```\n> b   \n>\n>\n> c\n> ````\n",
+            ),
+            (
+                "<ul><li><p>t</p><pre>a   \n```\nb   \n\n\nc\n</pre></li></ul>",
+                "- t\n\n  ````\n  a   \n  ```\n  b   \n\n\n  c\n  ````\n",
+            ),
+        ],
+    );
+    assert_style(
+        CodeBlockStyle::Tildes,
+        &[(
+            "<pre>a   \n~~~\nb   \n\n\nc\n~~~~\nd   \n\n\ne\n</pre><p>x</p><pre>f   \n\n\ng\n</pre>",
+            "~~~~~\na   \n~~~\nb   \n\n\nc\n~~~~\nd   \n\n\ne\n~~~~~\n\nx\n\n~~~\nf   \n\n\ng\n~~~\n",
+        )],
+    );
+}
+
+#[test]
+fn should_keep_the_lines_of_a_fenced_block_in_a_block_quote_and_in_a_list_item() {
+    for (style, fence) in [(CodeBlockStyle::Backticks, "```"), (CodeBlockStyle::Tildes, "~~~")] {
+        let quote = format!("> {fence}\n> a   \n>\n>\n> b\n> {fence}\n");
+        let item = format!("- t\n\n  {fence}\n  a   \n\n\n  b\n  {fence}\n");
+        let first_in_item = format!("- {fence}\n  a   \n\n\n  b\n  {fence}\n");
+        let item_in_quote = format!("> - {fence}\n>   a   \n>\n>\n>   b\n>   {fence}\n");
+        assert_style(
+            style,
+            &[
+                ("<blockquote><pre>a   \n\n\nb\n</pre></blockquote>", &quote),
+                ("<ul><li><p>t</p><pre>a   \n\n\nb\n</pre></li></ul>", &item),
+                ("<ul><li><pre>a   \n\n\nb\n</pre></li></ul>", &first_in_item),
+                (
+                    "<blockquote><ul><li><pre>a   \n\n\nb\n</pre></li></ul></blockquote>",
+                    &item_in_quote,
+                ),
+            ],
+        );
+    }
+}
+
+#[test]
+fn should_not_open_a_block_on_a_code_span_that_holds_a_fence() {
+    assert_style(
+        CodeBlockStyle::Backticks,
+        &[
+            // ~keep One backtick delimits a span that holds a run of three (CommonMark 6.1).
+            (
+                "<p><code>```</code></p><pre>a   \n\n\nb\n</pre><p><code>```</code> y</p><pre>c   \n\n\nd\n</pre>",
+                "` ``` `\n\n```\na   \n\n\nb\n```\n\n` ``` ` y\n\n```\nc   \n\n\nd\n```\n",
+            ),
+            // ~keep The span holds runs of one and two, so three backticks start its line. A
+            // ~keep fence cannot have a backtick after its run (CommonMark 4.5): the line is text.
+            (
+                "<p><code>a`b``c</code></p><pre>a   \n\n\nb\n</pre><p>x   </p>",
+                "```a`b``c```\n\n```\na   \n\n\nb\n```\n\nx\n",
+            ),
+        ],
+    );
+    assert_style(
+        CodeBlockStyle::Tildes,
+        &[(
+            "<p><code>~~~</code></p><pre>a   \n\n\nb\n</pre>",
+            "`~~~`\n\n~~~\na   \n\n\nb\n~~~\n",
+        )],
+    );
+}
+
+#[test]
+fn should_grow_a_tilde_fence_past_the_tildes_in_the_code() {
+    let cases = [
+        (
+            "<pre>a\n~~~~\nb\n\n\nc\n</pre><p>x</p><pre>d\n\n\ne\n</pre>",
+            "~~~~~\na\n~~~~\nb\n\n\nc\n~~~~~\n\nx\n\n~~~\nd\n\n\ne\n~~~\n",
+        ),
+        (
+            "<pre>```\na\n\n\nb\n</pre><p>x</p><pre>c\n\n\nd\n</pre>",
+            "~~~\n```\na\n\n\nb\n~~~\n\nx\n\n~~~\nc\n\n\nd\n~~~\n",
+        ),
+    ];
+    for (html, expected) in cases {
+        for tier_strategy in tiers() {
+            let options = ConversionOptions {
+                code_block_style: CodeBlockStyle::Tildes,
+                ..options(tier_strategy)
+            };
+            assert_eq!(converted(html, Some(options)), expected, "{tier_strategy:?}");
+        }
+    }
+}
+
+#[test]
+fn should_keep_the_blank_lines_of_a_block_that_follows_fence_marks_in_running_text() {
+    for html in [
+        "<p>```</p><pre>a\n\n\nb\n</pre>",
+        "<p>~~~</p><pre>a\n\n\nb\n</pre>",
+        "<ul><li>```</li></ul><pre>a\n\n\nb\n</pre>",
+    ] {
+        for tier_strategy in tiers() {
+            let actual = converted(html, Some(options(tier_strategy)));
+            assert!(
+                actual.ends_with("\n\n```\na\n\n\nb\n```\n"),
+                "{html} ({tier_strategy:?}): {actual:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn should_keep_the_blank_lines_of_a_block_on_the_line_of_a_long_item_number() {
+    let html = "<ol start=\"100\"><li><pre>a\n\n\nb\n</pre></li></ol>";
+    for tier_strategy in tiers() {
+        let actual = converted(html, Some(options(tier_strategy)));
+        assert!(actual.starts_with("100. ```\n"), "{tier_strategy:?}: {actual:?}");
+        assert!(actual.contains("a\n\n\n"), "{tier_strategy:?}: {actual:?}");
+    }
+}
+
+#[test]
+fn should_keep_the_line_feeds_at_the_start_of_a_block_in_strict_white_space_mode() {
+    let options = ConversionOptions {
+        whitespace_mode: WhitespaceMode::Strict,
+        ..options(TierStrategy::Tier2)
+    };
+    let actual = converted("<pre>\n\n\na\n</pre>", Some(options));
+    assert!(actual.starts_with("```\n\n"), "{actual:?}");
+    assert!(actual.ends_with("a\n```\n"), "{actual:?}");
+}
+
+#[test]
+fn should_keep_the_white_space_of_text_outside_a_list_item_in_strict_white_space_mode() {
+    let options = ConversionOptions {
+        whitespace_mode: WhitespaceMode::Strict,
+        ..options(TierStrategy::Tier2)
+    };
+    let actual = converted("<div>a\n\n  b</div>", Some(options));
+    assert!(actual.contains("a\n\n  b"), "{actual:?}");
+}
+
+#[cfg(feature = "visitor")]
+mod visitor_in_code {
+    #![allow(clippy::significant_drop_tightening)]
+
+    use html_to_markdown_rs::visitor::{HtmlVisitor, NodeContext, VisitResult, VisitorHandle};
+    use html_to_markdown_rs::{ConversionOptions, convert};
+    use std::sync::{Arc, Mutex};
+
+    const HTML: &str = "<pre><a href=\"/x\">link</a> <mark>hot</mark><img src=\"i.png\" alt=\"pic\"> end</pre>\
+                        <p><code>b <a href=\"/y\">two</a></code></p>";
+
+    #[derive(Debug, Default)]
+    struct Recorder {
+        custom: bool,
+        seen: Vec<String>,
+    }
+
+    impl Recorder {
+        fn answer(&self, custom: String) -> VisitResult {
+            if self.custom {
+                VisitResult::Custom(custom)
+            } else {
+                VisitResult::Continue
+            }
+        }
+    }
+
+    impl HtmlVisitor for Recorder {
+        fn visit_link(&mut self, _ctx: &NodeContext<'_>, href: &str, text: &str, _title: Option<&str>) -> VisitResult {
+            self.seen.push(format!("link {href} {text}"));
+            self.answer(format!("<{text}@{href}>"))
+        }
+
+        fn visit_mark(&mut self, _ctx: &NodeContext<'_>, text: &str) -> VisitResult {
+            self.seen.push(format!("mark {text}"));
+            self.answer(format!("[{text}]"))
+        }
+
+        fn visit_image(&mut self, _ctx: &NodeContext<'_>, src: &str, alt: &str, _title: Option<&str>) -> VisitResult {
+            self.seen.push(format!("image {src} {alt}"));
+            self.answer(format!("{{{alt}}}"))
+        }
+    }
+
+    fn converted_with(custom: bool) -> (String, Vec<String>) {
+        let recorder = Arc::new(Mutex::new(Recorder {
+            custom,
+            seen: Vec::new(),
+        }));
+        let handle: VisitorHandle = recorder.clone();
+        let options = ConversionOptions {
+            extract_metadata: false,
+            visitor: Some(handle),
+            ..ConversionOptions::default()
+        };
+        let content = convert(HTML, Some(options))
+            .expect("conversion must succeed")
+            .content
+            .unwrap_or_default();
+        let seen = recorder.lock().expect("the visitor lock").seen.clone();
+        (content, seen)
+    }
+
+    #[test]
+    fn should_ask_the_visitor_about_a_link_a_highlight_and_an_image_in_code() {
+        let (content, seen) = converted_with(false);
+        assert_eq!(
+            seen,
+            ["link /x link", "mark hot", "image i.png pic", "link /y two"].map(String::from)
+        );
+        assert_eq!(content, "```\nlink hot end\n```\n\n`b two`\n");
+    }
+
+    #[test]
+    fn should_write_in_code_what_the_visitor_returns() {
+        let (content, seen) = converted_with(true);
+        assert_eq!(content, "```\n<link@/x> [hot]{pic} end\n```\n\n`b <two@/y>`\n");
+        assert_eq!(seen.len(), 4);
+    }
 }
 
 #[cfg(feature = "metadata")]

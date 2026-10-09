@@ -3,6 +3,7 @@
 //! This module contains utility functions used by the main conversion pipeline,
 //! including preprocessing helpers, HTML repair, and metadata formatting.
 
+use crate::options::CodeBlockStyle;
 use crate::options::ConversionOptions;
 use crate::options::NewlineStyle;
 use crate::options::conversion::{MAX_CONFIGURABLE_DEPTH, NATIVE_STACK_SAFE_DEPTH};
@@ -180,14 +181,14 @@ pub const fn hard_break_marker(options: &ConversionOptions) -> &'static str {
 /// final emission is normalized here. This intentionally preserves single
 /// blank lines (`\n\n`) — only runs of three or more newlines are collapsed.
 ///
-/// The lines of a fenced code block are code, not block transitions, and stay as they are
-/// (issue #783).
-pub fn collapse_excess_blank_lines(output: &mut String) {
+/// The lines of a code block, fenced or indented, are code, not block transitions, and stay as
+/// they are (issue #783).
+pub fn collapse_excess_blank_lines(output: &mut String, style: CodeBlockStyle) {
     if !output.contains("\n\n\n") {
         return;
     }
     let mut cleaned = String::with_capacity(output.len());
-    let mut fences = FenceScan::default();
+    let mut fences = CodeScan::new(style, output);
     let mut consecutive = 0usize;
     for line in output.split_inclusive('\n') {
         let content = line.strip_suffix('\n').unwrap_or(line);
@@ -204,9 +205,47 @@ pub fn collapse_excess_blank_lines(output: &mut String) {
     *output = cleaned;
 }
 
+/// Follows the code blocks of finished Markdown, one line at a time.
+pub enum CodeScan {
+    /// The style writes fenced code blocks.
+    Fenced(FenceScan),
+    /// The style writes indented code blocks: whether each line is code, in the order of the lines.
+    Indented(std::vec::IntoIter<bool>),
+}
+
+impl CodeScan {
+    /// A scan of `output` for the code blocks that `style` writes.
+    ///
+    /// ~keep Only the configured style opens a block. A line of indented code that looks like a
+    /// ~keep fence opens nothing, and neither does a line of tildes in a document whose fences are
+    /// ~keep backticks.
+    pub fn new(style: CodeBlockStyle, output: &str) -> Self {
+        match style {
+            CodeBlockStyle::Indented => Self::Indented(indented_code_lines(output).into_iter()),
+            CodeBlockStyle::Backticks => Self::Fenced(FenceScan {
+                fence: b'`',
+                open: None,
+            }),
+            CodeBlockStyle::Tildes => Self::Fenced(FenceScan {
+                fence: b'~',
+                open: None,
+            }),
+        }
+    }
+
+    /// Whether `line`, the next line of the output, is a line of code.
+    pub fn is_code(&mut self, line: &str) -> bool {
+        match self {
+            Self::Fenced(fences) => fences.is_code(line),
+            Self::Indented(lines) => lines.next().unwrap_or(false),
+        }
+    }
+}
+
 /// Follows the fenced code blocks of finished Markdown, one line at a time.
-#[derive(Default)]
 pub struct FenceScan {
+    /// The fence character of the configured style.
+    fence: u8,
     open: Option<(u8, usize)>,
 }
 
@@ -215,11 +254,11 @@ impl FenceScan {
     ///
     /// ~keep A fence is longer than every run of its character in the code, so no line of code
     /// ~keep closes it. A block quote and a list item put their prefix before every line.
-    pub fn is_code(&mut self, line: &str) -> bool {
+    fn is_code(&mut self, line: &str) -> bool {
         use crate::converter::utility::escaping::code_fence;
 
         let Some((marker, length)) = self.open else {
-            self.open = code_fence(after_container_markers(line));
+            self.open = code_fence(after_container_markers(line)).filter(|(marker, _)| *marker == self.fence);
             return false;
         };
         let rest = line.trim_start_matches([' ', '\t', '>']);
@@ -236,32 +275,212 @@ impl FenceScan {
 fn after_container_markers(mut line: &str) -> &str {
     loop {
         line = line.trim_start_matches([' ', '\t', '>']);
-        let bytes = line.as_bytes();
-        let digits = bytes.iter().take_while(|byte| byte.is_ascii_digit()).count();
-        let marker = match bytes {
-            [b'-' | b'*' | b'+', b' ', ..] => 2,
-            _ if (1..=9).contains(&digits)
-                && matches!(bytes.get(digits), Some(b'.' | b')'))
-                && bytes.get(digits + 1) == Some(&b' ') =>
-            {
-                digits + 2
-            }
-            _ => return line,
+        let Some(marker) = list_marker_length(line) else {
+            return line;
         };
         line = &line[marker..];
     }
 }
 
+/// The length of the list item marker that `rest` starts with: a bullet, or a number of at most
+/// nine digits with its delimiter, before a space, a tab or the end of the line.
+fn list_marker_length(rest: &str) -> Option<usize> {
+    let bytes = rest.as_bytes();
+    let digits = bytes.iter().take_while(|byte| byte.is_ascii_digit()).count();
+    let length = match bytes.first()? {
+        b'-' | b'*' | b'+' => 1,
+        _ if (1..=9).contains(&digits) && matches!(bytes.get(digits), Some(b'.' | b')')) => digits + 1,
+        _ => return None,
+    };
+    matches!(bytes.get(length), None | Some(b' ' | b'\t')).then_some(length)
+}
+
+/// A block whose marker precedes its lines: a block quote, or a list item with the number of
+/// columns its content is indented by.
+enum Container {
+    Quote,
+    Item(usize),
+}
+
+/// A position in a line that counts columns: a tab reaches the next multiple of four.
+struct LineCursor<'a> {
+    rest: &'a str,
+    column: usize,
+    /// Columns of a tab that `skip` passed but did not use.
+    spare: usize,
+}
+
+impl LineCursor<'_> {
+    /// The columns of white space at the cursor.
+    fn indent(&self) -> usize {
+        let mut column = self.column;
+        for byte in self.rest.bytes() {
+            match byte {
+                b' ' => column += 1,
+                b'\t' => column += 4 - column % 4,
+                _ => break,
+            }
+        }
+        self.spare + column - self.column
+    }
+
+    /// Move past `columns` columns of white space.
+    fn skip(&mut self, mut columns: usize) {
+        let used = columns.min(self.spare);
+        self.spare -= used;
+        columns -= used;
+        while columns > 0 {
+            let width = match self.rest.as_bytes().first() {
+                Some(b' ') => 1,
+                Some(b'\t') => 4 - self.column % 4,
+                _ => return,
+            };
+            self.advance(1);
+            self.column += width - 1;
+            if width > columns {
+                self.spare = width - columns;
+                return;
+            }
+            columns -= width;
+        }
+    }
+
+    /// Move past `bytes` bytes that are one column each.
+    fn advance(&mut self, bytes: usize) {
+        self.rest = &self.rest[bytes..];
+        self.column += bytes;
+    }
+
+    /// Move past the `>` of a block quote and the one space that can follow it.
+    fn skip_quote_marker(&mut self) {
+        self.advance(1);
+        if self.indent() > 0 {
+            self.skip(1);
+        }
+    }
+
+    fn is_blank(&self) -> bool {
+        self.rest.trim_matches([' ', '\t']).is_empty()
+    }
+}
+
+/// Whether each line of `output` is a line of an indented code block (CommonMark 4.4).
+///
+/// ~keep A line is code when it is indented by four columns or more past the block quotes and the
+/// ~keep list items it is in, and it does not continue a paragraph. The blank lines between two
+/// ~keep lines of one code block belong to the block. The indentation alone does not say this:
+/// ~keep the third level of a list is indented by four columns too.
+fn indented_code_lines(output: &str) -> Vec<bool> {
+    let mut code = Vec::new();
+    let mut containers: Vec<Container> = Vec::new();
+    let mut in_paragraph = false;
+    let mut last_code: Option<usize> = None;
+    for (index, line) in output.split('\n').enumerate() {
+        code.push(false);
+        let mut cursor = LineCursor {
+            rest: line,
+            column: 0,
+            spare: 0,
+        };
+        let mut depth = 0;
+        for container in &containers {
+            match *container {
+                Container::Quote => {
+                    let indent = cursor.indent();
+                    if indent > 3 || !cursor.rest.trim_start_matches([' ', '\t']).starts_with('>') {
+                        break;
+                    }
+                    cursor.skip(indent);
+                    cursor.skip_quote_marker();
+                }
+                Container::Item(content) => {
+                    if cursor.indent() >= content {
+                        cursor.skip(content);
+                    } else if !cursor.is_blank() {
+                        break;
+                    }
+                }
+            }
+            depth += 1;
+        }
+        if cursor.is_blank() {
+            in_paragraph = false;
+            continue;
+        }
+        if depth < containers.len() {
+            containers.truncate(depth);
+            last_code = None;
+        }
+        let is_code = loop {
+            let indent = cursor.indent();
+            if indent >= 4 {
+                break !in_paragraph;
+            }
+            cursor.skip(indent);
+            if cursor.rest.starts_with('>') {
+                cursor.skip_quote_marker();
+                containers.push(Container::Quote);
+            } else if let Some(marker) = list_marker_length(cursor.rest) {
+                cursor.advance(marker);
+                // ~keep The content of an item starts after one to four spaces. With more, or with
+                // ~keep nothing after the marker, it starts after one.
+                let padding = match cursor.indent() {
+                    spaces @ 1..=4 if !cursor.is_blank() => spaces,
+                    _ => 1,
+                };
+                cursor.skip(padding);
+                containers.push(Container::Item(indent + marker + padding));
+            } else {
+                in_paragraph = true;
+                break false;
+            }
+            in_paragraph = false;
+            last_code = None;
+            if cursor.is_blank() {
+                break false;
+            }
+        };
+        if is_code {
+            code[index] = true;
+            if let Some(last) = last_code {
+                code[last + 1..index].fill(true);
+            }
+            last_code = Some(index);
+        } else {
+            last_code = None;
+        }
+    }
+    code
+}
+
+/// The part of `content`, the Markdown inside a block quote, without the white space around it.
+///
+/// ~keep With the indented style the indentation of a first line of code stays, and so does the
+/// ~keep line end of a last line of code: without its four columns the line is running text.
+pub fn quote_content_range(content: &str, style: CodeBlockStyle) -> std::ops::Range<usize> {
+    let start = content.len() - content.trim_start().len();
+    let end = content.trim_end().len();
+    if style != CodeBlockStyle::Indented || start >= end {
+        return start..end.max(start);
+    }
+    let first_line = content[..start].rfind('\n').map_or(0, |index| index + 1);
+    let last_line = content[end..].find('\n').map_or(content.len(), |index| end + index);
+    let code = indented_code_lines(&content[first_line..last_line]);
+    let start = if code.first() == Some(&true) { first_line } else { start };
+    let end = if code.last() == Some(&true) { last_line } else { end };
+    start..end
+}
+
 /// Remove trailing spaces/tabs from every line while preserving newlines.
 ///
-/// The lines of a fenced code block keep their line ends: they are code.
-pub fn trim_line_end_whitespace(output: &mut String) {
+/// The lines of a code block, fenced or indented, keep their line ends: they are code.
+pub fn trim_line_end_whitespace(output: &mut String, style: CodeBlockStyle) {
     if output.is_empty() {
         return;
     }
 
     let mut cleaned = String::with_capacity(output.len());
-    let mut fences = FenceScan::default();
+    let mut fences = CodeScan::new(style, output);
     for line in output.split('\n') {
         if fences.is_code(line) {
             cleaned.push_str(line);
@@ -762,42 +981,93 @@ mod tests {
         assert!(is_ignorable_before_head("hello", true));
     }
 
+    fn cleaned(markdown: &str, style: CodeBlockStyle) -> String {
+        let mut output = markdown.to_owned();
+        trim_line_end_whitespace(&mut output, style);
+        collapse_excess_blank_lines(&mut output, style);
+        output
+    }
+
+    #[test]
+    fn should_clean_the_prose_and_not_the_code_of_an_indented_style_document() {
+        let cases = [
+            // A fence line in indented code opens nothing: the prose after it is cleaned.
+            (
+                "    a \t\n    ```\n\n\n\n    b\n\n\n\nx \t\n\n\n\ny\n",
+                "    a \t\n    ```\n\n\n\n    b\n\nx\n\ny\n",
+            ),
+            // The third level of a list is indented by four columns and is not code.
+            (
+                "- a\n  - b\n    - c \t\n\n\n\n    - d \t\n",
+                "- a\n  - b\n    - c\n\n    - d\n",
+            ),
+            // Code in a list item is indented by four columns past the content of the item.
+            (
+                "1. t\n\n       a \t\n\n\n\n       b\n\n\n\n   u \t\n",
+                "1. t\n\n       a \t\n\n\n\n       b\n\n   u\n",
+            ),
+            // A code block that starts on the line of the item marker.
+            ("-     a \t\n\n\n\n      b\n", "-     a \t\n\n\n\n      b\n"),
+            // The blank lines between the code blocks of two items belong to neither.
+            ("-     a\n\n\n\n-     b\n", "-     a\n\n-     b\n"),
+            // Code in a block quote, and prose after the quote.
+            (
+                ">     a \t\n>\n>\n>\n>     b\n\n\n\nx \t\n",
+                ">     a \t\n>\n>\n>\n>     b\n\nx\n",
+            ),
+            // An indented line that continues a paragraph is not code.
+            ("x\n    y \t\n", "x\n    y\n"),
+            // A tab is four columns of indentation.
+            ("\ta \t\n\n\n\n\tb\n", "\ta \t\n\n\n\n\tb\n"),
+        ];
+        for (markdown, expected) in cases {
+            assert_eq!(cleaned(markdown, CodeBlockStyle::Indented), expected, "{markdown:?}");
+        }
+    }
+
+    #[test]
+    fn should_open_a_block_only_on_the_fence_of_the_configured_style() {
+        let markdown = "~~~\na \t\n\n\n\nb\n~~~\n";
+        assert_eq!(cleaned(markdown, CodeBlockStyle::Tildes), markdown);
+        assert_eq!(cleaned(markdown, CodeBlockStyle::Backticks), "~~~\na\n\nb\n~~~\n");
+    }
+
     #[test]
     fn test_trim_line_end_whitespace() {
         let mut s = String::new();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("", s.as_str());
 
         let mut s = "\t\n\t\n".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("", s.as_str());
 
         let mut s = "hello, world  ".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello, world  \n", s.as_str());
 
         let mut s = "hello, world  \n".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello, world  \n", s.as_str());
 
         let mut s = "hello, world  ".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello, world  \n", s.as_str());
 
         let mut s = "hello, world  \n\n\n".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello, world  \n", s.as_str());
 
         let mut s = "hello  \n- world\n".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello  \n- world\n", s.as_str());
 
         let mut s = "hello, world\t\t  ".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello, world  \n", s.as_str());
 
         let mut s = "hello, world\t\t  \n.abc def \t \t".to_owned();
-        trim_line_end_whitespace(&mut s);
+        trim_line_end_whitespace(&mut s, CodeBlockStyle::Backticks);
         assert_eq!("hello, world  \n.abc def\n", s.as_str());
     }
 

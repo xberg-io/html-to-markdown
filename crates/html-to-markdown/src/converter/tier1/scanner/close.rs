@@ -23,7 +23,7 @@ fn emit_close_for_implicit(
     match spec.kind {
         TagKind::Paragraph => close_paragraph(state),
         TagKind::Heading(n) => close_heading(state, &frame, n, true, options)?,
-        TagKind::Blockquote => close_blockquote(state, &frame, options.br_in_tables),
+        TagKind::Blockquote => close_blockquote(state, &frame, options),
         TagKind::Pre => close_pre(state, &frame, options),
         // ~keep Strong: suppress close marker when inside summary, or when this
         // frame nested inside another `<strong>` and so never emitted an
@@ -224,7 +224,8 @@ fn escape_heading_closing_sequence(buf: &mut String, content_start: usize, optio
     }
 }
 
-fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool) {
+fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
+    let (br_in_tables, style) = (options.br_in_tables, options.code_block_style);
     // ~keep Phase GG follow-up: inside a table cell `frame.content_start` indexes
     // into the cell buffer, not `state.output`.  Don't prefix `> ` — Tier-2
     // also sheds the quote marker inside cells (issue #647).
@@ -232,7 +233,7 @@ fn close_blockquote(state: &mut Tier1State, frame: &OpenTag, br_in_tables: bool)
         return;
     }
     let content_start = clamp_to_char_boundary(&state.output, frame.content_start);
-    let content = prepare_blockquote_content(&state.output[content_start..]);
+    let content = prepare_blockquote_content(&state.output[content_start..], style);
     let prefixed = prefix_blockquote_lines(&content);
     state.output.truncate(content_start);
     separate_blockquote_prefix(&mut state.output, frame.prev_escape_ctx);
@@ -282,13 +283,10 @@ fn close_blockquote_in_cell(state: &mut Tier1State, frame: &OpenTag, br_in_table
     true
 }
 
-fn prepare_blockquote_content(content: &str) -> String {
+fn prepare_blockquote_content(content: &str, style: crate::options::CodeBlockStyle) -> String {
     let mut content = content.to_owned();
     crate::converter::main_helpers::trim_trailing_whitespace(&mut content);
-    let leading_len = content
-        .char_indices()
-        .find(|&(_, character)| !character.is_whitespace())
-        .map_or(content.len(), |(index, _)| index);
+    let leading_len = crate::converter::main_helpers::quote_content_range(&content, style).start;
     content.replace_range(0..leading_len, "");
     content
 }

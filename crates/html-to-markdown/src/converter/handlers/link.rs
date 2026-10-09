@@ -70,16 +70,14 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
         return;
     };
     // ~keep Code shows every character as text, so a link in code writes its text and no marks.
+    // ~keep A visitor still sees the link and decides what it writes.
     if handler.context.in_code {
         let text_start = handler.output.len();
         walk_handles_to_output(data.children.iter().copied(), &mut handler);
+        let text = handler.output.split_off(text_start);
+        emit_link(tag, &data, &text, false, &mut handler);
         #[cfg(feature = "metadata")]
-        {
-            let label = handler.output.get(text_start..).unwrap_or_default().trim().to_string();
-            record_link_metadata(tag, &data, &label, handler.context);
-        }
-        #[cfg(not(feature = "metadata"))]
-        let _ = text_start;
+        record_link_metadata(tag, &data, text.trim(), handler.context);
         return;
     }
     if emit_autolink(&data, &mut handler) || emit_heading_link(&data, &mut handler) {
@@ -387,7 +385,7 @@ fn emit_link(
 }
 
 fn write_link(output: &mut String, data: &LinkData<'_>, label: &str, options: &ConversionOptions, context: &Context) {
-    if data.href_addr_dropped {
+    if data.href_addr_dropped || context.in_code {
         output.push_str(label);
         return;
     }

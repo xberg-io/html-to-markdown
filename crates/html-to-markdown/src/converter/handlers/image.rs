@@ -55,8 +55,7 @@ pub fn handle_img(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
         .context
         .inline_data_treatment(handler.options.inline_data_media, &data.src);
     let rendered = render_image(tag, &data, inline_data, &handler);
-    // ~keep Code shows every character as text, and a browser shows no text for an image.
-    if !handler.options.skip_images && !handler.context.in_code {
+    if !handler.options.skip_images {
         if let Some(image_text) = rendered {
             handler.output.push_str(&image_text);
         }
@@ -166,6 +165,11 @@ fn render_image(
     #[cfg(feature = "visitor")]
     if let std::ops::ControlFlow::Break(result) = visit_image(tag, data, handler) {
         return result;
+    }
+    // ~keep Code shows every character as text, and a browser shows no text for an image. Only
+    // ~keep what a visitor writes for the image is written in code.
+    if context.in_code {
+        return None;
     }
     render_image_default(data, inline_data, should_use_alt_text, handler)
 }

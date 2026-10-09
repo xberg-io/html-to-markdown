@@ -655,8 +655,8 @@ fn finish_scan(
         emit_close_for_implicit(&mut state, options, &mut table_probes)?;
     }
 
-    crate::converter::main_helpers::trim_line_end_whitespace(&mut state.output);
-    crate::converter::main_helpers::collapse_excess_blank_lines(&mut state.output);
+    crate::converter::main_helpers::trim_line_end_whitespace(&mut state.output, options.code_block_style);
+    crate::converter::main_helpers::collapse_excess_blank_lines(&mut state.output, options.code_block_style);
 
     if !state.output.is_empty() {
         let trimmed_end = state.output.trim_end_matches('\n');
