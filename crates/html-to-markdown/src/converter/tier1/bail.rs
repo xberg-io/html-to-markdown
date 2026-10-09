@@ -292,8 +292,8 @@ pub enum BailReason {
     /// A form control whose text Tier-2 separates from the text around it: `<select>`,
     /// `<option>`, `<optgroup>`, `<datalist>`, an `<input>` that is not `type="hidden"` right
     /// after text, and a `<button>`, `<output>`, `<meter>` or `<progress>` in a heading, a
-    /// summary, a caption or a link. The space after such a control depends on the text that
-    /// follows it, which this scanner has not read yet.
+    /// summary, a caption, a link or an inline element. The space after such a control depends
+    /// on the text that follows it, which this scanner has not read yet.
     FormControl,
 
     /// An `<hr>` opened between inline markers: inside `<strong>`/`<b>`, `<em>`/`<i>`,

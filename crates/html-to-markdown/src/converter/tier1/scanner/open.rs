@@ -323,7 +323,11 @@ fn emit_open_kind(
                     TagKind::Heading(_) | TagKind::Summary | TagKind::Figcaption | TagKind::Link | TagKind::TableCaption
                 )
             });
-            if in_inline_container {
+            let in_inline_element = state
+                .stack
+                .last()
+                .is_some_and(|parent| crate::converter::form::spacing::line_goes_on_in(Some(parent.spec)));
+            if in_inline_container || in_inline_element {
                 return Err(BailReason::FormControl);
             }
         }

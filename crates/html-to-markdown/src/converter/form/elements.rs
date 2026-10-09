@@ -13,7 +13,7 @@
 //! extract and format the content in a readable manner.
 
 use super::FormContext;
-use super::spacing::{ControlStart, separate_from_next_text};
+use super::spacing::{ControlStart, line_goes_on_after_parent, separate_from_next_text};
 use super::walk_node;
 #[cfg(feature = "visitor")]
 use std::borrow::Cow;
@@ -463,8 +463,9 @@ pub fn handle_input(
 /// Writes the children of a control that ends its line: `<textarea>`, `<button>`, `<output>`,
 /// `<meter>` and `<progress>`.
 ///
-/// The text is a word of its own after the text before it. A blank line follows it in block
-/// mode; in inline mode, where the line goes on, the text after it is a word of its own too.
+/// The text is a word of its own after the text before it. A blank line follows it where a
+/// block holds the control. In inline mode and in an inline element the line goes on, and the
+/// text after the control is a word of its own too.
 fn write_line_end_control(
     node_handle: tl::NodeHandle,
     tag: &tl::HTMLTag,
@@ -490,7 +491,7 @@ fn write_line_end_control(
     if !start.finish(output) {
         return;
     }
-    if ctx.convert_as_inline {
+    if ctx.convert_as_inline || line_goes_on_after_parent(node_handle.get_inner(), parser, dom_ctx) {
         separate_from_next_text(output, node_handle, parser, dom_ctx);
     } else {
         output.push_str("\n\n");

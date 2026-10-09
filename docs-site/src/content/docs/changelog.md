@@ -50,7 +50,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `Ruby 101` gave `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`;
   a label, a select list and a text area in one form gave `NameOneTwoarea words` and now give
   `Name One Two area words`. Both converters give the same text for output, meter and progress
-  elements ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
+  elements. A button, an output, a meter, a progress bar or a text area in an inline element (a
+  label, a span, bold text, a custom element) stays in its line, as a browser shows it:
+  `<label><button>One</button></label>items` gave `Oneitems` and now gives `One items`, and
+  `<span><button>One</button></span>items` gave `One`, a blank line and `items`, and now gives
+  `One items`. A block that holds such a control still ends the line after it
+  ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
 - The `label` attribute of an option group is no longer written. It is not text of the page: a
   browser shows it only inside the open list. A select list with the groups `Getting Started`
   (option `Quickstart`) and `Build` (option `Commands`) gave `**Getting Started**`, a line break,

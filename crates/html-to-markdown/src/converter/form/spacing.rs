@@ -2,6 +2,7 @@
 //! one space separates it from text before it and from text after it in the same block.
 
 use crate::converter::DomContext;
+use crate::converter::tier1::tags::{TagSpec, lookup};
 
 /// The nodes a search for the text after a control reads before it gives up.
 const MAX_LOOKAHEAD_NODES: usize = 64;
@@ -21,6 +22,23 @@ pub fn needs_space_before(output: &str) -> bool {
         .chars()
         .next_back()
         .is_some_and(|last| !last.is_whitespace() && !matches!(last, '(' | '[' | '{'))
+}
+
+/// Whether the line of a control goes on after the element that holds it. `parent` is the entry
+/// of that element in the tag table: the line goes on after an inline element, and after an
+/// element that is not in the table and is written as its children alone (a custom element).
+///
+/// ~keep Both converters ask this function. The fast converter has not read the text after the
+/// ~keep control, so it hands the control over where the answer is yes.
+pub fn line_goes_on_in(parent: Option<&TagSpec>) -> bool {
+    parent.is_none_or(|spec| !spec.is_block)
+}
+
+/// Whether the line of node `id` goes on after its parent element.
+pub fn line_goes_on_after_parent(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    dom_ctx
+        .parent_tag_name(id, parser)
+        .is_some_and(|name| line_goes_on_in(lookup(name.as_bytes())))
 }
 
 /// The place in the output where a control starts to write.
@@ -88,10 +106,9 @@ fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool 
                 return starts_with_word;
             }
         }
-        // ~keep The line ends with a block. It goes on after every other parent: an inline
-        // ~keep element, and an element that is written as its children alone (a custom element).
+        // ~keep The line ends with a block.
         let Some(parent_id) = parent else { return false };
-        if dom_ctx.tag_info(parent_id, parser).is_none_or(|info| info.is_block) {
+        if !line_goes_on_after_parent(id, parser, dom_ctx) {
             return false;
         }
         id = parent_id;

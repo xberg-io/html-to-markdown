@@ -356,6 +356,104 @@ fn should_separate_a_control_in_a_line_that_goes_on_after_it() {
     }
 }
 
+/// A button, an output, a meter and a progress bar end their line only where a block holds
+/// them. In an inline element a browser keeps them in the line, so the text after the element
+/// is a word of the same line.
+#[test]
+fn should_keep_a_control_in_an_inline_element_in_its_line() {
+    for control in ["button", "output", "meter", "progress", "textarea"] {
+        for (html, expected) in [
+            ("<label><c>One</c></label>items", "One items\n"),
+            ("<label><c>One</c></label> items", "One items\n"),
+            ("<label><c>One</c></label>.", "One.\n"),
+            ("<p>a<label><c>One</c></label>items</p>", "a One items\n"),
+            ("<p>a<label><c>One</c></label></p><p>next</p>", "a One\n\nnext\n"),
+            ("<label><c>One</c></label><label><c>One</c></label>", "One One\n"),
+            ("<p><label><c>One</c>after</label>items</p>", "One afteritems\n"),
+            ("<p><label>Pick <c>One</c></label>items</p>", "Pick One items\n"),
+            ("<b><c>One</c></b>items", "**One** items\n"),
+            ("<b><c>One</c></b> items", "**One** items\n"),
+            ("<b><c>One</c></b>.", "**One**.\n"),
+            ("<p>a<b><c>One</c></b>items</p>", "a**One** items\n"),
+            ("<p>a<b><c>One</c></b></p><p>next</p>", "a**One**\n\nnext\n"),
+            ("<b><c>One</c></b><b><c>One</c></b>", "**One** **One**\n"),
+            ("<p><b><c>One</c>after</b>items</p>", "**One after**items\n"),
+            ("<em><c>One</c></em>items", "*One* items\n"),
+            ("<p>a<em><c>One</c></em></p><p>next</p>", "a*One*\n\nnext\n"),
+            ("<span><c>One</c></span>items", "One items\n"),
+            ("<span><c>One</c></span> items", "One items\n"),
+            ("<span><c>One</c></span>.", "One.\n"),
+            ("<p>a<span><c>One</c></span>items</p>", "a One items\n"),
+            ("<p>a<span><c>One</c></span></p><p>next</p>", "a One\n\nnext\n"),
+            ("<span><c>One</c></span><span><c>One</c></span>", "One One\n"),
+            ("<p><span><c>One</c>after</span>items</p>", "One afteritems\n"),
+            ("<my-tag><c>One</c></my-tag>items", "One items\n"),
+            ("<p>a<my-tag><c>One</c></my-tag></p><p>next</p>", "a One\n\nnext\n"),
+            ("<p><span><my-tag><c>One</c></my-tag></span>items</p>", "One items\n"),
+            // ~keep An element the converter does not know is written as its children alone.
+            ("<p><font><c>One</c></font>items</p>", "One items\n"),
+            (
+                "<table><tr><th>h</th></tr><tr><td>a<label><c>One</c></label>items</td></tr></table>",
+                "| h           |\n| ----------- |\n| a One items |\n",
+            ),
+            ("<ul><li>a<label><c>One</c></label>items</li></ul>", "- a One items\n"),
+        ] {
+            let html = html
+                .replace("<c>", &format!("<{control}>"))
+                .replace("</c>", &format!("</{control}>"));
+            assert_all_paths(&html, expected);
+        }
+        // ~keep In a code span and in a link label the control is written as a select list is.
+        for wrapper in ["<code>|</code>", r#"<a href="/u">|</a>"#] {
+            for shape in [
+                "|items",
+                "| items",
+                "|.",
+                "<p>a|items</p>",
+                "<p>a|</p><p>next</p>",
+                "||",
+            ] {
+                let line_end = wrapper.replace('|', &format!("<{control}>One</{control}>"));
+                let list = wrapper.replace('|', "<select><option>One</option></select>");
+                let html = shape.replace('|', &line_end);
+                let expected = markdown(&shape.replace('|', &list), options(TierStrategy::Tier2));
+                assert!(expected.contains("One"), "{expected:?}");
+                assert_all_paths(&html, &expected);
+            }
+        }
+        // ~keep A block still ends the line of the control.
+        for (html, expected) in [
+            ("<div><c>One</c>items</div>", "One\n\nitems\n"),
+            ("<p>a<c>One</c>items</p>", "a One\n\nitems\n"),
+            ("<label><div><c>One</c></div></label><p>items</p>", "One\n\nitems\n"),
+        ] {
+            let html = html
+                .replace("<c>", &format!("<{control}>"))
+                .replace("</c>", &format!("</{control}>"));
+            assert_all_paths(&html, expected);
+        }
+    }
+}
+
+/// The fast converter has not read the text after a control, so it hands over a control whose
+/// line goes on after it and keeps one that a block holds.
+#[test]
+fn should_hand_a_control_in_an_inline_element_to_the_full_converter() {
+    for control in ["button", "output", "meter", "progress"] {
+        for wrapper in ["label", "b", "code", "em", "span", "my-tag"] {
+            let html = format!("<{wrapper}><{control}>One</{control}></{wrapper}>items");
+            let result = fast_converter(&html);
+            assert!(matches!(result, Err(BailReason::FormControl)), "{html}: {result:?}");
+        }
+        let html = format!("<div><{control}>One</{control}>items</div>");
+        assert_eq!(
+            fast_converter(&html).map_err(|reason| reason.to_string()),
+            Ok("One\n\nitems\n".to_string()),
+            "{html}"
+        );
+    }
+}
+
 #[test]
 fn should_separate_a_label_that_starts_with_a_control_as_the_control_is() {
     for (html, expected) in [
@@ -435,6 +533,9 @@ fn should_write_a_button_as_a_word_of_its_own_in_the_fast_converter_too() {
         ("<label>Name</label><button></button>tail", "Nametail\n"),
         ("<label>Name</label><button> Go</button>", "Name Go\n"),
         ("<label>Total</label><output>42</output>", "Total 42\n"),
+        ("<label>Total</label><progress>42</progress>", "Total 42\n"),
+        ("<progress>a</progress>tail", "a\n\ntail\n"),
+        ("<progress>a</progress><output>b</output>", "a\n\nb\n"),
         (
             r#"<output>42</output><meter value="0.5">half</meter><progress value="1" max="3">one of three</progress>"#,
             "42\n\nhalf\n\none of three\n",
@@ -743,6 +844,44 @@ fn should_separate_a_control_in_a_custom_element_from_the_text_after_the_element
         ),
     ] {
         assert_all_paths(html, expected);
+    }
+}
+
+/// A block parent ends the line of a control: what the block writes after itself separates it
+/// from the text that follows, and the control adds nothing.
+#[test]
+fn should_end_the_line_of_a_control_at_a_block_parent() {
+    // ~keep A preformatted block in a cell is a code span. A space from the control would be inside it.
+    assert_all_paths(
+        "<table><tr><th>h</th></tr><tr><td><pre><select><option>One</option></select></pre>items</td></tr></table>",
+        "| h           |\n| ----------- |\n| `One` items |\n",
+    );
+    // ~keep A checkbox separates itself from the text before it. A space from the control before
+    // ~keep it would be inside the code span.
+    assert_all_paths(
+        r#"<p><code><select><option>One</option></select></code><input type="checkbox">items</p>"#,
+        "`One` ☐ items\n",
+    );
+    // ~keep In a heading a block is written in the line. The text of a control in the block is
+    // ~keep separated from the text after the block as plain text in that block is.
+    for block in ["p", "section", "form"] {
+        let control = format!("<h2><{block}><select><option>One</option></select></{block}>items</h2>");
+        let text = format!("<h2><{block}>One</{block}>items</h2>");
+        assert_eq!(
+            markdown(&control, options(TierStrategy::Tier2)),
+            markdown(&text, options(TierStrategy::Tier2)),
+            "{control}"
+        );
+    }
+}
+
+/// The search for the text after a control reads a bounded number of nodes, so a line of many
+/// controls is read in linear time. Past the bound the control writes no space.
+#[test]
+fn should_stop_the_search_for_the_text_after_a_control_at_the_node_limit() {
+    for (empty_elements, expected) in [(10, "a b\n"), (200, "ab\n")] {
+        let html = format!("<p>a<input>{}b</p>", "<span></span>".repeat(empty_elements));
+        assert_all_paths(&html, expected);
     }
 }
 
