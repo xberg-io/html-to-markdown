@@ -557,6 +557,63 @@ fn should_not_read_text_that_starts_with_spaces_in_a_block_quote_as_code() {
 }
 
 #[test]
+fn should_keep_the_first_line_of_an_indented_code_block_in_a_definition() {
+    assert_style(
+        CodeBlockStyle::Indented,
+        &[
+            (
+                "<dl><dt>t</dt><dd><pre>a   \n\n\nb\n</pre></dd></dl>",
+                "t\n\n    a   \n\n\n    b\n",
+            ),
+            (
+                "<dl><dt>t</dt><dd><div><pre>a\nb   \n</pre></div></dd></dl>",
+                "t\n\n    a\n    b   \n",
+            ),
+            (
+                "<dl><dt>t</dt><dd><pre>a\n</pre><p>u</p></dd></dl>",
+                "t\n\n    a\n\nu\n",
+            ),
+            ("<dl><dd><pre>a\nb\n</pre></dd></dl>", "    a\n    b\n"),
+        ],
+    );
+}
+
+#[test]
+fn should_not_read_text_that_starts_with_spaces_in_a_definition_as_code() {
+    for tier_strategy in tiers() {
+        let options = ConversionOptions {
+            whitespace_mode: WhitespaceMode::Strict,
+            code_block_style: CodeBlockStyle::Indented,
+            ..options(tier_strategy)
+        };
+        let actual = converted("<dl><dt>t</dt><dd><p>      text</p></dd></dl>", Some(options));
+        let lines: Vec<&str> = actual.lines().filter(|line| !line.is_empty()).collect();
+        assert_eq!(lines, ["t", "text"], "{tier_strategy:?}");
+    }
+}
+
+#[test]
+fn should_not_close_a_fenced_block_on_a_longer_fence_line_of_the_code_in_a_container() {
+    assert_style(
+        CodeBlockStyle::Backticks,
+        &[
+            (
+                "<blockquote><pre>a   \n````\nb   \n\n\nc\n</pre></blockquote>",
+                "> `````\n> a   \n> ````\n> b   \n>\n>\n> c\n> `````\n",
+            ),
+            (
+                "<ul><li><p>t</p><pre>a   \n````\nb   \n\n\nc\n</pre></li></ul>",
+                "- t\n\n  `````\n  a   \n  ````\n  b   \n\n\n  c\n  `````\n",
+            ),
+            (
+                "<blockquote><ul><li><pre>a   \n````\nb   \n\n\nc\n</pre></li></ul></blockquote>",
+                "> - `````\n>   a   \n>   ````\n>   b   \n>\n>\n>   c\n>   `````\n",
+            ),
+        ],
+    );
+}
+
+#[test]
 fn should_not_close_a_fenced_block_on_a_fence_line_of_the_code() {
     assert_style(
         CodeBlockStyle::Backticks,

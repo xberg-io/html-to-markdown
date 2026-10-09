@@ -44,15 +44,7 @@ pub fn handle_blockquote(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
                 .unwrap_or(value)
         });
     let content = collect_quote_content(tag, &handler);
-    let kept = crate::converter::main_helpers::quote_content_range(&content, handler.options.code_block_style);
-    // ~keep Only a code block keeps its indentation at the start of the quote. Text that starts
-    // ~keep with spaces (strict white space mode) is not code and loses them, as before.
-    let start = if starts_with_code_block(tag, handler.parser) {
-        kept.start
-    } else {
-        content.len() - content.trim_start().len()
-    };
-    let trimmed = &content[start..kept.end.max(start)];
+    let trimmed = container_content(tag, handler.parser, &content, handler.options.code_block_style);
 
     #[cfg(feature = "visitor")]
     if visit_blockquote(tag, trimmed, &mut handler) {
@@ -63,6 +55,26 @@ pub fn handle_blockquote(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     } else {
         render_quote(trimmed, cite.as_deref(), &mut handler);
     }
+}
+
+/// The part of `content`, the Markdown of the children of the container `tag`, without the white
+/// space around it.
+///
+/// ~keep Only a code block keeps its indentation at the start of the container. Text that starts
+/// ~keep with spaces (strict white space mode) is not code and loses them.
+pub(crate) fn container_content<'p, 'a, 'c>(
+    tag: &'p tl::HTMLTag<'a>,
+    parser: &'p tl::Parser<'a>,
+    content: &'c str,
+    style: crate::options::CodeBlockStyle,
+) -> &'c str {
+    let kept = crate::converter::main_helpers::quote_content_range(content, style);
+    let start = if starts_with_code_block(tag, parser) {
+        kept.start
+    } else {
+        content.len() - content.trim_start().len()
+    };
+    &content[start..kept.end.max(start)]
 }
 
 /// Whether the first content of `tag` is a `pre` element, directly or as the first content of its

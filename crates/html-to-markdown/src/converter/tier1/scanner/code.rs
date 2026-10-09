@@ -565,7 +565,7 @@ fn close_dd(state: &mut Tier1State) {
     }
 }
 
-fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
+fn close_dl(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptions) {
     if state.in_table_cell() {
         return;
     }
@@ -575,9 +575,13 @@ fn close_dl(state: &mut Tier1State, frame: &OpenTag) {
     if buf.len() <= frame.content_start {
         return;
     }
+    // ~keep A last line of indented code keeps its line end, as in Tier-2: the spaces are code.
+    let content_start = clamp_to_char_boundary(buf, frame.content_start);
+    let kept_end = content_start
+        + crate::converter::main_helpers::quote_content_range(&buf[content_start..], options.code_block_style).end;
     // ~keep Tier-2 trims the dl's accumulated content, so any trailing whitespace
     // from the last dt/dd close should collapse to a single "\n\n" separator.
-    while buf.len() > frame.content_start {
+    while buf.len() > frame.content_start.max(kept_end) {
         let last = buf.as_bytes()[buf.len() - 1];
         if matches!(last, b' ' | b'\t' | b'\n' | b'\r') {
             buf.pop();

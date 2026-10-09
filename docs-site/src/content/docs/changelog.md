@@ -48,6 +48,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The link is kept and labelled by the first rule above:
   `<a href="/page" aria-label="Next"><div><svg>...</svg></div></a>` gives `[Next](/page)`
   ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
+- A code block keeps the indentation that all its lines share. The converter removed it since the
+  fix for [#134](https://github.com/xberg-io/html-to-markdown/issues/134):
+  `<pre>  a = 1\n    b = 2\n</pre>` wrote `a = 1`, `  b = 2` and now writes `  a = 1`, `    b = 2`, as the
+  page shows it. Blank lines at the start and at the end of a block are still dropped
+  ([#782](https://github.com/xberg-io/html-to-markdown/issues/782)).
+- A link, an image, highlighted text and an abbreviation inside a code block or a code span write
+  their text and no Markdown marks, because code shows every character as text:
+  `<pre>Guido &lt;<a href="/mail">guido</a>&gt;</pre>` wrote `Guido <[guido](/mail)>` and now writes
+  `Guido <guido>`. An image in code writes nothing, and an inline `<svg>` in code writes its text in
+  place of a `data:` image. The link and the image stay in the metadata
+  ([#781](https://github.com/xberg-io/html-to-markdown/issues/781)).
+- With `extract_metadata` off, an empty `pre` writes nothing in place of an empty fence, as with the
+  default options.
 
 ### Fixed
 
@@ -98,6 +111,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is on, and `build_document_structure` no longer panics on it. The Markdown is the same as with the
   structure off. Neither builder records an empty heading, paragraph or list item
   ([#749](https://github.com/xberg-io/html-to-markdown/issues/749)).
+- A code block inside a list item keeps the indentation of every line. A line after a blank line got
+  four spaces for each list level in place of its own indentation, so
+  `<ol><li><p>Save this:</p><pre>def f(x):\n    if x:\n\n        return 1\n</pre></li></ol>` wrote
+  `return 1` at the level of `if x:`. It now writes it eight spaces in, as in the page
+  ([#769](https://github.com/xberg-io/html-to-markdown/issues/769)).
+- A code block whose lines are separate block elements has one line for each. A `div`, `section` or
+  other plain container inside a `pre` starts a line and ends a line, as in a browser, and adds no
+  blank line: `<pre><div>a<br></div><div>b<br></div></pre>` wrote `a`, a blank line, `b` and now writes
+  `a`, `b`. An empty container is no line. A line feed between two containers is still a blank line,
+  because a browser shows one ([#770](https://github.com/xberg-io/html-to-markdown/issues/770)).
+- Two or more blank lines in a row inside a fenced code block stay, and so do the spaces at the end of
+  a line of code: `<pre>import a\n\n\nclass B:\n</pre>` wrote one blank line and now writes two. The
+  rules that fold blank lines and trim line ends still apply to the text outside of code
+  ([#783](https://github.com/xberg-io/html-to-markdown/issues/783)).
 
 ## [3.17.2] - 2026-10-06
 

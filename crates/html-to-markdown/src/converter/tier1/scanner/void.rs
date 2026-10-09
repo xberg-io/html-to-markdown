@@ -468,7 +468,7 @@ fn dispatch_close(
         TagKind::Inserted => close_inline_marker(state, frame, "==")?,
         TagKind::Code => close_code(state, frame, matches!(name_lower, b"kbd" | b"samp"), options)?,
         TagKind::Link => close_link(state, frame, options)?,
-        TagKind::List(ListKind::Definition) => close_dl(state, frame),
+        TagKind::List(ListKind::Definition) => close_dl(state, frame, options),
         TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state, frame)?,
         TagKind::DefinitionTerm => close_dt(state),

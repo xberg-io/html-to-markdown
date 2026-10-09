@@ -46,7 +46,7 @@ fn emit_close_for_implicit(
         TagKind::Inserted => close_inline_marker(state, &frame, "==")?,
         TagKind::Code => close_code(state, &frame, false, options)?,
         TagKind::Link => close_link(state, &frame, options)?,
-        TagKind::List(ListKind::Definition) => close_dl(state, &frame),
+        TagKind::List(ListKind::Definition) => close_dl(state, &frame, options),
         TagKind::List(kind) => close_list(state, kind),
         TagKind::ListItem => close_list_item(state, &frame)?,
         TagKind::DefinitionTerm => close_dt(state),
