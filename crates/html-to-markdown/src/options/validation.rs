@@ -286,6 +286,65 @@ impl InlineDataMedia {
     }
 }
 
+/// Which text that a browser does not show at first the output holds.
+///
+/// The choice answers one question: can a reader get to the text? It does not depend on how the
+/// page hides it.
+///
+/// | Markup | `Drop` | `Reachable` | `All` |
+/// | --- | --- | --- | --- |
+/// | An element with the `hidden` attribute, any value (`hidden="until-found"` too) | dropped | kept | kept |
+/// | An element with inline `display: none`, `visibility: hidden` or `font-size: 0` | dropped | kept | kept |
+/// | A declarative shadow root (`<template shadowrootmode>`) | dropped | kept | kept |
+/// | Any other `<template>`, and `<noscript>` | dropped | dropped | kept |
+/// | `<script>`, `<style>`, comments, the value of `<input type="hidden">` | dropped | dropped | dropped |
+///
+/// `aria-hidden` is not hidden for this option. It takes an element away from assistive
+/// technology only: a browser still shows the element, so a reader sees its text, and every
+/// choice keeps it.
+///
+/// Every choice also keeps what the converter never treated as hidden: `inert`, a closed
+/// `<details>` or `<dialog>`, `<datalist>` and `<option>` text, and an element hidden by a class
+/// name, a style sheet rule, `opacity`, `content-visibility`, a zero size or an off-screen
+/// position. The converter reads the inline `style` attribute only. It does no layout and reads no
+/// style sheet, so it cannot tell that a rule in a style sheet hides an element.
+///
+/// A kept element converts like the same element without the attribute or style. Kept
+/// `<template>` and `<noscript>` content converts where it is written, as if the two tags were
+/// not there: a row in a `<template>` inside a `<table>` is a row of that table, and the content
+/// of a declarative shadow root comes before the other children of its host element. Slots are
+/// not resolved. `All` keeps `<noscript>` content with every preprocessing preset. A `<template>`
+/// or `<noscript>` in the document head holds metadata (`<link>`, `<meta>`, `<style>`), not text
+/// for a reader, and no choice keeps it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum HiddenContent {
+    /// Drop the text a browser does not show at first. Default.
+    #[default]
+    Drop,
+    /// Keep the text of elements that are in the page and that the page can show: an inactive tab
+    /// panel, a collapsed section, an answer shown on a click, a declarative shadow root.
+    Reachable,
+    /// Keep what `Reachable` keeps, and the content of `<template>` and `<noscript>`. A reader
+    /// gets to that text only after a script copies it into the page, or with scripting off.
+    All,
+}
+
+impl HiddenContent {
+    /// Parse the choice from a string.
+    ///
+    /// Accepts "reachable" or "all" or defaults to Drop.
+    /// Input is normalized (lowercased, alphanumeric only).
+    #[must_use]
+    #[cfg_attr(alef, alef(skip))]
+    pub fn parse(value: &str) -> Self {
+        match normalize_token(value).as_str() {
+            "reachable" => Self::Reachable,
+            "all" => Self::All,
+            _ => Self::Drop,
+        }
+    }
+}
+
 /// Output format for conversion.
 ///
 /// Specifies the target markup language format for the conversion output.
@@ -330,8 +389,8 @@ pub(crate) fn normalize_token(value: &str) -> String {
 #[cfg(any(feature = "serde", feature = "metadata"))]
 mod serde_impls {
     use super::{
-        CodeBlockStyle, HeadingStyle, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType, NewlineStyle,
-        OutputFormat, UrlEscapeStyle, WhitespaceMode,
+        CodeBlockStyle, HeadingStyle, HiddenContent, HighlightStyle, InlineDataMedia, LinkStyle, ListIndentType,
+        NewlineStyle, OutputFormat, UrlEscapeStyle, WhitespaceMode,
     };
     use serde::{Deserialize, Serialize, Serializer};
 
@@ -359,6 +418,7 @@ mod serde_impls {
     impl_deserialize_from_parse!(UrlEscapeStyle, UrlEscapeStyle::parse);
     impl_deserialize_from_parse!(OutputFormat, OutputFormat::parse);
     impl_deserialize_from_parse!(InlineDataMedia, InlineDataMedia::parse);
+    impl_deserialize_from_parse!(HiddenContent, HiddenContent::parse);
 
     impl Serialize for HeadingStyle {
         fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -477,6 +537,20 @@ mod serde_impls {
                 Self::Keep => "keep",
                 Self::AltTextOnly => "alttextonly",
                 Self::DropElement => "dropelement",
+            };
+            serializer.serialize_str(s)
+        }
+    }
+
+    impl Serialize for HiddenContent {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+        {
+            let s = match self {
+                Self::Drop => "drop",
+                Self::Reachable => "reachable",
+                Self::All => "all",
             };
             serializer.serialize_str(s)
         }

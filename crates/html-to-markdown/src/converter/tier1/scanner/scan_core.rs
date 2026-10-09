@@ -161,8 +161,15 @@ impl<'a> Tier1Scanner<'a> {
         if name_lower == b"svg" && self.scan_svg(name_end)? {
             return Ok(());
         }
-        if name_lower == b"template" && self.scan_template(name_end) {
-            return Ok(());
+        if name_lower == b"template" {
+            // ~keep Tier-1 skips a template. A caller that keeps hidden content needs Tier-2,
+            // ~keep whose preprocessing removes the tags of the templates it keeps.
+            if self.options.hidden_content != crate::options::HiddenContent::Drop {
+                return Err(BailReason::Classifier);
+            }
+            if self.scan_template(name_end) {
+                return Ok(());
+            }
         }
 
         let spec = resolve_tag_spec(name_lower, tag_name_bytes, self.pos)?;

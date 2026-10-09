@@ -122,6 +122,36 @@ typedef struct HTMHeaderMetadata HTMHeaderMetadata;
  */
 typedef struct HTMHeadingStyle HTMHeadingStyle;
 /**
+ * Which text that a browser does not show at first the output holds.
+ *
+ * The choice answers one question: can a reader get to the text? It does not depend on how the
+ * page hides it.
+ *
+ * | Markup | `Drop` | `Reachable` | `All` |
+ * | --- | --- | --- | --- |
+ * | An element with the `hidden` attribute, any value (`hidden="until-found"` too) | dropped | kept |
+ * kept |
+ * | An element with inline `display: none`, `visibility: hidden` or `font-size: 0` | dropped | kept |
+ * kept |
+ * | A declarative shadow root (`<template shadowrootmode>`) | dropped | kept | kept |
+ * | Any other `<template>`, and `<noscript>` | dropped | dropped | kept |
+ * | `<script>`, `<style>`, comments, the value of `<input type="hidden">` | dropped | dropped |
+ * dropped |
+ *
+ * Every choice keeps what the converter never treated as hidden: `aria-hidden`, `inert`, a closed
+ * `<details>` or `<dialog>`, `<datalist>` and `<option>` text, and an element hidden by a class
+ * name, a style sheet rule, `opacity`, `content-visibility`, a zero size or an off-screen
+ * position. The converter reads the inline `style` attribute only. It does no layout and reads no
+ * style sheet, so it cannot tell that a rule in a style sheet hides an element.
+ *
+ * A kept element converts like the same element without the attribute or style. Kept
+ * `<template>` and `<noscript>` content converts where it is written, as if the two tags were
+ * not there: a row in a `<template>` inside a `<table>` is a row of that table, and the content
+ * of a declarative shadow root comes before the other children of its host element. Slots are
+ * not resolved. `All` keeps `<noscript>` content with every preprocessing preset.
+ */
+typedef struct HTMHiddenContent HTMHiddenContent;
+/**
  * Highlight rendering style for `<mark>` elements.
  *
  * Controls how highlighted text is rendered in Markdown output.
@@ -1307,6 +1337,15 @@ int32_t htm_conversion_options_skip_images(HTMAlefHandle handle);
 HTMAlefHandle htm_conversion_options_inline_data_media(HTMAlefHandle handle);
 
 /**
+ * Get the `hidden_content` field from a `ConversionOptions`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `htm_hidden_content_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMAlefHandle htm_conversion_options_hidden_content(HTMAlefHandle handle);
+
+/**
  * Get the `url_escape_style` field from a `ConversionOptions`.
  * A non-null returned handle is owned by the caller.
  * It must be freed with `htm_url_escape_style_free`.
@@ -1937,6 +1976,15 @@ int32_t htm_conversion_options_update_has_skip_images(HTMAlefHandle handle);
  * Pointer must be a valid handle returned by this library.
  */
 HTMAlefHandle htm_conversion_options_update_inline_data_media(HTMAlefHandle handle);
+
+/**
+ * Get the `hidden_content` field from a `ConversionOptionsUpdate`.
+ * A non-null returned handle is owned by the caller.
+ * It must be freed with `htm_hidden_content_free`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+HTMAlefHandle htm_conversion_options_update_hidden_content(HTMAlefHandle handle);
 
 /**
  * Get the `url_escape_style` field from a `ConversionOptionsUpdate`.
@@ -3567,6 +3615,21 @@ int32_t htm_heading_style_from_i32(int32_t value);
 int32_t htm_heading_style_from_str(const char *name);
 
 /**
+ * Convert an integer to a `HiddenContent` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t htm_hidden_content_from_i32(int32_t value);
+
+/**
+ * Convert a `HiddenContent` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t htm_hidden_content_from_str(const char *name);
+
+/**
  * Convert an integer to a `HighlightStyle` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -3874,6 +3937,13 @@ void htm_code_block_style_free(HTMAlefHandle handle);
  * Handle must have been returned by this library, or be zero.
  */
 void htm_heading_style_free(HTMAlefHandle handle);
+
+/**
+ * Free a `HiddenContent` handle.
+ * # Safety
+ * Handle must have been returned by this library, or be zero.
+ */
+void htm_hidden_content_free(HTMAlefHandle handle);
 
 /**
  * Free a `HighlightStyle` handle.

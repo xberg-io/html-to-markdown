@@ -25,10 +25,10 @@ use crate::converter::utility::content::{is_block_level_element, normalized_tag_
 use crate::converter::utility::preprocessing::{
     PRESERVED_MENU_ATTRIBUTE, normalize_bogus_comment_endings, normalize_menu_elements, normalize_split_closing_tags,
     normalize_unclosed_list_items, preprocess_html, restore_preserved_menu_elements, strip_bogus_comments,
-    strip_hidden_elements, strip_script_and_style_tags,
+    strip_hidden_elements, strip_script_and_style_tags, unwrap_kept_inert_elements,
 };
 use crate::converter::utility::serialization::serialize_tag_to_html;
-use crate::options::{NewlineStyle, OutputFormat};
+use crate::options::{HiddenContent, NewlineStyle, OutputFormat};
 
 use crate::converter::block::container::HandlerContext;
 use crate::error::Result;
@@ -77,10 +77,15 @@ pub fn convert_html_impl(
         document_base_href,
     } = parameters;
     let preserve_menu = options.preserve_tags.iter().any(|tag| tag.eq_ignore_ascii_case("menu"));
-    let mut preprocessed = prepare_html(html, preserve_menu);
+    let mut preprocessed = prepare_html(html, preserve_menu, options.hidden_content);
     let mut attempted_misnest_repair = false;
     let (dom, dom_ctx) = loop {
-        let repaired = match parse_for_conversion(&preprocessed, preserve_menu, &mut attempted_misnest_repair)? {
+        let repaired = match parse_for_conversion(
+            &preprocessed,
+            preserve_menu,
+            options.hidden_content,
+            &mut attempted_misnest_repair,
+        )? {
             ParseOutcome::Ready { dom, dom_ctx } => break (dom, dom_ctx),
             ParseOutcome::Retry(repaired) => repaired,
         };
@@ -360,19 +365,29 @@ fn document_language_and_direction(
     (language, direction)
 }
 
-fn prepare_html(html: &str, preserve_menu: bool) -> String {
-    let mut preprocessed = preprocess_initial_html(html, preserve_menu);
+fn prepare_html(html: &str, preserve_menu: bool, hidden_content: HiddenContent) -> String {
+    let mut preprocessed = preprocess_initial_html(html, preserve_menu, hidden_content);
     if has_custom_element_tags(&preprocessed) {
-        preprocessed = repair_custom_elements(preprocessed, preserve_menu);
+        preprocessed = repair_custom_elements(preprocessed, preserve_menu, hidden_content);
     }
     preprocessed
 }
 
-fn preprocess_initial_html(html: &str, preserve_menu: bool) -> String {
+/// Remove the elements that the `hidden` attribute or an inline style hides, unless the caller
+/// keeps hidden content. A kept element then converts like any other element.
+fn strip_hidden(html: &str, hidden_content: HiddenContent) -> Cow<'_, str> {
+    match hidden_content {
+        HiddenContent::Drop => strip_hidden_elements(html),
+        HiddenContent::Reachable | HiddenContent::All => Cow::Borrowed(html),
+    }
+}
+
+fn preprocess_initial_html(html: &str, preserve_menu: bool, hidden_content: HiddenContent) -> String {
     let stripped = strip_script_and_style_tags(html);
     // ~keep Bogus comments must be removed before tag-shaped preprocessing examines them.
     let stripped = strip_bogus_comments(&stripped);
-    let stripped = strip_hidden_elements(&stripped);
+    let stripped = strip_hidden(&stripped, hidden_content);
+    let stripped = unwrap_kept_inert_elements(&stripped, hidden_content);
     let stripped = normalize_bogus_comment_endings(&stripped);
     let stripped = normalize_split_closing_tags(&stripped);
     // ~keep Implicit list-item closes prevent deeply nested parser output on large changelogs.
@@ -381,9 +396,9 @@ fn preprocess_initial_html(html: &str, preserve_menu: bool) -> String {
     preprocess_html(&stripped).into_owned()
 }
 
-fn preprocess_repaired_html(html: &str, preserve_menu: bool) -> String {
+fn preprocess_repaired_html(html: &str, preserve_menu: bool, hidden_content: HiddenContent) -> String {
     let stripped = strip_script_and_style_tags(html);
-    let stripped = strip_hidden_elements(&stripped);
+    let stripped = strip_hidden(&stripped, hidden_content);
     let stripped = normalize_bogus_comment_endings(&stripped);
     let stripped = normalize_split_closing_tags(&stripped);
     let stripped = normalize_unclosed_list_items(&stripped);
@@ -391,7 +406,7 @@ fn preprocess_repaired_html(html: &str, preserve_menu: bool) -> String {
     preprocess_html(&stripped).into_owned()
 }
 
-fn repair_custom_elements(preprocessed: String, preserve_menu: bool) -> String {
+fn repair_custom_elements(preprocessed: String, preserve_menu: bool, hidden_content: HiddenContent) -> String {
     let Some(repaired) = repair_with_html5ever(&preprocessed) else {
         tracing::warn!(
             target: "html_to_markdown::convert",
@@ -403,7 +418,7 @@ fn repair_custom_elements(preprocessed: String, preserve_menu: bool) -> String {
         target: "html_to_markdown::convert",
         "custom element tags detected; re-parsed input with html5ever repair fallback"
     );
-    preprocess_repaired_html(&repaired, preserve_menu)
+    preprocess_repaired_html(&repaired, preserve_menu, hidden_content)
 }
 
 /// Wrap `output` at the wrap width, leaving the `frontmatter` it starts with as it is.

@@ -4,6 +4,7 @@ use crate::converter::main_helpers::repair_with_html5ever;
 use crate::converter::preprocessing_helpers::has_inline_block_misnest;
 use crate::converter::utility::caching::build_dom_context;
 use crate::error::{ConversionError, Result};
+use crate::options::HiddenContent;
 
 #[cfg(test)]
 thread_local! {
@@ -33,6 +34,7 @@ pub(super) enum ParseOutcome<'a> {
 pub(super) fn parse_for_conversion<'a>(
     input: &'a str,
     preserve_menu: bool,
+    hidden_content: HiddenContent,
     attempted_misnest_repair: &mut bool,
 ) -> Result<ParseOutcome<'a>> {
     let dom = match parse_html(input) {
@@ -64,7 +66,11 @@ pub(super) fn parse_for_conversion<'a>(
         target: "html_to_markdown::convert",
         "misnested HTML elements detected; re-parsed with html5ever repair"
     );
-    Ok(ParseOutcome::Retry(preprocess_repaired_html(&repaired, preserve_menu)))
+    Ok(ParseOutcome::Retry(preprocess_repaired_html(
+        &repaired,
+        preserve_menu,
+        hidden_content,
+    )))
 }
 
 #[cfg(test)]

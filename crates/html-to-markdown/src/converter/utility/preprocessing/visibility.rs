@@ -1,7 +1,8 @@
 use std::borrow::Cow;
 
 use super::markup::{find_tag_end, matches_tag_start};
-use super::raw_text::{find_closing_tag_bytes_nested, is_self_closing_tag, skip_opaque_region};
+use super::raw_text::{find_closing_tag_bytes_nested, is_self_closing_tag, opens_a_tag, skip_opaque_region};
+use crate::options::HiddenContent;
 
 /// Sanitize malformed markdown-like URLs in HTML attributes.
 ///
@@ -353,6 +354,97 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
     } else {
         Cow::Borrowed(input)
     }
+}
+
+/// Remove the start and end tags of the `<template>` and `<noscript>` elements whose content
+/// the caller keeps, so that the content converts where it is written.
+///
+/// [`HiddenContent::Reachable`] removes the tags of a declarative shadow root, which a browser
+/// renders in its host element. [`HiddenContent::All`] removes the tags of every `<template>` and
+/// `<noscript>`. An element whose tags stay is dropped by the walk, as before. Inside `<head>` no
+/// tag is removed: what the two elements hold there is metadata (`<link>`, `<meta>`, `<style>`),
+/// and removing the tags would make it the metadata of the document.
+///
+/// ~keep The tags are removed before the parse, not skipped in the walk, so that every reader
+/// ~keep of the tree sees the content: a row in a `<template>` that is a child of a `<table>` is
+/// ~keep a row of that table, which a walk that descends into the template cannot give.
+pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) -> Cow<'_, str> {
+    if hidden_content == HiddenContent::Drop {
+        return Cow::Borrowed(input);
+    }
+    let bytes = input.as_bytes();
+    // ~keep One entry for each open `<template>`: whether its tags are removed. An end tag takes
+    // ~keep the entry of the start tag it closes, so a kept template inside a dropped one, and
+    // ~keep the reverse, each close with their own tag.
+    let mut open_templates: Vec<bool> = Vec::new();
+    let mut output: Option<String> = None;
+    let mut last = 0;
+    let mut idx = 0;
+    // ~keep Past the last `>` no tag can end, so the scan stops there. Without this bound a run
+    // ~keep of unterminated `<a` makes every `find_tag_end` call read to the end of the input.
+    let scan_end = bytes.iter().rposition(|&byte| byte == b'>').map_or(0, |gt| gt + 1);
+
+    let mut in_head = false;
+
+    while idx < scan_end {
+        let Some(offset) = memchr::memchr(b'<', &bytes[idx..scan_end]) else {
+            break;
+        };
+        idx += offset;
+        let is_end_tag = bytes.get(idx + 1) == Some(&b'/');
+        let name_start = idx + 1 + usize::from(is_end_tag);
+        let is_template = matches_tag_start(bytes, name_start, b"template");
+        let is_noscript = matches_tag_start(bytes, name_start, b"noscript");
+        if matches_tag_start(bytes, name_start, b"head") {
+            in_head = !is_end_tag;
+        } else if matches_tag_start(bytes, name_start, b"body") {
+            in_head = false;
+        }
+        if in_head || (!is_template && !is_noscript) {
+            // ~keep A comment, a raw-text body and a quoted attribute value can hold text that
+            // ~keep looks like one of the two tags. Step over each as one unit.
+            idx = skip_opaque_region(bytes, idx)
+                .or_else(|| opens_a_tag(bytes, idx).then(|| find_tag_end(bytes, idx + 1)).flatten())
+                .unwrap_or(idx + 1);
+            continue;
+        }
+        let Some(tag_end) = find_tag_end(bytes, idx + 1) else {
+            break;
+        };
+        let remove = if is_noscript {
+            hidden_content == HiddenContent::All
+        } else if is_end_tag {
+            open_templates.pop().unwrap_or(false)
+        } else {
+            let tag = &input[idx..tag_end];
+            let remove = hidden_content == HiddenContent::All || tag_declares_shadow_root(tag);
+            if !is_self_closing_tag(tag.as_bytes(), b"template") {
+                open_templates.push(remove);
+            }
+            remove
+        };
+        if remove {
+            let out = output.get_or_insert_with(|| String::with_capacity(bytes.len()));
+            out.push_str(&input[last..idx]);
+            last = tag_end;
+        }
+        idx = tag_end;
+    }
+
+    match output {
+        Some(mut out) => {
+            out.push_str(&input[last..]);
+            Cow::Owned(out)
+        }
+        None => Cow::Borrowed(input),
+    }
+}
+
+/// Whether the start tag of a `<template>` declares a shadow root: `shadowrootmode` is `open` or
+/// `closed`, the two values for which a browser attaches one.
+fn tag_declares_shadow_root(tag: &str) -> bool {
+    extract_attribute_value(tag, "shadowrootmode")
+        .is_some_and(|mode| mode.eq_ignore_ascii_case("open") || mode.eq_ignore_ascii_case("closed"))
 }
 
 /// Consume an optional `=value` following an attribute name, starting at `i` (already past the
