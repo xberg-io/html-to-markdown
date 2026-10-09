@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Text that is only white space no longer makes the conversion fail when
+  `include_document_structure` is on. A heading, paragraph or list item that holds only spaces,
+  line breaks or non-breaking spaces, and white space between two inline images, now give the same
+  Markdown as with the document structure off, and the structure has no node for the empty text.
+  `build_document_structure` no longer panics on the same input
+  ([#749](https://github.com/xberg-io/html-to-markdown/issues/749)).
+
 ## [3.17.2] - 2026-10-06
 
 ### Changed

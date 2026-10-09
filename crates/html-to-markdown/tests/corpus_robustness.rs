@@ -24,6 +24,7 @@
 //! A stack overflow aborts the process and cannot be caught here, by design of the platform;
 //! that case is covered separately by `deep_nesting_overflow.rs`.
 
+use html_to_markdown_rs::ConversionError;
 use html_to_markdown_rs::options::{ConversionOptions, NewlineStyle};
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::PathBuf;
@@ -123,11 +124,16 @@ fn with_hang_guard(budget: Duration, body: impl FnOnce(&Mutex<String>) + Send + 
 ///
 /// ~keep A conversion `Err` is a fine outcome -- refusing malformed input is correct
 /// ~keep behaviour, crashing on it is not.
+/// ~keep `convert` catches a panic of the DOM walk and returns it as `ConversionError::Panic`,
+/// ~keep so that variant is the crash and not a refusal. While this function accepted every
+/// ~keep `Err`, it could not see the panic of issue #749.
 fn convert_guarded(html: &str, options: ConversionOptions) -> Result<usize, String> {
-    catch_unwind(AssertUnwindSafe(|| {
-        html_to_markdown_rs::convert(html, Some(options)).map_or(0, |r| r.content.unwrap_or_default().len())
-    }))
-    .map_err(|_| "panicked".to_owned())
+    match catch_unwind(AssertUnwindSafe(|| html_to_markdown_rs::convert(html, Some(options)))) {
+        Ok(Ok(result)) => Ok(result.content.unwrap_or_default().len()),
+        Ok(Err(ConversionError::Panic(message))) => Err(format!("panicked: {message}")),
+        Ok(Err(_)) => Ok(0),
+        Err(_) => Err("panicked".to_owned()),
+    }
 }
 
 fn option_matrix() -> Vec<(&'static str, ConversionOptions)> {
@@ -142,6 +148,24 @@ fn option_matrix() -> Vec<(&'static str, ConversionOptions)> {
         ),
     ]
 }
+
+/// The document structure records text during the same walk, with its own indexes into it.
+///
+/// ~keep A sweep of its own and not a third entry of `option_matrix`: each sweep has one
+/// ~keep wall-clock budget for all its conversions, and the fixture sweep already uses most of
+/// ~keep it on a loaded runner. It runs after the first sweep and not as a test beside it, so
+/// ~keep it does not take a core from that sweep.
+fn structure_matrix() -> Vec<(&'static str, ConversionOptions)> {
+    vec![(
+        "document structure",
+        ConversionOptions {
+            include_document_structure: true,
+            ..Default::default()
+        },
+    )]
+}
+
+type OptionMatrix = fn() -> Vec<(&'static str, ConversionOptions)>;
 
 fn assert_survives(label: &str, html: &str, options: ConversionOptions, option_label: &str, current: &Mutex<String>) {
     if let Ok(mut slot) = current.lock() {
@@ -165,8 +189,7 @@ fn assert_survives(label: &str, html: &str, options: ConversionOptions, option_l
     }
 }
 
-#[test]
-fn should_survive_every_fixture_in_the_corpus() {
+fn sweep_fixtures(matrix: OptionMatrix) {
     let mut corpus = Vec::new();
     collect_html(&fixture_root(), &mut corpus);
     let root = fixture_root();
@@ -189,11 +212,17 @@ fn should_survive_every_fixture_in_the_corpus() {
 
     with_hang_guard(CONVERSION_BUDGET, move |current| {
         for (path, html) in &corpus {
-            for (option_label, options) in option_matrix() {
+            for (option_label, options) in matrix() {
                 assert_survives(path, html, options, option_label, current);
             }
         }
     });
+}
+
+#[test]
+fn should_survive_every_fixture_in_the_corpus() {
+    sweep_fixtures(option_matrix);
+    sweep_fixtures(structure_matrix);
 }
 
 /// Deterministic 64-bit PRNG (`SplitMix64`), written here so a failing seed reproduces
@@ -318,17 +347,16 @@ fn generate(seed: u64, max_fragments: usize) -> String {
     html
 }
 
-#[test]
-fn should_survive_generated_adversarial_markup() {
+fn sweep_generated(matrix: OptionMatrix) {
     // ~keep Seeds are the reproducer: a failure names the exact seed, and `generate(seed, n)`
     // ~keep rebuilds that input byte for byte.
     const CASES: u64 = 3_000;
     const MAX_FRAGMENTS: usize = 60;
 
-    with_hang_guard(CONVERSION_BUDGET, |current| {
+    with_hang_guard(CONVERSION_BUDGET, move |current| {
         for seed in 0..CASES {
             let html = generate(seed, MAX_FRAGMENTS);
-            for (option_label, options) in option_matrix() {
+            for (option_label, options) in matrix() {
                 assert_survives(&format!("seed {seed}"), &html, options, option_label, current);
             }
         }
@@ -336,7 +364,12 @@ fn should_survive_generated_adversarial_markup() {
 }
 
 #[test]
-fn should_survive_pathological_shapes() {
+fn should_survive_generated_adversarial_markup() {
+    sweep_generated(option_matrix);
+    sweep_generated(structure_matrix);
+}
+
+fn sweep_pathological(matrix: OptionMatrix) {
     // ~keep Named shapes rather than random ones, for the degenerate inputs a fragment
     // ~keep shuffler is unlikely to build but a hostile document trivially contains.
     let cases: Vec<(&str, String)> = vec![
@@ -369,9 +402,15 @@ fn should_survive_pathological_shapes() {
 
     with_hang_guard(CONVERSION_BUDGET, move |current| {
         for (label, html) in &cases {
-            for (option_label, options) in option_matrix() {
+            for (option_label, options) in matrix() {
                 assert_survives(label, html, options, option_label, current);
             }
         }
     });
+}
+
+#[test]
+fn should_survive_pathological_shapes() {
+    sweep_pathological(option_matrix);
+    sweep_pathological(structure_matrix);
 }
