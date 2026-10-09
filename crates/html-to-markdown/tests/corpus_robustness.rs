@@ -59,8 +59,8 @@ fn fixture_root() -> PathBuf {
 /// ~keep levels up from `CARGO_MANIFEST_DIR`, same as `fixture_root`'s
 /// ~keep `tools/benchmark-harness/fixtures`): a checkout that is missing this directory for
 /// ~keep any reason must still run this test at full strength over the in-repo fixtures
-/// ~keep instead of failing or, worse, silently covering nothing. The required corpus is
-/// ~keep asserted non-empty separately.
+/// ~keep instead of failing or, worse, silently covering nothing. The sweep asserts a floor on
+/// ~keep the number of documents it keeps, and the floor counts this folder only when it is there.
 /// ~keep
 /// ~keep Was `../../../test_documents/html` (three levels up, landing outside the repo)
 /// ~keep until this was found and fixed. In CI, and in any clean checkout, nothing exists at
@@ -76,6 +76,18 @@ fn optional_extra_roots() -> Vec<PathBuf> {
         .filter(|p| p.is_dir())
         .collect()
 }
+
+/// The number of distinct documents that the fixture folder holds.
+///
+/// ~keep Source: `git ls-files tools/benchmark-harness/fixtures test_documents/html` with the
+/// ~keep SHA-256 of each `.html` file. The fixture folder holds 29 files, all distinct.
+/// ~keep `test_documents/html` holds 70 files; 16 are copies of a fixture, so it adds 54. If a
+/// ~keep change removes a document, lower the number in that change. A new document needs no
+/// ~keep edit, because the sweep checks a floor.
+const FIXTURE_DOCUMENTS: usize = 29;
+
+/// The number of distinct documents that `test_documents/html` adds to the fixture folder.
+const EXTRA_DOCUMENTS: usize = 54;
 
 fn collect_html(dir: &PathBuf, out: &mut Vec<(String, String)>) {
     let Ok(entries) = std::fs::read_dir(dir) else {
@@ -199,8 +211,9 @@ fn sweep_fixtures(matrix: OptionMatrix) {
     collect_html(&fixture_root(), &mut corpus);
     let root = fixture_root();
     let required = corpus.len();
-    for extra in optional_extra_roots() {
-        collect_html(&extra, &mut corpus);
+    let extra_roots = optional_extra_roots();
+    for extra in &extra_roots {
+        collect_html(extra, &mut corpus);
     }
     // ~keep `test_documents/html` holds byte for byte copies of 16 of the in-repo fixtures, among
     // ~keep them the five largest pages. A copy converts to the same result, so the second
@@ -216,12 +229,18 @@ fn sweep_fixtures(matrix: OptionMatrix) {
         corpus.len()
     );
 
-    // ~keep A corpus that silently resolves to nothing is how this kind of test rots into a
-    // ~keep no-op that passes forever. Fail loudly instead.
+    // ~keep A corpus that silently resolves to nothing, or to a few documents, is how this kind
+    // ~keep of test rots into a no-op that passes forever. Fail loudly instead. The floor counts
+    // ~keep `test_documents/html` only when that folder is there, because the folder is optional.
+    let floor = FIXTURE_DOCUMENTS + if extra_roots.is_empty() { 0 } else { EXTRA_DOCUMENTS };
     assert!(
-        !corpus.is_empty(),
-        "no fixtures found under {} -- the corpus path is wrong, not the corpus empty",
-        root.display()
+        corpus.len() >= floor,
+        "the sweep keeps {} distinct document(s), fewer than the {floor} that the corpus holds \
+         ({FIXTURE_DOCUMENTS} under {}, {} more under test_documents/html) -- the corpus path is \
+         wrong, or the sweep lost documents",
+        corpus.len(),
+        root.display(),
+        floor - FIXTURE_DOCUMENTS
     );
 
     with_hang_guard(CONVERSION_BUDGET, move |current| {

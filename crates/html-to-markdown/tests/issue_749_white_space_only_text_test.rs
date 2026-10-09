@@ -436,21 +436,56 @@ fn built_structure(html: &str) -> Result<DocumentStructure, String> {
         .map_err(|_| "the structure builder panics".to_owned())
 }
 
-/// The kind and the text of each heading, paragraph and list item, in document order.
-fn recorded_texts(document: &DocumentStructure) -> Vec<(&'static str, String)> {
+/// The kind and the text of a node, without its place.
+fn label(node: &DocumentNode) -> String {
+    match &node.content {
+        NodeContent::Group { heading_text, .. } => {
+            format!("section {:?}", heading_text.as_deref().unwrap_or_default())
+        }
+        NodeContent::Heading { level, text } => format!("heading {level} {text:?}"),
+        NodeContent::Paragraph { text } => format!("paragraph {text:?}"),
+        NodeContent::List { ordered: true } => "ordered list".to_owned(),
+        NodeContent::List { ordered: false } => "unordered list".to_owned(),
+        NodeContent::ListItem { text } => format!("list item {text:?}"),
+        other => format!("{other:?}"),
+    }
+}
+
+/// Each node with its place, in document order: the labels from the top of the document down
+/// to the node, and the indexes of its children.
+///
+/// ~keep The path holds the parent, the depth and the section of a node at once, so two
+/// ~keep outlines that are equal put each node at the same place.
+fn outline(document: &DocumentStructure) -> Vec<String> {
     document
         .nodes
         .iter()
-        .filter_map(|node| {
-            let kind = match &node.content {
-                NodeContent::Heading { .. } => "heading",
-                NodeContent::Paragraph { .. } => "paragraph",
-                NodeContent::ListItem { .. } => "list item",
-                _ => return None,
-            };
-            recorded_text(node).map(|text| (kind, text.to_owned()))
+        .map(|node| {
+            let mut path = vec![label(node)];
+            let mut parent = node.parent;
+            for _ in 0..document.nodes.len() {
+                let Some(ancestor) = parent.and_then(|index| document.nodes.get(index as usize)) else {
+                    break;
+                };
+                path.push(label(ancestor));
+                parent = ancestor.parent;
+            }
+            path.reverse();
+            format!("{} {:?}", path.join(" > "), node.children)
         })
         .collect()
+}
+
+/// The outline that each of the two structure builders gives for `html`, with the name of the
+/// builder.
+fn outlines(html: &str) -> Result<[(&'static str, Vec<String>); 2], String> {
+    let options = with_structure(&ConversionOptions::default(), true);
+    let converted = convert(html, Some(options)).map_err(|error| error.to_string())?;
+    let converted = converted.document.ok_or("the conversion has no structure")?;
+    Ok([
+        ("the conversion", outline(&converted)),
+        ("the builder", outline(&built_structure(html)?)),
+    ])
 }
 
 #[test]
@@ -461,29 +496,133 @@ fn should_build_a_structure_from_a_parsed_document_that_holds_only_white_space()
 }
 
 /// Blocks that hold one text each and nothing nested, so the conversion and the builder record
-/// the same nodes for them.
+/// the same nodes for them. The last four put content after the heading that takes the white
+/// space, at each relation of its level to the sections that are open.
 const PLAIN_BLOCKS: &[&str] = &[
     "<h1>Title</h1><h2>{}</h2><p>body text</p>",
     "<h3>{}</h3>",
     "<p>{}</p><p>body text</p>",
     "<ul><li>{}</li><li>item</li></ul>",
     "<ol><li>item</li><li>{}</li></ol>",
+    "<h2>{}</h2><p>after</p>",
+    "<h2>Alpha</h2><h2>{}</h2><p>after</p>",
+    "<h1>Alpha</h1><h2>Beta</h2><h2>{}</h2><h3>Gamma</h3><p>after</p>",
+    "<h1>Alpha</h1><h2>Beta</h2><h1>{}</h1><p>after</p><ul><li>item</li></ul>",
 ];
 
 #[test]
-fn should_record_the_same_texts_in_the_builder_and_in_the_conversion() {
-    let templates = PLAIN_BLOCKS;
-    let options = with_structure(&ConversionOptions::default(), true);
-    assert_each(&fill(templates), |case| {
-        let converted = convert(&case.html, Some(options.clone())).map_err(|error| error.to_string())?;
-        let converted = recorded_texts(&converted.document.ok_or("the conversion has no structure")?);
-        let built = recorded_texts(&built_structure(&case.html)?);
+fn should_record_the_same_nodes_at_the_same_places_in_the_builder_and_in_the_conversion() {
+    assert_each(&fill(PLAIN_BLOCKS), |case| {
+        let [(_, converted), (_, built)] = outlines(&case.html)?;
         if converted == built {
             Ok(())
         } else {
             Err(format!(
-                "the conversion records {converted:?} and the builder records {built:?}"
+                "the conversion records {converted:#?} and the builder records {built:#?}"
             ))
         }
     });
+}
+
+/// Text that the trim removes whole, so a heading that holds it gives no node.
+const EMPTY_FILLS: &[&str] = &["", " ", " \n\t ", "&nbsp;", "\u{3000}"];
+
+/// A template, its outline when the heading that takes `{}` has no text, and its outline when
+/// that heading has the text `Kept`.
+///
+/// ~keep A heading with no text opens no section and closes none: the content after it stays in
+/// ~keep the section that was open before it, which is where the Markdown shows it. The outline
+/// ~keep for `Kept` is the control: a heading with text does close the open sections and take
+/// ~keep the content, so the first outline is not one that every input gives.
+const AFTER_A_HEADING: &[(&str, &[&str], &[&str])] = &[
+    (
+        "<h2>{}</h2><p>after</p>",
+        &[r#"paragraph "after" []"#],
+        &[
+            r#"section "Kept" [1, 2]"#,
+            r#"section "Kept" > heading 2 "Kept" []"#,
+            r#"section "Kept" > paragraph "after" []"#,
+        ],
+    ),
+    (
+        "<h2>Alpha</h2><h2>{}</h2><p>after</p>",
+        &[
+            r#"section "Alpha" [1, 2]"#,
+            r#"section "Alpha" > heading 2 "Alpha" []"#,
+            r#"section "Alpha" > paragraph "after" []"#,
+        ],
+        &[
+            r#"section "Alpha" [1]"#,
+            r#"section "Alpha" > heading 2 "Alpha" []"#,
+            r#"section "Kept" [3, 4]"#,
+            r#"section "Kept" > heading 2 "Kept" []"#,
+            r#"section "Kept" > paragraph "after" []"#,
+        ],
+    ),
+    (
+        "<h1>Alpha</h1><h2>Beta</h2><h1>{}</h1><p>after</p>",
+        &[
+            r#"section "Alpha" [1, 2]"#,
+            r#"section "Alpha" > heading 1 "Alpha" []"#,
+            r#"section "Alpha" > section "Beta" [3, 4]"#,
+            r#"section "Alpha" > section "Beta" > heading 2 "Beta" []"#,
+            r#"section "Alpha" > section "Beta" > paragraph "after" []"#,
+        ],
+        &[
+            r#"section "Alpha" [1, 2]"#,
+            r#"section "Alpha" > heading 1 "Alpha" []"#,
+            r#"section "Alpha" > section "Beta" [3]"#,
+            r#"section "Alpha" > section "Beta" > heading 2 "Beta" []"#,
+            r#"section "Kept" [5, 6]"#,
+            r#"section "Kept" > heading 1 "Kept" []"#,
+            r#"section "Kept" > paragraph "after" []"#,
+        ],
+    ),
+    (
+        "<h1>Alpha</h1><h2>Beta</h2><h2>{}</h2><h3>Gamma</h3>",
+        &[
+            r#"section "Alpha" [1, 2]"#,
+            r#"section "Alpha" > heading 1 "Alpha" []"#,
+            r#"section "Alpha" > section "Beta" [3, 4]"#,
+            r#"section "Alpha" > section "Beta" > heading 2 "Beta" []"#,
+            r#"section "Alpha" > section "Beta" > section "Gamma" [5]"#,
+            r#"section "Alpha" > section "Beta" > section "Gamma" > heading 3 "Gamma" []"#,
+        ],
+        &[
+            r#"section "Alpha" [1, 2, 4]"#,
+            r#"section "Alpha" > heading 1 "Alpha" []"#,
+            r#"section "Alpha" > section "Beta" [3]"#,
+            r#"section "Alpha" > section "Beta" > heading 2 "Beta" []"#,
+            r#"section "Alpha" > section "Kept" [5, 6]"#,
+            r#"section "Alpha" > section "Kept" > heading 2 "Kept" []"#,
+            r#"section "Alpha" > section "Kept" > section "Gamma" [7]"#,
+            r#"section "Alpha" > section "Kept" > section "Gamma" > heading 3 "Gamma" []"#,
+        ],
+    ),
+];
+
+#[test]
+fn should_keep_the_content_after_an_empty_heading_in_the_section_before_it() {
+    let mut failures = Vec::new();
+    let mut case_count = 0;
+    for (template, empty, kept) in AFTER_A_HEADING {
+        let fills = EMPTY_FILLS.iter().map(|fill| (*fill, *empty)).chain([("Kept", *kept)]);
+        for (fill, expected) in fills {
+            case_count += 1;
+            let html = template.replace("{}", fill);
+            match outlines(&html) {
+                Ok(found) => {
+                    for (builder, outline) in found {
+                        if outline != expected {
+                            failures.push(format!(
+                                "{html:?}: {builder} records {outline:#?}, and the right outline is {expected:#?}"
+                            ));
+                        }
+                    }
+                }
+                Err(reason) => failures.push(format!("{html:?}: {reason}")),
+            }
+        }
+    }
+    assert_none(&failures, case_count);
 }
