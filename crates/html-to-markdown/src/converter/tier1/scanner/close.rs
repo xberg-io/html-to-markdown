@@ -43,7 +43,7 @@ fn emit_close_for_implicit(
         TagKind::Strikethrough => close_inline_marker(state, &frame, "~~")?,
         TagKind::Inserted
             if state.escape_ctx.contains(EscapeCtx::CODE) || state.escape_ctx.contains(EscapeCtx::PRE) => {}
-        TagKind::Inserted => close_inline_marker(state, &frame, "==")?,
+        TagKind::Inserted => {}
         TagKind::Code => close_code(state, &frame, false, options)?,
         TagKind::Link => close_link(state, &frame, options)?,
         TagKind::List(ListKind::Definition) => close_dl(state, &frame),
@@ -57,8 +57,7 @@ fn emit_close_for_implicit(
         TagKind::Summary => close_summary(state, &frame),
         // ~keep Figcaption: pop accumulation buffer, trim, emit `*…*\n\n` (Phase FF-2).
         TagKind::Figcaption => close_figcaption(state, &frame),
-        // ~keep Button (Phase T): emit `\n\n` on EOF close just like explicit close.
-        TagKind::Button => close_button(state, &frame),
+        TagKind::Button => {}
         // ~keep An unclosed `<table>` at EOF (html5ever/tl both implicitly close every
         // open element there, per the loop's own doc comment) used to hit the
         // do-nothing arm below, discarding the WHOLE accumulated table --

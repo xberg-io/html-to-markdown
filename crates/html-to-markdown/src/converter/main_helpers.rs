@@ -647,6 +647,7 @@ pub fn is_inline_element(tag_name: &str) -> bool {
             | "ruby"
             | "s"
             | "samp"
+            | "tt"
             | "small"
             | "span"
             | "strong"

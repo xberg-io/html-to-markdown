@@ -123,7 +123,7 @@ impl<'a> Tier1Scanner<'a> {
         let ends_own_line = tier1::lookup(name_lower).is_some_and(|spec| spec.is_block)
             || matches!(
                 name_lower,
-                b"optgroup" | b"button" | b"progress" | b"meter" | b"output" | b"datalist"
+                b"optgroup" | b"progress" | b"meter" | b"output" | b"datalist"
             );
         let dest = self.state.cell_or_output_mut();
         let (dest_len, ends_in_newline) = (dest.len(), dest.ends_with('\n'));

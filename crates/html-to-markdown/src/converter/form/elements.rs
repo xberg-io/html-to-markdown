@@ -631,9 +631,6 @@ pub fn handle_button(
                 VisitResult::Skip => return,
                 VisitResult::Custom(custom) => {
                     output.push_str(&custom);
-                    if !ctx.convert_as_inline && !custom.ends_with('\n') {
-                        output.push_str("\n\n");
-                    }
                     return;
                 }
                 VisitResult::PreserveHtml => {
@@ -650,7 +647,6 @@ pub fn handle_button(
             }
         }
 
-        let start_len = output.len();
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
@@ -661,10 +657,6 @@ pub fn handle_button(
                     crate::converter::block::container::HandlerContext::new(options, ctx, depth + 1, dom_ctx),
                 );
             }
-        }
-
-        if !ctx.convert_as_inline && output.len() > start_len {
-            output.push_str("\n\n");
         }
     }
 }

@@ -25,7 +25,7 @@ use crate::converter::utility::content::{is_block_level_element, normalized_tag_
 use crate::converter::utility::preprocessing::{
     PRESERVED_MENU_ATTRIBUTE, normalize_bogus_comment_endings, normalize_menu_elements, normalize_split_closing_tags,
     normalize_unclosed_list_items, preprocess_html, restore_preserved_menu_elements, strip_bogus_comments,
-    strip_hidden_elements, strip_script_and_style_tags,
+    strip_hidden_elements, strip_html_cdata, strip_script_and_style_tags,
 };
 use crate::converter::utility::serialization::serialize_tag_to_html;
 use crate::options::{NewlineStyle, OutputFormat};
@@ -368,7 +368,8 @@ fn prepare_html(html: &str, preserve_menu: bool) -> String {
 }
 
 fn preprocess_initial_html(html: &str, preserve_menu: bool) -> String {
-    let stripped = strip_script_and_style_tags(html);
+    let stripped = strip_html_cdata(html);
+    let stripped = strip_script_and_style_tags(&stripped);
     // ~keep Bogus comments must be removed before tag-shaped preprocessing examines them.
     let stripped = strip_bogus_comments(&stripped);
     let stripped = strip_hidden_elements(&stripped);
@@ -381,7 +382,8 @@ fn preprocess_initial_html(html: &str, preserve_menu: bool) -> String {
 }
 
 fn preprocess_repaired_html(html: &str, preserve_menu: bool) -> String {
-    let stripped = strip_script_and_style_tags(html);
+    let stripped = strip_html_cdata(html);
+    let stripped = strip_script_and_style_tags(&stripped);
     let stripped = strip_hidden_elements(&stripped);
     let stripped = normalize_bogus_comment_endings(&stripped);
     let stripped = normalize_split_closing_tags(&stripped);
