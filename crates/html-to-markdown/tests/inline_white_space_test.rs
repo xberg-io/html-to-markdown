@@ -6,7 +6,9 @@
 //! heading separates words. Every input runs on both converters.
 
 use html_to_markdown_rs::prescan::PrescanReport;
-use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert, tier1};
+use html_to_markdown_rs::{
+    CodeBlockStyle, ConversionOptions, HighlightStyle, TierStrategy, WhitespaceMode, convert, tier1,
+};
 
 fn tier_options() -> ConversionOptions {
     ConversionOptions {
@@ -482,6 +484,153 @@ fn a_link_label_gets_no_space_that_the_source_does_not_have() {
         ("<p>Press<a href=\"/p\"><br>Go</a> now.</p>", "Press[  \nGo](/p) now.\n"),
         ("<p>Press <a href=\"/p\">Go<br></a>now.</p>", "Press [Go  \n](/p)now.\n"),
     ]);
+}
+
+/// A sectioning element (`<footer>`, `<section>`, `<article>`, `<aside>`, `<header>`, `<main>`)
+/// is a block. The white space that a link label starts with is no space at the start of that
+/// block, whatever lies between the element and the link.
+#[test]
+fn white_space_at_the_start_of_a_link_label_is_no_space_at_the_start_of_a_sectioning_element() {
+    assert_on_both(&[
+        ("x<footer><a href=\"/x\">\nLogo</a></footer>", "x\n\n[Logo](/x)\n"),
+        (
+            "x<footer><a href=\"/x\"> Logo</a> now</footer>",
+            "x\n\n[Logo](/x) now\n",
+        ),
+        ("x<footer>\n<a href=\"/x\">\nLogo</a>\n</footer>", "x\n\n[Logo](/x)\n"),
+        (
+            "x<footer><div><a href=\"/x\">\nLogo</a></div></footer>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "<p>x</p><footer><p><a href=\"/x\">\nLogo</a></p></footer>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "x<section><div><a href=\"/x\">\nLogo</a></div></section>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "x<article><div><a href=\"/x\">\nLogo</a></div></article>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "x<aside><div><a href=\"/x\">\nLogo</a></div></aside>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "x<header><div><a href=\"/x\">\nLogo</a></div></header>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "x<main><article><section><div><a href=\"/x\">\nLogo</a></div></section></article></main>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "<p>x</p><footer><div>\n<a href=\"/\">\n<img src=\"/l.png\" alt=\"Logo\">\n</a>\n</div></footer>",
+            "x\n\n[![Logo](/l.png)](/)\n",
+        ),
+        (
+            "x<footer><div><a href=\"https://e.org/\"> https://e.org/</a></div></footer>",
+            "x\n\n<https://e.org/>\n",
+        ),
+        (
+            "x<footer><span><a href=\"/x\">\nLogo</a></span></footer>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "x<footer><div><b><a href=\"/x\">\nLogo</a></b></div></footer>",
+            "x\n\n**[Logo](/x)**\n",
+        ),
+        (
+            "x<footer><a href=\"/x\"><b> Logo</b></a></footer>",
+            "x\n\n[**Logo**](/x)\n",
+        ),
+        (
+            "x<footer><a href=\"/x\">\nLogo</a></footer><footer><a href=\"/y\">\nTwo</a></footer>",
+            "x\n\n[Logo](/x)\n\n[Two](/y)\n",
+        ),
+        (
+            "<div>x<footer><a href=\"/x\">\nLogo</a></footer></div>",
+            "x\n\n[Logo](/x)\n",
+        ),
+        (
+            "<blockquote>x<footer><a href=\"/x\">\nLogo</a></footer></blockquote>",
+            "> x\n>\n> [Logo](/x)\n",
+        ),
+    ]);
+    assert_on_full(&[
+        (
+            "<ul><li>x<footer><a href=\"/x\">\nLogo</a></footer></li></ul>",
+            "- x\n\n  [Logo](/x)\n",
+        ),
+        (
+            "<ul><li><footer><a href=\"/x\">\nLogo</a></footer></li></ul>",
+            "- [Logo](/x)\n",
+        ),
+        ("x<footer><div><q> Logo</q></div></footer>", "x\n\n\"Logo\"\n"),
+    ]);
+}
+
+/// The space is owed where the link is not the start of the sectioning element, and the white
+/// space at the end of a label is no space at the end of the element.
+#[test]
+fn a_link_label_in_a_sectioning_element_keeps_the_space_between_two_words() {
+    assert_on_both(&[
+        (
+            "x<footer><div>one<a href=\"/x\">\nLogo</a></div></footer>",
+            "x\n\none [Logo](/x)\n",
+        ),
+        (
+            "x<section><a href=\"/x\">one </a><a href=\"/y\"> two </a></section><p>y</p>",
+            "x\n\n[one](/x) [two](/y)\n\ny\n",
+        ),
+        (
+            "x<footer><a href=\"/x\">Logo </a></footer><p>y</p>",
+            "x\n\n[Logo](/x)\n\ny\n",
+        ),
+        (
+            "x<footer><a href=\"/x\">Logo </a><div>y</div></footer>",
+            "x\n\n[Logo](/x)\n\ny\n",
+        ),
+    ]);
+}
+
+/// The other content that a sectioning element can start with follows the same rule: text, and
+/// an inline element that writes marks.
+#[test]
+fn a_sectioning_element_does_not_start_with_a_space() {
+    assert_on_both(&[
+        ("x<footer> Logo</footer>", "x\n\nLogo\n"),
+        ("x<footer><b> Logo</b></footer>", "x\n\n**Logo**\n"),
+        ("x<footer> <b>Logo</b></footer>", "x\n\n**Logo**\n"),
+        ("x<footer><div><i> Logo</i></div></footer>", "x\n\n*Logo*\n"),
+        ("x<footer><div><a> Logo</a></div></footer>", "x\n\nLogo\n"),
+    ]);
+}
+
+/// Only the one space of collapsed white space is removed at the start of a sectioning
+/// element: the indent of a code block stays, and so does white space in the strict mode.
+#[test]
+fn a_sectioning_element_keeps_an_indent_and_strict_white_space() {
+    let indented = convert_with(
+        "x<footer><pre><code>a</code></pre></footer>",
+        Some(ConversionOptions {
+            code_block_style: CodeBlockStyle::Indented,
+            tier_strategy: TierStrategy::Tier2,
+            ..tier_options()
+        }),
+    );
+    assert_eq!(indented, "x\n\n    a\n");
+    let strict = convert_with(
+        "x<footer> Logo</footer>",
+        Some(ConversionOptions {
+            whitespace_mode: WhitespaceMode::Strict,
+            tier_strategy: TierStrategy::Tier2,
+            ..tier_options()
+        }),
+    );
+    assert_eq!(strict, "x\n\n Logo\n");
 }
 
 /// A short quotation is written without the white space at its two ends too, and that white

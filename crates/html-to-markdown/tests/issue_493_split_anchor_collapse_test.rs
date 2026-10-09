@@ -69,8 +69,10 @@ fn should_still_render_a_genuinely_empty_anchor_as_commonmark_does() {
 
 #[test]
 fn should_not_change_a_nested_anchor_with_no_block_boundary() {
+    // ~keep Chrome 155 shows `Outer Inner` for this input: the space at the end of the first
+    // ~keep label stays between the two links (issue #800).
     let out = content(r#"<a href="/o">Outer <a href="/i">Inner</a></a>"#);
-    assert_eq!(out, "[Outer](/o)[Inner](/i)\n", "actual: {out:?}");
+    assert_eq!(out, "[Outer](/o) [Inner](/i)\n", "actual: {out:?}");
 }
 
 #[test]

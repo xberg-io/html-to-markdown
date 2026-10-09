@@ -183,6 +183,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   break at the end of a quotation is kept. With no white space in the source the output has none
   ([#800](https://github.com/xberg-io/html-to-markdown/issues/800)).
 
+- A `<footer>`, a `<section>`, an `<article>`, an `<aside>`, a `<header>` and a `<main>` start with
+  no space. White space at the start of a block is no space, and the full converter wrote one
+  there. This changes the default output: `x<footer> Logo</footer>` gave `x` and then ` Logo` with
+  a space at the start of its line, and gives `x` and then `Logo`. The same holds for an inline
+  element at the start: `x<footer><b> Logo</b></footer>` gave ` **Logo**` and gives `**Logo**`.
+
 - The white space after an image, an inline graphic, a video or a form control at the start of a
   document is kept. This changes the default output: `<p><img src="/i.png" alt="alt"> text</p>`
   gave `![alt](/i.png)text` and gives `![alt](/i.png) text`, and
