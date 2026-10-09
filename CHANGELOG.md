@@ -43,6 +43,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The options of a select list and the texts of neighbouring form controls are separated by one
+  space instead of joined into one word. A select list with the options `Quickstart`, `Installation`
+  and `Ruby 101` gave `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`;
+  a label, a select list and a text area in one form gave `NameOneTwoarea words` and now give
+  `Name One Two area words`. Both converters give the same text for output, meter and progress
+  elements ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
+- The `label` attribute of an option group is no longer written. It is not text of the page: a
+  browser shows it only inside the open list. A select list with the groups `Getting Started`
+  (option `Quickstart`) and `Build` (option `Commands`) gave `**Getting Started**`, a line break,
+  `Quickstart**Build**`, a line break and `Commands`, and now gives `Quickstart Commands`
+  ([#776](https://github.com/xberg-io/html-to-markdown/issues/776)).
 - An inline `<svg>` keeps its text and no longer adds the words `SVG Image`. Its text is its
   `aria-label`, the `<title>` and `<desc>` of the graphic, its `<text>` elements and the HTML in a
   `<foreignObject>`, in document order. Style sheets, scripts, metadata and the content of `<defs>`
@@ -71,13 +82,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is on, and `build_document_structure` no longer panics on it. The Markdown is the same as with the
   structure off. Neither builder records an empty heading, paragraph or list item
   ([#749](https://github.com/xberg-io/html-to-markdown/issues/749)).
-- The options of a select list and the texts of neighbouring form controls are separated by one
-  space instead of joined into one word. A select list with the options `Quickstart`, `Installation`
-  and `Ruby 101` gave `QuickstartInstallationRuby 101` and now gives `Quickstart Installation Ruby 101`;
-  a label, a select list and a text area in one form gave `NameOneTwoarea words` and now give
-  `Name One Two area words`. A group label is written in the line of its options, and both converters
-  give the same text for output, meter and progress elements
-  ([#752](https://github.com/xberg-io/html-to-markdown/issues/752)).
 
 ## [3.17.2] - 2026-10-06
 

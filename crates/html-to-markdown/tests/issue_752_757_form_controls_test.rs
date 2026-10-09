@@ -8,7 +8,7 @@
 use html_to_markdown_rs::options::PreprocessingOptions;
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::tier1::{self, BailReason};
-use html_to_markdown_rs::{ConversionOptions, HighlightStyle, TierStrategy, convert};
+use html_to_markdown_rs::{ConversionOptions, HighlightStyle, NewlineStyle, TierStrategy, WarningKind, convert};
 
 /// Options that let the fast converter run, with forms kept.
 fn options(tier_strategy: TierStrategy) -> ConversionOptions {
@@ -88,7 +88,7 @@ fn should_separate_the_options_of_a_select_list() {
         ),
         (
             r#"<select><optgroup label="Fruit"><option>Apple</option><option>Pear</option></optgroup><optgroup label="Veg"><option>Leek</option></optgroup><option>Other</option></select>"#,
-            "**Fruit** Apple Pear **Veg** Leek Other\n",
+            "Apple Pear Leek Other\n",
         ),
         (
             r#"<input list="l"><datalist id="l"><option value="v1">One</option><option value="v2">Two</option></datalist>"#,
@@ -97,6 +97,40 @@ fn should_separate_the_options_of_a_select_list() {
         (
             r#"<p>Browser <input list="l"><datalist id="l"><option>One</option><option>Two</option></datalist> end</p>"#,
             "Browser One Two end\n",
+        ),
+    ] {
+        assert_all_paths(html, expected);
+    }
+}
+
+/// Issue 776: the `label` attribute of an option group is not text of the page. A browser shows
+/// it only inside the open list.
+#[test]
+fn should_not_write_the_label_of_an_option_group() {
+    for (html, expected) in [
+        (
+            r#"<p>Before.</p><select><optgroup label="Getting Started"><option>Quickstart</option><option>Installation</option></optgroup></select><p>After.</p>"#,
+            "Before.\n\nQuickstart Installation\n\nAfter.\n",
+        ),
+        (
+            r#"<p>Before.</p><select><optgroup label="Getting Started"><option>Quickstart</option></optgroup><optgroup label="Build"><option>Commands</option></optgroup></select><p>After.</p>"#,
+            "Before.\n\nQuickstart Commands\n\nAfter.\n",
+        ),
+        (
+            "<p>Before.</p>\n<select>\n  <optgroup label=\"Getting Started\"><option>Quickstart</option></optgroup>\n  <optgroup label=\"Build\"><option>Commands</option></optgroup>\n</select>\n<p>After.</p>",
+            "Before.\n\nQuickstart Commands\n\nAfter.\n",
+        ),
+        (
+            r#"<p>Pick <select><optgroup label="Fruit"><option>Apple</option></optgroup></select> now.</p>"#,
+            "Pick Apple now.\n",
+        ),
+        (
+            r#"<p>a</p><select><optgroup label="Empty"></optgroup></select><p>b</p>"#,
+            "a\n\nb\n",
+        ),
+        (
+            r#"<datalist><optgroup label="Fruit"><option>Apple</option></optgroup></datalist>"#,
+            "Apple\n",
         ),
     ] {
         assert_all_paths(html, expected);
@@ -602,6 +636,92 @@ fn should_not_turn_a_checkbox_into_a_link() {
     }
     // ~keep The renderer does make a link of the bracket form, so the assertion above can fail.
     assert!(render("[x](optional)\n").contains("<a "));
+}
+
+#[test]
+fn should_read_past_an_element_that_writes_nothing_to_the_text_after_a_control() {
+    for (html, expected) in [
+        (
+            "<p><select><option>One</option></select><template>.</template>items</p>",
+            "One items\n",
+        ),
+        (
+            "<p><select><option>One</option></select><noscript>.</noscript>items</p>",
+            "One items\n",
+        ),
+        (
+            r#"<p><select><option>One</option></select><script type="application/ld+json">{"a":1}</script>items</p>"#,
+            "One items\n",
+        ),
+        (r#"<p><input type="checkbox"><button></button>items</p>"#, "☐ items\n"),
+        (
+            r#"<p><input type="checkbox"><textarea></textarea>items</p>"#,
+            "☐ items\n",
+        ),
+        (r#"<p><input type="checkbox"><select></select>items</p>"#, "☐ items\n"),
+        (
+            "<p><select><option>One</option></select><my-tag>items</my-tag></p>",
+            "One items\n",
+        ),
+        (
+            "<p><select><option>One</option></select><my-tag>.</my-tag></p>",
+            "One.\n",
+        ),
+    ] {
+        assert_all_paths(html, expected);
+    }
+}
+
+#[test]
+fn should_write_no_space_between_a_control_and_a_line_break() {
+    let html = "<p><select><option>One</option></select><br>items</p>";
+    for tier_strategy in [TierStrategy::Tier2, TierStrategy::Auto] {
+        let backslash = ConversionOptions {
+            newline_style: NewlineStyle::Backslash,
+            ..options(tier_strategy)
+        };
+        assert_eq!(markdown(html, backslash), "One\\\nitems\n", "{tier_strategy:?}");
+    }
+}
+
+#[test]
+fn should_look_past_what_a_reader_does_not_see_for_the_task_checkbox() {
+    for (html, expected) in [
+        (
+            r#"<ul><li><template>word</template><input type="checkbox"> a</li></ul>"#,
+            "- [ ] a\n",
+        ),
+        (
+            r#"<ul><li><script type="application/ld+json">{"a":1}</script><input type="checkbox"> a</li></ul>"#,
+            "- [ ] a\n",
+        ),
+    ] {
+        assert_all_paths(html, expected);
+    }
+}
+
+#[test]
+fn should_stop_the_search_for_the_task_checkbox_at_the_depth_limit() {
+    let html = format!(
+        r#"<ul><li>{}<input type="checkbox"> a{}</li></ul>"#,
+        "<span>".repeat(12),
+        "</span>".repeat(12)
+    );
+    let shallow = ConversionOptions {
+        max_depth: Some(6),
+        ..options(TierStrategy::Tier2)
+    };
+    let result = convert(&html, Some(shallow)).expect("conversion must succeed");
+    let output = result.content.unwrap_or_default();
+    assert!(!output.contains("[ ]"), "task brackets in {output:?}");
+    assert!(
+        result
+            .warnings
+            .iter()
+            .any(|warning| warning.kind == WarningKind::DepthLimitExceeded),
+        "{:?}",
+        result.warnings
+    );
 }
 
 #[test]

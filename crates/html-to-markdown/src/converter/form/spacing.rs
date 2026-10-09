@@ -81,10 +81,7 @@ fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool 
             None => Some(&dom_ctx.root_children),
         };
         let Some(siblings) = siblings else { return false };
-        let Some(position) = dom_ctx
-            .sibling_index(id)
-            .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))
-        else {
+        let Some(position) = dom_ctx.sibling_index(id) else {
             return false;
         };
         for sibling in siblings.iter().skip(position + 1) {
@@ -119,19 +116,19 @@ fn leading_word(handle: tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContex
         tl::Node::Tag(tag) => {
             let name = dom_ctx.tag_name_for(handle, parser)?;
             match name.as_ref() {
-                // ~keep An input that writes nothing is not in the way; a checkbox and the
-                // ~keep controls below separate themselves from the text before them.
+                // ~keep An input that writes nothing is not in the way; a checkbox separates
+                // ~keep itself from the text before it.
                 "input" => super::elements::checkbox_state(tag).map(|_| false),
                 "script" | "style" | "template" | "noscript" => None,
                 "br" => Some(false),
-                name if writes_own_text(name) => Some(false),
                 "img" => Some(true),
-                name if is_inline_element(name) => tag
+                // ~keep An element that writes nothing (an empty button, an empty span) is not in
+                // ~keep the way either. A space before a block is at a line end, where it is removed.
+                _ => tag
                     .children()
                     .top()
                     .iter()
                     .find_map(|child| leading_word(*child, parser, dom_ctx, budget)),
-                _ => Some(false),
             }
         }
     }

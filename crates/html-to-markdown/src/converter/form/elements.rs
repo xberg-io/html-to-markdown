@@ -15,6 +15,7 @@
 use super::FormContext;
 use super::spacing::{ControlStart, separate_from_next_text};
 use super::walk_node;
+#[cfg(feature = "visitor")]
 use std::borrow::Cow;
 
 /// Run `<form>`'s visitor hook, if one is installed.
@@ -549,14 +550,6 @@ pub fn handle_option_list(
     }
 }
 
-/// Starts an option or a group label in the buffer of its list: one space after what the list
-/// already holds.
-fn start_list_entry(output: &mut String) {
-    if !output.is_empty() && !output.ends_with(char::is_whitespace) {
-        output.push(' ');
-    }
-}
-
 /// Handles the `<option>` element.
 ///
 /// An option is inline text. Selection state does not change the visible label.
@@ -589,7 +582,10 @@ pub fn handle_option(
 
         let trimmed = text.trim();
         if !trimmed.is_empty() {
-            start_list_entry(output);
+            // ~keep One space separates an option from what its list already holds.
+            if !output.is_empty() && !output.ends_with(char::is_whitespace) {
+                output.push(' ');
+            }
             output.push_str(trimmed);
         }
     }
@@ -597,8 +593,8 @@ pub fn handle_option(
 
 /// Handles the `<optgroup>` element.
 ///
-/// The `label` attribute is written as strong text in the line of the options, followed by the
-/// grouped options.
+/// Its options are written as the options of the list are. The `label` attribute is not text of
+/// the page: a browser shows it only inside the open list.
 pub fn handle_optgroup(
     _tag_name: &str,
     node_handle: &tl::NodeHandle,
@@ -613,22 +609,6 @@ pub fn handle_optgroup(
         dom_ctx,
     } = context;
     if let Some(tl::Node::Tag(tag)) = node_handle.get(parser) {
-        let label = tag
-            .attributes()
-            .get("label")
-            .flatten()
-            .map_or(Cow::Borrowed(""), |v| v.as_utf8_str());
-
-        if !label.is_empty() {
-            let mut symbol = String::with_capacity(2);
-            symbol.push(options.strong_em_symbol);
-            symbol.push(options.strong_em_symbol);
-            start_list_entry(output);
-            output.push_str(&symbol);
-            output.push_str(&label);
-            output.push_str(&symbol);
-        }
-
         let children = tag.children();
         {
             for child_handle in children.top().iter() {
