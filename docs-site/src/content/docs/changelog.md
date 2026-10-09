@@ -54,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hidden element in a graphic, or with a link that has a name and no text, to the full converter
   ([#766](https://github.com/xberg-io/html-to-markdown/issues/766)).
 - Two page shapes no longer take quadratic time in the pass that removes hidden elements: many
-  tag starts with no end (`<a ` repeated), and many attribute values with no closing quote
+  tag starts with no end (`<a` and a space, repeated), and many attribute values with no closing quote
   (`<g a="` repeated). A 120 KB page with 40,000 such tag starts in a graphic took 16 seconds;
   200,000 of them now take 20 milliseconds. The pass reads each tag once. A `<` inside a tag is
   part of an attribute value there, so an attribute value that holds markup is no longer cut.

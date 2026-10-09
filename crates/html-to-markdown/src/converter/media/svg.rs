@@ -448,38 +448,11 @@ pub fn handle_svg(
     output: &mut String,
     context: MediaContext<'_>,
 ) {
-    let MediaContext {
-        options, ctx, depth, ..
-    } = context;
+    let MediaContext { options, ctx, .. } = context;
 
     #[cfg(feature = "inline-images")]
     if let Some(ref collector_ref) = ctx.inline_collector {
-        let title_opt = tag
-            .children()
-            .top()
-            .iter()
-            .find(|child| {
-                matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if child_tag.name().as_utf8_str().eq_ignore_ascii_case("title"))
-            })
-            .map(|child| {
-                crate::converter::utility::content::get_text_content(child, parser, context.dom_ctx)
-                    .trim()
-                    .to_string()
-            });
-        let mut attributes_map = BTreeMap::new();
-        for (key, value_opt) in tag.attributes().iter() {
-            let key_str = key.to_string();
-            let keep = key_str == "width"
-                || key_str == "height"
-                || key_str == "filename"
-                || key_str == "aria-label"
-                || key_str.starts_with("data-");
-            if keep {
-                let value = value_opt.map(|value| value.to_string()).unwrap_or_default();
-                attributes_map.insert(key_str, value);
-            }
-        }
-        handle_inline_svg(collector_ref, node_handle, parser, title_opt, attributes_map);
+        collect_inline_svg(collector_ref, *node_handle, tag, parser, context.dom_ctx);
     }
 
     // ~keep The converter writes an inline SVG as a `data:` URL it builds itself, so the
@@ -497,40 +470,105 @@ pub fn handle_svg(
 
     let title = graphic_text(tag, parser);
     if ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
-        // ~keep Written as running text through the function a text node uses, so it gets the same
-        // ~keep escaping, also where it starts a line.
-        let escaped = crate::text::escape(
-            &title,
-            options.escape_misc,
-            options.escape_asterisks,
-            options.escape_underscores,
-            options.escape_ascii,
-        );
-        if !escaped.is_empty() {
-            crate::converter::text_node::push_running_text(
-                output,
-                &escaped,
-                crate::converter::text_node::TextSite {
-                    node_handle,
-                    parser,
-                    options,
-                    ctx,
-                    dom_ctx: context.dom_ctx,
-                },
-            );
-        }
+        write_graphic_as_text(*node_handle, parser, output, context, &title);
     } else {
-        use base64::{Engine as _, engine::general_purpose::STANDARD};
-
-        let svg_html = serialize_element_at_depth(node_handle, parser, depth, effective_max_depth(options));
-        let base64_svg = STANDARD.encode(svg_html.as_bytes());
-
-        output.push_str("![");
-        output.push_str(&escape_link_label(&title));
-        output.push_str("](data:image/svg+xml;base64,");
-        output.push_str(&base64_svg);
-        output.push(')');
+        write_graphic_as_image(*node_handle, parser, output, context, &title);
     }
+}
+
+/// Gives an inline `<svg>` to the collector of inline images, with the text of its `title` child
+/// and the attributes that describe it.
+#[cfg(feature = "inline-images")]
+fn collect_inline_svg(
+    collector_ref: &InlineCollectorHandle,
+    node_handle: NodeHandle,
+    tag: &tl::HTMLTag,
+    parser: &Parser,
+    dom_ctx: &crate::converter::DomContext,
+) {
+    let title_opt = tag
+        .children()
+        .top()
+        .iter()
+        .find(|child| {
+            matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if child_tag.name().as_utf8_str().eq_ignore_ascii_case("title"))
+        })
+        .map(|child| {
+            crate::converter::utility::content::get_text_content(child, parser, dom_ctx)
+                .trim()
+                .to_string()
+        });
+    let mut attributes_map = BTreeMap::new();
+    for (key, value_opt) in tag.attributes().iter() {
+        let key_str = key.to_string();
+        let keep = key_str == "width"
+            || key_str == "height"
+            || key_str == "filename"
+            || key_str == "aria-label"
+            || key_str.starts_with("data-");
+        if keep {
+            let value = value_opt.map(|value| value.to_string()).unwrap_or_default();
+            attributes_map.insert(key_str, value);
+        }
+    }
+    handle_inline_svg(collector_ref, &node_handle, parser, title_opt, attributes_map);
+}
+
+/// Writes the text of a graphic as running text.
+fn write_graphic_as_text(
+    node_handle: NodeHandle,
+    parser: &Parser,
+    output: &mut String,
+    context: MediaContext<'_>,
+    title: &str,
+) {
+    let MediaContext {
+        options, ctx, dom_ctx, ..
+    } = context;
+    // ~keep Written as running text through the function a text node uses, so it gets the same
+    // ~keep escaping, also where it starts a line.
+    let escaped = crate::text::escape(
+        title,
+        options.escape_misc,
+        options.escape_asterisks,
+        options.escape_underscores,
+        options.escape_ascii,
+    );
+    if !escaped.is_empty() {
+        crate::converter::text_node::push_running_text(
+            output,
+            &escaped,
+            crate::converter::text_node::TextSite {
+                node_handle: &node_handle,
+                parser,
+                options,
+                ctx,
+                dom_ctx,
+            },
+        );
+    }
+}
+
+/// Writes a graphic as an image with a base64 `data:` URL, with the text of the graphic as its
+/// alt text.
+fn write_graphic_as_image(
+    node_handle: NodeHandle,
+    parser: &Parser,
+    output: &mut String,
+    context: MediaContext<'_>,
+    title: &str,
+) {
+    use base64::{Engine as _, engine::general_purpose::STANDARD};
+
+    let MediaContext { options, depth, .. } = context;
+    let svg_html = serialize_element_at_depth(&node_handle, parser, depth, effective_max_depth(options));
+    let base64_svg = STANDARD.encode(svg_html.as_bytes());
+
+    output.push_str("![");
+    output.push_str(&escape_link_label(title));
+    output.push_str("](data:image/svg+xml;base64,");
+    output.push_str(&base64_svg);
+    output.push(')');
 }
 
 /// Handle `MathML` element conversion to Markdown.
