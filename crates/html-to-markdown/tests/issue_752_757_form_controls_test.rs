@@ -673,6 +673,80 @@ fn should_read_past_an_element_that_writes_nothing_to_the_text_after_a_control()
 }
 
 #[test]
+fn should_separate_a_control_in_a_custom_element_from_the_text_after_the_element() {
+    for (html, expected) in [
+        (
+            "<p><my-tag><select><option>One</option></select></my-tag>items</p>",
+            "One items\n",
+        ),
+        (r#"<p><my-tag><input type="checkbox"></my-tag>items</p>"#, "☐ items\n"),
+        (
+            "<p><x-a><x-b><select><option>One</option></select></x-b></x-a>items</p>",
+            "One items\n",
+        ),
+        (
+            "<p><span><my-tag><select><option>One</option></select></my-tag></span>items</p>",
+            "One items\n",
+        ),
+        (
+            "<p><my-tag><span><select><option>One</option></select></span></my-tag>items</p>",
+            "One items\n",
+        ),
+        (
+            "<p><my-tag><select><option>One</option></select></my-tag><my-tag>items</my-tag></p>",
+            "One items\n",
+        ),
+        ("<h2><my-tag><output>42</output></my-tag>items</h2>", "## 42 items\n"),
+        ("<h2><my-tag><button>Go</button></my-tag>now</h2>", "## Go now\n"),
+        (
+            "<ul><li><my-tag><select><option>One</option></select></my-tag>items</li></ul>",
+            "- One items\n",
+        ),
+        (
+            "<table><tr><th>h</th></tr><tr><td><my-tag><select><option>One</option></select></my-tag>items</td></tr></table>",
+            "| h         |\n| --------- |\n| One items |\n",
+        ),
+        // ~keep An element with no hyphen in its name that the converter does not know is the same case.
+        (
+            "<p><font><select><option>One</option></select></font>items</p>",
+            "One items\n",
+        ),
+        (
+            "<p><blink><select><option>One</option></select></blink>items</p>",
+            "One items\n",
+        ),
+        // ~keep Punctuation, white space and the end of the block still take no space.
+        (
+            "<p><my-tag><select><option>One</option></select></my-tag>.</p>",
+            "One.\n",
+        ),
+        (
+            "<p><my-tag><select><option>One</option></select></my-tag> items</p>",
+            "One items\n",
+        ),
+        (
+            "<div><my-tag><select><option>One</option></select></my-tag></div><p>items</p>",
+            "One\n\nitems\n",
+        ),
+        (
+            "<my-tag><select><option>One</option></select></my-tag><p>items</p>",
+            "One\n\nitems\n",
+        ),
+        // ~keep A table cell and a list item end the line of a control too.
+        (
+            "<table><tr><th>h</th><th>k</th></tr><tr><td><select><option>One</option></select></td><td>items</td></tr></table>",
+            "| h   | k     |\n| --- | ----- |\n| One | items |\n",
+        ),
+        (
+            "<ul><li><select><option>One</option></select></li><li>items</li></ul>",
+            "- One\n- items\n",
+        ),
+    ] {
+        assert_all_paths(html, expected);
+    }
+}
+
+#[test]
 fn should_write_no_space_between_a_control_and_a_line_break() {
     let html = "<p><select><option>One</option></select><br>items</p>";
     for tier_strategy in [TierStrategy::Tier2, TierStrategy::Auto] {

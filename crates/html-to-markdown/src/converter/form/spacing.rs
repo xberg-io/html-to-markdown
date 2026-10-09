@@ -2,7 +2,6 @@
 //! one space separates it from text before it and from text after it in the same block.
 
 use crate::converter::DomContext;
-use crate::converter::main_helpers::is_inline_element;
 
 /// The nodes a search for the text after a control reads before it gives up.
 const MAX_LOOKAHEAD_NODES: usize = 64;
@@ -89,13 +88,10 @@ fn word_follows(mut id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool 
                 return starts_with_word;
             }
         }
-        // ~keep The line goes on after an inline parent, and ends with a block.
+        // ~keep The line ends with a block. It goes on after every other parent: an inline
+        // ~keep element, and an element that is written as its children alone (a custom element).
         let Some(parent_id) = parent else { return false };
-        let parent_is_inline = dom_ctx
-            .node_handle(parent_id)
-            .and_then(|handle| dom_ctx.tag_name_for(*handle, parser))
-            .is_some_and(|name| is_inline_element(&name));
-        if !parent_is_inline {
+        if dom_ctx.tag_info(parent_id, parser).is_none_or(|info| info.is_block) {
             return false;
         }
         id = parent_id;
