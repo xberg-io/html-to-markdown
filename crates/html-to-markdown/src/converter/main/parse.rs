@@ -59,7 +59,7 @@ pub(super) fn parse_for_conversion<'a>(
     let Some(repaired) = repair_with_html5ever(input) else {
         tracing::warn!(
             target: "html_to_markdown::convert",
-            "block-level element misnested under an inline ancestor; html5ever repair failed, proceeding with original structure"
+            "html5ever repair gave no tree (the document nests too deep or cannot be written back); proceeding with original structure"
         );
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     };
@@ -121,9 +121,20 @@ mod tests {
 
     #[test]
     fn should_parse_once_when_only_html_and_body_have_no_end_tag() {
-        let (calls, content) = parse_calls_for("<html><body><p>one</p><p>two</p>");
+        for html in ["<html><body><p>one</p><p>two</p>", "<HTML><BODY><p>one</p><p>two</p>"] {
+            let (calls, content) = parse_calls_for(html);
 
-        assert_eq!(content.as_deref(), Some("one\n\ntwo\n"));
+            assert_eq!(content.as_deref(), Some("one\n\ntwo\n"), "{html:?}");
+            assert_eq!(calls, 1, "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_keep_the_first_parse_when_the_second_parse_nests_past_its_limit() {
+        let html = format!("<p>kept</p>{}deep", "<div>".repeat(600));
+        let (calls, content) = parse_calls_for(&html);
+
+        assert_eq!(content.as_deref(), Some("kept\n"));
         assert_eq!(calls, 1);
     }
 

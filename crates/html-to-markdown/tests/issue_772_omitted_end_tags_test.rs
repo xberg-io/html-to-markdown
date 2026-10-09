@@ -301,6 +301,8 @@ fn an_end_tag_in_another_spelling_ends_its_element() {
         "<!doctype html><DIV><P>one</DIV><DIV><P>two</DIV>tail",
         "one\n\ntwo\n\ntail\n",
     );
+    assert_all_routes("<HTML><BODY><DIV><P>one</DIV>tail", "one\n\ntail\n");
+    assert_all_routes("<HTML><BODY><p>one</p><p>two</p>", "one\n\ntwo\n");
     // ~keep The end tag of any heading ends an open heading.
     assert_default_and_tier2("<!doctype html><h2>one</h3>two", "## one\n\ntwo\n");
 }
@@ -313,6 +315,51 @@ fn a_fragment_with_no_body_tag_keeps_its_header_after_the_second_parse() {
     assert_all_routes("<header>h</header><b><p>one</p></b>", "h\n\n**one**\n");
     assert_all_routes("<body><header>h</header><div><p>one</div>tail", "one\n\ntail\n");
     assert_all_routes("<body><header>h</header><b><p>one</p></b>", "**one**\n");
+    // ~keep An `<html>` start tag does not make a page: only a `<body>` start tag does.
+    assert_all_routes("<html><header>h</header><div><p>one</div>tail", "h\n\none\n\ntail\n");
+    assert_all_routes("<html><header>h</header><b><p>one</p></b>", "h\n\n**one**\n");
+}
+
+#[test]
+fn a_page_that_omits_an_end_tag_converts_as_the_page_with_every_end_tag() {
+    for (open, closed, expected) in [
+        (
+            "<nav><p>one</nav><aside><p>two</aside>tail",
+            "<nav><p>one</p></nav><aside><p>two</p></aside>tail",
+            "two\n\ntail\n",
+        ),
+        // ~keep A `<header>` directly in the `<body>` is a page header, and it is dropped.
+        (
+            "<body><article><p>one</article><header>site</header><p>two</p>",
+            "<body><article><p>one</p></article><header>site</header><p>two</p>",
+            "one\n\ntwo\n",
+        ),
+        (
+            "<body><main><p>one</main><header>late header</header><p>two</p>",
+            "<body><main><p>one</p></main><header>late header</header><p>two</p>",
+            "one\n\ntwo\n",
+        ),
+        (
+            "<main><p>one</main><header>late header</header><p>two</p>",
+            "<main><p>one</p></main><header>late header</header><p>two</p>",
+            "one\n\nlate header\n\ntwo\n",
+        ),
+        // ~keep A block quote can interrupt a paragraph, so no blank line comes before it.
+        (
+            "<p>one<blockquote>two</blockquote>three",
+            "<p>one</p><blockquote>two</blockquote>three",
+            "one\n> two\n\nthree\n",
+        ),
+    ] {
+        assert_all_routes(open, expected);
+        assert_all_routes(closed, expected);
+    }
+}
+
+#[test]
+fn a_heading_start_tag_ends_an_open_heading() {
+    assert_default_and_tier2("<h2>one<h3>two</h3>three", "## one\n\n### two\n\nthree\n");
+    assert_all_routes("<h2>one</h2><h3>two</h3>three", "## one\n\n### two\n\nthree\n");
 }
 
 #[test]

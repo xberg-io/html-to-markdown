@@ -543,7 +543,9 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
 
 /// Try to repair HTML using html5ever parser.
 ///
-/// Returns `Some(repaired_html)` if repair was successful, None otherwise.
+/// Returns `Some(repaired_html)` if repair was successful, None otherwise. The repair gives up
+/// on a document that nests deeper than a browser builds (512 open elements), so its cost stays
+/// linear in the size of the input.
 ///
 /// Before feeding the input to the HTML5 parser, XML-style self-closing tags on
 /// non-void elements (e.g. `<ac:parameter name="foo" />`) are expanded to explicit
@@ -561,7 +563,7 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
     // ~keep The adoption agency splits an `<a>` around a block into an authored element and
     // ~keep clones; collapse the empty halves before the tree is flattened to a string and
     // ~keep the provenance is gone (issue #493).
-    let dom = parse_with_anchor_origins(&expanded);
+    let dom = parse_with_anchor_origins(&expanded)?;
     collapse_split_anchors(&dom.document);
 
     let mut buf = Vec::with_capacity(input.len());

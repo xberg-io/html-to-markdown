@@ -15,7 +15,8 @@
 //! and the split can be undone on the repaired tree before it is serialized. ~keep
 //!
 //! The same token sink records whether the input wrote a `<body>` start tag, which the tree
-//! also no longer shows: see [`parse_with_anchor_origins`]. ~keep
+//! also no longer shows, and gives the repair up when the tree builder nests too deep: see
+//! [`parse_with_anchor_origins`]. ~keep
 
 use std::cell::Cell;
 use std::collections::BTreeMap;
@@ -23,7 +24,7 @@ use std::rc::Rc;
 
 use html5ever::tendril::StrTendril;
 use html5ever::tokenizer::{BufferQueue, Tag, TagKind, Token, TokenSink, TokenSinkResult, Tokenizer, TokenizerOpts};
-use html5ever::tree_builder::{TreeBuilder, TreeBuilderOpts, TreeSink};
+use html5ever::tree_builder::{Tracer, TreeBuilder, TreeBuilderOpts, TreeSink};
 use html5ever::{Attribute, LocalName, QualName, TokenizerResult, ns};
 
 use crate::rcdom::{Handle, NodeData, RcDom};
@@ -37,15 +38,59 @@ const CONTENT_BEARING: [&str; 14] = [
     "textarea", "select",
 ];
 
-/// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
-/// and records whether a `<body>` start tag went by.
-struct AnchorOriginStamper<S> {
-    inner: S,
-    next_origin: Cell<u32>,
-    saw_body_tag: Cell<bool>,
+/// The number of elements the tree builder may hold open before the repair is given up.
+///
+/// ~keep For most start tags the tree builder searches its stack of open elements (the scope
+/// ~keep checks of the standard), so each tag costs the depth of the tree and a document that
+/// ~keep never ends its blocks costs the square of its size. Chrome and Safari keep at most 512
+/// ~keep elements open and flatten what is deeper, which html5ever does not do: past this depth
+/// ~keep its tree is not the tree of a browser, and the converter cuts the page long before
+/// ~keep (`max_depth`). The count includes the active formatting elements.
+const MAX_OPEN_ELEMENTS: usize = 512;
+
+/// The tree builder is measured once in this many start tags. One measurement reads the whole
+/// stack, so this keeps its cost per tag constant.
+const START_TAGS_PER_MEASUREMENT: usize = 64;
+
+/// True when the tree builder is measured after start tag number `start_tags`.
+const fn is_measured(start_tags: usize) -> bool {
+    start_tags.is_multiple_of(START_TAGS_PER_MEASUREMENT)
 }
 
-impl<S> AnchorOriginStamper<S> {
+/// Counts the handles that the tree builder holds.
+struct HandleCount(Cell<usize>);
+
+impl Tracer for HandleCount {
+    type Handle = Handle;
+
+    fn trace_handle(&self, _node: &Handle) {
+        self.0.set(self.0.get() + 1);
+    }
+}
+
+/// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
+/// records whether a `<body>` start tag went by, and stops forwarding when the tree builder
+/// holds more than [`MAX_OPEN_ELEMENTS`] elements open.
+struct AnchorOriginStamper {
+    inner: TreeBuilder<Handle, RcDom>,
+    next_origin: Cell<u32>,
+    saw_body_tag: Cell<bool>,
+    start_tags: Cell<usize>,
+    too_deep: Cell<bool>,
+}
+
+impl AnchorOriginStamper {
+    fn measure_depth(&self) {
+        let start_tags = self.start_tags.get() + 1;
+        self.start_tags.set(start_tags);
+        if !is_measured(start_tags) {
+            return;
+        }
+        let held = HandleCount(Cell::new(0));
+        self.inner.trace_handles(&held);
+        self.too_deep.set(held.0.get() > MAX_OPEN_ELEMENTS);
+    }
+
     fn stamp(&self, tag: &mut Tag) {
         if tag.kind != TagKind::StartTag {
             return;
@@ -68,14 +113,22 @@ impl<S> AnchorOriginStamper<S> {
     }
 }
 
-impl<S: TokenSink> TokenSink for AnchorOriginStamper<S> {
-    type Handle = S::Handle;
+impl TokenSink for AnchorOriginStamper {
+    type Handle = Handle;
 
     fn process_token(&self, mut token: Token, line_number: u64) -> TokenSinkResult<Self::Handle> {
+        if self.too_deep.get() {
+            return TokenSinkResult::Continue;
+        }
+        let is_start_tag = matches!(&token, Token::TagToken(tag) if tag.kind == TagKind::StartTag);
         if let Token::TagToken(ref mut tag) = token {
             self.stamp(tag);
         }
-        self.inner.process_token(token, line_number)
+        let result = self.inner.process_token(token, line_number);
+        if is_start_tag {
+            self.measure_depth();
+        }
+        result
     }
 
     fn end(&self) {
@@ -97,13 +150,19 @@ impl<S: TokenSink> TokenSink for AnchorOriginStamper<S> {
 /// ~keep fragment, and rules that ask "is this element in the body of a page" (the page header
 /// ~keep rule) must still see a fragment after the repair, so the body that no tag asked for is
 /// ~keep unwrapped and its children become children of `<html>`.
-pub fn parse_with_anchor_origins(html: &str) -> RcDom {
+///
+/// Returns `None` when the tree builder holds more than [`MAX_OPEN_ELEMENTS`] elements open.
+/// The rest of the input is then tokenized and not built, so the call stays linear in the size
+/// of the input.
+pub fn parse_with_anchor_origins(html: &str) -> Option<RcDom> {
     let tree_builder = TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default());
     let tokenizer = Tokenizer::new(
         AnchorOriginStamper {
             inner: tree_builder,
             next_origin: Cell::new(0),
             saw_body_tag: Cell::new(false),
+            start_tags: Cell::new(0),
+            too_deep: Cell::new(false),
         },
         TokenizerOpts::default(),
     );
@@ -111,12 +170,15 @@ pub fn parse_with_anchor_origins(html: &str) -> RcDom {
     input.push_back(StrTendril::from(html));
     while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
     tokenizer.end();
+    if tokenizer.sink.too_deep.get() {
+        return None;
+    }
     let saw_body_tag = tokenizer.sink.saw_body_tag.get();
     let dom = TreeSink::finish(tokenizer.sink.inner.sink);
     if !saw_body_tag {
         unwrap_implied_body(&dom.document);
     }
-    dom
+    Some(dom)
 }
 
 /// Replace the `<body>` of `document` with its children.
@@ -262,7 +324,7 @@ mod tests {
     use html5ever::serialize::{SerializeOpts, serialize};
 
     fn repaired(html: &str) -> String {
-        let dom = parse_with_anchor_origins(html);
+        let dom = parse_with_anchor_origins(html).expect("a tree");
         collapse_split_anchors(&dom.document);
         let mut buf = Vec::new();
         serialize(
@@ -291,6 +353,35 @@ mod tests {
             repaired("<title>T</title><p>one<!-- <body> --><p>two"),
             "<html><head><title>T</title></head><p>one<!-- <body> --></p><p>two</p></html>"
         );
+    }
+
+    #[test]
+    fn should_give_no_body_element_to_input_with_an_html_start_tag_and_no_body_start_tag() {
+        assert_eq!(
+            repaired("<html><header>h</header><div><p>one</div>tail"),
+            "<html><head></head><header>h</header><div><p>one</p></div>tail</html>"
+        );
+    }
+
+    #[test]
+    fn should_give_no_tree_when_the_tree_builder_nests_past_the_limit() {
+        let nested = |depth: usize| format!("{}x", "<div>".repeat(depth));
+        assert!(parse_with_anchor_origins(&nested(400)).is_some());
+        assert!(parse_with_anchor_origins(&nested(600)).is_none());
+        // ~keep A table moves the blocks in front of itself, so they are not its descendants,
+        // ~keep and the tree builder still holds every one of them open.
+        assert!(parse_with_anchor_origins(&format!("<table>{}", nested(600))).is_none());
+        let closed = format!("{}x{}", "<div>".repeat(400), "</div>".repeat(400));
+        assert!(parse_with_anchor_origins(&closed.repeat(4)).is_some());
+    }
+
+    #[test]
+    fn should_measure_the_tree_builder_once_in_sixty_four_start_tags() {
+        assert!(!is_measured(1));
+        assert!(!is_measured(63));
+        assert!(is_measured(64));
+        assert!(!is_measured(65));
+        assert!(is_measured(128));
     }
 
     #[test]
