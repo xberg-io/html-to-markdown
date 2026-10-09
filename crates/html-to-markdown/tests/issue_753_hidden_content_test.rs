@@ -600,6 +600,39 @@ fn should_write_no_text_for_metadata_in_the_document_head() {
 }
 
 #[test]
+fn should_end_the_document_head_where_a_browser_ends_it() {
+    // ~keep The end tag of the head and the body tag are optional: the first element that the
+    // ~keep head cannot hold starts the body.
+    for html in [
+        "<!doctype html><head><title>t</title><p>visible</p><template><p>BODY</p></template>",
+        "<head><title>t</title><p>visible</p><noscript><p>BODY</p></noscript>",
+        r#"<head><meta charset="utf-8"><link rel="icon" href="i.png"><script>var a;</script><title>t</title><p>visible</p><template><p>BODY</p></template>"#,
+    ] {
+        let [drop, reachable, all] = all_choices(html);
+        assert!(drop.contains("visible") && !drop.contains("BODY"), "{drop:?}");
+        assert_eq!(reachable, drop, "{html}");
+        assert!(all.contains("visible") && all.contains("BODY"), "{html}: {all:?}");
+    }
+    let shadow = r#"<head><title>t</title><div>visible<template shadowrootmode="open"><p>BODY</p></template></div>"#;
+    let [drop, reachable, all] = all_choices(shadow);
+    assert!(drop.contains("visible") && !drop.contains("BODY"), "{drop:?}");
+    assert!(
+        reachable.contains("BODY") && all.contains("BODY"),
+        "{reachable:?} {all:?}"
+    );
+    // ~keep Metadata elements and a tag written in the title text do not end the head.
+    for html in [
+        r#"<html><head><meta charset="utf-8"><link rel="icon" href="i.png"><base href="/"><script>var a;</script><noscript><meta name="CODE" content="CODE"><link rel="stylesheet" href="CODE.css"></noscript></head><body><p>visible</p></body></html>"#,
+        r#"<html><head><title>a <b> c</title><template><meta name="CODE" content="CODE"><link rel="stylesheet" href="CODE.css"></template></head><body><p>visible</p></body></html>"#,
+    ] {
+        let [drop, reachable, all] = all_choices(html);
+        assert!(drop.ends_with("visible\n") && !drop.contains("CODE"), "{drop:?}");
+        assert_eq!(reachable, drop, "{html}");
+        assert_eq!(all, drop, "{html}");
+    }
+}
+
+#[test]
 fn should_convert_a_document_that_ends_in_an_unterminated_comment() {
     // ~keep The comment starts before the last `>` and runs to the end of the input.
     let html = "<p>visible</p><template><p>BODY</p></template><!-- <b>open</b> tail";

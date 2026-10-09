@@ -379,7 +379,8 @@ pub fn strip_hidden_elements(input: &str) -> Cow<'_, str> {
 /// renders in its host element. [`HiddenContent::All`] removes the tags of every `<template>` and
 /// `<noscript>`. An element whose tags stay is dropped by the walk, as before. Inside `<head>` no
 /// tag is removed: what the two elements hold there is metadata (`<link>`, `<meta>`, `<style>`),
-/// and removing the tags would make it the metadata of the document.
+/// and removing the tags would make it the metadata of the document. The head ends at its end
+/// tag or at the first start tag of an element that it cannot hold.
 ///
 /// ~keep The tags are removed before the parse, not skipped in the walk, so that every reader
 /// ~keep of the tree sees the content: a row in a `<template>` that is a child of a `<table>` is
@@ -397,7 +398,8 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
     let mut last = 0;
     let mut idx = 0;
     let mut tag_ends = TagEndScan::new(bytes);
-    let mut in_head = false;
+    // ~keep The text of a `<title>` is not markup: a tag written in it does not end the head.
+    let (mut in_head, mut in_title) = (false, false);
 
     while idx < bytes.len() {
         let Some(offset) = memchr::memchr(b'<', &bytes[idx..]) else {
@@ -410,7 +412,9 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
         let is_noscript = matches_tag_start(bytes, name_start, b"noscript");
         if matches_tag_start(bytes, name_start, b"head") {
             in_head = !is_end_tag;
-        } else if matches_tag_start(bytes, name_start, b"body") {
+        } else if matches_tag_start(bytes, name_start, b"title") {
+            in_title = !is_end_tag;
+        } else if in_head && !in_title && !is_end_tag && ends_the_head(bytes, name_start) {
             in_head = false;
         }
         if in_head || (!is_template && !is_noscript) {
@@ -457,6 +461,34 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
         }
         None => Cow::Borrowed(input),
     }
+}
+
+/// The elements that a browser keeps in the document head, without `title`, which the scan reads
+/// by itself.
+const HEAD_CONTENT_NAMES: [&[u8]; 11] = [
+    b"base",
+    b"basefont",
+    b"bgsound",
+    b"html",
+    b"link",
+    b"meta",
+    b"noframes",
+    b"noscript",
+    b"script",
+    b"style",
+    b"template",
+];
+
+/// Whether the start tag whose name starts at `name_start` ends the document head.
+///
+/// ~keep The end tag of the head and the body tag are optional. A browser ends the head at the
+/// ~keep first start tag of an element that the head cannot hold, so `<head><title>t</title><p>`
+/// ~keep has its paragraph in the body.
+fn ends_the_head(bytes: &[u8], name_start: usize) -> bool {
+    bytes.get(name_start).is_some_and(u8::is_ascii_alphabetic)
+        && !HEAD_CONTENT_NAMES
+            .iter()
+            .any(|name| matches_tag_start(bytes, name_start, name))
 }
 
 /// Whether the start tag of a `<template>` declares a shadow root: `shadowrootmode` is `open` or
