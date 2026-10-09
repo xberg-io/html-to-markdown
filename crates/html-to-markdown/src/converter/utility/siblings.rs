@@ -205,6 +205,80 @@ pub fn br_follows_enclosing_elements(id: u32, parser: &tl::Parser, dom_ctx: &Dom
     false
 }
 
+/// Whether the text that follows `node_handle` in its parent starts with a zero-width space.
+/// The walk looks into the elements that only wrap text and passes the empty ones, comments
+/// and `<wbr>`. Any other element is content of its own and ends the walk, and so does an
+/// element with a `style` attribute: it can be a box of its own (`display: inline-block`), and
+/// a browser keeps the line end before such a box.
+///
+/// ~keep Tier-1 answers the same question on the bytes (`zero_width_space_is_upcoming`).
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    use crate::converter::utility::content::{ZERO_WIDTH_SPACE, is_text_wrapper};
+
+    let text_parent = dom_ctx.parent_of(node_handle.get_inner());
+    let mut current = node_handle.get_inner();
+    // ~keep A loop rather than recursion: nested wrappers are attacker-controlled depth. Each
+    // ~keep turn moves forward in the document, so the walk ends.
+    loop {
+        let mut node = loop {
+            if let Some(next) = next_sibling(current, dom_ctx) {
+                break next;
+            }
+            let parent = dom_ctx.parent_of(current);
+            if parent == text_parent {
+                return false;
+            }
+            let Some(parent) = parent else {
+                return false;
+            };
+            current = parent;
+        };
+        loop {
+            match node.get(parser) {
+                Some(tl::Node::Raw(raw)) => {
+                    let raw = raw.as_utf8_str();
+                    let text = crate::text::decode_html_entities_cow(raw.as_ref());
+                    if text.is_empty() {
+                        break;
+                    }
+                    return text.starts_with(ZERO_WIDTH_SPACE);
+                }
+                Some(tl::Node::Tag(tag)) => {
+                    let wraps_text = dom_ctx
+                        .tag_info(node.get_inner(), parser)
+                        .is_some_and(|info| info.name == "wbr" || is_text_wrapper(&info.name));
+                    if !wraps_text || tag.attributes().get("style").is_some() {
+                        return false;
+                    }
+                    match dom_ctx
+                        .children_of(node.get_inner())
+                        .and_then(|children| children.first())
+                    {
+                        Some(first) => node = *first,
+                        None => break,
+                    }
+                }
+                Some(tl::Node::Comment(_)) => break,
+                None => return false,
+            }
+        }
+        current = node.get_inner();
+    }
+}
+
+/// The node after `id` among the children of its parent.
+fn next_sibling(id: u32, dom_ctx: &DomContext) -> Option<tl::NodeHandle> {
+    let siblings = match dom_ctx.parent_of(id) {
+        Some(parent_id) => dom_ctx.children_of(parent_id)?,
+        None => &dom_ctx.root_children,
+    };
+    let position = dom_ctx
+        .sibling_index(id)
+        .or_else(|| siblings.iter().position(|handle| handle.get_inner() == id))?;
+    siblings.get(position + 1).copied()
+}
+
 /// Append an inline suffix to output, with smart whitespace handling.
 ///
 /// Avoids adding spaces before siblings that are already whitespace.

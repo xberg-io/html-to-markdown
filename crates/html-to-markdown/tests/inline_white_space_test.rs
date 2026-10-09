@@ -114,21 +114,223 @@ fn a_line_break_before_an_inline_element_is_a_space() {
     ]);
 }
 
-/// Outside a paragraph the line end of the source stays a line end: Markdown reads it as a space.
+/// The container does not change the rule: where a page shows a space, the output has a space,
+/// not a line end.
 #[test]
-fn a_line_break_before_an_inline_element_separates_words_in_each_container() {
+fn a_line_break_before_an_inline_element_is_a_space_in_each_container() {
     assert_on_both(&[
-        ("<ul><li>one\n<span id=\"a\"></span>two</li></ul>", "- one\n  two\n"),
-        ("<h2>one\n<span id=\"a\"></span>two</h2>", "## one two\n"),
-        (
-            "<dl><dt>t</dt><dd>one\n<span id=\"a\"></span>two</dd></dl>",
-            "t\none\ntwo\n",
-        ),
+        ("<p>one\n<span id=\"a\"></span>two</p>", "one two\n"),
+        ("<div>one\n<span id=\"a\"></span>two</div>", "one two\n"),
+        ("<ul><li>one\n<span id=\"a\"></span>two</li></ul>", "- one two\n"),
         (
             "<table><tr><th>h</th></tr><tr><td>one\n<span id=\"a\"></span>two</td></tr></table>",
             "| h       |\n| ------- |\n| one two |\n",
         ),
-        ("<div>one\n<span id=\"a\"></span>two</div>", "one\ntwo\n"),
+        ("<blockquote>one\n<span id=\"a\"></span>two</blockquote>", "> one two\n"),
+        ("<h2>one\n<span id=\"a\"></span>two</h2>", "## one two\n"),
+        ("one\n<span id=\"a\"></span>two", "one two\n"),
+        (
+            "<dl><dt>t</dt><dd>one\n<span id=\"a\"></span>two</dd></dl>",
+            "t\none two\n",
+        ),
+    ]);
+}
+
+/// A span that holds only white space after a line end is the same run of white space.
+#[test]
+fn a_line_break_before_white_space_in_an_element_is_one_space_in_each_container() {
+    assert_on_both(&[
+        ("<p>one\n<span> </span>two</p>", "one two\n"),
+        ("<div>one\n<span> </span>two</div>", "one two\n"),
+        ("<ul><li>one\n<span> </span>two</li></ul>", "- one two\n"),
+        (
+            "<table><tr><th>h</th></tr><tr><td>one\n<span> </span>two</td></tr></table>",
+            "| h       |\n| ------- |\n| one two |\n",
+        ),
+        ("<blockquote>one\n<span> </span>two</blockquote>", "> one two\n"),
+        ("<h2>one\n<span> </span>two</h2>", "## one two\n"),
+        ("one\n<span> </span>two", "one two\n"),
+        ("<div>one\n<span> </span> two</div>", "one two\n"),
+        ("<ul><li>one\n<span> </span>\ntwo</li></ul>", "- one two\n"),
+        ("<ul><li>one\n<span>&nbsp;</span>two</li></ul>", "- one \u{a0}two\n"),
+        ("one\n<span>&nbsp;</span>two", "one \u{a0}two\n"),
+    ]);
+}
+
+/// The element that follows the line end holds text: the same space in each container.
+#[test]
+fn a_line_break_before_a_filled_inline_element_is_a_space_in_each_container() {
+    assert_on_both(&[
+        ("<p>one\n<b>two</b></p>", "one **two**\n"),
+        ("<div>one\n<b>two</b></div>", "one **two**\n"),
+        ("<ul><li>one\n<b>two</b></li></ul>", "- one **two**\n"),
+        (
+            "<table><tr><th>h</th></tr><tr><td>one\n<b>two</b></td></tr></table>",
+            "| h           |\n| ----------- |\n| one **two** |\n",
+        ),
+        ("<blockquote>one\n<b>two</b></blockquote>", "> one **two**\n"),
+        ("<h2>one\n<b>two</b></h2>", "## one **two**\n"),
+        ("one\n<b>two</b>", "one **two**\n"),
+        ("<div>one\n<span>two</span> three</div>", "one two three\n"),
+        (
+            "<div>see\n<a href=\"/x\">two</a>\n<code>three</code></div>",
+            "see [two](/x) `three`\n",
+        ),
+        ("<div>one\n<br>two</div>", "one  \ntwo\n"),
+        // ~keep A comment before the element changes nothing.
+        ("<div>one\n<!-- c --><b>two</b></div>", "one **two**\n"),
+        ("<div>one\n<!-- c --> <!-- d --><b>two</b></div>", "one **two**\n"),
+        ("<div>one\n<!-- c --><br>two</div>", "one  \ntwo\n"),
+    ]);
+}
+
+/// White space before an element and white space at its start are one run: one space, and it
+/// goes outside the marks of the element.
+#[test]
+fn white_space_on_both_sides_of_an_element_start_is_one_space() {
+    assert_on_both(&[
+        ("<p>one <b> y</b>two</p>", "one **y**two\n"),
+        ("<p>one <b> y</b> two</p>", "one **y** two\n"),
+        ("<p>one <b> y </b>two</p>", "one **y** two\n"),
+        ("<p>one <b> y </b> two</p>", "one **y** two\n"),
+        ("<p>one <b>\ny</b>two</p>", "one **y**two\n"),
+        ("<p>one\n<b> y</b>two</p>", "one **y**two\n"),
+        ("<p>one\t<b>\ty</b>two</p>", "one **y**two\n"),
+        ("<p><b>one </b><i> two</i></p>", "**one** *two*\n"),
+        ("<p>one <em> y</em>two</p>", "one *y*two\n"),
+        ("<p>one <del> y</del>two</p>", "one ~~y~~two\n"),
+        ("<p>one <b> y</b></p>", "one **y**\n"),
+        ("<ul><li><b> y</b>one</li></ul>", "- **y**one\n"),
+        ("<ul><li>one <b> y</b>two</li></ul>", "- one **y**two\n"),
+        ("<div>one <b> y</b>two</div>", "one **y**two\n"),
+        ("<blockquote>one <b> y</b>two</blockquote>", "> one **y**two\n"),
+        ("<h2>one <b> y</b>two</h2>", "## one **y**two\n"),
+        ("one <b> y</b>two", "one **y**two\n"),
+        (
+            "<table><tr><th>h</th></tr><tr><td>one <b> y</b>two</td></tr></table>",
+            "| h            |\n| ------------ |\n| one **y**two |\n",
+        ),
+    ]);
+}
+
+/// The white space at the start of an element is the only white space there: it is kept.
+#[test]
+fn white_space_at_an_element_start_alone_is_one_space() {
+    assert_on_both(&[
+        ("<p>one<b> y</b>two</p>", "one **y**two\n"),
+        ("<p>one<b> y </b>two</p>", "one **y** two\n"),
+        ("<p>one<em>\ny</em>two</p>", "one *y*two\n"),
+        ("<p>one <b>y</b>two</p>", "one **y**two\n"),
+        ("<p>one<b>y</b>two</p>", "one**y**two\n"),
+    ]);
+}
+
+/// The other inline elements that write their own marks follow the same rule.
+#[test]
+fn white_space_on_both_sides_of_the_start_of_any_marked_element_is_one_space() {
+    assert_on_both(&[
+        ("<p>one <kbd> y</kbd>two</p>", "one `y`two\n"),
+        ("<p>one <abbr> y</abbr>two</p>", "one ytwo\n"),
+        ("<p>one <dfn> y</dfn>two</p>", "one *y*two\n"),
+        ("<p>one <ins> y</ins>two</p>", "one ==y==two\n"),
+        ("<p>one <b><i> y</i></b>two</p>", "one ***y***two\n"),
+    ]);
+}
+
+/// A zero-width space is a place where a line can break, not a space. A browser drops the line
+/// end beside it, so the two parts stay one word.
+#[test]
+fn a_line_end_before_a_zero_width_space_is_no_space() {
+    assert_on_both(&[
+        ("<p>one\n<span></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n<span id=\"a\"></span>&#8203;two</p>", "one\u{200b}two\n"),
+        ("<p>one\n<span>\u{200b}</span>two</p>", "one\u{200b}two\n"),
+        ("<p>one\n<span>\u{200b}</span> two</p>", "one\u{200b} two\n"),
+        ("<p>one\n<b>\u{200b}two</b></p>", "one**\u{200b}two**\n"),
+        (
+            "<p>one\n<span><i></i></span><!-- c -->\u{200b}two</p>",
+            "one\u{200b}two\n",
+        ),
+        ("<p>one \n <span></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n<wbr>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<ul><li>one\n<span></span>\u{200b}two</li></ul>", "- one\u{200b}two\n"),
+        ("<h2>one\n<span></span>\u{200b}two</h2>", "## one\u{200b}two\n"),
+        (
+            "<p><a href=\"/x\">one\n<span></span>\u{200b}two</a></p>",
+            "[one\u{200b}two](/x)\n",
+        ),
+        ("<div>one\n<span></span>\u{200b}two</div>", "one\u{200b}two\n"),
+        (
+            "<blockquote>one\n<span></span>\u{200b}two</blockquote>",
+            "> one\u{200b}two\n",
+        ),
+        ("one\n<span></span>\u{200b}two", "one\u{200b}two\n"),
+        (
+            "<table><tr><td>one\n<span></span>\u{200b}two</td></tr></table>",
+            "| one\u{200b}two |\n| ------- |\n",
+        ),
+        (
+            "<table><tr><td>one\n<!-- c -->\u{200b}two</td></tr></table>",
+            "| one\u{200b}two |\n| ------- |\n",
+        ),
+    ]);
+}
+
+/// A space that is not a line end stays beside a zero-width space, and so does a line end
+/// that content of its own separates from that character.
+#[test]
+fn a_space_beside_a_zero_width_space_is_kept() {
+    assert_on_both(&[
+        ("<p>one <span></span>\u{200b}two</p>", "one \u{200b}two\n"),
+        ("<p>one\n<span> </span>\u{200b}two</p>", "one \u{200b}two\n"),
+        ("<p>one\n<span></span>two</p>", "one two\n"),
+        ("<p>one\n<wbr>two</p>", "one two\n"),
+        (
+            "<p>one\n<img src=\"/i.png\" alt=\"i\">\u{200b}two</p>",
+            "one ![i](/i.png)\u{200b}two\n",
+        ),
+        ("<p>one\n<span>x</span>\u{200b}two</p>", "one x\u{200b}two\n"),
+        ("<p><span>one\n</span>\u{200b}two</p>", "one \u{200b}two\n"),
+        // ~keep An element with a style can be a box of its own, and a browser keeps the
+        // ~keep line end before such a box.
+        (
+            "<p>one\n<span style=\"display:inline-block\"></span>\u{200b}two</p>",
+            "one \u{200b}two\n",
+        ),
+        (
+            "<table><tr><td>one \n <span style=\"display:inline-block\"></span>\u{200b}two</td></tr></table>",
+            "| one \u{200b}two |\n| -------- |\n",
+        ),
+        (
+            "<pre>one\n<span></span>\u{200b}two</pre>",
+            "```\none\n\u{200b}two\n```\n",
+        ),
+    ]);
+}
+
+/// A link that has no text still writes its marks: the space after it is kept at the start of
+/// a document, on both converters.
+#[test]
+fn the_space_after_a_link_without_text_is_kept() {
+    assert_on_both(&[
+        ("<p><a href=\"/y\"></a> one</p>", "[](/y) one\n"),
+        ("<div><a href=\"/y\"></a> one</div>", "[](/y) one\n"),
+        ("<a href=\"/y\"></a> one", "[](/y) one\n"),
+        ("<p> <a href=\"/y\"></a>\none </p>", "[](/y) one\n"),
+        ("<p><a id=\"n\"></a> one</p>", "one\n"),
+    ]);
+}
+
+/// A no-break space beside a space in a link label is one space, on both converters.
+#[test]
+fn a_no_break_space_beside_a_space_in_a_link_label_is_one_space() {
+    assert_on_both(&[
+        (
+            "<p><a href=\"/x\">one<span>&nbsp;</span> two</a></p>",
+            "[one two](/x)\n",
+        ),
+        ("<p><a href=\"/x\"><span>&nbsp;</span> one</a></p>", "[one](/x)\n"),
+        ("<p><a href=\"/x\">one&nbsp;two</a></p>", "[one two](/x)\n"),
     ]);
 }
 

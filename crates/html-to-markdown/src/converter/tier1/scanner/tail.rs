@@ -377,8 +377,8 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 /// slice of the real `output`, which the same non-inline/non-cell precondition
 /// guarantees is `state.output` too).
 ///
-/// - The element that follows does not change the join: before any element the line end is
-///   white space between two words (issue #778).
+/// - Before an inline element the line end is white space between two words (issue #778):
+///   a space, in every container (`line_end_before_element`).
 /// - A blank-line break already in place needs nothing. The
 ///   "already" is scoped to the enclosing `<p>`/`<div>`'s OWN content (Tier-2's
 ///   `ctx.block_content_start`, i.e. `nearest_block_content_start` here) —
@@ -391,7 +391,7 @@ fn upcoming_open_tag_name<'b>(bytes: &[u8], lt_pos: usize, buf: &'b mut [u8; MAX
 ///   `inline_depth`-incrementing wrappers) ancestor, joins with a single
 ///   space; anything else (e.g. a bare `<div>`) joins with a literal newline,
 ///   which a `<br>` that follows removes again (`Tier1State::pending_newline_join`).
-fn trailing_single_newline_join(state: &Tier1State) -> &'static str {
+fn trailing_single_newline_join(state: &Tier1State, next_tag_is_inline: bool) -> &'static str {
     let block_start = clamp_to_char_boundary(&state.output, nearest_block_content_start(state));
     if state.output[block_start..].ends_with("\n\n") {
         return "";
@@ -402,7 +402,93 @@ fn trailing_single_newline_join(state: &Tier1State) -> &'static str {
             TagKind::Paragraph | TagKind::Strong | TagKind::Emphasis
         )
     });
-    if in_paragraph_or_inline_wrapper { " " } else { "\n" }
+    // ~keep The one decision of both converters: before an inline element the line end is a space.
+    match crate::converter::utility::content::line_end_before_element(in_paragraph_or_inline_wrapper, next_tag_is_inline)
+    {
+        ' ' => " ",
+        _ => "\n",
+    }
+}
+
+/// Whether an inline element other than `<br>` opens after the comments at `bytes[lt_pos]`,
+/// with only white space between them.
+///
+/// ~keep Tier-2 asks its tree for the next element (`DomContext::next_tag_id`), and the tree
+/// ~keep passes comments and white space. A `<br>` keeps the path it has without a comment.
+fn inline_follows_comments(bytes: &[u8], lt_pos: usize) -> bool {
+    let mut pos = lt_pos;
+    while bytes.get(pos..).is_some_and(|rest| rest.starts_with(b"<!--")) {
+        let Ok(after) = skip_bang(bytes, pos) else {
+            return false;
+        };
+        pos = parse::skip_ws(bytes, after);
+    }
+    let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
+    pos != lt_pos && upcoming_open_tag_name(bytes, pos, &mut name_buf).is_some_and(|name| name != b"br" && is_inline_tag(name))
+}
+
+/// Whether the text that follows the markup at `bytes[lt_pos]` starts with a zero-width space.
+/// The scan looks into the elements that only wrap text and passes the empty ones, comments
+/// and `<wbr>`. Any other element, an element with a `style` attribute and the end of the
+/// parent end the scan.
+///
+/// ~keep Mirrors Tier-2's `zero_width_space_follows`, which asks the same of the tree.
+fn zero_width_space_is_upcoming(html: &str, lt_pos: usize) -> bool {
+    use crate::converter::utility::content::{ZERO_WIDTH_SPACE, is_text_wrapper};
+
+    let bytes = html.as_bytes();
+    let mut pos = lt_pos;
+    let mut open_wrappers = 0usize;
+    while pos < bytes.len() {
+        if bytes[pos] != b'<' {
+            // ~keep The first character decides, and no character reference is longer than this.
+            let window_end = clamp_to_char_boundary(html, (pos + 40).min(bytes.len()));
+            let text_end = memchr::memchr(b'<', &bytes[pos..window_end]).map_or(window_end, |offset| pos + offset);
+            let text = crate::text::decode_html_entities_cow(&html[pos..text_end]);
+            return text.starts_with(ZERO_WIDTH_SPACE);
+        }
+        match bytes.get(pos + 1) {
+            Some(b'!') => match skip_bang(bytes, pos) {
+                Ok(after) => pos = after,
+                Err(_) => return false,
+            },
+            Some(b'/') => {
+                if open_wrappers == 0 {
+                    return false;
+                }
+                open_wrappers -= 1;
+                let Some((close, _)) = parse::find_tag_close(bytes, pos + 2) else {
+                    return false;
+                };
+                pos = close + 1;
+            }
+            _ => {
+                let mut name_buf = [0u8; MAX_TAG_NAME_BYTES];
+                let Some(name) = upcoming_open_tag_name(bytes, pos, &mut name_buf) else {
+                    return false;
+                };
+                let is_wbr = name == b"wbr";
+                if !is_wbr && !std::str::from_utf8(name).is_ok_and(is_text_wrapper) {
+                    return false;
+                }
+                let attributes_start = pos + 1 + name.len();
+                let Some((close, self_closing)) = parse::find_tag_close(bytes, attributes_start) else {
+                    return false;
+                };
+                let has_style = parse::collect_attrs(bytes, attributes_start, close)
+                    .iter()
+                    .any(|(key, _)| *key == b"style");
+                if has_style {
+                    return false;
+                }
+                if !is_wbr && !self_closing {
+                    open_wrappers += 1;
+                }
+                pos = close + 1;
+            }
+        }
+    }
+    false
 }
 
 fn contains_blank_line(bytes: &[u8]) -> bool {

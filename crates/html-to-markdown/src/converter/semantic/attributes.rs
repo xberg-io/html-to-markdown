@@ -53,7 +53,7 @@ pub fn handle_dfn(
 
         let (prefix, suffix, trimmed) = chomp_inline(&content);
         if !trimmed.is_empty() {
-            output.push_str(prefix);
+            crate::converter::utility::content::push_inline_prefix(output, prefix);
             output.push(handler.options.strong_em_symbol);
             output.push_str(trimmed);
             output.push(handler.options.strong_em_symbol);

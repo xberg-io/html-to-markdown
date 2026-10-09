@@ -311,7 +311,7 @@ pub fn emit_wrapped_inline(
         return;
     }
 
-    output.push_str(prefix);
+    crate::converter::utility::content::push_inline_prefix(output, prefix);
     let sibling_is_matching_tag =
         get_previous_sibling_tag(node_handle, parser, dom_ctx).is_some_and(|name| sibling_tag_names.contains(&name));
     let merged = prefix.is_empty()

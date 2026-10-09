@@ -164,9 +164,11 @@ pub struct OpenTag {
     /// Whether the first content of this quote or heading in a table cell was whitespace, which
     /// Tier-2 keeps at the start of the element's own buffer (see `scanner::flush_text`).
     pub starts_with_whitespace: bool,
-    /// Tier-2 renders this element's children into a fresh buffer of their own (`<mark>`,
-    /// `<sub>`, `<sup>`, `<abbr>`, `<dt>`, `<dd>`), so its text sees an empty buffer, not
-    /// the line before the element.
+    /// Tier-2 renders this element's children into a fresh buffer of their own and keeps the
+    /// white space at its start (`<dt>`, `<dd>`), so its text sees an empty buffer, not the
+    /// line before the element. An inline element with a buffer of its own (`<mark>`, `<sub>`,
+    /// `<sup>`, `<abbr>`) is not one of these: Tier-2 writes its leading white space only when
+    /// a space is owed (`push_inline_prefix`), so never after a line end.
     pub children_in_own_buffer: bool,
 }
 

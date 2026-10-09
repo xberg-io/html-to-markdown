@@ -84,6 +84,16 @@ impl<'a> Tier1Scanner<'a> {
             is_list: upcoming_tag_is_list_open(self.bytes, self.pos),
             is_img: upcoming_tag_is_named(self.bytes, self.pos, b"img"),
             is_inline: upcoming_tag_is_inline(self.bytes, self.pos),
+            // ~keep Only a text with content asks, so a run of comments is read once.
+            inline_follows_comments: !self.bytes[self.text_start..self.pos]
+                .iter()
+                .all(u8::is_ascii_whitespace)
+                && inline_follows_comments(self.bytes, self.pos),
+            line_end_meets_zero_width_space: crate::converter::utility::content::without_single_line_end(
+                &self.html[self.text_start..self.pos],
+            )
+            .is_some()
+                && zero_width_space_is_upcoming(self.html, self.pos),
         };
         flush_text(
             &mut self.state,
@@ -626,8 +636,10 @@ fn push_open_frame(
         dropped_whitespace_only_text: false,
         own_buffer: renders_into_own_buffer(spec.kind, name_lower, prev_ctx),
         starts_with_whitespace: false,
-        children_in_own_buffer: matches!(name_lower, b"mark" | b"sub" | b"sup" | b"abbr")
-            || matches!(spec.kind, TagKind::DefinitionTerm | TagKind::DefinitionDescription),
+        children_in_own_buffer: matches!(
+            spec.kind,
+            TagKind::DefinitionTerm | TagKind::DefinitionDescription
+        ),
     });
 }
 

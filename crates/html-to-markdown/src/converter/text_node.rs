@@ -12,9 +12,10 @@ use std::borrow::Cow;
 use crate::converter::block::container::HandlerContext;
 use crate::converter::dom_context::DomContext;
 use crate::converter::main_helpers::{has_more_than_one_char, is_ascii_whitespace_only, is_inline_element};
+use crate::converter::utility::content::{line_end_before_element, space_is_owed, without_single_line_end};
 use crate::converter::utility::siblings::{
     FollowingContent, br_follows_enclosing_elements, following_sibling_content, get_next_sibling_tag,
-    get_previous_sibling_tag, next_sibling_is_inline_tag,
+    get_previous_sibling_tag, next_sibling_is_inline_tag, zero_width_space_follows,
 };
 use crate::text;
 #[cfg(feature = "visitor")]
@@ -96,6 +97,7 @@ impl TextProcessor<'_, '_, '_> {
             }
             return;
         }
+        let decoded = self.without_line_end_before_zero_width_space(decoded);
         let escape_asterisks = self.escape_asterisks();
         let capture_semantic = crate::converter::structure_capture::is_text_capture_active(self.handler.ctx);
         let processed = self.process_content(decoded, escape_asterisks, facts.was_fresh_block_start, capture_semantic);
@@ -109,6 +111,23 @@ impl TextProcessor<'_, '_, '_> {
         if let Some(semantic) = final_text.semantic.as_deref() {
             crate::converter::structure_capture::append_text(self.handler.ctx, semantic);
         }
+    }
+
+    /// Removes the one line end that `text` ends with when a zero-width space follows it.
+    ///
+    /// ~keep A zero-width space is a place where a line can break, not a space: a browser
+    /// ~keep drops the line end beside it, so `long\n<span></span>&#8203;word` is one word.
+    fn without_line_end_before_zero_width_space<'text>(&self, text: Cow<'text, str>) -> Cow<'text, str> {
+        if self.handler.ctx.in_code || self.handler.options.whitespace_mode == crate::options::WhitespaceMode::Strict {
+            return text;
+        }
+        let Some(kept) = without_single_line_end(text.as_ref()) else {
+            return text;
+        };
+        if !zero_width_space_follows(self.node_handle, self.parser, self.handler.dom_ctx) {
+            return text;
+        }
+        Cow::Owned(kept.to_string())
     }
 
     fn escape_asterisks(&self) -> bool {
@@ -388,7 +407,7 @@ impl TextProcessor<'_, '_, '_> {
                 .any(|ending| self.output.ends_with(ending))
             // ~keep White space after a space is the same run of white space, whatever lies
             // ~keep between the two: an element that wrote nothing is no word.
-            || ((self.output.ends_with('\n') || self.output.ends_with(' ')) && prefix == " ")
+            || (!space_is_owed(self.output) && prefix == " ")
     }
 
     fn append_trailing_line_ending(&self, output: &mut String, has_double_newline: bool) {
@@ -422,11 +441,8 @@ impl TextProcessor<'_, '_, '_> {
             return;
         }
         let ctx = self.handler.ctx;
-        output.push(if ctx.inline_depth > 0 || ctx.convert_as_inline || ctx.in_paragraph {
-            ' '
-        } else {
-            '\n'
-        });
+        let in_running_text = ctx.inline_depth > 0 || ctx.convert_as_inline || ctx.in_paragraph;
+        output.push(line_end_before_element(in_running_text, is_inline_element(next_tag)));
     }
 
     #[cfg(feature = "visitor")]

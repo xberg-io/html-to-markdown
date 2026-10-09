@@ -94,13 +94,12 @@ fn adjacent_links_separated_by_pretty_printed_whitespace_collapse_to_one_space()
 }
 
 #[test]
-fn strikethrough_and_inserted_keep_their_genuine_double_space() {
-    // ~keep Confirms the fix does NOT overreach into Strikethrough/Inserted, where Tier-2
-    // ~keep itself keeps two spaces.
+fn strikethrough_and_inserted_collapse_to_one_space_too() {
+    // ~keep White space on both sides of the start of an element is one run, so one space.
     let del_html = "<p><del>with </del>\n  <del>bold</del>\n  <del> emphasis</del></p>";
     assert_eq!(
         run_tier2(del_html),
-        "~~with~~ ~~bold~~  ~~emphasis~~\n",
+        "~~with~~ ~~bold~~ ~~emphasis~~\n",
         "tier2 ground truth changed; update this test"
     );
     assert_tier1_matches_tier2(del_html);
@@ -108,7 +107,7 @@ fn strikethrough_and_inserted_keep_their_genuine_double_space() {
     let ins_html = "<p><ins>with </ins>\n  <ins>bold</ins>\n  <ins> emphasis</ins></p>";
     assert_eq!(
         run_tier2(ins_html),
-        "==with== ==bold==  ==emphasis==\n",
+        "==with== ==bold== ==emphasis==\n",
         "tier2 ground truth changed; update this test"
     );
     assert_tier1_matches_tier2(ins_html);

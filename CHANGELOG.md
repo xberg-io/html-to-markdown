@@ -146,15 +146,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   line of that code stay too
   ([#799](https://github.com/xberg-io/html-to-markdown/issues/799)).
 
-- A line break in the source before a `<span>` is white space between two words. Before, the
-  words on its two sides were joined, with an empty span and with a span that holds text. This
-  changes the default output: `<p>hard to read\n<span id="index-0"></span>docstrings</p>` gave
-  `hard to readdocstrings` and gives `hard to read docstrings`, and
-  `<p>one\n<span>two</span> three</p>` gave `onetwo three` and gives `one two three`. Outside a
-  paragraph the line break stays a line break, which Markdown reads as a space:
-  `<ul><li>one\n<span id="a"></span>two</li></ul>` gave `- onetwo` and gives `- one` and `two` on
-  two lines of the item
+- A line break in the source before an inline element is one space between two words, in every
+  container. Before, the words on the two sides of a `<span>` were joined, with an empty span and
+  with a span that holds text. This changes the default output:
+  `<p>hard to read\n<span id="index-0"></span>docstrings</p>` gave `hard to readdocstrings` and
+  gives `hard to read docstrings`, `<p>one\n<span>two</span> three</p>` gave `onetwo three` and
+  gives `one two three`, and `<ul><li>one\n<span id="a"></span>two</li></ul>` gave `- onetwo` and
+  gives `- one two`. Outside a paragraph the line break before any other inline element was a line
+  break, and it is a space now, as a browser shows it: `<div>one\n<b>y</b></div>` gave `one` and
+  `**y**` on two lines and gives `one **y**`. A line break before a block stays a line break
   ([#778](https://github.com/xberg-io/html-to-markdown/issues/778)).
+
+- White space on the two sides of the start of an inline element is one space, and it goes
+  outside the marks of the element: `<p>one <b> y</b>two</p>` gave `one  **y**two` with two spaces
+  and gives `one **y**two`. The same holds for `<kbd>`, `<samp>`, `<abbr>`, `<dfn>`, `<del>`,
+  `<ins>`, `<mark>`, `<sub>` and `<sup>`. At the start of a line such an element starts with no
+  space: `<div>a<br><sup> x</sup></div>` gave ` x` on the second line and gives `x`.
+
+- A line break beside a zero-width space is no space, as in a browser: the zero-width space is a
+  place where a line can break, so the two parts are one word.
+  `<p>one \n <span></span>&#8203;two</p>` gave `one`, a space, the zero-width space and `two`, and
+  gives `one`, the zero-width space and `two`. A space that is not a line break stays, and so does
+  a line break before an element with a `style` attribute.
 
 - The white space after an image, an inline graphic, a video or a form control at the start of a
   document is kept. This changes the default output: `<p><img src="/i.png" alt="alt"> text</p>`
@@ -188,7 +201,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A no-break space in an element of its own is kept after a space:
   `<p>one <span>&nbsp;</span> two</p>` gave `one  two` and gives `one`, a space, the no-break
-  space, a space and `two`. A no-break space in running text is one space, as before.
+  space, a space and `two`. A no-break space in running text is one space, as before. In a link
+  label a no-break space beside a space is one space on both converters.
 
 ## [3.17.2] - 2026-10-06
 

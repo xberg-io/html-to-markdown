@@ -3,6 +3,10 @@ struct UpcomingTextSibling {
     is_list: bool,
     is_img: bool,
     is_inline: bool,
+    /// Comments follow the text, and an inline element other than `<br>` opens after them.
+    inline_follows_comments: bool,
+    /// The text ends with one line end and the text after the tag starts with a zero-width space.
+    line_end_meets_zero_width_space: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -362,6 +366,7 @@ fn prepare_normal_text<'a>(
     raw: &'a str,
     inside_inline: bool,
     base_offset: usize,
+    next_tag_is_inline: bool,
 ) -> Result<PreparedText<'a>, BailReason> {
     let in_cell = state.in_table_cell();
     let (decoded, predecoded) = if !inside_inline && !in_cell && raw.contains('&') {
@@ -372,7 +377,7 @@ fn prepare_normal_text<'a>(
         (std::borrow::Cow::Borrowed(raw), false)
     };
     let transformed = if !inside_inline && !in_cell {
-        chomp_normal_text(state, decoded.as_ref())
+        chomp_normal_text(state, decoded.as_ref(), next_tag_is_inline)
     } else {
         None
     };
@@ -388,7 +393,7 @@ fn prepare_normal_text<'a>(
     })
 }
 
-fn chomp_normal_text(state: &Tier1State, raw: &str) -> Option<(String, bool)> {
+fn chomp_normal_text(state: &Tier1State, raw: &str, next_tag_is_inline: bool) -> Option<(String, bool)> {
     let trim_chars: &[char] = &['\n', '\r', ' ', '\t'];
     let after_leading = raw.trim_start_matches(trim_chars);
     let leading_len = raw.len() - after_leading.len();
@@ -402,14 +407,14 @@ fn chomp_normal_text(state: &Tier1State, raw: &str) -> Option<(String, bool)> {
         return None;
     }
     let prefix = if leading_len > 0 { " " } else { "" };
-    let (suffix, ends_in_newline_join) = trailing_text_suffix(state, trailing);
+    let (suffix, ends_in_newline_join) = trailing_text_suffix(state, trailing, next_tag_is_inline);
     Some((
         format!("{prefix}{}{suffix}", &raw[leading_len..trimmed_len]),
         ends_in_newline_join,
     ))
 }
 
-fn trailing_text_suffix<'a>(state: &Tier1State, trailing: &'a str) -> (&'a str, bool) {
+fn trailing_text_suffix<'a>(state: &Tier1State, trailing: &'a str, next_tag_is_inline: bool) -> (&'a str, bool) {
     if contains_blank_line(trailing.as_bytes()) {
         return ("\n\n", false);
     }
@@ -417,7 +422,7 @@ fn trailing_text_suffix<'a>(state: &Tier1State, trailing: &'a str) -> (&'a str, 
         return (" ", false);
     }
     if trailing.bytes().any(|byte| matches!(byte, b'\n' | b'\r')) {
-        let join = trailing_single_newline_join(state);
+        let join = trailing_single_newline_join(state, next_tag_is_inline);
         return (join, join == "\n");
     }
     (trailing, false)
@@ -612,6 +617,15 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
     let in_pre = state.escape_ctx.contains(EscapeCtx::PRE);
     let in_code = state.escape_ctx.contains(EscapeCtx::CODE);
 
+    // ~keep A line end beside a zero-width space is no white space: the two parts are one word.
+    // ~keep Mirrors Tier-2's `without_line_end_before_zero_width_space`.
+    let has_content = !raw.bytes().all(|byte| matches!(byte, b' ' | b'\t' | b'\n' | b'\r'));
+    let raw = if upcoming.line_end_meets_zero_width_space && has_content && !in_pre && !in_code {
+        crate::converter::utility::content::without_single_line_end(raw).unwrap_or(raw)
+    } else {
+        raw
+    };
+
     let normalized_whitespace = normalize_unicode_whitespace(raw, in_pre || in_code);
     let raw = normalized_whitespace.as_ref();
 
@@ -632,7 +646,8 @@ fn flush_text(state: &mut Tier1State, request: TextFlush<'_>) -> Result<(), Bail
     let inside_inline = state.in_table_cell()
         || state.in_summary()
         || state.stack.iter().any(|frame| matches!(frame.spec.kind, TagKind::Link));
-    let prepared = prepare_normal_text(state, raw, inside_inline, base_offset)?;
+    let next_tag_is_inline = upcoming.is_inline || upcoming.inline_follows_comments;
+    let prepared = prepare_normal_text(state, raw, inside_inline, base_offset, next_tag_is_inline)?;
     if prepared.text.is_empty() {
         return Ok(());
     }

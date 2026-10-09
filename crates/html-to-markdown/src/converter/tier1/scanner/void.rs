@@ -820,6 +820,10 @@ fn migrate_leading_inline_whitespace(buf: &mut String, content_start: usize, mar
     let leading = content[..leading_len].to_owned();
     buf.replace_range(content_start..content_start + leading_len, "");
     let marker_start = clamp_to_char_boundary(buf, content_start.saturating_sub(marker.len()));
+    // ~keep White space on both sides of the element start is one run: Tier-2's `push_inline_prefix`.
+    if !crate::converter::utility::content::space_is_owed(&buf[..marker_start]) {
+        return content_start;
+    }
     buf.insert_str(marker_start, &leading);
     content_start + leading_len
 }

@@ -122,6 +122,83 @@ pub fn get_text_content(node_handle: &tl::NodeHandle, parser: &tl::Parser, dom_c
     dom_ctx.text_content(*node_handle, parser)
 }
 
+/// Whether white space of the source owes one space at the end of `written`. Both converters
+/// ask here before they write the space of a text or of an inline element.
+///
+/// ~keep White space collapses as in CSS: a space after a space is the same run, whatever
+/// ~keep element boundary lies between the two, and the start of a line keeps none.
+#[must_use]
+pub fn space_is_owed(written: &str) -> bool {
+    !written.ends_with([' ', '\n'])
+}
+
+/// Writes the white space that an inline element starts with (`prefix` of [`chomp_inline`])
+/// before the marks of the element, when a space is owed there.
+///
+/// ~keep `one <b> two</b>` has white space on both sides of the element start. It is one run,
+/// ~keep so it is one space, and it goes outside the marks: `** two**` is not strong text.
+pub fn push_inline_prefix(output: &mut String, prefix: &str) {
+    if space_is_owed(output) {
+        output.push_str(prefix);
+    }
+}
+
+/// What one line end of the source becomes before the element that follows it: a space in
+/// running text and before an inline element, a line end before a block. Both converters ask
+/// here, so a line end is the same space in a paragraph, a `<div>`, a list item and the root.
+#[must_use]
+pub const fn line_end_before_element(in_running_text: bool, next_is_inline: bool) -> char {
+    if in_running_text || next_is_inline { ' ' } else { '\n' }
+}
+
+/// `text` without its trailing white space, when that white space holds exactly one line end.
+///
+/// ~keep The caller removes such a line end before a zero-width space: CSS drops a line end
+/// ~keep beside that character, so the two parts stay one word (`long\n&#8203;word`).
+#[must_use]
+pub fn without_single_line_end(text: &str) -> Option<&str> {
+    let kept = text.trim_end_matches([' ', '\t', '\n', '\r']);
+    let line_ends = text[kept.len()..].bytes().filter(|byte| *byte == b'\n').count();
+    (line_ends == 1).then_some(kept)
+}
+
+/// Whether an element only wraps its text: it writes no content of its own, so the text after
+/// a line end can start inside it or after it when it is empty.
+#[must_use]
+pub fn is_text_wrapper(tag_name: &str) -> bool {
+    matches!(
+        tag_name,
+        "a" | "abbr"
+            | "b"
+            | "bdi"
+            | "bdo"
+            | "cite"
+            | "code"
+            | "data"
+            | "del"
+            | "dfn"
+            | "em"
+            | "i"
+            | "ins"
+            | "kbd"
+            | "mark"
+            | "s"
+            | "samp"
+            | "small"
+            | "span"
+            | "strike"
+            | "strong"
+            | "sub"
+            | "sup"
+            | "time"
+            | "u"
+            | "var"
+    )
+}
+
+/// The zero-width space: a place where a line can break, not a space.
+pub const ZERO_WIDTH_SPACE: char = '\u{200b}';
+
 /// Determine whether a node is block-level, preferring the DOM context's precomputed tag
 /// info when available and falling back to a name-based check otherwise.
 ///
