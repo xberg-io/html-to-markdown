@@ -544,6 +544,37 @@ fn should_not_read_a_tag_in_an_attribute_value_or_a_comment_as_a_template() {
 }
 
 #[test]
+fn should_not_pair_a_template_tag_with_one_in_a_comment_or_a_script() {
+    // ~keep A template start tag in a comment or in a script body opens nothing. If the scan
+    // ~keep read it, the end tag of the real template would close it and stay removed, and the
+    // ~keep real template would hold the rest of the page.
+    for opaque in [
+        r#"<!-- <template shadowrootmode="open"> -->"#,
+        r#"<script>var a = '<template shadowrootmode="open">';</script>"#,
+    ] {
+        let html = format!("<div><p>visible</p><template>{opaque}<p>BODY</p></template><p>after</p></div>");
+        let [drop, reachable, _] = all_choices(&html);
+        assert!(drop.contains("visible") && drop.contains("after"), "{html}: {drop:?}");
+        assert!(!drop.contains("BODY") && !drop.contains("var a"), "{html}: {drop:?}");
+        assert_eq!(reachable, drop, "{html}");
+    }
+}
+
+#[test]
+fn should_read_the_kept_text_of_a_graphic_as_the_label_of_its_link() {
+    // ~keep A link whose text is its address has a short form. The link reads its text before
+    // ~keep it writes its label, so the kept text of a graphic must reach that reading too.
+    let hidden = r#"<p>visible <a href="https://example.com/page"><svg><text display="none">https://example.com/page</text></svg></a></p>"#;
+    let shown = hidden.replace(r#" display="none""#, "");
+    assert_ne!(shown, hidden);
+    let expected = convert_with(&shown, HiddenContent::Drop);
+    assert!(expected.contains("https://example.com/page"), "{expected:?}");
+    assert_ne!(convert_with(hidden, HiddenContent::Drop), expected);
+    assert_eq!(convert_with(hidden, HiddenContent::Reachable), expected);
+    assert_eq!(convert_with(hidden, HiddenContent::All), expected);
+}
+
+#[test]
 fn should_keep_noscript_content_with_every_preprocessing_preset() {
     use html_to_markdown_rs::{PreprocessingOptions, PreprocessingPreset};
     let html = "<p>visible</p><noscript><p>BODY</p></noscript>";
