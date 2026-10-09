@@ -531,7 +531,7 @@ fn close_block_container(state: &mut Tier1State, frame: &OpenTag, name_lower: &[
         // separator either.
         return;
     }
-    if state.in_table_cell() {
+    if state.in_table_cell() || start_line_in_pre(state, name_lower) {
         return;
     }
     let buf = state.cell_or_output_mut();

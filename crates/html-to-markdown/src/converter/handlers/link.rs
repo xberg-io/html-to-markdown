@@ -69,6 +69,19 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
         walk_handles_to_output(tag.children().top().iter().copied(), &mut handler);
         return;
     };
+    // ~keep Code shows every character as text, so a link in code writes its text and no marks.
+    if handler.context.in_code {
+        let text_start = handler.output.len();
+        walk_handles_to_output(data.children.iter().copied(), &mut handler);
+        #[cfg(feature = "metadata")]
+        {
+            let label = handler.output.get(text_start..).unwrap_or_default().trim().to_string();
+            record_link_metadata(tag, &data, &label, handler.context);
+        }
+        #[cfg(not(feature = "metadata"))]
+        let _ = text_start;
+        return;
+    }
     if emit_autolink(&data, &mut handler) || emit_heading_link(&data, &mut handler) {
         return;
     }

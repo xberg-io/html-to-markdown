@@ -385,7 +385,7 @@ fn open_marker(state: &mut Tier1State, marker: &str) -> Result<(), BailReason> {
 }
 
 fn open_block_container(state: &mut Tier1State, name_lower: &[u8], br_in_tables: bool) {
-    if block_container_is_passthrough(name_lower) {
+    if block_container_is_passthrough(name_lower) || start_line_in_pre(state, name_lower) {
         return;
     }
     if state.in_table_cell() {

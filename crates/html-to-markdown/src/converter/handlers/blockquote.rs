@@ -267,8 +267,12 @@ fn emit_quote_lines(content: &str, indent: Option<&str>, continuation: bool, out
         if (index > 0 || continuation) && indent.is_some() {
             output.push_str(indent.unwrap_or_default());
         }
-        output.push_str("> ");
-        if !line.trim().is_empty() {
+        // ~keep A blank line of the quote is the marker alone: a line of code keeps its line end,
+        // ~keep so no later pass removes a space written here.
+        if line.trim().is_empty() {
+            output.push('>');
+        } else {
+            output.push_str("> ");
             output.push_str(line);
         }
         output.push('\n');

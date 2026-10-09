@@ -187,6 +187,13 @@ impl<'a> Tier1Scanner<'a> {
             return Err(BailReason::Classifier);
         }
 
+        // ~keep A link or an image in code writes no marks; Tier-2 knows the rule.
+        if matches!(spec.kind, TagKind::Link | TagKind::Image)
+            && self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE)
+        {
+            return Err(BailReason::Classifier);
+        }
+
         let close = parse::find_tag_close(self.bytes, name_end).ok_or(BailReason::LiteralLt { offset: self.pos })?;
 
         let attrs = collect_open_attrs(spec, name_lower, self.bytes, name_end, close);
@@ -645,9 +652,7 @@ fn finish_scan(
     }
 
     crate::converter::main_helpers::trim_line_end_whitespace(&mut state.output);
-    if state.output.contains("\n\n\n") {
-        collapse_excess_blank_lines(&mut state.output);
-    }
+    crate::converter::main_helpers::collapse_excess_blank_lines(&mut state.output);
 
     if !state.output.is_empty() {
         let trimmed_end = state.output.trim_end_matches('\n');

@@ -55,7 +55,8 @@ pub fn handle_img(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
         .context
         .inline_data_treatment(handler.options.inline_data_media, &data.src);
     let rendered = render_image(tag, &data, inline_data, &handler);
-    if !handler.options.skip_images {
+    // ~keep Code shows every character as text, and a browser shows no text for an image.
+    if !handler.options.skip_images && !handler.context.in_code {
         if let Some(image_text) = rendered {
             handler.output.push_str(&image_text);
         }

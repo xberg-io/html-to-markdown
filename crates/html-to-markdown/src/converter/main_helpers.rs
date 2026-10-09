@@ -179,34 +179,95 @@ pub const fn hard_break_marker(options: &ConversionOptions) -> &'static str {
 /// markdownlint's MD012 rule forbids multiple consecutive blank lines, so the
 /// final emission is normalized here. This intentionally preserves single
 /// blank lines (`\n\n`) — only runs of three or more newlines are collapsed.
+///
+/// The lines of a fenced code block are code, not block transitions, and stay as they are
+/// (issue #783).
 pub fn collapse_excess_blank_lines(output: &mut String) {
     if !output.contains("\n\n\n") {
         return;
     }
     let mut cleaned = String::with_capacity(output.len());
+    let mut fences = FenceScan::default();
     let mut consecutive = 0usize;
-    for ch in output.chars() {
-        if ch == '\n' {
+    for line in output.split_inclusive('\n') {
+        let content = line.strip_suffix('\n').unwrap_or(line);
+        if fences.is_code(content) || !content.is_empty() {
+            consecutive = 1;
+            cleaned.push_str(line);
+        } else {
             consecutive += 1;
             if consecutive <= 2 {
-                cleaned.push(ch);
+                cleaned.push_str(line);
             }
-        } else {
-            consecutive = 0;
-            cleaned.push(ch);
         }
     }
     *output = cleaned;
 }
 
+/// Follows the fenced code blocks of finished Markdown, one line at a time.
+#[derive(Default)]
+pub struct FenceScan {
+    open: Option<(u8, usize)>,
+}
+
+impl FenceScan {
+    /// Whether `line` is a line of code: a line between the two fences of a code block.
+    ///
+    /// ~keep A fence is longer than every run of its character in the code, so no line of code
+    /// ~keep closes it. A block quote and a list item put their prefix before every line.
+    pub fn is_code(&mut self, line: &str) -> bool {
+        use crate::converter::utility::escaping::code_fence;
+
+        let Some((marker, length)) = self.open else {
+            self.open = code_fence(after_container_markers(line));
+            return false;
+        };
+        let rest = line.trim_start_matches([' ', '\t', '>']);
+        let closes = code_fence(rest).is_some_and(|(fence, run)| fence == marker && run >= length)
+            && rest.trim_start_matches(char::from(marker)).trim().is_empty();
+        if closes {
+            self.open = None;
+        }
+        !closes
+    }
+}
+
+/// `line` without the block quote and list item markers that can precede an opening fence.
+fn after_container_markers(mut line: &str) -> &str {
+    loop {
+        line = line.trim_start_matches([' ', '\t', '>']);
+        let bytes = line.as_bytes();
+        let digits = bytes.iter().take_while(|byte| byte.is_ascii_digit()).count();
+        let marker = match bytes {
+            [b'-' | b'*' | b'+', b' ', ..] => 2,
+            _ if (1..=9).contains(&digits)
+                && matches!(bytes.get(digits), Some(b'.' | b')'))
+                && bytes.get(digits + 1) == Some(&b' ') =>
+            {
+                digits + 2
+            }
+            _ => return line,
+        };
+        line = &line[marker..];
+    }
+}
+
 /// Remove trailing spaces/tabs from every line while preserving newlines.
+///
+/// The lines of a fenced code block keep their line ends: they are code.
 pub fn trim_line_end_whitespace(output: &mut String) {
     if output.is_empty() {
         return;
     }
 
     let mut cleaned = String::with_capacity(output.len());
+    let mut fences = FenceScan::default();
     for line in output.split('\n') {
+        if fences.is_code(line) {
+            cleaned.push_str(line);
+            cleaned.push('\n');
+            continue;
+        }
         let content = line.trim_end_matches([' ', '\t']);
         cleaned.push_str(content);
         // ~keep The two-space hard break is only meaningful after content on the same line;
