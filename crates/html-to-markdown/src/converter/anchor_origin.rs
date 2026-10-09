@@ -13,6 +13,9 @@
 //! attributes. Stamping every `<a>` start tag with a private origin id before it reaches the
 //! tree builder therefore marks the authored element and each of its clones with the same id,
 //! and the split can be undone on the repaired tree before it is serialized. ~keep
+//!
+//! The same token sink records whether the input wrote a `<body>` start tag, which the tree
+//! also no longer shows: see [`parse_with_anchor_origins`]. ~keep
 
 use std::cell::Cell;
 use std::collections::BTreeMap;
@@ -34,15 +37,23 @@ const CONTENT_BEARING: [&str; 14] = [
     "textarea", "select",
 ];
 
-/// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it.
+/// Token sink that stamps each `<a>` start tag with a fresh origin id before forwarding it,
+/// and records whether a `<body>` start tag went by.
 struct AnchorOriginStamper<S> {
     inner: S,
     next_origin: Cell<u32>,
+    saw_body_tag: Cell<bool>,
 }
 
 impl<S> AnchorOriginStamper<S> {
     fn stamp(&self, tag: &mut Tag) {
-        if tag.kind != TagKind::StartTag || &*tag.name != "a" {
+        if tag.kind != TagKind::StartTag {
+            return;
+        }
+        if &*tag.name == "body" {
+            self.saw_body_tag.set(true);
+        }
+        if &*tag.name != "a" {
             return;
         }
         // ~keep Input may already carry the private attribute; it must never survive as an
@@ -81,12 +92,18 @@ impl<S: TokenSink> TokenSink for AnchorOriginStamper<S> {
 /// Drives the tokenizer by hand: `html5ever::parse_document` hard-codes
 /// `Tokenizer<TreeBuilder<..>>` and leaves no room for a sink between the two. The input is
 /// already a `str`, so nothing the `TendrilSink` driver adds (UTF-8 decoding) is lost.
+///
+/// ~keep The tree builder gives every document a `<body>`. Input with no `<body>` start tag is a
+/// ~keep fragment, and rules that ask "is this element in the body of a page" (the page header
+/// ~keep rule) must still see a fragment after the repair, so the body that no tag asked for is
+/// ~keep unwrapped and its children become children of `<html>`.
 pub fn parse_with_anchor_origins(html: &str) -> RcDom {
     let tree_builder = TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default());
     let tokenizer = Tokenizer::new(
         AnchorOriginStamper {
             inner: tree_builder,
             next_origin: Cell::new(0),
+            saw_body_tag: Cell::new(false),
         },
         TokenizerOpts::default(),
     );
@@ -94,7 +111,29 @@ pub fn parse_with_anchor_origins(html: &str) -> RcDom {
     input.push_back(StrTendril::from(html));
     while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
     tokenizer.end();
-    TreeSink::finish(tokenizer.sink.inner.sink)
+    let saw_body_tag = tokenizer.sink.saw_body_tag.get();
+    let dom = TreeSink::finish(tokenizer.sink.inner.sink);
+    if !saw_body_tag {
+        unwrap_implied_body(&dom.document);
+    }
+    dom
+}
+
+/// Replace the `<body>` of `document` with its children.
+fn unwrap_implied_body(document: &Handle) {
+    if let Some(body) = child_element(document, "html").and_then(|html| child_element(&html, "body")) {
+        unwrap_element(&body);
+    }
+}
+
+/// The first child of `parent` that is an element named `name`.
+fn child_element(parent: &Handle, name: &str) -> Option<Handle> {
+    parent
+        .children
+        .borrow()
+        .iter()
+        .find(|child| matches!(&child.data, NodeData::Element { name: qualified, .. } if &*qualified.local == name))
+        .cloned()
 }
 
 /// Undo the adoption agency's split of an anchor around a block, then strip every origin stamp.
@@ -237,9 +276,33 @@ mod tests {
 
     fn body(html: &str) -> String {
         let out = repaired(html);
-        out.trim_start_matches("<html><head></head><body>")
-            .trim_end_matches("</body></html>")
+        out.trim_start_matches("<html><head></head>")
+            .trim_end_matches("</html>")
             .to_string()
+    }
+
+    #[test]
+    fn should_give_no_body_element_to_input_with_no_body_start_tag() {
+        assert_eq!(
+            repaired("<header>h</header><div><p>one</div>tail"),
+            "<html><head></head><header>h</header><div><p>one</p></div>tail</html>"
+        );
+        assert_eq!(
+            repaired("<title>T</title><p>one<!-- <body> --><p>two"),
+            "<html><head><title>T</title></head><p>one<!-- <body> --></p><p>two</p></html>"
+        );
+    }
+
+    #[test]
+    fn should_keep_the_body_element_when_the_input_has_a_body_start_tag() {
+        assert_eq!(
+            repaired("<body><header>h</header><p>one"),
+            "<html><head></head><body><header>h</header><p>one</p></body></html>"
+        );
+        assert_eq!(
+            repaired("<p>one<BODY class=late><p>two"),
+            "<html><head></head><body class=\"late\"><p>one</p><p>two</p></body></html>"
+        );
     }
 
     #[test]

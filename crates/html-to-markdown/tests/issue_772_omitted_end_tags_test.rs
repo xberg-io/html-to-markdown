@@ -306,6 +306,16 @@ fn an_end_tag_in_another_spelling_ends_its_element() {
 }
 
 #[test]
+fn a_fragment_with_no_body_tag_keeps_its_header_after_the_second_parse() {
+    // ~keep The page header rule drops a `<header>` in the `<body>` of a page. A fragment has no
+    // ~keep `<body>` tag, and the tree builder must not give it one.
+    assert_all_routes("<header>h</header><div><p>one</div>tail", "h\n\none\n\ntail\n");
+    assert_all_routes("<header>h</header><b><p>one</p></b>", "h\n\n**one**\n");
+    assert_all_routes("<body><header>h</header><div><p>one</div>tail", "one\n\ntail\n");
+    assert_all_routes("<body><header>h</header><b><p>one</p></b>", "**one**\n");
+}
+
+#[test]
 fn a_page_that_nests_past_the_limit_is_still_cut_and_reports_it() {
     let html = format!(
         "<!doctype html>{}<p>Deep text.</p>{}<p>Shallow text.</p>",

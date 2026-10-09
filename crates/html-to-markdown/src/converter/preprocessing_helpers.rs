@@ -125,9 +125,6 @@ fn child_misnest_state(info: &TagInfo, state: MisnestState, self_inside_preforma
 /// misplaced element child (e.g. a `<p>` stranded inside a `<tr>` by a dropped `</table>`
 /// close tag). See [`is_row_context_with_misplaced_element`]. Issue #489.
 ///
-/// Also detects an element with content that is still open at the end of the input. See
-/// [`has_omitted_end_tag`]. Issue #772.
-///
 /// ~keep Walks the tree top-down exactly once, carrying inherited ancestor state
 /// ~keep (see [`MisnestState`]) instead of re-walking every node's ancestor chain.
 /// ~keep The original per-node ancestor walk was O(depth) per node — O(n²) total on
@@ -135,10 +132,6 @@ fn child_misnest_state(info: &TagInfo, state: MisnestState, self_inside_preforma
 /// ~keep accounted for essentially all of it, confirmed via phase timing in
 /// ~keep `tools/benchmark-harness/examples/profile_deep_nesting_phases.rs`).
 pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
-    if has_omitted_end_tag(dom_ctx, parser) {
-        return true;
-    }
-
     let mut stack: Vec<(tl::NodeHandle, MisnestState)> = dom_ctx
         .root_children
         .iter()
@@ -206,7 +199,7 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
 /// ~keep descendants (issue #772). The open elements are the stack of `tl` at the end of the
 /// ~keep input: the last root node, its last child, and so on, so the walk is O(depth).
 /// ~keep `html` and `body` are exempt: their end tags close no element in the standard.
-fn has_omitted_end_tag(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
+pub fn has_omitted_end_tag(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
     let mut last = dom_ctx.root_children.last().copied();
     while let Some(handle) = last {
         let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
