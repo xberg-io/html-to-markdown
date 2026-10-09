@@ -7,7 +7,7 @@
 /// so raw-source slicing would diverge from Tier-2).
 ///
 /// Mirrors Tier-2's `media/svg.rs::handle_svg`:
-/// - Walks children for a `<title>` tag → alt text.  Default: "SVG Image".
+/// - Takes the alt text from `graphic_text`, the function Tier-2 uses.
 /// - Calls `serialize_element` on the root SVG node.
 /// - Base64-encodes (STANDARD engine) the serialized bytes.
 /// - Emits `![{title}](data:image/svg+xml;base64,{b64})`.
@@ -31,6 +31,14 @@ fn emit_svg_from_slice(
         return Ok(());
     }
 
+    // ~keep Tier-2 removes a hidden element before it parses, also inside a graphic. The slice
+    // ~keep still holds it, and its text would be read as text of the graphic.
+    if holds_hidden_element(svg_slice) {
+        return Err(BailReason::HiddenElement {
+            offset: svg_start_offset,
+        });
+    }
+
     use crate::converter::media::svg::serialize_element;
     use base64::{Engine as _, engine::general_purpose::STANDARD};
 
@@ -50,7 +58,10 @@ fn emit_svg_from_slice(
     let Some(handle) = find_svg_handle(&dom) else {
         return Ok(());
     };
-    let title = svg_title(handle, parser);
+    let Some(tl::Node::Tag(svg)) = handle.get(parser) else {
+        return Ok(());
+    };
+    let title = crate::converter::media::svg::graphic_text(svg, parser);
 
     let svg_html = serialize_element(&handle, parser);
     let base64_svg = STANDARD.encode(svg_html.as_bytes());
@@ -75,6 +86,30 @@ fn emit_svg_from_slice(
     Ok(())
 }
 
+/// Whether a tag inside the `<svg>` of `svg_slice` is hidden by its attribute or its style.
+///
+/// ~keep Each search starts where the last tag ended, so the scan reads the slice once.
+fn holds_hidden_element(svg_slice: &str) -> bool {
+    use crate::converter::utility::preprocessing::{find_tag_end, tag_has_hidden_attribute, tag_has_hidden_style};
+
+    let mut from = 1;
+    while let Some(start) = svg_slice
+        .get(from..)
+        .and_then(|rest| rest.find('<'))
+        .map(|at| from + at)
+    {
+        let end = find_tag_end(svg_slice.as_bytes(), start + 1)
+            .unwrap_or(svg_slice.len())
+            .max(start + 1);
+        let tag = &svg_slice[start..end];
+        if tag_has_hidden_attribute(tag) || tag_has_hidden_style(tag) {
+            return true;
+        }
+        from = end;
+    }
+    false
+}
+
 fn find_svg_handle(dom: &tl::VDom<'_>) -> Option<tl::NodeHandle> {
     dom.nodes().iter().enumerate().find_map(|(index, node)| {
         let tl::Node::Tag(tag) = node else { return None };
@@ -84,35 +119,6 @@ fn find_svg_handle(dom: &tl::VDom<'_>) -> Option<tl::NodeHandle> {
             .eq_ignore_ascii_case("svg")
             .then(|| tl::NodeHandle::new(index as u32))
     })
-}
-
-fn svg_title(handle: tl::NodeHandle, parser: &tl::Parser<'_>) -> String {
-    let Some(tl::Node::Tag(svg)) = handle.get(parser) else {
-        return String::from("SVG Image");
-    };
-    svg.children()
-        .top()
-        .iter()
-        .filter_map(|child| child.get(parser).and_then(tl::Node::as_tag))
-        .find(|tag| tag.name().as_utf8_str().as_ref().eq_ignore_ascii_case("title"))
-        .map_or_else(
-            || String::from("SVG Image"),
-            |title| {
-                let text = title
-                    .children()
-                    .top()
-                    .iter()
-                    .filter_map(|child| child.get(parser).and_then(tl::Node::as_raw))
-                    .map(|raw| raw.as_utf8_str())
-                    .collect::<String>();
-                let trimmed = text.trim();
-                if trimmed.is_empty() {
-                    String::from("SVG Image")
-                } else {
-                    trimmed.to_owned()
-                }
-            },
-        )
 }
 
 /// Skip the body of a raw-text element (script/style/textarea/iframe/…).

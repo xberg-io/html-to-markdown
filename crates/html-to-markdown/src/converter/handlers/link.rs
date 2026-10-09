@@ -19,7 +19,7 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_conte
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
-    collect_link_label_text, get_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
+    collect_link_label_text, link_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -121,7 +121,7 @@ impl<'a> LinkData<'a> {
             .map_or_else(|| tag.children().top().iter().copied().collect(), ToOwned::to_owned);
         let (inline_label, _, saw_block) = collect_link_label_text(&children, handler.parser, handler.dom_context);
         let text_source = if saw_block {
-            get_text_content(handler.node_handle, handler.parser, handler.dom_context)
+            link_text_content(&children, handler.parser, handler.dom_context)
         } else {
             inline_label.clone()
         };

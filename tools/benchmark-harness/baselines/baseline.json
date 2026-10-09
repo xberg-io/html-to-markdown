@@ -47,7 +47,7 @@
       "median_ms": 5.4856486,
       "mad_ms": 0.009397044444444447,
       "mb_per_s": 19.51141673181659,
-      "output_bytes": 13009
+      "output_bytes": 12982
     },
     {
       "fixture": "mdream/wikipedia-small.html",
@@ -65,7 +65,7 @@
       "median_ms": 9.792242166666666,
       "mad_ms": 0.03259875000000001,
       "mb_per_s": 22.540711522261777,
-      "output_bytes": 70691
+      "output_bytes": 70664
     },
     {
       "fixture": "mdream/react-learn.html",
@@ -74,7 +74,7 @@
       "median_ms": 11.2530497,
       "mad_ms": 0.059547700000000425,
       "mb_per_s": 22.469003268139822,
-      "output_bytes": 59205
+      "output_bytes": 58175
     },
     {
       "fixture": "mdream/github-markdown-complete.html",
@@ -83,7 +83,7 @@
       "median_ms": 10.0925849,
       "mad_ms": 0.039093000000000266,
       "mb_per_s": 40.59977344965667,
-      "output_bytes": 45649
+      "output_bytes": 45525
     },
     {
       "fixture": "real-world/wikipedia/small_html.html",
@@ -191,7 +191,7 @@
       "median_ms": 2.02843646,
       "mad_ms": 0.005187359999999863,
       "mb_per_s": 32.65208577172492,
-      "output_bytes": 24895
+      "output_bytes": 24859
     },
     {
       "fixture": "real-world/issues/gh-190/sjsu.html",
@@ -290,7 +290,7 @@
       "median_ms": 0.012293813057529517,
       "mad_ms": 0.00009349611330956766,
       "mb_per_s": 3.6459552997384703,
-      "output_bytes": 120
+      "output_bytes": 111
     }
   ]
 }

@@ -293,8 +293,9 @@ pub struct Context {
     pub(crate) excluded_node_ids: Rc<HashSet<u32>>,
     /// Shared flag set when the guarded DOM walk reaches its effective depth limit.
     pub(crate) depth_limit_reached: Rc<Cell<bool>>,
-    /// Shared flag set when `inline_data_media` replaced or dropped an element. A link reads it to
-    /// tell a label emptied by that option from an empty one.
+    /// Shared flag set when `inline_data_media` replaced or dropped an element, or an inline
+    /// context wrote an inline `<svg>` as its text. A link reads it to tell a label emptied that
+    /// way from an empty one.
     pub(crate) inline_data_replaced: Rc<Cell<bool>>,
     #[cfg(feature = "inline-images")]
     /// Shared collector for inline images when enabled.

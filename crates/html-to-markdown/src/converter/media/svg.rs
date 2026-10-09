@@ -1,6 +1,6 @@
 //! SVG and `MathML` element handling with serialization and base64 encoding.
 
-use crate::converter::main_helpers::{effective_max_depth, tag_name_eq};
+use crate::converter::main_helpers::effective_max_depth;
 use crate::converter::media::MediaContext;
 use crate::converter::utility::content::normalized_tag_name;
 use crate::converter::utility::escaping::escape_link_label;
@@ -218,10 +218,183 @@ fn non_empty_trimmed(value: &str) -> Option<String> {
     }
 }
 
+/// Where the walk of [`graphic_text`] is, which decides what a child gives.
+#[derive(Clone, Copy)]
+enum GraphicScope {
+    /// Among drawn elements. `of_svg`: the parent is an `svg` element, whose `title` and `desc`
+    /// name the graphic. `named`: no `aria-hidden="true"` hides that name.
+    Drawing { of_svg: bool, named: bool },
+    /// Inside a `title` or a `desc`: every text node.
+    Label,
+    /// Inside a `text` element: every text node but the tooltip of a part.
+    Text,
+    /// Inside a `foreignObject`: HTML.
+    Html,
+}
+
+enum GraphicStep {
+    Visit(tl::NodeHandle, GraphicScope),
+    Space,
+    EndPart,
+}
+
+/// Collects the parts of [`graphic_text`], each with its white space collapsed.
+#[derive(Default)]
+struct GraphicParts {
+    label: Option<String>,
+    parts: Vec<String>,
+    current: String,
+}
+
+impl GraphicParts {
+    fn end_part(&mut self) {
+        let part = self.current.split_whitespace().collect::<Vec<_>>().join(" ");
+        self.current.clear();
+        // ~keep A title that repeats the `aria-label` is one name, not two.
+        if !part.is_empty() && self.label.as_deref() != Some(part.as_str()) {
+            self.parts.push(part);
+        }
+    }
+}
+
+fn is_aria_hidden(tag: &tl::HTMLTag<'_>) -> bool {
+    tag.attributes()
+        .get("aria-hidden")
+        .flatten()
+        .is_some_and(|value| value.as_utf8_str().trim().eq_ignore_ascii_case("true"))
+}
+
+/// The text of an inline `<svg>` for a reader who does not get the picture, on one line.
+///
+/// In reading order: the `aria-label` of the graphic, then the `title` and `desc` of each `svg`
+/// element, each `text` element and each `foreignObject`, joined by one space. Only elements that
+/// draw their children are entered (`svg`, `g`, `a`, the first child of `switch`), so `defs`,
+/// `symbol`, `style`, `script` and `metadata` give nothing, and a `use` reference is not followed.
+/// `aria-hidden="true"` removes the label, the title and the description, and keeps drawn text.
+/// A graphic with none of these gives the empty string.
+pub fn graphic_text(svg: &tl::HTMLTag<'_>, parser: &Parser<'_>) -> String {
+    let named = !is_aria_hidden(svg);
+    let mut out = GraphicParts::default();
+    if named {
+        if let Some(label) = crate::converter::utility::attributes::decoded_attribute(svg, "aria-label") {
+            out.current.push_str(&label);
+            out.end_part();
+            out.label = out.parts.first().cloned();
+        }
+    }
+    // ~keep An explicit stack: the nesting is the page's, and native recursion over it can overflow.
+    let mut stack = Vec::new();
+    push_graphic_children(&mut stack, svg, GraphicScope::Drawing { of_svg: true, named });
+    while let Some(step) = stack.pop() {
+        let (handle, scope) = match step {
+            GraphicStep::Visit(handle, scope) => (handle, scope),
+            GraphicStep::Space => {
+                out.current.push(' ');
+                continue;
+            }
+            GraphicStep::EndPart => {
+                out.end_part();
+                continue;
+            }
+        };
+        match handle.get(parser) {
+            Some(tl::Node::Raw(bytes)) if !matches!(scope, GraphicScope::Drawing { .. }) => {
+                out.current
+                    .push_str(&crate::text::decode_html_entities_cow(bytes.as_utf8_str().as_ref()));
+            }
+            Some(tl::Node::Tag(tag)) => visit_graphic_tag(tag, parser, scope, &mut stack, &mut out),
+            _ => {}
+        }
+    }
+    out.end_part();
+    out.parts.join(" ")
+}
+
+fn push_graphic_children(stack: &mut Vec<GraphicStep>, tag: &tl::HTMLTag<'_>, scope: GraphicScope) {
+    stack.extend(
+        tag.children()
+            .top()
+            .as_slice()
+            .iter()
+            .rev()
+            .map(|child| GraphicStep::Visit(*child, scope)),
+    );
+}
+
+/// Schedules the children of `tag` as one part of the text.
+fn push_graphic_part(stack: &mut Vec<GraphicStep>, out: &mut GraphicParts, tag: &tl::HTMLTag<'_>, scope: GraphicScope) {
+    out.end_part();
+    stack.push(GraphicStep::EndPart);
+    push_graphic_children(stack, tag, scope);
+}
+
+fn visit_graphic_tag(
+    tag: &tl::HTMLTag<'_>,
+    parser: &Parser<'_>,
+    scope: GraphicScope,
+    stack: &mut Vec<GraphicStep>,
+    out: &mut GraphicParts,
+) {
+    let name = normalized_tag_name(tag.name().as_utf8_str());
+    let nested_svg = |named: bool| GraphicScope::Drawing {
+        of_svg: true,
+        named: named && !is_aria_hidden(tag),
+    };
+    match (scope, &*name) {
+        (GraphicScope::Drawing { of_svg, named }, "title" | "desc") => {
+            if of_svg && named {
+                push_graphic_part(stack, out, tag, GraphicScope::Label);
+            }
+        }
+        (GraphicScope::Drawing { .. }, "text") => push_graphic_part(stack, out, tag, GraphicScope::Text),
+        (GraphicScope::Drawing { .. }, "foreignobject") => push_graphic_part(stack, out, tag, GraphicScope::Html),
+        (GraphicScope::Drawing { named, .. }, "svg") => push_graphic_children(stack, tag, nested_svg(named)),
+        (GraphicScope::Drawing { named, .. }, "g" | "a") => {
+            push_graphic_children(stack, tag, GraphicScope::Drawing { of_svg: false, named });
+        }
+        (GraphicScope::Drawing { named, .. }, "switch") => {
+            // ~keep A `switch` draws one child: the first that is an element.
+            let first = tag
+                .children()
+                .top()
+                .iter()
+                .find(|child| matches!(child.get(parser), Some(tl::Node::Tag(_))))
+                .copied();
+            stack.extend(first.map(|child| GraphicStep::Visit(child, GraphicScope::Drawing { of_svg: false, named })));
+        }
+        (GraphicScope::Drawing { .. }, _) => {}
+        (GraphicScope::Label, _) => push_graphic_children(stack, tag, GraphicScope::Label),
+        (GraphicScope::Text, "title" | "desc") | (GraphicScope::Html, "script" | "style" | "template") => {}
+        (GraphicScope::Text, _) => {
+            push_graphic_children(stack, tag, GraphicScope::Text);
+            // ~keep A span with its own `x` or `y` starts at a new place, as a new line of a label does.
+            if ["x", "y"].iter().any(|key| tag.attributes().get(*key).is_some()) {
+                stack.push(GraphicStep::Space);
+            }
+        }
+        (GraphicScope::Html, "svg") => {
+            out.end_part();
+            stack.push(GraphicStep::EndPart);
+            push_graphic_children(stack, tag, nested_svg(true));
+        }
+        (GraphicScope::Html, "br") => out.current.push(' '),
+        (GraphicScope::Html, html_name) => {
+            let is_block = crate::converter::utility::content::is_block_level_element(html_name);
+            if is_block {
+                stack.push(GraphicStep::Space);
+            }
+            push_graphic_children(stack, tag, GraphicScope::Html);
+            if is_block {
+                stack.push(GraphicStep::Space);
+            }
+        }
+    }
+}
+
 /// Handle SVG element conversion to Markdown.
 ///
-/// Extracts title from child elements, handles inline image collection,
-/// and outputs either the title text (in inline mode) or a base64-encoded image.
+/// Handles inline image collection, and writes either the text of the graphic (in inline mode
+/// and for `alt_text_only`) or a base64-encoded image with that text as its alt text.
 pub fn handle_svg(
     node_handle: &NodeHandle,
     tag: &tl::HTMLTag,
@@ -230,31 +403,23 @@ pub fn handle_svg(
     context: MediaContext<'_>,
 ) {
     let MediaContext {
-        options,
-        ctx,
-        depth,
-        dom_ctx,
+        options, ctx, depth, ..
     } = context;
-    use crate::converter::utility::content::get_text_content;
-
-    let mut title = String::from("SVG Image");
-    let children = tag.children();
-    for child_handle in children.top().iter() {
-        if let Some(tl::Node::Tag(child_tag)) = child_handle.get(parser) {
-            if tag_name_eq(child_tag.name().as_utf8_str(), "title") {
-                title = get_text_content(child_handle, parser, dom_ctx).trim().to_string();
-                break;
-            }
-        }
-    }
 
     #[cfg(feature = "inline-images")]
     if let Some(ref collector_ref) = ctx.inline_collector {
-        let title_opt = if title == "SVG Image" {
-            None
-        } else {
-            Some(title.clone())
-        };
+        let title_opt = tag
+            .children()
+            .top()
+            .iter()
+            .find(|child| {
+                matches!(child.get(parser), Some(tl::Node::Tag(child_tag)) if child_tag.name().as_utf8_str().eq_ignore_ascii_case("title"))
+            })
+            .map(|child| {
+                crate::converter::utility::content::get_text_content(child, parser, context.dom_ctx)
+                    .trim()
+                    .to_string()
+            });
         let mut attributes_map = BTreeMap::new();
         for (key, value_opt) in tag.attributes().iter() {
             let key_str = key.to_string();
@@ -281,8 +446,19 @@ pub fn handle_svg(
         return;
     }
 
+    let title = graphic_text(tag, parser);
     if ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
-        output.push_str(&title);
+        // ~keep An inline context replaces the payload by the text whatever the option says, so a
+        // ~keep link that this leaves empty goes with it and is not labelled with its own address.
+        ctx.inline_data_replaced.set(true);
+        // ~keep Written as running text, so it gets the escaping of a text node.
+        output.push_str(&crate::text::escape(
+            &title,
+            options.escape_misc,
+            options.escape_asterisks,
+            options.escape_underscores,
+            options.escape_ascii,
+        ));
     } else {
         use base64::{Engine as _, engine::general_purpose::STANDARD};
 
