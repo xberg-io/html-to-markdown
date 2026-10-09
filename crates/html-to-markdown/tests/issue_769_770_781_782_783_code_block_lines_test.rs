@@ -269,6 +269,26 @@ const CASES: &[Case] = &[
         "```\na  b\n```\n",
     ),
     case(
+        "issue 781, an inline graphic with text in a block",
+        "<pre>a <svg width=\"1\" height=\"1\"><title>T</title><text>x</text></svg> b</pre>",
+        "```\na T x b\n```\n",
+    ),
+    case(
+        "issue 781, an inline graphic with text in a code span",
+        "<p><code>a <svg width=\"1\" height=\"1\"><text>x</text></svg> b</code></p>",
+        "`a x b`\n",
+    ),
+    case(
+        "issue 781, an inline graphic with no text in a block",
+        "<pre>a <svg width=\"1\" height=\"1\"><path d=\"M0 0\"/></svg> b</pre>",
+        "```\na  b\n```\n",
+    ),
+    case(
+        "issue 781, a link around an inline graphic in a block",
+        "<pre>go <a href=\"/p\"><svg width=\"1\" height=\"1\"><text>there</text></svg></a> now</pre>",
+        "```\ngo there now\n```\n",
+    ),
+    case(
         "issue 781, highlighted text and an abbreviation in a block",
         "<pre>a <mark>c</mark> <abbr title=\"t\">e</abbr> <sub>1</sub><sup>2</sup> <ins>d</ins></pre>",
         "```\na c e 12 d\n```\n",

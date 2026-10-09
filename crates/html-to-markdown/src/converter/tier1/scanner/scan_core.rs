@@ -269,6 +269,10 @@ impl<'a> Tier1Scanner<'a> {
         if in_heading {
             return Err(BailReason::Classifier);
         }
+        // ~keep A graphic in code writes its text and no marks; Tier-2 knows the rule.
+        if self.state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE) {
+            return Err(BailReason::Classifier);
+        }
         let tag_open_start = self.pos;
         let Some((close_pos, is_self_closing)) = parse::find_tag_close(self.bytes, name_end) else {
             self.pos = self.bytes.len();

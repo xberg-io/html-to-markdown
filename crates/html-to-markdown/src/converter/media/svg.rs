@@ -469,6 +469,11 @@ pub fn handle_svg(
     }
 
     let title = graphic_text(tag, parser);
+    // ~keep Code shows every character as text, so a graphic in code writes its text and no marks.
+    if ctx.in_code {
+        output.push_str(&title);
+        return;
+    }
     if ctx.convert_as_inline || inline_data == crate::options::InlineDataMedia::AltTextOnly {
         write_graphic_as_text(*node_handle, parser, output, context, &title);
     } else {

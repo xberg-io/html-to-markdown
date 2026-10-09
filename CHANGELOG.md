@@ -54,7 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A link, an image, highlighted text and an abbreviation inside a code block or a code span write
   their text and no Markdown marks, because code shows every character as text:
   `<pre>Guido &lt;<a href="/mail">guido</a>&gt;</pre>` wrote `Guido <[guido](/mail)>` and now writes
-  `Guido <guido>`. An image in code writes nothing. The link and the image stay in the metadata
+  `Guido <guido>`. An image in code writes nothing, and an inline `<svg>` in code writes its text in
+  place of a `data:` image. The link and the image stay in the metadata
   ([#781](https://github.com/xberg-io/html-to-markdown/issues/781)).
 - With `extract_metadata` off, an empty `pre` writes nothing in place of an empty fence, as with the
   default options.
