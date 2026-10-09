@@ -429,22 +429,61 @@ fn should_convert_white_space_only_text_under_each_output_option() {
     assert_none(&failures, inputs.len() * option_sets.len());
 }
 
+/// The structure that `build_document_structure` returns for `html`, or the reason it panics.
+fn built_structure(html: &str) -> Result<DocumentStructure, String> {
+    let dom = tl::parse(html, tl::ParserOptions::default()).map_err(|error| error.to_string())?;
+    catch_unwind(AssertUnwindSafe(|| build_document_structure(&dom)))
+        .map_err(|_| "the structure builder panics".to_owned())
+}
+
+/// The kind and the text of each heading, paragraph and list item, in document order.
+fn recorded_texts(document: &DocumentStructure) -> Vec<(&'static str, String)> {
+    document
+        .nodes
+        .iter()
+        .filter_map(|node| {
+            let kind = match &node.content {
+                NodeContent::Heading { .. } => "heading",
+                NodeContent::Paragraph { .. } => "paragraph",
+                NodeContent::ListItem { .. } => "list item",
+                _ => return None,
+            };
+            recorded_text(node).map(|text| (kind, text.to_owned()))
+        })
+        .collect()
+}
+
 #[test]
 fn should_build_a_structure_from_a_parsed_document_that_holds_only_white_space() {
     let templates = every_template();
     let templates: Vec<&str> = templates.iter().map(String::as_str).collect();
-    assert_each(&fill(&templates), |case| {
-        let dom = tl::parse(&case.html, tl::ParserOptions::default()).map_err(|error| error.to_string())?;
-        let document = catch_unwind(AssertUnwindSafe(|| build_document_structure(&dom)))
-            .map_err(|_| "the structure builder panics".to_owned())?;
-        for node in &document.nodes {
-            let Some(text) = recorded_text(node) else {
-                continue;
-            };
-            if text.trim() != text {
-                return Err(format!("the structure records the text {text:?}"));
-            }
+    assert_each(&fill(&templates), |case| check_document(&built_structure(&case.html)?));
+}
+
+/// Blocks that hold one text each and nothing nested, so the conversion and the builder record
+/// the same nodes for them.
+const PLAIN_BLOCKS: &[&str] = &[
+    "<h1>Title</h1><h2>{}</h2><p>body text</p>",
+    "<h3>{}</h3>",
+    "<p>{}</p><p>body text</p>",
+    "<ul><li>{}</li><li>item</li></ul>",
+    "<ol><li>item</li><li>{}</li></ol>",
+];
+
+#[test]
+fn should_record_the_same_texts_in_the_builder_and_in_the_conversion() {
+    let templates = PLAIN_BLOCKS;
+    let options = with_structure(&ConversionOptions::default(), true);
+    assert_each(&fill(templates), |case| {
+        let converted = convert(&case.html, Some(options.clone())).map_err(|error| error.to_string())?;
+        let converted = recorded_texts(&converted.document.ok_or("the conversion has no structure")?);
+        let built = recorded_texts(&built_structure(&case.html)?);
+        if converted == built {
+            Ok(())
+        } else {
+            Err(format!(
+                "the conversion records {converted:?} and the builder records {built:?}"
+            ))
         }
-        Ok(())
     });
 }

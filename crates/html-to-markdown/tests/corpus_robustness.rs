@@ -26,11 +26,12 @@
 
 use html_to_markdown_rs::ConversionError;
 use html_to_markdown_rs::options::{ConversionOptions, NewlineStyle};
+use std::collections::HashSet;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 /// Wall-clock ceiling for a single conversion.
 ///
@@ -104,6 +105,7 @@ fn with_hang_guard(budget: Duration, body: impl FnOnce(&Mutex<String>) + Send + 
     let current: Arc<Mutex<String>> = Arc::new(Mutex::new("<none>".to_owned()));
     let worker_view = Arc::clone(&current);
     let (tx, rx) = mpsc::channel();
+    let started = Instant::now();
     thread::Builder::new()
         .stack_size(8 * 1024 * 1024)
         .spawn(move || {
@@ -112,7 +114,9 @@ fn with_hang_guard(budget: Duration, body: impl FnOnce(&Mutex<String>) + Send + 
         })
         .expect("spawn conversion thread");
 
-    if rx.recv_timeout(budget).is_err() {
+    let finished = rx.recv_timeout(budget);
+    println!("sweep took {:?} of its {budget:?} budget", started.elapsed());
+    if finished.is_err() {
         let stuck = current.lock().map_or_else(|e| e.into_inner().clone(), |g| g.clone());
         // ~keep The worker is left running on purpose: it is wedged by definition, and
         // ~keep detaching it lets the failure be reported instead of deadlocking the suite.
@@ -153,8 +157,9 @@ fn option_matrix() -> Vec<(&'static str, ConversionOptions)> {
 ///
 /// ~keep A sweep of its own and not a third entry of `option_matrix`: each sweep has one
 /// ~keep wall-clock budget for all its conversions, and the fixture sweep already uses most of
-/// ~keep it on a loaded runner. It runs after the first sweep and not as a test beside it, so
-/// ~keep it does not take a core from that sweep.
+/// ~keep it on a loaded runner. In the fixture test it runs after the first sweep on the same
+/// ~keep thread, so it takes no core from that sweep. In the two other tests it overlaps the
+/// ~keep fixture sweep for a few seconds, and those sweeps are the cheap ones.
 fn structure_matrix() -> Vec<(&'static str, ConversionOptions)> {
     vec![(
         "document structure",
@@ -197,9 +202,18 @@ fn sweep_fixtures(matrix: OptionMatrix) {
     for extra in optional_extra_roots() {
         collect_html(&extra, &mut corpus);
     }
+    // ~keep `test_documents/html` holds byte for byte copies of 16 of the in-repo fixtures, among
+    // ~keep them the five largest pages. A copy converts to the same result, so the second
+    // ~keep conversion proves nothing and costs the time of the first. Dropping it cut the corpus
+    // ~keep from 12.6 MB to 7.1 MB, and each sweep of it by the same share, which is what keeps a
+    // ~keep sweep with the document structure on inside its budget beside the sweep without it.
+    let collected = corpus.len();
+    let mut seen = HashSet::new();
+    corpus.retain(|(_, html)| seen.insert(html.clone()));
     println!(
-        "corpus: {required} in-repo fixture(s) + {} from optional sibling corpora",
-        corpus.len() - required
+        "corpus: {required} in-repo fixture(s) + {} from optional sibling corpora, {} distinct documents",
+        collected - required,
+        corpus.len()
     );
 
     // ~keep A corpus that silently resolves to nothing is how this kind of test rots into a

@@ -146,7 +146,8 @@ fn collect_annotated_text(tag: &tl::HTMLTag, parser: &tl::Parser) -> (String, Ve
 ///
 /// ~keep The end is the start plus the length of the trimmed slice, so it is never before the
 /// ~keep start. Two indexes measured from the two ends cross when the text is only white space,
-/// ~keep and a slice between them panics (issue #749). Such text gives the empty text here.
+/// ~keep and a slice between them panics (issue #749). Such text gives the empty text here, and
+/// ~keep neither structure builder records a heading, paragraph or list item for empty text.
 pub(super) fn trim_annotated_text(text: &str, mut annotations: Vec<TextAnnotation>) -> (String, Vec<TextAnnotation>) {
     let without_leading = text.trim_start();
     let trimmed = without_leading.trim_end();
@@ -723,6 +724,9 @@ fn process_list(
 
 fn process_list_item(state: &mut BuilderState, tag: &tl::HTMLTag, parser: &tl::Parser, parent_idx: Option<u32>) {
     let (text, annotations) = collect_annotated_text(tag, parser);
+    if text.is_empty() {
+        return;
+    }
     state.push_attached(DocumentNode {
         id: make_node_id("list_item", &text, state.nodes.len()),
         content: NodeContent::ListItem { text },
@@ -780,6 +784,9 @@ fn process_heading(
 ) {
     let level = tag_name[1..].parse::<u8>().unwrap_or(1);
     let (text, annotations) = collect_annotated_text(tag, parser);
+    if text.is_empty() {
+        return;
+    }
     while state
         .group_stack
         .last()
