@@ -234,8 +234,9 @@ pub struct Tier1State {
     /// rather than risk a false negative against Tier-2's tag-stripped autolink
     /// predicate — see that bail reason's doc comment.
     ///
-    /// The last flag says that the link has a name of its own (`aria-label` or `title`).
-    /// `close_link` reads it to leave a link with a name and no text to Tier-2, which labels it.
+    /// The last flag says that the link has a name of its own (`aria-label` or `title`) or
+    /// points into its own page. `close_link` reads it to leave such a link with no text to
+    /// Tier-2, which labels the first kind and leaves the second kind out.
     pub link_stack: Vec<(Option<String>, Option<String>, bool, bool)>,
     /// Byte range of `<head>…</head>` content (between the tags) in the
     /// input the scanner walked.  Populated by the `TagKind::Ignored`

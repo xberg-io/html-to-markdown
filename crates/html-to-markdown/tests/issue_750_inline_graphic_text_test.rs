@@ -312,8 +312,8 @@ fn should_keep_a_link_around_a_graphic_with_no_text_and_name_it_as_a_browser_doe
             ConversionOptions::default(),
             "[Photo](/page)\n",
         ),
-        // ~keep Only the icon of a heading permalink is dropped: a link into its own page whose
-        // ~keep content is a graphic with no text.
+        // ~keep A link into its own page whose content gives no text is left out: the icon of a
+        // ~keep heading permalink.
         (
             format!(r##"<h2>Head<a href="#x" title="Link for this heading" aria-label="Link">{ICON}</a></h2>"##),
             ConversionOptions::default(),
@@ -337,15 +337,96 @@ fn should_keep_a_link_around_a_graphic_with_no_text_and_name_it_as_a_browser_doe
     ] {
         assert_eq!(convert_with(&html, options), expected, "{html}");
     }
-    // ~keep A permalink around an image is not the icon of a graphic: it keeps the label that a
-    // ~keep link around an image with no alt text has.
-    assert_eq!(
-        convert_plain(
-            r##"<h2>Head<a href="#x"><img src="/i.png"></a></h2>"##,
-            ConversionOptions::default()
+}
+
+#[test]
+fn should_leave_out_a_link_into_its_own_page_whose_content_gives_no_text() {
+    let with_base = || ConversionOptions {
+        base_url: Some("https://example.org/doc".to_string()),
+        ..ConversionOptions::default()
+    };
+    // ~keep One rule, whatever the empty content is and whether or not the link has a name.
+    // ~keep `convert_with` also compares the two converters for each input.
+    for (html, options, expected) in [
+        (
+            r##"<p>a<a href="#top" aria-label="Back to top"></a>b</p>"##,
+            ConversionOptions::default(),
+            "ab\n",
         ),
-        "## Head[#x](#x)\n"
-    );
+        (
+            r##"<h2>Title <a href="#id" aria-label="Link for this heading"></a></h2>"##,
+            ConversionOptions::default(),
+            "## Title\n",
+        ),
+        (
+            r##"<h2>Title <a href="#id" title="Link for this heading"><span class="icon"></span></a></h2>"##,
+            ConversionOptions::default(),
+            "## Title\n",
+        ),
+        (
+            r##"<h2>Head<a href="#x"><img src="/i.png"></a></h2>"##,
+            ConversionOptions::default(),
+            "## Head\n",
+        ),
+        (
+            r##"<p>a<a href="#top"></a>b</p>"##,
+            ConversionOptions::default(),
+            "ab\n",
+        ),
+        (
+            r##"<p>a<a href="#" aria-label="Menu"><i class="fa"></i></a>b</p>"##,
+            ConversionOptions::default(),
+            "ab\n",
+        ),
+        (
+            r#"<p>a<a href="https://example.org/doc#part" aria-label="Part"></a>b</p>"#,
+            with_base(),
+            "ab\n",
+        ),
+        // ~keep A link that leaves the page is kept and named, and a link into the page that has
+        // ~keep text is kept with its text.
+        (
+            r#"<p>a<a href="https://example.org/other#part" aria-label="Part"></a>b</p>"#,
+            with_base(),
+            "a[Part](https://example.org/other#part)b\n",
+        ),
+        (
+            r##"<p><a href="#top" aria-label="Back to top">Top</a></p>"##,
+            ConversionOptions::default(),
+            "[Top](#top)\n",
+        ),
+        (
+            r##"<p><a href="#top"><img src="/up.png" alt="Up"></a></p>"##,
+            ConversionOptions::default(),
+            "[![Up](/up.png)](#top)\n",
+        ),
+    ] {
+        assert_eq!(convert_with(html, options), expected, "{html}");
+    }
+    // ~keep With a base, the two converters agree on the address that is the page's own.
+    #[cfg(feature = "testkit")]
+    for html in [
+        r#"<p>a<a href="https://example.org/doc#part" aria-label="Part"></a>b</p>"#,
+        r#"<p>a<a href="https://example.org/doc#part"><i class="fa"></i></a>b</p>"#,
+        r#"<p>a<a href="https://example.org/other#part" aria-label="Part"></a>b</p>"#,
+    ] {
+        let on_tier = |tier_strategy| {
+            convert_plain(
+                html,
+                ConversionOptions {
+                    extract_metadata: false,
+                    highlight_style: html_to_markdown_rs::HighlightStyle::None,
+                    tier_strategy,
+                    ..with_base()
+                },
+            )
+        };
+        assert_eq!(
+            on_tier(html_to_markdown_rs::TierStrategy::Tier1),
+            on_tier(html_to_markdown_rs::TierStrategy::Tier2),
+            "the two converters differ for {html}"
+        );
+    }
 }
 
 #[test]

@@ -19,7 +19,7 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_conte
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
-    collect_link_label_text, link_accessible_name, link_holds_graphic, link_text_content, node_is_block_level,
+    collect_link_label_text, is_same_page_fragment, link_accessible_name, link_text_content, node_is_block_level,
     normalize_link_label, normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
@@ -102,39 +102,20 @@ struct LinkData<'a> {
     same_page_fragment: bool,
 }
 
-/// Whether a link address points into the page that holds the link: `#part`, or with a known
-/// base an address that differs from the base only by its fragment.
-fn is_same_page_fragment(raw_href: &str, resolved_href: &str, base: Option<&url::Url>) -> bool {
-    if raw_href.trim_start().starts_with('#') {
-        return true;
-    }
-    let without_fragment = |url: &url::Url| {
-        let mut url = url.clone();
-        url.set_fragment(None);
-        url
-    };
-    base.zip(url::Url::parse(resolved_href).ok())
-        .is_some_and(|(base, target)| {
-            target.fragment().is_some() && without_fragment(&target) == without_fragment(base)
-        })
-}
-
 impl<'a> LinkData<'a> {
     /// The name of the link apart from its content: its `aria-label`, else its `title`.
     fn accessible_name(&self) -> Option<&str> {
         link_accessible_name(self.aria_label.as_deref(), self.title.as_deref())
     }
 
-    /// Whether the link is the icon of a heading permalink: it points into its own page and
-    /// holds an inline graphic. With an empty label it is dropped; it leads nowhere else.
-    fn is_icon_permalink(&self, handler: &HandlerContext<'_>) -> bool {
-        self.same_page_fragment && link_holds_graphic(&self.children, handler.parser, handler.dom_context)
-    }
-
-    /// Whether the link is left out of the output: its label is empty, and either the
-    /// `inline_data_media` choice removed its content or it is an icon permalink.
+    /// Whether the link is left out of the output: its content gives no text, and either the
+    /// link points into its own page or the `inline_data_media` choice removed its content.
+    ///
+    /// ~keep A link into its own page with nothing to read is the icon of a heading permalink
+    /// ~keep or of a "back to top" link. It leads nowhere else, so it is left out whatever its
+    /// ~keep content is (a graphic, an empty element, nothing) and whether or not it has a name.
     fn is_dropped(&self, label: &str, handler: &HandlerContext<'_>) -> bool {
-        label.is_empty() && (handler.context.inline_data_replaced.get() || self.is_icon_permalink(handler))
+        label.is_empty() && (handler.context.inline_data_replaced.get() || self.same_page_fragment)
     }
 
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {
@@ -351,8 +332,8 @@ fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &Hand
     // ~keep names it: by its `aria-label`, then by its `title`. A named link is also kept when
     // ~keep `inline_data_media` removed its content. A link with no child node at all is named
     // ~keep too: its icon comes from a style sheet. Its own address is the last label, for a link
-    // ~keep that has content and no name.
-    if label.is_empty() && !data.is_icon_permalink(handler) {
+    // ~keep that has content and no name. A link into its own page is not named: it is left out.
+    if label.is_empty() && !data.same_page_fragment {
         if let Some(name) = data.accessible_name() {
             *label = normalize_link_label(name);
         }

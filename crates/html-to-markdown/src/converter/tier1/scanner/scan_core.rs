@@ -349,13 +349,22 @@ impl<'a> Tier1Scanner<'a> {
             1
         };
         if matches!(spec.kind, TagKind::Link) {
-            let (href, title) = extract_link_attrs(attrs)?;
-            let href = href.map(|value| self.state.resolve_url(&value).unwrap_or(value));
+            let (raw_href, title) = extract_link_attrs(attrs)?;
+            let href = raw_href
+                .as_deref()
+                .map(|value| self.state.resolve_url(value).unwrap_or_else(|| value.to_owned()));
             let aria_label = find_attr(attrs, b"aria-label").map(decode_attr).transpose()?;
             let has_name =
                 crate::converter::utility::content::link_accessible_name(aria_label.as_deref(), title.as_deref())
                     .is_some();
-            self.state.link_stack.push((href, title, false, has_name));
+            let same_page = raw_href.as_deref().zip(href.as_deref()).is_some_and(|(raw, resolved)| {
+                crate::converter::utility::content::is_same_page_fragment(
+                    raw,
+                    resolved,
+                    self.state.effective_base.as_deref(),
+                )
+            });
+            self.state.link_stack.push((href, title, false, has_name || same_page));
         }
         if name_lower == b"abbr" {
             let title = find_attr(attrs, b"title")

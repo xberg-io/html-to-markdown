@@ -20,12 +20,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   A link with no name keeps its address as its label, or its empty label when it has no child
   node. A link with
   a name is also kept when `inline_data_media = drop_element` removes its content.
+- A link into its own page whose content gives no text is left out, whatever that content is
+  (a graphic with no text, an empty element, nothing) and whether or not the link has a name. It
+  is the icon of a heading permalink or of a "back to top" link, and it leads nowhere else:
+  `<h2>Title <a href="#title"><svg>...</svg></a></h2>` gives `## Title`, and
+  `<a href="#top" aria-label="Back to top"></a>` gave `[](#top)` and gives nothing. A link into
+  its own page is `href="#part"`, or with `base_url` set an address that differs from it only by
+  the fragment. Such a link that has text is kept with its text.
 - A link whose only content is an inline `<svg>` with no text is no longer labelled `SVG Image`.
-  The link is kept and labelled by the rule above:
-  `<a href="/page" aria-label="Next"><div><svg>...</svg></div></a>` gives `[Next](/page)`. One
-  link is left out: a link into its own page that holds a graphic and gives no text, which is the
-  icon of a heading permalink. `<h2>Title <a href="#title"><svg>...</svg></a></h2>` gives
-  `## Title` ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
+  The link is kept and labelled by the first rule above:
+  `<a href="/page" aria-label="Next"><div><svg>...</svg></div></a>` gives `[Next](/page)`
+  ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
 
 ### Fixed
 
