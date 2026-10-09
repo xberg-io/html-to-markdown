@@ -1,9 +1,9 @@
 #![allow(missing_docs)]
 #![cfg(feature = "testkit")]
 
-//! White space between inline content (issues #751, #762, #778): white space in the source is one
-//! space in the output, no white space is no space, and a block boundary inside a link label or a
-//! heading separates words. Every input runs on both converters.
+//! White space between inline content (issues #751, #762, #778, #795, #800, #803): white space in
+//! the source is one space in the output, no white space is no space, and a block boundary inside
+//! a link label or a heading separates words. Every input runs on both converters.
 
 use html_to_markdown_rs::prescan::PrescanReport;
 use html_to_markdown_rs::{
@@ -486,6 +486,16 @@ fn a_link_label_gets_no_space_that_the_source_does_not_have() {
     ]);
 }
 
+/// The white space at the end of a label is one space before a period too: a browser shows
+/// `Press Go .` for the first input and `Press Go.` for the second.
+#[test]
+fn white_space_at_the_end_of_a_link_label_is_one_space_before_a_period() {
+    assert_on_both(&[
+        ("<p>Press <a href=\"/p\">Go </a>.</p>", "Press [Go](/p) .\n"),
+        ("<p>Press <a href=\"/p\">Go</a>.</p>", "Press [Go](/p).\n"),
+    ]);
+}
+
 /// A sectioning element (`<footer>`, `<section>`, `<article>`, `<aside>`, `<header>`, `<main>`)
 /// is a block. The white space that a link label starts with is no space at the start of that
 /// block, whatever lies between the element and the link.
@@ -648,6 +658,19 @@ fn white_space_at_an_end_of_a_short_quotation_is_one_space_outside_the_marks() {
         ("<ul><li>Press <q>Go </q>now.</li></ul>", "- Press \"Go\" now.\n"),
         ("<p>Press <b><q>Go </q></b>now.</p>", "Press **\"Go\"** now.\n"),
     ]);
+}
+
+/// A line break at the end of a short quotation is kept: a browser shows `now.` on a new line.
+#[test]
+fn a_line_break_at_the_end_of_a_short_quotation_is_kept() {
+    assert_on_full(&[("<p>Press <q>Go<br></q>now.</p>", "Press \"Go\"  \nnow.\n")]);
+}
+
+/// A browser writes the closing mark of a short quotation after the line end, so the line end is
+/// a space before a zero-width space: it shows `one`, a space, then the zero-width space.
+#[test]
+fn the_space_after_a_short_quotation_is_kept_before_a_zero_width_space() {
+    assert_on_full(&[("<p><q>one\n</q>\u{200b}two</p>", "\"one\" \u{200b}two\n")]);
 }
 
 /// A no-break space beside a space in a link label is one space, on both converters.

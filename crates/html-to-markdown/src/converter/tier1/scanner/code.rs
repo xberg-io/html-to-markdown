@@ -351,7 +351,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     let trim_start = clamp_to_char_boundary(dest, frame.content_start);
     let edge_spaces = take_label_edge_spaces(dest, trim_start);
     // ~keep Mirror Tier-2's `normalize_whitespace_cow` step inside
-    // `normalize_link_label` (utility/content.rs:144): any Unicode whitespace
+    // `normalize_link_label` (utility/content.rs): any Unicode whitespace
     // in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII
     // space.  Tier-1 otherwise emits `[Designed\u{a0}by](url)` where Tier-2
     // emits `[Designed by](url)`. It runs before the trim, as it does in Tier-2:
