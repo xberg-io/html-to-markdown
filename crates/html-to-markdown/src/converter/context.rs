@@ -37,6 +37,7 @@ pub struct ContextParameters {
     pub structure_collector: Option<StructureCollectorHandle>,
     pub reference_collector: Option<ReferenceCollectorHandle>,
     pub base_url: Option<Rc<url::Url>>,
+    pub own_page: crate::converter::url_resolve::OwnPage,
 }
 
 #[cfg(feature = "metadata")]
@@ -352,6 +353,9 @@ pub struct Context {
     /// `None` when `options.base_url` is unset -- every resolution call becomes a
     /// no-op then, so output is byte-identical to before this option existed.
     pub(crate) base_url: Option<Rc<url::Url>>,
+    /// The address of the page, as far as it is known. A link asks it whether it points into
+    /// the page (see `converter::url_resolve::OwnPage`).
+    pub(crate) own_page: Rc<crate::converter::url_resolve::OwnPage>,
 }
 
 impl Context {
@@ -440,6 +444,7 @@ impl Context {
             skip_visitor_hooks: false,
             measure_width_only: false,
             base_url: parameters.base_url,
+            own_page: Rc::new(parameters.own_page),
         }
     }
 

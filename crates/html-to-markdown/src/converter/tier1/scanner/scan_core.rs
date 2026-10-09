@@ -251,6 +251,17 @@ impl<'a> Tier1Scanner<'a> {
     }
 
     fn scan_svg(&mut self, name_end: usize) -> Result<bool, BailReason> {
+        // ~keep A heading writes a graphic as its text, and a link in a heading that this leaves
+        // ~keep empty is named or dropped by rules of the full converter. This scanner has none of
+        // ~keep these rules, so it leaves a page with a graphic in a heading to that converter (#766).
+        let in_heading = self
+            .state
+            .stack
+            .iter()
+            .any(|frame| matches!(frame.spec.kind, TagKind::Heading(_)));
+        if in_heading {
+            return Err(BailReason::Classifier);
+        }
         let tag_open_start = self.pos;
         let Some((close_pos, is_self_closing)) = parse::find_tag_close(self.bytes, name_end) else {
             self.pos = self.bytes.len();
@@ -338,9 +349,23 @@ impl<'a> Tier1Scanner<'a> {
             1
         };
         if matches!(spec.kind, TagKind::Link) {
-            let (href, title) = extract_link_attrs(attrs)?;
-            let href = href.map(|value| self.state.resolve_url(&value).unwrap_or(value));
-            self.state.link_stack.push((href, title, false));
+            let (raw_href, title) = extract_link_attrs(attrs)?;
+            let href = raw_href
+                .as_deref()
+                .map(|value| self.state.resolve_url(value).unwrap_or_else(|| value.to_owned()));
+            let aria_label = find_attr(attrs, b"aria-label").map(decode_attr).transpose()?;
+            let has_name =
+                crate::converter::utility::content::link_accessible_name(aria_label.as_deref(), title.as_deref())
+                    .is_some();
+            let same_page = raw_href.as_deref().zip(href.as_deref()).is_some_and(|(raw, resolved)| {
+                self.state
+                    .own_page
+                    .get_or_init(|| {
+                        crate::converter::url_resolve::OwnPage::of(self.html, self.options.base_url.as_deref())
+                    })
+                    .holds(raw, resolved)
+            });
+            self.state.link_stack.push((href, title, false, has_name || same_page));
         }
         if name_lower == b"abbr" {
             let title = find_attr(attrs, b"title")

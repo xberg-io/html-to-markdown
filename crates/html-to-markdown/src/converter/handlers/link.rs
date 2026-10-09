@@ -19,7 +19,8 @@ use crate::converter::inline::link::{MarkdownLink, append_markdown_link_in_conte
 use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::utility::content::{
-    collect_link_label_text, get_text_content, node_is_block_level, normalize_link_label, normalized_tag_name,
+    collect_link_label_text, link_accessible_name, link_text_content, node_is_block_level, normalize_link_label,
+    normalized_tag_name,
 };
 use crate::converter::utility::escaping::escape_link_label;
 use crate::options::{ConversionOptions, InlineDataMedia};
@@ -76,7 +77,7 @@ pub fn handle_link(tag: &tl::HTMLTag, mut handler: HandlerContext<'_>) {
     let mut label = build_label(&data, &handler);
     apply_label_fallbacks(&data, &mut label, &handler);
     indent_hard_break_continuations(&mut label, handler.context, handler.options);
-    let drop_link = label.is_empty() && handler.context.inline_data_replaced.get();
+    let drop_link = data.is_dropped(&label, &handler);
     let emit_deferred = emit_link(tag, &data, &label, drop_link, &mut handler);
     #[cfg(feature = "metadata")]
     record_link_metadata(tag, &data, &label, handler.context);
@@ -97,21 +98,37 @@ struct LinkData<'a> {
     href_addr_dropped: bool,
     link_allow_inline_images: bool,
     saw_block: bool,
+    aria_label: Option<Cow<'a, str>>,
+    same_page_fragment: bool,
 }
 
 impl<'a> LinkData<'a> {
+    /// The name of the link apart from its content: its `aria-label`, else its `title`.
+    fn accessible_name(&self) -> Option<&str> {
+        link_accessible_name(self.aria_label.as_deref(), self.title.as_deref())
+    }
+
+    /// Whether the link is left out of the output: its content gives no text, and either the
+    /// link points into its own page or the `inline_data_media` choice removed its content.
+    ///
+    /// ~keep A link into its own page with nothing to read is the icon of a heading permalink
+    /// ~keep or of a "back to top" link. It leads nowhere else, so it is left out whatever its
+    /// ~keep content is (a graphic, an empty element, nothing) and whether or not it has a name.
+    fn is_dropped(&self, label: &str, handler: &HandlerContext<'_>) -> bool {
+        label.is_empty() && (handler.context.inline_data_replaced.get() || self.same_page_fragment)
+    }
+
     fn new(tag: &'a tl::HTMLTag<'a>, handler: &HandlerContext<'_>) -> Option<Self> {
-        let href = tag
+        let raw_href = tag
             .attributes()
             .get("href")
             .flatten()
-            .map(|value| text::decode_attribute_value_cow(&value.as_utf8_str()).into_owned())
-            .map(|href| {
-                handler
-                    .context
-                    .resolve_url(&href, handler.node_handle, handler.parser, handler.dom_context)
-                    .unwrap_or(href)
-            })?;
+            .map(|value| text::decode_attribute_value_cow(&value.as_utf8_str()).into_owned())?;
+        let href = handler
+            .context
+            .resolve_url(&raw_href, handler.node_handle, handler.parser, handler.dom_context)
+            .unwrap_or_else(|| raw_href.clone());
+        let same_page_fragment = handler.context.own_page.holds(&raw_href, &href);
         // ~keep Empty titles are absent because Markdown serializers drop `""` on reparse.
         let title =
             crate::converter::utility::attributes::decoded_attribute(tag, "title").filter(|value| !value.is_empty());
@@ -121,7 +138,7 @@ impl<'a> LinkData<'a> {
             .map_or_else(|| tag.children().top().iter().copied().collect(), ToOwned::to_owned);
         let (inline_label, _, saw_block) = collect_link_label_text(&children, handler.parser, handler.dom_context);
         let text_source = if saw_block {
-            get_text_content(handler.node_handle, handler.parser, handler.dom_context)
+            link_text_content(&children, handler.parser, handler.dom_context)
         } else {
             inline_label.clone()
         };
@@ -139,6 +156,8 @@ impl<'a> LinkData<'a> {
                 handler.dom_context,
             ),
             link_allow_inline_images: handler.context.keep_inline_images_in.contains("a"),
+            aria_label: crate::converter::utility::attributes::decoded_attribute(tag, "aria-label"),
+            same_page_fragment,
             href,
             title,
             children,
@@ -309,7 +328,17 @@ fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &Hand
     if !data.emit_blocks_separately && label.is_empty() && !data.raw_text.is_empty() {
         *label = normalize_link_label(&data.raw_text);
     }
-    let drop_link = label.is_empty() && handler.context.inline_data_replaced.get();
+    // ~keep A link whose content gives no text, whatever that content is, is named as a browser
+    // ~keep names it: by its `aria-label`, then by its `title`. A named link is also kept when
+    // ~keep `inline_data_media` removed its content. A link with no child node at all is named
+    // ~keep too: its icon comes from a style sheet. Its own address is the last label, for a link
+    // ~keep that has content and no name. A link into its own page is not named: it is left out.
+    if label.is_empty() && !data.same_page_fragment {
+        if let Some(name) = data.accessible_name() {
+            *label = normalize_link_label(name);
+        }
+    }
+    let drop_link = data.is_dropped(label, handler);
     if label.is_empty() && !data.href.is_empty() && !data.children.is_empty() && !drop_link && !data.href_addr_dropped {
         *label = text::escape(
             &data.href,

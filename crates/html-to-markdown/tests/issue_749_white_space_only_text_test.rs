@@ -296,9 +296,11 @@ fn should_convert_the_inputs_of_the_issue_to_the_markdown_of_the_structure_off()
             "# Title\n\nbody text\n",
             3,
         ),
+        // ~keep A link into its own page whose content gives no text is left out, so this heading
+        // ~keep holds nothing and is left out with it. The structure never had a node for it.
         (
             r##"<h1>Title</h1><h2><a href="#x"> </a></h2><p>body text</p>"##,
-            "# Title\n\n## [#x](#x)\n\nbody text\n",
+            "# Title\n\nbody text\n",
             3,
         ),
         (

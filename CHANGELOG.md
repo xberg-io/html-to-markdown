@@ -7,7 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A link whose content gives no text is labelled with the name of the link: its `aria-label`,
+  then its `title`. Before, the label was the address of the link. This changes the default
+  output for every such link, with or without a graphic:
+  `<a href="/page" aria-label="Next page"><i class="fa fa-arrow"></i></a>` gave `[/page](/page)`
+  and gives `[Next page](/page)`. A link with no child node is named too:
+  `<a href="/page" aria-label="Next page"></a>` gave `[](/page)` and gives `[Next page](/page)`.
+  A link with no name keeps its address as its label, or its empty label when it has no child
+  node. A link with
+  a name is also kept when `inline_data_media = drop_element` removes its content.
+- A link into its own page whose content gives no text is left out, whatever that content is
+  (a graphic with no text, an empty element, nothing) and whether or not the link has a name. It
+  is the icon of a heading permalink or of a "back to top" link, and it leads nowhere else:
+  `<h2>Title <a href="#title"><svg>...</svg></a></h2>` gives `## Title`, and
+  `<a href="#top" aria-label="Back to top"></a>` gave `[](#top)` and gives nothing. A link is
+  into its own page when its address, after it is resolved, differs from the address of the page
+  (`base_url`) only by a fragment. A `<base>` element changes what `#part` resolves to, so on such
+  a page `#part` can name another document, and that link is kept. With no `base_url`, a written
+  `#part` is into its own page when the document has no `<base>` element; with one, the link is
+  kept. Such a link that has text is kept with its text.
+- A link whose only content is an inline `<svg>` with no text is no longer labelled `SVG Image`.
+  The link is kept and labelled by the first rule above:
+  `<a href="/page" aria-label="Next"><div><svg>...</svg></div></a>` gives `[Next](/page)`
+  ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
+
 ### Fixed
+
+- An inline `<svg>` keeps its text and no longer adds the words `SVG Image`. Its text is its
+  `aria-label`, the `<title>` and `<desc>` of the graphic, its `<text>` elements and the HTML in a
+  `<foreignObject>`, in document order. Style sheets, scripts, metadata and the content of `<defs>`
+  and `<symbol>` are not text, and a `<use>` reference is not followed. A `<switch>` gives the child
+  that a reader of English gets. An element with `display="none"` or `visibility="hidden"` gives
+  nothing, as hidden text outside a graphic gives nothing. `aria-hidden="true"` removes the label,
+  the title and the description. That text is the alt text of the image, and it is what
+  `inline_data_media = alt_text_only`, a heading and plain text output write, with the escaping of
+  any other text. A graphic with no text writes nothing there, and an image with an empty alt text
+  when the payload is kept. An icon link no longer takes the style sheet of its graphic as its
+  label ([#750](https://github.com/xberg-io/html-to-markdown/issues/750)).
+- A graphic in a heading is written as its text also with `extract_metadata = false` and
+  `highlight_style = none`. With those options it was written as a `data:` image, because the fast
+  converter has no rule for a heading. It now leaves a page with a graphic in a heading, with a
+  hidden element in a graphic, or with a link that has a name and no text, to the full converter
+  ([#766](https://github.com/xberg-io/html-to-markdown/issues/766)).
+- Two page shapes no longer take quadratic time in the pass that removes hidden elements: many
+  tag starts with no end (`<a ` repeated), and many attribute values with no closing quote
+  (`<g a="` repeated). A 120 KB page with 40,000 such tag starts in a graphic took 16 seconds;
+  200,000 of them now take 20 milliseconds. The pass reads each tag once. A `<` inside a tag is
+  part of an attribute value there, so an attribute value that holds markup is no longer cut.
+  Other page shapes are still slow
+  ([#765](https://github.com/xberg-io/html-to-markdown/issues/765)).
 
 - Text that is only white space no longer makes the conversion fail when `include_document_structure`
   is on, and `build_document_structure` no longer panics on it. The Markdown is the same as with the
