@@ -65,7 +65,7 @@
       "median_ms": 9.792242166666666,
       "mad_ms": 0.03259875000000001,
       "mb_per_s": 22.540711522261777,
-      "output_bytes": 70664
+      "output_bytes": 70731
     },
     {
       "fixture": "mdream/react-learn.html",

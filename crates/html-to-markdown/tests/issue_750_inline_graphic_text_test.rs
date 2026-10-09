@@ -406,6 +406,57 @@ fn should_name_any_link_whose_content_gives_no_text_in_both_converters() {
     }
 }
 
+#[test]
+fn should_name_a_link_that_has_no_content_at_all() {
+    // ~keep `convert_with` also compares the two converters for each input.
+    for (html, expected) in [
+        (
+            r#"<p>a <a href="/page" aria-label="Next page"></a> b</p>"#,
+            "a [Next page](/page) b\n",
+        ),
+        (
+            r#"<p>a <a href="/page" title="Go to page"></a> b</p>"#,
+            "a [Go to page](/page \"Go to page\") b\n",
+        ),
+        (
+            r#"<p>a <a href="/page" aria-label="Next page"> </a> b</p>"#,
+            "a [Next page](/page) b\n",
+        ),
+        (
+            r#"<p>a <a href="/page" aria-label="Next page"><!-- icon --></a> b</p>"#,
+            "a [Next page](/page) b\n",
+        ),
+        (
+            r#"<p>a <a href="/page" aria-label="Next page"><span></span></a> b</p>"#,
+            "a [Next page](/page) b\n",
+        ),
+        (
+            r#"<p>a <a href="/page" aria-label="Next page"><span hidden>h</span></a> b</p>"#,
+            "a [Next page](/page) b\n",
+        ),
+        (
+            r#"<ul><li><a href="https://x.com/mozdevnet" aria-label="MDN on X"></a></li></ul>"#,
+            "- [MDN on X](https://x.com/mozdevnet)\n",
+        ),
+        // ~keep No name and no child node: the label stays empty, as before.
+        (r#"<p>a <a href="/page"></a> b</p>"#, "a [](/page) b\n"),
+        (r#"<p>a <a href="/page" aria-label="  "></a> b</p>"#, "a [](/page) b\n"),
+    ] {
+        assert_eq!(convert_with(html, ConversionOptions::default()), expected, "{html}");
+    }
+    // ~keep No name, and content that gives no text: the address, as before (full converter).
+    for html in [
+        r#"<p>a <a href="/page"> </a> b</p>"#,
+        r#"<p>a <a href="/page"><span></span></a> b</p>"#,
+    ] {
+        assert_eq!(
+            convert_plain(html, ConversionOptions::default()),
+            "a [/page](/page) b\n",
+            "{html}"
+        );
+    }
+}
+
 #[cfg(feature = "metadata")]
 #[test]
 fn should_record_a_kept_link_under_the_label_the_markdown_shows() {

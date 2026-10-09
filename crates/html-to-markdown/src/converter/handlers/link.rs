@@ -349,9 +349,10 @@ fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &Hand
     }
     // ~keep A link whose content gives no text, whatever that content is, is named as a browser
     // ~keep names it: by its `aria-label`, then by its `title`. A named link is also kept when
-    // ~keep `inline_data_media` removed its content. Its own address is the last label, for a link
-    // ~keep with no name at all.
-    if label.is_empty() && !data.children.is_empty() && !data.is_icon_permalink(handler) {
+    // ~keep `inline_data_media` removed its content. A link with no child node at all is named
+    // ~keep too: its icon comes from a style sheet. Its own address is the last label, for a link
+    // ~keep that has content and no name.
+    if label.is_empty() && !data.is_icon_permalink(handler) {
         if let Some(name) = data.accessible_name() {
             *label = normalize_link_label(name);
         }

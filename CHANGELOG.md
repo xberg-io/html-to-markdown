@@ -13,7 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   then its `title`. Before, the label was the address of the link. This changes the default
   output for every such link, with or without a graphic:
   `<a href="/page" aria-label="Next page"><i class="fa fa-arrow"></i></a>` gave `[/page](/page)`
-  and gives `[Next page](/page)`. A link with no name keeps its address as its label. A link with
+  and gives `[Next page](/page)`. A link with no child node is named too:
+  `<a href="/page" aria-label="Next page"></a>` gave `[](/page)` and gives `[Next page](/page)`.
+  A link with no name keeps its address as its label, or its empty label when it has no child
+  node. A link with
   a name is also kept when `inline_data_media = drop_element` removes its content.
 - A link whose only content is an inline `<svg>` with no text is no longer labelled `SVG Image`.
   The link is kept and labelled by the rule above:
@@ -45,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`<g a="` repeated). A 120 KB page with 40,000 such tag starts in a graphic took 16 seconds;
   200,000 of them now take 20 milliseconds. The pass reads each tag once. A `<` inside a tag is
   part of an attribute value there, so an attribute value that holds markup is no longer cut.
-  Other page shapes are still slow, in other passes
+  Other page shapes are still slow
   ([#765](https://github.com/xberg-io/html-to-markdown/issues/765)).
 
 - Text that is only white space no longer makes the conversion fail when `include_document_structure`
