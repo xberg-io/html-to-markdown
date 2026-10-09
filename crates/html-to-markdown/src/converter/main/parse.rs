@@ -89,6 +89,50 @@ mod tests {
         DOM_CONTEXT_BUILDS.with(|builds| assert_eq!(builds.get(), 1));
     }
 
+    fn parse_calls_for(html: &str) -> (usize, Option<String>) {
+        let options = ConversionOptions {
+            tier_strategy: TierStrategy::Tier2,
+            ..ConversionOptions::default()
+        };
+        PARSE_CALLS.with(|calls| calls.set(0));
+        let result = convert(html, options).expect("convert HTML");
+        (PARSE_CALLS.with(std::cell::Cell::get), result.content)
+    }
+
+    #[test]
+    fn should_parse_twice_when_an_element_with_content_has_no_end_tag() {
+        let (calls, content) = parse_calls_for("<div><p>one</div>tail");
+
+        assert_eq!(content.as_deref(), Some("one\n\ntail\n"));
+        assert_eq!(calls, 2);
+    }
+
+    #[test]
+    fn should_parse_once_when_only_html_and_body_have_no_end_tag() {
+        let (calls, content) = parse_calls_for("<html><body><p>one</p><p>two</p>");
+
+        assert_eq!(content.as_deref(), Some("one\n\ntwo\n"));
+        assert_eq!(calls, 1);
+    }
+
+    #[test]
+    fn should_parse_once_when_the_open_element_has_no_content() {
+        for html in ["<p>one</p><br>", "<p>one</p><span>", "<html><body><p>one</p><hr>"] {
+            let (calls, content) = parse_calls_for(html);
+
+            assert_eq!(calls, 1, "{html:?}");
+            assert!(content.is_some_and(|content| content.starts_with("one\n")), "{html:?}");
+        }
+    }
+
+    #[test]
+    fn should_parse_once_when_an_attribute_value_holds_an_end_tag() {
+        let (calls, content) = parse_calls_for("<p>one</p><div title='</div>'></div>");
+
+        assert_eq!(content.as_deref(), Some("one\n"));
+        assert_eq!(calls, 1);
+    }
+
     #[test]
     fn should_fail_once_when_input_exceeds_parser_capacity() {
         let options = ConversionOptions {

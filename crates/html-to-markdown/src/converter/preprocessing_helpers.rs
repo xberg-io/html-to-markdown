@@ -132,6 +132,10 @@ fn child_misnest_state(info: &TagInfo, state: MisnestState, self_inside_preforma
 /// ~keep accounted for essentially all of it, confirmed via phase timing in
 /// ~keep `tools/benchmark-harness/examples/profile_deep_nesting_phases.rs`).
 pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
+    if has_omitted_end_tag(dom_ctx, parser) {
+        return true;
+    }
+
     let mut stack: Vec<(tl::NodeHandle, MisnestState)> = dom_ctx
         .root_children
         .iter()
@@ -188,6 +192,46 @@ pub fn has_inline_block_misnest(dom_ctx: &DomContext, parser: &tl::Parser) -> bo
     }
 
     false
+}
+
+/// True when an element with content is still open at the end of the input, so the HTML tree
+/// builder must decide where it ends.
+///
+/// ~keep `tl` closes an element only for an end tag that names the element on top of its stack
+/// ~keep and discards every other end tag (astral-tl `parser/base.rs`, `read_end`). In
+/// ~keep `<div><p>text</div>` the `div` and the `p` stay open and take the rest of the page as
+/// ~keep descendants (issue #772). The open elements are the stack of `tl` at the end of the
+/// ~keep input: the last root node, its last child, and so on, so the walk is O(depth).
+/// ~keep `html` and `body` are exempt: their end tags close no element in the standard.
+fn has_omitted_end_tag(dom_ctx: &DomContext, parser: &tl::Parser) -> bool {
+    let mut last = dom_ctx.root_children.last().copied();
+    while let Some(handle) = last {
+        let Some(tl::Node::Tag(tag)) = handle.get(parser) else {
+            return false;
+        };
+        if has_end_tag(tag) {
+            return false;
+        }
+        let children = dom_ctx.children_of(handle.get_inner());
+        let has_content = children.is_some_and(|children| !children.is_empty());
+        let name = tag.name().as_bytes();
+        if has_content && !name.eq_ignore_ascii_case(b"html") && !name.eq_ignore_ascii_case(b"body") {
+            return true;
+        }
+        last = children.and_then(|children| children.last().copied());
+    }
+    false
+}
+
+/// True when the source range of `tag` ends with its end tag. For an element that `tl` never
+/// closed, the range is the start tag alone.
+fn has_end_tag(tag: &tl::HTMLTag<'_>) -> bool {
+    let name = tag.name().as_bytes();
+    tag.raw()
+        .as_bytes()
+        .strip_suffix(b">")
+        .and_then(|raw| raw.strip_suffix(name))
+        .is_some_and(|raw| raw.ends_with(b"</"))
 }
 
 /// True if `child`, as a direct child of a `<table>` element, is content that a
