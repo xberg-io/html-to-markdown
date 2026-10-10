@@ -570,6 +570,9 @@ pub(super) fn repair_with_html5ever_bounded(input: &str) -> Option<(String, Opti
 /// start tag. The lightweight parser preserves source nesting, so its tree needs this targeted
 /// repair before either conversion tier reads metadata or renders the body.
 pub fn repair_head_content_before_explicit_head(input: &str) -> Option<(String, Option<crate::types::WarningKind>)> {
+    if super::repair_detection::needs_source_tree_repair(input) {
+        return repair_with_html5ever_bounded(input);
+    }
     let head_start = last_start_tag(input.as_bytes(), b"head")?;
     const HEAD_CONTENT: [&[u8]; 11] = [
         b"base",

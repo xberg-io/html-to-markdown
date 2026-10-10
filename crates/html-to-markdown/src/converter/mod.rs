@@ -137,3 +137,5 @@ pub use crate::converter::utility::content::{
 pub use crate::converter::utility::serialization::{serialize_node, serialize_node_to_html};
 
 pub use crate::converter::utility::siblings::append_inline_suffix;
+
+mod repair_detection;
