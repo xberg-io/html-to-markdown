@@ -173,6 +173,46 @@ fn a_line_break_before_white_space_in_an_element_is_one_space_in_each_container(
     ]);
 }
 
+/// The line end is the same line end when a character reference writes it.
+#[test]
+fn a_no_break_space_stays_after_a_line_end_written_as_a_character_reference() {
+    assert_on_both(&[
+        ("<p>one&#10;<span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
+        ("<p>one&#xA;<span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
+        ("<p>one&#x0a;<span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
+        ("<ul><li>one&#10;<span>&nbsp;</span>two</li></ul>", "- one \u{a0}two\n"),
+    ]);
+}
+
+/// A comment between the line end and the element is no text.
+#[test]
+fn a_no_break_space_stays_after_a_line_end_that_a_comment_follows() {
+    assert_on_both(&[
+        ("<p>one\n<!--c--><span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
+        ("<p>one\n<!--c--><!--d--><span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
+        ("<p>one&#10;<!--c--><span>&nbsp;</span>two</p>", "one \u{a0}two\n"),
+        (
+            "<ul><li>one\n<!--c--><span>&nbsp;</span>two</li></ul>",
+            "- one \u{a0}two\n",
+        ),
+    ]);
+}
+
+/// A space of the source decides as before on the full converter, with a comment after it too.
+///
+/// ~keep The two converters differ for these inputs, at the base too: the fast converter keeps
+/// ~keep the no-break space. This test pins only that the line end rule leaves the full one alone.
+#[test]
+fn a_no_break_space_goes_after_a_space_of_the_source_in_every_spelling() {
+    for html in [
+        "<p>one <span>&nbsp;</span>two</p>",
+        "<p>one&#32;<span>&nbsp;</span>two</p>",
+        "<p>one <!--c--><span>&nbsp;</span>two</p>",
+    ] {
+        assert_eq!(tier2(html), "one two\n", "{html}");
+    }
+}
+
 /// The element that follows the line end holds text: the same space in each container.
 #[test]
 fn a_line_break_before_a_filled_inline_element_is_a_space_in_each_container() {
@@ -386,6 +426,39 @@ fn a_run_of_line_ends_before_a_zero_width_space_is_no_space() {
             "| one\u{200b}two |\n| ------- |\n",
         ),
     ]);
+}
+
+/// The rule has two sides: a line end after a zero-width space is no space either. Chrome shows
+/// `one`, the zero-width space and `y` for each input outside `pre`.
+#[test]
+fn a_line_end_after_a_zero_width_space_is_no_space() {
+    assert_on_both(&[
+        ("<div>one\u{200b}\n<b>y</b></div>", "one\u{200b}**y**\n"),
+        ("<div>one&#8203;\n<b>y</b></div>", "one\u{200b}**y**\n"),
+        ("<div>one&#x200B;\n<b>y</b></div>", "one\u{200b}**y**\n"),
+        ("<div>one\u{200b} \n <b>y</b></div>", "one\u{200b}**y**\n"),
+        ("<ul><li>one\u{200b}\n<b>y</b></li></ul>", "- one\u{200b}**y**\n"),
+        // ~keep A space that is no line end stays, and `pre` keeps its line end.
+        ("<div>one\u{200b} <b>y</b></div>", "one\u{200b} **y**\n"),
+        ("<pre>one\u{200b}\n<span>y</span></pre>", "```\none\u{200b}\ny\n```\n"),
+    ]);
+}
+
+/// A block in code writes its blank line on the fast converter, after a line end of the source
+/// too: the rule for the space at an element start does not take the separator of the block.
+///
+/// ~keep This row pins the output of the base on the fast converter, where the two converters
+/// ~keep differ: the full converter writes `y` with no code marks. Chrome shows `one`, a blank
+/// ~keep line and `y`.
+#[test]
+fn a_block_in_code_after_a_line_end_keeps_its_blank_line_on_the_fast_converter() {
+    for html in [
+        "<p>one\n<kbd><div>y</div></kbd></p>",
+        "<p>one\n  <kbd><div>y</div></kbd></p>",
+    ] {
+        let written = tier1::run(html, &PrescanReport::default(), &tier_options());
+        assert_eq!(written.as_deref().ok(), Some("one\n\n`y`\n"), "{html}");
+    }
 }
 
 /// A text of a form feed and a line end is white space for the fast converter, so the comment

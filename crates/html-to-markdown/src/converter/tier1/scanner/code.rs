@@ -52,7 +52,10 @@ fn close_code(
     let (leading, content, trailing) = code_span_parts(&buf[content_start..], trim_boundary_whitespace);
     buf.truncate(content_start);
     // ~keep White space on both sides of the element start is one run: Tier-2's `push_inline_prefix`.
-    if crate::converter::utility::white_space::space_is_owed(buf) {
+    // ~keep A line end in `leading` is no white space of the source: a block in the code wrote
+    // ~keep its separator across the start of the content (`one\n<kbd><div>y</div></kbd>`), or a
+    // ~keep `<br>` its split marker. It is written as before the rules of running text.
+    if leading.contains('\n') || crate::converter::utility::white_space::space_is_owed(buf) {
         buf.push_str(&leading);
     }
 

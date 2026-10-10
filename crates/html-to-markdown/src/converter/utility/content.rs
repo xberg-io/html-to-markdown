@@ -225,6 +225,20 @@ pub fn without_trailing_line_end_in_source(raw: &str) -> Option<&str> {
     (has_line_end && !kept.is_empty()).then_some(kept)
 }
 
+/// Whether the source text `raw` ends with a zero-width space, written as the character or as
+/// a character reference (`one&#8203;`, `one&#x200B;`, `one&ZeroWidthSpace;`).
+///
+/// ~keep Tier-1 asks for the character before a line end (rule 2 of `white_space`); Tier-2 reads
+/// ~keep the last character of its decoded text. Only the text from the last `&` on is decoded:
+/// ~keep a reference ends where the text ends, and `&amp;#8203;` is the text `&#8203;`.
+#[must_use]
+pub fn ends_with_zero_width_space_in_source(raw: &str) -> bool {
+    raw.rfind('&').map_or_else(
+        || raw.ends_with(ZERO_WIDTH_SPACE),
+        |start| text::decode_html_entities_cow(&raw[start..]).ends_with(ZERO_WIDTH_SPACE),
+    )
+}
+
 /// Whether an element only wraps its text: it writes no content of its own, so the text after
 /// a line end can start inside it or after it when it is empty.
 #[must_use]
@@ -544,7 +558,7 @@ pub const fn floor_char_boundary(s: &str, index: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::without_trailing_line_end_in_source;
+    use super::{ends_with_zero_width_space_in_source, without_trailing_line_end_in_source};
 
     #[test]
     fn a_source_text_that_ends_with_a_line_end_loses_its_trailing_white_space() {
@@ -589,6 +603,30 @@ mod tests {
             "&#32;&#10;\n",
         ] {
             assert_eq!(without_trailing_line_end_in_source(raw), None, "{raw:?}");
+        }
+    }
+
+    #[test]
+    fn a_source_text_ends_with_a_zero_width_space_as_a_character_or_a_reference() {
+        for raw in [
+            "one\u{200b}",
+            "one&#8203;",
+            "one&#x200B;",
+            "one&#x200b;",
+            "a &amp; b\u{200b}",
+            "a & b&#8203;",
+        ] {
+            assert!(ends_with_zero_width_space_in_source(raw), "{raw:?}");
+        }
+        for raw in [
+            "one",
+            "",
+            "one\u{200b}two",
+            "one&amp;#8203;",
+            "one&#8203;two",
+            "one&#82030;",
+        ] {
+            assert!(!ends_with_zero_width_space_in_source(raw), "{raw:?}");
         }
     }
 }

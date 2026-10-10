@@ -92,10 +92,10 @@ impl<'a> Tier1Scanner<'a> {
         // ~keep becomes, so a text that ends with no line end does not scan: each scan passes
         // ~keep the open tags of the elements that only wrap text, and a run of them on every
         // ~keep text made the converter four times slower on deep nesting.
-        let ends_with_line_end = crate::converter::utility::content::without_trailing_line_end_in_source(
+        let before_line_end = crate::converter::utility::content::without_trailing_line_end_in_source(
             &self.html[self.text_start..self.pos],
-        )
-        .is_some();
+        );
+        let ends_with_line_end = before_line_end.is_some();
         let upcoming = UpcomingTextSibling {
             is_list: upcoming_tag_is_list_open(self.bytes, self.pos),
             is_img: upcoming_tag_is_named(self.bytes, self.pos, b"img"),
@@ -104,8 +104,11 @@ impl<'a> Tier1Scanner<'a> {
             inline_starts_with_block: ends_with_line_end
                 && (is_inline || inline_follows_comments)
                 && upcoming_inline_starts_with_block(self.bytes, self.pos),
-            line_end_meets_zero_width_space: ends_with_line_end
-                && zero_width_space_is_upcoming(self.html, self.pos, &self.state.stack),
+            // ~keep Rule 2 has two sides: the character before the line end, or the one after it.
+            line_end_meets_zero_width_space: before_line_end.is_some_and(|text| {
+                crate::converter::utility::content::ends_with_zero_width_space_in_source(text)
+                    || zero_width_space_is_upcoming(self.html, self.pos, &self.state.stack)
+            }),
         };
         flush_text(
             &mut self.state,
@@ -505,9 +508,10 @@ impl<'a> Tier1Scanner<'a> {
             self.text_start = self.pos;
             return Ok(());
         }
-        let (close_start, close_end) = match find_close_tag_range(self.bytes, open_end, name_lower) {
-            Some(pair) => pair,
-            None => (self.bytes.len(), self.bytes.len()),
+        // ~keep With no end tag, the start tag of the body content ends the `<head>`; only the
+        // ~keep HTML tree builder knows where, so Tier-2 converts the document (issue #772).
+        let Some((close_start, close_end)) = find_close_tag_range(self.bytes, open_end, name_lower) else {
+            return Err(BailReason::EofWithOpenBlock { open_count: 1 });
         };
         if self.state.head_range.is_none() {
             self.state.head_range = Some(open_end..close_start);

@@ -52,11 +52,9 @@ pub fn get_previous_sibling_tag<'a>(
     None
 }
 
-/// The block element the content before `node_handle` in its parent ends with: the previous
-/// sibling when it is a block, or the block an inline sibling's own last content ends with
-/// (`<span><ul>...</ul></span>`). Whitespace text and comments are skipped (issue #585).
 /// Whether the text before `node_handle` in document order ends with a line end: its previous
-/// sibling, or the text before the inline element it is the first child of.
+/// sibling, or the text before the inline element it is the first child of. A comment is no
+/// text, and the text is read decoded: `one&#10;` and `one\n<!--c-->` end with a line end.
 ///
 /// ~keep The space a line end makes before an inline element is the claim of the inline white
 /// ~keep space rules; a no-break blank after it stays (`one\n<span>&nbsp;</span>two`), where one
@@ -79,11 +77,15 @@ fn previous_text_ends_with_line_end(mut id: u32, parser: &tl::Parser, dom_ctx: &
                 .iter()
                 .position(|handle: &tl::NodeHandle| handle.get_inner() == id)
         })?;
-        if let Some(previous) = position.checked_sub(1).and_then(|before| siblings.get(before)) {
-            return Some(match previous.get(parser) {
-                Some(tl::Node::Raw(raw)) => raw.as_utf8_str().ends_with(['\n', '\r']),
-                _ => false,
-            });
+        for previous in siblings.iter().take(position).rev() {
+            match previous.get(parser) {
+                Some(tl::Node::Comment(_)) => {}
+                Some(tl::Node::Raw(raw)) => {
+                    let source = raw.as_utf8_str();
+                    return Some(crate::text::decode_html_entities_cow(&source).ends_with(['\n', '\r']));
+                }
+                _ => return Some(false),
+            }
         }
         let parent_id = parent?;
         if !dom_ctx
@@ -96,6 +98,9 @@ fn previous_text_ends_with_line_end(mut id: u32, parser: &tl::Parser, dom_ctx: &
     }
 }
 
+/// The block element the content before `node_handle` in its parent ends with: the previous
+/// sibling when it is a block, or the block an inline sibling's own last content ends with
+/// (`<span><ul>...</ul></span>`). Whitespace text and comments are skipped (issue #585).
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn previous_content_block<'a>(
     node_handle: &tl::NodeHandle,
