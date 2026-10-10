@@ -137,10 +137,18 @@ pub fn space_is_owed(written: &str) -> bool {
 ///
 /// ~keep `one <b> two</b>` has white space on both sides of the element start. It is one run,
 /// ~keep so it is one space, and it goes outside the marks: `** two**` is not strong text.
-pub fn push_inline_prefix(output: &mut String, prefix: &str) {
-    if space_is_owed(output) {
+/// ~keep The strict mode keeps the white space of the source, so there the prefix is always written.
+pub fn push_inline_prefix(output: &mut String, prefix: &str, options: &crate::options::ConversionOptions) {
+    if keeps_source_white_space(options) || space_is_owed(output) {
         output.push_str(prefix);
     }
+}
+
+/// Whether the strict white space mode is on. That mode keeps the white space of the source, so
+/// no rule that collapses white space or moves it out of an element applies.
+#[must_use]
+pub const fn keeps_source_white_space(options: &crate::options::ConversionOptions) -> bool {
+    matches!(options.whitespace_mode, crate::options::WhitespaceMode::Strict)
 }
 
 /// Whether the content of a link label starts with white space, and whether it ends with it.

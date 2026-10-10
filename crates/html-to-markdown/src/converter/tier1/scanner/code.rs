@@ -52,7 +52,9 @@ fn close_code(
     let (leading, content, trailing) = code_span_parts(&buf[content_start..], trim_boundary_whitespace);
     buf.truncate(content_start);
     // ~keep White space on both sides of the element start is one run: Tier-2's `push_inline_prefix`.
-    crate::converter::utility::content::push_inline_prefix(buf, &leading);
+    if crate::converter::utility::content::space_is_owed(buf) {
+        buf.push_str(&leading);
+    }
 
     let mut first = true;
     for segment in content.split('\n').filter(|segment| !segment.is_empty()) {

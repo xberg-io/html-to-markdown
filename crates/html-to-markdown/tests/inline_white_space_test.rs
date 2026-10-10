@@ -792,6 +792,48 @@ fn a_sectioning_element_keeps_an_indent_and_strict_white_space() {
     assert_eq!(strict, "x\n\n Logo\n");
 }
 
+/// The strict white space mode keeps the white space of the source. No rule of running text
+/// applies there: each row is the output that the strict mode had before those rules. The strict
+/// mode always runs on the full converter.
+#[test]
+fn the_strict_mode_writes_what_it_wrote_before_the_rules_of_running_text() {
+    let cases = [
+        // ~keep The white space at an end of a link label writes no space outside the link.
+        ("<p>Press <a href=\"/p\">Go </a> now</p>", "Press [Go](/p) now\n"),
+        ("<p><a href=\"/p\"> Go </a>now</p>", "[Go](/p)now\n"),
+        // ~keep A marked element writes the white space it starts with, also after a space.
+        ("<p>one <b> y</b>two</p>", "one  **y**two\n"),
+        // ~keep A short quotation writes nothing outside its marks.
+        ("<p>Press <q> Go </q> now</p>", "Press \"Go\" now\n"),
+        ("<p>Press<q>Go<br></q>now</p>", "Press\"Go\"now\n"),
+        // ~keep A block boundary in a heading writes no space of its own.
+        ("<h2>x<footer> Logo</footer></h2>", "## x Logo\n"),
+        // ~keep Two children of a link label that touch get one space when a block is among them.
+        (
+            "<a href=\"/x\"><b>H</b>ello<div>x</div></a>",
+            "[**H** ello x](/x)\n",
+        ),
+    ];
+    let wrong: Vec<String> = cases
+        .iter()
+        .flat_map(|(html, expected)| {
+            [TierStrategy::Tier2, TierStrategy::default()].map(|tier_strategy| {
+                let actual = convert_with(
+                    html,
+                    Some(ConversionOptions {
+                        whitespace_mode: WhitespaceMode::Strict,
+                        tier_strategy,
+                        ..tier_options()
+                    }),
+                );
+                (actual != *expected).then(|| format!("{html:?}\n  expected {expected:?}\n  actual   {actual:?}"))
+            })
+        })
+        .flatten()
+        .collect();
+    assert!(wrong.is_empty(), "{} wrong:\n{}", wrong.len(), wrong.join("\n"));
+}
+
 /// A short quotation is written without the white space at its two ends too, and that white
 /// space is one space outside the quotation marks. The fast converter does not write these marks.
 #[test]

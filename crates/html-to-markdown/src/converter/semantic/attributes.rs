@@ -273,8 +273,14 @@ pub fn handle_q(
         }
         // ~keep The white space at the two ends of the quotation is white space between two
         // ~keep words: it is one space outside the marks, as for every inline element (#800).
-        let (prefix, suffix, trimmed) = chomp_inline(&content);
-        crate::converter::utility::content::push_inline_prefix(output, prefix);
+        // ~keep The strict mode writes the marks around the trimmed content and nothing outside them.
+        let strict = crate::converter::utility::content::keeps_source_white_space(handler.options);
+        let (prefix, suffix, trimmed) = if strict {
+            ("", "", content.trim())
+        } else {
+            chomp_inline(&content)
+        };
+        crate::converter::utility::content::push_inline_prefix(output, prefix, handler.options);
         output.push('"');
         output.push_str(trimmed);
         output.push('"');

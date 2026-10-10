@@ -20,8 +20,8 @@ use crate::converter::main::walk_node;
 use crate::converter::media::inline_data_treatment;
 use crate::converter::text_node::is_fresh_block_start;
 use crate::converter::utility::content::{
-    collect_link_label_text, label_edge_spaces, link_accessible_name, link_text_content, node_is_block_level,
-    normalize_link_label, normalized_tag_name, push_inline_prefix,
+    collect_link_label_text, keeps_source_white_space, label_edge_spaces, link_accessible_name, link_text_content,
+    node_is_block_level, normalize_link_label, normalized_tag_name, push_inline_prefix,
 };
 use crate::converter::utility::escaping::escape_link_label;
 use crate::converter::utility::siblings::append_inline_suffix;
@@ -328,19 +328,22 @@ fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool 
 /// ~keep A code span keeps the white space of its text, so there the space of a label is not
 /// ~keep written a second time. A `<pre>` block shows the label as it is written and keeps it.
 fn push_space_before_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
-    if edge_spaces.0 && !in_code_span(handler.context) {
-        push_inline_prefix(handler.output, " ");
+    if edge_spaces.0 && writes_label_edge_spaces(handler) {
+        push_inline_prefix(handler.output, " ", handler.options);
     }
 }
 
-/// Whether the link is in a code span: in code, and not in a `<pre>` block.
-const fn in_code_span(context: &Context) -> bool {
-    context.in_code && !context.in_code_block
+/// Whether the link writes the white space at the ends of its label outside the link: not in a
+/// code span (in code, and not in a `<pre>` block), and not in the strict white space mode,
+/// where the link is written as it was before that rule.
+const fn writes_label_edge_spaces(handler: &HandlerContext<'_>) -> bool {
+    let in_code_span = handler.context.in_code && !handler.context.in_code_block;
+    !in_code_span && !keeps_source_white_space(handler.options)
 }
 
 /// Writes the white space that the content of a link ends with as one space after the link.
 fn push_space_after_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
-    if edge_spaces.1 && !in_code_span(handler.context) {
+    if edge_spaces.1 && writes_label_edge_spaces(handler) {
         append_inline_suffix(
             handler.output,
             " ",
@@ -420,6 +423,7 @@ fn walk_label_content(
     handler: &HandlerContext<'_>,
 ) -> String {
     let link_context = label_context(data, handler, convert_as_inline);
+    let strict = keeps_source_white_space(handler.options);
     let mut content = String::new();
     let mut after_image = false;
     for child in children {
@@ -442,7 +446,14 @@ fn walk_label_content(
             .dom_context
             .tag_info(child.get_inner(), handler.parser)
             .is_some_and(|info| matches!(info.name.as_str(), "img" | "picture" | "svg"));
-        if (is_image || after_image) && words_touch_at(&content, child_start) {
+        // ~keep The strict mode writes no space at a block boundary (`separate_from_block`). It
+        // ~keep keeps the rule that a label had before: one space between two children that touch.
+        let separate = if strict {
+            texts_touch_at(&content, child_start)
+        } else {
+            (is_image || after_image) && words_touch_at(&content, child_start)
+        };
+        if separate {
             content.insert(child_start, ' ');
         }
         after_image = is_image;
@@ -450,17 +461,24 @@ fn walk_label_content(
     content
 }
 
-/// Whether two words touch at the byte offset `at` of `content`: no white space on either side,
-/// no opening punctuation before it and no closing punctuation after it.
+/// Whether two texts touch at the byte offset `at` of `content`: no white space on either side.
 ///
 /// ~keep A child can shorten the label (a block trims the white space before it), so `at` can
 /// ~keep lie past the end or inside a character: then nothing touches there.
-fn words_touch_at(content: &str, at: usize) -> bool {
+fn texts_touch_at(content: &str, at: usize) -> bool {
     let (Some(before), Some(after)) = (content.get(..at), content.get(at..)) else {
         return false;
     };
-    before.ends_with(|character: char| !character.is_whitespace() && !"([{".contains(character))
-        && after.starts_with(|character: char| !character.is_whitespace() && !".,;:!?)]}".contains(character))
+    before.ends_with(|character: char| !character.is_whitespace())
+        && after.starts_with(|character: char| !character.is_whitespace())
+}
+
+/// Whether two words touch at the byte offset `at` of `content`: two texts touch there, with no
+/// opening punctuation before it and no closing punctuation after it.
+fn words_touch_at(content: &str, at: usize) -> bool {
+    texts_touch_at(content, at)
+        && !content[..at].ends_with(['(', '[', '{'])
+        && !content[at..].starts_with(['.', ',', ';', ':', '!', '?', ')', ']', '}'])
 }
 
 fn apply_label_fallbacks(data: &LinkData<'_>, label: &mut String, handler: &HandlerContext<'_>) {
