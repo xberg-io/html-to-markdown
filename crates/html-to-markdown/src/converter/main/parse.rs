@@ -2,6 +2,7 @@ use super::preprocess_repaired_html;
 use crate::converter::DomContext;
 use crate::converter::main_helpers::{repair_with_html5ever, repair_with_html5ever_within_depth};
 use crate::converter::preprocessing_helpers::{has_inline_block_misnest, has_omitted_end_tag};
+use crate::converter::url_resolve::has_start_tag;
 use crate::converter::utility::caching::build_dom_context;
 use crate::error::{ConversionError, Result};
 
@@ -51,7 +52,10 @@ pub(super) fn parse_for_conversion<'a>(
     if *attempted_misnest_repair {
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     }
-    let omitted_end_tag = has_omitted_end_tag(&dom_ctx, parser);
+    // ~keep In a frameset document the tree builder drops the text after `</frameset>`, which
+    // ~keep the first parse keeps. `tl` also leaves a `<frame>` open, so such a page looks like
+    // ~keep one with no end tag when every end tag is written. It keeps the first parse.
+    let omitted_end_tag = has_omitted_end_tag(&dom_ctx, parser) && !has_start_tag(input.as_bytes(), b"frameset");
     if !omitted_end_tag && !has_inline_block_misnest(&dom_ctx, parser) {
         return Ok(ParseOutcome::Ready { dom, dom_ctx });
     }
@@ -176,6 +180,23 @@ mod tests {
 
         assert_eq!(content.as_deref(), Some("one\n"));
         assert_eq!(calls, 1);
+    }
+
+    #[test]
+    fn should_parse_once_when_the_page_writes_a_frameset() {
+        // ~keep `tl` leaves a `<frame>` open, so the first page looks like one with no end tag.
+        for (html, expected) in [
+            (
+                "<frameset><frame></frameset><div><p>one</p></div><p>tail</p>",
+                "one\n\ntail\n",
+            ),
+            ("<FRAMESET></FRAMESET><div><p>one</div>tail", "onetail\n"),
+        ] {
+            let (calls, content) = parse_calls_for(html);
+
+            assert_eq!(content.as_deref(), Some(expected), "{html:?}");
+            assert_eq!(calls, 1, "{html:?}");
+        }
     }
 
     type Events = std::sync::Arc<std::sync::Mutex<Vec<(tracing::Level, String)>>>;

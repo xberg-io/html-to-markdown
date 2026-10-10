@@ -538,3 +538,41 @@ fn a_body_start_tag_after_content_keeps_the_header_in_front_of_it() {
         assert_eq!(depth_warnings, 0);
     }
 }
+
+/// ~keep In a frameset document the HTML tree builder drops everything after `</frameset>` and
+/// ~keep everything in the frameset but a `<noframes>`. The converter wrote that text before
+/// ~keep issue #772, so a page that writes a `<frameset>` start tag does not take the second
+/// ~keep parse. Each expected string is the output before issue #772, not the tree of a browser.
+#[test]
+fn a_frameset_page_keeps_the_text_that_the_tree_builder_drops() {
+    for (html, expected) in [
+        (
+            "<frameset><frame></frameset><div><p>one</p></div><p>tail</p>",
+            "one\n\ntail\n",
+        ),
+        ("<frameset><frame></frameset>tail", "tail\n"),
+        ("<frameset></frameset><div><p>one</p></div><p>tail</p>", "one\n\ntail\n"),
+        (
+            "<frameset><frame><noframes><p>one</p></noframes></frameset><div><p>two</p></div>tail",
+            "one\n\ntwo\n\ntail\n",
+        ),
+    ] {
+        assert_default_and_tier2(html, expected);
+    }
+}
+
+/// ~keep Not covered by issue #772: the omitted end tag of a frameset page is not repaired, so
+/// ~keep the tail still joins the paragraph, as before.
+#[test]
+fn a_frameset_page_with_an_omitted_end_tag_converts_as_before() {
+    for (html, expected) in [
+        ("<frameset><frame></frameset><div><p>one</div>tail", "onetail\n"),
+        ("<frameset></frameset><div><p>one</div>tail", "onetail\n"),
+        (
+            "<frameset><frame><noframes><p>one</noframes></frameset><div><p>two</div>tail",
+            "one\n\ntwotail\n",
+        ),
+    ] {
+        assert_default_and_tier2(html, expected);
+    }
+}

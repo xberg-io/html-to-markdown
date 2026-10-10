@@ -120,8 +120,7 @@ impl AnchorOriginStamper {
 
     /// True when the tree already holds a `<body>`.
     fn has_body(&self) -> bool {
-        child_element(&self.inner.sink.document, "html")
-            .is_some_and(|html| child_element(&html, "body").is_some())
+        child_element(&self.inner.sink.document, "html").is_some_and(|html| child_element(&html, "body").is_some())
     }
 
     fn stamp_anchor(&self, tag: &mut Tag) {
