@@ -332,7 +332,6 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     // already been folded to a space regardless of the link, and a marker kept at the
     // label's edge here would only survive as a stray trailing space.
     let keeps_boundary_hard_breaks = !state.escape_ctx.contains(EscapeCtx::HEADING) && !state.in_table_cell();
-    let in_code_span = state.escape_ctx.contains(EscapeCtx::CODE) && !state.escape_ctx.contains(EscapeCtx::PRE);
     let marker = crate::converter::main_helpers::hard_break_marker(options);
     let dest = state.cell_or_output_mut();
     // ~keep Trim the whitespace inside the link label so `[text  ](url)` collapses to
@@ -343,10 +342,8 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     if !keeps_boundary_hard_breaks {
         fold_label_hard_breaks(dest, trim_start, marker);
     }
+    // ~keep No link closes in code here: `prepare_open_state` leaves a link in code to Tier-2.
     let edge_spaces = take_label_edge_spaces(dest, trim_start);
-    // ~keep A code span keeps the white space of its text, so the space of a label is not
-    // ~keep written a second time outside a link there, as in Tier-2 (`handlers/link.rs`).
-    let link_edge_spaces = if in_code_span { (false, false) } else { edge_spaces };
     // ~keep Mirror Tier-2's `normalize_whitespace_cow` step inside
     // `normalize_link_label` (utility/content.rs): any Unicode whitespace
     // in the link label (notably NBSP `\u{00a0}`) collapses to a single ASCII
@@ -365,7 +362,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     let link_start = trim_start.saturating_sub(1);
     if let Some(href_str) = href.as_deref() {
         if try_emit_autolink(dest, trim_start, frame, href_str, has_nested_tag, options)? {
-            push_label_edge_spaces(dest, link_start, link_edge_spaces);
+            push_label_edge_spaces(dest, link_start, edge_spaces);
             return Ok(());
         }
     }
@@ -380,7 +377,7 @@ fn close_link(state: &mut Tier1State, frame: &OpenTag, options: &ConversionOptio
     }
     if let Some(href) = href {
         emit_markdown_link_close(dest, trim_start, &href, title.as_deref(), options);
-        push_label_edge_spaces(dest, link_start, link_edge_spaces);
+        push_label_edge_spaces(dest, link_start, edge_spaces);
         // ~keep A link with no text still writes `[](href)`: content, as in Tier-2's `convert_node`.
         state.end_document_start_if_written(link_start);
     } else {

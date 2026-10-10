@@ -231,10 +231,11 @@ fn a_line_break_at_an_end_of_a_link_label_is_one_space_outside_the_link_in_a_hea
 }
 
 /// A code span keeps the white space of its text. The white space at an end of a link label is
-/// not written a second time outside the link there. A `<pre>` block keeps it, as a browser does.
+/// not written a second time outside the link there. The fast converter gives a link in a code
+/// span to the full one.
 #[test]
 fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
-    assert_on_both(&[
+    assert_on_full(&[
         (
             "<p><code>Press <a href=\"/p\"> Go </a> now</code></p>",
             "`Press [Go](/p) now`\n",
@@ -260,11 +261,30 @@ fn white_space_at_an_end_of_a_link_label_is_not_moved_in_a_code_span() {
         ),
         // ~keep A link with no address is running text of the span, with its white space.
         ("<p><code>Press<a>Go </a>now</code></p>", "`PressGo now`\n"),
-        // ~keep A `<pre>` block shows the label as it is written.
+    ]);
+}
+
+/// In `<pre>`, `<code>`, `<kbd>` and `<samp>` no rule of running text runs. Each row pins the
+/// output of the full converter before those rules, not the output of a browser. The fast
+/// converter gives a link or a block in such an element to the full one.
+#[test]
+fn the_rules_of_running_text_do_not_run_in_code() {
+    assert_on_full(&[
+        (
+            "<pre>Press<a href=\"/p\">Go </a>now</pre>",
+            "```\nPress[Go](/p)now\n```\n",
+        ),
         (
             "<pre>Press<a href=\"/p\"> Go </a>now</pre>",
-            "```\nPress [Go](/p) now\n```\n",
+            "```\nPress[Go](/p)now\n```\n",
         ),
+        ("<pre>Press<q> Go </q>now</pre>", "```\nPress\"Go\"now\n```\n"),
+        (
+            "<pre>one\n<a href=\"/y\">t<div>y</div></a></pre>",
+            "```\none\n[t y](/y)\n```\n",
+        ),
+        ("<p><kbd>Press<a name=\"n\">Go </a> now</kbd></p>", "`PressGo now`\n"),
+        ("<pre>x<section> a</section></pre>", "```\nx\n\n a\n```\n"),
     ]);
 }
 

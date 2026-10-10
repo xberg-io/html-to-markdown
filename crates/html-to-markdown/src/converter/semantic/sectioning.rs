@@ -63,7 +63,7 @@ pub fn handle(
         if content.trim().is_empty() {
             return;
         }
-        let content = without_leading_space(&content, handler.options);
+        let content = without_leading_space(&content, handler.options, handler.ctx);
 
         // ~keep Inside a list item the section starts at the item's content column (issue #583).
         if handler.ctx.in_list_item && !handler.ctx.in_table_cell && !output.is_empty() {
@@ -89,12 +89,13 @@ pub fn handle(
 /// ~keep buffer of their own, so nothing before them shows that the block starts there: text
 /// ~keep and inline elements write the space that they start with, and a link writes the space
 /// ~keep that its label starts with (issue #800). Two spaces or more are an indent (a code
-/// ~keep block), and the strict mode keeps all white space.
+/// ~keep block), and the strict mode and code keep all white space.
 fn without_leading_space<'content>(
     content: &'content str,
     options: &crate::options::ConversionOptions,
+    ctx: &crate::converter::context::Context,
 ) -> &'content str {
-    if options.whitespace_mode == crate::options::WhitespaceMode::Strict {
+    if crate::converter::utility::content::keeps_source_white_space(options, ctx) {
         return content;
     }
     match content.strip_prefix(' ') {

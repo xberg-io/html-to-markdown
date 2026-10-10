@@ -325,25 +325,17 @@ fn emit_autolink(data: &LinkData<'_>, handler: &mut HandlerContext<'_>) -> bool 
 /// Writes the white space that the content of a link starts with as one space before the link,
 /// when a space is owed there (issue #800).
 ///
-/// ~keep A code span keeps the white space of its text, so there the space of a label is not
-/// ~keep written a second time. A `<pre>` block shows the label as it is written and keeps it.
+/// ~keep Where the source white space is kept (the strict mode, code), the link is written as
+/// ~keep it was before that rule: nothing outside it.
 fn push_space_before_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
-    if edge_spaces.0 && writes_label_edge_spaces(handler) {
-        push_inline_prefix(handler.output, " ", handler.options);
+    if edge_spaces.0 && !keeps_source_white_space(handler.options, handler.context) {
+        push_inline_prefix(handler.output, " ", handler.options, handler.context);
     }
-}
-
-/// Whether the link writes the white space at the ends of its label outside the link: not in a
-/// code span (in code, and not in a `<pre>` block), and not in the strict white space mode,
-/// where the link is written as it was before that rule.
-const fn writes_label_edge_spaces(handler: &HandlerContext<'_>) -> bool {
-    let in_code_span = handler.context.in_code && !handler.context.in_code_block;
-    !in_code_span && !keeps_source_white_space(handler.options)
 }
 
 /// Writes the white space that the content of a link ends with as one space after the link.
 fn push_space_after_link(edge_spaces: (bool, bool), handler: &mut HandlerContext<'_>) {
-    if edge_spaces.1 && writes_label_edge_spaces(handler) {
+    if edge_spaces.1 && !keeps_source_white_space(handler.options, handler.context) {
         append_inline_suffix(
             handler.output,
             " ",
@@ -423,7 +415,7 @@ fn walk_label_content(
     handler: &HandlerContext<'_>,
 ) -> String {
     let link_context = label_context(data, handler, convert_as_inline);
-    let strict = keeps_source_white_space(handler.options);
+    let strict = keeps_source_white_space(handler.options, handler.context);
     let mut content = String::new();
     let mut after_image = false;
     for child in children {

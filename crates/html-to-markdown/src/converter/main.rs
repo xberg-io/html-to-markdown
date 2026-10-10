@@ -464,7 +464,7 @@ fn separate_from_block(
     // ~keep A heading or a link label converts inline, but in a cell the text after a block needs the break.
     // ~keep The strict mode keeps the white space of the source and writes no space of its own there.
     if ctx.convert_as_inline && !ctx.in_table_cell {
-        if !crate::converter::utility::content::keeps_source_white_space(options) {
+        if !crate::converter::utility::content::keeps_source_white_space(options, ctx) {
             separate_words_at_block_boundary(node, node_handle, parser, output, handler);
         }
         return;
