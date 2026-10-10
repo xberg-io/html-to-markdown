@@ -404,12 +404,14 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
     let mut idx = 0;
     let mut tag_ends = TagEndScan::new(bytes);
     let mut head = HeadScan::Before;
+    let mut text_start = 0;
 
     while idx < bytes.len() {
         let Some(offset) = memchr::memchr(b'<', &bytes[idx..]) else {
             break;
         };
         idx += offset;
+        head = head.after_text(bytes.get(text_start..idx).unwrap_or_default());
         let is_end_tag = bytes.get(idx + 1) == Some(&b'/');
         let name_start = idx + 1 + usize::from(is_end_tag);
         let is_template = matches_tag_start(bytes, name_start, b"template");
@@ -423,11 +425,15 @@ pub fn unwrap_kept_inert_elements(input: &str, hidden_content: HiddenContent) ->
             // ~keep looks like one of the two tags. Step over each as one unit.
             // ~keep A raw-text element starts with a tag that ends. For a tag start with no end
             // ~keep the raw-text scan would read to the end of the input and find nothing.
-            idx = if is_tag && tag_end.is_none() {
-                idx + 1
+            let unit_end = if is_tag && tag_end.is_none() {
+                None
             } else {
-                skip_opaque_region(bytes, idx).or(tag_end).unwrap_or(idx + 1)
+                skip_opaque_region(bytes, idx).or(tag_end)
             };
+            // ~keep The text that the head state reads starts after the unit. A `<` that starts
+            // ~keep no tag is text itself. A tag with no end holds the rest of the page.
+            text_start = unit_end.unwrap_or(if is_tag { bytes.len() } else { idx });
+            idx = unit_end.unwrap_or(idx + 1);
             continue;
         }
         let Some(tag_end) = tag_end else {

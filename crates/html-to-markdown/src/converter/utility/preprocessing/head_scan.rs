@@ -7,7 +7,8 @@ use super::markup::matches_tag_start;
 /// ~keep The head starts at a `<head>` tag that no element of the body precedes, and it ends
 /// ~keep once: a browser ignores a `<head>` tag after the head. The end tag of the head and the
 /// ~keep body tag are optional, so the head also ends at the first start tag of an element that
-/// ~keep it cannot hold: `<head><title>t</title><p>` has its paragraph in the body.
+/// ~keep it cannot hold: `<head><title>t</title><p>` has its paragraph in the body. Text that is
+/// ~keep not white space ends it too, and starts the body of a document with no `<head>` tag.
 /// ~keep
 /// ~keep What a `<template>` or a `<noscript>` of the head holds is not content of the head: a
 /// ~keep browser with scripting reads the first as a separate fragment and the second as text.
@@ -57,6 +58,17 @@ impl HeadScan {
             state => state,
         }
     }
+
+    /// The state after `text`, which is written between two tags.
+    ///
+    /// ~keep A browser keeps white space in the head and puts other text in the body. The text of
+    /// ~keep a `<title>`, a `<noscript>` and a `<template>` of the head is their content.
+    pub(super) fn after_text(self, text: &[u8]) -> Self {
+        match self {
+            Self::Before | Self::In if !text.iter().all(u8::is_ascii_whitespace) => Self::After,
+            state => state,
+        }
+    }
 }
 
 /// The elements whose start tag does not end the document head: the ones that a browser keeps
@@ -76,3 +88,53 @@ const HEAD_CONTENT_NAMES: [&[u8]; 13] = [
     b"template",
     b"title",
 ];
+
+#[cfg(test)]
+mod tests {
+    use super::HeadScan;
+
+    /// The state after the one tag that `markup` is.
+    fn after(state: HeadScan, markup: &str) -> HeadScan {
+        let is_end_tag = markup.starts_with("</");
+        state.after_tag(markup.as_bytes(), 1 + usize::from(is_end_tag), is_end_tag, false)
+    }
+
+    #[test]
+    fn should_end_the_head_at_its_end_tag_and_at_no_other_tag_that_it_holds() {
+        assert_eq!(after(HeadScan::In, "</head>"), HeadScan::After);
+        assert_eq!(after(HeadScan::In, "<head>"), HeadScan::In);
+        assert_eq!(after(HeadScan::In, "</p>"), HeadScan::In);
+        assert_eq!(after(HeadScan::In, "<p>"), HeadScan::After);
+    }
+
+    #[test]
+    fn should_end_a_title_and_a_noscript_of_the_head_at_their_own_end_tags() {
+        for (state, end_tag, start_tag) in [
+            (HeadScan::InTitle, "</title>", "<title>"),
+            (HeadScan::InNoscript, "</noscript>", "<noscript>"),
+        ] {
+            assert_eq!(after(state, end_tag), HeadScan::In);
+            assert_eq!(after(state, start_tag), state);
+            assert_eq!(after(state, "</i>"), state);
+            assert_eq!(after(state, "<p>"), state);
+        }
+    }
+
+    #[test]
+    fn should_end_the_head_at_text_that_is_not_white_space() {
+        for state in [HeadScan::Before, HeadScan::In] {
+            assert_eq!(state.after_text(b"a"), HeadScan::After);
+            assert_eq!(state.after_text(b" \n a"), HeadScan::After);
+            assert_eq!(state.after_text(b" \t\n\x0c\r"), state);
+            assert_eq!(state.after_text(b""), state);
+        }
+        for state in [
+            HeadScan::InTitle,
+            HeadScan::InNoscript,
+            HeadScan::InTemplate(1),
+            HeadScan::After,
+        ] {
+            assert_eq!(state.after_text(b"a"), state);
+        }
+    }
+}
