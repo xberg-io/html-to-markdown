@@ -12,6 +12,9 @@
 //! `src/converter/tier1/scanner.rs` for the fix, and the paired fix in `close_pre`'s
 //! Backticks branch (a fenced code block's closing fence must strip ALL trailing
 //! newlines, not just one, once a nested block element can leave more than one).
+//!
+//! Tier-1 hands a page with a block inside `<pre>` over to Tier-2. The four `<pre>` tests
+//! assert that handover and what `convert` writes for the page.
 
 #![cfg(feature = "testkit")]
 
@@ -39,6 +42,26 @@ fn run_tier2(html: &str) -> String {
     let mut options = tier1_friendly_options();
     options.tier_strategy = TierStrategy::Tier2;
     convert(html, Some(options)).unwrap().content.unwrap_or_default()
+}
+
+/// What `convert` writes for a page that Tier-1 hands over to Tier-2: a block inside `<pre>`.
+/// Tier-1 must refuse the page, and `convert` must write what Tier-2 writes.
+fn run_handed_over(html: &str) -> String {
+    let report = PrescanReport::default();
+    let tier1_out = tier1::run(html, &report, &tier1_friendly_options());
+    assert!(
+        matches!(tier1_out, Err(tier1::BailReason::Classifier)),
+        "tier1 must hand {html:?} over to tier2, got {tier1_out:?}"
+    );
+    let mut options = tier1_friendly_options();
+    options.tier_strategy = TierStrategy::Auto;
+    let out = convert(html, Some(options)).unwrap().content.unwrap_or_default();
+    let t2 = run_tier2(html);
+    assert_eq!(
+        out, t2,
+        "convert diverged from tier2\ninput: {html:?}\nconvert: {out:?}\ntier2: {t2:?}"
+    );
+    out
 }
 
 fn assert_tier1_matches_tier2(html: &str) {
@@ -93,7 +116,7 @@ fn blockquote_as_only_child_of_pre_has_no_blank_line_before_closing_fence() {
         "```\n> foo\n```\n",
         "tier2 ground truth changed; update this test"
     );
-    assert_eq!(run_tier1(html), "```\n> foo\n```\n");
+    assert_eq!(run_handed_over(html), "```\n> foo\n```\n");
 }
 
 #[test]
@@ -104,15 +127,19 @@ fn blockquote_followed_by_text_inside_pre_gets_blank_line() {
         "```\n> foo\n\nafter\n```\n",
         "tier2 ground truth changed; update this test"
     );
-    assert_eq!(run_tier1(html), "```\n> foo\n\nafter\n```\n");
+    assert_eq!(run_handed_over(html), "```\n> foo\n\nafter\n```\n");
 }
 
+/// Tier-1 does not write this shape any more: it hands the page over, so `convert` is what must
+/// match Tier-2.
 #[test]
 fn text_before_blockquote_inside_pre_still_matches() {
-    assert_tier1_matches_tier2("<pre>before<blockquote>foo</blockquote></pre>");
+    run_handed_over("<pre>before<blockquote>foo</blockquote></pre>");
 }
 
+/// Tier-1 does not write this shape any more: it hands the page over, so `convert` is what must
+/// match Tier-2.
 #[test]
 fn multiline_blockquote_inside_pre_with_text_on_both_sides_matches() {
-    assert_tier1_matches_tier2("<pre>a\n<blockquote>foo\nbar</blockquote>\nb</pre>");
+    run_handed_over("<pre>a\n<blockquote>foo\nbar</blockquote>\nb</pre>");
 }
