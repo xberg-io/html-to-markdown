@@ -57,14 +57,22 @@ impl<S> AnchorOriginStamper<S> {
     }
 }
 
-impl<S: TokenSink> TokenSink for AnchorOriginStamper<S> {
-    type Handle = S::Handle;
+impl TokenSink for AnchorOriginStamper<TreeBuilder<Handle, RcDom>> {
+    type Handle = Handle;
 
     fn process_token(&self, mut token: Token, line_number: u64) -> TokenSinkResult<Self::Handle> {
+        let is_tag = matches!(token, Token::TagToken(_));
+        if is_tag && self.inner.sink.repair_limit.get().is_some() {
+            return TokenSinkResult::Script(Rc::clone(&self.inner.sink.document));
+        }
         if let Token::TagToken(ref mut tag) = token {
             self.stamp(tag);
         }
-        self.inner.process_token(token, line_number)
+        let result = self.inner.process_token(token, line_number);
+        if is_tag && self.inner.sink.repair_limit.get().is_some() {
+            return TokenSinkResult::Script(Rc::clone(&self.inner.sink.document));
+        }
+        result
     }
 
     fn end(&self) {
@@ -82,7 +90,20 @@ impl<S: TokenSink> TokenSink for AnchorOriginStamper<S> {
 /// `Tokenizer<TreeBuilder<..>>` and leaves no room for a sink between the two. The input is
 /// already a `str`, so nothing the `TendrilSink` driver adds (UTF-8 decoding) is lost.
 pub fn parse_with_anchor_origins(html: &str) -> RcDom {
-    let tree_builder = TreeBuilder::new(RcDom::default(), TreeBuilderOpts::default());
+    // ~keep Formatting reconstruction can create hundreds of clones per source tag (#809).
+    // ~keep Both allocation and depth budgets apply to every HTML5 repair route (#808).
+    const MAX_REPAIR_DEPTH: usize = 512;
+    const MAX_NODE_MULTIPLIER: usize = 8;
+    const IMPLICIT_NODE_ALLOWANCE: usize = 16;
+    let markup_count = html
+        .as_bytes()
+        .windows(2)
+        .filter(|pair| pair[0] == b'<' && pair[1] != b'/')
+        .count();
+    let max_nodes = markup_count
+        .saturating_mul(MAX_NODE_MULTIPLIER)
+        .saturating_add(IMPLICIT_NODE_ALLOWANCE);
+    let tree_builder = TreeBuilder::new(RcDom::bounded(max_nodes, MAX_REPAIR_DEPTH), TreeBuilderOpts::default());
     let tokenizer = Tokenizer::new(
         AnchorOriginStamper {
             inner: tree_builder,
@@ -92,8 +113,16 @@ pub fn parse_with_anchor_origins(html: &str) -> RcDom {
     );
     let input = BufferQueue::default();
     input.push_back(StrTendril::from(html));
-    while !matches!(tokenizer.feed(&input), TokenizerResult::Done) {}
-    tokenizer.end();
+    while tokenizer.sink.inner.sink.repair_limit.get().is_none() {
+        if matches!(tokenizer.feed(&input), TokenizerResult::Done) {
+            break;
+        }
+    }
+    if tokenizer.sink.inner.sink.repair_limit.get().is_none() {
+        tokenizer.end();
+    } else {
+        tokenizer.sink.inner.end();
+    }
     TreeSink::finish(tokenizer.sink.inner.sink)
 }
 
@@ -221,6 +250,41 @@ mod tests {
     use super::*;
     use crate::rcdom::SerializableHandle;
     use html5ever::serialize::{SerializeOpts, serialize};
+
+    fn tree_size_and_depth(document: &Handle) -> (usize, usize) {
+        let mut work = vec![(Rc::clone(document), 0)];
+        let mut count = 0;
+        let mut max_depth = 0;
+        while let Some((node, depth)) = work.pop() {
+            count += 1;
+            max_depth = max_depth.max(depth);
+            work.extend(node.children.borrow().iter().map(|child| (Rc::clone(child), depth + 1)));
+        }
+        (count, max_depth)
+    }
+
+    #[test]
+    fn bounded_repair_should_cap_tree_builder_depth_on_every_shape() {
+        for prefix in ["<table><td>visible", "<b><p>one</p></b>", "<x-custom>"] {
+            let html = format!("{prefix}{}tail", "<div>".repeat(2_000));
+            let dom = parse_with_anchor_origins(&html);
+            let (nodes, depth) = tree_size_and_depth(&dom.document);
+            assert!(depth <= 514, "depth={depth}, nodes={nodes}");
+        }
+    }
+
+    #[test]
+    fn bounded_repair_should_cap_formatting_reconstruction_amplification() {
+        use std::fmt::Write;
+        let bold = (0..250).fold(String::new(), |mut bold, id| {
+            write!(bold, "<b id='b{id}'>").expect("writing to String succeeds");
+            bold
+        });
+        let html = format!("<p>{bold}x</p>{}", "<p>y</p>".repeat(1_000));
+        let dom = parse_with_anchor_origins(&html);
+        let (nodes, _) = tree_size_and_depth(&dom.document);
+        assert!(nodes <= (1_251 * 8) + 512, "amplified to {nodes} nodes");
+    }
 
     fn repaired(html: &str) -> String {
         let dom = parse_with_anchor_origins(html);

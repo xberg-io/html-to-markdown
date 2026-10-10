@@ -354,7 +354,7 @@ fn skip_to_after_gt(bytes: &[u8], from: usize) -> usize {
 ///
 /// These elements are always void in HTML5: they have no end tag, and `<br />` is
 /// equivalent to `<br>`.  We must leave them as-is when pre-processing XML-style
-/// self-closing syntax so that `repair_with_html5ever` can parse them correctly.
+/// self-closing syntax so that `repair_with_html5ever_bounded` can parse them correctly.
 const HTML5_VOID_ELEMENTS: &[&str] = &[
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr",
 ];
@@ -440,7 +440,7 @@ fn scan_tag_terminator(bytes: &[u8], start: usize) -> (bool, usize) {
 /// Expand XML-style self-closing tags to explicit open+close pairs.
 ///
 /// HTML5 does not honour the `/>` self-close syntax for non-void elements.  When
-/// `repair_with_html5ever` re-parses content that contains custom / namespaced tags
+/// `repair_with_html5ever_bounded` re-parses content that contains custom / namespaced tags
 /// written as `<ac:parameter name="foo" />`, the HTML5 parser treats the `/>` as `>`
 /// and leaves the element open.  Subsequent siblings then nest inside it, breaking
 /// visitor pre-order/post-order start/end pairing.
@@ -536,7 +536,7 @@ pub fn expand_xml_self_closing_tags(input: &str) -> String {
 /// semantics do not honour `/>` on unknown elements — without the expansion, the
 /// element would be left open and subsequent siblings would nest inside it, breaking
 /// visitor start/end event pairing (issue #331).
-pub fn repair_with_html5ever(input: &str) -> Option<String> {
+pub(super) fn repair_with_html5ever_bounded(input: &str) -> Option<(String, Option<crate::types::WarningKind>)> {
     use crate::converter::anchor_origin::{collapse_split_anchors, parse_with_anchor_origins};
     use crate::rcdom::SerializableHandle;
     use html5ever::serialize::{SerializeOpts, serialize};
@@ -547,12 +547,21 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
     // ~keep clones; collapse the empty halves before the tree is flattened to a string and
     // ~keep the provenance is gone (issue #493).
     let dom = parse_with_anchor_origins(&expanded);
+    let limit = dom.repair_limit.get();
+    if limit == Some(crate::types::WarningKind::TruncatedInput) {
+        tracing::warn!(target: "html_to_markdown::convert", "HTML tree repair exceeded its node budget; continuing with the original structure");
+        // ~keep Abandon amplified repair rather than discarding authored text (#809).
+        return Some((input.to_owned(), Some(crate::types::WarningKind::MalformedHtml)));
+    }
+    if let Some(kind) = limit {
+        tracing::warn!(target: "html_to_markdown::convert", ?kind, "HTML tree repair reached its depth limit; retaining the partial tree");
+    }
     collapse_split_anchors(&dom.document);
 
     let mut buf = Vec::with_capacity(input.len());
     let handle = SerializableHandle::from(dom.document);
     serialize(&mut buf, &handle, SerializeOpts::default()).ok()?;
-    String::from_utf8(buf).ok()
+    String::from_utf8(buf).ok().map(|html| (html, limit))
 }
 
 /// Rebuild a document when head content precedes an authored `<head>` element.
@@ -560,7 +569,10 @@ pub fn repair_with_html5ever(input: &str) -> Option<String> {
 /// The HTML tree builder places that content in an implicit head and ignores the later head
 /// start tag. The lightweight parser preserves source nesting, so its tree needs this targeted
 /// repair before either conversion tier reads metadata or renders the body.
-pub fn repair_head_content_before_explicit_head(input: &str) -> Option<String> {
+pub fn repair_head_content_before_explicit_head(input: &str) -> Option<(String, Option<crate::types::WarningKind>)> {
+    if super::repair_detection::needs_source_tree_repair(input) {
+        return repair_with_html5ever_bounded(input);
+    }
     let head_start = last_start_tag(input.as_bytes(), b"head")?;
     const HEAD_CONTENT: [&[u8]; 11] = [
         b"base",
@@ -586,7 +598,7 @@ pub fn repair_head_content_before_explicit_head(input: &str) -> Option<String> {
     if !document_head_search(dom.children(), dom.parser()).1 {
         return None;
     }
-    repair_with_html5ever(input)
+    repair_with_html5ever_bounded(input)
 }
 
 fn first_start_tag(bytes: &[u8], name: &[u8]) -> Option<usize> {
@@ -679,6 +691,17 @@ pub fn is_inline_element(tag_name: &str) -> bool {
             | "progress"
             | "meter"
     )
+}
+
+pub fn repair_limit_warning(kind: crate::types::WarningKind) -> crate::types::ProcessingWarning {
+    crate::types::ProcessingWarning {
+        kind,
+        message: if kind == crate::types::WarningKind::MalformedHtml {
+            "HTML tree repair exceeded its node budget; continued with the original structure.".to_owned()
+        } else {
+            "HTML tree repair reached the depth limit of 512; later input was skipped.".to_owned()
+        },
+    }
 }
 
 #[cfg(test)]

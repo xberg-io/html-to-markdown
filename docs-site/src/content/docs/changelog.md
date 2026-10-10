@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add `expand_abbreviations` and `include_blockquote_citations` options, enabled by default.
+- Keep one blank quote line between lists and blocks, preserving blank lines inside code.
+- Convert repeated unfinished tags, unclosed hidden elements, and inline list fragments with linear scans.
+
 ## [3.17.2] - 2026-10-06
 
 ### Changed
