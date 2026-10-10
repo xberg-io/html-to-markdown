@@ -152,6 +152,14 @@ impl TagDispatcher<'_, '_> {
                 self.output,
                 handler,
             ),
+            "td" | "th" if !handler.ctx.in_table_cell => {
+                crate::converter::block::container::handle_passthrough(
+                    self.node_handle,
+                    self.parser,
+                    self.output,
+                    handler,
+                );
+            }
             "wbr" | "thead" | "tbody" | "tfoot" | "tr" | "th" | "td" | "source" => {
                 crate::converter::block::container::handle_noop();
             }
