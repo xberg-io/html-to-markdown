@@ -38,7 +38,7 @@ use crate::converter::context::{Context, ContextParameters, InlineCollectorHandl
 use crate::types::structure_collector::StructureCollectorHandle;
 
 mod parse;
-use self::parse::{ParseOutcome, parse_for_conversion};
+use self::parse::{ParsedPage, parse_for_conversion};
 
 type ConversionOutput = (
     String,
@@ -77,16 +77,13 @@ pub fn convert_html_impl(
         document_base_href,
     } = parameters;
     let preserve_menu = options.preserve_tags.iter().any(|tag| tag.eq_ignore_ascii_case("menu"));
-    let mut preprocessed = prepare_html(html, preserve_menu);
-    let mut attempted_misnest_repair = false;
-    let (dom, dom_ctx) = loop {
-        let repaired = match parse_for_conversion(&preprocessed, preserve_menu, &mut attempted_misnest_repair)? {
-            ParseOutcome::Ready { dom, dom_ctx } => break (dom, dom_ctx),
-            ParseOutcome::Retry(repaired) => repaired,
-        };
-        preprocessed = repaired;
-    };
-    let preprocessed_len = preprocessed.len();
+    let preprocessed = prepare_html(html, preserve_menu);
+    let repaired_page = std::cell::OnceCell::new();
+    let ParsedPage {
+        dom,
+        dom_ctx,
+        len: preprocessed_len,
+    } = parse_for_conversion(&preprocessed, &repaired_page, preserve_menu)?;
     trace_parse_complete(&dom, preprocessed_len);
     let parser = dom.parser();
     let mut output = String::with_capacity(preprocessed_len.saturating_add(preprocessed_len / 4));

@@ -474,9 +474,10 @@ impl<'a> Tier1Scanner<'a> {
             self.text_start = self.pos;
             return Ok(());
         }
-        let (close_start, close_end) = match find_close_tag_range(self.bytes, open_end, name_lower) {
-            Some(pair) => pair,
-            None => (self.bytes.len(), self.bytes.len()),
+        // ~keep With no end tag, the start tag of the body content ends the `<head>`; only the
+        // ~keep HTML tree builder knows where, so Tier-2 converts the document (issue #772).
+        let Some((close_start, close_end)) = find_close_tag_range(self.bytes, open_end, name_lower) else {
+            return Err(BailReason::EofWithOpenBlock { open_count: 1 });
         };
         if self.state.head_range.is_none() {
             self.state.head_range = Some(open_end..close_start);

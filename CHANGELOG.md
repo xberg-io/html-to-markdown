@@ -98,6 +98,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (option `Quickstart`) and `Build` (option `Commands`) gave `**Getting Started**`, a line break,
   `Quickstart**Build**`, a line break and `Commands`, and now gives `Quickstart Commands`
   ([#776](https://github.com/xberg-io/html-to-markdown/issues/776)).
+- An element with no end tag ends where the HTML standard says: at the end tag of its parent, or
+  at a start tag that cannot be its content. Before, a paragraph with no end tag stayed open after
+  its parent ended, so each `<div class="note"><p>Note</div>` put the rest of the page two levels
+  deeper, and after 30 such blocks the page was cut at the depth limit with a
+  `depth_limit_exceeded` warning. A page of 80 such blocks and a footer gave 30 notes and no
+  footer; it gives 80 notes and the footer, with no warning. This changes the default output for
+  other pages that omit an end tag: `<div><p>one</div>tail` gave `onetail` and gives `one`, a
+  blank line, `tail`. `<blockquote><p>quoted</blockquote><p>after</p>` gave `after` inside the
+  quote and gives it after the quote. A paragraph after a table whose last cell has no end tag
+  was written into that cell and is written after the table.
+  `<nav><p>one</nav><aside><p>two</aside>tail` gave an empty document and gives `two` and `tail`.
+  `<table><thead><tr><th>a<th>b<tbody><tr><td>c<td>d</table>` gave a table of one cell and gives
+  both rows. A document with no `</head>` wrote its title into the body, or wrote nothing with
+  `extract_metadata = false`; it writes its body. `<p><ruby>a<rt>b<rt>c</ruby> after` gave
+  `a(b(c after))` and gives `a(b)(c) after`. `<h2>one<h3>two</h3>three` gave `## onetwothree` and
+  gives two headings and a paragraph. `<p>one<blockquote>two</blockquote>three` gave a blank line
+  between `one` and the quote and gives none, as the same input with `</p>` written always did.
+  A page that ends with an element open converts as the same page with every end tag written:
+  `<body><article><p>one</article><header>site</header><p>two</p>` gave `one`, `site` and `two`,
+  and gives `one` and `two`, because a `<header>` directly in the body is a page header.
+  `<body><main><p>one</main><header>late</header>` loses `late` by the same rule. A page that
+  omits an end tag is parsed a second time, by the HTML tree builder. Each of 11 recorded
+  Docusaurus pages of 33 to 143 KB takes 1.3 to 6.1 ms more (median 3.2 ms), which is 1.9 to 2.5
+  times as long, and the 70 recorded pages together take 290 ms in place of 252 ms. Pages with
+  every end tag are not affected. The second parse is given up when it holds more than 512
+  elements open, which is the depth a browser builds. Such a page converts as it did before, so
+  its omitted end tags are not repaired and it can still lose its tail. A repair that would
+  lose text is not used: the text of the page is counted before and after the second parse, and
+  a page that comes back with less text converts as it did before. A page that a `<frameset>`
+  replaces is such a page: the tree builder drops the text after `</frameset>`, and the
+  converter writes it. The omitted end tags of such a page are not repaired. A fragment with no
+  `<body>` tag keeps its top-level `<header>` when it is parsed a second time. Before, the second
+  parse read every fragment as a document and dropped that `<header>` as a page header:
+  `<header>h</header><b><p>one</p></b>` gave `**one**` and gives `h` and `**one**`, and
+  `<header>h</header><div><p>one</div>tail` gives `h`, `one` and `tail`. The depth limit and its
+  warning are unchanged for a page that really nests that deep. Past the depth limit, where the
+  converter warns, the number of empty tables before the cut can differ; no text is lost. Two
+  inputs are not repaired: an element that its parent ended and that gets its own end tag later
+  (`<div><p>one</div>two</p>rest</div>tail`), and an unquoted attribute value that runs into an
+  end tag (`<div class=a</div>`)
+  ([#772](https://github.com/xberg-io/html-to-markdown/issues/772)).
 - An inline `<svg>` keeps its text and no longer adds the words `SVG Image`. Its text is its
   `aria-label`, the `<title>` and `<desc>` of the graphic, its `<text>` elements and the HTML in a
   `<foreignObject>`, in document order. Style sheets, scripts, metadata and the content of `<defs>`
@@ -946,50 +987,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The session now reconstructs that layout after building. The gate went red without any
   change to this tree, when the runner's preinstalled Swift moved to 6.4.
 
-## [3.14.3] - 2026-09-19
-
-### Fixed
-
-- **A whitespace-only inline wrapper nested inside another wrapper keeps its separator**
-  ([#504](https://github.com/xberg-io/html-to-markdown/issues/504)).
-  `<h2><strong>Alpha</strong><strong><em><br></em></strong>Beta</h2>` rendered `## **Alpha**Beta`
-  from 3.14.2 on, where 3.14.1 kept the space, and a paragraph or table cell joined the words the
-  same way. Issue #501 taught the shared wrapper emitter that a whitespace-only body at a line
-  start contributes nothing, keyed on the destination buffer being empty -- but the destination
-  can also be an enclosing wrapper's fresh scratch buffer, which is empty mid-line, so the inner
-  `<em>`'s one space was dropped there and the outer `<strong>` came out empty. The line-start
-  rule now fires only on the block's own buffer, using the address test the text-node fallback
-  already uses for the same distinction, so `<mark>`, `<ins>`, `<del>`, `<sub>` and `<sup>`
-  wrappers move with it. A `<br>` inside a wrapper inside a table cell had the same shape on its
-  own since before 3.14.2 -- `<td>Alpha<em><br></em>Beta</td>` -- and now keeps its space too; a
-  cell's own leading `<br>` still contributes nothing. Tier 1 bails on adjacent emphasis, so the
-  change is Tier-2 only.
-- **A newline inside nested transparent inline wrappers still separates the words around it**
-  ([#505](https://github.com/xberg-io/html-to-markdown/issues/505)).
-  `<p><i>Alpha</i><span><span>\n</span></span>Beta</p>` rendered `*Alpha*Beta` where a browser
-  shows a space. Issues #430 and #491 taught the text-node fallback that a lone newline inside
-  an inline wrapper separates words when the wrapper is followed by inline content, but the check
-  looked one level up only: with a second wrapper the inner `<span>` is the last child of the
-  outer one and the newline was dropped. The check now climbs through every transparent inline
-  ancestor that has nothing after it and stops at the first block. Tier 1 already emitted the
-  space, so this was a live cross-tier divergence; the tiers now agree.
-- **An anchor that html5ever's adoption agency splits around a block is emitted once, not twice**
-  ([#493](https://github.com/xberg-io/html-to-markdown/issues/493)).
-  `<a href="/o"><div><a href="/i">Inner</a></div></a>` rendered `[](/o)` and then
-  `[](/o)[Inner](/i)`: the repair legitimately closes the outer `<a>` at the `<div>` and
-  reconstructs it inside, and the clone reached the renderer indistinguishable from an authored
-  element. A renderer rule keyed on shape would either drop a genuine empty anchor (`CommonMark`
-  example 484) or a deliberately authored duplicate, so the fix is at parse time: every `<a>`
-  start tag is stamped with a private origin id before the tree builder sees it, the clones
-  inherit it, and on the repaired tree the halves of a split anchor with no content of their own
-  are unwrapped in place. When no half has content the authored one is kept, so the destination
-  still appears once as `[](/o)`; `<a href="/o"><div>Text<a href="/i">Inner</a></div></a>` keeps
-  the half that carries `Text` and renders `[Text](/o)[Inner](/i)`. Input the repair never runs
-  on, and an anchor the repair leaves whole, are unchanged.
-
 ## Archives
 
-- [3.14.2 through 3.14.0](changelog-archive-6.md)
+- [3.14.3 through 3.14.0](changelog-archive-6.md)
 - [3.13.0 through 3.11.5](changelog-archive-1.md)
 - [3.11.4 through 3.6.21](changelog-archive-2.md)
 - [3.6.20 through 3.2.0](changelog-archive-3.md)
