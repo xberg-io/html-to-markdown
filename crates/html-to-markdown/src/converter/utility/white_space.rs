@@ -111,7 +111,9 @@ mod tests {
 
     #[test]
     fn a_no_break_space_and_the_other_unicode_spaces_are_characters() {
-        for character in ['\u{a0}', '\u{2002}', '\u{2003}', '\u{3000}', '\u{200b}', '\u{feff}', 'a'] {
+        for character in [
+            '\u{a0}', '\u{2002}', '\u{2003}', '\u{3000}', '\u{200b}', '\u{feff}', 'a',
+        ] {
             assert!(!is_collapsible(character), "{character:?}");
         }
     }
