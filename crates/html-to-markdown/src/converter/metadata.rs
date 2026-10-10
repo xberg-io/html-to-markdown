@@ -80,7 +80,7 @@ fn handle_head(node_handle: &NodeHandle, parser: &Parser, output: &mut String, h
     });
 
     #[cfg(feature = "metadata")]
-    if handler.ctx.metadata_wants_structured_data {
+    if handler.ctx.metadata_wants.structured_data {
         collect_json_ld_from_children(&children, parser, handler);
     }
 
@@ -153,7 +153,7 @@ fn handle_script(node_handle: &NodeHandle, parser: &Parser, _output: &mut String
     };
 
     #[cfg(feature = "metadata")]
-    if ctx.metadata_wants_structured_data
+    if ctx.metadata_wants.structured_data
         && let Some(collector) = ctx.metadata_collector.as_ref()
         && let Some(json) = json_ld_from_tag(tag, parser)
     {

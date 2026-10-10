@@ -235,6 +235,9 @@ fn prepare_open_state(
     {
         return Err(BailReason::InlineMarkerNotReproduced);
     }
+    if matches!(name_lower, b"select" | b"option" | b"optgroup" | b"datalist") {
+        return Err(BailReason::FormControl);
+    }
     let is_link_block = matches!(
         spec.kind,
         TagKind::Block
@@ -310,13 +313,35 @@ fn emit_open_kind(
         TagKind::Block => open_block_container(state, name_lower, options.br_in_tables),
         TagKind::Summary => open_summary_container(state, options.br_in_tables)?,
         TagKind::Figcaption => open_figcaption(state),
-        // ~keep Button: no leading separator (matches Tier-2 handle_button which
-        // does nothing on open).  Close-side `\n\n` is emitted by close_button.
-        TagKind::Button => {}
+        TagKind::Button => open_button(state)?,
         TagKind::Inline => {}
         _ => {}
     }
 
+    Ok(())
+}
+
+/// ~keep Button: nothing on open. `close_button` writes the space before its text and
+/// ~keep the `\n\n` after it, as Tier-2 `handle_button` does. In a line that goes on
+/// ~keep after the control, Tier-2 reads the text that follows it instead. In code Tier-2
+/// ~keep writes neither.
+fn open_button(state: &Tier1State) -> Result<(), BailReason> {
+    if state.escape_ctx.intersects(EscapeCtx::CODE | EscapeCtx::PRE) {
+        return Err(BailReason::FormControl);
+    }
+    let in_inline_container = state.stack.iter().any(|frame| {
+        matches!(
+            frame.spec.kind,
+            TagKind::Heading(_) | TagKind::Summary | TagKind::Figcaption | TagKind::Link | TagKind::TableCaption
+        )
+    });
+    let in_inline_element = state
+        .stack
+        .last()
+        .is_some_and(|parent| crate::converter::form::spacing::line_goes_on_in(Some(parent.spec)));
+    if in_inline_container || in_inline_element {
+        return Err(BailReason::FormControl);
+    }
     Ok(())
 }
 

@@ -58,12 +58,9 @@ fn emit_void(
     // ~keep A void element closes the "just closed a custom element" boundary
     // window too (see the field's doc comment on `Tier1State`).
     state.last_closed_custom_element = false;
-    if name_lower == b"input"
-        && attrs.iter().any(|(key, value)| {
-            key.eq_ignore_ascii_case(b"type") && value.is_some_and(|v| v.eq_ignore_ascii_case(b"checkbox"))
-        })
-    {
-        // ~keep Tier-2 writes the list item that holds a checkbox as a task item (issue #632).
+    let input_type = (name_lower == b"input").then(|| find_attr(attrs, b"type").unwrap_or_default());
+    if input_type.is_some_and(|input_type| input_type.eq_ignore_ascii_case(b"checkbox")) {
+        // ~keep Tier-2 writes a list item that starts with a checkbox as a task item (issue #632).
         if state
             .stack
             .iter()
@@ -674,16 +671,15 @@ fn close_figcaption(state: &mut Tier1State, _frame: &OpenTag) {
     dest.push_str("*\n\n");
 }
 
-/// Close a `<button>` (Phase T).  When the button produced visible content,
-/// emit `\n\n` after.  Skipped in table cells (cells stay one logical line).
+/// Close a `<button>` (Phase T).  When the button produced visible content, write the space
+/// that keeps it a word of its own before it and `\n\n` after it.  The `\n\n` is skipped in
+/// table cells (cells stay one logical line).
 ///
-/// Mirrors the block-separator tail of Tier-2 `form/elements.rs`'s `handle_button`:
-/// ```text
-/// if !ctx.convert_as_inline && output.len() > start_len {
-///     output.push_str("\n\n");
-/// }
-/// ```
+/// Mirrors Tier-2 `form/elements.rs`'s `write_line_end_control`, with the same `ControlStart`.
 fn close_button(state: &mut Tier1State, frame: &OpenTag) {
+    let dest = state.cell_or_output_mut();
+    let content_start = clamp_to_char_boundary(dest, frame.content_start);
+    crate::converter::form::spacing::ControlStart::at(dest, content_start).finish(dest);
     if state.in_table_cell() {
         return;
     }

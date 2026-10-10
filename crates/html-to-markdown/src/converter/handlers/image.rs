@@ -48,7 +48,7 @@ struct ImageData<'a> {
 pub fn handle_img(tag: &tl::HTMLTag, handler: HandlerContext<'_>) {
     let data = image_data(tag, &handler);
     #[cfg(feature = "metadata")]
-    let metadata = handler.context.metadata_wants_images.then(|| image_metadata(tag));
+    let metadata = handler.context.metadata_wants.images.then(|| image_metadata(tag));
     #[cfg(feature = "inline-images")]
     collect_inline_image(tag, &data, handler.context);
     let inline_data = handler

@@ -40,13 +40,15 @@ pub struct ContextParameters {
     pub own_page: crate::converter::url_resolve::OwnPage,
 }
 
+/// The kinds of metadata the collector asks for, read once when the context is made.
 #[cfg(feature = "metadata")]
-struct MetadataPreferences {
-    document: bool,
-    headers: bool,
-    links: bool,
-    images: bool,
-    structured_data: bool,
+#[derive(Clone, Copy)]
+pub struct MetadataPreferences {
+    pub(crate) document: bool,
+    pub(crate) headers: bool,
+    pub(crate) links: bool,
+    pub(crate) images: bool,
+    pub(crate) structured_data: bool,
 }
 
 #[cfg(feature = "metadata")]
@@ -125,6 +127,9 @@ pub struct Context {
     pub(crate) blockquote_depth: usize,
     /// Are we inside a table cell (td/th)?
     pub(crate) in_table_cell: bool,
+    /// Are we inside a table cell (td/th) that holds only inputs and white space? A checkbox
+    /// writes its state there. [`Self::for_cell`] decides it where the cell opens.
+    pub(crate) in_cell_of_inputs: bool,
     /// Are we inside a *layout*-table cell, whose row renders as a list item rather than a
     /// pipe row?
     ///
@@ -304,15 +309,8 @@ pub struct Context {
     /// Shared collector for metadata when enabled.
     pub(crate) metadata_collector: Option<crate::metadata::MetadataCollectorHandle>,
     #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_document: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_headers: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_links: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_images: bool,
-    #[cfg(feature = "metadata")]
-    pub(crate) metadata_wants_structured_data: bool,
+    /// The kinds of metadata the collector asks for; all false without a collector.
+    pub(crate) metadata_wants: MetadataPreferences,
     #[cfg(feature = "visitor")]
     /// Optional visitor for custom HTML traversal callbacks.
     pub(crate) visitor: Option<crate::visitor::VisitorHandle>,
@@ -379,6 +377,7 @@ impl Context {
             in_ordered_list: false,
             blockquote_depth: 0,
             in_table_cell: false,
+            in_cell_of_inputs: false,
             in_layout_cell: false,
             convert_as_inline: options.convert_as_inline,
             inline_depth: 0,
@@ -426,15 +425,7 @@ impl Context {
             #[cfg(feature = "metadata")]
             metadata_collector: parameters.metadata_collector,
             #[cfg(feature = "metadata")]
-            metadata_wants_document: metadata.document,
-            #[cfg(feature = "metadata")]
-            metadata_wants_headers: metadata.headers,
-            #[cfg(feature = "metadata")]
-            metadata_wants_links: metadata.links,
-            #[cfg(feature = "metadata")]
-            metadata_wants_images: metadata.images,
-            #[cfg(feature = "metadata")]
-            metadata_wants_structured_data: metadata.structured_data,
+            metadata_wants: metadata,
             #[cfg(feature = "visitor")]
             visitor: parameters.visitor,
             #[cfg(feature = "visitor")]
@@ -482,6 +473,31 @@ impl Context {
                 crate::converter::utility::escaping::ends_with_hard_break(output)
             },
             ..self.clone()
+        }
+    }
+
+    /// The context for the children of the table cell `cell_handle`: `self` with the answer to
+    /// "does this cell hold only inputs" for that cell.
+    ///
+    /// ~keep Each walk of a cell's children takes its context from here, so the cell is read one
+    /// ~keep time for each walk and not one time for each control in it. A row shares one context
+    /// ~keep between its cells: this copies it only for a cell whose answer differs.
+    pub(crate) fn for_cell(
+        &self,
+        cell_handle: tl::NodeHandle,
+        parser: &tl::Parser,
+        dom_ctx: &crate::converter::DomContext,
+        br_in_tables: bool,
+    ) -> std::borrow::Cow<'_, Self> {
+        let in_cell_of_inputs =
+            crate::converter::block::table::scanner::cell_holds_only_inputs(cell_handle, parser, dom_ctx, br_in_tables);
+        if in_cell_of_inputs == self.in_cell_of_inputs {
+            std::borrow::Cow::Borrowed(self)
+        } else {
+            std::borrow::Cow::Owned(Self {
+                in_cell_of_inputs,
+                ..self.clone()
+            })
         }
     }
 
