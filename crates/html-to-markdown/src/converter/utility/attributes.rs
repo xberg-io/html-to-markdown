@@ -32,6 +32,23 @@ pub fn decoded_attribute<'a>(tag: &'a tl::HTMLTag<'a>, name: &'a str) -> Option<
     })
 }
 
+/// Whether the value of a `style` attribute sets `display` or `white-space`.
+///
+/// Such an element can be a box of its own (`display: inline-block`) or keep its line ends
+/// (`white-space: pre`). Any other `style` value, the empty one too, changes neither.
+///
+/// ~keep This is no CSS parser: a declaration ends at each `;`, and its property name is the
+/// ~keep text before the first `:`. A `;` in a quoted value starts a declaration here.
+/// ~keep Both converters ask it, on the bytes of the attribute value.
+pub fn style_sets_display_or_white_space(style: &[u8]) -> bool {
+    style.split(|&byte| byte == b';').any(|declaration| {
+        declaration.iter().position(|&byte| byte == b':').is_some_and(|colon| {
+            let name = declaration[..colon].trim_ascii();
+            name.eq_ignore_ascii_case(b"display") || name.eq_ignore_ascii_case(b"white-space")
+        })
+    })
+}
+
 /// Check if a tag has main content semantics based on role or class.
 pub fn tag_has_main_semantics(tag: &tl::HTMLTag) -> bool {
     if let Some(Some(role)) = tag.attributes().get("role") {
@@ -180,4 +197,58 @@ pub fn has_semantic_content_ancestor(node_handle: &tl::NodeHandle, parser: &tl::
         current_id = parent_id;
     }
     false
+}
+
+#[cfg(test)]
+mod tests {
+    use super::style_sets_display_or_white_space;
+
+    #[test]
+    fn a_style_with_a_display_or_a_white_space_declaration_sets_one() {
+        for style in [
+            "display:inline-block",
+            "display:block",
+            "white-space:pre",
+            "white-space: pre-wrap",
+            "DISPLAY:none",
+            "White-Space:PRE",
+            "display : inline",
+            " display\t:\tinline",
+            "\n white-space \n : pre",
+            "color:red;display:block",
+            "color:red; white-space:pre;",
+            ";;display:block",
+            "display:",
+        ] {
+            assert!(style_sets_display_or_white_space(style.as_bytes()), "{style:?}");
+        }
+    }
+
+    #[test]
+    fn a_style_with_no_display_and_no_white_space_declaration_sets_none() {
+        for style in [
+            "",
+            " ",
+            ";",
+            "color:red",
+            "color:red;",
+            "display",
+            "display;color:red",
+            "--display:block",
+            "text-white-space-x:pre",
+            "white-space-collapse:preserve",
+            "displays:block",
+            "white space:pre",
+            "color:display",
+            "content:\"display:block\"",
+            ":display",
+        ] {
+            assert!(!style_sets_display_or_white_space(style.as_bytes()), "{style:?}");
+        }
+    }
+
+    #[test]
+    fn a_semicolon_in_a_quoted_value_starts_a_declaration() {
+        assert!(style_sets_display_or_white_space(b"content:\"a;display:x\""));
+    }
 }

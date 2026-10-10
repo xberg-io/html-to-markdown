@@ -470,7 +470,9 @@ fn inline_follows_comments(bytes: &[u8], lt_pos: usize) -> bool {
 /// Whether the text that follows the markup at `bytes[lt_pos]` starts with a zero-width space.
 /// The scan looks into the elements that only wrap text, leaves such an open element of
 /// `stack` at its end tag and passes the empty ones, comments and `<wbr>`. Any other element,
-/// an element with a `style` attribute and the end of any other parent end the scan.
+/// an element whose `style` attribute sets `display` or `white-space` and the end of any
+/// other parent end the scan. Inside an open element with such a `style` attribute the answer
+/// is no.
 ///
 /// ~keep Mirrors Tier-2's `zero_width_space_follows`, which asks the same of the tree.
 fn zero_width_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) -> bool {
@@ -486,7 +488,7 @@ fn zero_width_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) ->
             let window_end = clamp_to_char_boundary(html, (pos + 40).min(bytes.len()));
             let text_end = memchr::memchr(b'<', &bytes[pos..window_end]).map_or(window_end, |offset| pos + offset);
             let text = crate::text::decode_html_entities_cow(&html[pos..text_end]);
-            return text.starts_with(ZERO_WIDTH_SPACE);
+            return text.starts_with(ZERO_WIDTH_SPACE) && !open_element_sets_display_or_white_space(bytes, stack);
         }
         match bytes.get(pos + 1) {
             Some(b'!') => match skip_bang(bytes, pos) {
@@ -528,7 +530,8 @@ fn zero_width_space_is_upcoming(html: &str, lt_pos: usize, stack: &[OpenTag]) ->
 
 /// Where the open tag of an element that only wraps text (or of a `<wbr>`) ends, and whether
 /// it closes itself. `name` is the lowercase name of the tag and its attributes start at
-/// `attributes_start`. `None` for any other element and for one with a `style` attribute.
+/// `attributes_start`. `None` for any other element and for one whose `style` attribute sets
+/// `display` or `white-space`.
 fn plain_text_wrapper_open_end(bytes: &[u8], name: &[u8], attributes_start: usize) -> Option<(usize, bool)> {
     use crate::converter::utility::content::is_text_wrapper;
 
@@ -536,15 +539,37 @@ fn plain_text_wrapper_open_end(bytes: &[u8], name: &[u8], attributes_start: usiz
         return None;
     }
     let (close, self_closing) = parse::find_tag_close(bytes, attributes_start)?;
+    (!open_tag_sets_display_or_white_space(bytes, attributes_start, close)).then_some((close, self_closing))
+}
+
+/// Whether the open tag whose attributes are `bytes[attributes_start..close]` has a `style`
+/// attribute that sets `display` or `white-space`.
+fn open_tag_sets_display_or_white_space(bytes: &[u8], attributes_start: usize, close: usize) -> bool {
+    use crate::converter::utility::attributes::style_sets_display_or_white_space;
+
     // ~keep An attribute name has no letter case in HTML, and Tier-2's parser gives it in lower case.
-    let has_style = parse::collect_attrs(bytes, attributes_start, close)
+    // ~keep A browser reads the first of two `style` attributes, so the first decides.
+    parse::collect_attrs(bytes, attributes_start, close)
         .iter()
-        .any(|(key, _)| key.eq_ignore_ascii_case(b"style"));
-    (!has_style).then_some((close, self_closing))
+        .find(|(key, _)| key.eq_ignore_ascii_case(b"style"))
+        .and_then(|(_, value)| *value)
+        .is_some_and(style_sets_display_or_white_space)
+}
+
+/// Whether an open element of `stack` has a `style` attribute that sets `display` or
+/// `white-space`.
+///
+/// ~keep Such an element can keep its line ends (`white-space: pre`), and its content inherits
+/// ~keep that. Mirrors Tier-2's `is_inside_display_or_white_space_style`.
+fn open_element_sets_display_or_white_space(bytes: &[u8], stack: &[OpenTag]) -> bool {
+    stack.iter().any(|frame| {
+        parse::find_tag_close(bytes, frame.name_range.end)
+            .is_some_and(|(close, _)| open_tag_sets_display_or_white_space(bytes, frame.name_range.end, close))
+    })
 }
 
 /// Whether the end tag at `bytes[lt_pos]` closes `frame`, and `frame` is an element that only
-/// wraps text and has no `style` attribute.
+/// wraps text and has no `style` attribute that sets `display` or `white-space`.
 fn closes_plain_text_wrapper(bytes: &[u8], lt_pos: usize, frame: &OpenTag) -> bool {
     let name_start = lt_pos + 2;
     let closed = &bytes[name_start..parse::scan_tag_name(bytes, name_start)];

@@ -173,9 +173,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of an element that only wraps text: `<p><span>one\n</span>&#8203;two</p>` gave `one`, a space,
   the zero-width space and `two`, and gives `one`, the zero-width space and `two`. Two or more
   line breaks are one line break there: `<p>one\n\n<span></span>&#8203;two</p>` gave two
-  paragraphs and gives one word. A space that is not a line break stays, and so does a line break
-  before or in an element with a `style` attribute. A line break directly before the zero-width
-  space in the same text is not changed: `<p>one\n&#8203;two</p>` keeps its line break.
+  paragraphs and gives one word. A space that is not a line break stays. The converter keeps the
+  space before a zero-width space only when the `style` attribute of the element between them, or
+  of an element around them, sets `display` or `white-space`:
+  `<p>one\n<span style="display:inline-block"></span>&#8203;two</p>` keeps the space, and
+  `<p>one\n<span style="color:red"></span>&#8203;two</p>` gives one word. A line break directly
+  before the zero-width space in the same text is not changed: `<p>one\n&#8203;two</p>` keeps its
+  line break.
 
 - A `<footer>`, a `<section>`, an `<article>`, an `<aside>`, a `<header>` and a `<main>` start with
   no space. White space at the start of a block is no space, and the full converter wrote one

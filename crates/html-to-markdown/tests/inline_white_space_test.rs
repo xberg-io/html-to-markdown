@@ -419,10 +419,14 @@ fn a_space_beside_a_zero_width_space_is_kept() {
             "one \u{200b}two\n",
         ),
         ("<div><span>one\n</span></div>\u{200b}two", "one\n\n\u{200b}two\n"),
-        // ~keep An element with a style can be a box of its own, and a browser keeps the
-        // ~keep line end before such a box.
+        // ~keep An element whose style sets `display` or `white-space` can be a box of its
+        // ~keep own or keep its line ends, and a browser keeps the line end beside it.
         (
             "<p>one\n<span style=\"display:inline-block\"></span>\u{200b}two</p>",
+            "one \u{200b}two\n",
+        ),
+        (
+            "<p>one\n<span style=\"display:inline-block\">\u{200b}two</span></p>",
             "one \u{200b}two\n",
         ),
         (
@@ -430,8 +434,65 @@ fn a_space_beside_a_zero_width_space_is_kept() {
             "| one \u{200b}two |\n| -------- |\n",
         ),
         (
+            "<p>one\n<span style=\"white-space:pre\">\u{200b}two</span></p>",
+            "one \u{200b}two\n",
+        ),
+        (
             "<pre>one\n<span></span>\u{200b}two</pre>",
             "```\none\n\u{200b}two\n```\n",
+        ),
+    ]);
+}
+
+/// A `style` attribute that sets neither `display` nor `white-space` changes nothing: the
+/// element is no box of its own, and the line end before the zero-width space is no space.
+#[test]
+fn a_style_that_sets_no_display_and_no_white_space_keeps_no_space_before_a_zero_width_space() {
+    assert_on_both(&[
+        (
+            "<p>one\n<span style=\"color:red\"></span>\u{200b}two</p>",
+            "one\u{200b}two\n",
+        ),
+        (
+            "<p>one\n<span style=\"color:red\">\u{200b}two</span></p>",
+            "one\u{200b}two\n",
+        ),
+        (
+            "<p><span style=\"color:red\">one\n</span>\u{200b}two</p>",
+            "one\u{200b}two\n",
+        ),
+        ("<p>one\n<span style=\"\"></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n<span style=\"\">\u{200b}two</span></p>", "one\u{200b}two\n"),
+        ("<p>one\n<span style></span>\u{200b}two</p>", "one\u{200b}two\n"),
+        ("<p>one\n<span style>\u{200b}two</span></p>", "one\u{200b}two\n"),
+        (
+            "<table><tr><td>one\n<span style=\"color:red\"></span>\u{200b}two</td></tr></table>",
+            "| one\u{200b}two |\n| ------- |\n",
+        ),
+        (
+            "<pre>one\n<span style=\"color:red\"></span>\u{200b}two</pre>",
+            "```\none\n\u{200b}two\n```\n",
+        ),
+    ]);
+}
+
+/// Inside an element whose `style` attribute sets `white-space`, the line end before a
+/// zero-width space stays: the element can keep its line ends, and its content inherits that.
+#[test]
+fn a_line_end_before_a_zero_width_space_stays_inside_a_style_that_sets_white_space() {
+    assert_on_both(&[
+        (
+            "<div style=\"white-space:pre\">one\n<!-- c -->\u{200b}two</div>",
+            "one\n\u{200b}two\n",
+        ),
+        // ~keep Chrome shows a line end in the next two; Markdown shows the line end as this space.
+        (
+            "<p style=\"white-space: pre-wrap\">one\n<!-- c -->\u{200b}two</p>",
+            "one \u{200b}two\n",
+        ),
+        (
+            "<div style=\"white-space:pre\">one\n<b>\u{200b}two</b></div>",
+            "one **\u{200b}two**\n",
         ),
     ]);
 }
@@ -442,7 +503,7 @@ fn a_space_beside_a_zero_width_space_is_kept() {
 fn the_style_attribute_name_is_read_in_any_letter_case() {
     assert_on_both(&[
         (
-            "<p>one\n<span STYLE=\"color:red\">&#8203;two</span></p>",
+            "<p>one\n<span STYLE=\"white-space:pre\">&#8203;two</span></p>",
             "one \u{200b}two\n",
         ),
         (
@@ -454,8 +515,16 @@ fn the_style_attribute_name_is_read_in_any_letter_case() {
             "one \u{200b}two\n",
         ),
         (
-            "<table><tr><td>one\n<span STYLE=\"color:red\">&#8203;two</span></td></tr></table>",
+            "<table><tr><td>one\n<span STYLE=\"display:inline-block\">&#8203;two</span></td></tr></table>",
             "| one \u{200b}two |\n| -------- |\n",
+        ),
+        (
+            "<p>one\n<span STYLE=\"color:red\">&#8203;two</span></p>",
+            "one\u{200b}two\n",
+        ),
+        (
+            "<table><tr><td>one\n<span STYLE=\"color:red\">&#8203;two</span></td></tr></table>",
+            "| one\u{200b}two |\n| ------- |\n",
         ),
     ]);
 }

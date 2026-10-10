@@ -225,9 +225,10 @@ pub fn br_follows_enclosing_elements(id: u32, parser: &tl::Parser, dom_ctx: &Dom
 /// Whether the text that follows `node_handle` starts with a zero-width space. The walk looks
 /// into the elements that only wrap text, leaves such an element at its end (the text node can
 /// be the last content of one) and passes the empty ones, comments and `<wbr>`. Any other
-/// element is content of its own and ends the walk, and so does an element with a `style`
-/// attribute: it can be a box of its own (`display: inline-block`), and a browser keeps the
-/// line end before such a box.
+/// element is content of its own and ends the walk, and so does an element whose `style`
+/// attribute sets `display` or `white-space`: it can be a box of its own
+/// (`display: inline-block`), and a browser keeps the line end before such a box. Inside an
+/// element with such a `style` attribute the answer is no.
 ///
 /// ~keep Tier-1 answers the same question on the bytes (`zero_width_space_is_upcoming`).
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -255,7 +256,8 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
                     if text.is_empty() {
                         break;
                     }
-                    return text.starts_with(ZERO_WIDTH_SPACE);
+                    return text.starts_with(ZERO_WIDTH_SPACE)
+                        && !is_inside_display_or_white_space_style(node_handle.get_inner(), parser, dom_ctx);
                 }
                 Some(tl::Node::Tag(_)) => {
                     if !is_plain_text_wrapper(node.get_inner(), parser, dom_ctx) {
@@ -277,7 +279,8 @@ pub fn zero_width_space_follows(node_handle: &tl::NodeHandle, parser: &tl::Parse
     }
 }
 
-/// Whether the element `id` only wraps text (or is a `<wbr>`) and has no `style` attribute.
+/// Whether the element `id` only wraps text (or is a `<wbr>`) and its `style` attribute, if
+/// it has one, sets neither `display` nor `white-space`.
 fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
     use crate::converter::utility::content::is_text_wrapper;
 
@@ -287,7 +290,37 @@ fn is_plain_text_wrapper(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> 
     dom_ctx
         .tag_info(id, parser)
         .is_some_and(|info| info.name == "wbr" || is_text_wrapper(&info.name))
-        && tag.attributes().get("style").is_none()
+        && !tag_sets_display_or_white_space(tag)
+}
+
+/// Whether the `style` attribute of `tag` sets `display` or `white-space`.
+fn tag_sets_display_or_white_space(tag: &tl::HTMLTag) -> bool {
+    use crate::converter::utility::attributes::style_sets_display_or_white_space;
+
+    tag.attributes()
+        .get("style")
+        .flatten()
+        .is_some_and(|style| style_sets_display_or_white_space(style.as_bytes()))
+}
+
+/// Whether the node `id` is inside an element whose `style` attribute sets `display` or
+/// `white-space`.
+///
+/// ~keep Such an element can keep its line ends (`white-space: pre`), and its content inherits
+/// ~keep that: a browser then shows the line end before a zero-width space.
+/// ~keep Tier-1 answers the same question on its open elements
+/// ~keep (`open_element_sets_display_or_white_space`).
+fn is_inside_display_or_white_space_style(id: u32, parser: &tl::Parser, dom_ctx: &DomContext) -> bool {
+    let mut current = id;
+    while let Some(parent) = dom_ctx.parent_of(current) {
+        if let Some(tl::Node::Tag(tag)) = tl::NodeHandle::new(parent).get(parser)
+            && tag_sets_display_or_white_space(tag)
+        {
+            return true;
+        }
+        current = parent;
+    }
+    false
 }
 
 /// Whether the content of the element `id` starts with a block. White space and comments are
